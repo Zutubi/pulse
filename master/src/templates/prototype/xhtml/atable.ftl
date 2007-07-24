@@ -1,14 +1,14 @@
 <table width="60%">
 <#assign tablewidth = table.columns?size + 1/>
     <tr>
-        <th class="heading" colspan="${tablewidth}">${"table.header.label"?i18n}</th>
+        <th class="heading" colspan="${tablewidth}">${table.heading?html}</th>
     </tr>
     <tr>
 <#list table.columns as column>
-<#assign header>${column.name}.label</#assign>
-        <th class="content" colspan="1">${header?i18n}</th>
+<#assign header = "${column.name}.label"/>
+        <th class="content">${header?i18n}</th>
 </#list>
-        <th class="content" colspan="1">${"actions.label"?i18n}</th>
+        <th class="content">${"actions.label"?i18n}</th>
     </tr>
 <#if data?exists && data?size &gt; 0>
 <#list data as item>

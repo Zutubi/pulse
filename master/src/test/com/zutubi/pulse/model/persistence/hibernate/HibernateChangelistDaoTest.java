@@ -4,6 +4,8 @@ import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.persistence.ChangelistDao;
+import com.zutubi.pulse.prototype.config.user.UserAliasConfiguration;
+import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 import com.zutubi.util.Constants;
 
 import java.util.Date;
@@ -144,7 +146,7 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        List<Changelist> changes = changelistDao.findLatestByUser(new User("login1", "Login One"), 10);
+        List<Changelist> changes = changelistDao.findLatestByUser(createUser(), 10);
         assertEquals(3, changes.size());
         assertEquals("4", changes.get(0).getRevision().getRevisionString());
         assertEquals("3", changes.get(1).getRevision().getRevisionString());
@@ -162,9 +164,9 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        User user = new User("login1", "Login One");
-        user.addAlias("alias1");
-        user.addAlias("alias3");
+        User user = createUser();
+        user.getConfig().getPreferences().getAlias().add(new UserAliasConfiguration("alias1"));
+        user.getConfig().getPreferences().getAlias().add(new UserAliasConfiguration("alias3"));
 
         List<Changelist> changes = changelistDao.findLatestByUser(user, 10);
         assertEquals(4, changes.size());
@@ -172,6 +174,14 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
         assertEquals("4", changes.get(1).getRevision().getRevisionString());
         assertEquals("3", changes.get(2).getRevision().getRevisionString());
         assertEquals("1", changes.get(3).getRevision().getRevisionString());
+    }
+
+    private User createUser()
+    {
+        User user = new User("login1", "Login One");
+        UserConfiguration config = new UserConfiguration("login1", "Login One");
+        user.setConfig(config);
+        return user;
     }
 
     public void testLookupByRevision()

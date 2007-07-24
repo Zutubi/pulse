@@ -18,13 +18,13 @@ import java.util.List;
 public abstract class ScmConfiguration extends AbstractConfiguration
 {
     @Wizard.Ignore
-    private boolean monitor;
+    private boolean monitor = true;
 
     private CheckoutScheme checkoutScheme;
     
     @ControllingCheckbox(dependentFields = {"pollingInterval"})
     @Wizard.Ignore
-    private boolean customPollingInterval;
+    private boolean customPollingInterval = false;
     /**
      * Number of minutes between polls of this SCM.
      */
@@ -34,7 +34,7 @@ public abstract class ScmConfiguration extends AbstractConfiguration
     
     @ControllingCheckbox(dependentFields = {"quietPeriod"})
     @Wizard.Ignore
-    private boolean quietPeriodEnabled;
+    private boolean quietPeriodEnabled = false;
     /**
      * Quiet period, i.e. idle time to wait for between checkins before
      * raising a change event, measured in minutes.

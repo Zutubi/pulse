@@ -3,6 +3,7 @@ package com.zutubi.pulse.web.project;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.prototype.config.user.UserSettingsConfiguration;
 
 import java.util.List;
 
@@ -140,8 +141,8 @@ public class ProjectHomeAction extends ProjectActionSupport
             }
 
             User user = getLoggedInUser();
-            summaryColumns = new BuildColumns(user == null ? User.getDefaultProjectColumns() : user.getProjectSummaryColumns(), projectManager);
-            recentColumns = new BuildColumns(user == null ? User.getDefaultProjectColumns() : user.getProjectRecentColumns(), projectManager);
+            summaryColumns = new BuildColumns(user == null ? UserSettingsConfiguration.defaultProjectColumns() : user.getPreferences().getSettings().getProjectSummaryColumns(), projectManager);
+            recentColumns = new BuildColumns(user == null ? UserSettingsConfiguration.defaultProjectColumns() : user.getPreferences().getSettings().getProjectRecentColumns(), projectManager);
         }
         else
         {

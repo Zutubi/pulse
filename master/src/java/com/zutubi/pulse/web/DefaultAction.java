@@ -51,15 +51,10 @@ public class DefaultAction extends ActionSupport
         else
         {
             User user = userManager.getUser(login);
-            return user.getDefaultAction();
+            return user.getPreferences().getSettings().getDefaultAction();
         }
     }
 
-    /**
-     * Required resource.
-     *
-     * @param userManager
-     */
     public void setUserManager(UserManager userManager)
     {
         this.userManager = userManager;

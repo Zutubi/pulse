@@ -7,9 +7,9 @@ import com.zutubi.pulse.license.LicenseManager;
 import com.zutubi.pulse.license.authorisation.AddUserAuthorisation;
 import com.zutubi.pulse.model.persistence.GroupDao;
 import com.zutubi.pulse.model.persistence.UserDao;
+import com.zutubi.pulse.prototype.config.user.DashboardConfiguration;
 import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 import com.zutubi.pulse.security.ldap.LdapManager;
-import com.zutubi.pulse.web.DefaultAction;
 import org.acegisecurity.providers.encoding.PasswordEncoder;
 import org.acegisecurity.userdetails.UserDetails;
 import org.acegisecurity.userdetails.UsernameNotFoundException;
@@ -86,7 +86,6 @@ public class DefaultUserManager implements UserManager, ConfigurationInjector.Co
             newUser.add(GrantedAuthority.ADMINISTRATOR);
         }
         newUser.setEnabled(true);
-        newUser.setDefaultAction(DefaultAction.WELCOME_ACTION);
         newUser.setLdapAuthentication(useLdapAuthencation);
         save(newUser);
         // can only update the password on a persistent user since the password salt relies
@@ -193,15 +192,14 @@ public class DefaultUserManager implements UserManager, ConfigurationInjector.Co
     public Set<Project> getUserProjects(User user, ProjectManager projectManager)
     {
         Set<Project> projects = new HashSet<Project>();
-        if(user.getShowAllProjects())
+        DashboardConfiguration dashboardConfig = user.getConfig().getPreferences().getDashboard();
+        if(dashboardConfig.isShowAllProjects())
         {
             projects.addAll(projectManager.getProjects());
         }
         else
         {
-            // Reload the user so we get the lazy-loaded projects
-            user = userDao.findById(user.getId());
-            projects.addAll(user.getShownProjects());
+            projects.addAll(projectManager.mapConfigsToProjects(dashboardConfig.getShownProjects()));
             for(ProjectGroup g: user.getShownGroups())
             {
                 projects.addAll(g.getProjects());
@@ -218,26 +216,6 @@ public class DefaultUserManager implements UserManager, ConfigurationInjector.Co
         user.getGroups();
         getLdapManager().addLdapRoles(principle);
         return principle;
-    }
-
-    public void removeReferencesToProject(Project project)
-    {
-        List<User> users = userDao.findByShownProject(project);
-        for(User u: users)
-        {
-            u.getShownProjects().remove(project);
-            userDao.save(u);
-        }
-    }
-
-    public void removeReferencesToProjectGroup(ProjectGroup projectGroup)
-    {
-        List<User> users = userDao.findByShownProjectGroup(projectGroup);
-        for(User u: users)
-        {
-            u.getShownGroups().remove(projectGroup);
-            userDao.save(u);
-        }
     }
 
     public int getUserCount()

@@ -202,7 +202,6 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
         }
         
         buildManager.deleteAllBuilds(entity);
-        userManager.removeReferencesToProject(entity);
 
         // Remove test case index
         List<TestCaseIndex> tests;
@@ -514,8 +513,22 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
     @Secured({"ROLE_ADMINISTRATOR"})
     public void delete(ProjectGroup projectGroup)
     {
-        userManager.removeReferencesToProjectGroup(projectGroup);
         projectGroupDao.delete(projectGroup);
+    }
+
+    public List<Project> mapConfigsToProjects(List<ProjectConfiguration> projects)
+    {
+        List<Project> result = new LinkedList<Project>();
+        for(ProjectConfiguration config: projects)
+        {
+            Project project = projectDao.findById(config.getProjectId());
+            if(project != null)
+            {
+                result.add(project);
+            }
+        }
+
+        return result;
     }
 
     public void setConfiguration(Project state)

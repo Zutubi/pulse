@@ -18,9 +18,8 @@ public class UserPreferencesConfiguration extends AbstractConfiguration
     private UserSettingsConfiguration settings = new UserSettingsConfiguration();
     private List<UserAliasConfiguration> alias = new LinkedList<UserAliasConfiguration>();
     private Map<String, ContactConfiguration> contacts = new HashMap<String, ContactConfiguration>();
-    private List<SubscriptionConfiguration> subscriptions = new LinkedList<SubscriptionConfiguration>();
+    private Map<String, SubscriptionConfiguration> subscriptions = new HashMap<String, SubscriptionConfiguration>();
     private DashboardConfiguration dashboard = new DashboardConfiguration();
-
 
     public UserSettingsConfiguration getSettings()
     {
@@ -52,12 +51,12 @@ public class UserPreferencesConfiguration extends AbstractConfiguration
         this.contacts = contacts;
     }
 
-    public List<SubscriptionConfiguration> getSubscriptions()
+    public Map<String, SubscriptionConfiguration> getSubscriptions()
     {
         return subscriptions;
     }
 
-    public void setSubscriptions(List<SubscriptionConfiguration> subscriptions)
+    public void setSubscriptions(Map<String, SubscriptionConfiguration> subscriptions)
     {
         this.subscriptions = subscriptions;
     }

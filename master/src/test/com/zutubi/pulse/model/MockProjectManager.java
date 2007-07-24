@@ -3,13 +3,8 @@ package com.zutubi.pulse.model;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
-import org.acegisecurity.annotation.Secured;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.Collection;
+import java.util.*;
 
 /**
  */
@@ -126,6 +121,11 @@ public class MockProjectManager implements ProjectManager
     public void delete(ProjectGroup projectGroup)
     {
         throw new RuntimeException("Method not implemented.");
+    }
+
+    public List<Project> mapConfigsToProjects(List<ProjectConfiguration> projects)
+    {
+        throw new RuntimeException("Method not yet implemented.");
     }
 
     public void delete(BuildHostRequirements hostRequirements)

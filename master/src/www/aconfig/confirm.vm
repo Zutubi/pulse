@@ -1,7 +1,7 @@
 #macro(showTask $cleanupTask $indent)
     <tr>
         <td class="content">
-            $indent <a href="#url("action=display" "path=$cleanupTask.affectedPath")">$!webwork.htmlEncode($cleanupTask.affectedPath)</a>
+            ${indent}$!webwork.htmlEncode($cleanupTask.affectedPath)
         </td>
         <td class="content">
             $action.getMessage($cleanupTask, "summary")

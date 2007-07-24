@@ -63,7 +63,7 @@
                 #if( $config.record )
                     #if( $config.simpleProperties.size() > 0)
                     <div class="frame">
-                        <h3 class="header">#i18n("key=form.heading")</h3>
+                        <h3 class="header">${config.formHeading?html}</h3>
                         <p class="description">
                             #i18n("key=form.description")
                         </p>
@@ -77,7 +77,7 @@
                 #else
                     #if( $config.extensions.size() > 0)
                     <div class="frame">
-                        <h3 class="header">#i18n("key=form.heading")</h3>
+                        <h3 class="header">${config.formHeading?html}</h3>
                         <p class="description">
                             #i18n("key=form.description")
                         </p>
@@ -86,7 +86,7 @@
                     #else
                         #if( $config.simpleProperties.size() > 0)
                         <div class="frame">
-                            <h3 class="header">#i18n("key=form.heading")</h3>
+                            <h3 class="header">${config.formHeading?html}</h3>
                             <p class="description">
                                 #i18n("key=form.description")
                             </p>

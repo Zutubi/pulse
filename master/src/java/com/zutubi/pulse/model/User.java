@@ -2,8 +2,7 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.prototype.config.user.UserConfiguration;
-import com.zutubi.pulse.web.DefaultAction;
-import com.zutubi.util.StringUtils;
+import com.zutubi.pulse.prototype.config.user.UserPreferencesConfiguration;
 
 import java.util.*;
 
@@ -79,17 +78,11 @@ public class User extends Entity
 
     private Map<String, String> properties;
 
-    /**
-     * A list of login aliases for the user: logins in other tools that pulse
-     * may be interacting with (e.g. SCMs).
-     */
-    private List<String> aliases;
     private long nextBuildNumber = 1;
     private UserConfiguration config;
 
     public User()
     {
-        aliases = new LinkedList<String>();
     }
 
     public User(String login, String name)
@@ -194,49 +187,6 @@ public class User extends Entity
         return getGrantedAuthorities().contains(authority);
     }
 
-    public List<String> getAliases()
-    {
-        return aliases;
-    }
-
-    private void setAliases(List<String> aliases)
-    {
-        this.aliases = aliases;
-    }
-
-    public void addAlias(String alias)
-    {
-        aliases.add(alias);
-    }
-
-    public boolean removeAlias(String alias)
-    {
-        return aliases.remove(alias);
-    }
-
-    public void removeAlias(int index)
-    {
-        if (index <= aliases.size())
-        {
-            aliases.remove(index);
-        }
-    }
-
-    public boolean hasAlias(String alias)
-    {
-        return aliases.contains(alias);
-    }
-
-    public Set<Project> getShownProjects()
-    {
-        return shownProjects;
-    }
-
-    public void setShownProjects(Set<Project> shownProjects)
-    {
-        this.shownProjects = shownProjects;
-    }
-
     public Set<ProjectGroup> getShownGroups()
     {
         return shownGroups;
@@ -276,77 +226,6 @@ public class User extends Entity
         return getProperties().containsKey(key);
     }
 
-    // ---( for backward compatibility and ease of migration. )---
-    /**
-     * The action to take the user to when they log in.  Usually their
-     * dashboard, but can be a welcome page when they first sign up.
-     */
-    public String getDefaultAction()
-    {
-        if (hasProperty(PROPERTY_DEFAULT_ACTION))
-        {
-            return getProperty(PROPERTY_DEFAULT_ACTION);
-        }
-        return DefaultAction.DASHBOARD_ACTION;
-    }
-
-    public void setDefaultAction(String defaultAction)
-    {
-        setProperty(PROPERTY_DEFAULT_ACTION, defaultAction);
-    }
-
-    /**
-     * Number of seconds between refreshes of "live" content, or 0 if the
-     * user disables refreshing.
-     */
-    public int getRefreshInterval()
-    {
-        if (hasProperty(PROPERTY_REFRESH_INTERVAL))
-        {
-            return Integer.valueOf(getProperty(PROPERTY_REFRESH_INTERVAL));
-        }
-        return 60;
-    }
-
-    public void setRefreshInterval(int refreshInterval)
-    {
-        setProperty(PROPERTY_REFRESH_INTERVAL, Integer.toString(refreshInterval));
-    }
-
-    public int getTailRefreshInterval()
-    {
-        return getIntProperty(PROPERTY_TAIL_REFRESH_INTERVAL, 60);
-    }
-
-    public void setTailRefreshInterval(int interval)
-    {
-        setIntProperty(PROPERTY_TAIL_REFRESH_INTERVAL, interval);
-    }
-
-    public int getTailLines()
-    {
-        return getIntProperty(PROPERTY_TAIL_LINES, 30);
-    }
-
-    public void setTailLines(int lines)
-    {
-        setIntProperty(PROPERTY_TAIL_LINES, lines);
-    }
-
-    public int getDashboardBuildCount()
-    {
-        if (hasProperty(PROPERTY_DASHBOARD_BUILD_COUNT))
-        {
-            return Integer.valueOf(getProperty(PROPERTY_DASHBOARD_BUILD_COUNT));
-        }
-        return 2;
-    }
-
-    public void setDashboardBuildCount(int buildCount)
-    {
-        setProperty(PROPERTY_DASHBOARD_BUILD_COUNT, Integer.toString(buildCount));
-    }
-
     public boolean getLdapAuthentication()
     {
         return getBooleanProperty(PROPERTY_LDAP_AUTHENTICATION, false);
@@ -357,144 +236,9 @@ public class User extends Entity
         setBooleanProperty(PROPERTY_LDAP_AUTHENTICATION, useLdap);
     }
 
-    public boolean getShowAllProjects()
-    {
-        return getBooleanProperty(PROPERTY_SHOW_ALL_PROJECTS, true);
-    }
-
-    public void setShowAllProjects(boolean show)
-    {
-        setBooleanProperty(PROPERTY_SHOW_ALL_PROJECTS, show);
-    }
-
-    public boolean getShowMyChanges()
-    {
-        return getBooleanProperty(PROPERTY_SHOW_MY_CHANGES, true);
-    }
-
-    public void setShowMyChanges(boolean show)
-    {
-        setBooleanProperty(PROPERTY_SHOW_MY_CHANGES, show);
-    }
-
-    public int getMyChangesCount()
-    {
-        return getIntProperty(PROPERTY_MY_CHANGES_COUNT, 10);
-    }
-
-    public void setMyChangesCount(int count)
-    {
-        setIntProperty(PROPERTY_MY_CHANGES_COUNT, count);
-    }
-
-    public boolean getShowProjectChanges()
-    {
-        return getBooleanProperty(PROPERTY_SHOW_PROJECT_CHANGES, false);
-    }
-
-    public void setShowProjectChanges(boolean show)
-    {
-        setBooleanProperty(PROPERTY_SHOW_PROJECT_CHANGES, show);
-    }
-
-    public int getProjectChangesCount()
-    {
-        return getIntProperty(PROPERTY_PROJECT_CHANGES_COUNT, 10);
-    }
-
-    public void setProjectChangesCount(int count)
-    {
-        setIntProperty(PROPERTY_PROJECT_CHANGES_COUNT, count);
-    }
-
-    public int getMyBuildsCount()
-    {
-        return getIntProperty(PROPERTY_MY_BUILDS_COUNT, 5);
-    }
-
-    public void setMyBuildsCount(int count)
-    {
-        setIntProperty(PROPERTY_MY_BUILDS_COUNT, count);
-    }
-
-    public String getMyBuildsColumns()
-    {
-        return getStringProperty(PROPERTY_MY_BUILDS_COLUMNS, StringUtils.join(",", BuildColumns.KEY_ID, BuildColumns.KEY_PROJECT, BuildColumns.KEY_STATUS, BuildColumns.KEY_TESTS, BuildColumns.KEY_WHEN, BuildColumns.KEY_ELAPSED, BuildColumns.KEY_ACTIONS));
-    }
-
-    public void setMyBuildsColumns(String columns)
-    {
-        setProperty(PROPERTY_MY_BUILDS_COLUMNS, columns);
-    }
-
-    public String getMyProjectsColumns()
-    {
-        return getStringProperty(PROPERTY_MY_PROJECTS_COLUMNS, getDefaultProjectColumns());
-    }
-
-    public void setMyProjectsColumns(String columns)
-    {
-        setProperty(PROPERTY_MY_PROJECTS_COLUMNS, columns);
-    }
-
-    public String getAllProjectsColumns()
-    {
-        return getStringProperty(PROPERTY_ALL_PROJECTS_COLUMNS, getDefaultAllProjectsColumns());
-    }
-
-    public void setAllProjectsColumns(String columns)
-    {
-        setProperty(PROPERTY_ALL_PROJECTS_COLUMNS, columns);
-    }
-
-    public String getProjectSummaryColumns()
-    {
-        return getStringProperty(PROPERTY_PROJECT_SUMMARY_COLUMNS, getDefaultProjectColumns());
-    }
-
-    public void setProjectSummaryColumns(String columns)
-    {
-        setProperty(PROPERTY_PROJECT_SUMMARY_COLUMNS, columns);
-    }
-
-    public String getProjectRecentColumns()
-    {
-        return getStringProperty(PROPERTY_PROJECT_RECENT_COLUMNS, getDefaultProjectColumns());
-    }
-
-    public void setProjectRecentColumns(String columns)
-    {
-        setProperty(PROPERTY_PROJECT_RECENT_COLUMNS, columns);
-    }
-
-    public String getProjectHistoryColumns()
-    {
-        return getStringProperty(PROPERTY_PROJECT_HISTORY_COLUMNS, getDefaultProjectColumns());
-    }
-
-    public void setProjectHistoryColumns(String columns)
-    {
-        setProperty(PROPERTY_PROJECT_HISTORY_COLUMNS, columns);
-    }
-
-    public static String getDefaultProjectColumns()
-    {
-        return StringUtils.join(",", BuildColumns.KEY_ID, BuildColumns.KEY_STATUS, BuildColumns.KEY_REASON, BuildColumns.KEY_TESTS, BuildColumns.KEY_WHEN, BuildColumns.KEY_ELAPSED, BuildColumns.KEY_ACTIONS);
-    }
-
-    public static String getDefaultAllProjectsColumns()
-    {
-        return StringUtils.join(",", BuildColumns.KEY_ID, BuildColumns.KEY_STATUS, BuildColumns.KEY_REASON, BuildColumns.KEY_TESTS, BuildColumns.KEY_WHEN, BuildColumns.KEY_ELAPSED, BuildColumns.KEY_ACTIONS);
-    }
-
     public boolean equals(Object other)
     {
-        if(other == null || !(other instanceof User))
-        {
-            return false;
-        }
-
-        return login.equals(((User)other).login);
+        return !(other == null || !(other instanceof User)) && login.equals(((User) other).login);
     }
 
     public int hashCode()
@@ -592,5 +336,17 @@ public class User extends Entity
     public void setConfig(UserConfiguration config)
     {
         this.config = config;
+    }
+
+    public UserPreferencesConfiguration getPreferences()
+    {
+        if (config == null)
+        {
+            return null;
+        }
+        else
+        {
+            return config.getPreferences();
+        }
     }
 }

@@ -159,7 +159,7 @@
               </td>
               <td class="user" align="right">
 #if($principle)
-                  $principle.name #if($canLogout) [ <a id="logout" href="$base/logout.action">logout</a> ] #end
+                  $principle.name [ <a id="prefs" href="$base/dashboard/preferences/">preferences</a>#if($canLogout) | <a id="logout" href="$base/logout.action">logout</a>#end ]
 #else
                   <a id="login" href="$base/login.action">login</a>
 #end

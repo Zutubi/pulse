@@ -1,5 +1,3 @@
-<#-- render the wizard -->
-
 <link rel="stylesheet" type="text/css" href="/css/prototype.css" media="screen"/>
 
 <h2>${"label"?i18n}</h2>
@@ -15,13 +13,13 @@
             <ul>
             <#list wizard.steps as step>
                 <#assign index = step_index + 1/>
-                <#assign labelkey = "${step.name}.label"/>
+                <#assign labelkey = "wizard.step.${step.name}.label"/>
                 <#assign stepclass = "wizardstep"/>
                 <#if step.id == wizard.currentStep>
-                    <#assign descrkey = "${step.name}.description"/>
+                    <#assign descrkey = "wizard.step.${step.name}.description"/>
                     <#assign stepclass = "currentwizardstep"/>
                 </#if>
-                <li class="${stepclass}"> ${index}: ${labelkey?i18n} </li>
+                <li class="${stepclass}"> ${index}: ${i18nText(step.type, labelkey)} </li>
             </#list>
             </ul>
         </td>

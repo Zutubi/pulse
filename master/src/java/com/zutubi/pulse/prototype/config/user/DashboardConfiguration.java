@@ -7,33 +7,42 @@ import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
- *
- *
+ * User preferences controlling what they see on their dashboard.
  */
 @SymbolicName("zutubi.dashboardConfig")
-@Form(fieldOrder = {"buildCount", "showAllProjects", "shownProjects", "showMyChanges", "myChangeCount", "showProjectChanges", "projectChangeCount"})
+@Form(labelWidth = 300, fieldOrder = {"buildCount", "showAllProjects", "shownProjects", "showMyChanges", "myChangeCount", "showProjectChanges", "projectChangeCount"})
 public class DashboardConfiguration extends AbstractConfiguration
 {
-    private int buildCount;
+    /**
+     * Number of builds to show for each project.
+     */
+    private int buildCount = 3;
 
     @ControllingCheckbox(invert = true, dependentFields = {"shownProjects"})
-    private boolean showAllProjects;
-
+    private boolean showAllProjects = true;
     @Reference
-    private List<ProjectConfiguration> shownProjects;
+    /**
+     * Projects to show on the dashboard.
+     */
+    private List<ProjectConfiguration> shownProjects = new LinkedList<ProjectConfiguration>();
 
     @ControllingCheckbox(dependentFields = {"myChangeCount"})
-    private boolean showMyChanges;
-
-    private int myChangeCount;
+    private boolean showMyChanges = true;
+    /**
+     * The number of recent changes by this user to show.
+     */
+    private int myChangeCount = 10;
 
     @ControllingCheckbox(dependentFields = {"projectChangeCount"})
-    private boolean showProjectChanges;
-    
-    private int projectChangeCount;
+    private boolean showProjectChanges = true;
+    /**
+     * The number of recent changes to this user's projects to show.
+     */
+    private int projectChangeCount = 10;
 
     public int getBuildCount()
     {

@@ -931,6 +931,26 @@ public class ConfigurationTemplateManager
         refreshCaches();
     }
 
+    @SuppressWarnings({ "unchecked" })
+    public <T extends Configuration> T deepClone(T instance)
+    {
+        Record record = recordManager.load(instance.getConfigurationPath());
+        CompositeType type = typeRegistry.getType(instance.getClass());
+        SimpleInstantiator instantiator = new SimpleInstantiator(configurationReferenceManager);
+        try
+        {
+            Configuration clone = (Configuration) instantiator.instantiate(type, record);
+            clone.setConfigurationPath(instance.getConfigurationPath());
+            clone.setHandle(instance.getHandle());
+            return (T) clone;
+        }
+        catch (TypeException e)
+        {
+            LOG.severe(e);
+            return null;
+        }
+    }
+
     /**
      * Load the object at the specified path, or null if no object exists.
      *

@@ -18,11 +18,7 @@
 
         <property name="enabled" column="ENABLED" type="boolean"/>
 
-        <property name="defaultAction" type="string" length="255"/>
-
-        <property name="refreshInterval" type="int"/>
-
-        <map name="properties" table="USER_PROPERTIES">
+        <map name="properties" table="USER_PROPERTIES" lazy="false">
             <cache usage="read-write"/>
             <key column="USER_ID"/>
             <index column="PROPERTY_KEY" type="string" length="255"/>
@@ -42,24 +38,6 @@
             <cache usage="read-write"/>
             <key column="USER_ID"/>
             <many-to-many class="com.zutubi.pulse.model.Group" column="GROUP_ID"/>
-        </set>
-
-        <bag name="aliases" lazy="false" table="USER_ALIASES">
-            <cache usage="read-write"/>
-            <key column="USER_ID"/>
-            <element type="string" column="ALIAS" not-null="true" length="255"/>
-        </bag>
-
-        <set name="shownProjects" table="USER_SHOWN_PROJECTS" lazy="true" cascade="save-update">
-            <cache usage="read-write"/>
-            <key column="USER_ID"/>
-            <many-to-many class="com.zutubi.pulse.model.Project" column="PROJECT_ID"/>
-        </set>
-
-        <set name="shownGroups" table="USER_SHOWN_GROUPS" lazy="true" cascade="save-update">
-            <cache usage="read-write"/>
-            <key column="USER_ID"/>
-            <many-to-many class="com.zutubi.pulse.model.ProjectGroup" column="PROJECT_GROUP_ID"/>
         </set>
 
         <property name="nextBuildNumber" column="NEXT_BUILD_NUMBER" type="long"/>

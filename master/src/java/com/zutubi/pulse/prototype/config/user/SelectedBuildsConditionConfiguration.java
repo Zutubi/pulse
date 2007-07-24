@@ -1,5 +1,6 @@
 package com.zutubi.pulse.prototype.config.user;
 
+import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.pulse.condition.NotifyConditionFactory;
 import com.zutubi.util.StringUtils;
@@ -11,6 +12,7 @@ import java.util.List;
  * A condition that is a disjunction of some common simple conditions.
  */
 @SymbolicName("zutubi.selectedBuildsConditionConfig")
+@Form(labelWidth = 350, fieldOrder = {"unsuccessful", "statusChange", "includeChanges", "includeChangesByMe"})
 public class SelectedBuildsConditionConfiguration extends SubscriptionConditionConfiguration
 {
     private boolean unsuccessful;

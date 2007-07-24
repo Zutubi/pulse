@@ -46,6 +46,7 @@ public class ConfigurationUIModel
     private String parentPath;
     private String[] parentPathElements;
     private String currentPath;
+    private String formHeading;
     private String displayName;
     
     private List<String> simpleProperties;
@@ -103,6 +104,7 @@ public class ConfigurationUIModel
             CompositeType ctype = (CompositeType) targetType;
             targetSymbolicName = ctype.getSymbolicName();
 
+            formHeading = PrototypeUtils.getFormHeading(ctype);
             simpleProperties = PrototypeUtils.getSimpleProperties(ctype);
             nestedProperties = PrototypeUtils.getNestedProperties(ctype);
 
@@ -208,6 +210,11 @@ public class ConfigurationUIModel
     public String getDisplayName()
     {
         return displayName;
+    }
+
+    public String getFormHeading()
+    {
+        return formHeading;
     }
 
     public Record getRecord()

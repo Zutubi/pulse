@@ -1,17 +1,11 @@
 package com.zutubi.pulse.model.persistence.hibernate;
 
 import com.zutubi.pulse.model.Group;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.ProjectGroup;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.persistence.GroupDao;
-import com.zutubi.pulse.model.persistence.ProjectDao;
-import com.zutubi.pulse.model.persistence.ProjectGroupDao;
 import com.zutubi.pulse.model.persistence.UserDao;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @noinspection FieldCanBeLocal
@@ -20,24 +14,18 @@ public class HibernateUserDaoTest extends MasterPersistenceTestCase
 {
     private UserDao userDao;
     private GroupDao groupDao;
-    private ProjectDao projectDao;
-    private ProjectGroupDao projectGroupDao;
 
     public void setUp() throws Exception
     {
         super.setUp();
         userDao = (UserDao) context.getBean("userDao");
         groupDao = (GroupDao) context.getBean("groupDao");
-        projectDao = (ProjectDao) context.getBean("projectDao");
-        projectGroupDao = (ProjectGroupDao) context.getBean("projectGroupDao");
     }
 
     public void tearDown() throws Exception
     {
         userDao = null;
         groupDao = null;
-        projectDao = null;
-        projectGroupDao = null;
         super.tearDown();
     }
 
@@ -68,41 +56,6 @@ public class HibernateUserDaoTest extends MasterPersistenceTestCase
         List users = userDao.findAll();
         assertNotNull(users);
         assertEquals(1, users.size());
-    }
-
-    public void testAliases()
-    {
-        User user = new User();
-        user.addAlias("help me");
-        user.addAlias("rhonda");
-        userDao.save(user);
-        commitAndRefreshTransaction();
-
-        user = userDao.findById(user.getId());
-        assertEquals(2, user.getAliases().size());
-        assertTrue(user.hasAlias("help me"));
-        assertTrue(user.hasAlias("rhonda"));
-    }
-
-    public void testProjects()
-    {
-        Set<Project> projects = new HashSet<Project>();
-        Project p1 = new Project();
-        Project p2 = new Project();
-        projectDao.save(p1);
-        projectDao.save(p2);
-        projects.add(p1);
-        projects.add(p2);
-
-        User user = new User();
-        user.setShownProjects(projects);
-        userDao.save(user);
-        commitAndRefreshTransaction();
-
-        user = userDao.findById(user.getId());
-
-        Set<Project> otherProjects = userDao.getShownProjects(user);
-        assertEquals(2, otherProjects.size());
     }
 
     public void testPropertyPersistence()
@@ -156,47 +109,6 @@ public class HibernateUserDaoTest extends MasterPersistenceTestCase
         assertEquals(u2, users.get(0));
 
         users = userDao.findByNotInGroup(g3);
-        assertEquals(0, users.size());
-    }
-
-    public void testFindByShownProject()
-    {
-        Set<Project> projects = new HashSet<Project>();
-        Project p1 = new Project();
-        Project p2 = new Project();
-        projectDao.save(p1);
-        projectDao.save(p2);
-        projects.add(p1);
-
-        User user = new User();
-        user.setShownProjects(projects);
-        userDao.save(user);
-        commitAndRefreshTransaction();
-
-        List<User> users = userDao.findByShownProject(p1);
-        assertEquals(1, users.size());
-        users = userDao.findByShownProject(p2);
-        assertEquals(0, users.size());
-    }
-
-    public void testFindByShownGroup()
-    {
-        Set<ProjectGroup> groups = new HashSet<ProjectGroup>();
-        ProjectGroup g1 = new ProjectGroup("1");
-        ProjectGroup g2 = new ProjectGroup("2");
-        projectGroupDao.save(g1);
-        projectGroupDao.save(g2);
-        groups.add(g1);
-
-        User user = new User();
-        user.setShownGroups(groups);
-        userDao.save(user);
-
-        commitAndRefreshTransaction();
-
-        List<User> users = userDao.findByShownProjectGroup(g1);
-        assertEquals(1, users.size());
-        users = userDao.findByShownProjectGroup(g2);
         assertEquals(0, users.size());
     }
 

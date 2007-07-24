@@ -1,6 +1,7 @@
 package com.zutubi.pulse.prototype.config.user.contacts;
 
 import com.opensymphony.util.TextUtils;
+import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.model.BuildResult;
@@ -17,6 +18,7 @@ import java.util.Properties;
 /**
  */
 @SymbolicName("zutubi.emailContactConfig")
+@Form(fieldOrder = {"name", "address"})
 public class EmailContactConfiguration extends ContactConfiguration
 {
     private static final Logger LOG = Logger.getLogger(EmailContactConfiguration.class);

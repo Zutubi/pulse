@@ -3,8 +3,10 @@ package com.zutubi.prototype;
 import com.zutubi.prototype.model.HiddenFieldDescriptor;
 import com.zutubi.prototype.model.Wizard;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.wizard.TypeWizardState;
 import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.prototype.wizard.WizardTransition;
+import com.zutubi.prototype.wizard.webwork.AbstractTypeWizard;
 import com.zutubi.prototype.wizard.webwork.ConfigurationWizardInterceptor;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
@@ -17,7 +19,7 @@ import java.util.List;
  */
 public class WizardDescriptor extends AbstractDescriptor
 {
-    private com.zutubi.prototype.wizard.Wizard wizardInstance;
+    private AbstractTypeWizard wizardInstance;
 
     private boolean ajax;
     private boolean decorate;
@@ -25,7 +27,7 @@ public class WizardDescriptor extends AbstractDescriptor
 
     private FormDescriptorFactory formDescriptorFactory;
 
-    public WizardDescriptor(com.zutubi.prototype.wizard.Wizard wizardInstance)
+    public WizardDescriptor(AbstractTypeWizard wizardInstance)
     {
         this.wizardInstance = wizardInstance;
     }
@@ -51,9 +53,9 @@ public class WizardDescriptor extends AbstractDescriptor
 
         wizard.setForm(formDescriptor.instantiate(path, record));
 
-        for(WizardState state: wizardInstance.getStates())
+        for(TypeWizardState state: wizardInstance.getStates())
         {
-            wizard.addStep(state.getId(), state.getName());    
+            wizard.addStep(state.getId(), state.getType(), state.getName());
         }
 
         wizard.setCurrentStep(wizardInstance.getCurrentState().getId());

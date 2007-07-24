@@ -1,5 +1,7 @@
 package com.zutubi.prototype.model;
 
+import com.zutubi.prototype.type.CompositeType;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -55,8 +57,8 @@ public class Wizard
         return steps;
     }
 
-    public void addStep(String id, String name)
+    public void addStep(String id, CompositeType type, String name)
     {
-        steps.add(new WizardStep(id, name));
+        steps.add(new WizardStep(id, type, name));
     }
 }

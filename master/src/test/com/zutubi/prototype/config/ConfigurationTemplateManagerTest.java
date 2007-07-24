@@ -1,5 +1,6 @@
 package com.zutubi.prototype.config;
 
+import com.zutubi.config.annotations.Reference;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.prototype.config.events.ConfigurationEvent;
 import com.zutubi.prototype.config.events.PostInsertEvent;
@@ -33,7 +34,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         super.setUp();
 
         typeA = typeRegistry.register(MockA.class);
-        typeB = typeRegistry.getType("mockB");
+        typeB = typeRegistry.getType(MockB.class);
         MapType mapA = new MapType();
         mapA.setTypeRegistry(typeRegistry);
         mapA.setCollectionType(typeA);
@@ -42,8 +43,20 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         templatedMap.setTypeRegistry(typeRegistry);
         templatedMap.setCollectionType(typeA);
 
+        CompositeType typeReferer = typeRegistry.register(MockReferer.class);
+        CompositeType typeReferee = typeRegistry.getType(MockReferee.class);
+        MapType mapReferer = new MapType();
+        mapReferer.setTypeRegistry(typeRegistry);
+        mapReferer.setCollectionType(typeReferer);
+
+        MapType mapReferee = new MapType();
+        mapReferee.setTypeRegistry(typeRegistry);
+        mapReferee.setCollectionType(typeReferee);
+
         configurationPersistenceManager.register("sample", mapA);
         configurationPersistenceManager.register("template", templatedMap);
+        configurationPersistenceManager.register("referer", mapReferer);
+        configurationPersistenceManager.register("referee", mapReferee);
     }
 
     protected void tearDown() throws Exception
@@ -206,6 +219,47 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         Record loaded = configurationTemplateManager.getRecord("sample/avalue");
         assertEquals("newb", loaded.get("b"));
         assertEquals("cvalue", loaded.get("c"));
+    }
+
+    public void testDeepClone()
+    {
+        MockA a = new MockA("aburger");
+        MockB b = new MockB("bburger");
+        a.setMock(b);
+
+        configurationTemplateManager.insert("sample", a);
+
+        a = configurationTemplateManager.getInstance("sample/aburger", MockA.class);
+        MockA aClone = configurationTemplateManager.deepClone(a);
+
+        assertNotSame(a, aClone);
+        assertNotSame(a.getMock(), aClone.getMock());
+        assertEquals(a.getHandle(), aClone.getHandle());
+        assertEquals(a.getConfigurationPath(), aClone.getConfigurationPath());
+        assertEquals("aburger", aClone.getName());
+        assertEquals("bburger", aClone.getMock().getB());
+    }
+
+    public void testDeepCloneWithReferences()
+    {
+        MockReferee ee = new MockReferee("ee");
+        configurationTemplateManager.insert("referee", ee);
+        ee = configurationTemplateManager.getInstance("referee/ee", MockReferee.class);
+
+        MockReferer er = new MockReferer("er");
+        er.setRefToRef(ee);
+        er.getRefToRefs().add(ee);
+
+        configurationTemplateManager.insert("referer", er);
+        er = configurationTemplateManager.getInstance("referer/er", MockReferer.class);
+        ee = configurationTemplateManager.getInstance("referee/ee", MockReferee.class);
+
+        MockReferer clone = configurationTemplateManager.deepClone(er);
+
+        assertNotSame(er, clone);
+        assertSame(ee, clone.getRefToRef());
+        assertSame(ee, clone.getRefToRefs().get(0));
+        assertEquals("er", er.getName());
     }
 
     public void testValidate() throws TypeException
@@ -374,5 +428,67 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         public MockB(String b){this.b = b;}
         public String getB(){return b;}
         public void setB(String b){this.b = b;}
+    }
+
+    @SymbolicName("mockReferer")
+    public static class MockReferer extends AbstractNamedConfiguration
+    {
+        MockReferee ref;
+        @Reference
+        MockReferee refToRef;
+        @Reference
+        List<MockReferee> refToRefs = new LinkedList<MockReferee>();
+
+        public MockReferer()
+        {
+        }
+
+        public MockReferer(String name)
+        {
+            super(name);
+        }
+
+        public MockReferee getRef()
+        {
+            return ref;
+        }
+
+        public void setRef(MockReferee ref)
+        {
+            this.ref = ref;
+        }
+
+        public MockReferee getRefToRef()
+        {
+            return refToRef;
+        }
+
+        public void setRefToRef(MockReferee refToRef)
+        {
+            this.refToRef = refToRef;
+        }
+
+        public List<MockReferee> getRefToRefs()
+        {
+            return refToRefs;
+        }
+
+        public void setRefToRefs(List<MockReferee> refToRefs)
+        {
+            this.refToRefs = refToRefs;
+        }
+    }
+
+    @SymbolicName("mockReferee")
+    public static class MockReferee extends AbstractNamedConfiguration
+    {
+        public MockReferee()
+        {
+        }
+
+        public MockReferee(String name)
+        {
+            super(name);
+        }
     }
 }

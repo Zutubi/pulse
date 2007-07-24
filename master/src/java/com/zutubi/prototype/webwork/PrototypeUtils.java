@@ -19,6 +19,10 @@ import java.util.*;
  */
 public class PrototypeUtils
 {
+    private static final String KEY_LABEL = "label";
+    private static final String KEY_FORM_HEADING = "form.heading";
+    private static final String KEY_TABLE_HEADING = "table.heading";
+
     public static String getConfigURL(String path, String action, String submitField)
     {
         return getConfigURL(path, action, submitField, null);
@@ -211,9 +215,9 @@ public class PrototypeUtils
         // One of:
         //   - the id, if this object is within a map
         //   - toString representation if this object is in a list
-        //   - the value of the first defined i18n key if this is composite
-        //     a property:
-        //       <parent type>.properties: <property>.property.label
+        //   - the value of the first defined i18n key if this is a composite
+        //     property:
+        //       <parent type>.properties: <property>.label
         //       <property type>.properties: label.plural (if a collection)
         //       <property type>.properties: label (auto-pluralised if a collection)
         String result = null;
@@ -246,16 +250,7 @@ public class PrototypeUtils
                     Type declaredType = parentType.getDeclaredPropertyType(baseName);
                     if (declaredType instanceof CollectionType)
                     {
-                        messages = Messages.getInstance(declaredType.getTargetType().getClazz());
-                        if (messages.isKeyDefined("label.plural"))
-                        {
-                            result = messages.format("label.plural");
-                        }
-                        else
-                        {
-                            // Auto-pluralise
-                            result = StringUtils.pluralise(messages.format("label"));
-                        }
+                        result = getPluralLabel(declaredType.getTargetType());
                     }
                     else
                     {
@@ -272,6 +267,53 @@ public class PrototypeUtils
         }
 
         return result;
+    }
+
+    public static String getFormHeading(CompositeType type)
+    {
+        Messages messages = Messages.getInstance(type.getClazz());
+        if(messages.isKeyDefined(KEY_FORM_HEADING))
+        {
+            return messages.format(KEY_FORM_HEADING);
+        }
+        else
+        {
+            // Default that works for english.  We could also i18n this part
+            // to allow defaults for other languages.
+            return "update " + messages.format(KEY_LABEL);
+        }
+    }
+
+    public static String getTableHeading(CompositeType type)
+    {
+        Messages messages = Messages.getInstance(type.getClazz());
+        if(messages.isKeyDefined(KEY_TABLE_HEADING))
+        {
+            return messages.format(KEY_TABLE_HEADING);
+        }
+        else
+        {
+            return getPluralLabel(messages);
+        }
+    }
+
+    public static String getPluralLabel(Type type)
+    {
+        Messages messages = Messages.getInstance(type.getClazz());
+        return getPluralLabel(messages);
+    }
+
+    private static String getPluralLabel(Messages messages)
+    {
+        if (messages.isKeyDefined("label.plural"))
+        {
+            return messages.format("label.plural");
+        }
+        else
+        {
+            // Auto-pluralise
+            return StringUtils.pluralise(messages.format("label"));
+        }
     }
 
     public static void mapErrors(Configuration instance, ValidationAware validationAware, String fieldSuffix)

@@ -17,7 +17,6 @@ import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 import com.zutubi.pulse.security.AcegiUtils;
-import com.zutubi.pulse.web.DefaultAction;
 import com.zutubi.util.logging.Logger;
 
 import java.net.InetAddress;
@@ -88,9 +87,6 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
             admin.add(GrantedAuthority.USER);
             admin.add(GrantedAuthority.ADMINISTRATOR);
             config.setAdminLogin(admin.getLogin());
-
-            // Send the admin to a welcome page by default
-            admin.setDefaultAction(DefaultAction.WELCOME_ACTION);
             userManager.save(admin);
 
             // make sure that we encode the password after we have a persistent user,

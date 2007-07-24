@@ -19,7 +19,7 @@ public class SelectTypeState extends SeleniumForm
 
     public String[] getFieldNames()
     {
-        return new String[]{ "option" };
+        return new String[]{ "wizard.select" };
     }
 
     public int[] getFieldTypes()

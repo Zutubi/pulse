@@ -2,9 +2,9 @@ package com.zutubi.i18n.bundle;
 
 import com.zutubi.i18n.context.*;
 
-import java.util.*;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
 
 /**
  * <class-comment/>
@@ -33,9 +33,8 @@ public class DefaultBundleManager implements BundleManager
         resolvers.put(resolver.getContextType(), resolver);
     }
 
-    public List<ResourceBundle> getBundles(Object contextObject, Locale locale)
+    public List<ResourceBundle> getBundles(Context context, Locale locale)
     {
-        Context context = (Context) contextObject;
         if (cache.isCached(context, locale))
         {
             return cache.getFromCache(context, locale);

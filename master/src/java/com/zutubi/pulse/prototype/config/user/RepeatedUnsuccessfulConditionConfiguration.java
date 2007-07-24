@@ -1,5 +1,6 @@
 package com.zutubi.pulse.prototype.config.user;
 
+import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.pulse.condition.NotifyConditionFactory;
 import com.zutubi.validation.annotations.Numeric;
@@ -9,6 +10,7 @@ import com.zutubi.validation.annotations.Numeric;
  * certain number of builds or days.
  */
 @SymbolicName("zutubi.repeatedUnsuccessfulConditionConfig")
+@Form(fieldOrder = {"after", "units"})
 public class RepeatedUnsuccessfulConditionConfiguration extends SubscriptionConditionConfiguration
 {
     @Numeric(min = 1)

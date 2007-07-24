@@ -32,6 +32,9 @@
     fieldConfig.valueField = 'value';
     fieldConfig.editable = false;
     fieldConfig.forceSelection = true;
+<#if parameters.width?exists>
+    fieldConfig.width = ${parameters.width};
+</#if>
 <#if parameters.value?exists>
     fieldConfig.value = '${parameters.value?js_string}';
 <#else>

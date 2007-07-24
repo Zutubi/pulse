@@ -232,7 +232,7 @@ public abstract class AbstractTypeWizard implements Wizard
         return rootState.getNextState() == null;
     }
 
-    public Iterable<? extends WizardState> getStates()
+    public Iterable<? extends TypeWizardState> getStates()
     {
         List<TypeWizardState> states = new LinkedList<TypeWizardState>(completedStates);
         for(TypeWizardState current = currentState; current != null; current = current.getNextState())
@@ -305,7 +305,7 @@ public abstract class AbstractTypeWizard implements Wizard
 
         public String getName()
         {
-            return baseType.getSymbolicName();
+            return "configure";
         }
 
         @SuppressWarnings({"unchecked"})
@@ -359,8 +359,8 @@ public abstract class AbstractTypeWizard implements Wizard
     }
 
     /**
-     *
-     *
+     * A wizard state that is used for configuring a single, non-extendable
+     * type.
      */
     public class SingleStepWizardState extends AbstractTypeWizardState
     {
@@ -437,7 +437,7 @@ public abstract class AbstractTypeWizard implements Wizard
      */
     public class TwoStepStateBuilder
     {
-        private static final String SELECT_FIELD_NAME = "option";
+        private static final String SELECT_FIELD_NAME = "wizard.select";
 
         private MutableRecord selectionRecord;
         private CompositeType baseType;
@@ -504,7 +504,7 @@ public abstract class AbstractTypeWizard implements Wizard
 
             public String getName()
             {
-                return baseType.getSymbolicName() + ".select";
+                return "select";
             }
 
             public Record getRenderRecord()
@@ -538,8 +538,9 @@ public abstract class AbstractTypeWizard implements Wizard
                 descriptor.setId("select.state");
 
                 SelectFieldDescriptor select = new SelectFieldDescriptor();
-                select.setName("option");
+                select.setName(SELECT_FIELD_NAME);
                 select.setType("select");
+                select.addParameter("width", 300);
 
                 ExtensionOptionProvider optionProvider = new ExtensionOptionProvider(baseType);
                 optionProvider.setTypeRegistry(typeRegistry);
@@ -593,7 +594,7 @@ public abstract class AbstractTypeWizard implements Wizard
 
             public String getName()
             {
-                return baseType.getSymbolicName();
+                return "configure";
             }
 
             public Record getRenderRecord()

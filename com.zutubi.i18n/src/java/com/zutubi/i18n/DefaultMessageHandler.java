@@ -56,38 +56,27 @@ public class DefaultMessageHandler implements MessageHandler
         return false;
     }
 
-    public String format(Object context, String key)
+    public String format(Context context, String key)
     {
         return format(context, getLocale(), key);
     }
 
-    public String format(Object context, Locale locale, String key)
+    public String format(Context context, Locale locale, String key)
     {
-        for (ResourceBundle bundle : bundleManager.getBundles(context, locale))
-        {
-            String formattedText = formatter.format(bundle, key);
-            if (formattedText != null)
-            {
-                return formattedText;
-            }
-        }
-        return null;
+        return internalFormat(context, locale, key);
     }
 
-    public String format(Object context, String key, Object... args)
+    public String format(Context context, String key, Object... args)
     {
-        for (ResourceBundle bundle : bundleManager.getBundles(context, getLocale()))
-        {
-            String formattedText = formatter.format(bundle, key, args);
-            if (formattedText != null)
-            {
-                return formattedText;
-            }
-        }
-        return null;
+        return internalFormat(context, getLocale(), key, args);
     }
 
-    public String format(Object context, Locale locale, String key, Object... args)
+    public String format(Context context, Locale locale, String key, Object... args)
+    {
+        return internalFormat(context, locale, key, args);
+    }
+
+    private String internalFormat(Context context, Locale locale, String key, Object... args)
     {
         for (ResourceBundle bundle : bundleManager.getBundles(context, locale))
         {

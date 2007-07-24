@@ -7,6 +7,7 @@ import com.zutubi.pulse.model.BuildColumns;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.prototype.config.user.UserSettingsConfiguration;
 import com.zutubi.util.logging.Logger;
 
 import java.util.List;
@@ -76,7 +77,7 @@ public class ViewBuildAction extends ProjectActionSupport
         if(summaryColumns == null)
         {
             User u = getLoggedInUser();
-            summaryColumns = new BuildColumns(u == null ? User.getDefaultProjectColumns() : u.getProjectSummaryColumns(), projectManager);
+            summaryColumns = new BuildColumns(u == null ? UserSettingsConfiguration.defaultProjectColumns() : u.getPreferences().getSettings().getProjectSummaryColumns(), projectManager);
         }
         return summaryColumns;
     }

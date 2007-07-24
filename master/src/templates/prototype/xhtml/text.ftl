@@ -4,7 +4,7 @@
     fieldConfig.value = '${parameters.value?js_string}';
 </#if>
 <#if parameters.size?exists>
-    fieldConfig.width = '${parameters.size?js_string}';
+    fieldConfig.width = ${parameters.size};
 </#if>
 form.add(new Ext.form.TextField(fieldConfig));
 

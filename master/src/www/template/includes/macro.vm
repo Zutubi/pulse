@@ -1999,7 +1999,7 @@
 ## about errors.
 ##
 #macro(updater $url $panelId $user)
-    #if($refreshInterval || $user.refreshInterval != 0)
+    #if($refreshInterval || $user.preferences.settings.refreshingEnabled)
     var updater = new Ajax.PeriodicalUpdater(
                       {success: "$panelId"},
                       "$url",
@@ -2008,7 +2008,7 @@
 #if($refreshInterval)
                           frequency: $refreshInterval
 #else
-                          frequency: $user.refreshInterval
+                          frequency: $user.preferences.settings.refreshInterval
 #end
                       });
     #end

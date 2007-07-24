@@ -1,7 +1,8 @@
+#set($config = $action.configuration)
 
 #macro(renderform)
     <div class="config-panel">
-        <h3 class="config-header">#i18n("key=form.heading")</h3>
+        <h3 class="config-header">${config.formHeading}</h3>
         ##<!-- add some space around the form so that it does not sit directly on the border. -->
         <div class="config-form-container">
             #pform("path=$config.path" "formName=mainform" "displayMode=true" "ajax=true" "namespace=aconfig")
@@ -33,7 +34,6 @@
     </div>
 #end
 
-#set($config = $action.configuration)
 <h2>$!webwork.htmlEncode($config.displayName)</h2>
 <p class="introduction">
     #i18n("key=introduction")

@@ -20,9 +20,8 @@ public class Form extends UIComponent
      * Ordered list of fields that make up this form.
      */
     private List<Field> fields = new LinkedList<Field>();
-
     /**
-     * The submit fields
+     * The buttons used to submit this form.
      */
     private List<Field> submitFields = new LinkedList<Field>();
 

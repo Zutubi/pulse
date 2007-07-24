@@ -13,6 +13,8 @@ import java.util.List;
 public class DefaultActionOptionProvider extends ListOptionProvider
 {
     private static final List<String> options = new LinkedList<String>();
+
+    static
     {
         options.add("welcome");
         options.add("dashboard");

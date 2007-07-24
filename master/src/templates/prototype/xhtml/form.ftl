@@ -15,7 +15,7 @@ width of its contents.  Floating it works, but hurts other things.
         var form = new Ext.form.Form({
             method: 'post',
             labelAlign: 'right',
-            labelWidth: 150,
+            labelWidth: ${form.parameters.labelWidth?default(150)},
             waitMsgTarget: true
         });
 

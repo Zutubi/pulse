@@ -1,7 +1,9 @@
 package com.zutubi.pulse.web.user;
 
+import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.prototype.config.user.DashboardConfiguration;
 import com.zutubi.pulse.security.AcegiUtils;
 
 /**
@@ -10,6 +12,7 @@ import com.zutubi.pulse.security.AcegiUtils;
 public class HideDashboardProjectAction extends UserActionSupport
 {
     private long id;
+    private ConfigurationProvider connfigurationProvider;
 
     public long getId()
     {
@@ -32,20 +35,27 @@ public class HideDashboardProjectAction extends UserActionSupport
         setUserLogin(login);
 
         User user = getUser();
+        DashboardConfiguration dashboardConfig = user.getConfig().getPreferences().getDashboard();
 
         Project p = projectManager.getProject(id);
         if(p != null)
         {
-            if(user.getShowAllProjects())
+            dashboardConfig = connfigurationProvider.deepClone(dashboardConfig);
+            if(dashboardConfig.isShowAllProjects())
             {
-                user.setShowAllProjects(false);
-                user.getShownProjects().addAll(projectManager.getProjects());
+                dashboardConfig.setShowAllProjects(false);
+                dashboardConfig.getShownProjects().addAll(projectManager.getAllProjectConfigs());
             }
 
-            user.getShownProjects().remove(p);
+            dashboardConfig.getShownProjects().remove(p.getConfig());
         }
 
         getUserManager().save(user);
         return SUCCESS;
+    }
+
+    public void setConnfigurationProvider(ConfigurationProvider connfigurationProvider)
+    {
+        this.connfigurationProvider = connfigurationProvider;
     }
 }

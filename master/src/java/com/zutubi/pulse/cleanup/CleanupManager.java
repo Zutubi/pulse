@@ -1,7 +1,6 @@
 package com.zutubi.pulse.cleanup;
 
 import com.zutubi.prototype.config.ConfigurationProvider;
-import com.zutubi.prototype.config.ConfigurationRegistry;
 import com.zutubi.prototype.config.TypeAdapter;
 import com.zutubi.prototype.config.TypeListener;
 import com.zutubi.prototype.type.record.PathUtils;
@@ -48,7 +47,6 @@ public class CleanupManager
     private Scheduler scheduler;
     private BuildManager buildManager;
 
-    private ConfigurationRegistry configurationRegistry;
     private ConfigurationProvider configurationProvider;
 
     private ProjectManager projectManager;
@@ -259,11 +257,6 @@ public class CleanupManager
         this.projectManager = projectManager;
     }
 
-    public void setConfigurationRegistry(ConfigurationRegistry configurationRegistry)
-    {
-        this.configurationRegistry = configurationRegistry;
-    }
-
     /**
      * Listen for build completed events, triggering each completed builds projects
      * cleanup routines.
@@ -381,7 +374,7 @@ public class CleanupManager
 
         public void cleanup()
         {
-            List<BuildResult> results = buildResultDao.getOldestCompletedBuilds(user, user.getMyBuildsCount());
+            List<BuildResult> results = buildResultDao.getOldestCompletedBuilds(user, user.getPreferences().getSettings().getMyBuildsCount());
             for(BuildResult result: results)
             {
                 buildManager.cleanupResult(result, true);

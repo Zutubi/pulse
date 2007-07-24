@@ -21,8 +21,8 @@ public interface ConfigurationProvider
     <T extends Configuration> T get(String path, Class<T> clazz);
 
     /**
-     * Retrieve a configuration instance of the specified type.  Note, if there are more than one instance
-     * of the specified type, no guarentees are provided on which of those instances will be returned.
+     * Retrieve a configuration instance of the specified type.  Note, if there is more than one instance
+     * of the specified type, no guarentee is provided regarding which of those instances will be returned.
      *
      * If no instance exists, null is returned.
      *
@@ -33,11 +33,11 @@ public interface ConfigurationProvider
     <T extends Configuration> T get(Class<T> clazz);
 
     /**
-     * Retrieve all of the instances of the configuration instances at the specified path.  All of these instances must
-     * be of the specified type.  The path may contain wildcards.
+     * Retrieve all configuration instances at paths matching the specified pattern.  All of these instances must
+     * be of the specified type.  The pattern is a path which may contain wildcards.
      *
      * For example, getAll("projects/*", ProjectConfiguration.class) will return all of the ProjectConfiguration
-     * instances located in the collection defined at "project/*"
+     * instances located in the collection defined at "projects"
      *
      * @param path of the configuration instances being looked up.  This path can contain wild card characters.
      * @param clazz is the expected type of the configuration instances.
@@ -97,6 +97,7 @@ public interface ConfigurationProvider
     void unregisterEventListener(ConfigurationEventListener listener);
 
     // should these methods be here or somewhere else?
+    <T extends Configuration> T deepClone(T instance);
     String insert(String path, Object instance);
     void save(String path, Object instance);
     void delete(String path);

@@ -1,7 +1,9 @@
 package com.zutubi.pulse.web.user;
 
 import com.opensymphony.util.TextUtils;
+import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.prototype.config.user.UserSettingsConfiguration;
 
 /**
  */
@@ -9,6 +11,7 @@ public class CustomiseBuildColumnsAction extends UserActionSupport
 {
     private String suffix;
     private String columns;
+    private ConfigurationProvider configurationProvider;
 
     public void setSuffix(String suffix)
     {
@@ -33,32 +36,38 @@ public class CustomiseBuildColumnsAction extends UserActionSupport
             return ERROR;
         }
 
+        UserSettingsConfiguration settings = configurationProvider.deepClone(user.getPreferences().getSettings());
         if(suffix.equals("my"))
         {
-            user.setMyBuildsColumns(columns);
+            settings.setMyBuildsColumns(columns);
         }
         else if(suffix.equals("my.projects"))
         {
-            user.setMyProjectsColumns(columns);
+            settings.setMyProjectsColumns(columns);
         }
         else if(suffix.equals("all.projects"))
         {
-            user.setAllProjectsColumns(columns);
+            settings.setAllProjectsColumns(columns);
         }
         else if(suffix.equals("project.summary"))
         {
-            user.setProjectSummaryColumns(columns);
+            settings.setProjectSummaryColumns(columns);
         }
         else if(suffix.equals("project.recent"))
         {
-            user.setProjectRecentColumns(columns);
+            settings.setProjectRecentColumns(columns);
         }
         else if(suffix.equals("project.history"))
         {
-            user.setProjectHistoryColumns(columns);
+            settings.setProjectHistoryColumns(columns);
         }
 
-        getUserManager().save(user);
+        configurationProvider.save(settings.getConfigurationPath(), settings);
         return SUCCESS;
+    }
+
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    {
+        this.configurationProvider = configurationProvider;
     }
 }

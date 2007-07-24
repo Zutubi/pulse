@@ -5,8 +5,8 @@ import com.zutubi.prototype.ConventionSupport;
 import com.zutubi.prototype.actions.Actions;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.PrimitiveType;
+import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.util.bean.ObjectFactory;
-import com.zutubi.util.logging.Logger;
 
 /**
  * The table descriptor factory is an implementation of a descriptor factory that uses an objects type definition
@@ -15,13 +15,11 @@ import com.zutubi.util.logging.Logger;
  */
 public class TableDescriptorFactory
 {
-    private static final Logger LOG = Logger.getLogger(TableDescriptorFactory.class);
-
     private ObjectFactory objectFactory;
 
     public TableDescriptor create(CompositeType type)
     {
-        TableDescriptor td = new TableDescriptor();
+        TableDescriptor td = new TableDescriptor(PrototypeUtils.getTableHeading(type));
 
         // default actions.
         ActionDescriptor ad = new ActionDescriptor();

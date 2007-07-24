@@ -117,4 +117,6 @@ public interface ProjectManager extends EntityManager<Project>
 
     @Secured({"ROLE_ADMINISTRATOR"})
     void delete(ProjectGroup projectGroup);
+
+    List<Project> mapConfigsToProjects(List<ProjectConfiguration> projects);
 }

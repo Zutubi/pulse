@@ -126,6 +126,11 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
         unregister(listener, asyncMux);
     }
 
+    public <T extends Configuration> T deepClone(T instance)
+    {
+        return configurationTemplateManager.deepClone(instance);
+    }
+
     private void unregister(final ConfigurationEventListener listener, MultiplexingListener mux)
     {
         mux.removeDelegate(new Predicate<EventListener>()

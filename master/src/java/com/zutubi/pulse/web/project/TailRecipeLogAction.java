@@ -1,11 +1,13 @@
 package com.zutubi.pulse.web.project;
 
+import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.MasterBuildPaths;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.RecipeResultNode;
 import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.prototype.config.user.UserSettingsConfiguration;
 import com.zutubi.util.CircularBuffer;
 
 import java.io.File;
@@ -28,6 +30,7 @@ public class TailRecipeLogAction extends ProjectActionSupport
     private String tail = "";
     private MasterConfigurationManager configurationManager;
     private boolean logExists;
+    private ConfigurationProvider configurationProvider;
 
     public long getId()
     {
@@ -180,29 +183,35 @@ public class TailRecipeLogAction extends ProjectActionSupport
             {
                 boolean changed = false;
 
+                UserSettingsConfiguration settings = user.getPreferences().getSettings();
                 if(refreshInterval <= 0)
                 {
-                    refreshInterval = user.getTailRefreshInterval();
+                    refreshInterval = settings.getTailRefreshInterval();
                 }
-                else if(refreshInterval != user.getTailRefreshInterval())
+                else if(refreshInterval != settings.getTailRefreshInterval())
                 {
-                    user.setTailRefreshInterval(refreshInterval);
+                    settings = configurationProvider.deepClone(settings);
+                    settings.setTailRefreshInterval(refreshInterval);
                     changed = true;
                 }
 
                 if(maxLines <= 0)
                 {
-                    maxLines = user.getTailLines();
+                    maxLines = settings.getTailLines();
                 }
-                else if(maxLines != user.getTailLines())
+                else if(maxLines != settings.getTailLines())
                 {
-                    user.setTailLines(maxLines);
+                    if (!changed)
+                    {
+                        settings = configurationProvider.deepClone(settings);
+                    }
+                    settings.setTailLines(maxLines);
                     changed = true;
                 }
 
                 if(changed)
                 {
-                    userManager.save(user);
+                    configurationProvider.save(settings.getConfigurationPath(), settings);
                 }
             }
         }
@@ -222,5 +231,10 @@ public class TailRecipeLogAction extends ProjectActionSupport
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
+    }
+
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    {
+        this.configurationProvider = configurationProvider;
     }
 }

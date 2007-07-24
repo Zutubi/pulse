@@ -11,11 +11,25 @@ import java.util.List;
 public class TableDescriptor
 {
     /**
+     * Heading for this table, already i18n'd.
+     */
+    private String heading;
+    /**
      * The columns descriptors associated with this table descriptor.
      */
     private List<ColumnDescriptor> columns = new LinkedList<ColumnDescriptor>();
 
     private ActionDescriptor actions = null;
+
+    public TableDescriptor(String heading)
+    {
+        this.heading = heading;
+    }
+
+    public String getHeading()
+    {
+        return heading;
+    }
 
     /**
      * Retreive the list of column descriptors associated with this table descriptor.

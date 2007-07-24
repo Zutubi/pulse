@@ -1,7 +1,7 @@
 <table>
 <#assign tablewidth = table.columns?size + 1/>
     <tr>
-        <th class="heading" colspan="${tablewidth}">${"table.header.label"?i18n}</th>
+        <th class="heading" colspan="${tablewidth}">${table.heading?html}</th>
     </tr>
     <tr>
 <#list table.columns as column>

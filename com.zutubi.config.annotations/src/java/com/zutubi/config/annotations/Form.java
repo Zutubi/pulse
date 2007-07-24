@@ -27,4 +27,6 @@ public @interface Form
     String[] fieldOrder();
 
     String[] actions() default { "save", "cancel" };
+
+    int labelWidth() default 150;
 }

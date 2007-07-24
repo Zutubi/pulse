@@ -3,6 +3,7 @@ package com.zutubi.pulse.web.user;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.ChangelistComparator;
 import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.prototype.config.user.DashboardConfiguration;
 import com.zutubi.pulse.prototype.config.user.contacts.ContactConfiguration;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.web.ActionSupport;
@@ -18,6 +19,7 @@ import java.util.Set;
 public class DashboardAction extends ActionSupport
 {
     private User user;
+    private DashboardConfiguration dashboardConfig;
     private List<BuildResult> myBuilds;
     private List<Project> shownProjects;
     private List<ProjectGroup> shownGroups;
@@ -33,6 +35,11 @@ public class DashboardAction extends ActionSupport
     public User getUser()
     {
         return user;
+    }
+
+    public DashboardConfiguration getDashboardConfig()
+    {
+        return dashboardConfig;
     }
 
     public List<BuildResult> getMyBuilds()
@@ -54,14 +61,14 @@ public class DashboardAction extends ActionSupport
     {
         if(columns == null)
         {
-            columns = new BuildColumns(user.getMyProjectsColumns(), projectManager);
+            columns = new BuildColumns(user.getPreferences().getSettings().getMyProjectsColumns(), projectManager);
         }
         return columns;
     }
     
     public List<BuildResult> getLatestBuilds(Project p)
     {
-        return buildManager.getLatestBuildResultsForProject(p, user.getDashboardBuildCount());
+        return buildManager.getLatestBuildResultsForProject(p, dashboardConfig.getBuildCount());
     }
 
     public List<Changelist> getChangelists()
@@ -92,15 +99,16 @@ public class DashboardAction extends ActionSupport
             return ERROR;
         }
 
+        dashboardConfig = user.getConfig().getPreferences().getDashboard();
         myBuilds = buildManager.getPersonalBuilds(user);
 
-        if(user.getShowAllProjects())
+        if(dashboardConfig.isShowAllProjects())
         {
             shownProjects = projectManager.getAllProjectsCached();
         }
         else
         {
-            shownProjects = new ArrayList<Project>(user.getShownProjects());
+            shownProjects = projectManager.mapConfigsToProjects(dashboardConfig.getShownProjects());
         }
         
 //        Collections.sort(shownProjects, new NamedEntityComparator());
@@ -108,13 +116,13 @@ public class DashboardAction extends ActionSupport
         shownGroups = new ArrayList<ProjectGroup>(user.getShownGroups());
         Collections.sort(shownGroups, new NamedEntityComparator());
 
-        changelists = buildManager.getLatestChangesForUser(user, user.getMyChangesCount());
+        changelists = buildManager.getLatestChangesForUser(user, dashboardConfig.getMyChangeCount());
         Collections.sort(changelists, new ChangelistComparator());
 
         Set<Project> projects = userManager.getUserProjects(user, projectManager);
-        if(projects.size() > 0 && user.getShowProjectChanges())
+        if(projects.size() > 0 && dashboardConfig.isShowProjectChanges())
         {
-            projectChangelists = buildManager.getLatestChangesForProjects(projects.toArray(new Project[]{}), user.getProjectChangesCount());
+            projectChangelists = buildManager.getLatestChangesForProjects(projects.toArray(new Project[]{}), dashboardConfig.getProjectChangeCount());
         }
 
         for(ContactConfiguration contact: user.getConfig().getPreferences().getContacts().values())

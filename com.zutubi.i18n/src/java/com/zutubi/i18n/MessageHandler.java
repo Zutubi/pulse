@@ -42,9 +42,9 @@ public interface MessageHandler
      *
      * @return
      */
-    public String format(Object context, String key);
+    public String format(Context context, String key);
 
-    public String format(Object context, Locale locale, String key);
+    public String format(Context context, Locale locale, String key);
 
     /**
      * Retrieve the message for the specified i18n key within the provided
@@ -56,9 +56,9 @@ public interface MessageHandler
      *
      * @return
      */
-    public String format(Object context, String key, Object... args);
+    public String format(Context context, String key, Object... args);
 
-    public String format(Object context, Locale locale, String key, Object... args);
+    public String format(Context context, Locale locale, String key, Object... args);
 
     /**
      * Clear any cached data held by this message handler.

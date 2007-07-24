@@ -1,13 +1,15 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.core.model.PersistentName;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.prototype.config.user.UserSettingsConfiguration;
 import com.zutubi.pulse.web.PagingSupport;
 import com.zutubi.pulse.xwork.interceptor.Preparable;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  */
@@ -31,21 +33,6 @@ public class HistoryAction extends ProjectActionSupport implements Preparable
     private List<String> stateFilters;
     private Long spec = 0L;
     private BuildColumns columns;
-
-    /**
-     * The system configuration manager.
-     */
-    private MasterConfigurationManager configurationManager;
-
-    /**
-     * Required resource.
-     *
-     * @param configurationManager
-     */
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
-    {
-        this.configurationManager = configurationManager;
-    }
 
     public long getId()
     {
@@ -173,7 +160,7 @@ public class HistoryAction extends ProjectActionSupport implements Preparable
         }
 
         User user = getLoggedInUser();
-        columns = new BuildColumns(user == null ? User.getDefaultProjectColumns() : user.getProjectHistoryColumns(), projectManager);
+        columns = new BuildColumns(user == null ? UserSettingsConfiguration.defaultProjectColumns() : user.getPreferences().getSettings().getProjectHistoryColumns(), projectManager);
 
         return SUCCESS;
     }

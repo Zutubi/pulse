@@ -4,7 +4,6 @@ import com.zutubi.config.annotations.*;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.scm.ScmException;
-import com.zutubi.pulse.servercore.scm.ScmClient;
 import com.zutubi.pulse.servercore.scm.cvs.CvsClient;
 import com.zutubi.pulse.servercore.validation.annotation.CvsRoot;
 import com.zutubi.validation.annotations.Required;
@@ -29,6 +28,12 @@ public class CvsConfiguration extends ScmConfiguration
     @Password
     private String password;
     private String branch;
+
+    public CvsConfiguration()
+    {
+        setQuietPeriodEnabled(true);
+        setQuietPeriod(5);
+    }
 
     public String getRoot()
     {

@@ -1,22 +1,17 @@
 package com.zutubi.pulse.prototype.config.user;
 
-import com.zutubi.config.annotations.Internal;
-import com.zutubi.config.annotations.Select;
-import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.Transient;
+import com.zutubi.config.annotations.*;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.model.BuildColumns;
 import com.zutubi.pulse.web.DefaultAction;
 import com.zutubi.util.StringUtils;
-
-import java.util.HashMap;
-import java.util.Map;
+import com.zutubi.validation.annotations.Numeric;
 
 /**
- *
- *
+ * General user preferences that do not fit in another category.
  */
 @SymbolicName("zutubi.userSettingConfig")
+@Form(labelWidth = 250, fieldOrder = {"defaultAction", "myBuildsCount", "refreshingEnabled", "refreshInterval", "tailLines", "tailRefreshInterval"})
 public class UserSettingsConfiguration extends AbstractConfiguration
 {
     private static final String PROPERTY_DASHBOARD_BUILD_COUNT = "user.dashboardBuildCount";
@@ -37,283 +32,164 @@ public class UserSettingsConfiguration extends AbstractConfiguration
     private static final String PROPERTY_PROJECT_RECENT_COLUMNS = "project.recent.columns";
     private static final String PROPERTY_PROJECT_HISTORY_COLUMNS = "project.history.columns";
 
-    @Transient // FIXME.
-    private Map<String, String> properties = new HashMap<String, String>();
 
     @Select(optionProvider = "DefaultActionOptionProvider")
-    public String getDefaultAction()
-    {
-        if (hasProperty(PROPERTY_DEFAULT_ACTION))
-        {
-            return getProperty(PROPERTY_DEFAULT_ACTION);
-        }
-        return DefaultAction.DASHBOARD_ACTION;
-    }
-
-    public void setDefaultAction(String defaultAction)
-    {
-        setProperty(PROPERTY_DEFAULT_ACTION, defaultAction);
-    }
-
+    private String defaultAction = DefaultAction.WELCOME_ACTION;
+    @ControllingCheckbox(dependentFields = "refreshInterval")
+    boolean refreshingEnabled = true;
     /**
      * Number of seconds between refreshes of "live" content, or 0 if the
      * user disables refreshing.
      */
+    @Numeric(min = 1)
+    private int refreshInterval = 60;
+    @Numeric(min = 1)
+    private int tailRefreshInterval = 60;
+    @Numeric(min = 1)
+    private int tailLines = 30;
+    @Numeric(min = 1)
+    private int myBuildsCount = 5;
+
+    @Internal
+    private String myBuildsColumns = defaultProjectColumns();
+    @Internal
+    private String myProjectsColumns = defaultProjectColumns();
+    @Internal
+    private String allProjectsColumns = defaultAllProjectsColumns();
+    @Internal
+    private String projectSummaryColumns = defaultProjectColumns();
+    @Internal
+    private String projectRecentColumns = defaultProjectColumns();
+    @Internal
+    private String projectHistoryColumns = defaultProjectColumns();
+
+    public String getDefaultAction()
+    {
+        return defaultAction;
+    }
+
+    public void setDefaultAction(String defaultAction)
+    {
+        this.defaultAction = defaultAction;
+    }
+
+    public boolean isRefreshingEnabled()
+    {
+        return refreshingEnabled;
+    }
+
+    public void setRefreshingEnabled(boolean refreshingEnabled)
+    {
+        this.refreshingEnabled = refreshingEnabled;
+    }
+
     public int getRefreshInterval()
     {
-        if (hasProperty(PROPERTY_REFRESH_INTERVAL))
-        {
-            return Integer.valueOf(getProperty(PROPERTY_REFRESH_INTERVAL));
-        }
-        return 60;
+        return refreshInterval;
     }
 
     public void setRefreshInterval(int refreshInterval)
     {
-        setProperty(PROPERTY_REFRESH_INTERVAL, Integer.toString(refreshInterval));
+        this.refreshInterval = refreshInterval;
     }
 
     public int getTailRefreshInterval()
     {
-        return getIntProperty(PROPERTY_TAIL_REFRESH_INTERVAL, 60);
+        return tailRefreshInterval;
     }
 
-    public void setTailRefreshInterval(int interval)
+    public void setTailRefreshInterval(int tailRefreshInterval)
     {
-        setIntProperty(PROPERTY_TAIL_REFRESH_INTERVAL, interval);
+        this.tailRefreshInterval = tailRefreshInterval;
     }
 
     public int getTailLines()
     {
-        return getIntProperty(PROPERTY_TAIL_LINES, 30);
+        return tailLines;
     }
 
-    public void setTailLines(int lines)
+    public void setTailLines(int tailLines)
     {
-        setIntProperty(PROPERTY_TAIL_LINES, lines);
-    }
-
-    @Internal
-    public int getDashboardBuildCount()
-    {
-        if (hasProperty(PROPERTY_DASHBOARD_BUILD_COUNT))
-        {
-            return Integer.valueOf(getProperty(PROPERTY_DASHBOARD_BUILD_COUNT));
-        }
-        return 2;
-    }
-
-    public void setDashboardBuildCount(int buildCount)
-    {
-        setProperty(PROPERTY_DASHBOARD_BUILD_COUNT, Integer.toString(buildCount));
-    }
-
-    @Internal
-    public boolean getShowAllProjects()
-    {
-        return getBooleanProperty(PROPERTY_SHOW_ALL_PROJECTS, true);
-    }
-
-    public void setShowAllProjects(boolean show)
-    {
-        setBooleanProperty(PROPERTY_SHOW_ALL_PROJECTS, show);
-    }
-
-    @Internal
-    public boolean getShowMyChanges()
-    {
-        return getBooleanProperty(PROPERTY_SHOW_MY_CHANGES, true);
-    }
-
-    public void setShowMyChanges(boolean show)
-    {
-        setBooleanProperty(PROPERTY_SHOW_MY_CHANGES, show);
-    }
-
-    @Internal
-    public int getMyChangesCount()
-    {
-        return getIntProperty(PROPERTY_MY_CHANGES_COUNT, 10);
-    }
-
-    public void setMyChangesCount(int count)
-    {
-        setIntProperty(PROPERTY_MY_CHANGES_COUNT, count);
-    }
-
-    @Internal
-    public boolean getShowProjectChanges()
-    {
-        return getBooleanProperty(PROPERTY_SHOW_PROJECT_CHANGES, false);
-    }
-
-    public void setShowProjectChanges(boolean show)
-    {
-        setBooleanProperty(PROPERTY_SHOW_PROJECT_CHANGES, show);
-    }
-
-    @Internal
-    public int getProjectChangesCount()
-    {
-        return getIntProperty(PROPERTY_PROJECT_CHANGES_COUNT, 10);
-    }
-
-    public void setProjectChangesCount(int count)
-    {
-        setIntProperty(PROPERTY_PROJECT_CHANGES_COUNT, count);
+        this.tailLines = tailLines;
     }
 
     public int getMyBuildsCount()
     {
-        return getIntProperty(PROPERTY_MY_BUILDS_COUNT, 5);
+        return myBuildsCount;
     }
 
-    public void setMyBuildsCount(int count)
+    public void setMyBuildsCount(int myBuildsCount)
     {
-        setIntProperty(PROPERTY_MY_BUILDS_COUNT, count);
+        this.myBuildsCount = myBuildsCount;
     }
 
-    @Internal
     public String getMyBuildsColumns()
     {
-        return getStringProperty(PROPERTY_MY_BUILDS_COLUMNS, StringUtils.join(",", BuildColumns.KEY_ID, BuildColumns.KEY_PROJECT, BuildColumns.KEY_STATUS, BuildColumns.KEY_TESTS, BuildColumns.KEY_WHEN, BuildColumns.KEY_ELAPSED, BuildColumns.KEY_ACTIONS));
+        return myBuildsColumns;
     }
 
-    public void setMyBuildsColumns(String columns)
+    public void setMyBuildsColumns(String myBuildsColumns)
     {
-        setProperty(PROPERTY_MY_BUILDS_COLUMNS, columns);
+        this.myBuildsColumns = myBuildsColumns;
     }
 
-    @Internal
     public String getMyProjectsColumns()
     {
-        return getStringProperty(PROPERTY_MY_PROJECTS_COLUMNS, getDefaultProjectColumns());
+        return myProjectsColumns;
     }
 
-    public void setMyProjectsColumns(String columns)
+    public void setMyProjectsColumns(String myProjectsColumns)
     {
-        setProperty(PROPERTY_MY_PROJECTS_COLUMNS, columns);
+        this.myProjectsColumns = myProjectsColumns;
     }
 
-    @Internal
     public String getAllProjectsColumns()
     {
-        return getStringProperty(PROPERTY_ALL_PROJECTS_COLUMNS, getDefaultAllProjectsColumns());
+        return allProjectsColumns;
     }
 
-    public void setAllProjectsColumns(String columns)
+    public void setAllProjectsColumns(String allProjectsColumns)
     {
-        setProperty(PROPERTY_ALL_PROJECTS_COLUMNS, columns);
+        this.allProjectsColumns = allProjectsColumns;
     }
 
-    @Internal
     public String getProjectSummaryColumns()
     {
-        return getStringProperty(PROPERTY_PROJECT_SUMMARY_COLUMNS, getDefaultProjectColumns());
+        return projectSummaryColumns;
     }
 
-    public void setProjectSummaryColumns(String columns)
+    public void setProjectSummaryColumns(String projectSummaryColumns)
     {
-        setProperty(PROPERTY_PROJECT_SUMMARY_COLUMNS, columns);
+        this.projectSummaryColumns = projectSummaryColumns;
     }
 
-    @Internal
     public String getProjectRecentColumns()
     {
-        return getStringProperty(PROPERTY_PROJECT_RECENT_COLUMNS, getDefaultProjectColumns());
+        return projectRecentColumns;
     }
 
-    public void setProjectRecentColumns(String columns)
+    public void setProjectRecentColumns(String projectRecentColumns)
     {
-        setProperty(PROPERTY_PROJECT_RECENT_COLUMNS, columns);
+        this.projectRecentColumns = projectRecentColumns;
     }
 
-    @Internal
     public String getProjectHistoryColumns()
     {
-        return getStringProperty(PROPERTY_PROJECT_HISTORY_COLUMNS, getDefaultProjectColumns());
+        return projectHistoryColumns;
     }
 
-    public void setProjectHistoryColumns(String columns)
+    public void setProjectHistoryColumns(String projectHistoryColumns)
     {
-        setProperty(PROPERTY_PROJECT_HISTORY_COLUMNS, columns);
+        this.projectHistoryColumns = projectHistoryColumns;
     }
 
-    @Internal
-    public static String getDefaultProjectColumns()
-    {
-        return StringUtils.join(",", BuildColumns.KEY_ID, BuildColumns.KEY_STATUS, BuildColumns.KEY_REASON, BuildColumns.KEY_TESTS, BuildColumns.KEY_WHEN, BuildColumns.KEY_ELAPSED, BuildColumns.KEY_ACTIONS);
-    }
-
-    public static String getDefaultAllProjectsColumns()
+    public static String defaultProjectColumns()
     {
         return StringUtils.join(",", BuildColumns.KEY_ID, BuildColumns.KEY_STATUS, BuildColumns.KEY_REASON, BuildColumns.KEY_TESTS, BuildColumns.KEY_WHEN, BuildColumns.KEY_ELAPSED, BuildColumns.KEY_ACTIONS);
     }
 
-    public Map<String, String> getProperties()
+    public static String defaultAllProjectsColumns()
     {
-        return properties;
+        return StringUtils.join(",", BuildColumns.KEY_ID, BuildColumns.KEY_STATUS, BuildColumns.KEY_REASON, BuildColumns.KEY_TESTS, BuildColumns.KEY_WHEN, BuildColumns.KEY_ELAPSED, BuildColumns.KEY_ACTIONS);
     }
-
-    public void setProperties(Map<String, String> properties)
-    {
-        this.properties = properties;
-    }
-
-    private boolean getBooleanProperty(String property, boolean defaultValue)
-    {
-        if(hasProperty(property))
-        {
-            return Boolean.valueOf(getProperty(property));
-        }
-
-        return defaultValue;
-    }
-
-    private void setBooleanProperty(String property, boolean value)
-    {
-        setProperty(property, Boolean.toString(value));
-    }
-
-    private int getIntProperty(String property, int defaultValue)
-    {
-        if(hasProperty(property))
-        {
-            return Integer.parseInt(getProperty(property));
-        }
-
-        return defaultValue;
-    }
-
-    private void setIntProperty(String property, int value)
-    {
-        setProperty(property, Integer.toString(value));
-    }
-
-    private String getStringProperty(String property, String defaultValue)
-    {
-        if(hasProperty(property))
-        {
-            return getProperty(property);
-        }
-
-        return defaultValue;
-    }
-
-    private void setProperty(String key, String value)
-    {
-        getProperties().put(key, value);
-    }
-
-    private String getProperty(String key)
-    {
-        return getProperties().get(key);
-    }
-
-    private boolean hasProperty(String key)
-    {
-        return getProperties().containsKey(key);
-    }
-
-
 }
