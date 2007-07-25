@@ -33,7 +33,7 @@ public class SlaveAgent implements Agent
     /**
      * The upgrade state is only used when the slave enable state is UPGRADING.
      */
-    private UpgradeState upgradeState = UpgradeState.NONE;
+    private UpgradeState upgradeState = UpgradeState.INITIAL;
     private int upgradeProgress = -1;
     private String upgradeMessage = null;
 

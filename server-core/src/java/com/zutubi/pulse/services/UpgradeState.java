@@ -5,9 +5,10 @@ package com.zutubi.pulse.services;
 public enum UpgradeState
 {
     /**
-     * Not currently upgrading.
+     * Not currently upgrading, or waiting for the first message from the
+     * agent.
      */
-    NONE,
+    INITIAL,
     /**
      * Underway.
      */
