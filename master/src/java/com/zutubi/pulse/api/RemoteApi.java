@@ -281,12 +281,12 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         }
     }
 
-    public Vector<Hashtable<String, Object>> queryBuildsForProject(String token, String projectName, String[] resultStates, String[] buildSpecifications, long earliestStartTime, long latestStartTime, int firstResult, int maxResults, boolean mostRecentFirst) throws AuthenticationException
+    public Vector<Hashtable<String, Object>> queryBuildsForProject(String token, String projectName, String[] resultStates, String[] buildSpecifications, int firstResult, int maxResults, boolean mostRecentFirst) throws AuthenticationException
     {
         tokenManager.verifyUser(token);
         Project project = internalGetProject(projectName);
 
-        List<BuildResult> builds = buildManager.queryBuilds(new Project[]{project}, mapStates(resultStates), mapSpecs(buildSpecifications, project), earliestStartTime, latestStartTime, null, firstResult, maxResults, mostRecentFirst);
+        List<BuildResult> builds = buildManager.queryBuilds(new Project[]{project}, mapStates(resultStates), mapSpecs(buildSpecifications, project), -1, -1, null, firstResult, maxResults, mostRecentFirst);
         Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(builds.size());
         for (BuildResult build : builds)
         {
