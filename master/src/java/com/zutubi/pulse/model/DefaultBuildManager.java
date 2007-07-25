@@ -3,7 +3,6 @@ package com.zutubi.pulse.model;
 import com.zutubi.pulse.MasterBuildPaths;
 import com.zutubi.pulse.bootstrap.DatabaseConsole;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.bootstrap.MasterUserPaths;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.model.persistence.ArtifactDao;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
@@ -73,28 +72,31 @@ public class DefaultBuildManager implements BuildManager
 
     private void cleanupDeadDirectories()
     {
-        MasterUserPaths paths = configurationManager.getUserPaths();
-        File[] projectDirs = paths.getProjectRoot().listFiles(new FileFilter()
+        File projectRoot = configurationManager.getUserPaths().getProjectRoot();
+        if (projectRoot.isDirectory())
         {
-            public boolean accept(File f)
-            {
-                return f.isDirectory();
-            }
-        });
-
-        for(File projectDir: projectDirs)
-        {
-            File[] deadDirs = projectDir.listFiles(new FileFilter()
+            File[] projectDirs = projectRoot.listFiles(new FileFilter()
             {
                 public boolean accept(File f)
                 {
-                    return f.isDirectory() && f.getName().endsWith(DEAD_DIR_SUFFIX);
+                    return f.isDirectory();
                 }
             });
 
-            for(File dead: deadDirs)
+            for(File projectDir: projectDirs)
             {
-                scheduleDeadCleanup(dead);
+                File[] deadDirs = projectDir.listFiles(new FileFilter()
+                {
+                    public boolean accept(File f)
+                    {
+                        return f.isDirectory() && f.getName().endsWith(DEAD_DIR_SUFFIX);
+                    }
+                });
+
+                for(File dead: deadDirs)
+                {
+                    scheduleDeadCleanup(dead);
+                }
             }
         }
     }
