@@ -16,7 +16,7 @@
         #dynamicLinkCell($agent.name "viewAgentStatus.action?agentId=$agent.id")
         #staticCell($agent.location)
 
-        #if($agent.slave.enabled)
+        #if($agent.enabled)
             #staticCell($agent.status.prettyString)
 #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
             #linkCell("agent.ping.$agent.name" "agent.ping" "$base/admin/pingAgent.action?agentId=$agent.id")

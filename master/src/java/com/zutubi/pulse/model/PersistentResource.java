@@ -44,6 +44,7 @@ public class PersistentResource extends Resource
     {
         // Deep copy the other way: don't want hibernate proxies in result.
         Resource resource = new Resource(getName());
+        resource.setDefaultVersion(getDefaultVersion());
         for(ResourceProperty p: getProperties().values())
         {
             resource.addProperty(new ResourceProperty(p.getName(), p.getValue(), p.getAddToEnvironment(), p.getAddToPath(), p.getResolveVariables()));
