@@ -1015,17 +1015,17 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             onlineAgents.put(slave.getId(), agent);
         }
 
-        public void enableSlave(Slave slave)
+        public void enableSlave(long slaveId)
         {
             throw new RuntimeException("Method not yet implemented.");
         }
 
-        public void disableSlave(Slave slave)
+        public void disableSlave(long slaveId)
         {
             throw new RuntimeException("Method not yet implemented.");
         }
 
-        public void setSlaveState(Slave slave, Slave.EnableState state)
+        public void setSlaveState(long slaveId, Slave.EnableState state)
         {
             throw new RuntimeException("Method not yet implemented.");
         }

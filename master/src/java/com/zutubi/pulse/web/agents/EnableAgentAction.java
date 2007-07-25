@@ -20,7 +20,7 @@ public class EnableAgentAction extends AgentActionSupport
         {
             try
             {
-                getAgentManager().setSlaveState(slave, Slave.EnableState.valueOf(enable));
+                getAgentManager().setSlaveState(slave.getId(), Slave.EnableState.valueOf(enable));
             }
             catch(IllegalArgumentException e)
             {

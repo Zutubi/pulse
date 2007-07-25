@@ -153,18 +153,19 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         slaveAdded(slave.getId());
     }
 
-    public void enableSlave(Slave slave)
+    public void enableSlave(long slaveId)
     {
-        setSlaveState(slave, Slave.EnableState.ENABLED);
+        setSlaveState(slaveId, Slave.EnableState.ENABLED);
     }
 
-    public void disableSlave(Slave slave)
+    public void disableSlave(long slaveId)
     {
-        setSlaveState(slave, Slave.EnableState.DISABLED);
+        setSlaveState(slaveId, Slave.EnableState.DISABLED);
     }
 
-    public void setSlaveState(Slave slave, Slave.EnableState state)
+    public void setSlaveState(long slaveId, Slave.EnableState state)
     {
+        Slave slave = slaveManager.getSlave(slaveId);
         slave.setEnableState(state);
         slaveManager.save(slave);
         slaveChanged(slave.getId());
@@ -234,7 +235,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
                     try
                     {
                         List<Resource> resources = agent.getSlaveService().discoverResources(serviceTokenManager.getToken());
-                        resourceManager.addDiscoveredResources(agent.getSlave(), resources);
+                        resourceManager.addDiscoveredResources(slaveManager.getSlave(agent.getId()), resources);
                     }
                     catch (Exception e)
                     {
@@ -258,7 +259,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 
     private void updateAgent(SlaveAgent agent)
     {
-        Slave slave = agent.getSlave();
+        Slave slave = slaveManager.getSlave(agent.getId());
         slave.setEnableState(Slave.EnableState.UPGRADING);
         slaveManager.save(slave);
 
@@ -268,7 +269,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 
         try
         {
-            updaters.put(agent.getSlave().getId(), updater);
+            updaters.put(agent.getId(), updater);
             updater.start();
         }
         finally
@@ -304,7 +305,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
     public void handleEvent(Event evt)
     {
         SlaveUpgradeCompleteEvent suce = (SlaveUpgradeCompleteEvent) evt;
-        Slave slave = suce.getSlaveAgent().getSlave();
+        Slave slave = slaveManager.getSlave(suce.getSlaveAgent().getId());
 
         updatersLock.lock();
         try

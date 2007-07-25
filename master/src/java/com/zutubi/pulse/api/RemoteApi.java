@@ -696,7 +696,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
 
         if(agent.isSlave())
         {
-            agentManager.enableSlave(((SlaveAgent)agent).getSlave());
+            agentManager.enableSlave(((SlaveAgent)agent).getId());
         }
         else
         {
@@ -718,7 +718,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
 
         if(agent.isSlave())
         {
-            agentManager.disableSlave(((SlaveAgent)agent).getSlave());
+            agentManager.disableSlave(((SlaveAgent)agent).getId());
         }
         else
         {

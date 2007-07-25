@@ -70,7 +70,7 @@ public class AgentUpdater implements Runnable
 
         try
         {
-            boolean accepted = slaveService.updateVersion(token, masterBuild, masterUrl, agent.getSlave().getId(), packageUrl, packageFile.length());
+            boolean accepted = slaveService.updateVersion(token, masterBuild, masterUrl, agent.getId(), packageUrl, packageFile.length());
 
             if(!accepted)
             {

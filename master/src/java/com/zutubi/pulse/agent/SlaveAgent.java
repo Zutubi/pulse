@@ -2,7 +2,6 @@ package com.zutubi.pulse.agent;
 
 import com.zutubi.pulse.BuildService;
 import com.zutubi.pulse.SystemInfo;
-import com.zutubi.pulse.Version;
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.model.Slave;
 import com.zutubi.pulse.services.ServiceTokenManager;
@@ -18,8 +17,12 @@ import java.util.List;
  */
 public class SlaveAgent implements Agent
 {
-    private final int masterBuildNumber = Version.getVersion().getBuildNumberAsInt();
-
+    /**
+     * This cached version of the slave is fine for read-only purposes as a
+     * new SlaveAgent is created on any change to the underlying Slave.
+     * However, do not provide access to this outside this class as it should
+     * not be used to update the slave (a new lookup should be forced).
+     */
     private Slave slave;
     private Status status;
     private long lastPingTime = 0;
@@ -81,11 +84,6 @@ public class SlaveAgent implements Agent
     public String getName()
     {
         return slave.getName();
-    }
-
-    public Slave getSlave()
-    {
-        return slave;
     }
 
     public SlaveService getSlaveService()
@@ -202,5 +200,10 @@ public class SlaveAgent implements Agent
     public String getUpgradeMessage()
     {
         return upgradeMessage;
+    }
+
+    public Slave.EnableState getEnableState()
+    {
+        return slave.getEnableState();
     }
 }

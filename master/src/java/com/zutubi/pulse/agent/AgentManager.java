@@ -20,9 +20,9 @@ public interface AgentManager
     int getAgentCount();
 
     void addSlave(Slave slave) throws LicenseException;
-    void enableSlave(Slave slave);
-    void disableSlave(Slave slave);
-    void setSlaveState(Slave slave, Slave.EnableState state);
+    void enableSlave(long slaveId);
+    void disableSlave(long slaveId);
+    void setSlaveState(long slaveId, Slave.EnableState state);
 
     void slaveAdded(long id);
     void slaveChanged(long id);
