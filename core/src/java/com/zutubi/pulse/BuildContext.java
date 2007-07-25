@@ -3,6 +3,8 @@ package com.zutubi.pulse;
 import com.zutubi.pulse.repository.FileRepository;
 
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The build context contains contextual information relating to the build
@@ -14,10 +16,7 @@ public class BuildContext
     public static final SimpleDateFormat PULSE_BUILD_TIMESTAMP_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm");
     
     private long buildNumber = -1;
-    private long buildTimestamp = -1;
-    private String buildReason;
-    private String buildRevision = null;
-    private String buildTrigger = null;
+    private Map<String, String> properties = new HashMap<String, String>();
     /**
      * The version can be extracted while executing a command, and is
      * communicated back out by setting it here.
@@ -38,46 +37,6 @@ public class BuildContext
     public void setBuildNumber(long buildNumber)
     {
         this.buildNumber = buildNumber;
-    }
-
-    public long getBuildTimestamp()
-    {
-        return buildTimestamp;
-    }
-
-    public void setBuildTimestamp(long buildTimestamp)
-    {
-        this.buildTimestamp = buildTimestamp;
-    }
-
-    public String getBuildReason()
-    {
-        return buildReason;
-    }
-
-    public void setBuildReason(String buildReason)
-    {
-        this.buildReason = buildReason;
-    }
-
-    public String getBuildRevision()
-    {
-        return buildRevision;
-    }
-
-    public void setBuildRevision(String buildRevision)
-    {
-        this.buildRevision = buildRevision;
-    }
-
-    public String getBuildTrigger()
-    {
-        return buildTrigger;
-    }
-
-    public void setBuildTrigger(String buildTrigger)
-    {
-        this.buildTrigger = buildTrigger;
     }
 
     public String getBuildVersion()
@@ -108,5 +67,15 @@ public class BuildContext
     public String getProjectName()
     {
         return projectName;
+    }
+
+    public Map<String, String> getProperties()
+    {
+        return properties;
+    }
+
+    public void addProperty(String name, String value)
+    {
+        properties.put(name, value);
     }
 }

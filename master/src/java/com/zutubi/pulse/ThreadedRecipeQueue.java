@@ -2,6 +2,7 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.AgentManager;
+import com.zutubi.pulse.agent.MasterAgent;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
@@ -9,6 +10,7 @@ import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.events.*;
+import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.model.BuildReason;
 import com.zutubi.pulse.model.Project;
@@ -19,10 +21,7 @@ import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.util.Constants;
 import com.zutubi.pulse.util.logging.Logger;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
@@ -86,6 +85,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     
     private AgentManager agentManager;
     private EventManager eventManager;
+    private MasterConfigurationManager configurationManager;
 
 
     public ThreadedRecipeQueue()
@@ -513,17 +513,19 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     {
         BuildContext context = new BuildContext();
         context.setBuildNumber(request.getBuild().getNumber());
+        context.setProjectName(recipeRequest.getProject());
 
         BuildReason buildReason = request.getBuild().getReason();
-        context.setBuildReason(buildReason.getSummary());
+        context.addProperty("build.reason", buildReason.getSummary());
         if(buildReason instanceof TriggerBuildReason)
         {
-            context.setBuildTrigger(((TriggerBuildReason)buildReason).getTriggerName());
+            context.addProperty("build.trigger", ((TriggerBuildReason)buildReason).getTriggerName());
         }
 
-        context.setBuildRevision(buildRevision.getRevision().getRevisionString());
-        context.setBuildTimestamp(buildRevision.getTimestamp());
-        context.setProjectName(recipeRequest.getProject());
+        context.addProperty("build.revision", buildRevision.getRevision().getRevisionString());
+        context.addProperty("build.timestamp", BuildContext.PULSE_BUILD_TIMESTAMP_FORMAT.format(new Date(buildRevision.getTimestamp())));
+        context.addProperty("build.timestamp.millis", Long.toString(buildRevision.getTimestamp()));
+        context.addProperty("master.url", MasterAgent.constructMasterUrl(configurationManager.getAppConfig(), configurationManager.getSystemConfig()));
         return context;
     }
 
@@ -762,6 +764,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         }
 
         this.unsatisfiableTimeout = timeout;
+        this.configurationManager = configurationManager;
     }
 
     private static class DispatchedRequest

@@ -116,4 +116,9 @@ public class MasterAgent implements Agent
 
         return url;
     }
+
+    public static String constructMasterUrl(MasterConfiguration appConfig, SystemConfiguration systemConfig)
+    {
+        return "http://" + constructMasterLocation(appConfig, systemConfig);
+    }
 }

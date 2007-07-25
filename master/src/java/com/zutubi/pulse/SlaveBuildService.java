@@ -57,7 +57,7 @@ public class SlaveBuildService implements BuildService
     {
         MasterConfiguration appConfig = configurationManager.getAppConfig();
         SystemConfiguration systemConfig = configurationManager.getSystemConfig();
-        String masterUrl = "http://" + MasterAgent.constructMasterLocation(appConfig, systemConfig);
+        String masterUrl = MasterAgent.constructMasterUrl(appConfig, systemConfig);
 
         try
         {
