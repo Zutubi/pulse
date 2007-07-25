@@ -2,12 +2,10 @@ package com.zutubi.pulse.web.project;
 
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
+import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.model.ResourceProperty;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.model.BuildSpecification;
-import com.zutubi.pulse.model.ManualTriggerBuildReason;
-import com.zutubi.pulse.model.NamedEntityComparator;
-import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.util.logging.Logger;
 
@@ -134,9 +132,31 @@ public class EditBuildPropertiesAction extends ProjectActionSupport
                 LOG.severe(e);
                 return INPUT;
             }
+
+            // CIB-1162: Make sure we can get a pulse file at this revision
+            try
+            {
+                PulseFileDetails pulseFileDetails = project.getPulseFileDetails();
+                ComponentContext.autowire(pulseFileDetails);
+                pulseFileDetails.getPulseFile(0L, project, r, null);
+            }
+            catch (Exception e)
+            {
+                addFieldError("revision", "Unable to get pulse file for revision: " + e.getMessage());
+                LOG.severe(e);
+                return INPUT;
+            }
         }
-        
-        projectManager.triggerBuild(project, spec.getName(), new ManualTriggerBuildReason((String)getPrinciple()), r, true);
+
+        try
+        {
+            projectManager.triggerBuild(project, spec.getName(), new ManualTriggerBuildReason((String)getPrinciple()), r, true);
+        }
+        catch (Exception e)
+        {
+            addActionError(e.getMessage());
+            return ERROR;
+        }
 
         try
         {
