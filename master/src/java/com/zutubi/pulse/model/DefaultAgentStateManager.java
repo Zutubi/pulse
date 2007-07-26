@@ -22,7 +22,7 @@ public class DefaultAgentStateManager implements AgentStateManager
 
     private static final String PING_NAME = "ping";
     private static final String PING_GROUP = "services";
-    private static final long PING_FREQUENCY = Constants.MINUTE;
+    private static final long PING_FREQUENCY = Long.getLong("pulse.agent.ping.interval", 60);
 
     public void init()
     {
@@ -35,7 +35,7 @@ public class DefaultAgentStateManager implements AgentStateManager
         }
 
         // initialise the trigger.
-        trigger = new SimpleTrigger(PING_NAME, PING_GROUP, PING_FREQUENCY);
+        trigger = new SimpleTrigger(PING_NAME, PING_GROUP, PING_FREQUENCY * Constants.SECOND);
         trigger.setTaskClass(PingSlaves.class);
 
         try
