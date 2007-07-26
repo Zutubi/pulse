@@ -12,6 +12,7 @@ import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -23,6 +24,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class DefaultBuildManager implements BuildManager
 {
     private static final Logger LOG = Logger.getLogger(DefaultBuildManager.class);
+
+    private static final String DEAD_DIR_SUFFIX = ".dead";
 
     private BuildResultDao buildResultDao;
     private ArtifactDao artifactDao;
@@ -62,6 +65,40 @@ public class DefaultBuildManager implements BuildManager
 
         cleanupThread.setDaemon(true);
         cleanupThread.start();
+
+        // CIB-1147: detect and remove old .dead dirs on restart.
+        cleanupDeadDirectories();
+    }
+
+    private void cleanupDeadDirectories()
+    {
+        File projectRoot = configurationManager.getUserPaths().getProjectRoot();
+        if (projectRoot.isDirectory())
+        {
+            File[] projectDirs = projectRoot.listFiles(new FileFilter()
+            {
+                public boolean accept(File f)
+                {
+                    return f.isDirectory();
+                }
+            });
+
+            for(File projectDir: projectDirs)
+            {
+                File[] deadDirs = projectDir.listFiles(new FileFilter()
+                {
+                    public boolean accept(File f)
+                    {
+                        return f.isDirectory() && f.getName().endsWith(DEAD_DIR_SUFFIX);
+                    }
+                });
+
+                for(File dead: deadDirs)
+                {
+                    scheduleDeadCleanup(dead);
+                }
+            }
+        }
     }
 
     public void setBuildResultDao(BuildResultDao dao)
@@ -475,8 +512,13 @@ public class DefaultBuildManager implements BuildManager
 
     private void scheduleCleanup(File dir)
     {
-        File dead = new File(dir + ".dead");
+        File dead = new File(dir + DEAD_DIR_SUFFIX);
         dir.renameTo(dead);
+        scheduleDeadCleanup(dead);
+    }
+
+    private void scheduleDeadCleanup(File dead)
+    {
         try
         {
             cleanupQueue.put(new CleanupRequest(dead));
