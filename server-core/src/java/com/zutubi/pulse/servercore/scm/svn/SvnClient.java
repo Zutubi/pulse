@@ -375,12 +375,7 @@ public class SvnClient implements ScmClient
         repository.log(new String[]{""}, logs, fromNumber, toNumber, true, true);
         for (SVNLogEntry entry : logs)
         {
-            NumericalRevision revision = new NumericalRevision(entry.getRevision());
-            revision.setAuthor(entry.getAuthor());
-            revision.setComment(entry.getMessage());
-            revision.setDate(entry.getDate());
-            // branch??
-
+            NumericalRevision revision = new NumericalRevision(entry.getAuthor(), entry.getMessage(), entry.getDate(), entry.getRevision());
             Changelist list = new Changelist(getUid(), revision);
             handler.handle(list);
 

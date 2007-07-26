@@ -25,11 +25,8 @@ public class CvsRevision extends Revision
 
     public CvsRevision(String author, String tag, String comment, Date date)
     {
-        setAuthor(author);
+        super(author, comment, date);
         setBranch(tag);
-        setComment(comment);
-        setDate(date);
-
         // construct the revision string.
         setRevisionString(generateRevisionString());
     }

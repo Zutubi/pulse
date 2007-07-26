@@ -1,5 +1,4 @@
 // FIXME
-
 //package com.zutubi.pulse.test;
 //
 //import com.zutubi.pulse.MasterBuildPaths;
