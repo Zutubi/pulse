@@ -197,7 +197,10 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
         }
         finally
         {
-            child.destroy();
+            if (child != null)
+            {
+                child.destroy();
+            }
         }
     }
 
