@@ -6,12 +6,14 @@ import com.zutubi.prototype.config.events.ConfigurationEvent;
 import com.zutubi.prototype.config.events.PostSaveEvent;
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.AgentManager;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.events.*;
+import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.model.BuildReason;
 import com.zutubi.pulse.model.TriggerBuildReason;
@@ -24,10 +26,7 @@ import com.zutubi.pulse.servercore.config.ScmConfiguration;
 import com.zutubi.util.Constants;
 import com.zutubi.util.logging.Logger;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
@@ -91,6 +90,8 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     
     private AgentManager agentManager;
     private EventManager eventManager;
+    private MasterConfigurationManager configurationManager;
+    private GeneralAdminConfiguration adminConfiguration;
 
 
     public ThreadedRecipeQueue()
@@ -523,17 +524,19 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     {
         BuildContext context = new BuildContext();
         context.setBuildNumber(request.getBuild().getNumber());
-        context.setBuildRevision(buildRevision.getRevision().getRevisionString());
-        context.setBuildTimestamp(buildRevision.getTimestamp());
         context.setProjectName(recipeRequest.getProject());
 
         BuildReason buildReason = request.getBuild().getReason();
-        context.setBuildReason(buildReason.getSummary());
+        context.addProperty("build.reason", buildReason.getSummary());
         if(buildReason instanceof TriggerBuildReason)
         {
-            context.setBuildTrigger(((TriggerBuildReason)buildReason).getTriggerName());
+            context.addProperty("build.trigger", ((TriggerBuildReason)buildReason).getTriggerName());
         }
 
+        context.addProperty("build.revision", buildRevision.getRevision().getRevisionString());
+        context.addProperty("build.timestamp", BuildContext.PULSE_BUILD_TIMESTAMP_FORMAT.format(new Date(buildRevision.getTimestamp())));
+        context.addProperty("build.timestamp.millis", Long.toString(buildRevision.getTimestamp()));
+        context.addProperty("master.url", MasterAgentService.constructMasterUrl(adminConfiguration, configurationManager.getSystemConfig()));
         return context;
     }
 
@@ -747,7 +750,8 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     {
         if(event instanceof PostSaveEvent)
         {
-            updateTimeout((GeneralAdminConfiguration) event.getInstance());
+            adminConfiguration = (GeneralAdminConfiguration) event.getInstance();
+            updateTimeout(adminConfiguration);
         }
     }
 
@@ -784,10 +788,15 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)
     {
-        GeneralAdminConfiguration adminConfiguration = configurationProvider.get(GeneralAdminConfiguration.class);
+        adminConfiguration = configurationProvider.get(GeneralAdminConfiguration.class);
         updateTimeout(adminConfiguration);
 
         configurationProvider.registerEventListener(this, false, false, GeneralAdminConfiguration.class);
+    }
+
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
     }
 
     private static class DispatchedRequest

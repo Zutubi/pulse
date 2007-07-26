@@ -223,15 +223,12 @@ public class RecipeProcessor
         globalScope.add(new Property("recipe.timestamp.millis", Long.toString(recipeStartTime)));
         if(buildContext != null)
         {
-            globalScope.add(new Property("build.number", Long.toString(buildContext.getBuildNumber())));
-            globalScope.add(new Property("build.reason", buildContext.getBuildReason()));
-            globalScope.add(new Property("build.revision", buildContext.getBuildRevision()));
-            globalScope.add(new Property("build.timestamp", BuildContext.PULSE_BUILD_TIMESTAMP_FORMAT.format(new Date(buildContext.getBuildTimestamp()))));
-            globalScope.add(new Property("build.timestamp.millis", Long.toString(buildContext.getBuildTimestamp())));
-            if(buildContext.getBuildTrigger() != null)
+            for(Map.Entry<String, String> property: buildContext.getProperties().entrySet())
             {
-                globalScope.add(new Property("build.trigger", buildContext.getBuildTrigger()));                
+                globalScope.add(new Property(property.getKey(), property.getValue()));
             }
+
+            globalScope.add(new Property("build.number", Long.toString(buildContext.getBuildNumber())));
         }
 
         Map<String, String> env = System.getenv();

@@ -175,6 +175,11 @@ public class MasterAgentService implements AgentService
         return false;
     }
 
+    public static String constructMasterUrl(GeneralAdminConfiguration generalConfig, SystemConfiguration systemConfig)
+    {
+        return "http://" + constructMasterLocation(generalConfig, systemConfig);
+    }
+
     public static String constructMasterLocation(GeneralAdminConfiguration generalConfig, SystemConfiguration systemConfig)
     {
         String url = generalConfig.getMasterHost() + ":" + systemConfig.getServerPort() + systemConfig.getContextPath();
