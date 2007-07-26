@@ -12,18 +12,15 @@ import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.events.*;
-import com.zutubi.pulse.events.build.RecipeCompletedEvent;
-import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
-import com.zutubi.pulse.events.build.RecipeErrorEvent;
-import com.zutubi.pulse.events.build.RecipeEvent;
+import com.zutubi.pulse.events.build.*;
+import com.zutubi.pulse.model.BuildReason;
+import com.zutubi.pulse.model.TriggerBuildReason;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.project.types.TypeConfiguration;
 import com.zutubi.pulse.scm.ScmChangeEvent;
 import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.pulse.servercore.config.ScmConfiguration;
-import com.zutubi.pulse.model.BuildReason;
-import com.zutubi.pulse.model.TriggerBuildReason;
 import com.zutubi.util.Constants;
 import com.zutubi.util.logging.Logger;
 
@@ -213,12 +210,14 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         if (!buildRevision.isInitialised())
         {
             // Let's initialise it
+            eventManager.publish(new RecipeStatusEvent(this, dispatchRequest.getRequest().getId(), "Initialising build revision..."));
             ProjectConfiguration projectConfig = dispatchRequest.getProjectConfig();
             ScmConfiguration scm = projectConfig.getScm();
             Revision revision = scm.createClient().getLatestRevision();
 
             // May throw a BuildException
             updateRevision(dispatchRequest, revision);
+            eventManager.publish(new RecipeStatusEvent(this, dispatchRequest.getRequest().getId(), "Revision initialised to '" + revision.getRevisionString() + "'"));
         }
     }
 
@@ -398,14 +397,17 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
     private boolean requestMayBeFulfilled(RecipeDispatchRequest request)
     {
+        eventManager.publish(new RecipeStatusEvent(this, request.getRequest().getId(), "Checking recipe agent requirements..."));
         for (Agent a : onlineAgents.values())
         {
             if (request.getHostRequirements().fulfilledBy(request, a.getService()))
             {
+                eventManager.publish(new RecipeStatusEvent(this, request.getRequest().getId(), "Requirements satisfied by at least one online agent."));
                 return true;
             }
         }
 
+        eventManager.publish(new RecipeStatusEvent(this, request.getRequest().getId(), "No online agents satisfy requirements."));
         return false;
     }
 
@@ -718,6 +720,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
             {
                 try
                 {
+                    eventManager.publish(new RecipeStatusEvent(this, request.getRequest().getId(), "Change detected while queued, updating build revision to '" + event.getNewRevision() + "'"));
                     updateRevision(request, event.getNewRevision());
                     if (!requestMayBeFulfilled(request))
                     {

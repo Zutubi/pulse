@@ -725,7 +725,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         Project project = new Project();
         BuildResult result = new BuildResult(new UnknownBuildReason(), project, 100, false);
         BuildHostRequirements requirements = new MockBuildHostRequirements(type);
-        RecipeRequest request = new RecipeRequest("project", id, null, null, null, false, null, new LinkedList<ResourceProperty>());
+        RecipeRequest request = new RecipeRequest("project", id, null, null, null, false, false, false, null, new LinkedList<ResourceProperty>());
         request.setBootstrapper(new ChainBootstrapper());
         return new RecipeDispatchRequest(requirements, new BuildRevision(), request, projectConfig, result);
     }

@@ -354,6 +354,12 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
 
     public void handleEvent(Event evt)
     {
+        if(evt instanceof RecipeStatusEvent)
+        {
+            // We ignore status events as they do not affect behaviour.
+            return;
+        }
+        
         events.add(evt);
 
         if (waitMode)

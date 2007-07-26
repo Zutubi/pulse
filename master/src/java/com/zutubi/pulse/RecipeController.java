@@ -6,14 +6,7 @@ import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.FeaturePersister;
 import com.zutubi.pulse.core.model.RecipeResult;
-import com.zutubi.pulse.events.build.CommandCommencedEvent;
-import com.zutubi.pulse.events.build.CommandCompletedEvent;
-import com.zutubi.pulse.events.build.CommandOutputEvent;
-import com.zutubi.pulse.events.build.RecipeCommencedEvent;
-import com.zutubi.pulse.events.build.RecipeCompletedEvent;
-import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
-import com.zutubi.pulse.events.build.RecipeErrorEvent;
-import com.zutubi.pulse.events.build.RecipeEvent;
+import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.RecipeResultNode;
@@ -126,6 +119,10 @@ public class RecipeController
             else if (event instanceof RecipeCompletedEvent)
             {
                 handleRecipeCompleted((RecipeCompletedEvent) event);
+            }
+            else if (event instanceof RecipeStatusEvent)
+            {
+                logger.log((RecipeStatusEvent) event);
             }
             else if (event instanceof RecipeErrorEvent)
             {

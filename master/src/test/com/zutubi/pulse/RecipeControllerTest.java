@@ -5,18 +5,21 @@ import com.zutubi.pulse.agent.Status;
 import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.RecipeRequest;
-import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.config.Resource;
-import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.core.config.ResourceProperty;
+import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.model.Feature;
+import com.zutubi.pulse.core.model.RecipeResult;
+import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.servercore.config.SvnConfiguration;
-import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.services.UpgradeState;
-import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
+import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.util.FileSystemUtils;
 
 import java.io.File;
 import java.util.*;
@@ -57,7 +60,7 @@ public class RecipeControllerTest extends PulseTestCase
         childNode.setId(103);
         rootNode.addChild(childNode);
 
-        RecipeRequest recipeRequest = new RecipeRequest("project", rootResult.getId(), rootResult.getRecipeName(), false);
+        RecipeRequest recipeRequest = new RecipeRequest("project", rootResult.getId(), rootResult.getRecipeName());
         BuildResult build = new BuildResult();
         dispatchRequest = new RecipeDispatchRequest(new MasterBuildHostRequirements(), new BuildRevision(), recipeRequest, null, null);
         recipeController = new RecipeController(null, build, rootNode, dispatchRequest, new LinkedList<ResourceProperty>(), false, false, null, logger, resultCollector);
@@ -94,7 +97,7 @@ public class RecipeControllerTest extends PulseTestCase
 
         // After dispatching, the controller should handle a dispatched event
         // by recording the build service on the result node.
-        RecipeDispatchedEvent event = new RecipeDispatchedEvent(this, new RecipeRequest("project", rootResult.getId(), "test", false), new MockAgent(buildService));
+        RecipeDispatchedEvent event = new RecipeDispatchedEvent(this, new RecipeRequest("project", rootResult.getId(), "test"), new MockAgent(buildService));
         assertTrue(recipeController.handleRecipeEvent(event));
         assertEquals(buildService.getHostName(), rootNode.getHost());
 
@@ -524,6 +527,10 @@ public class RecipeControllerTest extends PulseTestCase
         }
 
         public void log(RecipeCompletedEvent event, RecipeResult result)
+        {
+        }
+
+        public void log(RecipeStatusEvent event)
         {
         }
 
