@@ -9,47 +9,68 @@ import java.util.List;
  */
 public class AcegiUser implements UserDetails
 {
-    private User user;
+    private String username;
+    private String password;
+    private GrantedAuthority[] authorities;
     /**
      * Authorities granted for this session to this user.  These include
      * authorities authorities inherited by being part of an LDAP group.
      */
     private List<String> transientAuthorities = new LinkedList<String>();
-
+    private boolean enabled;
+    private boolean ldapAuthentication;
 
     public AcegiUser(User user)
     {
-        this.user = user;
+        username = user.getLogin();
+        password = user.getPassword();
+        initAuthorities(user);
+        enabled = user.isEnabled();
+        ldapAuthentication = user.getLdapAuthentication();
     }
 
-    public org.acegisecurity.GrantedAuthority[] getAuthorities()
+    private void initAuthorities(User user)
     {
         List<String> directAuthorities = user.getGrantedAuthorities();
-        int total = directAuthorities.size() + transientAuthorities.size();
+        int total = directAuthorities.size();
 
         for(Group g: user.getGroups())
         {
             total += g.getAuthorityCount();
         }
 
-        GrantedAuthority[] result = new GrantedAuthority[total];
+        authorities = new GrantedAuthority[total];
         int i = 0;
         for(String authority: directAuthorities)
         {
-            result[i++] = new GrantedAuthority(authority);
+            authorities[i++] = new GrantedAuthority(authority);
         }
 
         for(String authority: transientAuthorities)
         {
-            result[i++] = new GrantedAuthority(authority);
+            authorities[i++] = new GrantedAuthority(authority);
         }
 
         for(Group g: user.getGroups())
         {
             for(GrantedAuthority authority: g.getAuthorities())
             {
-                result[i++] = authority;
+                authorities[i++] = authority;
             }
+        }
+    }
+
+    public org.acegisecurity.GrantedAuthority[] getAuthorities()
+    {
+        int total = authorities.length + transientAuthorities.size();
+        GrantedAuthority[] result = new GrantedAuthority[total];
+
+        System.arraycopy(authorities, 0, result, 0, authorities.length);
+
+        int i = authorities.length;
+        for(String authority: transientAuthorities)
+        {
+            result[i++] = new GrantedAuthority(authority);
         }
 
         return result;
@@ -71,12 +92,12 @@ public class AcegiUser implements UserDetails
 
     public String getPassword()
     {
-        return user.getPassword();
+        return password;
     }
 
     public String getUsername()
     {
-        return user.getLogin();
+        return username;
     }
 
     public boolean isAccountNonExpired()
@@ -96,7 +117,12 @@ public class AcegiUser implements UserDetails
 
     public boolean isEnabled()
     {
-        return user.isEnabled();
+        return enabled;
+    }
+
+    public boolean getLdapAuthentication()
+    {
+        return ldapAuthentication;
     }
 
     public void addTransientAuthority(String authority)
@@ -105,10 +131,5 @@ public class AcegiUser implements UserDetails
         {
             transientAuthorities.add(authority);
         }
-    }
-
-    public User getUser()
-    {
-        return user;
     }
 }

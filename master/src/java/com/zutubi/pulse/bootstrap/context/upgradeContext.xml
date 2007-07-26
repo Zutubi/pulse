@@ -87,6 +87,7 @@
                 <ref local="duplicateChangelist"/>
                 <ref local="schemaUpgrade0102019001"/>
                 <ref local="subscriptionCondition"/>
+                <ref local="longRevisionComments"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -605,5 +606,9 @@
 
     <bean id="subscriptionCondition" class="com.zutubi.pulse.upgrade.tasks.SubscriptionConditionUpgradeTask" autowire="byName">
         <property name="buildNumber" value="102019002"/>        
+    </bean>
+
+    <bean id="longRevisionComments" class="com.zutubi.pulse.upgrade.tasks.LongRevisionCommentsUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="102030001"/>
     </bean>
 </beans>

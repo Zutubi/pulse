@@ -20,7 +20,7 @@
         <filter-class>com.zutubi.pulse.spring.FilterWrapper</filter-class>
         <init-param>
             <param-name>delegateClassName</param-name>
-            <param-value>org.acegisecurity.context.HttpSessionContextIntegrationFilter</param-value>
+            <param-value>com.zutubi.pulse.security.HttpSessionContextIntegrationFilter</param-value>
         </init-param>
     </filter>
 

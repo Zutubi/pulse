@@ -59,7 +59,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider
     protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException
     {
         AcegiUser user = (AcegiUser) userDetails;
-        if(user.getUser().getLdapAuthentication())
+        if(user.getLdapAuthentication())
         {
             LOG.debug("Authenticating user '" + user.getUsername() + "' via LDAP");
             if(ldapManager.authenticate(authentication.getName(), authentication.getCredentials().toString()) == null)

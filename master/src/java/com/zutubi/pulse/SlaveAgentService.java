@@ -6,6 +6,7 @@ import com.zutubi.pulse.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.Resource;
+import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.model.ResourceManager;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
@@ -14,7 +15,6 @@ import com.zutubi.pulse.services.SlaveService;
 import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.ZipUtils;
-import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.util.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.mortbay.util.UrlEncoded;
@@ -129,7 +129,8 @@ public class SlaveAgentService implements AgentService
 
             URL resultUrl = new URL("http", agentConfig.getHost(), agentConfig.getPort(), "/download?token=" + serviceTokenManager.getToken() + "&project=" + UrlEncoded.encodeString(project) + "&incremental=" + incremental + "&output=" + output + "&recipe=" + recipeId);
             URLConnection urlConnection = resultUrl.openConnection();
-
+            urlConnection.setReadTimeout(300000);
+            
             // originally the zip stream was unzipped as read from the
             // servlet, however this resulted in socket errors on the
             // servlet side (I think when the zip was bigger than a
