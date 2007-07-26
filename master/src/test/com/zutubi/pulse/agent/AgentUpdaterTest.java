@@ -181,7 +181,7 @@ public class AgentUpdaterTest extends PulseTestCase implements EventListener
         }
 
         agent = new MockAgent(agentConfig, agentState, (AgentService) mockService.proxy());
-        updater = new AgentUpdater(agent, TEST_TOKEN, TEST_URL, eventManager, systemPaths);
+        updater = new AgentUpdater(agent, TEST_URL, eventManager, systemPaths);
         updater.setStatusTimeout(5);
         updater.setRebootTimeout(5);
         updater.setPingInterval(10);

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.prototype.config.agent;
 
-import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.agent.Agent;
+import com.zutubi.pulse.agent.AgentManager;
 
 /**
  *
@@ -28,7 +28,7 @@ public class AgentConfigurationFormatter
         }
         else
         {
-            return agentState.getState().getEnableState().toString();
+            return agentState.getEnableState().toString();
         }
     }
 

@@ -395,6 +395,11 @@ public class RecipeControllerTest extends PulseTestCase
             throw new RuntimeException("Method not yet implemented.");
         }
 
+        public AgentState.EnableState getEnableState()
+        {
+            throw new RuntimeException("Method not yet implemented.");
+        }
+
         public Status getStatus()
         {
             return Status.IDLE;
