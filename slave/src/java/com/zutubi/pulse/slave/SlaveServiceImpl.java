@@ -21,9 +21,9 @@ import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.LinkedList;
 import java.util.List;
-import java.net.MalformedURLException;
 
 /**
  */
@@ -39,6 +39,8 @@ public class SlaveServiceImpl implements SlaveService
     private SlaveRecipeProcessor slaveRecipeProcessor;
     private ServerMessagesHandler serverMessagesHandler;
     private MasterProxyFactory masterProxyFactory;
+
+    private boolean firstStatus = true;
 
     //---( Status API )---
 
@@ -93,15 +95,21 @@ public class SlaveServiceImpl implements SlaveService
             return new SlaveStatus(Status.INVALID_MASTER, "Unable to contact master at location '" + master + "': " + e.getMessage());
         }
 
-        // Synchronous request
+        boolean first = false;
+        if(firstStatus)
+        {
+            first = true;
+            firstStatus = false;
+        }
+
         long recipe = slaveRecipeProcessor.getBuildingRecipe();
         if (recipe != 0)
         {
-            return new SlaveStatus(Status.BUILDING, recipe);
+            return new SlaveStatus(Status.BUILDING, recipe, first);
         }
         else
         {
-            return new SlaveStatus(Status.IDLE, 0);
+            return new SlaveStatus(Status.IDLE, 0, first);
         }
     }
 

@@ -1,10 +1,11 @@
 package com.zutubi.pulse;
 
 import com.zutubi.prototype.config.ConfigurationProvider;
+import com.zutubi.pulse.agent.Status;
+import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.StartupManager;
 import com.zutubi.pulse.bootstrap.SystemConfiguration;
-import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.Resource;
@@ -13,10 +14,9 @@ import com.zutubi.pulse.logging.ServerMessagesHandler;
 import com.zutubi.pulse.model.ResourceManager;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
-import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.resources.ResourceDiscoverer;
 import com.zutubi.pulse.services.SlaveStatus;
-import com.zutubi.pulse.agent.Status;
+import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
@@ -65,7 +65,7 @@ public class MasterAgentService implements AgentService
         }
         else
         {
-            return new SlaveStatus(Status.BUILDING, recipeId);
+            return new SlaveStatus(Status.BUILDING, recipeId, false);
         }
     }
 

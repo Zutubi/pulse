@@ -130,7 +130,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         try
         {
             agents = new TreeMap<Long, Agent>();
-            for (AgentConfiguration agentConfig: configurationProvider.getAll(AgentConfiguration.class))
+            for (AgentConfiguration agentConfig : configurationProvider.getAll(AgentConfiguration.class))
             {
                 addAgent(agentConfig, false);
             }
@@ -147,7 +147,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         {
             AgentService agentService = createAgentService(agentConfig);
             AgentState agentState = agentStateManager.getAgentState(agentConfig.getAgentStateId());
-            if(agentState.getEnableState() == AgentState.EnableState.UPGRADING)
+            if (agentState.getEnableState() == AgentState.EnableState.UPGRADING)
             {
                 // Something went wrong: lost contact with slave (or master
                 // died) during upgrade.
@@ -171,7 +171,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 
     private AgentService createAgentService(AgentConfiguration agentConfig) throws Exception
     {
-        if(agentConfig.isRemote())
+        if (agentConfig.isRemote())
         {
             // Object factory fails us here as some of these deps are in the
             // same context.
@@ -184,7 +184,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         }
         else
         {
-            return objectFactory.buildBean(MasterAgentService.class, new Class[]{AgentConfiguration.class}, new Object[]{agentConfig});
+            return objectFactory.buildBean(MasterAgentService.class, new Class[] { AgentConfiguration.class }, new Object[] { agentConfig });
         }
     }
 
@@ -203,7 +203,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         }
 
         // pinging the slave agents may take a while, so lets do this outside the lock.
-        for (Agent agent: copyOfAgents)
+        for (Agent agent : copyOfAgents)
         {
             pingAgent(agent);
         }
@@ -256,7 +256,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
                 LOG.warning("Timed out pinging agent '" + agent.getConfig().getName() + "'", e);
                 status = new SlaveStatus(Status.OFFLINE, "Agent ping timed out");
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 String message = "Unexpected error pinging agent '" + agent.getConfig().getName() + "': " + e.getMessage();
                 LOG.warning(message);
@@ -268,24 +268,52 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 
             // If the slave has just come online, run resource
             // discovery
-            if(!oldStatus.isOnline() && status.getStatus().isOnline())
+            if (status.getStatus().isOnline())
             {
-                try
+                if (oldStatus.isOnline() && status.isFirst())
                 {
-                    List<Resource> resources = agent.getService().discoverResources();
-                    resourceManager.addDiscoveredResources(agent.getConfig().getHandle(), resources);
+                    // The agent bounced between pings.  Act like we saw it by
+                    // sending the offline event and setting old status to
+                    // offline.
+                    agent.setStatus(Status.OFFLINE);
+                    eventManager.publish(new AgentStatusEvent(this, oldStatus, agent));
+                    oldStatus = Status.OFFLINE;
+                    agent.updateStatus(status);
                 }
-                catch (Exception e)
+
+                if (!oldStatus.isOnline())
                 {
-                    LOG.warning("Unable to discover resource for agent '" + agent.getConfig().getName() + "': " + e.getMessage(), e);
+                    if (status.getRecipeId() != 0)
+                    {
+                        // The agent appears to have just come online but is
+                        // building.  Snap it out of that.
+                        try
+                        {
+                            agent.getService().terminateRecipe(status.getRecipeId());
+                        }
+                        catch (Exception e)
+                        {
+                            LOG.severe("Unable to terminate unwanted recipe on agent '" + agent.getConfig().getName() + "': " + e.getMessage(), e);
+                        }
+                    }
+
+                    try
+                    {
+                        List<Resource> resources = agent.getService().discoverResources();
+                        resourceManager.addDiscoveredResources(agent.getConfig().getHandle(), resources);
+                    }
+                    catch (Exception e)
+                    {
+                        LOG.warning("Unable to discover resource for agent '" + agent.getConfig().getName() + "': " + e.getMessage(), e);
+                    }
                 }
             }
 
-            if(oldStatus != agent.getStatus())
+            if (oldStatus != agent.getStatus())
             {
                 eventManager.publish(new AgentStatusEvent(this, oldStatus, agent));
 
-                if(status.getStatus() == Status.VERSION_MISMATCH)
+                if (status.getStatus() == Status.VERSION_MISMATCH)
                 {
                     // Try to update this agent.
                     updateAgent(agent);
@@ -317,13 +345,13 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 
     public void stop(boolean force)
     {
-        if(force)
+        if (force)
         {
             pingService.shutdownNow();
             updatersLock.lock();
             try
             {
-                for(AgentUpdater updater: updaters.values())
+                for (AgentUpdater updater : updaters.values())
                 {
                     updater.stop(force);
                 }
@@ -354,7 +382,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
             updatersLock.unlock();
         }
 
-        if(suce.isSuccessful())
+        if (suce.isSuccessful())
         {
             suce.getAgent().setStatus(Status.OFFLINE);
             agentState.setEnableState(AgentState.EnableState.ENABLED);
@@ -401,9 +429,9 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         try
         {
             List<Agent> online = new LinkedList<Agent>();
-            for(Agent a: agents.values())
+            for (Agent a : agents.values())
             {
-                if(a.isOnline())
+                if (a.isOnline())
                 {
                     online.add(a);
                 }
@@ -438,7 +466,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
     public void agentAdded(AgentConfiguration agentConfig)
     {
         AgentState agentState = agentStateManager.getAgentState(agentConfig.getAgentStateId());
-        if(agentState != null)
+        if (agentState != null)
         {
             lock.lock();
             try
@@ -457,7 +485,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
     public void agentChanged(AgentConfiguration agentConfig)
     {
         AgentState agentState = agentStateManager.getAgentState(agentConfig.getAgentStateId());
-        if(agentState != null)
+        if (agentState != null)
         {
             lock.lock();
             try
@@ -498,7 +526,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         try
         {
             AgentUpdater updater = updaters.get(upgradeStatus.getHandle());
-            if(updater != null)
+            if (updater != null)
             {
                 updater.upgradeStatus(upgradeStatus);
             }
@@ -518,9 +546,9 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         try // synchronize access to the agents map.
         {
             lock.lock();
-            for(Agent s: agents.values())
+            for (Agent s : agents.values())
             {
-                if(s.getConfig().getName().equals(name))
+                if (s.getConfig().getName().equals(name))
                 {
                     return s;
                 }
@@ -606,7 +634,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
             try
             {
                 int build = agent.getService().ping();
-                if(build == masterBuildNumber)
+                if (build == masterBuildNumber)
                 {
                     status = agent.getService().getStatus("http://" + MasterAgentService.constructMasterLocation(configurationProvider.get(GeneralAdminConfiguration.class), configurationManager.getSystemConfig()));
                 }

@@ -23,8 +23,8 @@ import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.personal.PatchArchive;
-import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.project.types.CustomTypeConfiguration;
 import com.zutubi.pulse.scm.FileStatus;
 import com.zutubi.pulse.scm.ScmChangeEvent;
@@ -55,7 +55,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
     private Semaphore semaphore;
     private Semaphore errorSemaphore;
     private Semaphore dispatchedSemaphore;
-    private ThreadedRecipeQueueTest.MockAgentManager agentManager;
+    private MockAgentManager agentManager;
     private AgentConfiguration slave1000;
     private AgentConfiguration slave2000;
     private AgentConfiguration slave3000;
@@ -711,7 +711,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
     private Agent createAvailableAgent(long type)
     {
         DefaultAgent slaveAgent = new DefaultAgent(createAgentConfig(type), new AgentState(), new MockAgentService(type));
-        slaveAgent.updateStatus(new SlaveStatus(Status.IDLE, 0));
+        slaveAgent.updateStatus(new SlaveStatus(Status.IDLE, 0, false));
         return slaveAgent;
     }
 
@@ -951,7 +951,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         public void addAgent(AgentConfiguration agentConfig)
         {
             DefaultAgent agent = new DefaultAgent(agentConfig, new AgentState(), new MockAgentService(agentConfig.getHandle()));
-            agent.updateStatus(new SlaveStatus(Status.IDLE, 0));
+            agent.updateStatus(new SlaveStatus(Status.IDLE, 0, true));
             onlineAgents.put(agentConfig.getHandle(), agent);
         }
 
