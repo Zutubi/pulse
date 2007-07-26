@@ -1,6 +1,8 @@
 package com.zutubi.pulse.servercore.scm.p4;
 
 import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.core.Scope;
+import com.zutubi.pulse.core.VariableHelper;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.filesystem.remote.CachingScmFile;
@@ -17,7 +19,6 @@ import com.zutubi.pulse.servercore.scm.ScmFileCache;
 import com.zutubi.pulse.servercore.scm.ScmFilepathFilter;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.SystemUtils;
-import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.*;
@@ -45,21 +46,39 @@ public class PerforceClient extends CachingScmClient
         this.excludedPaths = filteredPaths;
     }
 
-    private String resolveClient() throws ScmException
+    private String resolveClient(NumericalRevision revision) throws ScmException
     {
+        return resolveClient(revision, true);
+    }
+
+    private String resolveClient(NumericalRevision revision, boolean cache) throws ScmException
+    {
+        String resolved;
         if (resolvedClient == null)
         {
             if (templateClient.startsWith("!"))
             {
                 String commandLine = templateClient.substring(1);
-                List<String> command = StringUtils.split(commandLine);
+
+                Scope scope = new Scope();
+                String revisionSpec;
+                if(revision == null)
+                {
+                    revisionSpec = "#head";
+                }
+                else
+                {
+                    revisionSpec = "@" + revision.getRevisionString();
+                }
+
+                scope.add(new Property("revision.spec", revisionSpec));
 
                 try
                 {
-                    resolvedClient = SystemUtils.runCommand(command.toArray(new String[command.size()])).trim();
-                    return resolvedClient;
+                    List<String> command = VariableHelper.splitAndReplaceVariables(commandLine, scope, true);
+                    resolved = SystemUtils.runCommand(command.toArray(new String[command.size()])).trim();
                 }
-                catch (IOException e)
+                catch (Exception e)
                 {
                     LOG.severe(e);
                     throw new ScmException("Error running template client generation command: " + e.getMessage(), e);
@@ -67,16 +86,25 @@ public class PerforceClient extends CachingScmClient
             }
             else
             {
-                resolvedClient = templateClient;
+                resolved = templateClient;
             }
-        }
 
-        return resolvedClient;
+            if(cache)
+            {
+                resolvedClient = resolved;
+            }
+
+            return resolved;
+        }
+        else
+        {
+            return resolvedClient;
+        }
     }
 
-    private void createClient(String clientName, File toDirectory) throws ScmException
+    private void createClient(String clientName, File toDirectory, NumericalRevision revision) throws ScmException
     {
-        core.createClient(resolveClient(), clientName, toDirectory);
+        core.createClient(resolveClient(revision), clientName, toDirectory);
     }
 
     private boolean clientExists(String clientName) throws ScmException
@@ -107,7 +135,7 @@ public class PerforceClient extends CachingScmClient
 //        }
 //    }
 
-    private String updateClient(String id, File toDirectory) throws ScmException
+    private String updateClient(String id, File toDirectory, NumericalRevision revision) throws ScmException
     {
         if (toDirectory == null)
         {
@@ -119,7 +147,7 @@ public class PerforceClient extends CachingScmClient
 
         // If the client exists, perforce will just update the details.  This
         // is important in case the template is changed.
-        createClient(clientName, toDirectory);
+        createClient(clientName, toDirectory, revision);
 
         return clientName;
     }
@@ -160,7 +188,7 @@ public class PerforceClient extends CachingScmClient
 
         if (clientName == null)
         {
-            clientName = updateClient(null, null);
+            clientName = updateClient(null, null, null);
             cleanup = true;
         }
 
@@ -185,7 +213,7 @@ public class PerforceClient extends CachingScmClient
         CachingScmFile rootFile = new CachingScmFile("", true, null, "");
         item.cachedListing.put("", rootFile);
 
-        String clientName = updateClient(null, null);
+        String clientName = updateClient(null, null, null);
 
         try
         {
@@ -224,18 +252,6 @@ public class PerforceClient extends CachingScmClient
         catch (ScmException e)
         {
             LOG.warning("Unable to delete client: " + e.getMessage(), e);
-        }
-    }
-
-    private void populateChanges(StringBuffer stdout, List<Change> changes)
-    {
-        // RE to capture depot file, revision and local file
-        Matcher matcher = syncPattern.matcher(stdout);
-
-        while (matcher.find())
-        {
-            FileRevision fileRevision = new NumericalFileRevision(Long.parseLong(matcher.group(2)));
-            changes.add(new Change(matcher.group(1), fileRevision, decodeAction(matcher.group(3))));
         }
     }
 
@@ -387,7 +403,7 @@ public class PerforceClient extends CachingScmClient
 
     private Revision sync(String id, File toDirectory, Revision revision, ScmCheckoutEventHandler handler, boolean force) throws ScmException
     {
-        String clientName = updateClient(id, toDirectory);
+        String clientName = updateClient(id, toDirectory, (NumericalRevision) revision);
 
         try
         {
@@ -464,7 +480,7 @@ public class PerforceClient extends CachingScmClient
             this.core.setEnv(ENV_PASSWORD, password);
         }
 
-        this.core.setEnv(ENV_CLIENT, resolveClient());
+        this.core.setEnv(ENV_CLIENT, resolveClient(null, false));
     }
 
     public Set<ScmCapability> getCapabilities()
@@ -474,7 +490,7 @@ public class PerforceClient extends CachingScmClient
 
     public Map<String, String> getServerInfo() throws ScmException
     {
-        return core.getServerInfo(resolveClient());
+        return core.getServerInfo(resolveClient(null));
     }
 
     public String getUid()
@@ -489,7 +505,7 @@ public class PerforceClient extends CachingScmClient
 
     public void testConnection() throws ScmException
     {
-        String client = resolveClient();
+        String client = resolveClient(null);
         if (!clientExists(client))
         {
             throw new ScmException("Client '" + client + "' does not exist");
@@ -503,7 +519,7 @@ public class PerforceClient extends CachingScmClient
 
     public InputStream checkout(Revision revision, String file) throws ScmException
     {
-        String clientName = updateClient(null, null);
+        String clientName = updateClient(null, null, (NumericalRevision) revision);
 
         try
         {
@@ -557,7 +573,7 @@ public class PerforceClient extends CachingScmClient
     {
         List<Revision> result = new LinkedList<Revision>();
 
-        String clientName = updateClient(null, null);
+        String clientName = updateClient(null, null, null);
 
         if (to == null)
         {
@@ -601,7 +617,7 @@ public class PerforceClient extends CachingScmClient
 
     public boolean hasChangedSince(Revision since) throws ScmException
     {
-        String clientName = updateClient(null, null);
+        String clientName = updateClient(null, null, null);
         try
         {
             String root = new File(clientRoot.getAbsolutePath(), VALUE_ALL_FILES).getAbsolutePath();
@@ -649,7 +665,7 @@ public class PerforceClient extends CachingScmClient
 
     public void tag(Revision revision, String name, boolean moveExisting) throws ScmException
     {
-        String clientName = updateClient(null, null);
+        String clientName = updateClient(null, null, (NumericalRevision) revision);
         try
         {
             if (!labelExists(clientName, name))
@@ -682,10 +698,10 @@ public class PerforceClient extends CachingScmClient
 
     public void storeConnectionDetails(File outputDir) throws ScmException, IOException
     {
-        PerforceCore.P4Result result = core.runP4(null, P4_COMMAND, FLAG_CLIENT, resolveClient(), COMMAND_INFO);
+        PerforceCore.P4Result result = core.runP4(null, P4_COMMAND, FLAG_CLIENT, resolveClient(null), COMMAND_INFO);
         FileSystemUtils.createFile(new File(outputDir, "server-info.txt"), result.stdout.toString());
 
-        result = core.runP4(null, P4_COMMAND, FLAG_CLIENT, resolveClient(), COMMAND_CLIENT, FLAG_OUTPUT);
+        result = core.runP4(null, P4_COMMAND, FLAG_CLIENT, resolveClient(null), COMMAND_CLIENT, FLAG_OUTPUT);
         FileSystemUtils.createFile(new File(outputDir, "template-client.txt"), result.stdout.toString());
     }
 
@@ -722,7 +738,7 @@ public class PerforceClient extends CachingScmClient
             public void checkCancelled() throws ScmCancelledException
             {
             }
-        }, null, P4_COMMAND, FLAG_CLIENT, resolveClient(), COMMAND_CLIENT, FLAG_OUTPUT);
+        }, null, P4_COMMAND, FLAG_CLIENT, resolveClient(null), COMMAND_CLIENT, FLAG_OUTPUT);
 
         return eol[0];
     }
@@ -755,7 +771,7 @@ public class PerforceClient extends CachingScmClient
         //    ... ... otherAction0 edit
         //    ... ... otherChange0 38
         //    ... ... otherOpen 1
-        String clientName = updateClient(null, null);
+        String clientName = updateClient(null, null, (NumericalRevision) repoRevision);
         try
         {
             File f = new File(clientRoot.getAbsoluteFile(), path);
@@ -801,7 +817,7 @@ public class PerforceClient extends CachingScmClient
 
     public NumericalRevision getRevision(String revision) throws ScmException
     {
-        String clientName = updateClient(null, null);
+        String clientName = updateClient(null, null, null);
         try
         {
             try
