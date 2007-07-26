@@ -132,7 +132,7 @@
         <table>
             <tr>
               <td class="logo">
-                  :: <a href="$base/default.action">pulse 2 [ M1 ]</a> ::
+                  :: <a href="$base/default.action">pulse 2 [ M3 ]</a> ::
 #if($projectId && $projectId != "0")
                   <a href="$base/currentBuild.action?id=${projectId}">$projectName</a>
 #end
