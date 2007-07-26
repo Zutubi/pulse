@@ -4,8 +4,8 @@ import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.agent.DefaultAgent;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.pulse.model.AgentState;
+import com.zutubi.pulse.web.ActionSupport;
 
 import java.util.List;
 
@@ -31,12 +31,12 @@ public class ViewAgentsAction extends ActionSupport
 
     public boolean upgrading(DefaultAgent agent)
     {
-        return agent.getState().getEnableState() == AgentState.EnableState.UPGRADING;
+        return agent.getEnableState() == AgentState.EnableState.UPGRADING;
     }
 
     public boolean failedUpgrade(DefaultAgent agent)
     {
-        return agent.getState().getEnableState() == AgentState.EnableState.FAILED_UPGRADE;
+        return agent.getEnableState() == AgentState.EnableState.FAILED_UPGRADE;
     }
 
     public String execute() throws Exception

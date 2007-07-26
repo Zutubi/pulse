@@ -14,6 +14,10 @@ import java.util.Date;
 public class DefaultAgent implements Agent
 {
     private AgentConfiguration agentConfig;
+    /**
+     * This cached copy of the state is read-only, as it is detached from the
+     * session.  For this reason it should not be exposed beyond this object.
+     */
     private AgentState agentState;
     private Status status;
     private long lastPingTime = 0;
@@ -22,7 +26,7 @@ public class DefaultAgent implements Agent
     /**
      * The upgrade state is only used when the slave enable state is UPGRADING.
      */
-    private UpgradeState upgradeState = UpgradeState.NONE;
+    private UpgradeState upgradeState = UpgradeState.INITIAL;
     private int upgradeProgress = -1;
     private String upgradeMessage = null;
 
@@ -54,11 +58,6 @@ public class DefaultAgent implements Agent
         return agentService;
     }
 
-    public AgentState getState()
-    {
-        return agentState;
-    }
-
     public Status getStatus()
     {
         return status;
@@ -74,6 +73,11 @@ public class DefaultAgent implements Agent
         {
             return "[local]";
         }
+    }
+
+    public long getId()
+    {
+        return agentState.getId();
     }
 
     public void setStatus(Status status)
@@ -175,5 +179,10 @@ public class DefaultAgent implements Agent
     public String getUpgradeMessage()
     {
         return upgradeMessage;
+    }
+
+    public AgentState.EnableState getEnableState()
+    {
+        return agentState.getEnableState();
     }
 }

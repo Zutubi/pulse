@@ -1,10 +1,10 @@
 package com.zutubi.pulse.agent;
 
-import com.zutubi.pulse.Version;
 import com.zutubi.pulse.AgentService;
+import com.zutubi.pulse.Version;
 import com.zutubi.pulse.bootstrap.SystemPaths;
-import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.AgentUpgradeCompleteEvent;
+import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.services.UpgradeState;
 import com.zutubi.pulse.services.UpgradeStatus;
 import com.zutubi.pulse.servlet.DownloadPackageServlet;
@@ -26,7 +26,6 @@ public class AgentUpdater implements Runnable
     private static final Logger LOG = Logger.getLogger(AgentUpdater.class);
     
     private Agent agent;
-    private String token;
     private String masterUrl;
     private EventManager eventManager;
     private SystemPaths systemPaths;
@@ -47,10 +46,9 @@ public class AgentUpdater implements Runnable
      */
     private long pingInterval = 5000;
 
-    public AgentUpdater(Agent agent, String token, String masterUrl, EventManager eventManager, SystemPaths systemPaths)
+    public AgentUpdater(Agent agent, String masterUrl, EventManager eventManager, SystemPaths systemPaths)
     {
         this.agent = agent;
-        this.token = token;
         this.masterUrl = masterUrl;
         this.eventManager = eventManager;
         this.systemPaths = systemPaths;
@@ -70,7 +68,7 @@ public class AgentUpdater implements Runnable
 
         try
         {
-            boolean accepted = agentService.updateVersion(masterBuild, masterUrl, agent.getState().getId(), packageUrl, packageFile.length());
+            boolean accepted = agentService.updateVersion(masterBuild, masterUrl, agent.getId(), packageUrl, packageFile.length());
 
             if(!accepted)
             {

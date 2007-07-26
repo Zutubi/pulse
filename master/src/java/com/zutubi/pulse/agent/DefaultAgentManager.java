@@ -229,7 +229,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         Agent agent = agents.get(handle);
         if (agent != null)
         {
-            AgentState agentState = agent.getState();
+            AgentState agentState = agentStateManager.getAgentState(agent.getId());
             agentState.setEnableState(state);
             agentStateManager.save(agentState);
             agentChanged(agent.getConfig());
@@ -324,12 +324,12 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 
     private void updateAgent(Agent agent)
     {
-        AgentState agentState = agent.getState();
+        AgentState agentState = agentStateManager.getAgentState(agent.getId());
         agentState.setEnableState(AgentState.EnableState.UPGRADING);
         agentStateManager.save(agentState);
 
         String masterUrl = "http://" + MasterAgentService.constructMasterLocation(configurationProvider.get(GeneralAdminConfiguration.class), configurationManager.getSystemConfig());
-        AgentUpdater updater = new AgentUpdater(agent, serviceTokenManager.getToken(), masterUrl, eventManager, configurationManager.getSystemPaths());
+        AgentUpdater updater = new AgentUpdater(agent, masterUrl, eventManager, configurationManager.getSystemPaths());
         updatersLock.lock();
 
         try
@@ -370,7 +370,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
     public void handleEvent(Event evt)
     {
         AgentUpgradeCompleteEvent suce = (AgentUpgradeCompleteEvent) evt;
-        AgentState agentState = suce.getAgent().getState();
+        AgentState agentState = agentStateManager.getAgentState(suce.getAgent().getId());
 
         updatersLock.lock();
         try
