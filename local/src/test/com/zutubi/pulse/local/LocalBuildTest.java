@@ -1,11 +1,11 @@
 package com.zutubi.pulse.local;
 
+import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.PulseException;
+import com.zutubi.pulse.dev.bootstrap.DevBootstrapManager;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.IOUtils;
-import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.dev.bootstrap.DevBootstrapManager;
 
 import java.io.*;
 import java.net.URISyntaxException;
@@ -96,6 +96,15 @@ public class LocalBuildTest extends PulseTestCase
 
         builder.runBuild(tmpDir, pulseFile, null, resourceFile, "out");
         compareOutput("resourceload");
+    }
+
+    public void testDefaultResourceVersion() throws IOException, PulseException, URISyntaxException
+    {
+        String pulseFile = copyFile("defaultresource");
+        String resourceFile = new File(getInputURL("resources").toURI()).getAbsolutePath();
+
+        builder.runBuild(tmpDir, pulseFile, null, resourceFile, "out");
+        compareOutput("defaultresource");
     }
 
     public void testCommandFailure() throws Exception
