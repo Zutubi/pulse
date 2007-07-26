@@ -1,5 +1,6 @@
 package com.zutubi.pulse;
 
+import com.zutubi.prototype.config.MockConfigurationProvider;
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.agent.DefaultAgent;
@@ -25,6 +26,7 @@ import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.personal.PatchArchive;
+import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.project.types.CustomTypeConfiguration;
@@ -90,12 +92,15 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         agentManager.addAgent(slave3000);
 
         MasterConfigurationManager configurationManager = new SimpleMasterConfigurationManager();
+        MockConfigurationProvider configurationProvider = new MockConfigurationProvider();
+        configurationProvider.insert("test", new GeneralAdminConfiguration());
 
         queue = new ThreadedRecipeQueue();
         queue.setEventManager(eventManager);
         queue.setAgentManager(agentManager);
         queue.setUnsatisfiableTimeout(-1);
         queue.setConfigurationManager(configurationManager);
+        queue.setConfigurationProvider(configurationProvider);
         queue.init();
 
         recipeErrors = new LinkedList<RecipeErrorEvent>();
