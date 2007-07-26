@@ -22,6 +22,8 @@ import com.zutubi.pulse.prototype.config.project.types.TypeConfiguration;
 import com.zutubi.pulse.scm.ScmChangeEvent;
 import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.pulse.servercore.config.ScmConfiguration;
+import com.zutubi.pulse.model.BuildReason;
+import com.zutubi.pulse.model.TriggerBuildReason;
 import com.zutubi.util.Constants;
 import com.zutubi.util.logging.Logger;
 
@@ -29,13 +31,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
+ * A recipe queue that runs an independent thread to manage the dispatching
+ * of recipes.
  */
 public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener, Stoppable, ConfigurationEventListener
 {
@@ -88,6 +90,8 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
      */
     private long unsatisfiableTimeout = 0;
 
+    private BlockingQueue<DispatchedRequest> dispatchedQueue = new LinkedBlockingQueue<DispatchedRequest>();
+    
     private AgentManager agentManager;
     private EventManager eventManager;
 
@@ -108,6 +112,11 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
             }
 
             eventManager.register(this);
+
+            Thread dispatcherThread = new Thread(new Dispatcher(), "Recipe Dispatcher Service");
+            dispatcherThread.setDaemon(true);
+            dispatcherThread.start();
+            
             start();
         }
         catch (Exception e)
@@ -134,6 +143,11 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
     /**
      * Enqueue a new recipe dispatch request.
+<<<<<<< .working
+=======
+     *
+     * @param dispatchRequest the request to be enqueued
+>>>>>>> .merge-right.r3435
      */
     public void enqueue(RecipeDispatchRequest dispatchRequest)
     {
@@ -489,32 +503,36 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         buildRevision.apply(recipeRequest);
         recipeRequest.prepare(agent.getConfig().getName());
 
-        // TODO: this code cannot handle an agent rejecting the build
+        // This code cannot handle an agent rejecting the build
         // (the handling was backed outdue to CIB-553 and the fact that
         // agents do not currently reject builds)
         eventManager.publish(new RecipeDispatchedEvent(this, recipeRequest, agent));
         dispatchedRequests.add(request);
+        unavailableAgents.add(agent);
+        executingAgents.put(recipeRequest.getId(), agent);
 
-        try
-        {
-            // Generate the build context.
-            BuildContext context = new BuildContext();
-            context.setBuildNumber(request.getBuild().getNumber());
-            context.setBuildRevision(buildRevision.getRevision().getRevisionString());
-            context.setBuildTimestamp(buildRevision.getTimestamp());
-            context.setProjectName(recipeRequest.getProject());
-            
-            agent.getService().build(recipeRequest, context);
-            unavailableAgents.add(agent);
-            executingAgents.put(recipeRequest.getId(), agent);
-        }
-        catch (Exception e)
-        {
-            LOG.warning("Unable to dispatch recipe: " + e.getMessage(), e);
-            eventManager.publish(new RecipeErrorEvent(this, recipeRequest.getId(), "Unable to dispatch recipe: " + e.getMessage()));
-        }
+        BuildContext context = createBuildContext(request, recipeRequest, buildRevision);
+        dispatchedQueue.offer(new DispatchedRequest(recipeRequest, context, agent));
 
         return true;
+    }
+
+    private BuildContext createBuildContext(RecipeDispatchRequest request, RecipeRequest recipeRequest, BuildRevision buildRevision)
+    {
+        BuildContext context = new BuildContext();
+        context.setBuildNumber(request.getBuild().getNumber());
+        context.setBuildRevision(buildRevision.getRevision().getRevisionString());
+        context.setBuildTimestamp(buildRevision.getTimestamp());
+        context.setProjectName(recipeRequest.getProject());
+
+        BuildReason buildReason = request.getBuild().getReason();
+        context.setBuildReason(buildReason.getSummary());
+        if(buildReason instanceof TriggerBuildReason)
+        {
+            context.setBuildTrigger(((TriggerBuildReason)buildReason).getTriggerName());
+        }
+
+        return context;
     }
 
     public void stop(boolean force)
@@ -767,5 +785,48 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         updateTimeout(adminConfiguration);
 
         configurationProvider.registerEventListener(this, false, false, GeneralAdminConfiguration.class);
+    }
+
+    private static class DispatchedRequest
+    {
+        RecipeRequest recipeRequest;
+        BuildContext context;
+        Agent agent;
+
+        public DispatchedRequest(RecipeRequest recipeRequest, BuildContext context, Agent agent)
+        {
+            this.recipeRequest = recipeRequest;
+            this.context = context;
+            this.agent = agent;
+        }
+    }
+
+    private class Dispatcher implements Runnable
+    {
+        public void run()
+        {
+            while(!stopRequested)
+            {
+                DispatchedRequest dispatchedRequest;
+                try
+                {
+                    dispatchedRequest = dispatchedQueue.take();
+                }
+                catch (InterruptedException e)
+                {
+                    continue;
+                }
+
+                try
+                {
+                    dispatchedRequest.agent.getService().build(dispatchedRequest.recipeRequest, dispatchedRequest.context);
+                }
+                catch (Exception e)
+                {
+                    LOG.warning("Unable to dispatch recipe: " + e.getMessage(), e);
+                    eventManager.publish(new RecipeErrorEvent(this, dispatchedRequest.recipeRequest.getId(), "Unable to dispatch recipe: " + e.getMessage()));
+                }
+            }
+        }
     }
 }

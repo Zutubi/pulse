@@ -15,7 +15,9 @@ public class BuildContext
     
     private long buildNumber = -1;
     private long buildTimestamp = -1;
+    private String buildReason;
     private String buildRevision = null;
+    private String buildTrigger = null;
     /**
      * The version can be extracted while executing a command, and is
      * communicated back out by setting it here.
@@ -48,6 +50,16 @@ public class BuildContext
         this.buildTimestamp = buildTimestamp;
     }
 
+    public String getBuildReason()
+    {
+        return buildReason;
+    }
+
+    public void setBuildReason(String buildReason)
+    {
+        this.buildReason = buildReason;
+    }
+
     public String getBuildRevision()
     {
         return buildRevision;
@@ -56,6 +68,16 @@ public class BuildContext
     public void setBuildRevision(String buildRevision)
     {
         this.buildRevision = buildRevision;
+    }
+
+    public String getBuildTrigger()
+    {
+        return buildTrigger;
+    }
+
+    public void setBuildTrigger(String buildTrigger)
+    {
+        this.buildTrigger = buildTrigger;
     }
 
     public String getBuildVersion()
