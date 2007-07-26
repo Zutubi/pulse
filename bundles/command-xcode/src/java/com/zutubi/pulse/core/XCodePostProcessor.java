@@ -7,16 +7,16 @@ public class XCodePostProcessor extends PostProcessorGroup
 {
     private String[] errorRegexs = new String[]
     {
-            ".*[\\d]+: error:.*",
-            ".*Assertion failure.*",
-            ".*No such file or directory.*",
-            ".*Undefined symbols.*",
-            ".*Uncaught exception:.*"
+            "[\\d]+: error:",
+            "Assertion failure",
+            "No such file or directory",
+            "Undefined symbols",
+            "Uncaught exception:"
     };
 
     private String[] warningRegexs = new String[]
     {
-            ".*warning:.*"
+            "warning:"
     };
 
     public XCodePostProcessor()
@@ -37,5 +37,27 @@ public class XCodePostProcessor extends PostProcessorGroup
         xcode.setLeadingContext(1);
         xcode.setTrailingContext(6);
         add(xcode);
+    }
+
+    public void setLeadingContext(int leadingContext)
+    {
+        for(PostProcessor child: getProcessors())
+        {
+            if(child instanceof RegexPostProcessor)
+            {
+                ((RegexPostProcessor)child).setLeadingContext(leadingContext);
+            }
+        }
+    }
+
+    public void setTrailingContext(int trailingContext)
+    {
+        for(PostProcessor child: getProcessors())
+        {
+            if(child instanceof RegexPostProcessor)
+            {
+                ((RegexPostProcessor)child).setTrailingContext(trailingContext);
+            }
+        }
     }
 }

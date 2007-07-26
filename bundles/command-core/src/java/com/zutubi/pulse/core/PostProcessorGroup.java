@@ -50,6 +50,11 @@ public class PostProcessorGroup implements PostProcessor
         return processors.size();
     }
 
+    public List<PostProcessor> getProcessors()
+    {
+        return processors;
+    }
+
     public PostProcessor get(int index)
     {
         return processors.get(index);

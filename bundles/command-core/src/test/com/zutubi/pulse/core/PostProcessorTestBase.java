@@ -34,15 +34,7 @@ public abstract class PostProcessorTestBase extends PulseTestCase
     protected CommandResult createAndProcessArtifact(String name, PostProcessor pp) throws Exception
     {
         createArtifact(name);
-        CommandResult commandResult = new CommandResult("test");
-        commandResult.commence();
-
-        CommandContext commandContext = new CommandContext();
-        commandContext.setOutputDir(tempDir);
-        
-        pp.process(artifact, commandResult, commandContext);
-        commandResult.complete();
-        return commandResult;
+        return processArtifact(pp);
     }
 
     protected void createArtifact(String name) throws Exception
@@ -52,6 +44,19 @@ public abstract class PostProcessorTestBase extends PulseTestCase
         File toFile = new File(tempDir, fromFile.getName());
         IOUtils.copyFile(fromFile, toFile);
         artifact = new StoredFileArtifact(toFile.getName());
+    }
+
+    protected CommandResult processArtifact(PostProcessor pp)
+    {
+        CommandResult commandResult = new CommandResult("test");
+        commandResult.commence();
+
+        CommandContext commandContext = new CommandContext();
+        commandContext.setOutputDir(tempDir);
+
+        pp.process(artifact, commandResult, commandContext);
+        commandResult.complete();
+        return commandResult;
     }
 
     protected void assertErrors(String... summaries)

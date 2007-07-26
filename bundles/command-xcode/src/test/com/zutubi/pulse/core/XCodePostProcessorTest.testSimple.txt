@@ -1,0 +1,44 @@
+buffer line
+buffer line
+buffer line
+buffer line
+buffer line
+buffer line
+buffer line
+buffer line
+buffer line
+buffer line
+some warning: here
+buffer line
+buffer line
+buffer line
+buffer line
+buffer line
+buffer line
+buffer line
+buffer line
+buffer line
+buffer line
+Uncaught exception: Blah
+buffer line
+buffer line
+buffer line
+buffer line
+buffer line
+buffer line
+buffer line
+buffer line
+buffer line
+buffer line
+There was an Assertion failure
+buffer line
+buffer line
+buffer line
+buffer line
+buffer line
+buffer line
+buffer line
+buffer line
+buffer line
+buffer line
+buffer line
