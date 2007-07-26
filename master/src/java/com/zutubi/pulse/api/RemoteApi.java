@@ -246,6 +246,40 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
 //        }
 //    }
 //
+//    public Vector<Hashtable<String, Object>> queryBuildsForProject(String token, String projectName, String[] resultStates, int firstResult, int maxResults, boolean mostRecentFirst) throws AuthenticationException
+//    {
+//        tokenManager.verifyUser(token);
+//        Project project = internalGetProject(projectName);
+//
+//        List<BuildResult> builds = buildManager.queryBuilds(new Project[]{project}, mapStates(resultStates), -1, -1, null, firstResult, maxResults, mostRecentFirst);
+//        Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(builds.size());
+//        for (BuildResult build : builds)
+//        {
+//            Hashtable<String, Object> buildDetails = convertResult(build);
+//            result.add(buildDetails);
+//        }
+//
+//        return result;
+//    }
+//
+//    private ResultState[] mapStates(String[] stateNames)
+//    {
+//        if(stateNames.length > 0)
+//        {
+//            ResultState[] states = new ResultState[stateNames.length];
+//            for(int i = 0; i < stateNames.length; i++)
+//            {
+//                states[i] = ResultState.fromPrettyString(stateNames[i]);
+//            }
+//
+//            return states;
+//        }
+//        else
+//        {
+//            return null;
+//        }
+//    }
+//
 //    public Vector<Hashtable<String, Object>> getLatestBuildsForProject(String token, String projectName, String buildSpecification, boolean completedOnly, int maxResults) throws AuthenticationException
 //    {
 //        tokenManager.verifyUser(token);
@@ -338,6 +372,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
 //        Hashtable<String, Object> buildDetails = new Hashtable<String, Object>();
 //        buildDetails.put("id", (int) build.getNumber());
 //        buildDetails.put("project", build.getProject().getName());
+//        buildDetails.put("revision", getBuildRevision(build));
 //        buildDetails.put("specification", build.getBuildSpecification());
 //        buildDetails.put("status", build.getState().getPrettyString());
 //        buildDetails.put("completed", build.completed());
@@ -357,6 +392,22 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
 //
 //        return buildDetails;
 //    }
+//
+//
+//    private String getBuildRevision(BuildResult build)
+// 	{
+//        BuildScmDetails details = build.getScmDetails();
+// 	 	if(details != null)
+// 	 	{
+// 	 	    Revision revision = details.getRevision();
+// 	 	    if(revision != null)
+// 	 	    {
+// 	 	        return revision.getRevisionString();
+// 	 	    }
+// 	 	}
+//
+//         return "";
+// 	}
 //
 //    public Vector<Hashtable<String, Object>> getChangesInBuild(String token, String projectName, int id) throws AuthenticationException
 //    {
