@@ -5,4 +5,13 @@
         <property name="resource-var" value="resource-value"/>
     </resource>
 
+    <resource name="with-default" default-version="def">
+        <property name="global" value="global-value"/>
+        <version value="def">
+            <property name="var" value="var-def"/>
+        </version>
+        <version value="other">
+            <property name="var" value="var-other"/>
+        </version>
+    </resource>
 </resources>

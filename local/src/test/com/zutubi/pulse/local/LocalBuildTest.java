@@ -93,6 +93,15 @@ public class LocalBuildTest extends PulseTestCase
         compareOutput("resourceload");
     }
 
+    public void testDefaultResourceVersion() throws IOException, PulseException, URISyntaxException
+    {
+        String pulseFile = copyFile("defaultresource");
+        String resourceFile = new File(getInputURL("resources").toURI()).getAbsolutePath();
+
+        builder.runBuild(tmpDir, pulseFile, null, resourceFile, "out");
+        compareOutput("defaultresource");
+    }
+
     public void testCommandFailure() throws Exception
     {
         simpleCase("commandFailure");
