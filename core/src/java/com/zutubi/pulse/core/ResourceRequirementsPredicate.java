@@ -43,6 +43,10 @@ public class ResourceRequirementsPredicate implements TypeLoadPredicate
         {
             references.add((ResourceReference) type);
         }
+        else
+        {
+            return true;
+        }
 
         return false;
     }

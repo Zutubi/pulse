@@ -10,5 +10,7 @@
         <resource name="withversion" version="1"/>
 
         <resource name="notrequired" required="false"/>
+
+        <resource name="explicitlyrequired" required="true"/>
     </recipe>
 </project>

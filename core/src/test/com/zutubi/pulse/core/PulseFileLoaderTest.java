@@ -21,11 +21,13 @@ public class PulseFileLoaderTest extends FileLoaderTestBase
     {
         List<ResourceRequirement> requriements = loader.loadRequiredResources(IOUtils.inputStreamToString(getInput("requiredResources")), null);
 
-        assertEquals(2, requriements.size());
+        assertEquals(3, requriements.size());
         assertEquals("noversion", requriements.get(0).getResource());
         assertNull(requriements.get(0).getVersion());
         assertEquals("withversion", requriements.get(1).getResource());
         assertEquals("1", requriements.get(1).getVersion());
+        assertEquals("explicitlyrequired", requriements.get(2).getResource());
+        assertNull(requriements.get(2).getVersion());
     }
 
     public void testCustomProjectValidation() throws Exception
