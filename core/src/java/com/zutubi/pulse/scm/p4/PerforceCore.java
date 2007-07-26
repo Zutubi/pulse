@@ -4,12 +4,17 @@ import com.zutubi.pulse.core.model.NumericalRevision;
 import com.zutubi.pulse.scm.ScmCancelledException;
 import com.zutubi.pulse.scm.ScmException;
 import static com.zutubi.pulse.scm.p4.PerforceConstants.*;
-import com.zutubi.util.IOUtils;
+import com.zutubi.pulse.util.process.AsyncProcess;
+import com.zutubi.pulse.util.process.LineHandler;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,6 +26,7 @@ public class PerforceCore
     private static final Logger LOG = Logger.getLogger(PerforceCore.class);
 
     private static final String ASCII_CHARSET = "US-ASCII";
+    private static final long P4_TIMEOUT = Long.getLong("pulse.p4.inactivity.timeout", 300);
 
     private Map<String, String> p4Env = new HashMap<String, String>();
     private ProcessBuilder p4Builder;
@@ -101,13 +107,13 @@ public class PerforceCore
         return result;
     }
 
-    public void runP4WithHandler(PerforceHandler handler, String input, String... commands) throws ScmException
+    public void runP4WithHandler(final PerforceHandler handler, String input, String... commands) throws ScmException
     {
-        if(LOG.isLoggable(Level.FINE))
+        if (LOG.isLoggable(Level.FINE))
         {
             LOG.fine(StringUtils.join(" ", commands));
         }
-        
+
         Process child;
 
         p4Builder.command(commands);
@@ -136,46 +142,60 @@ public class PerforceCore
             }
         }
 
-        BufferedReader stdoutReader = null;
-        BufferedReader stderrReader = null;
+        final AtomicBoolean activity = new AtomicBoolean(false);
+        AsyncProcess async = new AsyncProcess(child, new LineHandler()
+        {
+            public void handle(String line, boolean error)
+            {
+                activity.set(true);
+                if (error)
+                {
+                    handler.handleStderr(line);
+                }
+                else
+                {
+                    handler.handleStdout(line);
+                }
+            }
+        }, true);
 
         try
         {
-            stdoutReader = new BufferedReader(new InputStreamReader(child.getInputStream(), ASCII_CHARSET));
-            stderrReader = new BufferedReader(new InputStreamReader(child.getErrorStream(), ASCII_CHARSET));
+            long lastActivityTime = System.currentTimeMillis();
 
-            String line;
-            while((line = stdoutReader.readLine()) != null)
+            Integer exitCode;
+            do
             {
-                handler.handleStdout(line);
                 handler.checkCancelled();
+                exitCode = async.waitFor(10, TimeUnit.SECONDS);
+                if(activity.getAndSet(false))
+                {
+                    lastActivityTime = System.currentTimeMillis();
+                }
+                else
+                {
+                    long secondsSinceActivity = (System.currentTimeMillis() - lastActivityTime) / 1000;
+                    if(secondsSinceActivity >= P4_TIMEOUT)
+                    {
+                        throw new ScmException("Timing out p4 process after " + secondsSinceActivity + " seconds of inactivity");
+                    }
+                }
             }
+            while(exitCode == null);
 
-            while((line = stderrReader.readLine()) != null)
-            {
-                handler.handleStderr(line);
-                handler.checkCancelled();
-            }
-
-            handler.handleExitCode(child.waitFor());
-        }
-        catch (IOException e)
-        {
-            throw new ScmException("Error reading output of p4 process", e);
+            handler.handleExitCode(exitCode);
         }
         catch (InterruptedException e)
         {
             // Do nothing
         }
-        catch(ScmCancelledException e)
+        catch(IOException e)
         {
-            child.destroy();
-            throw e;
+            throw new ScmException("Error reading output of p4 process", e);
         }
         finally
         {
-            IOUtils.close(stdoutReader);
-            IOUtils.close(stderrReader);
+            async.destroy();
         }
     }
 
@@ -198,9 +218,9 @@ public class PerforceCore
 
         runP4WithHandler(new PerforceErrorDetectingHandler(true)
         {
-            public void handleStdout(String line) throws ScmException
+            public void handleStdout(String line)
             {
-                if(line.startsWith(ROOT_PREFIX))
+                if (line.startsWith(ROOT_PREFIX))
                 {
                     result[0] = new File(line.substring(ROOT_PREFIX.length()).trim());
                 }
@@ -286,7 +306,7 @@ public class PerforceCore
         Pattern created = Pattern.compile("Change ([0-9]+) created.");
         String response = result.stdout.toString().trim();
         Matcher m = created.matcher(response);
-        if(m.matches())
+        if (m.matches())
         {
             return Long.parseLong(m.group(1));
         }

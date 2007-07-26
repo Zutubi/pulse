@@ -2,7 +2,6 @@ package com.zutubi.pulse.scm.p4;
 
 import com.zutubi.pulse.personal.PersonalBuildUI;
 import com.zutubi.pulse.scm.ScmCancelledException;
-import com.zutubi.pulse.scm.ScmException;
 
 /**
  */
@@ -16,7 +15,7 @@ public class PerforceProgressPrintingHandler extends PerforceErrorDetectingHandl
         this.ui = ui;
     }
 
-    public void handleStdout(String line) throws ScmException
+    public void handleStdout(String line)
     {
         if(ui != null)
         {

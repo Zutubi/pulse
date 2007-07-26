@@ -18,7 +18,8 @@ import com.zutubi.pulse.servercore.scm.ScmCapability;
 import com.zutubi.pulse.servercore.scm.ScmFileCache;
 import com.zutubi.pulse.servercore.scm.ScmFilepathFilter;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.SystemUtils;
+import com.zutubi.pulse.util.process.AsyncProcess;
+import com.zutubi.pulse.util.process.BufferingCharHandler;
 import com.zutubi.util.logging.Logger;
 
 import java.io.*;
@@ -26,12 +27,15 @@ import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class PerforceClient extends CachingScmClient
 {
     private static final Logger LOG = Logger.getLogger(PerforceClient.class);
+
+    private static final long RESOLVE_COMMAND_TIMEOUT = Long.getLong("pulse.p4.client.command.timeout", 300);
 
     private PerforceCore core;
     private String templateClient;
@@ -73,15 +77,33 @@ public class PerforceClient extends CachingScmClient
 
                 scope.add(new Property("revision.spec", revisionSpec));
 
+                Process p;
                 try
                 {
                     List<String> command = VariableHelper.splitAndReplaceVariables(commandLine, scope, true);
-                    resolved = SystemUtils.runCommand(command.toArray(new String[command.size()])).trim();
+                    p = Runtime.getRuntime().exec(command.toArray(new String[command.size()]));
+                }
+                catch(Exception e)
+                {
+                    throw new ScmException("Error starting template client generation command: " + e.getMessage(), e);
+                }
+
+                BufferingCharHandler handler = new BufferingCharHandler();
+                AsyncProcess ap = new AsyncProcess(p, handler, false);
+
+                try
+                {
+                    ap.waitForSuccessOrThrow(RESOLVE_COMMAND_TIMEOUT, TimeUnit.SECONDS);
+                    resolved = handler.getStdout().trim();
                 }
                 catch (Exception e)
                 {
                     LOG.severe(e);
                     throw new ScmException("Error running template client generation command: " + e.getMessage(), e);
+                }
+                finally
+                {
+                    ap.destroy();
                 }
             }
             else
@@ -706,7 +728,7 @@ public class PerforceClient extends CachingScmClient
 
         core.runP4WithHandler(new PerforceErrorDetectingHandler(true)
         {
-            public void handleStdout(String line) throws ScmException
+            public void handleStdout(String line)
             {
                 if (line.startsWith("LineEnd:"))
                 {

@@ -19,7 +19,7 @@ public class PerforceSyncHandler implements PerforceHandler
         this.ui = ui;
     }
 
-    public void handleStdout(String line) throws ScmException
+    public void handleStdout(String line)
     {
         if(ui != null)
         {
@@ -32,7 +32,7 @@ public class PerforceSyncHandler implements PerforceHandler
         }
     }
 
-    public void handleStderr(String line) throws ScmException
+    public void handleStderr(String line)
     {
         if(ui != null)
         {

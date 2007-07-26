@@ -32,7 +32,7 @@ public class PerforceFStatHandler extends PerforceErrorDetectingHandler
         this.checkOutOfDate = checkOutOfDate;
     }
 
-    public void handleStdout(String line) throws ScmException
+    public void handleStdout(String line)
     {
         line = line.trim();
         if(line.length() == 0)

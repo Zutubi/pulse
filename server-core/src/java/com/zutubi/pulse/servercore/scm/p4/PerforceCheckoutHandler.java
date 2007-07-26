@@ -5,7 +5,6 @@ import com.zutubi.pulse.core.model.FileRevision;
 import com.zutubi.pulse.core.model.NumericalFileRevision;
 import com.zutubi.pulse.scm.ScmCancelledException;
 import com.zutubi.pulse.scm.ScmCheckoutEventHandler;
-import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.pulse.scm.p4.PerforceErrorDetectingHandler;
 
 import java.util.regex.Matcher;
@@ -25,7 +24,7 @@ public class PerforceCheckoutHandler extends PerforceErrorDetectingHandler
         this.handler = handler;
     }
 
-    public void handleStdout(String line) throws ScmException
+    public void handleStdout(String line)
     {
         if (handler != null)
         {

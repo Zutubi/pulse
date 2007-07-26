@@ -7,8 +7,8 @@ import com.zutubi.pulse.scm.ScmException;
  */
 public interface PerforceHandler
 {
-    void handleStdout(String line) throws ScmException;
-    void handleStderr(String line) throws ScmException;
+    void handleStdout(String line);
+    void handleStderr(String line);
     void handleExitCode(int code) throws ScmException;
 
     void checkCancelled() throws ScmCancelledException;
