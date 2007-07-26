@@ -1,4 +1,4 @@
-Project: my project
+Project: test project
 Personal build 12 (http://host.url/viewBuild.action?id=11)
 
 Completed with status: failure

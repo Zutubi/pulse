@@ -10,6 +10,8 @@
         project :: ${result.project.name?html} ::
         <a href="${buildLink(result)}">personal build ${result.number?c}</a>
     </h1>
+    [@buildLinksHTML result=result/]
+    [@stageLogLinksHTML result=result/]
 <table>
 <tr><td>
     [@buildSummaryHTML result=result/]

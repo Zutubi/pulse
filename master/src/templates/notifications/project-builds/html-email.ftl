@@ -11,6 +11,8 @@
         <a href="${projectLink(result)}">${result.project.name?html}</a> ::
         <a href="${buildLink(result)}">build ${result.number?c}</a>
     </h1>
+    [@buildLinksHTML result=result/]
+    [@stageLogLinksHTML result=result/]
 <table>
 <tr><td>
     [@buildSummaryHTML result=result/]
