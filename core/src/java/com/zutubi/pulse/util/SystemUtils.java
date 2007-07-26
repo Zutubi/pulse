@@ -1,8 +1,7 @@
 package com.zutubi.pulse.util;
 
-import com.zutubi.pulse.jni.ProcessControl;
-import com.zutubi.util.logging.Logger;
 import com.zutubi.util.IOUtils;
+import com.zutubi.util.logging.Logger;
 
 import java.io.*;
 import java.util.Arrays;
@@ -102,7 +101,7 @@ public class SystemUtils
         }
         finally
         {
-            ProcessControl.destroyProcess(process);
+            process.destroy();
         }
     }
 

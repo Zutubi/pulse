@@ -1,14 +1,13 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.MasterBuildPaths;
-import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.core.Scope;
 import com.zutubi.pulse.core.VariableHelper;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.jni.ProcessControl;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.util.IOUtils;
 
 import java.util.LinkedList;
@@ -58,7 +57,10 @@ public class RunExecutablePostBuildAction extends PostBuildAction
         }
         finally
         {
-            ProcessControl.destroyProcess(child);
+            if (child != null)
+            {
+                child.destroy();
+            }
         }
     }
 

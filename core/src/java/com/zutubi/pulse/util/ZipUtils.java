@@ -1,11 +1,9 @@
 package com.zutubi.pulse.util;
 
-import com.zutubi.pulse.jni.ProcessControl;
-import com.zutubi.util.logging.Logger;
 import com.zutubi.util.IOUtils;
 import com.zutubi.util.NullOutputStream;
 import com.zutubi.util.StringUtils;
-import com.zutubi.pulse.util.SystemUtils;
+import com.zutubi.util.logging.Logger;
 
 import java.io.*;
 import java.util.Arrays;
@@ -135,7 +133,7 @@ public class ZipUtils
         }
         finally
         {
-            ProcessControl.destroyProcess(child);
+            child.destroy();
         }
     }
 

@@ -14,9 +14,8 @@ import java.util.*;
 /**
  * The executable command represents a os command invocation.
  *
- * It exposes two built in artifacts. The commands output and the commands execution
+ * It exposes two built in artifacts. The command's output and its execution
  * environment.
- *
  */
 public class ExecutableCommand extends CommandSupport implements ScopeAware
 {
@@ -195,6 +194,10 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
             {
                 throw new BuildException(e);
             }
+        }
+        finally
+        {
+            child.destroy();
         }
     }
 
@@ -460,12 +463,7 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
      */
     private boolean acceptableName(String name)
     {
-        if(name.startsWith("env."))
-        {
-            return false;
-        }
-
-        return name.matches("[-a-zA-Z._]+");
+        return !name.startsWith("env.") && name.matches("[-a-zA-Z._]+");
     }
 
     private String convertName(String name)

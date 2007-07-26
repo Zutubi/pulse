@@ -1,7 +1,6 @@
 package com.zutubi.pulse.util;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.pulse.jni.ProcessControl;
 import com.zutubi.util.IOUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
@@ -325,7 +324,10 @@ public class FileSystemUtils
         }
         finally
         {
-            ProcessControl.destroyProcess(process);
+            if (process != null)
+            {
+                process.destroy();
+            }
         }
 
         return result;
@@ -417,7 +419,10 @@ public class FileSystemUtils
             }
             finally
             {
-                ProcessControl.destroyProcess(p);    
+                if (p != null)
+                {
+                    p.destroy();
+                }
             }
         }
 
@@ -939,7 +944,10 @@ public class FileSystemUtils
         }
         finally
         {
-            ProcessControl.destroyProcess(child);
+            if (child != null)
+            {
+                child.destroy();
+            }
         }
     }
 
