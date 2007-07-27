@@ -42,7 +42,7 @@ public class SanityBuildAcceptanceTest extends SeleniumTestBase
 
         AddProjectWizard.AntState antState = new AddProjectWizard.AntState(selenium);
         antState.waitFor();
-        antState.finishFormElements("build.xml", null, null, null);
+        antState.finishFormElements(null, "build.xml", null, null);
 
         ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, projectName, false);
         hierarchyPage.waitFor();
