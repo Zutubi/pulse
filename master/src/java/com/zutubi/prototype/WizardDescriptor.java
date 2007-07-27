@@ -44,9 +44,12 @@ public class WizardDescriptor extends AbstractDescriptor
         formDescriptor.setAction("wizard");
         formDescriptor.setAjax(ajax);
         formDescriptor.setNamespace(namespace);
-        
-        TemplateFormDecorator templateDecorator = new TemplateFormDecorator(record);
-        templateDecorator.decorate(formDescriptor);
+
+        if (wizardInstance.isTemplate())
+        {
+            TemplateFormDecorator templateDecorator = new TemplateFormDecorator(record);
+            templateDecorator.decorate(formDescriptor);
+        }
 
         // decorate the form so that it fits into the wizard.
         decorate(formDescriptor);

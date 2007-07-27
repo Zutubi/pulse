@@ -1,6 +1,7 @@
 package com.zutubi.pulse.prototype.config;
 
 import com.zutubi.prototype.MapOptionProvider;
+import com.zutubi.prototype.MapOption;
 import com.zutubi.prototype.type.EnumType;
 import com.zutubi.prototype.type.TypeProperty;
 
@@ -14,6 +15,11 @@ import java.util.Map;
  */
 public class EnumOptionProvider extends MapOptionProvider
 {
+    public MapOption getEmptyOption(Object instance, String parentPath, TypeProperty property)
+    {
+        return new MapOption("", "");
+    }
+
     public Map<String,String> getMap(Object instance, String path, TypeProperty property)
     {
         EnumType enumType = (EnumType) property.getType().getTargetType();

@@ -5,6 +5,7 @@ import com.zutubi.config.annotations.NoOverride;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.TemplateRecord;
+import com.zutubi.prototype.model.SelectFieldDescriptor;
 
 import java.lang.annotation.Annotation;
 
@@ -66,6 +67,24 @@ public class TemplateFormDecorator
                                 field.addParameter("overriddenValue", parentRecord.get(fieldName));
                             }
                         }
+                    }
+                }
+            }
+        }
+
+        // Select fields may need a special option added to allow the
+        // user to not specify a value.
+        for (FieldDescriptor field : descriptor.getFieldDescriptors())
+        {
+            if(field instanceof SelectFieldDescriptor)
+            {
+                SelectFieldDescriptor select = (SelectFieldDescriptor) field;
+                if (!select.getMultiple())
+                {
+                    Object emptyOption = select.getEmptyOption();
+                    if(emptyOption != null)
+                    {
+                        select.getList().add(0, emptyOption);
                     }
                 }
             }

@@ -12,6 +12,8 @@ import java.util.*;
  */
 public abstract class MapOptionProvider implements OptionProvider
 {
+    public abstract MapOption getEmptyOption(Object instance, String parentPath, TypeProperty property);
+
     public List<Map.Entry<String, String>> getOptions(Object instance, String parentPath, TypeProperty property)
     {
         Map<String, String> optionMap = getMap(instance, parentPath, property);

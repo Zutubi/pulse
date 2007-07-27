@@ -10,6 +10,7 @@ import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.freemarker.FreemarkerConfigurationFactoryBean;
 import com.zutubi.util.logging.Logger;
@@ -116,8 +117,11 @@ public class FormDirective extends PrototypeDirective
                 formDescriptor.setActions("apply", "reset");
             }
 
-            TemplateFormDecorator templateDecorator = new TemplateFormDecorator(data);
-            templateDecorator.decorate(formDescriptor);
+            if (data != null && data instanceof TemplateRecord)
+            {
+                TemplateFormDecorator templateDecorator = new TemplateFormDecorator(data);
+                templateDecorator.decorate(formDescriptor);
+            }
 
             // Decorate the form to include the symbolic name as a hidden field. This is necessary for configuration.
             // This is probably not the best place for this, but until i think of a better location, it stays.

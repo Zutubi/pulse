@@ -4,6 +4,7 @@ import com.zutubi.prototype.FieldDescriptor;
 import com.zutubi.prototype.type.record.Record;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  *
@@ -11,6 +12,8 @@ import java.util.Collection;
  */
 public class SelectFieldDescriptor extends FieldDescriptor
 {
+    private static final String PARAMETER_EMPTY_OPTION = "emptyOption";
+    private static final String PARAMETER_LIST = "list";
     private static final String PARAMETER_MULTIPLE = "multiple";
     private static final String PARAMETER_SIZE = "size";
 
@@ -19,14 +22,24 @@ public class SelectFieldDescriptor extends FieldDescriptor
         setType("select");
     }
 
-    public Collection getList()
+    public Object getEmptyOption()
     {
-        return (Collection) getParameter("list");
+        return getParameter(PARAMETER_EMPTY_OPTION);
     }
 
-    public void setList(Collection list)
+    public void setEmptyOption(Object option)
     {
-        addParameter("list", list);
+        addParameter(PARAMETER_EMPTY_OPTION, option);
+    }
+
+    public List getList()
+    {
+        return (List) getParameter(PARAMETER_LIST);
+    }
+
+    public void setList(List list)
+    {
+        addParameter(PARAMETER_LIST, list);
     }
 
     public void setListKey(String listKey)

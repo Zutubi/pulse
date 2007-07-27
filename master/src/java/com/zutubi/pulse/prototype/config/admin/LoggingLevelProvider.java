@@ -15,7 +15,13 @@ import java.util.TreeMap;
 public class LoggingLevelProvider extends ListOptionProvider
 {
     private LogConfigurationManager logConfigurationManager;
-    
+
+    public String getEmptyOption(Object instance, String parentPath, TypeProperty property)
+    {
+        // Not templatable.
+        return null;
+    }
+
     public List<String> getOptions(Object instance, String path, TypeProperty property)
     {
         return logConfigurationManager.getAvailableConfigurations();

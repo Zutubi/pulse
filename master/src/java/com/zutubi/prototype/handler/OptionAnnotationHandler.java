@@ -12,7 +12,7 @@ import com.zutubi.util.ClassLoaderUtils;
 import com.zutubi.util.bean.ObjectFactory;
 
 import java.lang.annotation.Annotation;
-import java.util.Collection;
+import java.util.List;
 
 /**
  *
@@ -47,15 +47,25 @@ public abstract class OptionAnnotationHandler extends FieldAnnotationHandler
         }
 
         TypeProperty fieldTypeProperty = field.getProperty();
-        Collection optionList = optionProvider.getOptions(instance, parentPath, fieldTypeProperty);
+        List optionList = optionProvider.getOptions(instance, parentPath, fieldTypeProperty);
         field.setList(optionList);
-        if (optionProvider.getOptionKey() != null)
+
+        Object emptyOption = optionProvider.getEmptyOption(instance, parentPath, fieldTypeProperty);
+        if (emptyOption != null)
         {
-            field.setListKey(optionProvider.getOptionKey());
+            field.setEmptyOption(emptyOption);
         }
-        if (optionProvider.getOptionValue() != null)
+
+        String key = optionProvider.getOptionKey();
+        if (key != null)
         {
-            field.setListValue(optionProvider.getOptionValue());
+            field.setListKey(key);
+        }
+
+        String value = optionProvider.getOptionValue();
+        if (value != null)
+        {
+            field.setListValue(value);
         }
     }
 

@@ -6,31 +6,33 @@ import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.i18n.Messages;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.LinkedList;
+import java.util.*;
 
 /**
- *
- *
+ * An option provider that lists the extensions for a particular type.  Used,
+ * for example, when the user must select a type in a wizard.
  */
-public class ExtensionOptionProvider implements OptionProvider
+public class ExtensionOptionProvider extends MapOptionProvider
 {
     private CompositeType type;
-
     private TypeRegistry typeRegistry;
+
+    public ExtensionOptionProvider()
+    {
+    }
 
     public ExtensionOptionProvider(CompositeType type)
     {
         this.type = type;
     }
 
-    public ExtensionOptionProvider()
+    public MapOption getEmptyOption(Object instance, String parentPath, TypeProperty property)
     {
+        return null;
     }
 
-    public Collection getOptions(Object instance, String path, TypeProperty property)
+    @SuppressWarnings({"unchecked"})
+    protected Map<String, String> getMap(Object instance, String parentPath, TypeProperty property)
     {
         List<String> extensions;
         if (type != null)
@@ -50,50 +52,18 @@ public class ExtensionOptionProvider implements OptionProvider
             }
         }
 
-        List<OptionHolder> options = new LinkedList<OptionHolder>();
+        Map<String, String> options = new HashMap<String, String>(extensions.size());
         for (String extension : extensions)
         {
             Messages messages = Messages.getInstance(typeRegistry.getType(extension).getClazz());
-            options.add(new OptionHolder(extension, messages.format("label")));
+            options.put(extension, messages.format("label"));
         }
-        
+
         return options;
-    }
-
-    public String getOptionKey()
-    {
-        return "key";
-    }
-
-    public String getOptionValue()
-    {
-        return "value";
     }
 
     public void setTypeRegistry(TypeRegistry typeRegistry)
     {
         this.typeRegistry = typeRegistry;
-    }
-
-    public class OptionHolder
-    {
-        private String key;
-        private String value;
-
-        public OptionHolder(String key, String value)
-        {
-            this.key = key;
-            this.value = value;
-        }
-
-        public String getKey()
-        {
-            return key;
-        }
-
-        public String getValue()
-        {
-            return value;
-        }
     }
 }

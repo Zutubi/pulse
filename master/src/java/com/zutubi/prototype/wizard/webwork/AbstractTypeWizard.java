@@ -147,6 +147,11 @@ public abstract class AbstractTypeWizard implements Wizard
         return successPath;
     }
 
+    public boolean isTemplate()
+    {
+        return template;
+    }
+
     public void setParameters(String parentPath, String insertPath, TemplateRecord templateParentRecord, boolean template)
     {
         this.parentPath = parentPath;

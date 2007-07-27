@@ -1,5 +1,7 @@
 package com.zutubi.prototype.type;
 
+import com.opensymphony.util.TextUtils;
+
 /**
  * Type used for enum-valued properties.  They are similar to simple string
  * values, except are converted to the enums on instantiated objects and
@@ -20,18 +22,33 @@ public class EnumType extends SimpleType
 
     public Object instantiate(Object data, Instantiator instantiator) throws TypeException
     {
-        try
+        String s = (String) data;
+        if (TextUtils.stringSet(s))
         {
-            return Enum.valueOf(getClazz(), (String) data);
+            try
+            {
+                return Enum.valueOf(getClazz(), s);
+            }
+            catch (IllegalArgumentException e)
+            {
+                throw new TypeException("Illegal enumeration value '" + data.toString() + "'");
+            }
         }
-        catch (IllegalArgumentException e)
+        else
         {
-            throw new TypeException("Illegal enumeration value '" + data.toString() + "'");
+            return null;
         }
     }
 
     public Object unstantiate(Object instance) throws TypeException
     {
-        return instance.toString();
+        if (instance == null)
+        {
+            return "";
+        }
+        else
+        {
+            return instance.toString();
+        }
     }
 }

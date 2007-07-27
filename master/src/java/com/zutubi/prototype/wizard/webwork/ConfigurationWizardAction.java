@@ -289,6 +289,7 @@ public class ConfigurationWizardAction extends ActionSupport
         String parentPath = PathUtils.getParentPath(path);
         Type type;
         String insertPath;
+        boolean template;
         TemplateRecord templateParentRecord = null;
 
         // The incoming path for a templated scope should hold the template
@@ -303,6 +304,7 @@ public class ConfigurationWizardAction extends ActionSupport
             }
 
             insertPath = parentPath;
+            template = isSelected(CREATE_TEMPLATE);
         }
         else
         {
@@ -314,6 +316,8 @@ public class ConfigurationWizardAction extends ActionSupport
                 type = ((CollectionType) type).getCollectionType();
                 parentPath = path;
             }
+
+            template = configurationTemplateManager.isTemplatedPath(path);
         }
 
         Class wizardClass = ConventionSupport.getWizard(type);
@@ -336,7 +340,7 @@ public class ConfigurationWizardAction extends ActionSupport
             ComponentContext.autowire(wizardInstance);
         }
 
-        wizardInstance.setParameters(parentPath, insertPath, templateParentRecord, isSelected(CREATE_TEMPLATE));
+        wizardInstance.setParameters(parentPath, insertPath, templateParentRecord, template);
 
         wizardRequiresLazyInitialisation = true;
         return wizardInstance;

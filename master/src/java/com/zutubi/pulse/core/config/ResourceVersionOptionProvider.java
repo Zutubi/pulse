@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.config;
 
 import com.zutubi.prototype.MapOptionProvider;
+import com.zutubi.prototype.MapOption;
 import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.util.Sort;
 
@@ -12,6 +13,12 @@ import java.util.*;
  */
 public class ResourceVersionOptionProvider extends MapOptionProvider
 {
+    public MapOption getEmptyOption(Object instance, String parentPath, TypeProperty property)
+    {
+        // There is always an 'empty' option.
+        return null;
+    }
+
     public Map<String, String> getMap(Object instance, String parentPath, TypeProperty property)
     {
         List<String> resourceVersions = new LinkedList<String>();
