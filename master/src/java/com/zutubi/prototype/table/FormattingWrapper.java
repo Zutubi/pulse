@@ -5,11 +5,10 @@ import com.zutubi.prototype.ColumnFormatter;
 import com.zutubi.prototype.ConventionSupport;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeProperty;
-import com.zutubi.util.ClassLoaderUtils;
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.util.ClassLoaderUtils;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * A wrapper object that provides access to formatted property values via the #FormattingWrapper.get(String name) method.
@@ -47,7 +46,7 @@ public class FormattingWrapper
                 Object formatterInstance = ComponentContext.createBean(formatter);
 
                 String methodName = "get" + name.substring(0, 1).toUpperCase() + name.substring(1);
-                Method getter = null;
+                Method getter;
                 try
                 {
                     getter = formatter.getMethod(methodName, instance.getClass());

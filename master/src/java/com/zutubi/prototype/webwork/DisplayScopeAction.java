@@ -14,17 +14,18 @@ public class DisplayScopeAction extends ActionSupport
     private ConfigurationTemplateManager configurationTemplateManager;
 
     /**
-     * Section of the UI we live in.  Overridden in xwork.xml where necessary.
+     * Section of the UI we live in.  Overridden in
+     * {@link ConfigurationActionMapper} where necessary.
      */
     private String section = "administration";
     /**
      * Tab of the UI we live in.  Defaults to the scope, overridden in
-     * xwork.xml where necessary.
+     * {@link ConfigurationActionMapper} where necessary.
      */
     private String tab;
     /**
      * Prefixed to the path that comes in from the client.  Overridden in
-     * xwork.xml where necessary.
+     * {@link ConfigurationActionMapper} where necessary.
      */
     private String prefixPath = "";
     /**
@@ -121,6 +122,7 @@ public class DisplayScopeAction extends ActionSupport
         if (!TextUtils.stringSet(path))
         {
             addActionError("Path is required");
+            return ERROR;
         }
 
         String[] pathElements = PathUtils.getPathElements(path);

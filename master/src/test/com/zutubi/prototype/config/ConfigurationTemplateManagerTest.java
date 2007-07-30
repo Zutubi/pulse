@@ -19,6 +19,7 @@ import com.zutubi.validation.annotations.Required;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -397,6 +398,22 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         configurationTemplateManager.insert("template", a);
 
         assertFalse(configurationTemplateManager.isTemplatedCollection("template/a"));
+    }
+
+    public void testDelete()
+    {
+        MockA a = new MockA("mock");
+        String path = configurationTemplateManager.insert("sample", a);
+
+        configurationTemplateManager.delete(path);
+
+        // Are both record and instance gone?
+        assertNull(configurationTemplateManager.getRecord(path));
+        assertNull(configurationTemplateManager.getInstance(path));
+
+        // Are they removed from the parent record and instance?
+        assertEquals(0, configurationTemplateManager.getRecord("sample").size());
+        assertEquals(0, ((Map)configurationTemplateManager.getInstance("sample")).size());
     }
 
     @SymbolicName("mockA")
