@@ -211,7 +211,7 @@ public class TailRecipeLogAction extends ProjectActionSupport
 
                 if(changed)
                 {
-                    configurationProvider.save(settings.getConfigurationPath(), settings);
+                    configurationProvider.save(settings);
                 }
             }
         }

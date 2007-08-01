@@ -5,18 +5,23 @@ import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 
+import java.util.Hashtable;
+
 /**
  *
  *
  */
 public class CompositeTypeTest extends TypeTestCase
 {
+    private CompositeType basicType;
+    private CompositeType typeA;
+
     protected void setUp() throws Exception
     {
         super.setUp();
 
-        typeRegistry.register(BasicTypes.class);
-        typeRegistry.register(ObjectTypeA.class);
+        basicType = typeRegistry.register(BasicTypes.class);
+        typeA = typeRegistry.register(ObjectTypeA.class);
     }
 
     protected void tearDown() throws Exception
@@ -45,27 +50,23 @@ public class CompositeTypeTest extends TypeTestCase
         instance.setShortP((short) 12);
         instance.setString("howdy");
 
-        Type compositeType = typeRegistry.getType("basicTypes");
-
-        Record record = (Record) compositeType.unstantiate(instance);
+        Record record = basicType.unstantiate(instance);
         SimpleInstantiator instantiator = new SimpleInstantiator(null);
-        Object newInstance = instantiator.instantiate(compositeType, record);
+        Object newInstance = instantiator.instantiate(basicType, record);
         assertTrue(newInstance instanceof BasicTypes);
         assertEquals(newInstance, instance);
     }
 
     public void testWithNestedComplexType() throws TypeException
     {
-        Type compositeType = typeRegistry.getType("typeA");
-        
         ObjectTypeA instance = new ObjectTypeA();
         ObjectTypeB objectTypeB = new ObjectTypeB();
         objectTypeB.setA("b");
         instance.setA(objectTypeB);
 
-        Record record = (Record) compositeType.unstantiate(instance);
+        Record record = typeA.unstantiate(instance);
         SimpleInstantiator instantiator = new SimpleInstantiator(null);
-        ObjectTypeA newInstance = (ObjectTypeA) instantiator.instantiate(compositeType, record);
+        ObjectTypeA newInstance = (ObjectTypeA) instantiator.instantiate(typeA, record);
 
         assertNotNull(newInstance.getA());
         assertEquals("b", newInstance.getA().getA());
@@ -73,8 +74,7 @@ public class CompositeTypeTest extends TypeTestCase
 
     public void testCreateNewRecordInitialisedDefaultFields()
     {
-        CompositeType compositeType = typeRegistry.getType("typeA");
-        MutableRecord record = compositeType.createNewRecord(true);
+        MutableRecord record = typeA.createNewRecord(true);
         assertNotNull(record);
 
         // field a contains an instance of typeB.
@@ -88,6 +88,41 @@ public class CompositeTypeTest extends TypeTestCase
         assertEquals("value", b.get("a"));
     }
 
+    public void testToXmlRpcNull() throws TypeException
+    {
+        assertNull(typeA.toXmlRpc(null));
+    }
+
+    public void testToXmlRpc() throws TypeException
+    {
+        ObjectTypeA a = new ObjectTypeA();
+        ObjectTypeB b = new ObjectTypeB();
+        b.setA("string");
+        a.setB(b);
+
+        Record record = typeA.unstantiate(a);
+        Object rpcForm = typeA.toXmlRpc(record);
+        assertTrue(rpcForm instanceof Hashtable);
+
+        Hashtable ht = (Hashtable) rpcForm;
+        assertEquals(2, ht.size());
+        assertNotNull(ht.get("a"));
+        Hashtable member = (Hashtable) ht.get("b");
+        assertEquals("string", member.get("a"));
+    }
+
+    public void testToXmlRpcNullNotIncluded() throws TypeException
+    {
+        ObjectTypeA a = new ObjectTypeA();
+        Record record = typeA.unstantiate(a);
+        Object rpcForm = typeA.toXmlRpc(record);
+        assertTrue(rpcForm instanceof Hashtable);
+
+        Hashtable ht = (Hashtable) rpcForm;
+        assertEquals(1, ht.size());
+        assertNotNull(ht.get("a"));
+        assertNull(ht.get("b"));
+    }
 
     @SymbolicName("typeA")
     public static class ObjectTypeA extends AbstractConfiguration

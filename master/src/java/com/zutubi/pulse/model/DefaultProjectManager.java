@@ -4,7 +4,6 @@ import com.zutubi.prototype.config.*;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.MutableRecord;
-import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.DefaultSetupManager;
 import com.zutubi.pulse.cache.ehcache.CustomAclEntryCache;
@@ -157,7 +156,7 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
 
     public void saveProjectConfig(ProjectConfiguration config)
     {
-        configurationProvider.save(PathUtils.getPath("project", config.getName()), config);
+        configurationProvider.save(config);
     }
 
     public Project getProject(String name)

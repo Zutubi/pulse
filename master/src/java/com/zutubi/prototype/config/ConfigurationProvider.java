@@ -99,6 +99,6 @@ public interface ConfigurationProvider
     // should these methods be here or somewhere else?
     <T extends Configuration> T deepClone(T instance);
     String insert(String path, Object instance);
-    void save(String path, Object instance);
+    void save(Configuration instance);
     void delete(String path);
 }

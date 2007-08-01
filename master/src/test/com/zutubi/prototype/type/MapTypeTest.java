@@ -6,6 +6,7 @@ import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 
 /**
@@ -64,6 +65,33 @@ public class MapTypeTest extends TypeTestCase
 
         assertEquals("coll/valueA", mapType.getInsertionPath("coll", record));
         assertEquals("coll/valueA", mapType.getSavePath("coll/valueA", record));
+    }
+
+    public void testToXmlRpcNull() throws TypeException
+    {
+        assertNull(mapType.toXmlRpc(null));
+    }
+
+    public void testToXmlRpcEmptyRecord() throws TypeException
+    {
+        Record record = mapType.createNewRecord(true);
+        Object o = mapType.toXmlRpc(record);
+        assertTrue(o instanceof Hashtable);
+        assertEquals(0, ((Hashtable)o).size());
+    }
+
+    public void testToXmlRpc() throws TypeException
+    {
+        Map<String, MockA> m = new HashMap<String, MockA>();
+        m.put("key1", new MockA("1"));
+        m.put("key2", new MockA("2"));
+        Record record = (Record) mapType.unstantiate(m);
+        Object o = mapType.toXmlRpc(record);
+        assertTrue(o instanceof Hashtable);
+        Hashtable<String, Hashtable> rpcForm = ((Hashtable) o);
+        assertEquals(2, rpcForm.size());
+        assertEquals("1", rpcForm.get("key1").get("a"));
+        assertEquals("2", rpcForm.get("key2").get("a"));
     }
 
     @SymbolicName("mockA")

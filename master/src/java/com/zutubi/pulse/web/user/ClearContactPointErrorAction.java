@@ -29,7 +29,7 @@ public class ClearContactPointErrorAction extends ActionSupport
         if (contact != null)
         {
             contact.clearLastError();
-            configurationProvider.save(contact.getConfigurationPath(), contact);
+            configurationProvider.save(contact);
         }
         
         return SUCCESS;

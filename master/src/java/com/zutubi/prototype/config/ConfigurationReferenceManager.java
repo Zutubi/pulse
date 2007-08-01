@@ -39,6 +39,11 @@ public class ConfigurationReferenceManager
         references.clear();
     }
 
+    public String getPathForHandle(long handle)
+    {
+        return recordManager.getPathForHandle(handle);
+    }
+
     public Configuration resolveReference(String fromPath, long toHandle, Instantiator instantiator) throws TypeException
     {
         String toPath = recordManager.getPathForHandle(toHandle);

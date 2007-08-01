@@ -57,34 +57,38 @@ public class ListType extends CollectionType
         if (data instanceof Record)
         {
             ConfigurationList<Object> list = (ConfigurationList<Object>) instance;
-            Record record = (Record) data;
+            Adder adder = new InstantiateAdder(list, instantiator);
+            addItems((Record) data, adder);
+        }
+    }
 
-            Collection<String> keys = getOrder(record);
-            Type defaultType = getCollectionType();
-            for (String key : keys)
+    private void addItems(Record record, Adder adder)
+    {
+        Collection<String> keys = getOrder(record);
+        Type defaultType = getCollectionType();
+        for (String key : keys)
+        {
+            Object child = record.get(key);
+            Type type = defaultType;
+            if (child instanceof Record)
             {
-                Object child = record.get(key);
-                Type type = defaultType;
-                if (child instanceof Record)
+                Record childRecord = (Record) child;
+                String symbolicName = childRecord.getSymbolicName();
+                type = typeRegistry.getType(symbolicName);
+                if(type == null)
                 {
-                    Record childRecord = (Record) child;
-                    String symbolicName = childRecord.getSymbolicName();
-                    type = typeRegistry.getType(symbolicName);
-                    if(type == null)
-                    {
-                        list.addFieldError(key, "Reference to unknown type '" + symbolicName + "'");
-                        continue;
-                    }
+                    adder.handleFieldError(key, "Reference to unknown type '" + symbolicName + "'");
+                    continue;
                 }
+            }
 
-                try
-                {
-                    list.add(instantiator.instantiate(key, true, type, child));
-                }
-                catch (TypeException e)
-                {
-                    list.addFieldError(key, e.getMessage());
-                }
+            try
+            {
+                adder.add(key, type, child);
+            }
+            catch (TypeException e)
+            {
+                adder.handleFieldError(key, e.getMessage());
             }
         }
     }
@@ -132,6 +136,33 @@ public class ListType extends CollectionType
         }
     }
 
+    public Object toXmlRpc(Object data) throws TypeException
+    {
+        if(data == null)
+        {
+            return null;
+        }
+        else if(data instanceof Record)
+        {
+            Record record = (Record) data;
+            Vector<Object> result = new Vector<Object>(record.size());
+            addItems(record, new XmlRpcAdder(result));
+            return result;
+        }
+        else
+        {
+            String[] items = (String[]) data;
+            Type type = getCollectionType();
+            Vector<Object> result = new Vector<Object>(items.length);
+            for(String item: items)
+            {
+                result.add(type.toXmlRpc(item));
+            }
+
+            return result;
+        }
+    }
+
     public String getInsertionPath(String path, Record record)
     {
         return PathUtils.getPath(path, Long.toString(handleAllocator.allocateHandle()));
@@ -163,5 +194,53 @@ public class ListType extends CollectionType
                 }
             }
         };
+    }
+
+    private static interface Adder
+    {
+        void handleFieldError(String key, String error);
+        void add(String key, Type type, Object child) throws TypeException;
+    }
+
+    private static class InstantiateAdder implements Adder
+    {
+        private ConfigurationList<Object> list;
+        private Instantiator instantiator;
+
+        public InstantiateAdder(ConfigurationList<Object> list, Instantiator instantiator)
+        {
+            this.list = list;
+            this.instantiator = instantiator;
+        }
+
+        public void handleFieldError(String key, String error)
+        {
+            list.addFieldError(key, error);
+        }
+
+        public void add(String key, Type type, Object child) throws TypeException
+        {
+            list.add(instantiator.instantiate(key, true, type, child));
+        }
+    }
+
+    private static class XmlRpcAdder implements Adder
+    {
+        private Vector<Object> vector;
+
+        public XmlRpcAdder(Vector<Object> vector)
+        {
+            this.vector = vector;
+        }
+
+        public void handleFieldError(String key, String error)
+        {
+            // Do nothing
+        }
+
+        public void add(String key, Type type, Object child) throws TypeException
+        {
+            vector.add(type.toXmlRpc(child));
+        }
     }
 }

@@ -35,7 +35,7 @@ public class TriggerManager
                     instance.setTriggerId(trigger.getId());
 
                     // resave required 
-                    configurationProvider.save(instance.getConfigurationPath(), instance);
+                    configurationProvider.save(instance);
                 }
                 catch (SchedulingException e)
                 {

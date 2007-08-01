@@ -12,6 +12,7 @@ import com.zutubi.util.logging.Logger;
 import java.beans.IntrospectionException;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 
 /**
@@ -49,9 +50,11 @@ public class MapType extends CollectionType
     @SuppressWarnings({ "unchecked" })
     public void initialise(Object instance, Object data, Instantiator instantiator)
     {
-        ConfigurationMap<String, Object> map = (ConfigurationMap<String, Object>) instance;
-        Record record = (Record) data;
+        addItems((Record) data, new InstantiateAdder((ConfigurationMap<String, Object>) instance, instantiator));
+    }
 
+    private void addItems(Record record, Adder adder)
+    {
         Type defaultType = getCollectionType();
         for (String key : record.keySet())
         {
@@ -63,18 +66,18 @@ public class MapType extends CollectionType
                 type = typeRegistry.getType(childRecord.getSymbolicName());
                 if(type == null)
                 {
-                    map.addFieldError(key, "Reference to unrecognised type '" + childRecord.getSymbolicName() + "'");
+                    adder.handleFieldError(key, "Reference to unrecognised type '" + childRecord.getSymbolicName() + "'");
                     continue;
                 }
             }
 
             try
             {
-                map.put(key, instantiator.instantiate(key, true, type, child));
+                adder.add(key, type, child);
             }
             catch (TypeException e)
             {
-                map.addFieldError(key, e.getMessage());
+                adder.handleFieldError(key, e.getMessage());
             }
         }
     }
@@ -96,6 +99,21 @@ public class MapType extends CollectionType
         }
 
         return result;
+    }
+
+    public Object toXmlRpc(Object data) throws TypeException
+    {
+        if(data == null)
+        {
+            return null;
+        }
+        else
+        {
+            Record record = (Record) data;
+            Hashtable<String, Object> result = new Hashtable<String, Object>(record.size());
+            addItems(record, new XmlRpcAdder(result));
+            return result;
+        }
     }
 
     public void setCollectionType(Type collectionType) throws TypeException
@@ -146,5 +164,53 @@ public class MapType extends CollectionType
     public String getSavePath(String path, Record record)
     {
         return PathUtils.getPath(PathUtils.getParentPath(path), (String) record.get(keyProperty));
+    }
+
+    private static interface Adder
+    {
+        void handleFieldError(String key, String message);
+        void add(String key, Type type, Object child) throws TypeException;
+    }
+
+    private static class InstantiateAdder implements Adder
+    {
+        private ConfigurationMap<String, Object> map;
+        private Instantiator instantiator;
+
+        public InstantiateAdder(ConfigurationMap<String, Object> map, Instantiator instantiator)
+        {
+            this.map = map;
+            this.instantiator = instantiator;
+        }
+
+        public void handleFieldError(String key, String message)
+        {
+            map.addFieldError(key, message);
+        }
+
+        public void add(String key, Type type, Object child) throws TypeException
+        {
+            map.put(key, instantiator.instantiate(key, true, type, child));
+        }
+    }
+
+    private static class XmlRpcAdder implements Adder
+    {
+        private Hashtable<String, Object> hashtable;
+
+        public XmlRpcAdder(Hashtable<String, Object> hashtable)
+        {
+            this.hashtable = hashtable;
+        }
+
+        public void handleFieldError(String key, String message)
+        {
+            // Do nothing.
+        }
+
+        public void add(String key, Type type, Object child) throws TypeException
+        {
+            hashtable.put(key, type.toXmlRpc(child));
+        }
     }
 }

@@ -90,7 +90,7 @@ public class MockConfigurationProvider implements ConfigurationProvider
         return path;
     }
 
-    public void save(String path, Object instance)
+    public void save(Configuration instance)
     {
         throw new RuntimeException("Method not yet implemented.");
     }

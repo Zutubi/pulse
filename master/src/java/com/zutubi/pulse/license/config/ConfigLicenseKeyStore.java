@@ -40,7 +40,7 @@ public class ConfigLicenseKeyStore extends AbstractLicenseKeyStore
     {
         LicenseConfiguration licenseConfiguration = configurationProvider.get(LicenseConfiguration.class);
         licenseConfiguration.setKey(licenseKey);
-        configurationProvider.save(licenseConfiguration.getConfigurationPath(), licenseConfiguration);
+        configurationProvider.save(licenseConfiguration);
     }
 
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)

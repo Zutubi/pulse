@@ -109,13 +109,9 @@ public class MutableRecordImpl extends AbstractMutableRecord
     public void update(Record record)
     {
         // take the new primitive data from the record.
-        for (String key : record.keySet())
+        for (String key : record.simpleKeySet())
         {
-            Object value = record.get(key);
-            if(!(value instanceof Record))
-            {
-                data.put(key, value);
-            }
+            data.put(key, record.get(key));
         }
     }
 

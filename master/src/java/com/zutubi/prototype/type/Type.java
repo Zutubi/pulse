@@ -59,5 +59,24 @@ public interface Type
      */
     void initialise(Object instance, Object data, Instantiator instantiator);
 
+    /**
+     * Converts from an instance back to record form (i.e. records, strings,
+     * etc).  The inverse of {@link #instantiate}.
+     *
+     * @param instance the instance to convert
+     * @return record form of the instance
+     * @throws TypeException in the event of an error
+     */
     Object unstantiate(Object instance) throws TypeException;
+
+    /**
+     * Converts the given record form data into a form suitable for use in an
+     * XML-RPC call.  Records are converted to hashtables, strings to
+     * XML-RPC types (where sensible) and so on.
+     *
+     * @param data the data to be converted (record form)
+     * @return the XML-RPC formatted data
+     * @throws TypeException in the event of an error
+     */
+    Object toXmlRpc(Object data) throws TypeException;
 }

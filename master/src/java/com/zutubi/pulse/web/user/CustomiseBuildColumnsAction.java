@@ -62,7 +62,7 @@ public class CustomiseBuildColumnsAction extends UserActionSupport
             settings.setProjectHistoryColumns(columns);
         }
 
-        configurationProvider.save(settings.getConfigurationPath(), settings);
+        configurationProvider.save(settings);
         return SUCCESS;
     }
 

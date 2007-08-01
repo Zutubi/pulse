@@ -54,19 +54,24 @@ public class ReferenceType extends SimpleType implements Type
 
     public Configuration instantiate(Object data, Instantiator instantiator) throws TypeException
     {
+        long handle = getHandle(data);
+        if(handle > 0)
+        {
+            return instantiator.resolveReference(handle);
+        }
+        else
+        {
+            // Zero handle == null reference.
+            return null;
+        }
+    }
+
+    private long getHandle(Object data) throws TypeException
+    {
         String referenceHandle = (String) data;
         try
         {
-            long handle = Long.parseLong(referenceHandle);
-            if(handle > 0)
-            {
-                return instantiator.resolveReference(handle);
-            }
-            else
-            {
-                // Zero handle == null reference.
-                return null;
-            }
+            return Long.parseLong(referenceHandle);
         }
         catch (NumberFormatException e)
         {
@@ -77,5 +82,20 @@ public class ReferenceType extends SimpleType implements Type
     public Object unstantiate(Object instance) throws TypeException
     {
         return instance == null ? 0 : Long.toString(((Configuration)instance).getHandle());
+    }
+
+    public Object toXmlRpc(Object data) throws TypeException
+    {
+        // We return references via the remote api as paths so that the
+        // caller can use the value in subsequent calls.
+        long handle = getHandle(data);
+        if(handle > 0)
+        {
+            return configurationReferenceManager.getPathForHandle(handle);
+        }
+        else
+        {
+            return null;
+        }
     }
 }

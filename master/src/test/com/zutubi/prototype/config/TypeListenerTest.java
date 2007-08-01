@@ -112,9 +112,10 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
 
     public void testInstanceChanged()
     {
-        configurationTemplateManager.insert("sample", new A("a"));
+        String path = configurationTemplateManager.insert("sample", new A("a"));
         MockTypeListener<A> listener = register(A.class);
-        configurationTemplateManager.save("sample/a", new A("a"));
+
+        configurationTemplateManager.save(configurationTemplateManager.getCloneOfInstance(path, A.class));
         listener.assertSave("sample/a");
         listener.assertDone();
     }
@@ -140,9 +141,9 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
     public void testNestedSaveTriggersSave()
     {
         configurationTemplateManager.insert("sample", new A("a"));
-        configurationTemplateManager.insert("sample/a/b", new B("b"));
+        String bPath = configurationTemplateManager.insert("sample/a/b", new B("b"));
         MockTypeListener<A> listener = register(A.class);
-        configurationTemplateManager.save("sample/a/b", new B("b"));
+        configurationTemplateManager.save(configurationTemplateManager.getCloneOfInstance(bPath, B.class));
         listener.assertSave("sample/a");
         listener.assertDone();
     }

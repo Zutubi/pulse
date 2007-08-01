@@ -279,6 +279,15 @@ public class RecordManagerTest extends TestCase
         assertHandleToPath("r2");
     }
 
+    public void testHandleMapAfterNestedInsert()
+    {
+        MutableRecord r = new MutableRecordImpl();
+        r.put("nested", new MutableRecordImpl());
+        recordManager.insert("testpath", r);
+        assertHandleToPath("testpath");
+        assertHandleToPath("testpath/nested");
+    }
+
     public void testHandleMapNoSuchPath()
     {
         assertNull(recordManager.getPathForHandle(100));
@@ -307,7 +316,23 @@ public class RecordManagerTest extends TestCase
         assertHandleToPath("r2");
     }
 
-    public void testHandleMapAferMove()
+    public void testHandleMapAfterNestedDelete()
+    {
+        MutableRecord r = new MutableRecordImpl();
+        r.put("nested", new MutableRecordImpl());
+        recordManager.insert("testpath", r);
+
+        Record record = recordManager.load("testpath");
+        long outerHandle = record.getHandle();
+        record = recordManager.load("testpath/nested");
+        long innerHandle = record.getHandle();
+        recordManager.delete("testpath");
+
+        assertNull(recordManager.getPathForHandle(outerHandle));
+        assertNull(recordManager.getPathForHandle(innerHandle));
+    }
+
+    public void testHandleMapAfterMove()
     {
         long handle = recordManager.insert("r1", new MutableRecordImpl()).getHandle();
         recordManager.move("r1", "r2");

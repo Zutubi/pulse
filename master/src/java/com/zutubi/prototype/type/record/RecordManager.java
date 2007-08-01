@@ -184,8 +184,20 @@ public class RecordManager implements HandleAllocator
         // Save first before hooking up in memory
         recordSerialiser.serialise(path, record, true);
         parent.put(pathElements[pathElements.length - 1], record);
-        handleToPathMap.put(record.getHandle(), path);
+
+        // We can't do this at handle allocation time as it needs to work
+        // when moving a record.
+        addToHandleMap(path, record);
         return record;
+    }
+
+    private void addToHandleMap(String path, MutableRecord record)
+    {
+        handleToPathMap.put(record.getHandle(), path);
+        for(String key: record.nestedKeySet())
+        {
+            addToHandleMap(PathUtils.getPath(path, key), (MutableRecord) record.get(key));
+        }
     }
 
     private void checkPath(String path)
@@ -312,11 +324,20 @@ public class RecordManager implements HandleAllocator
         if(value != null && value instanceof Record)
         {
             Record result = (Record) parentRecord.remove(baseName);
-            handleToPathMap.remove(result.getHandle());
+            removeFromHandleMap(result);
             recordSerialiser.delete(path);
             return result;
         }
         return null;
+    }
+
+    private void removeFromHandleMap(Record record)
+    {
+        handleToPathMap.remove(record.getHandle());
+        for(String key: record.nestedKeySet())
+        {
+            removeFromHandleMap((Record) record.get(key));
+        }
     }
 
     /**

@@ -17,6 +17,7 @@ import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.validation.annotations.Required;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -83,7 +84,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
         MockB b = new MockB("b");
         configurationTemplateManager.insert("sample/a/mock", b);
-        
+
         MockB loaded = (MockB) configurationTemplateManager.getInstance("sample/a/mock");
         assertNotNull(loaded);
         assertEquals("b", loaded.getB());
@@ -92,10 +93,12 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     public void testSave()
     {
         MockA a = new MockA("a");
-        configurationTemplateManager.insert("sample", a);
+        String path = configurationTemplateManager.insert("sample", a);
 
+        a = configurationTemplateManager.getInstance(path, MockA.class);
+        a = configurationTemplateManager.deepClone(a);
         a.setB("somevalue");
-        configurationTemplateManager.save("sample/a", a);
+        configurationTemplateManager.save(a);
 
         MockA loaded = (MockA) configurationTemplateManager.getInstance("sample/a");
         assertNotNull(loaded);
@@ -103,16 +106,155 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         assertEquals("somevalue", loaded.getB());
     }
 
+    public void testSaveIsDeep()
+    {
+        MockA a = new MockA("a");
+        a.setMock(new MockB("b"));
+        String path = configurationTemplateManager.insert("sample", a);
+
+        a = configurationTemplateManager.getInstance(path, MockA.class);
+        assertEquals("b", a.getMock().getB());
+
+        a = configurationTemplateManager.deepClone(a);
+        a.getMock().setB("c");
+        configurationTemplateManager.save(a);
+
+        a = configurationTemplateManager.getInstance(path, MockA.class);
+        assertEquals("c", a.getMock().getB());
+    }
+
+    public void testSaveInsertsTransitively()
+    {
+        MockA a = new MockA("a");
+        String path = configurationTemplateManager.insert("sample", a);
+
+        a = configurationTemplateManager.getInstance(path, MockA.class);
+        assertEquals(0, a.getCs().size());
+
+        a = configurationTemplateManager.deepClone(a);
+        MockD d = new MockD("d");
+        MockC c = new MockC("c");
+        c.setD(d);
+        a.getCs().put("c", c);
+        configurationTemplateManager.save(a);
+
+        a = configurationTemplateManager.getInstance(path, MockA.class);
+        assertEquals(1, a.getCs().size());
+        c = a.getCs().get("c");
+        assertNotNull(c);
+        d = c.getD();
+        assertNotNull(d);
+        assertEquals("d", d.getName());
+    }
+
+    public void testSaveSavesTransitively()
+    {
+        MockD d = new MockD("d");
+        MockC c = new MockC("c");
+        c.setD(d);
+        MockA a = new MockA("a");
+        a.getCs().put("c", c);
+
+        String path = configurationTemplateManager.insert("sample", a);
+
+        a = configurationTemplateManager.getInstance(path, MockA.class);
+        assertEquals(1, a.getCs().size());
+        c = a.getCs().get("c");
+        assertNotNull(c);
+        d = c.getD();
+        assertNotNull(d);
+        assertEquals("d", d.getName());
+
+        a = configurationTemplateManager.deepClone(a);
+        a.getCs().get("c").getD().setName("newname");
+        configurationTemplateManager.save(a);
+
+        a = configurationTemplateManager.getInstance(path, MockA.class);
+        assertEquals("newname", a.getCs().get("c").getD().getName());
+    }
+
+    public void testSaveChildObjectAdded()
+    {
+        MockA a = new MockA("a");
+        String path = configurationTemplateManager.insert("sample", a);
+
+        a = configurationTemplateManager.getInstance(path, MockA.class);
+        assertNull(a.getMock());
+
+        a = configurationTemplateManager.deepClone(a);
+        a.setMock(new MockB("b"));
+        configurationTemplateManager.save(a);
+
+        a = configurationTemplateManager.getInstance(path, MockA.class);
+        assertNotNull(a.getMock());
+        assertEquals("b", a.getMock().getB());
+    }
+
+    public void testSaveChildObjectDeleted()
+    {
+        MockA a = new MockA("a");
+        a.setMock(new MockB("b"));
+        String path = configurationTemplateManager.insert("sample", a);
+
+        a = configurationTemplateManager.getInstance(path, MockA.class);
+        assertNotNull(a.getMock());
+        assertEquals("b", a.getMock().getB());
+
+        a = configurationTemplateManager.deepClone(a);
+        a.setMock(null);
+        configurationTemplateManager.save(a);
+
+        a = configurationTemplateManager.getInstance(path, MockA.class);
+        assertNull(a.getMock());
+    }
+
+    public void testSaveCollectionElementAdded()
+    {
+        MockA a = new MockA("a");
+        String path = configurationTemplateManager.insert("sample", a);
+
+        a = configurationTemplateManager.getInstance(path, MockA.class);
+        assertEquals(0, a.getCs().size());
+
+        a = configurationTemplateManager.deepClone(a);
+        a.getCs().put("jim", new MockC("jim"));
+        configurationTemplateManager.save(a);
+
+        a = configurationTemplateManager.getInstance(path, MockA.class);
+        assertEquals(1, a.getCs().size());
+        assertNotNull(a.getCs().get("jim"));
+    }
+
+    public void testSaveCollectionElementRemoved()
+    {
+        MockA a = new MockA("a");
+        a.getCs().put("jim", new MockC("jim"));
+        String path = configurationTemplateManager.insert("sample", a);
+
+        a = configurationTemplateManager.getInstance(path, MockA.class);
+        assertEquals(1, a.getCs().size());
+        assertNotNull(a.getCs().get("jim"));
+
+        a = configurationTemplateManager.deepClone(a);
+        a.getCs().remove("jim");
+        configurationTemplateManager.save(a);
+
+        a = configurationTemplateManager.getInstance(path, MockA.class);
+        assertEquals(0, a.getCs().size());
+    }
+
     public void testRename()
     {
         MockA a = new MockA("a");
-        configurationTemplateManager.insert("sample", a);
+        String path = configurationTemplateManager.insert("sample", a);
 
-        assertNotNull(configurationTemplateManager.getInstance("sample/a"));
+        a = configurationTemplateManager.getInstance(path, MockA.class);
+        assertNotNull(a);
 
         // change the ID field, effectively triggering a rename on save.
+        a = configurationTemplateManager.deepClone(a);
         a.setName("b");
-        configurationTemplateManager.save("sample/a", a);
+        configurationTemplateManager.save(a);
 
         assertNull(configurationTemplateManager.getInstance("sample/a"));
 
@@ -129,7 +271,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         {
             public void handleEvent(Event evt)
             {
-                events.add((ConfigurationEvent)evt);
+                events.add((ConfigurationEvent) evt);
             }
 
             public Class[] getHandledEvents()
@@ -139,7 +281,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         });
 
         MockA a = new MockA("a");
-        a.setMock(new MockB("b"));        
+        a.setMock(new MockB("b"));
 
         configurationTemplateManager.insert("sample", a);
 
@@ -325,7 +467,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         assertEquals(1, aErrors.size());
         assertEquals("b requires a value", aErrors.get(0));
     }
-    
+
     public void testValidateTemplateNestedPath() throws TypeException
     {
         // Check that a record not directly marked us a template is correctly
@@ -382,7 +524,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     public void testIsTemplatedCollection()
     {
         assertFalse(configurationTemplateManager.isTemplatedCollection("sample"));
-        assertTrue(configurationTemplateManager.isTemplatedCollection("template"));    
+        assertTrue(configurationTemplateManager.isTemplatedCollection("template"));
     }
 
     public void testIsTemplatedCollectionUnknownPath()
@@ -413,7 +555,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
         // Are they removed from the parent record and instance?
         assertEquals(0, configurationTemplateManager.getRecord("sample").size());
-        assertEquals(0, ((Map)configurationTemplateManager.getInstance("sample")).size());
+        assertEquals(0, ((Map) configurationTemplateManager.getInstance("sample")).size());
     }
 
     @SymbolicName("mockA")
@@ -423,16 +565,56 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         private String c;
 
         private MockB mock;
+        private Map<String, MockC> cs = new HashMap<String, MockC>();
 
-        public MockA(){}
-        public MockA(String name){super(name);}
-        public String getB(){return b;}
-        public void setB(String b){this.b = b;}
-        public String getC(){return c;}
-        public void setC(String c){this.c = c;}
+        public MockA()
+        {
+        }
 
-        public MockB getMock(){return mock;}
-        public void setMock(MockB mock){this.mock = mock;}
+        public MockA(String name)
+        {
+            super(name);
+        }
+
+        public String getB()
+        {
+            return b;
+        }
+
+        public void setB(String b)
+        {
+            this.b = b;
+        }
+
+        public String getC()
+        {
+            return c;
+        }
+
+        public void setC(String c)
+        {
+            this.c = c;
+        }
+
+        public MockB getMock()
+        {
+            return mock;
+        }
+
+        public void setMock(MockB mock)
+        {
+            this.mock = mock;
+        }
+
+        public Map<String, MockC> getCs()
+        {
+            return cs;
+        }
+
+        public void setCs(Map<String, MockC> cs)
+        {
+            this.cs = cs;
+        }
     }
 
     @SymbolicName("mockB")
@@ -441,10 +623,62 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         @Required
         private String b;
 
-        public MockB(){}
-        public MockB(String b){this.b = b;}
-        public String getB(){return b;}
-        public void setB(String b){this.b = b;}
+        public MockB()
+        {
+        }
+
+        public MockB(String b)
+        {
+            this.b = b;
+        }
+
+        public String getB()
+        {
+            return b;
+        }
+
+        public void setB(String b)
+        {
+            this.b = b;
+        }
+    }
+
+    @SymbolicName("mockC")
+    public static class MockC extends AbstractNamedConfiguration
+    {
+        private MockD d;
+
+        public MockC()
+        {
+        }
+
+        public MockC(String name)
+        {
+            super(name);
+        }
+
+        public MockD getD()
+        {
+            return d;
+        }
+
+        public void setD(MockD d)
+        {
+            this.d = d;
+        }
+    }
+
+    @SymbolicName("mockD")
+    public static class MockD extends AbstractNamedConfiguration
+    {
+        public MockD()
+        {
+        }
+
+        public MockD(String name)
+        {
+            super(name);
+        }
     }
 
     @SymbolicName("mockReferer")

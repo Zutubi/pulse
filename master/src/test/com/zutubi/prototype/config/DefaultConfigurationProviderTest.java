@@ -70,12 +70,13 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
         A a = new A("a");
 
         // check the insert events.
-        configurationTemplateManager.insert("sample", a);
+        String path = configurationTemplateManager.insert("sample", a);
         listener.assertNextEvent(PostInsertEvent.class, "sample/a");
         listener.assertNoMoreEvents();
 
         // check the save events.
-        configurationTemplateManager.save("sample/a", a);
+        a = configurationTemplateManager.getCloneOfInstance(path, A.class);
+        configurationTemplateManager.save(a);
         listener.assertNextEvent(PostSaveEvent.class, "sample/a");
         listener.assertNoMoreEvents();
 
@@ -97,27 +98,30 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
         A a = new A("a");
 
         // check the insert events.
-        configurationTemplateManager.insert("sample", a);
+        String aPath = configurationTemplateManager.insert("sample", a);
         includingChildren.assertNextEvent(PostInsertEvent.class, "sample/a");
         includingChildren.assertNoMoreEvents();
         excludingChildren.assertNoMoreEvents();
 
         B b = new B("b");
 
-        configurationTemplateManager.insert("sample/a/b", b);
+        String bPath = configurationTemplateManager.insert("sample/a/b", b);
         includingChildren.assertNextEvent(PostInsertEvent.class, "sample/a/b");
         includingChildren.assertNoMoreEvents();
         excludingChildren.assertNoMoreEvents();
 
         // check the save events.
-        configurationTemplateManager.save("sample/a", a);
+        a = configurationTemplateManager.getCloneOfInstance(aPath, A.class);
+        configurationTemplateManager.save(a);
         // including listening at "sample", will see everything that happens below it.
         includingChildren.assertNextEvent(PostSaveEvent.class, "sample/a");
+        includingChildren.assertNextEvent(PostSaveEvent.class, "sample/a/b");
         includingChildren.assertNoMoreEvents();
         // excludingChildren listening at "sample", will not see changes to "sample/a"
         excludingChildren.assertNoMoreEvents();
 
-        configurationTemplateManager.save("sample/a/b", b);
+        b = configurationTemplateManager.getCloneOfInstance(bPath, B.class);
+        configurationTemplateManager.save(b);
         includingChildren.assertNextEvent(PostSaveEvent.class, "sample/a/b");
         includingChildren.assertNoMoreEvents();
         excludingChildren.assertNoMoreEvents();

@@ -16,13 +16,17 @@ import com.zutubi.pulse.core.config.Configuration;
 public class PersistentInstantiator implements Instantiator
 {
     private String path;
+    private boolean concrete;
     private InstanceCache cache;
+    private InstanceCache incompleteCache;
     private ConfigurationReferenceManager configurationReferenceManager;
 
-    public PersistentInstantiator(String path, InstanceCache cache, ConfigurationReferenceManager configurationReferenceManager)
+    public PersistentInstantiator(String path, boolean concrete, InstanceCache cache, InstanceCache incompleteCache, ConfigurationReferenceManager configurationReferenceManager)
     {
         this.path = path;
+        this.concrete = concrete;
         this.cache = cache;
+        this.incompleteCache = incompleteCache;
         this.configurationReferenceManager = configurationReferenceManager;
     }
 
@@ -36,7 +40,7 @@ public class PersistentInstantiator implements Instantiator
         Object instance = cache.get(propertyPath);
         if (instance == null)
         {
-            PersistentInstantiator childInstantiator = new PersistentInstantiator(propertyPath, cache, configurationReferenceManager);
+            PersistentInstantiator childInstantiator = new PersistentInstantiator(propertyPath, concrete, cache, incompleteCache, configurationReferenceManager);
             instance = type.instantiate(data, childInstantiator);
 
             if (instance != null)
@@ -49,7 +53,14 @@ public class PersistentInstantiator implements Instantiator
                     configuration.setConfigurationPath(propertyPath);
                     configuration.setHandle(((Record) data).getHandle());
 
-                    cache.put(propertyPath, configuration);
+                    if(concrete && configuration.isValid())
+                    {
+                        cache.put(propertyPath, configuration);
+                    }
+                    else
+                    {
+                        incompleteCache.put(propertyPath, configuration);
+                    }
                 }
 
                 type.initialise(instance, data, childInstantiator);

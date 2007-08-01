@@ -255,6 +255,47 @@ public class CompositeType extends AbstractType implements ComplexType
         return result;
     }
 
+    public Object toXmlRpc(Object data) throws TypeException
+    {
+        if(data == null)
+        {
+            return null;
+        }
+        else
+        {
+            Record record = (Record) data;
+            if(getSymbolicName().equals(record.getSymbolicName()))
+            {
+                Hashtable<String, Object> result = new Hashtable<String, Object>();
+                for (Map.Entry<String, TypeProperty> entry : properties.entrySet())
+                {
+                    propertyToXmlRpc(entry, record, result);
+                }
+                for (Map.Entry<String, TypeProperty> entry : internalProperties.entrySet())
+                {
+                    propertyToXmlRpc(entry, record, result);
+                }
+
+                return result;
+            }
+            else
+            {
+                // Actually a derived type
+                CompositeType actualType = typeRegistry.getType(record.getSymbolicName());
+                return actualType.toXmlRpc(data);
+            }
+        }
+    }
+
+    private void propertyToXmlRpc(Map.Entry<String, TypeProperty> entry, Record record, Hashtable<String, Object> result) throws TypeException
+    {
+        Object propertyValue = record.get(entry.getKey());
+        if(propertyValue != null)
+        {
+            result.put(entry.getKey(), entry.getValue().getType().toXmlRpc(propertyValue));
+        }
+    }
+
     private void unstantiateProperty(TypeProperty property, Object instance, MutableRecord result) throws TypeException
     {
         try

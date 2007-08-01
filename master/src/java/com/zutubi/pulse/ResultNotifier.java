@@ -93,7 +93,7 @@ public class ResultNotifier implements EventListener
                 contactPoint.notify(buildResult, rendered.subject, rendered.content, buildResultRenderer.getTemplateInfo(templateName, buildResult.isPersonal()).getMimeType());
                 
                 // Contact point may be modified: e.g. error may be set.
-                configurationProvider.save(contactPoint.getConfigurationPath(), contactPoint);
+                configurationProvider.save(contactPoint);
             }
         }
     }

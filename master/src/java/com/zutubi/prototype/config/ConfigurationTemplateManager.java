@@ -437,11 +437,11 @@ public class ConfigurationTemplateManager
                     boolean concrete = isConcrete(record);
                     try
                     {
-                        PersistentInstantiator instantiator = new PersistentInstantiator(path, concrete ? instances : incompleteInstances, configurationReferenceManager);
-                        Object instance = instantiator.instantiate(id, true, templatedType, record);
+                        PersistentInstantiator instantiator = new PersistentInstantiator(path, concrete, instances, incompleteInstances, configurationReferenceManager);
+                        Configuration instance = (Configuration) instantiator.instantiate(id, true, templatedType, record);
 
-                        // Only concrete instances go into the collection
-                        if (concrete)
+                        // Only valid, concrete instances go into the collection
+                        if (concrete && instance.isValid())
                         {
                             topInstance.put(id, instance);
                         }
@@ -456,7 +456,7 @@ public class ConfigurationTemplateManager
             {
                 try
                 {
-                    PersistentInstantiator instantiator = new PersistentInstantiator(path, instances, configurationReferenceManager);
+                    PersistentInstantiator instantiator = new PersistentInstantiator(path, true, instances, incompleteInstances, configurationReferenceManager);
                     instantiator.instantiate(path, false, type, topRecord);
                 }
                 catch (TypeException e)
@@ -650,8 +650,24 @@ public class ConfigurationTemplateManager
         }
     }
 
-    public void save(String path, Object instance)
+    /**
+     * Saves the given instance at the given path.  This is the same as doing
+     * a conversion to a record and saving using
+     * {@link #saveRecord(String, com.zutubi.prototype.type.record.MutableRecord, boolean)}
+     * with deep set to true.  All the same restrictions apply.
+     *
+     * @param instance the instance to save (must already be persistent)
+     * @throws IllegalArgumentException if the instance is not persistent, is
+     *         of an unknown type or does not meet the requirements of
+     *         saveRecord
+     */
+    public void save(Configuration instance)
     {
+        if(instance.getConfigurationPath() == null)
+        {
+            throw new IllegalArgumentException("Instance does not appear to be persistent (configuration path is unset), use insert for new instances");
+        }
+
         CompositeType type = typeRegistry.getType(instance.getClass());
         if (type == null)
         {
@@ -667,12 +683,54 @@ public class ConfigurationTemplateManager
         {
             throw new ConfigRuntimeException(e);
         }
-        saveRecord(path, record);
+
+        saveRecord(instance.getConfigurationPath(), record, true);
     }
 
+    /**
+     * Performs a shallow save of the given record at the given path.
+     *
+     * @see #saveRecord(String, com.zutubi.prototype.type.record.MutableRecord, boolean)
+     *
+     * @param path   the path to save the record to
+     * @param record the record to save
+     * @return the path that the saved record is stored at, which may be
+     *         different from the save path
+     * @throws IllegalArgumentException when the arguments do not meet the
+     *                                  criteria outlined
+     */
     public String saveRecord(String path, MutableRecord record)
     {
+        return saveRecord(path, record, false);
+    }
+
+    /**
+     * Saves the given record to the given path.  The record must be of
+     * composite type, and a record of the same type must already exist at
+     * the path.  To manipulate collections or change the type, delete and
+     * insert operations should be used.  Child records are ignored unless
+     * deep is true, in which case they are also saved (transitively).  In
+     * this case deletes and inserts may occur at child paths.
+     *
+     * @param path   the path to save the record to
+     * @param record the record to save
+     * @param deep   if true, the state of child records is updated to match
+     *               the incoming record using delete, insert and save
+     *               operations as necessary (normally child records are
+     *               ignored)
+     * @return the path that the saved record is stored at, which may be
+     *         different from the save path
+     * @throws IllegalArgumentException when the arguments do not meet the
+     *                                  criteria outlined
+     */
+    public String saveRecord(String path, MutableRecord record, boolean deep)
+    {
         checkPersistent(path);
+
+        if(record.getSymbolicName() == null)
+        {
+            throw new IllegalArgumentException("Record has no type (note that collections should not be saved directly)");
+        }
 
         Record existingRecord = getRecord(path);
         if (existingRecord == null)
@@ -686,13 +744,17 @@ public class ConfigurationTemplateManager
             throw new IllegalArgumentException("Illegal path '" + path + "': no parent record");
         }
 
+        // Type check of incoming record.
+        if(!existingRecord.getSymbolicName().equals(record.getSymbolicName()))
+        {
+            throw new IllegalArgumentException("Saved record has type '" + record.getSymbolicName() + "' which does not match existing type '" + existingRecord.getSymbolicName() + "'");
+        }
+
         ComplexType parentType = configurationPersistenceManager.getType(parentPath);
         String newPath = parentType.getSavePath(path, record);
+        CompositeType type = typeRegistry.getType(record.getSymbolicName());
 
-        // Type check of incoming record.
-        CompositeType actualType = checkRecordType(parentType.getDeclaredPropertyType(PathUtils.getBaseName(newPath)), record);
-
-        MutableRecord newRecord = updateRecord(existingRecord, record, actualType);
+        MutableRecord newRecord = updateRecord(existingRecord, record, type);
         if (newPath.equals(path))
         {
             // Regular update
@@ -722,7 +784,63 @@ public class ConfigurationTemplateManager
             }
         }
 
+        if (deep)
+        {
+            synchroniseChildRecords(newPath, existingRecord, record);
+        }
+
         return newPath;
+    }
+
+    private void synchroniseChildRecords(String path, Record existingRecord, MutableRecord record)
+    {
+        Set<String> existingChildren = existingRecord.nestedKeySet();
+        Set<String> newChildren = record.nestedKeySet();
+
+        // Discover changed and inserted children
+        for(String key: newChildren)
+        {
+            String childPath = PathUtils.getPath(path, key);
+            MutableRecord child = (MutableRecord) record.get(key);
+
+            if(existingChildren.contains(key))
+            {
+                if(child.isCollection())
+                {
+                    // Jump down a level to synchronise elements
+                    synchroniseChildRecords(childPath, (Record)existingRecord.get(key), child);
+                }
+                else
+                {
+                    // Save this child composite
+                    saveRecord(childPath, child, true);
+                }
+            }
+            else
+            {
+                // Insert new child.
+                String insertPath;
+                if(record.isCollection())
+                {
+                    insertPath = path;
+                }
+                else
+                {
+                    insertPath = childPath;
+                }
+
+                insertRecord(insertPath, child);
+            }
+        }
+
+        // Discover deleted children
+        for(String key: existingChildren)
+        {
+            if(!newChildren.contains(key))
+            {
+                delete(PathUtils.getPath(path, key));
+            }
+        }
     }
 
     private MutableRecord updateRecord(Record existingRecord, MutableRecord updates, CompositeType type)
@@ -968,7 +1086,6 @@ public class ConfigurationTemplateManager
         return instance;
     }
 
-    @SuppressWarnings({ "unchecked" })
     public <T extends Configuration> T getInstance(String path, Class<T> clazz)
     {
         Configuration instance = getInstance(path);
@@ -983,6 +1100,17 @@ public class ConfigurationTemplateManager
         }
 
         return (T) instance;
+    }
+
+    public <T extends Configuration> T getCloneOfInstance(String path, Class<T> clazz)
+    {
+        T instance = getInstance(path, clazz);
+        if(instance == null)
+        {
+            return null;
+        }
+
+        return deepClone(instance);
     }
 
     public <T extends Configuration> Collection<T> getAllInstances(String path, Class<T> clazz, boolean allowIncomplete)

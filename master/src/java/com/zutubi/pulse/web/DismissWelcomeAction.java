@@ -21,7 +21,7 @@ public class DismissWelcomeAction extends ActionSupport
         User user = userManager.getUser(login);
         UserSettingsConfiguration settings = configurationProvider.deepClone(user.getPreferences().getSettings());
         settings.setDefaultAction(DefaultAction.DASHBOARD_ACTION);
-        configurationProvider.save(settings.getConfigurationPath(), settings);
+        configurationProvider.save(settings);
         return SUCCESS;
     }
 

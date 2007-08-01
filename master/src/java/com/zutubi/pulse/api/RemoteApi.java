@@ -1,5 +1,9 @@
 package com.zutubi.pulse.api;
 
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
+import com.zutubi.prototype.type.Type;
+import com.zutubi.prototype.type.TypeException;
+import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.ShutdownManager;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.bootstrap.ComponentContext;
@@ -16,7 +20,8 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
     private TokenManager tokenManager;
     private EventManager eventManager;
     private ShutdownManager shutdownManager;
-    
+    private ConfigurationTemplateManager configurationTemplateManager;
+
 //    private BuildManager buildManager;
 //    private ProjectManager projectManager;
 //    private UserManager userManager;
@@ -59,6 +64,27 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
     {
         return "pong";
     }
+
+    public Object getConfig(String token, String path) throws AuthenticationException, TypeException
+    {
+        tokenManager.verifyUser(token);
+
+        Record r = configurationTemplateManager.getRecord(path);
+        if(r == null)
+        {
+            throw new IllegalArgumentException("Path '" + path + "' does not exist");
+        }
+
+        Type t = configurationTemplateManager.getType(path);
+        return t.toXmlRpc(r);
+    }
+
+//    public String insertConfig(String token, String path, Hashtable config) throws AuthenticationException
+//    {
+//        tokenManager.verifyAdmin(token);
+//
+//        Type type =
+//    }
 
 //    public Vector<String> getAllUserLogins(String token) throws AuthenticationException
 //    {
@@ -1209,6 +1235,11 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
     public void setShutdownManager(ShutdownManager shutdownManager)
     {
         this.shutdownManager = shutdownManager;
+    }
+
+    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
+    {
+        this.configurationTemplateManager = configurationTemplateManager;
     }
 
 //    public void setUserManager(UserManager userManager)
