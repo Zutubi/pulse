@@ -111,7 +111,8 @@ public class ProjectXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         Hashtable<String, Object> details = (Hashtable<String, Object>) result;
 
         // check that the necessary entries exist.
-        assertEquals(5, details.size());
+        assertEquals(6, details.size());
+        assertNotNull(details.get("id"));
         assertEquals(projectName, details.get("name"));
         assertEquals(projectDescription, details.get("description"));
         assertEquals(PROJECT_URL, details.get("url"));
