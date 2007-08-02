@@ -6,6 +6,7 @@ import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.jabber.JabberManager;
 import com.zutubi.pulse.license.License;
 import com.zutubi.pulse.license.LicenseHolder;
+import com.zutubi.pulse.license.LicenseType;
 import com.zutubi.pulse.model.CommitMessageTransformer;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.security.ldap.LdapManager;
@@ -62,6 +63,11 @@ public class ServerSettingsAction extends ActionSupport
     public int getSupportedContactPoints()
     {
         return LicenseHolder.getLicense().getSupportedContactPoints();
+    }
+
+    public boolean isEvaluationLicense()
+    {
+        return license.getType() == LicenseType.EVALUATION;
     }
 
     public String execute() throws Exception

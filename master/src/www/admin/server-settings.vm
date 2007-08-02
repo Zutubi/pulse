@@ -71,8 +71,11 @@
                         #contentCell("license.type.$license.type")
                     </tr>
                     #dynamicRow("license.holder.field" $license.holder)
-                    #dynamicRow("license.expiry.field" $expiryDate)
-
+                    #if($evaluationLicense)
+                        #dynamicRow("license.expiry.field" $expiryDate)
+                    #else
+                        #dynamicRow("license.support.expiry.field" $expiryDate)
+                    #end
                     #foreach($res in $restrictions)
                         #if($res.supported == -1)
                             #set($t = "$unrestricted")
