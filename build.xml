@@ -118,6 +118,11 @@
             <fileset dir="local/etc" includes="classpath.txt"/>
         </copy>
 
+        <!-- Workaround for CIB-1165 -->
+        <replace file="${package.root.local}/bin/common.bat">
+            <replacefilter token="noJavaHomeS" value="noJavaHome"/>
+        </replace>
+
         <!-- place holder for package documentation -->
         <!--<copy todir="${version.root.local}/docs">-->
             <!--<fileset dir="etc" includes="delete-me.txt"/>-->
