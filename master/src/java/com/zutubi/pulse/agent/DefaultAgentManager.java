@@ -262,6 +262,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         Slave slave = slaveManager.getSlave(agent.getId());
         slave.setEnableState(Slave.EnableState.UPGRADING);
         slaveManager.save(slave);
+        agent.setSlave(slave);
 
         String masterUrl = "http://" + MasterAgent.constructMasterLocation(configurationManager.getAppConfig(), configurationManager.getSystemConfig());
         AgentUpdater updater = new AgentUpdater(agent, serviceTokenManager.getToken(), masterUrl, eventManager, configurationManager.getSystemPaths());
@@ -305,7 +306,8 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
     public void handleEvent(Event evt)
     {
         SlaveUpgradeCompleteEvent suce = (SlaveUpgradeCompleteEvent) evt;
-        Slave slave = slaveManager.getSlave(suce.getSlaveAgent().getId());
+        SlaveAgent agent = suce.getSlaveAgent();
+        Slave slave = slaveManager.getSlave(agent.getId());
 
         updatersLock.lock();
         try
@@ -319,15 +321,17 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 
         if (suce.isSuccessful())
         {
-            suce.getSlaveAgent().setStatus(Status.OFFLINE);
+            agent.setStatus(Status.OFFLINE);
             slave.setEnableState(Slave.EnableState.ENABLED);
             slaveManager.save(slave);
-            pingSlave(suce.getSlaveAgent());
+            agent.setSlave(slave);
+            pingSlave(agent);
         }
         else
         {
             slave.setEnableState(Slave.EnableState.FAILED_UPGRADE);
             slaveManager.save(slave);
+            agent.setSlave(slave);
         }
     }
 

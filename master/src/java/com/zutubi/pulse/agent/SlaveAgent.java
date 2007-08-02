@@ -206,4 +206,9 @@ public class SlaveAgent implements Agent
     {
         return slave.getEnableState();
     }
+
+    public void setSlave(Slave slave)
+    {
+        this.slave = slave;
+    }
 }
