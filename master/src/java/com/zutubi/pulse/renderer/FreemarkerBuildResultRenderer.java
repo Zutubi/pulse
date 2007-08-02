@@ -146,10 +146,21 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
         return StringUtils.wrapString(s, 64, prefix);
     }
 
-    public String transformComment(Changelist changelist)
+    public String transformCommentWithoutTrimming(Changelist changelist)
     {
         CommitMessageSupport support = new CommitMessageSupport(changelist, commitMessageTransformerManager.getCommitMessageTransformers());
-        return support.trim(60);
+        return support.toString();
+    }
+
+    public String transformComment(Changelist changelist)
+    {
+        return transformComment(changelist, 60);
+    }
+
+    public String transformComment(Changelist changelist, int trimToLength)
+    {
+        CommitMessageSupport support = new CommitMessageSupport(changelist, commitMessageTransformerManager.getCommitMessageTransformers());
+        return support.trim(trimToLength);
     }
 
     public void setFreemarkerConfiguration(Configuration freemarkerConfiguration)
