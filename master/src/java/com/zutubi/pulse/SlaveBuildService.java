@@ -124,7 +124,9 @@ public class SlaveBuildService implements BuildService
         }
         catch (IOException e)
         {
-            throw new BuildException("Error downloading results from agent '" + slave.getName() + ": " + e.getMessage(), e);
+            String message = e.getMessage();
+            message = message.replaceAll("token=[0-9a-zA-Z]+&", "token=[scrubbed]&");
+            throw new BuildException("Error downloading results from agent '" + slave.getName() + "': " + message, e);
         }
         finally
         {
