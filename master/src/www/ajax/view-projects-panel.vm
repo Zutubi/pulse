@@ -32,8 +32,12 @@
     #foreach($project in $projects)
         #set($lastResult = false)
         #set($lastResult = $action.getLatestBuild($project))
+        #set($health = $action.getHealth($project))
             <tr>
-                #projectCell($project)
+                <td class="content">
+                    <img alt="health: $health" src="$base/images/health/${health}.gif"/>
+                    <a href="currentBuild.action?id=$project.id" id="$!webwork.htmlEncode($project.name)">$!webwork.htmlEncode($project.name)</a>
+                </td>
                 #actionCellTitle("home.tab" "currentBuild.action?id=$project.id" "house.gif")
                 #actionCellTitle("reporting.tab" "projectReports.action?id=$project.id" "chart_bar.gif")
                 #actionCellTitle("history.tab" "history.action?id=$project.id" "time.gif")
