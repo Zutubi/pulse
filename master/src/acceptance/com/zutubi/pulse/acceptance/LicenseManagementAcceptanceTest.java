@@ -139,12 +139,14 @@ public class LicenseManagementAcceptanceTest extends BaseAcceptanceTestCase
         form.saveFormElements(LicenseHelper.newLicenseKey(newLicense));
         form.assertFormNotPresent();
 
+        // WARNING: The following is a rather brittle test since it relies upon the i18n strings.
+
         // validate the details of the license.
         assertTablePresent("license.info");
         assertTableRowsEqual("license.info", 1, new String[][]{
                 {"license type", "Custom"},
                 {"licensee", "local tester"},
-                {"expiry date", "Never"},
+                {"support expiry date", "Never"},
                 {"agent restriction", "unrestricted"},
                 {"project restriction", "unrestricted"},
                 {"user restriction", "3 of 200"}
