@@ -4,6 +4,42 @@
 <html>
 <head>
     <title>#wwtext("name=build.properties.specify")</title>
+    <script type="text/javascript" src="$base/js/prototype.js"></script>
+    <script type="text/javascript">
+        function getLatestRevision()
+        {
+            var field = $('editBuildProperties_revision');
+            var status = $('latest.revision.status');
+
+            status.innerHTML = '<img src="$base/images/inprogress.gif" alt="in progress"/>';
+            status.style.display = 'inline';
+            
+            new Ajax.Request('$base/ajax/getLatestRevision.action',
+              {
+                  method:'get',
+                  parameters: 'projectId=$projectId',
+
+                  onSuccess: function(transport, response)
+                  {
+                      var response = eval("(" + transport.responseText + ")");
+                      if(response.successful)
+                      {
+                          field.value = response.latestRevision;
+                          status.innerHTML = '<img src="$base/images/accept.gif" alt="success"/>';
+                      }
+                      else
+                      {
+                          status.innerHTML = '<img src="$base/images/exclamation.gif" alt="success"/> Unable to get revision: ' + response.error;
+                      }
+                  },
+
+                  onFailure: function()
+                  {
+                      status.innerHTML = '<img src="$base/images/exclamation.gif" alt="success"/> Request to get revision failed.';
+                  }
+              });
+        }
+    </script>
 </head>
 <body>
     #projectTabs("configuration")
@@ -14,7 +50,7 @@
     #wwhidden("name=projectId")
     #wwhidden("name=id")
 
-    #wwtextfield("name=revision" "label=%{getText('revision.to.build')}" "size=40" "tabindex=1")
+    #wwtextfield("name=revision" "label=%{getText('revision.to.build')}" "size=40" "tabindex=1" "after= <a href='#' onclick='getLatestRevision(); return false;'>get latest revision</a> <span id='latest.revision.status' style='display: none'></span>")
     #inlineHelp("revision.to.build.help")
     #foreach($property in $properties)
         #set($tabIndex = $velocityCount + 1)

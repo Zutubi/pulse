@@ -1590,6 +1590,10 @@
             <result name="error" type="json">error.xml</result>
         </action>
 
+        <action name="getLatestRevision" class="com.zutubi.pulse.web.ajax.GetLatestRevisionAction">
+            <result name="success" type="json">revision.xml</result>
+        </action>
+
         <action name="mkdir" class="com.zutubi.pulse.web.vfs.MkdirAction">
             <result name="success" type="json">mkdir.xml</result>
             <result name="error" type="json">error.xml</result>
