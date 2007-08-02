@@ -5,7 +5,6 @@ import com.zutubi.pulse.ShutdownManager;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.AgentManager;
-import com.zutubi.pulse.agent.SlaveAgent;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.committransformers.CommitMessageTransformerManager;
 import com.zutubi.pulse.core.model.*;
@@ -54,7 +53,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
     private CommitMessageTransformerManager transformerManager;
 
     {
-        structDefs.put(Project.class, new String[]{"name", "description", "url"});
+        structDefs.put(Project.class, new String[]{"id", "name", "description", "url"});
         structDefs.put(Cvs.class, new String[]{"root", "module", "password", "branch", "quietPeriod", "monitor", "pollingInterval"});
         structDefs.put(Svn.class, new String[]{"url", "username", "password", "keyfile", "passphrase", "monitor", "pollingInterval"});
         structDefs.put(P4.class, new String[]{"port", "user", "password", "client", "monitor", "pollingInterval"});
@@ -696,7 +695,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
 
         if(agent.isSlave())
         {
-            agentManager.enableSlave(((SlaveAgent)agent).getId());
+            agentManager.enableSlave(agent.getId());
         }
         else
         {
@@ -718,7 +717,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
 
         if(agent.isSlave())
         {
-            agentManager.disableSlave(((SlaveAgent)agent).getId());
+            agentManager.disableSlave(agent.getId());
         }
         else
         {
