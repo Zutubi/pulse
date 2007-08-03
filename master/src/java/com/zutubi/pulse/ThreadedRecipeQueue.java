@@ -526,6 +526,8 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         context.addProperty("build.timestamp", BuildContext.PULSE_BUILD_TIMESTAMP_FORMAT.format(new Date(buildRevision.getTimestamp())));
         context.addProperty("build.timestamp.millis", Long.toString(buildRevision.getTimestamp()));
         context.addProperty("master.url", MasterAgent.constructMasterUrl(configurationManager.getAppConfig(), configurationManager.getSystemConfig()));
+        context.addProperty("specification.build.count", Integer.toString(request.getBuildSpecification().getBuildCount()));
+        context.addProperty("specification.success.count", Integer.toString(request.getBuildSpecification().getSuccessCount()));
         return context;
     }
 

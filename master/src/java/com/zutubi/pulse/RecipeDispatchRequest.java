@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.model.BuildHostRequirements;
 import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.BuildSpecification;
 import com.zutubi.pulse.util.TimeStamps;
 
 /**
@@ -11,6 +12,7 @@ import com.zutubi.pulse.util.TimeStamps;
  */
 public class RecipeDispatchRequest
 {
+    private BuildSpecification buildSpecification;
     private BuildHostRequirements hostRequirements;
     private BuildRevision revision;
     private RecipeRequest request;
@@ -22,12 +24,18 @@ public class RecipeDispatchRequest
      */
     private long timeout = -1;
 
-    public RecipeDispatchRequest(BuildHostRequirements hostRequirements, BuildRevision revision, RecipeRequest request, BuildResult build)
+    public RecipeDispatchRequest(BuildSpecification buildSpecification, BuildHostRequirements hostRequirements, BuildRevision revision, RecipeRequest request, BuildResult build)
     {
+        this.buildSpecification = buildSpecification;
         this.hostRequirements = hostRequirements;
         this.revision = revision;
         this.request = request;
         this.build = build;
+    }
+
+    public BuildSpecification getBuildSpecification()
+    {
+        return buildSpecification;
     }
 
     public BuildHostRequirements getHostRequirements()

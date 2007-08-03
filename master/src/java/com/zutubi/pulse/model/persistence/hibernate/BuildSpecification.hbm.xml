@@ -23,6 +23,13 @@
 
         <property name="prompt" column="PROMPT" type="boolean"/>
 
+        <property name="buildCount" type="int">
+            <column name="BUILD_COUNT" default="0"/>
+        </property>
+        <property name="successCount" type="int">
+            <column name="SUCCESS_COUNT" default="0"/>
+        </property>
+        
         <many-to-one name="root" class="com.zutubi.pulse.model.BuildSpecificationNode" column="ROOT_ID" cascade="all" lazy="false"/>
 
         <bag name="properties" cascade="all,delete-orphan" lazy="false">

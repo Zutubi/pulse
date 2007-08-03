@@ -50,6 +50,9 @@ public class BuildSpecification extends Entity implements NamedEntity
     private List<ResourceProperty> properties = new LinkedList<ResourceProperty>();
     private boolean prompt = false;
 
+    private int buildCount = 0;
+    private int successCount = 0;
+
     public BuildSpecification()
     {
 
@@ -289,6 +292,25 @@ public class BuildSpecification extends Entity implements NamedEntity
         this.prompt = prompt;
     }
 
+    public int getBuildCount()
+    {
+        return buildCount;
+    }
+
+    public void setBuildCount(int buildCount)
+    {
+        this.buildCount = buildCount;
+    }
+
+    public int getSuccessCount()
+    {
+        return successCount;
+    }
+
+    public void setSuccessCount(int successCount)
+    {
+        this.successCount = successCount;
+    }
 
     public boolean equals(Object other)
     {

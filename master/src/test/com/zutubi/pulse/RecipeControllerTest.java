@@ -59,7 +59,7 @@ public class RecipeControllerTest extends PulseTestCase
         recipeRequest = new RecipeRequest("project", "spec", rootResult.getId(), rootResult.getRecipeName());
         BuildResult build = new BuildResult();
         BuildSpecificationNode specificationNode = new BuildSpecificationNode();
-        dispatchRequest = new RecipeDispatchRequest(new MasterBuildHostRequirements(), new BuildRevision(), recipeRequest, null);
+        dispatchRequest = new RecipeDispatchRequest(new BuildSpecification("test"), new MasterBuildHostRequirements(), new BuildRevision(), recipeRequest, null);
         recipeController = new RecipeController(build, specificationNode, rootNode, dispatchRequest, new LinkedList<ResourceProperty>(), false, false, null, logger, resultCollector, recipeQueue, buildManager, null);
     }
 

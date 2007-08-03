@@ -156,7 +156,7 @@ public class BuildController implements EventListener
             boolean incremental = !request.isPersonal() && specification.getCheckoutScheme() == BuildSpecification.CheckoutScheme.INCREMENTAL_UPDATE;
             List<ResourceProperty> recipeProperties = new LinkedList<ResourceProperty>(buildProperties);
             RecipeRequest recipeRequest = new RecipeRequest(project.getName(), specification.getName(), recipeResult.getId(), stage.getRecipe(), incremental, true, specification.getRetainWorkingCopy(), getResourceRequirements(specification, node), recipeProperties);
-            RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(stage.getHostRequirements(), request.getRevision(), recipeRequest, buildResult);
+            RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(specification, stage.getHostRequirements(), request.getRevision(), recipeRequest, buildResult);
             DefaultRecipeLogger logger = new DefaultRecipeLogger(new File(paths.getRecipeDir(buildResult, recipeResult.getId()), RecipeResult.RECIPE_LOG));
             RecipeResultNode previousRecipe = previousSuccessful == null ? null : previousSuccessful.findResultNode(stage.getPname());
             RecipeController rc = new RecipeController(buildResult, node, childResultNode, dispatchRequest, recipeProperties, request.isPersonal(), incremental, previousRecipe, logger, collector, queue, buildManager, serviceTokenManager);
@@ -632,8 +632,14 @@ public class BuildController implements EventListener
                 if (specification.getForceClean())
                 {
                     specification.setForceClean(false);
-                    projectManager.save(specification);
                 }
+
+                specification.setBuildCount(specification.getBuildCount() + 1);
+                if(buildResult.succeeded())
+                {
+                    specification.setSuccessCount(specification.getSuccessCount() + 1);
+                }
+                projectManager.save(specification);
 
                 for (PostBuildAction action : buildResult.getProject().getPostBuildActions())
                 {
