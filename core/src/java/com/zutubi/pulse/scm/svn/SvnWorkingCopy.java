@@ -14,6 +14,7 @@ import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
 import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
 import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
+import org.tmatesoft.svn.core.internal.wc.admin.SVNAdminAreaFactory;
 import org.tmatesoft.svn.core.wc.*;
 
 import java.io.File;
@@ -37,6 +38,7 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
         // Initialise SVN library
         DAVRepositoryFactory.setup();
         SVNRepositoryFactoryImpl.setup();
+        SVNAdminAreaFactory.setUpgradeEnabled(false);
     }
 
     public SvnWorkingCopy(File path, Config config)
