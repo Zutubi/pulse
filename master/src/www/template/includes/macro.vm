@@ -1388,7 +1388,7 @@
 ##
 ## Summarises the messages of a given level on a file artifact
 ##
-#macro(fileArtifactMessageSummary $build $command $fileArtifact $level $showHeader)
+#macro(fileArtifactMessageSummary $build $recipe $command $fileArtifact $level $showHeader)
     #if($fileArtifact.hasMessages($level))
         #if($showHeader)
     <li class="header">#wwtext("name=artifact") :: $!webwork.htmlEncode("$fileArtifact.path")
@@ -1413,9 +1413,11 @@
             #else
                 $action.plainToHtml($feature.summary)<br/>
             #end
+            #if($recipe.completed())
                 <a class="unadorned" href="viewArtifactt.action?id=$fileArtifact.id&amp;buildId=$build.id&amp;commandId=$command.id#$feature.lineNumber">
                     <span class="small">#wwtext("name=jump.to")</span> <img src="$base/images/go_small.gif"/>
                 </a>
+            #end
             </li>
         #end
         </ul>
@@ -1428,10 +1430,10 @@
 ##
 ## Summarises the messages of a given level on an artifact into a nested list
 ##
-#macro(artifactMessageSummary $build $command $artifact $level $showHeader)
+#macro(artifactMessageSummary $build  $recipe $command $artifact $level $showHeader)
     #if($artifact.hasMessages($level))
         #foreach($fileArtifact in $artifact.children)
-            #fileArtifactMessageSummary($build $command $fileArtifact $level $showHeader)
+            #fileArtifactMessageSummary($build $recipe $command $fileArtifact $level $showHeader)
         #end
     #end
 #end
@@ -1439,11 +1441,11 @@
 ##
 ## Summarises the messages of a given level on a command result into a nested list
 ##
-#macro(commandMessageSummary $build $commandResult $level)
+#macro(commandMessageSummary $build $recipeResult $commandResult $level)
     #if($commandResult.hasMessages($level))
         #resultMessageItems($commandResult $level)
         #foreach($artifact in $commandResult.artifacts)
-            #artifactMessageSummary($build $commandResult $artifact $level true)
+            #artifactMessageSummary($build $recipeResult $commandResult $artifact $level true)
         #end
     #end
 #end
@@ -1463,7 +1465,7 @@
             #if($commandResult.hasMessages($level))
                 <li class="header">#wwtext("name=command") :: $!webwork.htmlEncode("$commandResult.commandName")
                     <ul>
-                    #commandMessageSummary($build $commandResult $level)
+                    #commandMessageSummary($build $recipeResult $commandResult $level)
                     </ul>
                 </li>
             #end
@@ -1509,12 +1511,12 @@
 ##
 ## Shows features of all levels for the given artifact
 ##
-#macro(fileArtifactFeatures $build $result $fileArtifact)
+#macro(fileArtifactFeatures $build $recipe $result $fileArtifact)
     #foreach($level in $featureLevels)
         #if($fileArtifact.hasMessages($level))
     <ul class="$level.toString().toLowerCase()">
         <li class="header">$level.toString().toLowerCase() #wwtext("name=features")
-        #fileArtifactMessageSummary($build $result $fileArtifact $level false)
+        #fileArtifactMessageSummary($build $recipe $result $fileArtifact $level false)
         </li>
     </ul>
         #end
@@ -1524,7 +1526,7 @@
 ##
 ## Shows an artifact that is a single file
 ##
-#macro(commandFileArtifact $artifact $fileArtifact $build $result $showFeatures $showArtifactLink)
+#macro(commandFileArtifact $artifact $fileArtifact $build $recipe $result $showFeatures $showArtifactLink)
     <li class="file-artifact">
     #set($trimmedPath = $artifact.trimmedPath($fileArtifact))
     #if($showArtifactLink)
@@ -1536,7 +1538,7 @@
         $trimmedPath
     #end
     #if($showFeatures)
-        #fileArtifactFeatures($build $result $fileArtifact)
+        #fileArtifactFeatures($build $recipe $result $fileArtifact)
     #end
     </li>
 #end
@@ -1544,7 +1546,7 @@
 ##
 ## Shows an artifact that is multi file, and possibly too many to display
 ##
-#macro(commandMultiArtifact $artifact $build $result $showFeatures $showArtifactLink)
+#macro(commandMultiArtifact $artifact $build $recipe $result $showFeatures $showArtifactLink)
     #set($hasIndex = $artifact.hasIndexFile())
     #if($hasIndex)
         <li class="report-artifact">
@@ -1568,7 +1570,7 @@
     #if(!$hasIndex)
         <ul id="art_${artifact.id}">
         #foreach($fileArtifact in $artifact.children)
-            #commandFileArtifact($artifact $fileArtifact $build $result $showFeatures $showArtifactLink)
+            #commandFileArtifact($artifact $fileArtifact $build $recipe $result $showFeatures $showArtifactLink)
         #end
         </ul>
     #end
@@ -1578,10 +1580,10 @@
 ##
 ## Shows a list of artifacts for a command
 ##
-#macro(commandArtifacts $build $result $showFeatures $showArtifactLink)
+#macro(commandArtifacts $build $recipe $result $showFeatures $showArtifactLink)
     <ul class="artifact" id="${commandResult.id}_artifacts">
     #foreach($artifact in $result.artifacts)
-        #commandMultiArtifact($artifact $build $result $showFeatures $showArtifactLink)
+        #commandMultiArtifact($artifact $build $recipe $result $showFeatures $showArtifactLink)
     #end
     </ul>
 #end
@@ -1597,7 +1599,7 @@
         #foreach($commandResult in $result.commandResults)
             #if($commandResult.hasArtifacts())
         <li class="artifact"><span class="expanded-list" id="${commandResult.id}_artifacts_header" onclick="toggleList('${commandResult.id}_artifacts');">#wwtext("name=command") :: $!webwork.htmlEncode($commandResult.commandName)</span>
-            #commandArtifacts($build $commandResult false $result.completed())
+            #commandArtifacts($build $result $commandResult false $result.completed())
         </li>
             #end
         #end
@@ -1646,7 +1648,7 @@
 #end
 
 #macro(buildTestFailures $buildResult)
-    #if($buildResult.hasBrokenTests())
+    #if($buildResult.completed() && $buildResult.hasBrokenTests())
     <h2 class="section">#wwtext("name=failed.tests")</h2>
         #foreach($recipeNode in $buildResult.root.children)
             #if($recipeNode.hasBrokenTests())
