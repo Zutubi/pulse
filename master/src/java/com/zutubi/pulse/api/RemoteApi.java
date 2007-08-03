@@ -21,6 +21,8 @@ import com.zutubi.pulse.scm.SCMConfiguration;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.util.OgnlUtils;
 import com.zutubi.pulse.util.TimeStamps;
+import com.zutubi.pulse.util.UnaryFunction;
+import com.zutubi.pulse.util.StringUtils;
 import com.zutubi.pulse.validation.PulseValidationContext;
 import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.ValidationException;
@@ -311,7 +313,23 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
 
         return result;
     }
-    
+
+    public Vector<Hashtable<String, Object>> getPreviousBuild(String token, String projectName, int id) throws AuthenticationException
+    {
+        tokenManager.verifyUser(token);
+
+        Project project = internalGetProject(projectName);
+        BuildResult buildResult = internalGetBuild(project, id);
+        buildResult = buildManager.getPreviousBuildResult(buildResult);
+        Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>();
+        if(buildResult != null)
+        {
+            result.add(convertResult(buildResult));
+        }
+
+        return result;
+    }
+
     private PersistentName[] mapSpecs(String[] buildSpecifications, Project project)
     {
         if (buildSpecifications.length > 0)
@@ -480,11 +498,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
     {
         tokenManager.verifyUser(token);
         Project project = internalGetProject(projectName);
-        BuildResult build = buildManager.getByProjectAndNumber(project, id);
-        if (build == null)
-        {
-            throw new IllegalArgumentException("Unknown build '" + id + "' for project '" + projectName + "'");
-        }
+        BuildResult build = internalGetBuild(project, id);
 
         List<Changelist> changelists = buildManager.getChangesForBuild(build);
         Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(changelists.size());
@@ -542,6 +556,58 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
             result.put("action", change.getAction().toString().toLowerCase());
         }
 
+        return result;
+    }
+
+    public Vector<Hashtable<String, Object>> getArtifactsInBuild(String token, final String projectName, final int id) throws AuthenticationException
+    {
+        tokenManager.verifyUser(token);
+        final Project project = internalGetProject(projectName);
+        final Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>();
+
+        buildManager.executeInTransaction(new Runnable()
+        {
+            public void run()
+            {
+                final BuildResult build = internalGetBuild(project, id);
+
+                build.getRoot().forEachNode(new UnaryFunction<RecipeResultNode>()
+                {
+                    public void process(RecipeResultNode recipeResultNode)
+                    {
+                        RecipeResult recipeResult = recipeResultNode.getResult();
+                        if(recipeResult != null)
+                        {
+                            String stage = recipeResultNode.getStage();
+                            for(CommandResult commandResult: recipeResult.getCommandResults())
+                            {
+                                String command = commandResult.getCommandName();
+                                for(StoredArtifact artifact: commandResult.getArtifacts())
+                                {
+                                    result.add(convertArtifact(artifact, projectName, build, stage, command));
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
+        return result;
+    }
+
+    private Hashtable<String, Object> convertArtifact(StoredArtifact artifact, String project, BuildResult build, String stage, String command)
+    {
+        Hashtable<String, Object> result = new Hashtable<String, Object>();
+        result.put("stage", stage);
+        result.put("command", command);
+        result.put("name", artifact.getName());
+        result.put("permalink", StringUtils.join("/", "display/projects",
+                                                 StringUtils.uriComponentEncode(project),
+                                                 "builds", Long.toString(build.getNumber()),
+                                                 StringUtils.uriComponentEncode(stage),
+                                                 StringUtils.uriComponentEncode(command),
+                                                 StringUtils.uriComponentEncode(artifact.getName())));
         return result;
     }
 
@@ -1295,6 +1361,17 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
             throw new IllegalArgumentException("Unknown project '" + projectName + "'");
         }
         return project;
+    }
+
+    private BuildResult internalGetBuild(Project project, int id)
+    {
+        BuildResult build = buildManager.getByProjectAndNumber(project, id);
+        if (build == null)
+        {
+            throw new IllegalArgumentException("Unknown build '" + id + "' for project '" + project.getName() + "'");
+        }
+
+        return build;
     }
 
     private List<Project> getProjectList(Vector<String> projects)

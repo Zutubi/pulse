@@ -544,4 +544,79 @@ public class StringUtils
             return path;
         }
     }
+
+    public static String uriComponentEncode(String in)
+    {
+        StringBuilder sb = null;
+        for(int i = 0; i < in.length(); i++)
+        {
+            char c = in.charAt(i);
+            if(allowedInURIComponent(c))
+            {
+                if(sb != null)
+                {
+                    sb.append(c);
+                }
+            }
+            else
+            {
+                if (sb == null)
+                {
+                    sb = new StringBuilder(in.substring(0, i));
+                }
+
+                sb.append('%');
+                sb.append(toHexString(c));
+            }
+        }
+
+        if(sb == null)
+        {
+            return in;
+        }
+        else
+        {
+            return sb.toString();
+        }
+    }
+
+    private static boolean allowedInURIComponent(char c)
+    {
+        if(c < '\u0080')
+        {
+            // In the ASCII range we only accept alphanumerics and:
+            //   -_.!~*'()
+            if(Character.isLetterOrDigit(c))
+            {
+                return true;
+            }
+            else
+            {
+                switch(c)
+                {
+                    case '-':
+                    case '_':
+                    case '.':
+                    case '!':
+                    case '~':
+                    case '*':
+                    case '\'':
+                    case '(':
+                    case ')':
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        }
+        else
+        {
+            return true;
+        }
+    }
+
+    private static String toHexString(char c)
+    {
+        return Integer.toString(c, 16);
+    }
 }
