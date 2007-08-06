@@ -81,4 +81,83 @@ public class PrimitiveTypeTest extends TypeTestCase
         PrimitiveType type = new PrimitiveType(String.class);
         assertNull(type.toXmlRpc(null));
     }
+
+    public void testFromXmlRpcBoolean() throws TypeException
+    {
+        PrimitiveType type = new PrimitiveType(Boolean.class);
+        Object o = type.fromXmlRpc(true);
+        assertTrue(o instanceof String);
+        assertEquals("true", o);
+    }
+
+    public void testFromXmlRpcByte() throws TypeException
+    {
+        PrimitiveType type = new PrimitiveType(Byte.class);
+        Object o = type.fromXmlRpc(10);
+        assertTrue(o instanceof String);
+        assertEquals(Byte.toString((byte) 10), o);
+    }
+
+    public void testFromXmlRpcCharacter() throws TypeException
+    {
+        PrimitiveType type = new PrimitiveType(Character.class);
+        Object o = type.fromXmlRpc("a");
+        assertTrue(o instanceof String);
+        assertEquals("a", o);
+    }
+
+    public void testFromXmlRpcDouble() throws TypeException
+    {
+        PrimitiveType type = new PrimitiveType(Double.class);
+        Object o = type.fromXmlRpc(1.24324);
+        assertTrue(o instanceof String);
+        assertEquals(Double.toString(1.24324), o);
+    }
+
+    public void testFromXmlRpcInt() throws TypeException
+    {
+        PrimitiveType type = new PrimitiveType(Integer.class);
+        Object o = type.fromXmlRpc(987);
+        assertTrue(o instanceof String);
+        assertEquals(Integer.toString(987), o);
+    }
+
+    public void testFromXmlRpcFloat() throws TypeException
+    {
+        PrimitiveType type = new PrimitiveType(Float.class);
+        Object o = type.fromXmlRpc(1.2e-4);
+        assertTrue(o instanceof String);
+        assertEquals("1.2E-4", o);
+    }
+
+    public void testFromXmlRpcLong() throws TypeException
+    {
+        PrimitiveType type = new PrimitiveType(Long.class);
+        Object o = type.fromXmlRpc("9634");
+        assertTrue(o instanceof String);
+        assertEquals(Long.toString(9634), o);
+    }
+
+    public void testFromXmlRpcShort() throws TypeException
+    {
+        PrimitiveType type = new PrimitiveType(Short.class);
+        Object o = type.fromXmlRpc(77);
+        assertTrue(o instanceof String);
+        assertEquals(Short.toString((short) 77), o);
+    }
+
+    public void testfromXmlRpcString() throws TypeException
+    {
+        PrimitiveType type = new PrimitiveType(String.class);
+        Object o = type.fromXmlRpc("here is no why");
+        assertTrue(o instanceof String);
+        assertEquals("here is no why", o);
+    }
+
+    public void testFromXmlRpcNull() throws TypeException
+    {
+        PrimitiveType type = new PrimitiveType(String.class);
+        assertNull(type.toXmlRpc(null));
+    }
+    
 }

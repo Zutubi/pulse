@@ -10,8 +10,6 @@ import java.util.Hashtable;
 import java.util.Map;
 
 /**
- *
- *
  */
 public class MapTypeTest extends TypeTestCase
 {
@@ -93,6 +91,81 @@ public class MapTypeTest extends TypeTestCase
         assertEquals("1", rpcForm.get("key1").get("a"));
         assertEquals("2", rpcForm.get("key2").get("a"));
     }
+
+    public void testFromXmlRpc() throws TypeException
+    {
+        Hashtable element = new Hashtable();
+        element.put("meta.symbolicName", "mockA");
+        element.put("a", "avalue");
+
+        Hashtable rpcForm = new Hashtable();
+        rpcForm.put("avalue", element);
+
+        Object o = mapType.fromXmlRpc(rpcForm);
+        assertTrue(o instanceof Record);
+        Record record = (Record) o;
+        assertEquals(1, record.size());
+        o = record.get("avalue");
+        assertNotNull(o);
+        assertTrue(o instanceof Record);
+        record = (Record) o;
+        assertEquals("mockA", record.getSymbolicName());
+        assertEquals("avalue", record.get("a"));
+    }
+
+    public void testFromXmlRpcEmptyMap() throws TypeException
+    {
+        Hashtable rpcForm = new Hashtable();
+
+        Object o = mapType.fromXmlRpc(rpcForm);
+        assertTrue(o instanceof Record);
+        Record record = (Record) o;
+        assertEquals(0, record.size());
+    }
+
+    public void testFromXmlRpcInvalidType() throws TypeException
+    {
+        try
+        {
+            mapType.fromXmlRpc("string");
+            fail();
+        }
+        catch (TypeException e)
+        {
+            assertEquals("Expecting 'java.util.Hashtable', found 'java.lang.String'", e.getMessage());
+        }
+    }
+
+    public void testFromXmlRpcInvalidElementType() throws TypeException
+    {
+        try
+        {
+            Hashtable<String, Object> rpcForm = new Hashtable<String, Object>();
+            rpcForm.put("a", "avalue");
+            mapType.fromXmlRpc(rpcForm);
+            fail();
+        }
+        catch (TypeException e)
+        {
+            assertEquals("Converting map element 'a': Expecting 'java.util.Hashtable', found 'java.lang.String'", e.getMessage());
+        }
+    }
+
+    public void testFromXmlRpcInvalidKeyType() throws TypeException
+    {
+        try
+        {
+            Hashtable<Integer, Object> rpcForm = new Hashtable<Integer, Object>();
+            rpcForm.put(1, "avalue");
+            mapType.fromXmlRpc(rpcForm);
+            fail();
+        }
+        catch (TypeException e)
+        {
+            assertEquals("Map element has invalid key type: Expecting 'java.lang.String', found 'java.lang.Integer'", e.getMessage());
+        }
+    }
+
 
     @SymbolicName("mockA")
     public static class MockA extends AbstractConfiguration

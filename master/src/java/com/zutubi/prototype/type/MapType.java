@@ -50,10 +50,11 @@ public class MapType extends CollectionType
     @SuppressWarnings({ "unchecked" })
     public void initialise(Object instance, Object data, Instantiator instantiator)
     {
-        addItems((Record) data, new InstantiateAdder((ConfigurationMap<String, Object>) instance, instantiator));
+        ConfigurationMap<String, Object> map = (ConfigurationMap<String, Object>) instance;
+        covertFromRecord((Record) data, map, new InstantiateFromRecord(map, instantiator));
     }
 
-    private void addItems(Record record, Adder adder)
+    private void covertFromRecord(Record record, Map<String, Object> result, FromRecord fromRecord)
     {
         Type defaultType = getCollectionType();
         for (String key : record.keySet())
@@ -66,18 +67,18 @@ public class MapType extends CollectionType
                 type = typeRegistry.getType(childRecord.getSymbolicName());
                 if(type == null)
                 {
-                    adder.handleFieldError(key, "Reference to unrecognised type '" + childRecord.getSymbolicName() + "'");
+                    fromRecord.handleFieldError(key, "Reference to unrecognised type '" + childRecord.getSymbolicName() + "'");
                     continue;
                 }
             }
 
             try
             {
-                adder.add(key, type, child);
+                result.put(key, fromRecord.convert(key, type, child));
             }
             catch (TypeException e)
             {
-                adder.handleFieldError(key, e.getMessage());
+                fromRecord.handleFieldError(key, e.getMessage());
             }
         }
     }
@@ -85,20 +86,8 @@ public class MapType extends CollectionType
     @SuppressWarnings({"unchecked"})
     public Object unstantiate(Object instance) throws TypeException
     {
-        if(!(instance instanceof Map))
-        {
-            throw new TypeException("Expecting map, got '" + instance.getClass().getName() + "'");
-        }
-
-        MutableRecord result = createNewRecord(true);
-        Map<String, Object> map = (Map<String, Object>) instance;
-        Type collectionType = getCollectionType();
-        for(Map.Entry<String, Object> entry: map.entrySet())
-        {
-            result.put(entry.getKey(), collectionType.unstantiate(entry.getValue()));
-        }
-
-        return result;
+        typeCheck(instance, Map.class);
+        return convertToRecord((Map) instance, new UnstantiateToRecord());
     }
 
     public Object toXmlRpc(Object data) throws TypeException
@@ -111,9 +100,44 @@ public class MapType extends CollectionType
         {
             Record record = (Record) data;
             Hashtable<String, Object> result = new Hashtable<String, Object>(record.size());
-            addItems(record, new XmlRpcAdder(result));
+            covertFromRecord(record, result, new XmlRpcFromRecord());
             return result;
         }
+    }
+
+    public Object fromXmlRpc(Object data) throws TypeException
+    {
+        typeCheck(data, Hashtable.class);
+        return convertToRecord((Hashtable) data, new XmlRpcToRecord());
+    }
+
+    private MutableRecord convertToRecord(Map instance, ToRecord toRecord) throws TypeException
+    {
+        MutableRecord result = createNewRecord(true);
+        Type collectionType = getCollectionType();
+        for(Object entry: instance.entrySet())
+        {
+            Map.Entry e = (Map.Entry) entry;
+            try
+            {
+                typeCheck(e.getKey(), String.class);
+            }
+            catch (TypeException ex)
+            {
+                throw new TypeException("Map element has invalid key type: " + ex.getMessage(), ex);
+            }
+
+            try
+            {
+                result.put((String) e.getKey(), toRecord.convert(collectionType, e.getValue()));
+            }
+            catch (TypeException ex)
+            {
+                throw new TypeException("Converting map element '" + e.getKey() + "': " + ex.getMessage(), ex);
+            }
+        }
+
+        return result;
     }
 
     public void setCollectionType(Type collectionType) throws TypeException
@@ -166,18 +190,18 @@ public class MapType extends CollectionType
         return PathUtils.getPath(PathUtils.getParentPath(path), (String) record.get(keyProperty));
     }
 
-    private static interface Adder
+    private static interface FromRecord
     {
         void handleFieldError(String key, String message);
-        void add(String key, Type type, Object child) throws TypeException;
+        Object convert(String key, Type type, Object child) throws TypeException;
     }
 
-    private static class InstantiateAdder implements Adder
+    private static class InstantiateFromRecord implements FromRecord
     {
         private ConfigurationMap<String, Object> map;
         private Instantiator instantiator;
 
-        public InstantiateAdder(ConfigurationMap<String, Object> map, Instantiator instantiator)
+        public InstantiateFromRecord(ConfigurationMap<String, Object> map, Instantiator instantiator)
         {
             this.map = map;
             this.instantiator = instantiator;
@@ -188,29 +212,43 @@ public class MapType extends CollectionType
             map.addFieldError(key, message);
         }
 
-        public void add(String key, Type type, Object child) throws TypeException
+        public Object convert(String key, Type type, Object child) throws TypeException
         {
-            map.put(key, instantiator.instantiate(key, true, type, child));
+            return instantiator.instantiate(key, true, type, child);
         }
     }
 
-    private static class XmlRpcAdder implements Adder
+    private static class XmlRpcFromRecord implements FromRecord
     {
-        private Hashtable<String, Object> hashtable;
-
-        public XmlRpcAdder(Hashtable<String, Object> hashtable)
-        {
-            this.hashtable = hashtable;
-        }
-
         public void handleFieldError(String key, String message)
         {
             // Do nothing.
         }
 
-        public void add(String key, Type type, Object child) throws TypeException
+        public Object convert(String key, Type type, Object child) throws TypeException
         {
-            hashtable.put(key, type.toXmlRpc(child));
+            return type.toXmlRpc(child);
+        }
+    }
+
+    private static interface ToRecord
+    {
+        Object convert(Type type, Object object) throws TypeException;
+    }
+
+    private static class UnstantiateToRecord implements ToRecord
+    {
+        public Object convert(Type type, Object object) throws TypeException
+        {
+            return type.unstantiate(object);
+        }
+    }
+
+    private static class XmlRpcToRecord implements ToRecord
+    {
+        public Object convert(Type type, Object object) throws TypeException
+        {
+            return type.fromXmlRpc(object);
         }
     }
 }

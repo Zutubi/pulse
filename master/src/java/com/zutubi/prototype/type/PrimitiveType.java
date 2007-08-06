@@ -10,7 +10,7 @@ import com.zutubi.util.CollectionUtils;
  */
 public class PrimitiveType extends SimpleType implements Type
 {
-    private static final Class[] XML_RPC_TYPES = { Boolean.class, Double.class, Integer.class, String.class };
+    private static final Class[] XML_RPC_SUPPORTED_TYPES = { Boolean.class, Double.class, Integer.class, String.class };
 
     public PrimitiveType(Class type)
     {
@@ -47,7 +47,7 @@ public class PrimitiveType extends SimpleType implements Type
         }
     }
 
-    public Object unstantiate(Object instance) throws TypeException
+    public String unstantiate(Object instance) throws TypeException
     {
         TypeSqueezer squeezer = Squeezers.findSqueezer(getClazz());
         try
@@ -70,7 +70,7 @@ public class PrimitiveType extends SimpleType implements Type
         // XML-RPC only supports limited types, in their direct form.
         Class clazz = getClazz();
         String s = (String) data;
-        if(CollectionUtils.contains(XML_RPC_TYPES, clazz))
+        if(CollectionUtils.contains(XML_RPC_SUPPORTED_TYPES, clazz))
         {
             return instantiate(s, null);
         }
@@ -95,6 +95,36 @@ public class PrimitiveType extends SimpleType implements Type
             // longs as well (XML-RPC has no direct way to specify a 64 bit
             // int).
             return s;
+        }
+    }
+
+    public String fromXmlRpc(Object data) throws TypeException
+    {
+        Class clazz = getClazz();
+        if(CollectionUtils.contains(XML_RPC_SUPPORTED_TYPES, clazz))
+        {
+            typeCheck(data, clazz);
+            return unstantiate(data);
+        }
+        else if(clazz == Byte.class)
+        {
+            typeCheck(data, Integer.class);
+            return Byte.toString(((Integer)data).byteValue());
+        }
+        else if(clazz == Float.class)
+        {
+            typeCheck(data, Double.class);
+            return Float.toString(((Double)data).floatValue());
+        }
+        else if(clazz == Short.class)
+        {
+            typeCheck(data, Integer.class);
+            return Short.toString(((Integer)data).shortValue());
+        }
+        else
+        {
+            typeCheck(data, String.class);
+            return (String) data;
         }
     }
 }

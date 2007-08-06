@@ -19,4 +19,6 @@ public abstract class SimpleType extends AbstractType
     {
         // Nothing to to
     }
+
+    public abstract String fromXmlRpc(Object data) throws TypeException;
 }

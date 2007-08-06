@@ -6,6 +6,7 @@ import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 
 import java.util.Hashtable;
+import java.util.Vector;
 
 /**
  *
@@ -15,6 +16,7 @@ public class CompositeTypeTest extends TypeTestCase
 {
     private CompositeType basicType;
     private CompositeType typeA;
+    private CompositeType typeB;
 
     protected void setUp() throws Exception
     {
@@ -22,6 +24,7 @@ public class CompositeTypeTest extends TypeTestCase
 
         basicType = typeRegistry.register(BasicTypes.class);
         typeA = typeRegistry.register(ObjectTypeA.class);
+        typeB = typeRegistry.getType(ObjectTypeB.class);
     }
 
     protected void tearDown() throws Exception
@@ -105,9 +108,11 @@ public class CompositeTypeTest extends TypeTestCase
         assertTrue(rpcForm instanceof Hashtable);
 
         Hashtable ht = (Hashtable) rpcForm;
-        assertEquals(2, ht.size());
+        assertEquals(3, ht.size());
+        assertEquals("typeA", ht.get("meta.symbolicName"));
         assertNotNull(ht.get("a"));
         Hashtable member = (Hashtable) ht.get("b");
+        assertEquals("typeB", member.get("meta.symbolicName"));
         assertEquals("string", member.get("a"));
     }
 
@@ -119,9 +124,112 @@ public class CompositeTypeTest extends TypeTestCase
         assertTrue(rpcForm instanceof Hashtable);
 
         Hashtable ht = (Hashtable) rpcForm;
-        assertEquals(1, ht.size());
+        assertEquals(2, ht.size());
+        assertEquals("typeA", ht.get("meta.symbolicName"));
         assertNotNull(ht.get("a"));
         assertNull(ht.get("b"));
+    }
+
+    public void testFromXmlRpc() throws TypeException
+    {
+        Hashtable inner = new Hashtable();
+        inner.put("meta.symbolicName", "typeB");
+        inner.put("a", "avalue");
+
+        Hashtable outer = new Hashtable();
+        outer.put("meta.symbolicName", "typeA");
+        outer.put("a", inner);
+
+        Object o = typeA.fromXmlRpc(outer);
+        assertTrue(o instanceof Record);
+        Record outerRecord = (Record) o;
+        assertEquals(1, outerRecord.size());
+        assertEquals("typeA", outerRecord.getSymbolicName());
+
+        o = outerRecord.get("a");
+        assertNotNull(o);
+        assertTrue(o instanceof Record);
+        Record innerRecord = (Record) o;
+        assertEquals("typeB", innerRecord.getSymbolicName());
+        assertEquals(1, innerRecord.size());
+        assertEquals("avalue", innerRecord.get("a"));
+    }
+
+    public void testFromXmlRpcNoSymbolicName() throws TypeException
+    {
+        try
+        {
+            Hashtable rpcForm = new Hashtable();
+            rpcForm.put("a", "avalue");
+            typeB.fromXmlRpc(rpcForm);
+            fail();
+        }
+        catch (TypeException e)
+        {
+            assertEquals("No symbolic name found in XML-RPC struct", e.getMessage());
+        }
+    }
+
+    public void testFromXmlRpcInvalidSymbolicName() throws TypeException
+    {
+        try
+        {
+            Hashtable rpcForm = new Hashtable();
+            rpcForm.put("meta.symbolicName", "grr");
+            rpcForm.put("a", "avalue");
+            typeB.fromXmlRpc(rpcForm);
+            fail();
+        }
+        catch (TypeException e)
+        {
+            assertEquals("XML-RPC struct has unrecognised symbolic name 'grr'", e.getMessage());
+        }
+    }
+
+    public void testFromXmlRpcWrongType()
+    {
+        try
+        {
+            typeB.fromXmlRpc("string");
+            fail();
+        }
+        catch (TypeException e)
+        {
+            assertEquals("Expecting 'java.util.Hashtable', found 'java.lang.String'", e.getMessage());
+        }
+    }
+
+    public void testFromXmlRpcWrongPropertyType() throws TypeException
+    {
+        try
+        {
+            Hashtable rpcForm = new Hashtable();
+            rpcForm.put("meta.symbolicName", "typeB");
+            rpcForm.put("a", new Vector());
+            typeB.fromXmlRpc(rpcForm);
+            fail();
+        }
+        catch (TypeException e)
+        {
+            assertEquals("Converting property 'a' of type 'typeB': Expecting 'java.lang.String', found 'java.util.Vector'", e.getMessage());
+        }
+    }
+
+    public void testFromXmlRpcUnrecognisedProperty()
+    {
+        try
+        {
+            Hashtable rpcForm = new Hashtable();
+            rpcForm.put("meta.symbolicName", "typeB");
+            rpcForm.put("unknown", "ignored value");
+
+            typeB.fromXmlRpc(rpcForm);
+            fail();
+        }
+        catch (TypeException e)
+        {
+            assertEquals("Unrecognised property 'unknown' for type 'typeB'", e.getMessage());
+        }
     }
 
     @SymbolicName("typeA")

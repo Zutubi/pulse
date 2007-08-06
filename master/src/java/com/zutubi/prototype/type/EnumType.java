@@ -57,4 +57,10 @@ public class EnumType extends SimpleType
         // Leave it as is (a string).
         return data;
     }
+
+    public String fromXmlRpc(Object data) throws TypeException
+    {
+        typeCheck(data, String.class);
+        return (String) data;
+    }
 }

@@ -9,8 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- *
- *
+ * Helper base class that takes care of some of the type implementation.
  */
 public abstract class AbstractType implements Type
 {
@@ -87,6 +86,14 @@ public abstract class AbstractType implements Type
     public String getSymbolicName()
     {
         return symbolicName;
+    }
+
+    protected void typeCheck(Object data, Class expectedClass) throws TypeException
+    {
+        if(!expectedClass.isInstance(data))
+        {
+            throw new TypeException("Expecting '" + expectedClass.getName() + "', found '" + data.getClass().getName() + "'");
+        }
     }
 
     public void setTypeRegistry(TypeRegistry typeRegistry)

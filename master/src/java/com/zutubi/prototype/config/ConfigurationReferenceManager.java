@@ -44,6 +44,26 @@ public class ConfigurationReferenceManager
         return recordManager.getPathForHandle(handle);
     }
 
+    /**
+     * Returns the handle for the record at the given path.
+     *
+     * @param path the path of the record
+     * @return the handle for the record at path, or 0 if there is no such
+     *         record
+     */
+    public long getHandleForPath(String path)
+    {
+        Record record = recordManager.load(path);
+        if(record == null)
+        {
+            return 0;
+        }
+        else
+        {
+            return record.getHandle();
+        }
+    }
+
     public Configuration resolveReference(String fromPath, long toHandle, Instantiator instantiator) throws TypeException
     {
         String toPath = recordManager.getPathForHandle(toHandle);

@@ -24,6 +24,26 @@ public class EnumTypeTest extends TypeTestCase
         assertEquals("M2", o);
     }
 
+    public void testFromXmlRpc() throws TypeException
+    {
+        Object o = type.fromXmlRpc("M2");
+        assertTrue(o instanceof String);
+        assertEquals("M2", o);
+    }
+
+    public void testFromXmlRpcWrongType()
+    {
+        try
+        {
+            type.fromXmlRpc(new Integer(2));
+            fail();
+        }
+        catch (TypeException e)
+        {
+            assertEquals("Expecting 'java.lang.String', found 'java.lang.Integer'", e.getMessage());
+        }
+    }
+
     private enum TestEnum
     {
         M1,

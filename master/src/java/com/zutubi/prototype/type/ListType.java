@@ -57,12 +57,12 @@ public class ListType extends CollectionType
         if (data instanceof Record)
         {
             ConfigurationList<Object> list = (ConfigurationList<Object>) instance;
-            Adder adder = new InstantiateAdder(list, instantiator);
-            addItems((Record) data, adder);
+            FromRecord adder = new InstantiateFromRecord(list, instantiator);
+            convertFromRecord((Record) data, list, adder);
         }
     }
 
-    private void addItems(Record record, Adder adder)
+    private void convertFromRecord(Record record, Collection collection, FromRecord fromRecord)
     {
         Collection<String> keys = getOrder(record);
         Type defaultType = getCollectionType();
@@ -77,28 +77,25 @@ public class ListType extends CollectionType
                 type = typeRegistry.getType(symbolicName);
                 if(type == null)
                 {
-                    adder.handleFieldError(key, "Reference to unknown type '" + symbolicName + "'");
+                    fromRecord.handleFieldError(key, "Reference to unknown type '" + symbolicName + "'");
                     continue;
                 }
             }
 
             try
             {
-                adder.add(key, type, child);
+                collection.add(fromRecord.convert(key, type, child));
             }
             catch (TypeException e)
             {
-                adder.handleFieldError(key, e.getMessage());
+                fromRecord.handleFieldError(key, e.getMessage());
             }
         }
     }
 
     public Object unstantiate(Object instance) throws TypeException
     {
-        if(!(instance instanceof List))
-        {
-            throw new TypeException("Expecting list, got '" + instance.getClass().getName() + "'");
-        }
+        typeCheck(instance, List.class);
 
         List list = (List) instance;
         Type collectionType = getCollectionType();
@@ -118,22 +115,34 @@ public class ListType extends CollectionType
         {
             // A sub-record.  Need to set the ordering based on the iteration
             // order of the list.
-            MutableRecord result = createNewRecord(true);
-            List<String> order = new ArrayList<String>(list.size());
-            for(Object o: list)
-            {
-                String key = Long.toString(handleAllocator.allocateHandle());
-                result.put(key, collectionType.unstantiate(o));
-                order.add(key);
-            }
-
-            if (isOrdered() && order.size() > 0)
-            {
-                setOrder(result, order);
-            }
-            
-            return result;
+            return convertToRecord(list, collectionType, new UnstantiateToRecord());
         }
+    }
+
+    private MutableRecord convertToRecord(Collection collection, Type collectionType, ToRecord toRecord) throws TypeException
+    {
+        MutableRecord result = createNewRecord(true);
+        List<String> order = new ArrayList<String>(collection.size());
+        for(Object o: collection)
+        {
+            String key = Long.toString(handleAllocator.allocateHandle());
+            try
+            {
+                result.put(key, toRecord.convert(collectionType, o));
+            }
+            catch (TypeException e)
+            {
+                throw new TypeException("Converting list element: " + e.getMessage());
+            }
+            order.add(key);
+        }
+
+        if (isOrdered() && order.size() > 0)
+        {
+            setOrder(result, order);
+        }
+
+        return result;
     }
 
     public Object toXmlRpc(Object data) throws TypeException
@@ -142,15 +151,10 @@ public class ListType extends CollectionType
         {
             return null;
         }
-        else if(data instanceof Record)
+        else if(getCollectionType() instanceof SimpleType)
         {
-            Record record = (Record) data;
-            Vector<Object> result = new Vector<Object>(record.size());
-            addItems(record, new XmlRpcAdder(result));
-            return result;
-        }
-        else
-        {
+            typeCheck(data, String[].class);
+
             String[] items = (String[]) data;
             Type type = getCollectionType();
             Vector<Object> result = new Vector<Object>(items.length);
@@ -160,6 +164,47 @@ public class ListType extends CollectionType
             }
 
             return result;
+        }
+        else
+        {
+            typeCheck(data, Record.class);
+
+            Record record = (Record) data;
+            Vector<Object> result = new Vector<Object>(record.size());
+            convertFromRecord(record, result, new XmlRpcFromRecord());
+            return result;
+        }
+    }
+
+    public Object fromXmlRpc(Object data) throws TypeException
+    {
+        typeCheck(data, Vector.class);
+        Vector vector = (Vector) data;
+
+        Type collectionType = getCollectionType();
+        if(collectionType instanceof SimpleType)
+        {
+            SimpleType simpleType = (SimpleType) collectionType;
+
+            String[] result = new String[vector.size()];
+            int i = 0;
+            for(Object item: vector)
+            {
+                try
+                {
+                    result[i++] = simpleType.fromXmlRpc(item);
+                }
+                catch (TypeException e)
+                {
+                    throw new TypeException("Converting list element: " + e.getMessage(), e);
+                }
+            }
+
+            return result;
+        }
+        else
+        {
+            return convertToRecord(vector, collectionType, new XmlRpcToRecord());
         }
     }
 
@@ -196,18 +241,18 @@ public class ListType extends CollectionType
         };
     }
 
-    private static interface Adder
+    private static interface FromRecord
     {
         void handleFieldError(String key, String error);
-        void add(String key, Type type, Object child) throws TypeException;
+        Object convert(String key, Type type, Object child) throws TypeException;
     }
 
-    private static class InstantiateAdder implements Adder
+    private static class InstantiateFromRecord implements FromRecord
     {
         private ConfigurationList<Object> list;
         private Instantiator instantiator;
 
-        public InstantiateAdder(ConfigurationList<Object> list, Instantiator instantiator)
+        public InstantiateFromRecord(ConfigurationList<Object> list, Instantiator instantiator)
         {
             this.list = list;
             this.instantiator = instantiator;
@@ -218,29 +263,43 @@ public class ListType extends CollectionType
             list.addFieldError(key, error);
         }
 
-        public void add(String key, Type type, Object child) throws TypeException
+        public Object convert(String key, Type type, Object child) throws TypeException
         {
-            list.add(instantiator.instantiate(key, true, type, child));
+            return instantiator.instantiate(key, true, type, child);
         }
     }
 
-    private static class XmlRpcAdder implements Adder
+    private static class XmlRpcFromRecord implements FromRecord
     {
-        private Vector<Object> vector;
-
-        public XmlRpcAdder(Vector<Object> vector)
-        {
-            this.vector = vector;
-        }
-
         public void handleFieldError(String key, String error)
         {
             // Do nothing
         }
 
-        public void add(String key, Type type, Object child) throws TypeException
+        public Object convert(String key, Type type, Object child) throws TypeException
         {
-            vector.add(type.toXmlRpc(child));
+            return type.toXmlRpc(child);
+        }
+    }
+
+    private static interface ToRecord
+    {
+        Object convert(Type type, Object data) throws TypeException;
+    }
+
+    private static class UnstantiateToRecord implements ToRecord
+    {
+        public Object convert(Type type, Object data) throws TypeException
+        {
+            return type.unstantiate(data);
+        }
+    }
+
+    private static class XmlRpcToRecord implements ToRecord
+    {
+        public Object convert(Type type, Object data) throws TypeException
+        {
+            return type.fromXmlRpc(data);
         }
     }
 }

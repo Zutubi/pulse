@@ -31,6 +31,7 @@ public class CompositeType extends AbstractType implements ComplexType
     private Map<String, TypeProperty> properties = new HashMap<String, TypeProperty>();
 
     private Map<Class, List<String>> propertiesByClass = new HashMap<Class, List<String>>();
+    private static final String XML_RPC_SYMBOLIC_NAME = "meta.symbolicName";
 
 
     public CompositeType(Class type, String symbolicName)
@@ -263,10 +264,14 @@ public class CompositeType extends AbstractType implements ComplexType
         }
         else
         {
+            typeCheck(data, Record.class);
+
             Record record = (Record) data;
             if(getSymbolicName().equals(record.getSymbolicName()))
             {
                 Hashtable<String, Object> result = new Hashtable<String, Object>();
+                result.put(XML_RPC_SYMBOLIC_NAME, getSymbolicName());
+                
                 for (Map.Entry<String, TypeProperty> entry : properties.entrySet())
                 {
                     propertyToXmlRpc(entry, record, result);
@@ -293,6 +298,79 @@ public class CompositeType extends AbstractType implements ComplexType
         if(propertyValue != null)
         {
             result.put(entry.getKey(), entry.getValue().getType().toXmlRpc(propertyValue));
+        }
+    }
+
+    public Object fromXmlRpc(Object data) throws TypeException
+    {
+        typeCheck(data, Hashtable.class);
+
+        Hashtable rpcForm = (Hashtable) data;
+        Object o = rpcForm.get(XML_RPC_SYMBOLIC_NAME);
+        if(o == null)
+        {
+            throw new TypeException("No symbolic name found in XML-RPC struct");
+        }
+
+        typeCheck(o, String.class);
+
+        String symbolicName = (String) o;
+        if(symbolicName.equals(getSymbolicName()))
+        {
+            // Check that we recognise all of the properties given.
+            for(Object key: rpcForm.keySet())
+            {
+                typeCheck(key, String.class);
+                String keyString = (String) key;
+                if(!recognisedProperty(keyString))
+                {
+                    throw new TypeException("Unrecognised property '" + keyString + "' for type '" + symbolicName + "'");
+                }
+            }
+
+            MutableRecord result = newRecord();
+            for (TypeProperty property : properties.values())
+            {
+                propertyFromXmlRpc(property, rpcForm, result);
+            }
+            for (TypeProperty property : internalProperties.values())
+            {
+                propertyFromXmlRpc(property, rpcForm, result);
+            }
+
+            return result;
+        }
+        else
+        {
+            // Actually a derived type
+            CompositeType actualType = typeRegistry.getType(symbolicName);
+            if(actualType == null)
+            {
+                throw new TypeException("XML-RPC struct has unrecognised symbolic name '" + symbolicName + "'");
+            }
+
+            return actualType.fromXmlRpc(data);
+        }
+    }
+
+    private boolean recognisedProperty(String property)
+    {
+        return property.equals(XML_RPC_SYMBOLIC_NAME) || properties.containsKey(property) || internalProperties.containsKey(property);
+    }
+
+    private void propertyFromXmlRpc(TypeProperty property, Hashtable rpcForm, MutableRecord result) throws TypeException
+    {
+        Object value = rpcForm.get(property.getName());
+        if(value != null)
+        {
+            try
+            {
+                result.put(property.getName(), property.getType().fromXmlRpc(value));
+            }
+            catch (TypeException e)
+            {
+                throw new TypeException("Converting property '" + property.getName() + "' of type '" + getSymbolicName() + "': " + e.getMessage(), e);
+            }
         }
     }
 

@@ -79,4 +79,14 @@ public interface Type
      * @throws TypeException in the event of an error
      */
     Object toXmlRpc(Object data) throws TypeException;
+
+    /**
+     * Converts the given XML-RPC form data into record form.  This is the
+     * inverse of {#link toXmlRpc}.
+     *
+     * @param data the data to be converted (XML-RPC form)
+     * @return the record formatted data
+     * @throws TypeException in the event of an error
+     */
+    Object fromXmlRpc(Object data) throws TypeException;
 }

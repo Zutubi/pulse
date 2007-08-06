@@ -122,6 +122,115 @@ public class ListTypeTest extends TypeTestCase
         assertEquals("two", v.get(1));
     }
 
+    public void testFromXmlRpc() throws TypeException
+    {
+        Hashtable<String, Object> entry = new Hashtable<String, Object>();
+        entry.put("meta.symbolicName", "mockA");
+        entry.put("a", "avalue");
+
+        Vector<Hashtable<String, Object>> rpcForm = new Vector<Hashtable<String, Object>>();
+        rpcForm.add(entry);
+
+        Object o = listType.fromXmlRpc(rpcForm);
+        assertTrue(o instanceof Record);
+        Record record = (Record) o;
+        assertEquals(1, record.size());
+        o = record.values().iterator().next();
+        assertTrue(o instanceof Record);
+        record = (Record) o;
+        assertEquals("mockA", record.getSymbolicName());
+        assertEquals(1, record.size());
+        assertEquals("avalue", record.get("a"));
+    }
+
+    public void testFromXmlRpcEmptyVector() throws TypeException
+    {
+        Vector<Hashtable<String, Object>> rpcForm = new Vector<Hashtable<String, Object>>();
+
+        Object o = listType.fromXmlRpc(rpcForm);
+        assertTrue(o instanceof Record);
+        Record record = (Record) o;
+        assertEquals(0, record.size());
+    }
+
+    public void testFromXmlRpcInvalidType()
+    {
+        try
+        {
+            listType.fromXmlRpc(new Hashtable());
+            fail();
+        }
+        catch (TypeException e)
+        {
+            assertEquals("Expecting 'java.util.Vector', found 'java.util.Hashtable'", e.getMessage());
+        }
+    }
+
+    public void testFromXmlRpcInvalidElementType()
+    {
+        Vector<String> vector = new Vector<String>();
+        vector.add("bad news");
+        try
+        {
+            listType.fromXmlRpc(vector);
+            fail();
+        }
+        catch (TypeException e)
+        {
+            assertEquals("Converting list element: Expecting 'java.util.Hashtable', found 'java.lang.String'", e.getMessage());
+        }
+    }
+
+    public void testFromXmlRpcSimple() throws TypeException
+    {
+        Vector<String> rpcForm = new Vector<String>();
+        rpcForm.add("simple");
+
+        Object o = simpleListType.fromXmlRpc(rpcForm);
+        assertTrue(o instanceof String[]);
+        String[] array = (String[]) o;
+        assertEquals(1, array.length);
+        assertEquals("simple", array[0]);
+    }
+
+    public void testFromXmlRpcSimpleEmptyVector() throws TypeException
+    {
+        Vector<String> rpcForm = new Vector<String>();
+
+        Object o = simpleListType.fromXmlRpc(rpcForm);
+        assertTrue(o instanceof String[]);
+        String[] array = (String[]) o;
+        assertEquals(0, array.length);
+    }
+
+    public void testFromXmlRpcSimpleInvalidType() throws TypeException
+    {
+        try
+        {
+            simpleListType.fromXmlRpc("string");
+            fail();
+        }
+        catch (TypeException e)
+        {
+            assertEquals("Expecting 'java.util.Vector', found 'java.lang.String'", e.getMessage());
+        }
+    }
+
+    public void testFromXmlRpcSimpleInvalidElementType() throws TypeException
+    {
+        try
+        {
+            Vector<Integer> v = new Vector<Integer>();
+            v.add(2);
+            simpleListType.fromXmlRpc(v);
+            fail();
+        }
+        catch (TypeException e)
+        {
+            assertEquals("Converting list element: Expecting 'java.lang.String', found 'java.lang.Integer'", e.getMessage());
+        }
+    }
+
     @SymbolicName("mockA")
     public static class MockA extends AbstractConfiguration
     {

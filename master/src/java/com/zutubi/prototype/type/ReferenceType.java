@@ -98,4 +98,24 @@ public class ReferenceType extends SimpleType implements Type
             return null;
         }
     }
+
+    public String fromXmlRpc(Object data) throws TypeException
+    {
+        if(data == null)
+        {
+            return "0";
+        }
+        else
+        {
+            typeCheck(data, String.class);
+            String path = (String) data;
+            long handle = configurationReferenceManager.getHandleForPath(path);
+            if(handle == 0)
+            {
+                throw new TypeException("Reference to unknown path '" + path + "'");
+            }
+
+            return Long.toString(handle);
+        }
+    }
 }

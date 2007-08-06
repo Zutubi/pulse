@@ -50,6 +50,37 @@ public class ReferenceTypeTest extends AbstractConfigurationSystemTestCase
         assertEquals(eePath, o);
     }
 
+    public void testFromXmlRpcNull() throws TypeException
+    {
+        assertEquals("0", referenceType.fromXmlRpc(null));
+    }
+
+    public void testToXmlRpcInvalidPath() throws TypeException
+    {
+        try
+        {
+            referenceType.fromXmlRpc("nosuchpath");
+            fail();
+        }
+        catch (TypeException e)
+        {
+            assertEquals("Reference to unknown path 'nosuchpath'", e.getMessage());
+        }
+    }
+
+    public void testFromXmlRpc() throws TypeException
+    {
+        Referee ee = new Referee("ee");
+        Referer er = new Referer("er", ee);
+        String erPath = configurationTemplateManager.insert("refs", er);
+        String eePath = PathUtils.getPath(erPath, "r");
+
+        Record eeRecord = configurationTemplateManager.getRecord(eePath);
+        Object o = referenceType.fromXmlRpc(eePath);
+        assertTrue(o instanceof String);
+        assertEquals(Long.toString(eeRecord.getHandle()), o);
+    }
+
     @SymbolicName("referee")
     public static class Referee extends AbstractConfiguration
     {
