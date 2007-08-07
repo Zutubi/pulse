@@ -6,7 +6,6 @@ import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.CvsRevision;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.filesystem.remote.CachingScmFile;
 import com.zutubi.pulse.scm.FileStatus;
 import com.zutubi.pulse.scm.ScmCheckoutEventHandler;
 import com.zutubi.pulse.scm.ScmException;

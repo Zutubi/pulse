@@ -1,9 +1,7 @@
 package com.zutubi.pulse.servercore.scm;
 
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.filesystem.remote.CachingScmFile;
 import com.zutubi.pulse.scm.ScmException;
-import com.zutubi.pulse.servercore.scm.cvs.CvsClient;
 
 import java.util.Map;
 import java.util.TreeMap;
