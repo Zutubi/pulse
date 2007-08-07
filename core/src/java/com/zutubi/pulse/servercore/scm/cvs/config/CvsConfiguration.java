@@ -1,15 +1,11 @@
 package com.zutubi.pulse.servercore.scm.cvs.config;
 
 import com.zutubi.config.annotations.*;
-import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.pulse.servercore.scm.cvs.CvsClient;
 import com.zutubi.pulse.servercore.scm.cvs.validation.annotation.CvsRoot;
 import com.zutubi.pulse.servercore.scm.config.ScmConfiguration;
 import com.zutubi.validation.annotations.Required;
-
-import java.io.File;
 
 /**
  *
@@ -83,10 +79,13 @@ public class CvsConfiguration extends ScmConfiguration
 
     public CvsClient createClient() throws ScmException
     {
+/*
         // use a manual autowire here since this object itself is not wired, and so
         // does not have access to the object factory.
         ConfigurationManager configurationManager = (ConfigurationManager) ComponentContext.getBean("configurationManager");
         File tmpRoot = configurationManager.getSystemPaths().getTmpRoot();
         return new CvsClient(root, module, password, branch, getFilterPaths(), tmpRoot);
+*/
+        throw new ScmException();
     }
 }
