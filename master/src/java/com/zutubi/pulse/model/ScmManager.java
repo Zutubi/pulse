@@ -1,7 +1,5 @@
 package com.zutubi.pulse.model;
 
-import java.util.List;
-
 /**
  *
  * 

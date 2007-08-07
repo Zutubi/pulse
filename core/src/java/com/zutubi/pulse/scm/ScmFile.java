@@ -11,7 +11,7 @@ public class ScmFile implements Comparable
     private String path;
     private boolean isDir;
     private ScmFile parent;
-    private String type = "text/plain";
+//    private String type = "text/plain";
 
     public ScmFile(String name, boolean isDirectory, String path)
     {
@@ -93,6 +93,7 @@ public class ScmFile implements Comparable
         return path.substring(0, index);
     }
 
+/*
     public String getMimeType()
     {
         return type;
@@ -102,6 +103,7 @@ public class ScmFile implements Comparable
     {
         this.type = type;
     }
+*/
 
     public long length()
     {
