@@ -21,8 +21,8 @@ import com.zutubi.pulse.prototype.config.project.actions.PostBuildActionConfigur
 import com.zutubi.pulse.scheduling.quartz.TimeoutRecipeJob;
 import com.zutubi.pulse.scm.FileStatus;
 import com.zutubi.pulse.scm.ScmException;
-import com.zutubi.pulse.servercore.config.CheckoutScheme;
-import com.zutubi.pulse.servercore.config.ScmConfiguration;
+import com.zutubi.pulse.servercore.scm.CheckoutScheme;
+import com.zutubi.pulse.servercore.scm.config.ScmConfiguration;
 import com.zutubi.pulse.servercore.scm.ScmClient;
 import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.util.FileSystemUtils;

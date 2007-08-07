@@ -34,7 +34,7 @@ import com.zutubi.pulse.scm.FileStatus;
 import com.zutubi.pulse.scm.ScmChangeEvent;
 import com.zutubi.pulse.scm.ScmCheckoutEventHandler;
 import com.zutubi.pulse.scm.ScmException;
-import com.zutubi.pulse.servercore.config.ScmConfiguration;
+import com.zutubi.pulse.servercore.scm.config.ScmConfiguration;
 import com.zutubi.pulse.servercore.scm.ScmCapability;
 import com.zutubi.pulse.servercore.scm.ScmClient;
 import com.zutubi.pulse.servercore.scm.ScmFile;

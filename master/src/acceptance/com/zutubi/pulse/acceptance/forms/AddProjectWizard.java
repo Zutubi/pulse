@@ -3,7 +3,7 @@ package com.zutubi.pulse.acceptance.forms;
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.project.types.AntTypeConfiguration;
-import com.zutubi.pulse.servercore.config.SvnConfiguration;
+import com.zutubi.pulse.servercore.scm.svn.config.SvnConfiguration;
 
 /**
  * Encapsulates forms for the steps of the add project wizard.

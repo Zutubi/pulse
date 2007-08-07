@@ -14,7 +14,7 @@ import com.zutubi.pulse.scheduling.Trigger;
 import com.zutubi.pulse.scm.MonitorScms;
 import com.zutubi.pulse.scm.ScmChangeEvent;
 import com.zutubi.pulse.scm.ScmException;
-import com.zutubi.pulse.servercore.config.ScmConfiguration;
+import com.zutubi.pulse.servercore.scm.config.ScmConfiguration;
 import com.zutubi.pulse.servercore.scm.ScmClient;
 import com.zutubi.pulse.util.Pair;
 import com.zutubi.util.CollectionUtils;

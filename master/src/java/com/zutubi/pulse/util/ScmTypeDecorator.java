@@ -1,6 +1,6 @@
 package com.zutubi.pulse.util;
 
-import com.zutubi.pulse.servercore.config.SvnConfiguration;
+import com.zutubi.pulse.servercore.scm.svn.config.SvnConfiguration;
 import org.displaytag.decorator.TableDecorator;
 
 /**

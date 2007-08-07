@@ -9,7 +9,7 @@ import com.zutubi.pulse.model.ResourceRequirement;
 import com.zutubi.pulse.prototype.config.project.actions.PostBuildActionConfiguration;
 import com.zutubi.pulse.prototype.config.project.changeviewer.ChangeViewerConfiguration;
 import com.zutubi.pulse.prototype.config.project.types.TypeConfiguration;
-import com.zutubi.pulse.servercore.config.ScmConfiguration;
+import com.zutubi.pulse.servercore.scm.config.ScmConfiguration;
 import com.zutubi.validation.annotations.Url;
 
 import java.util.HashMap;

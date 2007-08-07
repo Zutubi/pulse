@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.Scope;
 import com.zutubi.pulse.core.VariableHelper;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.filesystem.remote.CachingScmFile;
+import com.zutubi.pulse.servercore.scm.CachingScmFile;
 import com.zutubi.pulse.scm.FileStatus;
 import com.zutubi.pulse.scm.ScmCancelledException;
 import com.zutubi.pulse.scm.ScmCheckoutEventHandler;

@@ -1,10 +1,10 @@
-package com.zutubi.pulse.servercore.config;
+package com.zutubi.pulse.servercore.scm.p4.config;
 
 import com.zutubi.config.annotations.ConfigurationCheck;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.pulse.scm.ScmException;
-import com.zutubi.pulse.servercore.scm.ScmClient;
+import com.zutubi.pulse.servercore.scm.config.ScmConfiguration;
 import com.zutubi.pulse.servercore.scm.p4.PerforceClient;
 
 /**

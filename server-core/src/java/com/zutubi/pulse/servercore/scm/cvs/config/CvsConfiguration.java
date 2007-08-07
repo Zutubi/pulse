@@ -1,11 +1,12 @@
-package com.zutubi.pulse.servercore.config;
+package com.zutubi.pulse.servercore.scm.cvs.config;
 
 import com.zutubi.config.annotations.*;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.pulse.servercore.scm.cvs.CvsClient;
-import com.zutubi.pulse.servercore.validation.annotation.CvsRoot;
+import com.zutubi.pulse.servercore.scm.cvs.validation.annotation.CvsRoot;
+import com.zutubi.pulse.servercore.scm.config.ScmConfiguration;
 import com.zutubi.validation.annotations.Required;
 
 import java.io.File;

@@ -1,4 +1,4 @@
-package com.zutubi.pulse.filesystem.remote;
+package com.zutubi.pulse.servercore.scm;
 
 import com.zutubi.pulse.servercore.scm.ScmFile;
 

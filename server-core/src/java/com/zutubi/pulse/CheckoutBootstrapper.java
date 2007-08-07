@@ -3,7 +3,7 @@ package com.zutubi.pulse;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.scm.ScmException;
-import com.zutubi.pulse.servercore.config.ScmConfiguration;
+import com.zutubi.pulse.servercore.scm.config.ScmConfiguration;
 import com.zutubi.pulse.servercore.scm.ScmClient;
 import com.zutubi.util.logging.Logger;
 

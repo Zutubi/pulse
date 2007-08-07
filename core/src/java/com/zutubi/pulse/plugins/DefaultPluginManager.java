@@ -13,6 +13,8 @@ import org.eclipse.core.internal.registry.osgi.OSGIUtils;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.RegistryFactory;
+import org.eclipse.core.runtime.IRegistryChangeListener;
+import org.eclipse.core.runtime.IRegistryChangeEvent;
 import org.eclipse.core.runtime.adaptor.EclipseStarter;
 import org.eclipse.core.runtime.dynamichelpers.ExtensionTracker;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
@@ -187,6 +189,7 @@ public class DefaultPluginManager implements PluginManager, EventListener
 
             // Need to resolve OSGi bundles before starting (otherwise
             // Equinox barfs).
+            System.out.println("Resolving bundles.");
             resolveBundles(null);
 
             foundPlugins = sortPlugins(foundPlugins);
@@ -244,10 +247,11 @@ public class DefaultPluginManager implements PluginManager, EventListener
         if (bundle.getState() == Bundle.INSTALLED)
         {
             // Resolve the bundle first
+            System.out.println("Resolving bundle: " + bundle.getSymbolicName());
             resolveBundles(new Bundle[] { bundle });
         }
 
-        LOG.info("Starting plugin " + bundle.getSymbolicName());
+        System.out.println("Starting bundle: " + bundle.getSymbolicName());
         try
         {
             bundle.start(Bundle.START_TRANSIENT);
@@ -442,7 +446,8 @@ public class DefaultPluginManager implements PluginManager, EventListener
                 {
                     Bundle bundle = installBundle(pluginFile);
                     plugin.setBundle(bundle);
-                    
+
+                    // FIXME: bug: bundle description is not available until the bundle has been resolved...
                     BundleDescription description = ((StateManager)platformAdmin).getSystemState().getBundle(plugin.getSymbolicName(), new org.osgi.framework.Version(plugin.getVersion()));
                     plugin.setBundleDescription(description);
                 }

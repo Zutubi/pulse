@@ -1,4 +1,4 @@
-package com.zutubi.pulse.servercore.config;
+package com.zutubi.pulse.servercore.scm.config;
 
 import com.zutubi.config.annotations.ControllingCheckbox;
 import com.zutubi.config.annotations.SymbolicName;
@@ -7,6 +7,7 @@ import com.zutubi.config.annotations.Wizard;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.pulse.servercore.scm.ScmClient;
+import com.zutubi.pulse.servercore.scm.CheckoutScheme;
 import com.zutubi.validation.annotations.Numeric;
 
 import java.util.List;

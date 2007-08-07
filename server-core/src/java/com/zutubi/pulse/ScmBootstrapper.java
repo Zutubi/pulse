@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.scm.ScmCancelledException;
 import com.zutubi.pulse.scm.ScmCheckoutEventHandler;
-import com.zutubi.pulse.servercore.config.ScmConfiguration;
+import com.zutubi.pulse.servercore.scm.config.ScmConfiguration;
 import com.zutubi.pulse.servercore.scm.ScmClient;
 import com.zutubi.util.ForkOutputStream;
 import com.zutubi.util.IOUtils;
