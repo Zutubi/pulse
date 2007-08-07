@@ -24,7 +24,6 @@
         <action name="signup" class="com.zutubi.pulse.web.admin.user.SignupUserAction">
             <result name="cancel" type="redirect">/</result>
             <result name="input" type="velocity">signup.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
             <result name="success" type="redirect">/</result>
             <result name="disabled" type="velocity">signup.vm</result>
         </action>
@@ -41,7 +40,6 @@
         <action name="viewServerQueues" class="com.zutubi.pulse.web.server.ViewServerQueuesAction">
             <interceptor-ref name="ajaxReadOnlyStack"/>
             <result name="success" type="velocity">view-server-queues.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="cancelBuild" class="com.zutubi.pulse.web.server.CancelBuildAction">
@@ -55,21 +53,17 @@
         <action name="viewAgentStatus" class="com.zutubi.pulse.web.agents.ViewAgentStatusAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">/view-agent-status.vm</result>
-            <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 
         <action name="serverMessages" class="com.zutubi.pulse.web.agents.ServerMessagesAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">server-messages.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="internalError" class="com.zutubi.pulse.web.InternalErrorAction">
             <result name="success" type="velocity">internal-error.vm</result>
             <result name="input" type="velocity">internal-error.vm</result>
             <result name="cancel" type="velocity">internal-error.vm</result>
-            <!-- sheesh, that's harsh -->
-            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="404" class="com.zutubi.pulse.web.FourOhFourAction">
@@ -86,50 +80,42 @@
         <action name="viewBuild" class="com.zutubi.pulse.web.project.ViewBuildAction">
             <interceptor-ref name="ajaxReadOnlyStack"/>
             <result name="success" type="velocity">view-build.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="viewChanges" class="com.zutubi.pulse.web.project.ViewChangesAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">view-changes.vm</result>
             <result name="input" type="velocity">view-changes.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="viewPersonalChanges" class="com.zutubi.pulse.web.project.ViewPersonalChangesAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">view-personal-changes.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="viewTests" class="com.zutubi.pulse.web.project.ViewBuildAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">view-tests.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="viewTestSuite" class="com.zutubi.pulse.web.project.ViewTestSuiteAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">view-test-suite.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="viewCommandLog" class="com.zutubi.pulse.web.project.ViewBuildAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">view-command-log.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="viewBuildArtifacts" class="com.zutubi.pulse.web.project.ViewArtifactsAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">view-artifacts.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="viewBuildFile" class="com.zutubi.pulse.web.project.ViewBuildFileAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">view-build-file.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="downloadBuildFile" class="com.zutubi.pulse.web.project.DownloadBuildFileAction">
@@ -138,7 +124,6 @@
                 <param name="contentType">${contentType}</param>
                 <param name="contentDisposition">filename="pulse.xml"</param>
             </result>
-            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="downloadProjectBuildFile" class="com.zutubi.pulse.web.project.DownloadProjectBuildFileAction">
@@ -146,7 +131,6 @@
             <result name="success" type="stream">
                 <param name="contentType">${contentType}</param>
             </result>
-            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="downloadDirectoryArtifact" class="com.zutubi.pulse.web.project.DownloadDirectoryArtifactAction">
@@ -155,13 +139,11 @@
                 <param name="contentType">${contentType}</param>
                 <param name="contentDisposition">filename="${filename}"</param>
             </result>
-            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="tailRecipeLog" class="com.zutubi.pulse.web.project.TailRecipeLogAction">
             <interceptor-ref name="completeStack"/>
             <result name="success" type="velocity">tail-recipe-log.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="viewRecipeLog" class="com.zutubi.pulse.web.project.ViewRecipeLogAction">
@@ -170,54 +152,45 @@
                 <param name="contentType">text/plain</param>
                 <param name="contentDisposition">filename="recipe.log"</param>
             </result>
-            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="viewChangelist" class="com.zutubi.pulse.web.project.ViewChangelistAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">view-changelist.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="triggerBuild" class="com.zutubi.pulse.web.project.TriggerBuildAction">
             <result name="success" type="redirect">currentBuild.action?id=${projectId}</result>
             <result name="prompt" type="chain">editBuildProperties!input</result>
-            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="editBuildProperties!input" class="com.zutubi.pulse.web.project.EditBuildPropertiesAction" method="doInput">
             <result name="input" type="velocity">edit-build-properties.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="editBuildProperties" class="com.zutubi.pulse.web.project.EditBuildPropertiesAction">
             <result name="input" type="velocity">edit-build-properties.vm</result>
             <result name="success" type="redirect">currentBuild.action?id=${projectId}</result>
             <result name="cancel" type="redirect">currentBuild.action?id=${projectId}</result>
-            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="forceCleanBuild" class="com.zutubi.pulse.web.project.ForceCleanBuildAction">
             <result name="success" type="redirect">/viewBuildSpecification.action?id=${id}&amp;projectId=${projectId}</result>
-            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="viewArtifact" class="com.zutubi.pulse.web.project.ViewArtifactAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">view-artifact.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="viewArtifactt" class="com.zutubi.pulse.web.project.TemporaryViewArtifactAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">view-artifact.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="browseProjectDir" class="com.zutubi.pulse.web.project.BrowseProjectDirAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">browse-project-dir.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="cat" class="com.zutubi.pulse.web.vfs.CatAction">
@@ -226,7 +199,6 @@
                 <param name="contentType">${contentType}</param>
                 <param name="contentDisposition">filename="${filename}"</param>
             </result>
-            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="zip" class="com.zutubi.pulse.web.vfs.ZipAction">
@@ -235,7 +207,6 @@
                 <param name="contentType">${contentType}</param>
                 <param name="contentDisposition">filename="${filename}"</param>
             </result>
-            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="browseProjectScm" class="com.zutubi.pulse.web.project.BrowseProjectScmAction">
@@ -259,7 +230,6 @@
             <result name="input" type="velocity">confirm-project-delete.vm</result>
             <result name="success" type="redirect">/viewProjects.action</result>
             <result name="cancel" type="redirect">/currentBuild.action?id=${id}</result>
-            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="currentBuild" class="com.zutubi.pulse.web.project.ProjectHomeAction">
@@ -270,13 +240,11 @@
 
         <action name="projectState" class="com.zutubi.pulse.web.project.ProjectStateAction">
             <result name="success" type="redirect">/currentBuild.action?id=${id}</result>
-            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="history" class="com.zutubi.pulse.web.project.HistoryAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">history.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="viewTriggers" class="com.zutubi.pulse.web.scheduling.ViewTriggersAction">
@@ -298,12 +266,10 @@
 
         <action name="deleteBuild" class="com.zutubi.pulse.web.project.DeleteBuildAction">
             <result name="success" type="redirect">/currentBuild.action?id=${result.project.id}</result>
-            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="rss" class="com.zutubi.pulse.web.rss.BuildResultsRssAction">
             <interceptor-ref name="completeReadOnlyStack"/>
-            <result name="disabled" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="projectReports" class="com.zutubi.pulse.web.project.ViewReportsAction">
@@ -319,14 +285,12 @@
         <action name="home" class="com.zutubi.pulse.web.user.DashboardAction">
             <interceptor-ref name="ajaxReadOnlyStack"/>
             <result name="success" type="velocity">/dashboard.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
             <result name="guest" type="redirect">/viewProjects.action</result>
         </action>
 
         <action name="my" class="com.zutubi.pulse.web.user.MyBuildsAction">
             <interceptor-ref name="ajaxReadOnlyStack"/>
             <result name="success" type="velocity">/my-builds.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
             <result name="guest" type="redirect">/viewProjects.action</result>
         </action>
     </package>
@@ -344,12 +308,10 @@
         <default-interceptor-ref name="completeStack"/>
 
         <action name="hideDashboardProject" class="com.zutubi.pulse.web.user.HideDashboardProjectAction">
-            <result name="error" type="velocity">generic-error.vm</result>
             <result name="success" type="redirect">/dashboard/home/</result>
         </action>
 
         <action name="hideDashboardGroup" class="com.zutubi.pulse.web.user.HideDashboardGroupAction">
-            <result name="error" type="velocity">generic-error.vm</result>
             <result name="success" type="redirect">/dashboard/home/</result>
         </action>
     </package>
@@ -401,7 +363,6 @@
 
         <action name="viewUser" class="com.zutubi.pulse.web.admin.user.ViewUserAction">
             <interceptor-ref name="completeReadOnlyStack"/>
-            <result name="input" type="velocity">/generic-error.vm</result>
             <result name="success" type="velocity">view-user.vm</result>
         </action>
 
@@ -466,7 +427,6 @@
         <action name="viewGroupMembers" class="com.zutubi.pulse.web.admin.user.ViewGroupMembersAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">view-group-members.vm</result>
-            <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 
         <action name="addGroupMembers" class="com.zutubi.pulse.web.admin.user.AddGroupMembersAction">
@@ -477,11 +437,9 @@
 
         <action name="removeGroupMember" class="com.zutubi.pulse.web.admin.user.RemoveGroupMemberAction">
             <result name="success" type="redirect">viewGroupMembers.action?groupId=${groupId}&amp;startPage=${startPage}</result>
-            <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 
         <action name="editLicense" class="com.zutubi.pulse.web.admin.ManageLicenseAction">
-            <result name="error" type="velocity">/generic-error.vm</result>
             <result name="input" type="velocity">edit-license.vm</result>
             <result name="success" type="redirect">/admin/serverSettings.action</result>
             <result name="cancel" type="redirect">/admin/serverSettings.action</result>
@@ -542,37 +500,30 @@
 
         <action name="viewProjectsPanel" class="com.zutubi.pulse.web.project.ViewProjectsAction">
             <result name="success" type="velocity">view-projects-panel.vm</result>
-            <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 
         <action name="projectHomePanel" class="com.zutubi.pulse.web.project.ProjectHomeAction">
             <result name="success" type="velocity">project-home-panel.vm</result>
-            <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 
         <action name="viewBuildPanel" class="com.zutubi.pulse.web.project.ViewBuildAction">
             <result name="success" type="velocity">view-build-panel.vm</result>
-            <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 
         <action name="tailRecipeLogPanel" class="com.zutubi.pulse.web.project.TailRecipeLogAction">
             <result name="success" type="velocity">tail-recipe-log-panel.vm</result>
-            <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 
         <action name="historyPanel" class="com.zutubi.pulse.web.project.HistoryAction">
             <result name="success" type="velocity">history-panel.vm</result>
-            <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
         <action name="viewAgentsPanel" class="com.zutubi.pulse.web.agents.ViewAgentsAction">
             <result name="success" type="velocity">view-agents-panel.vm</result>
-            <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 
         <action name="viewServerQueuesPanel" class="com.zutubi.pulse.web.server.ViewServerQueuesAction">
             <result name="success" type="velocity">view-server-queues-panel.vm</result>
-            <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 
         <action name="ls" class="com.zutubi.pulse.web.vfs.LsAction">
@@ -687,7 +638,6 @@
 
         <action name="browseResources" class="com.zutubi.pulse.web.project.BrowseResourcesAction">
             <result name="success" type="velocity">resource-browser.vm</result>
-            <result name="error" type="velocity">/generic-error.vm</result>
         </action>
 
         <action name="new-folder" class="com.zutubi.pulse.web.ActionSupport">
