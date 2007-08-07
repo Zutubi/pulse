@@ -7,7 +7,7 @@ import com.zutubi.pulse.core.VariableHelper;
 import com.zutubi.pulse.core.model.FileRevision;
 import com.zutubi.pulse.core.model.Property;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.servercore.scm.config.ScmConfiguration;
+import com.zutubi.pulse.scm.config.ScmConfiguration;
 import com.zutubi.util.StringUtils;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;

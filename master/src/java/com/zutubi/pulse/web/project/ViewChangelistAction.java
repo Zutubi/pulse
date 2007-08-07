@@ -10,7 +10,7 @@ import com.zutubi.pulse.model.ChangelistUtils;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.persistence.ChangelistDao;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
-import com.zutubi.pulse.servercore.scm.config.ScmConfiguration;
+import com.zutubi.pulse.scm.config.ScmConfiguration;
 import com.zutubi.pulse.web.ActionSupport;
 
 import java.util.List;

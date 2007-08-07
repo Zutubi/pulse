@@ -1,7 +1,7 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.core.*;
-import com.zutubi.pulse.servercore.scm.config.ScmConfiguration;
+import com.zutubi.pulse.scm.config.ScmConfiguration;
 import com.zutubi.pulse.util.FileSystemUtils;
 
 import java.io.File;

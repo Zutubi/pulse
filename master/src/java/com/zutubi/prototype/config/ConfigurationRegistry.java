@@ -24,10 +24,10 @@ import com.zutubi.pulse.prototype.config.user.*;
 import com.zutubi.pulse.prototype.config.user.contacts.ContactConfiguration;
 import com.zutubi.pulse.prototype.config.user.contacts.EmailContactConfiguration;
 import com.zutubi.pulse.prototype.config.user.contacts.JabberContactConfiguration;
-import com.zutubi.pulse.servercore.scm.cvs.config.CvsConfiguration;
-import com.zutubi.pulse.servercore.scm.svn.config.SvnConfiguration;
-import com.zutubi.pulse.servercore.scm.p4.config.PerforceConfiguration;
-import com.zutubi.pulse.servercore.scm.config.ScmConfiguration;
+import com.zutubi.pulse.scm.cvs.config.CvsConfiguration;
+import com.zutubi.pulse.scm.svn.config.SvnConfiguration;
+import com.zutubi.pulse.scm.p4.config.PerforceConfiguration;
+import com.zutubi.pulse.scm.config.ScmConfiguration;
 import com.zutubi.util.logging.Logger;
 
 import java.util.HashMap;

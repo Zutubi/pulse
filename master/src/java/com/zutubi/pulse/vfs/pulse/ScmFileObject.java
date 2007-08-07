@@ -1,7 +1,7 @@
 package com.zutubi.pulse.vfs.pulse;
 
 import com.zutubi.pulse.scm.ScmException;
-import com.zutubi.pulse.servercore.scm.ScmFile;
+import com.zutubi.pulse.scm.ScmFile;
 import com.zutubi.pulse.vfs.FileAction;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;

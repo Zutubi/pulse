@@ -15,7 +15,7 @@ import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
-import com.zutubi.pulse.servercore.scm.svn.config.SvnConfiguration;
+import com.zutubi.pulse.scm.svn.config.SvnConfiguration;
 import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.services.UpgradeState;
 import com.zutubi.pulse.test.PulseTestCase;

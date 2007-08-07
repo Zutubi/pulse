@@ -8,8 +8,8 @@ import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.project.BuildOptionsConfiguration;
 import com.zutubi.pulse.scm.ScmException;
-import com.zutubi.pulse.servercore.scm.config.ScmConfiguration;
-import com.zutubi.pulse.servercore.scm.ScmClient;
+import com.zutubi.pulse.scm.ScmClient;
+import com.zutubi.pulse.scm.config.ScmConfiguration;
 import com.zutubi.pulse.test.PulseTestCase;
 
 import java.util.Arrays;
