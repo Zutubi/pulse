@@ -2,6 +2,9 @@ package com.zutubi.pulse.acceptance;
 
 import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.forms.AddProjectWizard;
+import com.zutubi.pulse.acceptance.forms.SelectTypeState;
+import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.RandomUtils;
 import junit.framework.TestCase;
@@ -77,5 +80,53 @@ public class SeleniumTestBase extends TestCase
     protected void waitForElement(String id, long timeout)
     {
         SeleniumUtils.waitForElement(selenium, id, timeout);
+    }
+
+    protected void addProject(String name)
+    {
+        addProject(name, false, "global project template", true);
+    }
+
+    protected void addProject(String name, boolean template, String parentName, boolean parentIsTemplate)
+    {
+        ProjectHierarchyPage globalPage = new ProjectHierarchyPage(selenium, parentName, parentIsTemplate);
+        globalPage.waitFor();
+        if (template)
+        {
+            globalPage.clickAddTemplate();
+        }
+        else
+        {
+            globalPage.clickAdd();
+        }
+
+        AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(selenium);
+        projectState.waitFor();
+        projectState.nextFormElements(name, "test description", "http://test.com/");
+
+        SelectTypeState scmTypeState = new SelectTypeState(selenium);
+        scmTypeState.waitFor();
+        scmTypeState.nextFormElements("svn");
+
+        AddProjectWizard.SvnState svnState = new AddProjectWizard.SvnState(selenium);
+        svnState.waitFor();
+        svnState.nextFormElements("svn://localhost/test/trunk", null, null, null, null, null);
+
+        SelectTypeState projectTypeState = new SelectTypeState(selenium);
+        projectTypeState.waitFor();
+        scmTypeState.nextFormElements("ant");
+
+        AddProjectWizard.AntState antState = new AddProjectWizard.AntState(selenium);
+        antState.waitFor();
+        antState.finishFormElements(null, "build.xml", null, null);
+
+        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, name, template);
+        hierarchyPage.waitFor();
+        hierarchyPage.assertPresent();
+    }
+
+    protected void ensureProject(String name, boolean template)
+    {
+        
     }
 }

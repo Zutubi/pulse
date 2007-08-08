@@ -42,6 +42,11 @@ public class ProjectHierarchyPage extends SeleniumPage
         selenium.click(LINK_ADD);
     }
 
+    public void clickAddTemplate()
+    {
+        selenium.click(LINK_ADD_TEMPLATE);
+    }
+
     public void setTemplate(boolean template)
     {
         this.template = template;
