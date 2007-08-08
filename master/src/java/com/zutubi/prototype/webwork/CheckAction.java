@@ -1,7 +1,6 @@
 package com.zutubi.prototype.webwork;
 
 import com.opensymphony.xwork.ActionContext;
-import com.zutubi.pulse.core.config.ConfigurationCheckHandler;
 import com.zutubi.prototype.config.ConfigurationReferenceManager;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.SimpleInstantiator;
@@ -11,6 +10,7 @@ import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.pulse.core.config.ConfigurationCheckHandler;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -70,8 +70,8 @@ public class CheckAction extends PrototypeSupport
 
         try
         {
-            Configuration checkInstance = configurationTemplateManager.validate(null, null, checkRecord);
-            Configuration mainInstance = configurationTemplateManager.validate(PathUtils.getParentPath(path), PathUtils.getBaseName(path), record);
+            Configuration checkInstance = configurationTemplateManager.validate(null, null, checkRecord, false);
+            Configuration mainInstance = configurationTemplateManager.validate(PathUtils.getParentPath(path), PathUtils.getBaseName(path), record, false);
             if (!checkInstance.isValid() || !mainInstance.isValid())
             {
                 PrototypeUtils.mapErrors(checkInstance, this, null);

@@ -17,6 +17,7 @@ public class CompositeTypeTest extends TypeTestCase
     private CompositeType basicType;
     private CompositeType typeA;
     private CompositeType typeB;
+    private CompositeType typeBExtension;
 
     protected void setUp() throws Exception
     {
@@ -25,6 +26,8 @@ public class CompositeTypeTest extends TypeTestCase
         basicType = typeRegistry.register(BasicTypes.class);
         typeA = typeRegistry.register(ObjectTypeA.class);
         typeB = typeRegistry.getType(ObjectTypeB.class);
+        typeBExtension = typeRegistry.register(ObjectTypeBExtension.class);
+        typeB.addExtension("typeBExtension");
     }
 
     protected void tearDown() throws Exception
@@ -232,6 +235,46 @@ public class CompositeTypeTest extends TypeTestCase
         }
     }
 
+    public void testIsValid()
+    {
+        assertTrue(typeA.isValid(new ObjectTypeA()));
+    }
+
+    public void testIsValidDirectlyInvalid()
+    {
+        ObjectTypeA a = new ObjectTypeA();
+        a.addInstanceError("error");
+        assertFalse(typeA.isValid(a));
+    }
+
+    public void testIsValidNestedInvalid()
+    {
+        ObjectTypeA a = new ObjectTypeA();
+        a.getA().addInstanceError("error");
+        assertFalse(typeA.isValid(a));
+    }
+
+    public void testIsValidExtensionType()
+    {
+        ObjectTypeBExtension extension = new ObjectTypeBExtension();
+        ObjectTypeC c = new ObjectTypeC();
+        c.addInstanceError("error");
+        extension.setC(c);
+        assertFalse(typeB.isValid(extension));
+    }
+
+    public void testIsValidExtensionProperty()
+    {
+        ObjectTypeC c = new ObjectTypeC();
+        c.addInstanceError("error");
+        ObjectTypeBExtension extension = new ObjectTypeBExtension();
+        extension.setC(c);
+        ObjectTypeA a = new ObjectTypeA();
+        a.setB(extension);
+        assertFalse(typeA.isValid(a));
+    }
+
+
     @SymbolicName("typeA")
     public static class ObjectTypeA extends AbstractConfiguration
     {
@@ -304,6 +347,28 @@ public class CompositeTypeTest extends TypeTestCase
         {
             return (a != null ? a.hashCode() : 0);
         }
+    }
+
+    @SymbolicName("typeBExtension")
+    public static class ObjectTypeBExtension extends ObjectTypeB
+    {
+        private ObjectTypeC c;
+
+        public ObjectTypeC getC()
+        {
+            return c;
+        }
+
+        public void setC(ObjectTypeC c)
+        {
+            this.c = c;
+        }
+    }
+
+    @SymbolicName("typeC")
+    public static class ObjectTypeC extends AbstractConfiguration
+    {
+
     }
 
     @SymbolicName("basicTypes")

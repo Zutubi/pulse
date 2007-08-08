@@ -60,7 +60,7 @@ public class SaveAction extends PrototypeSupport
         String baseName = PathUtils.getBaseName(path);
         try
         {
-            Configuration instance = configurationTemplateManager.validate(parentPath, baseName, record);
+            Configuration instance = configurationTemplateManager.validate(parentPath, baseName, record, false);
             if (!instance.isValid())
             {
                 PrototypeUtils.mapErrors(instance, this, null);

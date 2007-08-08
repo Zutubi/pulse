@@ -346,7 +346,7 @@ public abstract class AbstractTypeWizard implements Wizard
         {
             try
             {
-                Configuration configuration = configurationTemplateManager.validate(parentPath, null, currentState.getDataRecord(), ignoredFields);
+                Configuration configuration = configurationTemplateManager.validate(parentPath, null, currentState.getDataRecord(), false, ignoredFields);
                 PrototypeUtils.mapErrors(configuration, validationCallback, null);
                 return configuration.isValid();
             }

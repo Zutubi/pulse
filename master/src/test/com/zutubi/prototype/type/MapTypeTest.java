@@ -4,6 +4,7 @@ import com.zutubi.config.annotations.ID;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
+import com.zutubi.pulse.core.config.ConfigurationMap;
 
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -166,12 +167,47 @@ public class MapTypeTest extends TypeTestCase
         }
     }
 
+    public void testIsValid()
+    {
+        ConfigurationMap<MockA> map = new ConfigurationMap<MockA>();
+        map.put("a", new MockA("a"));
+        assertTrue(mapType.isValid(map));
+    }
+
+    public void testIsValidDirectlyInvalid()
+    {
+        ConfigurationMap<MockA> map = new ConfigurationMap<MockA>();
+        map.addInstanceError("error");
+        map.put("a", new MockA("a"));
+        assertFalse(mapType.isValid(map));
+    }
+
+    public void testIsValidElementInvalid()
+    {
+        MockA element = new MockA("a");
+        element.addInstanceError("error");
+        ConfigurationMap<MockA> map = new ConfigurationMap<MockA>();
+        map.put("a", element);
+        assertFalse(mapType.isValid(map));
+    }
+
+    public void testIsValidElementIndirectlyInvalid()
+    {
+        MockB nested = new MockB();
+        nested.addInstanceError("error");
+        MockA element = new MockA("a");
+        element.setMockB(nested);
+        ConfigurationMap<MockA> map = new ConfigurationMap<MockA>();
+        map.put("a", element);
+        assertFalse(mapType.isValid(map));
+    }
 
     @SymbolicName("mockA")
     public static class MockA extends AbstractConfiguration
     {
         @ID
         private String a;
+        private MockB mockB;
 
         public MockA()
         {
@@ -207,5 +243,20 @@ public class MapTypeTest extends TypeTestCase
         {
             return (a != null ? a.hashCode() : 0);
         }
+
+        public MockB getMockB()
+        {
+            return mockB;
+        }
+
+        public void setMockB(MockB mockB)
+        {
+            this.mockB = mockB;
+        }
+    }
+
+    @SymbolicName("mockB")
+    public static class MockB extends AbstractConfiguration
+    {
     }
 }

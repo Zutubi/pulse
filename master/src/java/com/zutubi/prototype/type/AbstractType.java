@@ -88,7 +88,7 @@ public abstract class AbstractType implements Type
         return symbolicName;
     }
 
-    protected void typeCheck(Object data, Class expectedClass) throws TypeException
+    protected static void typeCheck(Object data, Class expectedClass) throws TypeException
     {
         if(!expectedClass.isInstance(data))
         {

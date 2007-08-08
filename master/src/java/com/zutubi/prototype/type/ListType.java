@@ -4,6 +4,7 @@ import com.zutubi.prototype.type.record.HandleAllocator;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.config.ConfigurationList;
 
 import java.util.*;
@@ -211,6 +212,33 @@ public class ListType extends CollectionType
     public String getInsertionPath(String path, Record record)
     {
         return PathUtils.getPath(path, Long.toString(handleAllocator.allocateHandle()));
+    }
+
+    public boolean isValid(Configuration instance)
+    {
+        ConfigurationList list = (ConfigurationList) instance;
+        if(getCollectionType() instanceof SimpleType)
+        {
+            return list.isValid();
+        }
+        else
+        {
+            ComplexType collectionType = (ComplexType) getCollectionType();
+            if(! list.isValid())
+            {
+                return false;
+            }
+
+            for(Object element: list)
+            {
+                if(!collectionType.isValid((Configuration) element))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
     }
 
     public String getSavePath(String path, Record record)

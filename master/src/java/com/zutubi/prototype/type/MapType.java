@@ -4,6 +4,7 @@ import com.zutubi.config.annotations.ID;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.config.ConfigurationMap;
 import com.zutubi.util.AnnotationUtils;
 import com.zutubi.util.Sort;
@@ -50,11 +51,11 @@ public class MapType extends CollectionType
     @SuppressWarnings({ "unchecked" })
     public void initialise(Object instance, Object data, Instantiator instantiator)
     {
-        ConfigurationMap<String, Object> map = (ConfigurationMap<String, Object>) instance;
+        ConfigurationMap<Configuration> map = (ConfigurationMap<Configuration>) instance;
         covertFromRecord((Record) data, map, new InstantiateFromRecord(map, instantiator));
     }
 
-    private void covertFromRecord(Record record, Map<String, Object> result, FromRecord fromRecord)
+    private void covertFromRecord(Record record, Map result, FromRecord fromRecord)
     {
         Type defaultType = getCollectionType();
         for (String key : record.keySet())
@@ -185,6 +186,27 @@ public class MapType extends CollectionType
         return PathUtils.getPath(path, (String) record.get(keyProperty));
     }
 
+    public boolean isValid(Configuration instance)
+    {
+        ConfigurationMap<Configuration> map = (ConfigurationMap) instance;
+
+        if(!map.isValid())
+        {
+            return false;
+        }
+
+        CompositeType collectionType = (CompositeType) getCollectionType();
+        for(Configuration c: map.values())
+        {
+            if(!collectionType.isValid(c))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public String getSavePath(String path, Record record)
     {
         return PathUtils.getPath(PathUtils.getParentPath(path), (String) record.get(keyProperty));
@@ -198,10 +220,10 @@ public class MapType extends CollectionType
 
     private static class InstantiateFromRecord implements FromRecord
     {
-        private ConfigurationMap<String, Object> map;
+        private ConfigurationMap<? extends Configuration> map;
         private Instantiator instantiator;
 
-        public InstantiateFromRecord(ConfigurationMap<String, Object> map, Instantiator instantiator)
+        public InstantiateFromRecord(ConfigurationMap<? extends Configuration> map, Instantiator instantiator)
         {
             this.map = map;
             this.instantiator = instantiator;

@@ -12,11 +12,16 @@ import com.zutubi.util.logging.Logger;
 import java.util.*;
 
 /**
- *
+ * A composite represents a user-defined Java type, i.e. a class.  Composites
+ * have properties based on the Java bean properties of the class, along with
+ * (in some cases) extension properties which are not defined directly on the
+ * class but are added at run time.
  */
 public class CompositeType extends AbstractType implements ComplexType
 {
     private static final Logger LOG = Logger.getLogger(CompositeType.class);
+
+    private static final String XML_RPC_SYMBOLIC_NAME = "meta.symbolicName";
 
     /**
      * The list of symbolic names of types that 'extend' this type.
@@ -31,8 +36,6 @@ public class CompositeType extends AbstractType implements ComplexType
     private Map<String, TypeProperty> properties = new HashMap<String, TypeProperty>();
 
     private Map<Class, List<String>> propertiesByClass = new HashMap<Class, List<String>>();
-    private static final String XML_RPC_SYMBOLIC_NAME = "meta.symbolicName";
-
 
     public CompositeType(Class type, String symbolicName)
     {
@@ -234,26 +237,26 @@ public class CompositeType extends AbstractType implements ComplexType
     {
         MutableRecord result;
 
-        if (extensions.size() > 0)
+        CompositeType actualType = typeRegistry.getType(instance.getClass());
+        if (actualType != this)
         {
-            CompositeType actualType = typeRegistry.getType(instance.getClass());
             return actualType.unstantiate(instance);
         }
         else
         {
             result = newRecord();
-        }
 
-        for (TypeProperty property : properties.values())
-        {
-            unstantiateProperty(property, instance, result);
-        }
-        for (TypeProperty property : internalProperties.values())
-        {
-            unstantiateProperty(property, instance, result);
-        }
+            for (TypeProperty property : properties.values())
+            {
+                unstantiateProperty(property, instance, result);
+            }
+            for (TypeProperty property : internalProperties.values())
+            {
+                unstantiateProperty(property, instance, result);
+            }
 
-        return result;
+            return result;
+        }
     }
 
     public Object toXmlRpc(Object data) throws TypeException
@@ -301,11 +304,15 @@ public class CompositeType extends AbstractType implements ComplexType
         }
     }
 
-    public Object fromXmlRpc(Object data) throws TypeException
+    /**
+     * Returns the type of the given XML-RPC struct in symbolic name form.
+     *
+     * @param rpcForm the XML-RPC struct to retrieve the type for
+     * @return the symbolic name of the type of the struct
+     * @throws TypeException if no symbolic name is found in the struct
+     */
+    public static String getTypeFromXmlRpc(Hashtable rpcForm) throws TypeException
     {
-        typeCheck(data, Hashtable.class);
-
-        Hashtable rpcForm = (Hashtable) data;
         Object o = rpcForm.get(XML_RPC_SYMBOLIC_NAME);
         if(o == null)
         {
@@ -313,8 +320,15 @@ public class CompositeType extends AbstractType implements ComplexType
         }
 
         typeCheck(o, String.class);
+        return (String) o;
+    }
 
-        String symbolicName = (String) o;
+    public MutableRecord fromXmlRpc(Object data) throws TypeException
+    {
+        typeCheck(data, Hashtable.class);
+
+        Hashtable rpcForm = (Hashtable) data;
+        String symbolicName = getTypeFromXmlRpc(rpcForm);
         if(symbolicName.equals(getSymbolicName()))
         {
             // Check that we recognise all of the properties given.
@@ -423,13 +437,6 @@ public class CompositeType extends AbstractType implements ComplexType
 
     private MutableRecord newRecord()
     {
-        if (extensions.size() > 0)
-        {
-            // Can only be created when the extension type is specified,
-            // there is no default initialisation.
-            return null;
-        }
-
         MutableRecordImpl record = new MutableRecordImpl();
         record.setSymbolicName(getSymbolicName());
 
@@ -473,6 +480,43 @@ public class CompositeType extends AbstractType implements ComplexType
     {
         TypeProperty property = properties.get(propertyName);
         return property == null ? null : property.getType().getActualType(propertyValue);
+    }
+
+    public boolean isValid(Configuration instance)
+    {
+        CompositeType actualType = typeRegistry.getType(instance.getClass());
+        if(actualType != this)
+        {
+            return actualType.isValid(instance);
+        }
+        
+        if(!instance.isValid())
+        {
+            return false;
+        }
+
+        for(String propertyName: getPropertyNames(ComplexType.class))
+        {
+            TypeProperty property = getProperty(propertyName);
+            try
+            {
+                Configuration nestedInstance = (Configuration) property.getValue(instance);
+                if (nestedInstance != null)
+                {
+                    if(!((ComplexType) property.getType()).isValid(nestedInstance))
+                    {
+                        return false;
+                    }
+                }
+            }
+            catch(Exception e)
+            {
+                LOG.severe(e);
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public Type getPropertyType(String key)

@@ -1,17 +1,17 @@
 package com.zutubi.pulse.core.config;
 
-import java.util.Map;
-import java.util.LinkedHashMap;
-import java.util.Set;
 import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A map type used within the configuration system, implementing both Map and
  * Configuration.
  */
-public class ConfigurationMap<K, V> extends AbstractConfiguration implements Map<K, V>
+public class ConfigurationMap<V extends Configuration> extends AbstractConfiguration implements Map<String, V>
 {
-    private Map<K, V> delegate;
+    private Map<String, V> delegate;
 
     public ConfigurationMap()
     {
@@ -20,7 +20,7 @@ public class ConfigurationMap<K, V> extends AbstractConfiguration implements Map
 
     public ConfigurationMap(int capacity)
     {
-        delegate = new LinkedHashMap<K,V>(capacity);
+        delegate = new LinkedHashMap<String,V>(capacity);
     }
 
     public int size()
@@ -48,7 +48,7 @@ public class ConfigurationMap<K, V> extends AbstractConfiguration implements Map
         return delegate.get(key);
     }
 
-    public V put(K key, V value)
+    public V put(String key, V value)
     {
         return delegate.put(key, value);
     }
@@ -58,7 +58,7 @@ public class ConfigurationMap<K, V> extends AbstractConfiguration implements Map
         return delegate.remove(key);
     }
 
-    public void putAll(Map<? extends K, ? extends V> t)
+    public void putAll(Map<? extends String, ? extends V> t)
     {
         delegate.putAll(t);
     }
@@ -68,7 +68,7 @@ public class ConfigurationMap<K, V> extends AbstractConfiguration implements Map
         delegate.clear();
     }
 
-    public Set<K> keySet()
+    public Set<String> keySet()
     {
         return delegate.keySet();
     }
@@ -78,7 +78,7 @@ public class ConfigurationMap<K, V> extends AbstractConfiguration implements Map
         return delegate.values();
     }
 
-    public Set<Entry<K, V>> entrySet()
+    public Set<Entry<String, V>> entrySet()
     {
         return delegate.entrySet();
     }

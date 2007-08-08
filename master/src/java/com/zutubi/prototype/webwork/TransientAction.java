@@ -137,7 +137,7 @@ public abstract class TransientAction<T> extends ActionSupport implements Messag
         Configuration instance = null;
         try
         {
-            instance = configurationTemplateManager.validate(parentPath, baseName, record);
+            instance = configurationTemplateManager.validate(parentPath, baseName, record, false);
             if (!instance.isValid())
             {
                 PrototypeUtils.mapErrors(instance, this, null);

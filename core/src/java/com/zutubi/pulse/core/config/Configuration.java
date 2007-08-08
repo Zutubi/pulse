@@ -2,8 +2,8 @@ package com.zutubi.pulse.core.config;
 
 import com.zutubi.config.annotations.Transient;
 
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Basic interface that must be implemented by all configuration types.
@@ -18,6 +18,10 @@ public interface Configuration
     String getConfigurationPath();
     void setConfigurationPath(String configurationPath);
 
+    /**
+     * @return true if there are no validation errors recorded directly on
+     *         this instance.
+     */
     @Transient
     boolean isValid();
 

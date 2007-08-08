@@ -5,6 +5,7 @@ import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
+import com.zutubi.pulse.core.config.ConfigurationList;
 
 import java.util.Hashtable;
 import java.util.LinkedList;
@@ -231,11 +232,62 @@ public class ListTypeTest extends TypeTestCase
         }
     }
 
+    public void testIsValid()
+    {
+        ConfigurationList<MockA> list = new ConfigurationList<MockA>();
+        list.add(new MockA("a"));
+        assertTrue(listType.isValid(list));
+    }
+
+    public void testIsValidDirectlyInvalid()
+    {
+        ConfigurationList<MockA> list = new ConfigurationList<MockA>();
+        list.add(new MockA("a"));
+        list.addInstanceError("error");
+        assertFalse(listType.isValid(list));
+    }
+
+    public void testIsValidElementInvalid()
+    {
+        MockA element = new MockA("a");
+        element.addInstanceError("error");
+        ConfigurationList<MockA> list = new ConfigurationList<MockA>();
+        list.add(element);
+        assertFalse(listType.isValid(list));
+    }
+
+    public void testIsValidElementIndirectlyInvalid()
+    {
+        MockB nested = new MockB();
+        nested.addInstanceError("error");
+        MockA element = new MockA("a");
+        element.setMockB(nested);
+        ConfigurationList<MockA> list = new ConfigurationList<MockA>();
+        list.add(element);
+        assertFalse(listType.isValid(list));
+    }
+    
+    public void testIsValidSimple()
+    {
+        ConfigurationList<String> list = new ConfigurationList<String>();
+        list.add("a");
+        assertTrue(simpleListType.isValid(list));
+    }
+
+    public void testIsValidSimpleDirectlyInvalid()
+    {
+        ConfigurationList<String> list = new ConfigurationList<String>();
+        list.add("a");
+        list.addInstanceError("error");
+        assertFalse(simpleListType.isValid(list));
+    }
+    
     @SymbolicName("mockA")
     public static class MockA extends AbstractConfiguration
     {
         @ID
         private String a;
+        private MockB mockB;
 
         public MockA()
         {
@@ -255,5 +307,20 @@ public class ListTypeTest extends TypeTestCase
         {
             this.a = a;
         }
+
+        public MockB getMockB()
+        {
+            return mockB;
+        }
+
+        public void setMockB(MockB mockB)
+        {
+            this.mockB = mockB;
+        }
+    }
+
+    @SymbolicName("mockB")
+    public static class MockB extends AbstractConfiguration
+    {
     }
 }

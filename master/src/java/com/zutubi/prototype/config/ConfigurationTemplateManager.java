@@ -6,6 +6,7 @@ import com.zutubi.prototype.config.events.PreDeleteEvent;
 import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.*;
 import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.pulse.core.config.ConfigurationList;
 import com.zutubi.pulse.core.config.ConfigurationMap;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.util.logging.Logger;
@@ -209,7 +210,7 @@ public class ConfigurationTemplateManager
         }
     }
 
-    @SuppressWarnings({ "unchecked" })
+    @SuppressWarnings({"unchecked"})
     public String insertRecord(final String path, MutableRecord record)
     {
         checkPersistent(path);
@@ -390,17 +391,39 @@ public class ConfigurationTemplateManager
         }
 
         CompositeType ctype = (CompositeType) expectedType;
+        String symbolicName = record.getSymbolicName();
+        return typeCheck(ctype, symbolicName);
+    }
+
+    /**
+     * Checks that the type referred to by the given symbolic name is
+     * compatible with an expected type.  To be compatible, the symbolic name
+     * must refer to the expected type or one of its extensions.
+     *
+     * @param expectedType the type that we expect
+     * @param symbolicName symbolic name of the type we have been given
+     * @return the type we have been given
+     * @throws IllegalArgumentException if the symbolic name does not refer
+     *                                  to a compatible type
+     */
+    public CompositeType typeCheck(CompositeType expectedType, String symbolicName)
+    {
         List<String> allowedTypes = new LinkedList<String>();
-        allowedTypes.add(ctype.getSymbolicName());
-        allowedTypes.addAll(ctype.getExtensions());
-        CompositeType recordType = typeRegistry.getType(record.getSymbolicName());
-        if (!allowedTypes.contains(record.getSymbolicName()))
+        allowedTypes.add(expectedType.getSymbolicName());
+        allowedTypes.addAll(expectedType.getExtensions());
+        CompositeType gotType = typeRegistry.getType(symbolicName);
+        if (gotType == null)
         {
-            // need to support type extensions here.
-            throw new IllegalArgumentException("Expected type: " + expectedType.getClazz() + " but instead found " + recordType.getClazz());
+            throw new IllegalArgumentException("Unrecognised symbolic name '" + symbolicName + "'");
         }
 
-        return recordType;
+        if (!allowedTypes.contains(symbolicName))
+        {
+            // need to support type extensions here.
+            throw new IllegalArgumentException("Expected type: " + expectedType.getClazz() + " but instead found " + gotType.getClazz());
+        }
+
+        return gotType;
     }
 
     private void refreshCaches()
@@ -428,7 +451,7 @@ public class ConfigurationTemplateManager
                 // instances created from template records.
                 CollectionType collectionType = (CollectionType) type;
                 CompositeType templatedType = (CompositeType) collectionType.getCollectionType();
-                ConfigurationMap<String, Object> topInstance = new ConfigurationMap<String, Object>();
+                ConfigurationMap<Configuration> topInstance = new ConfigurationMap<Configuration>();
                 instances.put(path, topInstance);
                 for (String id : collectionType.getOrder(topRecord))
                 {
@@ -483,7 +506,7 @@ public class ConfigurationTemplateManager
                 if (type != null)
                 {
                     // Then we have a composite
-                    validateInstance(type, instance, parentInstance, PathUtils.getBaseName(path), concrete, null);
+                    validateInstance(type, instance, parentInstance, PathUtils.getBaseName(path), concrete, false, null);
                 }
             }
         });
@@ -591,32 +614,34 @@ public class ConfigurationTemplateManager
      * the record is to be stored, allowing inspection of associated
      * instances if necessary.
      *
-     * @param parentPath         parent of the path where the record is to be
-     *                           stored
-     * @param baseName           base name of the path where the record is to
-     *                           be stored
-     * @param subject            record to validate
+     * @param parentPath parent of the path where the record is to be stored
+     * @param baseName   base name of the path where the record is to be
+     *                   stored
+     * @param subject    record to validate
+     * @param deep       if true, child records will also be validated
+     *                   recursively (otherwise they are ignored)
      * @return the instance if valid, null otherwise
-     * @throws com.zutubi.prototype.type.TypeException if an error prevents
-     *         creation of the instance: this is motre fatal than a normal
-     *         validation problem
+     * @throws com.zutubi.prototype.type.TypeException
+     *          if an error prevents
+     *          creation of the instance: this is motre fatal than a normal
+     *          validation problem
      */
-    @SuppressWarnings({ "unchecked" })
-    public <T> T validate(String parentPath, String baseName, Record subject) throws TypeException
+    @SuppressWarnings({"unchecked"})
+    public <T> T validate(String parentPath, String baseName, Record subject, boolean deep) throws TypeException
     {
-        return (T) validate(parentPath, baseName, subject, null);
+        return (T) validate(parentPath, baseName, subject, deep, null);
     }
 
-    @SuppressWarnings({ "unchecked" })
-    public <T> T validate(String parentPath, String baseName, Record subject, Set<String> ignoredFields) throws TypeException    
+    @SuppressWarnings({"unchecked"})
+    public <T> T validate(String parentPath, String baseName, Record subject, boolean deep, Set<String> ignoredFields) throws TypeException
     {
         // The type we are validating against.
         CompositeType type = typeRegistry.getType(subject.getSymbolicName());
-        if(type == null)
+        if (type == null)
         {
             throw new TypeException("Attempt to validate record with unrecognised symbolic name '" + subject.getSymbolicName() + "'");
         }
-        
+
         // Create an instance of the object represented by the record.  It is
         // during the instantiation that type conversion errors are detected.
         Configuration instance;
@@ -626,16 +651,16 @@ public class ConfigurationTemplateManager
         // Now apply validations via using the validation manager.
         Configuration parentInstance = parentPath == null ? null : getInstance(parentPath);
         boolean concrete = isConcrete(parentPath, subject);
-        validateInstance(type, instance, parentInstance, baseName, concrete, ignoredFields);
+        validateInstance(type, instance, parentInstance, baseName, concrete, deep, ignoredFields);
 
         return (T) instance;
     }
 
-    private void validateInstance(CompositeType type, Configuration instance, Configuration parentInstance, String baseName, boolean concrete, Set<String> ignoredFields)
+    private void validateInstance(CompositeType type, Configuration instance, Configuration parentInstance, String baseName, boolean concrete, boolean deep, Set<String> ignoredFields)
     {
         MessagesTextProvider textProvider = new MessagesTextProvider(type.getClazz());
         ValidationContext context = new ConfigurationValidationContext(instance, textProvider, parentInstance, baseName, !concrete);
-        if(ignoredFields != null)
+        if (ignoredFields != null)
         {
             context.addIgnoredFields(ignoredFields);
         }
@@ -648,22 +673,84 @@ public class ConfigurationTemplateManager
         {
             instance.addInstanceError(e.getMessage());
         }
+
+        if (deep)
+        {
+            validateNestedInstances(type, instance, concrete, ignoredFields);
+        }
+    }
+
+    private void validateNestedInstances(CompositeType type, Configuration instance, boolean concrete, Set<String> ignoredFields)
+    {
+        for (String key : type.getPropertyNames(ComplexType.class))
+        {
+            if (ignoredFields == null || !ignoredFields.contains(key))
+            {
+                TypeProperty property = type.getProperty(key);
+                ComplexType nestedType = (ComplexType) property.getType();
+                Type targetType = nestedType.getTargetType();
+                if (targetType instanceof CompositeType)
+                {
+                    validateNestedInstance(instance, property, (CompositeType) targetType, nestedType, concrete);
+                }
+            }
+        }
+    }
+
+    private void validateNestedInstance(Configuration instance, TypeProperty property, CompositeType validateType, ComplexType nestedType, boolean concrete)
+    {
+        try
+        {
+            Configuration nestedInstance = (Configuration) property.getValue(instance);
+            if (nestedInstance != null)
+            {
+                if (nestedType instanceof CompositeType)
+                {
+                    validateInstance(validateType, nestedInstance, instance, property.getName(), concrete, true, null);
+                }
+                else if (nestedType instanceof ListType)
+                {
+                    ConfigurationList list = (ConfigurationList) nestedInstance;
+                    for (Object element : list)
+                    {
+                        validateInstance(validateType, (Configuration) element, nestedInstance, null, concrete, true, null);
+                    }
+                }
+                else if (nestedType instanceof MapType)
+                {
+                    ConfigurationMap<Configuration> map = (ConfigurationMap) nestedInstance;
+                    for (Map.Entry<String, Configuration> entry : map.entrySet())
+                    {
+                        validateInstance(validateType, entry.getValue(), nestedInstance, entry.getKey(), concrete, true, null);
+                    }
+                }
+                else
+                {
+                    throw new ValidationException("Property has unrecognised type '" + nestedType.getClass().getName() + "'");
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            LOG.severe(e);
+            instance.addFieldError(property.getName(), "Unable to apply deep validation to property: " + e.getMessage());
+        }
     }
 
     /**
      * Saves the given instance at the given path.  This is the same as doing
      * a conversion to a record and saving using
-     * {@link #saveRecord(String, com.zutubi.prototype.type.record.MutableRecord, boolean)}
+     * {@link #saveRecord(String,com.zutubi.prototype.type.record.MutableRecord,boolean)}
      * with deep set to true.  All the same restrictions apply.
      *
      * @param instance the instance to save (must already be persistent)
      * @throws IllegalArgumentException if the instance is not persistent, is
-     *         of an unknown type or does not meet the requirements of
-     *         saveRecord
+     *                                  of an unknown type or does not meet the requirements of
+     *                                  saveRecord
      */
     public void save(Configuration instance)
     {
-        if(instance.getConfigurationPath() == null)
+        if (instance.getConfigurationPath() == null)
         {
             throw new IllegalArgumentException("Instance does not appear to be persistent (configuration path is unset), use insert for new instances");
         }
@@ -690,14 +777,13 @@ public class ConfigurationTemplateManager
     /**
      * Performs a shallow save of the given record at the given path.
      *
-     * @see #saveRecord(String, com.zutubi.prototype.type.record.MutableRecord, boolean)
-     *
      * @param path   the path to save the record to
      * @param record the record to save
      * @return the path that the saved record is stored at, which may be
      *         different from the save path
      * @throws IllegalArgumentException when the arguments do not meet the
      *                                  criteria outlined
+     * @see #saveRecord(String,com.zutubi.prototype.type.record.MutableRecord,boolean)
      */
     public String saveRecord(String path, MutableRecord record)
     {
@@ -727,7 +813,7 @@ public class ConfigurationTemplateManager
     {
         checkPersistent(path);
 
-        if(record.getSymbolicName() == null)
+        if (record.getSymbolicName() == null)
         {
             throw new IllegalArgumentException("Record has no type (note that collections should not be saved directly)");
         }
@@ -745,7 +831,7 @@ public class ConfigurationTemplateManager
         }
 
         // Type check of incoming record.
-        if(!existingRecord.getSymbolicName().equals(record.getSymbolicName()))
+        if (!existingRecord.getSymbolicName().equals(record.getSymbolicName()))
         {
             throw new IllegalArgumentException("Saved record has type '" + record.getSymbolicName() + "' which does not match existing type '" + existingRecord.getSymbolicName() + "'");
         }
@@ -798,17 +884,17 @@ public class ConfigurationTemplateManager
         Set<String> newChildren = record.nestedKeySet();
 
         // Discover changed and inserted children
-        for(String key: newChildren)
+        for (String key : newChildren)
         {
             String childPath = PathUtils.getPath(path, key);
             MutableRecord child = (MutableRecord) record.get(key);
 
-            if(existingChildren.contains(key))
+            if (existingChildren.contains(key))
             {
-                if(child.isCollection())
+                if (child.isCollection())
                 {
                     // Jump down a level to synchronise elements
-                    synchroniseChildRecords(childPath, (Record)existingRecord.get(key), child);
+                    synchroniseChildRecords(childPath, (Record) existingRecord.get(key), child);
                 }
                 else
                 {
@@ -820,7 +906,7 @@ public class ConfigurationTemplateManager
             {
                 // Insert new child.
                 String insertPath;
-                if(record.isCollection())
+                if (record.isCollection())
                 {
                     insertPath = path;
                 }
@@ -834,9 +920,9 @@ public class ConfigurationTemplateManager
         }
 
         // Discover deleted children
-        for(String key: existingChildren)
+        for (String key : existingChildren)
         {
-            if(!newChildren.contains(key))
+            if (!newChildren.contains(key))
             {
                 delete(PathUtils.getPath(path, key));
             }
@@ -940,7 +1026,7 @@ public class ConfigurationTemplateManager
         }
     }
 
-    @SuppressWarnings({ "unchecked" })
+    @SuppressWarnings({"unchecked"})
     public List<String> getDescendentPaths(String path, boolean strict, final boolean concreteOnly)
     {
         String[] elements = PathUtils.getPathElements(path);
@@ -1049,7 +1135,7 @@ public class ConfigurationTemplateManager
         refreshCaches();
     }
 
-    @SuppressWarnings({ "unchecked" })
+    @SuppressWarnings({"unchecked"})
     public <T extends Configuration> T deepClone(T instance)
     {
         Record record = recordManager.load(instance.getConfigurationPath());
@@ -1105,7 +1191,7 @@ public class ConfigurationTemplateManager
     public <T extends Configuration> T getCloneOfInstance(String path, Class<T> clazz)
     {
         T instance = getInstance(path, clazz);
-        if(instance == null)
+        if (instance == null)
         {
             return null;
         }
@@ -1120,7 +1206,7 @@ public class ConfigurationTemplateManager
         return result;
     }
 
-    @SuppressWarnings({ "unchecked" })
+    @SuppressWarnings({"unchecked"})
     public <T extends Configuration> void getAllInstances(String path, Collection<T> result, boolean allowIncomplete)
     {
         instances.getAllMatchingPathPattern(path, (Collection<Configuration>) result);
@@ -1130,7 +1216,7 @@ public class ConfigurationTemplateManager
         }
     }
 
-    @SuppressWarnings({ "unchecked" })
+    @SuppressWarnings({"unchecked"})
     public <T extends Configuration> Collection<T> getAllInstances(Class<T> clazz)
     {
         CompositeType type = typeRegistry.getType(clazz);
@@ -1152,7 +1238,7 @@ public class ConfigurationTemplateManager
         return result;
     }
 
-    @SuppressWarnings({ "unchecked" })
+    @SuppressWarnings({"unchecked"})
     public <T extends Configuration> T getAncestorOfType(Configuration c, Class<T> clazz)
     {
         String path = c.getConfigurationPath();
@@ -1226,7 +1312,7 @@ public class ConfigurationTemplateManager
         return templatePath;
     }
 
-    @SuppressWarnings({ "unchecked" })
+    @SuppressWarnings({"unchecked"})
     public <T extends Type> T getType(String path, Class<T> typeClass)
     {
         Type type = getType(path);
