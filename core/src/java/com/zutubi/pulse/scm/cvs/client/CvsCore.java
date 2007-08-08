@@ -2,7 +2,7 @@ package com.zutubi.pulse.scm.cvs.client;
 
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.model.CvsRevision;
-import com.zutubi.pulse.scm.ScmCheckoutEventHandler;
+import com.zutubi.pulse.scm.ScmEventHandler;
 import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.pulse.scm.cvs.client.commands.*;
 import com.zutubi.pulse.scm.cvs.client.util.CvsUtils;
@@ -99,7 +99,7 @@ public class CvsCore
         return version.getVersion();
     }
 
-    public void update(File workingDirectory, CvsRevision revision, ScmCheckoutEventHandler handler) throws ScmException
+    public void update(File workingDirectory, CvsRevision revision, ScmEventHandler handler) throws ScmException
     {
         UpdateListener listener = null;
         if (handler != null)
@@ -133,12 +133,12 @@ public class CvsCore
         }
     }
 
-    public void checkout(File workdir, String module, CvsRevision revision, ScmCheckoutEventHandler handler) throws ScmException
+    public void checkout(File workdir, String module, CvsRevision revision, ScmEventHandler handler) throws ScmException
     {
         checkout(workdir, module, revision, true, handler);
     }
 
-    public void checkout(File workdir, String module, CvsRevision revision, boolean recursive, ScmCheckoutEventHandler handler) throws ScmException
+    public void checkout(File workdir, String module, CvsRevision revision, boolean recursive, ScmEventHandler handler) throws ScmException
     {
         CheckoutCommand checkout = new CheckoutCommand();
         checkout.setModule(module);

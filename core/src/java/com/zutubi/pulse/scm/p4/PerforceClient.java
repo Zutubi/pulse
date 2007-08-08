@@ -8,7 +8,7 @@ import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.scm.CachingScmFile;
 import com.zutubi.pulse.scm.FileStatus;
 import com.zutubi.pulse.scm.ScmCancelledException;
-import com.zutubi.pulse.scm.ScmCheckoutEventHandler;
+import com.zutubi.pulse.scm.ScmEventHandler;
 import com.zutubi.pulse.scm.ScmException;
 import static com.zutubi.pulse.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.scm.p4.PerforceCore;
@@ -418,7 +418,7 @@ public class PerforceClient extends CachingScmClient
         }
     }
 
-    private Revision sync(String id, File toDirectory, Revision revision, ScmCheckoutEventHandler handler, boolean force) throws ScmException
+    private Revision sync(String id, File toDirectory, Revision revision, ScmEventHandler handler, boolean force) throws ScmException
     {
         String clientName = updateClient(id, toDirectory, (NumericalRevision) revision);
 
@@ -529,7 +529,7 @@ public class PerforceClient extends CachingScmClient
         }
     }
 
-    public Revision checkout(String id, File toDirectory, Revision revision, ScmCheckoutEventHandler handler) throws ScmException
+    public Revision checkout(String id, File toDirectory, Revision revision, ScmEventHandler handler) throws ScmException
     {
         return sync(id, toDirectory, revision, handler, true);
     }
@@ -675,7 +675,7 @@ public class PerforceClient extends CachingScmClient
         return false;
     }
 
-    public void update(String id, File workDir, Revision rev, ScmCheckoutEventHandler handler) throws ScmException
+    public void update(String id, File workDir, Revision rev, ScmEventHandler handler) throws ScmException
     {
         sync(id, workDir, rev, handler, false);
     }

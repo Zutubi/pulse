@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.scm.FileStatus;
-import com.zutubi.pulse.scm.ScmCheckoutEventHandler;
+import com.zutubi.pulse.scm.ScmEventHandler;
 import com.zutubi.pulse.scm.ScmException;
 
 import java.io.File;
@@ -56,7 +56,23 @@ public interface ScmClient
      * @return the revision actually checked out
      * @throws ScmException on error
      */
-    Revision checkout(String id, File toDirectory, Revision revision, ScmCheckoutEventHandler handler) throws ScmException;
+    Revision checkout(String id, File toDirectory, Revision revision, ScmEventHandler handler) throws ScmException;
+
+    /**
+     * Update the working directory to the specified revision.
+     *
+     * Required for {@link ScmCapability#UPDATE}.
+     *
+     * @param id      an identifier for this update used to identify related
+     *                checkout/update operations.  May be null to indicate no
+     *                relationship.
+     * @param workDir contains a local copy (checkout) of the module.
+     * @param rev     revision to which the local copy will be updated.
+     * @param handler if not null, receives notifications of events during the
+     *                update operation
+     * @throws ScmException on error
+     */
+    void update(String id, File workDir, Revision rev, ScmEventHandler handler) throws ScmException;
 
     /**
      * Returns variables that should be added to the build environment for
@@ -199,22 +215,6 @@ public interface ScmClient
      * @throws ScmException on error
      */
     List<ScmFile> getListing(String path) throws ScmException;
-
-    /**
-     * Update the working directory to the specified revision.
-     *
-     * Required for {@link ScmCapability#UPDATE}.
-     *
-     * @param id      an identifier for this update used to identify related
-     *                checkout/update operations.  May be null to indicate no
-     *                relationship.
-     * @param workDir contains a local copy (checkout) of the module.
-     * @param rev     revision to which the local copy will be updated.
-     * @param handler if not null, receives notifications of events during the
-     *                update operation
-     * @throws ScmException on error
-     */
-    void update(String id, File workDir, Revision rev, ScmCheckoutEventHandler handler) throws ScmException;
 
     /**
      * Applies a tag to the given revision of all files in the server's view .

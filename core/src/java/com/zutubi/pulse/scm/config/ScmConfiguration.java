@@ -118,5 +118,4 @@ public abstract class ScmConfiguration extends AbstractConfiguration
 
     @Transient
     public abstract String getType();
-    public abstract ScmClient createClient() throws ScmException;
 }

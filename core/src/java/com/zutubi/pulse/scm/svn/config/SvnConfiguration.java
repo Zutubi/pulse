@@ -97,6 +97,7 @@ public class SvnConfiguration extends ScmConfiguration
         return "svn";
     }
 
+/*
     public SvnClient createClient() throws ScmException
     {
         SvnClient client;
@@ -136,6 +137,7 @@ public class SvnConfiguration extends ScmConfiguration
         client.setVerifyExternals(getVerifyExternals());
         return client;
     }
+*/
 
     public String getExternalMonitorPaths()
     {

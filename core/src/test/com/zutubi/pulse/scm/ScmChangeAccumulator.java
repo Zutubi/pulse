@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  */
-public class ScmChangeAccumulator implements ScmCheckoutEventHandler
+public class ScmChangeAccumulator implements ScmEventHandler
 {
     List<Change> changes = new LinkedList<Change>();
 
@@ -20,7 +20,7 @@ public class ScmChangeAccumulator implements ScmCheckoutEventHandler
     {
     }
 
-    public void fileCheckedOut(Change change)
+    public void fileChanged(Change change)
     {
         changes.add(change);
     }

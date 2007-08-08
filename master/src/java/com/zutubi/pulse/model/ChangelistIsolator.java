@@ -2,6 +2,8 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
+import com.zutubi.pulse.scm.ScmClient;
+import com.zutubi.pulse.scm.ScmClientFactory;
 import com.zutubi.pulse.scm.ScmException;
 
 import java.util.Arrays;
@@ -15,6 +17,7 @@ public class ChangelistIsolator
 {
     private Map<Long, Revision> latestRequestedRevisions = new TreeMap<Long, Revision>();
     private BuildManager buildManager;
+    private ScmClientFactory scmClientFactory;
 
     public ChangelistIsolator(BuildManager buildManager)
     {
@@ -45,13 +48,15 @@ public class ChangelistIsolator
         {
             // The spec has never been built or even requested.  Just build
             // the latest (we need to start somewhere!).
-            result = Arrays.asList(projectConfig.getScm().createClient().getLatestRevision());
+            ScmClient client = scmClientFactory.createClient(projectConfig.getScm());
+            result = Arrays.asList(client.getLatestRevision());
         }
         else
         {
             // We now have the last requested revision, return every revision
             // since then.
-            result = projectConfig.getScm().createClient().getRevisionsSince(latestBuiltRevision);
+            ScmClient client = scmClientFactory.createClient(projectConfig.getScm());
+            result = client.getRevisionsSince(latestBuiltRevision);
         }
 
         if (result.size() > 0)
@@ -72,13 +77,13 @@ public class ChangelistIsolator
 
     private Revision getLatestBuiltRevision(Project project)
     {
-        for (int first = 0; /* forever */; first++)
+        for (int first = 0; /* forever */ ; first++)
         {
             List<BuildResult> latest = buildManager.queryBuilds(new Project[]{project}, null, -1, -1, null, first, 1, true);
             if (latest.size() > 0)
             {
                 BuildScmDetails scmDetails = latest.get(0).getScmDetails();
-                if(scmDetails != null)
+                if (scmDetails != null)
                 {
                     return scmDetails.getRevision();
                 }
@@ -93,5 +98,10 @@ public class ChangelistIsolator
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
+    }
+
+    public void setScmClientFactory(ScmClientFactory scmClientFactory)
+    {
+        this.scmClientFactory = scmClientFactory;
     }
 }

@@ -9,6 +9,7 @@ import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.project.BuildOptionsConfiguration;
 import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.pulse.scm.ScmClient;
+import com.zutubi.pulse.scm.DelegateScmClientFactory;
 import com.zutubi.pulse.scm.config.ScmConfiguration;
 import com.zutubi.pulse.test.PulseTestCase;
 
@@ -42,11 +43,6 @@ public class ChangelistIsolatorTest extends PulseTestCase
             public String getType()
             {
                 return "mock";
-            }
-
-            public ScmClient createClient() throws ScmException
-            {
-                return scmClient;
             }
         });
         BuildOptionsConfiguration options = new BuildOptionsConfiguration();
@@ -172,6 +168,13 @@ public class ChangelistIsolatorTest extends PulseTestCase
         BuildManager buildManager = (BuildManager) mockBuildManager.proxy();
         scmClient = (ScmClient) mockScm.proxy();
         isolator = new ChangelistIsolator(buildManager);
+        isolator.setScmClientFactory(new DelegateScmClientFactory()
+        {
+            public ScmClient createClient(Object config) throws ScmException
+            {
+                return scmClient;
+            }
+        });
     }
 
     private void expectRevisions(boolean force, long... revisions) throws ScmException

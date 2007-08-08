@@ -13,8 +13,9 @@ import com.zutubi.pulse.scheduling.SimpleTrigger;
 import com.zutubi.pulse.scheduling.Trigger;
 import com.zutubi.pulse.scm.MonitorScms;
 import com.zutubi.pulse.scm.ScmChangeEvent;
-import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.pulse.scm.ScmClient;
+import com.zutubi.pulse.scm.ScmClientFactory;
+import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.pulse.scm.config.ScmConfiguration;
 import com.zutubi.pulse.util.Pair;
 import com.zutubi.util.CollectionUtils;
@@ -40,6 +41,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
     private ProjectManager projectManager;
     private EventManager eventManager;
     private ShutdownManager shutdownManager;
+    private ScmClientFactory scmClientFactory;
 
     private Scheduler scheduler;
     private static final String MONITOR_NAME = "poll";
@@ -171,7 +173,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
             projectManager.save(project);
 
             // when was the last time that we checked? if never, get the latest revision.
-            ScmClient client = scm.createClient();
+            ScmClient client = scmClientFactory.createClient(scm);
             if (!latestRevisions.containsKey(project.getId()))
             {
                 latestRevisions.put(project.getId(), client.getLatestRevision());
@@ -320,5 +322,10 @@ public class DefaultScmManager implements ScmManager, Stoppable
     public void setProjectManager(ProjectManager projectManager)
     {
         this.projectManager = projectManager;
+    }
+
+    public void setScmClientFactory(ScmClientFactory scmClientFactory)
+    {
+        this.scmClientFactory = scmClientFactory;
     }
 }

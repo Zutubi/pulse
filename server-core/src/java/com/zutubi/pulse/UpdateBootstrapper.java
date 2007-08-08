@@ -15,18 +15,17 @@ public class UpdateBootstrapper extends ScmBootstrapper
 {
     private static final Logger LOG = Logger.getLogger(UpdateBootstrapper.class);
 
-    public UpdateBootstrapper(String project, ScmConfiguration scm, BuildRevision revision)
+    public UpdateBootstrapper(String project, ScmClient client, BuildRevision revision)
     {
-        super(project, scm, revision);
+        super(project, client, revision);
     }
 
     ScmClient bootstrap(File workDir)
     {
         try
         {
-            ScmClient client = scm.createClient();
-            client.update(getId(), workDir, revision.getRevision(), this);
-            return client;
+            scm.update(getId(), workDir, revision.getRevision(), this);
+            return scm;
         }
         catch (ScmException e)
         {

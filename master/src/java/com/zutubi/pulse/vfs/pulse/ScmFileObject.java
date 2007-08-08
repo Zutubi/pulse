@@ -1,5 +1,7 @@
 package com.zutubi.pulse.vfs.pulse;
 
+import com.zutubi.pulse.scm.ScmClient;
+import com.zutubi.pulse.scm.ScmClientFactory;
 import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.pulse.scm.ScmFile;
 import com.zutubi.pulse.vfs.FileAction;
@@ -23,6 +25,8 @@ import java.util.List;
 public class ScmFileObject extends AbstractPulseFileObject
 {
     private static final Logger LOG = Logger.getLogger(ScmFileObject.class);
+
+    private ScmClientFactory scmClientFactory;
 
     private ScmFile scmFile;
     private List<ScmFile> scmChildren;
@@ -70,7 +74,8 @@ public class ScmFileObject extends AbstractPulseFileObject
         {
             try
             {
-                scmChildren = getAncestor(ScmProvider.class).getScm().createClient().getListing(scmFile.getPath());
+                ScmClient client = scmClientFactory.createClient(getAncestor(ScmProvider.class).getScm());
+                scmChildren = client.getListing(scmFile.getPath());
             }
             catch (ScmException e)
             {
@@ -109,7 +114,8 @@ public class ScmFileObject extends AbstractPulseFileObject
         {
             try
             {
-                return getAncestor(ScmProvider.class).getScm().createClient().getLocation();
+                ScmClient client = scmClientFactory.createClient(getAncestor(ScmProvider.class).getScm());
+                return client.getLocation();
             }
             catch (Exception e)
             {
@@ -137,5 +143,10 @@ public class ScmFileObject extends AbstractPulseFileObject
         }
 
         return Collections.EMPTY_LIST;
+    }
+
+    public void setScmClientFactory(ScmClientFactory scmClientFactory)
+    {
+        this.scmClientFactory = scmClientFactory;
     }
 }

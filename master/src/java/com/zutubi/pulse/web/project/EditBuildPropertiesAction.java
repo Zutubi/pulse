@@ -11,6 +11,8 @@ import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.model.ManualTriggerBuildReason;
 import com.zutubi.pulse.prototype.config.project.types.TypeConfiguration;
+import com.zutubi.pulse.scm.ScmClient;
+import com.zutubi.pulse.scm.ScmClientFactory;
 import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.util.logging.Logger;
 import freemarker.template.Configuration;
@@ -34,6 +36,8 @@ public class EditBuildPropertiesAction extends ProjectActionBase
     private String revision;
     private List<ResourceProperty> properties;
     private Configuration freemarkerConfiguration;
+
+    private ScmClientFactory scmClientFactory;
 
     public String getFormSource()
     {
@@ -139,7 +143,8 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         {
             try
             {
-                r = getProjectConfig().getScm().createClient().getRevision(revision);
+                ScmClient client = scmClientFactory.createClient(getProjectConfig().getScm());
+                r = client.getRevision(revision);
             }
             catch (ScmException e)
             {
@@ -216,5 +221,10 @@ public class EditBuildPropertiesAction extends ProjectActionBase
     public void setFreemarkerConfiguration(Configuration freemarkerConfiguration)
     {
         this.freemarkerConfiguration = freemarkerConfiguration;
+    }
+
+    public void setScmClientFactory(ScmClientFactory scmClientFactory)
+    {
+        this.scmClientFactory = scmClientFactory;
     }
 }

@@ -1,7 +1,11 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.core.*;
-import com.zutubi.pulse.scm.config.ScmConfiguration;
+import com.zutubi.pulse.core.Bootstrapper;
+import com.zutubi.pulse.core.BuildException;
+import com.zutubi.pulse.core.BuildRevision;
+import com.zutubi.pulse.core.CommandContext;
+import com.zutubi.pulse.core.RecipePaths;
+import com.zutubi.pulse.scm.ScmClient;
 import com.zutubi.pulse.util.FileSystemUtils;
 
 import java.io.File;
@@ -16,13 +20,13 @@ import java.io.IOException;
 public class ProjectRepoBootstrapper implements Bootstrapper
 {
     private final String projectName;
-    private final ScmConfiguration scm;
+    private final ScmClient scm;
     private BuildRevision revision;
     private String agent;
     private boolean forceClean;
     private ScmBootstrapper childBootstrapper;
 
-    public ProjectRepoBootstrapper(String projectName, ScmConfiguration scm, BuildRevision revision, boolean forceClean)
+    public ProjectRepoBootstrapper(String projectName, ScmClient scm, BuildRevision revision, boolean forceClean)
     {
         this.projectName = projectName;
         this.scm = scm;

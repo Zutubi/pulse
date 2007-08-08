@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.scm.FileStatus;
 import com.zutubi.pulse.scm.ScmCancelledException;
-import com.zutubi.pulse.scm.ScmCheckoutEventHandler;
+import com.zutubi.pulse.scm.ScmEventHandler;
 import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.pulse.scm.ScmCapability;
 import com.zutubi.pulse.scm.ScmFile;
@@ -264,7 +264,7 @@ public class SvnClient implements ScmClient
         }
     }
 
-    public Revision checkout(String id, File toDirectory, Revision revision, ScmCheckoutEventHandler handler) throws ScmException
+    public Revision checkout(String id, File toDirectory, Revision revision, ScmEventHandler handler) throws ScmException
     {
         SVNRevision svnRevision;
         SVNUpdateClient updateClient = new SVNUpdateClient(repository.getAuthenticationManager(), null);
@@ -296,7 +296,7 @@ public class SvnClient implements ScmClient
         return new NumericalRevision(svnRevision.getNumber());
     }
 
-    private void updateExternals(File toDirectory, Revision revision, SVNUpdateClient client, ScmCheckoutEventHandler handler) throws ScmException
+    private void updateExternals(File toDirectory, Revision revision, SVNUpdateClient client, ScmEventHandler handler) throws ScmException
     {
         List<ExternalDefinition> externals = getExternals(revision);
         for (ExternalDefinition external : externals)
@@ -597,7 +597,7 @@ public class SvnClient implements ScmClient
         return result;
     }
 
-    public void update(String id, File workDir, Revision rev, ScmCheckoutEventHandler handler) throws ScmException
+    public void update(String id, File workDir, Revision rev, ScmEventHandler handler) throws ScmException
     {
         // CIB-610: cleanup before update in case WC is locked.
         SVNWCClient wcClient = new SVNWCClient(authenticationManager, null);
@@ -732,9 +732,9 @@ public class SvnClient implements ScmClient
 
     private static class ChangeEventHandler implements ISVNEventHandler
     {
-        private ScmCheckoutEventHandler handler;
+        private ScmEventHandler handler;
 
-        public ChangeEventHandler(ScmCheckoutEventHandler handler)
+        public ChangeEventHandler(ScmEventHandler handler)
         {
             this.handler = handler;
         }
@@ -759,7 +759,7 @@ public class SvnClient implements ScmClient
 
             if (action != null)
             {
-                handler.fileCheckedOut(new Change(event.getPath(), null, action));
+                handler.fileChanged(new Change(event.getPath(), null, action));
             }
         }
 

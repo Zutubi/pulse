@@ -5,4 +5,5 @@
     <bean id="pluginManager" class="com.zutubi.pulse.plugins.DefaultPluginManager" init-method="init" destroy-method="destroy"/>
     <bean id="commandExtensionManager" class="com.zutubi.pulse.core.plugins.CommandExtensionManager" init-method="init"/>
     <bean id="scmExtensionManager" class="com.zutubi.pulse.scm.ScmExtensionManager" init-method="init"/>
+    <bean id="scmClientFactory" class="com.zutubi.pulse.scm.DelegateScmClientFactory"/>
 </beans>

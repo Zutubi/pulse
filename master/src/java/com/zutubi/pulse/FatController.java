@@ -18,6 +18,7 @@ import com.zutubi.pulse.license.events.LicenseUpdateEvent;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.scheduling.quartz.TimeoutRecipeJob;
 import com.zutubi.pulse.services.ServiceTokenManager;
+import com.zutubi.pulse.scm.DelegateScmClientFactory;
 import com.zutubi.util.logging.Logger;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
@@ -47,6 +48,7 @@ public class FatController implements EventListener, Stoppable
     private AsynchronousDelegatingListener asyncListener;
     private BuildManager buildManager;
     private TestManager testManager;
+    private DelegateScmClientFactory scmClientManager;
     private MasterConfigurationManager configManager;
     private RecipeQueue recipeQueue;
 
@@ -257,6 +259,7 @@ public class FatController implements EventListener, Stoppable
                 controller.setQueue(recipeQueue);
                 controller.setServiceTokenManager(serviceTokenManager);
                 controller.setTestManager(testManager);
+                controller.setScmClientFactory(scmClientManager);
                 controller.setUserManager(userManager);
                 controller.setConfigurationManager(configManager);
                 controller.init();
@@ -429,5 +432,10 @@ public class FatController implements EventListener, Stoppable
     public void setTestManager(TestManager testManager)
     {
         this.testManager = testManager;
+    }
+
+    public void setScmClientManager(DelegateScmClientFactory scmClientManager)
+    {
+        this.scmClientManager = scmClientManager;
     }
 }

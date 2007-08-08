@@ -7,7 +7,7 @@ import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.CvsRevision;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.scm.FileStatus;
-import com.zutubi.pulse.scm.ScmCheckoutEventHandler;
+import com.zutubi.pulse.scm.ScmEventHandler;
 import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.pulse.scm.CachingScmClient;
 import com.zutubi.pulse.scm.ScmFilepathFilter;
@@ -186,7 +186,7 @@ public class CvsClient extends CachingScmClient
      * @param rev
      * @param handler
      */
-    public void update(String id, File workingDirectory, Revision rev, ScmCheckoutEventHandler handler) throws ScmException
+    public void update(String id, File workingDirectory, Revision rev, ScmEventHandler handler) throws ScmException
     {
         assertRevisionArgValid(rev);
         core.update(workingDirectory, (CvsRevision) rev, handler);
@@ -250,7 +250,7 @@ public class CvsClient extends CachingScmClient
         return cvsRevision;
     }
 
-    public Revision checkout(String id, File toDirectory, Revision revision, ScmCheckoutEventHandler handler) throws ScmException
+    public Revision checkout(String id, File toDirectory, Revision revision, ScmEventHandler handler) throws ScmException
     {
         assertRevisionArgValid(revision);
         core.checkout(toDirectory, module, (CvsRevision)revision, handler);

@@ -76,17 +76,4 @@ public class CvsConfiguration extends ScmConfiguration
     {
         return "cvs";
     }
-
-    public CvsClient createClient() throws ScmException
-    {
-/*
-        // use a manual autowire here since this object itself is not wired, and so
-        // does not have access to the object factory.
-        ConfigurationManager configurationManager = (ConfigurationManager) ComponentContext.getBean("configurationManager");
-        File tmpRoot = configurationManager.getSystemPaths().getTmpRoot();
-        return new CvsClient(root, module, password, branch, getFilterPaths(), tmpRoot);
-*/
-        // need to use the users temp directories instead.
-        throw new ScmException();
-    }
 }

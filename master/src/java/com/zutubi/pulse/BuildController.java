@@ -7,22 +7,35 @@ import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.ResourceProperty;
-import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.Feature;
+import com.zutubi.pulse.core.model.RecipeResult;
+import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.events.AsynchronousDelegatingListener;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.*;
-import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.model.BuildManager;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.BuildScmDetails;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.model.RecipeResultNode;
+import com.zutubi.pulse.model.ResourceRequirement;
+import com.zutubi.pulse.model.TestManager;
+import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.prototype.config.project.BuildOptionsConfiguration;
 import com.zutubi.pulse.prototype.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.project.actions.PostBuildActionConfiguration;
 import com.zutubi.pulse.scheduling.quartz.TimeoutRecipeJob;
-import com.zutubi.pulse.scm.FileStatus;
-import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.pulse.scm.CheckoutScheme;
+import com.zutubi.pulse.scm.FileStatus;
 import com.zutubi.pulse.scm.ScmClient;
+import com.zutubi.pulse.scm.ScmClientFactory;
+import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.pulse.scm.config.ScmConfiguration;
 import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.util.FileSystemUtils;
@@ -76,6 +89,8 @@ public class BuildController implements EventListener
     private ServiceTokenManager serviceTokenManager;
     private BuildResult previousSuccessful;
     private List<ResourceProperty> buildProperties;
+
+    private ScmClientFactory scmClientFactory;
 
     public BuildController(AbstractBuildRequestEvent event)
     {
@@ -228,43 +243,51 @@ public class BuildController implements EventListener
 
     private void handleBuildCommenced()
     {
-        // It is important that this directory is created *after* the build
-        // result is commenced and saved to the database, so that the
-        // database knows of the possibility of some other persistent
-        // artifacts, even if an error occurs very early in the build.
-        File buildDir = buildResult.getAbsoluteOutputDir(configurationManager.getDataDirectory());
-        if (!buildDir.mkdirs())
+        try
         {
-            throw new BuildException("Unable to create build directory '" + buildDir.getAbsolutePath() + "'");
-        }
-
-        if (!buildManager.isSpaceAvailableForBuild())
-        {
-            throw new BuildException("Insufficient database space to run build.  Consider adding more cleanup rules to remove old build information");
-        }
-
-        CheckoutScheme checkoutScheme = projectConfig.getScm().getCheckoutScheme();
-
-        // check project configuration to determine which bootstrap configuration should be used.
-        Bootstrapper initialBootstrapper;
-        boolean checkoutOnly = request.isPersonal() || checkoutScheme == CheckoutScheme.CLEAN_CHECKOUT;
-        if (checkoutOnly)
-        {
-            initialBootstrapper = new CheckoutBootstrapper(projectConfig.getName(), projectConfig.getScm(), request.getRevision(), false);
-            if (request.isPersonal())
+// It is important that this directory is created *after* the build
+            // result is commenced and saved to the database, so that the
+            // database knows of the possibility of some other persistent
+            // artifacts, even if an error occurs very early in the build.
+            File buildDir = buildResult.getAbsoluteOutputDir(configurationManager.getDataDirectory());
+            if (!buildDir.mkdirs())
             {
-                initialBootstrapper = createPersonalBuildBootstrapper(initialBootstrapper);
+                throw new BuildException("Unable to create build directory '" + buildDir.getAbsolutePath() + "'");
             }
+
+            if (!buildManager.isSpaceAvailableForBuild())
+            {
+                throw new BuildException("Insufficient database space to run build.  Consider adding more cleanup rules to remove old build information");
+            }
+
+            CheckoutScheme checkoutScheme = projectConfig.getScm().getCheckoutScheme();
+
+            // check project configuration to determine which bootstrap configuration should be used.
+            Bootstrapper initialBootstrapper;
+            boolean checkoutOnly = request.isPersonal() || checkoutScheme == CheckoutScheme.CLEAN_CHECKOUT;
+            ScmClient client = scmClientFactory.createClient(projectConfig.getScm());
+            if (checkoutOnly)
+            {
+                initialBootstrapper = new CheckoutBootstrapper(projectConfig.getName(), client, request.getRevision(), false);
+                if (request.isPersonal())
+                {
+                    initialBootstrapper = createPersonalBuildBootstrapper(initialBootstrapper);
+                }
+            }
+            else
+            {
+                initialBootstrapper = new ProjectRepoBootstrapper(projectConfig.getName(), client, request.getRevision(), project.isForceClean());
+            }
+
+            tree.prepare(buildResult);
+
+            // execute the first level of recipe controllers...
+            initialiseNodes(initialBootstrapper, tree.getRoot().getChildren());
         }
-        else
+        catch (ScmException e)
         {
-            initialBootstrapper = new ProjectRepoBootstrapper(projectConfig.getName(), projectConfig.getScm(), request.getRevision(), project.isForceClean());
+            throw new BuildException(e);
         }
-
-        tree.prepare(buildResult);
-
-        // execute the first level of recipe controllers...
-        initialiseNodes(initialBootstrapper, tree.getRoot().getChildren());
     }
 
     private Bootstrapper createPersonalBuildBootstrapper(Bootstrapper initialBootstrapper)
@@ -273,7 +296,8 @@ public class BuildController implements EventListener
         PersonalBuildRequestEvent pbr = ((PersonalBuildRequestEvent) request);
         try
         {
-            FileStatus.EOLStyle localEOL = projectConfig.getScm().createClient().getEOLPolicy();
+            ScmClient client = scmClientFactory.createClient(projectConfig.getScm());
+            FileStatus.EOLStyle localEOL = client.getEOLPolicy();
             initialBootstrapper = new PatchBootstrapper(initialBootstrapper, pbr.getUser().getId(), pbr.getNumber(), localEOL);
         }
         catch (ScmException e)
@@ -515,7 +539,7 @@ public class BuildController implements EventListener
             {
                 try
                 {
-                    ScmClient client = scm.createClient();
+                    ScmClient client = scmClientFactory.createClient(scm);
                     getChangeSince(client, previousRevision, revision);
                 }
                 catch (ScmException e)
@@ -727,5 +751,10 @@ public class BuildController implements EventListener
     public void setServiceTokenManager(ServiceTokenManager serviceTokenManager)
     {
         this.serviceTokenManager = serviceTokenManager;
+    }
+
+    public void setScmClientFactory(ScmClientFactory scmClientFactory)
+    {
+        this.scmClientFactory = scmClientFactory;
     }
 }

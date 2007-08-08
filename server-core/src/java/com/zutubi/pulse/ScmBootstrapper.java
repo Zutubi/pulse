@@ -1,32 +1,39 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.core.*;
+import com.zutubi.pulse.core.BootstrapCommand;
+import com.zutubi.pulse.core.Bootstrapper;
+import com.zutubi.pulse.core.BuildException;
+import com.zutubi.pulse.core.BuildRevision;
+import com.zutubi.pulse.core.CommandContext;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.scm.ScmCancelledException;
-import com.zutubi.pulse.scm.ScmCheckoutEventHandler;
+import com.zutubi.pulse.scm.ScmEventHandler;
 import com.zutubi.pulse.scm.ScmClient;
-import com.zutubi.pulse.scm.config.ScmConfiguration;
 import com.zutubi.util.ForkOutputStream;
 import com.zutubi.util.IOUtils;
 import com.zutubi.util.logging.Logger;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 
 /**
  * A bootstrapper that populates the working directory by checking out from one SCM.
  */
-public abstract class ScmBootstrapper implements Bootstrapper, ScmCheckoutEventHandler
+public abstract class ScmBootstrapper implements Bootstrapper, ScmEventHandler
 {
     private static final Logger LOG = Logger.getLogger(ScmBootstrapper.class);
 
     protected String agent;
     protected String project;
-    protected ScmConfiguration scm;
+    protected ScmClient scm;
     protected BuildRevision revision;
     protected boolean terminated = false;
     protected transient PrintWriter outputWriter;
 
-    public ScmBootstrapper(String project, ScmConfiguration scm, BuildRevision revision)
+    public ScmBootstrapper(String project, ScmClient scm, BuildRevision revision)
     {
         this.project = project;
         this.scm = scm;
@@ -99,7 +106,7 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmCheckoutEventH
         outputWriter.println(message);
     }
 
-    public void fileCheckedOut(Change change)
+    public void fileChanged(Change change)
     {
         String revision = "";
         if (change.getRevision() != null)

@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.model.Change;
 /**
  * A callback interface for receiving information about a checkout in progress.
  */
-public interface ScmCheckoutEventHandler
+public interface ScmEventHandler
 {
     /**
      * Called to report a simple freeform status message.
@@ -15,12 +15,11 @@ public interface ScmCheckoutEventHandler
     void status(String message);
 
     /**
-     * Called when a file is checked out.
+     * Called when a file is changed.
      *
-     * @param change holds details of the checked out file, including at
-     *               least the file path and action
+     * @param change holds details, including at least the file path and action
      */
-    void fileCheckedOut(Change change);
+    void fileChanged(Change change);
 
     /**
      * Called periodically to check if the operation is cancelled.  If this

@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.NumericalRevision;
 import com.zutubi.pulse.scm.ScmCancelledException;
-import com.zutubi.pulse.scm.ScmCheckoutEventHandler;
+import com.zutubi.pulse.scm.ScmEventHandler;
 import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.pulse.scm.svn.SvnClient;
 import com.zutubi.pulse.test.PulseTestCase;
@@ -225,14 +225,14 @@ public class SvnExternalsTest extends PulseTestCase
     private void doCheckout(int rev) throws ScmException
     {
         server.addExternalPath(".");
-        server.checkout(null, checkoutDir, new NumericalRevision(rev), new ScmCheckoutEventHandler()
+        server.checkout(null, checkoutDir, new NumericalRevision(rev), new ScmEventHandler()
         {
             public void status(String message)
             {
                 System.out.println(message);
             }
 
-            public void fileCheckedOut(Change change)
+            public void fileChanged(Change change)
             {
                 System.out.println(change.toString());
             }

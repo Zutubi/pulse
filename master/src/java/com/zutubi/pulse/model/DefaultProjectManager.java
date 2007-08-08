@@ -26,6 +26,7 @@ import com.zutubi.pulse.prototype.config.project.types.TypeConfiguration;
 import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.scheduling.SchedulingException;
 import com.zutubi.pulse.scm.ScmException;
+import com.zutubi.pulse.scm.DelegateScmClientFactory;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.annotation.Secured;
 
@@ -50,7 +51,7 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
     private BuildManager buildManager;
     private EventManager eventManager;
     private ChangelistIsolator changelistIsolator;
-
+    private DelegateScmClientFactory scmClientManager;
     private LicenseManager licenseManager;
     private UserManager userManager;
     private CustomAclEntryCache projectAclEntryCache;
@@ -65,6 +66,7 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
     public void initialise()
     {
         changelistIsolator = new ChangelistIsolator(buildManager);
+        changelistIsolator.setScmClientFactory(scmClientManager);
 
         // register the canAddProject authorisation with the license manager.
         AddProjectAuthorisation addProjectAuthorisation = new AddProjectAuthorisation();
@@ -588,5 +590,10 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
     public void setConfigurationInjector(ConfigurationInjector configurationInjector)
     {
         configurationInjector.registerSetter(Project.class, this);
+    }
+
+    public void setScmClientManager(DelegateScmClientFactory scmClientManager)
+    {
+        this.scmClientManager = scmClientManager;
     }
 }

@@ -1,6 +1,8 @@
 package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
+import com.zutubi.pulse.scm.ScmClient;
+import com.zutubi.pulse.scm.ScmClientFactory;
 import com.zutubi.pulse.scm.ScmException;
 
 import java.io.InputStream;
@@ -15,6 +17,8 @@ public class DownloadSCMFileAction extends ProjectActionBase
     private String path;
     private InputStream inputStream;
     private String contentType;
+
+    private ScmClientFactory scmClientFactory;
 
     public String getPath()
     {
@@ -41,7 +45,8 @@ public class DownloadSCMFileAction extends ProjectActionBase
         try
         {
             ProjectConfiguration projectConfig = getProjectConfig();
-            inputStream = projectConfig.getScm().createClient().checkout(null, path);
+            ScmClient client = scmClientFactory.createClient(projectConfig.getScm());
+            inputStream = client.checkout(null, path);
             contentType = URLConnection.guessContentTypeFromName(path);
             return SUCCESS;
         }
@@ -50,5 +55,10 @@ public class DownloadSCMFileAction extends ProjectActionBase
             addActionError(e.getMessage());
             return ERROR;
         }
+    }
+
+    public void setScmClientFactory(ScmClientFactory scmClientFactory)
+    {
+        this.scmClientFactory = scmClientFactory;
     }
 }

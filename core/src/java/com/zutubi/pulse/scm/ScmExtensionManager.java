@@ -11,6 +11,8 @@ import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
  */
 public class ScmExtensionManager extends AbstractExtensionManager
 {
+    private DelegateScmClientFactory clientFactory;
+
     protected String getExtensionPointId()
     {
         return "com.zutubi.pulse.core.scms";
@@ -18,16 +20,27 @@ public class ScmExtensionManager extends AbstractExtensionManager
 
     protected void handleConfigurationElement(IExtension extension, IExtensionTracker tracker, IConfigurationElement config)
     {
-        String name = config.getAttribute("name");
-        String configClass = config.getAttribute("config-class");
-        String clientClass = config.getAttribute("client-class");
-        System.out.println(String.format("Adding SCM: %s -> (%s, %s)", name, configClass, clientClass));
+        // check configuration.
 
-        Class configClazz = loadClass(extension, configClass);
-        Class clientClazz = loadClass(extension, clientClass);
-        if(configClazz != null && clientClazz != null)
+        try
         {
-            tracker.registerObject(extension, name, IExtensionTracker.REF_WEAK);
+            String name = config.getAttribute("name");
+            String configClass = config.getAttribute("config-class");
+            String clientClass = config.getAttribute("factory-class");
+            System.out.println(String.format("Adding SCM: %s -> (%s, %s)", name, configClass, clientClass));
+
+            Class configClazz = loadClass(extension, configClass);
+            Class clientClazz = loadClass(extension, clientClass);
+            if(configClazz != null && clientClazz != null)
+            {
+                tracker.registerObject(extension, name, IExtensionTracker.REF_WEAK);
+            }
+
+            clientFactory.register(configClazz, clientClazz);
+        }
+        catch (ScmException e)
+        {
+            e.printStackTrace();
         }
     }
 
@@ -36,5 +49,10 @@ public class ScmExtensionManager extends AbstractExtensionManager
         for (Object o : objects)
         {
         }
+    }
+
+    public void setScmClientFactory(DelegateScmClientFactory clientFactory)
+    {
+        this.clientFactory = clientFactory;
     }
 }

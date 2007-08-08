@@ -49,14 +49,14 @@
             <attribute name="config-class" type="string">
                 <annotation>
                     <documentation>
-                        The configuration class for the SCM. Must be derived from SCMConfiguration.
+                        The configuration class for the SCM. Must be derived from ScmConfiguration.
                     </documentation>
                 </annotation>
             </attribute>
-            <attribute name="client-class" type="string">
+            <attribute name="factory-class" type="string">
                 <annotation>
                     <documentation>
-                        The client implementation class for the SCM. Must implement SCMClient.
+                        The client factory implementation class for the SCM. Must implement ScmClientFactory.
                     </documentation>
                 </annotation>
             </attribute>

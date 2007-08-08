@@ -11,18 +11,35 @@ import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.events.build.*;
+import com.zutubi.pulse.events.build.CommandCommencedEvent;
+import com.zutubi.pulse.events.build.CommandCompletedEvent;
+import com.zutubi.pulse.events.build.CommandOutputEvent;
+import com.zutubi.pulse.events.build.RecipeCommencedEvent;
+import com.zutubi.pulse.events.build.RecipeCompletedEvent;
+import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
+import com.zutubi.pulse.events.build.RecipeErrorEvent;
+import com.zutubi.pulse.events.build.RecipeStatusEvent;
 import com.zutubi.pulse.logging.CustomLogRecord;
-import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.model.AgentState;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.MasterBuildHostRequirements;
+import com.zutubi.pulse.model.MockBuildManager;
+import com.zutubi.pulse.model.RecipeResultNode;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
-import com.zutubi.pulse.scm.svn.config.SvnConfiguration;
+import com.zutubi.pulse.scm.ScmException;
+import com.zutubi.pulse.scm.svn.SvnClient;
 import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.services.UpgradeState;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 
 import java.io.File;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 /**
  */
@@ -82,12 +99,19 @@ public class RecipeControllerTest extends PulseTestCase
     public void testDispatchRequest()
     {
         // Initialising should cause a dispatch request, and should initialise the bootstrapper
-        Bootstrapper bootstrapper = new CheckoutBootstrapper("project", new SvnConfiguration(), new BuildRevision(), false);
-        recipeController.initialise(bootstrapper);
-        assertTrue(recipeQueue.hasDispatched(rootResult.getId()));
-        RecipeDispatchRequest dispatched = recipeQueue.getRequest(rootResult.getId());
-        assertSame(dispatchRequest, dispatched);
-        assertSame(dispatchRequest.getRequest().getBootstrapper(), bootstrapper);
+        try
+        {
+            Bootstrapper bootstrapper = new CheckoutBootstrapper("project", new SvnClient(null), new BuildRevision(), false);
+            recipeController.initialise(bootstrapper);
+            assertTrue(recipeQueue.hasDispatched(rootResult.getId()));
+            RecipeDispatchRequest dispatched = recipeQueue.getRequest(rootResult.getId());
+            assertSame(dispatchRequest, dispatched);
+            assertSame(dispatchRequest.getRequest().getBootstrapper(), bootstrapper);
+        }
+        catch (ScmException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     public void testDispatchedEvent()

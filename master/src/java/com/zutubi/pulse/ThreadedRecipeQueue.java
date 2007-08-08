@@ -12,22 +12,40 @@ import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.events.*;
+import com.zutubi.pulse.events.AgentEvent;
+import com.zutubi.pulse.events.AgentRemovedEvent;
+import com.zutubi.pulse.events.AgentStatusEvent;
+import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
-import com.zutubi.pulse.events.build.*;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.build.RecipeCompletedEvent;
+import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
+import com.zutubi.pulse.events.build.RecipeErrorEvent;
+import com.zutubi.pulse.events.build.RecipeEvent;
+import com.zutubi.pulse.events.build.RecipeStatusEvent;
 import com.zutubi.pulse.model.BuildReason;
 import com.zutubi.pulse.model.TriggerBuildReason;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.project.types.TypeConfiguration;
 import com.zutubi.pulse.scm.ScmChangeEvent;
+import com.zutubi.pulse.scm.ScmClient;
+import com.zutubi.pulse.scm.ScmClientFactory;
 import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.pulse.scm.config.ScmConfiguration;
 import com.zutubi.util.Constants;
 import com.zutubi.util.logging.Logger;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -92,7 +110,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     private EventManager eventManager;
     private MasterConfigurationManager configurationManager;
     private GeneralAdminConfiguration adminConfiguration;
-
+    private ScmClientFactory scmClientFactory;
 
     public ThreadedRecipeQueue()
     {
@@ -214,7 +232,8 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
             eventManager.publish(new RecipeStatusEvent(this, dispatchRequest.getRequest().getId(), "Initialising build revision..."));
             ProjectConfiguration projectConfig = dispatchRequest.getProjectConfig();
             ScmConfiguration scm = projectConfig.getScm();
-            Revision revision = scm.createClient().getLatestRevision();
+            ScmClient client = scmClientFactory.createClient(scm);
+            Revision revision = client.getLatestRevision();
 
             // May throw a BuildException
             updateRevision(dispatchRequest, revision);
@@ -792,6 +811,11 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         updateTimeout(adminConfiguration);
 
         configurationProvider.registerEventListener(this, false, false, GeneralAdminConfiguration.class);
+    }
+
+    public void setScmClientFactory(ScmClientFactory scmClientFactory)
+    {
+        this.scmClientFactory = scmClientFactory;
     }
 
     public void setConfigurationManager(MasterConfigurationManager configurationManager)

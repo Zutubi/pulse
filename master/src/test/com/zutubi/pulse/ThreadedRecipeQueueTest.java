@@ -32,12 +32,13 @@ import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.project.types.CustomTypeConfiguration;
 import com.zutubi.pulse.scm.FileStatus;
 import com.zutubi.pulse.scm.ScmChangeEvent;
-import com.zutubi.pulse.scm.ScmCheckoutEventHandler;
+import com.zutubi.pulse.scm.ScmEventHandler;
 import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.pulse.scm.ScmFile;
 import com.zutubi.pulse.scm.ScmCapability;
 import com.zutubi.pulse.scm.config.ScmConfiguration;
 import com.zutubi.pulse.scm.ScmClient;
+import com.zutubi.pulse.scm.DelegateScmClientFactory;
 import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.services.UpgradeStatus;
 import junit.framework.TestCase;
@@ -101,6 +102,14 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         queue.setUnsatisfiableTimeout(-1);
         queue.setConfigurationManager(configurationManager);
         queue.setConfigurationProvider(configurationProvider);
+        queue.setScmClientFactory(new DelegateScmClientFactory()
+        {
+            public ScmClient createClient(Object config) throws ScmException
+            {
+                MockScm scm = (MockScm) config;
+                return new MockScmClient(scm.throwError);
+            }
+        });
         queue.init();
 
         recipeErrors = new LinkedList<RecipeErrorEvent>();
@@ -782,11 +791,6 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             this.throwError = throwError;
         }
 
-        public ScmClient createClient() throws ScmException
-        {
-            return new MockScmClient(throwError);
-        }
-
         public String getType()
         {
             return "mock";
@@ -836,7 +840,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             throw new RuntimeException("Method not implemented.");
         }
 
-        public Revision checkout(String id, File toDirectory, Revision revision, ScmCheckoutEventHandler handler) throws ScmException
+        public Revision checkout(String id, File toDirectory, Revision revision, ScmEventHandler handler) throws ScmException
         {
             throw new RuntimeException("Method not implemented.");
         }
@@ -883,7 +887,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             throw new RuntimeException("Method not implemented.");
         }
 
-        public void update(String id, File workDir, Revision rev, ScmCheckoutEventHandler handler) throws ScmException
+        public void update(String id, File workDir, Revision rev, ScmEventHandler handler) throws ScmException
         {
             throw new RuntimeException("Method not implemented.");
         }

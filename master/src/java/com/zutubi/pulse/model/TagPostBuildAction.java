@@ -8,6 +8,7 @@ import com.zutubi.pulse.core.model.Property;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.scm.ScmClient;
+import com.zutubi.pulse.scm.ScmClientFactory;
 
 import java.util.List;
 
@@ -19,6 +20,8 @@ public class TagPostBuildAction extends PostBuildAction
 {
     private String tag;
     private boolean moveExisting;
+
+    private ScmClientFactory scmClientFactory;
 
     public TagPostBuildAction()
     {
@@ -36,7 +39,7 @@ public class TagPostBuildAction extends PostBuildAction
         try
         {
             String tagName = substituteVariables(tag, result, recipe, properties, projectConfig);
-            ScmClient client = projectConfig.getScm().createClient();
+            ScmClient client = scmClientFactory.createClient(projectConfig.getScm());
             client.tag(result.getScmDetails().getRevision(), tagName, moveExisting);
         }
         catch (Exception e)
@@ -99,5 +102,10 @@ public class TagPostBuildAction extends PostBuildAction
     public void setMoveExisting(boolean moveExisting)
     {
         this.moveExisting = moveExisting;
+    }
+
+    public void setScmClientFactory(ScmClientFactory scmClientFactory)
+    {
+        this.scmClientFactory = scmClientFactory;
     }
 }
