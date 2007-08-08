@@ -1,7 +1,7 @@
 package com.zutubi.prototype.webwork;
 
 import com.opensymphony.xwork.ActionContext;
-import com.zutubi.prototype.ConfigurationCheckHandler;
+import com.zutubi.pulse.core.config.ConfigurationCheckHandler;
 import com.zutubi.prototype.config.ConfigurationReferenceManager;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.SimpleInstantiator;

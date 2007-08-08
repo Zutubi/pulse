@@ -1,4 +1,4 @@
-package com.zutubi.pulse.validation.validators;
+package com.zutubi.pulse.scm.cvs.validation.validators;
 
 import org.netbeans.lib.cvsclient.CVSRoot;
 import com.zutubi.validation.validators.FieldValidatorSupport;
@@ -19,6 +19,10 @@ public class CvsRootValidator extends FieldValidatorSupport
     public void validate(Object object) throws ValidationException
     {
         Object obj = getFieldValue(getFieldName(), object);
+        if (obj == null)
+        {
+            return;
+        }
         try
         {
             CVSRoot.parse((String) obj);

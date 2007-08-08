@@ -1,7 +1,7 @@
 package com.zutubi.pulse.prototype.config.setup;
 
 import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.prototype.ConfigurationCheckHandlerSupport;
+import com.zutubi.pulse.core.config.ConfigurationCheckHandlerSupport;
 import com.zutubi.pulse.prototype.config.user.contacts.EmailContactConfiguration;
 
 import javax.mail.MessagingException;

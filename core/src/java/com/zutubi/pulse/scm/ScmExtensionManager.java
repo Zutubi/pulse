@@ -13,7 +13,7 @@ public class ScmExtensionManager extends AbstractExtensionManager
 {
     protected String getExtensionPointId()
     {
-        return "com.zutubi.pulse.servercore.scms";
+        return "com.zutubi.pulse.core.scms";
     }
 
     protected void handleConfigurationElement(IExtension extension, IExtensionTracker tracker, IConfigurationElement config)

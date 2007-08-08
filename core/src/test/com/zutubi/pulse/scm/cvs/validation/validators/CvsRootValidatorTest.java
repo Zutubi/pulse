@@ -1,11 +1,13 @@
-package com.zutubi.pulse.xwork.validator.validators;
+package com.zutubi.pulse.scm.cvs.validation.validators;
 
-import com.opensymphony.xwork.validator.FieldValidator;
+import com.zutubi.validation.FieldValidator;
+import com.zutubi.validation.validators.FieldValidatorTestCase;
+import junit.framework.Assert;
 
 /**
  * <class-comment/>
  */
-public class CvsRootValidatorTest extends FieldValidatorTestBase
+public class CvsRootValidatorTest extends FieldValidatorTestCase
 {
     public CvsRootValidatorTest(String testName)
     {
@@ -30,24 +32,24 @@ public class CvsRootValidatorTest extends FieldValidatorTestBase
     public void testEmptyString() throws Exception
     {
         validator.validate(new FieldProvider(""));
-        assertTrue(validationAware.hasErrors());
+        Assert.assertTrue(validationAware.hasErrors());
     }
 
     public void testNull() throws Exception
     {
         validator.validate(new FieldProvider(null));
-        assertTrue(validationAware.hasErrors());
+        Assert.assertFalse(validationAware.hasErrors());
     }
 
     public void testLocalRoot() throws Exception
     {
         validator.validate(new FieldProvider("/local"));
-        assertFalse(validationAware.hasErrors());
+        Assert.assertFalse(validationAware.hasErrors());
     }
 
     public void testPSever() throws Exception
     {
         validator.validate(new FieldProvider(":pserver:blah@somehost.com:/path/to/root"));
-        assertFalse(validationAware.hasErrors());
+        Assert.assertFalse(validationAware.hasErrors());
     }
 }

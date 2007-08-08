@@ -1,6 +1,6 @@
 package com.zutubi.prototype.webwork;
 
-import com.zutubi.prototype.ConfigurationCheckHandler;
+import com.zutubi.pulse.core.config.ConfigurationCheckHandler;
 import com.zutubi.util.logging.Logger;
 import freemarker.template.Template;
 

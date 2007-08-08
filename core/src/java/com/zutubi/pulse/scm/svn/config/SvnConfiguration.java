@@ -14,7 +14,7 @@ import com.zutubi.validation.annotations.Required;
 /**
  */
 @Form(fieldOrder = { "url", "username", "password", "keyfile", "keyfilePassphrase", "externalMonitorPaths", "verifyExternals", "monitor", "checkoutScheme", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod" })
-@ConfigurationCheck("com.zutubi.pulse.prototype.config.SvnConfigurationCheckHandler")
+@ConfigurationCheck("SvnConfigurationCheckHandler")
 @SymbolicName("zutubi.svnConfig")
 public class SvnConfiguration extends ScmConfiguration
 {

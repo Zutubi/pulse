@@ -12,7 +12,7 @@ import com.zutubi.validation.annotations.Required;
  *
  */
 @Form(fieldOrder = {"root", "password", "module", "branch", "monitor", "checkoutScheme", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod"})
-@ConfigurationCheck("com.zutubi.pulse.prototype.config.CvsConfigurationCheckHandler")
+@ConfigurationCheck("CvsConfigurationCheckHandler")
 @SymbolicName("zutubi.cvsConfig")
 public class CvsConfiguration extends ScmConfiguration
 {
@@ -86,6 +86,7 @@ public class CvsConfiguration extends ScmConfiguration
         File tmpRoot = configurationManager.getSystemPaths().getTmpRoot();
         return new CvsClient(root, module, password, branch, getFilterPaths(), tmpRoot);
 */
+        // need to use the users temp directories instead.
         throw new ScmException();
     }
 }

@@ -1,7 +1,7 @@
-package com.zutubi.pulse.prototype.config;
+package com.zutubi.pulse.scm.p4.config;
 
 import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.prototype.ConfigurationCheckHandlerSupport;
+import com.zutubi.pulse.core.config.ConfigurationCheckHandlerSupport;
 import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.pulse.scm.p4.config.PerforceConfiguration;
 

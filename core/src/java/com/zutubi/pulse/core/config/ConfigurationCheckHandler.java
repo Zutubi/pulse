@@ -1,4 +1,4 @@
-package com.zutubi.prototype;
+package com.zutubi.pulse.core.config;
 
 import com.zutubi.config.annotations.Transient;
 import com.zutubi.pulse.core.config.Configuration;

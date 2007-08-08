@@ -1,7 +1,7 @@
 package com.zutubi.pulse.prototype.config.admin;
 
 import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.prototype.ConfigurationCheckHandlerSupport;
+import com.zutubi.pulse.core.config.ConfigurationCheckHandlerSupport;
 import com.zutubi.pulse.prototype.config.user.contacts.EmailContactConfiguration;
 import com.zutubi.validation.annotations.Required;
 

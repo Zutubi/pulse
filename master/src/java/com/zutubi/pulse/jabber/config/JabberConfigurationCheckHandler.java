@@ -1,7 +1,7 @@
 package com.zutubi.pulse.jabber.config;
 
 import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.prototype.ConfigurationCheckHandlerSupport;
+import com.zutubi.pulse.core.config.ConfigurationCheckHandlerSupport;
 import com.zutubi.pulse.jabber.JabberManager;
 import org.jivesoftware.smack.XMPPException;
 

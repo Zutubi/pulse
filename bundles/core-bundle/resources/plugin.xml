@@ -2,4 +2,5 @@
 <?eclipse version="3.2"?>
 <plugin>
     <extension-point name="Commands" id="commands" schema="schema/commands.exsd"/>
+    <extension-point name="SCMs" id="scms" schema="schema/scms.exsd"/>
 </plugin>

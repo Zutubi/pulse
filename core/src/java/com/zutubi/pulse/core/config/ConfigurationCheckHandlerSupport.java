@@ -1,7 +1,4 @@
-package com.zutubi.prototype;
-
-import com.zutubi.pulse.core.config.AbstractConfiguration;
-import com.zutubi.pulse.core.config.Configuration;
+package com.zutubi.pulse.core.config;
 
 /**
  * Abstract base for configuration check handlers that supplies the standard
