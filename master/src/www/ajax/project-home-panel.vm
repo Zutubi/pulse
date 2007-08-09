@@ -118,7 +118,7 @@ project action links.
                 <tr>
                     <th class="content-row"">#wwtext("name=actions")</th>
                     <td class="content">
-                        <img src="$base/images/pencil.gif"/> <a href="$base/admin/project/#uce($project.name).action">#wwtext("name=project.configure")</a>
+                        <img src="$base/images/pencil.gif"/> <a href="$base/admin/projects/#uce($project.name)/">#wwtext("name=project.configure")</a>
                     </td>
                 </tr>
             </table>

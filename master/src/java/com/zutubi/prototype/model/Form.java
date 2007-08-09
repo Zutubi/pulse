@@ -27,6 +27,8 @@ public class Form extends UIComponent
 
     public Form()
     {
+        parameters.put(PARAMETER_AJAX, true);
+        parameters.put(PARAMETER_DISPLAY_MODE, false);
     }
 
     public String getName()

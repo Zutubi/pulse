@@ -4,11 +4,18 @@
 <html>
 <head>
     <title>#wwtext("name=build.properties.specify")</title>
+    <script type="text/javascript" src="$base/js/prototype.js"></script>
 </head>
 <body>
-    #projectTabs("configuration")
+    #projectTabs("home")
 
-    $formSource
-
+    <table class="config-panel">
+    <tr><td>
+        <h3 class="config-header">#wwtext("name=build.properties.specify")</h3>
+        <table class="eform">
+            <tr><td>$formSource</td></tr>
+        </table>
+    </td></tr>
+    </table>
 </body>
 </html>

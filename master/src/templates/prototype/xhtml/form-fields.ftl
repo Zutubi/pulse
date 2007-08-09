@@ -80,7 +80,7 @@ Ext.onReady(function()
     if(el)
     {
         el.set({tabindex: window.nextTabindex++ });
-    <#if parameters.submitOnEnter>
+    <#if parameters.submitOnEnter?default(true)>
         el.on('keypress', function(event){ return handleKeypress(event); });
     </#if>
     <#if form.displayMode?default(false)>

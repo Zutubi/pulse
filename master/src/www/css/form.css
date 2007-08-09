@@ -3,8 +3,9 @@ table.eform {
     margin-bottom: 16px;
 }
 
-a.browse {
+a.field-action {
     margin-left: 4px;
+    margin-right: 4px;
 }
 
 

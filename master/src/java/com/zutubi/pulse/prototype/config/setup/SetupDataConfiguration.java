@@ -1,6 +1,6 @@
 package com.zutubi.pulse.prototype.config.setup;
 
-import com.zutubi.config.annotations.BrowseLink;
+import com.zutubi.config.annotations.FieldAction;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Text;
@@ -22,7 +22,7 @@ public class SetupDataConfiguration extends AbstractConfiguration implements Val
 {
     @Required
     @Text(size = 400)
-    @BrowseLink(template = "SetupDataConfiguration")
+    @FieldAction(template = "SetupDataConfiguration")
     private String data;
 
     public String getData()

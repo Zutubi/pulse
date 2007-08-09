@@ -23,6 +23,7 @@ public class FieldDescriptor extends AbstractDescriptor
     private boolean required;
     private boolean constrained;
     private boolean submitOnEnter = false;
+    private List<String> actions = new LinkedList<String>();
     private List<String> scripts = new LinkedList<String>();
 
     public Field instantiate(String path, Record instance)
@@ -39,6 +40,7 @@ public class FieldDescriptor extends AbstractDescriptor
         field.addParameter("constrained", isConstrained());
         field.addParameter("submitOnEnter", submitOnEnter);
         field.addParameter("property", getProperty());
+        field.addParameter("actions", getActions());
         field.addParameter("scripts", getScripts());
         field.addAll(getParameters());
 
@@ -153,6 +155,16 @@ public class FieldDescriptor extends AbstractDescriptor
     public void setSubmitOnEnter(boolean submitOnEnter)
     {
         this.submitOnEnter = submitOnEnter;
+    }
+
+    public void addAction(String template)
+    {
+        actions.add(template);
+    }
+
+    public List<String> getActions()
+    {
+        return actions;
     }
 
     public void addScript(String template)

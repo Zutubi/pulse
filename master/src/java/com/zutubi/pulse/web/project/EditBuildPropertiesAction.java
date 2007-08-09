@@ -6,6 +6,8 @@ import com.zutubi.prototype.model.Field;
 import com.zutubi.prototype.model.Form;
 import com.zutubi.prototype.velocity.PrototypeDirective;
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.bootstrap.freemarker.FreemarkerConfigurationFactoryBean;
 import com.zutubi.pulse.core.config.NamedConfigurationComparator;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Revision;
@@ -15,16 +17,16 @@ import com.zutubi.pulse.scm.ScmClient;
 import com.zutubi.pulse.scm.ScmClientFactory;
 import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.util.logging.Logger;
+import freemarker.cache.ClassTemplateLoader;
+import freemarker.cache.MultiTemplateLoader;
+import freemarker.cache.TemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class EditBuildPropertiesAction extends ProjectActionBase
 {
@@ -35,9 +37,9 @@ public class EditBuildPropertiesAction extends ProjectActionBase
     private String formSource;
     private String revision;
     private List<ResourceProperty> properties;
-    private Configuration freemarkerConfiguration;
 
     private ScmClientFactory scmClientFactory;
+    private MasterConfigurationManager configurationManager;
 
     public String getFormSource()
     {
@@ -83,6 +85,8 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         field.setName("revision");
         field.setLabel("revision");
         field.setValue(revision);
+        field.addParameter("actions", Arrays.asList("getlatest"));
+        field.addParameter("scripts", Arrays.asList("EditBuildPropertiesAction.getlatest"));
         form.add(field);
 
         for(ResourceProperty property: properties)
@@ -104,8 +108,15 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         context.put("actionErrors", getActionErrors());
         context.put("fieldErrors", getFieldErrors());
 
+        Configuration configuration = FreemarkerConfigurationFactoryBean.createConfiguration(configurationManager);
+        configuration.setSharedVariable("projectId", getProject().getId());
+        TemplateLoader currentLoader = configuration.getTemplateLoader();
+        TemplateLoader classLoader = new ClassTemplateLoader(getClass(), "");
+        MultiTemplateLoader loader = new MultiTemplateLoader(new TemplateLoader[]{ classLoader, currentLoader });
+        configuration.setTemplateLoader(loader);
+
         StringWriter writer = new StringWriter();
-        Template template = freemarkerConfiguration.getTemplate("prototype/xhtml/form.ftl");
+        Template template = configuration.getTemplate("prototype/xhtml/form.ftl");
         template.process(context, writer);
 
         formSource = writer.toString();
@@ -218,13 +229,13 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         }
     }
 
-    public void setFreemarkerConfiguration(Configuration freemarkerConfiguration)
-    {
-        this.freemarkerConfiguration = freemarkerConfiguration;
-    }
-
     public void setScmClientFactory(ScmClientFactory scmClientFactory)
     {
         this.scmClientFactory = scmClientFactory;
+    }
+
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
     }
 }

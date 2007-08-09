@@ -545,6 +545,10 @@
             <interceptor-ref name="ajaxStack"/>
             <result name="success" type="httpheader">200</result>
         </action>
+
+        <action name="getLatestRevision" class="com.zutubi.pulse.web.ajax.GetLatestRevisionAction">
+            <result name="success" type="json">revision.xml</result>
+        </action>
     </package>
 
     <package name="configAjax" namespace="/aconfig" extends="default">
