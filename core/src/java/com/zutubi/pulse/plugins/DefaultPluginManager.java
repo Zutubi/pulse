@@ -1,41 +1,59 @@
 package com.zutubi.pulse.plugins;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.events.EventListener;
-import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.DataDirectoryLocatedEvent;
-import com.zutubi.util.*;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.EventListener;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.IOUtils;
+import com.zutubi.util.Mapping;
+import com.zutubi.util.Predicate;
+import com.zutubi.util.Sort;
 import com.zutubi.util.logging.Logger;
-import nu.xom.*;
+import nu.xom.Attribute;
+import nu.xom.Builder;
+import nu.xom.Document;
+import nu.xom.Element;
+import nu.xom.Elements;
+import nu.xom.ParsingException;
+import nu.xom.Serializer;
 import org.eclipse.core.internal.registry.osgi.OSGIUtils;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.RegistryFactory;
-import org.eclipse.core.runtime.IRegistryChangeListener;
-import org.eclipse.core.runtime.IRegistryChangeEvent;
 import org.eclipse.core.runtime.adaptor.EclipseStarter;
 import org.eclipse.core.runtime.dynamichelpers.ExtensionTracker;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 import org.eclipse.osgi.framework.internal.core.FrameworkProperties;
 import org.eclipse.osgi.framework.util.Headers;
+import org.eclipse.osgi.internal.baseadaptor.StateManager;
 import org.eclipse.osgi.service.resolver.BundleDescription;
 import org.eclipse.osgi.service.resolver.BundleSpecification;
 import org.eclipse.osgi.service.resolver.PlatformAdmin;
 import org.eclipse.osgi.service.resolver.State;
-import org.eclipse.osgi.internal.baseadaptor.StateManager;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.packageadmin.PackageAdmin;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.*;
 
 public class DefaultPluginManager implements PluginManager, EventListener
 {
@@ -189,7 +207,7 @@ public class DefaultPluginManager implements PluginManager, EventListener
 
             // Need to resolve OSGi bundles before starting (otherwise
             // Equinox barfs).
-            System.out.println("Resolving bundles.");
+//            System.out.println("Resolving bundles.");
             resolveBundles(null);
 
             foundPlugins = sortPlugins(foundPlugins);
@@ -247,11 +265,11 @@ public class DefaultPluginManager implements PluginManager, EventListener
         if (bundle.getState() == Bundle.INSTALLED)
         {
             // Resolve the bundle first
-            System.out.println("Resolving bundle: " + bundle.getSymbolicName());
+//            System.out.println("Resolving bundle: " + bundle.getSymbolicName());
             resolveBundles(new Bundle[] { bundle });
         }
 
-        System.out.println("Starting bundle: " + bundle.getSymbolicName());
+//        System.out.println("Starting bundle: " + bundle.getSymbolicName());
         try
         {
             bundle.start(Bundle.START_TRANSIENT);
