@@ -41,7 +41,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
 //    private CommitMessageTransformerManager transformerManager;
 //
 //    {
-//        structDefs.put(Project.class, new String[]{"name", "description", "url"});
+//        structDefs.put(Project.class, new String[]{"id", "name", "description", "url"});
 //    }
 //
     public RemoteApi()
@@ -799,7 +799,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
 //
 //        if(agent.isSlave())
 //        {
-//            agentManager.enableSlave(((SlaveAgent)agent).getId());
+//            agentManager.enableSlave(agent.getId());
 //        }
 //        else
 //        {
@@ -821,7 +821,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
 //
 //        if(agent.isSlave())
 //        {
-//            agentManager.disableSlave(((SlaveAgent)agent).getId());
+//            agentManager.disableSlave(agent.getId());
 //        }
 //        else
 //        {
