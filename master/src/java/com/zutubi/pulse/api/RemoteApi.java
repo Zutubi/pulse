@@ -8,13 +8,18 @@ import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.pulse.ShutdownManager;
 import com.zutubi.pulse.Version;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.system.SystemStartedEvent;
 
 import java.util.Hashtable;
+import java.util.List;
+import java.util.Vector;
 
 /**
  * Implements a simple API for remote monitoring and control.
@@ -412,6 +417,22 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
 //        {
 //            Hashtable<String, Object> buildDetails = convertResult(build);
 //            result.add(buildDetails);
+//        }
+//
+//        return result;
+//    }
+//
+//    public Vector<Hashtable<String, Object>> getBuildRange(String token, String projectName, String buildSpecification, int afterBuild, int toBuild) throws AuthenticationException
+//    {
+//        tokenManager.verifyUser(token);
+//
+//        Project project = internalGetProject(projectName);
+//        BuildSpecification spec = getBuildSpecification(project, buildSpecification);
+//        List<BuildResult> buildRange = buildManager.querySpecificationBuilds(project, spec.getPname(), ResultState.getCompletedStates(), afterBuild + 1, toBuild, 0, -1, false, false);
+//        Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(buildRange.size());
+//        for(BuildResult r: buildRange)
+//        {
+//            result.add(convertResult(r));
 //        }
 //
 //        return result;
