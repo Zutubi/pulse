@@ -161,7 +161,7 @@ public class RecipeProcessor
         if(compressWorkingCopy)
         {
             eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Compressing working copy snapshot..."));
-            if(zipDir(paths.getOutputDir()))
+            if(zipDir(paths.getBaseDir()))
             {
                 eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Working copy snapshot compressed."));
             }
