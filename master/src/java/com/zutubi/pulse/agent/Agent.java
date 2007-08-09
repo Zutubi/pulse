@@ -31,4 +31,6 @@ public interface Agent
     boolean isAvailable();
 
     AgentState.EnableState getEnableState();
+
+    void setAgentState(AgentState agentState);
 }

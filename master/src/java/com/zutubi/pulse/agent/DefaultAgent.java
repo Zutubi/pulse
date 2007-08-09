@@ -185,4 +185,9 @@ public class DefaultAgent implements Agent
     {
         return agentState.getEnableState();
     }
+
+    public void setAgentState(AgentState agentState)
+    {
+        this.agentState = agentState;
+    }
 }

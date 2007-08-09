@@ -112,6 +112,7 @@ public class AgentUpdater implements Runnable
                     if(build == expectedBuild)
                     {
                         // We did it!
+                        agent.upgradeStatus(UpgradeState.INITIAL, -1, null);
                         completed(true);
                         return;
                     }
