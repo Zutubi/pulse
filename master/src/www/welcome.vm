@@ -21,21 +21,21 @@
         Pulse 2.0 is a major rework, boasting largely new internals that enable important new features.
         New things to look at so far include:
 
-        <h3><a href="/admin/projects.action">Configuration UI</a></h3>
+        <h3><a href="/admin/projects/">Configuration UI</a></h3>
         <p>
             The configuration UI has been completely redone.  All configuration is now in the one place,
             under 'administration'.  We have used AJAX to create a more consistent interface that is also
             more responsive.
         </p>
 
-        <h3><a href="/admin/projects.action">Templated Configuration</a></h3>
+        <h3><a href="/admin/projects/">Templated Configuration</a></h3>
         <p>
             The new configuration system supports templating: a way to share common configuration between
             related projects (and agents) by inheritance from ancestor templates.  You will notice that
             the configuration system allows you to configure a hierarchy of projects/agents, and shows
             the inheritance relationship of fields.
         </p>
-        <h3><a href="/admin/plugins.action">Plugins</a></h3>
+        <h3><a href="/admin/plugins/">Plugins</a></h3>
         <p>
             Support for various tools is being extracted into plugins.  The plugin UI is raw at the moment,
             but illustrates that we are already running some of the functionality via plugins 'under the
