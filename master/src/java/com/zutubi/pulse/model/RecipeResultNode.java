@@ -1,7 +1,7 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.util.UnaryFunction;
+import com.zutubi.util.UnaryFunction;
 
 import java.io.File;
 import java.util.LinkedList;
