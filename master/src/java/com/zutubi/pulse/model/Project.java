@@ -37,6 +37,8 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
 
     private State state = State.IDLE;
     private long nextBuildNumber = 1;
+    private int buildCount = 0;
+    private int successCount = 0;
     private Long lastPollTime;
     private boolean forceClean = false;
     private ProjectConfiguration config;
@@ -158,6 +160,26 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
     public void setNextBuildNumber(long nextBuildNumber)
     {
         this.nextBuildNumber = nextBuildNumber;
+    }
+
+    public int getBuildCount()
+    {
+        return buildCount;
+    }
+
+    public void setBuildCount(int buildCount)
+    {
+        this.buildCount = buildCount;
+    }
+
+    public int getSuccessCount()
+    {
+        return successCount;
+    }
+
+    public void setSuccessCount(int successCount)
+    {
+        this.successCount = successCount;
     }
 
     public AclObjectIdentity getAclObjectIdentity()

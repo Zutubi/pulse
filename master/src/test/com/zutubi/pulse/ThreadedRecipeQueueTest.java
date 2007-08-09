@@ -742,11 +742,12 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
     private RecipeDispatchRequest createDispatchRequest(int type, long id, ProjectConfiguration projectConfig)
     {
         Project project = new Project();
+        project.setConfig(projectConfig);
         BuildResult result = new BuildResult(new UnknownBuildReason(), project, 100, false);
         BuildHostRequirements requirements = new MockBuildHostRequirements(type);
         RecipeRequest request = new RecipeRequest("project", id, null, null, null, false, false, false, null, new LinkedList<ResourceProperty>());
         request.setBootstrapper(new ChainBootstrapper());
-        return new RecipeDispatchRequest(requirements, new BuildRevision(), request, projectConfig, result);
+        return new RecipeDispatchRequest(project, requirements, new BuildRevision(), request, result);
     }
 
     private RecipeDispatchRequest createDispatchRequest(int type)

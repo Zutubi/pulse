@@ -159,11 +159,8 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
     /**
      * Enqueue a new recipe dispatch request.
-<<<<<<< .working
-=======
      *
      * @param dispatchRequest the request to be enqueued
->>>>>>> .merge-right.r3435
      */
     public void enqueue(RecipeDispatchRequest dispatchRequest)
     {
@@ -230,7 +227,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         {
             // Let's initialise it
             eventManager.publish(new RecipeStatusEvent(this, dispatchRequest.getRequest().getId(), "Initialising build revision..."));
-            ProjectConfiguration projectConfig = dispatchRequest.getProjectConfig();
+            ProjectConfiguration projectConfig = dispatchRequest.getProject().getConfig();
             ScmConfiguration scm = projectConfig.getScm();
             ScmClient client = scmClientFactory.createClient(scm);
             Revision revision = client.getLatestRevision();
@@ -243,8 +240,9 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
     private void updateRevision(RecipeDispatchRequest dispatchRequest, Revision revision) throws BuildException
     {
-        TypeConfiguration type = dispatchRequest.getProjectConfig().getType();
-        String pulseFile = type.getPulseFile(dispatchRequest.getRequest().getId(), dispatchRequest.getProjectConfig(), revision, null);
+        ProjectConfiguration projectConfig = dispatchRequest.getProject().getConfig();
+        TypeConfiguration type = projectConfig.getType();
+        String pulseFile = type.getPulseFile(dispatchRequest.getRequest().getId(), projectConfig, revision, null);
         dispatchRequest.getRevision().update(revision, pulseFile);
     }
 
@@ -556,6 +554,8 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         context.addProperty("build.timestamp", BuildContext.PULSE_BUILD_TIMESTAMP_FORMAT.format(new Date(buildRevision.getTimestamp())));
         context.addProperty("build.timestamp.millis", Long.toString(buildRevision.getTimestamp()));
         context.addProperty("master.url", MasterAgentService.constructMasterUrl(adminConfiguration, configurationManager.getSystemConfig()));
+        context.addProperty("build.count", Integer.toString(request.getProject().getBuildCount()));
+        context.addProperty("success.count", Integer.toString(request.getProject().getSuccessCount()));
         return context;
     }
 
@@ -737,7 +737,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
         for (RecipeDispatchRequest request : requests)
         {
-            ProjectConfiguration requestProject = request.getProjectConfig();
+            ProjectConfiguration requestProject = request.getProject().getConfig();
             if (!request.getRevision().isFixed() && requestProject.getProjectId() == changedProject.getProjectId())
             {
                 try

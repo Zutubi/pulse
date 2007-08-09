@@ -173,7 +173,7 @@ public class BuildController implements EventListener
             boolean incremental = !request.isPersonal() && checkoutScheme == CheckoutScheme.INCREMENTAL_UPDATE;
             List<ResourceProperty> recipeProperties = new LinkedList<ResourceProperty>(buildProperties);
             RecipeRequest recipeRequest = new RecipeRequest(projectConfig.getName(), recipeResult.getId(), stage.getRecipe(), incremental, true, projectConfig.getOptions().getRetainWorkingCopy(), getResourceRequirements(stage), recipeProperties);
-            RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(stage.getHostRequirements(), request.getRevision(), recipeRequest, projectConfig, buildResult);
+            RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(project, stage.getHostRequirements(), request.getRevision(), recipeRequest, buildResult);
             DefaultRecipeLogger logger = new DefaultRecipeLogger(new File(paths.getRecipeDir(buildResult, recipeResult.getId()), RecipeResult.RECIPE_LOG));
             RecipeResultNode previousRecipe = previousSuccessful == null ? null : previousSuccessful.findResultNodeByHandle(stage.getHandle());
             RecipeController rc = new RecipeController(projectConfig, buildResult, childResultNode, dispatchRequest, recipeProperties, request.isPersonal(), incremental, previousRecipe, logger, collector);
@@ -657,8 +657,14 @@ public class BuildController implements EventListener
                 if (project.isForceClean())
                 {
                     project.setForceClean(false);
-                    projectManager.save(project);
                 }
+
+                project.setBuildCount(project.getBuildCount() + 1);
+                if(buildResult.succeeded())
+                {
+                    project.setSuccessCount(project.getSuccessCount() + 1);
+                }
+                projectManager.save(project);
 
                 for (PostBuildActionConfiguration action : projectConfig.getPostBuildActions())
                 {

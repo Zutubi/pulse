@@ -88,6 +88,7 @@
                 <ref local="schemaUpgrade0102019001"/>
                 <ref local="subscriptionCondition"/>
                 <ref local="longRevisionComments"/>
+                <ref local="schemaUpgrade0102033001"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -610,5 +611,14 @@
 
     <bean id="longRevisionComments" class="com.zutubi.pulse.upgrade.tasks.LongRevisionCommentsUpgradeTask" autowire="byName">
         <property name="buildNumber" value="102030001"/>
+    </bean>
+
+    <bean id="schemaUpgrade0102033001" class="com.zutubi.pulse.upgrade.tasks.MigrateSchemaUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="102033001"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/upgrade/schema/build_0102033001/BuildSpecification.hbm.xml</value>
+            </list>
+        </property>
     </bean>
 </beans>

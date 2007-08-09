@@ -20,11 +20,7 @@ import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.events.build.RecipeStatusEvent;
 import com.zutubi.pulse.logging.CustomLogRecord;
-import com.zutubi.pulse.model.AgentState;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.MasterBuildHostRequirements;
-import com.zutubi.pulse.model.MockBuildManager;
-import com.zutubi.pulse.model.RecipeResultNode;
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.pulse.scm.svn.SvnClient;
@@ -79,7 +75,7 @@ public class RecipeControllerTest extends PulseTestCase
 
         RecipeRequest recipeRequest = new RecipeRequest("project", rootResult.getId(), rootResult.getRecipeName());
         BuildResult build = new BuildResult();
-        dispatchRequest = new RecipeDispatchRequest(new MasterBuildHostRequirements(), new BuildRevision(), recipeRequest, null, null);
+        dispatchRequest = new RecipeDispatchRequest(new Project(), new MasterBuildHostRequirements(), new BuildRevision(), recipeRequest, null);
         recipeController = new RecipeController(null, build, rootNode, dispatchRequest, new LinkedList<ResourceProperty>(), false, false, null, logger, resultCollector);
         recipeController.setRecipeQueue(recipeQueue);
         recipeController.setBuildManager(buildManager);

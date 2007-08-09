@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.model.BuildHostRequirements;
 import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.util.TimeStamps;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 
@@ -12,10 +13,10 @@ import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
  */
 public class RecipeDispatchRequest
 {
+    private Project project;
     private BuildHostRequirements hostRequirements;
     private BuildRevision revision;
     private RecipeRequest request;
-    private ProjectConfiguration projectConfig;
     private BuildResult build;
     private long queueTime;
     /**
@@ -24,13 +25,18 @@ public class RecipeDispatchRequest
      */
     private long timeout = -1;
 
-    public RecipeDispatchRequest(BuildHostRequirements hostRequirements, BuildRevision revision, RecipeRequest request, ProjectConfiguration projectConfig, BuildResult build)
+    public RecipeDispatchRequest(Project project, BuildHostRequirements hostRequirements, BuildRevision revision, RecipeRequest request, BuildResult build)
     {
+        this.project = project;
         this.hostRequirements = hostRequirements;
         this.revision = revision;
         this.request = request;
         this.build = build;
-        this.projectConfig = projectConfig;
+    }
+
+    public Project getProject()
+    {
+        return project;
     }
 
     public BuildHostRequirements getHostRequirements()
@@ -51,11 +57,6 @@ public class RecipeDispatchRequest
     public BuildResult getBuild()
     {
         return build;
-    }
-
-    public ProjectConfiguration getProjectConfig()
-    {
-        return projectConfig;
     }
 
     public void queued()
