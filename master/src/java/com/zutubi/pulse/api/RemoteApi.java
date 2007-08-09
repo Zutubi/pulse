@@ -8,18 +8,13 @@ import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.pulse.ShutdownManager;
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.config.Configuration;
-import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.system.SystemStartedEvent;
 
 import java.util.Hashtable;
-import java.util.List;
-import java.util.Vector;
 
 /**
  * Implements a simple API for remote monitoring and control.
@@ -438,6 +433,22 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
 //        return result;
 //    }
 //
+//    public Vector<Hashtable<String, Object>> getPreviousBuild(String token, String projectName, int id) throws AuthenticationException
+//    {
+//        tokenManager.verifyUser(token);
+//
+//        Project project = internalGetProject(projectName);
+//        BuildResult buildResult = internalGetBuild(project, id);
+//        buildResult = buildManager.getPreviousBuildResult(buildResult);
+//        Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>();
+//        if(buildResult != null)
+//        {
+//            result.add(convertResult(buildResult));
+//        }
+//
+//        return result;
+//    }
+//    
 //    private ResultState[] mapStates(String[] stateNames)
 //    {
 //        if(stateNames.length > 0)
@@ -651,6 +662,58 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
 //            result.put("action", change.getAction().toString().toLowerCase());
 //        }
 //
+//        return result;
+//    }
+//
+//    public Vector<Hashtable<String, Object>> getArtifactsInBuild(String token, final String projectName, final int id) throws AuthenticationException
+//    {
+//        tokenManager.verifyUser(token);
+//        final Project project = internalGetProject(projectName);
+//        final Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>();
+//
+//        buildManager.executeInTransaction(new Runnable()
+//        {
+//            public void run()
+//            {
+//                final BuildResult build = internalGetBuild(project, id);
+//
+//                build.getRoot().forEachNode(new UnaryFunction<RecipeResultNode>()
+//                {
+//                    public void process(RecipeResultNode recipeResultNode)
+//                    {
+//                        RecipeResult recipeResult = recipeResultNode.getResult();
+//                        if(recipeResult != null)
+//                        {
+//                            String stage = recipeResultNode.getStage();
+//                            for(CommandResult commandResult: recipeResult.getCommandResults())
+//                            {
+//                                String command = commandResult.getCommandName();
+//                                for(StoredArtifact artifact: commandResult.getArtifacts())
+//                                {
+//                                    result.add(convertArtifact(artifact, projectName, build, stage, command));
+//                                }
+//                            }
+//                        }
+//                    }
+//                });
+//            }
+//        });
+//
+//        return result;
+//    }
+//
+//    private Hashtable<String, Object> convertArtifact(StoredArtifact artifact, String project, BuildResult build, String stage, String command)
+//    {
+//        Hashtable<String, Object> result = new Hashtable<String, Object>();
+//        result.put("stage", stage);
+//        result.put("command", command);
+//        result.put("name", artifact.getName());
+//        result.put("permalink", StringUtils.join("/", "display/projects",
+//                                                 StringUtils.uriComponentEncode(project),
+//                                                 "builds", Long.toString(build.getNumber()),
+//                                                 StringUtils.uriComponentEncode(stage),
+//                                                 StringUtils.uriComponentEncode(command),
+//                                                 StringUtils.uriComponentEncode(artifact.getName())));
 //        return result;
 //    }
 //

@@ -1,6 +1,7 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.util.UnaryFunction;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -309,5 +310,15 @@ public class RecipeResultNode extends Entity
             }
         }
         return null;
+    }
+
+    public void forEachNode(UnaryFunction<RecipeResultNode> fn)
+    {
+        fn.process(this);
+
+        for(RecipeResultNode child: children)
+        {
+            child.forEachNode(fn);
+        }
     }
 }
