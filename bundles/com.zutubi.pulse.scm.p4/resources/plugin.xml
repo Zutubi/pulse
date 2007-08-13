@@ -2,6 +2,6 @@
 <?eclipse version="3.2"?>
 <plugin>
     <extension point="com.zutubi.pulse.core.scms">
-        <scm name="p4" config-class="com.zutubi.pulse.scm.p4.config.PerforceConfiguration" factory-class="com.zutubi.pulse.scm.p4.PerforceClientFactory"/>
+        <scm name="p4" config-class="com.zutubi.pulse.core.scm.p4.config.PerforceConfiguration" factory-class="com.zutubi.pulse.core.scm.p4.PerforceClientFactory"/>
     </extension>
 </plugin>

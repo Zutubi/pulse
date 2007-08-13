@@ -2,8 +2,8 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
-import com.zutubi.pulse.scm.ScmException;
-import com.zutubi.pulse.scm.ScmClient;
+import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;

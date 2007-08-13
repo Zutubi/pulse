@@ -49,7 +49,7 @@
 
         <discriminator column="TYPE" type="string" length="15"/>
 
-        <subclass name="com.zutubi.pulse.scm.cvs.CvsFileRevision" discriminator-value="CVS">
+        <subclass name="com.zutubi.pulse.core.scm.cvs.CvsFileRevision" discriminator-value="CVS">
             <property name="revision" type="string"/>
         </subclass>
 

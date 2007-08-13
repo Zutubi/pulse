@@ -2,6 +2,6 @@
 <?eclipse version="3.2"?>
 <plugin>
     <extension point="com.zutubi.pulse.core.scms">
-        <scm name="svn" config-class="com.zutubi.pulse.scm.svn.config.SvnConfiguration" factory-class="com.zutubi.pulse.scm.svn.SvnClientFactory"/>
+        <scm name="svn" config-class="com.zutubi.pulse.core.scm.svn.config.SvnConfiguration" factory-class="com.zutubi.pulse.core.scm.svn.SvnClientFactory"/>
     </extension>
 </plugin>

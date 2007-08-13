@@ -1,6 +1,6 @@
 package com.zutubi.pulse.vfs.pulse;
 
-import com.zutubi.pulse.scm.config.ScmConfiguration;
+import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;

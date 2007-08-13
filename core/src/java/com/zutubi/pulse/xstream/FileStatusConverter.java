@@ -6,7 +6,7 @@ import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
-import com.zutubi.pulse.scm.FileStatus;
+import com.zutubi.pulse.core.scm.FileStatus;
 
 import java.util.Map;
 

@@ -6,7 +6,7 @@ import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.persistence.ChangelistDao;
 import com.zutubi.pulse.prototype.config.user.UserAliasConfiguration;
 import com.zutubi.pulse.prototype.config.user.UserConfiguration;
-import com.zutubi.pulse.scm.cvs.CvsFileRevision;
+import com.zutubi.pulse.core.scm.cvs.CvsFileRevision;
 import com.zutubi.util.Constants;
 
 import java.util.Date;

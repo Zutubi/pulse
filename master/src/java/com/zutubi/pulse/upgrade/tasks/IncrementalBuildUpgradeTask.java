@@ -1,6 +1,6 @@
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.pulse.scm.CheckoutScheme;
+import com.zutubi.pulse.core.scm.CheckoutScheme;
 import com.zutubi.pulse.upgrade.UpgradeContext;
 import com.zutubi.pulse.util.JDBCUtils;
 

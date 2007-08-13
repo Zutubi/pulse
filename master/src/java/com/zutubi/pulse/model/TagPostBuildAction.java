@@ -7,8 +7,8 @@ import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Property;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
-import com.zutubi.pulse.scm.ScmClient;
-import com.zutubi.pulse.scm.ScmClientFactory;
+import com.zutubi.pulse.core.scm.ScmClient;
+import com.zutubi.pulse.core.scm.ScmClientFactory;
 
 import java.util.List;
 

@@ -1,8 +1,8 @@
 package com.zutubi.pulse.web.ajax;
 
 import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.scm.ScmClient;
-import com.zutubi.pulse.scm.ScmClientFactory;
+import com.zutubi.pulse.core.scm.ScmClient;
+import com.zutubi.pulse.core.scm.ScmClientFactory;
 import com.zutubi.pulse.web.project.ProjectActionSupport;
 
 /**

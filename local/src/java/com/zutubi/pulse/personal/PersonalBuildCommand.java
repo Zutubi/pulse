@@ -5,8 +5,8 @@ import com.zutubi.pulse.command.Command;
 import com.zutubi.pulse.config.CommandLineConfig;
 import com.zutubi.pulse.config.CompositeConfig;
 import com.zutubi.pulse.config.PropertiesConfig;
-import com.zutubi.pulse.scm.WorkingCopy;
-import com.zutubi.pulse.scm.WorkingCopyStatus;
+import com.zutubi.pulse.core.scm.WorkingCopy;
+import com.zutubi.pulse.core.scm.WorkingCopyStatus;
 import org.apache.commons.cli.*;
 
 import java.io.File;

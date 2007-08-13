@@ -29,10 +29,10 @@ import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.project.types.TypeConfiguration;
 import com.zutubi.pulse.scm.ScmChangeEvent;
-import com.zutubi.pulse.scm.ScmClient;
-import com.zutubi.pulse.scm.ScmClientFactory;
-import com.zutubi.pulse.scm.ScmException;
-import com.zutubi.pulse.scm.config.ScmConfiguration;
+import com.zutubi.pulse.core.scm.ScmClient;
+import com.zutubi.pulse.core.scm.ScmClientFactory;
+import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.util.Constants;
 import com.zutubi.util.logging.Logger;
 

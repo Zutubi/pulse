@@ -2,7 +2,7 @@ package com.zutubi.pulse.personal;
 
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.scm.*;
+import com.zutubi.pulse.core.scm.*;
 import com.zutubi.pulse.xmlrpc.PulseXmlRpcClient;
 import com.zutubi.pulse.xmlrpc.PulseXmlRpcException;
 import com.zutubi.util.IOUtils;

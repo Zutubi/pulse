@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.CommandContext;
 import com.zutubi.pulse.core.RecipePaths;
-import com.zutubi.pulse.scm.ScmClient;
+import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.pulse.util.FileSystemUtils;
 
 import java.io.File;

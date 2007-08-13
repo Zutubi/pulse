@@ -6,7 +6,7 @@ import com.zutubi.pulse.core.CommandContext;
 import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.repository.FileRepository;
-import com.zutubi.pulse.scm.FileStatus;
+import com.zutubi.pulse.core.scm.FileStatus;
 
 import java.io.File;
 

@@ -1,9 +1,9 @@
 package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
-import com.zutubi.pulse.scm.ScmClient;
-import com.zutubi.pulse.scm.ScmClientFactory;
-import com.zutubi.pulse.scm.ScmException;
+import com.zutubi.pulse.core.scm.ScmClient;
+import com.zutubi.pulse.core.scm.ScmClientFactory;
+import com.zutubi.pulse.core.scm.ScmException;
 
 import java.io.InputStream;
 import java.net.URLConnection;

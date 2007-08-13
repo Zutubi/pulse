@@ -6,7 +6,7 @@ import com.zutubi.pulse.core.model.NumericalFileRevision;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.project.changeviewer.FisheyeConfiguration;
-import com.zutubi.pulse.scm.config.ScmConfiguration;
+import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.test.PulseTestCase;
 
 /**

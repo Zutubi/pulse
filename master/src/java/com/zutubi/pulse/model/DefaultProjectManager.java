@@ -25,8 +25,8 @@ import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.project.types.TypeConfiguration;
 import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.scheduling.SchedulingException;
-import com.zutubi.pulse.scm.ScmException;
-import com.zutubi.pulse.scm.DelegateScmClientFactory;
+import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.scm.DelegateScmClientFactory;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.annotation.Secured;
 

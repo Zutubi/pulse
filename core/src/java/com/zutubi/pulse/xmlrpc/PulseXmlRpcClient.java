@@ -1,6 +1,6 @@
 package com.zutubi.pulse.xmlrpc;
 
-import com.zutubi.pulse.scm.ScmConfiguration;
+import com.zutubi.pulse.core.scm.ScmConfiguration;
 import org.apache.xmlrpc.XmlRpcClient;
 
 import java.net.MalformedURLException;
