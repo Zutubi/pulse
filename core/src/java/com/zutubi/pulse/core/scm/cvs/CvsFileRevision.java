@@ -1,4 +1,4 @@
-package com.zutubi.pulse.scm.cvs;
+package com.zutubi.pulse.core.scm.cvs;
 
 import com.zutubi.pulse.core.model.FileRevision;
 

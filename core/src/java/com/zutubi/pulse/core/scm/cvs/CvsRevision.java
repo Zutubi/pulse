@@ -1,6 +1,6 @@
-package com.zutubi.pulse.scm.cvs;
+package com.zutubi.pulse.core.scm.cvs;
 
-import com.zutubi.pulse.scm.ScmException;
+import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.model.Revision;
 
 import java.text.DateFormat;
