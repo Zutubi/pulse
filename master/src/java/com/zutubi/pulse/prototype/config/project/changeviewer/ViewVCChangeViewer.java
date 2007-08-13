@@ -1,12 +1,11 @@
 package com.zutubi.pulse.prototype.config.project.changeviewer;
 
-import com.zutubi.pulse.core.model.CvsRevision;
+import com.zutubi.config.annotations.Form;
+import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.pulse.core.model.FileRevision;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.scm.config.ScmConfiguration;
 import com.zutubi.util.StringUtils;
-import com.zutubi.config.annotations.Form;
-import com.zutubi.config.annotations.SymbolicName;
 
 /**
  * A change viewer for linking to ViewVC.
@@ -15,6 +14,8 @@ import com.zutubi.config.annotations.SymbolicName;
 @SymbolicName("zutubi.viewVCChangeViewerConfig")
 public class ViewVCChangeViewer extends BasePathChangeViewer
 {
+    private static final String CVS_TYPE = "cvs";
+
     public ViewVCChangeViewer()
     {
         super(null, null);
@@ -25,14 +26,15 @@ public class ViewVCChangeViewer extends BasePathChangeViewer
         super(baseURL, projectPath);
     }
 
-    public boolean hasCapability(ScmConfiguration scm, Capability capability)
+    public boolean hasCapability(Capability capability)
     {
-        if(capability.equals(Capability.VIEW_CHANGESET) && scm.getType().equals("cvs"))
+        ScmConfiguration scm = lookupScmConfiguration();
+        if(capability.equals(Capability.VIEW_CHANGESET) && scm.getType().equals(CVS_TYPE))
         {
             return false;
         }
         
-        return super.hasCapability(scm, capability);
+        return super.hasCapability(capability);
     }
 
     public String getDetails()
@@ -42,11 +44,6 @@ public class ViewVCChangeViewer extends BasePathChangeViewer
 
     public String getChangesetURL(Revision revision)
     {
-        if(revision instanceof CvsRevision)
-        {
-            return null;
-        }
-
         return StringUtils.join("/", true, true, getBaseURL(), getProjectPath() + "?rev=" + revision.getRevisionString() + "&view=rev");
     }
 

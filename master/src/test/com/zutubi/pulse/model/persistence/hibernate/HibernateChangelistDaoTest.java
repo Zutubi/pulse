@@ -6,6 +6,7 @@ import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.persistence.ChangelistDao;
 import com.zutubi.pulse.prototype.config.user.UserAliasConfiguration;
 import com.zutubi.pulse.prototype.config.user.UserConfiguration;
+import com.zutubi.pulse.scm.cvs.CvsFileRevision;
 import com.zutubi.util.Constants;
 
 import java.util.Date;
@@ -37,7 +38,7 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
     public void testLoadSave() throws Exception
     {
         Date date = new Date(System.currentTimeMillis() - Constants.YEAR);
-        CvsRevision revision = new CvsRevision("pulse", "MAIN", "test changelist", date);
+        Revision revision = new Revision("pulse", "test changelist", date);
         Changelist list = new Changelist("scm", revision);
         Change change = new Change("some/random/file", new NumericalFileRevision(23), Change.Action.EDIT);
 
@@ -49,7 +50,7 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
         Changelist otherList = changelistDao.findById(list.getId());
         assertPropertyEquals(list, otherList);
 
-        CvsRevision otherRevision = (CvsRevision) otherList.getRevision();
+        Revision otherRevision = otherList.getRevision();
         assertPropertyEquals(revision, otherRevision);
 
         Change otherChange = otherList.getChanges().get(0);
@@ -190,14 +191,14 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        Changelist changelist = changelistDao.findByRevision("scm", new NumericalRevision(12));
+        Changelist changelist = changelistDao.findByRevision("scm", createRevision(12));
         assertNotNull(changelist);
         assertEquals("jason", changelist.getRevision().getAuthor());
     }
 
     public void testLookupByCvsRevision()
     {
-        Revision r = new CvsRevision("joe", "MAIN", "i made this", new Date(1234));
+        Revision r = new Revision("joe", "i made this", new Date(1234));
         Changelist list = new Changelist("scm", r);
 
         changelistDao.save(list);
@@ -211,7 +212,7 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
 
     public void testFindByResult()
     {
-        Changelist list = new Changelist("uid", new NumericalRevision(1));
+        Changelist list = new Changelist("uid", createRevision(1));
         list.addResultId(12);
         changelistDao.save(list);
         commitAndRefreshTransaction();
@@ -225,7 +226,7 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
 
     public void testFindByResultDistinct()
     {
-        NumericalRevision r1 = new NumericalRevision(1);
+        Revision r1 = createRevision(1);
         r1.setDate(new Date(System.currentTimeMillis() - 1000));
         Changelist l1 = new Changelist("uid", r1);
         l1.addResultId(12);
@@ -236,7 +237,7 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
         l1.addChange(new Change("file3", new NumericalFileRevision(4), Change.Action.ADD));
         changelistDao.save(l1);
 
-        NumericalRevision r2 = new NumericalRevision(100);
+        Revision r2 = createRevision(100);
         r2.setDate(new Date(System.currentTimeMillis()));
         Changelist l2 = new Changelist("uid", r2);
         l2.addResultId(13);
@@ -300,7 +301,7 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
 
     private Changelist createChangelist(long project, long number, String login)
     {
-        NumericalRevision revision = new NumericalRevision(number);
+        Revision revision = createRevision(number);
         revision.setAuthor(login);
         // generate time stamps to provide the same ordering as the revision numbers.
         revision.setDate(new Date(System.currentTimeMillis() + number));
@@ -340,11 +341,11 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
                 System.out.println("nutter " + n + " starting");
                 while(!done)
                 {
-                    Changelist newList = new Changelist("scm", new NumericalRevision(i));
+                    Changelist newList = new Changelist("scm", createRevision(i));
                     lock.lock();
                     try
                     {
-                        Changelist list = changelistDao.findByRevision("scm", new NumericalRevision(i++));
+                        Changelist list = changelistDao.findByRevision("scm", createRevision(i++));
                         if(list == null)
                         {
                             changelistDao.save(newList);
@@ -365,5 +366,10 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
                 this.e = e;
             }
         }
+    }
+
+    private Revision createRevision(long rev)
+    {
+        return new Revision(null, null, null, Long.toString(rev));
     }
 }

@@ -16,13 +16,6 @@
         <property name="branch" column="BRANCH" type="string" length="255"/>
         <property name="revisionString" column="REVISIONSTRING" type="string" length="255"/>
 
-        <subclass name="com.zutubi.pulse.core.model.NumericalRevision" discriminator-value="NUMERICAL"
-                  dynamic-update="false">
-        </subclass>
-
-        <subclass name="com.zutubi.pulse.core.model.CvsRevision" discriminator-value="CVS" dynamic-update="false">
-        </subclass>
-
     </class>
 
 </hibernate-mapping>

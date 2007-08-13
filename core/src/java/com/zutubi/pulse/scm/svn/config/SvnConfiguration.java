@@ -1,14 +1,11 @@
 package com.zutubi.pulse.scm.svn.config;
 
-import com.opensymphony.util.TextUtils;
 import com.zutubi.config.annotations.ConfigurationCheck;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Wizard;
-import com.zutubi.pulse.scm.ScmException;
-import com.zutubi.pulse.scm.svn.SvnClient;
 import com.zutubi.pulse.scm.config.ScmConfiguration;
-import com.zutubi.util.StringUtils;
+import com.zutubi.pulse.scm.svn.SvnClient;
 import com.zutubi.validation.annotations.Required;
 
 /**
@@ -94,7 +91,7 @@ public class SvnConfiguration extends ScmConfiguration
 
     public String getType()
     {
-        return "svn";
+        return SvnClient.TYPE;
     }
 
 /*

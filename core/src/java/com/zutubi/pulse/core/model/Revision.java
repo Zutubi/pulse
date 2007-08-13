@@ -17,15 +17,23 @@ public class Revision extends Entity implements Comparable<Revision>
     private long time;
     private String revisionString;
 
+    public static final Revision HEAD = null;
+
     protected Revision()
     {
     }
 
     public Revision(String author, String comment, Date date)
     {
+        this(author, comment, date, "");
+    }
+
+    public Revision(String author, String comment, Date date, String revisionString)
+    {
         this.author = author;
         this.comment = trimComment(comment);
         setDate(date);
+        setRevisionString(revisionString);
     }
 
     private String trimComment(String comment)
@@ -38,19 +46,14 @@ public class Revision extends Entity implements Comparable<Revision>
         return comment;
     }
 
-    protected void copyCommon(Revision copy)
+    public Revision copy()
     {
+        Revision copy = new Revision();
         copy.author = author;
         copy.comment = comment;
         copy.branch = branch;
         copy.time = time;
         copy.revisionString = revisionString;
-    }
-
-    public Revision copy()
-    {
-        Revision copy = new Revision();
-        copyCommon(copy);
         return copy;
     }
 

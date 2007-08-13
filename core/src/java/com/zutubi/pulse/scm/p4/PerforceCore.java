@@ -1,6 +1,7 @@
 package com.zutubi.pulse.scm.p4;
 
-import com.zutubi.pulse.core.model.NumericalRevision;
+import com.zutubi.pulse.scm.NumericalRevision;
+import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.scm.ScmCancelledException;
 import com.zutubi.pulse.scm.ScmException;
 import static com.zutubi.pulse.scm.p4.PerforceConstants.*;
@@ -54,6 +55,16 @@ public class PerforceCore
         //   Change <number> on <date> by <user>@<client>
         changesPattern = Pattern.compile("^Change ([0-9]+) on (.+) by (.+)@(.+) '(.+)'$", Pattern.MULTILINE);
         lineSplitterPattern = Pattern.compile("\r?\n");
+    }
+
+    public Revision convertRevision(NumericalRevision rev)
+    {
+        return new Revision(rev.getAuthor(), rev.getComment(), rev.getDate(), rev.getRevisionString());
+    }
+
+    public NumericalRevision convertRevision(Revision rev)
+    {
+        return new NumericalRevision(rev.getAuthor(), rev.getComment(), rev.getDate(), rev.getRevisionString());
     }
 
     public Map<String, String> getEnv()

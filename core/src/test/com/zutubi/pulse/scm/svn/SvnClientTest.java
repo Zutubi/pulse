@@ -2,11 +2,9 @@ package com.zutubi.pulse.scm.svn;
 
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.NumericalRevision;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.pulse.scm.ScmFile;
-import com.zutubi.pulse.scm.svn.SvnClient;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.ZipUtils;
@@ -123,7 +121,7 @@ public class SvnClientTest extends PulseTestCase
 
     public void testGetLatestRevision() throws ScmException
     {
-        assertEquals(8L, server.getLatestRevision().getRevisionNumber());
+        assertEquals("8", server.getLatestRevision().getRevisionString());
     }
 
     public void testList() throws ScmException
@@ -149,7 +147,7 @@ public class SvnClientTest extends PulseTestCase
 
     public void testTag() throws ScmException, IOException
     {
-        server.tag(new NumericalRevision(1), TAG_PATH, false);
+        server.tag(createRevision(1), TAG_PATH, false);
 
         SvnClient confirmServer = new SvnClient(TAG_PATH, "jsankey", "password");
         List<ScmFile> files = getSortedListing(confirmServer);
@@ -165,14 +163,14 @@ public class SvnClientTest extends PulseTestCase
 
     public void testMoveTag() throws ScmException, IOException
     {
-        server.tag(new NumericalRevision(1), TAG_PATH, false);
-        server.tag(new NumericalRevision(8), TAG_PATH, true);
+        server.tag(createRevision(1), TAG_PATH, false);
+        server.tag(createRevision(8), TAG_PATH, true);
         assertTaggedRev8();
     }
 
     public void testMoveTagNonExistant() throws ScmException, IOException
     {
-        server.tag(new NumericalRevision(8), TAG_PATH, true);
+        server.tag(createRevision(8), TAG_PATH, true);
         assertTaggedRev8();
     }
 
@@ -192,10 +190,10 @@ public class SvnClientTest extends PulseTestCase
 
     public void testUnmovableTag() throws ScmException
     {
-        server.tag(new NumericalRevision(1), TAG_PATH, false);
+        server.tag(createRevision(1), TAG_PATH, false);
         try
         {
-            server.tag(new NumericalRevision(8), TAG_PATH, false);
+            server.tag(createRevision(8), TAG_PATH, false);
             fail();
         }
         catch (ScmException e)
@@ -206,7 +204,7 @@ public class SvnClientTest extends PulseTestCase
 
     public void testChangesSince() throws ScmException
     {
-        List<Changelist> changes = server.getChanges(new NumericalRevision(2), null);
+        List<Changelist> changes = server.getChanges(createRevision(2), null);
         assertEquals(2, changes.size());
         Changelist changelist = changes.get(0);
         assertEquals("3", changelist.getRevision().getRevisionString());
@@ -222,7 +220,7 @@ public class SvnClientTest extends PulseTestCase
 
     public void testRevisionsSince() throws ScmException
     {
-        List<Revision> revisions = server.getRevisionsSince(new NumericalRevision(2));
+        List<Revision> revisions = server.getRevisionsSince(createRevision(2));
         assertEquals(2, revisions.size());
         assertEquals("3", revisions.get(0).getRevisionString());
         assertEquals("4", revisions.get(1).getRevisionString());
@@ -230,41 +228,41 @@ public class SvnClientTest extends PulseTestCase
 
     public void testRevisionsSinceLatestInFiles() throws ScmException
     {
-        List<Revision> revisions = server.getRevisionsSince(new NumericalRevision(6));
+        List<Revision> revisions = server.getRevisionsSince(createRevision(6));
         assertEquals(0, revisions.size());
     }
 
     public void testRevisionsSincePastHead() throws ScmException
     {
-        List<Revision> revisions = server.getRevisionsSince(new NumericalRevision(9));
+        List<Revision> revisions = server.getRevisionsSince(createRevision(9));
         assertEquals(0, revisions.size());
     }
 
     public void testCheckout() throws ScmException, IOException
     {
-        server.checkout(null, gotDir, new NumericalRevision(1), null);
+        server.checkout(null, gotDir, createRevision(1), null);
         assertRevision(gotDir, 1);
     }
 
     public void testUpdate() throws ScmException, IOException
     {
-        server.checkout(null, gotDir, new NumericalRevision(1), null);
-        server.update(null, gotDir, new NumericalRevision(4), null);
+        server.checkout(null, gotDir, createRevision(1), null);
+        server.update(null, gotDir, createRevision(4), null);
         assertRevision(gotDir, 4);
     }
 
     public void testMultiUpdate() throws ScmException, IOException
     {
-        server.checkout(null, gotDir, new NumericalRevision(1), null);
-        server.update(null, gotDir, new NumericalRevision(4), null);
-        server.update(null, gotDir, new NumericalRevision(8), null);
+        server.checkout(null, gotDir, createRevision(1), null);
+        server.update(null, gotDir, createRevision(4), null);
+        server.update(null, gotDir, createRevision(8), null);
         assertRevision(gotDir, 8);
     }
 
     public void testCheckNonExistantPathHTTP() throws Exception
     {
         SvnClient server = new SvnClient("https://svn.apache.org/repos/asf", "anonymous", "");
-        assertFalse(server.pathExists(new NumericalRevision(1), SVNURL.parseURIEncoded("https://svn.apache.org/repos/asf/nosuchpath/")));
+        assertFalse(server.pathExists(createRevision(1), SVNURL.parseURIEncoded("https://svn.apache.org/repos/asf/nosuchpath/")));
     }
 
     private void assertRevision(File dir, int revision) throws IOException
@@ -286,5 +284,10 @@ public class SvnClientTest extends PulseTestCase
             }
         });
         return files;
+    }
+
+    private static Revision createRevision(long rev)
+    {
+        return new Revision(null, null, null, Long.toString(rev));
     }
 }

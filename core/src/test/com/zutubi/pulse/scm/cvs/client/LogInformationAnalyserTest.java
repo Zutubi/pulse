@@ -2,7 +2,7 @@ package com.zutubi.pulse.scm.cvs.client;
 
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.CvsRevision;
+import com.zutubi.pulse.scm.cvs.CvsRevision;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.pulse.test.PulseTestCase;
@@ -377,10 +377,9 @@ public class LogInformationAnalyserTest extends PulseTestCase
 
     private static void assertCvsRevision(Revision revision, String author, String branch, String comment)
     {
-        CvsRevision cvsRev = (CvsRevision)revision;
-        assertEquals(author, cvsRev.getAuthor());
-        assertEquals(branch, cvsRev.getBranch());
-        assertEquals(comment, cvsRev.getComment());
+        assertEquals(author, revision.getAuthor());
+        assertEquals(branch, revision.getBranch());
+        assertEquals(comment, revision.getComment());
     }
 
 }

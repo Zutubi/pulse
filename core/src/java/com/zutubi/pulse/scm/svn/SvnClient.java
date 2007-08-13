@@ -1,22 +1,25 @@
 package com.zutubi.pulse.scm.svn;
 
 import com.zutubi.pulse.core.config.ResourceProperty;
-import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.scm.FileStatus;
-import com.zutubi.pulse.scm.ScmCancelledException;
-import com.zutubi.pulse.scm.ScmEventHandler;
-import com.zutubi.pulse.scm.ScmException;
-import com.zutubi.pulse.scm.ScmCapability;
-import com.zutubi.pulse.scm.ScmFile;
-import com.zutubi.pulse.scm.FilepathFilter;
-import com.zutubi.pulse.scm.ScmClient;
-import com.zutubi.pulse.scm.ScmFilepathFilter;
-import com.zutubi.pulse.scm.svn.SVNSSHAuthenticationProvider;
+import com.zutubi.pulse.core.model.Change;
+import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.FileRevision;
+import com.zutubi.pulse.core.model.NumericalFileRevision;
+import com.zutubi.pulse.scm.NumericalRevision;
+import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.scm.*;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.IOUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
-import org.tmatesoft.svn.core.*;
+import org.tmatesoft.svn.core.SVNCancelException;
+import org.tmatesoft.svn.core.SVNDirEntry;
+import org.tmatesoft.svn.core.SVNException;
+import org.tmatesoft.svn.core.SVNLogEntry;
+import org.tmatesoft.svn.core.SVNLogEntryPath;
+import org.tmatesoft.svn.core.SVNNodeKind;
+import org.tmatesoft.svn.core.SVNProperty;
+import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
 import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
 import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
@@ -24,7 +27,14 @@ import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 import org.tmatesoft.svn.core.wc.*;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
 import java.util.*;
 
 /**
@@ -32,6 +42,8 @@ import java.util.*;
  */
 public class SvnClient implements ScmClient
 {
+    public static final String TYPE = "svn";
+
     private static final Logger LOG = Logger.getLogger(ScmClient.class);
 
     /**
@@ -79,8 +91,18 @@ public class SvnClient implements ScmClient
         }
         else
         {
-            return SVNRevision.create(((NumericalRevision) revision).getRevisionNumber());
+            return SVNRevision.create(convertToNumericalRevision(revision).getRevisionNumber());
         }
+    }
+
+    public Revision convertRevision(NumericalRevision rev)
+    {
+        return new Revision(rev.getAuthor(), rev.getComment(), rev.getDate(), rev.getRevisionString());
+    }
+
+    public NumericalRevision convertToNumericalRevision(Revision rev)
+    {
+        return new NumericalRevision(rev.getAuthor(), rev.getComment(), rev.getDate(), rev.getRevisionString());
     }
 
     /**
@@ -293,7 +315,7 @@ public class SvnClient implements ScmClient
             throw convertException(e);
         }
 
-        return new NumericalRevision(svnRevision.getNumber());
+        return convertRevision(new NumericalRevision(svnRevision.getNumber()));
     }
 
     private void updateExternals(File toDirectory, Revision revision, SVNUpdateClient client, ScmEventHandler handler) throws ScmException
@@ -380,10 +402,10 @@ public class SvnClient implements ScmClient
         for (SVNLogEntry entry : logs)
         {
             NumericalRevision revision = new NumericalRevision(entry.getAuthor(), entry.getMessage(), entry.getDate(), entry.getRevision());
-            Changelist list = new Changelist(getUid(), revision);
+            Changelist list = new Changelist(getUid(), convertRevision(revision));
             handler.handle(list);
 
-            FileRevision fileRevision = new NumericalFileRevision(((NumericalRevision) list.getRevision()).getRevisionNumber());
+            FileRevision fileRevision = new NumericalFileRevision(revision.getRevisionNumber());
 
             Map files = entry.getChangedPaths();
 
@@ -509,11 +531,11 @@ public class SvnClient implements ScmClient
 
     public boolean hasChangedSince(Revision since) throws ScmException
     {
-        NumericalRevision latestRevision = getLatestRevision();
-        if (latestRevision.getRevisionNumber() != ((NumericalRevision) since).getRevisionNumber())
+        NumericalRevision latestRevision = convertToNumericalRevision(getLatestRevision());
+        if (latestRevision.getRevisionNumber() != (convertToNumericalRevision(since)).getRevisionNumber())
         {
             ChangeDetector detector = new ChangeDetector();
-            reportChanges(detector, since, latestRevision);
+            reportChanges(detector, since, convertRevision(latestRevision));
             return detector.isChanged();
         }
         else
@@ -522,11 +544,11 @@ public class SvnClient implements ScmClient
         }
     }
 
-    public NumericalRevision getLatestRevision() throws ScmException
+    public Revision getLatestRevision() throws ScmException
     {
         try
         {
-            return new NumericalRevision(repository.getLatestRevision());
+            return convertRevision(new NumericalRevision(repository.getLatestRevision()));
         }
         catch (SVNException e)
         {
@@ -632,6 +654,7 @@ public class SvnClient implements ScmClient
         }
     }
 
+    // should the revision be used here???
     boolean pathExists(Revision revision, SVNURL path) throws SVNException
     {
         SVNRepository repo = SVNRepositoryFactory.create(path);
@@ -718,7 +741,7 @@ public class SvnClient implements ScmClient
                 throw new ScmException("Revision '" + revision + "' does not exist in this repository");
             }
 
-            return new NumericalRevision(revisionNumber);
+            return convertRevision(new NumericalRevision(revisionNumber));
         }
         catch(NumberFormatException e)
         {

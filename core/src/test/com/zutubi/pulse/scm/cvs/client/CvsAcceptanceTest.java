@@ -1,6 +1,6 @@
 package com.zutubi.pulse.scm.cvs.client;
 
-import com.zutubi.pulse.core.model.CvsRevision;
+import com.zutubi.pulse.scm.cvs.CvsRevision;
 import junit.framework.TestCase;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.util.Logger;

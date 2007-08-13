@@ -3,16 +3,14 @@ package com.zutubi.pulse.personal;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.zutubi.pulse.core.PulseException;
-import com.zutubi.pulse.core.model.CvsRevision;
 import com.zutubi.pulse.core.model.Entity;
-import com.zutubi.pulse.core.model.NumericalRevision;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.scm.FileStatus;
 import com.zutubi.pulse.scm.WorkingCopyStatus;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.xstream.FileStatusConverter;
 import com.zutubi.util.IOUtils;
 import com.zutubi.util.NullOutputStream;
-import com.zutubi.pulse.xstream.FileStatusConverter;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -129,8 +127,10 @@ public class PatchArchive
         XStream xstream = new XStream(new DomDriver());
         xstream.alias("status", WorkingCopyStatus.class);
         xstream.alias("revision", Revision.class);
+/*
         xstream.alias("numerical", NumericalRevision.class);
         xstream.alias("cvs", CvsRevision.class);
+*/
         xstream.omitField(Entity.class, "id");
         xstream.alias("fileStatus", FileStatus.class);
         xstream.addImplicitCollection(WorkingCopyStatus.class, "changes");

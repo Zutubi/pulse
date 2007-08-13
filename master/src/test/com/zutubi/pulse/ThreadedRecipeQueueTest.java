@@ -13,7 +13,6 @@ import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.NumericalRevision;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.events.AgentRemovedEvent;
@@ -24,21 +23,25 @@ import com.zutubi.pulse.events.build.RecipeCompletedEvent;
 import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.logging.CustomLogRecord;
-import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.model.AgentState;
+import com.zutubi.pulse.model.BuildHostRequirements;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.UnknownBuildReason;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.project.types.CustomTypeConfiguration;
+import com.zutubi.pulse.scm.DelegateScmClientFactory;
 import com.zutubi.pulse.scm.FileStatus;
+import com.zutubi.pulse.scm.ScmCapability;
 import com.zutubi.pulse.scm.ScmChangeEvent;
+import com.zutubi.pulse.scm.ScmClient;
 import com.zutubi.pulse.scm.ScmEventHandler;
 import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.pulse.scm.ScmFile;
-import com.zutubi.pulse.scm.ScmCapability;
 import com.zutubi.pulse.scm.config.ScmConfiguration;
-import com.zutubi.pulse.scm.ScmClient;
-import com.zutubi.pulse.scm.DelegateScmClientFactory;
 import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.services.UpgradeStatus;
 import junit.framework.TestCase;
@@ -46,7 +49,13 @@ import junit.framework.TestCase;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -459,7 +468,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
     public void testFixedRevision() throws Exception
     {
         RecipeDispatchRequest request = createDispatchRequest(0);
-        request.getRevision().update(new NumericalRevision(88), getPulseFileForRevision(88));
+        request.getRevision().update(createRevision(88), getPulseFileForRevision(88));
         request.getRevision().apply(request.getRequest());
 
         queue.online(createAvailableAgent(0));
@@ -479,7 +488,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
         assertTrue(dispatchedSemaphore.tryAcquire(30, TimeUnit.SECONDS));
 
-        queue.handleEvent(new ScmChangeEvent(projectConfig, new NumericalRevision(98), new NumericalRevision(1)));
+        queue.handleEvent(new ScmChangeEvent(projectConfig, createRevision(98), createRevision(1)));
         sendRecipeCompleted(1000);
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
         assertTrue(dispatchedSemaphore.tryAcquire(30, TimeUnit.SECONDS));
@@ -497,7 +506,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
         assertTrue(dispatchedSemaphore.tryAcquire(30, TimeUnit.SECONDS));
 
-        queue.handleEvent(new ScmChangeEvent(createProjectConfig(), new NumericalRevision(98), new NumericalRevision(1)));
+        queue.handleEvent(new ScmChangeEvent(createProjectConfig(), createRevision(98), createRevision(1)));
         sendRecipeCompleted(1000);
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
         assertTrue(dispatchedSemaphore.tryAcquire(30, TimeUnit.SECONDS));
@@ -520,7 +529,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         {
             public String getPulseFile(long id, ProjectConfiguration projectConfig, Revision revision, PatchArchive patch)
             {
-                long number = ((NumericalRevision) revision).getRevisionNumber();
+                long number = Long.valueOf(revision.getRevisionString());
                 if (number == 0)
                 {
                     throw new BuildException("test");
@@ -543,11 +552,11 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         assertTrue(dispatchedSemaphore.tryAcquire(30, TimeUnit.SECONDS));
 
         RecipeDispatchRequest request = createDispatchRequest(0, 1001);
-        request.getRevision().update(new NumericalRevision(5), getPulseFileForRevision(5));
+        request.getRevision().update(createRevision(5), getPulseFileForRevision(5));
         request.getRevision().apply(request.getRequest());
         queue.enqueue(request);
 
-        queue.handleEvent(new ScmChangeEvent(projectConfig, new NumericalRevision(98), new NumericalRevision(1)));
+        queue.handleEvent(new ScmChangeEvent(projectConfig, createRevision(98), createRevision(1)));
         sendRecipeCompleted(1000);
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
         assertTrue(dispatchedSemaphore.tryAcquire(30, TimeUnit.SECONDS));
@@ -568,7 +577,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
 
 
         // Negative revision will be rejected by mock
-        queue.handleEvent(new ScmChangeEvent(projectConfig, new NumericalRevision(-1), new NumericalRevision(1)));
+        queue.handleEvent(new ScmChangeEvent(projectConfig, createRevision(-1), createRevision(1)));
         assertTrue(errorSemaphore.tryAcquire(30, TimeUnit.SECONDS));
         assertRecipeError(1001, "No online agent is capable of executing the build stage");
     }
@@ -584,7 +593,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
 
         queue.enqueue(createDispatchRequest(0, 1001, projectConfig));
 
-        queue.handleEvent(new ScmChangeEvent(projectConfig, new NumericalRevision(0), new NumericalRevision(1)));
+        queue.handleEvent(new ScmChangeEvent(projectConfig, createRevision(0), createRevision(1)));
         sendRecipeCompleted(1000);
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
         assertTrue(dispatchedSemaphore.tryAcquire(30, TimeUnit.SECONDS));
@@ -659,7 +668,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
 
         // Negative revision will be rejected by mock
-        queue.handleEvent(new ScmChangeEvent(projectConfig, new NumericalRevision(-1), new NumericalRevision(1)));
+        queue.handleEvent(new ScmChangeEvent(projectConfig, createRevision(-1), createRevision(1)));
         assertTrue(errorSemaphore.tryAcquire(30, TimeUnit.SECONDS));
         assertRecipeError(1001, "Recipe request timed out waiting for a capable agent to become available");
     }
@@ -874,7 +883,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             }
             else
             {
-                return new NumericalRevision(1);
+                return createRevision(1);
             }
         }
 
@@ -1098,12 +1107,17 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         public boolean fulfilledBy(RecipeDispatchRequest request, AgentService service)
         {
             return (((MockAgentService) service).getType() == type) &&
-                    (((NumericalRevision)request.getRevision().getRevision()).getRevisionNumber() >= 0);
+                    Long.valueOf(request.getRevision().getRevision().getRevisionString()) >= 0;
         }
 
         public String getSummary()
         {
             return "mock";
         }
+    }
+
+    private Revision createRevision(long rev)
+    {
+        return new Revision(null, null, null, Long.toString(rev));
     }
 }

@@ -1,11 +1,11 @@
 package com.zutubi.pulse.prototype.config.project.changeviewer;
 
-import com.zutubi.pulse.core.model.CvsRevision;
-import com.zutubi.pulse.core.model.FileRevision;
-import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.util.StringUtils;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.pulse.core.model.FileRevision;
+import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.scm.config.ScmConfiguration;
+import com.zutubi.util.StringUtils;
 
 /**
  * A ChangeViewer for linking to a Fisheye instance.
@@ -57,10 +57,11 @@ public class FisheyeConfiguration extends BasePathChangeViewer
 
     private String getChangesetString(Revision revision)
     {
-        if(revision instanceof CvsRevision)
+        //FIXME: Can not statically reference the CvsRevision type.
+        ScmConfiguration scm = lookupScmConfiguration();
+        if (scm.getType().equals("cvs"))
         {
-            CvsRevision cvs = (CvsRevision) revision;
-            return String.format("%s:%s:%s", cvs.getBranch(), cvs.getAuthor(), CustomChangeViewerConfiguration.FISHEYE_DATE_FORMAT.format(revision.getDate()));
+            return String.format("%s:%s:%s", revision.getBranch(), revision.getAuthor(), CustomChangeViewerConfiguration.FISHEYE_DATE_FORMAT.format(revision.getDate()));
         }
 
         return revision.getRevisionString();

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.scm.cvs.client;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.pulse.core.model.CvsRevision;
+import com.zutubi.pulse.scm.cvs.CvsRevision;
 import com.zutubi.pulse.scm.ScmEventHandler;
 import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.pulse.scm.cvs.client.commands.*;
@@ -144,13 +144,16 @@ public class CvsCore
         checkout.setModule(module);
         checkout.setRecursive(recursive);
 
-        if (TextUtils.stringSet(revision.getBranch()))
+        if (revision != null)
         {
-            checkout.setCheckoutByRevision(revision.getBranch());
-        }
-        if (revision.getDate() != null)
-        {
-            checkout.setCheckoutByDate(SERVER_DATE.format(revision.getDate()));
+            if (TextUtils.stringSet(revision.getBranch()))
+            {
+                checkout.setCheckoutByRevision(revision.getBranch());
+            }
+            if (revision.getDate() != null)
+            {
+                checkout.setCheckoutByDate(SERVER_DATE.format(revision.getDate()));
+            }
         }
 
         CheckoutListener listener = null;

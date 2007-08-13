@@ -1,9 +1,9 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.NumericalFileRevision;
-import com.zutubi.pulse.core.model.NumericalRevision;
-import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.prototype.config.project.changeviewer.P4WebChangeViewer;
+import com.zutubi.pulse.test.PulseTestCase;
 
 /**
  */
@@ -20,7 +20,7 @@ public class P4WebChangeViewerTest extends PulseTestCase
 
     public void testGetChangesetURL()
     {
-        assertEquals("http://localhost:8080/@md=d@/2508?ac=10", viewer.getChangesetURL(new NumericalRevision(2508)));   
+        assertEquals("http://localhost:8080/@md=d@/2508?ac=10", viewer.getChangesetURL(new Revision(null, null, null, "2508")));   
     }
 
     public void testGetFileViewURL()

@@ -1,9 +1,9 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.NumericalFileRevision;
-import com.zutubi.pulse.core.model.NumericalRevision;
-import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.prototype.config.project.changeviewer.ViewVCChangeViewer;
+import com.zutubi.pulse.test.PulseTestCase;
 
 /**
  */
@@ -21,7 +21,7 @@ public class ViewVCChangeViewerTest extends PulseTestCase
 
     public void testGetChangesetURL()
     {
-        assertEquals("http://viewvc.tigris.org/source/browse/viewvc?rev=1412&view=rev", viewer.getChangesetURL(new NumericalRevision(1412)));
+        assertEquals("http://viewvc.tigris.org/source/browse/viewvc?rev=1412&view=rev", viewer.getChangesetURL(new Revision(null, null, null, "1412")));
     }
 
     public void testGetFileViewURL()

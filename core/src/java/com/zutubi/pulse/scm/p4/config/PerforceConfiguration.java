@@ -63,6 +63,6 @@ public class PerforceConfiguration extends ScmConfiguration
 
     public String getType()
     {
-        return "p4";
+        return PerforceClient.TYPE;
     }
 }

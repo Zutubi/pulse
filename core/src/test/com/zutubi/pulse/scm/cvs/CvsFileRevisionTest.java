@@ -1,7 +1,7 @@
 package com.zutubi.pulse.scm.cvs;
 
 import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.core.model.CvsFileRevision;
+import com.zutubi.pulse.scm.cvs.CvsFileRevision;
 
 /**
  */

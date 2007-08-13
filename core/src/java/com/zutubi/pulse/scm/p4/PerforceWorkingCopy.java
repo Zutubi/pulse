@@ -2,7 +2,7 @@ package com.zutubi.pulse.scm.p4;
 
 import com.zutubi.pulse.config.Config;
 import com.zutubi.pulse.config.ConfigSupport;
-import com.zutubi.pulse.core.model.NumericalRevision;
+import com.zutubi.pulse.scm.NumericalRevision;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.personal.PersonalBuildSupport;
 import com.zutubi.pulse.personal.PersonalBuildUI;
@@ -84,7 +84,8 @@ public class PerforceWorkingCopy extends PersonalBuildSupport implements Working
         do
         {
             revision = core.getLatestRevisionForFiles(null);
-            status = new WorkingCopyStatus(core.getClientRoot(), revision);
+            // convert revision.
+            status = new WorkingCopyStatus(core.getClientRoot(), core.convertRevision(revision));
             PerforceFStatHandler handler = new PerforceFStatHandler(getUi(), status);
             core.runP4WithHandler(handler, null, P4_COMMAND, COMMAND_FSTAT, FLAG_PATH_IN_DEPOT_FORMAT, "//...");
 
@@ -152,7 +153,7 @@ public class PerforceWorkingCopy extends PersonalBuildSupport implements Working
 
                 if(!response.isAffirmative())
                 {
-                    return revision;
+                    return core.convertRevision(revision);
                 }
             }
 
@@ -169,7 +170,7 @@ public class PerforceWorkingCopy extends PersonalBuildSupport implements Working
             status("Resolve complete.");
         }
 
-        return revision;
+        return core.convertRevision(revision);
     }
 
     PerforceCore getClient()

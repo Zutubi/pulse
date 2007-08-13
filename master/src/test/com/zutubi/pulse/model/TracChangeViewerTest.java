@@ -1,9 +1,9 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.NumericalFileRevision;
-import com.zutubi.pulse.core.model.NumericalRevision;
-import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.prototype.config.project.changeviewer.TracChangeViewer;
+import com.zutubi.pulse.test.PulseTestCase;
 
 /**
  */
@@ -21,7 +21,7 @@ public class TracChangeViewerTest extends PulseTestCase
 
     public void testGetChangesetURL()
     {
-        assertEquals("http://trac.edgewall.org/changeset/3673", viewer.getChangesetURL(new NumericalRevision(3673)));
+        assertEquals("http://trac.edgewall.org/changeset/3673", viewer.getChangesetURL(new Revision(null, null, null, "3673")));
     }
 
     public void testGetFileViewURL()

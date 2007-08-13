@@ -1,16 +1,15 @@
 package com.zutubi.pulse.prototype.config.project.changeviewer;
 
 import com.opensymphony.util.TextUtils;
+import com.zutubi.config.annotations.Form;
+import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.core.Scope;
 import com.zutubi.pulse.core.VariableHelper;
 import com.zutubi.pulse.core.model.FileRevision;
 import com.zutubi.pulse.core.model.Property;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.scm.config.ScmConfiguration;
 import com.zutubi.util.StringUtils;
-import com.zutubi.config.annotations.Form;
-import com.zutubi.config.annotations.SymbolicName;
 
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
@@ -100,7 +99,7 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
         this.fileDiffURL = fileDiffURL;
     }
 
-    public boolean hasCapability(ScmConfiguration scm, Capability capability)
+    public boolean hasCapability(Capability capability)
     {
         switch(capability)
         {
@@ -169,6 +168,7 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
             catch (FileLoadException e)
             {
                 // Never happens with allowUnresolved set to true
+                e.printStackTrace();
             }
         }
 

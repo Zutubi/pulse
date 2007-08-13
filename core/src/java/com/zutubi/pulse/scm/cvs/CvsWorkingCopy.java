@@ -3,11 +3,14 @@ package com.zutubi.pulse.scm.cvs;
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.config.Config;
 import com.zutubi.pulse.config.ConfigSupport;
-import com.zutubi.pulse.core.model.CvsRevision;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.personal.PersonalBuildException;
 import com.zutubi.pulse.personal.PersonalBuildSupport;
-import com.zutubi.pulse.scm.*;
+import com.zutubi.pulse.scm.FileStatus;
+import com.zutubi.pulse.scm.ScmException;
+import com.zutubi.pulse.scm.ScmUtils;
+import com.zutubi.pulse.scm.WorkingCopy;
+import com.zutubi.pulse.scm.WorkingCopyStatus;
 import com.zutubi.pulse.scm.cvs.client.CvsCore;
 import com.zutubi.util.IOUtils;
 import org.netbeans.lib.cvsclient.CVSRoot;
@@ -146,7 +149,7 @@ public class CvsWorkingCopy extends PersonalBuildSupport implements WorkingCopy
         
         CvsRevision revision = new CvsRevision(null, branch, null, new Date());
         core.update(workingDir, revision, updateHandler);
-        return revision;
+        return CvsClient.convertRevision(revision);
     }
 
     private class UpdateHandler extends CVSAdapter

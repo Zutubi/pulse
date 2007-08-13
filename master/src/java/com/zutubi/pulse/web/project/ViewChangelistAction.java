@@ -133,7 +133,7 @@ public class ViewChangelistAction extends ActionSupport
     public String getChangeUrl()
     {
         ChangeViewerConfiguration changeViewer = getChangeViewer();
-        if(changeViewer != null && changeViewer.hasCapability(scm, ChangeViewerConfiguration.Capability.VIEW_CHANGESET))
+        if(changeViewer != null && changeViewer.hasCapability(ChangeViewerConfiguration.Capability.VIEW_CHANGESET))
         {
             return changeViewer.getChangesetURL(changelist.getRevision());
         }
@@ -166,7 +166,7 @@ public class ViewChangelistAction extends ActionSupport
     public void updateFileViewUrl(Change change)
     {
         ChangeViewerConfiguration changeViewer = getChangeViewer();
-        if(changeViewer != null && changeViewer.hasCapability(scm, ChangeViewerConfiguration.Capability.VIEW_FILE))
+        if(changeViewer != null && changeViewer.hasCapability(ChangeViewerConfiguration.Capability.VIEW_FILE))
         {
             fileViewUrl = changeViewer.getFileViewURL(change.getFilename(), change.getRevision());
         }
@@ -179,7 +179,7 @@ public class ViewChangelistAction extends ActionSupport
     public void updateFileDownloadUrl(Change change)
     {
         ChangeViewerConfiguration changeViewer = getChangeViewer();
-        if(changeViewer != null && changeViewer.hasCapability(scm, ChangeViewerConfiguration.Capability.DOWNLOAD_FILE))
+        if(changeViewer != null && changeViewer.hasCapability(ChangeViewerConfiguration.Capability.DOWNLOAD_FILE))
         {
             fileDownloadUrl = changeViewer.getFileDownloadURL(change.getFilename(), change.getRevision());
         }
@@ -197,7 +197,7 @@ public class ViewChangelistAction extends ActionSupport
             if(previous != null)
             {
                 ChangeViewerConfiguration changeViewer = getChangeViewer();
-                if(changeViewer != null && changeViewer.hasCapability(scm, ChangeViewerConfiguration.Capability.VIEW_FILE_DIFF))
+                if(changeViewer != null && changeViewer.hasCapability(ChangeViewerConfiguration.Capability.VIEW_FILE_DIFF))
                 {
                     fileDiffUrl = changeViewer.getFileDiffURL(change.getFilename(), change.getRevision());
                     return;

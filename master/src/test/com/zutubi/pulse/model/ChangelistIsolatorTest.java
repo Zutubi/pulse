@@ -3,13 +3,12 @@ package com.zutubi.pulse.model;
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
 import com.zutubi.config.annotations.Transient;
-import com.zutubi.pulse.core.model.NumericalRevision;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.project.BuildOptionsConfiguration;
-import com.zutubi.pulse.scm.ScmException;
-import com.zutubi.pulse.scm.ScmClient;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.scm.DelegateScmClientFactory;
+import com.zutubi.pulse.scm.ScmClient;
+import com.zutubi.pulse.scm.ScmException;
 import com.zutubi.pulse.scm.config.ScmConfiguration;
 import com.zutubi.pulse.test.PulseTestCase;
 
@@ -127,7 +126,7 @@ public class ChangelistIsolatorTest extends PulseTestCase
 
     private Revision returnLatestBuild(long revision)
     {
-        NumericalRevision rev = new NumericalRevision(revision);
+        Revision rev = new Revision(null, null, null, Long.toString(revision));
         mockScm.expectAndReturn("getLatestRevision", C.ANY_ARGS, rev);
         return rev;
     }
@@ -146,7 +145,7 @@ public class ChangelistIsolatorTest extends PulseTestCase
     private Revision returnBuild(long revision)
     {
         BuildResult result = new BuildResult();
-        NumericalRevision rev = new NumericalRevision(revision);
+        Revision rev = new Revision(null, null, null, Long.toString(revision));
         result.setScmDetails(new BuildScmDetails(rev));
         mockBuildManager.expectAndReturn("queryBuilds", C.ANY_ARGS, Arrays.asList(result));
         return rev;
@@ -157,10 +156,10 @@ public class ChangelistIsolatorTest extends PulseTestCase
         List<Revision> ret = new LinkedList<Revision>();
         for(long r: revisions)
         {
-            ret.add(new NumericalRevision(r));
+            ret.add(new Revision(null, null, null, Long.toString(r)));
         }
 
-        mockScm.expectAndReturn("getRevisionsSince", new NumericalRevision(since), ret);
+        mockScm.expectAndReturn("getRevisionsSince", new Revision(null, null, null, Long.toString(since)), ret);
     }
 
     private void setupIsolator()
@@ -183,7 +182,7 @@ public class ChangelistIsolatorTest extends PulseTestCase
         assertEquals(revisions.length, gotRevisions.size());
         for(int i = 0; i < revisions.length; i++)
         {
-            assertEquals(revisions[i], ((NumericalRevision)gotRevisions.get(i)).getRevisionNumber());
+            assertEquals(revisions[i], (long)Long.valueOf(gotRevisions.get(i).getRevisionString()));
         }
     }
 

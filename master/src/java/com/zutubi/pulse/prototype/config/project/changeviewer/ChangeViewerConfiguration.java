@@ -22,7 +22,7 @@ public abstract class ChangeViewerConfiguration extends AbstractConfiguration
         VIEW_FILE_DIFF,
     }
 
-    public abstract boolean hasCapability(ScmConfiguration scm, Capability capability);
+    public abstract boolean hasCapability(Capability capability);
 
     @Transient
     public abstract String getDetails();

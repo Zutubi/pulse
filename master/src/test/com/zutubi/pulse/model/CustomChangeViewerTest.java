@@ -1,11 +1,10 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.core.model.CvsRevision;
 import com.zutubi.pulse.core.model.FileRevision;
 import com.zutubi.pulse.core.model.NumericalFileRevision;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.prototype.config.project.changeviewer.CustomChangeViewerConfiguration;
+import com.zutubi.pulse.test.PulseTestCase;
 
 import java.util.Date;
 
@@ -18,7 +17,8 @@ public class CustomChangeViewerTest extends PulseTestCase
     public void testGetChangesetURL()
     {
         viewer.setChangesetURL("${revision} ${author} ${branch} ${time.pulse} ${time.fisheye} ${unknown}");
-        Revision rev = new CvsRevision("author", "branch", "comment", new Date(1000));
+        Revision rev = new Revision("author", "comment", new Date(1000), "author:branch:19700101-10:00:01");
+        rev.setBranch("branch");
         assertEquals("author:branch:19700101-10:00:01 author branch 19700101-10:00:01 19700101000001 ${unknown}", viewer.getChangesetURL(rev));
     }
 

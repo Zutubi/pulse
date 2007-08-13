@@ -4,35 +4,44 @@ import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.Scope;
 import com.zutubi.pulse.core.VariableHelper;
 import com.zutubi.pulse.core.config.ResourceProperty;
-import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.scm.CachingScmFile;
-import com.zutubi.pulse.scm.FileStatus;
-import com.zutubi.pulse.scm.ScmCancelledException;
-import com.zutubi.pulse.scm.ScmEventHandler;
-import com.zutubi.pulse.scm.ScmException;
+import com.zutubi.pulse.core.model.Change;
+import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.FileRevision;
+import com.zutubi.pulse.core.model.NumericalFileRevision;
+import com.zutubi.pulse.scm.NumericalRevision;
+import com.zutubi.pulse.core.model.Property;
+import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.scm.*;
 import static com.zutubi.pulse.scm.p4.PerforceConstants.*;
-import com.zutubi.pulse.scm.p4.PerforceCore;
-import com.zutubi.pulse.scm.p4.PerforceErrorDetectingHandler;
-import com.zutubi.pulse.scm.CachingScmClient;
-import com.zutubi.pulse.scm.ScmCapability;
-import com.zutubi.pulse.scm.ScmFileCache;
-import com.zutubi.pulse.scm.ScmFilepathFilter;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.process.AsyncProcess;
 import com.zutubi.pulse.util.process.BufferingCharHandler;
 import com.zutubi.util.logging.Logger;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class PerforceClient extends CachingScmClient
 {
+    public static final String TYPE = "p4";
+
     private static final Logger LOG = Logger.getLogger(PerforceClient.class);
 
     private static final long RESOLVE_COMMAND_TIMEOUT = Long.getLong("pulse.p4.client.command.timeout", 300);
@@ -199,9 +208,9 @@ public class PerforceClient extends CachingScmClient
         return clientName;
     }
 
-    public NumericalRevision getLatestRevision() throws ScmException
+    public Revision getLatestRevision() throws ScmException
     {
-        return getLatestRevision(null);
+        return core.convertRevision(getLatestRevision(null));
     }
 
     private NumericalRevision getLatestRevision(String clientName) throws ScmException
@@ -352,7 +361,7 @@ public class PerforceClient extends CachingScmClient
 
         String comment = getChangelistComment(lines, affectedFilesIndex);
 
-        NumericalRevision revision = new NumericalRevision(user, comment, date, number);
+        Revision revision = new Revision(user, comment, date, Long.toString(number));
         ScmFilepathFilter filter = new ScmFilepathFilter(excludedPaths);
         Changelist changelist = new Changelist(getUid(), revision);
 
@@ -420,16 +429,17 @@ public class PerforceClient extends CachingScmClient
 
     private Revision sync(String id, File toDirectory, Revision revision, ScmEventHandler handler, boolean force) throws ScmException
     {
-        String clientName = updateClient(id, toDirectory, (NumericalRevision) revision);
+        NumericalRevision numericalRevision = core.convertRevision(revision);
+        String clientName = updateClient(id, toDirectory, numericalRevision);
 
         try
         {
-            if (revision == null)
+            if (numericalRevision == null)
             {
-                revision = getLatestRevision(clientName);
+                numericalRevision = getLatestRevision(clientName);
             }
 
-            long number = ((NumericalRevision) revision).getRevisionNumber();
+            long number = numericalRevision.getRevisionNumber();
             PerforceCheckoutHandler perforceHandler = new PerforceCheckoutHandler(force, handler);
 
             if (force)
@@ -536,7 +546,7 @@ public class PerforceClient extends CachingScmClient
 
     public InputStream checkout(Revision revision, String file) throws ScmException
     {
-        String clientName = updateClient(null, null, (NumericalRevision) revision);
+        String clientName = updateClient(null, null, core.convertRevision(revision));
 
         try
         {
@@ -592,13 +602,14 @@ public class PerforceClient extends CachingScmClient
 
         String clientName = updateClient(null, null, null);
 
-        if (to == null)
+        NumericalRevision numericalTo = core.convertRevision(to);
+        if (numericalTo == null)
         {
-            to = getLatestRevision(clientName);
+            numericalTo = getLatestRevision(clientName);
         }
 
-        long start = ((NumericalRevision) from).getRevisionNumber() + 1;
-        long end = ((NumericalRevision) to).getRevisionNumber();
+        long start = core.convertRevision(from).getRevisionNumber() + 1;
+        long end = numericalTo.getRevisionNumber();
 
         try
         {
@@ -610,7 +621,7 @@ public class PerforceClient extends CachingScmClient
                 while (matcher.find())
                 {
                     NumericalRevision revision = new NumericalRevision(Long.parseLong(matcher.group(1)));
-                    result.add(0, revision);
+                    result.add(0, core.convertRevision(revision));
 
                     if (changes != null)
                     {
@@ -639,7 +650,7 @@ public class PerforceClient extends CachingScmClient
         {
             String root = new File(clientRoot.getAbsolutePath(), VALUE_ALL_FILES).getAbsolutePath();
             long latestRevision = core.getLatestRevisionForFiles(clientName, root).getRevisionNumber();
-            long sinceRevision = ((NumericalRevision) since).getRevisionNumber();
+            long sinceRevision = core.convertRevision(since).getRevisionNumber();
             if (latestRevision > sinceRevision)
             {
                 if (excludedPaths != null && excludedPaths.size() > 0)
@@ -682,7 +693,7 @@ public class PerforceClient extends CachingScmClient
 
     public void tag(Revision revision, String name, boolean moveExisting) throws ScmException
     {
-        String clientName = updateClient(null, null, (NumericalRevision) revision);
+        String clientName = updateClient(null, null, core.convertRevision(revision));
         try
         {
             if (!labelExists(clientName, name))
@@ -788,7 +799,7 @@ public class PerforceClient extends CachingScmClient
         //    ... ... otherAction0 edit
         //    ... ... otherChange0 38
         //    ... ... otherOpen 1
-        String clientName = updateClient(null, null, (NumericalRevision) repoRevision);
+        String clientName = updateClient(null, null, core.convertRevision(repoRevision));
         try
         {
             File f = new File(clientRoot.getAbsoluteFile(), path);
@@ -832,7 +843,7 @@ public class PerforceClient extends CachingScmClient
 
     }
 
-    public NumericalRevision getRevision(String revision) throws ScmException
+    public Revision getRevision(String revision) throws ScmException
     {
         String clientName = updateClient(null, null, null);
         try
@@ -842,7 +853,7 @@ public class PerforceClient extends CachingScmClient
                 long revisionNumber = Long.parseLong(revision);
                 // Run a quick check to ensure that the change exists.
                 core.runP4(true, null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_CHANGE, FLAG_OUTPUT, revision);
-                return new NumericalRevision(revisionNumber);
+                return core.convertRevision(new NumericalRevision(revisionNumber));
             }
             catch (NumberFormatException e)
             {
@@ -885,8 +896,8 @@ public class PerforceClient extends CachingScmClient
         try
         {
             PerforceClient client = new PerforceClient("localhost:1666", "jsankey", "", "pulse-demo");
-            client.checkout(new NumericalRevision(2), "file");
-            List<Changelist> cls = client.getChanges(new NumericalRevision(2), new NumericalRevision(6));
+            client.checkout(new Revision(null, null, null, "2"), "file");
+            List<Changelist> cls = client.getChanges(new Revision(null, null, null, "2"), new Revision(null, null, null, "6"));
 
             for (Changelist l : cls)
             {

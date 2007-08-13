@@ -4,17 +4,16 @@ import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.CvsRevision;
 import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.scm.CachingScmClient;
+import com.zutubi.pulse.scm.CachingScmFile;
 import com.zutubi.pulse.scm.FileStatus;
+import com.zutubi.pulse.scm.FilepathFilter;
+import com.zutubi.pulse.scm.ScmCapability;
 import com.zutubi.pulse.scm.ScmEventHandler;
 import com.zutubi.pulse.scm.ScmException;
-import com.zutubi.pulse.scm.CachingScmClient;
-import com.zutubi.pulse.scm.ScmFilepathFilter;
-import com.zutubi.pulse.scm.CachingScmFile;
-import com.zutubi.pulse.scm.ScmCapability;
 import com.zutubi.pulse.scm.ScmFileCache;
-import com.zutubi.pulse.scm.FilepathFilter;
+import com.zutubi.pulse.scm.ScmFilepathFilter;
 import com.zutubi.pulse.scm.cvs.client.CvsCore;
 import com.zutubi.pulse.scm.cvs.client.LogInformationAnalyser;
 import com.zutubi.pulse.util.FileSystemUtils;
@@ -25,7 +24,11 @@ import com.zutubi.util.logging.Logger;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 /**
@@ -33,6 +36,8 @@ import java.util.*;
  */
 public class CvsClient extends CachingScmClient
 {
+    public static final String TYPE = "cvs";
+
     private File tmpSpace;
 
     private static final Logger LOG = Logger.getLogger(CvsClient.class);
@@ -189,13 +194,13 @@ public class CvsClient extends CachingScmClient
     public void update(String id, File workingDirectory, Revision rev, ScmEventHandler handler) throws ScmException
     {
         assertRevisionArgValid(rev);
-        core.update(workingDirectory, (CvsRevision) rev, handler);
+        core.update(workingDirectory, convertRevision(rev), handler);
     }
 
     public void tag(Revision revision, String name, boolean moveExisting) throws ScmException
     {
         assertRevisionArgValid(revision);
-        core.tag(module, (CvsRevision) revision, name, moveExisting);
+        core.tag(module, convertRevision(revision), name, moveExisting);
     }
 
     public List<ResourceProperty> getProperties(String id, File dir) throws ScmException
@@ -237,7 +242,7 @@ public class CvsClient extends CachingScmClient
         return FileStatus.EOLStyle.BINARY;
     }
 
-    public CvsRevision getRevision(String revision) throws ScmException
+    public Revision getRevision(String revision) throws ScmException
     {
         CvsRevision cvsRevision = new CvsRevision(revision);
         if(cvsRevision.getBranch() == null)
@@ -247,13 +252,13 @@ public class CvsClient extends CachingScmClient
             cvsRevision.setBranch(branch);
         }
         
-        return cvsRevision;
+        return convertRevision(cvsRevision);
     }
 
     public Revision checkout(String id, File toDirectory, Revision revision, ScmEventHandler handler) throws ScmException
     {
         assertRevisionArgValid(revision);
-        core.checkout(toDirectory, module, (CvsRevision)revision, handler);
+        core.checkout(toDirectory, module, convertRevision(revision), handler);
         return revision;
     }
 
@@ -264,17 +269,12 @@ public class CvsClient extends CachingScmClient
             throw new IllegalArgumentException("You need to specify a file to checkout.");
         }
 
-        if (revision == null)
-        {
-            revision = CvsRevision.HEAD;
-        }
-
         final File tmpDir[] = new File[1];
         try
         {
             tmpDir[0] = createTemporaryDirectory();
 
-            core.checkout(tmpDir[0], file, (CvsRevision)revision, null);
+            core.checkout(tmpDir[0], file, convertRevision(revision), null);
 
             // read checked out file.
             File checkedOutFile = new File(tmpDir[0], file);
@@ -314,7 +314,7 @@ public class CvsClient extends CachingScmClient
         // assert that the branch for both revisions is the same. We do not support retrieving
         // differences across multiple branches/revisions. For practical reasons, we do not need to...
 
-        List<LogInformation> info = core.rlog(module, (CvsRevision)from, (CvsRevision)to);
+        List<LogInformation> info = core.rlog(module, convertRevision(from), convertRevision(to));
         LogInformationAnalyser analyser = new LogInformationAnalyser(getUid(), CVSRoot.parse(root));
 
         String branch = (from != null) ? from.getBranch() : (to != null) ? to.getBranch() : null;
@@ -399,7 +399,7 @@ public class CvsClient extends CachingScmClient
         return changelists.size() > 0;
     }
 
-    public CvsRevision getLatestRevision() throws ScmException
+    public Revision getLatestRevision() throws ScmException
     {
         // The latest change in a cvs repository is located by taking time x, and checking if
         // there have been any changes since that time. We jump through hoops (as mentioned below)
@@ -420,7 +420,7 @@ public class CvsClient extends CachingScmClient
         if (latestUpdate != null)
         {
             // should we be returning the author and comment of the latest update as well?... probably :|
-            return new CvsRevision("", branch, "", latestUpdate);
+            return convertRevision(new CvsRevision("", branch, "", latestUpdate));
         }
 
         // If the cvs server is ahead of this host, then any changes would have been picked
@@ -431,7 +431,7 @@ public class CvsClient extends CachingScmClient
 
         CvsRevision result = new CvsRevision("", branch, "", cal.getTime());
         LOG.exiting(result);
-        return result;
+        return convertRevision(result);
     }
 
     /**
@@ -503,7 +503,7 @@ public class CvsClient extends CachingScmClient
             try
             {
                 // non - recursive.
-                core.checkout(tmpDir, module, CvsRevision.HEAD, false, null);
+                core.checkout(tmpDir, module, null, false, null);
             }
             catch (ScmException e)
             {
@@ -526,6 +526,26 @@ public class CvsClient extends CachingScmClient
         return FileSystemUtils.createTempDir("cvs", "checkout", tmpSpace);
     }
 
+    public static CvsRevision convertRevision(Revision revision)
+    {
+        if (revision == null)
+        {
+            return null;
+        }
+        return new CvsRevision(revision.getAuthor(), revision.getBranch(), revision.getComment(), revision.getDate());
+    }
+
+    public static Revision convertRevision(CvsRevision revision)
+    {
+        if (revision == null)
+        {
+            return null;
+        }
+        Revision newRevision = new Revision(revision.getAuthor(), revision.getComment(), revision.getDate(), revision.getRevisionString());
+        newRevision.setBranch(revision.getBranch());
+        return newRevision;
+    }
+
     /**
      * Throw an IllegalArgumentException if either of the following are true:
      * <ul>
@@ -540,10 +560,6 @@ public class CvsClient extends CachingScmClient
         if (r == null)
         {
             throw new IllegalArgumentException("Revision is a required argument.");
-        }
-        if (!(r instanceof CvsRevision))
-        {
-            throw new IllegalArgumentException("Unsupported revision type: " + r.getClass() + ".");
         }
     }
 
