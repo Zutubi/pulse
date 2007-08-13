@@ -3,9 +3,6 @@ package com.zutubi.pulse.core.scm;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.scm.FileStatus;
-import com.zutubi.pulse.core.scm.ScmEventHandler;
-import com.zutubi.pulse.core.scm.ScmException;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,6 +24,18 @@ public interface ScmClient
      * @return a set of operations this implementation is capable of
      */
     Set<ScmCapability> getCapabilities();
+
+    /**
+     * Returns a string that uniquely identifies the server itself.  This may
+     * include the server address and repository root, for example.  All
+     * SCMServer objects talking to the same SCM should return the same id.
+     *
+     * Required for {@link ScmCapability#LIST_CHANGES}.
+     *
+     * @return a unique id for the SCM server
+     * @throws ScmException on error
+     */
+    String getUid() throws ScmException;
 
     /**
      * Returns a summarised form of the location of the source this SCM has
@@ -73,6 +82,18 @@ public interface ScmClient
      * @throws ScmException on error
      */
     void update(String id, File workDir, Revision rev, ScmEventHandler handler) throws ScmException;
+
+    /**
+     * Checks out the specified file at the given revision.
+     *
+     * Required for {@link ScmCapability#CHECKOUT_FILE}.
+     *
+     * @param revision the revision be checked out
+     * @param file     the path of the file relative to the configured scms checkout path
+     * @return an input stream that will return the contents of the requested file
+     * @throws ScmException on error
+     */
+    InputStream checkout(Revision revision, String file) throws ScmException;
 
     /**
      * Returns variables that should be added to the build environment for
@@ -129,28 +150,17 @@ public interface ScmClient
     Revision getLatestRevision() throws ScmException;
 
     /**
-     * Returns a string that uniquely identifies the server itself.  This may
-     * include the server address and repository root, for example.  All
-     * SCMServer objects talking to the same SCM should return the same id.
+     * Returns a list of revisions occuring between the given revisions.
+     * The from revision itself it NOT included in the result.
      *
-     * Required for {@link ScmCapability#LIST_CHANGES}.
+     * Required for {@link ScmCapability#POLL}.
      *
-     * @return a unique id for the SCM server
-     * @throws ScmException on error
+     * @param from the revision before the first revision to return
+     * @param to
+     * @return a list of revisions for all changes since from
+     * @throws ScmException if an error occurs talking to the server
      */
-    String getUid() throws ScmException;
-
-    /**
-     * Checks out the specified file at the given revision.
-     *
-     * Required for {@link ScmCapability#CHECKOUT_FILE}.
-     *
-     * @param revision the revision be checked out
-     * @param file     the path of the file relative to the configured scms checkout path
-     * @return an input stream that will return the contents of the requested file
-     * @throws ScmException on error
-     */
-    InputStream checkout(Revision revision, String file) throws ScmException;
+    List<Revision> getRevisions(Revision from, Revision to) throws ScmException;
 
     /**
      * Returns a list of changelists occuring in between the given revisions.
@@ -165,30 +175,6 @@ public interface ScmClient
      * @throws ScmException if an error occurs talking to the server
      */
     List<Changelist> getChanges(Revision from, Revision to) throws ScmException;
-
-    /**
-     * Returns a list of revisions occuring between the given revision and now.
-     * The from revision itself it NOT included in the result.
-     *
-     * Required for {@link ScmCapability#POLL}.
-     *
-     * @param from the revision before the first revision to return
-     * @return a list of revisions for all changes since from
-     * @throws ScmException if an error occurs talking to the server
-     */
-    List<Revision> getRevisionsSince(Revision from) throws ScmException;
-
-    /**
-     * Returns true iff a change has occured since the specified revision.
-     *
-     * Required for {@link ScmCapability#POLL}.
-     *
-     * @param since the revision to check from (changes in this revision are
-     *              not included)
-     * @return true iff there has been a change since the revision
-     * @throws ScmException on error
-     */
-    boolean hasChangedSince(Revision since) throws ScmException;
 
     /**
      * Returns details of a file or directory in the repository.

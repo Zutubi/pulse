@@ -865,7 +865,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             throw new RuntimeException("Method not implemented.");
         }
 
-        public List<Revision> getRevisionsSince(Revision from) throws ScmException
+        public List<Revision> getRevisions(Revision from, Revision to) throws ScmException
         {
             throw new RuntimeException("Method not implemented.");
         }

@@ -336,9 +336,9 @@ public class CvsClient extends CachingScmClient
         return changes;
     }
 
-    public List<Revision> getRevisionsSince(Revision from) throws ScmException
+    public List<Revision> getRevisions(Revision from, Revision to) throws ScmException
     {
-        List<Changelist> changes = getChanges(from, null);
+        List<Changelist> changes = getChanges(from, to);
         Collections.sort(changes, new Comparator<Changelist>()
         {
             public int compare(Changelist o1, Changelist o2)

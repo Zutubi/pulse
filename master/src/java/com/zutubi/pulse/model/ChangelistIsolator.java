@@ -56,7 +56,7 @@ public class ChangelistIsolator
             // We now have the last requested revision, return every revision
             // since then.
             ScmClient client = scmClientFactory.createClient(projectConfig.getScm());
-            result = client.getRevisionsSince(latestBuiltRevision);
+            result = client.getRevisions(latestBuiltRevision, null);
         }
 
         if (result.size() > 0)

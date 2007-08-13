@@ -220,7 +220,7 @@ public class SvnClientTest extends PulseTestCase
 
     public void testRevisionsSince() throws ScmException
     {
-        List<Revision> revisions = server.getRevisionsSince(createRevision(2));
+        List<Revision> revisions = server.getRevisions(createRevision(2), null);
         assertEquals(2, revisions.size());
         assertEquals("3", revisions.get(0).getRevisionString());
         assertEquals("4", revisions.get(1).getRevisionString());
@@ -228,13 +228,13 @@ public class SvnClientTest extends PulseTestCase
 
     public void testRevisionsSinceLatestInFiles() throws ScmException
     {
-        List<Revision> revisions = server.getRevisionsSince(createRevision(6));
+        List<Revision> revisions = server.getRevisions(createRevision(6), null);
         assertEquals(0, revisions.size());
     }
 
     public void testRevisionsSincePastHead() throws ScmException
     {
-        List<Revision> revisions = server.getRevisionsSince(createRevision(9));
+        List<Revision> revisions = server.getRevisions(createRevision(9), null);
         assertEquals(0, revisions.size());
     }
 

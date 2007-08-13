@@ -591,9 +591,9 @@ public class PerforceClient extends CachingScmClient
         return result;
     }
 
-    public List<Revision> getRevisionsSince(Revision from) throws ScmException
+    public List<Revision> getRevisions(Revision from, Revision to) throws ScmException
     {
-        return getRevisions(from, null, null);
+        return getRevisions(from, to, null);
     }
 
     private List<Revision> getRevisions(Revision from, Revision to, List<Changelist> changes) throws ScmException

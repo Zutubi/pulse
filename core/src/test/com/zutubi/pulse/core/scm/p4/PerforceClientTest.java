@@ -133,39 +133,6 @@ public class PerforceClientTest extends PulseTestCase
         assertEquals("content of file2\n", content);
     }
 
-    public void testHasChangedSince() throws Exception
-    {
-        getServer(TEST_CLIENT);
-        assertTrue(client.hasChangedSince(createRevision(6)));
-    }
-
-    public void testHasChangedSinceRestrictedToView() throws Exception
-    {
-        getServer("depot-client");
-        assertFalse(client.hasChangedSince(createRevision(6)));
-    }
-
-    public void testHasChangeSinceExcluded() throws Exception
-    {
-        getServer(TEST_CLIENT);
-        client.setExcludedPaths(Arrays.asList("//depot2/**"));
-        assertFalse(client.hasChangedSince(createRevision(6)));
-    }
-
-    public void testHasChangeSinceSomeExcluded() throws Exception
-    {
-        getServer(TEST_CLIENT);
-        client.setExcludedPaths(Arrays.asList("//depot2/**"));
-        assertTrue(client.hasChangedSince(createRevision(3)));
-    }
-
-    public void testHasChangeNoneExcluded() throws Exception
-    {
-        getServer(TEST_CLIENT);
-        client.setExcludedPaths(Arrays.asList("//depot1/**"));
-        assertTrue(client.hasChangedSince(createRevision(6)));
-    }
-
     public void testGetChanges() throws Exception
     {
         // [{ uid: :6666, rev: 7, changes: [//depot2/test-branch/file9#2 - INTEGRATE] },
@@ -336,7 +303,7 @@ public class PerforceClientTest extends PulseTestCase
     public void testGetRevisionsSince() throws ScmException
     {
         getServer(TEST_CLIENT);
-        List<Revision> revisions = client.getRevisionsSince(createRevision(5));
+        List<Revision> revisions = client.getRevisions(createRevision(5), null);
         assertEquals(2, revisions.size());
         assertEquals("6", revisions.get(0).getRevisionString());
         assertEquals("7", revisions.get(1).getRevisionString());
@@ -345,7 +312,7 @@ public class PerforceClientTest extends PulseTestCase
     public void testGetRevisionsSinceLatest() throws ScmException
     {
         getServer(TEST_CLIENT);
-        List<Revision> revisions = client.getRevisionsSince(createRevision(7));
+        List<Revision> revisions = client.getRevisions(createRevision(7), null);
         assertEquals(0, revisions.size());
     }
 
@@ -500,7 +467,7 @@ public class PerforceClientTest extends PulseTestCase
         core.runP4(null, "p4", "client", "-d", "edit-client");
 
         client.setExcludedPaths(Arrays.asList("//depot/file2"));
-        assertTrue(client.hasChangedSince(latest));
+        assertTrue(client.getRevisions(latest, null).size() > 0);
     }
 
     private PerforceCore getClient()

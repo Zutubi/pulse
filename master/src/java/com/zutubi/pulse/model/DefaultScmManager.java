@@ -250,7 +250,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
 
     private Revision getLatestRevisionSince(Revision revision, ScmClient client) throws ScmException
     {
-        List<Revision> revisions = client.getRevisionsSince(revision);
+        List<Revision> revisions = client.getRevisions(revision, null);
         if (revisions.size() > 0)
         {
             // get the latest revision.

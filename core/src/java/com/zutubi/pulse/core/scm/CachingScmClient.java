@@ -18,7 +18,8 @@ public abstract class CachingScmClient implements ScmClient, ScmCachePopulator
 
     public boolean requiresRefresh(Revision revision) throws ScmException
     {
-        return hasChangedSince(revision);
+        List<Revision> newRevisions = getRevisions(revision, null);
+        return newRevisions.size() > 0;
     }
 
     public ScmFile getFile(String path) throws ScmException

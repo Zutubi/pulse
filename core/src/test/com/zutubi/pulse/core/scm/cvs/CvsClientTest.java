@@ -141,7 +141,6 @@ public class CvsClientTest extends PulseTestCase
         cvsClient.setExcludedPaths(Arrays.asList("**/*"));
         changes = cvsClient.getChanges(CvsClient.convertRevision(from), CvsClient.convertRevision(to));
         assertEquals(0, changes.size());
-        assertFalse(cvsClient.hasChangedSince(CvsClient.convertRevision(from)));
     }
 
     public void testListingNonExistent()
@@ -190,7 +189,7 @@ public class CvsClientTest extends PulseTestCase
     {
         CvsClient cvsClient = new CvsClient(cvsRoot, "unit-test/CvsServerTest/testGetChangesBetweenSingleRevision", null, null);
         CvsRevision from = new CvsRevision("", "", "", SERVER_DATE.parse("2006-05-08 11:07:00 GMT"));
-        List<Revision> revisions = cvsClient.getRevisionsSince(CvsClient.convertRevision(from));
+        List<Revision> revisions = cvsClient.getRevisions(CvsClient.convertRevision(from), null);
         assertNotNull(revisions);
         assertEquals(1, revisions.size());
     }
