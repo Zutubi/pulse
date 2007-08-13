@@ -46,7 +46,7 @@ public class DownloadSCMFileAction extends ProjectActionBase
         {
             ProjectConfiguration projectConfig = getProjectConfig();
             ScmClient client = scmClientFactory.createClient(projectConfig.getScm());
-            inputStream = client.checkout(null, path);
+            inputStream = client.retrieve(path, null);
             contentType = URLConnection.guessContentTypeFromName(path);
             return SUCCESS;
         }

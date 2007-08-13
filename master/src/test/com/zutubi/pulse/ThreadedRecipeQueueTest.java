@@ -855,7 +855,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             throw new RuntimeException("Method not implemented.");
         }
 
-        public InputStream checkout(Revision revision, String file) throws ScmException
+        public InputStream retrieve(String path, Revision revision) throws ScmException
         {
             throw new RuntimeException("Method not implemented.");
         }
@@ -887,12 +887,14 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             }
         }
 
+/*
         public ScmFile getFile(String path) throws ScmException
         {
             throw new RuntimeException("Method not implemented.");
         }
+*/
 
-        public List<ScmFile> getListing(String path) throws ScmException
+        public List<ScmFile> browse(String path) throws ScmException
         {
             throw new RuntimeException("Method not implemented.");
         }

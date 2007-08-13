@@ -337,13 +337,13 @@ public class SvnClient implements ScmClient
         }
     }
 
-    public InputStream checkout(Revision revision, String file) throws ScmException
+    public InputStream retrieve(String path, Revision revision) throws ScmException
     {
         ByteArrayOutputStream os = new ByteArrayOutputStream(1024);
 
         try
         {
-            repository.getFile(file, convertRevision(revision).getNumber(), null, os);
+            repository.getFile(path, convertRevision(revision).getNumber(), null, os);
         }
         catch (SVNException e)
         {
@@ -556,6 +556,7 @@ public class SvnClient implements ScmClient
         }
     }
 
+/*
     public ScmFile getFile(String path) throws ScmException
     {
         try
@@ -575,8 +576,9 @@ public class SvnClient implements ScmClient
             throw convertException(e);
         }
     }
+*/
 
-    public List<ScmFile> getListing(String path) throws ScmException
+    public List<ScmFile> browse(String path) throws ScmException
     {
         LinkedList<SVNDirEntry> files = new LinkedList<SVNDirEntry>();
         try

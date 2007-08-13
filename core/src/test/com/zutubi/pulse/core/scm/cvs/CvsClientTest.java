@@ -52,7 +52,7 @@ public class CvsClientTest extends PulseTestCase
     public void testListRoot() throws ScmException
     {
         CvsClient cvsClient = new CvsClient(cvsRoot, "unit-test", null, null);
-        List<ScmFile> files = cvsClient.getListing("");
+        List<ScmFile> files = cvsClient.browse("");
         assertEquals(1, files.size());
         assertEquals("unit-test", files.get(0).getPath());
         assertTrue(files.get(0).isDirectory());
@@ -61,7 +61,7 @@ public class CvsClientTest extends PulseTestCase
     public void testListing() throws ScmException
     {
         CvsClient cvsClient = new CvsClient(cvsRoot, "unit-test", null, null);
-        List<ScmFile> files = cvsClient.getListing("unit-test/CvsWorkerTest/testRlog");
+        List<ScmFile> files = cvsClient.browse("unit-test/CvsWorkerTest/testRlog");
         assertEquals(4, files.size());
 
         String [] expectedNames = new String[]{"file1.txt", "Attic", "dir1", "dir2"};
@@ -148,7 +148,7 @@ public class CvsClientTest extends PulseTestCase
         CvsClient cvsClient = new CvsClient(cvsRoot, "unit-test", null, null);
         try
         {
-            cvsClient.getListing("nosuchpath");
+            cvsClient.browse("nosuchpath");
             fail();
         }
         catch (ScmException e)

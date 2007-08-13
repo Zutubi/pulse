@@ -126,7 +126,7 @@ public class SvnClientTest extends PulseTestCase
 
     public void testList() throws ScmException
     {
-        List<ScmFile> files = server.getListing("afolder");
+        List<ScmFile> files = server.browse("afolder");
         assertEquals(2, files.size());
         assertEquals("f1", files.get(0).getName());
         assertEquals("f2", files.get(1).getName());
@@ -136,7 +136,7 @@ public class SvnClientTest extends PulseTestCase
     {
         try
         {
-            server.getListing("nosuchfile");
+            server.browse("nosuchfile");
             fail();
         }
         catch (ScmException e)
@@ -157,7 +157,7 @@ public class SvnClientTest extends PulseTestCase
         assertEquals("bfolder", files.get(1).getName());
         assertEquals("foo", files.get(2).getName());
 
-        String foo = IOUtils.inputStreamToString(confirmServer.checkout(null, "foo"));
+        String foo = IOUtils.inputStreamToString(confirmServer.retrieve("foo", null));
         assertEquals("", foo);
     }
 
@@ -184,7 +184,7 @@ public class SvnClientTest extends PulseTestCase
         assertEquals("bfolder", files.get(1).getName());
         assertEquals("foo", files.get(2).getName());
 
-        String foo = IOUtils.inputStreamToString(confirmServer.checkout(null, "foo"));
+        String foo = IOUtils.inputStreamToString(confirmServer.retrieve("foo", null));
         assertEquals("hello\n", foo);
     }
 
@@ -275,7 +275,7 @@ public class SvnClientTest extends PulseTestCase
     private List<ScmFile> getSortedListing(SvnClient confirmServer)
             throws ScmException
     {
-        List<ScmFile> files = confirmServer.getListing("");
+        List<ScmFile> files = confirmServer.browse("");
         Collections.sort(files, new Comparator<ScmFile>()
         {
             public int compare(ScmFile o1, ScmFile o2)

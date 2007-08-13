@@ -88,12 +88,11 @@ public interface ScmClient
      *
      * Required for {@link ScmCapability#CHECKOUT_FILE}.
      *
-     * @param revision the revision be checked out
-     * @param file     the path of the file relative to the configured scms checkout path
-     * @return an input stream that will return the contents of the requested file
+     * @param path
+     * @param revision the revision be checked out @return an input stream that will return the contents of the requested file
      * @throws ScmException on error
      */
-    InputStream checkout(Revision revision, String file) throws ScmException;
+    InputStream retrieve(String path, Revision revision) throws ScmException;
 
     /**
      * Returns variables that should be added to the build environment for
@@ -177,17 +176,6 @@ public interface ScmClient
     List<Changelist> getChanges(Revision from, Revision to) throws ScmException;
 
     /**
-     * Returns details of a file or directory in the repository.
-     *
-     * Required for {@link ScmCapability#BROWSE}.
-     *
-     * @param path path to the file, relative to this connection's root
-     * @return the file details
-     * @throws ScmException on error
-     */
-    ScmFile getFile(String path) throws ScmException;
-
-    /**
      * Returns a list of all files/directories in the given path (which
      * should specify a directory).  This function is NOT recursive, i.e.
      * only direct descendents should be listed.
@@ -200,7 +188,7 @@ public interface ScmClient
      *         path
      * @throws ScmException on error
      */
-    List<ScmFile> getListing(String path) throws ScmException;
+    List<ScmFile> browse(String path) throws ScmException;
 
     /**
      * Applies a tag to the given revision of all files in the server's view .

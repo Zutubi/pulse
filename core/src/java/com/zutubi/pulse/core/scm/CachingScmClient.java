@@ -21,6 +21,7 @@ public abstract class CachingScmClient implements ScmClient, ScmCachePopulator
         List<Revision> newRevisions = getRevisions(revision, null);
         return newRevisions.size() > 0;
     }
+/*
 
     public ScmFile getFile(String path) throws ScmException
     {
@@ -34,8 +35,9 @@ public abstract class CachingScmClient implements ScmClient, ScmCachePopulator
             throw new ScmException("Path '" + path + "' does not exist");
         }
     }
+*/
 
-    public List<ScmFile> getListing(String path) throws ScmException
+    public List<ScmFile> browse(String path) throws ScmException
     {
         Map<String, CachingScmFile> cachedListing = ScmFileCache.getInstance().lookup(this);
         if (cachedListing.containsKey(path))

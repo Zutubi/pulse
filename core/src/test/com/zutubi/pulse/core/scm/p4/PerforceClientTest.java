@@ -122,14 +122,14 @@ public class PerforceClientTest extends PulseTestCase
     public void testCheckoutFile() throws ScmException, IOException
     {
         getServer("depot-client");
-        String content = IOUtils.inputStreamToString(client.checkout(null, FileSystemUtils.composeFilename("depot", "file2")));
+        String content = IOUtils.inputStreamToString(client.retrieve(FileSystemUtils.composeFilename("depot", "file2"), null));
         assertEquals("content of file2: edited at the same time as file2 in depot2.\n", content);
     }
 
     public void testCheckoutFileRevision() throws ScmException, IOException
     {
         getServer("depot-client");
-        String content = IOUtils.inputStreamToString(client.checkout(createRevision(2), FileSystemUtils.composeFilename("depot", "file2")));
+        String content = IOUtils.inputStreamToString(client.retrieve(FileSystemUtils.composeFilename("depot", "file2"), createRevision(2)));
         assertEquals("content of file2\n", content);
     }
 
@@ -171,7 +171,7 @@ public class PerforceClientTest extends PulseTestCase
         getServer(TEST_CLIENT);
         try
         {
-            client.getListing("depot4");
+            client.browse("depot4");
             fail();
         }
         catch (ScmException e)
@@ -183,7 +183,7 @@ public class PerforceClientTest extends PulseTestCase
     public void testListRoot() throws ScmException
     {
         getServer(TEST_CLIENT);
-        List<ScmFile> files = client.getListing("");
+        List<ScmFile> files = client.browse("");
         assertEquals(2, files.size());
         ScmFile f = files.get(0);
         assertEquals("depot", f.getName());
@@ -198,7 +198,7 @@ public class PerforceClientTest extends PulseTestCase
     public void testListPath() throws ScmException
     {
         getServer(TEST_CLIENT);
-        List<ScmFile> files = client.getListing("depot2");
+        List<ScmFile> files = client.browse("depot2");
         assertEquals(10, files.size());
 
         ScmFile f;
@@ -220,7 +220,7 @@ public class PerforceClientTest extends PulseTestCase
     public void testListComplexClient() throws ScmException
     {
         getServer("complex-client");
-        List<ScmFile> files = client.getListing("");
+        List<ScmFile> files = client.browse("");
         assertEquals(1, files.size());
         ScmFile scmFile = files.get(0);
         assertEquals("src", scmFile.getName());
@@ -230,7 +230,7 @@ public class PerforceClientTest extends PulseTestCase
     public void testListComplexSrc() throws ScmException
     {
         getServer("complex-client");
-        List<ScmFile> files = client.getListing("src");
+        List<ScmFile> files = client.browse("src");
         assertEquals(2, files.size());
 
         ScmFile scmFile = files.get(0);
@@ -245,7 +245,7 @@ public class PerforceClientTest extends PulseTestCase
     public void testListComplexSnuth() throws ScmException
     {
         getServer("complex-client");
-        List<ScmFile> files = client.getListing("src/libraries/snuth");
+        List<ScmFile> files = client.browse("src/libraries/snuth");
         assertEquals(2, files.size());
 
         ScmFile scmFile = files.get(0);

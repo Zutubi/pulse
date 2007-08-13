@@ -262,9 +262,9 @@ public class CvsClient extends CachingScmClient
         return revision;
     }
 
-    public InputStream checkout(Revision revision, String file) throws ScmException
+    public InputStream retrieve(String path, Revision revision) throws ScmException
     {
-        if (!TextUtils.stringSet(file))
+        if (!TextUtils.stringSet(path))
         {
             throw new IllegalArgumentException("You need to specify a file to checkout.");
         }
@@ -274,13 +274,13 @@ public class CvsClient extends CachingScmClient
         {
             tmpDir[0] = createTemporaryDirectory();
 
-            core.checkout(tmpDir[0], file, convertRevision(revision), null);
+            core.checkout(tmpDir[0], path, convertRevision(revision), null);
 
             // read checked out file.
-            File checkedOutFile = new File(tmpDir[0], file);
+            File checkedOutFile = new File(tmpDir[0], path);
             if (!checkedOutFile.exists())
             {
-                throw new ScmException("Unable to checkout file '" + file + "' from cvs[" + getRoot() + "].");
+                throw new ScmException("Unable to checkout file '" + path + "' from cvs[" + getRoot() + "].");
             }
 
             FileInputStream fis = new FileInputStream(checkedOutFile);
@@ -298,7 +298,7 @@ public class CvsClient extends CachingScmClient
         catch (IOException e)
         {
             LOG.severe(e);
-            throw new ScmException("Unable to retrieve requested file: " + file, e);
+            throw new ScmException("Unable to retrieve requested file: " + path, e);
         }
         finally
         {

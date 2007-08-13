@@ -544,13 +544,13 @@ public class PerforceClient extends CachingScmClient
         return sync(id, toDirectory, revision, handler, true);
     }
 
-    public InputStream checkout(Revision revision, String file) throws ScmException
+    public InputStream retrieve(String path, Revision revision) throws ScmException
     {
         String clientName = updateClient(null, null, core.convertRevision(revision));
 
         try
         {
-            File fullFile = new File(clientRoot, file);
+            File fullFile = new File(clientRoot, path);
 
             String fileArgument = fullFile.getAbsolutePath();
             if (revision != null)
@@ -566,7 +566,7 @@ public class PerforceClient extends CachingScmClient
             if (e.getMessage().contains("no such file") || e.getMessage().contains("not in client view"))
             {
                 String rev = revision == null ? "head" : revision.getRevisionString();
-                throw new ScmException("File '" + file + "' revision " + rev + " does not exist in the client's view (" + e.getMessage() + ")");
+                throw new ScmException("File '" + path + "' revision " + rev + " does not exist in the client's view (" + e.getMessage() + ")");
             }
             else
             {
@@ -896,7 +896,7 @@ public class PerforceClient extends CachingScmClient
         try
         {
             PerforceClient client = new PerforceClient("localhost:1666", "jsankey", "", "pulse-demo");
-            client.checkout(new Revision(null, null, null, "2"), "file");
+            client.retrieve("file", new Revision(null, null, null, "2"));
             List<Changelist> cls = client.getChanges(new Revision(null, null, null, "2"), new Revision(null, null, null, "6"));
 
             for (Changelist l : cls)
