@@ -1,6 +1,11 @@
 package com.zutubi.pulse.core.scm;
 
+import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.Change;
+
 import java.io.File;
+import java.util.List;
+import java.util.Iterator;
 
 /**
  * Helpers shared amongst SCM implementations.
@@ -26,4 +31,28 @@ public class ScmUtils
 
         return result;
     }
+
+    public static List<Changelist> filterExcludes(List<Changelist> changelists, FilepathFilter filter)
+    {
+        Iterator<Changelist> changelist = changelists.iterator();
+        while (changelist.hasNext())
+        {
+            Changelist ch = changelist.next();
+            Iterator<Change> i = ch.getChanges().iterator();
+            while (i.hasNext())
+            {
+                Change c = i.next();
+                if (filter != null && !filter.accept(c.getFilename()))
+                {
+                    i.remove();
+                }
+            }
+            if (ch.getChanges().size() == 0)
+            {
+                changelist.remove();
+            }
+        }
+        return changelists;
+    }
+
 }

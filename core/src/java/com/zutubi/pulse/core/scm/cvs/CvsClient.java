@@ -2,18 +2,17 @@ package com.zutubi.pulse.core.scm.cvs;
 
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.config.ResourceProperty;
-import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.CachingScmClient;
 import com.zutubi.pulse.core.scm.CachingScmFile;
 import com.zutubi.pulse.core.scm.FileStatus;
-import com.zutubi.pulse.core.scm.FilepathFilter;
 import com.zutubi.pulse.core.scm.ScmCapability;
 import com.zutubi.pulse.core.scm.ScmEventHandler;
 import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.ScmFileCache;
 import com.zutubi.pulse.core.scm.ScmFilepathFilter;
+import com.zutubi.pulse.core.scm.ScmUtils;
 import com.zutubi.pulse.core.scm.cvs.client.CvsCore;
 import com.zutubi.pulse.core.scm.cvs.client.LogInformationAnalyser;
 import com.zutubi.pulse.util.FileSystemUtils;
@@ -321,7 +320,7 @@ public class CvsClient extends CachingScmClient
         List<Changelist> changes = analyser.extractChangelists(info, branch);
 
         // process excludes from the changelist.
-        changes = filterExcludes(changes, new ScmFilepathFilter(excludedPaths));
+        changes = ScmUtils.filterExcludes(changes, new ScmFilepathFilter(excludedPaths));
         if (changes.size() == 0)
         {
             return changes;
@@ -356,29 +355,6 @@ public class CvsClient extends CachingScmClient
         return result;
     }
 
-    private List<Changelist> filterExcludes(List<Changelist> changelists, FilepathFilter filter)
-    {
-        Iterator<Changelist> changelist = changelists.iterator();
-        while (changelist.hasNext())
-        {
-            Changelist ch = changelist.next();
-            Iterator<Change> i = ch.getChanges().iterator();
-            while (i.hasNext())
-            {
-                Change c = i.next();
-                if (filter != null && !filter.accept(c.getFilename()))
-                {
-                    i.remove();
-                }
-            }
-            if (ch.getChanges().size() == 0)
-            {
-                changelist.remove();
-            }
-        }
-        return changelists;
-    }
-
     /**
      * This method checks to see if there have been any changes to the scm system since the
      * specified revision.
@@ -395,7 +371,7 @@ public class CvsClient extends CachingScmClient
         }
 
         List<Changelist> changelists = getChanges(since, null);
-        changelists = filterExcludes(changelists, new ScmFilepathFilter(excludedPaths));
+        changelists = ScmUtils.filterExcludes(changelists, new ScmFilepathFilter(excludedPaths));
         return changelists.size() > 0;
     }
 
