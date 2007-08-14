@@ -24,7 +24,7 @@ import com.zutubi.pulse.prototype.config.user.*;
 import com.zutubi.pulse.prototype.config.user.contacts.ContactConfiguration;
 import com.zutubi.pulse.prototype.config.user.contacts.EmailContactConfiguration;
 import com.zutubi.pulse.prototype.config.user.contacts.JabberContactConfiguration;
-import com.zutubi.pulse.scm.cvs.config.CvsConfiguration;
+import com.zutubi.pulse.core.scm.cvs.config.CvsConfiguration;
 import com.zutubi.pulse.core.scm.svn.config.SvnConfiguration;
 import com.zutubi.pulse.core.scm.p4.config.PerforceConfiguration;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
