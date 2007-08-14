@@ -1,16 +1,28 @@
 package com.zutubi.prototype.config;
 
 import com.zutubi.config.annotations.ConfigurationCheck;
-import com.zutubi.pulse.core.config.ConfigurationCheckHandler;
-import com.zutubi.prototype.type.*;
+import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.ExtensionTypeProperty;
+import com.zutubi.prototype.type.MapType;
+import com.zutubi.prototype.type.TemplatedMapType;
+import com.zutubi.prototype.type.TypeException;
+import com.zutubi.prototype.type.TypeHandler;
+import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.pulse.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.pulse.core.config.ConfigurationCheckHandler;
+import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.prototype.config.misc.LoginConfiguration;
 import com.zutubi.pulse.prototype.config.misc.TransientConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
-import com.zutubi.pulse.prototype.config.project.changeviewer.*;
+import com.zutubi.pulse.prototype.config.project.changeviewer.ChangeViewerConfiguration;
+import com.zutubi.pulse.prototype.config.project.changeviewer.CustomChangeViewerConfiguration;
+import com.zutubi.pulse.prototype.config.project.changeviewer.FisheyeConfiguration;
+import com.zutubi.pulse.prototype.config.project.changeviewer.P4WebChangeViewer;
+import com.zutubi.pulse.prototype.config.project.changeviewer.TracChangeViewer;
+import com.zutubi.pulse.prototype.config.project.changeviewer.ViewVCChangeViewer;
 import com.zutubi.pulse.prototype.config.project.commit.CommitMessageConfiguration;
 import com.zutubi.pulse.prototype.config.project.commit.CustomCommitMessageConfiguration;
 import com.zutubi.pulse.prototype.config.project.commit.JiraCommitMessageConfiguration;
@@ -20,14 +32,18 @@ import com.zutubi.pulse.prototype.config.project.triggers.ScmBuildTriggerConfigu
 import com.zutubi.pulse.prototype.config.project.triggers.TriggerConfiguration;
 import com.zutubi.pulse.prototype.config.project.types.*;
 import com.zutubi.pulse.prototype.config.setup.SetupConfiguration;
-import com.zutubi.pulse.prototype.config.user.*;
+import com.zutubi.pulse.prototype.config.user.AllBuildsConditionConfiguration;
+import com.zutubi.pulse.prototype.config.user.CustomConditionConfiguration;
+import com.zutubi.pulse.prototype.config.user.PersonalSubscriptionConfiguration;
+import com.zutubi.pulse.prototype.config.user.ProjectSubscriptionConfiguration;
+import com.zutubi.pulse.prototype.config.user.RepeatedUnsuccessfulConditionConfiguration;
+import com.zutubi.pulse.prototype.config.user.SelectedBuildsConditionConfiguration;
+import com.zutubi.pulse.prototype.config.user.SubscriptionConditionConfiguration;
+import com.zutubi.pulse.prototype.config.user.SubscriptionConfiguration;
+import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 import com.zutubi.pulse.prototype.config.user.contacts.ContactConfiguration;
 import com.zutubi.pulse.prototype.config.user.contacts.EmailContactConfiguration;
 import com.zutubi.pulse.prototype.config.user.contacts.JabberContactConfiguration;
-import com.zutubi.pulse.core.scm.cvs.config.CvsConfiguration;
-import com.zutubi.pulse.core.scm.svn.config.SvnConfiguration;
-import com.zutubi.pulse.core.scm.p4.config.PerforceConfiguration;
-import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.util.logging.Logger;
 
 import java.util.HashMap;
@@ -36,7 +52,7 @@ import java.util.Map;
 /**
  * Registers the Pulse built-in configuration types.
  */
-@SuppressWarnings({ "unchecked" })
+@SuppressWarnings({"unchecked"})
 public class ConfigurationRegistry
 {
     private static final Logger LOG = Logger.getLogger(ConfigurationRegistry.class);
@@ -114,7 +130,8 @@ public class ConfigurationRegistry
             CompositeType projectConfig = registerConfigurationType(ProjectConfiguration.class);
 
             // scm configuration
-            CompositeType scmConfig = typeRegistry.getType(ScmConfiguration.class);
+            /*CompositeType scmConfig = */typeRegistry.getType(ScmConfiguration.class);
+/*
             registerConfigurationType(SvnConfiguration.class);
             registerConfigurationType(CvsConfiguration.class);
             registerConfigurationType(PerforceConfiguration.class);
@@ -123,6 +140,7 @@ public class ConfigurationRegistry
             scmConfig.addExtension("zutubi.svnConfig");
             scmConfig.addExtension("zutubi.cvsConfig");
             scmConfig.addExtension("zutubi.perforceConfig");
+*/
 
             // Triggers
             CompositeType triggerConfig = registerConfigurationType(TriggerConfiguration.class);
@@ -133,7 +151,7 @@ public class ConfigurationRegistry
             triggerConfig.addExtension("zutubi.buildCompletedConfig");
             triggerConfig.addExtension("zutubi.cronTriggerConfig");
             triggerConfig.addExtension("zutubi.scmTriggerConfig");
-            
+
             MapType triggers = new MapType();
             triggers.setTypeRegistry(typeRegistry);
             triggers.setCollectionType(triggerConfig);
@@ -169,7 +187,7 @@ public class ConfigurationRegistry
 
             // register project configuration.  This will eventually be handled as an extension point
             registerProjectMapExtension("cleanup", CleanupConfiguration.class);
-            
+
             TemplatedMapType agentCollection = new TemplatedMapType();
             agentCollection.setTypeRegistry(typeRegistry);
             agentCollection.setCollectionType(registerConfigurationType(AgentConfiguration.class));
@@ -178,7 +196,6 @@ public class ConfigurationRegistry
             CompositeType globalConfig = registerConfigurationType(GlobalConfiguration.class);
             configurationPersistenceManager.register(GlobalConfiguration.SCOPE_NAME, globalConfig);
 
-            
             // user configuration.
 
             MapType userCollection = new MapType();
@@ -202,7 +219,7 @@ public class ConfigurationRegistry
             registerConfigurationType(PersonalSubscriptionConfiguration.class);
             userSubscriptionConfig.addExtension("zutubi.projectSubscriptionConfig");
             userSubscriptionConfig.addExtension("zutubi.personalSubscriptionConfig");
-            
+
             // user subscription conditions
             CompositeType userSubscriptionConditionConfig = typeRegistry.getType(SubscriptionConditionConfiguration.class);
             registerConfigurationType(AllBuildsConditionConfiguration.class);
@@ -220,6 +237,13 @@ public class ConfigurationRegistry
         {
             LOG.severe(e);
         }
+    }
+
+    public void registerExtension(Class extendedType, Class extensionType) throws TypeException
+    {
+        CompositeType extension = registerConfigurationType(extensionType);
+        CompositeType type = typeRegistry.getType(extendedType);
+        type.addExtension(extension.getSymbolicName());
     }
 
     public void registerTransientConfiguration(String propertyName, Class clazz) throws TypeException
@@ -269,7 +293,7 @@ public class ConfigurationRegistry
                         throw new TypeException("Registering check type for class '" + type.getClazz().getName() + "': " + e.getMessage(), e);
                     }
 
-                    if(!ConfigurationCheckHandler.class.isAssignableFrom(checkClass))
+                    if (!ConfigurationCheckHandler.class.isAssignableFrom(checkClass))
                     {
                         throw new TypeException("Check type '" + checkClassName + "' does not implement ConfigurationCheckHandler");
                     }
