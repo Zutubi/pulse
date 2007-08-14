@@ -48,7 +48,7 @@ public class FatController implements EventListener, Stoppable
     private AsynchronousDelegatingListener asyncListener;
     private BuildManager buildManager;
     private TestManager testManager;
-    private DelegateScmClientFactory scmClientManager;
+    private DelegateScmClientFactory scmClientFactory;
     private MasterConfigurationManager configManager;
     private RecipeQueue recipeQueue;
 
@@ -94,7 +94,7 @@ public class FatController implements EventListener, Stoppable
     }
 
     /**
-     * If enabled, this fat controller is accepting build requests.
+     * @return true if this fat controller is accepting build requests.
      *
      * @see #isDisabled()
      */
@@ -104,7 +104,7 @@ public class FatController implements EventListener, Stoppable
     }
 
     /**
-     * If disabled, this fat controller is ignoring build requests.
+     * @return true if this fat controller is ignoring build requests.
      *
      * @see #isEnabled()
      */
@@ -177,11 +177,6 @@ public class FatController implements EventListener, Stoppable
         asyncListener.stop(force);
     }
 
-    /**
-     * Handle the incoming event.
-     *
-     * @param event
-     */
     public void handleEvent(Event event)
     {
         if (event instanceof AbstractBuildRequestEvent)
@@ -194,11 +189,11 @@ public class FatController implements EventListener, Stoppable
         }
         else if (event instanceof LicenseEvent)
         {
-            handleLicenseEvent((LicenseEvent)event);
+            handleLicenseEvent();
         }
     }
 
-    private void handleLicenseEvent(LicenseEvent event)
+    private void handleLicenseEvent()
     {
         // the type or detail of the license event does not matter at this stage.
         if (LicenseHolder.hasAuthorization(LicenseHolder.AUTH_RUN_PULSE))
@@ -259,7 +254,7 @@ public class FatController implements EventListener, Stoppable
                 controller.setQueue(recipeQueue);
                 controller.setServiceTokenManager(serviceTokenManager);
                 controller.setTestManager(testManager);
-                controller.setScmClientFactory(scmClientManager);
+                controller.setScmClientFactory(scmClientFactory);
                 controller.setUserManager(userManager);
                 controller.setConfigurationManager(configManager);
                 controller.init();
@@ -347,61 +342,31 @@ public class FatController implements EventListener, Stoppable
         }
     }
 
-    /**
-     * Required resource.
-     *
-     * @param buildManager
-     */
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param recipeQueue
-     */
     public void setRecipeQueue(RecipeQueue recipeQueue)
     {
         this.recipeQueue = recipeQueue;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param eventManager
-     */
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param quartzScheduler
-     */
     public void setQuartzScheduler(Scheduler quartzScheduler)
     {
         this.quartzScheduler = quartzScheduler;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param configManager
-     */
     public void setConfigurationManager(MasterConfigurationManager configManager)
     {
         this.configManager = configManager;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param projectManager
-     */
     public void setProjectManager(ProjectManager projectManager)
     {
         this.projectManager = projectManager;
@@ -434,8 +399,8 @@ public class FatController implements EventListener, Stoppable
         this.testManager = testManager;
     }
 
-    public void setScmClientManager(DelegateScmClientFactory scmClientManager)
+    public void setScmClientFactory(DelegateScmClientFactory scmClientFactory)
     {
-        this.scmClientManager = scmClientManager;
+        this.scmClientFactory = scmClientFactory;
     }
 }

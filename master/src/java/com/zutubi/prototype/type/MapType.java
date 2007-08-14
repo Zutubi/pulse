@@ -7,6 +7,7 @@ import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.config.ConfigurationMap;
 import com.zutubi.util.AnnotationUtils;
+import com.zutubi.util.GraphFunction;
 import com.zutubi.util.Sort;
 import com.zutubi.util.logging.Logger;
 
@@ -186,25 +187,39 @@ public class MapType extends CollectionType
         return PathUtils.getPath(path, (String) record.get(keyProperty));
     }
 
-    public boolean isValid(Configuration instance)
+    public boolean isValid(Object instance)
     {
-        ConfigurationMap<Configuration> map = (ConfigurationMap) instance;
+        Map map = (Map) instance;
 
-        if(!map.isValid())
+        if(map instanceof ConfigurationMap && !((ConfigurationMap)map).isValid())
         {
             return false;
         }
 
         CompositeType collectionType = (CompositeType) getCollectionType();
-        for(Configuration c: map.values())
+        for(Object o: map.values())
         {
-            if(!collectionType.isValid(c))
+            if(!collectionType.isValid(o))
             {
                 return false;
             }
         }
 
         return true;
+    }
+
+    @SuppressWarnings({ "unchecked" })
+    public void forEachComplex(Object instance, GraphFunction<Object> f) throws TypeException
+    {
+        f.process(instance);
+        CompositeType collectionType = (CompositeType) getCollectionType();
+        Map<String, Object> map = ((Map<String, Object>) instance);
+        for(Map.Entry<String, Object> entry: map.entrySet())
+        {
+            f.push(entry.getKey());
+            collectionType.forEachComplex(entry.getValue(), f);
+            f.pop();
+        }
     }
 
     public String getSavePath(String path, Record record)

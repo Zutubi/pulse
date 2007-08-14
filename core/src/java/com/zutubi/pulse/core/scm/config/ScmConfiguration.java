@@ -7,6 +7,7 @@ import com.zutubi.config.annotations.Wizard;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.core.scm.CheckoutScheme;
 import com.zutubi.validation.annotations.Numeric;
+import com.zutubi.validation.annotations.Required;
 
 import java.util.List;
 
@@ -19,7 +20,8 @@ public abstract class ScmConfiguration extends AbstractConfiguration
     @Wizard.Ignore
     private boolean monitor = true;
 
-    private CheckoutScheme checkoutScheme;
+    @Required
+    private CheckoutScheme checkoutScheme = CheckoutScheme.CLEAN_CHECKOUT;
     
     @ControllingCheckbox(dependentFields = {"pollingInterval"})
     @Wizard.Ignore

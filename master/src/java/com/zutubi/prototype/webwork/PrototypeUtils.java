@@ -127,48 +127,9 @@ public class PrototypeUtils
         }
         else if (type instanceof CompositeType)
         {
-            listing = getNestedProperties((CompositeType) type);
+            listing = ((CompositeType)type).getNestedPropertyNames();
         }
 
-        return listing;
-    }
-
-    public static List<String> getSimpleProperties(CompositeType ctype)
-    {
-        List<String> listing = new LinkedList<String>();
-        for (String propertyName : ctype.getPropertyNames(PrimitiveType.class))
-        {
-            listing.add(propertyName);
-        }
-
-        for (TypeProperty property : ctype.getProperties(CollectionType.class))
-        {
-            final CollectionType propertyType = (CollectionType) property.getType();
-            if (propertyType.getCollectionType() instanceof SimpleType)
-            {
-                listing.add(property.getName());
-            }
-        }
-
-        return listing;
-    }
-
-    public static List<String> getNestedProperties(CompositeType ctype)
-    {
-        List<String> listing = new LinkedList<String>();
-        for (String propertyName : ctype.getPropertyNames(CompositeType.class))
-        {
-            listing.add(propertyName);
-        }
-
-        for (TypeProperty property : ctype.getProperties(CollectionType.class))
-        {
-            final CollectionType propertyType = (CollectionType) property.getType();
-            if (!(propertyType.getCollectionType() instanceof SimpleType))
-            {
-                listing.add(property.getName());
-            }
-        }
         return listing;
     }
 

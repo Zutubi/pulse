@@ -6,6 +6,7 @@ import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.GraphFunction;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.logging.Logger;
 
@@ -124,6 +125,44 @@ public class CompositeType extends AbstractType implements ComplexType
     public List<String> getPropertyNames()
     {
         return Collections.unmodifiableList(new LinkedList<String>(properties.keySet()));
+    }
+
+    /**
+     * @return the names of all embedded properties, that is simple values
+     *         and simple collections.
+     */
+    public List<String> getSimplePropertyNames()
+    {
+        List<String> result = new LinkedList<String>();
+        for(Map.Entry<String, TypeProperty> entry: properties.entrySet())
+        {
+            Type type = entry.getValue().getType();
+            if(type instanceof SimpleType || type instanceof CollectionType && type.getTargetType() instanceof SimpleType)
+            {
+                result.add(entry.getKey());
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * @return the names of all non-embedded properties, that is nested
+     *         composites and complex collections.
+     */
+    public List<String> getNestedPropertyNames()
+    {
+        List<String> result = new LinkedList<String>();
+        for(Map.Entry<String, TypeProperty> entry: properties.entrySet())
+        {
+            Type type = entry.getValue().getType();
+            if(type instanceof CompositeType || type instanceof CollectionType && type.getTargetType() instanceof ComplexType)
+            {
+                result.add(entry.getKey());
+            }
+        }
+
+        return result;
     }
 
     public boolean hasProperty(String propertyName)
@@ -482,15 +521,16 @@ public class CompositeType extends AbstractType implements ComplexType
         return property == null ? null : property.getType().getActualType(propertyValue);
     }
 
-    public boolean isValid(Configuration instance)
+    public boolean isValid(Object instance)
     {
-        CompositeType actualType = typeRegistry.getType(instance.getClass());
+        Configuration configuration = (Configuration) instance;
+        CompositeType actualType = typeRegistry.getType(configuration.getClass());
         if(actualType != this)
         {
-            return actualType.isValid(instance);
+            return actualType.isValid(configuration);
         }
         
-        if(!instance.isValid())
+        if(!configuration.isValid())
         {
             return false;
         }
@@ -500,7 +540,7 @@ public class CompositeType extends AbstractType implements ComplexType
             TypeProperty property = getProperty(propertyName);
             try
             {
-                Configuration nestedInstance = (Configuration) property.getValue(instance);
+                Object nestedInstance = property.getValue(configuration);
                 if (nestedInstance != null)
                 {
                     if(!((ComplexType) property.getType()).isValid(nestedInstance))
@@ -517,6 +557,31 @@ public class CompositeType extends AbstractType implements ComplexType
         }
 
         return true;
+    }
+
+    public void forEachComplex(Object instance, GraphFunction<Object> f) throws TypeException
+    {
+        f.process(instance);
+
+        for(String propertyName: getPropertyNames(ComplexType.class))
+        {
+            TypeProperty property = getProperty(propertyName);
+            try
+            {
+                Object nestedInstance = property.getValue(instance);
+                if (nestedInstance != null)
+                {
+                    ComplexType nestedType = (ComplexType) property.getType();
+                    f.push(propertyName);
+                    nestedType.forEachComplex(nestedInstance, f);
+                    f.pop();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new TypeException("Error getting value of property '" + propertyName + "': " + e.getMessage(), e);
+            }
+        }
     }
 
     public Type getPropertyType(String key)

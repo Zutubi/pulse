@@ -3,6 +3,7 @@ package com.zutubi.prototype.type;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.util.GraphFunction;
 
 /**
  */
@@ -32,5 +33,15 @@ public interface ComplexType extends Type
      *         (i.e. there are no errors on the instance or any nested
      *         instances).
      */
-    boolean isValid(Configuration instance);
+    boolean isValid(Object instance);
+
+    /**
+     * Performs a type-directed walk of an instance graph, calling the given
+     * function on each complex object in the graph.
+     *
+     * @param instance root of the object graph to walk
+     * @param f        function to call
+     * @throws TypeException if an error occurs walking the graph
+     */
+    void forEachComplex(Object instance, GraphFunction<Object> f) throws TypeException;
 }

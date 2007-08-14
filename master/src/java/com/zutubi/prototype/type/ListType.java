@@ -4,8 +4,8 @@ import com.zutubi.prototype.type.record.HandleAllocator;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
-import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.config.ConfigurationList;
+import com.zutubi.util.GraphFunction;
 
 import java.util.*;
 
@@ -214,30 +214,47 @@ public class ListType extends CollectionType
         return PathUtils.getPath(path, Long.toString(handleAllocator.allocateHandle()));
     }
 
-    public boolean isValid(Configuration instance)
+    public boolean isValid(Object instance)
     {
-        ConfigurationList list = (ConfigurationList) instance;
+        List list = (List) instance;
+        if(list instanceof ConfigurationList && !((ConfigurationList)list).isValid())
+        {
+            return false;
+        }
+
         if(getCollectionType() instanceof SimpleType)
         {
-            return list.isValid();
+            return true;
         }
         else
         {
             ComplexType collectionType = (ComplexType) getCollectionType();
-            if(! list.isValid())
-            {
-                return false;
-            }
-
             for(Object element: list)
             {
-                if(!collectionType.isValid((Configuration) element))
+                if(!collectionType.isValid(element))
                 {
                     return false;
                 }
             }
 
             return true;
+        }
+    }
+
+    public void forEachComplex(Object instance, GraphFunction<Object> f) throws TypeException
+    {
+        f.process(instance);
+        if(getCollectionType() instanceof ComplexType)
+        {
+            ComplexType collectionType = (ComplexType) getCollectionType();
+            int i = 0;
+            for(Object element: (List)instance)
+            {
+                f.push("[" + i + "]");
+                collectionType.forEachComplex(element, f);
+                f.pop();
+                i++;
+            }
         }
     }
 

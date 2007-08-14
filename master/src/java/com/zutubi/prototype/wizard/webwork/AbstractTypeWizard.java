@@ -359,7 +359,7 @@ public abstract class AbstractTypeWizard implements Wizard
 
         public boolean hasFields()
         {
-            return PrototypeUtils.getSimpleProperties(getType()).size() > 0;
+            return getType().getSimplePropertyNames().size() > 0;
         }
     }
 

@@ -1,11 +1,9 @@
 package com.zutubi.pulse.api;
 
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
+import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.type.*;
-import com.zutubi.prototype.type.record.MutableRecord;
-import com.zutubi.prototype.type.record.PathUtils;
-import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.type.record.TemplateRecord;
+import com.zutubi.prototype.type.record.*;
 import com.zutubi.pulse.ShutdownManager;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.bootstrap.ComponentContext;
@@ -15,6 +13,7 @@ import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.system.SystemStartedEvent;
 
 import java.util.Hashtable;
+import java.util.Vector;
 
 /**
  * Implements a simple API for remote monitoring and control.
@@ -27,6 +26,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
     private ShutdownManager shutdownManager;
     private ConfigurationTemplateManager configurationTemplateManager;
     private TypeRegistry typeRegistry;
+    private RecordManager recordManager;
 
 //    private BuildManager buildManager;
 //    private ProjectManager projectManager;
@@ -71,18 +71,70 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         return "pong";
     }
 
+    public Boolean configPathExists(String token, String path) throws AuthenticationException
+    {
+        tokenManager.verifyUser(token);
+        return configurationTemplateManager.getRecord(path) != null;
+    }
+
+    public Vector<String> getConfigListing(String token, String path) throws AuthenticationException, TypeException
+    {
+        tokenManager.verifyUser(token);
+
+        if(path.length() == 0)
+        {
+            return new Vector<String>(configurationTemplateManager.getRootListing());
+        }
+        else
+        {
+            Type type = configurationTemplateManager.getType(path);
+            if(type instanceof CollectionType)
+            {
+                CollectionType collectionType = (CollectionType) type;
+                if(collectionType.getCollectionType() instanceof ComplexType)
+                {
+                    Record record = configurationTemplateManager.getRecord(path);
+                    return new Vector<String>(collectionType.getOrder(record));
+                }
+                else
+                {
+                    throw new IllegalArgumentException("Path refers to simple collection");
+                }
+            }
+            else
+            {
+                CompositeType compositeType = (CompositeType) type;
+                return new Vector<String>(compositeType.getNestedPropertyNames());
+            }
+        }
+    }
+
     public Object getConfig(String token, String path) throws AuthenticationException, TypeException
     {
         tokenManager.verifyUser(token);
 
-        Record r = configurationTemplateManager.getRecord(path);
-        if(r == null)
+        Object instance = configurationTemplateManager.getInstance(path);
+        if(instance == null)
         {
             throw new IllegalArgumentException("Path '" + path + "' does not exist");
         }
 
         Type t = configurationTemplateManager.getType(path);
-        return t.toXmlRpc(r);
+        return t.toXmlRpc(t.unstantiate(instance));
+    }
+
+    public Object getRawConfig(String token, String path) throws AuthenticationException, TypeException
+    {
+        tokenManager.verifyUser(token);
+
+        Record record = recordManager.load(path);
+        if(record == null)
+        {
+            throw new IllegalArgumentException("Path '" + path + "' does not exist");
+        }
+
+        Type t = configurationTemplateManager.getType(path);
+        return t.toXmlRpc(record);
     }
 
     public String insertConfig(String token, String path, Hashtable config) throws AuthenticationException, TypeException, ValidationException
@@ -117,7 +169,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         Configuration instance = configurationTemplateManager.validate(parentPath, baseName, record, true);
         if(!type.isValid(instance))
         {
-            throw new ValidationException(instance);
+            throw new ValidationException(type, instance);
         }
 
         return configurationTemplateManager.insertRecord(path, record);
@@ -163,7 +215,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         Configuration instance = configurationTemplateManager.validate(insertPath, null, record, true);
         if(!type.isValid(instance))
         {
-            throw new ValidationException(instance);
+            throw new ValidationException(type, instance);
         }
 
         return configurationTemplateManager.insertRecord(insertPath, record);
@@ -197,7 +249,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         Configuration instance = configurationTemplateManager.validate(PathUtils.getParentPath(path), PathUtils.getBaseName(path), record, deep);
         if((deep && !type.isValid(instance)) || !instance.isValid())
         {
-            throw new ValidationException(instance);
+            throw new ValidationException(type, instance);
         }
 
         return configurationTemplateManager.saveRecord(path, record, deep);
@@ -1512,5 +1564,10 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
     public Class[] getHandledEvents()
     {
         return new Class[] { SystemStartedEvent.class } ;
+    }
+
+    public void setRecordManager(RecordManager recordManager)
+    {
+        this.recordManager = recordManager;
     }
 }

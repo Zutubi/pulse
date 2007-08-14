@@ -105,8 +105,8 @@ public class ConfigurationUIModel
             targetSymbolicName = ctype.getSymbolicName();
 
             formHeading = PrototypeUtils.getFormHeading(ctype);
-            simpleProperties = PrototypeUtils.getSimpleProperties(ctype);
-            nestedProperties = PrototypeUtils.getNestedProperties(ctype);
+            simpleProperties = ctype.getSimplePropertyNames();
+            nestedProperties = ctype.getNestedPropertyNames();
 
             // sort the nested properties.... this is a ui thing.
             final Collator collator = Collator.getInstance();

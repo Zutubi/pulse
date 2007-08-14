@@ -5,12 +5,27 @@ import com.zutubi.pulse.prototype.squeezer.Squeezers;
 import com.zutubi.pulse.prototype.squeezer.TypeSqueezer;
 import com.zutubi.util.CollectionUtils;
 
+import java.util.Map;
+import java.util.HashMap;
+
 /**
  * Manages basic numerical, boolean and string values.
  */
 public class PrimitiveType extends SimpleType implements Type
 {
     private static final Class[] XML_RPC_SUPPORTED_TYPES = { Boolean.class, Double.class, Integer.class, String.class };
+    private static final Map<Class, Class> PRIMITIVE_CLASSES_MAP;
+    static
+    {
+        PRIMITIVE_CLASSES_MAP = new HashMap<Class, Class>(7);
+        PRIMITIVE_CLASSES_MAP.put(boolean.class, Boolean.class);
+        PRIMITIVE_CLASSES_MAP.put(byte.class, Byte.class);
+        PRIMITIVE_CLASSES_MAP.put(char.class, Character.class);
+        PRIMITIVE_CLASSES_MAP.put(double.class, Double.class);
+        PRIMITIVE_CLASSES_MAP.put(int.class, Integer.class);
+        PRIMITIVE_CLASSES_MAP.put(float.class, Float.class);
+        PRIMITIVE_CLASSES_MAP.put(short.class, Short.class);
+    }
 
     public PrimitiveType(Class type)
     {
@@ -69,6 +84,11 @@ public class PrimitiveType extends SimpleType implements Type
 
         // XML-RPC only supports limited types, in their direct form.
         Class clazz = getClazz();
+        if(PRIMITIVE_CLASSES_MAP.containsKey(clazz))
+        {
+            clazz = PRIMITIVE_CLASSES_MAP.get(clazz);
+        }
+
         String s = (String) data;
         if(CollectionUtils.contains(XML_RPC_SUPPORTED_TYPES, clazz))
         {
@@ -101,6 +121,11 @@ public class PrimitiveType extends SimpleType implements Type
     public String fromXmlRpc(Object data) throws TypeException
     {
         Class clazz = getClazz();
+        if(PRIMITIVE_CLASSES_MAP.containsKey(clazz))
+        {
+            clazz = PRIMITIVE_CLASSES_MAP.get(clazz);
+        }
+        
         if(CollectionUtils.contains(XML_RPC_SUPPORTED_TYPES, clazz))
         {
             typeCheck(data, clazz);
