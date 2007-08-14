@@ -65,4 +65,14 @@ public class PerforceConfiguration extends ScmConfiguration
     {
         return PerforceClient.TYPE;
     }
+
+    public String getPreviousRevision(String revision)
+    {
+        long number = Long.valueOf(revision);
+        if(number > 0)
+        {
+            return String.valueOf(number - 1);
+        }
+        return null;
+    }
 }

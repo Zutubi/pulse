@@ -2,11 +2,10 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.prototype.config.MockConfigurationProvider;
 import com.zutubi.pulse.core.config.Configuration;
-import com.zutubi.pulse.core.model.NumericalFileRevision;
 import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.project.changeviewer.FisheyeConfiguration;
-import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.test.PulseTestCase;
 
 /**
@@ -28,6 +27,16 @@ public class FisheyeChangeViewerTest extends PulseTestCase
             {
                 return "mock";
             }
+
+            public String getPreviousRevision(String revision)
+            {
+                long number = Long.valueOf(revision);
+                if(number > 0)
+                {
+                    return String.valueOf(number - 1);
+                }
+                return null;
+            }
         });
         viewer = new FisheyeConfiguration(BASE, PATH);
         viewer.setConfigurationProvider(new MockConfigurationProvider()
@@ -46,16 +55,16 @@ public class FisheyeChangeViewerTest extends PulseTestCase
 
     public void testGetFileViewURL()
     {
-        assertEquals("http://fisheye.cinnamonbob.com/browse/Zutubi/pulse/trunk/master/src/java/com/zutubi/pulse/api/RemoteApi.java?r=2508", viewer.getFileViewURL("/pulse/trunk/master/src/java/com/zutubi/pulse/api/RemoteApi.java", new NumericalFileRevision(2508)));   
+        assertEquals("http://fisheye.cinnamonbob.com/browse/Zutubi/pulse/trunk/master/src/java/com/zutubi/pulse/api/RemoteApi.java?r=2508", viewer.getFileViewURL("/pulse/trunk/master/src/java/com/zutubi/pulse/api/RemoteApi.java", "2508"));
     }
 
     public void testGetFileDownloadURL()
     {
-        assertEquals("http://fisheye.cinnamonbob.com/browse/~raw,r=2508/Zutubi/pulse/trunk/master/src/java/com/zutubi/pulse/api/RemoteApi.java", viewer.getFileDownloadURL("/pulse/trunk/master/src/java/com/zutubi/pulse/api/RemoteApi.java", new NumericalFileRevision(2508)));
+        assertEquals("http://fisheye.cinnamonbob.com/browse/~raw,r=2508/Zutubi/pulse/trunk/master/src/java/com/zutubi/pulse/api/RemoteApi.java", viewer.getFileDownloadURL("/pulse/trunk/master/src/java/com/zutubi/pulse/api/RemoteApi.java", "2508"));
     }
 
     public void testGetFileDiffURL()
     {
-        assertEquals("http://fisheye.cinnamonbob.com/browse/Zutubi/pulse/trunk/master/src/java/com/zutubi/pulse/api/RemoteApi.java?r1=2507&r2=2508", viewer.getFileDiffURL("/pulse/trunk/master/src/java/com/zutubi/pulse/api/RemoteApi.java", new NumericalFileRevision(2508)));
+        assertEquals("http://fisheye.cinnamonbob.com/browse/Zutubi/pulse/trunk/master/src/java/com/zutubi/pulse/api/RemoteApi.java?r1=2507&r2=2508", viewer.getFileDiffURL("/pulse/trunk/master/src/java/com/zutubi/pulse/api/RemoteApi.java", "2508"));
     }
 }

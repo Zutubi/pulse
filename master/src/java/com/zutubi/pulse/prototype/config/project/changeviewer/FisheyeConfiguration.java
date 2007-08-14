@@ -34,25 +34,26 @@ public class FisheyeConfiguration extends BasePathChangeViewer
         return StringUtils.join("/", true, true, getBaseURL(), "changelog", getProjectPath(), "?cs=" + getChangesetString(revision));
     }
 
-    public String getFileViewURL(String path, FileRevision revision)
+    public String getFileViewURL(String path, String revision)
     {
-        return StringUtils.join("/", true, true, getBaseURL(), "browse", getProjectPath(), StringUtils.urlEncodePath(path) + "?r=" + revision.getRevisionString());
+        return StringUtils.join("/", true, true, getBaseURL(), "browse", getProjectPath(), StringUtils.urlEncodePath(path) + "?r=" + revision);
     }
 
-    public String getFileDownloadURL(String path, FileRevision revision)
+    public String getFileDownloadURL(String path, String revision)
     {
-        return StringUtils.join("/", true, true, getBaseURL(), "browse", "~raw,r=" + revision.getRevisionString(), getProjectPath(), StringUtils.urlEncodePath(path));
+        return StringUtils.join("/", true, true, getBaseURL(), "browse", "~raw,r=" + revision, getProjectPath(), StringUtils.urlEncodePath(path));
     }
 
-    public String getFileDiffURL(String path, FileRevision revision)
+    public String getFileDiffURL(String path, String revision)
     {
-        FileRevision previousRevision = revision.getPrevious();
+        ScmConfiguration scm = lookupScmConfiguration();
+        String previousRevision = scm.getPreviousRevision(revision);
         if(previousRevision == null)
         {
             return null;
         }
 
-        return StringUtils.join("/", true, true, getBaseURL(), "browse", getProjectPath(), StringUtils.urlEncodePath(path) + "?r1=" + previousRevision.getRevisionString() + "&r2=" + revision.getRevisionString());
+        return StringUtils.join("/", true, true, getBaseURL(), "browse", getProjectPath(), StringUtils.urlEncodePath(path) + "?r1=" + previousRevision + "&r2=" + revision);
     }
 
     private String getChangesetString(Revision revision)

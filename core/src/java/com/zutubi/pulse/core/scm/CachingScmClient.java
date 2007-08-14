@@ -1,7 +1,6 @@
 package com.zutubi.pulse.core.scm;
 
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.scm.ScmException;
 
 import java.util.List;
 import java.util.Map;

@@ -99,18 +99,19 @@ public class Change extends Entity
     }
 
     private String filename;
-    private FileRevision revision;
     private Action action;
+
+    private String revisionString;
 
     protected Change()
     {
 
     }
 
-    public Change(String filename, FileRevision revision, Action action)
+    public Change(String filename, String revisionString, Action action)
     {
         this.filename = filename;
-        this.revision = revision;
+        this.revisionString = revisionString;
         this.action = action;
     }
 
@@ -124,10 +125,12 @@ public class Change extends Entity
 
     /**
      * @return the revision number of the change
+     *
+     * @deprecated
      */
     public FileRevision getRevision()
     {
-        return revision;
+        return null;
     }
 
     /**
@@ -138,6 +141,11 @@ public class Change extends Entity
         return action;
     }
 
+    public String getRevisionString()
+    {
+        return revisionString;
+    }
+
     /**
      * Used by hibernate
      *
@@ -146,16 +154,6 @@ public class Change extends Entity
     private void setFilename(String filename)
     {
         this.filename = filename;
-    }
-
-    /**
-     * Used by hibernate
-     *
-     * @param revision string
-     */
-    private void setRevision(FileRevision revision)
-    {
-        this.revision = revision;
     }
 
     /**
@@ -178,13 +176,23 @@ public class Change extends Entity
         this.action = Action.valueOf(action);
     }
 
+    /**
+     * Used by hibernate.
+     *
+     * @param revisionString string
+     */
+    private void setRevisionString(String revisionString)
+    {
+        this.revisionString = revisionString;
+    }
+
     public String toString()
     {
         StringBuffer buffer = new StringBuffer();
         buffer.append(filename);
-        if (revision != null)
+        if (revisionString != null)
         {
-            buffer.append("#").append(revision);
+            buffer.append("#").append(revisionString);
         }
         if (action != null)
         {

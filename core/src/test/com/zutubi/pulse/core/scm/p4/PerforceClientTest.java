@@ -2,10 +2,8 @@ package com.zutubi.pulse.core.scm.p4;
 
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.FileRevision;
-import com.zutubi.pulse.core.model.NumericalFileRevision;
-import com.zutubi.pulse.core.scm.NumericalRevision;
 import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.scm.NumericalRevision;
 import com.zutubi.pulse.core.scm.ScmChangeAccumulator;
 import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.ScmFile;
@@ -358,9 +356,7 @@ public class PerforceClientTest extends PulseTestCase
     public void testGetFileRevision() throws ScmException
     {
         getServer(TEST_CLIENT);
-        FileRevision rev = client.getFileRevision("//depot2/file1", createRevision(5));
-        assertTrue(rev instanceof NumericalFileRevision);
-        assertEquals("2", rev.getRevisionString());
+        assertEquals("2", client.getFileRevision("//depot2/file1", createRevision(5)));
     }
 
     public void testGetFileRevisionUnknownPath() throws ScmException
@@ -378,8 +374,7 @@ public class PerforceClientTest extends PulseTestCase
     public void testGetFileRevisionAfterFileDeleted() throws ScmException
     {
         getServer(TEST_CLIENT);
-        FileRevision fileRevision = client.getFileRevision("//depot2/file10", createRevision(4));
-        assertNull(fileRevision);
+        assertNull(client.getFileRevision("//depot2/file10", createRevision(4)));
     }
 
     public void testGetRevision() throws ScmException

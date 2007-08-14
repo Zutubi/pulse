@@ -74,7 +74,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         Change change = changelist.getChanges().get(0);
         assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/Attic/file1.txt", change.getFilename());
         assertEquals(com.zutubi.pulse.core.model.Change.Action.EDIT, change.getAction());
-        assertEquals("1.2", change.getRevision().toString());
+        assertEquals("1.2", change.getRevisionString());
         changelist = changes.get(1);
         assertEquals("daniel", changelist.getUser());
         assertEquals("file1.txt deleted by author a\n", changelist.getComment());
@@ -83,7 +83,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         change = changelist.getChanges().get(0);
         assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/Attic/file1.txt", change.getFilename());
         assertEquals(com.zutubi.pulse.core.model.Change.Action.DELETE, change.getAction());
-        assertEquals("1.3", change.getRevision().toString());
+        assertEquals("1.3", change.getRevisionString());
     }
 
     public void testChangeDetails() throws Exception
@@ -103,7 +103,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         Change change = changelist.getChanges().get(0);
         assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/Attic/file1.txt", change.getFilename());
         assertEquals(com.zutubi.pulse.core.model.Change.Action.ADD, change.getAction());
-        assertEquals("1.1", change.getRevision().toString());
+        assertEquals("1.1", change.getRevisionString());
         changelist = changes.get(1);
         assertEquals("daniel", changelist.getUser());
         assertEquals("file1.txt modified by author a\n", changelist.getComment());
@@ -112,7 +112,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         change = changelist.getChanges().get(0);
         assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/Attic/file1.txt", change.getFilename());
         assertEquals(com.zutubi.pulse.core.model.Change.Action.EDIT, change.getAction());
-        assertEquals("1.2", change.getRevision().toString());
+        assertEquals("1.2", change.getRevisionString());
         changelist = changes.get(2);
         assertEquals("daniel", changelist.getUser());
         assertEquals("file1.txt deleted by author a\n", changelist.getComment());
@@ -121,7 +121,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         change = changelist.getChanges().get(0);
         assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/Attic/file1.txt", change.getFilename());
         assertEquals(com.zutubi.pulse.core.model.Change.Action.DELETE, change.getAction());
-        assertEquals("1.3", change.getRevision().toString());
+        assertEquals("1.3", change.getRevisionString());
         changelist = changes.get(3);
         assertEquals("daniel", changelist.getUser());
         assertEquals("file2.txt checked in by author a\n", changelist.getComment());
@@ -130,7 +130,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         change = changelist.getChanges().get(0);
         assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/file2.txt", change.getFilename());
         assertEquals(com.zutubi.pulse.core.model.Change.Action.ADD, change.getAction());
-        assertEquals("1.1", change.getRevision().toString());
+        assertEquals("1.1", change.getRevisionString());
     }
 
     public void testChangesByDifferentAuthors() throws Exception
@@ -350,7 +350,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
     {
         assertEndsWith(file, change.getFilename());
         assertEquals(action, change.getAction());
-        assertEquals(revision, change.getRevision().toString());
+        assertEquals(revision, change.getRevisionString());
     }
 
     private static void assertValidChangeSets(List<Changelist> changelists)
@@ -370,7 +370,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         {
             assertFalse(filenames.containsKey(change.getFilename()));
             filenames.put(change.getFilename(), change.getFilename());
-            assertNotNull(change.getRevision());
+            assertNotNull(change.getRevisionString());
             assertNotNull(change.getAction());
         }
     }

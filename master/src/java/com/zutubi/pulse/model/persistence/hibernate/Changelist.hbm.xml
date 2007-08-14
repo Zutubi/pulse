@@ -39,9 +39,12 @@
 
         <property name="filename" column="FILENAME" type="string" length="4095"/>
 
-        <many-to-one name="revision" class="com.zutubi.pulse.core.model.FileRevision" column="REVISION_ID" cascade="all" lazy="false"/>
+        <property name="revisionString" column="REVISION_STRING" type="string" length="4095"/>
+
+        <!--<many-to-one name="revision" class="com.zutubi.pulse.core.model.FileRevision" column="REVISION_ID" cascade="all" lazy="false"/>-->
     </class>
 
+<!--
     <class name="com.zutubi.pulse.core.model.FileRevision" table="FILE_REVISION" lazy="false">
         <id name="id" type="long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
@@ -57,4 +60,5 @@
             <property name="number" type="long"/>
         </subclass>
     </class>
+-->
 </hibernate-mapping>

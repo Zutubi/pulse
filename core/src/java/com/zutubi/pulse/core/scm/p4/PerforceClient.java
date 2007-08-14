@@ -6,9 +6,6 @@ import com.zutubi.pulse.core.VariableHelper;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.FileRevision;
-import com.zutubi.pulse.core.model.NumericalFileRevision;
-import com.zutubi.pulse.core.scm.NumericalRevision;
 import com.zutubi.pulse.core.model.Property;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.*;
@@ -390,8 +387,7 @@ public class PerforceClient extends CachingScmClient
 
         if (matcher.matches())
         {
-            FileRevision fileRevision = new NumericalFileRevision(Long.parseLong(matcher.group(2)));
-            return new Change(matcher.group(1), fileRevision, decodeAction(matcher.group(3)));
+            return new Change(matcher.group(1), matcher.group(2), decodeAction(matcher.group(3)));
         }
         else
         {
@@ -771,7 +767,7 @@ public class PerforceClient extends CachingScmClient
         return eol[0];
     }
 
-    public FileRevision getFileRevision(String path, Revision repoRevision) throws ScmException
+    public String getFileRevision(String path, Revision repoRevision) throws ScmException
     {
         //    jsankey@shiny:~/p4test$ p4 fstat //depot/build.xml@34
         //    //depot/build.xml@34 - no file(s) at that changelist number.
@@ -828,8 +824,7 @@ public class PerforceClient extends CachingScmClient
                     Matcher m = revPattern.matcher(line);
                     if (m.matches())
                     {
-                        long number = Long.parseLong(m.group(1));
-                        return new NumericalFileRevision(number);
+                        return m.group(1);
                     }
                 }
 
@@ -910,7 +905,7 @@ public class PerforceClient extends CachingScmClient
 
                 for (Change c : l.getChanges())
                 {
-                    System.out.println("    " + c.getFilename() + "#" + c.getRevision() + " - " + c.getAction());
+                    System.out.println("    " + c.getFilename() + "#" + c.getRevisionString() + " - " + c.getAction());
                 }
             }
         }

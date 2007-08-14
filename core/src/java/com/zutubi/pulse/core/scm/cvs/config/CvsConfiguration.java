@@ -79,4 +79,28 @@ public class CvsConfiguration extends ScmConfiguration
     {
         return CvsClient.TYPE;
     }
+
+    public String getPreviousRevision(String revision)
+    {
+        int index = revision.lastIndexOf(".");
+        if(index != -1)
+        {
+            String end = revision.substring(index + 1);
+            try
+            {
+                long last = Long.parseLong(end);
+                if(last > 1)
+                {
+                    String start = revision.substring(0, index + 1);
+                    return start + Long.toString(last - 1);
+                }
+            }
+            catch(NumberFormatException e)
+            {
+                // Fall through.
+            }
+        }
+
+        return null;
+    }
 }

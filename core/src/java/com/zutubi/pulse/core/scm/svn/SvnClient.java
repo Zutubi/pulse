@@ -3,9 +3,6 @@ package com.zutubi.pulse.core.scm.svn;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.FileRevision;
-import com.zutubi.pulse.core.model.NumericalFileRevision;
-import com.zutubi.pulse.core.scm.NumericalRevision;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.*;
 import com.zutubi.pulse.util.FileSystemUtils;
@@ -405,8 +402,6 @@ public class SvnClient implements ScmClient
             Changelist list = new Changelist(getUid(), convertRevision(revision));
             handler.handle(list);
 
-            FileRevision fileRevision = new NumericalFileRevision(revision.getRevisionNumber());
-
             Map files = entry.getChangedPaths();
 
             for (Object value : files.values())
@@ -414,7 +409,7 @@ public class SvnClient implements ScmClient
                 SVNLogEntryPath entryPath = (SVNLogEntryPath) value;
                 if (filter.accept(entryPath.getPath()))
                 {
-                    if (handler.handle(new Change(entryPath.getPath(), fileRevision, decodeAction(entryPath.getType()))))
+                    if (handler.handle(new Change(entryPath.getPath(), String.valueOf(revision.getRevisionNumber()), decodeAction(entryPath.getType()))))
                     {
                         return true;
                     }
@@ -784,7 +779,7 @@ public class SvnClient implements ScmClient
 
             if (action != null)
             {
-                handler.fileChanged(new Change(event.getPath(), null, action));
+                handler.fileChanged(new Change(event.getPath(), (String) null, action));
             }
         }
 

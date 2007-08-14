@@ -1,7 +1,10 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.core.model.NumericalFileRevision;
+import com.zutubi.prototype.config.MockConfigurationProvider;
+import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.scm.config.ScmConfiguration;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.project.changeviewer.TracChangeViewer;
 import com.zutubi.pulse.test.PulseTestCase;
 
@@ -16,7 +19,32 @@ public class TracChangeViewerTest extends PulseTestCase
 
     protected void setUp() throws Exception
     {
+        final ProjectConfiguration project = new ProjectConfiguration();
+        project.setScm(new ScmConfiguration()
+        {
+            public String getType()
+            {
+                return "mock";
+            }
+
+            public String getPreviousRevision(String revision)
+            {
+                long number = Long.valueOf(revision);
+                if (number > 0)
+                {
+                    return String.valueOf(number - 1);
+                }
+                return null;
+            }
+        });
         viewer = new TracChangeViewer(BASE, PATH);
+        viewer.setConfigurationProvider(new MockConfigurationProvider()
+        {
+            public <T extends Configuration> T getAncestorOfType(Configuration c, Class<T> clazz)
+            {
+                return (T) project;
+            }
+        });
     }
 
     public void testGetChangesetURL()
@@ -26,31 +54,31 @@ public class TracChangeViewerTest extends PulseTestCase
 
     public void testGetFileViewURL()
     {
-        assertEquals("http://trac.edgewall.org/browser/trunk/INSTALL?rev=3673", viewer.getFileViewURL("/trunk/INSTALL", new NumericalFileRevision(3673)));
+        assertEquals("http://trac.edgewall.org/browser/trunk/INSTALL?rev=3673", viewer.getFileViewURL("/trunk/INSTALL", "3673"));
     }
 
     public void testGetFileDownloadURL()
     {
-        assertEquals("http://trac.edgewall.org/browser/trunk/INSTALL?rev=3673&format=raw", viewer.getFileDownloadURL("/trunk/INSTALL", new NumericalFileRevision(3673)));
+        assertEquals("http://trac.edgewall.org/browser/trunk/INSTALL?rev=3673&format=raw", viewer.getFileDownloadURL("/trunk/INSTALL", "3673"));
     }
 
     public void testGetFileDiffURL()
     {
-        assertEquals("http://trac.edgewall.org/changeset?new=trunk%2FINSTALL%403673&old=trunk%2FINSTALL%403672", viewer.getFileDiffURL("/trunk/INSTALL", new NumericalFileRevision(3673)));
+        assertEquals("http://trac.edgewall.org/changeset?new=trunk%2FINSTALL%403673&old=trunk%2FINSTALL%403672", viewer.getFileDiffURL("/trunk/INSTALL", "3673"));
     }
 
     public void testGetFileViewURLSpecial()
     {
-        assertEquals("http://trac.edgewall.org/browser/trunk/INSTALL+this%20please?rev=3673", viewer.getFileViewURL("/trunk/INSTALL+this please", new NumericalFileRevision(3673)));
+        assertEquals("http://trac.edgewall.org/browser/trunk/INSTALL+this%20please?rev=3673", viewer.getFileViewURL("/trunk/INSTALL+this please", "3673"));
     }
 
     public void testGetFileDownloadURLSpecial()
     {
-        assertEquals("http://trac.edgewall.org/browser/trunk/INSTALL+this%20please?rev=3673&format=raw", viewer.getFileDownloadURL("/trunk/INSTALL+this please", new NumericalFileRevision(3673)));
+        assertEquals("http://trac.edgewall.org/browser/trunk/INSTALL+this%20please?rev=3673&format=raw", viewer.getFileDownloadURL("/trunk/INSTALL+this please", "3673"));
     }
 
     public void testGetFileDiffURLSpecial()
     {
-        assertEquals("http://trac.edgewall.org/changeset?new=trunk%2FINSTALL%2Bthis+please%403673&old=trunk%2FINSTALL%2Bthis+please%403672", viewer.getFileDiffURL("/trunk/INSTALL+this please", new NumericalFileRevision(3673)));
+        assertEquals("http://trac.edgewall.org/changeset?new=trunk%2FINSTALL%2Bthis+please%403673&old=trunk%2FINSTALL%2Bthis+please%403672", viewer.getFileDiffURL("/trunk/INSTALL+this please", "3673"));
     }
 }

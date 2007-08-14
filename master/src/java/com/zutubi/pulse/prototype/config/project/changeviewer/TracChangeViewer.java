@@ -1,10 +1,10 @@
 package com.zutubi.pulse.prototype.config.project.changeviewer;
 
-import com.zutubi.pulse.core.model.FileRevision;
-import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.util.StringUtils;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.scm.config.ScmConfiguration;
+import com.zutubi.util.StringUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -36,19 +36,20 @@ public class TracChangeViewer extends BasePathChangeViewer
         return StringUtils.join("/", true, true, getBaseURL(), "changeset", revision.getRevisionString());
     }
 
-    public String getFileViewURL(String path, FileRevision revision)
+    public String getFileViewURL(String path, String revision)
     {
-        return StringUtils.join("/", true, true, getBaseURL(), "browser", StringUtils.urlEncodePath(path) + "?rev=" + revision.getRevisionString());
+        return StringUtils.join("/", true, true, getBaseURL(), "browser", StringUtils.urlEncodePath(path) + "?rev=" + revision);
     }
 
-    public String getFileDownloadURL(String path, FileRevision revision)
+    public String getFileDownloadURL(String path, String revision)
     {
         return getFileViewURL(path, revision) + "&format=raw";
     }
 
-    public String getFileDiffURL(String path, FileRevision revision)
+    public String getFileDiffURL(String path, String revision)
     {
-        FileRevision previous = revision.getPrevious();
+        ScmConfiguration scm = lookupScmConfiguration();
+        String previous = scm.getPreviousRevision(revision);
         if(previous == null)
         {
             return null;
@@ -57,9 +58,9 @@ public class TracChangeViewer extends BasePathChangeViewer
         return StringUtils.join("/", true, true, getBaseURL(), "changeset?new=" + getDiffPath(path, revision) + "&old=" + getDiffPath(path, previous));
     }
 
-    private String getDiffPath(String path, FileRevision revision)
+    private String getDiffPath(String path, String revision)
     {
-        String result = StringUtils.join("/", path + "@" + revision.getRevisionString());
+        String result = StringUtils.join("/", path + "@" + revision);
         if(result.startsWith("/"))
         {
             result = result.substring(1);

@@ -31,11 +31,11 @@ public abstract class ChangeViewerConfiguration extends AbstractConfiguration
     public abstract String getChangesetURL(Revision revision);
 
     @Transient
-    public abstract String getFileViewURL(String path, FileRevision revision);
+    public abstract String getFileViewURL(String path, String revision);
 
     @Transient
-    public abstract String getFileDownloadURL(String path, FileRevision revision);
+    public abstract String getFileDownloadURL(String path, String revision);
 
     @Transient
-    public abstract String getFileDiffURL(String path, FileRevision revision);
+    public abstract String getFileDiffURL(String path, String revision);
 }

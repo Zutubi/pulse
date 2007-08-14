@@ -1,10 +1,10 @@
 package com.zutubi.pulse.prototype.config.project.changeviewer;
 
-import com.zutubi.pulse.core.model.FileRevision;
-import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.util.StringUtils;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.scm.config.ScmConfiguration;
+import com.zutubi.util.StringUtils;
 
 /**
  * A ChangeViewer for linking to a P4Web instance.
@@ -33,24 +33,25 @@ public class P4WebChangeViewer extends BasePathChangeViewer
         return StringUtils.join("/", true, true, getBaseURL(), "@md=d@", revision.getRevisionString() + "?ac=10");
     }
 
-    public String getFileViewURL(String path, FileRevision revision)
+    public String getFileViewURL(String path, String revision)
     {
-        return StringUtils.join("/", true, true, getBaseURL(), "@md=d@" + StringUtils.urlEncodePath(path) + "?ac=64&rev1=" + revision.getRevisionString());
+        return StringUtils.join("/", true, true, getBaseURL(), "@md=d@" + StringUtils.urlEncodePath(path) + "?ac=64&rev1=" + revision);
     }
 
-    public String getFileDownloadURL(String path, FileRevision revision)
+    public String getFileDownloadURL(String path, String revision)
     {
-        return StringUtils.join("/", true, true, getBaseURL(), "@md=d&rev1=" + revision.getRevisionString() + "@" + StringUtils.urlEncodePath(path));
+        return StringUtils.join("/", true, true, getBaseURL(), "@md=d&rev1=" + revision + "@" + StringUtils.urlEncodePath(path));
     }
 
-    public String getFileDiffURL(String path, FileRevision revision)
+    public String getFileDiffURL(String path, String revision)
     {
-        FileRevision previousRevision = revision.getPrevious();
-        if(previousRevision == null)
+        ScmConfiguration config = lookupScmConfiguration();
+        String previous = config.getPreviousRevision(revision);
+        if(previous == null)
         {
             return null;
         }
 
-        return StringUtils.join("/", true, true, getBaseURL(), "@md=d@" + StringUtils.urlEncodePath(path) + "?ac=19&rev1=" + previousRevision.getRevisionString() + "&rev2=" + revision.getRevisionString());
+        return StringUtils.join("/", true, true, getBaseURL(), "@md=d@" + StringUtils.urlEncodePath(path) + "?ac=19&rev1=" + previous + "&rev2=" + revision);
     }
 }

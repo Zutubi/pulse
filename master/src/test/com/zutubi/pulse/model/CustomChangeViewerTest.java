@@ -1,10 +1,13 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.core.model.FileRevision;
-import com.zutubi.pulse.core.model.NumericalFileRevision;
 import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.scm.config.ScmConfiguration;
+import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.prototype.config.project.changeviewer.CustomChangeViewerConfiguration;
+import com.zutubi.pulse.prototype.config.project.changeviewer.ViewVCChangeViewer;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.prototype.config.MockConfigurationProvider;
 
 import java.util.Date;
 
@@ -12,7 +15,44 @@ import java.util.Date;
  */
 public class CustomChangeViewerTest extends PulseTestCase
 {
-    private CustomChangeViewerConfiguration viewer = new CustomChangeViewerConfiguration();
+    private CustomChangeViewerConfiguration viewer;
+
+    protected void setUp() throws Exception
+    {
+        super.setUp();
+
+        final ProjectConfiguration project = new ProjectConfiguration();
+        project.setScm(new ScmConfiguration()
+        {
+            public String getType()
+            {
+                return "mock";
+            }
+
+            public String getPreviousRevision(String revision)
+            {
+                long number = Long.valueOf(revision);
+                if (number > 0)
+                {
+                    return String.valueOf(number - 1);
+                }
+                return null;
+            }
+        });
+        viewer = new CustomChangeViewerConfiguration();
+        viewer.setConfigurationProvider(new MockConfigurationProvider()
+        {
+            public <T extends Configuration> T getAncestorOfType(Configuration c, Class<T> clazz)
+            {
+                return (T) project;
+            }
+        });
+    }
+
+    protected void tearDown() throws Exception
+    {
+        super.tearDown();
+    }
 
     public void testGetChangesetURL()
     {
@@ -25,49 +65,42 @@ public class CustomChangeViewerTest extends PulseTestCase
     public void testGetFileViewURL()
     {
         viewer.setFileViewURL("http://hello${path}?r=${revision}");
-        FileRevision rev = new NumericalFileRevision(10);
-        assertEquals("http://hello/my/path?r=10", viewer.getFileViewURL("/my/path", rev));
+        assertEquals("http://hello/my/path?r=10", viewer.getFileViewURL("/my/path", "10"));
     }
 
     public void testGetFileDownloadURL()
     {
         viewer.setFileDownloadURL("http://hello${path}?r=${revision}&format=raw");
-        FileRevision rev = new NumericalFileRevision(10);
-        assertEquals("http://hello/my/path?r=10&format=raw", viewer.getFileDownloadURL("/my/path", rev));
+        assertEquals("http://hello/my/path?r=10&format=raw", viewer.getFileDownloadURL("/my/path", "10"));
     }
 
     public void testGetFileDiffURL()
     {
         viewer.setFileDiffURL("http://hello${path}?r=${revision}&p=${previous.revision}");
-        FileRevision rev = new NumericalFileRevision(10);
-        assertEquals("http://hello/my/path?r=10&p=9", viewer.getFileDiffURL("/my/path", rev));
+        assertEquals("http://hello/my/path?r=10&p=9", viewer.getFileDiffURL("/my/path", "10"));
     }
 
     public void testGetFileViewURLSpecial()
     {
         viewer.setFileViewURL("http://hello${path}?r=${revision}");
-        FileRevision rev = new NumericalFileRevision(10);
-        assertEquals("http://hello/my/path+special%20chars?r=10", viewer.getFileViewURL("/my/path+special chars", rev));
+        assertEquals("http://hello/my/path+special%20chars?r=10", viewer.getFileViewURL("/my/path+special chars", "10"));
     }
 
     public void testGetFileDownloadURLSpecial()
     {
         viewer.setFileDownloadURL("http://hello${path}?r=${revision}&format=raw");
-        FileRevision rev = new NumericalFileRevision(10);
-        assertEquals("http://hello/my/path+special%20chars?r=10&format=raw", viewer.getFileDownloadURL("/my/path+special chars", rev));
+        assertEquals("http://hello/my/path+special%20chars?r=10&format=raw", viewer.getFileDownloadURL("/my/path+special chars", "10"));
     }
 
     public void testGetFileDiffURLSpecial()
     {
         viewer.setFileDiffURL("http://hello${path}?r=${revision}&p=${previous.revision}");
-        FileRevision rev = new NumericalFileRevision(10);
-        assertEquals("http://hello/my/path+special%20chars?r=10&p=9", viewer.getFileDiffURL("/my/path+special chars", rev));
+        assertEquals("http://hello/my/path+special%20chars?r=10&p=9", viewer.getFileDiffURL("/my/path+special chars", "10"));
     }
 
     public void testFilePropertiesSpecial()
     {
         viewer.setFileDiffURL("${path} ${path.raw} ${path.form}");
-        FileRevision rev = new NumericalFileRevision(10);
-        assertEquals("/my/path+special%20chars /my/path+special chars %2Fmy%2Fpath%2Bspecial+chars", viewer.getFileDiffURL("/my/path+special chars", rev));
+        assertEquals("/my/path+special%20chars /my/path+special chars %2Fmy%2Fpath%2Bspecial+chars", viewer.getFileDiffURL("/my/path+special chars", "10"));
     }
 }

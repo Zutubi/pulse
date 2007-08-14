@@ -94,6 +94,16 @@ public class SvnConfiguration extends ScmConfiguration
         return SvnClient.TYPE;
     }
 
+    public String getPreviousRevision(String revision)
+    {
+        long number = Long.valueOf(revision);
+        if(number > 0)
+        {
+            return String.valueOf(number - 1);
+        }
+        return null;
+    }
+
 /*
     public SvnClient createClient() throws ScmException
     {

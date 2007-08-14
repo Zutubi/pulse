@@ -109,9 +109,9 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmEventHandler
     public void fileChanged(Change change)
     {
         String revision = "";
-        if (change.getRevision() != null)
+        if (change.getRevisionString() != null)
         {
-            revision = "#" + change.getRevision();
+            revision = "#" + change.getRevisionString();
         }
 
         outputWriter.println(change.getFilename() + revision + " - " + change.getAction().toString());

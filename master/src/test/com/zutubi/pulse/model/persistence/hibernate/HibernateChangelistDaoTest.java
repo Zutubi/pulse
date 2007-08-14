@@ -1,12 +1,13 @@
 package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.core.model.Change;
+import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.persistence.ChangelistDao;
 import com.zutubi.pulse.prototype.config.user.UserAliasConfiguration;
 import com.zutubi.pulse.prototype.config.user.UserConfiguration;
-import com.zutubi.pulse.core.scm.cvs.CvsFileRevision;
 import com.zutubi.util.Constants;
 
 import java.util.Date;
@@ -40,7 +41,7 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
         Date date = new Date(System.currentTimeMillis() - Constants.YEAR);
         Revision revision = new Revision("pulse", "test changelist", date);
         Changelist list = new Changelist("scm", revision);
-        Change change = new Change("some/random/file", new NumericalFileRevision(23), Change.Action.EDIT);
+        Change change = new Change("some/random/file", "23", Change.Action.EDIT);
 
         list.addChange(change);
         changelistDao.save(list);
@@ -232,9 +233,9 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
         l1.addResultId(12);
         l1.addResultId(13);
         l1.addResultId(14);
-        l1.addChange(new Change("file1", new NumericalFileRevision(1), Change.Action.ADD));
-        l1.addChange(new Change("file2", new NumericalFileRevision(23), Change.Action.ADD));
-        l1.addChange(new Change("file3", new NumericalFileRevision(4), Change.Action.ADD));
+        l1.addChange(new Change("file1", "1", Change.Action.ADD));
+        l1.addChange(new Change("file2", "23", Change.Action.ADD));
+        l1.addChange(new Change("file3", "4", Change.Action.ADD));
         changelistDao.save(l1);
 
         Revision r2 = createRevision(100);
@@ -243,9 +244,9 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
         l2.addResultId(13);
         l2.addResultId(14);
         l2.addResultId(15);
-        l2.addChange(new Change("file1", new NumericalFileRevision(2), Change.Action.ADD));
-        l2.addChange(new Change("file2", new NumericalFileRevision(1), Change.Action.ADD));
-        l2.addChange(new Change("file3", new CvsFileRevision("1.1.2.3"), Change.Action.ADD));
+        l2.addChange(new Change("file1", "2", Change.Action.ADD));
+        l2.addChange(new Change("file2", "1", Change.Action.ADD));
+        l2.addChange(new Change("file3", "1.1.2.3", Change.Action.ADD));
         changelistDao.save(l2);
         commitAndRefreshTransaction();
 

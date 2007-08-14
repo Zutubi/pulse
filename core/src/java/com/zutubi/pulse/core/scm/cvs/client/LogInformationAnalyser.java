@@ -5,14 +5,20 @@
 
 package com.zutubi.pulse.core.scm.cvs.client;
 
-import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.core.scm.cvs.CvsFileRevision;
-import com.zutubi.pulse.core.scm.cvs.CvsRevision;
+import com.zutubi.pulse.core.model.Change;
+import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.scm.cvs.CvsClient;
-
-import java.util.*;
+import com.zutubi.pulse.core.scm.cvs.CvsRevision;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
+
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -173,7 +179,7 @@ public class LogInformationAnalyser
             Changelist changelist = new Changelist(uid, CvsClient.convertRevision(rev));
             for (Revision change : localChanges)
             {
-                changelist.addChange(new Change(change.getFilename(), new CvsFileRevision(change.getRevision()), change.getAction()));
+                changelist.addChange(new Change(change.getFilename(), change.getRevision(), change.getAction()));
             }
             changelists.add(changelist);
         }

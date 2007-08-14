@@ -2,7 +2,6 @@ package com.zutubi.pulse.prototype.config.project.changeviewer;
 
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.pulse.core.model.FileRevision;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.util.StringUtils;
@@ -47,24 +46,25 @@ public class ViewVCChangeViewer extends BasePathChangeViewer
         return StringUtils.join("/", true, true, getBaseURL(), getProjectPath() + "?rev=" + revision.getRevisionString() + "&view=rev");
     }
 
-    public String getFileViewURL(String path, FileRevision revision)
+    public String getFileViewURL(String path, String revision)
     {
-        return StringUtils.join("/", true, true, getBaseURL(), getProjectPath(), StringUtils.urlEncodePath(path) + "?rev=" + revision.getRevisionString() + "&view=markup");
+        return StringUtils.join("/", true, true, getBaseURL(), getProjectPath(), StringUtils.urlEncodePath(path) + "?rev=" + revision + "&view=markup");
     }
 
-    public String getFileDownloadURL(String path, FileRevision revision)
+    public String getFileDownloadURL(String path, String revision)
     {
-        return StringUtils.join("/", true, true, getBaseURL(), "*checkout*", getProjectPath(), StringUtils.urlEncodePath(path) + "?rev=" + revision.getRevisionString());
+        return StringUtils.join("/", true, true, getBaseURL(), "*checkout*", getProjectPath(), StringUtils.urlEncodePath(path) + "?rev=" + revision);
     }
 
-    public String getFileDiffURL(String path, FileRevision revision)
+    public String getFileDiffURL(String path, String revision)
     {
-        FileRevision previous = revision.getPrevious();
+        ScmConfiguration config = lookupScmConfiguration();
+        String previous = config.getPreviousRevision(revision);
         if(previous == null)
         {
             return null;
         }
 
-        return StringUtils.join("/", true, true, getBaseURL(), getProjectPath(), StringUtils.urlEncodePath(path) + "?r1=" + previous.getRevisionString() + "&r2=" + revision.getRevisionString());
+        return StringUtils.join("/", true, true, getBaseURL(), getProjectPath(), StringUtils.urlEncodePath(path) + "?r1=" + previous + "&r2=" + revision);
     }
 }

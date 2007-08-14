@@ -6,10 +6,13 @@ import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.core.Scope;
 import com.zutubi.pulse.core.VariableHelper;
+import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.core.model.FileRevision;
 import com.zutubi.pulse.core.model.Property;
 import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.util.StringUtils;
+import com.zutubi.prototype.config.ConfigurationProvider;
 
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
@@ -39,6 +42,8 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
     private String fileViewURL;
     private String fileDownloadURL;
     private String fileDiffURL;
+    
+    private ConfigurationProvider configurationProvider;
 
     static
     {
@@ -126,23 +131,25 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
         return resolveURL(changesetURL, revision);
     }
 
-    public String getFileViewURL(String path, FileRevision revision)
+    public String getFileViewURL(String path, String revision)
     {
         return resolveFileURL(fileViewURL, path, revision);
     }
 
-    public String getFileDownloadURL(String path, FileRevision revision)
+    public String getFileDownloadURL(String path, String revision)
     {
         return resolveFileURL(fileDownloadURL, path, revision);
     }
 
-    public String getFileDiffURL(String path, FileRevision revision)
+    public String getFileDiffURL(String path, String revision)
     {
-        if(revision.getPrevious() == null)
+        ScmConfiguration config = lookupScmConfiguration();
+        String previous = config.getPreviousRevision(revision);
+        if (previous == null)
         {
             return null;
         }
-
+        
         return resolveFileURL(fileDiffURL, path, revision);
     }
 
@@ -175,7 +182,7 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
         return null;
     }
 
-    private String resolveFileURL(String url, String path, FileRevision revision)
+    private String resolveFileURL(String url, String path, String revision)
     {
         if(TextUtils.stringSet(url))
         {
@@ -183,11 +190,13 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
             scope.add(new Property(PROPERTY_PATH, StringUtils.urlEncodePath(path)));
             scope.add(new Property(PROPERTY_PATH_RAW, path));
             scope.add(new Property(PROPERTY_PATH_FORM, StringUtils.formUrlEncode(path)));
-            scope.add(new Property(PROPERTY_REVISION, revision.getRevisionString()));
-            FileRevision previous = revision.getPrevious();
+            scope.add(new Property(PROPERTY_REVISION, revision));
+
+            ScmConfiguration config = lookupScmConfiguration();
+            String previous = config.getPreviousRevision(revision);
             if(previous != null)
             {
-                scope.add(new Property(PROPERTY_PREVIOUS_REVISION, previous.getRevisionString()));
+                scope.add(new Property(PROPERTY_PREVIOUS_REVISION, previous));
             }
             
             try
@@ -237,6 +246,17 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
         {
             throw new IllegalArgumentException(e.getMessage(), e);
         }
+    }
+
+    protected ScmConfiguration lookupScmConfiguration()
+    {
+        ProjectConfiguration project = configurationProvider.getAncestorOfType(this, ProjectConfiguration.class);
+        return project.getScm();
+    }
+
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    {
+        this.configurationProvider = configurationProvider;
     }
 
 }

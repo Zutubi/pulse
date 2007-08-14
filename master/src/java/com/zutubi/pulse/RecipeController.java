@@ -24,12 +24,10 @@ public class RecipeController
 {
     private static final Logger LOG = Logger.getLogger(RecipeController.class);
 
-    private ProjectConfiguration projectConfig;
     private BuildResult buildResult;
     private RecipeResultNode recipeResultNode;
     private RecipeResult recipeResult;
     private RecipeDispatchRequest dispatchRequest;
-    private List<ResourceProperty> buildProperties;
     private boolean personal;
     private boolean incremental;
     private RecipeResultNode previousSuccessful;
@@ -42,14 +40,12 @@ public class RecipeController
     private RecipeQueue queue;
     private AgentService agentService;
 
-    public RecipeController(ProjectConfiguration projectConfig, BuildResult buildResult, RecipeResultNode recipeResultNode, RecipeDispatchRequest dispatchRequest, List<ResourceProperty> buildProperties, boolean personal, boolean incremental, RecipeResultNode previousSuccessful, RecipeLogger logger, RecipeResultCollector collector)
+    public RecipeController(BuildResult buildResult, RecipeResultNode recipeResultNode, RecipeDispatchRequest dispatchRequest, boolean personal, boolean incremental, RecipeResultNode previousSuccessful, RecipeLogger logger, RecipeResultCollector collector)
     {
-        this.projectConfig = projectConfig;
         this.buildResult = buildResult;
         this.recipeResultNode = recipeResultNode;
         this.recipeResult = recipeResultNode.getResult();
         this.dispatchRequest = dispatchRequest;
-        this.buildProperties = buildProperties;
         this.personal = personal;
         this.incremental = incremental;
         this.previousSuccessful = previousSuccessful;
@@ -83,9 +79,6 @@ public class RecipeController
         }
     }
 
-    /**
-     * @param event
-     */
     public boolean handleRecipeEvent(RecipeEvent event)
     {
         if (event.getRecipeId() != recipeResult.getId())

@@ -5,9 +5,7 @@ import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Transient;
 import com.zutubi.config.annotations.Wizard;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
-import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.CheckoutScheme;
-import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.validation.annotations.Numeric;
 
 import java.util.List;
@@ -118,4 +116,6 @@ public abstract class ScmConfiguration extends AbstractConfiguration
 
     @Transient
     public abstract String getType();
+
+    public abstract String getPreviousRevision(String revision);
 }

@@ -805,6 +805,11 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         {
             return "mock";
         }
+
+        public String getPreviousRevision(String revision)
+        {
+            return null;
+        }
     }
 
     class MockScmClient implements ScmClient
