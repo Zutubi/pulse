@@ -82,7 +82,11 @@ public class ChangelistIsolator
             List<BuildResult> latest = buildManager.queryBuilds(new Project[]{project}, null, -1, -1, null, first, 1, true);
             if (latest.size() > 0)
             {
-                return latest.get(0).getRevision();
+                Revision revision = latest.get(0).getRevision();
+                if (revision != null)
+                {
+                    return revision;
+                }
             }
             else
             {
