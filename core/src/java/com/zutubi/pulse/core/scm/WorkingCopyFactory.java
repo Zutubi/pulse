@@ -2,9 +2,6 @@ package com.zutubi.pulse.core.scm;
 
 import com.zutubi.pulse.config.Config;
 import com.zutubi.pulse.personal.PersonalBuildException;
-import com.zutubi.pulse.core.scm.cvs.CvsWorkingCopy;
-import com.zutubi.pulse.core.scm.p4.PerforceWorkingCopy;
-import com.zutubi.pulse.core.scm.svn.SvnWorkingCopy;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
@@ -16,20 +13,6 @@ import java.util.TreeMap;
 public class WorkingCopyFactory
 {
     private static Map<String, Constructor> typeMap = new TreeMap<String, Constructor>();
-
-    static
-    {
-        try
-        {
-            registerType(ScmConfiguration.TYPE_SUBVERSION, SvnWorkingCopy.class);
-            registerType(ScmConfiguration.TYPE_PERFORCE, PerforceWorkingCopy.class);
-            registerType(ScmConfiguration.TYPE_CVS, CvsWorkingCopy.class);
-        }
-        catch (NoSuchMethodException e)
-        {
-            // Programmer error
-        }
-    }
 
     public static WorkingCopy create(String type, File base, Config config) throws PersonalBuildException
     {

@@ -3,7 +3,6 @@ package com.zutubi.pulse.validation.validators;
 import com.zutubi.validation.validators.FieldValidatorSupport;
 import com.zutubi.validation.validators.IgnoreDependentsFieldValidator;
 import com.zutubi.validation.ValidationException;
-import org.netbeans.lib.cvsclient.CVSRoot;
 
 /**
  * A validator that ignores dependent fields when a controlling checkbox is

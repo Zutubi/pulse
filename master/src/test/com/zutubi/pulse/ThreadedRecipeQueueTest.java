@@ -12,9 +12,13 @@ import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceProperty;
-import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.scm.DelegateScmClientFactory;
+import com.zutubi.pulse.core.scm.ScmClient;
+import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.scm.MockScmClient;
+import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.events.AgentRemovedEvent;
 import com.zutubi.pulse.events.DefaultEventManager;
 import com.zutubi.pulse.events.Event;
@@ -33,28 +37,15 @@ import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.project.types.CustomTypeConfiguration;
-import com.zutubi.pulse.core.scm.DelegateScmClientFactory;
-import com.zutubi.pulse.core.scm.FileStatus;
-import com.zutubi.pulse.core.scm.ScmCapability;
 import com.zutubi.pulse.scm.ScmChangeEvent;
-import com.zutubi.pulse.core.scm.ScmClient;
-import com.zutubi.pulse.core.scm.ScmEventHandler;
-import com.zutubi.pulse.core.scm.ScmException;
-import com.zutubi.pulse.core.scm.ScmFile;
-import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.services.UpgradeStatus;
 import junit.framework.TestCase;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -809,129 +800,6 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         public String getPreviousRevision(String revision)
         {
             return null;
-        }
-    }
-
-    class MockScmClient implements ScmClient
-    {
-        private boolean throwError = false;
-
-        public MockScmClient()
-        {
-        }
-
-        public MockScmClient(boolean throwError)
-        {
-            this.throwError = throwError;
-        }
-
-        public void setThrowError(boolean throwError)
-        {
-            this.throwError = throwError;
-        }
-
-        public Set<ScmCapability> getCapabilities()
-        {
-            return new HashSet<ScmCapability>(Arrays.asList(ScmCapability.values()));
-        }
-
-        public Map<String, String> getServerInfo() throws ScmException
-        {
-            throw new RuntimeException("Method not implemented.");
-        }
-
-        public String getUid() throws ScmException
-        {
-            throw new RuntimeException("Method not implemented.");
-        }
-
-        public String getLocation()
-        {
-            throw new RuntimeException("Method not implemented.");
-        }
-
-        public void testConnection() throws ScmException
-        {
-            throw new RuntimeException("Method not implemented.");
-        }
-
-        public Revision checkout(String id, File toDirectory, Revision revision, ScmEventHandler handler) throws ScmException
-        {
-            throw new RuntimeException("Method not implemented.");
-        }
-
-        public InputStream retrieve(String path, Revision revision) throws ScmException
-        {
-            throw new RuntimeException("Method not implemented.");
-        }
-
-        public List<Changelist> getChanges(Revision from, Revision to) throws ScmException
-        {
-            throw new RuntimeException("Method not implemented.");
-        }
-
-        public List<Revision> getRevisions(Revision from, Revision to) throws ScmException
-        {
-            throw new RuntimeException("Method not implemented.");
-        }
-
-        public boolean hasChangedSince(Revision since) throws ScmException
-        {
-            throw new RuntimeException("Method not implemented.");
-        }
-
-        public Revision getLatestRevision() throws ScmException
-        {
-            if(throwError)
-            {
-                throw new ScmException("test");
-            }
-            else
-            {
-                return createRevision(1);
-            }
-        }
-
-/*
-        public ScmFile getFile(String path) throws ScmException
-        {
-            throw new RuntimeException("Method not implemented.");
-        }
-*/
-
-        public List<ScmFile> browse(String path) throws ScmException
-        {
-            throw new RuntimeException("Method not implemented.");
-        }
-
-        public void update(String id, File workDir, Revision rev, ScmEventHandler handler) throws ScmException
-        {
-            throw new RuntimeException("Method not implemented.");
-        }
-
-        public void tag(Revision revision, String name, boolean moveExisting) throws ScmException
-        {
-            throw new RuntimeException("Method not implemented");
-        }
-
-        public List<ResourceProperty> getProperties(String id, File dir) throws ScmException
-        {
-            throw new RuntimeException("Method not yet implemented.");
-        }
-
-        public void storeConnectionDetails(File outputDir) throws ScmException, IOException
-        {
-            throw new RuntimeException("Method not implemented.");
-        }
-
-        public FileStatus.EOLStyle getEOLPolicy() throws ScmException
-        {
-            return FileStatus.EOLStyle.BINARY;
-        }
-
-        public Revision getRevision(String revision) throws ScmException
-        {
-            throw new RuntimeException("Method not yet implemented.");
         }
     }
 

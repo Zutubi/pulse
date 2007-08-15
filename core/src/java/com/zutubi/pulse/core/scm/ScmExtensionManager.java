@@ -27,16 +27,28 @@ public class ScmExtensionManager extends AbstractExtensionManager
             String name = config.getAttribute("name");
             String configClass = config.getAttribute("config-class");
             String clientClass = config.getAttribute("factory-class");
+            String wcClass = config.getAttribute("working-copy-class");
             System.out.println(String.format("Adding SCM: %s -> (%s, %s)", name, configClass, clientClass));
 
             Class configClazz = loadClass(extension, configClass);
             Class clientClazz = loadClass(extension, clientClass);
+            Class wcClazz = loadClass(extension, wcClass);
             if(configClazz != null && clientClazz != null)
             {
                 tracker.registerObject(extension, name, IExtensionTracker.REF_WEAK);
             }
 
             clientFactory.register(configClazz, clientClazz);
+
+            try
+            {
+                ScmConfiguration configInstance = (ScmConfiguration) configClazz.newInstance();
+                WorkingCopyFactory.registerType(configInstance.getType(), wcClazz);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
         }
         catch (ScmException e)
         {

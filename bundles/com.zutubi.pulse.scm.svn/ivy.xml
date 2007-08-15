@@ -28,6 +28,9 @@
 
     <dependencies>
         <dependency org="zutubi" name="com.zutubi.pulse.core" rev="latest.integration" conf="*->@"/>
+
+        <dependency org="javasvn" name="javasvn" rev="1.0.6" conf="external,build,release->default"/>
+
     </dependencies>
 
 </ivy-module>
