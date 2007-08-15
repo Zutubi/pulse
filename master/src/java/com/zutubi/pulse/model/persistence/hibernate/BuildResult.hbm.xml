@@ -42,17 +42,15 @@
 
         <many-to-one name="user" column="LOCAL_USER" class="com.zutubi.pulse.model.User" cascade="none" not-null="false"/>
 
-        <!--<many-to-one name="specName" column="SPEC_NAME" class="com.zutubi.pulse.core.model.PersistentName" cascade="none" lazy="false"/>-->
-
-        <many-to-one name="scmDetails" class="com.zutubi.pulse.model.BuildScmDetails" column="SCM_DETAILS"
-                     cascade="all" lazy="false"/>
-
         <many-to-one name="root" class="com.zutubi.pulse.model.RecipeResultNode" column="RECIPE_RESULT_ID"
                      cascade="all"/>
 
         <property name="version" column="VERSION" type="string" length="255"/>
 
         <property name="hasWorkDir" type="boolean"/>
+
+        <many-to-one name="revision" class="com.zutubi.pulse.core.model.Revision" column="REVISION_ID" cascade="all" unique="true"/>
+
     </class>
 
     <class name="com.zutubi.pulse.model.AbstractBuildReason" table="BUILD_REASON" lazy="false">
@@ -80,6 +78,7 @@
 
     </class>
 
+<!--
     <class name="com.zutubi.pulse.model.BuildScmDetails" table="BUILD_SCM_DETAILS" lazy="false">
 
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
@@ -89,6 +88,7 @@
         <many-to-one name="revision" class="com.zutubi.pulse.core.model.Revision" column="REVISION_ID" cascade="all" unique="true"/>
         
     </class>
+-->
 
     <class name="com.zutubi.pulse.model.RecipeResultNode" table="RECIPE_RESULT_NODE" lazy="false">
 

@@ -2,7 +2,6 @@ package com.zutubi.pulse.model.persistence.hibernate;
 
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.BuildScmDetails;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.RecipeResultNode;
 import com.zutubi.pulse.model.TriggerBuildReason;
@@ -93,7 +92,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
     {
         RecipeResult recipeResult = createRecipe();
 
-        BuildScmDetails scmDetails = new BuildScmDetails(new Revision(null, null, null, "42"));
+        Revision revision = new Revision(null, null, null, "42");
 
         // Need to save the Project as it is *not* cascaded from BuildResult
         Project project = new Project();
@@ -104,7 +103,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
         BuildResult buildResult = new BuildResult(new TriggerBuildReason("scm trigger"), project, 11, false);
         buildResult.commence();
-        buildResult.setScmDetails(scmDetails);
+        buildResult.setRevision(revision);
 /*
         //FIXME: how is the stage going to be made accessible? and persistent?
         RecipeResultNode recipeNode = new RecipeResultNode(node.getStage().getPname(), recipeResult);
@@ -458,7 +457,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         projectDao.save(p);
 
         BuildResult result = createCompletedBuild(p, 1);
-        result.setScmDetails(new BuildScmDetails(new Revision(null, null, null, "10")));
+        result.setRevision(new Revision(null, null, null, "10"));
         buildResultDao.save(result);
 
         Changelist list = new Changelist("uid", new Revision(null, null, null, "10"));

@@ -152,7 +152,7 @@ public class ViewChangesAction extends ProjectActionSupport
             if(previousResults.size() > 0)
             {
                 BuildResult buildResult = previousResults.get(0);
-                if(!buildResult.isUserRevision() && buildResult.getScmDetails() != null)
+                if(!buildResult.isUserRevision() && buildResult.getRevision() != null)
                 {
                     return buildResult;
                 }

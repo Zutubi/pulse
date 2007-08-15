@@ -25,7 +25,6 @@ import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.BuildScmDetails;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.model.RecipeResultNode;
@@ -526,8 +525,7 @@ public class BuildController implements EventListener
     private void getChanges(BuildRevision buildRevision)
     {
         Revision revision = buildRevision.getRevision();
-        BuildScmDetails scmDetails = new BuildScmDetails(revision);
-        buildResult.setScmDetails(scmDetails);
+        buildResult.setRevision(revision);
 
         if (!buildResult.isUserRevision())
         {

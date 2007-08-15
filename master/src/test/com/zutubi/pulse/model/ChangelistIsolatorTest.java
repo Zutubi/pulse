@@ -151,7 +151,7 @@ public class ChangelistIsolatorTest extends PulseTestCase
     {
         BuildResult result = new BuildResult();
         Revision rev = new Revision(null, null, null, Long.toString(revision));
-        result.setScmDetails(new BuildScmDetails(rev));
+        result.setRevision(rev);
         mockBuildManager.expectAndReturn("queryBuilds", C.ANY_ARGS, Arrays.asList(result));
         return rev;
     }

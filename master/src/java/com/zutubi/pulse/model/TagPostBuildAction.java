@@ -40,7 +40,7 @@ public class TagPostBuildAction extends PostBuildAction
         {
             String tagName = substituteVariables(tag, result, recipe, properties, projectConfig);
             ScmClient client = scmClientFactory.createClient(projectConfig.getScm());
-            client.tag(result.getScmDetails().getRevision(), tagName, moveExisting);
+            client.tag(result.getRevision(), tagName, moveExisting);
         }
         catch (Exception e)
         {

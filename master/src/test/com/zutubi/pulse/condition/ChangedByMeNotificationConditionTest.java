@@ -4,7 +4,6 @@ import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.BuildScmDetails;
 import com.zutubi.pulse.model.MockBuildManager;
 import com.zutubi.pulse.prototype.config.user.UserAliasConfiguration;
 import com.zutubi.pulse.prototype.config.user.UserConfiguration;
@@ -61,8 +60,7 @@ public class ChangedByMeNotificationConditionTest extends PulseTestCase
             list.addResultId(result.getId());
             buildManager.save(list);
         }
-        BuildScmDetails details = new BuildScmDetails(new Revision(null, null, null, "1"));
-        result.setScmDetails(details);
+        result.setRevision(new Revision(null, null, null, "1"));
         return result;
     }
 

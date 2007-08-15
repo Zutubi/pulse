@@ -29,7 +29,7 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
      * between builds. 
      */
     private boolean userRevision;
-    private BuildScmDetails scmDetails;
+    private Revision revision;
     private RecipeResultNode root;
     private String version;
     /**
@@ -186,18 +186,17 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
                 return true;
             }
         }
-
         return false;
     }
 
-    public BuildScmDetails getScmDetails()
+    public Revision getRevision()
     {
-        return scmDetails;
+        return revision;
     }
 
-    public void setScmDetails(BuildScmDetails scmDetails)
+    public void setRevision(Revision revision)
     {
-        this.scmDetails = scmDetails;
+        this.revision = revision;
     }
 
     public AclObjectIdentity getAclObjectIdentity()

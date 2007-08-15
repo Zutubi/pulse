@@ -254,10 +254,9 @@ public class DefaultBuildManager implements BuildManager
                 BuildResult previous = previousBuildResults.get(0);
                 if (!previous.isUserRevision())
                 {
-                    BuildScmDetails previousScmDetails = previous.getScmDetails();
-                    if (previousScmDetails != null)
+                    previousRevision = previous.getRevision();
+                    if (previousRevision != null)
                     {
-                        previousRevision = previousScmDetails.getRevision();
                         break;
                     }
                 }
@@ -474,8 +473,8 @@ public class DefaultBuildManager implements BuildManager
         else
         {
             // Remove records of this build from changelists
-            BuildScmDetails scmDetails = build.getScmDetails();
-            if(scmDetails != null)
+            Revision revision = build.getRevision();
+            if(revision != null)
             {
                 List<Changelist> changelists = changelistDao.findByResult(build.getId());
                 for(Changelist change: changelists)
