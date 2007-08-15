@@ -1,6 +1,7 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.model.PersistentName;
 import com.zutubi.pulse.personal.PatchArchive;
 import org.acegisecurity.annotation.Secured;
 
@@ -95,9 +96,9 @@ public class MockProjectManager implements ProjectManager
         throw new RuntimeException("Method not implemented.");
     }
 
-    public void buildCompleted(long projectId)
+    public void buildCompleted(long projectId, PersistentName specName, boolean successful)
     {
-        throw new RuntimeException("Method not implemented.");
+        // do nothing
     }
 
     public Project pauseProject(Project project)

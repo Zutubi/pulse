@@ -2,6 +2,7 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.model.PersistentName;
 import com.zutubi.pulse.license.LicenseException;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.scheduling.SchedulingException;
@@ -60,7 +61,7 @@ public interface ProjectManager extends EntityManager<Project>
 
     void buildCommenced(long projectId);
 
-    void buildCompleted(long projectId);
+    void buildCompleted(long projectId, PersistentName specName, boolean succeeded);
 
     @Secured({"ACL_PROJECT_WRITE"})
     Project pauseProject(Project project);

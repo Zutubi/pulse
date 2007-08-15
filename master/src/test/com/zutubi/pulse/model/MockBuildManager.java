@@ -2,10 +2,7 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.*;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 public class MockBuildManager implements BuildManager
 {
@@ -289,14 +286,17 @@ public class MockBuildManager implements BuildManager
         buildResults.remove(result.getId());
     }
 
-    public void abortUnfinishedBuilds(Project project, String message)
+    public List<BuildResult> abortUnfinishedBuilds(Project project, String message)
     {
         BuildResult result = getLatestBuildResult(project);
         if(result != null && result.inProgress())
         {
             result.error(message);
             result.complete();
+            return Arrays.asList(result);
         }
+
+        return Collections.EMPTY_LIST;
     }
 
     public void abortUnfinishedBuilds(User user, String message)

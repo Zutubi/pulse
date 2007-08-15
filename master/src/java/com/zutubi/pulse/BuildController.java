@@ -629,18 +629,6 @@ public class BuildController implements EventListener
 
             if (!request.isPersonal())
             {
-                if (specification.getForceClean())
-                {
-                    specification.setForceClean(false);
-                }
-
-                specification.setBuildCount(specification.getBuildCount() + 1);
-                if(buildResult.succeeded())
-                {
-                    specification.setSuccessCount(specification.getSuccessCount() + 1);
-                }
-                projectManager.save(specification);
-
                 for (PostBuildAction action : buildResult.getProject().getPostBuildActions())
                 {
                     ComponentContext.autowire(action);

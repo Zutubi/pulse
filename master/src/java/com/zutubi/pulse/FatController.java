@@ -268,10 +268,6 @@ public class FatController implements EventListener, Stoppable
         try
         {
             BuildResult result = event.getResult();
-
-            // Look up the project to avoid stale data
-            Project project = projectManager.getProject(result.getProject().getId());
-
             BuildController controller = (BuildController) event.getSource();
             runningBuilds.remove(controller);
 
@@ -282,7 +278,7 @@ public class FatController implements EventListener, Stoppable
 
             if(!result.isPersonal())
             {
-                projectManager.buildCompleted(project.getId());
+                projectManager.buildCompleted(result.getProject().getId(), result.getSpecName(), result.succeeded());
             }
 
             if (!stopping)

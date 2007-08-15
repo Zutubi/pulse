@@ -18,10 +18,10 @@ public class BuildAborter implements Runnable
         List<Project> projects = projectManager.getAllProjects();
         for (Project project : projects)
         {
-            buildManager.abortUnfinishedBuilds(project, ABORT_MESSAGE);
-            if(project.getState() == Project.State.BUILDING || project.getState() == Project.State.PAUSING)
+            List<BuildResult> abortedResults = buildManager.abortUnfinishedBuilds(project, ABORT_MESSAGE);
+            for(BuildResult result: abortedResults)
             {
-                projectManager.buildCompleted(project.getId());
+                projectManager.buildCompleted(project.getId(), result.getSpecName(), false);
             }
         }
 

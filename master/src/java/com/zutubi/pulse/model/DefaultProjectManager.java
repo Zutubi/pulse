@@ -8,6 +8,7 @@ import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.PulseRuntimeException;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.model.TestCaseIndex;
+import com.zutubi.pulse.core.model.PersistentName;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.BuildRequestEvent;
 import com.zutubi.pulse.events.build.PersonalBuildRequestEvent;
@@ -431,11 +432,26 @@ public class DefaultProjectManager implements ProjectManager
         }
     }
 
-    public void buildCompleted(long projectId)
+    public void buildCompleted(long projectId, PersistentName specName, boolean succeeded)
     {
         Project project = getProject(projectId);
         if (project != null)
         {
+            BuildSpecification specification = project.getBuildSpecification(specName.getName());
+            if (specification != null)
+            {
+                if (specification.getForceClean())
+                {
+                    specification.setForceClean(false);
+                }
+
+                specification.setBuildCount(specification.getBuildCount() + 1);
+                if (succeeded)
+                {
+                    specification.setSuccessCount(specification.getSuccessCount() + 1);
+                }
+            }
+
             project.buildCompleted();
             projectDao.save(project);
         }
