@@ -78,18 +78,6 @@
 
     </class>
 
-<!--
-    <class name="com.zutubi.pulse.model.BuildScmDetails" table="BUILD_SCM_DETAILS" lazy="false">
-
-        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
-            <generator class="hilo"/>
-        </id>
-
-        <many-to-one name="revision" class="com.zutubi.pulse.core.model.Revision" column="REVISION_ID" cascade="all" unique="true"/>
-        
-    </class>
--->
-
     <class name="com.zutubi.pulse.model.RecipeResultNode" table="RECIPE_RESULT_NODE" lazy="false">
 
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
