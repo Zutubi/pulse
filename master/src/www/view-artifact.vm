@@ -22,7 +22,7 @@
         #headingRow("decorated.features" 1)
         <tr>
             <td class="content-wrap">
-                #fileArtifactFeatures($buildResult $commandResult $artifact)
+                #fileArtifactFeatures($buildResult $recipeResult $commandResult $artifact)
             </td>
         </tr>
     </table>

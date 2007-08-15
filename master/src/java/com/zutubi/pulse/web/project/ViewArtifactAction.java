@@ -26,6 +26,7 @@ public class ViewArtifactAction extends VFSActionSupport
     private BuildManager buildManager;
 
     private BuildResult buildResult;
+    private RecipeResult recipeResult;
     private CommandResult commandResult;
     private StoredFileArtifact artifact;
     private BufferedReader reader;
@@ -54,6 +55,11 @@ public class ViewArtifactAction extends VFSActionSupport
     public BuildResult getBuildResult()
     {
         return buildResult;
+    }
+
+    public RecipeResult getRecipeResult()
+    {
+        return recipeResult;
     }
 
     public CommandResult getCommandResult()
@@ -124,7 +130,7 @@ public class ViewArtifactAction extends VFSActionSupport
         AbstractPulseFileObject pfo = (AbstractPulseFileObject) fo;
 
         buildResult = pfo.getAncestor(BuildResultProvider.class).getBuildResult();
-        RecipeResult recipeResult = pfo.getAncestor(RecipeResultProvider.class).getRecipeResult();
+        recipeResult = pfo.getAncestor(RecipeResultProvider.class).getRecipeResult();
         commandResult = pfo.getAncestor(CommandResultProvider.class).getCommandResult();
         commandResult.loadFeatures(recipeResult.getRecipeDir(configurationManager.getDataDirectory()));
         artifact = buildManager.getFileArtifact(((FileArtifactProvider)pfo).getFileArtifactId());
