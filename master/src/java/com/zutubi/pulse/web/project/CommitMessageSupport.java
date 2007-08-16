@@ -72,4 +72,19 @@ public class CommitMessageSupport
             return changelist.getComment();
         }
     }
+
+    public String toString()
+    {
+        try
+        {
+            CommitMessageBuilder builder = applyTransformers();
+            builder.encode();
+            return builder.toString();
+        }
+        catch (Exception e)
+        {
+            LOG.warning(String.format("Failed to process changelist comment. Cause: %s", e.getMessage()), e);
+            return changelist.getComment();
+        }
+    }
 }

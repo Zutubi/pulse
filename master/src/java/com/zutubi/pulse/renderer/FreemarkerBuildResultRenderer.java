@@ -65,10 +65,10 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
         // Templates are stored under <root>/notifications/builds/<name>.ftl
         List<TemplateInfo> result = new ArrayList<TemplateInfo>();
         List<File> templateRoots = systemPaths.getTemplateRoots();
-        for(File root: templateRoots)
+        for (File root : templateRoots)
         {
             File dir = new File(root, getTemplatePath(personal));
-            if(dir.isDirectory())
+            if (dir.isDirectory())
             {
                 String[] names = dir.list(new FilenameFilter()
                 {
@@ -78,7 +78,7 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
                     }
                 });
 
-                for(String name: names)
+                for (String name : names)
                 {
                     result.add(getTemplateInfo(name.substring(0, name.length() - 4), personal));
                 }
@@ -94,7 +94,7 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
         String mimeType = "text/plain";
         File propertiesFile = findProperties(templateName, personal);
 
-        if(propertiesFile != null)
+        if (propertiesFile != null)
         {
             Properties properties = new Properties();
             try
@@ -120,13 +120,13 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
     private File findProperties(String templateName, boolean personal)
     {
         List<File> templateRoots = systemPaths.getTemplateRoots();
-        for(File root: templateRoots)
+        for (File root : templateRoots)
         {
             File dir = new File(root, getTemplatePath(personal));
-            if(dir.isDirectory())
+            if (dir.isDirectory())
             {
                 File candidate = new File(dir, templateName + ".properties");
-                if(candidate.exists())
+                if (candidate.exists())
                 {
                     return candidate;
                 }
@@ -146,10 +146,21 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
         return StringUtils.wrapString(s, 64, prefix);
     }
 
-    public String transformComment(Changelist changelist)
+    public String transformCommentWithoutTrimming(Changelist changelist)
     {
         CommitMessageSupport support = new CommitMessageSupport(changelist, commitMessageTransformerManager.getCommitMessageTransformers());
-        return support.trim(60);
+        return support.toString();
+    }
+
+    public String transformComment(Changelist changelist)
+    {
+        return transformComment(changelist, 60);
+    }
+    
+    public String transformComment(Changelist changelist, int trimToLength)
+    {
+        CommitMessageSupport support = new CommitMessageSupport(changelist, commitMessageTransformerManager.getCommitMessageTransformers());
+        return support.trim(trimToLength);
     }
 
     public void setFreemarkerConfiguration(Configuration freemarkerConfiguration)
