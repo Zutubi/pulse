@@ -3,6 +3,7 @@ package com.zutubi.pulse;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.pulse.core.scm.DelegateScmClientFactory;
 import com.zutubi.pulse.events.AsynchronousDelegatingListener;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
@@ -11,14 +12,13 @@ import com.zutubi.pulse.events.build.AbstractBuildRequestEvent;
 import com.zutubi.pulse.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.events.build.BuildTerminationRequestEvent;
 import com.zutubi.pulse.events.build.RecipeTimeoutEvent;
+import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.license.events.LicenseEvent;
 import com.zutubi.pulse.license.events.LicenseExpiredEvent;
-import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.license.events.LicenseUpdateEvent;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.scheduling.quartz.TimeoutRecipeJob;
 import com.zutubi.pulse.services.ServiceTokenManager;
-import com.zutubi.pulse.core.scm.DelegateScmClientFactory;
 import com.zutubi.util.logging.Logger;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
@@ -279,10 +279,6 @@ public class FatController implements EventListener, Stoppable
         try
         {
             BuildResult result = event.getResult();
-
-            // Look up the project to avoid stale data
-            Project project = projectManager.getProject(result.getProject().getId());
-
             BuildController controller = (BuildController) event.getSource();
             runningBuilds.remove(controller);
 
@@ -293,7 +289,7 @@ public class FatController implements EventListener, Stoppable
 
             if(!result.isPersonal())
             {
-                projectManager.buildCompleted(project.getId());
+                projectManager.buildCompleted(result.getProject().getId(), result.succeeded());
             }
 
             if (!stopping)

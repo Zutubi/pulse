@@ -7,30 +7,15 @@ import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.ResourceProperty;
-import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.Feature;
-import com.zutubi.pulse.core.model.RecipeResult;
-import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.scm.CheckoutScheme;
-import com.zutubi.pulse.core.scm.FileStatus;
-import com.zutubi.pulse.core.scm.ScmClient;
-import com.zutubi.pulse.core.scm.ScmClientFactory;
-import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.core.scm.*;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.events.AsynchronousDelegatingListener;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.*;
-import com.zutubi.pulse.model.BuildManager;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.ProjectManager;
-import com.zutubi.pulse.model.RecipeResultNode;
-import com.zutubi.pulse.model.ResourceRequirement;
-import com.zutubi.pulse.model.TestManager;
-import com.zutubi.pulse.model.UserManager;
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.prototype.config.project.BuildOptionsConfiguration;
 import com.zutubi.pulse.prototype.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
@@ -652,18 +637,6 @@ public class BuildController implements EventListener
 
             if (!request.isPersonal())
             {
-                if (project.isForceClean())
-                {
-                    project.setForceClean(false);
-                }
-
-                project.setBuildCount(project.getBuildCount() + 1);
-                if(buildResult.succeeded())
-                {
-                    project.setSuccessCount(project.getSuccessCount() + 1);
-                }
-                projectManager.save(project);
-
                 for (PostBuildActionConfiguration action : projectConfig.getPostBuildActions())
                 {
                     ComponentContext.autowire(action);

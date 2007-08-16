@@ -334,13 +334,14 @@ public class DefaultBuildManager implements BuildManager
         cleanupResult(result, true);
     }
 
-    public void abortUnfinishedBuilds(Project project, String message)
+    public List<BuildResult> abortUnfinishedBuilds(Project project, String message)
     {
         List<BuildResult> incompleteBuilds = queryBuilds(new Project[]{ project}, ResultState.getIncompleteStates(), -1, -1, null, -1, -1, true);
         for(BuildResult r: incompleteBuilds)
         {
             abortBuild(r, message);
         }
+        return incompleteBuilds;
     }
 
     public void abortUnfinishedBuilds(User user, String message)

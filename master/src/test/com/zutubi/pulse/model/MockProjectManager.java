@@ -63,9 +63,9 @@ public class MockProjectManager implements ProjectManager
         throw new RuntimeException("Method not implemented.");
     }
 
-    public void buildCompleted(long projectId)
+    public void buildCompleted(long projectId, boolean b)
     {
-        throw new RuntimeException("Method not implemented.");
+        // do nothing
     }
 
     public Project pauseProject(Project project)

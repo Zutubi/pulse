@@ -19,10 +19,10 @@ public class BuildAborterStartupTask implements StartupTask
         List<Project> projects = projectManager.getProjects();
         for (Project project : projects)
         {
-            buildManager.abortUnfinishedBuilds(project, ABORT_MESSAGE);
-            if(project.getState() == Project.State.BUILDING || project.getState() == Project.State.PAUSING)
+            List<BuildResult> abortedResults = buildManager.abortUnfinishedBuilds(project, ABORT_MESSAGE);
+            for(BuildResult result: abortedResults)
             {
-                projectManager.buildCompleted(project.getId());
+                projectManager.buildCompleted(project.getId(), false);
             }
         }
 

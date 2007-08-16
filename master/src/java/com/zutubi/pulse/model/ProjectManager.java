@@ -35,7 +35,7 @@ public interface ProjectManager extends EntityManager<Project>
 
     void buildCommenced(long projectId);
 
-    void buildCompleted(long projectId);
+    void buildCompleted(long projectId, boolean successful);
 
     @Secured({"ACL_PROJECT_WRITE"})
     Project pauseProject(Project project);

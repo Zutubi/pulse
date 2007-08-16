@@ -120,7 +120,7 @@ public interface BuildManager
 
     void delete(BuildResult result);
 
-    void abortUnfinishedBuilds(Project project, String message);
+    List<BuildResult> abortUnfinishedBuilds(Project project, String message);
 
     void abortUnfinishedBuilds(User user, String message);
 
