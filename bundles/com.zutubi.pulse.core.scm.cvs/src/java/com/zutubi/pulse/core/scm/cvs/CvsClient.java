@@ -4,20 +4,19 @@ import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.scm.CachingScmClient;
-import com.zutubi.pulse.core.scm.CachingScmFile;
 import com.zutubi.pulse.core.scm.FileStatus;
 import com.zutubi.pulse.core.scm.ScmCapability;
+import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.pulse.core.scm.ScmEventHandler;
 import com.zutubi.pulse.core.scm.ScmException;
-import com.zutubi.pulse.core.scm.ScmFileCache;
+import com.zutubi.pulse.core.scm.ScmFile;
 import com.zutubi.pulse.core.scm.ScmFilepathFilter;
 import com.zutubi.pulse.core.scm.ScmUtils;
+import com.zutubi.pulse.core.scm.DataCacheAware;
 import com.zutubi.pulse.core.scm.cvs.client.CvsCore;
 import com.zutubi.pulse.core.scm.cvs.client.LogInformationAnalyser;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.CleanupInputStream;
-import com.zutubi.util.Constants;
 import com.zutubi.util.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.netbeans.lib.cvsclient.CVSRoot;
@@ -33,7 +32,7 @@ import java.util.*;
 /**
  * The CvsClient provides all interactions with a cvs repository.
  */
-public class CvsClient extends CachingScmClient
+public class CvsClient implements ScmClient, DataCacheAware
 {
     public static final String TYPE = "cvs";
 
@@ -47,6 +46,8 @@ public class CvsClient extends CachingScmClient
     private String branch;
     private String root;
     private String password;
+
+    private Map<Object, Object> cache;
 
     /**
      * A list of ant style path expressions that define what should be excluded from being considered as a change.
@@ -410,6 +411,23 @@ public class CvsClient extends CachingScmClient
         return convertRevision(result);
     }
 
+    public List<ScmFile> browse(String path) throws ScmException
+    {
+        return new LinkedList<ScmFile>();
+    }
+
+    //---( data cache aware implementation )---
+
+    public String getCacheId()
+    {
+        return getUid(); // unique to each external repository since we use the cache to store per server details.
+    }
+
+    public void setCache(Map<Object, Object> cache)
+    {
+        this.cache = cache;
+    }
+
     /**
      * Configure the temporary space root. This defaults to the users temporary directories.
      *
@@ -417,51 +435,6 @@ public class CvsClient extends CachingScmClient
     public void setTemporarySpace(File file)
     {
         this.tmpSpace = file;
-    }
-
-    public void populate(ScmFileCache.CacheItem item) throws ScmException
-    {
-        item.cachedRevision = getLatestRevision();
-        item.cachedListing = new TreeMap<String, CachingScmFile>();
-
-        List<LogInformation> logs = core.rlog(module, null, null, true);
-
-        CVSRoot root = CVSRoot.parse(getRoot());
-
-        CachingScmFile rootFile = new CachingScmFile("", true, null, "");
-        item.cachedListing.put("", rootFile);
-
-        for (LogInformation log : logs)
-        {
-            String filename = log.getRepositoryFilename();
-
-            // remove the ,v
-            if (filename.endsWith(",v"))
-            {
-                filename = filename.substring(0, filename.length() - 2);
-            }
-
-            // remove the repo root.
-            if (filename.startsWith(root.getRepository()))
-            {
-                filename = filename.substring(root.getRepository().length());
-            }
-
-            // break this up into files and directories.
-            addToCache(filename, rootFile, item);
-        }
-    }
-
-    public boolean requiresRefresh(Revision revision) throws ScmException
-    {
-        if(System.currentTimeMillis() - revision.getDate().getTime() > Constants.MINUTE * 5)
-        {
-            return super.requiresRefresh(revision);
-        }
-        else
-        {
-            return false;
-        }
     }
 
     /**
