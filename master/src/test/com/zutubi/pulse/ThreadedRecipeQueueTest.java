@@ -12,6 +12,7 @@ import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceProperty;
+import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.DelegateScmClientFactory;
@@ -104,7 +105,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         queue.setConfigurationProvider(configurationProvider);
         queue.setScmClientFactory(new DelegateScmClientFactory()
         {
-            public ScmClient createClient(Object config) throws ScmException
+            public ScmClient createClient(Configuration config) throws ScmException
             {
                 MockScm scm = (MockScm) config;
                 return new MockScmClient(scm.throwError);
