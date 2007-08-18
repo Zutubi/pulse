@@ -25,28 +25,35 @@ public class HibernateBuildSpecificationDao extends HibernateEntityDao<BuildSpec
 
         for(BuildSpecification spec: all)
         {
-            spec.getRoot().getNodesByPredicate(new Predicate<BuildSpecificationNode>()
+            if(slave != null && spec.isForceCleanForSlave(slave.getId()))
             {
-                public boolean satisfied(BuildSpecificationNode node)
-                {
-                    BuildStage stage = node.getStage();
-                    if (stage != null)
-                    {
-                        BuildHostRequirements hostRequirements = stage.getHostRequirements();
-                        if(hostRequirements instanceof SlaveBuildHostRequirements)
-                        {
-                            return ((SlaveBuildHostRequirements)hostRequirements).getSlave().getId() == slave.getId();
-                        }
-                    }
-
-                    return false;
-                }
-            }, nodes);
-
-            if(!nodes.isEmpty())
-            {
-                nodes.clear();
                 referringToSlave.add(spec);
+            }
+            else
+            {
+                spec.getRoot().getNodesByPredicate(new Predicate<BuildSpecificationNode>()
+                {
+                    public boolean satisfied(BuildSpecificationNode node)
+                    {
+                        BuildStage stage = node.getStage();
+                        if (stage != null)
+                        {
+                            BuildHostRequirements hostRequirements = stage.getHostRequirements();
+                            if(hostRequirements instanceof SlaveBuildHostRequirements)
+                            {
+                                return ((SlaveBuildHostRequirements)hostRequirements).getSlave().getId() == slave.getId();
+                            }
+                        }
+
+                        return false;
+                    }
+                }, nodes);
+
+                if(!nodes.isEmpty())
+                {
+                    nodes.clear();
+                    referringToSlave.add(spec);
+                }
             }
         }
 

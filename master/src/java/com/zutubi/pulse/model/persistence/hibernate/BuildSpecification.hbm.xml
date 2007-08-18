@@ -19,7 +19,12 @@
 
         <property name="checkoutSchemeName" column="CHECKOUT_SCHEME" type="string" length="255"/>
 
-        <property name="forceClean" column="FORCE_CLEAN" type="boolean"/>
+        <property name="forceCleanMaster" column="FORCE_CLEAN" type="boolean"/>
+
+        <bag name="forceCleanSlaves" table="FORCE_CLEAN_SLAVES" lazy="false" cascade="save-update">
+            <key column="SPECIFICATION_ID"/>
+            <many-to-many class="com.zutubi.pulse.model.Slave" column="SLAVE_ID"/>
+        </bag>
 
         <property name="prompt" column="PROMPT" type="boolean"/>
 

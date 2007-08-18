@@ -12,10 +12,7 @@ import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.events.*;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.build.*;
-import com.zutubi.pulse.model.BuildReason;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.Scm;
-import com.zutubi.pulse.model.TriggerBuildReason;
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.scm.SCMChangeEvent;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.util.Constants;
@@ -503,17 +500,18 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         unavailableAgents.add(agent);
         executingAgents.put(recipeRequest.getId(), agent);
 
-        BuildContext context = createBuildContext(request, recipeRequest, buildRevision);
+        BuildContext context = createBuildContext(request, recipeRequest, buildRevision, agent);
         dispatchedQueue.offer(new DispatchedRequest(recipeRequest, context, agent));
 
         return true;
     }
 
-    private BuildContext createBuildContext(RecipeDispatchRequest request, RecipeRequest recipeRequest, BuildRevision buildRevision)
+    private BuildContext createBuildContext(RecipeDispatchRequest request, RecipeRequest recipeRequest, BuildRevision buildRevision, Agent agent)
     {
         BuildContext context = new BuildContext();
         context.setBuildNumber(request.getBuild().getNumber());
         context.setProjectName(recipeRequest.getProject());
+        context.setCleanBuild(isMarkedForCleanBuild(request.getBuildSpecification(), agent));
 
         BuildReason buildReason = request.getBuild().getReason();
         context.addProperty("build.reason", buildReason.getSummary());
@@ -529,6 +527,18 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         context.addProperty("specification.build.count", Integer.toString(request.getBuildSpecification().getBuildCount()));
         context.addProperty("specification.success.count", Integer.toString(request.getBuildSpecification().getSuccessCount()));
         return context;
+    }
+
+    private boolean isMarkedForCleanBuild(BuildSpecification buildSpecification, Agent agent)
+    {
+        if(agent.isSlave())
+        {
+            return buildSpecification.isForceCleanForSlave(agent.getId());
+        }
+        else
+        {
+            return buildSpecification.isForceCleanMaster();
+        }
     }
 
     public void stop(boolean force)

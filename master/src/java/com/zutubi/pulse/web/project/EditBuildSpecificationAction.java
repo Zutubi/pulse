@@ -3,6 +3,7 @@ package com.zutubi.pulse.web.project;
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.model.BuildSpecification;
 import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.SlaveManager;
 import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
 import com.zutubi.pulse.xwork.interceptor.Preparable;
 
@@ -27,6 +28,7 @@ public class EditBuildSpecificationAction extends BuildSpecificationActionSuppor
     private int timeout = 60;
     private static final List<String> PREPARE_PARAMS = Arrays.asList("id", "projectId");
     private Map<String, String> checkoutSchemes;
+    private SlaveManager slaveManager;
 
     public void setId(long id)
     {
@@ -230,7 +232,7 @@ public class EditBuildSpecificationAction extends BuildSpecificationActionSuppor
         BuildSpecification.CheckoutScheme newScheme = BuildSpecification.CheckoutScheme.valueOf(checkoutSchemeName);
         if(newScheme != spec.getCheckoutScheme())
         {
-            spec.setForceClean(true);
+            spec.markForCleanBuild(slaveManager.getAll());
             spec.setCheckoutScheme(newScheme);
         }
 
@@ -251,5 +253,10 @@ public class EditBuildSpecificationAction extends BuildSpecificationActionSuppor
     public void setBuildSpecificationDao(BuildSpecificationDao buildSpecificationDao)
     {
         this.buildSpecificationDao = buildSpecificationDao;
+    }
+
+    public void setSlaveManager(SlaveManager slaveManager)
+    {
+        this.slaveManager = slaveManager;
     }
 }

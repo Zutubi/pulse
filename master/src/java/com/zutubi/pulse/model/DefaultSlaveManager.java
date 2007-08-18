@@ -77,6 +77,7 @@ public class DefaultSlaveManager implements SlaveManager
             for(BuildSpecification spec: buildSpecs)
             {
                 removeStageReferences(spec.getRoot(), id);
+                spec.clearCleanBuildForSlave(id);
                 projectManager.save(spec);
             }
 

@@ -260,7 +260,7 @@ public class BuildController implements EventListener
         }
         else
         {
-            initialBootstrapper = new ProjectRepoBootstrapper(project.getName(), specification.getName(), project.getScm(), request.getRevision(), specification.getForceClean());
+            initialBootstrapper = new ProjectRepoBootstrapper(project.getName(), specification.getName(), project.getScm(), request.getRevision());
         }
 
         tree.prepare(buildResult);

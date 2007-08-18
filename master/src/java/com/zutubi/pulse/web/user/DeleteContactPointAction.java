@@ -22,7 +22,6 @@ public class DeleteContactPointAction extends UserActionSupport
 
     public String execute()
     {
-
         ContactPoint contactPoint = getUserManager().getContactPoint(id);
         if (contactPoint != null)
         {

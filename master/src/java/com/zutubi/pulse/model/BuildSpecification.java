@@ -46,7 +46,8 @@ public class BuildSpecification extends Entity implements NamedEntity
     private int timeout = TIMEOUT_NEVER;
     private CheckoutScheme checkoutScheme = CheckoutScheme.CLEAN_CHECKOUT;
     private BuildSpecificationNode root = new BuildSpecificationNode(null);
-    private boolean forceClean;
+    private boolean forceCleanMaster;
+    private List<Slave> forceCleanSlaves = new LinkedList<Slave>();
     private List<ResourceProperty> properties = new LinkedList<ResourceProperty>();
     private boolean prompt = false;
 
@@ -201,14 +202,58 @@ public class BuildSpecification extends Entity implements NamedEntity
         return root.getNodeByStageName(name);
     }
 
-    public boolean getForceClean()
+    public boolean isForceCleanMaster()
     {
-        return forceClean;
+        return forceCleanMaster;
     }
 
-    public void setForceClean(boolean forceClean)
+    public void setForceCleanMaster(boolean forceCleanMaster)
     {
-        this.forceClean = forceClean;
+        this.forceCleanMaster = forceCleanMaster;
+    }
+
+    public List<Slave> getForceCleanSlaves()
+    {
+        return forceCleanSlaves;
+    }
+
+    public void setForceCleanSlaves(List<Slave> forceCleanSlaves)
+    {
+        this.forceCleanSlaves = forceCleanSlaves;
+    }
+
+    public void markForCleanBuild(List<Slave> slaves)
+    {
+        forceCleanMaster = true;
+        forceCleanSlaves.clear();
+        forceCleanSlaves.addAll(slaves);
+    }
+
+    public boolean isForceCleanForSlave(long id)
+    {
+        for(Slave slave: forceCleanSlaves)
+        {
+            if(slave.getId() == id)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    
+    public void clearCleanBuildForSlave(long id)
+    {
+        Iterator<Slave> iterator = forceCleanSlaves.iterator();
+        while (iterator.hasNext())
+        {
+            Slave slave = iterator.next();
+            if(slave.getId() == id)
+            {
+                iterator.remove();
+                break;
+            }
+        }
     }
 
     public List<ResourceProperty> getProperties()
@@ -310,10 +355,5 @@ public class BuildSpecification extends Entity implements NamedEntity
     public void setSuccessCount(int successCount)
     {
         this.successCount = successCount;
-    }
-
-    public boolean equals(Object other)
-    {
-        return super.equals(other);    //To change body of overridden methods use File | Settings | File Templates.
     }
 }

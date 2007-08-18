@@ -2,10 +2,12 @@ package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.model.BuildSpecification;
 import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.SlaveManager;
 
 public class ForceCleanBuildAction extends ProjectActionSupport
 {
     private long id;
+    private SlaveManager slaveManager;
 
     public long getId()
     {
@@ -40,9 +42,14 @@ public class ForceCleanBuildAction extends ProjectActionSupport
             return ERROR;
         }
 
-        spec.setForceClean(true);
+        spec.markForCleanBuild(slaveManager.getAll());
         getProjectManager().save(spec);
 
         return SUCCESS;
+    }
+
+    public void setSlaveManager(SlaveManager slaveManager)
+    {
+        this.slaveManager = slaveManager;
     }
 }

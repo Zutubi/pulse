@@ -3,6 +3,7 @@ package com.zutubi.pulse.web.project;
 import com.zutubi.pulse.model.BuildSpecification;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.Scm;
+import com.zutubi.pulse.model.SlaveManager;
 import com.zutubi.pulse.xwork.interceptor.Preparable;
 
 import java.util.Arrays;
@@ -18,6 +19,7 @@ public abstract class AbstractEditScmAction extends ProjectActionSupport impleme
     private Project project;
     private static final List<String> ID_PARAMS = Arrays.asList("id", "projectId");
     private boolean monitor;
+    private SlaveManager slaveManager;
 
     public long getId()
     {
@@ -67,7 +69,7 @@ public abstract class AbstractEditScmAction extends ProjectActionSupport impleme
         project = getProjectManager().getProject(projectId);
         for(BuildSpecification spec: project.getBuildSpecifications())
         {
-            spec.setForceClean(true);
+            spec.markForCleanBuild(slaveManager.getAll());
             getProjectManager().save(spec);
         }
         return SUCCESS;
@@ -77,4 +79,8 @@ public abstract class AbstractEditScmAction extends ProjectActionSupport impleme
 
     public abstract String getScmProperty();
 
+    public void setSlaveManager(SlaveManager slaveManager)
+    {
+        this.slaveManager = slaveManager;
+    }
 }

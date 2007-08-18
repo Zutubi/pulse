@@ -1,17 +1,18 @@
 package com.zutubi.pulse.model;
 
+import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.cache.ehcache.CustomAclEntryCache;
-import com.zutubi.pulse.core.BuildException;
-import com.zutubi.pulse.core.BuildRevision;
-import com.zutubi.pulse.core.PulseException;
-import com.zutubi.pulse.core.PulseRuntimeException;
+import com.zutubi.pulse.core.*;
+import com.zutubi.pulse.core.model.PersistentName;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.model.TestCaseIndex;
-import com.zutubi.pulse.core.model.PersistentName;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.BuildRequestEvent;
 import com.zutubi.pulse.events.build.PersonalBuildRequestEvent;
+import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
 import com.zutubi.pulse.license.LicenseException;
 import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.license.LicenseManager;
@@ -32,7 +33,7 @@ import java.util.List;
  * 
  *
  */
-public class DefaultProjectManager implements ProjectManager
+public class DefaultProjectManager implements ProjectManager, EventListener
 {
     public static final int DEFAULT_WORK_DIR_BUILDS = 10;
 
@@ -440,11 +441,6 @@ public class DefaultProjectManager implements ProjectManager
             BuildSpecification specification = project.getBuildSpecification(specName.getName());
             if (specification != null)
             {
-                if (specification.getForceClean())
-                {
-                    specification.setForceClean(false);
-                }
-
                 specification.setBuildCount(specification.getBuildCount() + 1);
                 if (succeeded)
                 {
@@ -626,8 +622,40 @@ public class DefaultProjectManager implements ProjectManager
         buildSpecificationDao.delete(hostRequirements);
     }
 
+
+    public void handleEvent(Event evt)
+    {
+        RecipeDispatchedEvent rde = (RecipeDispatchedEvent) evt;
+        RecipeRequest request = rde.getRequest();
+        Project project = projectDao.findByName(request.getProject());
+        if(project != null)
+        {
+            BuildSpecification spec = project.getBuildSpecification(request.getSpec());
+            if(spec != null)
+            {
+                Agent agent = rde.getAgent();
+                if(agent.isSlave())
+                {
+                    spec.clearCleanBuildForSlave(agent.getId());
+                }
+                else
+                {
+                    spec.setForceCleanMaster(false);
+                }
+
+                buildSpecificationDao.save(spec);
+            }
+        }
+    }
+
+    public Class[] getHandledEvents()
+    {
+        return new Class[] { RecipeDispatchedEvent.class };
+    }
+
     public void setEventManager(EventManager eventManager)
     {
+        eventManager.register(this);
         this.eventManager = eventManager;
     }
 

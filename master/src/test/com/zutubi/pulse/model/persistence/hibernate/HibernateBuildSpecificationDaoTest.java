@@ -4,6 +4,7 @@ import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
 import com.zutubi.pulse.model.persistence.SlaveDao;
 
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -41,7 +42,7 @@ public class HibernateBuildSpecificationDaoTest extends MasterPersistenceTestCas
     public void testSaveAndLoad()
     {
         BuildSpecification spec = assembleSpec();
-
+        spec.markForCleanBuild(Arrays.asList(slaveDao.findByName("test slave")));
         buildSpecificationDao.save(spec);
         commitAndRefreshTransaction();
 
@@ -64,6 +65,22 @@ public class HibernateBuildSpecificationDaoTest extends MasterPersistenceTestCas
         assertEquals(spec.getId(), specs.get(0).getId());
     }
 
+    public void testFindBySlaveMarkedClean()
+    {
+        BuildSpecification spec = new BuildSpecification();
+        Slave slave = insertSlave();
+        spec.markForCleanBuild(Arrays.asList(slave));
+        BuildSpecification emptySpec = new BuildSpecification();
+        buildSpecificationDao.save(spec);
+        buildSpecificationDao.save(emptySpec);
+        commitAndRefreshTransaction();
+
+        List<BuildSpecification> specs= buildSpecificationDao.findBySlave(slave);
+
+        assertEquals(1, specs.size());
+        assertEquals(spec.getId(), specs.get(0).getId());
+    }
+
     private BuildSpecification assembleSpec()
     {
         BuildSpecification spec = new BuildSpecification("test spec");
@@ -73,12 +90,17 @@ public class HibernateBuildSpecificationDaoTest extends MasterPersistenceTestCas
         masterNode.addResourceRequirement(new ResourceRequirement("resource", "version"));
         spec.getRoot().addChild(masterNode);
 
-        Slave slave = new Slave("test slave", "test host");
-        slaveDao.save(slave);
-
+        Slave slave = insertSlave();
         BuildSpecificationNode slaveNode = new BuildSpecificationNode(new BuildStage("child", new SlaveBuildHostRequirements(slave), "recipe 2"));
         masterNode.addChild(slaveNode);
         return spec;
+    }
+
+    private Slave insertSlave()
+    {
+        Slave slave = new Slave("test slave", "test host");
+        slaveDao.save(slave);
+        return slave;
     }
 
 }
