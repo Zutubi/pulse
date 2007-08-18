@@ -18,7 +18,6 @@ public class MonitorScms implements Task
     public void execute(TaskExecutionContext context)
     {
         LOG.entering(MonitorScms.class.getName(), "execute");
-//        System.out.println("MONITOR SCM STARTING.");
         long start = System.currentTimeMillis();
         try
         {
@@ -26,12 +25,11 @@ public class MonitorScms implements Task
         }
         finally
         {
-//            System.out.println("MONITOR SCM FINISHED.");
             long end = System.currentTimeMillis();
             long time = (end - start) / Constants.SECOND;
             if (time > 100)
             {
-                LOG.warning("polling active Scms took %s seconds.", time);
+                LOG.info(String.format("Polling active Scms took %s seconds.", time));
             }
         }
         LOG.exiting();

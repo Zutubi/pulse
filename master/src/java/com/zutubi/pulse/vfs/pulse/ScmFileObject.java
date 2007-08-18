@@ -47,12 +47,12 @@ public class ScmFileObject extends AbstractPulseFileObject
     {
         return objectFactory.buildBean(ScmFileObject.class,
                                        new Class[]{ScmFile.class, FileName.class, AbstractFileSystem.class},
-                                       new Object[]{getSCMChild(fileName), fileName, pfs});
+                                       new Object[]{getScmChild(fileName), fileName, pfs});
     }
 
-    private ScmFile getSCMChild(final FileName fileName) throws FileSystemException
+    private ScmFile getScmChild(final FileName fileName) throws FileSystemException
     {
-        ScmFile file = CollectionUtils.find(getSCMChildren(), new Predicate<ScmFile>()
+        ScmFile file = CollectionUtils.find(getScmChildren(), new Predicate<ScmFile>()
         {
             public boolean satisfied(ScmFile scmFile)
             {
@@ -68,7 +68,7 @@ public class ScmFileObject extends AbstractPulseFileObject
         return file;
     }
 
-    private List<ScmFile> getSCMChildren() throws FileSystemException
+    private List<ScmFile> getScmChildren() throws FileSystemException
     {
         if (scmChildren == null)
         {
@@ -93,7 +93,7 @@ public class ScmFileObject extends AbstractPulseFileObject
 
     protected String[] doListChildren() throws Exception
     {
-        List<ScmFile> children = getSCMChildren();
+        List<ScmFile> children = getScmChildren();
         return CollectionUtils.mapToArray(children, new Mapping<ScmFile, String>()
         {
             public String map(ScmFile scmFile)

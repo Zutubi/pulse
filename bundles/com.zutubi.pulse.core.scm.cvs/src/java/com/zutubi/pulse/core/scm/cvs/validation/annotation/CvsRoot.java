@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 /**
  * Validation annotation for checking CVS root syntax.
  */
-@Constraint("com.zutubi.pulse.validation.validators.CvsRootValidator")
+@Constraint("com.zutubi.pulse.core.scm.cvs.validation.validators.CvsRootValidator")
 @Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CvsRoot

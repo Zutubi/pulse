@@ -4,6 +4,10 @@ import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.ShutdownManager;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.scm.ScmClient;
+import com.zutubi.pulse.core.scm.ScmClientFactory;
+import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
@@ -13,10 +17,6 @@ import com.zutubi.pulse.scheduling.SimpleTrigger;
 import com.zutubi.pulse.scheduling.Trigger;
 import com.zutubi.pulse.scm.MonitorScms;
 import com.zutubi.pulse.scm.ScmChangeEvent;
-import com.zutubi.pulse.core.scm.ScmClient;
-import com.zutubi.pulse.core.scm.ScmClientFactory;
-import com.zutubi.pulse.core.scm.ScmException;
-import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.util.Pair;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Constants;
@@ -106,7 +106,6 @@ public class DefaultScmManager implements ScmManager, Stoppable
         }
     }
 
-
     public void stop(boolean force)
     {
         shutdown();
@@ -116,26 +115,36 @@ public class DefaultScmManager implements ScmManager, Stoppable
     {
         return CollectionUtils.filter(projectManager.getAllProjectConfigs(), new Predicate<ProjectConfiguration>()
         {
-            public boolean satisfied(ProjectConfiguration configuration)
+            public boolean satisfied(ProjectConfiguration project)
             {
-                ScmConfiguration scm = configuration.getScm();
-                return scm != null && configuration.getScm().getMonitor();
+                ScmConfiguration scm = project.getScm();
+                // check a) sanity.
+                if (scm == null)
+                {
+                    return false;
+                }
+
+                // check b) monitoring is enabled.
+                return project.getScm().getMonitor();
             }
         });
     }
 
     public void pollActiveScms()
     {
-        for (final ProjectConfiguration projectConfiguration: getActiveProjects())
+        for (final ProjectConfiguration project: getActiveProjects())
         {
             executor.execute(new Runnable()
             {
                 public void run()
                 {
                     long start = System.currentTimeMillis();
-                    process(projectConfiguration);
+                    process(project);
                     long end = System.currentTimeMillis();
-                    LOG.debug("Scm polling took " + ((end - start)/Constants.SECOND) + " seconds.");
+                    long duration = ((end - start)/Constants.SECOND);
+                    LOG.info(String.format("polling scm for project %s took %s seconds.", project.getName(), duration));
+
+                    // would be good to record the polling duration somewhere so that we can report on it.
                 }
             });
         }
@@ -157,7 +166,8 @@ public class DefaultScmManager implements ScmManager, Stoppable
     private void process(ProjectConfiguration projectConfig)
     {
         ScmConfiguration scm = projectConfig.getScm();
-        Project project = projectManager.getProject(projectConfig.getProjectId());
+        long projectId = projectConfig.getProjectId();
+        Project project = projectManager.getProject(projectId);
 
         try
         {
@@ -174,18 +184,18 @@ public class DefaultScmManager implements ScmManager, Stoppable
 
             // when was the last time that we checked? if never, get the latest revision.
             ScmClient client = scmClientFactory.createClient(scm);
-            if (!latestRevisions.containsKey(project.getId()))
+            if (!latestRevisions.containsKey(projectId))
             {
-                latestRevisions.put(project.getId(), client.getLatestRevision());
+                latestRevisions.put(projectId, client.getLatestRevision());
                 return;
             }
 
-            Revision previous = latestRevisions.get(project.getId());
+            Revision previous = latestRevisions.get(projectId);
             
             // slightly paranoid, but we can not rely on the scm implementations to behave as expected.
             if (previous == null)
             {
-                latestRevisions.put(project.getId(), client.getLatestRevision());
+                latestRevisions.put(projectId, client.getLatestRevision());
                 return;
             }
 
@@ -193,23 +203,23 @@ public class DefaultScmManager implements ScmManager, Stoppable
             if (scm.isQuietPeriodEnabled())
             {
                 // are we waiting
-                if (waiting.containsKey(project.getId()))
+                if (waiting.containsKey(projectId))
                 {
-                    long quietTime = waiting.get(project.getId()).first;
+                    long quietTime = waiting.get(projectId).first;
                     if (quietTime < System.currentTimeMillis())
                     {
-                        Revision lastChange = waiting.get(project.getId()).second;
+                        Revision lastChange = waiting.get(projectId).second;
                         Revision latest = getLatestRevisionSince(lastChange, client);
                         if (latest != null)
                         {
                             // there has been a commit during the 'quiet period', lets reset the timer.
-                            waiting.put(project.getId(), new Pair<Long, Revision>(System.currentTimeMillis() + scm.getQuietPeriod() * Constants.MINUTE, latest));
+                            waiting.put(projectId, new Pair<Long, Revision>(System.currentTimeMillis() + scm.getQuietPeriod() * Constants.MINUTE, latest));
                         }
                         else
                         {
                             // there have been no commits during the 'quiet period', trigger a change.
                             sendScmChangeEvent(projectConfig, lastChange, previous);
-                            waiting.remove(project.getId());
+                            waiting.remove(projectId);
                         }
                     }
                 }
@@ -220,7 +230,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
                     {
                         if (scm.getQuietPeriod() != 0)
                         {
-                            waiting.put(project.getId(), new Pair<Long, Revision>(System.currentTimeMillis() + scm.getQuietPeriod() * Constants.MINUTE, latest));
+                            waiting.put(projectId, new Pair<Long, Revision>(System.currentTimeMillis() + scm.getQuietPeriod() * Constants.MINUTE, latest));
                         }
                         else
                         {
@@ -250,6 +260,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
 
     private Revision getLatestRevisionSince(Revision revision, ScmClient client) throws ScmException
     {
+        // this assumes that getting the revision since revision x is more efficient than getting the latest revision.
         List<Revision> revisions = client.getRevisions(revision, null);
         if (revisions.size() > 0)
         {
@@ -261,7 +272,6 @@ public class DefaultScmManager implements ScmManager, Stoppable
 
     private void sendScmChangeEvent(ProjectConfiguration projectConfig, Revision latest, Revision previous)
     {
-        LOG.finer("publishing scm change event for " + projectConfig.getName() + " revision " + latest);
         eventManager.publish(new ScmChangeEvent(projectConfig, latest, previous));
         latestRevisions.put(projectConfig.getProjectId(), latest);
     }
@@ -294,21 +304,11 @@ public class DefaultScmManager implements ScmManager, Stoppable
         return configurationProvider.get(GeneralAdminConfiguration.class).getScmPollingInterval();
     }
 
-    /**
-     * Required resource
-     *
-     * @param eventManager instance
-     */
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
     }
 
-    /**
-     * Required resource
-     *
-     * @param shutdownManager instance
-     */
     public void setShutdownManager(ShutdownManager shutdownManager)
     {
         this.shutdownManager = shutdownManager;

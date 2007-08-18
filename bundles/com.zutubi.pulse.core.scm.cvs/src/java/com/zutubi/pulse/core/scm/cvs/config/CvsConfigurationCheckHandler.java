@@ -1,10 +1,10 @@
 package com.zutubi.pulse.core.scm.cvs.config;
 
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.config.ConfigurationCheckHandlerSupport;
-import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.ScmClientFactory;
-import com.zutubi.pulse.core.scm.cvs.config.CvsConfiguration;
+import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.cvs.CvsClient;
 
 /**
@@ -14,7 +14,7 @@ import com.zutubi.pulse.core.scm.cvs.CvsClient;
 @SymbolicName("zutubi.cvsConfigurationCheckHandler")
 public class CvsConfigurationCheckHandler extends ConfigurationCheckHandlerSupport<CvsConfiguration>
 {
-    private ScmClientFactory scmClientFactory;
+    private ScmClientFactory<Configuration> scmClientFactory;
 
     public void test(CvsConfiguration configuration) throws ScmException
     {
@@ -22,7 +22,7 @@ public class CvsConfigurationCheckHandler extends ConfigurationCheckHandlerSuppo
         client.testConnection();
     }
 
-    public void setScmClientFactory(ScmClientFactory scmClientManager)
+    public void setScmClientFactory(ScmClientFactory<Configuration> scmClientManager)
     {
         this.scmClientFactory = scmClientManager;
     }

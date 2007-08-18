@@ -17,12 +17,14 @@ import java.util.List;
 @SymbolicName("zutubi.scmConfig")
 public abstract class ScmConfiguration extends AbstractConfiguration
 {
-    @Wizard.Ignore
-    private boolean monitor = true;
-
     @Required
     private CheckoutScheme checkoutScheme = CheckoutScheme.CLEAN_CHECKOUT;
     
+    // todo: monitor should only be an option if scm monitoring is supported by the implementation.
+    // customPollingInterval, pollingInterval, quietPeriod, quietPeriodEnabled should only be visible
+    @Wizard.Ignore
+    private boolean monitor = true;
+
     @ControllingCheckbox(dependentFields = {"pollingInterval"})
     @Wizard.Ignore
     private boolean customPollingInterval = false;
@@ -43,6 +45,7 @@ public abstract class ScmConfiguration extends AbstractConfiguration
     @Numeric(min = 1)
     @Wizard.Ignore
     private int quietPeriod = 1;
+
     @Wizard.Ignore
     private List<String> filterPaths;
 

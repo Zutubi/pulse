@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.scm;
 
-import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.util.bean.ObjectFactory;
 
 import java.util.HashMap;
 import java.util.Map;
