@@ -91,6 +91,25 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         assertEquals("b", loaded.getB());
     }
 
+    public void testInsertExistingPath()
+    {
+        MockA a = new MockA("a");
+        configurationTemplateManager.insert("sample", a);
+
+        MockB b = new MockB("b");
+        configurationTemplateManager.insert("sample/a/mock", b);
+
+        try
+        {
+            configurationTemplateManager.insert("sample/a/mock", b);
+            fail();
+        }
+        catch(IllegalArgumentException e)
+        {
+            assertEquals("Invalid insertion path 'sample/a/mock': record already exists (use save to modify)", e.getMessage());
+        }
+    }
+
     public void testSave()
     {
         MockA a = new MockA("a");
@@ -601,6 +620,33 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         // Are they removed from the parent record and instance?
         assertEquals(0, configurationTemplateManager.getRecord("sample").size());
         assertEquals(0, ((Map) configurationTemplateManager.getInstance("sample")).size());
+    }
+
+    public void testPathExistsEmptyPath()
+    {
+        assertFalse(configurationTemplateManager.pathExists(""));
+    }
+
+    public void testPathExistsNonExistantScope()
+    {
+        assertFalse(configurationTemplateManager.pathExists("nosuchscope"));
+    }
+
+    public void testPathExistsScopeExistsPathDoesnt()
+    {
+        assertFalse(configurationTemplateManager.pathExists("sample/nosuchpath"));
+    }
+
+    public void testPathExistsExistantScope()
+    {
+        assertTrue(configurationTemplateManager.pathExists("sample"));
+    }
+    
+    public void testPathExistsExistantPath()
+    {
+        MockA a = new MockA("mock");
+        String path = configurationTemplateManager.insert("sample", a);
+        assertTrue(configurationTemplateManager.pathExists(path));
     }
 
     private void assertMissingName(NamedConfiguration instance)

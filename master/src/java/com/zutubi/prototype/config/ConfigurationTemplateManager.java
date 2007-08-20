@@ -58,7 +58,8 @@ public class ConfigurationTemplateManager
      * @param path path to retrieve the record for
      * @return the record at the given location, or null if no record exists
      *         at that location
-     * @throws IllegalArgumentException if the parent path is invalid
+     * @throws IllegalArgumentException if the path does not refer to a
+     *         persistent scope
      */
     public Record getRecord(String path)
     {
@@ -220,6 +221,11 @@ public class ConfigurationTemplateManager
         // Determine the path at which the record will be inserted.  This is
         // type-dependent.
         String newPath = type.getInsertionPath(path, record);
+        if(pathExists(newPath))
+        {
+            throw new IllegalArgumentException("Invalid insertion path '" + newPath + "': record already exists (use save to modify)");
+        }
+
         Type expectedType;
         if (type instanceof CollectionType)
         {
@@ -1339,7 +1345,7 @@ public class ConfigurationTemplateManager
             ConfigurationScopeInfo scope = configurationPersistenceManager.getScopeInfo(pathElements[0]);
             if (scope == null)
             {
-                throw new IllegalArgumentException("Invalid path '" + path + "':refers to unknown root scope '" + pathElements[0]);
+                throw new IllegalArgumentException("Invalid path '" + path + "': refers to unknown root scope '" + pathElements[0]);
             }
 
             if (scope.isTemplated())
@@ -1396,6 +1402,28 @@ public class ConfigurationTemplateManager
         }
 
         return result;
+    }
+
+    /**
+     * @param path the path to test
+     * @return true if the given path refers to an existing record
+     */
+    public boolean pathExists(String path)
+    {
+        if(path.length() == 0)
+        {
+            return false;
+        }
+        else
+        {
+            String[] elements = PathUtils.getPathElements(path);
+            if(configurationPersistenceManager.getScopeInfo(elements[0]) == null)
+            {
+                return false;
+            }
+
+            return getRecord(path) != null;
+        }
     }
 
     /**

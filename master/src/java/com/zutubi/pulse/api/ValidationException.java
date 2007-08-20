@@ -101,7 +101,11 @@ public class ValidationException extends Exception
 
             if(field != null)
             {
-                if(!first)
+                if(first)
+                {
+                    first = false;
+                }
+                else
                 {
                     message.append('.');
                 }

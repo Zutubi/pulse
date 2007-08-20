@@ -86,6 +86,13 @@ EOF
 
 cp "$top/master/src/acceptance/drivers/"* versions/*/lib
 
+# Make sure selenium is running
+if ! netstat -an | grep 4444 > /dev/null
+then
+    java -jar "../..//master/src/acceptance/misc/"selenium-server-*.jar > ../selenium-stdout.txt 2> ../selenium-stderr.txt &
+    echo $! > ../selenium-pid.txt
+fi
+
 # Fire it up!
 export PULSE_HOME=
 "$(pwd)/bin/pulse" start -p 8889 -f config.properties > ../stdout.txt 2> ../stderr.txt

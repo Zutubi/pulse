@@ -19,4 +19,11 @@ do
 done
 sleep 10
 
+# Kill selenium if we started it
+pidFile=./pulse-accept/selenium-pid.txt
+if [[ -f $pidFile ]]
+then
+    kill $(cat $pidFile)
+fi
+
 exit 0

@@ -106,6 +106,17 @@ public class BaseXmlRpcAcceptanceTest extends TestCase
         }
     }
 
+    protected String ensureProject(String name) throws Exception
+    {
+        String path = "projects/" + name;
+        if(!((Boolean)call("configPathExists", path)))
+        {
+            insertSimpleProject(name);
+        }
+
+        return path;
+    }
+
     protected String insertSimpleProject(String name) throws Exception
     {
         Hashtable<String, Object> scm = new Hashtable<String, Object>();
@@ -124,5 +135,28 @@ public class BaseXmlRpcAcceptanceTest extends TestCase
         project.put("type", type);
 
         return call("insertTemplatedConfig", "projects/global project template", project, false);
+    }
+
+    protected String insertSimpleAgent(String name) throws Exception
+    {
+        Hashtable<String, Object> agent = new Hashtable<String, Object>();
+        agent.put(SYMBOLIC_NAME_KEY, "zutubi.agentConfig");
+        agent.put("name", name);
+        agent.put("host", name);
+
+        return call("insertTemplatedConfig", "agents/global agent template", agent, false);
+    }
+
+    protected void callAndExpectError(String error, String function, Object... args)
+    {
+        try
+        {
+            call(function, args);
+            fail();
+        }
+        catch (Exception e)
+        {
+            assertTrue("Message '" + e.getMessage() + "' does not contain '" + error + "'", e.getMessage().contains(error));
+        }
     }
 }

@@ -456,7 +456,7 @@
             <classpath>
                 <pathelement location="${build.dir}/classes"/>
                 <pathelement location="${build.dir}/test.classes"/>
-                <pathelement location="${build.dir}/accept.classes"/>
+                <pathelement location="${build.dir}/acceptance.classes"/>
                 <fileset dir="${build.dir}/lib">
                     <include name="**/*.jar"/>
                 </fileset>
@@ -498,7 +498,7 @@
             <classpath>
                 <pathelement location="${build.dir}/classes"/>
                 <pathelement location="${build.dir}/test.classes"/>
-                <pathelement location="${build.dir}/accept.classes"/>
+                <pathelement location="${build.dir}/acceptance.classes"/>
                 <fileset dir="${build.dir}/lib">
                     <include name="**/*.jar"/>
                 </fileset>

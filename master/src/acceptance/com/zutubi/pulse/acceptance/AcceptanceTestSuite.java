@@ -17,30 +17,31 @@ public class AcceptanceTestSuite
         // now we can run the rest of the tests.
 
         //---( xml rpc acceptance tests )---
-        suite.addTestSuite(AdminXmlRpcAcceptanceTest.class);
+//        suite.addTestSuite(AdminXmlRpcAcceptanceTest.class);
+        suite.addTestSuite(ConfigXmlRpcAcceptanceTest.class);
         suite.addTestSuite(ProjectXmlRpcAcceptanceTest.class);
 
         //---( web ui acceptance tests )---
-        suite.addTestSuite(LicenseAuthorisationAcceptanceTest.class);
-        suite.addTestSuite(LicenseManagementAcceptanceTest.class);
+//        suite.addTestSuite(LicenseAuthorisationAcceptanceTest.class);
+//        suite.addTestSuite(LicenseManagementAcceptanceTest.class);
         // AnonymousAccessAcceptanceTest needs some projects, so order it here for now.
-        suite.addTestSuite(AnonymousAccessAcceptanceTest.class);
+//        suite.addTestSuite(AnonymousAccessAcceptanceTest.class);
         // AnonymousAccessAcceptanceTest tests the default state of that setting, so
         // run this test (that messes with the setting) afterwards.
-        suite.addTestSuite(GeneralConfigurationAcceptanceTest.class);
-        suite.addTestSuite(ProjectArtifactsAcceptanceTest.class);
-        suite.addTestSuite(RssAcceptanceTest.class);
-        suite.addTestSuite(SmtpConfigurationAcceptanceTest.class);
-        suite.addTestSuite(ResourceAcceptanceTest.class);
-        suite.addTestSuite(SlaveAcceptanceTest.class);
-        suite.addTestSuite(JabberConfigurationAcceptanceTest.class);
-        suite.addTestSuite(LdapConfigurationAcceptanceTest.class);
-        suite.addTestSuite(ChangeViewersAcceptanceTest.class);
+//        suite.addTestSuite(GeneralConfigurationAcceptanceTest.class);
+//        suite.addTestSuite(ProjectArtifactsAcceptanceTest.class);
+//        suite.addTestSuite(RssAcceptanceTest.class);
+//        suite.addTestSuite(SmtpConfigurationAcceptanceTest.class);
+//        suite.addTestSuite(ResourceAcceptanceTest.class);
+//        suite.addTestSuite(SlaveAcceptanceTest.class);
+//        suite.addTestSuite(JabberConfigurationAcceptanceTest.class);
+//        suite.addTestSuite(LdapConfigurationAcceptanceTest.class);
+//        suite.addTestSuite(ChangeViewersAcceptanceTest.class);
 //        suite.addTestSuite(StartupShutdownAcceptanceTest.class);
-        suite.addTestSuite(UserAdministrationAcceptanceTest.class);
-        suite.addTestSuite(UserPreferencesAcceptanceTest.class);
-        suite.addTestSuite(UserSecurityAcceptanceTest.class);
-        suite.addTestSuite(WebAppAcceptanceTest.class);
+//        suite.addTestSuite(UserAdministrationAcceptanceTest.class);
+//        suite.addTestSuite(UserPreferencesAcceptanceTest.class);
+//        suite.addTestSuite(UserSecurityAcceptanceTest.class);
+//        suite.addTestSuite(WebAppAcceptanceTest.class);
         return suite;
     }
 }

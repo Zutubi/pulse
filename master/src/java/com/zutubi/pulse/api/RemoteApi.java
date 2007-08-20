@@ -74,7 +74,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
     public Boolean configPathExists(String token, String path) throws AuthenticationException
     {
         tokenManager.verifyUser(token);
-        return configurationTemplateManager.getRecord(path) != null;
+        return configurationTemplateManager.pathExists(path);
     }
 
     public Vector<String> getConfigListing(String token, String path) throws AuthenticationException, TypeException
@@ -182,7 +182,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         String insertPath = PathUtils.getParentPath(templateParentPath);
         if(insertPath == null)
         {
-            throw new IllegalArgumentException("Invalid templateParentPath '" + templateParentPath + "': does not refer to an existing template");
+            throw new IllegalArgumentException("Invalid templateParentPath '" + templateParentPath + "': no parent path");
         }
 
         if(!configurationTemplateManager.isTemplatedCollection(insertPath))
