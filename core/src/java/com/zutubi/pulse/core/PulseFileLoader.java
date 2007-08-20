@@ -1,12 +1,8 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.model.Property;
 import com.zutubi.pulse.model.ResourceRequirement;
-import com.zutubi.pulse.plugins.PluginManager;
-import com.zutubi.pulse.api.PulseFileElement;
 
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
