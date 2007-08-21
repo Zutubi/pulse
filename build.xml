@@ -481,7 +481,7 @@
         <fail message="One or more acceptance tests failed.  See the reports (${report.dir}) for details."
               if="test.failed"/>
 
-        <antcall target="test.agent.upgrade"/>
+        <!-- <antcall target="test.agent.upgrade"/> -->
     </target>
 
     <target name="test.agent.upgrade">
