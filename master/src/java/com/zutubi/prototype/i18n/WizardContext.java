@@ -25,6 +25,10 @@ public class WizardContext implements Context
 
     public InputStream getResourceAsStream(String name)
     {
+        if (wizard.getCurrentState() != null)
+        {
+            return wizard.getCurrentState().getType().getClazz().getResourceAsStream(name);
+        }
         return wizard.getType().getClazz().getResourceAsStream(name);
     }
 }
