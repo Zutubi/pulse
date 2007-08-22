@@ -14,6 +14,7 @@
         <conf name="source"/>
         <conf name="bundle"/>
         <conf name="external"/>
+        <conf name="bundled_3rd_party"/>
     </configurations>
 
     <publications>

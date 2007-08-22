@@ -13,6 +13,7 @@
         <conf name="build"/>
         <conf name="source"/>
         <conf name="bundle"/>
+        <conf name="bundled_3rd_party"/>
     </configurations>
 
     <publications>

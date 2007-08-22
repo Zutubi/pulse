@@ -8,8 +8,29 @@
         <echo message="    Component: package ${ivy.module}              "/>
         <echo message="----------------------------------------------"/>
 
+        <property name="3rd.party.extracted" value="${current.dir}/build/3rdparty/extracted"/>
+        <property name="3rd.party.jars" value="${current.dir}/build/3rdparty/jars"/>
+
+        <!-- pick up 3rd party components and extract them. -->
+        <mkdir dir="${3rd.party.extracted}"/>
+        <mkdir dir="${3rd.party.jars}"/>
+        <retrieve-dependencies dest="${3rd.party.jars}" conf="bundled_3rd_party"/>
+
+        <unzip dest="${3rd.party.extracted}">
+            <fileset dir="${3rd.party.jars}">
+                <include name="*.jar"/>
+            </fileset>
+        </unzip>
+
         <jar file="build/${ivy.module}.jar" manifest="resources/META-INF/MANIFEST.MF">
             <fileset dir="${classes.dir}"/>
+            <fileset dir="${3rd.party.extracted}">
+                <exclude name="META-INF"/>
+            </fileset>
+            <!-- include license text files. -->
+            <fileset dir="${3rd.party.jars}">
+                <exclude name="*.jar"/>
+            </fileset>
             <fileset dir="resources" excludes="resources/META-INF/MANIFEST.MF"/>
             <path refid="src.export.selection"/>
         </jar>
@@ -17,15 +38,53 @@
         <package-src name="${ivy.module}-src.jar" pathref="src.export.selection"/>
 
         <if>
-            <not><isset property="no.tests"/></not>
+            <not>
+                <isset property="no.tests"/>
+            </not>
             <then>
                 <jar file="build/${ivy.module}-test.jar">
                     <fileset dir="${test.classes.dir}"/>
                     <path refid="test.export.selection"/>
                 </jar>
-    
+
                 <package-src name="${ivy.module}-test-src.jar" pathref="test.export.selection"/>
             </then>
         </if>
     </target>
+
+    <!-- DEPLOYMENT OF BUNDLES IN DEVELOPMENT ENVIRONMENT.
+    copy and extract the 3rd party packages for each bundle into the plugin/prepackages/<pluginId>
+    directory so that the plugins will successfully deploy when pulse is run via IDEA.
+    -->
+    <target name="idea.prepare.prepackaged" depends="init">
+        
+        <property name="3rd.party.extracted" value="${current.dir}/build/3rdparty/extracted"/>
+        <property name="3rd.party.jars" value="${current.dir}/build/3rdparty/jars"/>
+
+        <!-- pick up 3rd party components and extract them. -->
+        <mkdir dir="${3rd.party.extracted}"/>
+        <mkdir dir="${3rd.party.jars}"/>
+        <retrieve-dependencies dest="${3rd.party.jars}" conf="bundled_3rd_party"/>
+
+        <unzip dest="${3rd.party.extracted}">
+            <fileset dir="${3rd.party.jars}">
+                <include name="*.jar"/>
+            </fileset>
+        </unzip>
+
+        <property name="idea.prepare.output.dir" value="${project.root.dir}/plugins/prepackaged/${ivy.module}"/>
+
+        <copy todir="${idea.prepare.output.dir}">
+            <fileset dir="${3rd.party.extracted}">
+                <exclude name="META-INF"/>
+            </fileset>
+            <!-- include license text files. -->
+            <fileset dir="${3rd.party.jars}">
+                <exclude name="*.jar"/>
+            </fileset>
+            <fileset dir="resources" excludes="resources/META-INF/MANIFEST.MF"/>
+        </copy>
+
+    </target>
+
 </project>
