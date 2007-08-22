@@ -12,12 +12,14 @@ import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.*;
 import com.zutubi.pulse.bootstrap.DefaultSetupManager;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.bootstrap.StartupManager;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.events.*;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.license.LicenseManager;
 import com.zutubi.pulse.license.authorisation.AddAgentAuthorisation;
+import com.zutubi.pulse.logging.ServerMessagesHandler;
 import com.zutubi.pulse.model.AgentState;
 import com.zutubi.pulse.model.AgentStateManager;
 import com.zutubi.pulse.model.ResourceManager;
@@ -27,7 +29,6 @@ import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.services.UpgradeStatus;
 import com.zutubi.util.Sort;
-import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
 import java.net.ConnectException;
@@ -61,7 +62,9 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
     private EventManager eventManager;
     private SlaveProxyFactory slaveProxyFactory;
     private ServiceTokenManager serviceTokenManager;
-    private ObjectFactory objectFactory;
+    private MasterRecipeProcessor masterRecipeProcessor;
+    private ServerMessagesHandler serverMessagesHandler;
+    private StartupManager startupManager;
 
     private LicenseManager licenseManager;
     private ExecutorService pingService = Executors.newCachedThreadPool();
@@ -184,7 +187,17 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         }
         else
         {
-            return objectFactory.buildBean(MasterAgentService.class, new Class[] { AgentConfiguration.class }, new Object[] { agentConfig });
+            // We wire this up ourselves as it uses resources that are
+            // defined in the same context as this agent manager (and
+            // thus are not in the context atm :|).
+            MasterAgentService agentService = new MasterAgentService(agentConfig);
+            agentService.setConfigurationManager(configurationManager);
+            agentService.setConfigurationProvider(configurationProvider);
+            agentService.setMasterRecipeProcessor(masterRecipeProcessor);
+            agentService.setResourceManager(resourceManager);
+            agentService.setServerMessagesHandler(serverMessagesHandler);
+            agentService.setStartupManager(startupManager);
+            return agentService;
         }
     }
 
@@ -607,9 +620,9 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         this.configurationProvider = configurationProvider;
     }
 
-    public void setObjectFactory(ObjectFactory objectFactory)
+    public void setMasterRecipeProcessor(MasterRecipeProcessor masterRecipeProcessor)
     {
-        this.objectFactory = objectFactory;
+        this.masterRecipeProcessor = masterRecipeProcessor;
     }
 
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
@@ -620,6 +633,16 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
     public void setTypeRegistry(TypeRegistry typeRegistry)
     {
         this.typeRegistry = typeRegistry;
+    }
+
+    public void setServerMessagesHandler(ServerMessagesHandler serverMessagesHandler)
+    {
+        this.serverMessagesHandler = serverMessagesHandler;
+    }
+
+    public void setStartupManager(StartupManager startupManager)
+    {
+        this.startupManager = startupManager;
     }
 
     private class Pinger implements Callable<SlaveStatus>

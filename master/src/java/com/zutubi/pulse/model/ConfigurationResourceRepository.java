@@ -8,6 +8,7 @@ import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceVersion;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
+import com.zutubi.util.logging.Logger;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -18,6 +19,8 @@ import java.util.Map;
  */
 public class ConfigurationResourceRepository implements ConfigurableResourceRepository
 {
+    private static final Logger LOG = Logger.getLogger(ConfigurationResourceRepository.class);
+    
     private AgentConfiguration agentConfig;
     private ConfigurationProvider configurationProvider;
 
@@ -63,10 +66,8 @@ public class ConfigurationResourceRepository implements ConfigurableResourceRepo
         }
         else
         {
-            // FIXME: do we have a better way to programmatically update an
-            // FIXME: existing instance?
             // Remove the existing instance before we play with it.
-            configurationProvider.delete(resource.getConfigurationPath());
+            existingResource = configurationProvider.deepClone(existingResource);
 
             // we have an existing resource, so merge the details.
             for (String propertyName: resource.getProperties().keySet())
@@ -116,13 +117,13 @@ public class ConfigurationResourceRepository implements ConfigurableResourceRepo
                         catch (FileLoadException e)
                         {
                             // should never happen.
-                            e.printStackTrace();
+                            LOG.severe(e);
                         }
                     }
                 }
             }
 
-            configurationProvider.insert(getResourcesPath(), existingResource);
+            configurationProvider.save(existingResource);
         }
     }
 

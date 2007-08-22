@@ -1,8 +1,10 @@
 package com.zutubi.pulse.web.agents;
 
+import com.caucho.hessian.client.HessianRuntimeException;
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.web.PagingSupport;
+import com.zutubi.util.logging.Logger;
 
 import java.util.Collections;
 import java.util.List;
@@ -12,6 +14,8 @@ import java.util.List;
  */
 public class ServerMessagesAction extends ServerMessagesActionSupport
 {
+    private static final Logger LOG = Logger.getLogger(ServerMessagesAction.class);
+    
     private List<CustomLogRecord> records;
     private PagingSupport pagingSupport = new PagingSupport(10);
 
@@ -42,8 +46,9 @@ public class ServerMessagesAction extends ServerMessagesActionSupport
                 pagingSupport.setTotalItems(records.size());
                 records = records.subList(pagingSupport.getStartOffset(), pagingSupport.getEndOffset());
             }
-            catch(RuntimeException e)
+            catch(HessianRuntimeException e)
             {
+                LOG.warning(e);
                 addActionError("Unable to contact agent: " + e.getMessage());
             }
         }
