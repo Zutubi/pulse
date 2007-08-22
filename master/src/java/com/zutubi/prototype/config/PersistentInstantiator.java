@@ -1,5 +1,6 @@
 package com.zutubi.prototype.config;
 
+import com.zutubi.prototype.type.ComplexType;
 import com.zutubi.prototype.type.Instantiator;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeException;
@@ -45,10 +46,12 @@ public class PersistentInstantiator implements Instantiator
 
             if (instance != null)
             {
-                ComponentContext.autowire(instance);
-                
-                if (instance instanceof Configuration)
+                // If this is a newly-created Configuration (as opposed to a
+                // reference), we need to initialise and cache it.
+                if (type instanceof ComplexType && instance instanceof Configuration)
                 {
+                    ComponentContext.autowire(instance);
+
                     Configuration configuration = (Configuration) instance;
                     configuration.setConfigurationPath(propertyPath);
                     configuration.setHandle(((Record) data).getHandle());

@@ -12,12 +12,12 @@
                 <value>com.zutubi.pulse.bootstrap.ProcessSetupStartupTask</value>
                 <value>com.zutubi.pulse.BuildAborterStartupTask</value>
                 <value>com.zutubi.pulse.NextBuildNumberAdjusterStartupTask</value>
-                <value>com.zutubi.pulse.bootstrap.DeployMainWebappStartupTask</value>
+                <value>com.zutubi.pulse.bootstrap.InitialiseExtensionsStartupTask</value>
             </list>
         </property>
         <property name="postStartupTasks">
             <list>
-                <value>com.zutubi.pulse.bootstrap.InitialiseExtensionsStartupTask</value>
+                <value>com.zutubi.pulse.bootstrap.DeployMainWebappStartupTask</value>
                 <value>com.zutubi.pulse.bootstrap.SystemStartedMessageStartupTask</value>
             </list>
         </property>
