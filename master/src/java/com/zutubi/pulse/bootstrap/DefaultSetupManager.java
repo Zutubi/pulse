@@ -6,10 +6,10 @@ import com.zutubi.prototype.config.*;
 import com.zutubi.prototype.type.record.DelegatingHandleAllocator;
 import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.events.DataDirectoryLocatedEvent;
-import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.bootstrap.conf.EnvConfig;
 import com.zutubi.pulse.config.PropertiesWriter;
+import com.zutubi.pulse.events.DataDirectoryLocatedEvent;
+import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.logging.LogConfigurationManager;
 import com.zutubi.pulse.model.UserManager;
@@ -312,6 +312,7 @@ public class DefaultSetupManager implements SetupManager
         ConfigurationReferenceManager configurationReferenceManager = ComponentContext.getBean("configurationReferenceManager");
         ConfigurationTemplateManager configurationTemplateManager = ComponentContext.getBean("configurationTemplateManager");
         ConfigurationRegistry configurationRegistry = ComponentContext.getBean("configurationRegistry");
+        ConfigurationExtensionManager configurationExtensionManager = ComponentContext.getBean("configurationExtensionManager");
         DefaultConfigurationProvider configurationProvider = ComponentContext.getBean("configurationProvider");
 
         recordManager.init();
@@ -320,6 +321,7 @@ public class DefaultSetupManager implements SetupManager
         configurationReferenceManager.setRecordManager(recordManager);
         configurationTemplateManager.setRecordManager(recordManager);
         configurationRegistry.init();
+        configurationExtensionManager.init();
         configurationTemplateManager.init();
         configurationProvider.init();
         this.configurationProvider = configurationProvider;

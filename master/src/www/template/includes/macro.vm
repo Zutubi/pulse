@@ -891,7 +891,7 @@
                 #set($result = $action.getResult($id))
                     <td class="content"><a href="currentBuild.action?id=$result.project.id">$!webwork.htmlEncode($result.project.name)</a></td>
                     #assignGlobalResultCssClass($result)
-                    #dynamicRightLinkCell($result.number "viewBuild.action?id=$result.id")
+                    #dynamicRightLinkCell($result.number "$base/viewBuild.action?id=$result.id")
                     #statusCell($result true)
                 </tr>
             #end
@@ -949,9 +949,9 @@
         #wwtext("name=tests.none")
     #else
         #if($recipe)
-            <a href="viewTestSuite.action?id=$build.id&amp;nodeId=$recipe.id">
+            <a href="$base/viewTestSuite.action?id=$build.id&amp;nodeId=$recipe.id">
         #else
-            <a href="viewTests.action?id=$build.id">
+            <a href="$base/viewTests.action?id=$build.id">
         #end
         #if($summary.allPassed())
             $action.getText("tests.all.passed", ["$summary.total"])
@@ -1002,7 +1002,7 @@
 ##
 #macro(viewCell $project $result)
     <td class="content">
-        <a href="viewBuild.action?id=$result.id" class="unadorned" title="view summary"><img alt="view summary" src="$base/images/information.gif"/></a>
+        <a href="$base/viewBuild.action?id=$result.id" class="unadorned" title="view summary"><img alt="view summary" src="$base/images/information.gif"/></a>
     </td>
 #end
 
@@ -1011,7 +1011,7 @@
 ##
 #macro(logCell $project $result)
     <td class="content">
-        <a href="viewCommandLog.action?id=$result.id" class="unadorned" title="view details"><img alt="view details" src="$base/images/magnifier.gif"/></a>
+        <a href="$base/viewCommandLog.action?id=$result.id" class="unadorned" title="view details"><img alt="view details" src="$base/images/magnifier.gif"/></a>
     </td>
 #end
 
@@ -1020,9 +1020,9 @@
 ##
 #macro(changesCell $project $result)
     #if($result.personal)
-        #set($url = "viewPersonalChanges.action?id=$result.id")
+        #set($url = "$base/viewPersonalChanges.action?id=$result.id")
     #else
-        #set($url = "viewChanges.action?projectId=$project.id&amp;toBuild=$result.number")
+        #set($url = "$base/viewChanges.action?projectId=$project.id&amp;toBuild=$result.number")
     #end
     <td class="content">
         <a href="$url" class="unadorned" title="view changes"><img alt="view changes" src="$base/images/page_code.gif"/></a>
@@ -1034,7 +1034,7 @@
 ##
 #macro(artifactsCell $project $result)
     <td class="content">
-        <a href="viewBuildArtifacts.action?id=$result.id" class="unadorned" title="view artifacts"><img alt="view artifacts" src="$base/images/folder_page.gif"/></a>
+        <a href="$base/viewBuildArtifacts.action?id=$result.id" class="unadorned" title="view artifacts"><img alt="view artifacts" src="$base/images/folder_page.gif"/></a>
     </td>
 #end
 
@@ -1044,7 +1044,7 @@
 #macro(workingCopyCell $project $result $multiProject)
     #if($action.canWrite($project) || $result.personal)
         <td class="content">
-            <a href="browseProjectDir.action?buildId=$result.id" class="unadorned" title="working copy"><img alt="view working copy" src="$base/images/page_gear.gif"/></a>
+            <a href="$base/browseProjectDir.action?buildId=$result.id" class="unadorned" title="working copy"><img alt="view working copy" src="$base/images/page_gear.gif"/></a>
         </td>
     #elseif($multiProject)
         <td class="content">
@@ -1849,7 +1849,7 @@
     <td class="test-failure">
         #wwtext("name=$key")
         #if($test.wasBrokenPreviously())
-            <br/>(<a href="viewBuild.action?id=$test.brokenSince">#wwtext("name=test.broken.since") $test.brokenNumber</a>)
+            <br/>(<a href="$base/viewBuild.action?id=$test.brokenSince">#wwtext("name=test.broken.since") $test.brokenNumber</a>)
         #end
     </td>
 #end
@@ -2384,7 +2384,7 @@
 #macro(buildTableCell $buildResult $columns $key $multiProject)
     #set($project = $buildResult.project)
     #if($key == "id")
-        #dynamicRightLinkCell($buildResult.number "viewBuild.action?id=$buildResult.id")
+        #dynamicRightLinkCell($buildResult.number "$base/viewBuild.action?id=$buildResult.id")
     #elseif($key == "project")
         #projectClassCell($project)
     #elseif($key == "status")

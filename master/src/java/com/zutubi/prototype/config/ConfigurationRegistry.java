@@ -6,7 +6,6 @@ import com.zutubi.pulse.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.config.ConfigurationCheckHandler;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
-import com.zutubi.pulse.plugins.AbstractExtensionManager;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.prototype.config.misc.LoginConfiguration;
@@ -27,9 +26,6 @@ import com.zutubi.pulse.prototype.config.user.contacts.ContactConfiguration;
 import com.zutubi.pulse.prototype.config.user.contacts.EmailContactConfiguration;
 import com.zutubi.pulse.prototype.config.user.contacts.JabberContactConfiguration;
 import com.zutubi.util.logging.Logger;
-import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IExtension;
-import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,7 +34,7 @@ import java.util.Map;
  * Registers the Pulse built-in configuration types.
  */
 @SuppressWarnings({"unchecked"})
-public class ConfigurationRegistry extends AbstractExtensionManager
+public class ConfigurationRegistry
 {
     private static final Logger LOG = Logger.getLogger(ConfigurationRegistry.class);
 
@@ -222,55 +218,6 @@ public class ConfigurationRegistry extends AbstractExtensionManager
         {
             LOG.severe(e);
         }
-
-        initialiseExtensions();
-    }
-
-    protected String getExtensionPointId()
-    {
-        return "com.zutubi.pulse.core.config";
-    }
-
-    protected void handleConfigurationElement(IExtension extension, IExtensionTracker tracker, IConfigurationElement config)
-    {
-        String className = config.getAttribute("class");
-        String extendedSymbolicName = config.getAttribute("extends");
-
-        Class clazz = loadClass(extension, className);
-        if(clazz != null)
-        {
-            try
-            {
-                if(extendedSymbolicName != null)
-                {
-                    CompositeType extendedType = typeRegistry.getType(extendedSymbolicName);
-                    if(extendedType == null)
-                    {
-                        String message = "Failed to register config class '" + clazz.getName() + "': extended symbolic name '" + extendedSymbolicName + "' is not recongnised";
-                        LOG.warning(message);
-                        handleExtensionError(extension, message);
-                    }
-                    else
-                    {
-                        registerExtension(extendedType.getClazz(), clazz);
-                    }
-                }
-                else
-                {
-                    registerConfigurationType(clazz);
-                }
-            }
-            catch (TypeException e)
-            {
-                LOG.warning(e);
-                handleExtensionError(extension, e);
-            }
-        }
-    }
-
-    public void removeExtension(IExtension iExtension, Object[] objects)
-    {
-        // Do nothing.
     }
 
     public void registerExtension(Class extendedType, Class extensionType) throws TypeException
