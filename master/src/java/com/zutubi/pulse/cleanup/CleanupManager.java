@@ -189,7 +189,7 @@ public class CleanupManager
     @SuppressWarnings({"unchecked"})
     private void cleanupBuilds(Project project)
     {
-        ProjectConfiguration projectConfig = projectManager.getProjectConfig(project.getId());
+        ProjectConfiguration projectConfig = project.getConfig();
         Map<String, CleanupConfiguration> cleanupConfigs = (Map<String, CleanupConfiguration>) projectConfig.getExtensions().get("cleanup");
 
         if (cleanupConfigs != null)

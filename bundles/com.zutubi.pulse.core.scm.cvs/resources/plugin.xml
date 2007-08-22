@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
+    <extension point="com.zutubi.pulse.core.config">
+        <config class="com.zutubi.pulse.core.scm.cvs.config.CvsConfiguration" extends="zutubi.scmConfig"/>
+    </extension>
     <extension point="com.zutubi.pulse.core.scms">
-        <scm name="cvs" config-class="com.zutubi.pulse.core.scm.cvs.config.CvsConfiguration" factory-class="com.zutubi.pulse.core.scm.cvs.CvsClientFactory"/>
+        <scm name="cvs" factory-class="com.zutubi.pulse.core.scm.cvs.CvsClientFactory" working-copy-class="com.zutubi.pulse.core.scm.cvs.CvsWorkingCopy"/>
     </extension>
 </plugin>

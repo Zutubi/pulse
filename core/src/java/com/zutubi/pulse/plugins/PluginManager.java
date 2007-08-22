@@ -11,6 +11,8 @@ import java.util.List;
  */
 public interface PluginManager
 {
+    static final String CONFIG_EXTENSION_POINT = "com.zutubi.pulse.core.config";
+    
     void initialiseExtensions();
     void registerExtensionManager(ExtensionManager extensionManager);
 
@@ -38,6 +40,7 @@ public interface PluginManager
     void uninstallPlugin(Plugin plugin) throws PluginException;
     void enablePlugin(Plugin plugin) throws PluginException;
     void disablePlugin(Plugin plugin) throws PluginException;
+    void disablePlugin(Plugin plugin, String errorMessage) throws PluginException;
 
     Plugin getPlugin(IExtension extension);
 }

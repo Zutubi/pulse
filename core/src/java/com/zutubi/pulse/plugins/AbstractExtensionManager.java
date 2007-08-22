@@ -1,15 +1,16 @@
 package com.zutubi.pulse.plugins;
 
+import com.zutubi.util.logging.Logger;
+import org.eclipse.core.internal.registry.osgi.OSGIUtils;
+import org.eclipse.core.runtime.*;
+import org.eclipse.core.runtime.dynamichelpers.ExtensionTracker;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionChangeHandler;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 import org.eclipse.core.runtime.dynamichelpers.IFilter;
-import org.eclipse.core.runtime.dynamichelpers.ExtensionTracker;
-import org.eclipse.core.runtime.*;
-import org.eclipse.core.internal.registry.osgi.OSGIUtils;
 import org.osgi.framework.Bundle;
-import com.zutubi.util.logging.Logger;
-import com.zutubi.pulse.core.plugins.CommandExtensionManager;
-import com.zutubi.pulse.core.PulseFileLoaderFactory;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * A convenient base class for common extension manager implementations.
@@ -91,18 +92,51 @@ public abstract class AbstractExtensionManager implements IExtensionChangeHandle
 
     protected void handleExtensionError(IExtension extension, Throwable t)
     {
+        handleExtensionError(extension, t.getMessage());
+    }
+
+    protected void handleExtensionError(IExtension extension, String message)
+    {
         try
         {
-            // now lets record it for the UI.
+            // Record the error for the UI.
             Plugin plugin = pluginManager.getPlugin(extension);
-            pluginManager.disablePlugin(plugin);
-            // add the error message to the plugin...
-            t.getMessage();
+            pluginManager.disablePlugin(plugin, message);
         }
         catch (Throwable e)
         {
             LOG.error(e);
         }
+    }
+
+    /**
+     * A helper that returns all <config> elements for configuration
+     * extensions that are contributed by the same bundle as the given
+     * extension.  This allows extension managers to correlate configuration
+     * classes with other extensions (e.g. the ScmConfiguration related to an
+     * Scm implementation).
+     *
+     * @param extension used to determine the contributing bundle
+     * @return all <config> elements for configuration extensions defined
+     *         within the same bundle as the given extension 
+     */
+    protected List<IConfigurationElement> getConfigElements(IExtension extension)
+    {
+        List<IConfigurationElement> configElements = new LinkedList<IConfigurationElement>();
+        IExtensionRegistry registry = pluginManager.getExtenstionRegistry();
+        IExtension[] bundleExtensions = registry.getExtensions(extension.getNamespaceIdentifier());
+        for (IExtension candidate : bundleExtensions)
+        {
+            if (candidate.getExtensionPointUniqueIdentifier().equals(PluginManager.CONFIG_EXTENSION_POINT))
+            {
+                for (IConfigurationElement configElement : candidate.getConfigurationElements())
+                {
+                    configElements.add(configElement);
+                }
+            }
+        }
+
+        return configElements;
     }
 
     public void setPluginManager(PluginManager pluginManager)

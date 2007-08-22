@@ -1,16 +1,19 @@
 package com.zutubi.pulse.core.scm;
 
+import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.plugins.AbstractExtensionManager;
+import com.zutubi.util.logging.Logger;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 
 /**
  * Extension manager for managing scm implementations
- * 
  */
 public class ScmExtensionManager extends AbstractExtensionManager
 {
+    private static final Logger LOG = Logger.getLogger(ScmExtensionManager.class);
+
     private DelegateScmClientFactory clientFactory;
 
     protected String getExtensionPointId()
@@ -21,46 +24,60 @@ public class ScmExtensionManager extends AbstractExtensionManager
     protected void handleConfigurationElement(IExtension extension, IExtensionTracker tracker, IConfigurationElement config)
     {
         // check configuration.
+        String name = config.getAttribute("name");
+        String configClassName = null;
+        Class configClazz = null;
 
-        try
+        for (IConfigurationElement configElement : getConfigElements(extension))
         {
-            String name = config.getAttribute("name");
-            String configClass = config.getAttribute("config-class");
-            String clientClass = config.getAttribute("factory-class");
-            String wcClass = config.getAttribute("working-copy-class");
-            System.out.println(String.format("Adding SCM: %s -> (%s, %s)", name, configClass, clientClass));
-
-            Class configClazz = loadClass(extension, configClass);
-            Class clientClazz = loadClass(extension, clientClass);
-            Class wcClazz = loadClass(extension, wcClass);
-            if(configClazz != null && clientClazz != null)
-            {
-                tracker.registerObject(extension, name, IExtensionTracker.REF_WEAK);
-            }
-
-            clientFactory.register(configClazz, clientClazz);
-
+            String candidateClassName = configElement.getAttribute("class");
+            Class candidateClazz = loadClass(extension, candidateClassName);
             try
             {
-                ScmConfiguration configInstance = (ScmConfiguration) configClazz.newInstance();
-                WorkingCopyFactory.registerType(configInstance.getType(), wcClazz);
+                ScmConfiguration configInstance = (ScmConfiguration) candidateClazz.newInstance();
+                if (configInstance.getType().equals(name))
+                {
+                    configClassName = candidateClassName;
+                    configClazz = candidateClazz;
+                    break;
+                }
             }
             catch (Exception e)
             {
-                e.printStackTrace();
+                LOG.warning(e);
             }
         }
-        catch (ScmException e)
+
+        if (configClassName == null)
         {
-            e.printStackTrace();
+            LOG.severe("No matching configuration class found for SCM name '" + name + "': ensure that the configuration class is registered and returns '" + name + "' from getType()");
+        }
+        else
+        {
+            String factoryClassName = config.getAttribute("factory-class");
+            String wcClassName = config.getAttribute("working-copy-class");
+            System.out.println(String.format("Adding SCM: %s -> (%s, %s, %s)", name, configClassName, factoryClassName, wcClassName == null ? "<none>" : wcClassName));
+
+            Class factoryClazz = loadClass(extension, factoryClassName);
+            try
+            {
+                clientFactory.register(configClazz, factoryClazz);
+                if (wcClassName != null)
+                {
+                    Class wcClazz = loadClass(extension, wcClassName);
+                    WorkingCopyFactory.registerType(name, wcClazz);
+                }
+            }
+            catch (Exception e)
+            {
+                LOG.severe(e);
+            }
         }
     }
 
     public void removeExtension(IExtension extension, Object[] objects)
     {
-        for (Object o : objects)
-        {
-        }
+        // Uninstall not currently supported
     }
 
     public void setScmClientFactory(DelegateScmClientFactory clientFactory)

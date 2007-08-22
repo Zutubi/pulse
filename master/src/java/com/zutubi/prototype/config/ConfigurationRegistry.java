@@ -1,28 +1,18 @@
 package com.zutubi.prototype.config;
 
 import com.zutubi.config.annotations.ConfigurationCheck;
-import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.prototype.type.ExtensionTypeProperty;
-import com.zutubi.prototype.type.MapType;
-import com.zutubi.prototype.type.TemplatedMapType;
-import com.zutubi.prototype.type.TypeException;
-import com.zutubi.prototype.type.TypeHandler;
-import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.type.*;
 import com.zutubi.pulse.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.config.ConfigurationCheckHandler;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
+import com.zutubi.pulse.plugins.AbstractExtensionManager;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.prototype.config.misc.LoginConfiguration;
 import com.zutubi.pulse.prototype.config.misc.TransientConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
-import com.zutubi.pulse.prototype.config.project.changeviewer.ChangeViewerConfiguration;
-import com.zutubi.pulse.prototype.config.project.changeviewer.CustomChangeViewerConfiguration;
-import com.zutubi.pulse.prototype.config.project.changeviewer.FisheyeConfiguration;
-import com.zutubi.pulse.prototype.config.project.changeviewer.P4WebChangeViewer;
-import com.zutubi.pulse.prototype.config.project.changeviewer.TracChangeViewer;
-import com.zutubi.pulse.prototype.config.project.changeviewer.ViewVCChangeViewer;
+import com.zutubi.pulse.prototype.config.project.changeviewer.*;
 import com.zutubi.pulse.prototype.config.project.commit.CommitMessageConfiguration;
 import com.zutubi.pulse.prototype.config.project.commit.CustomCommitMessageConfiguration;
 import com.zutubi.pulse.prototype.config.project.commit.JiraCommitMessageConfiguration;
@@ -32,19 +22,14 @@ import com.zutubi.pulse.prototype.config.project.triggers.ScmBuildTriggerConfigu
 import com.zutubi.pulse.prototype.config.project.triggers.TriggerConfiguration;
 import com.zutubi.pulse.prototype.config.project.types.*;
 import com.zutubi.pulse.prototype.config.setup.SetupConfiguration;
-import com.zutubi.pulse.prototype.config.user.AllBuildsConditionConfiguration;
-import com.zutubi.pulse.prototype.config.user.CustomConditionConfiguration;
-import com.zutubi.pulse.prototype.config.user.PersonalSubscriptionConfiguration;
-import com.zutubi.pulse.prototype.config.user.ProjectSubscriptionConfiguration;
-import com.zutubi.pulse.prototype.config.user.RepeatedUnsuccessfulConditionConfiguration;
-import com.zutubi.pulse.prototype.config.user.SelectedBuildsConditionConfiguration;
-import com.zutubi.pulse.prototype.config.user.SubscriptionConditionConfiguration;
-import com.zutubi.pulse.prototype.config.user.SubscriptionConfiguration;
-import com.zutubi.pulse.prototype.config.user.UserConfiguration;
+import com.zutubi.pulse.prototype.config.user.*;
 import com.zutubi.pulse.prototype.config.user.contacts.ContactConfiguration;
 import com.zutubi.pulse.prototype.config.user.contacts.EmailContactConfiguration;
 import com.zutubi.pulse.prototype.config.user.contacts.JabberContactConfiguration;
 import com.zutubi.util.logging.Logger;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtension;
+import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -53,7 +38,7 @@ import java.util.Map;
  * Registers the Pulse built-in configuration types.
  */
 @SuppressWarnings({"unchecked"})
-public class ConfigurationRegistry
+public class ConfigurationRegistry extends AbstractExtensionManager
 {
     private static final Logger LOG = Logger.getLogger(ConfigurationRegistry.class);
 
@@ -237,6 +222,55 @@ public class ConfigurationRegistry
         {
             LOG.severe(e);
         }
+
+        initialiseExtensions();
+    }
+
+    protected String getExtensionPointId()
+    {
+        return "com.zutubi.pulse.core.config";
+    }
+
+    protected void handleConfigurationElement(IExtension extension, IExtensionTracker tracker, IConfigurationElement config)
+    {
+        String className = config.getAttribute("class");
+        String extendedSymbolicName = config.getAttribute("extends");
+
+        Class clazz = loadClass(extension, className);
+        if(clazz != null)
+        {
+            try
+            {
+                if(extendedSymbolicName != null)
+                {
+                    CompositeType extendedType = typeRegistry.getType(extendedSymbolicName);
+                    if(extendedType == null)
+                    {
+                        String message = "Failed to register config class '" + clazz.getName() + "': extended symbolic name '" + extendedSymbolicName + "' is not recongnised";
+                        LOG.warning(message);
+                        handleExtensionError(extension, message);
+                    }
+                    else
+                    {
+                        registerExtension(extendedType.getClazz(), clazz);
+                    }
+                }
+                else
+                {
+                    registerConfigurationType(clazz);
+                }
+            }
+            catch (TypeException e)
+            {
+                LOG.warning(e);
+                handleExtensionError(extension, e);
+            }
+        }
+    }
+
+    public void removeExtension(IExtension iExtension, Object[] objects)
+    {
+        // Do nothing.
     }
 
     public void registerExtension(Class extendedType, Class extensionType) throws TypeException

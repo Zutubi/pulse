@@ -46,17 +46,17 @@
                     </documentation>
                 </annotation>
             </attribute>
-            <attribute name="config-class" type="string">
-                <annotation>
-                    <documentation>
-                        The configuration class for the SCM. Must be derived from ScmConfiguration.
-                    </documentation>
-                </annotation>
-            </attribute>
-            <attribute name="factory-class" type="string">
+            <attribute name="factory-class" type="string" use="required">
                 <annotation>
                     <documentation>
                         The client factory implementation class for the SCM. Must implement ScmClientFactory.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="working-copy-class" type="string">
+                <annotation>
+                    <documentation>
+                        The ScmWorkingCopy implementation class for the SCM, if any.
                     </documentation>
                 </annotation>
             </attribute>

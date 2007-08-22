@@ -6,19 +6,9 @@ import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.IOUtils;
-import com.zutubi.util.Mapping;
-import com.zutubi.util.Predicate;
-import com.zutubi.util.Sort;
+import com.zutubi.util.*;
 import com.zutubi.util.logging.Logger;
-import nu.xom.Attribute;
-import nu.xom.Builder;
-import nu.xom.Document;
-import nu.xom.Element;
-import nu.xom.Elements;
-import nu.xom.ParsingException;
-import nu.xom.Serializer;
+import nu.xom.*;
 import org.eclipse.core.internal.registry.osgi.OSGIUtils;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionRegistry;
@@ -39,19 +29,9 @@ import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.packageadmin.PackageAdmin;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -129,6 +109,8 @@ public class DefaultPluginManager implements PluginManager, EventListener
         {
             LOG.severe("Unable to start plugin manager: " + e.getMessage(), e);
         }
+
+        initialiseExtensions();
     }
 
     public void initialiseExtensions()
@@ -1065,6 +1047,12 @@ public class DefaultPluginManager implements PluginManager, EventListener
             case UPDATING:
                 throw new PluginException("Unable to disable plugin: already marked for update");
         }
+    }
+
+    public void disablePlugin(Plugin plugin, String errorMessage) throws PluginException
+    {
+        ((PluginImpl)plugin).setErrorMessage(errorMessage);
+        disablePlugin(plugin);
     }
 
     /**

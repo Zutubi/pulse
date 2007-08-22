@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
+    <extension point="com.zutubi.pulse.core.config">
+        <config class="com.zutubi.pulse.core.scm.svn.config.SvnConfiguration" extends="zutubi.scmConfig"/>
+    </extension>
     <extension point="com.zutubi.pulse.core.scms">
-        <scm name="svn" config-class="com.zutubi.pulse.core.scm.svn.config.SvnConfiguration" factory-class="com.zutubi.pulse.core.scm.svn.SvnClientFactory"/>
+        <scm name="svn" factory-class="com.zutubi.pulse.core.scm.svn.SvnClientFactory" working-copy-class="com.zutubi.pulse.core.scm.svn.SvnWorkingCopy"/>
     </extension>
 </plugin>
