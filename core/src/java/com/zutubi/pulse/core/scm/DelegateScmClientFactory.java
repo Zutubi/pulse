@@ -7,8 +7,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * An implementation of the ScmClientFactory that delegates the creation of the clients to the
+ * ScmClientFactory classes registered with the configuration.  This factory also handles the
+ * data cache for the various client instances. 
  *
- *
+ * 
  */
 public class DelegateScmClientFactory implements ScmClientFactory<Configuration>
 {
@@ -41,7 +44,7 @@ public class DelegateScmClientFactory implements ScmClientFactory<Configuration>
         return factories.get(config.getClass());
     }
 
-    public void register(Class configType, Class<ScmClientFactory<Configuration>> factoryType) throws ScmException
+    public void register(Class configType, Class<? extends ScmClientFactory> factoryType) throws ScmException
     {
         try
         {

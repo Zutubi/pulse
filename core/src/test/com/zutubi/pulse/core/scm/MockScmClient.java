@@ -17,9 +17,11 @@ import java.io.IOException;
  *
  *
  */
-public class MockScmClient implements ScmClient
+public class MockScmClient implements ScmClient, DataCacheAware
 {
     private boolean throwError = false;
+    protected Map<Object, Object> cache;
+    protected String cacheId = "mock";
 
     public MockScmClient()
     {
@@ -130,5 +132,15 @@ public class MockScmClient implements ScmClient
     public Revision getRevision(String revision) throws ScmException
     {
         throw new RuntimeException("Method not yet implemented.");
+    }
+
+    public String getCacheId()
+    {
+        return "mock";
+    }
+
+    public void setCache(Map<Object, Object> cache)
+    {
+        this.cache = cache;
     }
 }

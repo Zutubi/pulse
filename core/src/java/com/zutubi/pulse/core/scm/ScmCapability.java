@@ -1,21 +1,13 @@
 package com.zutubi.pulse.core.scm;
 
 /**
- * SCM capabilities are used to indicate what operations an SCM
- * implementation supports.
+ * SCM capabilities are used to indicate which of the optional operations an SCM
+ * implementation supports.  The presence or absence of these capabilities will enable / disable
+ * various features within pulse.
+ * 
  */
 public enum ScmCapability
 {
-/*
-    BROWSE,
-    CHECKOUT_FILE,
-    CHECKOUT_AT_REVISION,
-    LATEST_REVISION,
-    LIST_CHANGES,
-    POLL,
-    TAG,
-    UPDATE
-*/
     /**
      * This defines whether or not the contents of the scm repository can be browsed / navigated.
      * This involves being able obtain a listing of remote directories.
