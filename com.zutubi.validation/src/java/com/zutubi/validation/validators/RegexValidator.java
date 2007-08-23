@@ -36,8 +36,6 @@ public class RegexValidator extends FieldValidatorSupport
         }
 
         String value = (String) fieldValue;
-        value = value.trim();
-
         if (value.length() == 0)
         {
             return;
