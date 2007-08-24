@@ -712,7 +712,7 @@ public class PerforceClient extends CachingScmClient
         }
     }
 
-    public void addPropertiesToContext(ScmContext context) throws ScmException
+    private void addPropertiesToContext(ScmContext context) throws ScmException
     {
         for (Map.Entry<String, String> entry : core.getEnv().entrySet())
         {

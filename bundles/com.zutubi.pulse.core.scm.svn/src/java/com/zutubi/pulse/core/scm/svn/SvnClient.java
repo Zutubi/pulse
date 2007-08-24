@@ -702,8 +702,7 @@ public class SvnClient implements ScmClient
         }
     }
 
-    @SuppressWarnings({"unchecked"})
-    public void addPropertiesToContext(ScmContext context) throws ScmException
+    private void addPropertiesToContext(ScmContext context) throws ScmException
     {
         context.addProperty("svn.url", url);
     }
