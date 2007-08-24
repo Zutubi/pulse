@@ -3,7 +3,6 @@ package com.zutubi.pulse.web.project;
 import com.zutubi.pulse.charting.*;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
-import com.zutubi.pulse.web.ActionSupport;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -11,13 +10,10 @@ import java.util.TreeMap;
 /**
  * Action for viewing project reports (e.g. build time trend graph).
  */
-public class ViewReportsAction extends ActionSupport
+public class ViewReportsAction extends ProjectActionBase
 {
     private static final int WIDTH = 400;
     private static final int HEIGHT = 300;
-
-    private long id;
-    private Project project;
 
     private Map buildResultsChart;
     private Map testCountChart;
@@ -28,16 +24,6 @@ public class ViewReportsAction extends ActionSupport
 
     private BuildResultDao buildResultDao;
 
-    public long getId()
-    {
-        return id;
-    }
-
-    public void setId(long id)
-    {
-        this.id = id;
-    }
-
     public int getTimeframe()
     {
         return timeframe;
@@ -46,11 +32,6 @@ public class ViewReportsAction extends ActionSupport
     public void setTimeframe(int timeframe)
     {
         this.timeframe = timeframe;
-    }
-
-    public Project getProject()
-    {
-        return project;
     }
 
     public String doInput() throws Exception
@@ -70,12 +51,7 @@ public class ViewReportsAction extends ActionSupport
 
     public String execute() throws Exception
     {
-        project = projectManager.getProject(id);
-        if(project == null)
-        {
-            addActionError("Unknown project [" + id + "]");
-            return ERROR;
-        }
+        Project project = getRequiredProject();
         
         DBBuildResultsDataSource dataSource = new DBBuildResultsDataSource();
         dataSource.setProject(project);

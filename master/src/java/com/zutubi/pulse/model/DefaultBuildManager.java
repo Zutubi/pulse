@@ -192,6 +192,42 @@ public class DefaultBuildManager implements BuildManager
         return buildResultDao.findByProjectAndNumber(project, number);
     }
 
+    public BuildResult getByProjectAndVirtualId(Project project, String buildId)
+    {
+        if(buildId.equals("latest"))
+        {
+            return getLatestBuildResult(project);
+        }
+        else if(buildId.equals("success") || buildId.equals("successful") || buildId.equals("latestsuccess") || buildId.equals("latestsuccessful"))
+        {
+            return getLatestSuccessfulBuildResult(project);
+        }
+        else if(buildId.equals("broken") || buildId.equals("latestbroken"))
+        {
+            List<BuildResult> results = queryBuilds(project, new ResultState[]{ResultState.ERROR, ResultState.FAILURE}, -1, -1, 1, 1, true, true);
+            if(results.size() > 0)
+            {
+                return results.get(0);
+            }
+            else
+            {
+                return null;
+            }
+        }
+        else
+        {
+            try
+            {
+                long id = Long.parseLong(buildId);
+                return getByProjectAndNumber(project, id);
+            }
+            catch(NumberFormatException e)
+            {
+                return null;
+            }
+        }
+    }
+
     public BuildResult getByUserAndNumber(User user, long id)
     {
         return buildResultDao.findByUserAndNumber(user, id);

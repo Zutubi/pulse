@@ -408,4 +408,100 @@ public class StringUtilsTest extends TestCase
         String got = StringUtils.unsplit(Arrays.asList(pieces));
         assertEquals(expected, got);
     }
+
+    public void testGetNextTokenEmpty()
+    {
+        getNextTokenHelper("", false, null, null);
+    }
+
+    public void testGetNextTokenEmptySkipEmpty()
+    {
+        getNextTokenHelper("", true, null, null);
+    }
+
+    public void testGetNextTokenSeparator()
+    {
+        getNextTokenHelper("/", false, "", "");
+    }
+
+    public void testGetNextTokenSeparatorSkipEmpty()
+    {
+        getNextTokenHelper("/", true, null, null);
+    }
+
+    public void testGetNextTokenTwoSeparators()
+    {
+        getNextTokenHelper("//", false, "", "/");
+    }
+
+    public void testGetNextTokenTwoSeparatorsSkipEmpty()
+    {
+        getNextTokenHelper("//", true, null, null);
+    }
+
+    public void testGetNextTokenStartsWithSeparator()
+    {
+        getNextTokenHelper("/a", false, "", "a");
+    }
+
+    public void testGetNextTokenStartsWithSeparatorSkipEmpty()
+    {
+        getNextTokenHelper("/a", true, "a", "");
+    }
+
+    public void testGetNextTokenStartsWithTwoSeparators()
+    {
+        getNextTokenHelper("//a", false, "", "/a");
+    }
+
+    public void testGetNextTokenStartsWithTwoSeparatorsSkipEmpty()
+    {
+        getNextTokenHelper("//a", true, "a", "");
+    }
+
+    public void testGetNextTokenEndsWithSeparator()
+    {
+        getNextTokenHelper("a/", false, "a", "");
+    }
+
+    public void testGetNextTokenEndsWithSeparatorSkipEmpty()
+    {
+        getNextTokenHelper("a/", true, "a", "");
+    }
+
+    public void testGetNextTokenSingleSeparator()
+    {
+        getNextTokenHelper("a/b", false, "a", "b");
+    }
+
+    public void testGetNextTokenSingleSeparatorSkipEmpty()
+    {
+        getNextTokenHelper("a/b", true, "a", "b");
+    }
+
+    public void testGetNextTokenEmptyElement()
+    {
+        getNextTokenHelper("a//b", false, "a", "/b");
+    }
+
+    public void testGetNextTokenEmptyElementSkipEmpty()
+    {
+        getNextTokenHelper("a//b", true, "a", "/b");
+    }
+
+    private void getNextTokenHelper(String s, boolean skipEmpty, String expectedToken, String expectedRemainder)
+    {
+        String[] result = StringUtils.getNextToken(s, '/', skipEmpty);
+        if(expectedToken == null)
+        {
+            assertNull(result);
+        }
+        else
+        {
+            assertNotNull(result);
+            assertEquals(2, result.length);
+            assertEquals(expectedToken, result[0]);
+            assertEquals(expectedRemainder, result[1]);
+        }
+    }
 }

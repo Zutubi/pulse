@@ -34,7 +34,7 @@ public class DownloadProjectBuildFileAction extends ProjectActionBase
 
     public String execute() throws Exception
     {
-        ProjectConfiguration projectConfig = getProjectConfig();
+        ProjectConfiguration projectConfig = getRequiredProject().getConfig();
         try
         {
             TypeConfiguration typeConfiguration = projectConfig.getType();

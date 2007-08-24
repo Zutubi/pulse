@@ -1,16 +1,16 @@
 #helpTag("Build+Summary+Tab")
 #authorisationTags($principle)
-#buildTags($project $result)
+#buildTags($project $buildResult)
 <html>
 <head>
     <title>#wwtext("name=build") $result.number</title>
     <script type="text/javascript" src="$base/js/prototype.js"></script>
     <script type="text/javascript">
-        #updater("$base/ajax/viewBuildPanel.action?id=$result.id" "panel" $principle)
+        #updater("$base/ajax/viewBuildPanel.action?projectName=$u_projectName&buildVID=$buildResult.number" "panel" $principle)
     </script>
 </head>
 <body>
-    #buildTabs($result "summary")
+    #buildTabs($buildResult "summary")
 
     <div id="panel">
         #parse("ajax/view-build-panel.vm")
@@ -19,8 +19,8 @@
 #acl("domainObject=project" "hasPermission=4,1")
     #if($result.completed())
     <p>
-        #set($confirm = $action.getText("build.delete.confirm", [$result.number]))
-        <a href="#" onclick="confirmUrl('$confirm', 'deleteBuild.action?id=$result.id')"><img alt="delete" src="$base/images/delete.gif"/> #wwtext("name=build.delete")</a>
+        #set($confirm = $action.getText("build.delete.confirm", [$buildResult.number]))
+        <a href="#" onclick="confirmUrl('$confirm', 'projectName=$u_projectName&amp;buildVID=$buildResult.number')"><img alt="delete" src="$base/images/delete.gif"/> #wwtext("name=build.delete")</a>
     </p>
     #end
 #end

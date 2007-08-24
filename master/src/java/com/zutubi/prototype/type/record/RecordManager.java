@@ -1,6 +1,8 @@
 package com.zutubi.prototype.type.record;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -63,6 +65,37 @@ public class RecordManager implements HandleAllocator
     }
 
     /**
+     * Returns a list of all existing paths that match the given pattern.
+     *
+     * @param pattern pattern to match, may include wildcards
+     * @return the paths of all records whose path matches the pattern
+     */
+    public List<String> getAllPaths(String pattern)
+    {
+        return getAllPaths(baseRecord, PathUtils.getPathElements(pattern), 0, "", new LinkedList<String>());
+    }
+
+    private List<String> getAllPaths(Record record, String[] elements, int pathIndex, String resolvedPath, List<String> paths)
+    {
+        if(pathIndex == elements.length)
+        {
+            paths.add(resolvedPath);
+        }
+        else
+        {
+            for(String key: record.nestedKeySet())
+            {
+                if(PathUtils.elementMatches(elements[pathIndex], key))
+                {
+                    getAllPaths((Record) record.get(key), elements, pathIndex + 1, PathUtils.getPath(resolvedPath, key), paths);
+                }
+            }
+        }
+
+        return paths;
+    }
+
+    /**
      * Load the record identified by the path.
      *
      * @param path uniquely identifying the record to be loaded.
@@ -115,7 +148,7 @@ public class RecordManager implements HandleAllocator
             return;
         }
 
-        for(String key: record.keySet())
+        for(String key: record.nestedKeySet())
         {
             if(PathUtils.elementMatches(elements[pathIndex], key))
             {

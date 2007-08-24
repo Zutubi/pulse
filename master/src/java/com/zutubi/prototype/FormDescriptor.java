@@ -4,8 +4,8 @@ import com.zutubi.prototype.model.Field;
 import com.zutubi.prototype.model.Form;
 import com.zutubi.prototype.model.SubmitFieldDescriptor;
 import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.webwork.ConfigurationActionMapper;
 import com.zutubi.prototype.webwork.PrototypeUtils;
+import com.zutubi.pulse.webwork.mapping.PulseActionMapper;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 
@@ -37,7 +37,7 @@ public class FormDescriptor extends AbstractDescriptor
     /**
      * Defines url namespace in which the form submission should be made.
      */
-    private String namespace = ConfigurationActionMapper.ADMIN_NAMESPACE;
+    private String namespace = PulseActionMapper.ADMIN_NAMESPACE;
 
     public void setName(String name)
     {

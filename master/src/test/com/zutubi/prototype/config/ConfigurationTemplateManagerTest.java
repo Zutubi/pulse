@@ -614,12 +614,39 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         configurationTemplateManager.delete(path);
 
         // Are both record and instance gone?
-        assertNull(configurationTemplateManager.getRecord(path));
-        assertNull(configurationTemplateManager.getInstance(path));
+        assertNoSuchPath(path);
+        assertEmptyMap("sample");
+    }
 
-        // Are they removed from the parent record and instance?
-        assertEquals(0, configurationTemplateManager.getRecord("sample").size());
-        assertEquals(0, ((Map) configurationTemplateManager.getInstance("sample")).size());
+    public void testDeleteAllTrivial()
+    {
+        MockA a = new MockA("mock");
+        String path = configurationTemplateManager.insert("sample", a);
+
+        assertEquals(1, configurationTemplateManager.deleteAll(path));
+
+        // Are both record and instance gone?
+        assertNoSuchPath(path);
+        assertEmptyMap("sample");
+    }
+
+    public void testDeleteAllNoMatches()
+    {
+        assertEquals(0, configurationTemplateManager.deleteAll("sample/none"));
+    }
+
+    public void testDeleteAllMultipleMatches()
+    {
+        MockA a1 = new MockA("a1");
+        MockA a2 = new MockA("a2");
+        String path1 = configurationTemplateManager.insert("sample", a1);
+        String path2 = configurationTemplateManager.insert("sample", a2);
+
+        assertEquals(2, configurationTemplateManager.deleteAll("sample/*"));
+
+        assertNoSuchPath(path1);
+        assertNoSuchPath(path2);
+        assertEmptyMap("sample");
     }
 
     public void testPathExistsEmptyPath()
@@ -641,12 +668,26 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     {
         assertTrue(configurationTemplateManager.pathExists("sample"));
     }
-    
+
     public void testPathExistsExistantPath()
     {
         MockA a = new MockA("mock");
         String path = configurationTemplateManager.insert("sample", a);
         assertTrue(configurationTemplateManager.pathExists(path));
+    }
+
+    private void assertNoSuchPath(String path)
+    {
+        assertFalse(configurationTemplateManager.pathExists(path));
+        assertNull(configurationTemplateManager.getRecord(path));
+        assertNull(configurationTemplateManager.getInstance(path));
+    }
+
+    private void assertEmptyMap(String path)
+    {
+        // Are they removed from the parent record and instance?
+        assertEquals(0, configurationTemplateManager.getRecord(path).size());
+        assertEquals(0, ((Map) configurationTemplateManager.getInstance(path)).size());
     }
 
     private void assertMissingName(NamedConfiguration instance)

@@ -101,7 +101,7 @@ public class FormDescriptorFactory
         {
             CollectionType propertyType = (CollectionType) property.getType();
             Type targetType = propertyType.getCollectionType();
-            if(targetType instanceof EnumType || targetType instanceof ReferenceType)
+            if(targetType instanceof SimpleType)
             {
                 SelectFieldDescriptor fd = new SelectFieldDescriptor();
                 fd.setForm(form);

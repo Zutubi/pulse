@@ -27,7 +27,7 @@ public class HibernateTestCaseIndexDaoTest extends MasterPersistenceTestCase
 
     public void testLoadSave() throws Exception
     {
-        TestCaseIndex index = new TestCaseIndex(101, 22, 123, "some/test/case");
+        TestCaseIndex index = new TestCaseIndex(101, 123, "some/test/case");
         testCaseIndexDao.save(index);
         commitAndRefreshTransaction();
 
@@ -37,10 +37,10 @@ public class HibernateTestCaseIndexDaoTest extends MasterPersistenceTestCase
 
     public void testFindBySuite() throws Exception
     {
-        TestCaseIndex i1 = new TestCaseIndex(1, 11, 101, "suite1/case1");
-        TestCaseIndex i2 = new TestCaseIndex(1, 11, 101, "suite2/case1");
-        TestCaseIndex i3 = new TestCaseIndex(1, 11, 101, "suite1/case2");
-        TestCaseIndex i4 = new TestCaseIndex(2, 22, 201, "suite1/case1");
+        TestCaseIndex i1 = new TestCaseIndex(1, 101, "suite1/case1");
+        TestCaseIndex i2 = new TestCaseIndex(1, 101, "suite2/case1");
+        TestCaseIndex i3 = new TestCaseIndex(1, 101, "suite1/case2");
+        TestCaseIndex i4 = new TestCaseIndex(2, 201, "suite1/case1");
 
         testCaseIndexDao.save(i1);
         testCaseIndexDao.save(i2);
@@ -57,10 +57,10 @@ public class HibernateTestCaseIndexDaoTest extends MasterPersistenceTestCase
 
     public void testFindByStage() throws Exception
     {
-        TestCaseIndex i1 = new TestCaseIndex(1, 11, 101, "suite1/case1");
-        TestCaseIndex i2 = new TestCaseIndex(1, 11, 101, "suite2/case1");
-        TestCaseIndex i3 = new TestCaseIndex(1, 11, 101, "suite1/case2");
-        TestCaseIndex i4 = new TestCaseIndex(2, 22, 201, "suite1/case1");
+        TestCaseIndex i1 = new TestCaseIndex(1, 101, "suite1/case1");
+        TestCaseIndex i2 = new TestCaseIndex(1, 101, "suite2/case1");
+        TestCaseIndex i3 = new TestCaseIndex(1, 101, "suite1/case2");
+        TestCaseIndex i4 = new TestCaseIndex(2, 201, "suite1/case1");
 
         testCaseIndexDao.save(i1);
         testCaseIndexDao.save(i2);

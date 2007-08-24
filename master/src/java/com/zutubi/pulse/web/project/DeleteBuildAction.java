@@ -1,42 +1,14 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.ProjectManager;
-import com.zutubi.pulse.web.ActionSupport;
 
 /**
  */
-public class DeleteBuildAction extends ActionSupport
+public class DeleteBuildAction extends BuildActionBase
 {
-    private long id;
-    private BuildManager buildManager;
-    private BuildResult result;
-
-    public long getId()
-    {
-        return id;
-    }
-
-    public void setId(long id)
-    {
-        this.id = id;
-    }
-
-    public BuildResult getResult()
-    {
-        return result;
-    }
-
     public String execute()
     {
-        result = buildManager.getBuildResult(id);
-        if (result == null)
-        {
-            addActionError("Unknown build [" + id + "]");
-            return ERROR;
-        }
-
+        BuildResult result = getRequiredBuildResult();
         if(!result.completed())
         {
             addActionError("Build cannot be deleted as it is not complete.");
@@ -46,10 +18,5 @@ public class DeleteBuildAction extends ActionSupport
         projectManager.checkWrite(result.getProject());
         buildManager.delete(result);
         return SUCCESS;
-    }
-
-    public void setBuildManager(BuildManager buildManager)
-    {
-        this.buildManager = buildManager;
     }
 }

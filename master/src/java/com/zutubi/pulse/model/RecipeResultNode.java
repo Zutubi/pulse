@@ -1,6 +1,7 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.*;
+import com.zutubi.util.Predicate;
 import com.zutubi.util.UnaryFunction;
 
 import java.io.File;
@@ -197,59 +198,22 @@ public class RecipeResultNode extends Entity
         }
     }
 
-    public RecipeResultNode findNode(long id)
+    public RecipeResultNode findNode(Predicate<RecipeResultNode> p)
     {
-        if(id == getId())
+        if(p.satisfied(this))
         {
             return this;
         }
 
         for(RecipeResultNode child: children)
         {
-            RecipeResultNode found = child.findNode(id);
+            RecipeResultNode found = child.findNode(p);
             if(found != null)
             {
                 return found;
             }
         }
 
-        return null;
-    }
-
-    public RecipeResultNode findNodeByHandle(long handle)
-    {
-        if(handle == getStageHandle())
-        {
-            return this;
-        }
-
-        for(RecipeResultNode child: children)
-        {
-            RecipeResultNode found = child.findNodeByHandle(handle);
-            if(found != null)
-            {
-                return found;
-            }
-        }
-
-        return null;
-    }
-
-    public RecipeResultNode findNode(String stageName)
-    {
-        if(this.stageName != null && stageName.equals(this.stageName))
-        {
-            return this;
-        }
-
-        for(RecipeResultNode child: children)
-        {
-            RecipeResultNode found = child.findNode(stageName);
-            if(found != null)
-            {
-                return found;
-            }
-        }
         return null;
     }
 

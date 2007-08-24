@@ -1,19 +1,19 @@
 package com.zutubi.pulse.prototype.config.project.types;
 
+import com.opensymphony.util.TextUtils;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Transient;
 import com.zutubi.util.StringUtils;
-import com.opensymphony.util.TextUtils;
 
-import java.util.List;
 import java.util.Collections;
+import java.util.List;
 
 /**
  *
  *
  */
-@Form(fieldOrder = {"name", "base", "mimeType", "includes", "excludes"})
+@Form(fieldOrder = {"name", "base", "mimeType", "includes", "excludes", "postprocessors"})
 @SymbolicName("zutubi.directoryArtifactConfig")
 public class DirectoryArtifactConfiguration extends ArtifactConfiguration
 {

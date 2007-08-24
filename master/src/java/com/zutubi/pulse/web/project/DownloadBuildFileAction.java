@@ -11,17 +11,11 @@ import java.io.InputStream;
 /**
  * An action to download the pulse file used in a specific build.
  */
-public class DownloadBuildFileAction extends ProjectActionSupport
+public class DownloadBuildFileAction extends BuildActionBase
 {
-    private long id;
     private InputStream inputStream;
     private long contentLength;
     private MasterConfigurationManager configurationManager;
-
-    public void setId(long id)
-    {
-        this.id = id;
-    }
 
     public InputStream getInputStream()
     {
@@ -40,14 +34,8 @@ public class DownloadBuildFileAction extends ProjectActionSupport
 
     public String execute() throws Exception
     {
-        BuildResult result = getBuildManager().getBuildResult(id);
-        if(result == null)
-        {
-            addActionError("Unknown build [" + id + "]");
-            return ERROR;
-        }
-
-        checkPermissions(result);        
+        BuildResult result = getRequiredBuildResult();
+        checkPermissions(result);
 
         try
         {

@@ -2,6 +2,7 @@ package com.zutubi.pulse.vfs.pulse;
 
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.RecipeResultNode;
+import com.zutubi.util.StringUtils;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
@@ -108,8 +109,8 @@ public class ArtifactsContextFileObject extends AbstractPulseFileObject implemen
         return true;
     }
 
-    public String getUrlPath()
+    public String getUrlPath() throws FileSystemException
     {
-        return "/viewBuildArtifacts.action?id=" + getBuildResultId();
+        return "/browse/projects/" + StringUtils.uriComponentEncode(getBuildResult().getProject().getName()) + "/" + getBuildResult().getNumber() + "/artifacts";
     }
 }

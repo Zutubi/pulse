@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.model;
 
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.util.StringUtils;
 
 import java.net.URLConnection;
 import java.util.LinkedList;
@@ -41,6 +42,23 @@ public class StoredFileArtifact extends Entity
     {
         // Normalise to the same path separator used in URLs
         this.path = FileSystemUtils.normaliseSeparators(path);
+    }
+
+    public String getPathUrl()
+    {
+        String[] pieces = path.split("/");
+        StringBuilder result = new StringBuilder(path.length() * 2);
+        for(String piece: pieces)
+        {
+            if(result.length() > 0)
+            {
+                result.append('/');
+            }
+
+            result.append(StringUtils.uriComponentEncode(piece));
+        }
+
+        return result.toString();
     }
 
     public void addFeature(Feature feature)

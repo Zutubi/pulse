@@ -20,7 +20,7 @@
         #else
             #contentCell("build.id.unknown")
         #end
-            #dynamicLinkCell($request.project.name "currentBuild.action?id=$request.project.id")
+            #dynamicLinkCell($request.project.name "$urls.projectHome($request.project)")
         #if($request.revision.fixed)
             #dynamicCell($request.revision.revision)
         #else
@@ -58,8 +58,8 @@
 
         <tr>
             #ownerCell($buildResult "content")
-            <td class="content"><a href="currentBuild.action?id=$project.id">$!webwork.htmlEncode($project.name)</a></td>
-            #dynamicRightLinkCell($buildResult.number "viewBuild.action?id=$buildResult.id")
+            <td class="content"><a href="$urls.projectHome($project)">$!webwork.htmlEncode($project.name)</a></td>
+            #dynamicRightLinkCell($buildResult.number "$urls.build($buildResult)")
             #statusCell($buildResult true)
             #dateClassCell($buildResult)
             #elapsedCell($buildResult)
@@ -103,7 +103,7 @@
         <tr>
             #ownerCell($build "content")
             #rightCell($build.number)
-            #dynamicLinkCell($project.name "currentBuild.action?id=$project.id")
+            #dynamicLinkCell($project.name "$urls.projectHome($project)")
             #dynamicCell($dispatchRequest.request.recipeNameSafe)
             #dynamicCell($dispatchRequest.hostRequirements.summary)
             #contentCell($dispatchRequest.prettyQueueTime)

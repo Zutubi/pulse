@@ -2,6 +2,7 @@ package com.zutubi.pulse.bootstrap.freemarker;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.webwork.mapping.Urls;
 import com.zutubi.util.logging.Logger;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;
@@ -44,7 +45,9 @@ public class FreemarkerConfigurationFactoryBean implements FactoryBean
         configuration.setTemplateLoader(getMultiLoader(configurationManager));
         configuration.setObjectWrapper(new DefaultObjectWrapper());
         configuration.addAutoInclude("macro.ftl");
-        configuration.setSharedVariable("base", configurationManager.getSystemConfig().getContextPathNormalised());
+        String base = configurationManager.getSystemConfig().getContextPathNormalised();
+        configuration.setSharedVariable("base", base);
+        configuration.setSharedVariable("urls", new Urls(base));
         return configuration;
     }
 

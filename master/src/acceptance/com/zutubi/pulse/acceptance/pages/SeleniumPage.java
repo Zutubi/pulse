@@ -8,7 +8,7 @@ import junit.framework.Assert;
  * Base for all pages, with basic functions for identifying page presence and
  * content.
  */
-public class SeleniumPage
+public abstract class SeleniumPage
 {
     protected Selenium selenium;
     /**
@@ -34,6 +34,12 @@ public class SeleniumPage
         this.id = id;
     }
 
+    public void goTo()
+    {
+        selenium.open(getUrl());
+        waitFor();
+    }
+
     public void waitFor()
     {
         SeleniumUtils.waitForElement(selenium, id);
@@ -48,4 +54,6 @@ public class SeleniumPage
             Assert.assertEquals(title, selenium.getTitle());
         }
     }
+
+    public abstract String getUrl();
 }

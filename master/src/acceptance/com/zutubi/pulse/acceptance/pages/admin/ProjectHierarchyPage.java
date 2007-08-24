@@ -37,6 +37,11 @@ public class ProjectHierarchyPage extends SeleniumPage
         Assert.assertTrue(CollectionUtils.contains(links, LINK_CONFIGURE));
     }
 
+    public String getUrl()
+    {
+        return "/admin/projects/";
+    }
+
     public void clickAdd()
     {
         selenium.click(LINK_ADD);

@@ -4,33 +4,21 @@ import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.ChangelistComparator;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.Project;
 
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 /**
- *
- *
  */
-public class ViewChangesAction extends ProjectActionSupport
+public class ViewChangesAction extends BuildActionBase
 {
-    private long id = 0;
     private long sinceBuild = 0;
-    private long toBuild;
-    private Project project;
     private BuildResult previous;
     private BuildResult previousSuccessful;
     private BuildResult previousUnsuccessful;
     private BuildResult sinceResult;
-    private BuildResult result;
     private List<Changelist> changelists;
-
-    public void setId(long id)
-    {
-        this.id = id;
-    }
 
     public long getSinceBuild()
     {
@@ -42,24 +30,9 @@ public class ViewChangesAction extends ProjectActionSupport
         this.sinceBuild = sinceBuild;
     }
 
-    public long getToBuild()
-    {
-        return toBuild;
-    }
-
-    public void setToBuild(long toBuild)
-    {
-        this.toBuild = toBuild;
-    }
-
     public BuildResult getSinceResult()
     {
         return sinceResult;
-    }
-
-    public BuildResult getResult()
-    {
-        return result;
     }
 
     public BuildResult getPrevious()
@@ -82,65 +55,10 @@ public class ViewChangesAction extends ProjectActionSupport
         return changelists;
     }
 
-    public void validate()
-    {
-        if(id == 0)
-        {
-            project = getProject();
-            if(project == null)
-            {
-                addActionError("Unknown project [" + projectId + "]");
-                return;
-            }
-
-            result = getBuildManager().getByProjectAndNumber(project, toBuild);
-            if(result == null)
-            {
-                addActionError("No such build [" + toBuild + "]");
-                return;
-            }
-        }
-        else
-        {
-            result = getBuildManager().getBuildResult(id);
-            if(result == null)
-            {
-                addActionError("Unknown build [" + id + "]");
-                return;
-            }
-
-            toBuild = result.getNumber();
-            project = result.getProject();
-            projectId = project.getId();
-        }
-
-        previous = getPrevious(ResultState.getCompletedStates());
-        if(sinceBuild == 0)
-        {
-            sinceResult = previous;
-            if(previous != null)
-            {
-                sinceBuild = sinceResult.getNumber();
-            }
-        }
-        else
-        {
-            sinceResult = getBuildManager().getByProjectAndNumber(project, sinceBuild);
-            if(sinceResult == null)
-            {
-                addActionError("No such build [" + sinceBuild + "]");
-            }
-
-            if(sinceBuild >= toBuild)
-            {
-                addActionError("Invalid build range");
-            }
-        }
-    }
-
     private BuildResult getPrevious(ResultState[] states)
     {
-        if(toBuild == 1)
+        BuildResult result = getRequiredBuildResult();
+        if(result.getNumber() == 1)
         {
             return null;
         }
@@ -148,7 +66,7 @@ public class ViewChangesAction extends ProjectActionSupport
         int offset = 0;
         while(true)
         {
-            List<BuildResult> previousResults = getBuildManager().queryBuilds(project, states, -1, toBuild - 1, offset, 1, true, false);
+            List<BuildResult> previousResults = buildManager.queryBuilds(result.getProject(), states, -1, result.getNumber() - 1, offset, 1, true, false);
             if(previousResults.size() > 0)
             {
                 BuildResult buildResult = previousResults.get(0);
@@ -168,20 +86,54 @@ public class ViewChangesAction extends ProjectActionSupport
 
     public String execute()
     {
+        BuildResult result = getRequiredBuildResult();
+
+        // FIXME i don't think this will work so well: the build result will
+        // be looked up from project not user, so we cannot check it like this
+        if(result.isPersonal())
+        {
+            return "personal";
+        }
+
         checkPermissions(result);
+
+        previous = getPrevious(ResultState.getCompletedStates());
+        if(sinceBuild == 0)
+        {
+            sinceResult = previous;
+            if(previous != null)
+            {
+                sinceBuild = sinceResult.getNumber();
+            }
+        }
+        else
+        {
+            if(sinceBuild >= result.getNumber())
+            {
+                addActionError("Invalid build range");
+                return ERROR;
+            }
+
+            sinceResult = buildManager.getByProjectAndNumber(result.getProject(), sinceBuild);
+            if(sinceResult == null)
+            {
+                addActionError("No such build [" + sinceBuild + "]");
+                return ERROR;
+            }
+        }
 
         changelists = new LinkedList<Changelist>();
 
         // Get changes for all results after since, up to and including to.
         if (sinceBuild != 0)
         {
-            List<BuildResult> resultRange = getBuildManager().queryBuilds(project, ResultState.getCompletedStates(), sinceBuild + 1, toBuild - 1, 0, -1, true, false);
+            List<BuildResult> resultRange = buildManager.queryBuilds(result.getProject(), ResultState.getCompletedStates(), sinceBuild + 1, result.getNumber() - 1, 0, -1, true, false);
             for(BuildResult r: resultRange)
             {
-                changelists.addAll(getBuildManager().getChangesForBuild(r));
+                changelists.addAll(buildManager.getChangesForBuild(r));
             }
         }
-        changelists.addAll(getBuildManager().getChangesForBuild(result));
+        changelists.addAll(buildManager.getChangesForBuild(result));
         Collections.sort(changelists, new ChangelistComparator());
         
         previousSuccessful = getPrevious(new ResultState[] { ResultState.SUCCESS });

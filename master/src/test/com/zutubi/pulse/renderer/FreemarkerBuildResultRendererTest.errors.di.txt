@@ -1,5 +1,5 @@
-test project (http://another.url/currentBuild.action?id=0)
-Build 101 (http://another.url/viewBuild.action?id=11)
+test project (/browse/projects/test%20project/)
+Build 101 (/browse/projects/test%20project/builds/101/)
 
 Completed with status: error
 

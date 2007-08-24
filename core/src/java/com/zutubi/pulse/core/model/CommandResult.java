@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.model;
 
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
@@ -105,6 +106,23 @@ public class CommandResult extends Result
     public boolean hasArtifacts()
     {
         return artifacts.size() > 0;
+    }
+
+    public StoredFileArtifact getFileArtifact(String path)
+    {
+        String[] tokenised = StringUtils.getNextToken(path, '/', true);
+        if(tokenised == null || tokenised[1].length() == 0)
+        {
+            return null;
+        }
+
+        StoredArtifact artifact = getArtifact(tokenised[0]);
+        if(artifact == null)
+        {
+            return null;
+        }
+
+        return artifact.findFileBase(tokenised[1]);
     }
 
     public void calculateFeatureCounts()

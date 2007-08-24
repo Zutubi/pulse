@@ -36,14 +36,14 @@
             <tr>
                 <td class="content">
                     <img alt="health: $health" src="$base/images/health/${health}.gif"/>
-                    <a href="currentBuild.action?id=$project.id" id="$!webwork.htmlEncode($project.name)">$!webwork.htmlEncode($project.name)</a>
+                    <a href="$urls.projectHome($project)" id="#uce($project.name)">$!webwork.htmlEncode($project.name)</a>
                 </td>
-                #actionCellTitle("home.tab" "currentBuild.action?id=$project.id" "house.gif")
-                #actionCellTitle("reporting.tab" "projectReports.action?id=$project.id" "chart_bar.gif")
-                #actionCellTitle("history.tab" "history.action?id=$project.id" "time.gif")
-                #actionCellTitle("configuration.tab" "$base/admin/projects/#uce($project.name)/" "pencil.gif")
+                #actionCellTitle("home-#uce($project.name)" "home.tab" "$urls.projectHome($project)" "house.gif")
+                #actionCellTitle("reports-#uce($project.name)" "reporting.tab" "$urls.projectReports($project)" "chart_bar.gif")
+                #actionCellTitle("history-#uce($project.name)" "history.tab" "$urls.projectHistory($project)" "time.gif")
+                #actionCellTitle("config-#uce($project.name)" "configuration.tab" "$base/admin/projects/#uce($project.name)/" "pencil.gif")
             #if($action.canWrite($project))
-                #actionCellTitle("buildspec.trigger" "triggerBuild.action?projectId=$project.id" "lightning.gif")
+                #actionCellTitle("trigger-#uce($project.name)" "buildspec.trigger" "/triggerBuild.action?projectName=#uce($project.name)" "lightning.gif")
             #else
                 <td class="content">&nbsp;</td>
             #end

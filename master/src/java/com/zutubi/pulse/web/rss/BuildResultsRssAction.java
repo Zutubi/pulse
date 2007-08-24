@@ -19,6 +19,7 @@ import com.zutubi.pulse.search.BuildResultExpressions;
 import com.zutubi.pulse.search.Queries;
 import com.zutubi.pulse.search.SearchQuery;
 import com.zutubi.pulse.web.project.ProjectActionSupport;
+import com.zutubi.pulse.webwork.mapping.Urls;
 import com.zutubi.pulse.xwork.results.JITFeed;
 import org.hibernate.criterion.Expression;
 import org.hibernate.criterion.Order;
@@ -31,6 +32,7 @@ import java.util.*;
  */
 public class BuildResultsRssAction extends ProjectActionSupport
 {
+    private Urls urls;
     private CacheManager cacheManager;
 
     private BuildResultRenderer buildResultRenderer;
@@ -61,6 +63,8 @@ public class BuildResultsRssAction extends ProjectActionSupport
 
     public String execute()
     {
+        urls = new Urls(getBaseUrl());
+
         // check that rss is enabled.
         if (!configurationProvider.get(GeneralAdminConfiguration.class).isRssEnabled())
         {
@@ -205,7 +209,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
 
         public String getEntryLink(BuildResult result)
         {
-            return getBaseUrl() + "/viewBuild.action?id=" + result.getId();
+            return urls.build(result);
         }
 
         public String getUID()
@@ -271,7 +275,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
 
         public String getEntryLink(BuildResult result)
         {
-            return getBaseUrl() + "/viewBuild.action?id=" + result.getId();
+            return urls.build(result);
         }
 
         public String getUID()
@@ -313,7 +317,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
 
         public String getLink()
         {
-            return getBaseUrl() + "/currentBuild.action?id=" + project.getId();
+            return urls.projectHome(project);
         }
 
         public String getEntryTitle(BuildResult result)
@@ -323,7 +327,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
 
         public String getEntryLink(BuildResult result)
         {
-            return getBaseUrl() + "/viewBuild.action?id=" + result.getId();
+            return urls.build(result);
         }
 
         public String getUID()
@@ -383,7 +387,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
 
         public String getEntryLink(BuildResult result)
         {
-            return getBaseUrl() + "/viewBuild.action?id=" + result.getId();
+            return urls.build(result);
         }
 
         public String getUID()

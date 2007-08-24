@@ -43,11 +43,11 @@
         </tr>
 #foreach($result in $buildResults)
         <tr>
-            <td class="content"><a href="currentBuild.action?id=$result.project.id">$!webwork.htmlEncode($result.project.name)</a></td>
+            <td class="content"><a href="$urls.projectHome($result.project)">$!webwork.htmlEncode($result.project.name)</a></td>
 
             #set($result = $latestBuilds.get($index))
 
-            #dynamicRightLinkCell($result.number "viewBuild.action?id=$result.id")
+            #dynamicRightLinkCell($result.number "$urls.build($result)")
             #statusCell($result true)
         </tr>
 #end
@@ -67,7 +67,7 @@
     $action.updateUrls($file)
         <tr>
             #dynamicCell($file.filename)
-            #dynamicRightLinkCell($file.revision.revisionString $action.getFileViewUrl())
+            #dynamicRightLinkCell($file.revisionString $action.getFileViewUrl())
             #dynamicCell($file.action.getPrettyString())
 #if($action.haveChangeViewer())
             <td class="content">
@@ -85,6 +85,4 @@
         </tr>
 #end
     </table>
-
-
 </html>

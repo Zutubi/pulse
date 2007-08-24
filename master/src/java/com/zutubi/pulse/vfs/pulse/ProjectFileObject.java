@@ -2,6 +2,7 @@ package com.zutubi.pulse.vfs.pulse;
 
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
+import com.zutubi.util.StringUtils;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
@@ -91,6 +92,6 @@ public class ProjectFileObject extends AbstractPulseFileObject implements Projec
 
     public String getUrlPath()
     {
-        return "/currentBuild.action?id=" + getProjectId();
+        return "/browse/projects/" + StringUtils.uriComponentEncode(getProject().getName()) + "/";
     }
 }

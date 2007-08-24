@@ -1,1 +1,1 @@
-${project.name}: ${result.specName.name}: ${status}
+${project.name}: ${status}

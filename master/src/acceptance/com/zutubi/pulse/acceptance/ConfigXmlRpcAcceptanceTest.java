@@ -4,8 +4,8 @@ import com.zutubi.util.Sort;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Vector;
 import java.util.Hashtable;
+import java.util.Vector;
 
 /**
  * Tests for the remote API functions dealing with configuration.  Other
@@ -459,6 +459,32 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertEquals(true, call("deleteConfig", parentPath));
         assertEquals(false, call("configPathExists", parentPath));
         assertEquals(false, call("configPathExists", childPath));
+    }
+
+    public void testDeleteAll() throws Exception
+    {
+        String path = insertSimpleProject(randomName());
+        Hashtable<String, Object> project = call("getConfig", path);
+        Hashtable<String, Object> properties = (Hashtable<String, Object>) project.get("properties");
+        properties.put("p1", createProperty("p1", "v1"));
+        properties.put("p2", createProperty("p2", "v2"));
+        call("saveConfig", path, project, true);
+
+        Hashtable<String, Object> loadedProperties = call("getConfig", path + "/properties");
+        assertEquals(2, loadedProperties.size());
+
+        assertEquals(2, call("deleteAllConfigs", path + "/properties/*"));
+        loadedProperties = call("getConfig", path + "/properties");
+        assertEquals(0, loadedProperties.size());
+    }
+
+    private Hashtable<String, Object> createProperty(String name, String value)
+    {
+        Hashtable<String, Object> property = new Hashtable<String, Object>();
+        property.put(SYMBOLIC_NAME_KEY, "zutubi.resourceProperty");
+        property.put("name", name);
+        property.put("value", value);
+        return property;
     }
 
     private void assertSortedEquals(Collection<String> got, String... expected)

@@ -1,38 +1,20 @@
 package com.zutubi.pulse.renderer;
 
-import com.mockobjects.dynamic.Mock;
-import com.zutubi.pulse.committransformers.CommitMessageTransformerManager;
 import com.zutubi.pulse.committransformers.LinkCommitMessageTransformer;
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.CommitMessageTransformer;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.RecipeResultNode;
-import com.zutubi.pulse.model.TriggerBuildReason;
-import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.SystemUtils;
+import com.zutubi.pulse.webwork.mapping.Urls;
 import com.zutubi.util.Constants;
 import com.zutubi.util.IOUtils;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.StringWriter;
-import java.io.Writer;
+import java.io.*;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  */
@@ -52,6 +34,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         freemarkerConfiguration.setDirectoryForTemplateLoading(pulseRoot);
         freemarkerConfiguration.setObjectWrapper(new DefaultObjectWrapper());
         freemarkerConfiguration.addAutoInclude("macro.ftl");
+        freemarkerConfiguration.setSharedVariable("urls", new Urls(""));
         renderer.setFreemarkerConfiguration(freemarkerConfiguration);
 
         LinkCommitMessageTransformer tx = new LinkCommitMessageTransformer("Jira");
@@ -61,9 +44,10 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         List<CommitMessageTransformer> txs = new ArrayList<CommitMessageTransformer>(1);
         txs.add(tx);
 
-        Mock commitMessageTransformerManager = new Mock(CommitMessageTransformerManager.class);
-        renderer.setCommitMessageTransformerManager((CommitMessageTransformerManager) commitMessageTransformerManager.proxy());
-        commitMessageTransformerManager.matchAndReturn("getCommitMessageTransformers", txs);
+        // FIXME
+//        Mock commitMessageTransformerManager = new Mock(CommitMessageTransformerManager.class);
+//        renderer.setCommitMessageTransformerManager((CommitMessageTransformerManager) commitMessageTransformerManager.proxy());
+//        commitMessageTransformerManager.matchAndReturn("getCommitMessageTransformers", txs);
     }
 
     protected void tearDown() throws Exception
@@ -201,7 +185,8 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
 
     public void testProjectOverviewFailurePreviousSuccess() throws Exception
     {
-        BuildResult previous = new BuildResult(new TriggerBuildReason("scm trigger"), new Project(), 90, false);
+        Project project = createProject();
+        BuildResult previous = new BuildResult(new TriggerBuildReason("scm trigger"), project, 90, false);
         initialiseResult(previous);
         previous.getStamps().setStartTime(System.currentTimeMillis() - Constants.DAY * 3);
         BuildResult result = createSuccessfulBuild();
@@ -230,10 +215,12 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         RecipeResult secondResult = secondNode.getResult();
 
         CommandResult command = new CommandResult("test command");
+        command.setId(200);
         command.error("bad stuff happened, so wrap this: 000000000000000000000000000000000000000000000000000000000000000000000");
         secondResult.add(command);
 
         command = new CommandResult("artifact command");
+        command.setId(101);
         command.failure("artifacts let me down");
 
         StoredFileArtifact artifact = new StoredFileArtifact("first-artifact/testpath");
@@ -268,6 +255,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         RecipeResult secondResult = secondNode.getResult();
 
         CommandResult command = new CommandResult("failing tests");
+        command.setId(100);
         command.failure("tests let me down");
 
         TestSuiteResult tests = new TestSuiteResult();
@@ -310,6 +298,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         RecipeResult secondResult = secondNode.getResult();
 
         CommandResult command = new CommandResult("failing tests");
+        command.setId(23);
         command.failure("i failed");
         secondResult.add(command);
         createAndVerify("singelstagefailure", type, "http://host.url", result);
@@ -318,10 +307,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
     private void personalBuildHelper(String type) throws Exception
     {
         User user = new User("jason", "Jason Sankey");
-        Project project = new Project();
-        ProjectConfiguration config = new ProjectConfiguration();
-        config.setName("test project");
-        project.setConfig(config);
+        Project project = createProject();
         BuildResult result = new BuildResult(user, project, 12);
         initialiseResult(result);
 
@@ -337,6 +323,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         RecipeResult secondResult = secondNode.getResult();
 
         CommandResult command = new CommandResult("failing tests");
+        command.setId(22);
         command.failure("tests let me down");
 
         TestSuiteResult tests = new TestSuiteResult();
@@ -363,6 +350,15 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         TestResultSummary summary = tests.getSummary();
         secondResult.setTestSummary(summary);
         createAndVerify("personal", type, "http://host.url", result);
+    }
+
+    private Project createProject()
+    {
+        Project project = new Project();
+        ProjectConfiguration config = new ProjectConfiguration();
+        config.setName("test project");
+        project.setConfig(config);
+        return project;
     }
 
     private BuildResult createBuildWithChanges(List<Changelist> changes)
@@ -393,10 +389,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
 
     private BuildResult createSuccessfulBuild()
     {
-        Project project = new Project();
-        ProjectConfiguration config = new ProjectConfiguration();
-        config.setName("test project");
-        project.setConfig(config);
+        Project project = createProject();
         BuildResult result = new BuildResult(new TriggerBuildReason("scm trigger"), project, 101, false);
         initialiseResult(result);
         return result;

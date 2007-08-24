@@ -23,7 +23,6 @@ import java.util.List;
 public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> implements BuildResultDao
 {
     private static final Logger LOG = Logger.getLogger(HibernateEntityDao.class);
-    private static final String SPEC_QUERY = "select distinct model.specName from BuildResult model";
 
     @Override
     public Class persistentClass()
@@ -42,7 +41,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery("from BuildResult model where model.project = :project and model.specName = :spec and model.user = null and model.stamps.endTime > :since order by model.number desc");
+                Query queryObject = session.createQuery("from BuildResult model where model.project = :project and model.user = null and model.stamps.endTime > :since order by model.number desc");
                 queryObject.setEntity("project", project);
                 queryObject.setLong("since", since.getTime());
 

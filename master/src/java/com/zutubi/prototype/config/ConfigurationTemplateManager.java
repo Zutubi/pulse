@@ -750,11 +750,12 @@ public class ConfigurationTemplateManager
      * with deep set to true.  All the same restrictions apply.
      *
      * @param instance the instance to save (must already be persistent)
+     * @return the path where the saved instance is stored
      * @throws IllegalArgumentException if the instance is not persistent, is
      *                                  of an unknown type or does not meet the requirements of
      *                                  saveRecord
      */
-    public void save(Configuration instance)
+    public String save(Configuration instance)
     {
         if (instance.getConfigurationPath() == null)
         {
@@ -777,7 +778,7 @@ public class ConfigurationTemplateManager
             throw new ConfigRuntimeException(e);
         }
 
-        saveRecord(instance.getConfigurationPath(), record, true);
+        return saveRecord(instance.getConfigurationPath(), record, true);
     }
 
     /**
@@ -1139,6 +1140,16 @@ public class ConfigurationTemplateManager
 
         getCleanupTasks(path).execute();
         refreshCaches();
+    }
+
+    public int deleteAll(final String pathPattern)
+    {
+        List<String> paths = recordManager.getAllPaths(pathPattern);
+        for(String path: paths)
+        {
+            delete(path);
+        }
+        return paths.size();
     }
 
     @SuppressWarnings({"unchecked"})

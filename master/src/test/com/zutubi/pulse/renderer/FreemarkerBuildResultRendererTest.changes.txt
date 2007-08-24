@@ -5,7 +5,7 @@ Build 101 has completed with status 'success'.
 
 You can view the full build result at:
 
-http://another.url/viewBuild.action?id=11
+/browse/projects/test%20project/builds/101/
 
 Build reason: trigger 'scm trigger'.
 

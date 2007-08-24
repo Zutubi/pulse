@@ -15,17 +15,17 @@ public class DisplayScopeAction extends ActionSupport
 
     /**
      * Section of the UI we live in.  Overridden in
-     * {@link ConfigurationActionMapper} where necessary.
+     * {@link com.zutubi.pulse.webwork.mapping.PulseActionMapper} where necessary.
      */
     private String section = "administration";
     /**
      * Tab of the UI we live in.  Defaults to the scope, overridden in
-     * {@link ConfigurationActionMapper} where necessary.
+     * {@link com.zutubi.pulse.webwork.mapping.PulseActionMapper} where necessary.
      */
     private String tab;
     /**
      * Prefixed to the path that comes in from the client.  Overridden in
-     * {@link ConfigurationActionMapper} where necessary.
+     * {@link com.zutubi.pulse.webwork.mapping.PulseActionMapper} where necessary.
      */
     private String prefixPath = "";
     /**

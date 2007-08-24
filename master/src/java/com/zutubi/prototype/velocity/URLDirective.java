@@ -1,8 +1,8 @@
 package com.zutubi.prototype.velocity;
 
-import com.zutubi.prototype.webwork.ConfigurationActionMapper;
 import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.webwork.mapping.PulseActionMapper;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.velocity.context.InternalContextAdapter;
@@ -31,7 +31,7 @@ public class URLDirective extends PrototypeDirective
      */
     private String path;
 
-    private String namespace = ConfigurationActionMapper.ADMIN_NAMESPACE;
+    private String namespace = PulseActionMapper.ADMIN_NAMESPACE;
 
     private MasterConfigurationManager configurationManager;
 

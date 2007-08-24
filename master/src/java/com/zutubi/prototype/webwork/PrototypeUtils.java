@@ -10,6 +10,7 @@ import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.pulse.webwork.mapping.PulseActionMapper;
 import com.zutubi.util.StringUtils;
 
 import java.util.*;
@@ -30,7 +31,7 @@ public class PrototypeUtils
 
     public static String getConfigURL(String path, String action, String submitField, String namespace)
     {
-        String result = (namespace != null) ? namespace : ConfigurationActionMapper.ADMIN_NAMESPACE;
+        String result = (namespace != null) ? namespace : PulseActionMapper.ADMIN_NAMESPACE;
         if (path != null)
         {
             result = StringUtils.join("/", true, true, result, path);

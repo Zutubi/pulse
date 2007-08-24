@@ -1,5 +1,6 @@
 package com.zutubi.pulse.prototype.config.project.types;
 
+import com.zutubi.config.annotations.Select;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Table;
 import com.zutubi.config.annotations.Transient;
@@ -16,6 +17,7 @@ import java.util.List;
 @Table(columns = {"name", "details"})
 public abstract class ArtifactConfiguration extends AbstractNamedConfiguration
 {
+    @Select(optionProvider = "PostProcessorOptionProvider")
     List<String> postprocessors = new LinkedList<String>();
 
     public ArtifactConfiguration()

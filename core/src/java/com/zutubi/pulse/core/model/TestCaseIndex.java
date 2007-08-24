@@ -6,7 +6,6 @@ package com.zutubi.pulse.core.model;
 public class TestCaseIndex extends Entity
 {
     private long projectId;
-    private long specNameId;
     private long stageNameId;
     private String name;
     private int totalCount;
@@ -19,10 +18,9 @@ public class TestCaseIndex extends Entity
     {
     }
 
-    public TestCaseIndex(long projectId, long specNameId, long stageNameId, String name)
+    public TestCaseIndex(long projectId, long stageNameId, String name)
     {
         this.projectId = projectId;
-        this.specNameId = specNameId;
         this.stageNameId = stageNameId;
         this.name = name;
     }
@@ -64,16 +62,6 @@ public class TestCaseIndex extends Entity
     public void setProjectId(long projectId)
     {
         this.projectId = projectId;
-    }
-
-    public long getSpecNameId()
-    {
-        return specNameId;
-    }
-
-    public void setSpecNameId(long specNameId)
-    {
-        this.specNameId = specNameId;
     }
 
     public long getStageNameId()

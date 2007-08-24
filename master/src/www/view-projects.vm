@@ -3,7 +3,7 @@
 <content tag="selectedTab">projects</content>
 <html>
 <head>
-    <title>#wwtext("name=projects")</title>
+    <title id="projects">#wwtext("name=projects")</title>
     <script type="text/javascript" src="$base/js/prototype.js"></script>
     <script type="text/javascript" src="$base/js/scriptaculous/scriptaculous.js"></script>
     <script type="text/javascript" src="$base/js/buildcolumns.js"></script>

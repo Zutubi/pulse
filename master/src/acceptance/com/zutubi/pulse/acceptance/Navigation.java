@@ -26,7 +26,6 @@ public class Navigation
         public static final String TAB_CONFIGURATION = "tab.project.configuration";
 
         public static final String LINK_EDIT_CHANGE_VIEWER = "project.change.viewer.edit";
-        public static final String ACTION_PROJECT_HOME = "/currentBuild.action";
         public static final String ACTION_PROJECT_CONFIG = "/configureProject.action";
     }
 

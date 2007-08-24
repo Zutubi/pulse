@@ -1,10 +1,13 @@
 package com.zutubi.prototype.type.record;
 
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.util.Sort;
 import junit.framework.TestCase;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -137,6 +140,45 @@ public class RecordManagerTest extends TestCase
         assertTrue(recordManager.containsRecord("a"));
     }
 
+    public void testGetAllPaths()
+    {
+        recordManager.insert("a", new MutableRecordImpl());
+        recordManager.insert("a/b", new MutableRecordImpl());
+        recordManager.insert("a/b/c", new MutableRecordImpl());
+
+        assertPaths("a", "a");
+        assertPaths("a/b", "a/b");
+        assertPaths("a/b/c", "a/b/c");
+        assertPaths("a/b/c/d");
+
+        assertPaths("a/*/c", "a/b/c");
+        assertPaths("*/*/*", "a/b/c");
+
+        recordManager.insert("a/b/d", new MutableRecordImpl());
+        assertPaths("a/b/*", "a/b/c", "a/b/d");
+    }
+
+    public void testGetAllPathsMatchesSimpleKey()
+    {
+        MutableRecord record = new MutableRecordImpl();
+        record.put("simple", "value");
+        recordManager.insert("a", record);
+        recordManager.insert("a/nested", new MutableRecordImpl());
+
+        assertPaths("a/*", "a/nested");
+    }
+
+    private void assertPaths(String pattern, String... expected)
+    {
+        List<String> got = recordManager.getAllPaths(pattern);
+        Collections.sort(got, new Sort.StringComparator());
+        assertEquals(expected.length, got.size());
+        for(int i = 0; i < expected.length; i++)
+        {
+            assertEquals(expected[i], got.get(i));
+        }
+    }
+
     public void testLoadAll()
     {
         // setup test data.
@@ -167,6 +209,16 @@ public class RecordManagerTest extends TestCase
         {
             // noop.
         }
+    }
+
+    public void testLoadAllMatchesSimpleKey()
+    {
+        MutableRecord record = new MutableRecordImpl();
+        record.put("simple", "value");
+        recordManager.insert("a", record);
+        recordManager.insert("a/nested", new MutableRecordImpl());
+        
+        assertLoadedRecordCount("a/*", 1);
     }
 
     private void assertLoadedRecordCount(String path, int count)

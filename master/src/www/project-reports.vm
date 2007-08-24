@@ -10,7 +10,7 @@
     <title>$!webwork.htmlEncode($project.name)</title>
 </head>
 <body>
-    #projectTabs("reporting")
+    #projectTabs("reports")
 
 <table>
     <tr>
@@ -32,7 +32,7 @@
     <tr>
         <td colspan="2" style="padding-left: 30px">
             #wwcform("action=projectReports.action" "heading=%{getText('chart.parameters')}" "colspan=5" "width=100%" "method=post")
-                #wwhidden("name=id")
+                #wwhidden("name=projectName")
                 <tr>
                     #wwselect("name=timeframe" "label=%{getText('chart.timeframe')}" "list=timeframes" "singleRow=true" "tabindex=1")
                     <td>

@@ -5,8 +5,6 @@ import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.TestSuitePersister;
 import com.zutubi.pulse.core.model.TestSuiteResult;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.RecipeResultNode;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
@@ -19,38 +17,14 @@ import java.util.List;
  *
  *
  */
-public class ViewTestSuiteAction extends ProjectActionSupport
+public class ViewTestSuiteAction extends StageActionBase
 {
     private static final Logger LOG = Logger.getLogger(ViewTestSuiteAction.class);
 
-    private long id;
-    private long nodeId;
     private String path;
-    private BuildResult result;
-    private RecipeResultNode node;
     private TestSuiteResult suite;
     private List<String> paths;
     private MasterConfigurationManager configurationManager;
-
-    public long getId()
-    {
-        return id;
-    }
-
-    public void setId(long id)
-    {
-        this.id = id;
-    }
-
-    public long getNodeId()
-    {
-        return nodeId;
-    }
-
-    public void setNodeId(long nodeId)
-    {
-        this.nodeId = nodeId;
-    }
 
     public String getPath()
     {
@@ -60,21 +34,6 @@ public class ViewTestSuiteAction extends ProjectActionSupport
     public void setPath(String path)
     {
         this.path = path;
-    }
-
-    public Project getProject()
-    {
-        return result.getProject();
-    }
-
-    public BuildResult getResult()
-    {
-        return result;
-    }
-
-    public RecipeResultNode getNode()
-    {
-        return node;
     }
 
     public TestSuiteResult getSuite()
@@ -94,17 +53,10 @@ public class ViewTestSuiteAction extends ProjectActionSupport
 
     public String execute()
     {
-        result = getBuildManager().getBuildResult(id);
-        if (result == null)
+        RecipeResultNode node = getRequiredRecipeResultNode();
+        if(node.getResult() == null)
         {
-            addActionError("Unknown build [" + id + "]");
-            return ERROR;
-        }
-
-        node = result.findResultNode(nodeId);
-        if(node == null || node.getResult() == null)
-        {
-            addActionError("Unknown recipe node [" + nodeId + "]");
+            addActionError("Invalid stage [" + getStageName() + "]");
             return ERROR;
         }
 

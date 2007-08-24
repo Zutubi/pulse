@@ -1,6 +1,7 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.*;
+import com.zutubi.util.Predicate;
 import org.acegisecurity.acl.basic.AclObjectIdentity;
 import org.acegisecurity.acl.basic.AclObjectIdentityAware;
 
@@ -26,7 +27,7 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
     /**
      * If true, this build was triggered by a user at a fixed revision.
      * This build will be ignored for the purposes of calculating changes
-     * between builds. 
+     * between builds.
      */
     private boolean userRevision;
     private Revision revision;
@@ -204,22 +205,68 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
         return project;
     }
 
-    public RecipeResultNode findResultNode(long id)
+    public RecipeResultNode findResultNode(final long id)
     {
-        return root.findNode(id);
+        return root.findNode(new Predicate<RecipeResultNode>()
+        {
+            public boolean satisfied(RecipeResultNode recipeResultNode)
+            {
+                return recipeResultNode.getId() == id;
+            }
+        });
     }
 
-    public RecipeResultNode findResultNodeByHandle(long handle)
+    public RecipeResultNode findResultNodeByHandle(final long handle)
     {
-        return root.findNodeByHandle(handle);
+        return root.findNode(new Predicate<RecipeResultNode>()
+        {
+            public boolean satisfied(RecipeResultNode recipeResultNode)
+            {
+                return recipeResultNode.getStageHandle() == handle;
+            }
+        });
+    }
+
+    public RecipeResultNode findResultNode(final String stageName)
+    {
+        return root.findNode(new Predicate<RecipeResultNode>()
+        {
+            public boolean satisfied(RecipeResultNode recipeResultNode)
+            {
+                return stageName.equals(recipeResultNode.getStageName());
+            }
+        });
+    }
+
+    public RecipeResultNode findResultNode(final CommandResult commandResult)
+    {
+        return root.findNode(new Predicate<RecipeResultNode>()
+        {
+            public boolean satisfied(RecipeResultNode recipeResultNode)
+            {
+                RecipeResult result = recipeResultNode.getResult();
+                if (result != null)
+                {
+                    for (CommandResult command : result.getCommandResults())
+                    {
+                        if (command.equals(commandResult))
+                        {
+                            return true;
+                        }
+                    }
+                }
+                
+                return false;
+            }
+        });
     }
 
     public StoredArtifact findArtifact(String artifactName)
     {
-        for(RecipeResultNode child: root.getChildren())
+        for (RecipeResultNode child : root.getChildren())
         {
             StoredArtifact artifact = child.findArtifact(artifactName);
-            if(artifact != null)
+            if (artifact != null)
             {
                 return artifact;
             }
@@ -248,7 +295,7 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
 
     public Entity getOwner()
     {
-        if(user == null)
+        if (user == null)
         {
             return project;
         }
@@ -339,7 +386,7 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
             warningFeatureCount += result.getWarningFeatureCount();
             errorFeatureCount += result.getErrorFeatureCount();
         }
-        
+
         // recurse to the child nodes.
         for (RecipeResultNode child : node.getChildren())
         {

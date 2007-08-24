@@ -5,7 +5,6 @@ import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
-import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
 /**
@@ -60,10 +59,10 @@ public abstract class AbstractBuildFileObject extends AbstractPulseFileObject im
 
     public String getUrlPath()
     {
-        return "/viewBuild.action?id=" + getBuildResultId();
+        return "/browse/projects/" + getProjectConfig().getName() + "/builds/" + getBuildResult().getNumber() + "/";
     }
 
-    public ProjectConfiguration getProjectConfig() throws FileSystemException
+    public ProjectConfiguration getProjectConfig()
     {
         return projectManager.getProjectConfig(getProjectId());
     }

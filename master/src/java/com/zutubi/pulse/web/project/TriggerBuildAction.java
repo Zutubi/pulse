@@ -4,47 +4,16 @@ import com.zutubi.pulse.model.ManualTriggerBuildReason;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 
-public class TriggerBuildAction extends ProjectActionSupport
+public class TriggerBuildAction extends ProjectActionBase
 {
-    private long id = -1;
-    private String projectName;
-
-    public long getId()
-    {
-        return id;
-    }
-
-    public void setId(long id)
-    {
-        this.id = id;
-    }
-
-    public String getProjectName()
-    {
-        return projectName;
-    }
-
-    public void validate()
-    {
-    }
-
     public String execute()
     {
-        Project project = getProjectManager().getProject(projectId);
-
-        if (project == null)
-        {
-            addActionError("Trigger build request for unknown project [" + projectId + "]");
-            return ERROR;
-        }
-
+        Project project = getRequiredProject();
         getProjectManager().checkWrite(project);
 
-        ProjectConfiguration projectConfig = getProjectManager().getProjectConfig(projectId);
-
+        ProjectConfiguration projectConfig = project.getConfig();
         if(projectConfig.getOptions().getPrompt())
         {
-            projectName = projectConfig.getName();
             return "prompt";
         }
         

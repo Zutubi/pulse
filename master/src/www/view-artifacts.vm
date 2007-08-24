@@ -1,9 +1,9 @@
 #helpTag("Build+Artifacts+Tab")
 #authorisationTags($principle)
-#buildTags($project $result)
+#buildTags($project $buildResult)
 <html>
 <head>
-    <title>#wwtext("name=build") $result.number</title>
+    <title>#wwtext("name=build") $buildResult.number</title>
 
     <link rel="stylesheet" type="text/css" href="$base/css/treeview/tree.css"/>
     <script type="text/javascript" src="$base/js/prototype.js"></script>
@@ -18,7 +18,7 @@
                 {
                     var tree = new ZUTUBI.widget.PulseTreeView('browseTree');
                     tree.setSeparator('$separator');
-                    tree.setFSRoot('pulse:///projects/$project.id/builds/$result.id/artifacts/');
+                    tree.setFSRoot('pulse:///projects/$project.id/builds/$buildResult.id/artifacts/');
                     tree.setBase('$base');
 
                     // load the root nodes for the file system, then draw the tree.
@@ -36,7 +36,7 @@
     </script>
 </head>
 <body>
-    #buildTabs($result "artifacts")
+    #buildTabs($buildResult "artifacts")
 
     <h3>#wwtext("name=artifacts.all")</h3>
 

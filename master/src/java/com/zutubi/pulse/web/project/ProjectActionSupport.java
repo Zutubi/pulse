@@ -1,16 +1,10 @@
 package com.zutubi.pulse.web.project;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.pulse.committransformers.CommitMessageTransformerManager;
-import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.web.ActionSupport;
 import org.acegisecurity.AccessDeniedException;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * 
@@ -20,12 +14,10 @@ public class ProjectActionSupport extends ActionSupport
 {
     protected BuildManager buildManager;
     protected ScmManager scmManager;
-    protected UserManager userManager;
     protected Scheduler scheduler;
 
     private static final long NONE_SPECIFIED = -1;
 
-    private User loggedInUser = null;
     protected long projectId = NONE_SPECIFIED;
     protected String projectName = null;
 
@@ -59,22 +51,6 @@ public class ProjectActionSupport extends ActionSupport
         this.scheduler = scheduler;
     }
 
-    public Feature.Level getErrorLevel()
-    {
-        return Feature.Level.ERROR;
-    }
-
-    public Feature.Level getWarningLevel()
-    {
-        return Feature.Level.WARNING;
-    }
-
-    public List<Feature.Level> getFeatureLevels()
-    {
-        List<Feature.Level> list = Arrays.asList(Feature.Level.values());
-        Collections.reverse(list);
-        return list;
-    }
 
     public long getProjectId()
     {
@@ -162,20 +138,6 @@ public class ProjectActionSupport extends ActionSupport
         return p;
     }
 
-    public User getLoggedInUser()
-    {
-        if (loggedInUser == null)
-        {
-            Object principle = getPrinciple();
-            if(principle != null && principle instanceof String)
-            {
-                loggedInUser = userManager.getUser((String)principle);
-            }
-        }
-
-        return loggedInUser;
-    }
-
     public void checkPermissions(BuildResult result)
     {
         if(result.isPersonal())
@@ -191,10 +153,5 @@ public class ProjectActionSupport extends ActionSupport
     public void setUserManager(UserManager userManager)
     {
         this.userManager = userManager;
-    }
-
-    public CommitMessageTransformerManager getTransformerManager()
-    {
-        return commitMessageTransformerManager;
     }
 }

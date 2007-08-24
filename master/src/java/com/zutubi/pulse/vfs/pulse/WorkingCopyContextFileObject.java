@@ -2,6 +2,7 @@ package com.zutubi.pulse.vfs.pulse;
 
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.RecipeResultNode;
+import com.zutubi.pulse.webwork.mapping.Urls;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
@@ -74,8 +75,8 @@ public class WorkingCopyContextFileObject extends AbstractPulseFileObject implem
         return true;
     }
 
-    public String getUrlPath()
+    public String getUrlPath() throws FileSystemException
     {
-        return "/browseProjectDir.action?buildId=" + getBuildResultId();   
+        return new Urls("").buildWorkingCopy(getBuildResult());
     }
 }

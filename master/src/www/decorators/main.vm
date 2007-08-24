@@ -133,17 +133,17 @@
             <tr>
               <td class="logo">
                   :: <a href="$base/default.action">pulse 2 [ M3 ]</a> ::
-#if($projectId && $projectId != "0")
-                  <a href="$base/currentBuild.action?id=${projectId}">$projectName</a>
+#if($u_projectName)
+                  <a href="$urls.projectHome($u_projectName)">$h_projectName</a>
 #end
 #if($personalBuild)
                  <a href="$base/myBuilds.action">my builds</a>
 #end
-#if($buildId && $buildId != "0")
-                  :: <a href="$base/viewBuild.action?id=${buildId}">build $buildNumber</a>
-#end
-#if($stageName)
-                  :: <a href="$base/viewCommandLog.action?id=${buildId}&amp;selectedNode=$resultNodeId">stage $stageName</a>
+#if($buildNumber && $buildNumber != "0")
+                  :: <a href="$urls.build($u_projectName, $buildNumber)">build $buildNumber</a>
+    #if($u_stageName)
+                  :: <a href="$urls.stageDetails($u_projectName, $buildNumber, $u_stageName)">stage $h_stageName</a>
+    #end
 #end
 #if($agentName)
     #if($agentId && $agentId != "0")
@@ -184,7 +184,7 @@
 #if($principle)
         <li><a #if($selectedTab && $selectedTab == "dashboard")      class="active" #end id="tab.dashboard" href="$base/dashboard/home/">dashboard</a></li>
 #end
-        <li><a #if($selectedTab && $selectedTab == "projects")       class="active" #end id="tab.projects" href="$base/viewProjects.action">browse</a></li>
+        <li><a #if($selectedTab && $selectedTab == "projects")       class="active" #end id="tab.projects" href="$base/browse/">browse</a></li>
         <li><a #if($selectedTab && $selectedTab == "queues")         class="active" #end id="tab.queues" href="$base/viewServerQueues.action">queues</a></li>
         <li><a #if($selectedTab && $selectedTab == "agents")         class="active" #end id="tab.agents" href="$base/viewAgents.action">agents</a></li>
         #authorize("ifAllGranted=ROLE_ADMINISTRATOR")

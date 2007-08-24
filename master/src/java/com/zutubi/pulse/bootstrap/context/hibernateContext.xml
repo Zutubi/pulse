@@ -308,25 +308,4 @@ This context requires:
             </props>
         </property>
     </bean>
-
-    <bean id="commitMessageTransformerDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateCommitMessageTransformerDao">
-        <property name="sessionFactory">
-            <ref bean="sessionFactory"/>
-        </property>
-    </bean>
-
-    <bean id="commitMessageTransformerDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager">
-            <ref bean="transactionManager"/>
-        </property>
-        <property name="target">
-            <ref bean="commitMessageTransformerDaoTarget"/>
-        </property>
-        <property name="transactionAttributes">
-            <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
-            </props>
-        </property>
-    </bean>
-
 </beans>

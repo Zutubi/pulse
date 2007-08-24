@@ -3,23 +3,22 @@
 #projectTags($project)
 <html>
 <head>
-    <title>$!webwork.htmlEncode($project.name)</title>
+    <title id="project-home-#uce($project.name)">$!webwork.htmlEncode($project.name)</title>
     <script type="text/javascript" src="$base/js/prototype.js"></script>
     <script type="text/javascript" src="$base/js/scriptaculous/scriptaculous.js"></script>
     <script type="text/javascript" src="$base/js/buildcolumns.js"></script>
     <script type="text/javascript">
     //<![CDATA[
-        #updater("$base/ajax/projectHomePanel.action?id=$project.id" "panel" $principle)
+        #set($ajaxUrl = "$base/ajax/projectHomePanel.action?projectName=$u_projectName")
+        #updater($ajaxUrl "panel" $principle)
 
         var summaryPopup;
         var recentPopup;
         YAHOO.util.Event.addListener(window, "load", function() {
-            summaryPopup = new BuildColumnPopup("project.summary", "$base", "$base/ajax/projectHomePanel.action?id=$project.id", "panel");
-            recentPopup = new BuildColumnPopup("project.recent", "$base", "$base/ajax/projectHomePanel.action?id=$project.id", "panel");
+            summaryPopup = new BuildColumnPopup("project.summary", "$base", "$ajaxUrl", "panel");
+            recentPopup = new BuildColumnPopup("project.recent", "$base", "$ajaxUrl", "panel");
         });
     //]]>
-    </script>
-    <script type="text/javascript">
     </script>
 </head>
 <body>
@@ -38,7 +37,5 @@
         <div id="commentsWindowContent">
         </div>
     </div>
-
-
 </body>
 </html>

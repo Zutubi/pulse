@@ -12,35 +12,35 @@ Returns a link to the projecty home page for the project the given build
 belongs to.
 ---------------------------------------------------------------------------->
 [#function projectLink result]
-    [#return "${baseUrl}/currentBuild.action?id=${result.project.id?c}"/]
+    [#return urls.project(result.project)/]
 [/#function]
 
 <#---------------------------------------------------------------------------
 Returns a link to the summary page for a build result.
 ---------------------------------------------------------------------------->
 [#function buildLink result]
-    [#return "${baseUrl}/viewBuild.action?id=${result.id?c}"/]
+    [#return urls.build(result)/]
 [/#function]
 
 <#---------------------------------------------------------------------------
 Returns a link to the tests page for a build result.
 ---------------------------------------------------------------------------->
 [#function testsLink result]
-    [#return "${baseUrl}/viewTests.action?id=${result.id?c}"/]
+    [#return urls.buildTests(result)/]
 [/#function]
 
 <#---------------------------------------------------------------------------
 Returns a link to the detailed view page for a build stage.
 ---------------------------------------------------------------------------->
 [#function stageDetailsLink result node]
-    [#return "${baseUrl}/viewCommandLog.action?id=${result.id?c}&amp;selectedNode=${node.id?c}"/]
+    [#return urls.stageDetails(result, node)/]
 [/#function]
 
 <#---------------------------------------------------------------------------
 Returns a link to the tests page for a build stage.
 ---------------------------------------------------------------------------->
 [#function stageTestsLink result node]
-    [#return "${baseUrl}/viewTestSuite.action?id=${result.id?c}&amp;nodeId=${node.id?c}"/]
+    [#return urls.stageTests(result, node)/]
 [/#function]
 
 
@@ -401,10 +401,10 @@ Shows a list of links for a build.
 [#macro buildLinksHTML result]
     <p style="font-size: 85%">
         jump to ::
-          <a href="${baseUrl}/viewBuild.action?id=${result.id?c}">summary</a>
-        | <a href="${baseUrl}/viewChanges.action?id=${result.id?c}">changes</a>
-        | <a href="${baseUrl}/viewTests.action?id=${result.id?c}">tests</a>
-        | <a href="${baseUrl}/viewBuildArtifacts.action?id=${result.id?c}">artifacts</a>
+          <a href="${urls.buildSummary(result)}">summary</a>
+        | <a href="${urls.buildChanges(result)}">changes</a>
+        | <a href="${urls.buildTests(result)}">tests</a>
+        | <a href="${urls.buildArtifacts(result)}">artifacts</a>
     <p/>
 [/#macro]
 
@@ -425,7 +425,7 @@ Shows a summary table for a build.
         </tr>
         <tr>
             [#assign class = result.state.string]
-            [@linkCell cc=result.number?c url="${baseUrl}/viewBuild.action?id=${result.id?c}" class=class/]
+            [@linkCell cc=result.number?c url="${urls.build(result)}" class=class/]
             [@classCell cc=result.stateName?lower_case/]
             [@classCell cc=result.reason.summary/]
             [@linkCell cc=result.testSummary url="${testsLink(result)}" class=class/]
@@ -443,7 +443,7 @@ Shows a list of links to build stage logs.
     <p style="font-size: 85%">
         stage logs ::
     [#list result.root.children as child]
-        <a href="${baseUrl}/tailRecipeLog.action?id=${child.id?c}&buildId=${result.id?c}">${child.stageName}</a> [#if child_has_next]|[/#if]
+        <a href="${urls.stageLogs(result, child)}">${child.stageName?html}</a> [#if child_has_next]|[/#if]
     [/#list]
     </p>
 [/#macro]
@@ -467,7 +467,6 @@ Shows a summary for each stage in a build.
     [#list result.root.children as child]
         <tr>
             [#assign class = child.result.state.string]
-            [@classCell cc=child.stageName/]
             [@linkCell cc=child.stageName url="${stageDetailsLink(result, child)}" class=class/]
             [@classCell cc=child.result.recipeNameSafe/]
             [@classCell cc=child.hostSafe/]
@@ -505,7 +504,7 @@ Shows a table with the given changelists.
             [#else]
             [@contentCell cc=renderer.transformCommentWithoutTrimming(change)/]
             [/#if]
-            [@linkCell cc="view" url="${baseUrl}/viewChangelist.action?id=${change.id?c}&amp;buildId=${result.id?c}"/]
+            [@linkCell cc="view" url="${urls.buildChangelist(result, change.id)}"/]
         </tr>
         [/#list]
     [#else]
@@ -537,7 +536,7 @@ list.
         [#list artifact.getFeatures(level) as feature]
         <li class="${level?lower_case}"><pre class="feature">${feature.summary?html}</pre>
             [#if feature.isPlain()]
-                <a class="unadorned" href="${baseUrl}/viewArtifactt.action?id=${artifact.id?c}&amp;buildId=${result.id?c}&amp;commandId=${command.id?c}#${feature.firstLine?c}">
+                <a class="unadorned" href="${urls.commandArtifacts(result, command)}${artifact.pathUrl}/#${feature.firstLine?c}">
                     <span class="small">jump to &gt;&gt;</span>
                 </a>
             [/#if]

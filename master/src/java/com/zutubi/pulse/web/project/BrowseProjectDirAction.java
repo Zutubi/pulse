@@ -1,7 +1,6 @@
 package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.prototype.config.project.BuildOptionsConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 
@@ -9,27 +8,10 @@ import java.io.File;
 
 /**
  */
-public class BrowseProjectDirAction extends ProjectActionSupport
+public class BrowseProjectDirAction extends BuildActionBase
 {
-    private long buildId;
-    private BuildResult buildResult;
     private String separator;
     private BuildOptionsConfiguration buildOptions;
-
-    public long getBuildId()
-    {
-        return buildId;
-    }
-
-    public void setBuildId(long buildId)
-    {
-        this.buildId = buildId;
-    }
-
-    public BuildResult getBuildResult()
-    {
-        return buildResult;
-    }
 
     public BuildOptionsConfiguration getBuildOptions()
     {
@@ -41,25 +23,9 @@ public class BrowseProjectDirAction extends ProjectActionSupport
         return separator;
     }
 
-    public Project getProject()
-    {
-        if(buildResult != null)
-        {
-            return buildResult.getProject();
-        }
-
-        return null;
-    }
-
     public String execute() throws Exception
     {
-        buildResult = getBuildManager().getBuildResult(buildId);
-        if (buildResult == null)
-        {
-            addActionError("Unknown build [" + buildId + "]");
-            return ERROR;
-        }
-
+        BuildResult buildResult = getRequiredBuildResult();
         checkPermissions(buildResult);
         getProjectManager().checkWrite(buildResult.getProject());
 
@@ -68,7 +34,7 @@ public class BrowseProjectDirAction extends ProjectActionSupport
         separator = File.separator.replace("\\", "\\\\");
 
         // provide some useful feedback on why the working directory is not available.
-        ProjectConfiguration projectConfig = getProjectManager().getProjectConfig(buildResult.getProject().getId());
+        ProjectConfiguration projectConfig = getProject().getConfig();
         // a) the working copy is not being retained.
         buildOptions = projectConfig.getOptions();
         // b) else, the working directory has been cleaned up by a the projects "cleanup rules" or

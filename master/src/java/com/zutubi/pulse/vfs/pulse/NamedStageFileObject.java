@@ -1,12 +1,12 @@
 package com.zutubi.pulse.vfs.pulse;
 
-import org.apache.commons.vfs.FileName;
-import org.apache.commons.vfs.FileType;
-import org.apache.commons.vfs.FileSystemException;
-import org.apache.commons.vfs.provider.AbstractFileSystem;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.RecipeResultNode;
+import org.apache.commons.vfs.FileName;
+import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs.FileType;
+import org.apache.commons.vfs.provider.AbstractFileSystem;
 
 /**
  * <class comment/>
@@ -51,7 +51,7 @@ public class NamedStageFileObject extends AbstractPulseFileObject implements Rec
             throw new FileSystemException("No build result available.");
         }
         
-        RecipeResultNode node = result.getRoot().findNode(recipeName);
+        RecipeResultNode node = result.findResultNode(recipeName);
         if (node == null)
         {
             throw new FileSystemException(String.format("No recipe by the name '%s' is available.", recipeName));

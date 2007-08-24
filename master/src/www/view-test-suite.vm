@@ -1,9 +1,9 @@
 #helpTag("Build+Tests+Tab")
 #authorisationTags($principle)
-#buildTags($project $result)
+#buildTags($project $buildResult)
 <html>
 <head>
-    <title>#wwtext("name=build") $result.number</title>
+    <title>#wwtext("name=build") $buildResult.number</title>
     <script type="text/javascript">
     <!--
         var successfulShowing = {
@@ -31,16 +31,16 @@
     </script>
 </head>
 <body>
-    #buildTabs($result "tests")
+    #buildTabs($buildResult "tests")
 
     <p>
-        <a href="viewTests.action?id=$result.id">#wwtext("name=tests.all")</a>
-        :: <a href="viewTestSuite.action?id=$result.id&nodeId=$node.id">#wwtext("name=build.stage") $!webwork.htmlEncode($node.stageName)</a>
+        <a href="$urls.buildTests($buildResult)">#wwtext("name=tests.all")</a>
+        :: <a href="$urls.stageTests($buildResult, $recipeResultNode)">#wwtext("name=build.stage") $h_stageName</a>
 #set($suitePath="")
 #foreach($element in $paths)
     #if($element.length() > 0)
         #set($suitePath = "$suitePath/$element")
-        :: <a href="viewTestSuite.action?id=$result.id&nodeId=$node.id&path=$action.urlEncode($suitePath)">#wwtext("name=test.suite") $!webwork.htmlEncode($action.urlDecode($element))</a>
+        :: <a href="$urls.stageTests($buildResult, $recipeResultNode)$action.urlEncode($suitePath)">#wwtext("name=test.suite") $!webwork.htmlEncode($action.urlDecode($element))</a>
     #end
 #end
     </p>
@@ -77,7 +77,7 @@
             #set($cssClass = "successful")
         #end
         <tr class="$cssClass">
-            #dynamicLinkCell($childSuite.name "viewTestSuite.action?id=$result.id&nodeId=$node.id&path=$action.urlEncode($childPath)")
+            #dynamicLinkCell($childSuite.name "$urls.stageTests($buildResult, $recipeResultNode)$action.urlEncode($childPath)")
             #testStatusCell($childSuite)
             #rightCell($childSuite.total)
             #rightCell($childSuite.failures)

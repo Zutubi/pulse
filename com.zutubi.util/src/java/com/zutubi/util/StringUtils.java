@@ -672,4 +672,45 @@ public class StringUtils
     {
         return Integer.toString(c, 16);
     }
+
+    /**
+     * Splits the given string around the first occurence of the given
+     * separator.
+     *
+     * @param s         the string to split
+     * @param seperator separator character that delimits tokens
+     * @param skipEmpty if true, empty tokens are skipped over
+     * @return a pair of strings: the next token and the remaining string, or
+     *         null if no more tokens are found 
+     */
+    public static String[] getNextToken(String s, char seperator, boolean skipEmpty)
+    {
+        if(s.length() == 0)
+        {
+            return null;
+        }
+        
+        int index = s.indexOf(seperator);
+        String token;
+        String remainder;
+        if(index < 0)
+        {
+            token = s;
+            remainder = "";
+        }
+        else
+        {
+            token = s.substring(0, index);
+            remainder = s.substring(index + 1);
+        }
+
+        if(token.length() == 0 && skipEmpty)
+        {
+            return getNextToken(s.substring(1), seperator, skipEmpty);
+        }
+        else
+        {
+            return new String[]{token, remainder};
+        }
+    }
 }

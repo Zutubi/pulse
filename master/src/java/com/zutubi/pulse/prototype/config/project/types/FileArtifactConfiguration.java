@@ -1,15 +1,15 @@
 package com.zutubi.pulse.prototype.config.project.types;
 
-import com.zutubi.validation.annotations.Required;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Transient;
+import com.zutubi.validation.annotations.Required;
 
 /**
  *
  *
  */
-@Form(fieldOrder = {"name", "file", "mimeType"})
+@Form(fieldOrder = {"name", "file", "mimeType", "postprocessors"})
 @SymbolicName("zutubi.fileArtifactConfig")
 public class FileArtifactConfiguration extends ArtifactConfiguration
 {

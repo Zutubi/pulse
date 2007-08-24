@@ -10,7 +10,7 @@
 ##    #end
                 </span>
 #end
-                <a href="$base/currentBuild.action?id=$project.id" id="home_$!webwork.htmlEncode($project.name)">
+                <a href="$urls.projectHome($project)" id="home_$!webwork.htmlEncode($project.name)">
                     <img alt="home" src="$base/images/house.gif">
                     $!webwork.htmlEncode($project.name)
                 </a>
@@ -53,7 +53,7 @@
             #dateCell($changelist)
             #commitCommentCell($changelist $source)
             #aggregateResultCell($changelist $showWho)
-            #linkCell("view.$changelist.id" "view" "viewChangelist.action?id=$changelist.id")
+            #linkCell("view.$changelist.id" "view" "$base/dashboard/changes/$changelist.id/")
         </tr>
         #end
     #else

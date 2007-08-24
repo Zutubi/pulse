@@ -3,7 +3,6 @@ package com.zutubi.pulse.web.project;
 import com.uwyn.jhighlight.renderer.XmlXhtmlRenderer;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.Project;
 import com.zutubi.util.IOUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -15,38 +14,10 @@ import java.io.IOException;
  * An action to show the build file used for a build.  The file is
  * highlighted beautifully for the benefit of the user.
  */
-public class ViewBuildFileAction extends ProjectActionSupport
+public class ViewBuildFileAction extends BuildActionBase
 {
-    private long id;
-    private BuildResult result;
-    private String classes;
     private String highlightedFile;
     private MasterConfigurationManager configurationManager;
-
-    public long getId()
-    {
-        return id;
-    }
-
-    public void setId(long id)
-    {
-        this.id = id;
-    }
-
-    public Project getProject()
-    {
-        return result.getProject();
-    }
-
-    public BuildResult getResult()
-    {
-        return result;
-    }
-
-    public String getClasses()
-    {
-        return classes;
-    }
 
     public String getHighlightedFile()
     {
@@ -55,13 +26,7 @@ public class ViewBuildFileAction extends ProjectActionSupport
 
     public String execute()
     {
-        result = getBuildManager().getBuildResult(id);
-        if (result == null)
-        {
-            addActionError("Unknown build [" + id + "]");
-            return ERROR;
-        }
-
+        BuildResult result = getRequiredBuildResult();
         checkPermissions(result);        
 
         FileInputStream is = null;

@@ -1,21 +1,17 @@
 package com.zutubi.pulse.renderer;
 
 import com.zutubi.pulse.bootstrap.SystemPaths;
-import com.zutubi.pulse.committransformers.CommitMessageTransformerManager;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.web.project.CommitMessageSupport;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
-import com.zutubi.pulse.web.project.CommitMessageSupport;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 /**
  */
@@ -25,7 +21,6 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
 
     private Configuration freemarkerConfiguration;
     private SystemPaths systemPaths;
-    private CommitMessageTransformerManager commitMessageTransformerManager;
 
     public void render(BuildResult result, Map<String, Object> dataMap, String templateName, Writer writer)
     {
@@ -148,7 +143,8 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
 
     public String transformCommentWithoutTrimming(Changelist changelist)
     {
-        CommitMessageSupport support = new CommitMessageSupport(changelist, commitMessageTransformerManager.getCommitMessageTransformers());
+        // FIXME
+        CommitMessageSupport support = new CommitMessageSupport(changelist, Collections.EMPTY_LIST);
         return support.toString();
     }
 
@@ -159,18 +155,14 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
     
     public String transformComment(Changelist changelist, int trimToLength)
     {
-        CommitMessageSupport support = new CommitMessageSupport(changelist, commitMessageTransformerManager.getCommitMessageTransformers());
+        // FIXME
+        CommitMessageSupport support = new CommitMessageSupport(changelist, Collections.EMPTY_LIST);
         return support.trim(trimToLength);
     }
 
     public void setFreemarkerConfiguration(Configuration freemarkerConfiguration)
     {
         this.freemarkerConfiguration = freemarkerConfiguration;
-    }
-
-    public void setCommitMessageTransformerManager(CommitMessageTransformerManager commitMessageTransformerManager)
-    {
-        this.commitMessageTransformerManager = commitMessageTransformerManager;
     }
 
     public void setSystemPaths(SystemPaths systemPaths)

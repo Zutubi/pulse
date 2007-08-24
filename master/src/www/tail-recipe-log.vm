@@ -1,22 +1,23 @@
 #helpTag("Build+Stage+Log+View")
 #authorisationTags($principle)
-#stageTags($buildResult $resultNode)
+#stageTags($buildResult)
 <html>
 <head>
-    <title>#wwtext("name=build") $buildResult.number :: #wwtext("name=build.stage") $resultNode.stage</title>
+    <title>#wwtext("name=build") $buildResult.number :: #wwtext("name=build.stage") $h_stageName</title>
     <script type="text/javascript" src="$base/js/prototype.js"></script>
     <script type="text/javascript">
         <!--
-        #updater("$base/ajax/tailRecipeLogPanel.action?id=$resultNode.id&buildId=$buildResult.id&maxLines=$maxLines&refreshInterval=$refreshInterval" "panel" $principle)
+        #updater("$base/ajax/tailRecipeLogPanel.action?projectName=${u_projectName}&buildVID=${buildResult.number}&stageName=${u_stageName}&maxLines=${maxLines}&refreshInterval=${refreshInterval}" "panel" $principle)
         -->
     </script>
 </head>
 <body>
-    #buildTabs($buildResult "detailed-view")
+    #buildTabs($buildResult "details")
 
-    #wwcform("action=tailRecipeLog.action" "heading=%{getText('stage.tail.settings')}" "colspan=5" "width=100%" "method=get")
-        #wwhidden("name=id")
-        #wwhidden("name=buildId")
+    #wwcform("action=/tailRecipeLog.action" "heading=%{getText('stage.tail.settings')}" "colspan=5" "width=100%" "method=get")
+        #wwhidden("name=projectName")
+        #wwhidden("name=buildVID")
+        #wwhidden("name=stageName")
 
         <tr>
         #wwtextfield("name=maxLines" "singleRow=true" "label=%{getText('stage.tail.max.lines')}" "size=4" "onchange=submit()" "tabindex=1")
@@ -25,7 +26,7 @@
         </tr>
     #end
 
-    <h3 class="heading">#wwtext("name=stage.tail.box") #if($logExists) &nbsp;<a href="viewRecipeLog.action?id=$resultNode.id&amp;buildId=$buildResult.id"><img alt="down" src="$base/images/arrow_down.gif"/>#wwtext("name=stage.full.log")</a> #end </h3>
+    <h3 class="heading">#wwtext("name=stage.tail.box") #if($logExists) &nbsp;<a href="$urls.stageLogs($buildResult, $recipeResultNode)raw/true/"><img alt="down" src="$base/images/arrow_down.gif"/>#wwtext("name=stage.full.log")</a> #end </h3>
     <div class="box">
         <div id="panel">
             #parse("ajax/tail-recipe-log-panel.vm")

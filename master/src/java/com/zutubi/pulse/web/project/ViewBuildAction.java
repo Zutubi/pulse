@@ -5,7 +5,6 @@ import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.TestSuiteResult;
 import com.zutubi.pulse.model.BuildColumns;
 import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.prototype.config.user.UserSettingsConfiguration;
 import com.zutubi.util.logging.Logger;
@@ -17,17 +16,14 @@ import java.util.Stack;
  *
  *
  */
-public class ViewBuildAction extends ProjectActionSupport
+public class ViewBuildAction extends CommandActionBase
 {
     public static final String FAILURE_LIMIT_PROPERTY = "pulse.test.failure.limit";
     public static final int DEFAULT_FAILURE_LIMIT = 100;
 
     private static final Logger LOG = Logger.getLogger(ViewBuildAction.class);
 
-    private long id;
-    private BuildResult result;
     private List<Changelist> changelists;
-    private long selectedNode;
     private BuildColumns summaryColumns;
 
     private MasterConfigurationManager configurationManager;
@@ -36,39 +32,19 @@ public class ViewBuildAction extends ProjectActionSupport
      */
     private Stack<String> pathStack = new Stack<String>();
 
-    public long getId()
+    public boolean haveRecipeResultNode()
     {
-        return id;
+        return getRecipeResultNode() != null;
     }
 
-    public void setId(long id)
+    public boolean haveCommandResult()
     {
-        this.id = id;
-    }
-
-    public long getSelectedNode()
-    {
-        return selectedNode;
-    }
-
-    public void setSelectedNode(long selectedNode)
-    {
-        this.selectedNode = selectedNode;
-    }
-
-    public boolean haveSelectedNode()
-    {
-        return selectedNode != 0L && selectedNode != result.getId();
-    }
-
-    public Project getProject()
-    {
-        return result.getProject();
+        return getCommandResult() != null;
     }
 
     public BuildResult getResult()
     {
-        return result;
+        return getBuildResult();
     }
 
     public BuildColumns getSummaryColumns()
@@ -108,13 +84,10 @@ public class ViewBuildAction extends ProjectActionSupport
 
     public String execute()
     {
-        result = getBuildManager().getBuildResult(id);
-        if (result == null)
-        {
-            addActionError("Unknown build [" + id + "]");
-            return ERROR;
-        }
+        // Initialise detail down to the command level (optional)
+        getCommandResult();
 
+        BuildResult result = getRequiredBuildResult();
         checkPermissions(result);
 
         result.loadFeatures(configurationManager.getDataDirectory());
@@ -153,7 +126,7 @@ public class ViewBuildAction extends ProjectActionSupport
     {
         if(changelists == null)
         {
-            changelists = getBuildManager().getChangesForBuild(getResult());
+            changelists = buildManager.getChangesForBuild(getResult());
         }
         return changelists;
     }

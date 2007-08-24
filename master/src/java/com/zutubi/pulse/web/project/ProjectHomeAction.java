@@ -2,17 +2,18 @@ package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.model.BuildColumns;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.prototype.config.user.UserSettingsConfiguration;
 
 import java.util.List;
 
 /**
  */
-public class ProjectHomeAction extends ProjectActionSupport
+public class ProjectHomeAction extends ProjectActionBase
 {
-    private long id;
-    private Project project;
     private int totalBuilds;
     private int successfulBuilds;
     private int failedBuilds;
@@ -21,21 +22,6 @@ public class ProjectHomeAction extends ProjectActionSupport
     private List<BuildResult> recentBuilds;
     private BuildColumns summaryColumns;
     private BuildColumns recentColumns;
-
-    public long getId()
-    {
-        return id;
-    }
-
-    public void setId(long id)
-    {
-        this.id = id;
-    }
-
-    public Project getProject()
-    {
-        return project;
-    }
 
     public int getTotalBuilds()
     {
@@ -91,6 +77,7 @@ public class ProjectHomeAction extends ProjectActionSupport
 
     public boolean getProjectNotBuilding()
     {
+        Project project = getRequiredProject();
         return project.getState() == Project.State.PAUSED || project.getState() == Project.State.IDLE;
     }
 
@@ -121,35 +108,24 @@ public class ProjectHomeAction extends ProjectActionSupport
 
     public String execute()
     {
-        if(id != 0)
+        Project project = getRequiredProject();
+
+        totalBuilds = buildManager.getBuildCount(project, new ResultState[]{ResultState.SUCCESS, ResultState.ERROR, ResultState.FAILURE});
+        successfulBuilds = buildManager.getBuildCount(project, new ResultState[]{ResultState.SUCCESS});
+        failedBuilds = buildManager.getBuildCount(project, new ResultState[]{ResultState.FAILURE});
+        currentBuild = buildManager.getLatestBuildResult(project);
+        latestChanges = buildManager.getLatestChangesForProject(project, 10);
+        recentBuilds = buildManager.getLatestBuildResultsForProject(project, 11);
+        if(!recentBuilds.isEmpty())
         {
-            project = getProjectManager().getProject(id);
+            recentBuilds.remove(0);
         }
 
-        if (project != null)
-        {
-            BuildManager buildManager = getBuildManager();
-            totalBuilds = buildManager.getBuildCount(project, new ResultState[]{ResultState.SUCCESS, ResultState.ERROR, ResultState.FAILURE});
-            successfulBuilds = buildManager.getBuildCount(project, new ResultState[]{ResultState.SUCCESS});
-            failedBuilds = buildManager.getBuildCount(project, new ResultState[]{ResultState.FAILURE});
-            currentBuild = buildManager.getLatestBuildResult(project);
-            latestChanges = getBuildManager().getLatestChangesForProject(project, 10);
-            recentBuilds = buildManager.getLatestBuildResultsForProject(project, 11);
-            if(!recentBuilds.isEmpty())
-            {
-                recentBuilds.remove(0);
-            }
-
-            User user = getLoggedInUser();
-            summaryColumns = new BuildColumns(user == null ? UserSettingsConfiguration.defaultProjectColumns() : user.getPreferences().getSettings().getProjectSummaryColumns(), projectManager);
-            recentColumns = new BuildColumns(user == null ? UserSettingsConfiguration.defaultProjectColumns() : user.getPreferences().getSettings().getProjectRecentColumns(), projectManager);
-        }
-        else
-        {
-            addActionError("Unknown project [" + id + "] ");
-            return ERROR;
-        }
+        User user = getLoggedInUser();
+        summaryColumns = new BuildColumns(user == null ? UserSettingsConfiguration.defaultProjectColumns() : user.getPreferences().getSettings().getProjectSummaryColumns(), projectManager);
+        recentColumns = new BuildColumns(user == null ? UserSettingsConfiguration.defaultProjectColumns() : user.getPreferences().getSettings().getProjectRecentColumns(), projectManager);
 
         return SUCCESS;
     }
+
 }

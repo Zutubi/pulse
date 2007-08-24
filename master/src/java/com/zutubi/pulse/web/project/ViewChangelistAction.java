@@ -1,5 +1,6 @@
 package com.zutubi.pulse.web.project;
 
+import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
@@ -11,7 +12,10 @@ import com.zutubi.pulse.model.persistence.ChangelistDao;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.project.changeviewer.ChangeViewerConfiguration;
 import com.zutubi.pulse.web.ActionSupport;
+import com.zutubi.util.Sort;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -24,12 +28,12 @@ public class ViewChangelistAction extends ActionSupport
     private BuildManager buildManager;
 
     /** If we drilled down from the project, this is the project ID */
-    private long projectId;
+    private String projectName;
     private Project project;
 
     /** This is the build result we have drilled down from, if any. */
+    private String buildVID;
     private BuildResult buildResult;
-    private long buildId;
 
     /** All builds affected by this change. */
     private List<BuildResult> buildResults;
@@ -52,14 +56,24 @@ public class ViewChangelistAction extends ActionSupport
         this.id = id;
     }
 
-    public long getProjectId()
+    public String getProjectName()
     {
-        return projectId;
+        return projectName;
     }
 
-    public void setProjectId(long projectId)
+    public void setProjectName(String projectName)
     {
-        this.projectId = projectId;
+        this.projectName = projectName;
+    }
+
+    public String getu_projectName()
+    {
+        return uriComponentEncode(projectName);
+    }
+
+    public String geth_projectName()
+    {
+        return htmlEncode(projectName);
     }
 
     public Project getProject()
@@ -67,14 +81,14 @@ public class ViewChangelistAction extends ActionSupport
         return project;
     }
 
-    public long getBuildId()
+    public String getBuildVID()
     {
-        return buildId;
+        return buildVID;
     }
 
-    public void setBuildId(long buildId)
+    public void setBuildVID(String buildVID)
     {
-        this.buildId = buildId;
+        this.buildVID = buildVID;
     }
 
     public BuildResult getBuildResult()
@@ -225,37 +239,33 @@ public class ViewChangelistAction extends ActionSupport
         this.changelist = changelist;
     }
 
-    public void validate()
+    public String execute()
     {
         changelist = changelistDao.findById(id);
         if (changelist == null)
         {
             addActionError("Unknown changelist '" + id + "'");
+            return ERROR;
         }
-    }
 
-    public String execute()
-    {
-        if(projectId != 0)
+        if(TextUtils.stringSet(projectName))
         {
-            project = projectManager.getProject(projectId);    
+            project = projectManager.getProject(projectName);
         }
-
-        if(buildId != 0)
+        if(TextUtils.stringSet(buildVID))
         {
             // It is valid to have no build ID set: we may not be viewing
             // the change as part of a build.
-            buildResult = buildManager.getBuildResult(buildId);
+            buildResult = buildManager.getByProjectAndVirtualId(project, buildVID);
         }
 
         buildResults = ChangelistUtils.getBuilds(buildManager, changelist);
-/*
         Collections.sort(buildResults, new Comparator<BuildResult>()
         {
             public int compare(BuildResult b1, BuildResult b2)
             {
-                NamedEntityComparator comparator = new NamedEntityComparator();
-                int result = comparator.compare(b1.getProject(), b2.getProject());
+                Sort.StringComparator comparator = new Sort.StringComparator();
+                int result = comparator.compare(b1.getProject().getName(), b2.getProject().getName());
                 if(result == 0)
                 {
                     result = (int)(b1.getNumber() - b2.getNumber());
@@ -264,7 +274,7 @@ public class ViewChangelistAction extends ActionSupport
                 return result;
             }
         });
-*/
+
         return SUCCESS;
     }
 

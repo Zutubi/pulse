@@ -5,11 +5,12 @@ import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.xwork.TextProvider;
 import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.committransformers.CommitMessageTransformerManager;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.util.TimeStamps;
@@ -22,6 +23,7 @@ import com.zutubi.util.logging.Logger;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -49,7 +51,8 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
     protected String cancel;
     protected ProjectManager projectManager;
     protected String changeUrl;
-    protected CommitMessageTransformerManager commitMessageTransformerManager;
+    private User loggedInUser = null;
+    protected UserManager userManager;
 
     public boolean isCancelled()
     {
@@ -162,7 +165,17 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
     {
         return TextUtils.htmlEncode(s).replace("'", "\\'");
     }
-    
+
+    public String uriComponentEncode(String s)
+    {
+        return s == null ? null : StringUtils.uriComponentEncode(s);
+    }
+
+    public String htmlEncode(String s)
+    {
+        return s == null ? null : TextUtils.htmlEncode(s);
+    }
+
     public String urlDecode(String s)
     {
         try
@@ -259,16 +272,6 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
         changeUrl = null;
     }
 
-    public void setCommitMessageTransformerManager(CommitMessageTransformerManager commitMessageTransformerManager)
-    {
-        this.commitMessageTransformerManager = commitMessageTransformerManager;
-    }
-
-    public CommitMessageSupport getCommitMessageSupport(Changelist changelist)
-    {
-        return new CommitMessageSupport(changelist, commitMessageTransformerManager.getCommitMessageTransformers());
-    }
-
     public String getMessage(Object instance, String key)
     {
         return Messages.getInstance(instance).format(key);
@@ -277,5 +280,30 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
     public String getMessage(Object instance, String key, String... args)
     {
         return Messages.getInstance(instance).format(key, (Object[])args);
+    }
+
+    public CommitMessageSupport getCommitMessageSupport(Changelist changelist)
+    {
+        // FIXME
+        return new CommitMessageSupport(changelist, Collections.EMPTY_LIST);
+    }
+
+    public User getLoggedInUser()
+    {
+        if (loggedInUser == null)
+        {
+            Object principle = getPrinciple();
+            if(principle != null && principle instanceof String)
+            {
+                loggedInUser = userManager.getUser((String)principle);
+            }
+        }
+
+        return loggedInUser;
+    }
+
+    public void setUserManager(UserManager userManager)
+    {
+        this.userManager = userManager;
     }
 }

@@ -2,13 +2,12 @@
         <tr>
             <td>
 
-    #wwcform("action=history.action" "heading=%{getText('quick.filters')}" "colspan=5" "width=100%" "method=get")
-        #wwhidden("name=id")
+    #wwcform("action=$base/history.action" "heading=%{getText('quick.filters')}" "colspan=5" "width=100%" "method=get")
+        #wwhidden("name=projectName")
 
         <tr>
         #wwselect("name=stateFilter" "singleRow=true" "label=%{getText('filter.state')}" "list=stateFilters" "onchange=submit()" "tabindex=1")
-        #wwselect("name=spec" "singleRow=true" "label=%{getText('filter.spec')}" "list=specs" "onchange=submit()" "tabindex=2")
-        <td><a href="history.action?id=$project.id">#wwtext("name=filter.clear")</a></td>
+        <td><a href="$urls.projectHistory($u_projectName)">#wwtext("name=filter.clear")</a></td>
         </tr>
     #end
             </td>
@@ -42,7 +41,7 @@
             <td>
 
             <table width="100%" class="content">
-                #pagingRow("history.action?id=$project.id&amp;stateFilter=$stateFilter&amp;spec=$spec&amp;" $pagingSupport)
+                #pagingRow("$base/history.action?projectName=$u_projectName&amp;stateFilter=$stateFilter&amp;" $pagingSupport)
                 <tr><th colspan="5">$action.getText("history.count", ["$pagingSupport.totalItems"])</th></tr>
             </table>
 #else

@@ -84,6 +84,20 @@ public interface BuildManager
 
     BuildResult getByProjectAndNumber(final Project project, final long number);
 
+    /**
+     * Returns the given build for the given project.  The build id can be
+     * either a numeric build id or one of a few recognised virtual ids:
+     *
+     *  latest              : the latest build
+     *  [latest]success[ful]: the latest successful build
+     *  [latest]broken      : the latest unsuccessful build
+     *  
+     * @param project the project to lookup the build for
+     * @param buildId the real or virtual build id
+     * @return the described build, or null if there is no such build
+     */
+    BuildResult getByProjectAndVirtualId(Project project, String buildId);
+
     BuildResult getByUserAndNumber(User user, long id);
 
     /**

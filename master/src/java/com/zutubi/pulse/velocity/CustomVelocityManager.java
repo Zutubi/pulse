@@ -10,6 +10,7 @@ import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.pulse.security.AcegiUtils;
+import com.zutubi.pulse.webwork.mapping.Urls;
 import org.apache.velocity.context.Context;
 
 import javax.servlet.http.HttpServletRequest;
@@ -30,6 +31,8 @@ public class CustomVelocityManager extends VelocityManager
     public Context createContext(OgnlValueStack stack, HttpServletRequest req, HttpServletResponse res)
     {
         Context context = super.createContext(stack, req, res);
+        context.put("urls", new Urls((String) context.get("base")));
+        
         if(getConfigurationProvider() != null)
         {
             GeneralAdminConfiguration config = getConfigurationProvider().get(GeneralAdminConfiguration.class);

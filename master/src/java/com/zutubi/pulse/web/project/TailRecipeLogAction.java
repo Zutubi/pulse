@@ -11,55 +11,29 @@ import com.zutubi.pulse.prototype.config.user.UserSettingsConfiguration;
 import com.zutubi.util.CircularBuffer;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
  */
-public class TailRecipeLogAction extends ProjectActionSupport
+public class TailRecipeLogAction extends StageActionBase
 {
     private static final int LINE_COUNT = 30;
     private static final int MAX_BYTES = 500 * LINE_COUNT;
 
-    private long id;
-    private long buildId;
+    private boolean raw = false;
     private int maxLines = -1;
     private int refreshInterval = -1;
-    private BuildResult buildResult;
-    private RecipeResultNode resultNode;
     private String tail = "";
     private MasterConfigurationManager configurationManager;
     private boolean logExists;
+    private FileInputStream inputStream;
     private ConfigurationProvider configurationProvider;
 
-    public long getId()
+    public void setRaw(boolean raw)
     {
-        return id;
-    }
-
-    public void setId(long id)
-    {
-        this.id = id;
-    }
-
-    public long getBuildId()
-    {
-        return buildId;
-    }
-
-    public void setBuildId(long buildId)
-    {
-        this.buildId = buildId;
-    }
-
-    public BuildResult getBuildResult()
-    {
-        return buildResult;
-    }
-
-    public RecipeResultNode getResultNode()
-    {
-        return resultNode;
+        this.raw = raw;
     }
 
     public String getTail()
@@ -92,77 +66,31 @@ public class TailRecipeLogAction extends ProjectActionSupport
         return logExists;
     }
 
+    public FileInputStream getInputStream()
+    {
+        return inputStream;
+    }
+
     public String execute() throws Exception
     {
         initialiseProperties();
 
-        buildResult = getBuildManager().getBuildResult(buildId);
-        if(buildResult == null)
-        {
-            addActionError("Unknown build [" + buildId + "]");
-            return ERROR;
-        }
-        
+        BuildResult buildResult = getRequiredBuildResult();
         checkPermissions(buildResult);
 
-        resultNode = buildResult.findResultNode(id);
-        if(resultNode == null)
-        {
-            addActionError("Unknown stage [" + id + "]");
-            return ERROR;
-        }
-
+        RecipeResultNode resultNode = getRequiredRecipeResultNode();
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
         File recipeLog = new File(paths.getRecipeDir(buildResult, resultNode.getResult().getId()), RecipeResult.RECIPE_LOG);
-        if(recipeLog.exists())
+        if (recipeLog.exists())
         {
             logExists = true;
-            RandomAccessFile file = null;
-
-            try
+            if (raw)
             {
-                file = new RandomAccessFile(recipeLog, "r");
-                long length = file.length();
-                if (length > 0)
-                {
-                    if(length > MAX_BYTES)
-                    {
-                        file.seek(length - MAX_BYTES);
-                        length = MAX_BYTES;
-
-                        // Discard the next (possibly partial) line
-                        file.readLine();
-                    }
-
-                    CircularBuffer<String> buffer = new CircularBuffer<String>(maxLines);
-                    String line = file.readLine();
-                    while(line != null)
-                    {
-                        buffer.append(line);
-                        line = file.readLine();
-                    }
-
-                    StringBuilder builder = new StringBuilder((int) length);
-                    for(String l: buffer)
-                    {
-                        builder.append(l);
-                        builder.append('\n');
-                    }
-
-                    tail = builder.toString();
-                }
+                return getRaw(recipeLog);
             }
-            catch(IOException e)
+            else
             {
-                addActionError("Error tailing log '" + recipeLog.getAbsolutePath() + "': " + e.getMessage());
-                return ERROR;
-            }
-            finally
-            {
-                if(file != null)
-                {
-                    file.close();
-                }
+                return getTail(recipeLog);
             }
         }
         else
@@ -170,13 +98,81 @@ public class TailRecipeLogAction extends ProjectActionSupport
             logExists = false;
         }
 
-        return SUCCESS;
+        return "tail";
+    }
+
+    private String getRaw(File recipeLog)
+    {
+        try
+        {
+            inputStream = new FileInputStream(recipeLog);
+        }
+        catch (IOException e)
+        {
+            addActionError("Unable to open recipe log '" + recipeLog.getAbsolutePath() + "': " + e.getMessage());
+            return ERROR;
+        }
+
+        return "raw";
+    }
+
+    private String getTail(File recipeLog) throws IOException
+    {
+        RandomAccessFile file = null;
+
+        try
+        {
+            file = new RandomAccessFile(recipeLog, "r");
+            long length = file.length();
+            if (length > 0)
+            {
+                if (length > MAX_BYTES)
+                {
+                    file.seek(length - MAX_BYTES);
+                    length = MAX_BYTES;
+
+                    // Discard the next (possibly partial) line
+                    file.readLine();
+                }
+
+                CircularBuffer<String> buffer = new CircularBuffer<String>(maxLines);
+                String line = file.readLine();
+                while (line != null)
+                {
+                    buffer.append(line);
+                    line = file.readLine();
+                }
+
+                StringBuilder builder = new StringBuilder((int) length);
+                for (String l : buffer)
+                {
+                    builder.append(l);
+                    builder.append('\n');
+                }
+
+                tail = builder.toString();
+            }
+        }
+        catch (IOException e)
+        {
+            addActionError("Error tailing log '" + recipeLog.getAbsolutePath() + "': " + e.getMessage());
+            return ERROR;
+        }
+        finally
+        {
+            if (file != null)
+            {
+                file.close();
+            }
+        }
+
+        return "tail";
     }
 
     private void initialiseProperties()
     {
         Object principle = getPrinciple();
-        if(principle != null)
+        if (principle != null)
         {
             User user = userManager.getUser((String) principle);
             if (user != null)
@@ -184,22 +180,22 @@ public class TailRecipeLogAction extends ProjectActionSupport
                 boolean changed = false;
 
                 UserSettingsConfiguration settings = user.getPreferences().getSettings();
-                if(refreshInterval <= 0)
+                if (refreshInterval <= 0)
                 {
                     refreshInterval = settings.getTailRefreshInterval();
                 }
-                else if(refreshInterval != settings.getTailRefreshInterval())
+                else if (refreshInterval != settings.getTailRefreshInterval())
                 {
                     settings = configurationProvider.deepClone(settings);
                     settings.setTailRefreshInterval(refreshInterval);
                     changed = true;
                 }
 
-                if(maxLines <= 0)
+                if (maxLines <= 0)
                 {
                     maxLines = settings.getTailLines();
                 }
-                else if(maxLines != settings.getTailLines())
+                else if (maxLines != settings.getTailLines())
                 {
                     if (!changed)
                     {
@@ -209,7 +205,7 @@ public class TailRecipeLogAction extends ProjectActionSupport
                     changed = true;
                 }
 
-                if(changed)
+                if (changed)
                 {
                     configurationProvider.save(settings);
                 }
@@ -217,12 +213,12 @@ public class TailRecipeLogAction extends ProjectActionSupport
         }
 
         // Just in case the user couldn't be found
-        if(refreshInterval <= 0)
+        if (refreshInterval <= 0)
         {
             refreshInterval = 60;
         }
 
-        if(maxLines <= 0)
+        if (maxLines <= 0)
         {
             maxLines = LINE_COUNT;
         }

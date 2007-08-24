@@ -2,6 +2,7 @@ package com.zutubi.pulse.web.project;
 
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
+import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.model.Field;
 import com.zutubi.prototype.model.Form;
 import com.zutubi.prototype.velocity.PrototypeDirective;
@@ -11,11 +12,13 @@ import com.zutubi.pulse.bootstrap.freemarker.FreemarkerConfigurationFactoryBean;
 import com.zutubi.pulse.core.config.NamedConfigurationComparator;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.model.ManualTriggerBuildReason;
-import com.zutubi.pulse.prototype.config.project.types.TypeConfiguration;
 import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.pulse.core.scm.ScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.model.ManualTriggerBuildReason;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.project.types.TypeConfiguration;
 import com.zutubi.util.logging.Logger;
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;
@@ -40,6 +43,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
 
     private ScmClientFactory scmClientFactory;
     private MasterConfigurationManager configurationManager;
+    private ConfigurationProvider configurationProvider;
 
     public String getFormSource()
     {
@@ -63,7 +67,8 @@ public class EditBuildPropertiesAction extends ProjectActionBase
 
     private void renderForm() throws IOException, TemplateException
     {
-        properties = new ArrayList<ResourceProperty>(getProjectConfig().getProperties().values());
+        Project project = getRequiredProject();
+        properties = new ArrayList<ResourceProperty>(project.getConfig().getProperties().values());
         Collections.sort(properties, new NamedConfigurationComparator());
 
         Form form = new Form();
@@ -109,7 +114,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         context.put("fieldErrors", getFieldErrors());
 
         Configuration configuration = FreemarkerConfigurationFactoryBean.createConfiguration(configurationManager);
-        configuration.setSharedVariable("projectId", getProject().getId());
+        configuration.setSharedVariable("projectId", project.getId());
         TemplateLoader currentLoader = configuration.getTemplateLoader();
         TemplateLoader classLoader = new ClassTemplateLoader(getClass(), "");
         MultiTemplateLoader loader = new MultiTemplateLoader(new TemplateLoader[]{ classLoader, currentLoader });
@@ -140,21 +145,20 @@ public class EditBuildPropertiesAction extends ProjectActionBase
 
     public String execute() throws IOException, TemplateException
     {
-        getProjectManager().checkWrite(getProject());
+        Project project = getRequiredProject();
+        getProjectManager().checkWrite(project);
 
-        mapProperties();
-        // FIXME the values here do not seem to persist, but we are saving
-        // FIXME something accurate...also saving at this granularity is very
-        // FIXME heavy handed
-
-        projectManager.saveProjectConfig(getProjectConfig());
+        ProjectConfiguration projectConfig = configurationProvider.deepClone(project.getConfig());
+        mapProperties(projectConfig);
+        String path = configurationProvider.save(projectConfig);
+        projectConfig = configurationProvider.get(path, ProjectConfiguration.class);
 
         Revision r = null;
         if(TextUtils.stringSet(revision))
         {
             try
             {
-                ScmClient client = scmClientFactory.createClient(getProjectConfig().getScm());
+                ScmClient client = scmClientFactory.createClient(projectConfig.getScm());
                 r = client.getRevision(revision);
             }
             catch (ScmException e)
@@ -168,9 +172,9 @@ public class EditBuildPropertiesAction extends ProjectActionBase
             // CIB-1162: Make sure we can get a pulse file at this revision
             try
             {
-                TypeConfiguration projectType = getProjectConfig().getType();
+                TypeConfiguration projectType = projectConfig.getType();
                 ComponentContext.autowire(projectType);
-                projectType.getPulseFile(0L, getProjectConfig(), r, null);
+                projectType.getPulseFile(0L, projectConfig, r, null);
             }
             catch (Exception e)
             {
@@ -182,7 +186,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
 
         try
         {
-            projectManager.triggerBuild(getProjectConfig(), new ManualTriggerBuildReason((String)getPrinciple()), r, true);
+            projectManager.triggerBuild(projectConfig, new ManualTriggerBuildReason((String)getPrinciple()), r, true);
         }
         catch (Exception e)
         {
@@ -203,7 +207,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         return SUCCESS;
     }
 
-    private void mapProperties()
+    private void mapProperties(ProjectConfiguration projectConfig)
     {
         Map parameters = ActionContext.getContext().getParameters();
         for(Object n: parameters.keySet())
@@ -212,7 +216,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
             if(name.startsWith(PROPERTY_PREFIX))
             {
                 String propertyName = name.substring(PROPERTY_PREFIX.length());
-                ResourceProperty property = getProjectConfig().getProperty(propertyName);
+                ResourceProperty property = projectConfig.getProperty(propertyName);
                 if(property != null)
                 {
                     Object value = parameters.get(name);
@@ -237,5 +241,10 @@ public class EditBuildPropertiesAction extends ProjectActionBase
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
+    }
+
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    {
+        this.configurationProvider = configurationProvider;
     }
 }

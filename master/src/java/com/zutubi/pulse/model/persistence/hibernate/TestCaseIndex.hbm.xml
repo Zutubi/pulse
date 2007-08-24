@@ -7,7 +7,6 @@
         </id>
 
         <property name="projectId" type="long" column="PROJECT_ID"/>
-        <property name="specNameId" type="long" column="SPEC_ID"/>
         <property name="stageNameId" type="long" column="NODE_ID"/>
         <property name="name" type="text" column="NAME"/>
         <property name="totalCount" type="int" column="TOTAL_COUNT"/>

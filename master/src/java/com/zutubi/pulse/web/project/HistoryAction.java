@@ -13,7 +13,7 @@ import java.util.TreeMap;
 
 /**
  */
-public class HistoryAction extends ProjectActionSupport implements Preparable
+public class HistoryAction extends ProjectActionBase implements Preparable
 {
     private static final int SURROUNDING_PAGES = 10;
 
@@ -23,8 +23,6 @@ public class HistoryAction extends ProjectActionSupport implements Preparable
     private static final String STATE_ERROR = "error";
     private static final String STATE_SUCCESS = "success";
 
-    private long id;
-    private Project project;
     private List<BuildResult> history;
     private PagingSupport pagingSupport = new PagingSupport(SURROUNDING_PAGES);
 
@@ -34,24 +32,9 @@ public class HistoryAction extends ProjectActionSupport implements Preparable
     private Long spec = 0L;
     private BuildColumns columns;
 
-    public long getId()
-    {
-        return id;
-    }
-
-    public void setId(long id)
-    {
-        this.id = id;
-    }
-
     public void setStartPage(int page)
     {
         pagingSupport.setStartPage(page);
-    }
-
-    public Project getProject()
-    {
-        return project;
     }
 
     public PagingSupport getPagingSupport()
@@ -118,12 +101,7 @@ public class HistoryAction extends ProjectActionSupport implements Preparable
 
     public String execute()
     {
-        project = getProjectManager().getProject(id);
-        if (project == null)
-        {
-            addActionError("Unknown project [" + id + "]");
-            return ERROR;
-        }
+        Project project = getRequiredProject();
 
         if (pagingSupport.getStartPage() < 0)
         {
@@ -136,7 +114,7 @@ public class HistoryAction extends ProjectActionSupport implements Preparable
         if (stateFilter.equals(STATE_ANY) && (spec == null || spec == 0L))
         {
             // Common case
-            getBuildManager().fillHistoryPage(page);
+            buildManager.fillHistoryPage(page);
         }
         else
         {
@@ -147,7 +125,7 @@ public class HistoryAction extends ProjectActionSupport implements Preparable
                 return ERROR;
             }
 
-            getBuildManager().fillHistoryPage(page, states);
+            buildManager.fillHistoryPage(page, states);
         }
 
         history = page.getResults();

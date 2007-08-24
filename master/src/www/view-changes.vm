@@ -1,27 +1,27 @@
 #helpTag("Build+Changes+Tab")
 #authorisationTags($principle)
-#buildTags($project $result)
+#buildTags($project $buildResult)
 <html>
 <head>
-    <title>#wwtext("name=build") $result.number</title>
+    <title>#wwtext("name=build") $buildResult.number</title>
     <script type="text/javascript" src="$base/js/prototype.js"></script>
 </head>
 <body>
-    #buildTabs($result "changes")
+    #buildTabs($buildResult "changes")
 
     #parse("/template/includes/actionerrors.vm")
 
 #macro(revisionCell $key $build $showLink)
     #if($build)
         #set($revision = "build $build.number")
-        #if($build.scmDetails.revision)
-            #set($revision = "$revision: revision $build.scmDetails.revision")
+        #if($build.revision)
+            #set($revision = "$revision: revision $build.revision")
         #else
             #set($revision = "$revision: no revision")
         #end
         #if($showLink)
             #set($linkText = $action.getText("changes.since"))
-            #set($revision = "$revision [<a href='$base/viewChanges.action?projectId=$projectId&amp;toBuild=$result.number&amp;sinceBuild=$build.number'>$linkText</a>]")
+            #set($revision = "$revision [<a href='$urls.buildChanges($buildResult)sinceBuild/$build.number/'>$linkText</a>]")
         #end
     #else
         #set($revision = "no build")
@@ -35,8 +35,8 @@
 
     <table class="content">
         #headingRow("changes.revisions" 2)
-        #revisionCell("changes.build.revision" $result false)
-#if(!$result.userRevision)
+        #revisionCell("changes.build.revision" $buildResult false)
+#if(!$buildResult.userRevision)
         #revisionCell("changes.previous.revision" $previous true)
         #revisionCell("changes.previous.successful.revision" $previousSuccessful true)
         #revisionCell("changes.previous.unsuccessful.revision" $previousUnsuccessful true)
@@ -45,9 +45,9 @@
 
 #if($changelists.size() > 0)
     #if($sinceResult)
-        #set($title = $action.getText("changes.between", [$sinceResult.number, $result.number]))
+        #set($title = $action.getText("changes.between", [$sinceResult.number, $buildResult.number]))
     #else
-        #set($title = $action.getText("changes.in.build", [$result.number]))
+        #set($title = $action.getText("changes.in.build", [$buildResult.number]))
     #end
     <table class="content">
         #headingRow($title 5)
@@ -65,7 +65,7 @@
             #dynamicCell($change.user)
             #dateCell($change)
             #commitCommentCell($change "changes")
-            #linkCell("view.$change.id" "view" "viewChangelist.action?id=$change.id&amp;buildId=$result.id")
+            #linkCell("view.$change.id" "view" "$urls.buildChangelist($buildResult, $change.id)")
         </tr>
         #if($change.changes.size() > 0)
         <tr>
@@ -81,7 +81,7 @@
             #end
             #foreach($i in [0..$limit])
                 #set($file = $change.changes.get($i))
-                    <li>$!webwork.htmlEncode($file.filename) #$file.revision.revisionString - $file.action.getPrettyString()</li>
+                    <li>$!webwork.htmlEncode($file.filename) #$file.revisionString - $file.action.getPrettyString()</li>
             #end
             #if($remaining > 0)
                     <li>... ($remaining #wwtext("name=changes.more.files"))</li>
@@ -95,7 +95,7 @@
 #else
     <p>
         <td class="content" colspan="5">
-    #if($result.userRevision)
+    #if($buildResult.userRevision)
             #wwtext("name=changes.user.revision")
     #else
             #wwtext("name=changes.none")

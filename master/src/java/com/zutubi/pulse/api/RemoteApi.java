@@ -1,7 +1,6 @@
 package com.zutubi.pulse.api;
 
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
-import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.*;
 import com.zutubi.pulse.ShutdownManager;
@@ -265,6 +264,12 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
 
         configurationTemplateManager.delete(path);
         return true;
+    }
+
+    public int deleteAllConfigs(String token, String pathPattern) throws AuthenticationException
+    {
+        tokenManager.verifyAdmin(token);
+        return configurationTemplateManager.deleteAll(pathPattern);
     }
     
 //    public Vector<String> getAllUserLogins(String token) throws AuthenticationException

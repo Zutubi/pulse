@@ -36,17 +36,17 @@ public class DefaultTestManager implements TestManager
                 File testDir = new File(node.getResult().getAbsoluteOutputDir(configurationManager.getDataDirectory()), RecipeResult.TEST_DIR);
                 if (testDir.isDirectory())
                 {
-                    indexTestsForStage(result, result.getProject().getId(), node.getStageHandle(), testDir);
+                    indexTestsForStage(result, node.getStageHandle(), testDir);
                 }
             }
         }
     }
 
-    private void indexTestsForStage(BuildResult result, long projectId, long stageNameId, File testDir)
+    private void indexTestsForStage(BuildResult result, long stageNameId, File testDir)
     {
         try
         {
-            persister.read(new IndexingHandler(result.getProject().getId(), result.getId(), result.getNumber(), projectId, stageNameId), null, testDir, true, false);
+            persister.read(new IndexingHandler(result.getProject().getId(), result.getId(), result.getNumber(), stageNameId), null, testDir, true, false);
         }
         catch (Exception e)
         {
@@ -76,18 +76,16 @@ public class DefaultTestManager implements TestManager
         private long projectId;
         private long buildId;
         private long buildNumber;
-        private long specNameId;
         private long stageNameId;
         private String path;
         private Map<String, TestCaseIndex> allCases;
         private int count = 0;
 
-        public IndexingHandler(long projectId, long buildId, long buildNumber, long specNameId, long stageNameId)
+        public IndexingHandler(long projectId, long buildId, long buildNumber, long stageNameId)
         {
             this.projectId = projectId;
             this.buildId = buildId;
             this.buildNumber = buildNumber;
-            this.specNameId = specNameId;
             this.stageNameId = stageNameId;
 
             List<TestCaseIndex> cases = testCaseIndexDao.findByStage(stageNameId);
@@ -152,7 +150,7 @@ public class DefaultTestManager implements TestManager
             TestCaseIndex caseIndex = allCases.get(casePath);
             if (caseIndex == null)
             {
-                caseIndex = new TestCaseIndex(projectId, specNameId, stageNameId, casePath);
+                caseIndex = new TestCaseIndex(projectId, stageNameId, casePath);
             }
 
             if (caseResult.hasBrokenTests() && !caseIndex.isHealthy())

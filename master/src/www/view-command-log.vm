@@ -5,15 +5,17 @@
 <head>
     <title>#wwtext("name=build") $result.number</title>
     <script type="text/javascript">
-#if($action.haveSelectedNode())
-        var selectedNode = "$selectedNode";
+#if($action.haveCommandResult())
+        var selectedNode = "$commandResult.id"
+#elseif($action.haveRecipeResultNode())
+        var selectedNode = "$recipeResultNode.id";
 #else
         var selectedNode = "$result.root.id";
 #end
     </script>
 </head>
 <body>
-    #buildTabs($result "detailed-view")
+    #buildTabs($result "details")
 
     <table class="twopane">
         <tr>

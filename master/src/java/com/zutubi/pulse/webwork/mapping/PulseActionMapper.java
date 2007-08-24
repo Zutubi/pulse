@@ -1,4 +1,4 @@
-package com.zutubi.prototype.webwork;
+package com.zutubi.pulse.webwork.mapping;
 
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.webwork.dispatcher.mapper.ActionMapper;
@@ -15,13 +15,15 @@ import java.util.Set;
 
 /**
  */
-public class ConfigurationActionMapper implements ActionMapper
+public class PulseActionMapper implements ActionMapper
 {
     public static final String DASHBOARD_NAMESPACE = "/dashboard";
+    public static final String BROWSE_NAMESPACE = "/browse";
     public static final String ADMIN_NAMESPACE = "/admin";
 
     private DefaultActionMapper delegate = new DefaultActionMapper();
-
+    private ActionResolver browseActionResolver = new BrowseActionResolver();
+    
     // Pure config namespaces only, no hybrids here!
     private static final Set<String> configNamespaces = new HashSet<String>();
     {
@@ -49,6 +51,10 @@ public class ConfigurationActionMapper implements ActionMapper
             // Urls in this space currently have no parameters, just the
             // action name.
             mapping = getDashboardMapping(path, request);
+        }
+        else if(BROWSE_NAMESPACE.equals(namespace))
+        {
+            mapping = getBrowseMapping(path, request);
         }
         else if(ADMIN_NAMESPACE.equals(namespace))
         {
@@ -129,11 +135,67 @@ public class ConfigurationActionMapper implements ActionMapper
             parameters.put("tab", "preferences");
             return getConfigMapping(ADMIN_NAMESPACE, path, request.getQueryString(), parameters);
         }
+        else if(path.startsWith("changes"))
+        {
+            String[] elements = path.split("/");
+            if(elements.length != 2)
+            {
+                return null;
+            }
+
+            Map<String, String> parameters = new HashMap<String, String>(1);
+            parameters.put("id", elements[1]);
+            return new ActionMapping("viewChangelist", "default", null, parameters);
+        }
         else
         {
             // All other dashboard paths are trivial action names.
             return new ActionMapping(path, DASHBOARD_NAMESPACE, null, null);
         }
+    }
+
+    private ActionMapping getBrowseMapping(String path, HttpServletRequest request)
+    {
+        // browse/                    - projects page
+        //   <project>/               - project tabs
+        //     home/                  - (default)
+        //     reports/
+        //     builds/                - (history)
+        //       <build id>/          - build tabs
+        //         summary/           - (default)
+        //         detailed/
+        //           <stage>/         - select stage on detailed tab
+        //             log/           - log for stage
+        //         changes/
+        //         tests/
+        //         file/
+        //         wc/
+        path = PathUtils.normalizePath(path);
+        return resolve(BROWSE_NAMESPACE, path, browseActionResolver);
+    }
+
+    private ActionMapping resolve(String namespace, String path, ActionResolver actionResolver)
+    {
+        Map<String, String> parameters = new HashMap<String, String>(actionResolver.getParameters());
+        String[] elements = path.length() == 0 ? new String[0] : path.split("/");
+        for(String element: elements)
+        {
+            actionResolver = actionResolver.getChild(element);
+            if(actionResolver == null)
+            {
+                break;
+            }
+
+            parameters.putAll(actionResolver.getParameters());
+        }
+
+        if(actionResolver == null || actionResolver.getAction() == null)
+        {
+            // No action found.
+            return null;
+        }
+
+        return new ActionMapping(actionResolver.getAction(), namespace, null, parameters);
     }
 
     private ActionMapping getAdminMapping(String path, HttpServletRequest request)

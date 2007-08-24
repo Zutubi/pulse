@@ -24,13 +24,13 @@ public abstract class TemplateTypeConfiguration extends TypeConfiguration
 {
     private static final Logger LOG = Logger.getLogger(TemplateTypeConfiguration.class);
 
+    @Select(optionProvider = "PostProcessorOptionProvider")
     private List<String> postProcessors = new LinkedList<String>();
 
     private Map<String, ArtifactConfiguration> artifacts = new LinkedHashMap<String, ArtifactConfiguration>();
     @Transient
     private VelocityEngine velocityEngine;
 
-    @Select(optionProvider = "PostProcessorOptionProvider")
     public List<String> getPostProcessors()
     {
         return postProcessors;

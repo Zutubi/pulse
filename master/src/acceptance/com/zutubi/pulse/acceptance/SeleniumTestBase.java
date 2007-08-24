@@ -110,7 +110,7 @@ public class SeleniumTestBase extends TestCase
 
         AddProjectWizard.SvnState svnState = new AddProjectWizard.SvnState(selenium);
         svnState.waitFor();
-        svnState.nextFormElements("svn://localhost/test/trunk", null, null, null, null, null);
+        svnState.nextFormElements("svn://localhost:3088/accept/triviant", null, null, null, null, null);
 
         SelectTypeState projectTypeState = new SelectTypeState(selenium);
         projectTypeState.waitFor();

@@ -1,5 +1,5 @@
 Project: test project
-Personal build 12 (http://host.url/viewBuild.action?id=11)
+Personal build 12 (/browse/projects/test%20project/builds/12/)
 
 Completed with status: failure
 
@@ -7,4 +7,4 @@ Build stages:
   * first stage :: first recipe@[pending] :: failure
   * second stage :: second recipe@[pending] :: failure
 
-Test summary: 5 of 5 broken (http://host.url/viewTests.action?id=11)
+Test summary: 5 of 5 broken (/browse/projects/test%20project/builds/12/tests/)

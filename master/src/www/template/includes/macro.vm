@@ -19,8 +19,8 @@
 ## Outputs sitemesh content tags for the project links on the header bar
 ##
 #macro(projectTags $project)
-    <content tag="projectId">$project.id</content>
-    <content tag="projectName">$!webwork.htmlEncode($project.name)</content>
+    <content tag="u_projectName">hello</content>
+    <content tag="h_projectName">$!webwork.htmlEncode($project.name)</content>
     <content tag="selectedTab">projects</content>
 #end
 
@@ -41,17 +41,16 @@
 #else
     #projectTags($project)
 #end
-    <content tag="buildId">$buildResult.id</content>
     <content tag="buildNumber">$buildResult.number</content>
 #end
 
 ##
 ## Outputs sitemesh content tags for stage links on the header bar
 ##
-#macro(stageTags $buildResult $resultNode)
+#macro(stageTags $buildResult)
     #buildTags($buildResult.project $buildResult)
-    <content tag="resultNodeId">$resultNode.id</content>
-    <content tag="stageName">$!webwork.htmlEncode($resultNode.stageName)</content>
+    <content tag="h_stageName">$h_stageName</content>
+    <content tag="u_stageName">$u_stageName</content>
 #end
 
 ##
@@ -80,7 +79,7 @@
 ## Outputs a project heading
 ##        
 #macro(projectName $project)
-    :: <a href="$base/currentBuild.action?id=${project.id}">$!webwork.htmlEncode($project.name)</a> ::
+    :: <a href="$urls.projectHome($project)">$!webwork.htmlEncode($project.name)</a> ::
 #end
 
 ##
@@ -208,8 +207,8 @@
 ##
 ## Shows a project tab of the given name with the given action name
 ##
-#macro(projectTab $name $action $selected)
-    #tabItem("tab.project.$name" $name "${action}.action?id=$project.id" $selected)
+#macro(projectTab $name $selected)
+    #tabItem("tab.project.$name" $name "$urls.project($u_projectName)${name}/" $selected)
 #end
 
 ##
@@ -217,17 +216,17 @@
 ##
 #macro(projectTabs $selected)
     #openTabs()
-        #projectTab("home" "currentBuild" $selected)
-        #projectTab("reporting" "projectReports" $selected)
-        #projectTab("history" "history" $selected)
+        #projectTab("home" $selected)
+        #projectTab("reports" $selected)
+        #projectTab("history" $selected)
     #closeTabs()
 #end
 
 ##
 ## Shows a build tab of the given name with the given action name
 ##
-#macro(buildTab $result $name $action $selected)
-    #tabItem("tab.build.$name" $name "${action}.action?id=$result.id" $selected)
+#macro(buildTab $result $name $selected)
+    #tabItem("tab.build.$name" $name "$urls.build($result)$name/" $selected)
 #end
 
 ##
@@ -235,18 +234,14 @@
 ##
 #macro(buildTabs $result $selected)
     #openTabs()
-        #buildTab($result "summary" "viewBuild" $selected)
-        #buildTab($result "detailed-view" "viewCommandLog" $selected)
-#if($result.personal)
-        #buildTab($result "changes" "viewPersonalChanges" $selected)
-#else
-        #buildTab($result "changes" "viewChanges" $selected)
-#end
-        #buildTab($result "tests" "viewTests" $selected)
-        #buildTab($result "build-file" "viewBuildFile" $selected)
-        #buildTab($result "artifacts" "viewBuildArtifacts" $selected)
+        #buildTab($result "summary" $selected)
+        #buildTab($result "details" $selected)
+        #buildTab($result "changes" $selected)
+        #buildTab($result "tests" $selected)
+        #buildTab($result "file" $selected)
+        #buildTab($result "artifacts" $selected)
 #if($action.canWrite($result.project))
-        #tabItem("build.tab.working-dir" "working-dir" "browseProjectDir.action?buildId=$result.id&amp;recipeId=$result.root.children.get(0).result.id" $selected)
+        #buildTab($result "wc" $selected)
 #end
     #closeTabs()
 #end
@@ -649,9 +644,9 @@
 ##
 ## Outputs an action cell with an image, and link title but no text
 ##
-#macro(actionCellTitle $titleKey $url $image)
+#macro(actionCellTitle $id $titleKey $url $image)
     <td class="content">
-        <a class="unadorned" href="$url" title="$action.getText($titleKey)"><img alt="$action.getText($titleKey)" src="$base/images/$image"/></a>
+        <a id="$id" class="unadorned" href="$url" title="$action.getText($titleKey)"><img alt="$action.getText($titleKey)" src="$base/images/$image"/></a>
     </td>
 #end
 
@@ -889,9 +884,9 @@
             #foreach($id in $changelist.resultIds)
                 <tr>
                 #set($result = $action.getResult($id))
-                    <td class="content"><a href="currentBuild.action?id=$result.project.id">$!webwork.htmlEncode($result.project.name)</a></td>
+                    <td class="content"><a href="$urls.projectHome($result.project)">$!webwork.htmlEncode($result.project.name)</a></td>
                     #assignGlobalResultCssClass($result)
-                    #dynamicRightLinkCell($result.number "$base/viewBuild.action?id=$result.id")
+                    #dynamicRightLinkCell($result.number "$urls.build($result)")
                     #statusCell($result true)
                 </tr>
             #end
@@ -949,9 +944,9 @@
         #wwtext("name=tests.none")
     #else
         #if($recipe)
-            <a href="$base/viewTestSuite.action?id=$build.id&amp;nodeId=$recipe.id">
+            <a href="$urls.stageTests($build, $recipe)">
         #else
-            <a href="$base/viewTests.action?id=$build.id">
+            <a href="$urls.buildTests($build)">
         #end
         #if($summary.allPassed())
             $action.getText("tests.all.passed", ["$summary.total"])
@@ -974,7 +969,7 @@
         </td>
     #else
         <td class="$cssClass">
-            <a href="$base/currentBuild.action?id=$rr.owner.id">
+            <a href="$urls.projectHome($rr.owner)">
                 $!webwork.htmlEncode($rr.owner.name)
             </a>
          </td>
@@ -1002,7 +997,7 @@
 ##
 #macro(viewCell $project $result)
     <td class="content">
-        <a href="$base/viewBuild.action?id=$result.id" class="unadorned" title="view summary"><img alt="view summary" src="$base/images/information.gif"/></a>
+        <a href="$urls.build($result)" class="unadorned" title="view summary"><img alt="view summary" src="$base/images/information.gif"/></a>
     </td>
 #end
 
@@ -1011,7 +1006,7 @@
 ##
 #macro(logCell $project $result)
     <td class="content">
-        <a href="$base/viewCommandLog.action?id=$result.id" class="unadorned" title="view details"><img alt="view details" src="$base/images/magnifier.gif"/></a>
+        <a href="$urls.buildDetails($result)" class="unadorned" title="view details"><img alt="view details" src="$base/images/magnifier.gif"/></a>
     </td>
 #end
 
@@ -1019,11 +1014,7 @@
 ## Outputs an action cell for viewing changes for a build
 ##
 #macro(changesCell $project $result)
-    #if($result.personal)
-        #set($url = "$base/viewPersonalChanges.action?id=$result.id")
-    #else
-        #set($url = "$base/viewChanges.action?projectId=$project.id&amp;toBuild=$result.number")
-    #end
+    #set($url = "$urls.buildChanges($result)")
     <td class="content">
         <a href="$url" class="unadorned" title="view changes"><img alt="view changes" src="$base/images/page_code.gif"/></a>
     </td>
@@ -1034,7 +1025,7 @@
 ##
 #macro(artifactsCell $project $result)
     <td class="content">
-        <a href="$base/viewBuildArtifacts.action?id=$result.id" class="unadorned" title="view artifacts"><img alt="view artifacts" src="$base/images/folder_page.gif"/></a>
+        <a href="$urls.buildArtifacts($result)" class="unadorned" title="view artifacts"><img alt="view artifacts" src="$base/images/folder_page.gif"/></a>
     </td>
 #end
 
@@ -1044,7 +1035,7 @@
 #macro(workingCopyCell $project $result $multiProject)
     #if($action.canWrite($project) || $result.personal)
         <td class="content">
-            <a href="$base/browseProjectDir.action?buildId=$result.id" class="unadorned" title="working copy"><img alt="view working copy" src="$base/images/page_gear.gif"/></a>
+            <a href="$urls.buildWorkingCopy($result)" class="unadorned" title="working copy"><img alt="view working copy" src="$base/images/page_gear.gif"/></a>
         </td>
     #elseif($multiProject)
         <td class="content">
@@ -1336,7 +1327,7 @@
             </a>
         </td>
     #else
-        #dynamicLinkCell($resultNode.stageName "$base/viewCommandLog.action?id=$build.id&amp;selectedNode=$resultNode.id")
+        #dynamicLinkCell($resultNode.stageName "$urls.stageDetails($build, $resultNode)")
     #end
         #dynamicCell($recipe.recipeNameSafe)
         #dynamicCell($resultNode.hostSafe)
@@ -1345,7 +1336,7 @@
         #dateClassCell($recipe)
         #elapsedCell($recipe)
         <td class="content">
-            <a href="tailRecipeLog.action?id=$id&amp;buildId=$build.id" class="unadorned" title="view log""><img alt="view log" src="$base/images/script.gif"/> #wwtext("name=log")  </a>
+            <a href="$urls.stageLogs($build, $resultNode)" class="unadorned" title="view log""><img alt="view log" src="$base/images/script.gif"/> #wwtext("name=log")  </a>
         </td>
     </tr>
 #end
@@ -1423,7 +1414,7 @@
                 $action.plainToHtml($feature.summary)<br/>
             #end
             #if($recipe.completed())
-                <a class="unadorned" href="viewArtifactt.action?id=$fileArtifact.id&amp;buildId=$build.id&amp;commandId=$command.id#$feature.lineNumber">
+                <a class="unadorned" href="$urls.commandArtifacts($build, $command)$fileArtifact.pathUrl/#$feature.lineNumber">
                     <span class="small">#wwtext("name=jump.to")</span> <img src="$base/images/go_small.gif"/>
                 </a>
             #end
@@ -1539,9 +1530,9 @@
     <li class="file-artifact">
     #set($trimmedPath = $artifact.trimmedPath($fileArtifact))
     #if($showArtifactLink)
-        <a href="$base/view/$result.id/$artifact.id/$action.escapeSpaces($fileArtifact.path)">$trimmedPath</a>
+        <a href="$base/view/$result.id/${artifact.id}${fileArtifact.pathUrl}">$trimmedPath</a>
         #if($fileArtifact.canDecorate())
-            [<a href="viewArtifactt.action?id=$fileArtifact.id&amp;buildId=$build.id&amp;commandId=$result.id">decorated</a>]
+            [<a href="$urls.commandArtifacts($build, $result)$fileArtifact.pathUrl/">decorated</a>]
         #end
     #else
         $trimmedPath
@@ -1849,7 +1840,7 @@
     <td class="test-failure">
         #wwtext("name=$key")
         #if($test.wasBrokenPreviously())
-            <br/>(<a href="$base/viewBuild.action?id=$test.brokenSince">#wwtext("name=test.broken.since") $test.brokenNumber</a>)
+            <br/>(<a href="$urls.build($buildResult)">#wwtext("name=test.broken.since") $test.brokenNumber</a>)
         #end
     </td>
 #end
@@ -1962,7 +1953,7 @@
 
     <tr>
         <td class="test-failure content-nowrap">
-             ${indent}<a href='viewTestSuite.action?id=$build.id&amp;nodeId=$recipe.id&amp;path=$action.urlEncode($path)'>$!webwork.htmlEncode($test.name)</a>
+             ${indent}<a href='$urls.stageTests($build, $recipe)$action.urlEncode($path)'>$!webwork.htmlEncode($test.name)</a>
          </td>
         #contentCell("empty.cell")
         #contentCell("empty.cell")
@@ -2368,13 +2359,13 @@
 ##
 #macro(projectCell $project)
     <td class="content">
-        <a href="currentBuild.action?id=$project.id" id="$!webwork.htmlEncode($project.name)">$!webwork.htmlEncode($project.name)</a>
+        <a href="$urls.projectHome($project)" id="$!webwork.htmlEncode($project.name)">$!webwork.htmlEncode($project.name)</a>
     </td>
 #end
 
 #macro(projectClassCell $project)
     <td class="$cssClass">
-        <a href="currentBuild.action?id=$project.id" id="$!webwork.htmlEncode($project.name)">$!webwork.htmlEncode($project.name)</a>
+        <a href="$urls.projectHome($project)" id="$!webwork.htmlEncode($project.name)">$!webwork.htmlEncode($project.name)</a>
     </td>
 #end
 
@@ -2384,7 +2375,7 @@
 #macro(buildTableCell $buildResult $columns $key $multiProject)
     #set($project = $buildResult.project)
     #if($key == "id")
-        #dynamicRightLinkCell($buildResult.number "$base/viewBuild.action?id=$buildResult.id")
+        #dynamicRightLinkCell($buildResult.number "$urls.build($buildResult)")
     #elseif($key == "project")
         #projectClassCell($project)
     #elseif($key == "status")
@@ -2398,9 +2389,9 @@
     #elseif($key == "rev")
         #if($buildResult.personal)
             #staticClassCell("personal")
-        #elseif($buildResult.scmDetails.revision)
-            $action.updateChangeUrl($project, $buildResult.scmDetails.revision)
-            #dynamicRightLinkClassCell($buildResult.scmDetails.revision $action.getChangeUrl())
+        #elseif($buildResult.revision)
+            $action.updateChangeUrl($project, $buildResult.revision)
+            #dynamicRightLinkClassCell($buildResult.revision $action.getChangeUrl())
         #else
             #contentClassCell("revision.none")
         #end
