@@ -9,6 +9,7 @@ import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.scm.ScmCancelledException;
 import com.zutubi.pulse.core.scm.ScmEventHandler;
 import com.zutubi.pulse.core.scm.ScmClient;
+import com.zutubi.pulse.core.scm.ScmContext;
 import com.zutubi.util.ForkOutputStream;
 import com.zutubi.util.IOUtils;
 import com.zutubi.util.logging.Logger;
@@ -55,6 +56,9 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmEventHandler
         FileOutputStream fout = null;
         ScmClient client = null;
 
+        ScmContext scmContext = new ScmContext();
+        scmContext.setDir(workDir);
+        
         try
         {
             fout = new FileOutputStream(new File(outDir, BootstrapCommand.FILES_FILE));
@@ -68,7 +72,7 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmEventHandler
             }
 
             outputWriter = new PrintWriter(out);
-            client = bootstrap(workDir);
+            client = bootstrap(scmContext);
         }
         catch (IOException e)
         {
@@ -87,6 +91,9 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmEventHandler
             try
             {
                 client.storeConnectionDetails(outDir);
+
+                scmContext.getProperties();
+
                 context.getGlobalScope().add(client.getProperties(getId(), workDir));
             }
             catch (Exception e)
@@ -130,5 +137,5 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmEventHandler
         terminated = true;
     }
 
-    abstract ScmClient bootstrap(File workDir);
+    abstract ScmClient bootstrap(ScmContext context);
 }

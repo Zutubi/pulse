@@ -535,9 +535,10 @@ public class PerforceClient extends CachingScmClient
         }
     }
 
-    public Revision checkout(String id, File toDirectory, Revision revision, ScmEventHandler handler) throws ScmException
+    public Revision checkout(ScmContext context, ScmEventHandler handler) throws ScmException
     {
-        return sync(id, toDirectory, revision, handler, true);
+        Revision revision = context.getRevision();
+        return sync(context.getId(), context.getDir(), revision, handler, true);
     }
 
     public InputStream retrieve(String path, Revision revision) throws ScmException
@@ -682,9 +683,10 @@ public class PerforceClient extends CachingScmClient
         return false;
     }
 
-    public void update(String id, File workDir, Revision rev, ScmEventHandler handler) throws ScmException
+    public void update(ScmContext context, ScmEventHandler handler) throws ScmException
     {
-        sync(id, workDir, rev, handler, false);
+        Revision rev = context.getRevision();
+        sync(context.getId(), context.getDir(), rev, handler, false);
     }
 
     public void tag(Revision revision, String name, boolean moveExisting) throws ScmException

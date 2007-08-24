@@ -283,8 +283,10 @@ public class SvnClient implements ScmClient
         }
     }
 
-    public Revision checkout(String id, File toDirectory, Revision revision, ScmEventHandler handler) throws ScmException
+    public Revision checkout(ScmContext context, ScmEventHandler handler) throws ScmException
     {
+        Revision revision = context.getRevision();
+
         SVNRevision svnRevision;
         SVNUpdateClient updateClient = new SVNUpdateClient(repository.getAuthenticationManager(), null);
 
@@ -304,8 +306,8 @@ public class SvnClient implements ScmClient
 
         try
         {
-            updateClient.doCheckout(repository.getLocation(), toDirectory, svnRevision, svnRevision, true);
-            updateExternals(toDirectory, revision, updateClient, handler);
+            updateClient.doCheckout(repository.getLocation(), context.getDir(), svnRevision, svnRevision, true);
+            updateExternals(context.getDir(), revision, updateClient, handler);
         }
         catch (SVNException e)
         {
@@ -616,13 +618,15 @@ public class SvnClient implements ScmClient
         return result;
     }
 
-    public void update(String id, File workDir, Revision rev, ScmEventHandler handler) throws ScmException
+    public void update(ScmContext context, ScmEventHandler handler) throws ScmException
     {
+        Revision rev = context.getRevision();
+
         // CIB-610: cleanup before update in case WC is locked.
         SVNWCClient wcClient = new SVNWCClient(authenticationManager, null);
         try
         {
-            wcClient.doCleanup(workDir);
+            wcClient.doCleanup(context.getDir());
         }
         catch (SVNException e)
         {
@@ -635,8 +639,8 @@ public class SvnClient implements ScmClient
             client.setEventHandler(new ChangeEventHandler(handler));
         }
 
-        update(workDir, convertRevision(rev), client);
-        updateExternals(workDir, rev, client, handler);
+        update(context.getDir(), convertRevision(rev), client);
+        updateExternals(context.getDir(), rev, client, handler);
     }
 
     private void update(File workDir, SVNRevision rev, SVNUpdateClient client) throws ScmException

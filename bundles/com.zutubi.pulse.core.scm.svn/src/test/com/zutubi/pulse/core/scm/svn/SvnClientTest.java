@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.ScmFile;
+import com.zutubi.pulse.core.scm.ScmContext;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.ZipUtils;
@@ -29,6 +30,7 @@ public class SvnClientTest extends PulseTestCase
     private File expectedDir;
     private Process serverProcess;
     private static final String TAG_PATH = "svn://localhost/test/tags/test-tag";
+    private ScmContext context;
 
 //    $ svn log -v svn://localhost/test
 //    ------------------------------------------------------------------------
@@ -102,6 +104,9 @@ public class SvnClientTest extends PulseTestCase
         gotDir = new File(repoDir, "got");
         gotDir.mkdirs();
 
+        context = new ScmContext();
+        context.setDir(gotDir);
+
         ZipUtils.extractZip(dataFile, repoDir);
         serverProcess = Runtime.getRuntime().exec("svnserve --foreground -dr " + repoDir.getAbsolutePath());
 
@@ -112,6 +117,7 @@ public class SvnClientTest extends PulseTestCase
 
     protected void tearDown() throws Exception
     {
+        context = null;
         server = null;
         serverProcess.destroy();
         serverProcess.waitFor();
@@ -240,22 +246,22 @@ public class SvnClientTest extends PulseTestCase
 
     public void testCheckout() throws ScmException, IOException
     {
-        server.checkout(null, gotDir, createRevision(1), null);
+        server.checkout(context, null);
         assertRevision(gotDir, 1);
     }
 
     public void testUpdate() throws ScmException, IOException
     {
-        server.checkout(null, gotDir, createRevision(1), null);
-        server.update(null, gotDir, createRevision(4), null);
+        server.checkout(context, null);
+        server.update(context, null);
         assertRevision(gotDir, 4);
     }
 
     public void testMultiUpdate() throws ScmException, IOException
     {
-        server.checkout(null, gotDir, createRevision(1), null);
-        server.update(null, gotDir, createRevision(4), null);
-        server.update(null, gotDir, createRevision(8), null);
+        server.checkout(context, null);
+        server.update(context, null);
+        server.update(context, null);
         assertRevision(gotDir, 8);
     }
 

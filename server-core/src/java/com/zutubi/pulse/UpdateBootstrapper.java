@@ -3,11 +3,9 @@ package com.zutubi.pulse;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.scm.ScmException;
-import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.core.scm.ScmClient;
+import com.zutubi.pulse.core.scm.ScmContext;
 import com.zutubi.util.logging.Logger;
-
-import java.io.File;
 
 /**
  */
@@ -20,11 +18,13 @@ public class UpdateBootstrapper extends ScmBootstrapper
         super(project, client, revision);
     }
 
-    ScmClient bootstrap(File workDir)
+    ScmClient bootstrap(ScmContext context)
     {
         try
         {
-            scm.update(getId(), workDir, revision.getRevision(), this);
+            context.setId(getId());
+            context.setRevision(revision.getRevision());
+            scm.update(context, this);
             return scm;
         }
         catch (ScmException e)

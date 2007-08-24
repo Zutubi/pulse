@@ -4,9 +4,8 @@ import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.ScmClient;
+import com.zutubi.pulse.core.scm.ScmContext;
 import com.zutubi.util.logging.Logger;
-
-import java.io.File;
 
 /**
  * <class-comment/>
@@ -23,7 +22,7 @@ public class CheckoutBootstrapper extends ScmBootstrapper
         this.persist = persist;
     }
 
-    public ScmClient bootstrap(File workDir)
+    public ScmClient bootstrap(ScmContext context)
     {
         try
         {
@@ -32,8 +31,9 @@ public class CheckoutBootstrapper extends ScmBootstrapper
             {
                 id = getId();
             }
-
-            scm.checkout(id, workDir, revision.getRevision(), this);
+            context.setId(id);
+            context.setRevision(revision.getRevision());
+            scm.checkout(context, this);
             return scm;
         }
         catch (ScmException e)

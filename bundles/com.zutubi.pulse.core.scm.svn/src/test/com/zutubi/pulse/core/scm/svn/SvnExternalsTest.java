@@ -213,7 +213,7 @@ public class SvnExternalsTest extends PulseTestCase
     public void testUpdate() throws Exception
     {
         doCheckout(2);
-        server.update(null, checkoutDir, createRevision(5), null);
+        server.update(null, null);
 
         assertFile("file1", "edited bundle file1\n");
         assertFile("pull1/file1", "");
@@ -224,7 +224,7 @@ public class SvnExternalsTest extends PulseTestCase
     private void doCheckout(int rev) throws ScmException
     {
         server.addExternalPath(".");
-        server.checkout(null, checkoutDir, createRevision(rev), new ScmEventHandler()
+        server.checkout(null, new ScmEventHandler()
         {
             public void status(String message)
             {

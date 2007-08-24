@@ -7,6 +7,7 @@ import com.zutubi.pulse.core.scm.NumericalRevision;
 import com.zutubi.pulse.core.scm.ScmChangeAccumulator;
 import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.ScmFile;
+import com.zutubi.pulse.core.scm.ScmContext;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.SystemUtils;
@@ -112,7 +113,11 @@ public class PerforceClientTest extends PulseTestCase
     public void testCheckoutRevision() throws Exception
     {
         getServer("depot-client");
-        Revision revision = client.checkout(null, workDir, createRevision(1), null);
+
+        ScmContext context = new ScmContext();
+        context.setDir(workDir);
+
+        Revision revision = client.checkout(context, null);
         assertEquals("1", revision.getRevisionString());
         checkDirectory("checkoutRevision");
     }
@@ -317,7 +322,11 @@ public class PerforceClientTest extends PulseTestCase
     public void testCheckoutThenUpdate() throws ScmException, IOException
     {
         getServer("depot-client");
-        Revision got = client.checkout("my-id", workDir, createRevision(1), null);
+
+        ScmContext context = new ScmContext();
+        context.setDir(workDir);
+
+        Revision got = client.checkout(context, null);
         assertEquals("1", got.getRevisionString());
         checkDirectory("checkoutRevision");
 
@@ -332,7 +341,11 @@ public class PerforceClientTest extends PulseTestCase
     public void testUpdateSameRevision() throws ScmException, IOException
     {
         getServer("depot-client");
-        client.checkout("my-id", workDir, null, null);
+
+        ScmContext context = new ScmContext();
+        context.setDir(workDir);
+
+        client.checkout(context, null);
 
         List<Change> changes = updateChanges("my-id", workDir, null);
         checkDirectory("checkoutHead");
@@ -343,8 +356,11 @@ public class PerforceClientTest extends PulseTestCase
     {
         getServer(TEST_CLIENT);
 
-        Revision coRevision = createRevision(1);
-        client.checkout("my-id", workDir, coRevision, null);
+        ScmContext context = new ScmContext();
+        context.setRevision(createRevision(1));
+        context.setDir(workDir);
+        
+        client.checkout(context, null);
 
         for(int i = 2; i <= 8; i++)
         {
@@ -502,16 +518,26 @@ public class PerforceClientTest extends PulseTestCase
 
     private List<Change> checkoutChanges(String id, File dir, Revision revision, long expectedRevision) throws ScmException
     {
+        ScmContext context = new ScmContext();
+        context.setId(id);
+        context.setDir(dir);
+        context.setRevision(revision);
+        
         ScmChangeAccumulator accumulator = new ScmChangeAccumulator();
-        Revision rev = client.checkout(id, dir, revision, accumulator);
+        Revision rev = client.checkout(context, accumulator);
         assertEquals(expectedRevision, (long)Long.valueOf(rev.getRevisionString()));
         return accumulator.getChanges();
     }
 
     private List<Change> updateChanges(String id, File dir, Revision revision) throws ScmException
     {
+        ScmContext context = new ScmContext();
+        context.setId(id);
+        context.setDir(dir);
+        context.setRevision(revision);
+
         ScmChangeAccumulator accumulator = new ScmChangeAccumulator();
-        client.update(id, dir, revision, accumulator);
+        client.update(context, accumulator);
         return accumulator.getChanges();
     }
 

@@ -30,8 +30,6 @@ public interface ScmClient
      * include the server address and repository root, for example.  All
      * SCMServer objects talking to the same SCM should return the same id.
      *
-     * Required for {@link ScmCapability#LIST_CHANGES}.
-     *
      * @return a unique id for the SCM server
      * @throws ScmException on error
      */
@@ -54,39 +52,21 @@ public interface ScmClient
      *
      * Required for all implementations.
      *
-     * @param id          an identifier for this checkout used to identify related
-     *                    checkout/update operations.  May be null to indicate no
-     *                    relationship.
-     * @param toDirectory root directory to check out to
-     * @param revision    the revision to check out, or null for most recent
-     *                    or when revisions are not supported
+     * @param context
      * @param handler     if not null, receives notifications of events during the
-     *                    checkout operation
-     * @return the revision actually checked out
-     * @throws ScmException on error
      */
-    Revision checkout(String id, File toDirectory, Revision revision, ScmEventHandler handler) throws ScmException;
+    Revision checkout(ScmContext context, ScmEventHandler handler) throws ScmException;
 
     /**
      * Update the working directory to the specified revision.
      *
-     * Required for {@link ScmCapability#UPDATE}.
-     *
-     * @param id      an identifier for this update used to identify related
-     *                checkout/update operations.  May be null to indicate no
-     *                relationship.
-     * @param workDir contains a local copy (checkout) of the module.
-     * @param rev     revision to which the local copy will be updated.
+     * @param context
      * @param handler if not null, receives notifications of events during the
-     *                update operation
-     * @throws ScmException on error
      */
-    void update(String id, File workDir, Revision rev, ScmEventHandler handler) throws ScmException;
+    void update(ScmContext context, ScmEventHandler handler) throws ScmException;
 
     /**
      * Checks out the specified file at the given revision.
-     *
-     * Required for {@link ScmCapability#CHECKOUT_FILE}.
      *
      * @param path
      * @param revision the revision be checked out @return an input stream that will return the contents of the requested file
@@ -141,8 +121,6 @@ public interface ScmClient
     /**
      * Returns the latest repository revision.
      *
-     * Required for {@link ScmCapability#LATEST_REVISION}.
-     *
      * @return the latest revision in the repository
      * @throws ScmException on error
      */
@@ -151,8 +129,6 @@ public interface ScmClient
     /**
      * Returns a list of revisions occuring between the given revisions.
      * The from revision itself it NOT included in the result.
-     *
-     * Required for {@link ScmCapability#POLL}.
      *
      * @param from the revision before the first revision to return
      * @param to
@@ -166,7 +142,7 @@ public interface ScmClient
      * The changelist that created the from revision itself is NOT included in
      * the model.
      *
-     * Required for {@link ScmCapability#LIST_CHANGES}.
+     * Required for {@link ScmCapability#CHANGESET}.
      *
      * @param from  the revision before the first changelist to include in the model
      * @param to    the last revision to include in the model
@@ -208,8 +184,6 @@ public interface ScmClient
      * and thus should be validated.  If it is invalid, an SCMException
      * should be thrown.
      *
-     * Required for {@link ScmCapability#CHECKOUT_AT_REVISION}.
-     * 
      * @param revision revision input string to be converted into an actual
      *                 revision
      * @return a valid revision derived from the string
