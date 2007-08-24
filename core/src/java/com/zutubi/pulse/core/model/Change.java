@@ -124,16 +124,6 @@ public class Change extends Entity
     }
 
     /**
-     * @return the revision number of the change
-     *
-     * @deprecated
-     */
-    public FileRevision getRevision()
-    {
-        return null;
-    }
-
-    /**
      * @return the action performed on the file
      */
     public Action getAction()

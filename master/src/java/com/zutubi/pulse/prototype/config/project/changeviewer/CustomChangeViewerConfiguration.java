@@ -3,16 +3,15 @@ package com.zutubi.pulse.prototype.config.project.changeviewer;
 import com.opensymphony.util.TextUtils;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.core.Scope;
 import com.zutubi.pulse.core.VariableHelper;
-import com.zutubi.pulse.core.scm.config.ScmConfiguration;
-import com.zutubi.pulse.core.model.FileRevision;
 import com.zutubi.pulse.core.model.Property;
 import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.util.StringUtils;
-import com.zutubi.prototype.config.ConfigurationProvider;
 
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;

@@ -3,9 +3,7 @@ package com.zutubi.pulse.prototype.config.project.changeviewer;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Transient;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
-import com.zutubi.pulse.core.model.FileRevision;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 
 /**
  * Represents an external SCM change viewing application, such as Fisheye or
