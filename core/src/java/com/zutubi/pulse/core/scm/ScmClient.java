@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core.scm;
 
-import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
 
@@ -73,23 +72,6 @@ public interface ScmClient
      * @throws ScmException on error
      */
     InputStream retrieve(String path, Revision revision) throws ScmException;
-
-    /**
-     * Returns variables that should be added to the build environment for
-     * this SCM.  This is useful if commands run in the build may need access
-     * to the information, but may be unnecessary for SCMs where the
-     * information is already present in the working copy (e.g. Subversion).
-     * In this latter case an empty map may be returned.
-     *
-     * Required for all implementations.
-     *
-     * @param id  identifier linking this request with a previous checkout
-     *            operation, or null if no such relationship exists.
-     * @param dir directory containing the working copy for the build
-     * @return properties to introduce into the build environment
-     * @throws ScmException on error
-     */
-    List<ResourceProperty> getProperties(String id, File dir) throws ScmException;
 
     /**
      * Stores details about the connection to the server to the given

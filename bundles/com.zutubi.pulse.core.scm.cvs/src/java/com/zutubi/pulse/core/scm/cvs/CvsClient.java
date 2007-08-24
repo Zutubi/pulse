@@ -1,7 +1,6 @@
 package com.zutubi.pulse.core.scm.cvs;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.*;
@@ -186,6 +185,7 @@ public class CvsClient implements ScmClient, DataCacheAware
     {
         Revision rev = context.getRevision();
         assertRevisionArgValid(rev);
+        addPropertiesToContext(context);
         core.update(context.getDir(), convertRevision(rev), handler);
     }
 
@@ -195,16 +195,14 @@ public class CvsClient implements ScmClient, DataCacheAware
         core.tag(module, convertRevision(revision), name, moveExisting);
     }
 
-    public List<ResourceProperty> getProperties(String id, File dir) throws ScmException
+    private void addPropertiesToContext(ScmContext context) throws ScmException
     {
-        List<ResourceProperty> result = new ArrayList<ResourceProperty>(3);
-        result.add(new ResourceProperty("cvs.root", root));
+        context.addProperty("cvs.root", root);
         if (branch != null)
         {
-            result.add(new ResourceProperty("cvs.branch", branch));
+            context.addProperty("cvs.branch", branch);
         }
-        result.add(new ResourceProperty("cvs.module", module));
-        return result;
+        context.addProperty("cvs.module", module);
     }
 
     public void storeConnectionDetails(File outputDir) throws ScmException, IOException
@@ -251,6 +249,7 @@ public class CvsClient implements ScmClient, DataCacheAware
     {
         Revision revision = context.getRevision();
         assertRevisionArgValid(revision);
+        addPropertiesToContext(context);
         core.checkout(context.getDir(), module, convertRevision(revision), handler);
         return revision;
     }

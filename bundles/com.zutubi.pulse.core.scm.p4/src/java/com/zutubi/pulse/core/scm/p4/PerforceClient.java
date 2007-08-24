@@ -3,7 +3,6 @@ package com.zutubi.pulse.core.scm.p4;
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.Scope;
 import com.zutubi.pulse.core.VariableHelper;
-import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Property;
@@ -538,6 +537,7 @@ public class PerforceClient extends CachingScmClient
     public Revision checkout(ScmContext context, ScmEventHandler handler) throws ScmException
     {
         Revision revision = context.getRevision();
+        addPropertiesToContext(context);
         return sync(context.getId(), context.getDir(), revision, handler, true);
     }
 
@@ -686,6 +686,7 @@ public class PerforceClient extends CachingScmClient
     public void update(ScmContext context, ScmEventHandler handler) throws ScmException
     {
         Revision rev = context.getRevision();
+        addPropertiesToContext(context);
         sync(context.getId(), context.getDir(), rev, handler, false);
     }
 
@@ -711,15 +712,13 @@ public class PerforceClient extends CachingScmClient
         }
     }
 
-    public List<ResourceProperty> getProperties(String id, File dir) throws ScmException
+    public void addPropertiesToContext(ScmContext context) throws ScmException
     {
-        List<ResourceProperty> result = new LinkedList<ResourceProperty>();
         for (Map.Entry<String, String> entry : core.getEnv().entrySet())
         {
-            result.add(new ResourceProperty(entry.getKey(), entry.getValue(), true, false, false));
+            context.addProperty(entry.getKey(), entry.getValue(), true);
         }
-        result.add(new ResourceProperty("P4CLIENT", getClientName(id), true, false, false));
-        return result;
+        context.addProperty("P4CLIENT", getClientName(context.getId()), true);
     }
 
     public void storeConnectionDetails(File outputDir) throws ScmException, IOException

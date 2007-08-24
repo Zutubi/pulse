@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core.scm.svn;
 
-import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
@@ -286,6 +285,7 @@ public class SvnClient implements ScmClient
     public Revision checkout(ScmContext context, ScmEventHandler handler) throws ScmException
     {
         Revision revision = context.getRevision();
+        addPropertiesToContext(context);
 
         SVNRevision svnRevision;
         SVNUpdateClient updateClient = new SVNUpdateClient(repository.getAuthenticationManager(), null);
@@ -621,7 +621,7 @@ public class SvnClient implements ScmClient
     public void update(ScmContext context, ScmEventHandler handler) throws ScmException
     {
         Revision rev = context.getRevision();
-
+        addPropertiesToContext(context);
         // CIB-610: cleanup before update in case WC is locked.
         SVNWCClient wcClient = new SVNWCClient(authenticationManager, null);
         try
@@ -703,11 +703,9 @@ public class SvnClient implements ScmClient
     }
 
     @SuppressWarnings({"unchecked"})
-    public List<ResourceProperty> getProperties(String id, File dir) throws ScmException
+    public void addPropertiesToContext(ScmContext context) throws ScmException
     {
-        List<ResourceProperty> properties = new LinkedList<ResourceProperty>();
-        properties.add(new ResourceProperty("svn.url", url));
- 	    return properties;
+        context.addProperty("svn.url", url);
     }
 
     public void storeConnectionDetails(File outputDir) throws ScmException, IOException

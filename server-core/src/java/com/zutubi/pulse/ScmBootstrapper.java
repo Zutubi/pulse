@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.CommandContext;
+import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.scm.ScmCancelledException;
 import com.zutubi.pulse.core.scm.ScmEventHandler;
@@ -19,6 +20,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.List;
 
 /**
  * A bootstrapper that populates the working directory by checking out from one SCM.
@@ -92,9 +94,17 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmEventHandler
             {
                 client.storeConnectionDetails(outDir);
 
-                scmContext.getProperties();
-
-                context.getGlobalScope().add(client.getProperties(getId(), workDir));
+                List<ScmContext.Property> properties = scmContext.getProperties();
+                for (ScmContext.Property prop : properties)
+                {
+                    context.getGlobalScope().add(new ResourceProperty(
+                            prop.getName(),
+                            prop.getValue(),
+                            prop.isAddToEnvironment(),
+                            prop.isAddToPath(),
+                            prop.isResolveVariables())
+                    );
+                }
             }
             catch (Exception e)
             {
