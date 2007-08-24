@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.*;
 import com.zutubi.pulse.core.scm.cvs.client.CvsCore;
 import com.zutubi.pulse.core.scm.cvs.client.LogInformationAnalyser;
+import com.zutubi.pulse.core.scm.cvs.client.commands.RlsInfo;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.CleanupInputStream;
 import com.zutubi.util.IOUtils;
@@ -405,7 +406,14 @@ public class CvsClient implements ScmClient, DataCacheAware
 
     public List<ScmFile> browse(String path) throws ScmException
     {
-        return new LinkedList<ScmFile>();
+        List<ScmFile> listing = new LinkedList<ScmFile>();
+
+        for (RlsInfo info : core.list(path))
+        {
+            listing.add(new ScmFile(info.getModule(), info.getName(), info.isDirectory()));
+        }
+
+        return listing;
     }
 
     //---( data cache aware implementation )---

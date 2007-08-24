@@ -292,6 +292,19 @@ public class CvsCore
         }
     }
 
+    public List<RlsInfo> list(String path) throws ScmException
+    {
+        RlsCommand rls = new RlsCommand();
+        rls.setDisplayInEntriesFormat(true); // ensure that we get the appropriate response from the server
+        rls.setPaths(path);
+
+        if (!executeCommand(rls, null, null))
+        {
+            throw new ScmException("Failed to run the rls command.");
+        }
+        return rls.getListing();
+    }
+
     public void testConnection() throws ScmException
     {
         Connection connection = null;

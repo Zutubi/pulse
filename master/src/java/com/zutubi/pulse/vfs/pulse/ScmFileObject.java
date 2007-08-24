@@ -34,7 +34,7 @@ public class ScmFileObject extends AbstractPulseFileObject
     public ScmFileObject(final FileName name, final AbstractFileSystem fs)
     {
         super(name, fs);
-        this.scmFile = new ScmFile(true, "");
+        this.scmFile = new ScmFile("", true);
     }
 
     public ScmFileObject(ScmFile scmFile, FileName name, AbstractFileSystem fs)

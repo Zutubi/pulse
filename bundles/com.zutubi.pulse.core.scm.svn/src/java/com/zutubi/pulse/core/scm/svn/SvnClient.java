@@ -588,11 +588,6 @@ public class SvnClient implements ScmClient
         }
 
         List<ScmFile> result = new LinkedList<ScmFile>();
-        String pathPrefix = "";
-        if (path.length() > 0)
-        {
-            pathPrefix = path + "/";
-        }
 
         for (SVNDirEntry e : files)
         {
@@ -611,7 +606,7 @@ public class SvnClient implements ScmClient
                 continue;
             }
 
-            ScmFile f = new ScmFile(e.getName(), isDir, pathPrefix + e.getName());
+            ScmFile f = new ScmFile(path, e.getName(), isDir);
             result.add(f);
         }
 

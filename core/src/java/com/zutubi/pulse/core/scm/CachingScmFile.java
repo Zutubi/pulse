@@ -1,7 +1,5 @@
 package com.zutubi.pulse.core.scm;
 
-import com.zutubi.pulse.core.scm.ScmFile;
-
 import java.util.LinkedList;
 import java.util.List;
 
@@ -14,12 +12,12 @@ public class CachingScmFile extends ScmFile
 
     public CachingScmFile(String name, boolean isDirectory, ScmFile parent, String path)
     {
-        super(name, isDirectory, parent, path);
+        super(path, name, isDirectory);
     }
 
     public CachingScmFile(boolean isDirectory, ScmFile parent, String path)
     {
-        super(isDirectory, parent, path);
+        super(path, isDirectory);
     }
 
     public void addChild(ScmFile child)
