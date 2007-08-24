@@ -40,21 +40,21 @@ public class ScmFileTest extends TestCase
     {
         ScmFile file = new ScmFile("parent/file");
         assertNotNull(file.getParentFile());
-        assertEquals(new ScmFile("parent"), file.getParentFile());
+        assertEquals(new ScmFile("parent", true), file.getParentFile());
         assertEquals("parent/file", file.getPath());
         assertEquals("file", file.getName());
         assertEquals("parent", file.getParent());
 
         file = new ScmFile("/parent/file");
         assertNotNull(file.getParentFile());
-        assertEquals(new ScmFile("parent"), file.getParentFile());
+        assertEquals(new ScmFile("parent",true), file.getParentFile());
         assertEquals("parent/file", file.getPath());
         assertEquals("file", file.getName());
         assertEquals("parent", file.getParent());
 
         file = new ScmFile("parent/file/");
         assertNotNull(file.getParentFile());
-        assertEquals(new ScmFile("parent"), file.getParentFile());
+        assertEquals(new ScmFile("parent", true), file.getParentFile());
         assertEquals("parent/file", file.getPath());
         assertEquals("file", file.getName());
         assertEquals("parent", file.getParent());
