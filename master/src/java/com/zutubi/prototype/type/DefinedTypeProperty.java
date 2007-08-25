@@ -1,7 +1,7 @@
 package com.zutubi.prototype.type;
 
-import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 /**
  *
@@ -27,7 +27,18 @@ public class DefinedTypeProperty extends TypeProperty
     {
         if (getter != null)
         {
-            return getter.invoke(instance);
+            Object o = getter.invoke(instance);
+            if(getType() instanceof PrimitiveType)
+            {
+                PrimitiveType primitiveType = (PrimitiveType) getType();
+                Object nullValue = primitiveType.getNullValue();
+                if(nullValue != null && nullValue.equals(o))
+                {
+                    return null;
+                }
+            }
+            
+            return o;
         }
         return null;
     }
@@ -40,12 +51,13 @@ public class DefinedTypeProperty extends TypeProperty
             return;
         }
 
-        // can not set nulls on primitive types (int, long, bool, etc), so we treat null by
-        // leaving the default value.
-        if (value != null || !(getType() instanceof PrimitiveType))
+        if(value == null && getType() instanceof PrimitiveType)
         {
-            setter.invoke(instance, value);
+            PrimitiveType primitiveType = (PrimitiveType) getType();
+            value = primitiveType.getNullValue();
         }
+
+        setter.invoke(instance, value);
     }
 
     public boolean isReadable()

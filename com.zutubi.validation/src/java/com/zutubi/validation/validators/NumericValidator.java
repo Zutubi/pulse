@@ -41,27 +41,33 @@ public class NumericValidator extends FieldValidatorSupport
         if (value instanceof Integer)
         {
             Integer integerValue = (Integer) value;
-            if (integerValue < min)
+            if (integerValue != Integer.MIN_VALUE)
             {
-                addError(MIN);
-            }
+                if (integerValue < min)
+                {
+                    addError(MIN);
+                }
 
-            if (max < integerValue)
-            {
-                addError(MAX);
+                if (max < integerValue)
+                {
+                    addError(MAX);
+                }
             }
         }
         else if (value instanceof Long)
         {
             Long longValue = (Long) value;
-            if (longValue < min)
+            if (longValue != Long.MIN_VALUE)
             {
-                addError(MIN);
-            }
+                if (longValue < min)
+                {
+                    addError(MIN);
+                }
 
-            if (max < longValue)
-            {
-                addError(MAX);
+                if (max < longValue)
+                {
+                    addError(MAX);
+                }
             }
         }
     }

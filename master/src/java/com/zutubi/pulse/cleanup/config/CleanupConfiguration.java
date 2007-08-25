@@ -26,7 +26,7 @@ public class CleanupConfiguration extends AbstractNamedConfiguration
     private CleanupWhat what;
 
     @Numeric(min = 1)
-    private int retain;
+    private int retain = Integer.MIN_VALUE;
 
     @Required
     private CleanupUnit unit;

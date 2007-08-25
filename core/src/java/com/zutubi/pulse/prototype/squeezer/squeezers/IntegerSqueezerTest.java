@@ -1,7 +1,7 @@
 package com.zutubi.pulse.prototype.squeezer.squeezers;
 
-import junit.framework.TestCase;
 import com.zutubi.pulse.prototype.squeezer.SqueezeException;
+import junit.framework.TestCase;
 
 /**
  * <class-comment/>
@@ -42,5 +42,23 @@ public class IntegerSqueezerTest extends TestCase
     public void testStringToInteger() throws SqueezeException
     {
         assertEquals(15, squeezer.unsqueeze("15"));
+    }
+
+    public void testEmptyStringToInteger() throws SqueezeException
+    {
+        assertNull(squeezer.unsqueeze(""));
+    }
+
+    public void testInvalid() throws SqueezeException
+    {
+        try
+        {
+            squeezer.unsqueeze("a");
+            fail();
+        }
+        catch (SqueezeException e)
+        {
+            assertEquals("'a' is not a valid integer", e.getMessage());
+        }
     }
 }

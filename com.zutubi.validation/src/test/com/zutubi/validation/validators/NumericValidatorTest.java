@@ -52,4 +52,17 @@ public class NumericValidatorTest extends FieldValidatorTestCase
         assertEquals(Arrays.asList("field.max"), validationAware.getFieldErrors("field"));
     }
 
+    public void testUnsetInt() throws ValidationException
+    {
+        ((NumericValidator)validator).setMin(0);
+        validator.validate(new FieldProvider(Integer.MIN_VALUE));
+        assertFalse(validationAware.hasFieldErrors());
+    }
+
+    public void testUnsetLong() throws ValidationException
+    {
+        ((NumericValidator)validator).setMin(0);
+        validator.validate(new FieldProvider(Long.MIN_VALUE));
+        assertFalse(validationAware.hasFieldErrors());
+    }
 }

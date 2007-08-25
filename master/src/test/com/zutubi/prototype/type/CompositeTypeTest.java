@@ -24,6 +24,7 @@ public class CompositeTypeTest extends TypeTestCase
         super.setUp();
 
         basicType = typeRegistry.register(BasicTypes.class);
+        basicType.setTypeRegistry(typeRegistry);
         typeA = typeRegistry.register(ObjectTypeA.class);
         typeB = typeRegistry.getType(ObjectTypeB.class);
         typeBExtension = typeRegistry.register(ObjectTypeBExtension.class);
@@ -61,6 +62,30 @@ public class CompositeTypeTest extends TypeTestCase
         Object newInstance = instantiator.instantiate(basicType, record);
         assertTrue(newInstance instanceof BasicTypes);
         assertEquals(newInstance, instance);
+    }
+
+    public void testBasicTypesInstantiateNull() throws TypeException
+    {
+        MutableRecord record = basicType.createNewRecord(false);
+        for(TypeProperty property: basicType.getProperties())
+        {
+            if(property.getName().endsWith("P"))
+            {
+                record.put(property.getName(), "");
+            }
+        }
+
+        SimpleInstantiator instantiator = new SimpleInstantiator(null);
+        BasicTypes instance = (BasicTypes) basicType.instantiate(record, instantiator);
+        basicType.initialise(instance, record, instantiator);
+        assertEquals(false, instance.isBooleanP());
+        assertEquals(Byte.MIN_VALUE, instance.getByteP());
+        assertEquals(Character.MIN_VALUE, instance.getCharacterP());
+        assertEquals(Double.MIN_VALUE, instance.getDoubleP());
+        assertEquals(Float.MIN_VALUE, instance.getFloatP());
+        assertEquals(Integer.MIN_VALUE, instance.getIntegerP());
+        assertEquals(Long.MIN_VALUE, instance.getLongP());
+        assertEquals(Short.MIN_VALUE, instance.getShortP());
     }
 
     public void testWithNestedComplexType() throws TypeException

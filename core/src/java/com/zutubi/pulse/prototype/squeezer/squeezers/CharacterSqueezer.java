@@ -1,5 +1,6 @@
 package com.zutubi.pulse.prototype.squeezer.squeezers;
 
+import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.prototype.squeezer.SqueezeException;
 import com.zutubi.pulse.prototype.squeezer.TypeSqueezer;
 
@@ -19,6 +20,14 @@ public class CharacterSqueezer implements TypeSqueezer
 
     public Object unsqueeze(String... str) throws SqueezeException
     {
-        return str[0].charAt(0);
+        String s = str[0];
+        if(TextUtils.stringSet(s))
+        {
+            return s.charAt(0);
+        }
+        else
+        {
+            return null;
+        }
     }
 }
