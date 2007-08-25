@@ -91,7 +91,7 @@ public class SvnClient implements ScmClient
         }
     }
 
-    public Revision convertRevision(NumericalRevision rev)
+    public static Revision convertRevision(NumericalRevision rev)
     {
         return new Revision(rev.getAuthor(), rev.getComment(), rev.getDate(), rev.getRevisionString());
     }
@@ -292,7 +292,7 @@ public class SvnClient implements ScmClient
 
         if (revision == null)
         {
-            svnRevision = SVNRevision.HEAD;
+            svnRevision = convertRevision(getLatestRevision());
         }
         else
         {
@@ -584,6 +584,10 @@ public class SvnClient implements ScmClient
         }
         catch (SVNException e)
         {
+            if (e.getMessage().endsWith("Can't get entries of non-directory"))
+            {
+                return Arrays.asList(new ScmFile(path));
+            }
             throw convertException(e);
         }
 
@@ -776,7 +780,7 @@ public class SvnClient implements ScmClient
 
             if (action != null)
             {
-                handler.fileChanged(new Change(event.getPath(), (String) null, action));
+                handler.fileChanged(new Change(event.getPath(), null, action));
             }
         }
 
