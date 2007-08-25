@@ -6,7 +6,9 @@ import com.zutubi.pulse.core.scm.ScmEventHandler;
 import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.cvs.client.commands.*;
 import com.zutubi.pulse.core.scm.cvs.client.util.CvsUtils;
+import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.Constants;
+import com.zutubi.util.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.Client;
@@ -29,6 +31,7 @@ import org.netbeans.lib.cvsclient.event.CVSListener;
 import org.netbeans.lib.cvsclient.event.MessageEvent;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -104,9 +107,38 @@ public class CvsCore
         UpdateListener listener = null;
         if (handler != null)
         {
-            listener = new UpdateListener(handler);
+            try
+            {
+                // strip the relative repo path from the working directory to determine the relative repository root.
+                String path = FileSystemUtils.normaliseSeparators(workingDirectory.getCanonicalPath());
+                String repoPath = readRespositoryPath(workingDirectory);
+                if (!path.endsWith(repoPath))
+                {
+                    // ??
+                }
+                path = path.substring(0, path.lastIndexOf(repoPath));
+
+                listener = new UpdateListener(handler, new File(path));
+            }
+            catch (IOException e)
+            {
+                LOG.warning(e);
+            }
         }
         update(workingDirectory, revision, listener);
+    }
+
+    private String readRespositoryPath(File dir)
+    {
+        try
+        {
+            return IOUtils.fileToString(new File(dir, "CVS/Repository"));
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public void update(File workingDirectory, CvsRevision revision, CVSListener listener) throws ScmException
@@ -216,8 +248,7 @@ public class CvsCore
         return rlog(module, from, to, false);
     }
 
-    public List<LogInformation> rlog(String module, CvsRevision from, CvsRevision to, boolean verbose)
-            throws ScmException
+    public List<LogInformation> rlog(String module, CvsRevision from, CvsRevision to, boolean verbose) throws ScmException
     {
         RlogCommand rlog = new RlogCommand();
         rlog.setModule(module);

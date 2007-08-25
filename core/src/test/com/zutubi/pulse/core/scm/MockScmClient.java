@@ -99,12 +99,12 @@ public class MockScmClient implements ScmClient, DataCacheAware
         }
     }
 
-    public List<ScmFile> browse(String path) throws ScmException
+    public List<ScmFile> browse(String path, Revision revision) throws ScmException
     {
         throw new RuntimeException("Method not implemented.");
     }
 
-    public void update(ScmContext context, ScmEventHandler handler) throws ScmException
+    public Revision update(ScmContext context, ScmEventHandler handler) throws ScmException
     {
         throw new RuntimeException("Method not implemented.");
     }

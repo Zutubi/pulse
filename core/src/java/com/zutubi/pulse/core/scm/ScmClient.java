@@ -51,24 +51,36 @@ public interface ScmClient
      *
      * Required for all implementations.
      *
-     * @param context
+     * @param context     defines the context for the checkout operation
      * @param handler     if not null, receives notifications of events during the
+     *
+     * @return the revision of the locally checked out working copy.
+     *
+     * @throws ScmException on error
      */
     Revision checkout(ScmContext context, ScmEventHandler handler) throws ScmException;
 
     /**
      * Update the working directory to the specified revision.
      *
-     * @param context
-     * @param handler if not null, receives notifications of events during the
+     * @param context    defines the context for the checkout operation
+     * @param handler    if not null, receives notifications of events during the
+     *
+     * @return the revision updated to.
+     * 
+     * @throws ScmException on error.
      */
-    void update(ScmContext context, ScmEventHandler handler) throws ScmException;
+    Revision update(ScmContext context, ScmEventHandler handler) throws ScmException;
 
     /**
      * Checks out the specified file at the given revision.
      *
-     * @param path
-     * @param revision the revision be checked out @return an input stream that will return the contents of the requested file
+     * @param path          path defining the content to be retrieved.
+     * @param revision      the revision be checked out @return an input stream that 
+     *                      will return the contents of the requested file
+     *
+     * @return input stream providing access to the requested content.
+     *
      * @throws ScmException on error
      */
     InputStream retrieve(String path, Revision revision) throws ScmException;
@@ -112,9 +124,10 @@ public interface ScmClient
      * Returns a list of revisions occuring between the given revisions.
      * The from revision itself it NOT included in the result.
      *
-     * @param from the revision before the first revision to return
-     * @param to
+     * @param from      the revision before the first revision to return
+     * @param to        the revision that defined the inclusive upper bound for this call.
      * @return a list of revisions for all changes since from
+     * 
      * @throws ScmException if an error occurs talking to the server
      */
     List<Revision> getRevisions(Revision from, Revision to) throws ScmException;
@@ -142,11 +155,12 @@ public interface ScmClient
      *
      * @param path the path to list (relative to the root of the connection,
      *             i.e. an empty string is valid and means "list the root").
+     * @param revision
      * @return a list of files and directories contained within the given
      *         path
      * @throws ScmException on error
      */
-    List<ScmFile> browse(String path) throws ScmException;
+    List<ScmFile> browse(String path, Revision revision) throws ScmException;
 
     /**
      * Applies a tag to the given revision of all files in the server's view .

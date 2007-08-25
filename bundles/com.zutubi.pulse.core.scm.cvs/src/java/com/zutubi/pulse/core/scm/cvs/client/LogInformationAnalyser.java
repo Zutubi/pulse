@@ -51,7 +51,7 @@ public class LogInformationAnalyser
         this.root = root;
     }
 
-    public Date latestUpdate(List<LogInformation> rlogResponse)
+    public Revision latestUpdate(List<LogInformation> rlogResponse)
     {
         // here, we are not interested in the branch/tag of the revision, so use null.
         List<Revision> revisions = extractRevisions(rlogResponse, null);
@@ -62,9 +62,9 @@ public class LogInformationAnalyser
         // need to ensure that the log information is ordered by date...
         Collections.sort(revisions, new RevisionDateComparator());
 
-        Revision latestChange = revisions.get(revisions.size() - 1);
-        return latestChange.getDate();
+        return revisions.get(revisions.size() - 1);
     }
+
 
     /**
      * Process the response from the rlog command and extract the cvs revisions.

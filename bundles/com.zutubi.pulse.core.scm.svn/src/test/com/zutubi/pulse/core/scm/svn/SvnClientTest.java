@@ -93,7 +93,7 @@ public class SvnClientTest extends PulseTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        File dataFile = getTestDataFile("server-core", "data", "zip");
+        File dataFile = getTestDataFile("bundles/com.zutubi.pulse.core.scm.svn", "data", "zip");
         tmpDir = FileSystemUtils.createTempDir(getClass().getName(), "");
         File repoDir = new File(tmpDir, "repo");
         repoDir.mkdirs();
@@ -132,7 +132,7 @@ public class SvnClientTest extends PulseTestCase
 
     public void testList() throws ScmException
     {
-        List<ScmFile> files = server.browse("afolder");
+        List<ScmFile> files = server.browse("afolder", null);
         assertEquals(2, files.size());
         assertEquals("f1", files.get(0).getName());
         assertEquals("f2", files.get(1).getName());
@@ -142,7 +142,7 @@ public class SvnClientTest extends PulseTestCase
     {
         try
         {
-            server.browse("nosuchfile");
+            server.browse("nosuchfile", null);
             fail();
         }
         catch (ScmException e)
@@ -281,7 +281,7 @@ public class SvnClientTest extends PulseTestCase
     private List<ScmFile> getSortedListing(SvnClient confirmServer)
             throws ScmException
     {
-        List<ScmFile> files = confirmServer.browse("");
+        List<ScmFile> files = confirmServer.browse("", null);
         Collections.sort(files, new Comparator<ScmFile>()
         {
             public int compare(ScmFile o1, ScmFile o2)

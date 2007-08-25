@@ -152,6 +152,6 @@ public class Changelist extends Entity
 
     public String toString()
     {
-        return "{ uid: " + serverUid + ", rev: " + revision.toString() + ", changes: " + changes.toString() + " }";
+        return "{ uid: " + serverUid + ", rev: " + ((revision != null) ? revision.toString() : "null") + ", changes: " + changes.size() + " }";
     }
 }

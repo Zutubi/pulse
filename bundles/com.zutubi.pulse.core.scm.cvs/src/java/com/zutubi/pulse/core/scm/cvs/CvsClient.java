@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.scm.cvs;
 
 import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.*;
@@ -15,6 +16,7 @@ import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -80,27 +82,6 @@ public class CvsClient implements ScmClient, DataCacheAware
     public Set<ScmCapability> getCapabilities()
     {
         return new HashSet<ScmCapability>(Arrays.asList(ScmCapability.values()));
-    }
-
-    /**
-     * Get access to the servers properties. These include:
-     * <ul>
-     * <li>location: the location property.</li>
-     * <li>version: the version of the remote server.</li>
-     * </ul>
-     *
-     * @return a map of key value pairs representing the server information.
-     *
-     * @see #getLocation()
-     *
-     * @throws com.zutubi.pulse.core.scm.ScmException
-     */
-    public Map<String, String> getServerInfo() throws ScmException
-    {
-        Map<String, String> info = new TreeMap<String, String>();
-        info.put("location", getLocation());
-        info.put("version", core.version());
-        return info;
     }
 
     /**
@@ -182,12 +163,37 @@ public class CvsClient implements ScmClient, DataCacheAware
      * @param context
      * @param handler
      */
-    public void update(ScmContext context, ScmEventHandler handler) throws ScmException
+    public Revision update(ScmContext context, ScmEventHandler handler) throws ScmException
     {
         Revision rev = context.getRevision();
         assertRevisionArgValid(rev);
-        addPropertiesToContext(context);
-        core.update(context.getDir(), convertRevision(rev), handler);
+        writePropertiesToContext(context);
+
+        // we can not run an update from the base directory, even though this is where the checkout occured.
+        // Checkout will checkout into the current directory, but not generate a ./CVS directory.  For that, we need to
+        // go into the sub directories.  So, if we have sub directories that contain a CVS directory, we have a local
+        // working copy, and should run an update from WITHIN THOSE DIRECTORIES.  If not, then we can run a checkout
+        // When will there be multiple directories? When we are dealing with an &module.
+        File[] workingDirs = getSubdirectoriesContainingCvsDirectories(context.getDir());
+        if (workingDirs.length > 0)
+        {
+            for (File workingDir : workingDirs)
+            {
+                core.update(workingDir, convertRevision(rev), handler);
+            }
+        }
+        return rev;
+    }
+
+    private File[] getSubdirectoriesContainingCvsDirectories(File base)
+    {
+        return base.listFiles(new FileFilter()
+        {
+            public boolean accept(File child)
+            {
+                return child.isDirectory() && new File(child, "CVS").isDirectory();
+            }
+        });
     }
 
     public void tag(Revision revision, String name, boolean moveExisting) throws ScmException
@@ -196,7 +202,7 @@ public class CvsClient implements ScmClient, DataCacheAware
         core.tag(module, convertRevision(revision), name, moveExisting);
     }
 
-    private void addPropertiesToContext(ScmContext context) throws ScmException
+    private void writePropertiesToContext(ScmContext context) throws ScmException
     {
         context.addProperty("cvs.root", root);
         if (branch != null)
@@ -249,9 +255,19 @@ public class CvsClient implements ScmClient, DataCacheAware
     public Revision checkout(ScmContext context, ScmEventHandler handler) throws ScmException
     {
         Revision revision = context.getRevision();
-        assertRevisionArgValid(revision);
-        addPropertiesToContext(context);
+        if (revision == Revision.HEAD)
+        {
+            // FIXME: it would be good to be able to avoid this call to get the latest revision and
+            // simply use the information from the checkout / update
+            // It would be nice to have the revision that we checkout/update to be returned by the cvscore
+            // and then return that revision from this method.
+            revision = getLatestRevision();
+        }
+
+        writePropertiesToContext(context);
+        
         core.checkout(context.getDir(), module, convertRevision(revision), handler);
+        
         return revision;
     }
 
@@ -320,9 +336,42 @@ public class CvsClient implements ScmClient, DataCacheAware
             return changes;
         }
 
+        // remove the module name from the start of the changes, and normalize.
+        List<Changelist> fixedChangelists = new LinkedList<Changelist>();
+        for (Changelist changelist : changes)
+        {
+            Changelist fixedChangelist = new Changelist(changelist.getServerUid(), changelist.getRevision());
+            for (Change change : changelist.getChanges())
+            {
+                // a) strip off the leading /.
+                String filename = change.getFilename();
+                if (filename.startsWith("/"))
+                {
+                    filename = filename.substring(1);
+                }
+                // b) strip off the 'Attic' for dead files.  This may catch valid directories, but that is a less frequent case.
+                if (filename.contains("/Attic/"))
+                {
+                    // looking for the attic parent directory...
+                    // use the scmfile object to simplify the extraction of the 'Attic'
+                    ScmFile file = new ScmFile(filename);
+                    if (file.getParent() != null && file.getParent().endsWith("/Attic"))
+                    {
+                        file = new ScmFile(file.getParentFile().getParentFile(), file.getName());
+                        filename = file.getPath();
+                    }
+                }
+                Change fixedChange = new Change(filename, change.getRevisionString(), change.getAction());
+                fixedChangelist.addChange(fixedChange);
+            }
+            fixedChangelists.add(fixedChangelist);
+        }
+
+        changes = fixedChangelists;
+
         // ensure that the lower bound of the changes is excluded.
         Changelist firstChange = changes.get(0);
-        if (firstChange.getRevision().getDate().equals(from.getDate()))
+        if (firstChange.getRevision().equals(from))
         {
             return changes.subList(1, changes.size());
         }
@@ -371,40 +420,48 @@ public class CvsClient implements ScmClient, DataCacheAware
 
     public Revision getLatestRevision() throws ScmException
     {
-        // The latest change in a cvs repository is located by taking time x, and checking if
-        // there have been any changes since that time. We jump through hoops (as mentioned below)
-        // to handle possible time differences between the local and remote server machines. If
-        // times were in sync, then the latest revision would be now. However, since times are not
-        // in sync, we go back a few hours and have a look.
-
-        // We jump through hoops to handle the possible time difference between the hosts.
+        // The latest revision is determined by running successive rlog commands.  Each time we go back a little
+        // bit further in the hope that we encounter a change.  When we detect that change, we have the latest revision.
+        // The time intervals for the checks are selected in an attempt to reduce the amount of network traffic. RLog
+        // can be very expensive if there are a large number of changes. So, for high volume repositories, we would
+        // expect recent changes.  For lower volume repositories, we would expect spread further apart. We stop looking
+        // once we get to two years ago without any changes.
 
         LogInformationAnalyser analyser = new LogInformationAnalyser(getUid(), CVSRoot.parse(root));
 
         Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DAY_OF_YEAR, -1);
 
-        CvsRevision since = new CvsRevision("", branch, "", cal.getTime());
+        Calendar twoYearsAgo = Calendar.getInstance();
+        twoYearsAgo.add(Calendar.YEAR, -2);
 
-        Date latestUpdate = analyser.latestUpdate(core.rlog(module, since, null));
-        if (latestUpdate != null)
+        LogInformationAnalyser.Revision latestUpdate;
+        int increment = 1;
+        while (true)
         {
-            // should we be returning the author and comment of the latest update as well?... probably :|
-            return convertRevision(new CvsRevision("", branch, "", latestUpdate));
+            cal.add(Calendar.DAY_OF_YEAR, -increment);
+
+            CvsRevision since = new CvsRevision("", branch, "", cal.getTime());
+            latestUpdate = analyser.latestUpdate(core.rlog(module, since, null));
+            if (latestUpdate != null)
+            {
+                return convertRevision(new CvsRevision(latestUpdate.getAuthor(), branch, latestUpdate.getMessage(), latestUpdate.getDate()));
+            }
+
+            // We have checked more than two years back, and still no changes. We
+            // need to stop somewhere, so here is as good as anywhere.
+            if (cal.compareTo(twoYearsAgo) < 0)
+            {
+                return convertRevision(new CvsRevision("", branch, "", cal.getTime()));
+            }
+
+            if (increment < 64)
+            {
+                increment = increment * 2;
+            }
         }
-
-        // If the cvs server is ahead of this host, then any changes would have been picked
-        // up if they occured.
-
-        // Assuming that the time is no more then 24 hours behind, we can assume
-        // that the latest calendar time will give us a reasonable starting point.
-
-        CvsRevision result = new CvsRevision("", branch, "", cal.getTime());
-        LOG.exiting(result);
-        return convertRevision(result);
     }
 
-    public List<ScmFile> browse(String path) throws ScmException
+    public List<ScmFile> browse(String path, Revision revision) throws ScmException
     {
         List<ScmFile> listing = new LinkedList<ScmFile>();
 

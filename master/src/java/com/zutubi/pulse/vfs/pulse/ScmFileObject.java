@@ -75,7 +75,7 @@ public class ScmFileObject extends AbstractPulseFileObject
             try
             {
                 ScmClient client = scmClientFactory.createClient(getAncestor(ScmProvider.class).getScm());
-                scmChildren = client.browse(scmFile.getPath());
+                scmChildren = client.browse(scmFile.getPath(), null);
             }
             catch (ScmException e)
             {

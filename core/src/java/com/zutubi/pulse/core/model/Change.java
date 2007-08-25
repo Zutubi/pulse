@@ -100,7 +100,7 @@ public class Change extends Entity
 
     private String filename;
     private Action action;
-
+    private boolean directory;
     private String revisionString;
 
     protected Change()
@@ -110,9 +110,16 @@ public class Change extends Entity
 
     public Change(String filename, String revisionString, Action action)
     {
+        this(filename, revisionString, action, false);
+    }
+
+
+    public Change(String filename, String revisionString, Action action, boolean directory)
+    {
         this.filename = filename;
-        this.revisionString = revisionString;
         this.action = action;
+        this.directory = directory;
+        this.revisionString = revisionString;
     }
 
     /**
@@ -134,6 +141,11 @@ public class Change extends Entity
     public String getRevisionString()
     {
         return revisionString;
+    }
+
+    public boolean isDirectory()
+    {
+        return directory;
     }
 
     /**
@@ -174,6 +186,34 @@ public class Change extends Entity
     private void setRevisionString(String revisionString)
     {
         this.revisionString = revisionString;
+    }
+
+
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        Change change = (Change) o;
+
+        if (directory != change.directory) return false;
+        if (action != change.action) return false;
+        if (filename != null ? !filename.equals(change.filename) : change.filename != null) return false;
+        if (revisionString != null ? !revisionString.equals(change.revisionString) : change.revisionString != null)
+            return false;
+
+        return true;
+    }
+
+    public int hashCode()
+    {
+        int result = super.hashCode();
+        result = 31 * result + (filename != null ? filename.hashCode() : 0);
+        result = 31 * result + (action != null ? action.hashCode() : 0);
+        result = 31 * result + (directory ? 1 : 0);
+        result = 31 * result + (revisionString != null ? revisionString.hashCode() : 0);
+        return result;
     }
 
     public String toString()

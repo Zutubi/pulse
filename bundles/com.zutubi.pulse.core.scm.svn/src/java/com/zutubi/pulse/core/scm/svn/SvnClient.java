@@ -575,7 +575,7 @@ public class SvnClient implements ScmClient
     }
 */
 
-    public List<ScmFile> browse(String path) throws ScmException
+    public List<ScmFile> browse(String path, Revision revision) throws ScmException
     {
         LinkedList<SVNDirEntry> files = new LinkedList<SVNDirEntry>();
         try
@@ -613,7 +613,7 @@ public class SvnClient implements ScmClient
         return result;
     }
 
-    public void update(ScmContext context, ScmEventHandler handler) throws ScmException
+    public Revision update(ScmContext context, ScmEventHandler handler) throws ScmException
     {
         Revision rev = context.getRevision();
         addPropertiesToContext(context);
@@ -636,6 +636,7 @@ public class SvnClient implements ScmClient
 
         update(context.getDir(), convertRevision(rev), client);
         updateExternals(context.getDir(), rev, client, handler);
+        return rev;
     }
 
     private void update(File workDir, SVNRevision rev, SVNUpdateClient client) throws ScmException

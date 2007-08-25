@@ -174,7 +174,7 @@ public class PerforceClientTest extends PulseTestCase
         getServer(TEST_CLIENT);
         try
         {
-            client.browse("depot4");
+            client.browse("depot4", null);
             fail();
         }
         catch (ScmException e)
@@ -186,7 +186,7 @@ public class PerforceClientTest extends PulseTestCase
     public void testListRoot() throws ScmException
     {
         getServer(TEST_CLIENT);
-        List<ScmFile> files = client.browse("");
+        List<ScmFile> files = client.browse("", null);
         assertEquals(2, files.size());
         ScmFile f = files.get(0);
         assertEquals("depot", f.getName());
@@ -201,7 +201,7 @@ public class PerforceClientTest extends PulseTestCase
     public void testListPath() throws ScmException
     {
         getServer(TEST_CLIENT);
-        List<ScmFile> files = client.browse("depot2");
+        List<ScmFile> files = client.browse("depot2", null);
         assertEquals(10, files.size());
 
         ScmFile f;
@@ -223,7 +223,7 @@ public class PerforceClientTest extends PulseTestCase
     public void testListComplexClient() throws ScmException
     {
         getServer("complex-client");
-        List<ScmFile> files = client.browse("");
+        List<ScmFile> files = client.browse("", null);
         assertEquals(1, files.size());
         ScmFile scmFile = files.get(0);
         assertEquals("src", scmFile.getName());
@@ -233,7 +233,7 @@ public class PerforceClientTest extends PulseTestCase
     public void testListComplexSrc() throws ScmException
     {
         getServer("complex-client");
-        List<ScmFile> files = client.browse("src");
+        List<ScmFile> files = client.browse("src", null);
         assertEquals(2, files.size());
 
         ScmFile scmFile = files.get(0);
@@ -248,7 +248,7 @@ public class PerforceClientTest extends PulseTestCase
     public void testListComplexSnuth() throws ScmException
     {
         getServer("complex-client");
-        List<ScmFile> files = client.browse("src/libraries/snuth");
+        List<ScmFile> files = client.browse("src/libraries/snuth", null);
         assertEquals(2, files.size());
 
         ScmFile scmFile = files.get(0);

@@ -156,7 +156,7 @@ public class Revision extends Entity implements Comparable<Revision>
         // First try basing on time
         if (getDate() != null && r.getDate() != null)
         {
-            int result = getDate().compareTo(getDate());
+            int result = getDate().compareTo(r.getDate());
             if (result != 0)
             {
                 return result;

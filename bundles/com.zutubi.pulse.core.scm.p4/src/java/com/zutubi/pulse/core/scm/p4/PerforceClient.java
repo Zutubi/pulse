@@ -683,11 +683,12 @@ public class PerforceClient extends CachingScmClient
         return false;
     }
 
-    public void update(ScmContext context, ScmEventHandler handler) throws ScmException
+    public Revision update(ScmContext context, ScmEventHandler handler) throws ScmException
     {
         Revision rev = context.getRevision();
         addPropertiesToContext(context);
         sync(context.getId(), context.getDir(), rev, handler, false);
+        return rev;
     }
 
     public void tag(Revision revision, String name, boolean moveExisting) throws ScmException

@@ -36,7 +36,7 @@ public abstract class CachingScmClient implements ScmClient, ScmCachePopulator
     }
 */
 
-    public List<ScmFile> browse(String path) throws ScmException
+    public List<ScmFile> browse(String path, Revision revision) throws ScmException
     {
         Map<String, CachingScmFile> cachedListing = ScmFileCache.getInstance().lookup(this);
         if (cachedListing.containsKey(path))

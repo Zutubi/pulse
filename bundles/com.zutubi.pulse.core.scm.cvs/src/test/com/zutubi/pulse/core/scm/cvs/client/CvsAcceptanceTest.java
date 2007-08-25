@@ -74,25 +74,25 @@ public class CvsAcceptanceTest extends TestCase
         // between 6:30 and 6:34, changes are made to head.
         CvsRevision from = new CvsRevision("", "", "", SERVER_DATE.parse("2007-01-14 06:30:30 GMT"));
         CvsRevision to = new CvsRevision("", "", "", SERVER_DATE.parse("2007-01-14 06:33:30 GMT"));
-        Date latestUpdate = analyser.latestUpdate(cvs.rlog(module, from, to));
+        Date latestUpdate = analyser.latestUpdate(cvs.rlog(module, from, to)).getDate();
         assertEquals("2007-01-14 06:33:00 GMT", SERVER_DATE.format(latestUpdate)); // add.
 
         // ensure that during the same timeframe, no changes are detected on the branch.
         from = new CvsRevision("", "BRANCH", "", SERVER_DATE.parse("2007-01-14 06:30:30 GMT"));
         to = new CvsRevision("", "BRANCH", "", SERVER_DATE.parse("2007-01-14 06:33:30 GMT"));
-        latestUpdate = analyser.latestUpdate(cvs.rlog(module, from, to));
+        latestUpdate = analyser.latestUpdate(cvs.rlog(module, from, to)).getDate();
         assertNull(latestUpdate);
 
         // between 6:40 and 6:44, changes are made to BRANCH.
         from = new CvsRevision("", "BRANCH", "", SERVER_DATE.parse("2007-01-14 06:40:30 GMT"));
         to = new CvsRevision("", "BRANCH", "", SERVER_DATE.parse("2007-01-14 06:43:30 GMT"));
-        latestUpdate = analyser.latestUpdate(cvs.rlog(module, from, to));
+        latestUpdate = analyser.latestUpdate(cvs.rlog(module, from, to)).getDate();
         assertEquals("2007-01-14 06:43:00 GMT", SERVER_DATE.format(latestUpdate)); // add.
 
         // ensure that during the same timeframe, no changes are detected on the head.
         from = new CvsRevision("", "", "", SERVER_DATE.parse("2007-01-14 06:40:30 GMT"));
         to = new CvsRevision("", "", "", SERVER_DATE.parse("2007-01-14 06:43:30 GMT"));
-        latestUpdate = analyser.latestUpdate(cvs.rlog(module, from, to));
+        latestUpdate = analyser.latestUpdate(cvs.rlog(module, from, to)).getDate();
         assertNull(latestUpdate);
     }
 
