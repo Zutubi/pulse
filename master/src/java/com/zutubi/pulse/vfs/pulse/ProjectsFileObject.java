@@ -1,6 +1,7 @@
 package com.zutubi.pulse.vfs.pulse;
 
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
+import com.zutubi.pulse.webwork.mapping.Urls;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
@@ -73,6 +74,6 @@ public class ProjectsFileObject extends AbstractPulseFileObject implements Addre
 
     public String getUrlPath()
     {
-        return "/viewProjects.action";
+        return new Urls("").projects();
     }
 }

@@ -195,7 +195,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
 
         public String getLink()
         {
-            return getBaseUrl() + "/viewProjects.action";
+            return urls.projects();
         }
 
         public String getEntryTitle(BuildResult result)
@@ -261,7 +261,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
 
         public String getLink()
         {
-            return getBaseUrl() + "/viewProjects.action";
+            return urls.projects();
         }
 
         public String getEntryTitle(BuildResult result)

@@ -41,7 +41,7 @@
                     #dynamicCell($changelist.user)
                     #dateCell($changelist)
                     #commitCommentCell($changelist "project")
-                    #linkCell("view.$changelist.id" "view" "$urls.projectChangelist($u_projectName, $changelist)")
+                    #linkCell("view.$changelist.id" "view" "$urls.projectChangelist($u_projectName, $changelist.id)")
                 </tr>
             #end
         #else
