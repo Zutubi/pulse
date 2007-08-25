@@ -3,14 +3,14 @@
 #projectTags($project)
 <html>
 <head>
-    <title id="project-home-#uce($project.name)">$!webwork.htmlEncode($project.name)</title>
+    <title>$!webwork.htmlEncode($project.name)</title>
     <script type="text/javascript" src="$base/js/prototype.js"></script>
     <script type="text/javascript" src="$base/js/scriptaculous/scriptaculous.js"></script>
     <script type="text/javascript" src="$base/js/buildcolumns.js"></script>
     <script type="text/javascript">
     //<![CDATA[
         #set($ajaxUrl = "$base/ajax/projectHomePanel.action?projectName=$u_projectName")
-        #updater($ajaxUrl "panel" $principle)
+        #updater($ajaxUrl "project-home-#uce($project.name)" $principle)
 
         var summaryPopup;
         var recentPopup;
@@ -26,7 +26,7 @@
 
     #parse("/template/includes/actionerrors.vm")
     
-    <div id="panel">
+    <div id="project-home-#uce($project.name)">
         #parse("ajax/project-home-panel.vm")
     </div>
 

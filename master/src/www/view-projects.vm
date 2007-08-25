@@ -3,13 +3,13 @@
 <content tag="selectedTab">projects</content>
 <html>
 <head>
-    <title id="projects">#wwtext("name=projects")</title>
+    <title>#wwtext("name=projects")</title>
     <script type="text/javascript" src="$base/js/prototype.js"></script>
     <script type="text/javascript" src="$base/js/scriptaculous/scriptaculous.js"></script>
     <script type="text/javascript" src="$base/js/buildcolumns.js"></script>
     <script type="text/javascript">
     //<![CDATA[
-        #updater("$base/ajax/viewProjectsPanel.action" "panel" $principle)
+        #updater("$base/ajax/viewProjectsPanel.action" "projects" $principle)
 
         var popup;
         YAHOO.util.Event.addListener(window, "load", function() { popup = new BuildColumnPopup("all.projects", "$base", "$base/ajax/viewProjectsPanel.action", "panel"); });
@@ -36,7 +36,7 @@
         </tr>
     </table>
 
-    <div id="panel">
+    <div id="projects">
         #parse("ajax/view-projects-panel.vm")
     </div>
 

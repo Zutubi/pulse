@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance.pages.browse;
 
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
+import com.zutubi.pulse.webwork.mapping.Urls;
 import junit.framework.Assert;
 
 /**
@@ -10,14 +11,14 @@ import junit.framework.Assert;
  */
 public class ProjectsPage extends SeleniumPage
 {
-    public ProjectsPage(Selenium selenium)
+    public ProjectsPage(Selenium selenium, Urls urls)
     {
-        super(selenium, "projects", "projects");
+        super(selenium, urls, "projects", "projects");
     }
 
     public String getUrl()
     {
-        return "/viewProjects.action";
+        return urls.projects();
     }
 
     public void assertProjectPresent(String name)

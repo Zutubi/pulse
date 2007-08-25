@@ -146,7 +146,7 @@ public abstract class SeleniumForm
                     {
                         // Combos are custom ext widgets, so we just poke a
                         // value into the underlying hidden input field.
-                        selenium.getEval("selenium.browserbot.getCurrentWindow().document.getElementById('zfid." + getFieldNames()[i] + "').value = '" + values[i] + "';");
+                        selenium.getEval("selenium.browserbot.getCurrentWindow().document.getElementById('" + getFieldNames()[i] + "').value = '" + values[i] + "';");
                     }
                     break;
                 case CHECKBOX:

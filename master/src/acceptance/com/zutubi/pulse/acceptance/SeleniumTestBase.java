@@ -5,6 +5,7 @@ import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.forms.AddProjectWizard;
 import com.zutubi.pulse.acceptance.forms.SelectTypeState;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
+import com.zutubi.pulse.webwork.mapping.Urls;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.RandomUtils;
 import junit.framework.TestCase;
@@ -15,6 +16,7 @@ import junit.framework.TestCase;
 public class SeleniumTestBase extends TestCase
 {
     protected Selenium selenium;
+    protected Urls urls;
     protected String port;
     protected String baseUrl;
     protected String random;
@@ -25,6 +27,7 @@ public class SeleniumTestBase extends TestCase
 
         port = System.getProperty("pulse.port", "8080");
         baseUrl = "http://localhost:" + port + "/";
+        urls = new Urls("");
         random = RandomUtils.randomString(10);
         selenium = new DefaultSelenium("localhost", 4444, "*firefox", "http://localhost:" + port + "/");
         selenium.start();
@@ -55,11 +58,16 @@ public class SeleniumTestBase extends TestCase
         selenium.open(baseUrl + location);
     }
 
+    protected void assertElementPresent(String id)
+    {
+        assertTrue(selenium.isElementPresent(id));
+    }
+
     protected void assertTextPresent(String text)
     {
         assertTrue(selenium.isTextPresent(text));
     }
-    
+
     protected void assertLinkPresent(String id)
     {
         assertTrue(CollectionUtils.contains(selenium.getAllLinks(), id));
@@ -89,7 +97,7 @@ public class SeleniumTestBase extends TestCase
 
     protected void addProject(String name, boolean template, String parentName, boolean parentIsTemplate)
     {
-        ProjectHierarchyPage globalPage = new ProjectHierarchyPage(selenium, parentName, parentIsTemplate);
+        ProjectHierarchyPage globalPage = new ProjectHierarchyPage(selenium, urls, parentName, parentIsTemplate);
         globalPage.waitFor();
         if (template)
         {
@@ -106,27 +114,27 @@ public class SeleniumTestBase extends TestCase
 
         SelectTypeState scmTypeState = new SelectTypeState(selenium);
         scmTypeState.waitFor();
-        scmTypeState.nextFormElements("svn");
+        scmTypeState.nextFormElements("zutubi.svnConfig");
 
         AddProjectWizard.SvnState svnState = new AddProjectWizard.SvnState(selenium);
         svnState.waitFor();
-        svnState.nextFormElements("svn://localhost:3088/accept/triviant", null, null, null, null, null);
+        svnState.nextFormElements("svn://localhost:3088/accept/trunk/triviant", null, null, null, null, null);
 
         SelectTypeState projectTypeState = new SelectTypeState(selenium);
         projectTypeState.waitFor();
-        scmTypeState.nextFormElements("ant");
+        scmTypeState.nextFormElements("zutubi.antTypeConfig");
 
         AddProjectWizard.AntState antState = new AddProjectWizard.AntState(selenium);
         antState.waitFor();
         antState.finishFormElements(null, "build.xml", null, null);
 
-        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, name, template);
+        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, name, template);
         hierarchyPage.waitFor();
         hierarchyPage.assertPresent();
     }
 
     protected void ensureProject(String name, boolean template)
     {
-        
+
     }
 }

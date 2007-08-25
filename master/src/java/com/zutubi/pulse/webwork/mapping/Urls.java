@@ -19,12 +19,12 @@ public class Urls
         this.baseUrl = baseUrl;
     }
 
-    private String browse()
+    public String browse()
     {
         return baseUrl + "/browse/";
     }
 
-    private String projects()
+    public String projects()
     {
         return browse() + "projects/";
     }

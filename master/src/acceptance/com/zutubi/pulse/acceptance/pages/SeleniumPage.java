@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance.pages;
 
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.SeleniumUtils;
+import com.zutubi.pulse.webwork.mapping.Urls;
 import junit.framework.Assert;
 
 /**
@@ -11,6 +12,10 @@ import junit.framework.Assert;
 public abstract class SeleniumPage
 {
     protected Selenium selenium;
+    /**
+     * Used to determine urls for the page.
+     */
+    protected Urls urls;
     /**
      * Identifier of an element that is always on the page and can therefore
      * by used to determine the page's presence.
@@ -22,14 +27,15 @@ public abstract class SeleniumPage
      */
     private String title;
 
-    public SeleniumPage(Selenium selenium, String id)
+    public SeleniumPage(Selenium selenium, Urls urls, String id)
     {
-        this(selenium, id, null);
+        this(selenium, urls, id, null);
     }
 
-    public SeleniumPage(Selenium selenium, String id, String title)
+    public SeleniumPage(Selenium selenium, Urls urls, String id, String title)
     {
         this.selenium = selenium;
+        this.urls = urls;
         this.title = title;
         this.id = id;
     }
