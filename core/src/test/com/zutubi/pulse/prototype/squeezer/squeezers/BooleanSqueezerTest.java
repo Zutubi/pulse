@@ -1,7 +1,7 @@
 package com.zutubi.pulse.prototype.squeezer.squeezers;
 
-import junit.framework.TestCase;
 import com.zutubi.pulse.prototype.squeezer.SqueezeException;
+import junit.framework.TestCase;
 
 /**
  * <class-comment/>

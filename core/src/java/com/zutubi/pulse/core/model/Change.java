@@ -148,6 +148,11 @@ public class Change extends Entity
         return directory;
     }
 
+    private void setDirectory(boolean directory)
+    {
+        this.directory = directory;
+    }
+
     /**
      * Used by hibernate
      *
