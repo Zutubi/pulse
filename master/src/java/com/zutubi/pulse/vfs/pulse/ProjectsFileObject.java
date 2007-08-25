@@ -46,7 +46,7 @@ public class ProjectsFileObject extends AbstractPulseFileObject implements Addre
         }
         catch (NumberFormatException e)
         {
-            ProjectConfiguration project = projectManager.getProjectConfig(str);
+            ProjectConfiguration project = projectManager.getProjectConfig(str, true);
             if (project != null)
             {
                 return project.getProjectId();

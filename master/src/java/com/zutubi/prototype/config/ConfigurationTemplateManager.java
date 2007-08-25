@@ -469,8 +469,8 @@ public class ConfigurationTemplateManager
                         PersistentInstantiator instantiator = new PersistentInstantiator(path, concrete, instances, incompleteInstances, configurationReferenceManager);
                         Configuration instance = (Configuration) instantiator.instantiate(id, true, templatedType, record);
 
-                        // Only valid, concrete instances go into the collection
-                        if (concrete && instance.isValid())
+                        // Concrete instances go into the collection
+                        if (concrete)
                         {
                             topInstance.put(id, instance);
                         }
@@ -502,7 +502,7 @@ public class ConfigurationTemplateManager
         validateInstances(incompleteInstances, false);
     }
 
-    private void validateInstances(InstanceCache instances, final boolean concrete)
+    private void validateInstances(final InstanceCache instances, final boolean concrete)
     {
         instances.forAllInstances(new InstanceCache.InstanceHandler()
         {
@@ -513,6 +513,10 @@ public class ConfigurationTemplateManager
                 {
                     // Then we have a composite
                     validateInstance(type, instance, parentInstance, PathUtils.getBaseName(path), concrete, false, null);
+                    if(!instance.isValid())
+                    {
+                        instances.markInvalid(path);
+                    }
                 }
             }
         });
@@ -615,6 +619,27 @@ public class ConfigurationTemplateManager
     }
 
     /**
+     * Indicates if an instance and all instances reachable via its
+     * properties are valid.
+     * For example, for a project, indicates if the entire project
+     * configuration (including the SCM, triggers etc) is valid.
+     *
+     * @param path the path to test
+     * @return true if all instances under the path are valid
+     */
+    public boolean isDeeplyValid(String path)
+    {
+        if(instances.get(path) != null)
+        {
+            return instances.isValid(path);
+        }
+        else
+        {
+            return incompleteInstances.isValid(path);
+        }
+    }
+
+    /**
      * Validates the given record as a composite of some type, and returns
      * the instance if valid.  The validation occurs in the context of where
      * the record is to be stored, allowing inspection of associated
@@ -660,6 +685,24 @@ public class ConfigurationTemplateManager
         validateInstance(type, instance, parentInstance, baseName, concrete, deep, ignoredFields);
 
         return (T) instance;
+    }
+
+    /**
+     * Performs a shallow validation of the given instance, recording errors
+     * on the instance itself.
+     *
+     * @param type           instance type
+     * @param instance       instance to validate
+     * @param parentInstance parent instance, or null if this is a top-level
+     *                       instance
+     * @param baseName       base name of the instances path, may be null for
+     *                       a new instance
+     * @param concrete       if true, the validation will check for
+     *                       completeness
+     */
+    public void validateInstance(CompositeType type, Configuration instance, Configuration parentInstance, String baseName, boolean concrete)
+    {
+        validateInstance(type, instance, parentInstance, baseName, concrete, false, null);
     }
 
     private void validateInstance(CompositeType type, Configuration instance, Configuration parentInstance, String baseName, boolean concrete, boolean deep, Set<String> ignoredFields)

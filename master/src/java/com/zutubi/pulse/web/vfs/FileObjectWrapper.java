@@ -1,10 +1,10 @@
 package com.zutubi.pulse.web.vfs;
 
-import com.zutubi.util.logging.Logger;
 import com.zutubi.pulse.vfs.FileAction;
 import com.zutubi.pulse.vfs.pulse.AbstractPulseFileObject;
 import com.zutubi.pulse.vfs.pulse.AddressableFileObject;
 import com.zutubi.pulse.vfs.pulse.FileTypeConstants;
+import com.zutubi.util.logging.Logger;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
@@ -147,5 +147,15 @@ public class FileObjectWrapper
             return ((AbstractPulseFileObject)fo).getActions();
         }
         return Collections.EMPTY_LIST;
+    }
+
+    @SuppressWarnings({"unchecked"})
+    public String getCls()
+    {
+        if (fo instanceof AbstractPulseFileObject)
+        {
+            return ((AbstractPulseFileObject)fo).getCls();
+        }
+        return null;
     }
 }

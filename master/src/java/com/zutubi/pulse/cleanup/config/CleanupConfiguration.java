@@ -8,6 +8,7 @@ import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
 import com.zutubi.util.Constants;
 import com.zutubi.validation.annotations.Numeric;
+import com.zutubi.validation.annotations.Required;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -21,16 +22,19 @@ import java.util.List;
 @Table(columns = {"name", "states", "after"})
 public class CleanupConfiguration extends AbstractNamedConfiguration
 {
+    @Required
     private CleanupWhat what;
+
+    @Numeric(min = 1)
+    private int retain;
+
+    @Required
+    private CleanupUnit unit;
 
     @Select(optionProvider = "com.zutubi.pulse.prototype.CompletedResultStateOptionProvider")
     @Format("CleanupStateColumnFormatter")
     private List<ResultState> states;
 
-    @Numeric(min = 1)
-    private int retain;
-
-    private CleanupUnit unit;
 
     public CleanupConfiguration(CleanupWhat what, List<ResultState> states, int count, CleanupUnit unit)
     {

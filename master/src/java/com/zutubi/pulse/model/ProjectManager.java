@@ -15,21 +15,19 @@ import java.util.List;
  */
 public interface ProjectManager extends EntityManager<Project>
 {
-    Collection<ProjectConfiguration> getAllProjectConfigs();
+    Collection<ProjectConfiguration> getAllProjectConfigs(boolean allowInvalid);
 
-    ProjectConfiguration getProjectConfig(String name);
+    ProjectConfiguration getProjectConfig(String name, boolean allowInvalid);
 
-    ProjectConfiguration getProjectConfig(long handle);
+    ProjectConfiguration getProjectConfig(long handle, boolean allowInvalid);
 
     void saveProjectConfig(ProjectConfiguration config);
 
-    Project getProject(String name);
+    Project getProject(String name, boolean allowInvalid);
 
-    Project getProject(long id);
+    Project getProject(long id, boolean allowInvalid);
 
-    List<Project> getProjects();
-
-    List<Project> getAllProjectsCached();
+    List<Project> getProjects(boolean allowInvalid);
 
     int getProjectCount();
 

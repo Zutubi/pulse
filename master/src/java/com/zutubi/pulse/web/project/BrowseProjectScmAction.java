@@ -31,7 +31,7 @@ public class BrowseProjectScmAction extends AbstractBrowseDirAction
 
     public String execute()
     {
-        project = getProjectManager().getProject(id);
+        project = getProjectManager().getProject(id, false);
         if (project == null)
         {
             addActionError("Unknown project [" + id + "]");

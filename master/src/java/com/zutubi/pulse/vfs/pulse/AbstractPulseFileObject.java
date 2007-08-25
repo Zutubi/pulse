@@ -1,9 +1,9 @@
 package com.zutubi.pulse.vfs.pulse;
 
-import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.vfs.FileAction;
+import com.zutubi.util.bean.ObjectFactory;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
@@ -77,6 +77,17 @@ public abstract class AbstractPulseFileObject extends AbstractFileObject
     public List<FileAction> getActions()
     {
         return Collections.EMPTY_LIST;
+    }
+
+    /**
+     * Returns an extra classification for the object, which may be used for
+     * categorising or styling in the UI.
+     *
+     * @return an extra class name, or null for no extra class
+     */
+    public String getCls()
+    {
+        return null;
     }
 
     /**

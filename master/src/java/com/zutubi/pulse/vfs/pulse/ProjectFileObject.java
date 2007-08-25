@@ -72,12 +72,12 @@ public class ProjectFileObject extends AbstractPulseFileObject implements Projec
 
     public ProjectConfiguration getProjectConfig() throws FileSystemException
     {
-        return projectManager.getProjectConfig(projectId);
+        return projectManager.getProjectConfig(projectId, false);
     }
 
     public Project getProject()
     {
-        return projectManager.getProject(projectId);
+        return projectManager.getProject(projectId, false);
     }
 
     public long getProjectId()

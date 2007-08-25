@@ -37,14 +37,14 @@ public class HideDashboardProjectAction extends UserActionSupport
         User user = getUser();
         DashboardConfiguration dashboardConfig = user.getConfig().getPreferences().getDashboard();
 
-        Project p = projectManager.getProject(id);
+        Project p = projectManager.getProject(id, false);
         if(p != null)
         {
             dashboardConfig = connfigurationProvider.deepClone(dashboardConfig);
             if(dashboardConfig.isShowAllProjects())
             {
                 dashboardConfig.setShowAllProjects(false);
-                dashboardConfig.getShownProjects().addAll(projectManager.getAllProjectConfigs());
+                dashboardConfig.getShownProjects().addAll(projectManager.getAllProjectConfigs(true));
             }
 
             dashboardConfig.getShownProjects().remove(p.getConfig());

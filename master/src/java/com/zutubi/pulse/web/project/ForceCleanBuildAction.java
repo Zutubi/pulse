@@ -22,7 +22,7 @@ public class ForceCleanBuildAction extends ProjectActionSupport
 
     public String execute()
     {
-        Project project = getProjectManager().getProject(projectId);
+        Project project = getProjectManager().getProject(projectId, false);
 
         if (project == null)
         {

@@ -159,7 +159,7 @@ public class ResultNotifier implements EventListener
 
     private String getDefaultSubject(BuildResult result)
     {
-        ProjectConfiguration config = projectManager.getProjectConfig(result.getProject().getId());
+        ProjectConfiguration config = projectManager.getProjectConfig(result.getProject().getId(), true);
         String prelude = result.isPersonal() ? "personal build " : (config.getName() + ": build ");
         return prelude + Long.toString(result.getNumber()) + ": " + result.getState().getPrettyString();
     }

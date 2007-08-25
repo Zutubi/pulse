@@ -84,7 +84,7 @@ public class BuildController implements EventListener
     public void init()
     {
         this.projectConfig = request.getProjectConfig();
-        this.project = projectManager.getProject(projectConfig.getProjectId());
+        this.project = projectManager.getProject(projectConfig.getProjectId(), false);
         this.asyncListener = new AsynchronousDelegatingListener(this);
     }
 

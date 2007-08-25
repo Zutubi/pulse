@@ -982,6 +982,11 @@ table.template-actions
 }
 
 /*
+.config-invalid a span {
+    color: #f00;
+}
+*/
+/*
 .x-item-disabled
 {
     background: none;

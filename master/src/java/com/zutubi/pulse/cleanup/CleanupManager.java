@@ -144,7 +144,7 @@ public class CleanupManager
     public void cleanupBuilds()
     {
         // Lookup project cleanup info, query for old builds, cleanup where necessary
-        List<Project> projects = projectManager.getProjects();
+        List<Project> projects = projectManager.getProjects(false);
         for (Project project : projects)
         {
             cleanupBuilds(project);

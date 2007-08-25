@@ -13,17 +13,17 @@ public class MockProjectManager implements ProjectManager
     private Map<Long, Project> projects = new TreeMap<Long, Project>();
     private long nextId = 1;
 
-    public Collection<ProjectConfiguration> getAllProjectConfigs()
+    public Collection<ProjectConfiguration> getAllProjectConfigs(boolean allowInvalid)
     {
         throw new RuntimeException("Method not yet implemented.");
     }
 
-    public ProjectConfiguration getProjectConfig(String name)
+    public ProjectConfiguration getProjectConfig(String name, boolean allowInvaid)
     {
         throw new RuntimeException("Method not yet implemented.");
     }
 
-    public ProjectConfiguration getProjectConfig(long id)
+    public ProjectConfiguration getProjectConfig(long id, boolean allowInvalid)
     {
         throw new RuntimeException("Method not yet implemented.");
     }
@@ -33,17 +33,17 @@ public class MockProjectManager implements ProjectManager
         throw new RuntimeException("Method not yet implemented.");
     }
 
-    public Project getProject(String name)
+    public Project getProject(String name, boolean allowInvalid)
     {
         throw new RuntimeException("Method not yet implemented.");
     }
 
-    public Project getProject(long id)
+    public Project getProject(long id, boolean allowInvalid)
     {
         return projects.get(id);
     }
 
-    public List<Project> getProjects()
+    public List<Project> getProjects(boolean allowInvalid)
     {
         return new LinkedList<Project>(projects.values());
     }

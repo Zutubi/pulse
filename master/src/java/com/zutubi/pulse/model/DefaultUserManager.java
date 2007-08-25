@@ -195,7 +195,7 @@ public class DefaultUserManager implements UserManager, ConfigurationInjector.Co
         DashboardConfiguration dashboardConfig = user.getConfig().getPreferences().getDashboard();
         if(dashboardConfig.isShowAllProjects())
         {
-            projects.addAll(projectManager.getProjects());
+            projects.addAll(projectManager.getProjects(true));
         }
         else
         {

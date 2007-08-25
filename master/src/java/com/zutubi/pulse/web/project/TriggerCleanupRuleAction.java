@@ -34,7 +34,7 @@ public class TriggerCleanupRuleAction extends ProjectActionSupport
 
     public String execute() throws Exception
     {
-        final Project project = getProjectManager().getProject(projectId);
+        final Project project = getProjectManager().getProject(projectId, false);
         if(project == null)
         {
             addActionError("Unknown project [" + projectId + "]");
@@ -42,7 +42,7 @@ public class TriggerCleanupRuleAction extends ProjectActionSupport
         }
 
 //        final CleanupRule rule = project.getCleanupRule(id);
-        ProjectConfiguration projectConfig = projectManager.getProjectConfig(project.getId());
+        ProjectConfiguration projectConfig = projectManager.getProjectConfig(project.getId(), false);
 
         // Fixme: need to locate the requested configuration. How is it identified? name? id certainly
         // does not work here.

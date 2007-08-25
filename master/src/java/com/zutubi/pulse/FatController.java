@@ -214,7 +214,7 @@ public class FatController implements EventListener, Stoppable
             return;
         }
 
-        Project project = projectManager.getProject(event.getProjectConfig().getProjectId());
+        Project project = projectManager.getProject(event.getProjectConfig().getProjectId(), false);
         if (!event.isPersonal() && project.isPaused())
         {
             // Ignore build requests while project is paused
@@ -229,7 +229,7 @@ public class FatController implements EventListener, Stoppable
 
     private void startBuild(AbstractBuildRequestEvent event)
     {
-        final Project project = projectManager.getProject(event.getProjectConfig().getProjectId());
+        final Project project = projectManager.getProject(event.getProjectConfig().getProjectId(), false);
 
         lock.lock();
         try

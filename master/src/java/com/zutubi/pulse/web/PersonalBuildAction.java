@@ -100,7 +100,7 @@ public class PersonalBuildAction extends ActionSupport
             return ERROR;
         }
 
-        Project p = projectManager.getProject(project);
+        Project p = projectManager.getProject(project, false);
         if(p == null)
         {
             errorMessage = "Unknown project '" + project + "'";

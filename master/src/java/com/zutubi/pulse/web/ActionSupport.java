@@ -218,7 +218,7 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
             ProjectConfiguration projectConfig = null;
             if (project != null)
             {
-                projectConfig = projectManager.getProjectConfig(project.getId());
+                projectConfig = projectManager.getProjectConfig(project.getId(), false);
             }
             if(revision != null && projectConfig != null && projectConfig.getChangeViewer() != null)
             {
@@ -251,7 +251,7 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
                 {
                     for(long id: changelist.getProjectIds())
                     {
-                        ProjectConfiguration p = getProjectManager().getProjectConfig(id);
+                        ProjectConfiguration p = getProjectManager().getProjectConfig(id, false);
                         if(p != null && p.getChangeViewer() != null)
                         {
                             String url = p.getChangeViewer().getChangesetURL(revision);

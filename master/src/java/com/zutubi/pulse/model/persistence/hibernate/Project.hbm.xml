@@ -45,10 +45,6 @@
         <many-to-one name="aclObjectIdentity" column="PROJECT_ID" class="com.zutubi.pulse.model.Project" not-null="true"/>
     </class>
 
-    <query name="findAllProjectsCached" cacheable="true"><![CDATA[
-        from Project project
-    ]]></query>
-
     <query name="findByAcl"><![CDATA[
         select project
         from Project project

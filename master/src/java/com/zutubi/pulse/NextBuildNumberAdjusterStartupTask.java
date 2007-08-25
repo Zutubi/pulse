@@ -1,12 +1,13 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.StartupTask;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.util.logging.Logger;
 
-import java.util.List;
 import java.io.File;
+import java.util.List;
 
 /**
  * A startup task which checks the build directories on disk and ensure the
@@ -22,7 +23,7 @@ public class NextBuildNumberAdjusterStartupTask implements StartupTask
     public void execute()
     {
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        List<Project> projects = projectManager.getProjects();
+        List<Project> projects = projectManager.getProjects(true);
 
         for (Project project : projects)
         {

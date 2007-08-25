@@ -1,6 +1,9 @@
 package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.model.BuildHostRequirements;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.RunExecutablePostBuildAction;
+import com.zutubi.pulse.model.TagPostBuildAction;
 import com.zutubi.pulse.model.persistence.ProjectDao;
 import com.zutubi.util.logging.Logger;
 
@@ -42,11 +45,6 @@ public class HibernateProjectDao extends HibernateEntityDao<Project> implements 
     public List<Project> findByAdminAuthority(String recipient)
     {
         return findByNamedQuery("findByAcl", "recipient", recipient);
-    }
-
-    public List<Project> findAllProjectsCached()
-    {
-        return findByNamedQuery("findAllProjectsCached", 0, true);
     }
 
     public void delete(BuildHostRequirements hostRequirements)

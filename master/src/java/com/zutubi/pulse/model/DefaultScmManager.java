@@ -113,7 +113,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
 
     private List<ProjectConfiguration> getActiveProjects()
     {
-        return CollectionUtils.filter(projectManager.getAllProjectConfigs(), new Predicate<ProjectConfiguration>()
+        return CollectionUtils.filter(projectManager.getAllProjectConfigs(false), new Predicate<ProjectConfiguration>()
         {
             public boolean satisfied(ProjectConfiguration project)
             {
@@ -167,7 +167,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
     {
         ScmConfiguration scm = projectConfig.getScm();
         long projectId = projectConfig.getProjectId();
-        Project project = projectManager.getProject(projectId);
+        Project project = projectManager.getProject(projectId, false);
 
         try
         {

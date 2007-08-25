@@ -26,6 +26,102 @@ public class DefaultInstanceCacheTest extends PulseTestCase
         cache = null;
     }
 
+    public void testHasInstancesUnderEmptyEmptyPath()
+    {
+        assertFalse(cache.hasInstancesUnder(""));
+    }
+
+    public void testHasInstancesUnderEmptySinglePath()
+    {
+        assertFalse(cache.hasInstancesUnder("a"));
+    }
+
+    public void testHasInstancesUnderEmptyMultiPath()
+    {
+        assertFalse(cache.hasInstancesUnder("a/b/c"));
+    }
+
+    public void testHasInstancesUnderSingleEmptyPath()
+    {
+        cache.put("a", new TestConfiguration(1));
+        assertTrue(cache.hasInstancesUnder(""));
+    }
+
+    public void testHasInstancesUnderSingleSinglePath()
+    {
+        cache.put("a", new TestConfiguration(1));
+        assertTrue(cache.hasInstancesUnder("a"));
+    }
+
+    public void testHasInstancesUnderSingleMultiPath()
+    {
+        cache.put("a", new TestConfiguration(1));
+        assertFalse(cache.hasInstancesUnder("a/b/c"));
+    }
+
+    public void testHasInstancesUnderMultiEmptyPath()
+    {
+        cache.put("a/b/c", new TestConfiguration(1));
+        assertTrue(cache.hasInstancesUnder(""));
+    }
+
+    public void testHasInstancesUnderMultiSinglePath()
+    {
+        cache.put("a/b/c", new TestConfiguration(1));
+        assertTrue(cache.hasInstancesUnder("a"));
+    }
+
+    public void testHasInstancesUnderMultiMultiPath()
+    {
+        cache.put("a/b/c", new TestConfiguration(1));
+        assertTrue(cache.hasInstancesUnder("a/b/c"));
+    }
+
+    public void testMarkInvalidEmptyPath()
+    {
+        markInvalidHelper("", true, true, true, true);
+    }
+
+    public void testMarkInvalidA()
+    {
+        markInvalidHelper("a", false, true, true, true);
+    }
+
+    public void testMarkInvalidAB()
+    {
+        markInvalidHelper("a/b", false, false, true, true);
+    }
+    
+    public void testMarkInvalidABC()
+    {
+        markInvalidHelper("a/b/c", false, false, false, true);
+    }
+
+    public void testMarkInvalidAD()
+    {
+        markInvalidHelper("a/d", false, true, true, false);
+    }
+
+    private void markInvalidHelper(String path, boolean a, boolean ab, boolean abc, boolean ad)
+    {
+        cache.put("a", new TestConfiguration(1));
+        cache.put("a/b", new TestConfiguration(2));
+        cache.put("a/b/c", new TestConfiguration(3));
+        cache.put("a/d", new TestConfiguration(4));
+
+        cache.markInvalid(path);
+        assertFalse(cache.isValid(""));
+        assertEquals(a, cache.isValid("a"));
+        assertEquals(ab, cache.isValid("a/b"));
+        assertEquals(abc, cache.isValid("a/b/c"));
+        assertEquals(ad, cache.isValid("a/d"));
+    }
+
+    public void testIsValidNoSuchPath()
+    {
+        assertFalse(cache.isValid("a"));
+    }
+
     public void testGetSimpleEmptyCache()
     {
         assertNull(cache.get("trivial"));

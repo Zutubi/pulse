@@ -56,7 +56,7 @@ public class PersistentInstantiator implements Instantiator
                     configuration.setConfigurationPath(propertyPath);
                     configuration.setHandle(((Record) data).getHandle());
 
-                    if(concrete && configuration.isValid())
+                    if(concrete)
                     {
                         cache.put(propertyPath, configuration);
                     }

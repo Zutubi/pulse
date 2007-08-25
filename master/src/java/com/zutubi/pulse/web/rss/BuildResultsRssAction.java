@@ -150,7 +150,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
 
     public String getProjectName(Project project)
     {
-        return projectManager.getProjectConfig(project.getId()).getName();
+        return projectManager.getProjectConfig(project.getId(), true).getName();
     }
 
     private interface RssFeedTemplate

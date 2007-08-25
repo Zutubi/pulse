@@ -104,7 +104,7 @@ public class DashboardAction extends ActionSupport
 
         if(dashboardConfig.isShowAllProjects())
         {
-            shownProjects = projectManager.getAllProjectsCached();
+            shownProjects = projectManager.getProjects(false);
         }
         else
         {
@@ -138,7 +138,7 @@ public class DashboardAction extends ActionSupport
 
     public Project getProject(long id)
     {
-        return projectManager.getProject(id);
+        return projectManager.getProject(id, true);
     }
 
     public BuildResult getResult(long id)

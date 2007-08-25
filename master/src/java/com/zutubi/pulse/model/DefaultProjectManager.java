@@ -27,6 +27,8 @@ import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.project.types.TypeConfiguration;
 import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.scheduling.SchedulingException;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.annotation.Secured;
 
@@ -62,6 +64,7 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
 
     private Map<String, ProjectConfiguration> nameToConfig = new HashMap<String, ProjectConfiguration>();
     private Map<Long, ProjectConfiguration> idToConfig = new HashMap<Long, ProjectConfiguration>();
+    private List<ProjectConfiguration> validConfigs = new LinkedList<ProjectConfiguration>();
 
     public void initialise()
     {
@@ -87,6 +90,7 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
             {
                 nameToConfig.remove(instance.getName());
                 idToConfig.remove(instance.getProjectId());
+                validConfigs.remove(instance);
             }
 
             public void postSave(ProjectConfiguration instance)
@@ -96,6 +100,7 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
                 if(old != null)
                 {
                     nameToConfig.remove(old.getName());
+                    validConfigs.remove(old);
                 }
 
                 registerProjectConfig(instance);
@@ -134,6 +139,10 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
     {
         nameToConfig.put(projectConfig.getName(), projectConfig);
         idToConfig.put(projectConfig.getProjectId(), projectConfig);
+        if(configurationTemplateManager.isDeeplyValid(projectConfig.getConfigurationPath()))
+        {
+            validConfigs.add(projectConfig);
+        }
     }
 
     public void save(Project project)
@@ -141,19 +150,35 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
         projectDao.save(project);
     }
 
-    public Collection<ProjectConfiguration> getAllProjectConfigs()
+    public Collection<ProjectConfiguration> getAllProjectConfigs(boolean allowInvalid)
     {
-        return Collections.unmodifiableCollection(nameToConfig.values());
+        if(allowInvalid)
+        {
+            return Collections.unmodifiableCollection(nameToConfig.values());
+        }
+        else
+        {
+            return Collections.unmodifiableCollection(validConfigs);
+        }
     }
 
-    public ProjectConfiguration getProjectConfig(String name)
+    public ProjectConfiguration getProjectConfig(String name, boolean allowInvalid)
     {
-        return nameToConfig.get(name);
+        return checkValidity(nameToConfig.get(name), allowInvalid);
     }
 
-    public ProjectConfiguration getProjectConfig(long id)
+    public ProjectConfiguration getProjectConfig(long id, boolean allowInvalid)
     {
-        return idToConfig.get(id);
+        return checkValidity(idToConfig.get(id), allowInvalid);
+    }
+
+    private ProjectConfiguration checkValidity(ProjectConfiguration configuration, boolean allowInvalid)
+    {
+        if(!allowInvalid && configuration != null && !configurationTemplateManager.isDeeplyValid(configuration.getConfigurationPath()))
+        {
+            return null;
+        }
+        return configuration;
     }
 
     public void saveProjectConfig(ProjectConfiguration config)
@@ -161,29 +186,40 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
         configurationProvider.save(config);
     }
 
-    public Project getProject(String name)
+    public Project getProject(String name, boolean allowInvalid)
     {
         ProjectConfiguration config = nameToConfig.get(name);
-        if(config == null)
+        if(config == null || !allowInvalid && !configurationTemplateManager.isDeeplyValid(config.getConfigurationPath()))
         {
             return null;
         }
         return projectDao.findById(config.getProjectId());
     }
 
-    public Project getProject(long id)
+    public Project getProject(long id, boolean allowInvalid)
     {
-        return projectDao.findById(id);
+        Project project = projectDao.findById(id);
+        if(!allowInvalid && project != null && !configurationTemplateManager.isDeeplyValid(project.getConfig().getConfigurationPath()))
+        {
+            return null;
+        }
+        return project;
     }
 
-    public List<Project> getProjects()
+    public List<Project> getProjects(boolean allowInvalid)
     {
-        return projectDao.findAll();
+        return filterValidProjects(projectDao.findAll());
     }
 
-    public List<Project> getAllProjectsCached()
+    private List<Project> filterValidProjects(List<Project> projects)
     {
-        return projectDao.findAllProjectsCached();
+        return CollectionUtils.filter(projects, new Predicate<Project>()
+        {
+            public boolean satisfied(Project project)
+            {
+                return project.getConfig() != null && configurationTemplateManager.isDeeplyValid(project.getConfig().getConfigurationPath());
+            }
+        });
     }
 
     public int getProjectCount()
@@ -227,7 +263,7 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
 
     public void delete(Project project)
     {
-        project = getProject(project.getId());
+        project = getProject(project.getId(), true);
         if (project != null)
         {
             deleteProject(project);
@@ -243,7 +279,7 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
 
     public void triggerBuild(ProjectConfiguration projectConfig, BuildReason reason, Revision revision, boolean force)
     {
-        Project project = getProject(projectConfig.getProjectId());
+        Project project = getProject(projectConfig.getProjectId(), false);
 
         if(revision == null)
         {
@@ -278,7 +314,7 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
 
     public void triggerBuild(long number, Project project, User user, PatchArchive archive) throws PulseException
     {
-        ProjectConfiguration projectConfig = getProjectConfig(project.getId());
+        ProjectConfiguration projectConfig = getProjectConfig(project.getId(), false);
         if(projectConfig == null)
         {
             return;
@@ -298,7 +334,7 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
 
     public long getNextBuildNumber(Project project)
     {
-        project = getProject(project.getId());
+        project = getProject(project.getId(), true);
         long number = project.getNextBuildNumber();
         project.setNextBuildNumber(number + 1);
         save(project);
@@ -332,7 +368,7 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
 
     public void updateProjectAdmins(String authority, List<Long> restrictToProjects)
     {
-        List<Project> projects = getProjects();
+        List<Project> projects = getProjects(true);
         for(Project p: projects)
         {
             if(restrictToProjects == null || restrictToProjects.contains(p.getId()))
@@ -431,7 +467,7 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
 
     public void buildCommenced(long projectId)
     {
-        Project project = getProject(projectId);
+        Project project = getProject(projectId, true);
         if (project != null)
         {
             project.buildCommenced();
@@ -441,7 +477,7 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
 
     public void buildCompleted(long projectId, boolean successful)
     {
-        Project project = getProject(projectId);
+        Project project = getProject(projectId, true);
         if (project != null)
         {
             project.buildCompleted();
@@ -463,7 +499,7 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
 
     public Project pauseProject(Project project)
     {
-        project = getProject(project.getId());
+        project = getProject(project.getId(), true);
         if (project != null)
         {
             project.pause();
@@ -475,7 +511,7 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
 
     public void resumeProject(Project project)
     {
-        project = getProject(project.getId());
+        project = getProject(project.getId(), true);
         if (project != null)
         {
             project.resume();

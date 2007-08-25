@@ -50,7 +50,7 @@ public class ViewProjectsAction extends ProjectActionSupport
         groups = projectManager.getAllProjectGroupsCached();
         Collections.sort(groups, new NamedEntityComparator());
 
-        projects = getProjectManager().getAllProjectsCached();
+        projects = getProjectManager().getProjects(false);
         for (Project p : projects)
         {
             String health = "unknown";

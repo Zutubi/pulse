@@ -64,7 +64,7 @@ public abstract class AbstractBuildFileObject extends AbstractPulseFileObject im
 
     public ProjectConfiguration getProjectConfig()
     {
-        return projectManager.getProjectConfig(getProjectId());
+        return projectManager.getProjectConfig(getProjectId(), false);
     }
 
     public Project getProject()

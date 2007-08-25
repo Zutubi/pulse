@@ -35,7 +35,7 @@ public class BuildRequestEvent extends AbstractBuildRequestEvent
 
     public BuildResult createResult(ProjectManager projectManager, UserManager userManager)
     {
-        Project project = projectManager.getProject(getProjectConfig().getProjectId());
+        Project project = projectManager.getProject(getProjectConfig().getProjectId(), false);
         return new BuildResult(reason, project, projectManager.getNextBuildNumber(project), getRevision().isUser());
     }
 

@@ -88,6 +88,18 @@ public class ConfigFileObject extends AbstractPulseFileObject
         }
     }
 
+    public String getCls()
+    {
+        if (configurationTemplateManager.pathExists(path))
+        {
+            return configurationTemplateManager.isDeeplyValid(path) ? null : "config-invalid";
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     protected String[] doListChildren() throws Exception
     {
         List<String> listing = PrototypeUtils.getPathListing(path, type, configurationTemplateManager);

@@ -123,7 +123,7 @@ public class ViewChangelistAction extends ActionSupport
             {
                 for (long id : changelist.getProjectIds())
                 {
-                    p = projectManager.getProject(id);
+                    p = projectManager.getProject(id, false);
                     if (getViewerFromProject(p))
                     {
                         break;
@@ -262,7 +262,7 @@ public class ViewChangelistAction extends ActionSupport
 
         if (TextUtils.stringSet(projectName))
         {
-            project = projectManager.getProject(projectName);
+            project = projectManager.getProject(projectName, false);
         }
         if (TextUtils.stringSet(buildVID))
         {

@@ -146,29 +146,32 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 
     private void addAgent(AgentConfiguration agentConfig, boolean ping)
     {
-        try
+        if (configurationTemplateManager.isDeeplyValid(agentConfig.getConfigurationPath()))
         {
-            AgentService agentService = createAgentService(agentConfig);
-            AgentState agentState = agentStateManager.getAgentState(agentConfig.getAgentStateId());
-            if (agentState.getEnableState() == AgentState.EnableState.UPGRADING)
+            try
             {
-                // Something went wrong: lost contact with slave (or master
-                // died) during upgrade.
-                agentState.setEnableState(AgentState.EnableState.FAILED_UPGRADE);
-                agentStateManager.save(agentState);
+                AgentService agentService = createAgentService(agentConfig);
+                AgentState agentState = agentStateManager.getAgentState(agentConfig.getAgentStateId());
+                if (agentState.getEnableState() == AgentState.EnableState.UPGRADING)
+                {
+                    // Something went wrong: lost contact with slave (or master
+                    // died) during upgrade.
+                    agentState.setEnableState(AgentState.EnableState.FAILED_UPGRADE);
+                    agentStateManager.save(agentState);
+                }
+
+                DefaultAgent agent = new DefaultAgent(agentConfig, agentState, agentService);
+                agents.put(agentConfig.getHandle(), agent);
+
+                if (ping)
+                {
+                    pingAgent(agent);
+                }
             }
-
-            DefaultAgent agent = new DefaultAgent(agentConfig, agentState, agentService);
-            agents.put(agentConfig.getHandle(), agent);
-
-            if (ping)
+            catch (Exception e)
             {
-                pingAgent(agent);
+                LOG.severe("Unable to initialise agent '" + agentConfig.getName() + "': " + e.getMessage());
             }
-        }
-        catch (Exception e)
-        {
-            LOG.severe("Unable to initialise agent '" + agentConfig.getName() + "': " + e.getMessage());
         }
     }
 
@@ -415,7 +418,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 
     public Class[] getHandledEvents()
     {
-        return new Class[] { AgentUpgradeCompleteEvent.class };
+        return new Class[]{AgentUpgradeCompleteEvent.class};
     }
 
     public List<Agent> getAllAgents()
@@ -534,7 +537,10 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
     private void removeAgent(long handle)
     {
         Agent agent = agents.remove(handle);
-        eventManager.publish(new AgentRemovedEvent(this, agent));
+        if (agent != null)
+        {
+            eventManager.publish(new AgentRemovedEvent(this, agent));
+        }
     }
 
     public void upgradeStatus(UpgradeStatus upgradeStatus)

@@ -4,11 +4,7 @@ import com.zutubi.pulse.model.GrantedAuthority;
 import com.zutubi.pulse.model.Group;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  */
@@ -67,7 +63,7 @@ public class GroupBasicsActionSupport extends GroupActionSupport
         {
             // FIXME: sort the map.
             allProjects = new LinkedHashMap<Long, String>();
-            Collection<ProjectConfiguration> all = projectManager.getAllProjectConfigs();
+            Collection<ProjectConfiguration> all = projectManager.getAllProjectConfigs(true);
             for(ProjectConfiguration p: all)
             {
                 allProjects.put(p.getHandle(), p.getName());

@@ -2,6 +2,7 @@ package com.zutubi.prototype.config;
 
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.util.UnaryFunction;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -16,19 +17,52 @@ class DefaultInstanceCache implements InstanceCache
 {
     private Entry root = new Entry(null);
 
+    public boolean hasInstancesUnder(String path)
+    {
+        if(path.length() == 0)
+        {
+            return root.size() > 0;
+        }
+        else
+        {
+            return getEntry(path, null) != null;
+        }
+    }
+
+    public void markInvalid(String path)
+    {
+        getEntry(path, new UnaryFunction<Entry>()
+        {
+            public void process(Entry entry)
+            {
+                entry.markInvalid();
+            }
+        });
+    }
+
+    public boolean isValid(String path)
+    {
+        DefaultInstanceCache.Entry entry = getEntry(path, null);
+        return entry != null && entry.isValid();
+    }
+
     public Configuration get(String path)
     {
-        Entry entry = getEntry(path);
+        Entry entry = getEntry(path, null);
         return entry == null ? null : entry.getInstance();
     }
 
-    private Entry getEntry(String path)
+    private Entry getEntry(String path, UnaryFunction<Entry> f)
     {
-        return getEntry(root, PathUtils.getPathElements(path), 0);
+        return getEntry(root, PathUtils.getPathElements(path), 0, f);
     }
 
-    private Entry getEntry(Entry entry, String[] elements, int index)
+    private Entry getEntry(Entry entry, String[] elements, int index, UnaryFunction<Entry> f)
     {
+        if (f != null)
+        {
+            f.process(entry);
+        }
 
         if (index == elements.length)
         {
@@ -36,13 +70,13 @@ class DefaultInstanceCache implements InstanceCache
         }
 
         entry = entry.getChild(elements[index]);
-        return entry == null ? null : getEntry(entry, elements, index + 1);
+        return entry == null ? null : getEntry(entry, elements, index + 1, f);
     }
 
     public Collection<Configuration> getAllDescendents(String path)
     {
         Collection<Configuration> result = new LinkedList<Configuration>();
-        Entry entry = getEntry(path);
+        Entry entry = getEntry(path, null);
         if (entry != null)
         {
             entry.getAllDescendents(result);
@@ -119,6 +153,10 @@ class DefaultInstanceCache implements InstanceCache
          * leaf instances.
          */
         private Map<String, Entry> children;
+        /**
+         * True if this entry and all children are valid.
+         */
+        private boolean valid = true;
 
         public Entry(Configuration instance)
         {
@@ -191,6 +229,21 @@ class DefaultInstanceCache implements InstanceCache
                     childEntry.getValue().forAllInstances(instance, PathUtils.getPath(path, childEntry.getKey()), handler);
                 }
             }
+        }
+
+        public int size()
+        {
+            return children == null ? 0 : children.size();
+        }
+
+        public boolean isValid()
+        {
+            return valid;
+        }
+
+        public void markInvalid()
+        {
+            valid = false;
         }
     }
 }

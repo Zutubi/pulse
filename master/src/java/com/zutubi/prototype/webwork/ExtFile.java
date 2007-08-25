@@ -11,12 +11,14 @@ public class ExtFile
     private String id;
     private String text;
     private boolean leaf;
+    private String cls;
 
     public ExtFile(FileObjectWrapper fo)
     {
         id = fo.getId();
         text = fo.getName();
         leaf = !fo.isContainer();
+        cls = fo.getCls();
     }
 
     public ExtFile(String id, String text, boolean leaf)
@@ -39,5 +41,10 @@ public class ExtFile
     public boolean isLeaf()
     {
         return leaf;
+    }
+
+    public String getCls()
+    {
+        return cls;
     }
 }

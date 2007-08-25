@@ -10,6 +10,12 @@ import java.util.Collection;
  */
 public interface InstanceCache
 {
+    boolean hasInstancesUnder(String path);
+
+    void markInvalid(String path);
+
+    boolean isValid(String path);
+
     Configuration get(String path);
 
     Collection<Configuration> getAllDescendents(String path);

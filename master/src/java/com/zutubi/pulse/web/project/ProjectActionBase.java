@@ -1,6 +1,7 @@
 package com.zutubi.pulse.web.project;
 
 import com.opensymphony.util.TextUtils;
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.BuildResult;
@@ -22,6 +23,7 @@ public class ProjectActionBase extends ActionSupport
     private Project project;
     private long projectId;
     protected BuildManager buildManager;
+    private ConfigurationTemplateManager configurationTemplateManager;
 
     public String getProjectName()
     {
@@ -71,11 +73,16 @@ public class ProjectActionBase extends ActionSupport
         {
             if (TextUtils.stringSet(projectName))
             {
-                project = projectManager.getProject(projectName);
+                project = projectManager.getProject(projectName, true);
                 if(project == null)
                 {
                     throw new LookupErrorException("Unknown project '" + projectName + "'");
                 }
+                if(!configurationTemplateManager.isDeeplyValid(project.getConfig().getConfigurationPath()))
+                {
+                    throw new LookupErrorException("Project configuration is invalid.");
+                }
+                
                 projectId = project.getId();
             }
         }
@@ -109,5 +116,10 @@ public class ProjectActionBase extends ActionSupport
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
+    }
+
+    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
+    {
+        this.configurationTemplateManager = configurationTemplateManager;
     }
 }

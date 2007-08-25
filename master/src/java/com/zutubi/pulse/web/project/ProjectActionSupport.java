@@ -87,12 +87,12 @@ public class ProjectActionSupport extends ActionSupport
 
     protected Project getProject(long id)
     {
-        return projectManager.getProject(id);
+        return projectManager.getProject(id, false);
     }
 
     protected Project getProject(String projectName)
     {
-        return getProjectManager().getProject(projectName);
+        return getProjectManager().getProject(projectName, false);
     }
 
     public void addUnknownProjectActionError()
@@ -129,7 +129,7 @@ public class ProjectActionSupport extends ActionSupport
 
     public Project lookupProject(long id)
     {
-        Project p = projectManager.getProject(id);
+        Project p = projectManager.getProject(id, false);
         if(p == null)
         {
             addActionError("Unknown project [" + id + "]");

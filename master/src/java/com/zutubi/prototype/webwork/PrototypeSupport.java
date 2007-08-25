@@ -9,6 +9,7 @@ import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.web.ActionSupport;
 
 /**
@@ -116,7 +117,12 @@ public class PrototypeSupport extends ActionSupport implements MessagesProvider
             record = configuration.getRecord();
         }
 
-        // TODO: collapse into a single result vm that handles the various types.
+        Configuration instance = configuration.getInstance();
+        if(instance != null && !instance.isValid())
+        {
+            PrototypeUtils.mapErrors(instance, this, null);
+        }
+
         type = configuration.getType();
     }
 
@@ -124,6 +130,7 @@ public class PrototypeSupport extends ActionSupport implements MessagesProvider
     {
         prepare();
 
+        // TODO: collapse into a single result vm that handles the various types.
         if (type instanceof CompositeType)
         {
             return "composite";
