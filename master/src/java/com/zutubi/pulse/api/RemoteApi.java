@@ -19,6 +19,8 @@ import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.scm.SCMConfiguration;
 import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.scm.SCMServer;
+import com.zutubi.pulse.scm.SCMServerUtils;
 import com.zutubi.pulse.util.OgnlUtils;
 import com.zutubi.pulse.util.TimeStamps;
 import com.zutubi.pulse.util.UnaryFunction;
@@ -627,13 +629,19 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
             Revision r = null;
             if(TextUtils.stringSet(revision))
             {
+                SCMServer scm = null;
                 try
                 {
-                    r = project.getScm().createServer().getRevision(revision);
+                    scm = project.getScm().createServer();
+                    r = scm.getRevision(revision);
                 }
                 catch (SCMException e)
                 {
                     throw new IllegalArgumentException("Unable to verify revision: " + e.getMessage());
+                }
+                finally
+                {
+                    SCMServerUtils.close(scm);
                 }
             }
 

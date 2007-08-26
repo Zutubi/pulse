@@ -2,6 +2,8 @@ package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.filesystem.remote.RemoteScmFileSystem;
 import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.scm.SCMServer;
+import com.zutubi.pulse.scm.SCMServerUtils;
 import org.acegisecurity.acl.AclManager;
 
 /**
@@ -48,15 +50,21 @@ public class BrowseProjectScmAction extends AbstractBrowseDirAction
 
         getProjectManager().checkWrite(project);
 
+        SCMServer scm = null;
         try
         {
-            location = project.getScm().createServer().getLocation();
+            scm = project.getScm().createServer();
+            location = scm.getLocation();
             return super.execute(new RemoteScmFileSystem(project.getScm()));
         }
         catch (Exception e)
         {
             addActionError("Error browsing SCM: " + e.getMessage());
             return ERROR;
+        }
+        finally
+        {
+            SCMServerUtils.close(scm);
         }
     }
 }

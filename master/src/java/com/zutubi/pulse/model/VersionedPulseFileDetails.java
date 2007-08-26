@@ -4,6 +4,8 @@ import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.scm.SCMServer;
+import com.zutubi.pulse.scm.SCMServerUtils;
 import com.zutubi.pulse.util.FileSystemUtils;
 
 import java.io.IOException;
@@ -55,15 +57,20 @@ public class VersionedPulseFileDetails extends PulseFileDetails
         String normalisedPath = FileSystemUtils.normaliseSeparators(pulseFileName);
         if (patch == null || !patch.containsPath(normalisedPath))
         {
-            Scm scm = project.getScm();
+            SCMServer scm = null;
 
             try
             {
-                return scm.createServer().checkout(revision, pulseFileName);
+                scm = project.getScm().createServer();
+                return scm.checkout(revision, pulseFileName);
             }
             catch (SCMException e)
             {
                 throw new BuildException("Unable to retrieve pulse file from SCM: " + e.getMessage());
+            }
+            finally
+            {
+                SCMServerUtils.close(scm);
             }
         }
         else

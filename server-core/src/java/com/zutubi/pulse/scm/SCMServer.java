@@ -201,4 +201,10 @@ public interface SCMServer
      * @throws SCMException if the given revision is invalid
      */
     Revision getRevision(String revision) throws SCMException;
+
+    /**
+     * Must be called to release resources when this SCMServer is to be
+     * disposed.  No other methods may be called after closing.
+     */
+    void close();
 }

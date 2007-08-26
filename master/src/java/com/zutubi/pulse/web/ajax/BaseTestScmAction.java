@@ -6,6 +6,7 @@ import com.opensymphony.xwork.validator.ValidationException;
 import com.zutubi.pulse.model.Scm;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMServer;
+import com.zutubi.pulse.scm.SCMServerUtils;
 import com.zutubi.pulse.web.ActionSupport;
 
 import java.util.concurrent.*;
@@ -85,15 +86,20 @@ public abstract class BaseTestScmAction extends ActionSupport
 
         public String call() throws Exception
         {
+            SCMServer server = null;
             try
             {
-                SCMServer server = scm.createServer();
+                server = scm.createServer();
                 server.testConnection();
                 return null;
             }
             catch (SCMException e)
             {
                 return e.getMessage();
+            }
+            finally
+            {
+                SCMServerUtils.close(server);
             }
         }
     }

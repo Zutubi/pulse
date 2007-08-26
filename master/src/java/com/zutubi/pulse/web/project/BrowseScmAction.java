@@ -3,6 +3,8 @@ package com.zutubi.pulse.web.project;
 import com.zutubi.pulse.filesystem.remote.RemoteScmFileSystem;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.Scm;
+import com.zutubi.pulse.scm.SCMServer;
+import com.zutubi.pulse.scm.SCMServerUtils;
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
 
@@ -97,9 +99,11 @@ public class BrowseScmAction extends AbstractBrowseDirAction
             scm = wizard.getScm();
         }
 
+        SCMServer server = null;
         try
         {
-            location = scm.createServer().getLocation();
+            server = scm.createServer();
+            location = server.getLocation();
             if (TextUtils.stringSet(prefix) && !TextUtils.stringSet(getPath()))
             {
                 setPath(prefix);
@@ -110,6 +114,10 @@ public class BrowseScmAction extends AbstractBrowseDirAction
         {
             addActionError("Error browsing SCM: " + e.getMessage());
             return ERROR;
+        }
+        finally
+        {
+            SCMServerUtils.close(server);
         }
     }
 }

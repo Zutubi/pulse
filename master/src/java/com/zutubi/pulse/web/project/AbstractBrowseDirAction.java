@@ -104,6 +104,10 @@ public abstract class AbstractBrowseDirAction extends ProjectActionSupport
             addActionError(fse.getMessage());
             return ERROR;
         }
+        finally
+        {
+            fs.close();
+        }
 
         addActionError("Path '" + path + "' does not exist");
         return ERROR;

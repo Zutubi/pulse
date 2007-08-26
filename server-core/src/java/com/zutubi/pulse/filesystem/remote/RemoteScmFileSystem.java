@@ -93,4 +93,9 @@ public class RemoteScmFileSystem implements FileSystem
     {
         return "/";
     }
+
+    public void close()
+    {
+        server.close();
+    }
 }

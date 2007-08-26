@@ -6,6 +6,7 @@ import com.zutubi.pulse.model.Scm;
 import com.zutubi.pulse.scm.SCMCancelledException;
 import com.zutubi.pulse.scm.SCMCheckoutEventHandler;
 import com.zutubi.pulse.scm.SCMServer;
+import com.zutubi.pulse.scm.SCMServerUtils;
 import com.zutubi.pulse.util.ForkOutputStream;
 import com.zutubi.pulse.util.IOUtils;
 import com.zutubi.pulse.util.logging.Logger;
@@ -77,6 +78,7 @@ public abstract class ScmBootstrapper implements Bootstrapper, SCMCheckoutEventH
         }
         catch (IOException e)
         {
+            SCMServerUtils.close(server);
             throw new BuildException("I/O error running bootstrap: " + e.getMessage(), e);
         }
         finally
@@ -94,6 +96,10 @@ public abstract class ScmBootstrapper implements Bootstrapper, SCMCheckoutEventH
             catch (Exception e)
             {
                 LOG.warning("Unable to capture SCM connection details: " + e.getMessage(), e);
+            }
+            finally
+            {
+                SCMServerUtils.close(server);
             }
         }
     }

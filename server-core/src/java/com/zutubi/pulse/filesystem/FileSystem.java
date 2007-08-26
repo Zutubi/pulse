@@ -57,4 +57,6 @@ public interface FileSystem
     File[] list(File dir) throws FileSystemException;
 
     String getSeparator();
+
+    void close();
 }

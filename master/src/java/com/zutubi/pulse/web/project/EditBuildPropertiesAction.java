@@ -7,6 +7,8 @@ import com.zutubi.pulse.core.model.ResourceProperty;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.scm.SCMServer;
+import com.zutubi.pulse.scm.SCMServerUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.util.ArrayList;
@@ -122,15 +124,21 @@ public class EditBuildPropertiesAction extends ProjectActionSupport
         Revision r = null;
         if(TextUtils.stringSet(revision))
         {
+            SCMServer scm = null;
             try
             {
-                r = project.getScm().createServer().getRevision(revision);
+                scm = project.getScm().createServer();
+                r = scm.getRevision(revision);
             }
             catch (SCMException e)
             {
                 addFieldError("revision", "Unable to verify revision: " + e.getMessage());
                 LOG.severe(e);
                 return INPUT;
+            }
+            finally
+            {
+                SCMServerUtils.close(scm);
             }
 
             // CIB-1162: Make sure we can get a pulse file at this revision

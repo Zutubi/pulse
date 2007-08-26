@@ -262,6 +262,11 @@ public class CvsServer extends CachingSCMServer
         return cvsRevision;
     }
 
+    public void close()
+    {
+        // Noop
+    }
+
     public Revision checkout(String id, File toDirectory, Revision revision, SCMCheckoutEventHandler handler) throws SCMException
     {
         assertRevisionArgValid(revision);

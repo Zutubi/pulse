@@ -117,6 +117,11 @@ public class LocalFileSystem implements FileSystem
         return File.separator;
     }
 
+    public void close()
+    {
+        // Noop
+    }
+
     private LocalFile[] internalList(File dir) throws FileSystemException
     {
         if (!dir.exists())

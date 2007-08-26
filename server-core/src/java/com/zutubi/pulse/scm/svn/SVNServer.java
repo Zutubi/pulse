@@ -756,6 +756,21 @@ public class SVNServer implements SCMServer
         }
     }
 
+    public void close()
+    {
+        if(repository != null)
+        {
+            repository.closeSession();
+            repository = null;
+        }
+    }
+
+    protected void finalize() throws Throwable
+    {
+        super.finalize();
+        close();
+    }
+
     //=======================================================================
     // Testing use only
     //=======================================================================

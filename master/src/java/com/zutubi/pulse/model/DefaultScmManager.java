@@ -9,10 +9,7 @@ import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.scheduling.SchedulingException;
 import com.zutubi.pulse.scheduling.SimpleTrigger;
 import com.zutubi.pulse.scheduling.Trigger;
-import com.zutubi.pulse.scm.MonitorScms;
-import com.zutubi.pulse.scm.SCMChangeEvent;
-import com.zutubi.pulse.scm.SCMException;
-import com.zutubi.pulse.scm.SCMServer;
+import com.zutubi.pulse.scm.*;
 import com.zutubi.pulse.util.Constants;
 import com.zutubi.pulse.util.Pair;
 import com.zutubi.pulse.util.logging.Logger;
@@ -167,11 +164,19 @@ public class DefaultScmManager implements ScmManager, Stoppable
             save(scm);
 
             // when was the last time that we checked? if never, get the latest revision.
-            SCMServer server = scm.createServer();
-            if (!latestRevisions.containsKey(scm.getId()))
+            SCMServer server = null;
+            try
             {
-                latestRevisions.put(scm.getId(), server.getLatestRevision());
-                return;
+                server = scm.createServer();
+                if (!latestRevisions.containsKey(scm.getId()))
+                {
+                    latestRevisions.put(scm.getId(), server.getLatestRevision());
+                    return;
+                }
+            }
+            finally
+            {
+                SCMServerUtils.close(server);
             }
 
             Revision previous = latestRevisions.get(scm.getId());

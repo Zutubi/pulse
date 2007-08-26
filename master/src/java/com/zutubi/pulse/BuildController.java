@@ -17,6 +17,7 @@ import com.zutubi.pulse.scheduling.quartz.TimeoutRecipeJob;
 import com.zutubi.pulse.scm.FileStatus;
 import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMServer;
+import com.zutubi.pulse.scm.SCMServerUtils;
 import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.util.Constants;
 import com.zutubi.pulse.util.FileSystemUtils;
@@ -273,14 +274,20 @@ public class BuildController implements EventListener
     {
         // TODO: preferrable to move this out (maybe to the request)
         PersonalBuildRequestEvent pbr = ((PersonalBuildRequestEvent) request);
+        SCMServer scm = null;
         try
         {
-            FileStatus.EOLStyle localEOL = project.getScm().createServer().getEOLPolicy();
+            scm = project.getScm().createServer();
+            FileStatus.EOLStyle localEOL = scm.getEOLPolicy();
             initialBootstrapper = new PatchBootstrapper(initialBootstrapper, pbr.getUser().getId(), pbr.getNumber(), localEOL);
         }
         catch (SCMException e)
         {
             throw new BuildException("Unable to determine SCM end-of-line policy: " + e.getMessage(), e);
+        }
+        finally
+        {
+            SCMServerUtils.close(scm);
         }
         return initialBootstrapper;
     }
@@ -512,14 +519,19 @@ public class BuildController implements EventListener
 
             if (previousRevision != null)
             {
+                SCMServer server = null;
                 try
                 {
-                    SCMServer server = scm.createServer();
+                    server = scm.createServer();
                     getChangeSince(server, previousRevision, revision);
                 }
                 catch (SCMException e)
                 {
                     LOG.warning("Unable to retrieve changelist details from SCM server: " + e.getMessage(), e);
+                }
+                finally
+                {
+                    SCMServerUtils.close(server);
                 }
             }
         }

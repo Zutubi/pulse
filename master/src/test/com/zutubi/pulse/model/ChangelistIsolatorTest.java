@@ -135,6 +135,7 @@ public class ChangelistIsolatorTest extends PulseTestCase
     {
         NumericalRevision rev = new NumericalRevision(revision);
         mockScm.expectAndReturn("getLatestRevision", C.ANY_ARGS, rev);
+        mockScm.expect("close");
         return rev;
     }
 
@@ -167,6 +168,7 @@ public class ChangelistIsolatorTest extends PulseTestCase
         }
 
         mockScm.expectAndReturn("getRevisionsSince", new NumericalRevision(since), ret);
+        mockScm.expect("close");
     }
 
     private void setupIsolator()

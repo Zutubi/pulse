@@ -3,6 +3,8 @@ package com.zutubi.pulse.model;
 import com.zutubi.pulse.core.model.PersistentName;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.scm.SCMException;
+import com.zutubi.pulse.scm.SCMServer;
+import com.zutubi.pulse.scm.SCMServerUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -42,17 +44,26 @@ public class ChangelistIsolator
             }
         }
 
-        if (latestBuiltRevision == null)
+        SCMServer server = null;
+        try
         {
-            // The spec has never been built or even requested.  Just build
-            // the latest (we need to start somewhere!).
-            result = Arrays.asList(new Revision[]{project.getScm().createServer().getLatestRevision()});
+            server = project.getScm().createServer();
+            if (latestBuiltRevision == null)
+            {
+                // The spec has never been built or even requested.  Just build
+                // the latest (we need to start somewhere!).
+                result = Arrays.asList(new Revision[]{ server.getLatestRevision()});
+            }
+            else
+            {
+                // We now have the last requested revision, return every revision
+                // since then.
+                result = server.getRevisionsSince(latestBuiltRevision);
+            }
         }
-        else
+        finally
         {
-            // We now have the last requested revision, return every revision
-            // since then.
-            result = project.getScm().createServer().getRevisionsSince(latestBuiltRevision);
+            SCMServerUtils.close(server);
         }
 
         if (result.size() > 0)

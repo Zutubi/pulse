@@ -842,6 +842,11 @@ public class P4Server extends CachingSCMServer
         }
     }
 
+    public void close()
+    {
+        // Noop
+    }
+
     public boolean labelExists(String client, String name) throws SCMException
     {
         P4Client.P4Result p4Result = this.client.runP4(null, P4_COMMAND, FLAG_CLIENT, client, COMMAND_LABELS);

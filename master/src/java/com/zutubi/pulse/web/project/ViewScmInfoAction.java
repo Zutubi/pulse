@@ -2,6 +2,8 @@ package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.Scm;
+import com.zutubi.pulse.scm.SCMServer;
+import com.zutubi.pulse.scm.SCMServerUtils;
 
 import java.util.Map;
 
@@ -37,10 +39,11 @@ public class ViewScmInfoAction extends AbstractBrowseDirAction
             return ERROR;
         }
 
+        SCMServer scm = null;
         try
         {
-            Scm scm = project.getScm();
-            info = scm.createServer().getServerInfo();
+            scm = project.getScm().createServer();
+            info = scm.getServerInfo();
 
             return SUCCESS;
         }
@@ -48,6 +51,10 @@ public class ViewScmInfoAction extends AbstractBrowseDirAction
         {
             addActionError("Error retrieving SCM info: " + e.getMessage());
             return ERROR;
+        }
+        finally
+        {
+            SCMServerUtils.close(scm);
         }
     }
 }

@@ -895,6 +895,10 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         {
             throw new RuntimeException("Method not yet implemented.");
         }
+
+        public void close()
+        {
+        }
     }
 
 

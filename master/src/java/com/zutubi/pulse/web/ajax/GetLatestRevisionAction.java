@@ -2,6 +2,8 @@ package com.zutubi.pulse.web.ajax;
 
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.web.project.ProjectActionSupport;
+import com.zutubi.pulse.scm.SCMServer;
+import com.zutubi.pulse.scm.SCMServerUtils;
 
 /**
  * Simple ajax action to retrieve the latest revision for a project, used on
@@ -37,16 +39,21 @@ public class GetLatestRevisionAction extends ProjectActionSupport
         }
         else
         {
+            SCMServer scm = null;
             try
             {
-                latestRevision = project.getScm().createServer().getLatestRevision().getRevisionString();
+                scm = project.getScm().createServer();
+                latestRevision = scm.getLatestRevision().getRevisionString();
                 successful = true;
             }
             catch (Exception e)
             {
                 error = e.toString();
             }
-
+            finally
+            {
+                SCMServerUtils.close(scm);
+            }
         }
         
         return SUCCESS;
