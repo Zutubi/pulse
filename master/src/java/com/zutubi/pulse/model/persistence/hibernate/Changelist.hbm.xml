@@ -41,7 +41,7 @@
 
         <property name="revisionString" column="REVISION_STRING" type="string" length="4095"/>
 
-        <property name="directory" column="DIRECTORY" type="boolean" length="1"/> 
+        <!--<property name="directory" column="DIRECTORY" type="boolean" length="1"/> -->
         <!--<many-to-one name="revision" class="com.zutubi.pulse.core.model.FileRevision" column="REVISION_ID" cascade="all" lazy="false"/>-->
     </class>
 
