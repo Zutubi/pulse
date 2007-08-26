@@ -189,7 +189,6 @@ public class DefaultPluginManager implements PluginManager, EventListener
 
             // Need to resolve OSGi bundles before starting (otherwise
             // Equinox barfs).
-//            System.out.println("Resolving bundles.");
             resolveBundles(null);
 
             foundPlugins = sortPlugins(foundPlugins);
@@ -247,11 +246,9 @@ public class DefaultPluginManager implements PluginManager, EventListener
         if (bundle.getState() == Bundle.INSTALLED)
         {
             // Resolve the bundle first
-//            System.out.println("Resolving bundle: " + bundle.getSymbolicName());
             resolveBundles(new Bundle[] { bundle });
         }
 
-//        System.out.println("Starting bundle: " + bundle.getSymbolicName());
         try
         {
             bundle.start(Bundle.START_TRANSIENT);
@@ -724,7 +721,7 @@ public class DefaultPluginManager implements PluginManager, EventListener
 
     public PluginImpl getPlugin(final String id)
     {
-        return (PluginImpl) findPlugin(id, plugins);
+        return findPlugin(id, plugins);
     }
 
     private PluginImpl findPlugin(final String id, List<PluginImpl> plugins)

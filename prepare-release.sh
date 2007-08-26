@@ -35,10 +35,15 @@ tmpFile=/tmp/tmp.$$
 #   - replace rev="latest.integration" with rev="$version" for all pulse dependencies
 for ivy in */ivy.xml package/*/ivy.xml bundles/*/ivy.xml
 do
-    
     sed -e "s/status=\"integration\"/status=\"release\" revision=\"$version\"/g" \
         -e "s/latest.integration/$version/g" $ivy > $tmpFile
     mv $tmpFile $ivy
+done
+
+for manifest in bundles/*/resources/META-INF/MANIFEST.MF
+do
+    sed -e "s/Bundle-Version: [0-9]*\.[0-9]*\.[0-9]*/Bundle-Version: $version/g" $manifest > $tmpFile
+    mv $tmpFile $manifest
 done
 
 # Update build.properties

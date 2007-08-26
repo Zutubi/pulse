@@ -6,6 +6,8 @@ import org.eclipse.osgi.framework.util.Headers;
 
 import java.io.File;
 
+import com.zutubi.util.StringUtils;
+
 /**
  * Metadata that describes a plugin and its current state.
  */
@@ -94,7 +96,15 @@ public class PluginImpl implements Plugin
 
     public String getSymbolicName()
     {
-        return (String) manifest.get(HEADER_SYMBOLICNAME);
+        String[] nextToken = StringUtils.getNextToken((String) manifest.get(HEADER_SYMBOLICNAME), ';', true);
+        if(nextToken == null)
+        {
+            return null;
+        }
+        else
+        {
+            return nextToken[0];
+        }
     }
 
     public Plugin.State getState()

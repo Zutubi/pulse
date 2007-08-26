@@ -1,6 +1,7 @@
 package com.zutubi.util;
 
 import java.util.*;
+import java.io.PrintStream;
 
 /**
  */
@@ -194,5 +195,30 @@ public class CollectionUtils
         }
 
         return true;
+    }
+
+    public static <T> void print(Collection<T> c, Mapping<T, String> m)
+    {
+        print(c, m, System.out);
+    }
+
+    public static <T> void print(Collection<T> c, Mapping<T, String> m, PrintStream stream)
+    {
+        boolean comma = false;
+        stream.print("[");
+        for(T t: c)
+        {
+            if(comma)
+            {
+                stream.print(", ");
+            }
+            else
+            {
+                comma = true;
+            }
+
+            stream.print(m.map(t));
+        }
+        stream.println("]");
     }
 }
