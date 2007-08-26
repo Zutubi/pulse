@@ -28,8 +28,7 @@ public class PrimitiveType extends SimpleType implements Type
         PRIMITIVE_CLASSES_MAP.put(long.class, Long.class);
         PRIMITIVE_CLASSES_MAP.put(short.class, Short.class);
 
-        NULL_VALUES_MAP = new HashMap<Class, Object>(8);
-        NULL_VALUES_MAP.put(boolean.class, false);
+        NULL_VALUES_MAP = new HashMap<Class, Object>(7);
         NULL_VALUES_MAP.put(byte.class, Byte.MIN_VALUE);
         NULL_VALUES_MAP.put(char.class, Character.MIN_VALUE);
         NULL_VALUES_MAP.put(double.class, Double.MIN_VALUE);
