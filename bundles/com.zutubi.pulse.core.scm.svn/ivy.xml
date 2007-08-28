@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
-
     <info organisation="zutubi" module="com.zutubi.pulse.core.scm.svn" status="integration">
         <ivyauthor name="Zutubi" url="http://www.zutubi.com/"/>
         <description homepage="http://www.zutubi.com/">
@@ -28,10 +27,8 @@
     </publications>
 
     <dependencies>
-        <dependency org="zutubi" name="com.zutubi.pulse.core" rev="latest.integration" conf="*->@"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core" rev="latest.integration" conf="build->@"/>
 
         <dependency org="javasvn" name="javasvn" rev="1.0.6" conf="external,build,release,bundled_3rd_party->default"/>
-
     </dependencies>
-
 </ivy-module>
