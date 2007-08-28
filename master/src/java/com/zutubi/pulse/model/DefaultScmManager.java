@@ -1,8 +1,9 @@
 package com.zutubi.pulse.model;
 
+import com.zutubi.pulse.ShutdownManager;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.Stoppable;
+import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.model.persistence.ScmDao;
 import com.zutubi.pulse.scheduling.Scheduler;
@@ -13,7 +14,6 @@ import com.zutubi.pulse.scm.*;
 import com.zutubi.pulse.util.Constants;
 import com.zutubi.pulse.util.Pair;
 import com.zutubi.pulse.util.logging.Logger;
-import com.zutubi.pulse.ShutdownManager;
 
 import java.util.HashMap;
 import java.util.List;
@@ -150,33 +150,26 @@ public class DefaultScmManager implements ScmManager, Stoppable
 
     private void process(Scm scm)
     {
+        long now = System.currentTimeMillis();
+        if (!checkPollingInterval(scm, now))
+        {
+            // do not poll the scm just yet.
+            return;
+        }
+
+        // set the poll time.
+        scm.setLastPollTime(now);
+        save(scm);
+
+        SCMServer server = null;
         try
         {
-            long now = System.currentTimeMillis();
-            if (!checkPollingInterval(scm, now))
-            {
-                // do not poll the scm just yet.
-                return;
-            }
-
-            // set the poll time.
-            scm.setLastPollTime(now);
-            save(scm);
-
             // when was the last time that we checked? if never, get the latest revision.
-            SCMServer server = null;
-            try
+            server = scm.createServer();
+            if (!latestRevisions.containsKey(scm.getId()))
             {
-                server = scm.createServer();
-                if (!latestRevisions.containsKey(scm.getId()))
-                {
-                    latestRevisions.put(scm.getId(), server.getLatestRevision());
-                    return;
-                }
-            }
-            finally
-            {
-                SCMServerUtils.close(server);
+                latestRevisions.put(scm.getId(), server.getLatestRevision());
+                return;
             }
 
             Revision previous = latestRevisions.get(scm.getId());
@@ -245,6 +238,10 @@ public class DefaultScmManager implements ScmManager, Stoppable
             // This needs to be brought to the attention of the user since its likely to
             // be the result of a configuration problem.
             LOG.warning(e.getMessage(), e);
+        }
+        finally
+        {
+            SCMServerUtils.close(server);
         }
     }
 
