@@ -14,12 +14,14 @@ form.items.last().on('render', function(field)
 
 <#if parameters.inheritedFrom?exists>
     var inheritedEl = Ext.DomHelper.append(field.getEl().dom.parentNode, { tag: 'img', alt: 'inherited', src: '${base}/images/inherited.gif', id: '${parameters.id}.inherited'}, true);
+    inheritedEl.alignTo(inheritedEl.getPrevSibling(), 'l-r');
     inheritedEl.dom.qtip = 'value inherited from ${parameters.inheritedFrom}';
     field.getEl().addClass('field-inherited');
 </#if>
 
 <#if parameters.overriddenOwner?exists>
     var inheritedEl = Ext.DomHelper.append(field.getEl().dom.parentNode, { tag: 'img', alt: 'overridden', src: '${base}/images/overridden.gif', id: '${parameters.id}.overridden'}, true);
+    inheritedEl.alignTo(inheritedEl.getPrevSibling(), 'l-r');
     inheritedEl.dom.qtip = 'overrides value defined by ${parameters.overriddenOwner}';
     field.getEl().addClass('field-overridden');
 </#if>

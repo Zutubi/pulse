@@ -896,7 +896,8 @@ table.template-actions
     background: #f0f0f0;
 }
 
-.config-panel{
+.config-panel
+{
     border-bottom-style:dotted;
     border-right-style:dotted;
     border-left-style:dotted;

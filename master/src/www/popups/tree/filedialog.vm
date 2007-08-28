@@ -8,6 +8,7 @@
 
     <script type="text/javascript" src="$base/js/prototype.js"></script>
     <script type="text/javascript" src="$base/js/zutubi.js"></script>
+    <script type="text/javascript" src="$base/js/yahoo/utilities.js"></script>
     <script type="text/javascript" src="$base/js/yahoo/yahoo.js"></script>
     <script type="text/javascript" src="$base/js/yahoo/event.js"></script>
     <script type="text/javascript" src="$base/js/yahoo/animation.js"></script>

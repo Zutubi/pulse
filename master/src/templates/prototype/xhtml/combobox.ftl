@@ -32,6 +32,8 @@
     fieldConfig.valueField = 'value';
     fieldConfig.editable = false;
     fieldConfig.forceSelection = true;
+    fieldConfig.triggerAction = 'all';
+    fieldConfig.emptyText = 'jeebus';
 <#if parameters.width?exists>
     fieldConfig.width = ${parameters.width};
 </#if>

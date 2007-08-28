@@ -107,6 +107,13 @@ public class PulseActionMapper implements ActionMapper
     private String[] getActionSubmit(String query, String defaultAction)
     {
         String[] actionSubmit = new String[]{defaultAction, ""};
+        if (query != null)
+        {
+            // Strip parameter which is automatically added by Ext in some
+            // cases.
+            query = query.replaceAll("_dc=[0-9]+", "");
+        }
+        
         if (TextUtils.stringSet(query))
         {
             int index = query.indexOf('=');
