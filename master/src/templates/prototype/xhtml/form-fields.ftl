@@ -25,15 +25,7 @@ function handleKeypress(evt)
 
 function updateButtons()
 {
-    var dirty = false;
-    form.items.each(function(field)
-    {
-        if(field.isDirty())
-        {
-            dirty = true;
-        }
-    });
-
+    var dirty = form.isDirty();
     for(var i = 0; i < form.buttons.length; i++)
     {
         if(dirty)

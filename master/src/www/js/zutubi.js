@@ -461,11 +461,7 @@ Ext.extend(ZUTUBI.CheckForm, Ext.form.Form, {
     }
 });
 
-Ext.form.Field.prototype.isDirty = function()
+Ext.form.Checkbox.prototype.onResize = function()
 {
-    if(this.disabled)
-    {
-        return false;
-    }
-    return String(this.getValue()) !== String(this.originalValue);
+    Ext.form.Checkbox.superclass.onResize.apply(this, arguments);
 }
