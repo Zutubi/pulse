@@ -6,6 +6,7 @@ width of its contents.  Floating it works, but hurts other things.
 
 <#-- render form -->
 <script type="text/javascript">
+    Ext.QuickTips.init();
     Ext.QuickTips.tagConfig.width = 'qwidth';
 
     Ext.form.Field.prototype.msgTarget = 'under';
