@@ -58,6 +58,7 @@ public class FormDescriptorFactory
         registerFieldType(FieldType.HIDDEN, HiddenFieldDescriptor.class);
         registerFieldType(FieldType.PASSWORD, PasswordFieldDescriptor.class);
         registerFieldType(FieldType.SELECT, SelectFieldDescriptor.class);
+        registerFieldType(FieldType.STRING_LIST, StringListFieldDescriptor.class);
         registerFieldType(FieldType.TEXT, TextFieldDescriptor.class);
         registerFieldType(FieldType.TEXTAREA, TextAreaFieldDescriptor.class);
     }
@@ -103,13 +104,23 @@ public class FormDescriptorFactory
             Type targetType = propertyType.getCollectionType();
             if(targetType instanceof SimpleType)
             {
-                SelectFieldDescriptor fd = new SelectFieldDescriptor();
+                String fieldType = FieldType.SELECT;
+                com.zutubi.config.annotations.Field field = AnnotationUtils.findAnnotation(property.getAnnotations(), com.zutubi.config.annotations.Field.class);
+                if(field != null)
+                {
+                    fieldType = field.type();
+                }
+
+                FieldDescriptor fd = createFieldOfType(fieldType);
+                if(fd instanceof SelectFieldDescriptor)
+                {
+                    ((SelectFieldDescriptor)fd).setMultiple(true);                    
+                }
                 fd.setForm(form);
                 fd.setParentPath(parentPath);
                 fd.setBaseName(baseName);
                 fd.setProperty(property);
                 fd.setName(property.getName());
-                fd.setMultiple(true);
                 addFieldParameters(type, parentPath, baseName, property, fd);
                 fieldDescriptors.add(fd);
             }
@@ -135,7 +146,7 @@ public class FormDescriptorFactory
                 // other magical cases, then we can refactor this a bit.
                 if (property.getName().equals("password"))
                 {
-                    fieldType = "password";
+                    fieldType = FieldType.PASSWORD;
                 }
                 else
                 {
@@ -144,7 +155,7 @@ public class FormDescriptorFactory
             }
             else if (propertyType instanceof EnumType)
             {
-                fieldType = "select";
+                fieldType = FieldType.SELECT;
             }
         }
 

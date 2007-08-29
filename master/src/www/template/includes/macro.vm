@@ -280,10 +280,8 @@
         #adminTab("projects" "$base/admin/projects/" $selected)
         #adminTab("agents" "$base/admin/agents/" $selected)
         #adminTab("settings" "$base/admin/settings/" $selected)
-<!--
-        #adminTab("users" "$base/admin/userSettings" $selected)
-        #adminTab("groups" "$base/admin/viewGroups" $selected)
--->
+        #adminTab("users" "$base/admin/users" $selected)
+        #adminTab("groups" "$base/admin/groups" $selected)
         #adminTab("plugins" "$base/admin/plugins/" $selected)
 #closeTabs()
 #end

@@ -62,4 +62,6 @@ public interface FieldType
     static final String CHECKBOX = "checkbox";
 
     static final String SELECT = "select";
+
+    static final String STRING_LIST = "stringlist";
 }

@@ -461,6 +461,191 @@ Ext.extend(ZUTUBI.CheckForm, Ext.form.Form, {
     }
 });
 
+ZUTUBI.StringList = function(config)
+{
+    ZUTUBI.StringList.superclass.constructor.call(this, config);
+    this.addEvents({
+        'change': true
+    });
+};
+
+Ext.extend(ZUTUBI.StringList, Ext.form.Field, {
+    width: 100,
+    height: 100,
+    fieldName: 'value',
+    selectedClass: 'x-string-list-selected',
+    hiddenFields: [],
+    
+    onRender: function(ct, position)
+    {
+        //Ext.form.Field.superclass.onRender.call(this, ct, position);
+        this.wrap = ct.createChild({tag: 'div', cls: 'x-string-list'});
+        this.el = this.wrap.createChild({tag: 'input', type: 'hidden'});
+        this.input = this.wrap.createChild({tag: 'input', type: 'text'});
+        this.input.setWidth(this.width - 16);
+        this.input.on('keypress', this.onKeypress, this);
+        this.addButton = this.wrap.createChild({tag: 'img', src: '/images/add.gif', style: 'width: 16px; height: 16px;'});
+        this.addButton.on('click', this.onAdd, this);
+        this.addButton.alignTo(this.input, 'l-r');
+        
+        this.list = this.wrap.createChild({tag: 'div', cls: 'x-string-list-list'});
+        this.list.setWidth(this.width - 16);
+        this.list.setHeight(this.height);
+
+        this.removeButton = this.wrap.createChild({tag: 'img', src: '/images/delete.gif', style: 'width: 16px; height: 16px;'});
+        this.removeButton.alignTo(this.list, 'tl-tr');
+        this.removeButton.on('click', this.onRemove, this);
+
+        this.upButton = this.wrap.createChild({tag: 'img', src: '/images/resultset_up.gif', style: 'width: 16px; height: 16px;'});
+        this.upButton.alignTo(this.removeButton, 't-b');
+        this.upButton.on('click', this.onUp, this);
+
+        this.downButton = this.wrap.createChild({tag: 'img', src: '/images/resultset_down.gif', style: 'width: 16px; height: 16px;'});
+        this.downButton.alignTo(this.upButton, 't-b');
+        this.downButton.on('click', this.onDown, this);
+
+        var cls = 'x-string-list';
+
+        if(!this.tpl)
+        {
+            this.tpl = '<div class="' + cls + '-item">{' + this.fieldName + '}</div>';
+        }
+
+        this.view = new Ext.View(this.list, this.tpl, {
+            singleSelect:true, store: this.store, selectedClass: this.selectedClass
+        });
+
+        this.ValueRecord = Ext.data.Record.create({name: 'value'});
+    },
+
+    afterRender: function()
+    {
+        ZUTUBI.StringList.superclass.afterRender.call(this);
+        if(this.value)
+        {
+            this.setValue(this.value);
+            this.originalValue = this.value;
+        }
+    },
+
+    onKeypress: function(evt)
+    {
+        if (evt.getKey() == evt.RETURN)
+        {
+            this.onAdd(evt);
+        }
+    },
+
+    onAdd: function(evt)
+    {
+        var text = this.input.dom.value;
+        if(text.length > 0)
+        {
+            this.input.dom.value = '';
+            this.appendItem(text);
+            this.view.select(this.store.getCount() - 1);
+            this.ensureSelectionVisible();
+            this.fireEvent('change', this, evt);
+        }
+    },
+
+    appendItem: function(text)
+    {
+        this.store.add(new this.ValueRecord({value: text}));
+        this.hiddenFields.push(this.wrap.createChild({tag: 'input', type: 'hidden', name: this.name, value: text}));
+    },
+    
+    onRemove: function(evt)
+    {
+        var selected = this.view.getSelectedIndexes();
+        if(selected.length > 0)
+        {
+            var i = selected[0];
+            this.store.remove(this.store.getAt(i));
+            this.hiddenFields[i].remove();
+            this.hiddenFields.splice(i, 1);
+            this.fireEvent('change', this, evt);
+        }
+    },
+
+    onUp: function(evt)
+    {
+        var selected = this.view.getSelectedIndexes();
+        if(selected.length > 0 && selected[0] > 0)
+        {
+            var i = selected[0];
+            var record = this.store.getAt(i);
+            this.store.remove(record);
+            this.store.insert(i - 1, record);
+            this.view.select(i - 1);
+
+            var hidden = this.hiddenFields.splice(i, 1)[0];
+            this.hiddenFields.splice(i - 1, 0, hidden);
+            hidden.insertBefore(this.hiddenFields[i]);
+
+            this.ensureSelectionVisible();
+            this.fireEvent('change', this, evt);
+        }
+    },
+
+    onDown: function(evt)
+    {
+        var selected = this.view.getSelectedIndexes();
+        if(selected.length > 0 && selected[0] < this.store.getCount() - 1)
+        {
+            var i = selected[0];
+            var record = this.store.getAt(i);
+            this.store.remove(record);
+            this.store.insert(i + 1, record);
+            this.view.select(i + 1);
+
+            var hidden = this.hiddenFields.splice(i, 1)[0];
+            this.hiddenFields.splice(i + 1, 0, hidden);
+            hidden.insertAfter(this.hiddenFields[i]);
+
+            this.ensureSelectionVisible();
+            this.fireEvent('change', this, evt);
+        }
+    },
+
+    ensureSelectionVisible: function()
+    {
+        var nodes = this.view.getSelectedNodes();
+        if(nodes.length > 0)
+        {
+            var selectedEl = Ext.get(nodes[0]);
+            selectedEl.scrollIntoView(this.list);
+        }
+    },
+
+    doWithSelection: function(fn, cond)
+    {
+        var selected = this.view.getSelectedIndexes();
+        if(selected.length > 0)
+        {
+            if(!cond || cond(selected[0]))
+            {
+                fn(selected[0]);
+            }
+        }
+    },
+
+    getValue: function()
+    {
+        var value = [];
+        this.store.each(function(r) { value.push(r.value); });
+    },
+
+    setValue: function(value)
+    {
+        this.store.removeAll();
+        for(var i = 0; i < value.length; i++)
+        {
+            this.appendItem(value[i]);
+        }
+    }
+});
+
 Ext.form.Checkbox.prototype.onResize = function()
 {
     Ext.form.Checkbox.superclass.onResize.apply(this, arguments);

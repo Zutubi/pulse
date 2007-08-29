@@ -982,6 +982,29 @@ table.template-actions
     vertical-align:top;
 }
 
+.x-string-list-list
+{
+    border: solid 1px #b5b8c8;
+    overflow: auto;
+    cursor: pointer;
+}
+
+.x-string-list-item
+{
+    font:normal 12px tahoma, arial, helvetica, sans-serif;
+    padding:2px;
+    border:1px solid #fff;
+    white-space: nowrap;
+    overflow:hidden;
+    text-overflow: ellipsis;
+}
+
+.x-string-list-list .x-string-list-selected
+{
+	background-color: #c3daf9 !important;
+    border:1px solid #336699;
+}
+
 /*
 .config-invalid a span {
     color: #f00;
