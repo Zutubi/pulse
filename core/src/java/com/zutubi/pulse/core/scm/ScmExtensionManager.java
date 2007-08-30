@@ -61,6 +61,7 @@ public class ScmExtensionManager extends AbstractExtensionManager
             Class factoryClazz = loadClass(extension, factoryClassName);
             try
             {
+                //noinspection unchecked
                 clientFactory.register(configClazz, factoryClazz);
                 if (wcClassName != null)
                 {

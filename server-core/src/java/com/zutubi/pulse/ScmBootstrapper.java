@@ -8,9 +8,13 @@ import com.zutubi.pulse.core.CommandContext;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.scm.ScmCancelledException;
-import com.zutubi.pulse.core.scm.ScmEventHandler;
 import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.pulse.core.scm.ScmContext;
+import com.zutubi.pulse.core.scm.ScmEventHandler;
+import com.zutubi.pulse.core.scm.ScmClientFactory;
+import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.scm.config.ScmConfiguration;
+import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.util.ForkOutputStream;
 import com.zutubi.util.IOUtils;
 import com.zutubi.util.logging.Logger;
@@ -31,15 +35,15 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmEventHandler
 
     protected String agent;
     protected String project;
-    protected ScmClient scm;
+    protected ScmConfiguration scmConfig;
     protected BuildRevision revision;
     protected boolean terminated = false;
     protected transient PrintWriter outputWriter;
 
-    public ScmBootstrapper(String project, ScmClient scm, BuildRevision revision)
+    public ScmBootstrapper(String project, ScmConfiguration scmConfig, BuildRevision revision)
     {
         this.project = project;
-        this.scm = scm;
+        this.scmConfig = scmConfig;
         this.revision = revision;
     }
 
@@ -145,6 +149,12 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmEventHandler
     public void terminate()
     {
         terminated = true;
+    }
+
+    protected ScmClient createScmClient() throws ScmException
+    {
+        ScmClientFactory factory = ComponentContext.getBean("scmClientFactory");
+        return factory.createClient(scmConfig);
     }
 
     abstract ScmClient bootstrap(ScmContext context);

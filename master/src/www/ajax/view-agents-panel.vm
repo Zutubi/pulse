@@ -56,7 +56,7 @@
 #end
 #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
     #licensed("require=canAddAgent")
-        #addRow("add.agent" 7 "$base/admin/agents.action" "agent.add")
+        #addRow("add.agent" 7 "$base/admin/agents/" "agent.add")
     #end
 #end
 </table>

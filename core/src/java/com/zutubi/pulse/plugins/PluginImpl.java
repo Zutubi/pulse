@@ -5,6 +5,7 @@ import org.eclipse.osgi.service.resolver.BundleDescription;
 import org.eclipse.osgi.framework.util.Headers;
 
 import java.io.File;
+import java.net.URL;
 
 import com.zutubi.util.StringUtils;
 
@@ -124,6 +125,16 @@ public class PluginImpl implements Plugin
     public String getErrorMessage()
     {
         return errorMessage;
+    }
+
+    public Class loadClass(String type) throws ClassNotFoundException
+    {
+        return bundle.loadClass(type);
+    }
+
+    public URL getResource(String path)
+    {
+        return bundle.getResource(path);
     }
 
     void setErrorMessage(String errorMessage)

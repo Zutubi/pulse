@@ -7,6 +7,7 @@ import com.caucho.hessian.server.HessianSkeleton;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.pulse.spring.SpringObjectFactory;
+import com.zutubi.pulse.plugins.PluginManager;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -85,8 +86,15 @@ public class CustomHessianServlet extends GenericServlet
             return;
         }
 
+        ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         try
         {
+            CustomHessianClassLoader customClassLoader = new CustomHessianClassLoader(originalClassLoader);
+            customClassLoader.setRegistry((HessianConfigurationExtensionManager) ComponentContext.getBean("hessianExtensionManager"));
+            customClassLoader.setPluginManager((PluginManager) ComponentContext.getBean("pluginManager"));
+            
+            Thread.currentThread().setContextClassLoader(customClassLoader);
+
             HessianInput in = new HessianInput();
             HessianOutput out = new HessianOutput();
             in.setSerializerFactory(factory);
@@ -109,6 +117,10 @@ public class CustomHessianServlet extends GenericServlet
             ServletException se = new ServletException(e.getMessage());
             se.initCause(e);
             throw se;
+        }
+        finally
+        {
+            Thread.currentThread().setContextClassLoader(originalClassLoader);
         }
     }
 }

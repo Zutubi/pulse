@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.CommandContext;
 import com.zutubi.pulse.core.RecipePaths;
-import com.zutubi.pulse.core.scm.ScmClient;
+import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.util.FileSystemUtils;
 
 import java.io.File;
@@ -20,16 +20,16 @@ import java.io.IOException;
 public class ProjectRepoBootstrapper implements Bootstrapper
 {
     private final String projectName;
-    private final ScmClient scm;
+    private final ScmConfiguration scmConfig;
     private BuildRevision revision;
     private String agent;
     private boolean forceClean;
     private ScmBootstrapper childBootstrapper;
 
-    public ProjectRepoBootstrapper(String projectName, ScmClient scm, BuildRevision revision, boolean forceClean)
+    public ProjectRepoBootstrapper(String projectName, ScmConfiguration scmConfig, BuildRevision revision, boolean forceClean)
     {
         this.projectName = projectName;
-        this.scm = scm;
+        this.scmConfig = scmConfig;
         this.revision = revision;
         this.forceClean = forceClean;
     }
@@ -119,11 +119,11 @@ public class ProjectRepoBootstrapper implements Bootstrapper
         // else we can update.
         if (localDir.list().length == 0)
         {
-            return new CheckoutBootstrapper(projectName, scm, revision, true);
+            return new CheckoutBootstrapper(projectName, scmConfig, revision, true);
         }
         else
         {
-            return new UpdateBootstrapper(projectName, scm, revision);
+            return new UpdateBootstrapper(projectName, scmConfig, revision);
         }
     }
 }

@@ -1232,6 +1232,15 @@ public class ConfigurationTemplateManager
         return instance;
     }
 
+    /**
+     * Load the object at the specified path, ensuring that it is of the expected type.
+     *
+     * @param path      of the instance to retrieve
+     * @param clazz     defines the required type of the instance to be retrieved
+     * 
+     * @return instance
+     */
+    @SuppressWarnings({"unchecked"})
     public <T extends Configuration> T getInstance(String path, Class<T> clazz)
     {
         Configuration instance = getInstance(path);

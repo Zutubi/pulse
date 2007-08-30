@@ -156,35 +156,6 @@ public class CvsClient implements ScmClient, DataCacheAware
         checkModuleIsValid();
     }
 
-    /**
-     * Update the working directory to the specified revision.  It is required that the working
-     * directory has a local checkout that can be updated.
-     *
-     * @param context
-     * @param handler
-     */
-    public Revision update(ScmContext context, ScmEventHandler handler) throws ScmException
-    {
-        Revision rev = context.getRevision();
-        assertRevisionArgValid(rev);
-        writePropertiesToContext(context);
-
-        // we can not run an update from the base directory, even though this is where the checkout occured.
-        // Checkout will checkout into the current directory, but not generate a ./CVS directory.  For that, we need to
-        // go into the sub directories.  So, if we have sub directories that contain a CVS directory, we have a local
-        // working copy, and should run an update from WITHIN THOSE DIRECTORIES.  If not, then we can run a checkout
-        // When will there be multiple directories? When we are dealing with an &module.
-        File[] workingDirs = getSubdirectoriesContainingCvsDirectories(context.getDir());
-        if (workingDirs.length > 0)
-        {
-            for (File workingDir : workingDirs)
-            {
-                core.update(workingDir, convertRevision(rev), handler);
-            }
-        }
-        return rev;
-    }
-
     private File[] getSubdirectoriesContainingCvsDirectories(File base)
     {
         return base.listFiles(new FileFilter()
@@ -269,6 +240,35 @@ public class CvsClient implements ScmClient, DataCacheAware
         core.checkout(context.getDir(), module, convertRevision(revision), handler);
         
         return revision;
+    }
+
+    /**
+     * Update the working directory to the specified revision.  It is required that the working
+     * directory has a local checkout that can be updated.
+     *
+     * @param context
+     * @param handler
+     */
+    public Revision update(ScmContext context, ScmEventHandler handler) throws ScmException
+    {
+        Revision rev = context.getRevision();
+        assertRevisionArgValid(rev);
+        writePropertiesToContext(context);
+
+        // we can not run an update from the base directory, even though this is where the checkout occured.
+        // Checkout will checkout into the current directory, but not generate a ./CVS directory.  For that, we need to
+        // go into the sub directories.  So, if we have sub directories that contain a CVS directory, we have a local
+        // working copy, and should run an update from WITHIN THOSE DIRECTORIES.  If not, then we can run a checkout
+        // When will there be multiple directories? When we are dealing with an &module.
+        File[] workingDirs = getSubdirectoriesContainingCvsDirectories(context.getDir());
+        if (workingDirs.length > 0)
+        {
+            for (File workingDir : workingDirs)
+            {
+                core.update(workingDir, convertRevision(rev), handler);
+            }
+        }
+        return rev;
     }
 
     public InputStream retrieve(String path, Revision revision) throws ScmException

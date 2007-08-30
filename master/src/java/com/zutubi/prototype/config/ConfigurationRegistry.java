@@ -110,18 +110,8 @@ public class ConfigurationRegistry
             // generated dynamically as new components are registered.
             CompositeType projectConfig = registerConfigurationType(ProjectConfiguration.class);
 
-            // scm configuration
-            /*CompositeType scmConfig = */typeRegistry.getType(ScmConfiguration.class);
-/*
-            registerConfigurationType(SvnConfiguration.class);
-            registerConfigurationType(CvsConfiguration.class);
-            registerConfigurationType(PerforceConfiguration.class);
-
-            // sort out the extensions.
-            scmConfig.addExtension("zutubi.svnConfig");
-            scmConfig.addExtension("zutubi.cvsConfig");
-            scmConfig.addExtension("zutubi.perforceConfig");
-*/
+            // scm configuration - registration of extensions occurs via plugins.
+            typeRegistry.getType(ScmConfiguration.class);
 
             // Triggers
             CompositeType triggerConfig = registerConfigurationType(TriggerConfiguration.class);

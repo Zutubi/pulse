@@ -227,51 +227,43 @@ public class BuildController implements EventListener
 
     private void handleBuildCommenced()
     {
-        try
-        {
 // It is important that this directory is created *after* the build
-            // result is commenced and saved to the database, so that the
-            // database knows of the possibility of some other persistent
-            // artifacts, even if an error occurs very early in the build.
-            File buildDir = buildResult.getAbsoluteOutputDir(configurationManager.getDataDirectory());
-            if (!buildDir.mkdirs())
-            {
-                throw new BuildException("Unable to create build directory '" + buildDir.getAbsolutePath() + "'");
-            }
-
-            if (!buildManager.isSpaceAvailableForBuild())
-            {
-                throw new BuildException("Insufficient database space to run build.  Consider adding more cleanup rules to remove old build information");
-            }
-
-            CheckoutScheme checkoutScheme = projectConfig.getScm().getCheckoutScheme();
-
-            // check project configuration to determine which bootstrap configuration should be used.
-            Bootstrapper initialBootstrapper;
-            boolean checkoutOnly = request.isPersonal() || checkoutScheme == CheckoutScheme.CLEAN_CHECKOUT;
-            ScmClient client = scmClientFactory.createClient(projectConfig.getScm());
-            if (checkoutOnly)
-            {
-                initialBootstrapper = new CheckoutBootstrapper(projectConfig.getName(), client, request.getRevision(), false);
-                if (request.isPersonal())
-                {
-                    initialBootstrapper = createPersonalBuildBootstrapper(initialBootstrapper);
-                }
-            }
-            else
-            {
-                initialBootstrapper = new ProjectRepoBootstrapper(projectConfig.getName(), client, request.getRevision(), project.isForceClean());
-            }
-
-            tree.prepare(buildResult);
-
-            // execute the first level of recipe controllers...
-            initialiseNodes(initialBootstrapper, tree.getRoot().getChildren());
-        }
-        catch (ScmException e)
+        // result is commenced and saved to the database, so that the
+        // database knows of the possibility of some other persistent
+        // artifacts, even if an error occurs very early in the build.
+        File buildDir = buildResult.getAbsoluteOutputDir(configurationManager.getDataDirectory());
+        if (!buildDir.mkdirs())
         {
-            throw new BuildException(e);
+            throw new BuildException("Unable to create build directory '" + buildDir.getAbsolutePath() + "'");
         }
+
+        if (!buildManager.isSpaceAvailableForBuild())
+        {
+            throw new BuildException("Insufficient database space to run build.  Consider adding more cleanup rules to remove old build information");
+        }
+
+        CheckoutScheme checkoutScheme = projectConfig.getScm().getCheckoutScheme();
+
+        // check project configuration to determine which bootstrap configuration should be used.
+        Bootstrapper initialBootstrapper;
+        boolean checkoutOnly = request.isPersonal() || checkoutScheme == CheckoutScheme.CLEAN_CHECKOUT;
+        if (checkoutOnly)
+        {
+            initialBootstrapper = new CheckoutBootstrapper(projectConfig.getName(), projectConfig.getScm(), request.getRevision(), false);
+            if (request.isPersonal())
+            {
+                initialBootstrapper = createPersonalBuildBootstrapper(initialBootstrapper);
+            }
+        }
+        else
+        {
+            initialBootstrapper = new ProjectRepoBootstrapper(projectConfig.getName(), projectConfig.getScm(), request.getRevision(), project.isForceClean());
+        }
+
+        tree.prepare(buildResult);
+
+        // execute the first level of recipe controllers...
+        initialiseNodes(initialBootstrapper, tree.getRoot().getChildren());
     }
 
     private Bootstrapper createPersonalBuildBootstrapper(Bootstrapper initialBootstrapper)

@@ -1,5 +1,7 @@
 package com.zutubi.pulse.plugins;
 
+import java.net.URL;
+
 /**
  * Metadata that describes a plugin and its current state.
  */
@@ -73,6 +75,10 @@ public interface Plugin
      * automatically disabled.
      */
     String getErrorMessage();
+
+    Class loadClass(String type) throws ClassNotFoundException;
+
+    URL getResource(String path);
 
     boolean isEnabled();
     boolean canEnable();
