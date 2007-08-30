@@ -982,23 +982,43 @@ table.template-actions
     vertical-align:top;
 }
 
-.x-string-list-list
+.x-string-list-list, .x-select
 {
     border: solid 1px #b5b8c8;
-    border-top: none;
     overflow: auto;
     cursor: pointer;
 }
 
-.x-string-list-item
+.x-form-focus
+{
+    border: 1px solid #7eadd9;
+}
+
+.x-string-list-list
+{
+    border-top: none;
+}
+.x-string-list img
+{
+    position:absolute;
+    width: 21px;
+    height: 21px;
+}
+
+.x-string-list-item, .x-select-item
 {
     font:normal 12px tahoma, arial, helvetica, sans-serif;
-    padding:2px;
     border:1px solid #fff;
+    padding:2px;
     white-space: nowrap;
 }
 
-.x-string-list-list .x-string-list-selected
+.x-select-item
+{
+    margin: 1px;
+}
+
+.x-string-list-list .x-string-list-selected, .x-select .x-select-selected
 {
 	background-color: #c3daf9 !important;
     border: 1px solid #336699;

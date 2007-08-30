@@ -37,7 +37,11 @@
 <#if parameters.size?exists>
     fieldConfig.size = ${parameters.size};
 </#if>
-    form.add(new ZUTUBI.Select(fieldConfig));
+    var select = new ZUTUBI.Select(fieldConfig);
+    form.add(select);
+<#if form.displayMode?default(false)>
+    select.on('change', updateButtons);
+</#if>
 }());
 
 <#include "/prototype/xhtml/controlfooter.ftl" />

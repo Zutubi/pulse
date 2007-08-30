@@ -16,7 +16,9 @@ ZUTUBI.widget = ZUTUBI.widget || {};
 ZUTUBI.Select = function(config)
 {
     ZUTUBI.Select.superclass.constructor.call(this, config);
-    this.viewRendered = false;
+    this.addEvents({
+        'change': true
+    });
 };
 
 Ext.extend(ZUTUBI.Select, Ext.form.Field, {
@@ -42,64 +44,106 @@ Ext.extend(ZUTUBI.Select, Ext.form.Field, {
      * @cfg {String} valueField The store field to use as item values.
      */
     valueField : 'value',
-
-    onRender : function(ct, position){
-        if(!this.size)
-        {
-            if(this.multiple)
+    hiddenFields: {},
+    entryHeight: 22,
+    
+    onRender : function(ct, position)
+    {
+        this.el = ct.createChild({tag: 'div', cls: 'x-select', id: this.id});
+        if(!this.tpl){
+            if(Ext.isIE || Ext.isIE7)
             {
-                var total = this.store.getTotalCount();
-                // Make the min size 3 (looks like a select) and max size 10
-                this.size = total > 10 ? 10 : (total < 3 ? 3: total);
+                this.tpl = '<div unselectable="on" class="x-select-item" tabindex="-1">{' + this.displayField + '}</div>';
             }
             else
             {
-                this.size = 1;
+                this.tpl = '<div class="x-select-item  x-unselectable" tabindex="-1">{' + this.displayField + '}</div>';
             }
-        }
-        if(!this.el)
-        {
-            this.defaultAutoCreate = {tag: 'select', size: this.size };
-            if(this.multiple)
-            {
-                this.defaultAutoCreate.multiple = 'true';
-            }
-        }
-        ZUTUBI.Select.superclass.onRender.call(this, ct, position);
-
-        if(!this.tpl){
-            this.tpl = '<option value="{' + this.valueField + '}">{' + this.displayField + '}</option>';
         }
 
         this.view = new Ext.View(this.el, this.tpl, {
-            singleSelect :!this.multiple,
-            store: this.store
+            multiSelect :this.multiple,
+            store: this.store,
+            selectedClass: 'x-select-selected'
         });
 
-        this.viewRendered = true;
-        this.initValue();
+        var count = this.store.getCount();
+        if(!this.size)
+        {
+            if(count < 3)
+            {
+                this.size = 3;
+            }
+            else if(count > 10)
+            {
+                this.size = 10;
+            }
+            else
+            {
+                this.size = count;
+            }
+        }
 
-        //this.view.on('click', this.onViewClick, this);
-        //this.store.on('beforeload', this.onBeforeLoad, this);
-        //this.store.on('load', this.onLoad, this);
-        //this.store.on('loadexception', this.collapse, this);
+        if(count > 0)
+        {
+            this.entryHeight = this.el.child('div').getHeight() + 2;
+        }
+
+        this.el.setHeight(this.entryHeight * this.size);
+        this.view.on('selectionchange', this.onSelectionChange, this);
+        this.initValue();
     },
 
     initValue: function()
     {
-        if(!this.viewRendered)
-        {
-            return;
-        }
-
         this.setValue(this.value);
+        this.originalValue = this.getValue();
     },
 
-    findRecord : function(prop, value){
+    onSelectionChange: function(evt)
+    {
+        this.updateHiddenFields();
+        this.fireEvent('change');
+    },
+
+    updateHiddenFields: function()
+    {
+        var value = this.getValue();
+        var valueMap = {};
+
+        for(var i = 0; i < value.length; i++)
+        {
+            var iv = value[i];
+            valueMap[iv] = true;
+            if(!this.hiddenFields[iv])
+            {
+                this.addHiddenField(iv);
+            }
+        }
+
+        for(var key in this.hiddenFields)
+        {
+            if(!valueMap[key])
+            {
+                this.hiddenFields[key].remove();
+                delete this.hiddenFields[key];
+            }
+        }
+    },
+
+    addHiddenField: function(value)
+    {
+        this.hiddenFields[value] = this.el.createChild({tag: 'input', type: 'hidden', name: this.name, value: value});        
+    },
+
+    findRecord : function(prop, value)
+    {
         var record;
-        if(this.store.getCount() > 0){
-            this.store.each(function(r){
-                if(r.data[prop] == value){
+        if(this.store.getCount() > 0)
+        {
+            this.store.each(function(r) {
+                if(r.data[prop] == value)
+                {
                     record = r;
                     return false;
                 }
@@ -108,27 +152,34 @@ Ext.extend(ZUTUBI.Select, Ext.form.Field, {
         return record;
     },
 
+    getValue: function()
+    {
+        var value = [];
+        var selections = this.view.getSelectedIndexes();
+        for(var i = 0; i < selections.length; i++)
+        {
+            value.push(this.store.getAt(selections[i]).get(this.valueField));
+        }
+
+        return value;
+    },
+
     setValue: function(value)
     {
-        // Clear current selection
-        this.el.dom.selectedIndex = -1;
         this.view.clearSelections();
-
-        // Now select values in the view and DOM
-        var options = this.el.dom.options;
+        for(var key in this.hiddenFields)
+        {
+            this.hiddenFields[key].remove();
+        }
+        this.hiddenFields = {};
+        
         for(var i = 0; i < value.length; i++)
         {
             var record = this.findRecord(this.valueField, value[i]);
             if (record)
             {
-                this.view.select(this.store.indexOf(record));
-                for(var j = 0; j < options.length; j++)
-                {
-                    if(options[j].value == value[i])
-                    {
-                        options[j].selected = true;
-                    }
-                }
+                this.view.select(this.store.indexOf(record), true, true);
+                this.addHiddenField(value[i]);
             }
         }
     }
@@ -524,6 +575,19 @@ Ext.extend(ZUTUBI.ImageButton, Ext.BoxComponent, {
     }
 });
 
+
+//ZUTUBI.MultiValueField = function(config)
+//{
+//    ZUTUBI.MultiValueField.superclass.constructor.call(this, config);
+//};
+//
+//Ext.extend(ZUTUBI.MultiValueField, Ext.form.Field, {
+//    hiddenFields: [],
+//
+//
+//});
+
+
 ZUTUBI.StringList = function(config)
 {
     ZUTUBI.StringList.superclass.constructor.call(this, config);
@@ -546,8 +610,10 @@ Ext.extend(ZUTUBI.StringList, Ext.form.Field, {
         this.wrap.on('click', this.onClick, this);
         this.el = this.wrap.createChild({tag: 'input', type: 'hidden'});
 
-        this.input = this.wrap.createChild({tag: 'input', type: 'text', cls: 'x-form-text'});
+        this.input = this.wrap.createChild({tag: 'input', type: 'text', cls: 'x-form-text', id: this.id});
         this.input.setWidth(this.width);
+        this.input.on('focus', this.onInputFocus, this);
+        this.input.on('blur', this.onInputBlur, this);
         this.nav = new Ext.KeyNav(this.input, {
             "up": function(evt)
             {
@@ -568,35 +634,34 @@ Ext.extend(ZUTUBI.StringList, Ext.form.Field, {
         });
 
         this.addButton = new ZUTUBI.ImageButton(this.wrap, {image: '/images/buttons/sb-add-up.gif', overImage: '/images/buttons/sb-add-over.gif', downImage: '/images/buttons/sb-add-down.gif'});
-        this.addButton.getEl().setWidth(21);
-        this.addButton.getEl().setHeight(21);
         this.addButton.on('click', this.onAdd, this);
 
-        this.list = this.wrap.createChild({tag: 'div', cls: 'x-string-list-list x-unselectable'});
+        this.list = this.wrap.createChild({tag: 'div', cls: 'x-string-list-list'});
         this.list.setWidth(this.width);
         this.list.setHeight(this.height);
         this.list.alignTo(this.input, 't-b');
 
         this.removeButton = new ZUTUBI.ImageButton(this.wrap, {image: '/images/buttons/sb-delete-up.gif', overImage: '/images/buttons/sb-delete-over.gif', downImage: '/images/buttons/sb-delete-down.gif'});
-        this.removeButton.getEl().setWidth(21);
-        this.removeButton.getEl().setHeight(21);
         this.removeButton.on('click', this.onRemove, this);
 
         this.upButton = new ZUTUBI.ImageButton(this.wrap, {image: '/images/buttons/sb-up-up.gif', overImage: '/images/buttons/sb-up-over.gif', downImage: '/images/buttons/sb-up-down.gif'});
-        this.upButton.getEl().setWidth(21);
-        this.upButton.getEl().setHeight(21);
         this.upButton.on('click', this.onUp, this);
 
         this.downButton = new ZUTUBI.ImageButton(this.wrap, {image: '/images/buttons/sb-down-up.gif', overImage: '/images/buttons/sb-down-over.gif', downImage: '/images/buttons/sb-down-down.gif'});
-        this.downButton.getEl().setWidth(21);
-        this.downButton.getEl().setHeight(21);
         this.downButton.on('click', this.onDown, this);
 
         var cls = 'x-string-list';
 
         if(!this.tpl)
         {
-            this.tpl = (Ext.isIE || Ext.isIE7 ? '<div' : '<div unselectable=on') + ' class="' + cls + '-item">{' + this.fieldName + '}</div>';
+            if(Ext.isIE || Ext.isIE7)
+            {
+                this.tpl = '<div unselectable="on" class="' + cls + '-item">{' + this.fieldName + '}</div>';
+            }
+            else
+            {
+                this.tpl = '<div class="' + cls + '-item  x-unselectable">{' + this.fieldName + '}</div>';
+            }
         }
 
         this.view = new Ext.View(this.list, this.tpl, {
@@ -630,6 +695,18 @@ Ext.extend(ZUTUBI.StringList, Ext.form.Field, {
     onClick: function()
     {
         this.input.focus();
+    },
+
+    onInputFocus: function()
+    {
+        this.input.addClass('x-form-focus');
+        this.list.addClass('x-form-focus');
+    },
+
+    onInputBlur: function()
+    {
+        this.input.removeClass('x-form-focus');
+        this.list.removeClass('x-form-focus');    
     },
 
     alignButtons: function()
@@ -796,3 +873,95 @@ Ext.form.Checkbox.prototype.onResize = function()
 {
     Ext.form.Checkbox.superclass.onResize.apply(this, arguments);
 }
+
+Ext.override(Ext.View, {
+    onItemClick : function(item, index, e)
+    {
+        if (!this.fireEvent("beforeclick", this, index, item, e))
+        {
+            return false;
+        }
+        if (this.multiSelect || this.singleSelect)
+        {
+            if (this.multiSelect && e.shiftKey && this.lastSelection)
+            {
+                this.select(this.getNodes(this.indexOf(this.lastSelection), index), false);
+            }
+            else if (this.isSelected(this.getNode(item)) && e.ctrlKey)
+            {
+                this.unselect(item);
+            }
+            else
+            {
+                this.select(item, this.multiSelect && e.ctrlKey);
+                this.lastSelection = item;
+            }
+            e.preventDefault();
+        }
+        return true;
+    },
+
+    unselect : function(nodeInfo, suppressEvent)
+    {
+        var node = this.getNode(nodeInfo);
+        if (node && this.isSelected(node))
+        {
+            if (this.fireEvent("beforeselect", this, node, this.selections))
+            {
+                Ext.fly(node).removeClass(this.selectedClass);
+                this.selections.remove(node);
+                if (!suppressEvent)
+                {
+                    this.fireEvent("selectionchange", this, this.selections);
+                }
+            }
+        }
+    },
+
+    select : function(nodeInfo, keepExisting, suppressEvent)
+    {
+        if (nodeInfo instanceof Array)
+        {
+            if (!keepExisting)
+            {
+                this.clearSelections(true);
+            }
+            for (var i = 0, len = nodeInfo.length; i < len; i++)
+            {
+                this.select(nodeInfo[i], true, true);
+            }
+        }
+        else
+        {
+            var node = this.getNode(nodeInfo);
+            if (node)
+            {
+                if (this.isSelected(node))
+                {
+                    if (this.getSelectionCount() > 1)
+                    {
+                        this.clearSelections(true);
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
+                else if (!keepExisting)
+                {
+                    this.clearSelections(true);
+                }
+
+                if (this.fireEvent("beforeselect", this, node, this.selections))
+                {
+                    Ext.fly(node).addClass(this.selectedClass);
+                    this.selections.push(node);
+                    if (!suppressEvent)
+                    {
+                        this.fireEvent("selectionchange", this, this.selections);
+                    }
+                }
+            }
+        }
+    }
+});
