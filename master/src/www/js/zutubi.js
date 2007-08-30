@@ -461,6 +461,69 @@ Ext.extend(ZUTUBI.CheckForm, Ext.form.Form, {
     }
 });
 
+ZUTUBI.ImageButton = function(renderTo, config)
+{
+    ZUTUBI.ImageButton.superclass.constructor.call(this, config);
+    this.addEvents({
+        'click': true,
+        'mouseover': true,
+        'mouseout': true,
+        'mousedown': true
+    });
+
+    this.defaultAutoCreate = { tag: 'img', src: this.image };
+    this.render(renderTo);
+}
+
+Ext.extend(ZUTUBI.ImageButton, Ext.BoxComponent, {
+    onRender: function(ct, position)
+    {
+        ZUTUBI.ImageButton.superclass.onRender.call(this, ct, position);
+        this.el = ct.createChild(this.getAutoCreate(), position);
+    },
+
+    afterRender: function()
+    {
+        this.el.on('click', this.onClick,  this);
+        this.el.on("mouseover", this.onMouseOver, this);
+        this.el.on("mouseout", this.onMouseOut, this);
+        this.el.on("mousedown", this.onMouseDown, this);
+    },
+
+    onClick: function(evt)
+    {
+        this.fireEvent('click', evt);
+    },
+
+    onMouseOver : function(e){
+        if(!this.disabled){
+            this.el.set({src: this.overImage});
+            this.fireEvent('mouseover', this, e);
+        }
+    },
+
+    onMouseOut : function(e){
+        if(!e.within(this.el,  true)){
+            this.el.set({src: this.image});
+            this.fireEvent('mouseout', this, e);
+        }
+    },
+
+    onMouseDown : function(e){
+        if(!this.disabled && e.button == 0){
+            this.el.set({src: this.downImage});
+            Ext.get(document).on('mouseup', this.onMouseUp, this);
+        }
+    },
+
+    onMouseUp : function(e){
+        if(e.button == 0){
+            this.el.set({src: this.image});
+            Ext.get(document).un('mouseup', this.onMouseUp, this);
+        }
+    }
+});
+
 ZUTUBI.StringList = function(config)
 {
     ZUTUBI.StringList.superclass.constructor.call(this, config);
@@ -475,40 +538,65 @@ Ext.extend(ZUTUBI.StringList, Ext.form.Field, {
     fieldName: 'value',
     selectedClass: 'x-string-list-selected',
     hiddenFields: [],
-    
+    value: [],
+
     onRender: function(ct, position)
     {
-        //Ext.form.Field.superclass.onRender.call(this, ct, position);
         this.wrap = ct.createChild({tag: 'div', cls: 'x-string-list'});
+        this.wrap.on('click', this.onClick, this);
         this.el = this.wrap.createChild({tag: 'input', type: 'hidden'});
-        this.input = this.wrap.createChild({tag: 'input', type: 'text'});
-        this.input.setWidth(this.width - 16);
-        this.input.on('keypress', this.onKeypress, this);
-        this.addButton = this.wrap.createChild({tag: 'img', src: '/images/add.gif', style: 'width: 16px; height: 16px;'});
-        this.addButton.on('click', this.onAdd, this);
-        this.addButton.alignTo(this.input, 'l-r');
-        
-        this.list = this.wrap.createChild({tag: 'div', cls: 'x-string-list-list'});
-        this.list.setWidth(this.width - 16);
-        this.list.setHeight(this.height);
 
-        this.removeButton = this.wrap.createChild({tag: 'img', src: '/images/delete.gif', style: 'width: 16px; height: 16px;'});
-        this.removeButton.alignTo(this.list, 'tl-tr');
+        this.input = this.wrap.createChild({tag: 'input', type: 'text', cls: 'x-form-text'});
+        this.input.setWidth(this.width);
+        this.nav = new Ext.KeyNav(this.input, {
+            "up": function(evt)
+            {
+                this.navUp(evt.ctrlKey);
+            },
+
+            "down": function(evt)
+            {
+                this.navDown(evt.ctrlKey);
+            },
+
+            "enter": function(evt)
+            {
+                this.onAdd(evt);
+            },
+
+            scope: this
+        });
+
+        this.addButton = new ZUTUBI.ImageButton(this.wrap, {image: '/images/buttons/sb-add-up.gif', overImage: '/images/buttons/sb-add-over.gif', downImage: '/images/buttons/sb-add-down.gif'});
+        this.addButton.getEl().setWidth(21);
+        this.addButton.getEl().setHeight(21);
+        this.addButton.on('click', this.onAdd, this);
+
+        this.list = this.wrap.createChild({tag: 'div', cls: 'x-string-list-list x-unselectable'});
+        this.list.setWidth(this.width);
+        this.list.setHeight(this.height);
+        this.list.alignTo(this.input, 't-b');
+
+        this.removeButton = new ZUTUBI.ImageButton(this.wrap, {image: '/images/buttons/sb-delete-up.gif', overImage: '/images/buttons/sb-delete-over.gif', downImage: '/images/buttons/sb-delete-down.gif'});
+        this.removeButton.getEl().setWidth(21);
+        this.removeButton.getEl().setHeight(21);
         this.removeButton.on('click', this.onRemove, this);
 
-        this.upButton = this.wrap.createChild({tag: 'img', src: '/images/resultset_up.gif', style: 'width: 16px; height: 16px;'});
-        this.upButton.alignTo(this.removeButton, 't-b');
+        this.upButton = new ZUTUBI.ImageButton(this.wrap, {image: '/images/buttons/sb-up-up.gif', overImage: '/images/buttons/sb-up-over.gif', downImage: '/images/buttons/sb-up-down.gif'});
+        this.upButton.getEl().setWidth(21);
+        this.upButton.getEl().setHeight(21);
         this.upButton.on('click', this.onUp, this);
 
-        this.downButton = this.wrap.createChild({tag: 'img', src: '/images/resultset_down.gif', style: 'width: 16px; height: 16px;'});
-        this.downButton.alignTo(this.upButton, 't-b');
+        this.downButton = new ZUTUBI.ImageButton(this.wrap, {image: '/images/buttons/sb-down-up.gif', overImage: '/images/buttons/sb-down-over.gif', downImage: '/images/buttons/sb-down-down.gif'});
+        this.downButton.getEl().setWidth(21);
+        this.downButton.getEl().setHeight(21);
         this.downButton.on('click', this.onDown, this);
 
         var cls = 'x-string-list';
 
         if(!this.tpl)
         {
-            this.tpl = '<div class="' + cls + '-item">{' + this.fieldName + '}</div>';
+            this.tpl = (Ext.isIE || Ext.isIE7 ? '<div' : '<div unselectable=on') + ' class="' + cls + '-item">{' + this.fieldName + '}</div>';
         }
 
         this.view = new Ext.View(this.list, this.tpl, {
@@ -521,6 +609,7 @@ Ext.extend(ZUTUBI.StringList, Ext.form.Field, {
     afterRender: function()
     {
         ZUTUBI.StringList.superclass.afterRender.call(this);
+        this.alignButtons();
         if(this.value)
         {
             this.setValue(this.value);
@@ -528,12 +617,64 @@ Ext.extend(ZUTUBI.StringList, Ext.form.Field, {
         }
     },
 
-    onKeypress: function(evt)
+    onPosition: function()
     {
-        if (evt.getKey() == evt.RETURN)
+        this.alignButtons();
+    },
+
+    onResize: function()
+    {
+        this.alignButtons();
+    },
+
+    onClick: function()
+    {
+        this.input.focus();
+    },
+
+    alignButtons: function()
+    {
+        this.addButton.getEl().alignTo(this.input, 'l-r', [2, 0]);
+        this.removeButton.getEl().alignTo(this.list, 'bl-br', [2, 0]);
+        this.upButton.getEl().alignTo(this.list, 'l-r', [2, -this.input.getHeight()]);
+        this.downButton.getEl().alignTo(this.upButton.getEl(), 't-b', [0, 2]);
+    },
+
+    navUp: function(ctrl)
+    {
+        if(ctrl)
         {
-            this.onAdd(evt);
+            this.onUp();
         }
+        else
+        {
+            var selected = this.getSelection();
+            if(selected > 0)
+            {
+                this.view.select(selected - 1);
+            }
+        }
+
+        this.ensureSelectionVisible();
+
+    },
+
+    navDown: function(ctrl)
+    {
+        if(ctrl)
+        {
+            this.onDown();
+        }
+        else
+        {
+            var selected = this.getSelection();
+            if(selected >= 0 && selected < this.store.getCount() - 1)
+            {
+                this.view.select(selected + 1);
+            }
+        }
+
+        this.ensureSelectionVisible();
     },
 
     onAdd: function(evt)
@@ -557,31 +698,29 @@ Ext.extend(ZUTUBI.StringList, Ext.form.Field, {
     
     onRemove: function(evt)
     {
-        var selected = this.view.getSelectedIndexes();
-        if(selected.length > 0)
+        var selected = this.getSelection();
+        if(selected >= 0)
         {
-            var i = selected[0];
-            this.store.remove(this.store.getAt(i));
-            this.hiddenFields[i].remove();
-            this.hiddenFields.splice(i, 1);
+            this.store.remove(this.store.getAt(selected));
+            this.hiddenFields[selected].remove();
+            this.hiddenFields.splice(selected, 1);
             this.fireEvent('change', this, evt);
         }
     },
 
     onUp: function(evt)
     {
-        var selected = this.view.getSelectedIndexes();
-        if(selected.length > 0 && selected[0] > 0)
+        var selected = this.getSelection();
+        if(selected > 0)
         {
-            var i = selected[0];
-            var record = this.store.getAt(i);
+            var record = this.store.getAt(selected);
             this.store.remove(record);
-            this.store.insert(i - 1, record);
-            this.view.select(i - 1);
+            this.store.insert(selected - 1, record);
+            this.view.select(selected - 1);
 
-            var hidden = this.hiddenFields.splice(i, 1)[0];
-            this.hiddenFields.splice(i - 1, 0, hidden);
-            hidden.insertBefore(this.hiddenFields[i]);
+            var hidden = this.hiddenFields.splice(selected, 1)[0];
+            this.hiddenFields.splice(selected - 1, 0, hidden);
+            hidden.insertBefore(this.hiddenFields[selected]);
 
             this.ensureSelectionVisible();
             this.fireEvent('change', this, evt);
@@ -590,18 +729,17 @@ Ext.extend(ZUTUBI.StringList, Ext.form.Field, {
 
     onDown: function(evt)
     {
-        var selected = this.view.getSelectedIndexes();
-        if(selected.length > 0 && selected[0] < this.store.getCount() - 1)
+        var selected = this.getSelection();
+        if(selected >= 0 && selected < this.store.getCount() - 1)
         {
-            var i = selected[0];
-            var record = this.store.getAt(i);
+            var record = this.store.getAt(selected);
             this.store.remove(record);
-            this.store.insert(i + 1, record);
-            this.view.select(i + 1);
+            this.store.insert(selected + 1, record);
+            this.view.select(selected + 1);
 
-            var hidden = this.hiddenFields.splice(i, 1)[0];
-            this.hiddenFields.splice(i + 1, 0, hidden);
-            hidden.insertAfter(this.hiddenFields[i]);
+            var hidden = this.hiddenFields.splice(selected, 1)[0];
+            this.hiddenFields.splice(selected + 1, 0, hidden);
+            hidden.insertAfter(this.hiddenFields[selected]);
 
             this.ensureSelectionVisible();
             this.fireEvent('change', this, evt);
@@ -618,30 +756,38 @@ Ext.extend(ZUTUBI.StringList, Ext.form.Field, {
         }
     },
 
-    doWithSelection: function(fn, cond)
-    {
-        var selected = this.view.getSelectedIndexes();
-        if(selected.length > 0)
-        {
-            if(!cond || cond(selected[0]))
-            {
-                fn(selected[0]);
-            }
-        }
-    },
-
     getValue: function()
     {
         var value = [];
-        this.store.each(function(r) { value.push(r.value); });
+        this.store.each(function(r) { value.push(r.get('value')); });
+        return value;
     },
 
     setValue: function(value)
     {
         this.store.removeAll();
+        for(var i = 0; i < this.hiddenFields.length; i++)
+        {
+            this.hiddenFields[i].remove();
+        }
+        this.hiddenFields = [];
+        
         for(var i = 0; i < value.length; i++)
         {
             this.appendItem(value[i]);
+        }
+    },
+
+    getSelection: function()
+    {
+        var selections = this.view.getSelectedIndexes();
+        if(selections.length > 0)
+        {
+            return selections[0];
+        }
+        else
+        {
+            return -1;
         }
     }
 });
