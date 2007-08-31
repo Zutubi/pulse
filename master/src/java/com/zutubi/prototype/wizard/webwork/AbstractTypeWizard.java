@@ -147,6 +147,11 @@ public abstract class AbstractTypeWizard implements Wizard
         return successPath;
     }
 
+    public String getInsertPath()
+    {
+        return insertPath;
+    }
+
     public boolean isTemplate()
     {
         return template;

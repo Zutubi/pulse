@@ -101,7 +101,7 @@ public class PrototypeUtils
     public static boolean isFolder(String path, ConfigurationTemplateManager configurationTemplateManager)
     {
         Type type = configurationTemplateManager.getType(path);
-        return (type instanceof CollectionType) || getPathListing(path, type, configurationTemplateManager).size() > 0;
+        return (type instanceof MapType) || getPathListing(path, type, configurationTemplateManager).size() > 0;
     }
 
     public static boolean isLeaf(String path, ConfigurationTemplateManager configurationTemplateManager)
@@ -118,7 +118,7 @@ public class PrototypeUtils
         {
             listing = configurationTemplateManager.getRootListing();
         }
-        else if (type instanceof CollectionType)
+        else if (type instanceof MapType)
         {
             Record record = configurationTemplateManager.getRecord(path);
             if (record != null)
@@ -132,6 +132,25 @@ public class PrototypeUtils
         }
 
         return listing;
+    }
+
+    public static List<String> getEmbeddedCollections(CompositeType ctype)
+    {
+        List<String> result = new LinkedList<String>();
+        for(TypeProperty property: ctype.getProperties())
+        {
+            if(isEmbeddedCollection(property.getType()))
+            {
+                result.add(property.getName());
+            }
+        }
+
+        return result;
+    }
+
+    public static boolean isEmbeddedCollection(Type type)
+    {
+        return type instanceof ListType && type.getTargetType() instanceof ComplexType;
     }
 
     public static String getDisplayName(String path, ConfigurationTemplateManager configurationTemplateManager)
@@ -176,7 +195,6 @@ public class PrototypeUtils
     {
         // One of:
         //   - the id, if this object is within a map
-        //   - toString representation if this object is in a list
         //   - the value of the first defined i18n key if this is a composite
         //     property:
         //       <parent type>.properties: <property>.label
@@ -190,14 +208,6 @@ public class PrototypeUtils
             if (parentType instanceof MapType)
             {
                 result = (String) value.get(((MapType) parentType).getKeyProperty());
-            }
-            else if (parentType instanceof ListType)
-            {
-                Object instance = configurationTemplateManager.getInstance(path);
-                if (instance != null)
-                {
-                    result = instance.toString();
-                }
             }
             else
             {

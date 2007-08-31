@@ -6,6 +6,7 @@ import com.zutubi.prototype.table.TableDescriptorFactory;
 import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
+import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.util.logging.Logger;
 import freemarker.template.Configuration;
@@ -86,6 +87,7 @@ public class TableDirective extends PrototypeDirective
             Map<String, Object> context = initialiseContext(type.getClazz());
             context.put("table", tableDescriptor);
             context.put("path", path);
+            context.put("embedded", PrototypeUtils.isEmbeddedCollection(collectionType));
             context.put("data", data);
 
             String templateName = "table.ftl";

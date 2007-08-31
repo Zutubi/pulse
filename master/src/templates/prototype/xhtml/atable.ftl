@@ -21,7 +21,12 @@
 <#list table.getActions(item) as action>
     <#assign actionlabel>${action}.label</#assign>
 <#if action == "edit">
-        <a onclick="selectPath('${item.configurationPath}'); return false;">${"edit.label"?i18n}</a>
+    <#if embedded>
+        <#assign clickAction = "edit"/>
+    <#else>
+        <#assign clickAction = "select"/>
+    </#if>
+    <a onclick="${clickAction}Path('${item.configurationPath}'); return false">${"edit.label"?i18n}</a>
 <#elseif action == "delete">
         <a onclick="deletePath('${item.configurationPath}'); return false;">${"delete.label"?i18n}</a>
 <#else>

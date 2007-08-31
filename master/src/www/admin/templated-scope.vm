@@ -94,6 +94,11 @@
             configTree.selectConfigPath(path);
         }
 
+        var editPath = function(path)
+        {
+            Ext.get('detail-pane').load({url: '$base/aconfig/' + path, scripts:true});
+        }
+
         var addToPath = function(path, template)
         {
             runAjaxRequest('$base/aconfig/' + path + '?wizard' + (template ? '=template' : ''));

@@ -1,5 +1,6 @@
 package com.zutubi.prototype.wizard.webwork;
 
+import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.webwork.ConfigurationErrors;
 import com.zutubi.prototype.webwork.ConfigurationPanel;
 import com.zutubi.prototype.webwork.ConfigurationResponse;
@@ -37,15 +38,23 @@ public class AjaxEnabledConfigurationWizardAction extends ConfigurationWizardAct
         String result = super.execute();
 
         String newPath = getPath();
+        String parentPath = PathUtils.getParentPath(newPath);
 
         if (SUCCESS.equals(result))
         {
-            configurationResponse = new ConfigurationResponse(newPath, configurationTemplateManager.getTemplatePath(newPath));
-            if(!originalPath.equals(newPath))
+            if(isEmbeddedCollection(parentPath))
             {
-                // Then we added something.
-                String displayName = PrototypeUtils.getDisplayName(newPath, configurationTemplateManager);
-                configurationResponse.addAddedFile(new ConfigurationResponse.Addition(newPath, displayName, configurationTemplateManager.getTemplatePath(newPath), PrototypeUtils.isLeaf(newPath, configurationTemplateManager)));
+                configurationResponse = new ConfigurationResponse(parentPath, configurationTemplateManager.getTemplatePath(parentPath));
+            }
+            else
+            {
+                configurationResponse = new ConfigurationResponse(newPath, configurationTemplateManager.getTemplatePath(newPath));
+                if(!originalPath.equals(newPath))
+                {
+                    // Then we added something.
+                    String displayName = PrototypeUtils.getDisplayName(newPath, configurationTemplateManager);
+                    configurationResponse.addAddedFile(new ConfigurationResponse.Addition(newPath, displayName, configurationTemplateManager.getTemplatePath(newPath), PrototypeUtils.isLeaf(newPath, configurationTemplateManager)));
+                }
             }
         }
         else if ("step".equals(result))
@@ -58,8 +67,20 @@ public class AjaxEnabledConfigurationWizardAction extends ConfigurationWizardAct
         }
         else if ("cancel".equals(result))
         {
-            configurationResponse = new ConfigurationResponse(newPath, configurationTemplateManager.getTemplatePath(newPath));
+            if(isEmbeddedCollection(parentPath))
+            {
+                configurationResponse = new ConfigurationResponse(parentPath, configurationTemplateManager.getTemplatePath(parentPath));
+            }
+            else
+            {
+                configurationResponse = new ConfigurationResponse(newPath, configurationTemplateManager.getTemplatePath(newPath));
+            }
         }
         return result;
+    }
+
+    private boolean isEmbeddedCollection(String insertPath)
+    {
+        return PrototypeUtils.isEmbeddedCollection(configurationTemplateManager.getType(insertPath));
     }
 }

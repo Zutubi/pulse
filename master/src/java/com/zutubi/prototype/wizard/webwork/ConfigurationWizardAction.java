@@ -154,7 +154,6 @@ public class ConfigurationWizardAction extends ActionSupport
             }
 
             initWizardIfRequired();
-
             if (isSelected(SUBMIT_CANCEL))
             {
                 return doCancel();

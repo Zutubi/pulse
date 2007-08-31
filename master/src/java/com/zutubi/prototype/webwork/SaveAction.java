@@ -2,7 +2,9 @@ package com.zutubi.prototype.webwork;
 
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
+import com.zutubi.prototype.type.ComplexType;
 import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
@@ -34,6 +36,13 @@ public class SaveAction extends PrototypeSupport
         }
         else if(isCancelSelected())
         {
+            String parentPath = PathUtils.getParentPath(path);
+            Type parentType = configurationTemplateManager.getType(parentPath);
+            if(PrototypeUtils.isEmbeddedCollection(parentType))
+            {
+                path = parentPath;
+            }
+
             response = new ConfigurationResponse(path, configurationTemplateManager.getTemplatePath(path));
         }
         
@@ -76,17 +85,27 @@ public class SaveAction extends PrototypeSupport
             prepare();
             return INPUT;
         }
-        
-        String displayName = PrototypeUtils.getDisplayName(path, configurationTemplateManager);
-        String newPath = configurationTemplateManager.saveRecord(path, (MutableRecord) record);
-        String newDisplayName = PrototypeUtils.getDisplayName(newPath, configurationTemplateManager);
-        response = new ConfigurationResponse(newPath, configurationTemplateManager.getTemplatePath(newPath));
-        if(!newPath.equals(path) || !newDisplayName.equals(displayName))
-        {
-            response.addRenamedPath(new ConfigurationResponse.Rename(path, newPath, newDisplayName));
-        }
 
-        path = newPath;
+        String newPath = configurationTemplateManager.saveRecord(path, (MutableRecord) record);
+
+        ComplexType parentType = configurationTemplateManager.getType(parentPath);
+        if(PrototypeUtils.isEmbeddedCollection(parentType))
+        {
+            path = PathUtils.getParentPath(newPath);
+            response = new ConfigurationResponse(path, configurationTemplateManager.getTemplatePath(path));
+        }
+        else
+        {
+            String displayName = PrototypeUtils.getDisplayName(path, configurationTemplateManager);
+            String newDisplayName = PrototypeUtils.getDisplayName(newPath, configurationTemplateManager);
+            response = new ConfigurationResponse(newPath, configurationTemplateManager.getTemplatePath(newPath));
+            if(!newPath.equals(path) || !newDisplayName.equals(displayName))
+            {
+                response.addRenamedPath(new ConfigurationResponse.Rename(path, newPath, newDisplayName));
+            }
+
+            path = newPath;
+        }
 
         return doRender();
     }

@@ -8,6 +8,7 @@ import com.zutubi.prototype.config.ConfigurationRegistry;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.format.Display;
 import com.zutubi.prototype.type.CollectionType;
+import com.zutubi.prototype.type.ComplexType;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.record.PathUtils;
@@ -48,7 +49,7 @@ public class ConfigurationUIModel
     private String currentPath;
     private String formHeading;
     private String displayName;
-    
+
     private List<String> simpleProperties;
     private List<String> nestedProperties;
     private List<String> extensions = new LinkedList<String>();
@@ -57,6 +58,7 @@ public class ConfigurationUIModel
 
     private List<String> displayFields = new LinkedList<String>();
 
+    private boolean displayMode = true;
     private boolean configurationCheckAvailable = false;
 
     private Configuration instance;
@@ -94,6 +96,14 @@ public class ConfigurationUIModel
         }
 
         parentPath = PathUtils.getParentPath(path);
+        if (parentPath != null)
+        {
+            ComplexType parentType = configurationTemplateManager.getType(parentPath);
+            if (PrototypeUtils.isEmbeddedCollection(parentType))
+            {
+                displayMode = false;
+            }
+        }
 
         instance = configurationTemplateManager.getInstance(path);
         type = configurationTemplateManager.getType(path);
@@ -260,6 +270,11 @@ public class ConfigurationUIModel
     public List<String> getDisplayFields()
     {
         return displayFields;
+    }
+
+    public boolean isDisplayMode()
+    {
+        return displayMode;
     }
 
     public void setConfigurationPersistenceManager(ConfigurationPersistenceManager configurationPersistenceManager)

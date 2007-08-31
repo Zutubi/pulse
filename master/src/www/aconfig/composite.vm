@@ -5,7 +5,7 @@
         <h3 class="config-header">${config.formHeading}</h3>
         ##<!-- add some space around the form so that it does not sit directly on the border. -->
         <div class="config-form-container">
-            #pform("path=$config.path" "formName=mainform" "displayMode=true" "ajax=true" "namespace=aconfig")
+            #pform("path=$config.path" "formName=mainform" "displayMode=$config.displayMode" "ajax=true" "namespace=aconfig")
         </div>
         <script type="text/javascript">
             mainform.on('actioncomplete', function(form, action)
