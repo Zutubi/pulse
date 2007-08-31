@@ -19,6 +19,7 @@ ZUTUBI.Select = function(config)
     this.addEvents({
         'change': true
     });
+    this.hiddenName = config.name;
 };
 
 Ext.extend(ZUTUBI.Select, Ext.form.Field, {
@@ -46,7 +47,7 @@ Ext.extend(ZUTUBI.Select, Ext.form.Field, {
     valueField : 'value',
     hiddenFields: {},
     entryHeight: 22,
-    
+
     onRender : function(ct, position)
     {
         this.el = ct.createChild({tag: 'div', cls: 'x-select', id: this.id});
@@ -100,7 +101,7 @@ Ext.extend(ZUTUBI.Select, Ext.form.Field, {
         this.originalValue = this.getValue();
     },
 
-    onSelectionChange: function(evt)
+    onSelectionChange: function()
     {
         this.updateHiddenFields();
         this.fireEvent('change');
@@ -182,6 +183,18 @@ Ext.extend(ZUTUBI.Select, Ext.form.Field, {
                 this.addHiddenField(value[i]);
             }
         }
+    },
+
+    onDisable: function()
+    {
+        ZUTUBI.Select.superclass.onDisable.call(this);
+        this.view.disabled = true;
+    },
+
+    onEnable: function()
+    {
+        ZUTUBI.Select.superclass.onEnable.call(this);
+        this.view.disabled = false;
     }
 });
 
@@ -594,6 +607,7 @@ ZUTUBI.StringList = function(config)
     this.addEvents({
         'change': true
     });
+    this.hiddenName = config.name;
 };
 
 Ext.extend(ZUTUBI.StringList, Ext.form.Field, {
@@ -866,7 +880,19 @@ Ext.extend(ZUTUBI.StringList, Ext.form.Field, {
         {
             return -1;
         }
-    }
+    },
+
+    onDisable: function()
+    {
+        ZUTUBI.Select.superclass.onDisable.call(this);
+        this.view.disabled = true;
+    },
+
+    onEnable: function()
+    {
+        ZUTUBI.Select.superclass.onEnable.call(this);
+        this.view.disabled = false;
+    }    
 });
 
 Ext.form.Checkbox.prototype.onResize = function()
@@ -875,6 +901,32 @@ Ext.form.Checkbox.prototype.onResize = function()
 }
 
 Ext.override(Ext.View, {
+    onClick : function(e)
+    {
+        if(this.disabled)
+        {
+            if(e)
+            {
+                e.preventDefault();
+                return;
+            }
+        }
+        
+        var item = this.findItemFromChild(e.getTarget());
+        if (item)
+        {
+            var index = this.indexOf(item);
+            if (this.onItemClick(item, index, e) !== false)
+            {
+                this.fireEvent("click", this, index, item, e);
+            }
+        }
+        else
+        {
+            this.clearSelections();
+        }
+    },
+
     onItemClick : function(item, index, e)
     {
         if (!this.fireEvent("beforeclick", this, index, item, e))
