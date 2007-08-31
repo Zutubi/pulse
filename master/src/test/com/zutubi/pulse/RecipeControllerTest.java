@@ -10,21 +10,9 @@ import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.events.build.CommandCommencedEvent;
-import com.zutubi.pulse.events.build.CommandCompletedEvent;
-import com.zutubi.pulse.events.build.CommandOutputEvent;
-import com.zutubi.pulse.events.build.RecipeCommencedEvent;
-import com.zutubi.pulse.events.build.RecipeCompletedEvent;
-import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
-import com.zutubi.pulse.events.build.RecipeErrorEvent;
-import com.zutubi.pulse.events.build.RecipeStatusEvent;
+import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.logging.CustomLogRecord;
-import com.zutubi.pulse.model.AgentState;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.MasterBuildHostRequirements;
-import com.zutubi.pulse.model.MockBuildManager;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.RecipeResultNode;
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.services.UpgradeState;
@@ -32,11 +20,7 @@ import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 
 import java.io.File;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  */
@@ -520,6 +504,11 @@ public class RecipeControllerTest extends PulseTestCase
         public String getHostName()
         {
             return "mock build service";
+        }
+
+        public void garbageCollect()
+        {
+            throw new RuntimeException("Method not yet implemented.");
         }
 
         public String getUrl()

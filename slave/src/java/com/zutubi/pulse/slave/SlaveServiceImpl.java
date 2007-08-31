@@ -175,6 +175,11 @@ public class SlaveServiceImpl implements SlaveService
         return constructor.isResourceHome(path);
     }
 
+    public void garbageCollect()
+    {
+        Runtime.getRuntime().gc();
+    }
+
     //---( Remote File API )---
 
     public FileInfo getFileInfo(String token, String path)

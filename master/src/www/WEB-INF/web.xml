@@ -229,6 +229,11 @@
 
     <servlet-mapping>
         <servlet-name>webwork</servlet-name>
+        <url-pattern>/agents/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>webwork</servlet-name>
         <url-pattern>/admin/*</url-pattern>
     </servlet-mapping>
 

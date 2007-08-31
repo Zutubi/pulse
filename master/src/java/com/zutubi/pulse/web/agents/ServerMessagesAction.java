@@ -36,7 +36,7 @@ public class ServerMessagesAction extends ServerMessagesActionSupport
 
     public String execute() throws Exception
     {
-        Agent agent = getAgent();
+        Agent agent = getRequiredAgent();
         if(agent.isOnline())
         {
             try

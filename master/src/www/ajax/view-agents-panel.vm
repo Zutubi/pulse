@@ -10,54 +10,43 @@
     </tr>
 #foreach($agent in $agents)
     <tr>
-
-        #dynamicLinkCell($agent.config.name "viewAgentStatus.action?agentHandle=$agent.config.handle")
+        #set($h_agentName = $!webwork.htmlEncode($agent.config.name))
+        #dynamicLinkCell($h_agentName "$urls.agentStatus($agent)")
         #staticCell($agent.location)
-
         #if($agent.enabled)
             #staticCell($agent.status.prettyString)
 #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
-<!--
-            #linkCell("agent.ping.$agent.config.name" "agent.ping" "$base/admin/${agent.config.configurationPath}.action?ping")
-            #linkCell("agent.disable.$agent.config.name" "agent.disable" "$base/admin/${agent.config.configurationPath}.action?disable")
--->            
-            #editCell("$base/admin/${agent.config.configurationPath}.action" "edit_$!webwork.htmlEncode($agent.config.name)")
+            #linkCell("agent.ping.$agent.config.name" "agent.ping" "$urls.agentAction($agent, 'ping')")
+            #linkCell("agent.disable.$agent.config.name" "agent.disable" "$urls.agentAction($agent, 'disable')")
 #end
         #else
             #if($action.upgrading($agent))
                 #set($status = "$action.getText('agent.upgrading') [$agent.upgradeState.toString().toLowerCase()]")
 
                 #staticCell($status)
-                #contentCell("empty.cell")
-                #contentCell("empty.cell")
-                #contentCell("empty.cell")
+#authorize("ifAllGranted=ROLE_ADMINISTRATOR")
+                #contentCell("agent.ping")
+                #contentCell("agent.enable")
+#end
             #elseif($action.failedUpgrade($agent))
                 #contentCell("agent.failed.upgrade")
-                #contentCell("empty.cell")
-<!--
-                #linkCell("agent.enable.$agent.config.name" "agent.enable" "$base/admin/${agent.config.configurationPath}.action?enable")
-                #editCell("$base/admin/${agent.config.configurationPath}.action" "edit_$!webwork.htmlEncode($agent.config.name)")
--->
+#authorize("ifAllGranted=ROLE_ADMINISTRATOR")
+                #contentCell("agent.ping")
+                #linkCell("agent.enable.$agent.config.name" "agent.enable" "$urls.agentAction($agent, 'enable')")
+#end
             #else
                 ## Just plain disabled
                 #contentCell("agent.disabled")
 #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
-                #contentCell("empty.cell")
-<!--
-                #linkCell("agent.enable.$agent.config.name" "agent.enable" "$base/admin/${agent.config.configurationPath}.action?enable")
-                #editCell("$base/admin/${agent.config.configurationPath}.action" "edit_$!webwork.htmlEncode($agent.config.name)")
--->                
-                #editCell("$base/admin/${agent.config.configurationPath}.action" "edit_$!webwork.htmlEncode($agent.config.name)")
-
+                #contentCell("agent.ping")
+                #linkCell("agent.enable.$agent.config.name" "agent.enable" "$urls.agentAction($agent, 'enable')")
 #end
             #end
         #end
-    </tr>
-#end
 #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
-    #licensed("require=canAddAgent")
-        #addRow("add.agent" 7 "$base/admin/agents/" "agent.add")
-    #end
+        #editCell("$base/admin/${agent.config.configurationPath}/" "edit_$h_agentName")
+#end
+    </tr>
 #end
 </table>
 

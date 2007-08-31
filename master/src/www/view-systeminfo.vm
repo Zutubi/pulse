@@ -1,12 +1,12 @@
 #helpTag("Agent+Info+Tab")
 #authorisationTags($principle)
-#agentTags($slave)
+#agentTags()
 <html>
 <head>
     <title>#wwtext("name=agents")</title>
 </head>
 <body>
-    #agentTabs("server-info")
+    #agentTabs("info")
 
 #if($action.hasErrors())
         #parse("agent-error.vm")
@@ -53,7 +53,7 @@
                             </td>
                         </table>
                     </td>
-                    <td valign=top width="10%" align="left" nowrap>&nbsp;&nbsp;$action.getText("memory.free.percent", ["$percentageFree"]) #if(!$agent.isSlave()) #authorize("ifAllGranted=ROLE_ADMINISTRATOR") (<a href="garbageCollect.action">gc</a>) #end #end </td>
+                    <td valign=top width="10%" align="left" nowrap>&nbsp;&nbsp;$action.getText("memory.free.percent", ["$percentageFree"]) #authorize("ifAllGranted=ROLE_ADMINISTRATOR") (<a href="$urls.agentAction($agent, 'gc')tab/info/">gc</a>) #end </td>
                 </tr>
             </table>
         </td>

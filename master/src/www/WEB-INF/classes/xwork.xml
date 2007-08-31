@@ -34,12 +34,16 @@
 
         <action name="viewAgents" class="com.zutubi.pulse.web.agents.ViewAgentsAction">
             <interceptor-ref name="ajaxReadOnlyStack"/>
-            <result name="success" type="velocity">view-agents.vm</result>
+            <result name="success" type="velocity">/view-agents.vm</result>
+        </action>
+
+        <action name="agentAction" class="com.zutubi.pulse.web.agents.AgentActionAction">
+            <result name="success" type="redirect">${redirect}</result>
         </action>
 
         <action name="viewServerQueues" class="com.zutubi.pulse.web.server.ViewServerQueuesAction">
             <interceptor-ref name="ajaxReadOnlyStack"/>
-            <result name="success" type="velocity">view-server-queues.vm</result>
+            <result name="success" type="velocity">/view-server-queues.vm</result>
         </action>
 
         <action name="cancelBuild" class="com.zutubi.pulse.web.server.CancelBuildAction">
@@ -57,19 +61,19 @@
 
         <action name="serverMessages" class="com.zutubi.pulse.web.agents.ServerMessagesAction">
             <interceptor-ref name="completeReadOnlyStack"/>
-            <result name="success" type="velocity">server-messages.vm</result>
+            <result name="success" type="velocity">/server-messages.vm</result>
         </action>
 
         <action name="internalError" class="com.zutubi.pulse.web.InternalErrorAction">
-            <result name="success" type="velocity">internal-error.vm</result>
-            <result name="input" type="velocity">internal-error.vm</result>
-            <result name="cancel" type="velocity">internal-error.vm</result>
+            <result name="success" type="velocity">/internal-error.vm</result>
+            <result name="input" type="velocity">/internal-error.vm</result>
+            <result name="cancel" type="velocity">/internal-error.vm</result>
         </action>
 
         <action name="404" class="com.zutubi.pulse.web.FourOhFourAction">
-            <result name="success" type="velocity">404.vm</result>
-            <result name="input" type="velocity">404.vm</result>
-            <result name="error" type="velocity">404.vm</result>
+            <result name="success" type="velocity">/404.vm</result>
+            <result name="input" type="velocity">/404.vm</result>
+            <result name="error" type="velocity">/404.vm</result>
         </action>
 
         <action name="viewProjects" class="com.zutubi.pulse.web.project.ViewProjectsAction">
@@ -433,14 +437,6 @@
             <result name="input" type="velocity">edit-license.vm</result>
             <result name="success" type="redirect">/admin/serverSettings.action</result>
             <result name="cancel" type="redirect">/admin/serverSettings.action</result>
-        </action>
-
-        <action name="enableAgent" class="com.zutubi.pulse.web.agents.EnableAgentAction">
-            <result name="success" type="redirect">/viewAgents.action</result>
-        </action>
-
-        <action name="pingAgent" class="com.zutubi.pulse.web.agents.PingAgentAction">
-            <result name="success" type="redirect">/viewAgents.action</result>
         </action>
 
         <action name="addSystemProperty" class="com.zutubi.pulse.web.admin.SystemPropertiesAction" method="doAdd">

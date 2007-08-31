@@ -1,16 +1,13 @@
 package com.zutubi.pulse.web.agents;
 
 import com.zutubi.pulse.logging.CustomLogRecord;
-import com.zutubi.pulse.web.ActionSupport;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.logging.Level;
 
 /**
  * Helper base class for actions that display server messages.
  */
-public class ServerMessagesActionSupport extends AgentActionSupport
+public class ServerMessagesActionSupport extends AgentActionBase
 {
     public boolean isError(CustomLogRecord record)
     {

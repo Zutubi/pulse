@@ -6,6 +6,8 @@ import com.opensymphony.webwork.dispatcher.mapper.ActionMapping;
 import com.opensymphony.webwork.dispatcher.mapper.DefaultActionMapper;
 import com.opensymphony.xwork.ActionProxyFactory;
 import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.pulse.webwork.mapping.agents.AgentsActionResolver;
+import com.zutubi.pulse.webwork.mapping.browse.BrowseActionResolver;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
@@ -19,11 +21,13 @@ public class PulseActionMapper implements ActionMapper
 {
     public static final String DASHBOARD_NAMESPACE = "/dashboard";
     public static final String BROWSE_NAMESPACE = "/browse";
+    public static final String AGENTS_NAMESPACE = "/agents";
     public static final String ADMIN_NAMESPACE = "/admin";
 
     private DefaultActionMapper delegate = new DefaultActionMapper();
     private ActionResolver browseActionResolver = new BrowseActionResolver();
-    
+    private ActionResolver agentsActionResolver = new AgentsActionResolver();
+
     // Pure config namespaces only, no hybrids here!
     private static final Set<String> configNamespaces = new HashSet<String>();
     {
@@ -55,6 +59,10 @@ public class PulseActionMapper implements ActionMapper
         else if(BROWSE_NAMESPACE.equals(namespace))
         {
             mapping = getBrowseMapping(path, request);
+        }
+        else if(AGENTS_NAMESPACE.equals(namespace))
+        {
+            mapping = getAgentsMapping(path, request);
         }
         else if(ADMIN_NAMESPACE.equals(namespace))
         {
@@ -179,6 +187,26 @@ public class PulseActionMapper implements ActionMapper
         //         wc/
         path = PathUtils.normalizePath(path);
         return resolve(BROWSE_NAMESPACE, path, browseActionResolver);
+    }
+
+    private ActionMapping getAgentsMapping(String path, HttpServletRequest request)
+    {
+        // browse/                    - projects page
+        //   <project>/               - project tabs
+        //     home/                  - (default)
+        //     reports/
+        //     builds/                - (history)
+        //       <build id>/          - build tabs
+        //         summary/           - (default)
+        //         detailed/
+        //           <stage>/         - select stage on detailed tab
+        //             log/           - log for stage
+        //         changes/
+        //         tests/
+        //         file/
+        //         wc/
+        path = PathUtils.normalizePath(path);
+        return resolve(AGENTS_NAMESPACE, path, agentsActionResolver);
     }
 
     private ActionMapping resolve(String namespace, String path, ActionResolver actionResolver)

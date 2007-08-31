@@ -2,11 +2,11 @@ package com.zutubi.pulse.web.agents;
 
 /**
  */
-public class ViewAgentStatusAction extends AgentActionSupport
+public class ViewAgentStatusAction extends AgentActionBase
 {
     public String execute() throws Exception
     {
-        getAgent();
+        getRequiredAgent();
         return SUCCESS;
     }
 }

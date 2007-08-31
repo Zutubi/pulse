@@ -1,11 +1,11 @@
 package com.zutubi.pulse.prototype.config.agent;
 
-import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.agent.Agent;
+import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.model.AgentState;
 
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
@@ -24,6 +24,7 @@ public class AgentConfigurationActions
         {
             actions.add("disable");
             actions.add("ping");
+            actions.add("gc");
         }
         else if (agent.isDisabled())
         {
@@ -46,6 +47,15 @@ public class AgentConfigurationActions
     public void doPing(AgentConfiguration config)
     {
         agentManager.pingAgent(config.getHandle());
+    }
+
+    public void doGc(AgentConfiguration config)
+    {
+        Agent agent = agentManager.getAgent(config.getHandle());
+        if (agent != null)
+        {
+            agent.getService().garbageCollect();
+        }
     }
 
     public void setAgentManager(AgentManager agentManager)

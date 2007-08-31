@@ -5,10 +5,10 @@ import com.zutubi.pulse.agent.Agent;
 import com.zutubi.util.logging.Logger;
 
 /**
- *
- *
+ * An action to display information about the machine and JVM an agent is
+ * running on.
  */
-public class SystemInfoAction extends AgentActionSupport
+public class SystemInfoAction extends AgentActionBase
 {
     private static final Logger LOG = Logger.getLogger(SystemInfoAction.class);
 
@@ -18,7 +18,7 @@ public class SystemInfoAction extends AgentActionSupport
      */
     public String execute()
     {
-        Agent agent = getAgent();
+        Agent agent = getRequiredAgent();
         if(agent.isOnline())
         {
             try

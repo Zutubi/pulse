@@ -10,8 +10,8 @@ import com.zutubi.pulse.web.ActionSupport;
 import java.util.List;
 
 /**
- * An action to display all agents attached to this master, including the
- * master itself.
+ * An action to display all agents attached to this master, including local
+ * agents.
  */
 public class ViewAgentsAction extends ActionSupport
 {

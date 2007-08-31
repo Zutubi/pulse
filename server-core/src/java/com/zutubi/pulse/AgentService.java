@@ -58,4 +58,5 @@ public interface AgentService extends RemoteService
 
     String getHostName();
 
+    void garbageCollect();
 }

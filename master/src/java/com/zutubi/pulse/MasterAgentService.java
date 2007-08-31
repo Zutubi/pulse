@@ -163,6 +163,11 @@ public class MasterAgentService implements AgentService
         return "master";
     }
 
+    public void garbageCollect()
+    {
+        Runtime.getRuntime().gc();
+    }
+
     @Override
     public boolean equals(Object obj)
     {

@@ -1,0 +1,19 @@
+package com.zutubi.pulse.webwork.mapping.browse;
+
+import com.zutubi.pulse.webwork.mapping.ActionResolver;
+import com.zutubi.pulse.webwork.mapping.ActionResolverSupport;
+
+/**
+ */
+public class BrowseProjectsActionResolver extends ActionResolverSupport
+{
+    public BrowseProjectsActionResolver()
+    {
+        super("viewProjects");
+    }
+
+    public ActionResolver getChild(String name)
+    {
+        return new BrowseProjectActionResolver(name);
+    }
+}

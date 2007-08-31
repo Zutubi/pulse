@@ -56,23 +56,8 @@
 ##
 ## Outputs sitemesh content tags for the agent links on the header bar
 ##
-#macro(agentTags $slave)
+#macro(agentTags)
     <content tag="selectedTab">agents</content>
-    #if($slave)
-        <content tag="agentId">$slave.id</content>
-        <content tag="agentName">$!webwork.htmlEncode($slave.name)</content>
-    #else
-        <content tag="agentName">#wwtext("name=master")</content>
-    #end
-#end
-
-##
-## Outputs sitemesh content tags for the resource links on the header bar
-##
-#macro(resourceTags $slave $resource)
-    #agentTags($slave)
-    <content tag="resourceId">$resource.id</content>
-    <content tag="resourceName">$!webwork.htmlEncode($resource.name)</content>
 #end
 
 ##
@@ -249,9 +234,8 @@
 ##
 ## Shows an agent tab of the given name with the given action name
 ##
-#macro(agentTab $name $action $selected)
-    #set($args = "?agentHandle=$agent.config.handle")
-    #tabItem("tab.agent.$name" $name "${action}.action${args}" $selected)
+#macro(agentTab $name $selected)
+    #tabItem("tab.agent.$name" $name "$urls.agent($agent)$name/" $selected)
 #end
 
 ##
@@ -259,9 +243,9 @@
 ##
 #macro(agentTabs $selected)
     #openTabs()
-        #agentTab("status" "$base/viewAgentStatus" $selected)
-        #agentTab("server-messages" "$base/serverMessages" $selected)
-        #agentTab("server-info" "$base/viewSystemInfo" $selected)
+        #agentTab("status" $selected)
+        #agentTab("messages" $selected)
+        #agentTab("info" $selected)
     #closeTabs()
 #end
 
@@ -661,7 +645,7 @@
 ## Outputs an edit cell for a content table
 ##
 #macro(editCell $url $id)
-    #actionCellId("edit" $url "pencil.gif" $id false)
+    #actionCellId("configure" $url "pencil.gif" $id false)
 #end
 
 ##
@@ -1767,7 +1751,7 @@
 ## Shows a table row with pages and previous/next etc links.  Pager should be
 ## an instance of paging support.
 ##
-#macro(pagingRow $url $pager)
+#macro(pagingRow $url $extraParams $pager)
     #if($pager.pageCount > 1)
         #set($nextPage = $pager.startPage + 1)
         #set($previousPage = $pager.startPage - 1)
@@ -1775,7 +1759,7 @@
                 <tr>
                     <td class="content-centre">
         #if($pager.startPage > 0)
-                        <a href="${url}startPage=0" class="unadorned">
+                        <a href="${url}0/${extraParams}" class="unadorned">
         #end
                             #image("$base/images/resultset_first.gif" "page.latest") #wwtext("name=page.latest")
         #if($pager.startPage > 0)
@@ -1784,7 +1768,7 @@
                     </td>
                     <td class="content-centre">
         #if($pager.startPage > 0)
-                        <a href="${url}startPage=$previousPage" class="unadorned">
+                        <a href="${url}$previousPage/${extraParams}" class="unadorned">
         #end
                             #image("$base/images/resultset_previous.gif" "page.newer") #wwtext("name=page.newer")
         #if($pager.startPage > 0)
@@ -1796,7 +1780,7 @@
             #set($pageNumber = $pageIndex + 1)
                         &nbsp;
             #if($pageIndex != $pager.startPage)
-                        <a href="${url}startPage=$pageIndex">
+                        <a href="${url}$pageIndex/${extraParams}">
             #end
                             $pageNumber#if($pageIndex != $pager.startPage)</a>#end
         #end
@@ -1804,7 +1788,7 @@
                     </td>
                     <td class="content-centre">
         #if($pager.startPage < $lastPage)
-                        <a href="${url}startPage=$nextPage" class="unadorned">
+                        <a href="${url}$nextPage/${extraParams}" class="unadorned">
         #end
                             #wwtext("name=page.older") #image("$base/images/resultset_next.gif" "page.older")
         #if($pager.startPage < $lastPage)
@@ -1813,7 +1797,7 @@
                     </td>
                     <td class="content-centre">
         #if($pager.startPage < $lastPage)
-                        <a href="${url}startPage=$lastPage" class="unadorned">
+                        <a href="${url}$lastPage/${extraParams}" class="unadorned">
         #end
                             #wwtext("name=page.oldest") #image("$base/images/resultset_last.gif" "page.oldest")
         #if($pager.startPage < $lastPage)

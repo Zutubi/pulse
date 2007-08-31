@@ -1,5 +1,8 @@
 package com.zutubi.prototype.actions;
 
+import com.zutubi.prototype.ConventionSupport;
+import com.zutubi.prototype.type.Type;
+import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
@@ -109,6 +112,40 @@ public class Actions
         return actionName;
     }
 
+    /**
+     * Checks that the given action is available for the given instance and
+     * if so executes it.  If not, an {@link IllegalArgumentException} is
+     * thrown.
+     *
+     * @param actionName            name of the action to execute
+     * @param configurationInstance instance to execute the action with/on
+     * @param typeRegistry          registry of known configuration types
+     * @throws IllegalArgumentException if the instance is not valid, exposes
+     *         no actions or does not currently expose the given action
+     */
+    public void checkAndExecute(String actionName, Object configurationInstance, TypeRegistry typeRegistry)
+    {
+        Type type = typeRegistry.getType(configurationInstance.getClass());
+        if(type == null)
+        {
+            throw new IllegalArgumentException("Instance '" + configurationInstance.getClass().getName() + "' is not of a registered configuration type");
+        }
+
+        Class actionHandlerClass = ConventionSupport.getActions(type);
+        if(actionHandlerClass == null)
+        {
+            throw new IllegalArgumentException("No actions available for class '" + configurationInstance.getClass().getName() + "'");
+        }
+
+        List<String> availableActions = getActions(actionHandlerClass, configurationInstance);
+        if(!availableActions.contains(actionName))
+        {
+            throw new IllegalArgumentException("Action '" + actionName + "' not valid for given object");
+        }
+
+        execute(actionHandlerClass, actionName, configurationInstance);
+    }
+
     @SuppressWarnings({"unchecked"})
     public void execute(Class actionHandlerClass, String actionName, Object configurationInstance)
     {
@@ -171,11 +208,6 @@ public class Actions
         return methodName;
     }
 
-    /**
-     * Required resource
-     *
-     * @param objectFactory instance
-     */
     public void setObjectFactory(ObjectFactory objectFactory)
     {
         this.objectFactory = objectFactory;

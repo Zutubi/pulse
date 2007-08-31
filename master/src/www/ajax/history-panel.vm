@@ -41,7 +41,7 @@
             <td>
 
             <table width="100%" class="content">
-                #pagingRow("$base/history.action?projectName=$u_projectName&amp;stateFilter=$stateFilter&amp;" $pagingSupport)
+                #pagingRow("$urls.projectHistory($u_projectName)" "stateFilter/$stateFilter/" $pagingSupport)
                 <tr><th colspan="5">$action.getText("history.count", ["$pagingSupport.totalItems"])</th></tr>
             </table>
 #else

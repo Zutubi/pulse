@@ -10,15 +10,15 @@ import com.zutubi.pulse.bootstrap.SimpleMasterConfigurationManager;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceProperty;
-import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.DelegateScmClientFactory;
+import com.zutubi.pulse.core.scm.MockScmClient;
 import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.pulse.core.scm.ScmException;
-import com.zutubi.pulse.core.scm.MockScmClient;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.events.AgentRemovedEvent;
 import com.zutubi.pulse.events.DefaultEventManager;
@@ -28,11 +28,7 @@ import com.zutubi.pulse.events.build.RecipeCompletedEvent;
 import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.logging.CustomLogRecord;
-import com.zutubi.pulse.model.AgentState;
-import com.zutubi.pulse.model.BuildHostRequirements;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.UnknownBuildReason;
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
@@ -943,6 +939,11 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         public String getHostName()
         {
             return "[mock]";
+        }
+
+        public void garbageCollect()
+        {
+            throw new RuntimeException("Method not yet implemented.");
         }
 
         public String getUrl()

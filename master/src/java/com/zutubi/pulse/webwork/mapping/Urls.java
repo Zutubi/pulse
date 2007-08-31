@@ -1,5 +1,6 @@
 package com.zutubi.pulse.webwork.mapping;
 
+import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
@@ -185,4 +186,53 @@ public class Urls
         return StringUtils.uriComponentEncode(node.getStageName()) + "/";
     }
 
+    public String agents()
+    {
+        return baseUrl + "/agents/";
+    }
+
+    public String agent(Object agent)
+    {
+        String encodedName;
+        if(agent instanceof String)
+        {
+            // Should be pre-encoded name.
+            encodedName = (String) agent;
+        }
+        else if(agent instanceof Agent)
+        {
+            encodedName = StringUtils.uriComponentEncode(((Agent)agent).getConfig().getName());
+        }
+        else
+        {
+            return agents();
+        }
+
+        return agents() + encodedName + "/";
+    }
+
+    public String agentActions(Object agent)
+    {
+        return agent(agent) + "actions/";
+    }
+
+    public String agentAction(Object agent, String action)
+    {
+        return agentActions(agent) + action + "/";
+    }
+
+    public String agentStatus(Object agent)
+    {
+        return agent(agent) + "status/";
+    }
+
+    public String agentMessages(Object agent)
+    {
+        return agent(agent) + "messages/";
+    }
+
+    public String agentInfo(Object agent)
+    {
+        return agent(agent) + "info/";
+    }
 }

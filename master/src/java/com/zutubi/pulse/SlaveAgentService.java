@@ -200,6 +200,11 @@ public class SlaveAgentService implements AgentService
         return agentConfig.getName();
     }
 
+    public void garbageCollect()
+    {
+        service.garbageCollect();
+    }
+
     public AgentConfiguration getAgentConfig()
     {
         return agentConfig;
