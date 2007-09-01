@@ -258,7 +258,7 @@ a {
     border-bottom: dotted 1px #336;
 }
 
-a.unadorned, a.unadorned:hover, a.ytab-right, a.ytab-right:hover {
+a.unadorned, a.unadorned:hover, a.x-tabs-right, a.x-tabs-right:hover, .x-tree-node a, .x-tree-node a:hover {
     border-bottom: none;
 }
 
