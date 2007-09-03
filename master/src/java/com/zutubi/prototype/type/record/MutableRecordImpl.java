@@ -99,7 +99,7 @@ public class MutableRecordImpl extends AbstractMutableRecord
             Object value = entry.getValue();
             if (deep && value instanceof Record)
             {
-                value = ((Record) value).copy(true);
+                value = ((Record) value).copy(deep);
             }
             clone.put(key, value);
         }
@@ -147,5 +147,32 @@ public class MutableRecordImpl extends AbstractMutableRecord
         result = (meta != null ? meta.hashCode() : 0);
         result = 31 * result + (data != null ? data.hashCode() : 0);
         return result;
+    }
+
+    public void merge(MutableRecordImpl b)
+    {
+        for (String key : b.keySet())
+        {
+            Object value = b.get(key);
+            
+            if (value instanceof Record)
+            {
+                MutableRecordImpl record = (MutableRecordImpl) value;
+
+                // a) do we have a child record to merge with? if yes, nested merge, if no, clone and set.
+                if (this.get(key) instanceof Record)
+                {
+                    ((MutableRecordImpl)this.get(key)).merge(record);
+                }
+                else
+                {
+                    this.put(key, record.copy(true));
+                }
+            }
+            else
+            {
+                this.put(key, value);
+            }
+        }
     }
 }
