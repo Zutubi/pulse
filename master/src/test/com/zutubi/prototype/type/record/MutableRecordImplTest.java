@@ -110,6 +110,43 @@ public class MutableRecordImplTest extends TestCase
 
     public void testRecordDiff()
     {
+        MutableRecordImpl a = new MutableRecordImpl();
+        a.put("a", "a");
+        MutableRecordImpl b = new MutableRecordImpl();
+        b.put("b", "b");
+
+        MutableRecordImpl c = a.diff(b);
+        assertEquals(1, c.size());
+        assertFalse(c.containsKey("a"));
+        assertEquals("b", c.get("b"));
+    }
+
+    public void testRecordDiffWithOverlap()
+    {
+        MutableRecordImpl a = new MutableRecordImpl();
+        a.put("a", "a");
+        MutableRecordImpl b = new MutableRecordImpl();
+        b.put("a", "a");
+        b.put("b", "b");
+
+        MutableRecordImpl c = a.diff(b);
+        assertEquals(1, c.size());
+        assertFalse(c.containsKey("a"));
+        assertEquals("b", c.get("b"));
+    }
+
+    public void testNestedRecordDiff()
+    {
+        MutableRecordImpl a = new MutableRecordImpl();
+        a.put("a", "a");
+        MutableRecordImpl b = new MutableRecordImpl();
+        MutableRecordImpl b1 = new MutableRecordImpl();
+        b1.put("b", "b");
+        b.put("b", b1);
+
+        MutableRecordImpl c = a.diff(b);
+        assertEquals(1, c.size());
+        assertEquals("b", ((Record)c.get("b")).get("b"));
 
     }
 }

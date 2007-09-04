@@ -175,4 +175,50 @@ public class MutableRecordImpl extends AbstractMutableRecord
             }
         }
     }
+
+    public MutableRecordImpl diff(MutableRecordImpl b)
+    {
+        MutableRecordImpl diff = new MutableRecordImpl();
+        diff(b, diff);
+        return diff;
+    }
+
+    private void diff(MutableRecordImpl other, MutableRecordImpl diff)
+    {
+        // record the diff between this and other in the diff.
+        for (String key : other.keySet())
+        {
+            Object value = other.get(key);
+            if (containsKey(key))
+            {
+                if (value instanceof Record)
+                {
+                    MutableRecordImpl nestedDiff = new MutableRecordImpl();
+                    diff.put(key, nestedDiff);
+                    diff((MutableRecordImpl)value, nestedDiff);
+                }
+                else
+                {
+                    Object ourValue = get(key);
+                    if (!ourValue.equals(value))
+                    {
+                        diff.put(key, value);
+                    }
+                }
+            }
+            else
+            {
+                // need to copy other if it is a record.
+                if (value instanceof Record)
+                {
+                    diff.put(key, ((Record)value).copy(true));
+                }
+                else
+                {
+                    diff.put(key, value);
+                }
+            }
+
+        }
+    }
 }
