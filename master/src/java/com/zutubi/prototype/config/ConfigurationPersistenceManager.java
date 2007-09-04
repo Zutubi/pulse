@@ -285,7 +285,7 @@ public class ConfigurationPersistenceManager
 
     private ComplexType lookupPersistentType(String path, String[] parentElements, String lastElement)
     {
-        Record parentRecord = recordManager.load(PathUtils.getPath(parentElements));
+        Record parentRecord = recordManager.select(PathUtils.getPath(parentElements));
         if (parentRecord == null)
         {
             throw new IllegalArgumentException("Invalid path '" + path + "': parent does not exist");

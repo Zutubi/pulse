@@ -29,7 +29,7 @@ public class RemoveReferenceCleanupTask extends RecordCleanupTaskSupport
         String parentPath = PathUtils.getParentPath(getAffectedPath());
         String baseName = PathUtils.getBaseName(getAffectedPath());
 
-        Record parentRecord = recordManager.load(parentPath);
+        Record parentRecord = recordManager.select(parentPath);
         if (parentRecord != null)
         {
             MutableRecord newValues = parentRecord.copy(false);

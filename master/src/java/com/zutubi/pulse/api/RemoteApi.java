@@ -126,7 +126,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
     {
         tokenManager.verifyUser(token);
 
-        Record record = recordManager.load(path);
+        Record record = recordManager.select(path);
         if(record == null)
         {
             throw new IllegalArgumentException("Path '" + path + "' does not exist");

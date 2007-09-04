@@ -10,90 +10,90 @@ import java.util.Set;
  */
 public class MutableRecordImpl extends AbstractMutableRecord
 {
-    private Map<String, String> meta = new HashMap<String, String>();
+    private Map<String, String> meta = null;
 
-    private Map<String, Object> data = new HashMap<String, Object>();
+    private Map<String, Object> data = null;
 
     private static final String SYMBOLIC_NAME = "symbolicName";
 
     public void setSymbolicName(String name)
     {
-        meta.put(SYMBOLIC_NAME, name);
+        getMeta().put(SYMBOLIC_NAME, name);
     }
 
     public String getSymbolicName()
     {
-        return meta.get(SYMBOLIC_NAME);
+        return getMeta().get(SYMBOLIC_NAME);
     }
 
     public void putMeta(String key, String value)
     {
-        meta.put(key, value);
+        getMeta().put(key, value);
     }
 
     public String removeMeta(String key)
     {
-        return meta.remove(key);
+        return getMeta().remove(key);
     }
 
     public String getMeta(String key)
     {
-        return meta.get(key);
+        return getMeta().get(key);
     }
 
     public Object put(String key, Object value)
     {
-        return data.put(key, value);
+        return getData().put(key, value);
     }
 
     public int size()
     {
-        return data.size();
+        return getData().size();
     }
 
     public Set<String> keySet()
     {
-        return data.keySet();
+        return getData().keySet();
     }
 
     public Set<String> metaKeySet()
     {
-        return meta.keySet();
+        return getMeta().keySet();
     }
 
     public boolean containsKey(String key)
     {
-        return data.containsKey(key);
+        return getData().containsKey(key);
     }
 
     public Object get(String key)
     {
-        return data.get(key);
+        return getData().get(key);
     }
 
     public Object remove(String key)
     {
-        return data.remove(key);
+        return getData().remove(key);
     }
 
     public void clear()
     {
-        meta.clear();
-        data.clear();
+        getMeta().clear();
+        getData().clear();
     }
 
     public MutableRecord copy(boolean deep)
     {
         MutableRecordImpl clone = new MutableRecordImpl();
 
-        for (Map.Entry<String, String> entry : meta.entrySet())
+        for (Map.Entry<String, String> entry : getMeta().entrySet())
         {
             String key = entry.getKey();
             String value = entry.getValue();
             clone.putMeta(key, value);
         }
 
-        for (Map.Entry<String, Object> entry : data.entrySet())
+        for (Map.Entry<String, Object> entry : getData().entrySet())
         {
             String key = entry.getKey();
             Object value = entry.getValue();
@@ -111,13 +111,13 @@ public class MutableRecordImpl extends AbstractMutableRecord
         // take the new primitive data from the record.
         for (String key : record.simpleKeySet())
         {
-            data.put(key, record.get(key));
+            getData().put(key, record.get(key));
         }
     }
 
     public Collection<Object> values()
     {
-        return data.values();
+        return getData().values();
     }
 
     public boolean equals(Object o)
@@ -131,94 +131,24 @@ public class MutableRecordImpl extends AbstractMutableRecord
             return false;
         }
 
-        MutableRecordImpl that = (MutableRecordImpl) o;
+        return super.equals(o);
+    }
 
-        if (data != null ? !data.equals(that.data) : that.data != null)
+    private Map<String, String> getMeta()
+    {
+        if (meta == null)
         {
-            return false;
+            meta = new HashMap<String, String>();
         }
-
-        return !(meta != null ? !meta.equals(that.meta) : that.meta != null);
+        return meta;
     }
 
-    public int hashCode()
+    private Map<String, Object> getData()
     {
-        int result;
-        result = (meta != null ? meta.hashCode() : 0);
-        result = 31 * result + (data != null ? data.hashCode() : 0);
-        return result;
-    }
-
-    public void merge(MutableRecordImpl b)
-    {
-        for (String key : b.keySet())
+        if (data == null)
         {
-            Object value = b.get(key);
-            
-            if (value instanceof Record)
-            {
-                MutableRecordImpl record = (MutableRecordImpl) value;
-
-                // a) do we have a child record to merge with? if yes, nested merge, if no, clone and set.
-                if (this.get(key) instanceof Record)
-                {
-                    ((MutableRecordImpl)this.get(key)).merge(record);
-                }
-                else
-                {
-                    this.put(key, record.copy(true));
-                }
-            }
-            else
-            {
-                this.put(key, value);
-            }
+            data = new HashMap<String, Object>();
         }
-    }
-
-    public MutableRecordImpl diff(MutableRecordImpl b)
-    {
-        MutableRecordImpl diff = new MutableRecordImpl();
-        diff(b, diff);
-        return diff;
-    }
-
-    private void diff(MutableRecordImpl other, MutableRecordImpl diff)
-    {
-        // record the diff between this and other in the diff.
-        for (String key : other.keySet())
-        {
-            Object value = other.get(key);
-            if (containsKey(key))
-            {
-                if (value instanceof Record)
-                {
-                    MutableRecordImpl nestedDiff = new MutableRecordImpl();
-                    diff.put(key, nestedDiff);
-                    diff((MutableRecordImpl)value, nestedDiff);
-                }
-                else
-                {
-                    Object ourValue = get(key);
-                    if (!ourValue.equals(value))
-                    {
-                        diff.put(key, value);
-                    }
-                }
-            }
-            else
-            {
-                // need to copy other if it is a record.
-                if (value instanceof Record)
-                {
-                    diff.put(key, ((Record)value).copy(true));
-                }
-                else
-                {
-                    diff.put(key, value);
-                }
-            }
-
-        }
+        return data;
     }
 }

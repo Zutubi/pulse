@@ -53,7 +53,7 @@ public class ConfigurationReferenceManager
      */
     public long getHandleForPath(String path)
     {
-        Record record = recordManager.load(path);
+        Record record = recordManager.select(path);
         if(record == null)
         {
             return 0;

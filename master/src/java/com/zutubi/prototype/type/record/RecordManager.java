@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * cached in memory and backed by permanent storage.  This manager supports
  * basic CRUD operations, and manages the cache: including ensuring
  * consistency for loaded records.
- *
+ * <p/>
  * This class should not usually be accessed directly.  Rather, the
  * {@link com.zutubi.prototype.config.ConfigurationTemplateManager} should
  * be used.
@@ -25,19 +25,30 @@ public class RecordManager implements HandleAllocator
      * records start from here.
      */
     private MutableRecord baseRecord;
+    
+    /**
+     * Map of record handles to paths
+     */
     private Map<Long, String> handleToPathMap = new HashMap<Long, String>();
+
+    /**
+     * The current highest handle allocated.
+     */
     private AtomicLong nextHandle = new AtomicLong(UNDEFINED);
     private RecordSerialiser recordSerialiser;
 
     public void init()
     {
-        final long[] highest = { 0L };
+        // load the serialized records, recording handle - path mappings as well as
+        // the highest issued handle.
+        
+        final long[] highest = {0L};
         baseRecord = recordSerialiser.deserialise("", new RecordHandler()
         {
             public void handle(String path, Record record)
             {
                 long handle = record.getHandle();
-                if(handle > highest[0])
+                if (handle > highest[0])
                 {
                     highest[0] = handle;
                 }
@@ -72,27 +83,27 @@ public class RecordManager implements HandleAllocator
      */
     public List<String> getAllPaths(String pattern)
     {
-        return getAllPaths(baseRecord, PathUtils.getPathElements(pattern), 0, "", new LinkedList<String>());
+        List<String> allPaths = new LinkedList<String>();
+        getAllPaths(baseRecord, PathUtils.getPathElements(pattern), 0, "", allPaths);
+        return allPaths;
     }
 
-    private List<String> getAllPaths(Record record, String[] elements, int pathIndex, String resolvedPath, List<String> paths)
+    private void getAllPaths(Record record, String[] elements, int pathIndex, String resolvedPath, List<String> paths)
     {
-        if(pathIndex == elements.length)
+        if (pathIndex == elements.length)
         {
             paths.add(resolvedPath);
         }
         else
         {
-            for(String key: record.nestedKeySet())
+            for (String key : record.nestedKeySet())
             {
-                if(PathUtils.elementMatches(elements[pathIndex], key))
+                if (PathUtils.elementMatches(elements[pathIndex], key))
                 {
                     getAllPaths((Record) record.get(key), elements, pathIndex + 1, PathUtils.getPath(resolvedPath, key), paths);
                 }
             }
         }
-
-        return paths;
     }
 
     /**
@@ -101,18 +112,14 @@ public class RecordManager implements HandleAllocator
      * @param path uniquely identifying the record to be loaded.
      * @return the loaded record, or null if no record could be found.
      */
-    public synchronized Record load(String path)
+    public synchronized Record select(String path)
     {
         checkPath(path);
-        
-        String[] elements = PathUtils.getPathElements(path);
-        return load(elements);
-    }
 
-    private Record load(String[] elements)
-    {
+        String[] elements = PathUtils.getPathElements(path);
+        
         Record record = baseRecord;
-        for(String pathElement: elements)
+        for (String pathElement : elements)
         {
             Object data = record.get(pathElement);
             if (data == null || !(data instanceof Record))
@@ -133,24 +140,24 @@ public class RecordManager implements HandleAllocator
      *                records that are stored at a path matching the search
      *                path
      */
-    public synchronized void loadAll(String path, Map<String, Record> records)
+    public synchronized void selectAll(String path, Map<String, Record> records)
     {
         checkPath(path);
-        
+
         loadAll(baseRecord, PathUtils.getPathElements(path), 0, "", records);
     }
 
     private void loadAll(Record record, String[] elements, int pathIndex, String resolvedPath, Map<String, Record> records)
     {
-        if(pathIndex == elements.length)
+        if (pathIndex == elements.length)
         {
             records.put(resolvedPath, record);
             return;
         }
 
-        for(String key: record.nestedKeySet())
+        for (String key : record.nestedKeySet())
         {
-            if(PathUtils.elementMatches(elements[pathIndex], key))
+            if (PathUtils.elementMatches(elements[pathIndex], key))
             {
                 loadAll((Record) record.get(key), elements, pathIndex + 1, PathUtils.getPath(resolvedPath, key), records);
             }
@@ -166,7 +173,7 @@ public class RecordManager implements HandleAllocator
     public synchronized boolean containsRecord(String path)
     {
         checkPath(path);
-        
+
         return getRecord(PathUtils.getPathElements(path)) != null;
     }
 
@@ -189,9 +196,9 @@ public class RecordManager implements HandleAllocator
     private void allocateHandles(MutableRecord record)
     {
         record.setHandle(allocateHandle());
-        for(Object child: record.values())
+        for (Object child : record.values())
         {
-            if(child instanceof MutableRecord)
+            if (child instanceof MutableRecord)
             {
                 allocateHandles((MutableRecord) child);
             }
@@ -209,7 +216,7 @@ public class RecordManager implements HandleAllocator
         }
 
         MutableRecord parent = getRecord(PathUtils.getParentPathElements(pathElements));
-        if(parent == null)
+        if (parent == null)
         {
             throw new IllegalArgumentException("No parent record for path '" + path + "'");
         }
@@ -227,7 +234,7 @@ public class RecordManager implements HandleAllocator
     private void addToHandleMap(String path, MutableRecord record)
     {
         handleToPathMap.put(record.getHandle(), path);
-        for(String key: record.nestedKeySet())
+        for (String key : record.nestedKeySet())
         {
             addToHandleMap(PathUtils.getPath(path, key), (MutableRecord) record.get(key));
         }
@@ -275,14 +282,14 @@ public class RecordManager implements HandleAllocator
     public synchronized Record update(String path, Record values)
     {
         checkPath(path);
-        
+
         String[] parentElements = PathUtils.getParentPathElements(path);
         String baseName = PathUtils.getBaseName(path);
 
         MutableRecord parentRecord = getRecord(parentElements);
-        if(parentRecord == null)
+        if (parentRecord == null)
         {
-            throw new IllegalArgumentException("No parent record for path '" + path + "'" );
+            throw new IllegalArgumentException("No parent record for path '" + path + "'");
         }
 
         MutableRecord record = getChildRecord(parentRecord, baseName);
@@ -295,15 +302,15 @@ public class RecordManager implements HandleAllocator
         // the cached record.  The cached record is cut loose and will be
         // collected when no longer in use.
         MutableRecord copy = record.copy(false);
-        for(String key: values.simpleKeySet())
+        for (String key : values.simpleKeySet())
         {
             copy.put(key, values.get(key));
         }
 
         // Remove simple values not present in the input
-        for(String key: record.simpleKeySet())
+        for (String key : record.simpleKeySet())
         {
-            if(values.get(key) == null)
+            if (values.get(key) == null)
             {
                 copy.remove(key);
             }
@@ -325,7 +332,7 @@ public class RecordManager implements HandleAllocator
      */
     public synchronized Record insertOrUpdate(String path, Record record)
     {
-        if(containsRecord(path))
+        if (containsRecord(path))
         {
             return update(path, record);
         }
@@ -354,7 +361,7 @@ public class RecordManager implements HandleAllocator
 
         String baseName = PathUtils.getBaseName(path);
         Object value = parentRecord.get(baseName);
-        if(value != null && value instanceof Record)
+        if (value != null && value instanceof Record)
         {
             Record result = (Record) parentRecord.remove(baseName);
             removeFromHandleMap(result);
@@ -367,7 +374,7 @@ public class RecordManager implements HandleAllocator
     private void removeFromHandleMap(Record record)
     {
         handleToPathMap.remove(record.getHandle());
-        for(String key: record.nestedKeySet())
+        for (String key : record.nestedKeySet())
         {
             removeFromHandleMap((Record) record.get(key));
         }
@@ -384,7 +391,7 @@ public class RecordManager implements HandleAllocator
      */
     public synchronized Record copy(String sourcePath, String destinationPath)
     {
-        MutableRecord record = (MutableRecord) load(sourcePath);
+        MutableRecord record = (MutableRecord) select(sourcePath);
         if (record != null)
         {
             MutableRecord copy = record.copy(true);

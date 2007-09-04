@@ -46,7 +46,7 @@ public class RecordManagerTest extends TestCase
         record.put("key", "value");
         recordManager.insert("hello/world", record);
 
-        Record hello = recordManager.load("hello");
+        Record hello = recordManager.select("hello");
         assertNotNull(hello.get("world"));
     }
 
@@ -57,9 +57,9 @@ public class RecordManagerTest extends TestCase
 
         recordManager.insert("hello", new MutableRecordImpl());
         recordManager.insert("hello/world", record);
-        assertNull(recordManager.load("hello/moon"));
-        assertNull(recordManager.load("hello/world/key"));
-        assertNotNull(recordManager.load("hello/world"));
+        assertNull(recordManager.select("hello/moon"));
+        assertNull(recordManager.select("hello/world/key"));
+        assertNotNull(recordManager.select("hello/world"));
     }
 
     public void testDelete()
@@ -82,7 +82,7 @@ public class RecordManagerTest extends TestCase
         record.putMeta("key", "value");
         recordManager.insert("path", record);
 
-        Record loadedRecord = recordManager.load("path");
+        Record loadedRecord = recordManager.select("path");
         assertEquals(record.getMeta("key"), loadedRecord.getMeta("key"));
     }
 
@@ -93,9 +93,9 @@ public class RecordManagerTest extends TestCase
 
         recordManager.insert("another", record);
 
-        assertNotNull(recordManager.load("/another"));
-        assertNotNull(recordManager.load("another"));
-        assertNotNull(recordManager.load("another/"));
+        assertNotNull(recordManager.select("/another"));
+        assertNotNull(recordManager.select("another"));
+        assertNotNull(recordManager.select("another/"));
     }
 
     public void testCopy()
@@ -104,10 +104,10 @@ public class RecordManagerTest extends TestCase
         original.put("key", "value");
 
         recordManager.insert("sourcePath", original);
-        assertNull(recordManager.load("destinationPath"));
+        assertNull(recordManager.select("destinationPath"));
         recordManager.copy("sourcePath", "destinationPath");
 
-        Record copy = recordManager.load("destinationPath");
+        Record copy = recordManager.select("destinationPath");
         assertNotNull(copy);
         assertEquals(original.get("key"), copy.get("key"));
 
@@ -115,7 +115,7 @@ public class RecordManagerTest extends TestCase
         original.put("anotherKey", "anotherValue");
         recordManager.insert("sourcePath", original);
 
-        copy = recordManager.load("destinationPath");
+        copy = recordManager.select("destinationPath");
         assertFalse(copy.containsKey("anotherKey"));
     }
 
@@ -129,7 +129,7 @@ public class RecordManagerTest extends TestCase
         // update the external record.
         original.put("key", "changedValue");
 
-        Record storedRecord = recordManager.load("path");
+        Record storedRecord = recordManager.select("path");
         assertEquals("value", storedRecord.get("key"));
     }
 
@@ -202,7 +202,7 @@ public class RecordManagerTest extends TestCase
     {
         try
         {
-            recordManager.loadAll(null, new HashMap<String, Record>());
+            recordManager.selectAll(null, new HashMap<String, Record>());
             fail();
         }
         catch (IllegalArgumentException e)
@@ -224,7 +224,7 @@ public class RecordManagerTest extends TestCase
     private void assertLoadedRecordCount(String path, int count)
     {
         Map<String, Record> records = new HashMap<String, Record>();
-        recordManager.loadAll(path, records);
+        recordManager.selectAll(path, records);
         assertEquals(count, records.size());
     }
 
@@ -232,7 +232,7 @@ public class RecordManagerTest extends TestCase
     {
         try
         {
-            recordManager.loadAll("", new HashMap<String, Record>());
+            recordManager.selectAll("", new HashMap<String, Record>());
             fail();
         }
         catch (IllegalArgumentException e)
@@ -245,7 +245,7 @@ public class RecordManagerTest extends TestCase
     {
         try
         {
-            recordManager.load("");
+            recordManager.select("");
             fail();
         }
         catch (IllegalArgumentException e)
@@ -258,7 +258,7 @@ public class RecordManagerTest extends TestCase
     {
         try
         {
-            recordManager.load(null);
+            recordManager.select(null);
             fail();
         }
         catch (IllegalArgumentException e)
@@ -284,7 +284,7 @@ public class RecordManagerTest extends TestCase
     {
         Record record = new MutableRecordImpl();
         recordManager.insert("testpath", record);
-        record = recordManager.load("testpath");
+        record = recordManager.select("testpath");
         assertEquals(1, record.getHandle());
     }
 
@@ -293,7 +293,7 @@ public class RecordManagerTest extends TestCase
         MutableRecord record = new MutableRecordImpl();
         record.put("nested", new MutableRecordImpl());
         recordManager.insert("testpath", record);
-        Record nested = recordManager.load("testpath/nested");
+        Record nested = recordManager.select("testpath/nested");
         assertEquals(2, nested.getHandle());
     }
 
@@ -301,8 +301,8 @@ public class RecordManagerTest extends TestCase
     {
         recordManager.insert("r1", new MutableRecordImpl());
         recordManager.insert("r2", new MutableRecordImpl());
-        long h1 = recordManager.load("r1").getHandle();
-        long h2 = recordManager.load("r2").getHandle();
+        long h1 = recordManager.select("r1").getHandle();
+        long h2 = recordManager.select("r2").getHandle();
         assertNotSame(h1, h2);
     }
 
@@ -316,7 +316,7 @@ public class RecordManagerTest extends TestCase
             {
                 String path = "i" + i + "j" + j;
                 recordManager.insert(path, new MutableRecordImpl());
-                long nextHandle = recordManager.load(path).getHandle();
+                long nextHandle = recordManager.select(path).getHandle();
                 assertNextHandle(nextHandle, handle);
                 handle = nextHandle;
             }
@@ -374,9 +374,9 @@ public class RecordManagerTest extends TestCase
         r.put("nested", new MutableRecordImpl());
         recordManager.insert("testpath", r);
 
-        Record record = recordManager.load("testpath");
+        Record record = recordManager.select("testpath");
         long outerHandle = record.getHandle();
-        record = recordManager.load("testpath/nested");
+        record = recordManager.select("testpath/nested");
         long innerHandle = record.getHandle();
         recordManager.delete("testpath");
 
@@ -393,7 +393,7 @@ public class RecordManagerTest extends TestCase
     
     private void assertHandleToPath(String path)
     {
-        assertEquals(path, recordManager.getPathForHandle(recordManager.load(path).getHandle()));
+        assertEquals(path, recordManager.getPathForHandle(recordManager.select(path).getHandle()));
     }
 
     private void assertNextHandle(long nextHandle, long handle)
@@ -412,11 +412,11 @@ public class RecordManagerTest extends TestCase
         assertEquals("value", moved.get("prop"));
 
         // Check we can load from move destination
-        moved = recordManager.load("newpath");
+        moved = recordManager.select("newpath");
         assertEquals("value", moved.get("prop"));
 
         // Check nothing at source
-        assertNull(recordManager.load("testpath"));
+        assertNull(recordManager.select("testpath"));
     }
 
     public void testMovePreservesHandle()
@@ -429,7 +429,7 @@ public class RecordManagerTest extends TestCase
         record = recordManager.move("testpath", "newpath");
         assertEquals(handle, record.getHandle());
 
-        record = recordManager.load("newpath");
+        record = recordManager.select("newpath");
         assertEquals(handle, record.getHandle());
     }
 
@@ -451,11 +451,11 @@ public class RecordManagerTest extends TestCase
         assertEquals(insertedNest.getHandle(), movedNest.getHandle());
         assertEquals("nestedval", movedNest.get("prop"));
 
-        Record loadedNest = recordManager.load("newpath/nested");
+        Record loadedNest = recordManager.select("newpath/nested");
         assertEquals(insertedNest.getHandle(), loadedNest.getHandle());
         assertEquals("nestedval", loadedNest.get("prop"));
 
-        assertNull(recordManager.load("testpath/nested"));
+        assertNull(recordManager.select("testpath/nested"));
     }
 
     public void testUpdateRemovesKeys()
@@ -468,7 +468,7 @@ public class RecordManagerTest extends TestCase
         record = new MutableRecordImpl();
         recordManager.update("path", record);
 
-        Record loaded = recordManager.load("path");
+        Record loaded = recordManager.select("path");
         assertEquals(0, loaded.size());
     }
 
@@ -483,7 +483,7 @@ public class RecordManagerTest extends TestCase
         record = new MutableRecordImpl();
         recordManager.update("path", record);
 
-        Record loaded = recordManager.load("path");
+        Record loaded = recordManager.select("path");
         assertEquals(1, loaded.size());
         assertNotNull(loaded.get("quux"));
     }

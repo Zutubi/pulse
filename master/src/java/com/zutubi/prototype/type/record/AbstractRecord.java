@@ -72,12 +72,12 @@ public abstract class AbstractRecord implements Record
             return false;
         }
 
-        if(!getSymbolicName().equals(other.getSymbolicName()))
+        if(getSymbolicName() != null && !getSymbolicName().equals(other.getSymbolicName()))
         {
             return false;
         }
 
-        if(keySet() != other.keySet())
+        if(keySet().size() != other.keySet().size())
         {
             return false;
         }
@@ -90,7 +90,7 @@ public abstract class AbstractRecord implements Record
             }
         }
 
-        if(metaKeySet() != other.metaKeySet())
+        if(metaKeySet().size() != other.metaKeySet().size())
         {
             return false;
         }

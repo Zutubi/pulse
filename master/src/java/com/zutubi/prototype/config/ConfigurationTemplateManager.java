@@ -64,7 +64,7 @@ public class ConfigurationTemplateManager
     public Record getRecord(String path)
     {
         checkPersistent(path);
-        Record record = recordManager.load(path);
+        Record record = recordManager.select(path);
         if (record != null)
         {
             record = templatiseRecord(path, record);
@@ -145,7 +145,7 @@ public class ConfigurationTemplateManager
         // Get the top-level template record for our parent and then
         // ask it for the property to get our parent template record.
         String owningPath = PathUtils.getPath(pathElements[0], pathElements[1]);
-        Record owningRecord = recordManager.load(owningPath);
+        Record owningRecord = recordManager.select(owningPath);
         if (owningRecord == null)
         {
             throw new IllegalArgumentException("Invalid path '" + PathUtils.getPath(pathElements) + "': owning record '" + owningPath + "' does not exist");
@@ -301,7 +301,7 @@ public class ConfigurationTemplateManager
             public boolean handle(TemplateNode templateNode)
             {
                 String descendentPath = PathUtils.getPath(pathElements[0], templateNode.getId(), remainderPath);
-                if (recordManager.load(descendentPath) == null)
+                if (recordManager.select(descendentPath) == null)
                 {
                     recordManager.insert(descendentPath, skeleton);
                     return true;
@@ -359,7 +359,7 @@ public class ConfigurationTemplateManager
         CompositeType type = (CompositeType) getType(path);
         if (type.hasInternalProperties())
         {
-            MutableRecord mutable = recordManager.load(path).copy(false);
+            MutableRecord mutable = recordManager.select(path).copy(false);
             for (TypeProperty property : type.getInternalProperties())
             {
                 try
@@ -449,7 +449,7 @@ public class ConfigurationTemplateManager
         {
             String path = scope.getScopeName();
             Type type = scope.getType();
-            Record topRecord = recordManager.load(path);
+            Record topRecord = recordManager.select(path);
 
             if (scope.isTemplated())
             {
@@ -566,7 +566,7 @@ public class ConfigurationTemplateManager
                 MapType type = (MapType) scope.getType();
                 String idProperty = type.getKeyProperty();
                 Map<String, Record> recordsByPath = new HashMap<String, Record>();
-                recordManager.loadAll(PathUtils.getPath(scope.getScopeName(), PathUtils.WILDCARD_ANY_ELEMENT), recordsByPath);
+                recordManager.selectAll(PathUtils.getPath(scope.getScopeName(), PathUtils.WILDCARD_ANY_ELEMENT), recordsByPath);
 
                 Map<Long, List<Record>> recordsByParent = new HashMap<Long, List<Record>>();
                 for (Map.Entry<String, Record> entry : recordsByPath.entrySet())
@@ -1198,7 +1198,7 @@ public class ConfigurationTemplateManager
     @SuppressWarnings({"unchecked"})
     public <T extends Configuration> T deepClone(T instance)
     {
-        Record record = recordManager.load(instance.getConfigurationPath());
+        Record record = recordManager.select(instance.getConfigurationPath());
         CompositeType type = typeRegistry.getType(instance.getClass());
         SimpleInstantiator instantiator = new SimpleInstantiator(configurationReferenceManager);
         try
