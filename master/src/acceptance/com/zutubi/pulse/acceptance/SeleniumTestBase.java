@@ -2,13 +2,18 @@ package com.zutubi.pulse.acceptance;
 
 import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.Selenium;
-import com.zutubi.pulse.acceptance.forms.AddProjectWizard;
-import com.zutubi.pulse.acceptance.forms.SelectTypeState;
+import com.zutubi.pulse.acceptance.forms.admin.AddProjectWizard;
+import com.zutubi.pulse.acceptance.forms.admin.SelectTypeState;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.webwork.mapping.Urls;
-import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.RandomUtils;
+import com.zutubi.util.StringUtils;
 import junit.framework.TestCase;
+
+import java.net.URL;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Vector;
 
 /**
  * Helper base class for web UI acceptance tests that use Selenium.
@@ -20,12 +25,25 @@ public class SeleniumTestBase extends TestCase
     protected String port;
     protected String baseUrl;
     protected String random;
+    protected XmlRpcHelper xmlRpcHelper;
+
+    public SeleniumTestBase()
+    {
+        super();
+    }
+    
+    public SeleniumTestBase(String baseUrl)
+    {
+        super();
+        this.baseUrl = baseUrl;
+    }
 
     protected void setUp() throws Exception
     {
         super.setUp();
 
         port = System.getProperty("pulse.port", "8080");
+        xmlRpcHelper = new XmlRpcHelper(new URL("http", "localhost", Integer.parseInt(port), "/xmlrpc"));
         baseUrl = "http://localhost:" + port + "/";
         urls = new Urls("");
         random = RandomUtils.randomString(10);
@@ -42,7 +60,7 @@ public class SeleniumTestBase extends TestCase
 
     private void login(String username, String password)
     {
-        goTo(Navigation.LOCATION_LOGIN);
+        goTo(urls.login());
         selenium.type("j_username", username);
         selenium.type("j_password", password);
         selenium.click("login");
@@ -55,29 +73,27 @@ public class SeleniumTestBase extends TestCase
 
     protected void goTo(String location)
     {
-        selenium.open(baseUrl + location);
+        selenium.open(StringUtils.join("/", true, baseUrl, location));
     }
 
     protected void assertElementPresent(String id)
     {
-        assertTrue(selenium.isElementPresent(id));
+        SeleniumUtils.assertElementPresent(selenium, id);
     }
 
     protected void assertTextPresent(String text)
     {
-        assertTrue(selenium.isTextPresent(text));
+        SeleniumUtils.assertTextPresent(selenium, text);
     }
 
     protected void assertLinkPresent(String id)
     {
-        assertTrue(CollectionUtils.contains(selenium.getAllLinks(), id));
+        SeleniumUtils.assertLinkPresent(selenium, id);
     }
 
     protected void assertFormFieldNotEmpty(String id)
     {
-        String value = selenium.getValue(id);
-        assertNotNull(value);
-        assertTrue(value.length() > 0);
+        SeleniumUtils.assertFormFieldNotEmpty(selenium, id);
     }
 
     protected void waitForElement(String id)
@@ -118,7 +134,7 @@ public class SeleniumTestBase extends TestCase
 
         AddProjectWizard.SvnState svnState = new AddProjectWizard.SvnState(selenium);
         svnState.waitFor();
-        svnState.nextFormElements("svn://localhost:3088/accept/trunk/triviant", null, null, null, null, null);
+        svnState.nextFormElements("svn://localhost:3088/accept/trunk/triviant", null, null, null, null, "CLEAN_CHECKOUT");
 
         SelectTypeState projectTypeState = new SelectTypeState(selenium);
         projectTypeState.waitFor();
@@ -133,8 +149,31 @@ public class SeleniumTestBase extends TestCase
         hierarchyPage.assertPresent();
     }
 
-    protected void ensureProject(String name, boolean template)
+    protected void ensureProject(String name) throws Exception
     {
+        xmlRpcHelper.loginAsAdmin();
+        try
+        {
+            xmlRpcHelper.ensureProject(name);
+        }
+        finally
+        {
+            xmlRpcHelper.logout();
+        }
+    }
 
+    protected String getNewestListItem(String labelsPath) throws Exception
+    {
+        Vector<String> labels = xmlRpcHelper.call("getConfigListing", labelsPath);
+        Collections.sort(labels, new Comparator<String>()
+        {
+            public int compare(String o1, String o2)
+            {
+                long h1 = Long.parseLong(o1);
+                long h2 = Long.parseLong(o2);
+                return (int) (h1 - h2);
+            }
+        });
+        return labels.get(labels.size() - 1);
     }
 }

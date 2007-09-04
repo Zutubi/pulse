@@ -16,8 +16,7 @@
             if(form.isValid())
             {
                 form.submit({
-                    clientValidation: true,
-                    waitMsg: 'Testing...'
+                    clientValidation: false
                 });
             }
         }

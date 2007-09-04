@@ -15,6 +15,8 @@ import java.util.List;
  */
 public interface ProjectManager extends EntityManager<Project>
 {
+    String GLOBAL_PROJECT_NAME = "global project template";
+
     Collection<ProjectConfiguration> getAllProjectConfigs(boolean allowInvalid);
 
     ProjectConfiguration getProjectConfig(String name, boolean allowInvalid);
@@ -104,16 +106,8 @@ public interface ProjectManager extends EntityManager<Project>
 
     void delete(BuildHostRequirements hostRequirements);
 
-    List<ProjectGroup> getAllProjectGroups();
-    List<ProjectGroup> getAllProjectGroupsCached();
-    ProjectGroup getProjectGroup(long id);
+    Collection<ProjectGroup> getAllProjectGroups();
     ProjectGroup getProjectGroup(String name);
 
-    @Secured({"ROLE_ADMINISTRATOR"})
-    void save(ProjectGroup projectGroup);
-
-    @Secured({"ROLE_ADMINISTRATOR"})
-    void delete(ProjectGroup projectGroup);
-
-    List<Project> mapConfigsToProjects(List<ProjectConfiguration> projects);
+    List<Project> mapConfigsToProjects(Collection<ProjectConfiguration> projects);
 }

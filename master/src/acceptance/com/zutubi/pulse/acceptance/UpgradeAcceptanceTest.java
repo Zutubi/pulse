@@ -29,13 +29,18 @@ import java.util.Properties;
 /**
  * <class-comment/>
  */
-public class UpgradeAcceptanceTest extends BaseAcceptanceTestCase
+public class UpgradeAcceptanceTest extends SeleniumTestBase
 {
     File dataArea = new File(TestUtils.getPulseRoot(), FileSystemUtils.composeFilename("master", "src", "acceptance", "data"));
     private File tmpDir = null;
     private DriverManagerDataSource dataSource = new DriverManagerDataSource();
     private String dialect = "org.hibernate.dialect.HSQLDialect";
     private String db;
+
+    public UpgradeAcceptanceTest()
+    {
+        super("http://localhost:8990");
+    }
 
     protected void setUp() throws Exception
     {
@@ -235,24 +240,23 @@ public class UpgradeAcceptanceTest extends BaseAcceptanceTestCase
 
         // now we need to go to the Web UI and wait.
 
-        getTestContext().setBaseUrl("http://localhost:8990");
-        beginAt("/");
+        goTo("/");
 
         // check that we have received the upgrade preview, and that the data is as expected.
         assertTextPresent("Upgrade Preview");
         assertTextPresent(build);
 
-        tester.submit("continue");
+        selenium.click("continue");
 
         // waiting..
         assertTextPresent("Upgrade Progress");
 
-        pauseWhileMetaRefreshActive();
+        SeleniumUtils.waitForElement(selenium, "upgrade.complete", 120000);
 
         assertTextPresent("Upgrade Complete");
         assertTextPresent("The upgrade has been successful");
 
-        clickLinkWithText("continue");
+        selenium.click("continue");
 
         ShutdownCommand shutdown = new ShutdownCommand();
         shutdown.setExitJvm(false);

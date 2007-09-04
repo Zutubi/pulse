@@ -93,17 +93,7 @@ public class MockProjectManager implements ProjectManager
         throw new RuntimeException("Method not implemented.");
     }
 
-    public List<ProjectGroup> getAllProjectGroups()
-    {
-        throw new RuntimeException("Method not implemented.");
-    }
-
-    public List<ProjectGroup> getAllProjectGroupsCached()
-    {
-        throw new RuntimeException("Method not yet implemented.");
-    }
-
-    public ProjectGroup getProjectGroup(long id)
+    public Collection<ProjectGroup> getAllProjectGroups()
     {
         throw new RuntimeException("Method not implemented.");
     }
@@ -113,17 +103,7 @@ public class MockProjectManager implements ProjectManager
         throw new RuntimeException("Method not implemented.");
     }
 
-    public void save(ProjectGroup projectGroup)
-    {
-        throw new RuntimeException("Method not implemented.");
-    }
-
-    public void delete(ProjectGroup projectGroup)
-    {
-        throw new RuntimeException("Method not implemented.");
-    }
-
-    public List<Project> mapConfigsToProjects(List<ProjectConfiguration> projects)
+    public List<Project> mapConfigsToProjects(Collection<ProjectConfiguration> projects)
     {
         throw new RuntimeException("Method not yet implemented.");
     }

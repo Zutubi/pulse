@@ -1,5 +1,6 @@
 package com.zutubi.pulse.web.rss;
 
+import com.opensymphony.util.TextUtils;
 import com.sun.syndication.feed.WireFeed;
 import com.sun.syndication.feed.module.content.ContentModule;
 import com.sun.syndication.feed.module.content.ContentModuleImpl;
@@ -21,6 +22,7 @@ import com.zutubi.pulse.search.SearchQuery;
 import com.zutubi.pulse.web.project.ProjectActionSupport;
 import com.zutubi.pulse.webwork.mapping.Urls;
 import com.zutubi.pulse.xwork.results.JITFeed;
+import com.zutubi.util.StringUtils;
 import org.hibernate.criterion.Expression;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
@@ -44,16 +46,16 @@ public class BuildResultsRssAction extends ProjectActionSupport
     private JITFeed feed;
 
     private long userId = -1;
-    private long groupId = -1;
+    private String groupName;
 
     public void setUserId(long userId)
     {
         this.userId = userId;
     }
 
-    public void setGroupId(long groupId)
+    public void setGroupName(String groupName)
     {
-        this.groupId = groupId;
+        this.groupName = groupName;
     }
 
     public JITFeed getFeed()
@@ -80,9 +82,9 @@ public class BuildResultsRssAction extends ProjectActionSupport
                 User u = userManager.getUser(userId);
                 feed = new BuildJITFeed(new UserDashboardTemplate(u));
             }
-            else if(groupId != -1)
+            else if(TextUtils.stringSet(groupName))
             {
-                ProjectGroup g = projectManager.getProjectGroup(groupId);
+                ProjectGroup g = projectManager.getProjectGroup(groupName);
                 feed = new BuildJITFeed(new ProjectGroupTemplate(g));
             }
             else
@@ -234,7 +236,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
                 return null;
             }
 
-            List<Project> projects = group.getProjects();
+            Collection<Project> projects = group.getProjects();
             if (projects.size() == 0)
             {
                 return null;
@@ -280,7 +282,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
 
         public String getUID()
         {
-            return "ProjectGroupTemplate." + ((group != null) ? group.getId() : "");
+            return "ProjectGroupTemplate." + ((group != null) ? StringUtils.uriComponentEncode(group.getName()) : "");
         }
     }
 

@@ -5,11 +5,12 @@ import com.zutubi.prototype.type.Extendable;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.core.config.NamedConfiguration;
 import com.zutubi.pulse.core.config.ResourceProperty;
+import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.model.ResourceRequirement;
+import com.zutubi.pulse.prototype.config.LabelConfiguration;
 import com.zutubi.pulse.prototype.config.project.actions.PostBuildActionConfiguration;
 import com.zutubi.pulse.prototype.config.project.changeviewer.ChangeViewerConfiguration;
 import com.zutubi.pulse.prototype.config.project.types.TypeConfiguration;
-import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.validation.annotations.Url;
 
 import java.util.HashMap;
@@ -47,6 +48,8 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
     private Map<String, BuildStageConfiguration> stages;
 
     private List<ResourceRequirement> requirements;
+
+    private List<LabelConfiguration> labels = new LinkedList<LabelConfiguration>();
 
     @Transient
     private Map<String, Object> extensions = new HashMap<String, Object>();
@@ -200,5 +203,15 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
     public void setChangeViewer(ChangeViewerConfiguration changeViewer)
     {
         this.changeViewer = changeViewer;
+    }
+
+    public List<LabelConfiguration> getLabels()
+    {
+        return labels;
+    }
+
+    public void setLabels(List<LabelConfiguration> labels)
+    {
+        this.labels = labels;
     }
 }

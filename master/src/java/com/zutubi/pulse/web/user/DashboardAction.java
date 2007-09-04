@@ -8,10 +8,7 @@ import com.zutubi.pulse.prototype.config.user.contacts.ContactConfiguration;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.web.ActionSupport;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Action to view the user's dashboard: their own Pulse "homepage".
@@ -22,7 +19,7 @@ public class DashboardAction extends ActionSupport
     private DashboardConfiguration dashboardConfig;
     private List<BuildResult> myBuilds;
     private List<Project> shownProjects;
-    private List<ProjectGroup> shownGroups;
+    private Collection<ProjectGroup> shownGroups;
     private List<Changelist> changelists;
     private List<Changelist> projectChangelists = null;
 
@@ -52,7 +49,7 @@ public class DashboardAction extends ActionSupport
         return shownProjects;
     }
 
-    public List<ProjectGroup> getShownGroups()
+    public Collection<ProjectGroup> getShownGroups()
     {
         return shownGroups;
     }
@@ -104,17 +101,28 @@ public class DashboardAction extends ActionSupport
 
         if(dashboardConfig.isShowAllProjects())
         {
-            shownProjects = projectManager.getProjects(false);
+            shownProjects = new LinkedList<Project>(projectManager.getProjects(false));
         }
         else
         {
             shownProjects = projectManager.mapConfigsToProjects(dashboardConfig.getShownProjects());
         }
         
-//        Collections.sort(shownProjects, new NamedEntityComparator());
+        Collections.sort(shownProjects, new NamedEntityComparator());
 
-        shownGroups = new ArrayList<ProjectGroup>(user.getShownGroups());
-        Collections.sort(shownGroups, new NamedEntityComparator());
+        if (dashboardConfig.isShowAllGroups())
+        {
+            shownGroups = projectManager.getAllProjectGroups();
+        }
+        else
+        {
+            List<String> groupNames = dashboardConfig.getShownGroups();
+            shownGroups = new ArrayList<ProjectGroup>(groupNames.size());
+            for(String groupName: groupNames)
+            {
+                shownGroups.add(projectManager.getProjectGroup(groupName));
+            }
+        }
 
         changelists = buildManager.getLatestChangesForUser(user, dashboardConfig.getMyChangeCount());
         Collections.sort(changelists, new ChangelistComparator());

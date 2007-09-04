@@ -4,7 +4,9 @@ import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.i18n.Messages;
+import com.zutubi.prototype.freemarker.BaseNameMethod;
 import com.zutubi.prototype.freemarker.GetTextMethod;
+import com.zutubi.prototype.freemarker.ValidIdMethod;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.bootstrap.ComponentContext;
@@ -74,6 +76,8 @@ public abstract class PrototypeDirective extends AbstractDirective
         Map<String, Object> context = new HashMap<String, Object>();
         Messages messages = Messages.getInstance(clazz);
         context.put("i18nText", new GetTextMethod(messages));
+        context.put("baseName", new BaseNameMethod());
+        context.put("validId", new ValidIdMethod());
 
         // validation support:
         OgnlValueStack stack = ActionContext.getContext().getValueStack();
@@ -81,6 +85,8 @@ public abstract class PrototypeDirective extends AbstractDirective
 
         // provide some syntactic sweetener by linking the i18n text method to the ?i18n builtin function.
         DelegateBuiltin.conditionalRegistration("i18n", "i18nText");
+        DelegateBuiltin.conditionalRegistration("baseName", "baseName");
+        DelegateBuiltin.conditionalRegistration("id", "validId");
         return context;
     }
 }

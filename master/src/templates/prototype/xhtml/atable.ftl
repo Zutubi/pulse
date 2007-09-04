@@ -12,26 +12,30 @@
     </tr>
 <#if data?exists && data?size &gt; 0>
 <#list data as item>
-    <tr>
+    <#assign rawId = "item:${baseName(item)}"/>
+    <tr id="${rawId?id}">
 <#list table.columns as column>
     <#assign value = column.getValue(item)/>
-        <td class="content">${value?string}</td>
+        <td class="content">${value?string?html}</td>
 </#list>
         <td class="content" width="5%">
 <#list table.getActions(item) as action>
-    <#assign actionlabel>${action}.label</#assign>
+    <#assign actionlabel = "${action}.label"/>
+    <#assign actionId = "${action}:${baseName(item)}"/>
+    <a id="${actionId?id}"
 <#if action == "edit">
     <#if embedded>
         <#assign clickAction = "edit"/>
     <#else>
         <#assign clickAction = "select"/>
     </#if>
-    <a onclick="${clickAction}Path('${item.configurationPath}'); return false">${"edit.label"?i18n}</a>
+        onclick="${clickAction}Path('${item.configurationPath}'); return false">${"edit.label"?i18n}
 <#elseif action == "delete">
-        <a onclick="deletePath('${item.configurationPath}'); return false;">${"delete.label"?i18n}</a>
+         onclick="deletePath('${item.configurationPath}'); return false;">${"delete.label"?i18n}
 <#else>
-        <a onclick="actionPath('${item.configurationPath}?${action}'); return false;">${actionlabel?i18n}</a>
+         onclick="actionPath('${item.configurationPath}?${action}'); return false;">${actionlabel?i18n}
 </#if>
+    </a>
 </#list>
         </td>
     </tr>
@@ -42,6 +46,6 @@
     </tr>
 </#if>
     <tr>
-        <td class="content" colspan="${tablewidth}"><a onclick="addToPath('${path}'); return false;">${"add.label"?i18n}</a></td>
+        <td class="content" colspan="${tablewidth}"><a id="map:add" onclick="addToPath('${path}'); return false;">${"add.label"?i18n}</a></td>
     </tr>
 </table>

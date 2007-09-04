@@ -189,7 +189,7 @@ public class DefaultUserManager implements UserManager, ConfigurationInjector.Co
         return number;
     }
 
-    public Set<Project> getUserProjects(User user, ProjectManager projectManager)
+    public Set<Project> getUserProjects(User user, final ProjectManager projectManager)
     {
         Set<Project> projects = new HashSet<Project>();
         DashboardConfiguration dashboardConfig = user.getConfig().getPreferences().getDashboard();
@@ -200,9 +200,11 @@ public class DefaultUserManager implements UserManager, ConfigurationInjector.Co
         else
         {
             projects.addAll(projectManager.mapConfigsToProjects(dashboardConfig.getShownProjects()));
-            for(ProjectGroup g: user.getShownGroups())
+            List<String> groupNames = user.getPreferences().getDashboard().getShownGroups();
+            for(String groupName: groupNames)
             {
-                projects.addAll(g.getProjects());
+                ProjectGroup group = projectManager.getProjectGroup(groupName);
+                projects.addAll(group.getProjects());
             }
         }
 

@@ -1,36 +1,29 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.core.model.Entity;
-
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Collection;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * A logical grouping of projects, used to organise projects in the UI.
+ * Assembled by observing project labels.
  */
-public class ProjectGroup extends Entity implements NamedEntity
+public class ProjectGroup
 {
     /**
      * A descriptive name for the group.
      */
     private String name;
-    private List<Project> projects;
-
-    public ProjectGroup()
-    {
-        projects = new LinkedList<Project>();
-    }
+    /**
+     * Projects in the group, sorted by name.  Projects are looked up and
+     * populated on demand.
+     */
+    private Set<Project> projects;
 
     public ProjectGroup(String name)
     {
-        this();
         this.name = name;
-    }
-
-    public ProjectGroup(String name, List<Project> projects)
-    {
-        this(name);
-        this.projects = projects;
+        projects = new TreeSet<Project>(new NamedEntityComparator());
     }
 
     public String getName()
@@ -38,30 +31,25 @@ public class ProjectGroup extends Entity implements NamedEntity
         return name;
     }
 
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
-    public List<Project> getProjects()
+    public Collection<Project> getProjects()
     {
         return projects;
     }
 
-    public void setProjects(List<Project> projects)
+    void add(Project project)
     {
-        this.projects = projects;
+        projects.add(project);
     }
 
-    public void add(Project project)
+    void addAll(Collection<Project> projects)
     {
-        if(!projects.contains(project))
+        for(Project p: projects)
         {
-            projects.add(project);
+            add(p);
         }
     }
 
-    public boolean remove(Project project)
+    boolean remove(Project project)
     {
         return projects.remove(project);
     }

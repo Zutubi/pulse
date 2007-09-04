@@ -55,17 +55,6 @@ public class User extends Entity
     private String password;
 
     /**
-     * Set of projects the user wants to show on their dashboard.  Ignored
-     * when PROPERTY_SHOW_ALL_PROJECTS is true.
-     */
-    private Set<Project> shownProjects = new HashSet<Project>();
-
-    /**
-     * Set of project groups the user wants to show on their dashboard.
-     */
-    private Set<ProjectGroup> shownGroups = new HashSet<ProjectGroup>();
-
-    /**
      * Authorities granted directly to this user.  Authorities may also be
      * granted via the user's groups.
      */
@@ -185,16 +174,6 @@ public class User extends Entity
     public boolean hasAuthority(String authority)
     {
         return getGrantedAuthorities().contains(authority);
-    }
-
-    public Set<ProjectGroup> getShownGroups()
-    {
-        return shownGroups;
-    }
-
-    public void setShownGroups(Set<ProjectGroup> shownGroups)
-    {
-        this.shownGroups = shownGroups;
     }
 
     public void setProperties(Map<String, String> props)

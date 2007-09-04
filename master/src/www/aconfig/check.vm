@@ -1,22 +1,55 @@
 #if ($config.configurationCheckAvailable)
-<div class="frame">
+<div id="check.frame" class="frame">
     #i18nexists("key=test.heading")<h3 class="config-header">#i18n("key=test.heading")</h3>#end
     #i18nexists("key=test.description")<p class="config-description">#i18n("key=test.description")</p>#end
+    <p class="config-check-result" id="check.result" style="display: none">
+    </p>
     <div class="config-form-container">
         #checkform("path=$config.path" "mainFormName=mainform" "checkFormName=checkform" "namespace=aconfig")
     </div>
     <script type="text/javascript">
+        ## Used for Selenium testing
+        checkComplete = false;
+        checkOK = true;
+
+        var frameEl = Ext.get('check.frame');
+        var checkEl = Ext.get('check.result');
+        checkEl.enableDisplayMode();
+        
+        checkform.on('beforeaction', function(form, action)
+        {
+            checkComplete = false;
+            frameEl.mask('Checking configuration...');
+            return true;
+        });
+
         checkform.on('actioncomplete', function(form, action)
         {
-            if(action.result.success)
+            frameEl.unmask();
+            checkEl.setVisible(true, true);
+            checkEl.update(action.result.panel, true);
+            checkOK = action.result.checkSucceeded;
+            checkComplete = true;
+        });
+
+        checkform.on('actionfailed', function(form, action)
+        {
+            frameEl.unmask();
+
+            var message;
+            if(action.failureType == Ext.form.Action.SERVER_INVALID)
             {
-                Ext.get('check.result').update(action.result.panel, true);
+                message = 'unable to check configuration due to validation errors';
             }
             else
             {
-                console.dir(action.result);
-                alert('badness');
+                message = 'unable to contact Pulse to run check';
             }
+
+            checkEl.setVisible(true, true);
+            checkEl.update('<img src="$base/images/exclamation.gif" alt="error"/> <span class="config-check-failure">' + message + '</span>', true);
+            checkOK = false;
+            checkComplete = true;
         });
     </script>
 </div>

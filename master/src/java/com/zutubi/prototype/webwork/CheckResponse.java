@@ -34,6 +34,11 @@ public class CheckResponse
         return true;
     }
     
+    public boolean getCheckSucceeded()
+    {
+        return exception == null;
+    }
+
     public String getPanel()
     {
         String templateName;

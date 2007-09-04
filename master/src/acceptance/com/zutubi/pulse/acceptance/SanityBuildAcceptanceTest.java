@@ -1,7 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.pages.browse.ProjectsPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
+import com.zutubi.pulse.acceptance.pages.browse.ProjectsPage;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -20,7 +20,7 @@ public class SanityBuildAcceptanceTest extends SeleniumTestBase
     public void testSimpleBuild() throws InterruptedException, IOException, SAXException
     {
         loginAsAdmin();
-        goTo(Navigation.LOCATION_PROJECT_CONFIG);
+        goTo(urls.adminProjects());
         addProject(random);
 
         ProjectsPage projectsPage = new ProjectsPage(selenium, urls);

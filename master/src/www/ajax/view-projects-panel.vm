@@ -54,18 +54,6 @@
         #end
             </tr>
     #end
-#if($group)
-    #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
-            <tr>
-                <td class="add" colspan="$fullSpan">
-                    <a href="editProjectGroup!input.action?groupId=$group.id" id="edit_$!webwork.htmlEncode($group.name)"><img alt="edit" src="$base/images/pencil.gif"/> #wwtext("name=edit.project.group")</a>
-                    &nbsp;
-                    #set($confirm = $action.getText("project.group.confirm.delete", [ $group.name ]))
-                    <a href="#" id="delete_$!webwork.htmlEncode($group.name)" onclick="confirmUrl('$confirm', 'deleteProjectGroup.action?groupId=$group.id')"><img alt="$action.getText('delete')" src="$base/images/delete.gif"/> #wwtext("name=project.group.delete")</a>
-                </td>
-            </tr>
-    #end
-#end
         </table>
 #end
 

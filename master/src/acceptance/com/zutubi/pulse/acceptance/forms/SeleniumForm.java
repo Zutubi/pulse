@@ -33,6 +33,16 @@ public abstract class SeleniumForm
         this.ajax = ajax;
     }
 
+    public Selenium getSelenium()
+    {
+        return selenium;
+    }
+
+    public boolean isAjax()
+    {
+        return ajax;
+    }
+
     public void waitFor()
     {
         SeleniumUtils.waitForElement(selenium, getFormName());
@@ -56,7 +66,7 @@ public abstract class SeleniumForm
 
     private String getLocator(String rest)
     {
-        return "//td[@id='" + getFormName() + "']/form" + (rest == null ? "" : rest);
+        return "//*[@id='" + getFormName() + "']/form" + (rest == null ? "" : rest);
     }
 
     private String getFieldLocator(String name)
@@ -83,6 +93,18 @@ public abstract class SeleniumForm
     public String[] getSelectOptions(String name)
     {
         return selenium.getSelectOptions(getFieldLocator(name));
+    }
+
+    public String[] getComboBoxOptions(String name)
+    {
+        String js = "var result = function() { " +
+                        "var combo = selenium.browserbot.getCurrentWindow().Ext.getCmp('zfid." + name + "'); " +
+                        "var values = []; " +
+                        "combo.store.each(function(r) { values.push(r.get(combo.valueField)); }); " +
+                        "return values; " +
+                    "}(); " +
+                    "result";
+        return selenium.getEval(js).split(",");
     }
 
     public void submitFormElements(String id, String... args)
@@ -125,6 +147,74 @@ public abstract class SeleniumForm
         return selenium.getValue(getFieldLocator(name));
     }
 
+    public void setFormElement(String name, String value)
+    {
+        int type = getFieldType(name);
+        setFormElement(name, value, type);
+    }
+
+    private void setFormElement(String name, String value, int type)
+    {
+        String locator = getFieldLocator(name);
+        switch (type)
+        {
+            case TEXTFIELD:
+                if (value != null)
+                {
+                    selenium.type(locator, value);
+                }
+                break;
+            case COMBOBOX:
+                if (value != null)
+                {
+                    // Combos are custom ext widgets, so we just poke a
+                    // value into the underlying hidden input field.
+                    selenium.getEval("selenium.browserbot.getCurrentWindow().document.getElementById('" + name + "').value = '" + value + "';");
+                }
+                break;
+            case CHECKBOX:
+                if(Boolean.valueOf(value))
+                {
+                    selenium.check(locator);
+                }
+                else
+                {
+                    selenium.uncheck(locator);
+                }
+                break;
+            case RADIOBOX:
+                if (value != null)
+                {
+                    setRadioboxSelected(name, value);
+                }
+                break;
+            case MULTI_CHECKBOX:
+            case MULTI_SELECT:
+                if (value != null)
+                {
+                    setMultiValues(name, value);
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    private int getFieldType(String name)
+    {
+        int i;
+        String[] names = getFieldNames();
+        for(i = 0; i < names.length; i++)
+        {
+            if(names[i].equals(name))
+            {
+                break;
+            }
+        }
+
+        return getFieldTypes()[i];
+    }
+
     public void setFormElements(String... values)
     {
         int[] types = getFieldTypes();
@@ -132,49 +222,9 @@ public abstract class SeleniumForm
 
         for (int i = 0; i < types.length; i++)
         {
-            String locator = getFieldLocator(getFieldNames()[i]);
-            switch (types[i])
-            {
-                case TEXTFIELD:
-                    if (values[i] != null)
-                    {
-                        selenium.type(locator, values[i]);
-                    }
-                    break;
-                case COMBOBOX:
-                    if (values[i] != null)
-                    {
-                        // Combos are custom ext widgets, so we just poke a
-                        // value into the underlying hidden input field.
-                        selenium.getEval("selenium.browserbot.getCurrentWindow().document.getElementById('" + getFieldNames()[i] + "').value = '" + values[i] + "';");
-                    }
-                    break;
-                case CHECKBOX:
-                    if(Boolean.valueOf(values[i]))
-                    {
-                        selenium.check(locator);
-                    }
-                    else
-                    {
-                        selenium.uncheck(locator);
-                    }
-                    break;
-                case RADIOBOX:
-                    if (values[i] != null)
-                    {
-                        setRadioboxSelected(getFieldNames()[i], values[i]);
-                    }
-                    break;
-                case MULTI_CHECKBOX:
-                case MULTI_SELECT:
-                    if (values[i] != null)
-                    {
-                        setMultiValues(getFieldNames()[i], values[i]);
-                    }
-                    break;
-                default:
-                    break;
-            }
+            String name = getFieldNames()[i];
+            String value = values[i];
+            setFormElement(name, value, types[i]);
         }
     }
 

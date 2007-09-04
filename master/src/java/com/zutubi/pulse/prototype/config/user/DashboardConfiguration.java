@@ -1,9 +1,6 @@
 package com.zutubi.pulse.prototype.config.user;
 
-import com.zutubi.config.annotations.ControllingCheckbox;
-import com.zutubi.config.annotations.Form;
-import com.zutubi.config.annotations.Reference;
-import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.*;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 
@@ -24,11 +21,18 @@ public class DashboardConfiguration extends AbstractConfiguration
 
     @ControllingCheckbox(invert = true, dependentFields = {"shownProjects"})
     private boolean showAllProjects = true;
-    @Reference
     /**
      * Projects to show on the dashboard.
      */
+    @Reference
     private List<ProjectConfiguration> shownProjects = new LinkedList<ProjectConfiguration>();
+    @ControllingCheckbox(invert = true, dependentFields = {"shownGroups"})
+    private boolean showAllGroups = true;
+    /**
+     * Project groups to show on dashboard.
+     */
+    @Select(optionProvider = "com.zutubi.pulse.prototype.config.project.ProjectLabelOptionProvider")
+    private List<String> shownGroups = new LinkedList<String>();
 
     @ControllingCheckbox(dependentFields = {"myChangeCount"})
     private boolean showMyChanges = true;
@@ -72,6 +76,26 @@ public class DashboardConfiguration extends AbstractConfiguration
     public void setShownProjects(List<ProjectConfiguration> shownProjects)
     {
         this.shownProjects = shownProjects;
+    }
+
+    public boolean isShowAllGroups()
+    {
+        return showAllGroups;
+    }
+
+    public void setShowAllGroups(boolean showAllGroups)
+    {
+        this.showAllGroups = showAllGroups;
+    }
+
+    public List<String> getShownGroups()
+    {
+        return shownGroups;
+    }
+
+    public void setShownGroups(List<String> shownGroups)
+    {
+        this.shownGroups = shownGroups;
     }
 
     public boolean isShowMyChanges()

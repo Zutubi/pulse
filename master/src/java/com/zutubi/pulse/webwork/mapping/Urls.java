@@ -20,6 +20,11 @@ public class Urls
         this.baseUrl = baseUrl;
     }
 
+    public String login()
+    {
+        return baseUrl + "/login.action";
+    }
+    
     public String browse()
     {
         return baseUrl + "/browse/";
@@ -234,5 +239,20 @@ public class Urls
     public String agentInfo(Object agent)
     {
         return agent(agent) + "info/";
+    }
+
+    public String admin()
+    {
+        return baseUrl + "/admin/";
+    }
+
+    public String adminProjects()
+    {
+        return admin() + "projects/";
+    }
+
+    public String adminProject(String project)
+    {
+        return adminProjects() + project + "/";
     }
 }

@@ -19,8 +19,6 @@
 ## Outputs sitemesh content tags for the project links on the header bar
 ##
 #macro(projectTags $project)
-    <content tag="u_projectName">hello</content>
-    <content tag="h_projectName">$!webwork.htmlEncode($project.name)</content>
     <content tag="selectedTab">projects</content>
 #end
 

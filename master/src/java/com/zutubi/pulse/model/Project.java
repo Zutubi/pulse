@@ -12,7 +12,7 @@ import java.util.List;
  * 
  *
  */
-public class Project extends Entity implements AclObjectIdentity, AclObjectIdentityAware
+public class Project extends Entity implements AclObjectIdentity, AclObjectIdentityAware, NamedEntity
 {
     public enum State
     {

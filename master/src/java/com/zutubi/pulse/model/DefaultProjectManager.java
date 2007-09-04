@@ -10,6 +10,7 @@ import com.zutubi.pulse.cache.ehcache.CustomAclEntryCache;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseException;
+import com.zutubi.pulse.core.config.NamedConfigurationComparator;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.model.TestCaseIndex;
 import com.zutubi.pulse.core.scm.DelegateScmClientFactory;
@@ -20,15 +21,16 @@ import com.zutubi.pulse.events.build.PersonalBuildRequestEvent;
 import com.zutubi.pulse.license.LicenseManager;
 import com.zutubi.pulse.license.authorisation.AddProjectAuthorisation;
 import com.zutubi.pulse.model.persistence.ProjectDao;
-import com.zutubi.pulse.model.persistence.ProjectGroupDao;
 import com.zutubi.pulse.model.persistence.TestCaseIndexDao;
 import com.zutubi.pulse.personal.PatchArchive;
+import com.zutubi.pulse.prototype.config.LabelConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.project.types.TypeConfiguration;
 import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.scheduling.SchedulingException;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
+import com.zutubi.util.Sort;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.annotation.Secured;
 
@@ -44,10 +46,7 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
 
     public static final int DEFAULT_WORK_DIR_BUILDS = 10;
 
-    private static final String GLOBAL_PROJECT_NAME = "global project template";
-
     private ProjectDao projectDao;
-    private ProjectGroupDao projectGroupDao;
     private TestCaseIndexDao testCaseIndexDao;
     private Scheduler scheduler;
     private BuildManager buildManager;
@@ -55,7 +54,6 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
     private ChangelistIsolator changelistIsolator;
     private DelegateScmClientFactory scmClientManager;
     private LicenseManager licenseManager;
-    private UserManager userManager;
     private CustomAclEntryCache projectAclEntryCache;
 
     private ConfigurationProvider configurationProvider;
@@ -65,6 +63,7 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
     private Map<String, ProjectConfiguration> nameToConfig = new HashMap<String, ProjectConfiguration>();
     private Map<Long, ProjectConfiguration> idToConfig = new HashMap<Long, ProjectConfiguration>();
     private List<ProjectConfiguration> validConfigs = new LinkedList<ProjectConfiguration>();
+    private Map<String, Set<ProjectConfiguration>> labelToConfigs = new HashMap<String, Set<ProjectConfiguration>>();
 
     public void initialise()
     {
@@ -91,6 +90,7 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
                 nameToConfig.remove(instance.getName());
                 idToConfig.remove(instance.getProjectId());
                 validConfigs.remove(instance);
+                removeFromLabelMap(instance);
             }
 
             public void postSave(ProjectConfiguration instance)
@@ -101,6 +101,7 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
                 {
                     nameToConfig.remove(old.getName());
                     validConfigs.remove(old);
+                    removeFromLabelMap(old);
                 }
 
                 registerProjectConfig(instance);
@@ -142,6 +143,30 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
         if(configurationTemplateManager.isDeeplyValid(projectConfig.getConfigurationPath()))
         {
             validConfigs.add(projectConfig);
+
+            for(LabelConfiguration label: projectConfig.getLabels())
+            {
+                Set<ProjectConfiguration> projects = labelToConfigs.get(label.getLabel());
+                if(projects == null)
+                {
+                    projects = new TreeSet<ProjectConfiguration>(new NamedConfigurationComparator());
+                    labelToConfigs.put(label.getLabel(), projects);
+                }
+
+                projects.add(projectConfig);
+            }
+        }
+    }
+
+    private void removeFromLabelMap(ProjectConfiguration projectConfig)
+    {
+        for(LabelConfiguration label: projectConfig.getLabels())
+        {
+            Set<ProjectConfiguration> projects = labelToConfigs.get(label.getLabel());
+            if(projects != null)
+            {
+                projects.remove(projectConfig);
+            }
         }
     }
 
@@ -251,12 +276,6 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
             }
         }
         while(tests.size() > 0);
-
-        // cleanup the associated project groups.
-        for (ProjectGroup group: projectGroupDao.findByProject(entity))
-        {
-            group.remove(entity);
-        }
         
         projectDao.delete(entity);
     }
@@ -534,38 +553,40 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
         this.buildManager = buildManager;
     }
 
-    public List<ProjectGroup> getAllProjectGroups()
+    public Collection<ProjectGroup> getAllProjectGroups()
     {
-        return projectGroupDao.findAll();
-    }
+        final Comparator<String> cmp = new Sort.StringComparator();
+        Set<ProjectGroup> groups = new TreeSet<ProjectGroup>(new Comparator<ProjectGroup>()
+        {
+            public int compare(ProjectGroup o1, ProjectGroup o2)
+            {
+                return cmp.compare(o1.getName(), o2.getName());
+            }
+        });
 
-    public List<ProjectGroup> getAllProjectGroupsCached()
-    {
-        return projectGroupDao.findAllCached();
-    }
-
-    public ProjectGroup getProjectGroup(long id)
-    {
-        return projectGroupDao.findById(id);
+        for(Map.Entry<String, Set<ProjectConfiguration>> entry: labelToConfigs.entrySet())
+        {
+            ProjectGroup group = new ProjectGroup(entry.getKey());
+            group.addAll(mapConfigsToProjects(entry.getValue()));
+            groups.add(group);
+        }
+        
+        return groups;
     }
 
     public ProjectGroup getProjectGroup(String name)
     {
-        return projectGroupDao.findByName(name);
+        ProjectGroup group = new ProjectGroup(name);
+        Set<ProjectConfiguration> projects = labelToConfigs.get(name);
+        if(projects != null)
+        {
+            group.addAll(mapConfigsToProjects(projects));
+        }
+
+        return group;
     }
 
-    public void save(ProjectGroup projectGroup)
-    {
-        projectGroupDao.save(projectGroup);
-    }
-
-    @Secured({"ROLE_ADMINISTRATOR"})
-    public void delete(ProjectGroup projectGroup)
-    {
-        projectGroupDao.delete(projectGroup);
-    }
-
-    public List<Project> mapConfigsToProjects(List<ProjectConfiguration> projects)
+    public List<Project> mapConfigsToProjects(Collection<ProjectConfiguration> projects)
     {
         List<Project> result = new LinkedList<Project>();
         for(ProjectConfiguration config: projects)
@@ -598,16 +619,6 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
     public void setLicenseManager(LicenseManager licenseManager)
     {
         this.licenseManager = licenseManager;
-    }
-
-    public void setUserManager(UserManager userManager)
-    {
-        this.userManager = userManager;
-    }
-
-    public void setProjectGroupDao(ProjectGroupDao projectGroupDao)
-    {
-        this.projectGroupDao = projectGroupDao;
     }
 
     public void setTestCaseIndexDao(TestCaseIndexDao testCaseIndexDao)

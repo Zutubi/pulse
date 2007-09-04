@@ -1,6 +1,6 @@
 #set($config = $action.configuration)
 
-<h2>$!webwork.htmlEncode($config.displayName)</h2>
+<h2 id='#id("map:path:$config.path")'>#html($config.displayName)</h2>
 <p class="introduction">
     #i18n("key=introduction")
 </p>

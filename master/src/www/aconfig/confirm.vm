@@ -14,7 +14,7 @@
     #end
 #end
 
-<h2>#wwtext("name=confirm.delete")</h2>
+<h2 id='#id("delete:$path")'>#wwtext("name=confirm.delete")</h2>
 <p>
     #wwtext("name=confirm.delete.blurb")
 </p>
@@ -27,8 +27,8 @@
     #showTask($task "")
     <tr>
         <td class="submit" colspan="2">
-            <a href="#" onclick="runAjaxRequest('$base/aconfig/$path?delete=delete'); return false;"/>delete</a>
-            <a href="#" onclick="selectPath('$parentPath'); return false;"/>cancel</a>
+            <a href="#" id="confirm.delete" onclick="runAjaxRequest('$base/aconfig/$path?delete=delete'); return false;"/>delete</a>
+            <a href="#" id="cancel.delete" onclick="selectPath('$parentPath'); return false;"/>cancel</a>
         </td>
     </tr>
 </table>

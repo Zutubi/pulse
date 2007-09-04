@@ -924,6 +924,22 @@ table.template-actions
     font-size: 10px;
 }
 
+.config-check-result
+{
+    padding: 2px 8px 2px 8px;    
+}
+
+.config-check-success
+{
+    color: #383;
+}
+
+.config-check-failure
+{
+    color: #b22;
+    font-weight: bold;
+}
+
 .config-state-table
 {
     width:100%

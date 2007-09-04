@@ -1,15 +1,15 @@
 package com.zutubi.pulse.acceptance.forms;
 
-import net.sourceforge.jwebunit.WebTester;
+import com.thoughtworks.selenium.Selenium;
 
 /**
  * <class comment/>
  */
-public class SignupForm extends BaseForm
+public class SignupForm extends SeleniumForm
 {
-    public SignupForm(WebTester tester)
+    public SignupForm(Selenium selenium)
     {
-        super(tester);
+        super(selenium);
     }
 
     public String getFormName()

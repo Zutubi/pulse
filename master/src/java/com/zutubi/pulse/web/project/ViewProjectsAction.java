@@ -2,11 +2,9 @@ package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.prototype.config.user.UserSettingsConfiguration;
+import com.zutubi.util.Sort;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  *
@@ -47,8 +45,15 @@ public class ViewProjectsAction extends ProjectActionSupport
 
     public String execute()
     {
-        groups = projectManager.getAllProjectGroupsCached();
-        Collections.sort(groups, new NamedEntityComparator());
+        groups = new LinkedList<ProjectGroup>(projectManager.getAllProjectGroups());
+        final Comparator<String> comp = new Sort.StringComparator();
+        Collections.sort(groups, new Comparator<ProjectGroup>()
+        {
+            public int compare(ProjectGroup o1, ProjectGroup o2)
+            {
+                return comp.compare(o1.getName(), o2.getName());
+            }
+        });
 
         projects = getProjectManager().getProjects(false);
         for (Project p : projects)

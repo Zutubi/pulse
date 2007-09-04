@@ -173,25 +173,6 @@ This context requires:
         </property>
     </bean>
 
-    <bean id="projectGroupDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateProjectGroupDao">
-        <property name="sessionFactory">
-            <ref bean="sessionFactory"/>
-        </property>
-    </bean>
-    <bean id="projectGroupDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager">
-            <ref bean="transactionManager"/>
-        </property>
-        <property name="target">
-            <ref bean="projectGroupDaoTarget"/>
-        </property>
-        <property name="transactionAttributes">
-            <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
-            </props>
-        </property>
-    </bean>
-
     <bean id="projectAclDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateProjectAclDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>

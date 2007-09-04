@@ -1,8 +1,8 @@
 package com.zutubi.pulse.web.user;
 
-import com.zutubi.pulse.model.ProjectGroup;
-import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.prototype.config.user.DashboardConfiguration;
 import com.zutubi.pulse.security.AcegiUtils;
 
 /**
@@ -10,16 +10,17 @@ import com.zutubi.pulse.security.AcegiUtils;
  */
 public class HideDashboardGroupAction extends UserActionSupport
 {
-    private long id;
+    private String groupName;
+    private ConfigurationProvider configurationProvider;
 
-    public long getId()
+    public String getGroupName()
     {
-        return id;
+        return groupName;
     }
 
-    public void setId(long id)
+    public void setGroupName(String groupName)
     {
-        this.id = id;
+        this.groupName = groupName;
     }
 
     public String execute() throws Exception
@@ -34,13 +35,14 @@ public class HideDashboardGroupAction extends UserActionSupport
 
         User user = getUser();
 
-        ProjectGroup g = projectManager.getProjectGroup(id);
-        if(g != null)
-        {
-            user.getShownGroups().remove(g);
-        }
-
-        getUserManager().save(user);
+        DashboardConfiguration configuration = user.getPreferences().getDashboard();
+        configuration.getShownGroups().remove(groupName);
+        configurationProvider.save(configuration);
         return SUCCESS;
+    }
+
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    {
+        this.configurationProvider = configurationProvider;
     }
 }

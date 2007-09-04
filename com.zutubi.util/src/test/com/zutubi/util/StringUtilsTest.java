@@ -504,4 +504,247 @@ public class StringUtilsTest extends TestCase
             assertEquals(expectedRemainder, result[1]);
         }
     }
+
+    public void testIsAsciiLowerCaseLowBoundary()
+    {
+        assertTrue(StringUtils.isAsciiLowerCase('a'));
+    }
+
+    public void testIsAsciiLowerCaseMiddle()
+    {
+        assertTrue(StringUtils.isAsciiLowerCase('j'));
+    }
+
+    public void testIsAsciiLowerCaseHighBoundary()
+    {
+        assertTrue(StringUtils.isAsciiLowerCase('z'));
+    }
+
+    public void testIsAsciiLowerCasePunct()
+    {
+        assertFalse(StringUtils.isAsciiLowerCase(' '));
+    }
+
+    public void testIsAsciiLowerCaseUpper()
+    {
+        assertFalse(StringUtils.isAsciiLowerCase('A'));
+    }
+
+    public void testIsAsciiLowerCaseBelowLow()
+    {
+        assertFalse(StringUtils.isAsciiLowerCase('`'));
+    }
+
+    public void testIsAsciiLowerCaseAboveHigh()
+    {
+        assertFalse(StringUtils.isAsciiLowerCase('{'));
+    }
+
+    public void testIsAsciiUpperCaseLowBoundary()
+    {
+        assertTrue(StringUtils.isAsciiUpperCase('A'));
+    }
+
+    public void testIsAsciiUpperCaseMiddle()
+    {
+        assertTrue(StringUtils.isAsciiUpperCase('M'));
+    }
+
+    public void testIsAsciiUpperCaseHighBoundary()
+    {
+        assertTrue(StringUtils.isAsciiUpperCase('Z'));
+    }
+
+    public void testIsAsciiUpperCasePunct()
+    {
+        assertFalse(StringUtils.isAsciiUpperCase('.'));
+    }
+
+    public void testIsAsciiUpperCaseLower()
+    {
+        assertFalse(StringUtils.isAsciiUpperCase('d'));
+    }
+
+    public void testIsAsciiUpperCaseBelowLow()
+    {
+        assertFalse(StringUtils.isAsciiUpperCase('@'));
+    }
+    
+    public void testIsAsciiUpperCaseAboveHigh()
+    {
+        assertFalse(StringUtils.isAsciiUpperCase('['));
+    }
+
+    public void testIsAsciiDigitLowBoundary()
+    {
+        assertTrue(StringUtils.isAsciiDigit('0'));
+    }
+
+    public void testIsAsciiDigitMiddle()
+    {
+        assertTrue(StringUtils.isAsciiDigit('2'));
+    }
+
+    public void testIsAsciiDigitHighBoundary()
+    {
+        assertTrue(StringUtils.isAsciiDigit('9'));
+    }
+
+    public void testIsAsciiDigitRandom()
+    {
+        assertFalse(StringUtils.isAsciiDigit('j'));
+    }
+
+    public void testIsAsciiDigitPunct()
+    {
+        assertFalse(StringUtils.isAsciiDigit('!'));
+    }
+
+    public void testIsAsciiDigitBelowLow()
+    {
+        assertFalse(StringUtils.isAsciiDigit('/'));
+    }
+
+    public void testIsAsciiDigitAboveHigh()
+    {
+        assertFalse(StringUtils.isAsciiDigit(':'));
+    }
+
+    public void testIsAsciiAlphabeticalUpper()
+    {
+        assertTrue(StringUtils.isAsciiAlphabetical('A'));
+    }
+
+    public void testIsAsciiAlphabeticalLower()
+    {
+        assertTrue(StringUtils.isAsciiAlphabetical('z'));
+    }
+
+    public void testIsAsciiAlphabeticalBetween()
+    {
+        assertFalse(StringUtils.isAsciiAlphabetical('^'));
+    }
+
+    public void testIsAsciiAlphabeticalRandom()
+    {
+        assertFalse(StringUtils.isAsciiAlphabetical(' '));
+    }
+
+    public void testIsAsciiAlphaNumericUpper()
+    {
+        assertTrue(StringUtils.isAsciiAlphaNumeric('A'));
+    }
+
+    public void testIsAsciiAlphaNumericLower()
+    {
+        assertTrue(StringUtils.isAsciiAlphaNumeric('z'));
+    }
+
+    public void testIsAsciiAlphaNumericDigit()
+    {
+        assertTrue(StringUtils.isAsciiAlphaNumeric('0'));
+    }
+
+    public void testIsAsciiAlphaNumericBetween()
+    {
+        assertFalse(StringUtils.isAsciiAlphaNumeric('='));
+    }
+
+    public void testIsAsciiAlphaNumericRandom()
+    {
+        assertFalse(StringUtils.isAsciiAlphabetical('~'));
+    }
+
+    public void testIsHtmlNameStartLower()
+    {
+        assertTrue(StringUtils.isHtmlNameStartChar('a'));
+    }
+
+    public void testIsHtmlNameStartUpper()
+    {
+        assertTrue(StringUtils.isHtmlNameStartChar('G'));
+    }
+
+    public void testIsHtmlNameStartDigit()
+    {
+        assertFalse(StringUtils.isHtmlNameStartChar('0'));
+    }
+
+    public void testIsHtmlNameStartUnderScore()
+    {
+        assertFalse(StringUtils.isHtmlNameStartChar('_'));
+    }
+
+    public void testIsHtmlNameStartRandom()
+    {
+        assertFalse(StringUtils.isHtmlNameStartChar('&'));
+    }
+
+    public void testIsHtmlNameLower()
+    {
+        assertTrue(StringUtils.isHtmlNameChar('a'));
+    }
+
+    public void testIsHtmlNameUpper()
+    {
+        assertTrue(StringUtils.isHtmlNameChar('G'));
+    }
+
+    public void testIsHtmlNameDigit()
+    {
+        assertTrue(StringUtils.isHtmlNameChar('0'));
+    }
+
+    public void testIsHtmlNameAllowedPunct()
+    {
+        assertTrue(StringUtils.isHtmlNameChar('_'));
+        assertTrue(StringUtils.isHtmlNameChar('-'));
+        assertTrue(StringUtils.isHtmlNameChar('.'));
+        assertTrue(StringUtils.isHtmlNameChar(':'));
+    }
+
+    public void testIsHtmlNameRandom()
+    {
+        assertFalse(StringUtils.isHtmlNameChar('%'));
+    }
+
+    public void testToValidHtmlNameEmpty()
+    {
+        toValidHtmlNameHelper("a", "");
+    }
+
+    public void testToValidHtmlNameDigit()
+    {
+        toValidHtmlNameHelper("a0", "0");
+    }
+
+    public void testToValidHtmlNameInvalid()
+    {
+        toValidHtmlNameHelper("a.", "/");
+    }
+
+    public void testToValidHtmlNameLetter()
+    {
+        toValidHtmlNameHelper("b", "b");
+    }
+
+    public void testToValidHtmlNameValid()
+    {
+        toValidHtmlNameHelper("valid-id:here_0", "valid-id:here_0");
+    }
+
+    public void testToValidHtmlNameAllInvalid()
+    {
+        toValidHtmlNameHelper("a.....", "!@#$%");
+    }
+
+    public void testToValidHtmlNamePath()
+    {
+        toValidHtmlNameHelper("foo.bar.baz", "foo/bar/baz");
+    }
+
+    private void toValidHtmlNameHelper(String expected, String in)
+    {
+        assertEquals(expected, StringUtils.toValidHtmlName(in));
+    }
 }

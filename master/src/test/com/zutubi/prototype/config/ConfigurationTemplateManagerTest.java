@@ -649,6 +649,68 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         assertEmptyMap("sample");
     }
 
+    public void testDeleteListItem()
+    {
+        MockA a = new MockA("a");
+        MockD d1 = new MockD("d1");
+        MockD d2 = new MockD("d2");
+        a.getDs().add(d1);
+        a.getDs().add(d2);
+
+        String path = configurationTemplateManager.insert("sample", a);
+        a = configurationTemplateManager.getInstance(path, MockA.class);
+        assertEquals(2, a.getDs().size());
+        assertEquals("d1", a.getDs().get(0).getName());
+        assertEquals("d2", a.getDs().get(1).getName());
+
+        configurationTemplateManager.delete(a.getDs().get(0).getConfigurationPath());
+        a = configurationTemplateManager.getInstance(path, MockA.class);
+        assertEquals(1, a.getDs().size());
+        assertEquals("d2", a.getDs().get(0).getName());
+        
+        Record aRecord = configurationTemplateManager.getRecord(path);
+        Record dsRecord = (Record) aRecord.get("ds");
+        assertEquals(1, dsRecord.size());
+        Record d2Record = (Record) dsRecord.get(dsRecord.keySet().iterator().next());
+        assertEquals("d2", d2Record.get("name"));
+    }
+
+    public void testDeleteListItemFromTemplateChild() throws TypeException
+    {
+        MockA parent = new MockA("parent");
+        MockA child = new MockA("child");
+        MockD parentD = new MockD("pd");
+        MockD childD = new MockD("cd");
+        parent.getDs().add(parentD);
+        child.getDs().add(childD);
+
+        MutableRecord parentRecord = typeA.unstantiate(parent);
+        configurationTemplateManager.markAsTemplate(parentRecord);
+        String parentPath = configurationTemplateManager.insert("template", parent);
+
+        Record loadedParent = configurationTemplateManager.getRecord(parentPath);
+
+        MutableRecord childRecord = typeA.unstantiate(child);
+        configurationTemplateManager.setParentTemplate(childRecord, loadedParent.getHandle());
+        String childPath = configurationTemplateManager.insertRecord("template", childRecord);
+
+        child = configurationTemplateManager.getInstance(childPath, MockA.class);
+        assertEquals(2, child.getDs().size());
+        assertEquals("pd", child.getDs().get(0).getName());
+        assertEquals("cd", child.getDs().get(1).getName());
+
+        configurationTemplateManager.delete(child.getDs().get(1).getConfigurationPath());
+        child = configurationTemplateManager.getInstance(childPath, MockA.class);
+        assertEquals(1, child.getDs().size());
+        assertEquals("pd", child.getDs().get(0).getName());
+        
+        Record loadedChild = configurationTemplateManager.getRecord(childPath);
+        Record dsRecord = (Record) loadedChild.get("ds");
+        assertEquals(1, dsRecord.size());
+        Record d2Record = (Record) dsRecord.get(dsRecord.keySet().iterator().next());
+        assertEquals("pd", d2Record.get("name"));
+    }
+
     public void testPathExistsEmptyPath()
     {
         assertFalse(configurationTemplateManager.pathExists(""));

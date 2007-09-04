@@ -1,7 +1,7 @@
 package com.zutubi.util;
 
-import java.util.*;
 import java.io.PrintStream;
+import java.util.*;
 
 /**
  */
@@ -49,7 +49,7 @@ public class CollectionUtils
         return result.toArray(new String[result.size()]);
     }
 
-    public static <T, U> List<U> map(List<T> l, Mapping<T, U> m)
+    public static <T, U> List<U> map(Collection<T> l, Mapping<T, U> m)
     {
         List<U> result = new LinkedList<U>();
         map(l, m, result);

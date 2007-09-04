@@ -40,7 +40,7 @@ public class ProjectHierarchyPage extends SeleniumPage
 
     public String getUrl()
     {
-        return "/admin/projects/";
+        return urls.adminProjects();
     }
 
     public void clickAdd()

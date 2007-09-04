@@ -713,4 +713,137 @@ public class StringUtils
             return new String[]{token, remainder};
         }
     }
+
+    /**
+     * Converts the given string to a valid HTML name by replacing invalid
+     * name characters with periods ('.').  An 'a' character may also be
+     * prepended if the string does not start with an ASCII letter.  Note
+     * that this conversion is lossy: two input strings may result in the
+     * same output string (e.g. "a:b" and "a/b" both give "a:b").
+     *
+     * @param s input string to convert
+     * @return a valid HTML name string that resembles s as closely as
+     *         possible
+     */
+    public static String toValidHtmlName(String s)
+    {
+        StringBuilder sb = null;
+        if(s.length() == 0 || !isHtmlNameStartChar(s.charAt(0)))
+        {
+            sb = new StringBuilder(s.length() + 1);
+            sb.append('a');
+        }
+
+        for(int i = 0; i < s.length(); i++)
+        {
+            char c = s.charAt(i);
+            if(isHtmlNameChar(c))
+            {
+                if(sb != null)
+                {
+                    sb.append(c);
+                }
+            }
+            else
+            {
+                if(sb == null)
+                {
+                    sb = new StringBuilder(s.length());
+                    sb.append(s.substring(0, i));
+                }
+
+                sb.append('.');
+            }
+        }
+
+        if(sb == null)
+        {
+            return s;
+        }
+        else
+        {
+            return sb.toString();
+        }
+    }
+
+    /**
+     * @param c character to test
+     * @return true iff c is a valid first character for an HTML name
+     */
+    public static boolean isHtmlNameStartChar(char c)
+    {
+        return isAsciiAlphabetical(c);
+    }
+
+    /**
+     * @see #isHtmlNameStartChar
+     * @param c character to test
+     * @return true iff c is valid character for use in an HTML name (note
+     *         that the first character in the name is further restricted)
+     */
+    public static boolean isHtmlNameChar(char c)
+    {
+        if(isAsciiAlphaNumeric(c))
+        {
+            return true;
+        }
+        else
+        {
+            switch(c)
+            {
+                case '-':
+                case '_':
+                case ':':
+                case '.':
+                    return true;
+                default:
+                    return false;
+            }
+        }
+    }
+
+    /**
+     * @param c character to test
+     * @return true iff c is an ascii letter or digit (a-z, A-Z or 0-9).
+     */
+    public static boolean isAsciiAlphaNumeric(char c)
+    {
+        return isAsciiAlphabetical(c) || isAsciiDigit(c);
+    }
+
+    /**
+     * @param c character to test
+     * @return true iff c is an ascii letter (a-z or A-Z).
+     */
+    public static boolean isAsciiAlphabetical(char c)
+    {
+        return isAsciiLowerCase(c) || isAsciiUpperCase(c);
+    }
+
+    /**
+     * @param c character to test
+     * @return true iff c is an upper case ascii letter (a-z).
+     */
+    public static boolean isAsciiUpperCase(char c)
+    {
+        return c >= 'A' && c <= 'Z';
+    }
+
+    /**
+     * @param c character to test
+     * @return true iff c is a lower case ascii letter (a-z).
+     */
+    public static boolean isAsciiLowerCase(char c)
+    {
+        return c >= 'a' && c <= 'z';
+    }
+
+    /**
+     * @param c character to test
+     * @return true iff c is an ascii digit (0-9).
+     */
+    public static boolean isAsciiDigit(char c)
+    {
+        return c >= '0' && c <= '9';
+    }
 }
