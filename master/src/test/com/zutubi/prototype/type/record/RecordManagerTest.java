@@ -6,7 +6,6 @@ import junit.framework.TestCase;
 
 import java.io.File;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -202,7 +201,7 @@ public class RecordManagerTest extends TestCase
     {
         try
         {
-            recordManager.selectAll(null, new HashMap<String, Record>());
+            recordManager.selectAll(null);
             fail();
         }
         catch (IllegalArgumentException e)
@@ -223,8 +222,7 @@ public class RecordManagerTest extends TestCase
 
     private void assertLoadedRecordCount(String path, int count)
     {
-        Map<String, Record> records = new HashMap<String, Record>();
-        recordManager.selectAll(path, records);
+        Map<String, Record> records = recordManager.selectAll(path);
         assertEquals(count, records.size());
     }
 
@@ -232,7 +230,7 @@ public class RecordManagerTest extends TestCase
     {
         try
         {
-            recordManager.selectAll("", new HashMap<String, Record>());
+            recordManager.selectAll("");
             fail();
         }
         catch (IllegalArgumentException e)

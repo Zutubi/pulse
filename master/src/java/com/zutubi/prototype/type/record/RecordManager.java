@@ -20,21 +20,24 @@ public class RecordManager implements HandleAllocator
 {
     private static final long UNDEFINED = 0;
 
+    private RecordManagerState baseState = null;
+
     /**
      * The base record is the 'anchor' point for all of the records held in memory. All searches for
      * records start from here.
      */
-    private MutableRecord baseRecord;
-    
+//    private MutableRecord baseRecord;
+
     /**
      * Map of record handles to paths
      */
-    private Map<Long, String> handleToPathMap = new HashMap<Long, String>();
+//    private Map<Long, String> handleToPathMap = new HashMap<Long, String>();
 
     /**
      * The current highest handle allocated.
      */
     private AtomicLong nextHandle = new AtomicLong(UNDEFINED);
+    
     private RecordSerialiser recordSerialiser;
 
     public void init()
@@ -43,7 +46,8 @@ public class RecordManager implements HandleAllocator
         // the highest issued handle.
         
         final long[] highest = {0L};
-        baseRecord = recordSerialiser.deserialise("", new RecordHandler()
+        baseState = new RecordManagerState();
+        baseState.base = recordSerialiser.deserialise("", new RecordHandler()
         {
             public void handle(String path, Record record)
             {
@@ -53,7 +57,7 @@ public class RecordManager implements HandleAllocator
                     highest[0] = handle;
                 }
 
-                handleToPathMap.put(handle, path);
+                baseState.handleToPathMap.put(handle, path);
             }
         });
 
@@ -72,7 +76,7 @@ public class RecordManager implements HandleAllocator
      */
     public String getPathForHandle(long handle)
     {
-        return handleToPathMap.get(handle);
+        return baseState.getPathForHandle(handle);
     }
 
     /**
@@ -83,27 +87,7 @@ public class RecordManager implements HandleAllocator
      */
     public List<String> getAllPaths(String pattern)
     {
-        List<String> allPaths = new LinkedList<String>();
-        getAllPaths(baseRecord, PathUtils.getPathElements(pattern), 0, "", allPaths);
-        return allPaths;
-    }
-
-    private void getAllPaths(Record record, String[] elements, int pathIndex, String resolvedPath, List<String> paths)
-    {
-        if (pathIndex == elements.length)
-        {
-            paths.add(resolvedPath);
-        }
-        else
-        {
-            for (String key : record.nestedKeySet())
-            {
-                if (PathUtils.elementMatches(elements[pathIndex], key))
-                {
-                    getAllPaths((Record) record.get(key), elements, pathIndex + 1, PathUtils.getPath(resolvedPath, key), paths);
-                }
-            }
-        }
+        return baseState.getAllPaths(pattern);
     }
 
     /**
@@ -116,19 +100,7 @@ public class RecordManager implements HandleAllocator
     {
         checkPath(path);
 
-        String[] elements = PathUtils.getPathElements(path);
-        
-        Record record = baseRecord;
-        for (String pathElement : elements)
-        {
-            Object data = record.get(pathElement);
-            if (data == null || !(data instanceof Record))
-            {
-                return null;
-            }
-            record = (Record) data;
-        }
-        return record;
+        return baseState.select(path);
     }
 
     /**
@@ -136,32 +108,14 @@ public class RecordManager implements HandleAllocator
      * include wildcards.
      *
      * @param path    search path to use, may include wildcards
-     * @param records filled with a mapping from path to record for all
-     *                records that are stored at a path matching the search
-     *                path
+     * @return a map filled with a mapping from path to record for all records that are stored
+     *  at a path matching the search path
      */
-    public synchronized void selectAll(String path, Map<String, Record> records)
+    public synchronized Map<String, Record> selectAll(String path)
     {
         checkPath(path);
 
-        loadAll(baseRecord, PathUtils.getPathElements(path), 0, "", records);
-    }
-
-    private void loadAll(Record record, String[] elements, int pathIndex, String resolvedPath, Map<String, Record> records)
-    {
-        if (pathIndex == elements.length)
-        {
-            records.put(resolvedPath, record);
-            return;
-        }
-
-        for (String key : record.nestedKeySet())
-        {
-            if (PathUtils.elementMatches(elements[pathIndex], key))
-            {
-                loadAll((Record) record.get(key), elements, pathIndex + 1, PathUtils.getPath(resolvedPath, key), records);
-            }
-        }
+        return baseState.selectAll(PathUtils.getPathElements(path), 0, "");
     }
 
     /**
@@ -174,23 +128,35 @@ public class RecordManager implements HandleAllocator
     {
         checkPath(path);
 
-        return getRecord(PathUtils.getPathElements(path)) != null;
+        return baseState.getRecord(PathUtils.getPathElements(path)) != null;
+    }
+
+    private synchronized Object execute(Action action)
+    {
+        RecordManagerState newState = new RecordManagerState();
+        try
+        {
+            // start transaction
+            newState.base = baseState.base.copy(true);
+            newState.handleToPathMap = new HashMap<Long, String>(this.baseState.handleToPathMap);
+
+            return action.execute(newState);
+        }
+        finally
+        {
+            // end transaction
+            baseState = newState;
+
+            flush();
+        }
     }
 
     /**
-     * Inserts a new record at the given path.  No record should exist at
-     * that path, but the parent must exist.
-     *
-     * @param path      path to store the new record at
-     * @param newRecord the record value to store
-     * @return the newly-inserted record
+     * Flush in memory changes to disk.
      */
-    public synchronized Record insert(String path, Record newRecord)
+    private void flush()
     {
-        MutableRecord record = newRecord.copy(true);
-        allocateHandles(record);
-
-        return store(path, record);
+        recordSerialiser.serialise("", baseState.base, true);
     }
 
     private void allocateHandles(MutableRecord record)
@@ -205,68 +171,12 @@ public class RecordManager implements HandleAllocator
         }
     }
 
-    private Record store(String path, MutableRecord record)
-    {
-        checkPath(path);
-
-        String[] pathElements = PathUtils.getPathElements(path);
-        if (pathElements == null)
-        {
-            throw new IllegalArgumentException("Invalid path '" + path + "'");
-        }
-
-        MutableRecord parent = getRecord(PathUtils.getParentPathElements(pathElements));
-        if (parent == null)
-        {
-            throw new IllegalArgumentException("No parent record for path '" + path + "'");
-        }
-
-        // Save first before hooking up in memory
-        recordSerialiser.serialise(path, record, true);
-        parent.put(pathElements[pathElements.length - 1], record);
-
-        // We can't do this at handle allocation time as it needs to work
-        // when moving a record.
-        addToHandleMap(path, record);
-        return record;
-    }
-
-    private void addToHandleMap(String path, MutableRecord record)
-    {
-        handleToPathMap.put(record.getHandle(), path);
-        for (String key : record.nestedKeySet())
-        {
-            addToHandleMap(PathUtils.getPath(path, key), (MutableRecord) record.get(key));
-        }
-    }
-
     private void checkPath(String path)
     {
         if (path == null || path.equals(""))
         {
             throw new IllegalArgumentException("Invalid path '" + path + "'");
         }
-    }
-
-    private MutableRecord getRecord(String[] pathElements)
-    {
-        MutableRecord record = baseRecord;
-        for (String element : pathElements)
-        {
-            record = getChildRecord(record, element);
-        }
-
-        return record;
-    }
-
-    private MutableRecord getChildRecord(MutableRecord record, String element)
-    {
-        Object obj = record.get(element);
-        if (obj == null || !(obj instanceof MutableRecordImpl))
-        {
-            return null;
-        }
-        return (MutableRecordImpl) obj;
     }
 
     /**
@@ -281,44 +191,20 @@ public class RecordManager implements HandleAllocator
      */
     public synchronized Record update(String path, Record values)
     {
-        checkPath(path);
+        return (Record) execute(new UpdateAction(path, values));
+    }
 
-        String[] parentElements = PathUtils.getParentPathElements(path);
-        String baseName = PathUtils.getBaseName(path);
-
-        MutableRecord parentRecord = getRecord(parentElements);
-        if (parentRecord == null)
-        {
-            throw new IllegalArgumentException("No parent record for path '" + path + "'");
-        }
-
-        MutableRecord record = getChildRecord(parentRecord, baseName);
-        if (record == null)
-        {
-            throw new IllegalArgumentException("No record at path '" + path + "'");
-        }
-
-        // Create a new record to store the updates, and use it to replace
-        // the cached record.  The cached record is cut loose and will be
-        // collected when no longer in use.
-        MutableRecord copy = record.copy(false);
-        for (String key : values.simpleKeySet())
-        {
-            copy.put(key, values.get(key));
-        }
-
-        // Remove simple values not present in the input
-        for (String key : record.simpleKeySet())
-        {
-            if (values.get(key) == null)
-            {
-                copy.remove(key);
-            }
-        }
-
-        parentRecord.put(baseName, copy);
-        recordSerialiser.serialise(path, copy, false);
-        return copy;
+    /**
+     * Inserts a new record at the given path.  No record should exist at
+     * that path, but the parent must exist.
+     *
+     * @param path      path to store the new record at
+     * @param newRecord the record value to store
+     * @return the newly-inserted record
+     */
+    public synchronized Record insert(String path, Record newRecord)
+    {
+        return (Record) execute(new InsertAction(path, newRecord));
     }
 
     /**
@@ -351,33 +237,7 @@ public class RecordManager implements HandleAllocator
      */
     public synchronized Record delete(String path)
     {
-        checkPath(path);
-
-        MutableRecord parentRecord = getRecord(PathUtils.getParentPathElements(path));
-        if (parentRecord == null)
-        {
-            throw new IllegalArgumentException("No parent record for path '" + path + "'");
-        }
-
-        String baseName = PathUtils.getBaseName(path);
-        Object value = parentRecord.get(baseName);
-        if (value != null && value instanceof Record)
-        {
-            Record result = (Record) parentRecord.remove(baseName);
-            removeFromHandleMap(result);
-            recordSerialiser.delete(path);
-            return result;
-        }
-        return null;
-    }
-
-    private void removeFromHandleMap(Record record)
-    {
-        handleToPathMap.remove(record.getHandle());
-        for (String key : record.nestedKeySet())
-        {
-            removeFromHandleMap((Record) record.get(key));
-        }
+        return (Record) execute(new DeleteAction(path));
     }
 
     /**
@@ -416,7 +276,7 @@ public class RecordManager implements HandleAllocator
         Record record = delete(sourcePath);
         if (record != null)
         {
-            record = store(destinationPath, (MutableRecord) record);
+            record = (Record) execute(new InsertAction(destinationPath, record, false));
         }
         return record;
     }
@@ -424,5 +284,280 @@ public class RecordManager implements HandleAllocator
     public void setRecordSerialiser(RecordSerialiser recordSerialiser)
     {
         this.recordSerialiser = recordSerialiser;
+    }
+
+    private static interface Action
+    {
+        Object execute(RecordManagerState state);
+    }
+
+    private class InsertAction implements Action
+    {
+        private String path;
+        private Record newRecord;
+        private boolean allocateHandles;
+
+        public InsertAction(String path, Record newRecord)
+        {
+            this(path, newRecord, true);
+        }
+
+        public InsertAction(String path, Record newRecord, boolean allocateHandles)
+        {
+            this.path = path;
+            this.newRecord = newRecord;
+            this.allocateHandles = allocateHandles;
+        }
+
+        public Record execute(RecordManagerState state)
+        {
+            MutableRecord record = newRecord.copy(true);
+            if (allocateHandles)
+            {
+                allocateHandles(record);
+            }
+
+            return state.store(path, record);
+        }
+    }
+
+    private class UpdateAction implements Action
+    {
+        private String path;
+        private Record values;
+
+        public UpdateAction(String path, Record values)
+        {
+            this.path = path;
+            this.values = values;
+        }
+
+        public Record execute(RecordManagerState state)
+        {
+            checkPath(path);
+
+            return state.update(path, values);
+        }
+    }
+
+    private class DeleteAction implements Action
+    {
+        private String path;
+
+        public DeleteAction(String path)
+        {
+            this.path = path;
+        }
+
+        public Record execute(RecordManagerState state)
+        {
+            checkPath(path);
+
+            return state.remove(path);
+        }
+    }
+
+    /**
+     *
+     */
+    private class RecordManagerState
+    {
+        private MutableRecord base;
+        private Map<Long, String> handleToPathMap = new HashMap<Long, String>();
+
+        protected Record update(String path, Record values)
+        {
+            String[] parentElements = PathUtils.getParentPathElements(path);
+            String baseName = PathUtils.getBaseName(path);
+
+            MutableRecord parentRecord = getRecord(base, parentElements);
+            if (parentRecord == null)
+            {
+                throw new IllegalArgumentException("No parent record for path '" + path + "'");
+            }
+
+            MutableRecord record = getChildRecord(parentRecord, baseName);
+            if (record == null)
+            {
+                throw new IllegalArgumentException("No record at path '" + path + "'");
+            }
+
+            // Create a new record to store the updates, and use it to replace
+            // the cached record.  The cached record is cut loose and will be
+            // collected when no longer in use.
+            MutableRecord copy = record.copy(false);
+            for (String key : values.simpleKeySet())
+            {
+                copy.put(key, values.get(key));
+            }
+
+            // Remove simple values not present in the input
+            for (String key : record.simpleKeySet())
+            {
+                if (values.get(key) == null)
+                {
+                    copy.remove(key);
+                }
+            }
+            parentRecord.put(baseName, copy);
+            return copy;
+        }
+
+        protected Record remove(String path)
+        {
+            MutableRecord parentRecord = getRecord(PathUtils.getParentPathElements(path));
+            if (parentRecord == null)
+            {
+                throw new IllegalArgumentException("No parent record for path '" + path + "'");
+            }
+
+            String baseName = PathUtils.getBaseName(path);
+            Object value = parentRecord.get(baseName);
+            if (value != null && value instanceof Record)
+            {
+                Record result = (Record) parentRecord.remove(baseName);
+                removeFromHandleMap(result);
+                return result;
+            }
+            return null;
+        }
+
+        protected Record store(String path, MutableRecord record)
+        {
+            checkPath(path);
+
+            String[] pathElements = PathUtils.getPathElements(path);
+            if (pathElements == null)
+            {
+                throw new IllegalArgumentException("Invalid path '" + path + "'");
+            }
+
+            MutableRecord parent = getRecord(PathUtils.getParentPathElements(pathElements));
+            if (parent == null)
+            {
+                throw new IllegalArgumentException("No parent record for path '" + path + "'");
+            }
+
+            // Save first before hooking up in memory
+            parent.put(pathElements[pathElements.length - 1], record);
+
+            // We can't do this at handle allocation time as it needs to work
+            // when moving a record.
+            addToHandleMap(path, record);
+            return record;
+        }
+
+        protected Record select(String path)
+        {
+            String[] elements = PathUtils.getPathElements(path);
+
+            Record record = baseState.base;
+            for (String pathElement : elements)
+            {
+                Object data = record.get(pathElement);
+                if (data == null || !(data instanceof Record))
+                {
+                    return null;
+                }
+                record = (Record) data;
+            }
+            return record;
+        }
+
+        protected Map<String, Record> selectAll(String[] elements, int pathIndex, String resolvedPath)
+        {
+            Map<String, Record> records = new HashMap<String, Record>();
+            selectAll(base, elements, pathIndex, resolvedPath, records);
+            return records;
+        }
+
+        protected void selectAll(Record record, String[] elements, int pathIndex, String resolvedPath, Map<String, Record> records)
+        {
+            if (pathIndex == elements.length)
+            {
+                records.put(resolvedPath, record);
+                return;
+            }
+
+            for (String key : record.nestedKeySet())
+            {
+                if (PathUtils.elementMatches(elements[pathIndex], key))
+                {
+                    selectAll((Record) record.get(key), elements, pathIndex + 1, PathUtils.getPath(resolvedPath, key), records);
+                }
+            }
+        }
+
+        public List<String> getAllPaths(String pattern)
+        {
+            List<String> allPaths = new LinkedList<String>();
+            getAllPaths(baseState.base, PathUtils.getPathElements(pattern), 0, "", allPaths);
+            return allPaths;
+        }
+
+        private void getAllPaths(Record record, String[] elements, int pathIndex, String resolvedPath, List<String> paths)
+        {
+            if (pathIndex == elements.length)
+            {
+                paths.add(resolvedPath);
+            }
+            else
+            {
+                for (String key : record.nestedKeySet())
+                {
+                    if (PathUtils.elementMatches(elements[pathIndex], key))
+                    {
+                        getAllPaths((Record) record.get(key), elements, pathIndex + 1, PathUtils.getPath(resolvedPath, key), paths);
+                    }
+                }
+            }
+        }
+
+        public String getPathForHandle(long handle)
+        {
+            return handleToPathMap.get(handle);
+        }
+
+        private void addToHandleMap(String path, MutableRecord record)
+        {
+            handleToPathMap.put(record.getHandle(), path);
+            for (String key : record.nestedKeySet())
+            {
+                addToHandleMap(PathUtils.getPath(path, key), (MutableRecord) record.get(key));
+            }
+        }
+
+        protected void removeFromHandleMap(Record record)
+        {
+            handleToPathMap.remove(record.getHandle());
+            for (String key : record.nestedKeySet())
+            {
+                removeFromHandleMap((Record) record.get(key));
+            }
+        }
+
+        protected MutableRecord getRecord(String[] pathElements)
+        {
+            return getRecord(base, pathElements);
+        }
+
+        protected MutableRecord getRecord(MutableRecord record, String[] pathElements)
+        {
+            for (String element : pathElements)
+            {
+                record = getChildRecord(record, element);
+            }
+            return record;
+        }
+
+        protected MutableRecord getChildRecord(MutableRecord record, String element)
+        {
+            Object obj = record.get(element);
+            if (obj == null || !(obj instanceof MutableRecordImpl))
+            {
+                return null;
+            }
+            return (MutableRecordImpl) obj;
+        }
     }
 }

@@ -565,8 +565,8 @@ public class ConfigurationTemplateManager
             {
                 MapType type = (MapType) scope.getType();
                 String idProperty = type.getKeyProperty();
-                Map<String, Record> recordsByPath = new HashMap<String, Record>();
-                recordManager.selectAll(PathUtils.getPath(scope.getScopeName(), PathUtils.WILDCARD_ANY_ELEMENT), recordsByPath);
+                Map<String, Record> recordsByPath = recordManager.selectAll(PathUtils.getPath(scope.getScopeName(), PathUtils.WILDCARD_ANY_ELEMENT));
+
 
                 Map<Long, List<Record>> recordsByParent = new HashMap<Long, List<Record>>();
                 for (Map.Entry<String, Record> entry : recordsByPath.entrySet())
