@@ -20,18 +20,9 @@ public class RecordManager implements HandleAllocator
 {
     private static final long UNDEFINED = 0;
 
-    private RecordManagerState baseState = null;
+    private RecordManagerState readState;
 
-    /**
-     * The base record is the 'anchor' point for all of the records held in memory. All searches for
-     * records start from here.
-     */
-//    private MutableRecord baseRecord;
-
-    /**
-     * Map of record handles to paths
-     */
-//    private Map<Long, String> handleToPathMap = new HashMap<Long, String>();
+    private RecordManagerState writeState;
 
     /**
      * The current highest handle allocated.
@@ -46,8 +37,8 @@ public class RecordManager implements HandleAllocator
         // the highest issued handle.
         
         final long[] highest = {0L};
-        baseState = new RecordManagerState();
-        baseState.base = recordSerialiser.deserialise("", new RecordHandler()
+        readState = new RecordManagerState();
+        readState.base = recordSerialiser.deserialise("", new RecordHandler()
         {
             public void handle(String path, Record record)
             {
@@ -57,7 +48,7 @@ public class RecordManager implements HandleAllocator
                     highest[0] = handle;
                 }
 
-                baseState.handleToPathMap.put(handle, path);
+                readState.handleToPathMap.put(handle, path);
             }
         });
 
@@ -76,7 +67,7 @@ public class RecordManager implements HandleAllocator
      */
     public String getPathForHandle(long handle)
     {
-        return baseState.getPathForHandle(handle);
+        return readState.getPathForHandle(handle);
     }
 
     /**
@@ -87,7 +78,7 @@ public class RecordManager implements HandleAllocator
      */
     public List<String> getAllPaths(String pattern)
     {
-        return baseState.getAllPaths(pattern);
+        return readState.getAllPaths(pattern);
     }
 
     /**
@@ -100,7 +91,7 @@ public class RecordManager implements HandleAllocator
     {
         checkPath(path);
 
-        return baseState.select(path);
+        return readState.select(path);
     }
 
     /**
@@ -115,7 +106,7 @@ public class RecordManager implements HandleAllocator
     {
         checkPath(path);
 
-        return baseState.selectAll(PathUtils.getPathElements(path), 0, "");
+        return readState.selectAll(PathUtils.getPathElements(path), 0, "");
     }
 
     /**
@@ -128,35 +119,44 @@ public class RecordManager implements HandleAllocator
     {
         checkPath(path);
 
-        return baseState.getRecord(PathUtils.getPathElements(path)) != null;
+        return readState.getRecord(PathUtils.getPathElements(path)) != null;
     }
 
     private synchronized Object execute(Action action)
     {
-        RecordManagerState newState = new RecordManagerState();
+        writeState = new RecordManagerState(readState);
         try
         {
             // start transaction
-            newState.base = baseState.base.copy(true);
-            newState.handleToPathMap = new HashMap<Long, String>(this.baseState.handleToPathMap);
-
-            return action.execute(newState);
+            Object result = action.execute(writeState);
+            commit();
+            return result;
         }
-        finally
+        catch (RuntimeException e)
         {
-            // end transaction
-            baseState = newState;
-
-            flush();
+            rollback();
+            throw e;
         }
     }
 
-    /**
-     * Flush in memory changes to disk.
-     */
-    private void flush()
+    public void commit()
     {
-        recordSerialiser.serialise("", baseState.base, true);
+        if (writeState == null)
+        {
+            // nothing to commit.
+            return;
+        }
+
+        // Flush in memory changes to disk.
+        recordSerialiser.serialise("", writeState.base, true);
+
+        readState = writeState;
+        writeState = null;
+    }
+
+    public void rollback()
+    {
+        writeState = null;
     }
 
     private void allocateHandles(MutableRecord record)
@@ -191,6 +191,8 @@ public class RecordManager implements HandleAllocator
      */
     public synchronized Record update(String path, Record values)
     {
+        checkPath(path);
+
         return (Record) execute(new UpdateAction(path, values));
     }
 
@@ -204,6 +206,8 @@ public class RecordManager implements HandleAllocator
      */
     public synchronized Record insert(String path, Record newRecord)
     {
+        checkPath(path);
+
         return (Record) execute(new InsertAction(path, newRecord));
     }
 
@@ -237,6 +241,8 @@ public class RecordManager implements HandleAllocator
      */
     public synchronized Record delete(String path)
     {
+        checkPath(path);
+        
         return (Record) execute(new DeleteAction(path));
     }
 
@@ -276,6 +282,7 @@ public class RecordManager implements HandleAllocator
         Record record = delete(sourcePath);
         if (record != null)
         {
+            checkPath(destinationPath);
             record = (Record) execute(new InsertAction(destinationPath, record, false));
         }
         return record;
@@ -334,7 +341,6 @@ public class RecordManager implements HandleAllocator
 
         public Record execute(RecordManagerState state)
         {
-            checkPath(path);
 
             return state.update(path, values);
         }
@@ -351,8 +357,6 @@ public class RecordManager implements HandleAllocator
 
         public Record execute(RecordManagerState state)
         {
-            checkPath(path);
-
             return state.remove(path);
         }
     }
@@ -362,8 +366,27 @@ public class RecordManager implements HandleAllocator
      */
     private class RecordManagerState
     {
+        /**
+         * The base record is the 'anchor' point for all of the records held in memory. All searches for
+         * records start from here.
+         */
         private MutableRecord base;
-        private Map<Long, String> handleToPathMap = new HashMap<Long, String>();
+
+        /**
+         * Map of record handles to paths
+         */
+        private Map<Long, String> handleToPathMap;
+
+        public RecordManagerState()
+        {
+            handleToPathMap = new HashMap<Long, String>();
+        }
+
+        public RecordManagerState(RecordManagerState otherState)
+        {
+            this.base = otherState.base.copy(true);
+            this.handleToPathMap  = new HashMap<Long, String>(otherState.handleToPathMap);
+        }
 
         protected Record update(String path, Record values)
         {
@@ -424,8 +447,6 @@ public class RecordManager implements HandleAllocator
 
         protected Record store(String path, MutableRecord record)
         {
-            checkPath(path);
-
             String[] pathElements = PathUtils.getPathElements(path);
             if (pathElements == null)
             {
@@ -451,7 +472,7 @@ public class RecordManager implements HandleAllocator
         {
             String[] elements = PathUtils.getPathElements(path);
 
-            Record record = baseState.base;
+            Record record = this.base;
             for (String pathElement : elements)
             {
                 Object data = record.get(pathElement);
@@ -467,7 +488,7 @@ public class RecordManager implements HandleAllocator
         protected Map<String, Record> selectAll(String[] elements, int pathIndex, String resolvedPath)
         {
             Map<String, Record> records = new HashMap<String, Record>();
-            selectAll(base, elements, pathIndex, resolvedPath, records);
+            selectAll(this.base, elements, pathIndex, resolvedPath, records);
             return records;
         }
 
@@ -491,7 +512,7 @@ public class RecordManager implements HandleAllocator
         public List<String> getAllPaths(String pattern)
         {
             List<String> allPaths = new LinkedList<String>();
-            getAllPaths(baseState.base, PathUtils.getPathElements(pattern), 0, "", allPaths);
+            getAllPaths(this.base, PathUtils.getPathElements(pattern), 0, "", allPaths);
             return allPaths;
         }
 
@@ -538,7 +559,7 @@ public class RecordManager implements HandleAllocator
 
         protected MutableRecord getRecord(String[] pathElements)
         {
-            return getRecord(base, pathElements);
+            return getRecord(this.base, pathElements);
         }
 
         protected MutableRecord getRecord(MutableRecord record, String[] pathElements)
