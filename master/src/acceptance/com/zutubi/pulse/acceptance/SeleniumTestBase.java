@@ -55,6 +55,7 @@ public class SeleniumTestBase extends TestCase
     {
         selenium.stop();
         selenium = null;
+        xmlRpcHelper = null;
         super.tearDown();
     }
 
@@ -64,6 +65,7 @@ public class SeleniumTestBase extends TestCase
         selenium.type("j_username", username);
         selenium.type("j_password", password);
         selenium.click("login");
+        selenium.waitForPageToLoad("30000");
     }
 
     protected void loginAsAdmin()

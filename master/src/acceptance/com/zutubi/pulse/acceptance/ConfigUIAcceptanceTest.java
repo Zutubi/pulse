@@ -84,7 +84,6 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         form.setFormElement("url", "svn://localhost:9999/foo");
         CheckForm checkForm = new CheckForm(form);
         checkForm.checkAndAssertResult(false, "Connection refused: connect");
-        assertTextPresent("url requires a value");
     }
 
     public void testCheckFormValidationFailure() throws Exception
@@ -97,6 +96,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         form.setFormElement("url", "");
         CheckForm checkForm = new CheckForm(form);
         checkForm.checkAndAssertResult(false, "unable to check configuration due to validation errors");
+        assertTextPresent("url requires a value");
     }
 
     public void testCheckFormCheckFieldValidationFailure() throws Exception

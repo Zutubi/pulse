@@ -143,16 +143,8 @@
                   :: <a href="$urls.stageDetails($u_projectName, $buildNumber, $u_stageName)">stage $h_stageName</a>
     #end
 #end
-#if($agentName)
-    #if($agentId && $agentId != "0")
-        #set($args = "?agentId=$agentId")
-    #else
-        #set($args = "")
-    #end
-                  <a href="$base/viewAgentStatus.action${args}">$agentName</a>
-#end
-#if($resourceId && $resourceId != "0")
-                  :: <a href="$base/viewResource.action?resourceId=${resourceId}">$resourceName</a>
+#if($u_agentName)
+                  <a href="$urls.agentStatus($u_agentName)">$h_agentName</a>
 #end
               </td>
               <td class="user" align="right">
@@ -184,7 +176,7 @@
 #end
         <li><a #if($selectedTab && $selectedTab == "projects")       class="active" #end id="tab.projects" href="$base/browse/">browse</a></li>
         <li><a #if($selectedTab && $selectedTab == "queues")         class="active" #end id="tab.queues" href="$base/viewServerQueues.action">queues</a></li>
-        <li><a #if($selectedTab && $selectedTab == "agents")         class="active" #end id="tab.agents" href="$base/viewAgents.action">agents</a></li>
+        <li><a #if($selectedTab && $selectedTab == "agents")         class="active" #end id="tab.agents" href="$base/agents/">agents</a></li>
         #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
         <li><a #if($selectedTab && $selectedTab == "administration") class="active" #end id="tab.administration" href="$base/admin/projects/">administration</a></li>
         #end

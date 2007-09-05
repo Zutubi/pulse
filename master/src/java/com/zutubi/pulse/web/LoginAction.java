@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web;
 
-import com.zutubi.util.logging.Logger;
 import com.opensymphony.xwork.ActionContext;
+import com.zutubi.util.logging.Logger;
 import org.acegisecurity.AuthenticationException;
 import org.acegisecurity.ui.AbstractProcessingFilter;
 
