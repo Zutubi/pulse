@@ -85,7 +85,7 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
                 registerProjectConfig(instance);
             }
 
-            public void preDelete(ProjectConfiguration instance)
+            public void postDelete(ProjectConfiguration instance)
             {
                 nameToConfig.remove(instance.getName());
                 idToConfig.remove(instance.getProjectId());
@@ -166,6 +166,10 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
             if(projects != null)
             {
                 projects.remove(projectConfig);
+                if(projects.size() == 0)
+                {
+                    labelToConfigs.remove(label.getLabel());
+                }
             }
         }
     }

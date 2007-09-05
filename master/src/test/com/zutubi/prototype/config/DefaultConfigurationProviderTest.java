@@ -2,9 +2,9 @@ package com.zutubi.prototype.config;
 
 import com.zutubi.config.annotations.ID;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.prototype.config.events.PostDeleteEvent;
 import com.zutubi.prototype.config.events.PostInsertEvent;
 import com.zutubi.prototype.config.events.PostSaveEvent;
-import com.zutubi.prototype.config.events.PreDeleteEvent;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.MapType;
 import com.zutubi.prototype.type.TemplatedMapType;
@@ -82,7 +82,7 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
 
         // check the delete events.
         configurationTemplateManager.delete("sample/a");
-        listener.assertNextEvent(PreDeleteEvent.class, "sample/a");
+        listener.assertNextEvent(PostDeleteEvent.class, "sample/a");
         listener.assertNoMoreEvents();
     }
 
@@ -128,8 +128,8 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
 
         // check the delete events.
         configurationTemplateManager.delete("sample/a");
-        includingChildren.assertNextEvent(PreDeleteEvent.class, "sample/a");
-        includingChildren.assertNextEvent(PreDeleteEvent.class, "sample/a/b");
+        includingChildren.assertNextEvent(PostDeleteEvent.class, "sample/a");
+        includingChildren.assertNextEvent(PostDeleteEvent.class, "sample/a/b");
         includingChildren.assertNoMoreEvents();
         // excludingChildren listenening at "sample", will not see changes to "sample/a"
         excludingChildren.assertNoMoreEvents();
@@ -150,7 +150,7 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
         listener.assertNoMoreEvents();
 
         configurationTemplateManager.delete("sample/a");
-        listener.assertNextEvent(PreDeleteEvent.class, "sample/a/b");
+        listener.assertNextEvent(PostDeleteEvent.class, "sample/a/b");
         listener.assertNoMoreEvents();
     }
 

@@ -1,8 +1,8 @@
 package com.zutubi.prototype.config;
 
+import com.zutubi.prototype.config.events.PostDeleteEvent;
 import com.zutubi.prototype.config.events.PostInsertEvent;
 import com.zutubi.prototype.config.events.PostSaveEvent;
-import com.zutubi.prototype.config.events.PreDeleteEvent;
 import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.*;
 import com.zutubi.pulse.core.config.Configuration;
@@ -1169,6 +1169,7 @@ public class ConfigurationTemplateManager
     {
         checkPersistent(path);
 
+        List<PostDeleteEvent> events = new LinkedList<PostDeleteEvent>();
         for (String concretePath : getDescendentPaths(path, false, true))
         {
             for (Object instance : instances.getAllDescendents(concretePath))
@@ -1176,13 +1177,18 @@ public class ConfigurationTemplateManager
                 if (isComposite(instance))
                 {
                     Configuration configuration = (Configuration) instance;
-                    eventManager.publish(new PreDeleteEvent(this, configuration, !concretePath.equals(configuration.getConfigurationPath())));
+                    events.add(new PostDeleteEvent(this, configuration, !concretePath.equals(configuration.getConfigurationPath())));
                 }
             }
         }
 
         getCleanupTasks(path).execute();
         refreshCaches();
+
+        for(PostDeleteEvent event: events)
+        {
+            eventManager.publish(event);
+        }
     }
 
     public int deleteAll(final String pathPattern)
@@ -1310,10 +1316,10 @@ public class ConfigurationTemplateManager
     @SuppressWarnings({"unchecked"})
     public <T extends Configuration> T getAncestorOfType(Configuration c, Class<T> clazz)
     {
-        String path = c.getConfigurationPath();
         CompositeType type = typeRegistry.getType(clazz);
         if (type != null)
         {
+            String path = PathUtils.getParentPath(c.getConfigurationPath());
             while (path != null)
             {
                 Type pathType = configurationPersistenceManager.getType(path);

@@ -29,7 +29,7 @@ public class DefaultResourceManager implements ResourceManager
                 addAgentRepo(instance);
             }
 
-            public void preDelete(AgentConfiguration instance)
+            public void postDelete(AgentConfiguration instance)
             {
                 agentRepositories.remove(instance.getHandle());
             }

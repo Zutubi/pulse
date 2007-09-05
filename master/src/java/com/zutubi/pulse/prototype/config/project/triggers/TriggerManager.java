@@ -44,7 +44,7 @@ public class TriggerManager
                 }
             }
 
-            public void preDelete(TriggerConfiguration instance)
+            public void postDelete(TriggerConfiguration instance)
             {
                 try
                 {

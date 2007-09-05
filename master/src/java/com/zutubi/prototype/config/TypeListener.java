@@ -1,9 +1,9 @@
 package com.zutubi.prototype.config;
 
 import com.zutubi.prototype.config.events.ConfigurationEvent;
+import com.zutubi.prototype.config.events.PostDeleteEvent;
 import com.zutubi.prototype.config.events.PostInsertEvent;
 import com.zutubi.prototype.config.events.PostSaveEvent;
-import com.zutubi.prototype.config.events.PreDeleteEvent;
 import com.zutubi.pulse.core.config.Configuration;
 
 /**
@@ -43,9 +43,9 @@ public abstract class TypeListener<T extends Configuration> implements Configura
             {
                 postSave((T) event.getInstance());
             }
-            else if (event instanceof PreDeleteEvent)
+            else if (event instanceof PostDeleteEvent)
             {
-                preDelete((T) event.getInstance());
+                postDelete((T) event.getInstance());
             }
         }
         else
@@ -72,9 +72,9 @@ public abstract class TypeListener<T extends Configuration> implements Configura
         {
             return ((PostInsertEvent)event).isCascaded();
         }
-        else if(event instanceof PreDeleteEvent)
+        else if(event instanceof PostDeleteEvent)
         {
-            return ((PreDeleteEvent)event).isCascaded();
+            return ((PostDeleteEvent)event).isCascaded();
         }
         else
         {
@@ -83,6 +83,6 @@ public abstract class TypeListener<T extends Configuration> implements Configura
     }
 
     public abstract void postInsert(T instance);
-    public abstract void preDelete(T instance);
+    public abstract void postDelete(T instance);
     public abstract void postSave(T instance);
 }

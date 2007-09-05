@@ -41,9 +41,14 @@ public class XmlRpcHelper
         return (Boolean)result;
     }
 
+    public boolean isLoggedIn()
+    {
+        return token != null;
+    }
+
     private void verifyLoggedIn()
     {
-        if(token == null)
+        if(!isLoggedIn())
         {
             throw new IllegalStateException("Not logged in, call login first");
         }

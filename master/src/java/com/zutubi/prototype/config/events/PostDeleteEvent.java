@@ -5,11 +5,11 @@ import com.zutubi.pulse.core.config.Configuration;
 
 /**
  */
-public class PreDeleteEvent extends ConfigurationEvent
+public class PostDeleteEvent extends ConfigurationEvent
 {
     private boolean cascaded;
 
-    public PreDeleteEvent(ConfigurationTemplateManager source, Configuration oldInstance, boolean cascaded)
+    public PostDeleteEvent(ConfigurationTemplateManager source, Configuration oldInstance, boolean cascaded)
     {
         super(source, oldInstance);
         this.cascaded = cascaded;

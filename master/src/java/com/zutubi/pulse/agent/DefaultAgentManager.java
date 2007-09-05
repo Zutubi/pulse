@@ -84,7 +84,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
                 agentAdded(instance);
             }
 
-            public void preDelete(AgentConfiguration instance)
+            public void postDelete(AgentConfiguration instance)
             {
                 agentDeleted(instance);
             }

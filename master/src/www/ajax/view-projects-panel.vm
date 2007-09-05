@@ -3,16 +3,22 @@
 ##
 #macro(recentBuilds $group $projects)
     #set($fullSpan = $columns.totalSpan + 6)
-    <table class="content" id="group_$!webwork.htmlEncode($group.name)">
+#if($group)
+    #set($groupId = $group.name)
+#else
+    #set($groupId = "_ungrouped")
+#end
+
+    <table class="content" id='#id("group.$groupId")'>
         <tr>
             <th class="group" colspan="$fullSpan">
 #if($group)
     #if($rssEnabled)
                 <span class="action">
-                    <a class="unadorned" id="rss.builds.$group.id" href="rss.action?groupId=$group.id"><img alt="$action.getText('rss')" src="$base/images/feed-icon-16x16.gif"/></a>
+                    <a class="unadorned" id="rss.builds.#id($group.name)" href="rss.action?groupName=#uce($group.name)"><img alt="$action.getText('rss')" src="$base/images/feed-icon-16x16.gif"/></a>
                 </span>
     #end
-                $!webwork.htmlEncode($group.name)
+                #html($group.name)
 #else
                 #wwtext("name=projects")
 #end
@@ -33,7 +39,7 @@
         #set($lastResult = false)
         #set($lastResult = $action.getLatestBuild($project))
         #set($health = $action.getHealth($project))
-            <tr>
+            <tr id='#id("group.${groupId}.project.${project.name}")'>
                 <td class="content">
                     <img alt="health: $health" src="$base/images/health/${health}.gif"/>
                     <a href="$urls.projectHome($project)" id="#uce($project.name)">$!webwork.htmlEncode($project.name)</a>

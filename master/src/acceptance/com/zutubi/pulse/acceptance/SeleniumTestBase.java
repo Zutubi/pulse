@@ -153,14 +153,23 @@ public class SeleniumTestBase extends TestCase
 
     protected void ensureProject(String name) throws Exception
     {
-        xmlRpcHelper.loginAsAdmin();
+        boolean loggedIn = false;
+        if (!xmlRpcHelper.isLoggedIn())
+        {
+            xmlRpcHelper.loginAsAdmin();
+            loggedIn = true;
+        }
+
         try
         {
             xmlRpcHelper.ensureProject(name);
         }
         finally
         {
-            xmlRpcHelper.logout();
+            if (loggedIn)
+            {
+                xmlRpcHelper.logout();
+            }
         }
     }
 

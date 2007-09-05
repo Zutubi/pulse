@@ -771,7 +771,7 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
             got.add(new Event(Event.Type.INSERT, instance.getConfigurationPath()));
         }
 
-        public void preDelete(X instance)
+        public void postDelete(X instance)
         {
             got.add(new Event(Event.Type.DELETE, instance.getConfigurationPath()));
         }

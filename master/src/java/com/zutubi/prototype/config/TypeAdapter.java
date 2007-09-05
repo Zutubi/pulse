@@ -18,7 +18,7 @@ public abstract class TypeAdapter<X extends Configuration> extends TypeListener<
         // noop
     }
 
-    public void preDelete(X instance)
+    public void postDelete(X instance)
     {
         // noop
     }
