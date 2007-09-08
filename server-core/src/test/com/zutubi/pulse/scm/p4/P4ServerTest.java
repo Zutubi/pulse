@@ -344,6 +344,15 @@ public class P4ServerTest extends PulseTestCase
         assertEquals(0, revisions.size());
     }
 
+    public void testGetRevisionsSinceFiltered() throws SCMException
+    {
+        getServer(TEST_CLIENT);
+        server.setExcludedPaths(Arrays.asList("//depot2/*"));
+        List<Revision> revisions = server.getRevisionsSince(new NumericalRevision(5));
+        assertEquals(1, revisions.size());
+        assertEquals("7", revisions.get(0).getRevisionString());
+    }
+
     public void testCheckoutThenUpdate() throws SCMException, IOException
     {
         getServer("depot-client");

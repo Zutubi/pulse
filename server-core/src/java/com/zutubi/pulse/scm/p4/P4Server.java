@@ -592,13 +592,12 @@ public class P4Server extends CachingSCMServer
                 while (matcher.find())
                 {
                     NumericalRevision revision = new NumericalRevision(Long.parseLong(matcher.group(1)));
-                    result.add(0, revision);
-
-                    if (changes != null)
+                    Changelist list = getChangelist(clientName, revision.getRevisionNumber());
+                    if (list != null)
                     {
-                        Changelist list = getChangelist(clientName, revision.getRevisionNumber());
-
-                        if (list != null)
+                        result.add(0, revision);
+                        
+                        if (changes != null)
                         {
                             changes.add(0, list);
                         }
