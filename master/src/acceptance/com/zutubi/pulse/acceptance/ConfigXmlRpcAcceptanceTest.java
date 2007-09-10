@@ -47,7 +47,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testGetConfigListingEmptyPath() throws Exception
     {
         Vector<String> listing = call("getConfigListing", "");
-        assertSortedEquals(listing, "agents", "projects", "settings", "users");
+        assertSortedEquals(listing, "agents", "groups", "projects", "settings", "users");
     }
 
     public void testGetConfigListingNonExistantPath() throws Exception

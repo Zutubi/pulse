@@ -239,12 +239,13 @@
                         }
                     });
 
+                    templateTree.render();
+
 #if($configTreePath)
                     createConfigTree('$owner');
                     configTree.selectConfigPath('$configTreePath');
                     visibleTree = configTree;
 #else
-                    templateTree.render();
                     templateRoot.expand(false, false, function() {
                         templateRoot.firstChild.expand();
                         nestedLayout.getRegion('west').showPanel('template-tree');

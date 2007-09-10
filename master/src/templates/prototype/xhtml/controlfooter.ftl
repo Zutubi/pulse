@@ -13,24 +13,17 @@ form.items.last().on('render', function(field)
 </#if>
 
 <#if parameters.inheritedFrom?exists>
-    var inheritedEl = Ext.DomHelper.append(field.getEl().dom.parentNode, { tag: 'img', src: '${base}/images/inherited.gif', id: '${parameters.id}.inherited'}, true);
-    inheritedEl.alignTo(inheritedEl.getPrevSibling(), 'l-r');
-    inheritedEl.dom.qtip = 'value inherited from ${parameters.inheritedFrom}';
-    field.getEl().addClass('field-inherited');
+    form.annotateField('${parameters.id}', '${base}/images/inherited.gif', 'value inherited from ${parameters.inheritedFrom}');
 </#if>
 
 <#if parameters.overriddenOwner?exists>
-    var inheritedEl = Ext.DomHelper.append(field.getEl().dom.parentNode, { tag: 'img', src: '${base}/images/overridden.gif', id: '${parameters.id}.overridden'}, true);
-    inheritedEl.alignTo(inheritedEl.getPrevSibling(), 'l-r');
-    inheritedEl.dom.qtip = 'overrides value defined by ${parameters.overriddenOwner}';
-    field.getEl().addClass('field-overridden');
+    form.annotateField('${parameters.id}', '${base}/images/overridden.gif', 'overrides value defined by ${parameters.overriddenOwner}');
 </#if>
 
 <#assign helpkey>${parameters.name}.help</#assign>
 <#assign helpmsg>${helpkey?i18n}</#assign>
 <#if helpmsg?exists && helpkey != helpmsg>
-    var xFormElement = field.getEl().findParent('.x-form-element')
-    Ext.DomHelper.append(xFormElement, { tag: 'span', cls: 'inline-help', html: '${helpmsg?js_string}', id:field.getId() + '-inline-help'});
+    form.annotateField('${parameters.id}', '${base}/images/help.gif', '${helpmsg?js_string}');
 </#if>
 });
 

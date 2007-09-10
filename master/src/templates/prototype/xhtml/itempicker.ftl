@@ -28,29 +28,17 @@
     fieldConfig.optionStore = optionStore;
 </#if>
 
-    var data = [];
     var value = [];
 
 <#if parameters.value?exists>
     <#list parameters.value as item>
-        <#if parameters.listKey?exists>
-            <#assign itemKey = item[parameters.listKey]/>
-        <#else>
-            <#assign itemKey = item/>
-        </#if>
-        <#if parameters.listValue?exists>
-            <#assign itemValue = item[parameters.listValue]/>
-        <#else>
-            <#assign itemValue = item/>
-        </#if>
-        data.push(['${itemKey?js_string}', '${itemValue?js_string}']);
-        value.push('${itemKey?js_string}');
+        value.push('${item?js_string}');
     </#list>
 </#if>
 
     var store = new Ext.data.SimpleStore({
         fields: ['value', 'text'],
-        data: data
+        data: []
     });
 
     fieldConfig.store = store;

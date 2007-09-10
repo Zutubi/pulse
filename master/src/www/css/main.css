@@ -264,6 +264,7 @@ a.unadorned, a.unadorned:hover, a.x-tabs-right, a.x-tabs-right:hover, .x-tree-no
 
 table {
     border-collapse: collapse;
+    font-size: 1em;
 }
 
 hr {
@@ -860,42 +861,14 @@ table.template-actions
     font-size: 10px;
 }
 
-.x-form-select, .x-form-select-multiple
-{
-    border: 1px solid #B5B8C8;
-}
-
-.x-form-focus
-{
-	border: 1px solid #7eadd9;
-}
-
-.x-form-item
-{
-    font-family: verdana;
-    font-size: 12px;
-}
-
 .x-layout-split
 {
     background-color: #3e4e6a;
 }
 
-.field-overridden, textarea.field-overridden
-{
-    background: #ffffe0;
-}
-
-.field-inherited, textarea.field-inherited
-{
-    background: #e0e0ff;
-}
-
-.field-no-override, textarea.field-no-override
-{
-    background: #f0f0f0;
-}
-
+/*
+ * Config pages
+ */
 .config-panel
 {
     border-bottom-style:dotted;
@@ -983,9 +956,8 @@ table.template-actions
     padding-left:5px;
 }
 
-.config-form-container{
+.config-form-container {
     padding:10px;
-    padding-right:50px
 }
 
 #left-column {
@@ -997,54 +969,3 @@ table.template-actions
     width:300px;
     vertical-align:top;
 }
-
-.x-item-picker-list, .x-select
-{
-    border: solid 1px #b5b8c8;
-    overflow: auto;
-    cursor: pointer;
-}
-
-.x-form-focus
-{
-    border: 1px solid #7eadd9;
-}
-
-.x-item-picker .x-image-button
-{
-    position:absolute;
-    width: 21px;
-    height: 21px;
-}
-
-.x-item-picker-item, .x-select-item
-{
-    font:normal 12px tahoma, arial, helvetica, sans-serif;
-    border:1px solid #fff;
-    padding:2px;
-    white-space: nowrap;
-}
-
-.x-select-item
-{
-    margin: 1px;
-}
-
-.x-item-picker-list .x-item-picker-selected, .x-select .x-select-selected
-{
-	background-color: #c3daf9 !important;
-    border: 1px solid #336699;
-}
-
-/*
-.config-invalid a span {
-    color: #f00;
-}
-*/
-/*
-.x-item-disabled
-{
-    background: none;
-    border: none;
-}
-*/

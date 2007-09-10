@@ -31,7 +31,7 @@ public class DashboardConfiguration extends AbstractConfiguration
     /**
      * Project groups to show on dashboard.
      */
-    @Select(optionProvider = "com.zutubi.pulse.prototype.config.project.ProjectLabelOptionProvider")
+    @ItemPicker(optionProvider = "com.zutubi.pulse.prototype.config.project.ProjectLabelOptionProvider")
     private List<String> shownGroups = new LinkedList<String>();
 
     @ControllingCheckbox(dependentFields = {"myChangeCount"})

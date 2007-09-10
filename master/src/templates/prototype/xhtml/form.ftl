@@ -13,10 +13,8 @@ width of its contents.  Floating it works, but hurts other things.
 
     var ${form.name} = function()
     {
-        var form = new Ext.form.Form({
+        var form = new ZUTUBI.Form({
             method: 'post',
-            labelAlign: 'right',
-            labelWidth: ${form.parameters.labelWidth?default(150)},
             waitMsgTarget: true
         });
 

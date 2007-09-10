@@ -1,6 +1,4 @@
 table.eform {
-    margin-top: 8px;
-    margin-bottom: 16px;
 }
 
 a.field-action {
@@ -69,4 +67,93 @@ input.submit {
     color: #CC0000;
     font-weight: bold;
     letter-spacing: 3px;
+}
+
+.x-form-btns-ct
+{
+    margin-top: 6px;
+}
+
+.x-form-row td
+{
+    vertical-align: top;
+    padding: 3px;
+}
+
+td.x-form-label
+{
+    padding-top: 5px;
+    text-align: right;
+    white-space: nowrap;
+    /*font-size: 12px;*/
+}
+
+td.x-form-annotation
+{
+    padding-top: 5px;
+}
+
+.x-form-element
+{
+    padding: 0;
+    position: relative;
+}
+
+.x-item-picker-list, .x-select
+{
+    border: solid 1px #b5b8c8;
+    overflow: auto;
+    cursor: pointer;
+}
+
+.x-form-focus
+{
+    border: 1px solid #7eadd9;
+}
+
+.x-item-picker .x-image-button
+{
+    position:absolute;
+    width: 21px;
+    height: 21px;
+}
+
+.x-item-picker-item, .x-select-item
+{
+    font:normal 12px tahoma, arial, helvetica, sans-serif;
+    border:1px solid #fff;
+    padding:2px;
+    white-space: nowrap;
+}
+
+.x-select-item
+{
+    margin: 1px;
+}
+
+.x-item-picker-list .x-item-picker-selected, .x-select .x-select-selected
+{
+	background-color: #c3daf9 !important;
+    border: 1px solid #336699;
+}
+
+.x-form-select, .x-form-select-multiple
+{
+    border: 1px solid #B5B8C8;
+}
+
+.x-form-focus
+{
+	border: 1px solid #7eadd9;
+}
+
+.x-form-item
+{
+    font-family: verdana;
+    font-size: 12px;
+}
+
+.field-no-override, textarea.field-no-override
+{
+    background: #f0f0f0;
 }
