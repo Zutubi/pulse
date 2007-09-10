@@ -397,6 +397,11 @@ public class FatController implements EventListener, Stoppable
         this.userManager = userManager;
     }
 
+    public AbstractBuildRequestEvent findQueuedBuild(long id)
+    {
+        return buildQueue.findEvent(id);
+    }
+
     /**
      * Cancel the queued build.
      *

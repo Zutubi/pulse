@@ -150,4 +150,31 @@ public class BuildQueue
         }
         return false;
     }
+
+    public AbstractBuildRequestEvent findEvent(long id)
+    {
+        for (Map.Entry<Entity, List<AbstractBuildRequestEvent>> entry : requests.entrySet())
+        {
+            List<AbstractBuildRequestEvent> events = entry.getValue();
+            synchronized(events)
+            {
+                // Ingore the first in the list: it is alreayd running
+                Iterator<AbstractBuildRequestEvent> it = events.iterator();
+                if(it.hasNext())
+                {
+                    it.next();
+                    while(it.hasNext())
+                    {
+                        AbstractBuildRequestEvent event = it.next();
+                        if (event.getId() == id)
+                        {
+                            return event;
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
 }

@@ -4,6 +4,7 @@ import com.zutubi.pulse.MasterBuildPaths;
 import com.zutubi.pulse.bootstrap.DatabaseConsole;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.events.build.AbstractBuildRequestEvent;
 import com.zutubi.pulse.model.persistence.ArtifactDao;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
 import com.zutubi.pulse.model.persistence.ChangelistDao;
@@ -454,22 +455,56 @@ public class DefaultBuildManager implements BuildManager
         return buildResultDao.findLatestSuccessful();
     }
 
-    public boolean canCancel(BuildResult build, User user)
+    public boolean canCancel(AbstractBuildRequestEvent request, User user)
     {
-        if(build.isPersonal())
+        if (user.hasAuthority(GrantedAuthority.ADMINISTRATOR))
         {
-            return build.getUser().equals(user);
+            return true;
         }
         else
         {
-            try
+            if (request.isPersonal())
             {
-                projectManager.checkWrite(build.getProject());
-                return true;
+                return request.getOwner().equals(user);
             }
-            catch (Exception e)
+            else
             {
-                return false;
+                try
+                {
+                    projectManager.checkWrite((Project) request.getOwner());
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    return false;
+                }
+            }
+        }
+    }
+
+    public boolean canCancel(BuildResult build, User user)
+    {
+        if (user.hasAuthority(GrantedAuthority.ADMINISTRATOR))
+        {
+            return true;
+        }
+        else
+        {
+            if (build.isPersonal())
+            {
+                return build.getUser().equals(user);
+            }
+            else
+            {
+                try
+                {
+                    projectManager.checkWrite(build.getProject());
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    return false;
+                }
             }
         }
     }

@@ -1,6 +1,7 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.events.build.AbstractBuildRequestEvent;
 
 import java.util.*;
 
@@ -314,6 +315,11 @@ public class MockBuildManager implements BuildManager
     public boolean isSpaceAvailableForBuild()
     {
         return true;
+    }
+
+    public boolean canCancel(AbstractBuildRequestEvent request, User user)
+    {
+        throw new RuntimeException("Method not yet implemented.");
     }
 
     public boolean canCancel(BuildResult build, User user)

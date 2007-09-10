@@ -1,6 +1,7 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.events.build.AbstractBuildRequestEvent;
 
 import java.util.List;
 
@@ -141,6 +142,8 @@ public interface BuildManager
     void abortUnfinishedBuilds(User user, String message);
 
     boolean isSpaceAvailableForBuild();
+
+    boolean canCancel(AbstractBuildRequestEvent request, User user);
 
     boolean canCancel(BuildResult build, User user);
 

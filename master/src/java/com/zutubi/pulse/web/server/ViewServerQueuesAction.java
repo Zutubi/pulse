@@ -42,6 +42,17 @@ public class ViewServerQueuesAction extends ActionSupport
         return recipeQueueSnapshot;
     }
 
+    public boolean canCancel(AbstractBuildRequestEvent event)
+    {
+        Object principle = getPrinciple();
+        if(principle != null && principle instanceof String)
+        {
+            return buildManager.canCancel(event, userManager.getUser((String)principle));
+        }
+
+        return false;
+    }
+
     public boolean canCancel(BuildResult build)
     {
         Object principle = getPrinciple();
