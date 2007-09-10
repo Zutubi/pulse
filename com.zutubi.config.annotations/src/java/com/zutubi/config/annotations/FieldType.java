@@ -63,5 +63,5 @@ public interface FieldType
 
     static final String SELECT = "select";
 
-    static final String STRING_LIST = "stringlist";
+    static final String ITEM_PICKER = "itempicker";
 }

@@ -5,7 +5,6 @@ import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.MockBuildManager;
-import com.zutubi.pulse.prototype.config.user.UserAliasConfiguration;
 import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 import com.zutubi.pulse.test.PulseTestCase;
 
@@ -48,7 +47,7 @@ public class ChangedByMeNotificationConditionTest extends PulseTestCase
     {
         BuildResult result = getBuildWithChanges(getChangelistBy("my alias"));
         UserConfiguration me = new UserConfiguration("me", "Your Overlord");
-        me.getPreferences().getAlias().add(new UserAliasConfiguration("my alias"));
+        me.getPreferences().getSettings().getAliases().add("my alias");
         assertTrue(condition.satisfied(result, me));
     }
 

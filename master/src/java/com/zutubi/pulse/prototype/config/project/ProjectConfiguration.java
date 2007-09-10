@@ -51,6 +51,8 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
 
     private List<LabelConfiguration> labels = new LinkedList<LabelConfiguration>();
 
+    private List<ProjectAclConfiguration> permissions = new LinkedList<ProjectAclConfiguration>();
+
     @Transient
     private Map<String, Object> extensions = new HashMap<String, Object>();
 
@@ -213,5 +215,15 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
     public void setLabels(List<LabelConfiguration> labels)
     {
         this.labels = labels;
+    }
+
+    public List<ProjectAclConfiguration> getPermissions()
+    {
+        return permissions;
+    }
+
+    public void setPermissions(List<ProjectAclConfiguration> permissions)
+    {
+        this.permissions = permissions;
     }
 }

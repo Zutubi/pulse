@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
  */
 @Target({ ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-@Field(type = FieldType.STRING_LIST)
+@Field(type = FieldType.ITEM_PICKER)
 public @interface StringList
 {
 }

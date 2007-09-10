@@ -7,11 +7,14 @@ import com.zutubi.pulse.web.DefaultAction;
 import com.zutubi.util.StringUtils;
 import com.zutubi.validation.annotations.Numeric;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * General user preferences that do not fit in another category.
  */
 @SymbolicName("zutubi.userSettingConfig")
-@Form(labelWidth = 250, fieldOrder = {"defaultAction", "myBuildsCount", "refreshingEnabled", "refreshInterval", "tailLines", "tailRefreshInterval"})
+@Form(labelWidth = 250, fieldOrder = {"aliases", "defaultAction", "myBuildsCount", "refreshingEnabled", "refreshInterval", "tailLines", "tailRefreshInterval"})
 public class UserSettingsConfiguration extends AbstractConfiguration
 {
     private static final String PROPERTY_DASHBOARD_BUILD_COUNT = "user.dashboardBuildCount";
@@ -33,6 +36,8 @@ public class UserSettingsConfiguration extends AbstractConfiguration
     private static final String PROPERTY_PROJECT_HISTORY_COLUMNS = "project.history.columns";
 
 
+    @StringList
+    private List<String> aliases = new LinkedList<String>();
     @Select(optionProvider = "DefaultActionOptionProvider")
     private String defaultAction = DefaultAction.WELCOME_ACTION;
     @ControllingCheckbox(dependentFields = "refreshInterval")
@@ -62,6 +67,16 @@ public class UserSettingsConfiguration extends AbstractConfiguration
     private String projectRecentColumns = defaultProjectColumns();
     @Internal
     private String projectHistoryColumns = defaultProjectColumns();
+
+    public List<String> getAliases()
+    {
+        return aliases;
+    }
+
+    public void setAliases(List<String> aliases)
+    {
+        this.aliases = aliases;
+    }
 
     public String getDefaultAction()
     {

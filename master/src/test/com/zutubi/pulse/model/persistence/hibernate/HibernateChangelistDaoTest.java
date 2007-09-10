@@ -6,7 +6,6 @@ import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.persistence.ChangelistDao;
-import com.zutubi.pulse.prototype.config.user.UserAliasConfiguration;
 import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 import com.zutubi.util.Constants;
 
@@ -167,8 +166,8 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
         commitAndRefreshTransaction();
 
         User user = createUser();
-        user.getConfig().getPreferences().getAlias().add(new UserAliasConfiguration("alias1"));
-        user.getConfig().getPreferences().getAlias().add(new UserAliasConfiguration("alias3"));
+        user.getConfig().getPreferences().getSettings().getAliases().add("alias1");
+        user.getConfig().getPreferences().getSettings().getAliases().add("alias3");
 
         List<Changelist> changes = changelistDao.findLatestByUser(user, 10);
         assertEquals(4, changes.size());

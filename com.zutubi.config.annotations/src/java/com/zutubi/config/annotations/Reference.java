@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 
-@Field(type = FieldType.SELECT)
+@Field(type = FieldType.ITEM_PICKER)
 @Handler(className = DefaultAnnotationHandlers.REFERENCE)
 public @interface Reference
 {

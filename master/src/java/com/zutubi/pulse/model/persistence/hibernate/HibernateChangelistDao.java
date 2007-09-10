@@ -5,9 +5,6 @@ import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.persistence.ChangelistDao;
-import com.zutubi.pulse.prototype.config.user.UserAliasConfiguration;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -39,12 +36,7 @@ public class HibernateChangelistDao extends HibernateEntityDao<Changelist> imple
                 Query queryObject = session.createQuery("from Changelist model where model.revision.author in (:logins) order by model.revision.time desc");
                 List<String> allLogins = new LinkedList<String>();
                 allLogins.add(user.getLogin());
-                allLogins.addAll(CollectionUtils.map(user.getConfig().getPreferences().getAlias(), new Mapping<UserAliasConfiguration, String>(){
-                    public String map(UserAliasConfiguration alias)
-                    {
-                        return alias.getAlias();
-                    }
-                }));
+                allLogins.addAll(user.getConfig().getPreferences().getSettings().getAliases());
                 queryObject.setParameterList("logins", allLogins);
                 queryObject.setMaxResults(max);
 

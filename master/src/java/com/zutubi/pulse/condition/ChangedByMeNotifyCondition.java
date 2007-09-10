@@ -3,7 +3,6 @@ package com.zutubi.pulse.condition;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.prototype.config.user.UserAliasConfiguration;
 import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 
 import java.util.List;
@@ -51,9 +50,9 @@ public class ChangedByMeNotifyCondition implements NotifyCondition
             return true;
         }
 
-        for(UserAliasConfiguration alias: user.getPreferences().getAlias())
+        for(String alias: user.getPreferences().getSettings().getAliases())
         {
-            if(author.equals(alias.getAlias()))
+            if(author.equals(alias))
             {
                 return true;
             }

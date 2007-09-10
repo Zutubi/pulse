@@ -535,7 +535,7 @@ ZUTUBI.ImageButton = function(renderTo, config)
         'mousedown': true
     });
 
-    this.defaultAutoCreate = { tag: 'img', src: this.image };
+    this.defaultAutoCreate = { tag: 'img', src: this.image, cls: 'x-image-button' };
     this.render(renderTo);
 }
 
@@ -589,46 +589,74 @@ Ext.extend(ZUTUBI.ImageButton, Ext.BoxComponent, {
 });
 
 
-//ZUTUBI.MultiValueField = function(config)
-//{
-//    ZUTUBI.MultiValueField.superclass.constructor.call(this, config);
-//};
-//
-//Ext.extend(ZUTUBI.MultiValueField, Ext.form.Field, {
-//    hiddenFields: [],
-//
-//
-//});
-
-
-ZUTUBI.StringList = function(config)
+ZUTUBI.ItemPicker = function(config)
 {
-    ZUTUBI.StringList.superclass.constructor.call(this, config);
+    ZUTUBI.ItemPicker.superclass.constructor.call(this, config);
     this.addEvents({
         'change': true
     });
     this.hiddenName = config.name;
 };
 
-Ext.extend(ZUTUBI.StringList, Ext.form.Field, {
+Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
     width: 100,
     height: 100,
-    fieldName: 'value',
-    selectedClass: 'x-string-list-selected',
+    displayField: 'text',
+    valueField: 'value',
+    selectedClass: 'x-item-picker-selected',
     hiddenFields: [],
     value: [],
+    optionStore: undefined,
 
     onRender: function(ct, position)
     {
-        this.wrap = ct.createChild({tag: 'div', cls: 'x-string-list'});
+        this.wrap = ct.createChild({tag: 'div', cls: 'x-item-picker'});
         this.wrap.on('click', this.onClick, this);
         this.el = this.wrap.createChild({tag: 'input', type: 'hidden'});
 
-        this.input = this.wrap.createChild({tag: 'input', type: 'text', cls: 'x-form-text', id: this.id});
-        this.input.setWidth(this.width);
-        this.input.on('focus', this.onInputFocus, this);
-        this.input.on('blur', this.onInputBlur, this);
-        this.nav = new Ext.KeyNav(this.input, {
+        this.list = this.wrap.createChild({tag: 'div', cls: 'x-item-picker-list', tabindex: '0'});
+        this.list.setWidth(this.width);
+        this.list.setHeight(this.height);
+        this.list.on('focus', this.onInputFocus, this);
+        this.list.on('blur', this.onInputBlur, this);
+
+        var alignEl;
+        if(this.optionStore)
+        {
+            var fieldConfig = {
+                store: this.optionStore,
+                mode: 'local',
+                forceSelection: true,
+                name: 'combo.' + this.name,
+                displayField: this.displayField,
+                valueField: this.valueField,
+                triggerAction: 'all',
+                width: this.width,
+                id: this.id
+            };
+
+            this.combo = new Ext.form.ComboBox(fieldConfig);
+            this.combo.render(this.wrap);
+            this.choice = this.combo.getEl();
+            alignEl = this.combo.wrap;
+        }
+        else
+        {
+            this.input = this.wrap.createChild({tag: 'input', type: 'text', cls: 'x-form-text', id: this.id});
+            this.input.setWidth(this.width);
+            this.choice = this.input;
+            alignEl = this.input;
+        }
+
+        alignEl.alignTo(this.list, 'tl-bl', [Ext.isGecko ? -1 : 0, Ext.isGecko ? -1 : 0]);
+
+        this.choice.on('focus', this.onInputFocus, this);
+        this.choice.on('blur', this.onInputBlur, this);
+
+        this.addButton = new ZUTUBI.ImageButton(this.wrap, {image: '/images/buttons/sb-add-up.gif', overImage: '/images/buttons/sb-add-over.gif', downImage: '/images/buttons/sb-add-down.gif'});
+        this.addButton.on('click', this.onAdd, this);
+
+        this.nav = new Ext.KeyNav(this.input || this.list, {
             "up": function(evt)
             {
                 this.navUp(evt.ctrlKey);
@@ -641,19 +669,14 @@ Ext.extend(ZUTUBI.StringList, Ext.form.Field, {
 
             "enter": function(evt)
             {
-                this.onAdd(evt);
+                if(this.input)
+                {
+                    this.onAdd(evt);
+                }
             },
 
             scope: this
         });
-
-        this.addButton = new ZUTUBI.ImageButton(this.wrap, {image: '/images/buttons/sb-add-up.gif', overImage: '/images/buttons/sb-add-over.gif', downImage: '/images/buttons/sb-add-down.gif'});
-        this.addButton.on('click', this.onAdd, this);
-
-        this.list = this.wrap.createChild({tag: 'div', cls: 'x-string-list-list'});
-        this.list.setWidth(this.width);
-        this.list.setHeight(this.height);
-        this.list.alignTo(this.input, 't-b');
 
         this.removeButton = new ZUTUBI.ImageButton(this.wrap, {image: '/images/buttons/sb-delete-up.gif', overImage: '/images/buttons/sb-delete-over.gif', downImage: '/images/buttons/sb-delete-down.gif'});
         this.removeButton.on('click', this.onRemove, this);
@@ -664,17 +687,17 @@ Ext.extend(ZUTUBI.StringList, Ext.form.Field, {
         this.downButton = new ZUTUBI.ImageButton(this.wrap, {image: '/images/buttons/sb-down-up.gif', overImage: '/images/buttons/sb-down-over.gif', downImage: '/images/buttons/sb-down-down.gif'});
         this.downButton.on('click', this.onDown, this);
 
-        var cls = 'x-string-list';
+        var cls = 'x-item-picker';
 
         if(!this.tpl)
         {
             if(Ext.isIE || Ext.isIE7)
             {
-                this.tpl = '<div unselectable="on" class="' + cls + '-item">{' + this.fieldName + '}</div>';
+                this.tpl = '<div unselectable="on" class="' + cls + '-item">{' + this.displayField + '}</div>';
             }
             else
             {
-                this.tpl = '<div class="' + cls + '-item  x-unselectable">{' + this.fieldName + '}</div>';
+                this.tpl = '<div class="' + cls + '-item  x-unselectable">{' + this.displayField + '}</div>';
             }
         }
 
@@ -682,12 +705,12 @@ Ext.extend(ZUTUBI.StringList, Ext.form.Field, {
             singleSelect:true, store: this.store, selectedClass: this.selectedClass
         });
 
-        this.ValueRecord = Ext.data.Record.create({name: 'value'});
+        this.ValueRecord = Ext.data.Record.create({name: 'text'}, {name: 'value'});
     },
 
     afterRender: function()
     {
-        ZUTUBI.StringList.superclass.afterRender.call(this);
+        ZUTUBI.ItemPicker.superclass.afterRender.call(this);
         this.alignButtons();
         if(this.value)
         {
@@ -708,26 +731,29 @@ Ext.extend(ZUTUBI.StringList, Ext.form.Field, {
 
     onClick: function()
     {
-        this.input.focus();
+        if (this.input)
+        {
+            this.input.focus();
+        }
     },
 
     onInputFocus: function()
     {
-        this.input.addClass('x-form-focus');
+        this.choice.addClass('x-form-focus');
         this.list.addClass('x-form-focus');
     },
 
     onInputBlur: function()
     {
-        this.input.removeClass('x-form-focus');
+        this.choice.removeClass('x-form-focus');
         this.list.removeClass('x-form-focus');    
     },
 
     alignButtons: function()
     {
-        this.addButton.getEl().alignTo(this.input, 'l-r', [2, 0]);
-        this.removeButton.getEl().alignTo(this.list, 'bl-br', [2, 0]);
-        this.upButton.getEl().alignTo(this.list, 'l-r', [2, -this.input.getHeight()]);
+        this.addButton.getEl().alignTo(this.list, 'tl-br', [2, 0]);
+        this.removeButton.getEl().alignTo(this.list, 'tl-tr', [2, 0]);
+        this.upButton.getEl().alignTo(this.list, 'l-r', [2, 0]);
         this.downButton.getEl().alignTo(this.upButton.getEl(), 't-b', [0, 2]);
     },
 
@@ -770,21 +796,42 @@ Ext.extend(ZUTUBI.StringList, Ext.form.Field, {
 
     onAdd: function(evt)
     {
-        var text = this.input.dom.value;
+        var text = '';
+        var value;
+
+        if(this.input)
+        {
+            text = this.input.dom.value;
+            this.input.dom.value = '';
+            value = text;
+        }
+        else
+        {
+            var selectedIndexes = this.combo.view.getSelectedIndexes();
+            if(selectedIndexes.length > 0)
+            {
+                var record = this.combo.store.getAt(selectedIndexes[0]);
+                if(record)
+                {
+                    text = record.get(this.displayField);
+                    value = record.get(this.valueField);
+                }
+            }
+        }
+
         if(text.length > 0)
         {
-            this.input.dom.value = '';
-            this.appendItem(text);
+            this.appendItem(text, value);
             this.view.select(this.store.getCount() - 1);
             this.ensureSelectionVisible();
             this.fireEvent('change', this, evt);
         }
     },
 
-    appendItem: function(text)
+    appendItem: function(text, value)
     {
-        this.store.add(new this.ValueRecord({value: text}));
-        this.hiddenFields.push(this.wrap.createChild({tag: 'input', type: 'hidden', name: this.name, value: text}));
+        this.store.add(new this.ValueRecord({text: text, value: value}));
+        this.hiddenFields.push(this.wrap.createChild({tag: 'input', type: 'hidden', name: this.name, value: value}));
     },
     
     onRemove: function(evt)
@@ -865,7 +912,21 @@ Ext.extend(ZUTUBI.StringList, Ext.form.Field, {
         
         for(var i = 0; i < value.length; i++)
         {
-            this.appendItem(value[i]);
+            var text = this.getTextForValue(value[i]);
+            this.appendItem(text, value[i]);
+        }
+    },
+
+    getTextForValue: function(value)
+    {
+        if(this.input)
+        {
+            return value;
+        }
+        else
+        {
+            var record = this.optionStore.data.find(function(r) { return r.get(this.valueField) == value; }, this);
+            return record.get(this.displayField);
         }
     },
 

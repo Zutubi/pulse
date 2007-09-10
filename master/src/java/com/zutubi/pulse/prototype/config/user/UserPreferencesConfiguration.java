@@ -5,8 +5,6 @@ import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.prototype.config.user.contacts.ContactConfiguration;
 
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,7 +14,6 @@ import java.util.Map;
 public class UserPreferencesConfiguration extends AbstractConfiguration
 {
     private UserSettingsConfiguration settings = new UserSettingsConfiguration();
-    private List<UserAliasConfiguration> alias = new LinkedList<UserAliasConfiguration>();
     private Map<String, ContactConfiguration> contacts = new HashMap<String, ContactConfiguration>();
     private Map<String, SubscriptionConfiguration> subscriptions = new HashMap<String, SubscriptionConfiguration>();
     private DashboardConfiguration dashboard = new DashboardConfiguration();
@@ -29,16 +26,6 @@ public class UserPreferencesConfiguration extends AbstractConfiguration
     public void setSettings(UserSettingsConfiguration settings)
     {
         this.settings = settings;
-    }
-
-    public List<UserAliasConfiguration> getAlias()
-    {
-        return alias;
-    }
-
-    public void setAlias(List<UserAliasConfiguration> alias)
-    {
-        this.alias = alias;
     }
 
     public Map<String, ContactConfiguration> getContacts()

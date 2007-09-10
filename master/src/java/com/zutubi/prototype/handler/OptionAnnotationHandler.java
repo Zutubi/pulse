@@ -3,7 +3,7 @@ package com.zutubi.prototype.handler;
 import com.zutubi.prototype.Descriptor;
 import com.zutubi.prototype.OptionProvider;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
-import com.zutubi.prototype.model.SelectFieldDescriptor;
+import com.zutubi.prototype.model.OptionFieldDescriptor;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.prototype.type.record.PathUtils;
@@ -34,11 +34,11 @@ public abstract class OptionAnnotationHandler extends FieldAnnotationHandler
         String className = getOptionProviderClass(annotation);
         OptionProvider optionProvider = (OptionProvider) objectFactory.buildBean(ClassLoaderUtils.loadAssociatedClass(annotatedType.getClazz(), className));
 
-        SelectFieldDescriptor field = (SelectFieldDescriptor) descriptor;
+        OptionFieldDescriptor field = (OptionFieldDescriptor) descriptor;
         process(configurationTemplateManager, optionProvider, field.getParentPath(), field.getBaseName(), field);
     }
 
-    public static void process(ConfigurationTemplateManager configurationTemplateManager, OptionProvider optionProvider, String parentPath, String baseName, SelectFieldDescriptor field)
+    public static void process(ConfigurationTemplateManager configurationTemplateManager, OptionProvider optionProvider, String parentPath, String baseName, OptionFieldDescriptor field)
     {
         Configuration instance = null;
         if(baseName != null)

@@ -998,7 +998,7 @@ table.template-actions
     vertical-align:top;
 }
 
-.x-string-list-list, .x-select
+.x-item-picker-list, .x-select
 {
     border: solid 1px #b5b8c8;
     overflow: auto;
@@ -1010,18 +1010,14 @@ table.template-actions
     border: 1px solid #7eadd9;
 }
 
-.x-string-list-list
-{
-    border-top: none;
-}
-.x-string-list img
+.x-item-picker .x-image-button
 {
     position:absolute;
     width: 21px;
     height: 21px;
 }
 
-.x-string-list-item, .x-select-item
+.x-item-picker-item, .x-select-item
 {
     font:normal 12px tahoma, arial, helvetica, sans-serif;
     border:1px solid #fff;
@@ -1034,7 +1030,7 @@ table.template-actions
     margin: 1px;
 }
 
-.x-string-list-list .x-string-list-selected, .x-select .x-select-selected
+.x-item-picker-list .x-item-picker-selected, .x-select .x-select-selected
 {
 	background-color: #c3daf9 !important;
     border: 1px solid #336699;

@@ -58,7 +58,7 @@ public class FormDescriptorFactory
         registerFieldType(FieldType.HIDDEN, HiddenFieldDescriptor.class);
         registerFieldType(FieldType.PASSWORD, PasswordFieldDescriptor.class);
         registerFieldType(FieldType.SELECT, SelectFieldDescriptor.class);
-        registerFieldType(FieldType.STRING_LIST, StringListFieldDescriptor.class);
+        registerFieldType(FieldType.ITEM_PICKER, ItemPickerFieldDescriptor.class);
         registerFieldType(FieldType.TEXT, TextFieldDescriptor.class);
         registerFieldType(FieldType.TEXTAREA, TextAreaFieldDescriptor.class);
     }
@@ -112,9 +112,9 @@ public class FormDescriptorFactory
                 }
 
                 FieldDescriptor fd = createFieldOfType(fieldType);
-                if(fd instanceof SelectFieldDescriptor)
+                if(fd instanceof OptionFieldDescriptor)
                 {
-                    ((SelectFieldDescriptor)fd).setMultiple(true);                    
+                    ((OptionFieldDescriptor)fd).setMultiple(true);                    
                 }
                 fd.setForm(form);
                 fd.setParentPath(parentPath);

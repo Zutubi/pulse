@@ -8,6 +8,7 @@ import com.zutubi.pulse.core.config.ConfigurationCheckHandler;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
+import com.zutubi.pulse.prototype.config.group.GroupConfiguration;
 import com.zutubi.pulse.prototype.config.misc.LoginConfiguration;
 import com.zutubi.pulse.prototype.config.misc.TransientConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
@@ -44,6 +45,7 @@ public class ConfigurationRegistry
     public static final String PROJECTS_SCOPE = "projects";
     public static final String SETUP_SCOPE = "init";
     public static final String USERS_SCOPE = "users";
+    public static final String GROUPS_SCOPE = "groups";
 
     private CompositeType transientConfig;
     private Map<CompositeType, CompositeType> checkTypeMapping = new HashMap<CompositeType, CompositeType>();
@@ -202,6 +204,14 @@ public class ConfigurationRegistry
             userSubscriptionConditionConfig.addExtension("zutubi.selectedBuildsConditionConfig");
             userSubscriptionConditionConfig.addExtension("zutubi.customConditionConfig");
             userSubscriptionConditionConfig.addExtension("zutubi.repeatedUnsuccessfulConditionConfig");
+
+            // group configuration .
+
+            MapType groupCollection = new MapType();
+            groupCollection.setTypeRegistry(typeRegistry);
+            groupCollection.setCollectionType(registerConfigurationType(GroupConfiguration.class));
+
+            configurationPersistenceManager.register(GROUPS_SCOPE, groupCollection);
 
         }
         catch (TypeException e)
