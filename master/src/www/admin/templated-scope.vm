@@ -3,7 +3,6 @@
 <html>
 <head>
     <title>#wwtext("name=administration")</title>
-    <script type="text/javascript" src="$base/js/zutubi.js"></script>
 	<script type="text/javascript">
         var configTree;
         var templateTree;
