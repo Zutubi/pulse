@@ -147,6 +147,13 @@
                 </map>
             </subclass>
 
+            <subclass name="com.zutubi.pulse.model.BJamPulseFileDetails" discriminator-value="BJAM" lazy="false">
+                <property name="jamfile" column="MAKEFILE" type="string" length="255"/>
+                <property name="targets" column="TARGETS" type="string" length="1023"/>
+                <property name="arguments" column="ARGUMENTS" type="string" length="1023"/>
+                <property name="workingDir" column="WORKING_DIR" type="string" length="1023"/>
+            </subclass>
+
             <subclass name="com.zutubi.pulse.model.ExecutablePulseFileDetails" discriminator-value="EXE" lazy="false">
                 <!-- Overlap columns with other subtypes -->
                 <property name="executable" column="BUILD_FILE" type="string" length="255"/>

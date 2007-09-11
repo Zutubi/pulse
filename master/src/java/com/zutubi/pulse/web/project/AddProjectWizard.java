@@ -32,6 +32,7 @@ public class AddProjectWizard extends BaseWizard
     private CustomDetails customDetails;
     private VersionedDetails versionedDetails;
     private AntDetails antDetails;
+    private BJamDetails bjamDetails;
     private ExecutableDetails executableDetails;
     private MakeDetails makeDetails;
     private MavenDetails mavenDetails;
@@ -54,6 +55,7 @@ public class AddProjectWizard extends BaseWizard
 
         // step 3, project.
         antDetails = new AntDetails(this, "ant");
+        bjamDetails = new BJamDetails(this, "bjam");
         executableDetails = new ExecutableDetails(this, "executable");
         makeDetails = new MakeDetails(this, "make");
         mavenDetails = new MavenDetails(this, "maven");
@@ -67,6 +69,7 @@ public class AddProjectWizard extends BaseWizard
         addState(svnDetails);
         addState(p4Details);
         addState(antDetails);
+        addState(bjamDetails);
         addState(executableDetails);
         addState(makeDetails);
         addState(mavenDetails);
@@ -104,6 +107,10 @@ public class AddProjectWizard extends BaseWizard
         if ("ant".equals(projectType))
         {
             details = antDetails.getDetails();
+        }
+        else if ("bjam".equals(projectType))
+        {
+            details = bjamDetails.getDetails();
         }
         else if ("custom".equals(projectType))
         {
@@ -211,6 +218,7 @@ public class AddProjectWizard extends BaseWizard
             {
                 types = new TreeMap<String, String>();
                 types.put("ant", "ant project");
+                types.put("bjam", "boost jam project");
                 types.put("custom", "custom project");
                 types.put("executable", "executable project");
                 types.put("make", "make project");
@@ -442,6 +450,26 @@ public class AddProjectWizard extends BaseWizard
         private AntPulseFileDetails details = new AntPulseFileDetails("build.xml", null, null, null, null);
 
         public AntDetails(Wizard wizard, String name)
+        {
+            super(wizard, name);
+        }
+
+        public String getNextStateName()
+        {
+            return "success";
+        }
+
+        public PulseFileDetails getDetails()
+        {
+            return details;
+        }
+    }
+
+    private class BJamDetails extends BaseWizardState
+    {
+        private BJamPulseFileDetails details = new BJamPulseFileDetails(null, null, null, null);
+
+        public BJamDetails(Wizard wizard, String name)
         {
             super(wizard, name);
         }

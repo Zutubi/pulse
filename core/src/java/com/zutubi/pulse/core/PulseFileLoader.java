@@ -20,6 +20,7 @@ public class PulseFileLoader extends FileLoader
         register("post-processor", PostProcessorGroup.class);
         register("command", CommandGroup.class);
         register("ant.pp", AntPostProcessor.class);
+        register("bjam.pp", BJamPostProcessor.class);
         register("cppunit.pp", CppUnitReportPostProcessor.class);
         register("junit.pp", JUnitReportPostProcessor.class);
         register("junit.summary.pp", JUnitSummaryPostProcessor.class);
@@ -32,6 +33,7 @@ public class PulseFileLoader extends FileLoader
         register("unittestpp.pp", UnitTestPlusPlusReportPostProcessor.class);
         register("xcodebuild.pp", XCodePostProcessor.class);
         register("ant", AntCommand.class);
+        register("bjam", BJamCommand.class);
         register("maven", MavenCommand.class);
         register("maven2", Maven2Command.class);
         register("executable", ExecutableCommand.class);

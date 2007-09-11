@@ -423,12 +423,27 @@
             <result name="custom" type="chain">editCustomDetails!input</result>
             <result name="versioned" type="chain">editVersionedDetails!input</result>
             <result name="ant" type="chain">editAntDetails!input</result>
+            <result name="bjam" type="chain">editBJamDetails!input</result>
             <result name="executable" type="chain">editExecutableDetails!input</result>
             <result name="make" type="chain">editMakeDetails!input</result>
             <result name="maven" type="chain">editMavenDetails!input</result>
             <result name="maven2" type="chain">editMaven2Details!input</result>
             <result name="xcode" type="chain">editXCodeDetails!input</result>
             <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <!-- Alias is required as WW can't chain to a non-execute method :| -->
+        <action name="editBJamDetails!input" class="com.zutubi.pulse.web.project.EditBJamDetailsAction"
+                method="doInput">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-details-bjam.vm</result>
+        </action>
+
+        <action name="editBJamDetails" class="com.zutubi.pulse.web.project.EditBJamDetailsAction">
+            <interceptor-ref name="crudStack"/>
+            <result name="input" type="velocity">edit-details-bjam.vm</result>
+            <result name="cancel" type="redirect">/configureProject.action?id=${projectId}</result>
+            <result name="success" type="redirect">/configureProject.action?id=${projectId}</result>
         </action>
 
         <!-- Alias is required as WW can't chain to a non-execute method :| -->
@@ -629,6 +644,7 @@
             <result name="maven" type="velocity">addproject-maven.vm</result>
             <result name="maven2" type="velocity">addproject-maven2.vm</result>
             <result name="ant" type="velocity">addproject-ant.vm</result>
+            <result name="bjam" type="velocity">addproject-bjam.vm</result>
             <result name="executable" type="velocity">addproject-executable.vm</result>
             <result name="make" type="velocity">addproject-make.vm</result>
             <result name="xcode" type="velocity">addproject-xcode.vm</result>

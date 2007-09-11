@@ -36,6 +36,10 @@
                 #staticWrapCell("project.type.ant.description")
             </tr>
             <tr>
+                #contentRowHeading("project.type.bjam")
+                #staticWrapCell("project.type.bjam.description")
+            </tr>
+            <tr>
                 #contentRowHeading("project.type.custom")
                 #staticWrapCell("project.type.custom.description")
             </tr>

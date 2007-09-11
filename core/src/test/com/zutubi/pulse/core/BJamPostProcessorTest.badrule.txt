@@ -1,0 +1,9 @@
+Jamroot:4: in modules.load
+rule badrule unknown in module Jamfile</home/jsankey/archives/boost_1_34_1/tools/build/v2/example/libraries>.
+/home/jsankey/archives/boost_1_34_1/tools/build/v2/build/project.jam:312: in load-jamfile
+/home/jsankey/archives/boost_1_34_1/tools/build/v2/build/project.jam:68: in load
+/home/jsankey/archives/boost_1_34_1/tools/build/v2/build/project.jam:170: in project.find
+/home/jsankey/archives/boost_1_34_1/tools/build/v2/build-system.jam:237: in load
+/home/jsankey/archives/boost_1_34_1/tools/build/v2/example/../kernel/modules.jam:261: in import
+/home/jsankey/archives/boost_1_34_1/tools/build/v2/example/../kernel/bootstrap.jam:132: in boost-build
+/home/jsankey/archives/boost_1_34_1/tools/build/v2/example/boost-build.jam:6: in module scope
