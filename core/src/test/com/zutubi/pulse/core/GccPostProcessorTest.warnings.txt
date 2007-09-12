@@ -1,0 +1,13 @@
+gcc.compile.c++ ../bin.v2/libs/tr1/test/test_strstream_std_header.test/gcc-4.1.2/debug/test_strstream_std_header.o
+In file included from /usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/backward/strstream:51,
+                 from /home/jsankey/archives/boost_1_34_1/boost/tr1/tr1/strstream:18,
+                 from /home/jsankey/archives/boost_1_34_1/libs/tr1/test/std_headers/test_strstream.cpp:6:
+/usr/lib/gcc/i486-linux-gnu/4.1.2/../../../../include/c++/4.1.2/backward/backward_warning.h:32:2: warning: #warning This file includes at least one deprecated or antiquated header. Please consider using one of the 32 headers found in section 17.4.1.2 of the C++ standard. Examples include substituting the <X> header for the <X.h> header for C++ includes, or <iostream> instead of the deprecated header <iostream.h>. To disable this warning use -Wno-deprecated.
+**passed** ../bin.v2/libs/tr1/test/test_strstream_std_header.test/gcc-4.1.2/debug/test_strstream_std_header.test
+MkDir1 ../bin.v2/libs/tr1/test/test_string_std_header.test
+MkDir1 ../bin.v2/libs/tr1/test/test_string_std_header.test/gcc-4.1.2
+MkDir1 ../bin.v2/libs/tr1/test/test_string_std_header.test/gcc-4.1.2/debug
+gcc.compile.c++ ../bin.v2/libs/tr1/test/test_string_std_header.test/gcc-4.1.2/debug/test_string_std_header.o
+**passed** ../bin.v2/libs/tr1/test/test_string_std_header.test/gcc-4.1.2/debug/test_string_std_header.test
+MkDir1 ../bin.v2/libs/tr1/test/test_deque_std_header.test
+MkDir1 ../bin.v2/libs/tr1/test/test_deque_std_header.test/gcc-4.1.2

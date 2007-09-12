@@ -1,0 +1,12 @@
+MkDir1 ../bin.v2/libs/tr1/test/tr1_has_tr1_result_of_fail.test
+MkDir1 ../bin.v2/libs/tr1/test/tr1_has_tr1_result_of_fail.test/gcc-4.1.2
+MkDir1 ../bin.v2/libs/tr1/test/tr1_has_tr1_result_of_fail.test/gcc-4.1.2/debug
+gcc.compile.c++ ../bin.v2/libs/tr1/test/tr1_has_tr1_result_of_fail.test/gcc-4.1.2/debug/tr1_has_tr1_result_of_fail.o
+../libs/config/test/boost_has_tr1_result_of.ipp:16: error: ‘std::tr1’ has not been declared
+../libs/config/test/boost_has_tr1_result_of.ipp:16: error: expected initializer before ‘<’ token
+../libs/config/test/boost_has_tr1_result_of.ipp:17: error: using ‘typename’ outside of template
+../libs/config/test/boost_has_tr1_result_of.ipp:17: error: ‘r’ has not been declared
+../libs/config/test/boost_has_tr1_result_of.ipp:17: error: invalid type in declaration before ‘;’ token
+(failed-as-expected) ../bin.v2/libs/tr1/test/tr1_has_tr1_result_of_fail.test/gcc-4.1.2/debug/tr1_has_tr1_result_of_fail.o
+**passed** ../bin.v2/libs/tr1/test/tr1_has_tr1_result_of_fail.test/gcc-4.1.2/debug/tr1_has_tr1_result_of_fail.test
+MkDir1 ../bin.v2/libs/tr1/test/tr1_has_tr1_ref_wrap_fail.test
