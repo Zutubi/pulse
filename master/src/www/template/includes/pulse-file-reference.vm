@@ -13,7 +13,13 @@
                             #refLink("ant.pp")
                         </li>
                         <li>
+                            #refLink("bjam.pp")
+                        </li>
+                        <li>
                             #refLink("cppunit.pp")
+                        </li>
+                        <li>
+                            #refLink("gcc.pp")
                         </li>
                         <li>
                             #refLink("junit.pp")
@@ -47,6 +53,9 @@
                             <ul>
                                 <li>
                                     #refLink("ant")
+                                </li>
+                                <li>
+                                    #refLink("bjam")
                                 </li>
                                 <li>
                                     #refLink("command")
@@ -117,6 +126,9 @@
                         </li>
                         <li>
                             #refLink("regex-test.pp")
+                        </li>
+                        <li>
+                            #refLink("scope")
                         </li>
                         <li>
                             #refLink("unittestpp.pp")
