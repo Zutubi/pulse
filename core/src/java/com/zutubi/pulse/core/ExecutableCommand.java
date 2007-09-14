@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core;
 
+import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
@@ -14,22 +15,24 @@ import java.util.*;
  *
  *
  */
-public class ExecutableCommand implements Command, ScopeAware
+public class ExecutableCommand extends CommandSupport implements ScopeAware
 {
     public static final String ENV_NAME = "environment";
     private static final String ENV_PATH = "PATH";
     private static final String SUPPRESSED_VALUE = "[value suppressed for security reasons]";
 
-    private String name;
     private String exe;
     private List<Arg> args = new LinkedList<Arg>();
     private File workingDir;
+    private String inputFile;
+    private String outputFile;
     private List<Environment> env = new LinkedList<Environment>();
     private List<ProcessArtifact> processes = new LinkedList<ProcessArtifact>();
     private Scope scope;
 
     private Process child;
     private CancellableReader reader;
+    private CancellableReader writer;
     private volatile boolean terminated = false;
 
     private List<String> suppressedEnvironment = Arrays.asList(System.getProperty("pulse.suppressed.environment.variables", "P4PASSWD").split(" +"));
@@ -65,6 +68,8 @@ public class ExecutableCommand implements Command, ScopeAware
             throw new BuildException("Unable to create directory for the output artifact '" + outputFileDir.getAbsolutePath() + "'");
         }
 
+        File inFile = checkInputFile(workingDir);
+
         if (terminatedCheck(cmdResult))
         {
             // Catches the case where we were asked to terminate before
@@ -92,25 +97,20 @@ public class ExecutableCommand implements Command, ScopeAware
             throw new BuildException("Unable to create process: " + message, e);
         }
 
-        File outputFile = new File(outputFileDir, OUTPUT_FILENAME);
+        File outputArtifact = new File(outputFileDir, OUTPUT_FILENAME);
 
         try
         {
-            FileOutputStream outputFileStream = new FileOutputStream(outputFile);
-            OutputStream output;
-
-            if (context.getOutputStream() != null)
-            {
-                output = new ForkOutputStream(outputFileStream, context.getOutputStream());
-            }
-            else
-            {
-                output = outputFileStream;
-            }
-
+            OutputStream output = getOutputStream(context, workingDir, outputArtifact);
             InputStream input = child.getInputStream();
             reader = new CancellableReader(input, output);
             reader.start();
+
+            if(inFile != null)
+            {
+                writer = new CancellableReader(new FileInputStream(inFile), child.getOutputStream());
+                writer.start();
+            }
 
             if (terminatedCheck(cmdResult))
             {
@@ -145,6 +145,18 @@ public class ExecutableCommand implements Command, ScopeAware
                 cmdResult.error("Unable to cleanly terminate the child process tree.  It is likely that some orphaned processes remain.");
             }
 
+            if(writer != null)
+            {
+                if(writer.waitFor(10))
+                {
+                    IOException ioe = writer.getIoError();
+                    if(ioe != null)
+                    {
+                        throw new BuildException(ioe);
+                    }
+                }
+            }
+            
             String commandLine = constructCommandLine(builder);
 
             if (result == 0)
@@ -179,9 +191,9 @@ public class ExecutableCommand implements Command, ScopeAware
         {
             // In finally so that any output gathered will be captured as an
             // artifact, even if the command failed.
-            if(outputFile.exists())
+            if(outputArtifact.exists())
             {
-                ProcessSupport.postProcess(processes, outputFileDir, outputFile, cmdResult, context);
+                ProcessSupport.postProcess(processes, outputFileDir, outputArtifact, cmdResult, context);
             }
 
             if (child != null)
@@ -189,6 +201,61 @@ public class ExecutableCommand implements Command, ScopeAware
                 child.destroy();
             }
         }
+    }
+
+    private OutputStream getOutputStream(CommandContext context, File workingDir, File outputArtifact) throws FileNotFoundException
+    {
+        List<OutputStream> outputs = new ArrayList<OutputStream>(3);
+        outputs.add(new FileOutputStream(outputArtifact));
+
+        if(context.getOutputStream() != null)
+        {
+            outputs.add(context.getOutputStream());
+        }
+
+        if(TextUtils.stringSet(outputFile))
+            {
+                try
+                {
+                    outputs.add(new FileOutputStream(new File(workingDir, outputFile)));
+            }
+            catch (FileNotFoundException e)
+            {
+                throw new BuildException("Unable to create output file '" + outputFile + "': " + e.getMessage(), e);
+            }
+        }
+
+        OutputStream output;
+        if (outputs.size() > 1)
+        {
+            output = new ForkOutputStream(outputs.toArray(new OutputStream[outputs.size()]));
+        }
+        else
+        {
+            output = outputs.get(0);
+        }
+        return output;
+    }
+
+    private File checkInputFile(File workingDir)
+    {
+        if(TextUtils.stringSet(inputFile))
+        {
+            File input = new File(workingDir, inputFile);
+            if(!input.exists())
+            {
+                throw new BuildException("Input file '" + input.getAbsolutePath() + "' does not exist");
+            }
+
+            if(!input.canRead())
+            {
+                throw new BuildException("Input file '" + input.getAbsolutePath() + "' is not readable");
+            }
+
+            return input;
+        }
+
+        return null;
     }
 
     private boolean terminatedCheck(CommandResult commandResult)
@@ -461,6 +528,16 @@ public class ExecutableCommand implements Command, ScopeAware
         this.workingDir = d;
     }
 
+    public void setInputFile(String inputFile)
+    {
+        this.inputFile = inputFile;
+    }
+
+    public void setOutputFile(String outputFile)
+    {
+        this.outputFile = outputFile;
+    }
+
     public Arg createArg()
     {
         Arg arg = new Arg();
@@ -523,16 +600,6 @@ public class ExecutableCommand implements Command, ScopeAware
         }
 
         return result.toString();
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
     }
 
     public void terminate()

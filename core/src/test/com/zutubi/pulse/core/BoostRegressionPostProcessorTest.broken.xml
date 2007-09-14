@@ -1,0 +1,5 @@
+<test-log library="statechart" test-name="InvalidResultCopyTestRelaxed" test-type="run" test-program="libs/statechart/test/InvalidResultCopyTest.cpp" target-directory="bin.v2/libs/statechart/test/InvalidResultCopyTestRelaxed.test/gcc-4.1.2/debug" toolset="gcc-4.1.2" show-run-output="false">
+<compile result="fail" timestamp="2007-09-12 15:16:53 UTC">
+    compiler error here
+</compile>
+</test-log>

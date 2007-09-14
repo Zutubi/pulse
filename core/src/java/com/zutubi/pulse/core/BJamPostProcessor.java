@@ -7,7 +7,8 @@ public class BJamPostProcessor extends RegexPostProcessor implements PostProcess
 {
     public BJamPostProcessor()
     {
-        addErrorRegexs("^rule [a-zA-Z0-9_-]+ unknown",
+        addErrorRegexs("^error:",
+                       "^rule [a-zA-Z0-9_-]+ unknown",
                        "^\\.\\.\\.failed",
                        "^\\*\\*\\* argument error",
                        "^don't know how to make",

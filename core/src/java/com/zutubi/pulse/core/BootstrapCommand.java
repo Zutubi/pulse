@@ -62,6 +62,11 @@ public class BootstrapCommand implements Command
         // Ignored
     }
 
+    public boolean isForce()
+    {
+        return false;
+    }
+
     public void terminate()
     {
         bootstrapper.terminate();

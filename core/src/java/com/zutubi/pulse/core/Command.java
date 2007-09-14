@@ -22,5 +22,7 @@ public interface Command
 
     void setName(String name);
 
+    boolean isForce();
+
     void terminate();
 }

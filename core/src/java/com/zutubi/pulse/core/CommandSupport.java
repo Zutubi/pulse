@@ -12,6 +12,7 @@ import java.util.List;
 public abstract class CommandSupport implements Command
 {
     private String name;
+    private boolean force;
 
     public CommandSupport()
     {
@@ -39,6 +40,16 @@ public abstract class CommandSupport implements Command
     public void setName(String name)
     {
         this.name = name;
+    }
+
+    public boolean isForce()
+    {
+        return force;
+    }
+
+    public void setForce(boolean force)
+    {
+        this.force = force;
     }
 
     public void terminate()

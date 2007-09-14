@@ -192,26 +192,29 @@ public class RecipeProcessor
 
     public void build(long recipeId, Scope globalScope, long recipeStartTime, Recipe recipe, RecipePaths paths, TestSuiteResult testResults, boolean capture, BuildContext context) throws BuildException
     {
-        // TODO: support continuing build when errors occur. Take care: exceptions.
         int i = 1;
+        boolean success = true;
         for (Command command : recipe.getCommands())
         {
-            CommandResult result = new CommandResult(command.getName());
-
-            File commandOutput = new File(paths.getOutputDir(), getCommandDirName(i, result));
-
-            if(!executeCommand(recipeId, globalScope, recipeStartTime, result, paths, commandOutput, testResults, command, capture, context))
+            if (success || command.isForce())
             {
-                return;
-            }
+                CommandResult result = new CommandResult(command.getName());
+                File commandOutput = new File(paths.getOutputDir(), getCommandDirName(i, result));
 
-            switch (result.getState())
-            {
-                case FAILURE:
-                case ERROR:
+                if(!executeCommand(recipeId, globalScope, recipeStartTime, result, paths, commandOutput, testResults, command, capture, context))
+                {
+                    // Recipe terminated
                     return;
+                }
+
+                switch (result.getState())
+                {
+                    case FAILURE:
+                    case ERROR:
+                        success = false;
+                }
+                i++;
             }
-            i++;
         }
     }
 

@@ -1,0 +1,5 @@
+<test-log library="iterator" test-name="interoperable_fail" test-type="compile_fail" test-program="libs/iterator/test/interoperable_fail.cpp" target-directory="bin.v2/libs/iterator/test/interoperable_fail.test/gcc-4.1.2/debug" toolset="gcc-4.1.2" show-run-output="false">
+<compile result="succeed" timestamp="2007-09-12 15:16:46 UTC">
+(failed-as-expected) ../bin.v2/libs/iterator/test/interoperable_fail.test/gcc-4.1.2/debug/interoperable_fail.o
+</compile>
+</test-log>
