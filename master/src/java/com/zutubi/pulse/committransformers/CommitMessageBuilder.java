@@ -284,6 +284,7 @@ public class CommitMessageBuilder
      * @return
      * @see java.util.regex.Matcher#appendReplacement(StringBuffer,String)
      */
+    // WARNING: Any changes to this should also be reflected as changes to the PatternGroupValidator.
     private String processSubstitution(String replacement, Matcher matcher)
     {
         // Process substitution string to replace group references with groups

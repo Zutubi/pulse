@@ -230,6 +230,11 @@ public class LicenseEncoder implements LicenseKeyFactory
 
     private static class NewCommercialLicense
     {
+        public void generateKey(String companyName, LicenseType type, String expiry)
+        {
+            LicenseEncoder.main(new String[]{type.toString(), companyName, expiry});
+        }
+
         public void generateKey(String companyName, LicenseType type)
         {
             // code, name, expiry
@@ -237,7 +242,7 @@ public class LicenseEncoder implements LicenseKeyFactory
             Calendar oneYearFromToday = Calendar.getInstance();
             oneYearFromToday.add(Calendar.YEAR, 1);
 
-            LicenseEncoder.main(new String[]{type.toString(), companyName, expiryFormat.format(oneYearFromToday.getTime())});
+            generateKey(companyName, type, expiryFormat.format(oneYearFromToday.getTime()));
         }
     }
 

@@ -4,6 +4,7 @@ import com.zutubi.pulse.form.descriptor.annotation.Form;
 import com.zutubi.pulse.form.descriptor.annotation.Text;
 import com.zutubi.validation.annotations.Pattern;
 import com.zutubi.validation.annotations.Required;
+import com.zutubi.validation.annotations.PatternGroup;
 
 /**
  * <class comment/>
@@ -37,7 +38,7 @@ public class LinkHandler implements CommitMessageHandler
         this.expression = expression;
     }
 
-    @Required @Text(size=50)
+    @Required @PatternGroup @Text(size=50)
     public String getLink()
     {
         return link;
