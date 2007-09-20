@@ -16,6 +16,7 @@ import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 
 import java.io.File;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -181,7 +182,7 @@ public class AgentUpdaterTest extends PulseTestCase implements EventListener
         }
 
         agent = new MockAgent(agentConfig, agentState, (AgentService) mockService.proxy());
-        updater = new AgentUpdater(agent, TEST_URL, eventManager, systemPaths);
+        updater = new AgentUpdater(agent, TEST_URL, eventManager, systemPaths, Executors.defaultThreadFactory());
         updater.setStatusTimeout(5);
         updater.setRebootTimeout(5);
         updater.setPingInterval(10);

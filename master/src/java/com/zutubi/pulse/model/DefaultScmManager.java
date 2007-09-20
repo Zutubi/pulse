@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -38,17 +39,17 @@ public class DefaultScmManager implements ScmManager, Stoppable
 {
     private static final Logger LOG = Logger.getLogger(DefaultScmManager.class);
 
-    private ProjectManager projectManager;
-    private EventManager eventManager;
-    private ShutdownManager shutdownManager;
-    private ScmClientFactory scmClientFactory;
-
-    private Scheduler scheduler;
     private static final String MONITOR_NAME = "poll";
     private static final String MONITOR_GROUP = "scm";
     private static final long POLLING_FREQUENCY = Constants.MINUTE;
 
+    private ProjectManager projectManager;
+    private EventManager eventManager;
+    private ShutdownManager shutdownManager;
+    private ScmClientFactory scmClientFactory;
+    private Scheduler scheduler;
     private ConfigurationProvider configurationProvider;
+    private ThreadFactory threadFactory;
 
     private final Map<Long, Pair<Long, Revision>> waiting = new HashMap<Long, Pair<Long, Revision>>();
     private final Map<Long, Revision> latestRevisions = new HashMap<Long, Revision>();
@@ -73,7 +74,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
             pollThreadCount = Integer.getInteger(PROPERTY_POLLING_THREAD_COUNT);
         }
 
-        executor = new ThreadPoolExecutor(pollThreadCount, pollThreadCount, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
+        executor = new ThreadPoolExecutor(pollThreadCount, pollThreadCount, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), threadFactory);
 
         shutdownManager.addStoppable(this);
 
@@ -327,5 +328,10 @@ public class DefaultScmManager implements ScmManager, Stoppable
     public void setScmClientFactory(ScmClientFactory scmClientFactory)
     {
         this.scmClientFactory = scmClientFactory;
+    }
+
+    public void setThreadFactory(ThreadFactory threadFactory)
+    {
+        this.threadFactory = threadFactory;
     }
 }

@@ -1,6 +1,7 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 import com.zutubi.util.Predicate;
 import org.acegisecurity.acl.basic.AclObjectIdentity;
 import org.acegisecurity.acl.basic.AclObjectIdentityAware;
@@ -66,8 +67,14 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
 
     public BuildResult(User user, Project project, long number)
     {
-        this(new PersonalBuildReason(user.getLogin()), project, number, false);
+        this(new PersonalBuildReason(getLogin(user)), project, number, false);
         this.user = user;
+    }
+
+    private static String getLogin(User user)
+    {
+        UserConfiguration config = user.getConfig();
+        return config == null ? "" : config.getLogin();
     }
 
     public BuildReason getReason()

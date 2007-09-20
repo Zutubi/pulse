@@ -8,10 +8,9 @@ import com.zutubi.prototype.config.events.PostSaveEvent;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.model.AcegiUser;
-import com.zutubi.pulse.model.Group;
-import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.prototype.config.admin.LDAPConfiguration;
+import com.zutubi.pulse.prototype.config.group.GroupConfiguration;
 import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 import com.zutubi.pulse.prototype.config.user.UserPreferencesConfiguration;
 import com.zutubi.pulse.prototype.config.user.contacts.EmailContactConfiguration;
@@ -200,7 +199,7 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
         }
     }
 
-    public synchronized User authenticate(String username, String password)
+    public synchronized UserConfiguration authenticate(String username, String password)
     {
         if (enabled && initialised)
         {
@@ -213,10 +212,10 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
                     name = username;
                 }
 
-                User user = userManager.getUser(username);
+                UserConfiguration user = userManager.getUserConfig(username);
                 if(user == null)
                 {
-                    user = new User(username, name);
+                    user = new UserConfiguration(username, name);
                 }
 
                 if (TextUtils.stringSet(emailAttribute))
@@ -259,13 +258,13 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
             {
                 try
                 {
-                    List<Group> groups = getLdapGroups(details, populator);
-                    for(Group group: groups)
+                    List<GroupConfiguration> groups = getLdapGroups(details, populator);
+                    for(GroupConfiguration group: groups)
                     {
                         LOG.debug("Adding user '" + details.getUsername() + "' to group '" + group.getName() + "' via LDAP");
-                        for (GrantedAuthority a : group.getAuthorities())
+                        for (String authority : group.getGrantedAuthorities())
                         {
-                            user.addTransientAuthority(a.getAuthority());
+                            user.addTransientAuthority(authority);
                         }
                     }
                 }
@@ -277,13 +276,13 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
         }
     }
 
-    private List<Group> getLdapGroups(LdapUserDetails details, DefaultLdapAuthoritiesPopulator populator)
+    private List<GroupConfiguration> getLdapGroups(LdapUserDetails details, DefaultLdapAuthoritiesPopulator populator)
     {
-        List<Group> groups = new LinkedList<Group>();
+        List<GroupConfiguration> groups = new LinkedList<GroupConfiguration>();
         GrantedAuthority[] ldapAuthorities = populator.getGrantedAuthorities(details);
         for (GrantedAuthority authority : ldapAuthorities)
         {
-            Group group = userManager.getGroup(authority.getAuthority());
+            GroupConfiguration group = userManager.getGroupConfig(authority.getAuthority());
             if (group != null)
             {
                 groups.add(group);
@@ -293,10 +292,9 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
         return groups;
     }
 
-    private void addContact(User user, LdapUserDetails details)
+    private void addContact(UserConfiguration user, LdapUserDetails details)
     {
-        UserConfiguration config = user.getConfig();
-        UserPreferencesConfiguration prefs = config.getPreferences();
+        UserPreferencesConfiguration prefs = user.getPreferences();
         if (prefs.getContacts().containsKey(EMAIL_CONTACT_NAME))
         {
             String email = getStringAttribute(details, emailAttribute, user.getLogin());
@@ -308,8 +306,8 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
                     EmailContactConfiguration contact = new EmailContactConfiguration();
                     contact.setName(EMAIL_CONTACT_NAME);
                     contact.setAddress(email);
-                    // FIXME check what happens when users are being auto-added
-                    configurationProvider.insert(PathUtils.getPath(config.getConfigurationPath(), "contacts"), contact);
+                    // FIXME USERS check what happens when users are being auto-added
+                    configurationProvider.insert(PathUtils.getPath(user.getConfigurationPath(), "contacts"), contact);
                 }
                 catch (AddressException e)
                 {
@@ -350,7 +348,7 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
         return enabled && initialised && autoAdd && LicenseHolder.hasAuthorization("canAddUser");
     }
 
-    public List<Group> testAuthenticate(LDAPConfiguration configuration, String testLogin, String testPassword)
+    public List<GroupConfiguration> testAuthenticate(LDAPConfiguration configuration, String testLogin, String testPassword)
     {
         DefaultInitialDirContextFactory contextFactory = createContextFactory(configuration.getLdapUrl(), configuration.getBaseDn(), configuration.getManagerDn(), configuration.getManagerPassword(), configuration.getFollowReferrals(), configuration.getEscapeSpaceCharacters());
         contextFactory.newInitialDirContext();
@@ -365,7 +363,7 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
         }
         else
         {
-            return new ArrayList<Group>(0);
+            return Collections.EMPTY_LIST;
         }
     }
 

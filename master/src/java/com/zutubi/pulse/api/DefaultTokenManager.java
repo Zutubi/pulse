@@ -4,6 +4,7 @@ import com.zutubi.pulse.model.AcegiUser;
 import com.zutubi.pulse.model.GrantedAuthority;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.UserManager;
+import com.zutubi.pulse.prototype.config.group.ServerPermission;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.util.Constants;
 import org.acegisecurity.AuthenticationManager;
@@ -67,6 +68,7 @@ public class DefaultTokenManager implements TokenManager
         }
         catch(Exception e)
         {
+            e.printStackTrace();
             throw new AuthenticationException(e.getMessage());
         }
     }
@@ -88,7 +90,7 @@ public class DefaultTokenManager implements TokenManager
 
     public User verifyAdmin(String token) throws AuthenticationException
     {
-        return verifyRoleIn(token, GrantedAuthority.ADMINISTRATOR);
+        return verifyRoleIn(token, ServerPermission.ADMINISTER.toString());
     }
 
     public User verifyUser(String token) throws AuthenticationException
@@ -220,11 +222,6 @@ public class DefaultTokenManager implements TokenManager
         }
     }
 
-    /**
-     * Required resource.
-     *
-     * @param userManager
-     */
     public void setUserManager(UserManager userManager)
     {
         this.userManager = userManager;
@@ -235,11 +232,6 @@ public class DefaultTokenManager implements TokenManager
         this.authenticationManager = authenticationManager;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param adminTokenManager
-     */
     public void setAdminTokenManager(AdminTokenManager adminTokenManager)
     {
         this.adminTokenManager = adminTokenManager;

@@ -32,7 +32,6 @@ import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.Sort;
 import com.zutubi.util.logging.Logger;
-import org.acegisecurity.annotation.Secured;
 
 import java.util.*;
 
@@ -179,15 +178,15 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
         projectDao.save(project);
     }
 
-    public Collection<ProjectConfiguration> getAllProjectConfigs(boolean allowInvalid)
+    public List<ProjectConfiguration> getAllProjectConfigs(boolean allowInvalid)
     {
         if(allowInvalid)
         {
-            return Collections.unmodifiableCollection(nameToConfig.values());
+            return Collections.unmodifiableList(new LinkedList<ProjectConfiguration>(nameToConfig.values()));
         }
         else
         {
-            return Collections.unmodifiableCollection(validConfigs);
+            return Collections.unmodifiableList(validConfigs);
         }
     }
 
@@ -208,11 +207,6 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
             return null;
         }
         return configuration;
-    }
-
-    public void saveProjectConfig(ProjectConfiguration config)
-    {
-        configurationProvider.save(config);
     }
 
     public Project getProject(String name, boolean allowInvalid)
@@ -295,7 +289,6 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
         licenseManager.refreshAuthorisations();
     }
 
-    @Secured({"ACL_PROJECT_WRITE"})
     public void checkWrite(Project project)
     {
     }
@@ -382,41 +375,6 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
         TypeConfiguration type = projectConfig.getType();
         ComponentContext.autowire(type);
         return type.getPulseFile(0, projectConfig, revision, patch);
-    }
-
-    public List<Project> getProjectsWithAdmin(String authority)
-    {
-        return projectDao.findByAdminAuthority(authority);
-    }
-
-    public void updateProjectAdmins(String authority, List<Long> restrictToProjects)
-    {
-        List<Project> projects = getProjects(true);
-        for(Project p: projects)
-        {
-            if(restrictToProjects == null || restrictToProjects.contains(p.getId()))
-            {
-                p.addAdmin(authority);
-            }
-            else
-            {
-                p.removeAdmin(authority);
-            }
-
-            save(p);
-            projectAclEntryCache.removeEntriesFromCache(p);
-        }
-    }
-
-    public void removeAcls(String authority)
-    {
-        List<Project> projects = projectDao.findByAdminAuthority(authority);
-        for(Project p: projects)
-        {
-            p.removeAdmin(authority);
-            save(p);
-            projectAclEntryCache.removeEntriesFromCache(p);
-        }
     }
 
 /*

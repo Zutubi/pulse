@@ -26,7 +26,7 @@ public class HideDashboardProjectAction extends UserActionSupport
 
     public String execute() throws Exception
     {
-        String login = AcegiUtils.getLoggedInUser();
+        String login = AcegiUtils.getLoggedInUsername();
         if (login == null)
         {
             return ERROR;
@@ -50,7 +50,7 @@ public class HideDashboardProjectAction extends UserActionSupport
             dashboardConfig.getShownProjects().remove(p.getConfig());
         }
 
-        getUserManager().save(user);
+        userManager.save(user);
         return SUCCESS;
     }
 

@@ -4,8 +4,13 @@
 
 -->
 <beans>
-
     <bean id="objectFactory" class="com.zutubi.pulse.spring.SpringObjectFactory"/>
+
+    <bean id="threadFactory" class="com.zutubi.pulse.security.PulseThreadFactory"/>
+
+    <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+        <property name="threadFactory" ref="threadFactory"/>
+    </bean>
 
     <!-- Token manager required for scripted access to the remote api. -->
     <bean id="adminTokenManager" class="com.zutubi.pulse.api.AdminTokenManager" autowire="byName" init-method="init">

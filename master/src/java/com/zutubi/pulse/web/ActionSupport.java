@@ -69,7 +69,7 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
         // note, need to be careful - the returned user is likely to be
         // hopelessly out of sync if any changes have been made to the user during the
         // latest session...
-        return AcegiUtils.getLoggedInUser();
+        return AcegiUtils.getLoggedInUsername();
     }
 
     public String trimmedString(String s, int length)
@@ -302,7 +302,7 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
         return loggedInUser;
     }
 
-    public void setUserManager(UserManager userManager)
+    public final void setUserManager(UserManager userManager)
     {
         this.userManager = userManager;
     }

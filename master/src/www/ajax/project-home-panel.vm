@@ -65,7 +65,7 @@
                     </th>
                     <td #if($project.isPaused()) class="note" #else class="content" #end>
                         $project.state.toString().toLowerCase()&nbsp;
-#acl("domainObject=project" "hasPermission=4,1")
+#auth("resource=project" "action=pause")
             #if($project.isPaused())
                         <a class="unadorned" href="projectState.action?id=$project.id&amp;pause=false">
                             <img style="vertical-align: top" src="$base/images/control_play_blue.gif"/>

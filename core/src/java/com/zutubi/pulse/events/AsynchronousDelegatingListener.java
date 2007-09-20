@@ -5,6 +5,7 @@ import com.zutubi.util.logging.Logger;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -23,10 +24,10 @@ public class AsynchronousDelegatingListener implements EventListener, Stoppable
     private final ExecutorService executor;
     private final EventListener delegate;
 
-    public AsynchronousDelegatingListener(EventListener delegate)
+    public AsynchronousDelegatingListener(EventListener delegate, ThreadFactory threadFactory)
     {
         this.delegate = delegate;
-        executor = Executors.newSingleThreadExecutor();
+        executor = Executors.newSingleThreadExecutor(threadFactory);
     }
 
     public void handleEvent(final Event event)

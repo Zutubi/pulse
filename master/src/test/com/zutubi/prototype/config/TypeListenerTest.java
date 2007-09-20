@@ -14,6 +14,7 @@ import junit.framework.Assert;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
 
 /**
  *
@@ -36,6 +37,7 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         provider.setTypeRegistry(typeRegistry);
         provider.setConfigurationPersistenceManager(configurationPersistenceManager);
         provider.setConfigurationTemplateManager(configurationTemplateManager);
+        provider.setThreadFactory(Executors.defaultThreadFactory());
         provider.init();
 
         typeA = typeRegistry.register(A.class);

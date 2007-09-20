@@ -25,7 +25,7 @@ public class HideDashboardGroupAction extends UserActionSupport
 
     public String execute() throws Exception
     {
-        String login = AcegiUtils.getLoggedInUser();
+        String login = AcegiUtils.getLoggedInUsername();
         if (login == null)
         {
             return ERROR;

@@ -78,52 +78,7 @@
 
     <!-- Hibernate entities and associations -->
 
-    <cache name="com.zutubi.pulse.model.Group"
-           maxElementsInMemory="100"
-           eternal="true"
-           overflowToDisk="false"/>
-
-    <cache name="com.zutubi.pulse.model.Group.users"
-           maxElementsInMemory="100"
-           eternal="true"
-           overflowToDisk="false"/>
-
     <cache name="com.zutubi.pulse.model.User"
-           maxElementsInMemory="100"
-           eternal="true"
-           overflowToDisk="false"/>
-
-    <cache name="com.zutubi.pulse.model.User.properties"
-           maxElementsInMemory="500"
-           eternal="true"
-           overflowToDisk="false"/>
-
-    <cache name="com.zutubi.pulse.model.User.grantedAuthorities"
-           maxElementsInMemory="500"
-           eternal="true"
-           overflowToDisk="false"/>
-
-    <cache name="com.zutubi.pulse.model.User.groups"
-           maxElementsInMemory="500"
-           eternal="true"
-           overflowToDisk="false"/>
-
-    <cache name="com.zutubi.pulse.model.User.aliases"
-           maxElementsInMemory="100"
-           eternal="true"
-           overflowToDisk="false"/>
-
-    <cache name="com.zutubi.pulse.model.User.contactPoints"
-           maxElementsInMemory="100"
-           eternal="true"
-           overflowToDisk="false"/>
-
-    <cache name="com.zutubi.pulse.model.User.shownProjects"
-           maxElementsInMemory="100"
-           eternal="true"
-           overflowToDisk="false"/>
-
-    <cache name="com.zutubi.pulse.model.User.shownGroups"
            maxElementsInMemory="100"
            eternal="true"
            overflowToDisk="false"/>
@@ -139,16 +94,6 @@
            overflowToDisk="false"/>
 
     <cache name="com.zutubi.pulse.model.Project"
-           maxElementsInMemory="500"
-           eternal="true"
-           overflowToDisk="false"/>
-
-    <cache name="com.zutubi.pulse.model.ProjectAclEntry"
-           maxElementsInMemory="2000"
-           eternal="true"
-           overflowToDisk="false"/>
-
-    <cache name="com.zutubi.pulse.model.Project.aclEntries"
            maxElementsInMemory="500"
            eternal="true"
            overflowToDisk="false"/>

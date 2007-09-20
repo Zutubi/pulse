@@ -5,6 +5,7 @@
     <bean id="startupManager" class="com.zutubi.pulse.bootstrap.DefaultStartupManager" autowire="byName">
         <property name="startupTasks">
             <list>
+                <value>com.zutubi.pulse.bootstrap.LoginAsSystemStartupTask</value>
                 <value>com.zutubi.pulse.bootstrap.FreemarkerLoggingStartupTask</value>
                 <value>com.zutubi.pulse.bootstrap.ProcessSetupStartupTask</value>
                 <value>com.zutubi.pulse.BuildAborterStartupTask</value>
@@ -27,5 +28,4 @@
     <bean id="objectFactory" class="com.zutubi.pulse.spring.SpringObjectFactory"/>
 
     <bean id="xworkObjectFactory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>
-
 </beans>

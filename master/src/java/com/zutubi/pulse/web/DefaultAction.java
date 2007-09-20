@@ -1,7 +1,6 @@
 package com.zutubi.pulse.web;
 
 import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.security.AcegiUtils;
 
 /**
@@ -34,8 +33,6 @@ public class DefaultAction extends ActionSupport
      */
     private static final String SETUP_ADMIN = "setupAdmin";
 
-    private UserManager userManager;
-
     public String execute()
     {
         if (userManager.getUserCount() == 0)
@@ -43,7 +40,7 @@ public class DefaultAction extends ActionSupport
             return SETUP_ADMIN;
         }
 
-        String login = AcegiUtils.getLoggedInUser();
+        String login = AcegiUtils.getLoggedInUsername();
         if(login == null)
         {
             return PROJECT_DASHBOARD_ACTION;
@@ -53,10 +50,5 @@ public class DefaultAction extends ActionSupport
             User user = userManager.getUser(login);
             return user.getPreferences().getSettings().getDefaultAction();
         }
-    }
-
-    public void setUserManager(UserManager userManager)
-    {
-        this.userManager = userManager;
     }
 }

@@ -16,6 +16,7 @@ import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.scheduling.SchedulingException;
 import com.zutubi.pulse.scheduling.SimpleTrigger;
 import com.zutubi.pulse.scheduling.Trigger;
+import com.zutubi.pulse.security.PulseThreadFactory;
 import com.zutubi.util.Constants;
 import com.zutubi.util.logging.Logger;
 
@@ -49,6 +50,7 @@ public class CleanupManager
 
     private ProjectManager projectManager;
     private BuildResultDao buildResultDao;
+    private PulseThreadFactory threadFactory;
 
     private LinkedBlockingQueue<CleanupRequest> queue = new LinkedBlockingQueue<CleanupRequest>();
  	private Lock executingRequestLock = new ReentrantLock();
@@ -100,7 +102,7 @@ public class CleanupManager
         };
         listener.register(configurationProvider);
 
-        Thread cleanupThread = new Thread(new Runnable()
+        Thread cleanupThread = threadFactory.newThread(new Runnable()
         {
             @SuppressWarnings({"InfiniteLoopStatement"})
             public void run()
@@ -256,6 +258,11 @@ public class CleanupManager
     public void setProjectManager(ProjectManager projectManager)
     {
         this.projectManager = projectManager;
+    }
+
+    public void setThreadFactory(PulseThreadFactory threadFactory)
+    {
+        this.threadFactory = threadFactory;
     }
 
     /**

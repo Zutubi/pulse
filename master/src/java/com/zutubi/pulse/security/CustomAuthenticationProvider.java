@@ -1,8 +1,11 @@
 package com.zutubi.pulse.security;
 
+import com.zutubi.prototype.config.ConfigurationProvider;
+import com.zutubi.prototype.config.ConfigurationRegistry;
 import com.zutubi.pulse.model.AcegiUser;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.UserManager;
+import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 import com.zutubi.pulse.security.ldap.LdapManager;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.Authentication;
@@ -20,6 +23,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider
 
     private UserManager userManager;
     private LdapManager ldapManager;
+    private ConfigurationProvider configurationProvider;
 
     public Authentication authenticate(Authentication authentication) throws AuthenticationException
     {
@@ -44,11 +48,11 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider
         LOG.debug("Testing for user '" + username + "' via LDAP");
 
         // We can auto-add the user if they can be authenticated via LDAP.
-        User user = ldapManager.authenticate(username, password);
+        UserConfiguration user = ldapManager.authenticate(username, password);
         if(user != null)
         {
             LOG.debug("User '" + username + "' found via LDAP, adding.");
-            userManager.addUser(user, false, true);
+            configurationProvider.insert(ConfigurationRegistry.USERS_SCOPE, user);
         }
         else
         {
@@ -73,7 +77,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider
         else
         {
             LOG.debug("Authenticating user '" + user.getUsername() + "' via stored password");
-            super.additionalAuthenticationChecks(userDetails, authentication);
+//            super.additionalAuthenticationChecks(userDetails, authentication);
         }
     }
 
@@ -91,5 +95,10 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider
     {
         setUserDetailsService(userManager);
         this.userManager = userManager;
+    }
+
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    {
+        this.configurationProvider = configurationProvider;
     }
 }

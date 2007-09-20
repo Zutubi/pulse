@@ -19,7 +19,6 @@ public class ViewServerQueuesAction extends ActionSupport
     private FatController fatController;
     private RecipeQueue recipeQueue;
     private BuildManager buildManager;
-    private UserManager userManager;
 
     public List<AbstractBuildRequestEvent> getBuildQueue()
     {
@@ -121,11 +120,6 @@ public class ViewServerQueuesAction extends ActionSupport
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
-    }
-
-    public void setUserManager(UserManager userManager)
-    {
-        this.userManager = userManager;
     }
 
     public void setProjectManager(ProjectManager projectManager)

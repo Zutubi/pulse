@@ -13,7 +13,7 @@ public class MockProjectManager implements ProjectManager
     private Map<Long, Project> projects = new TreeMap<Long, Project>();
     private long nextId = 1;
 
-    public Collection<ProjectConfiguration> getAllProjectConfigs(boolean allowInvalid)
+    public List<ProjectConfiguration> getAllProjectConfigs(boolean allowInvalid)
     {
         throw new RuntimeException("Method not yet implemented.");
     }
@@ -24,11 +24,6 @@ public class MockProjectManager implements ProjectManager
     }
 
     public ProjectConfiguration getProjectConfig(long id, boolean allowInvalid)
-    {
-        throw new RuntimeException("Method not yet implemented.");
-    }
-
-    public void saveProjectConfig(ProjectConfiguration config)
     {
         throw new RuntimeException("Method not yet implemented.");
     }
@@ -46,11 +41,6 @@ public class MockProjectManager implements ProjectManager
     public List<Project> getProjects(boolean allowInvalid)
     {
         return new LinkedList<Project>(projects.values());
-    }
-
-    public List<Project> getAllProjectsCached()
-    {
-        throw new RuntimeException("Method not implemented.");
     }
 
     public int getProjectCount()
@@ -76,11 +66,6 @@ public class MockProjectManager implements ProjectManager
     public void resumeProject(Project project)
     {
         throw new RuntimeException("Method not implemented.");
-    }
-
-    public void create(Project project)
-    {
-        save(project);
     }
 
     public void checkWrite(Project project)
@@ -111,21 +96,6 @@ public class MockProjectManager implements ProjectManager
     public void delete(BuildHostRequirements hostRequirements)
     {
         throw new RuntimeException("Method not yet implemented.");
-    }
-
-    public List<Project> getProjectsWithAdmin(String authority)
-    {
-        throw new RuntimeException("Method not implemented.");
-    }
-
-    public void updateProjectAdmins(String authority, List<Long> restrictToProjects)
-    {
-        throw new RuntimeException("Method not implemented.");
-    }
-
-    public void removeAcls(String authority)
-    {
-        throw new RuntimeException("Method not implemented.");
     }
 
     public void triggerBuild(ProjectConfiguration project, BuildReason reason, Revision revision, boolean force)

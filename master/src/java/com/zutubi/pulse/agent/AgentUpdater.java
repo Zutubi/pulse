@@ -11,10 +11,7 @@ import com.zutubi.pulse.servlet.DownloadPackageServlet;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * An active object (i.e. runs in it's own thread) that tries to update an
@@ -29,7 +26,7 @@ public class AgentUpdater implements Runnable
     private String masterUrl;
     private EventManager eventManager;
     private SystemPaths systemPaths;
-    private ExecutorService executor = Executors.newSingleThreadExecutor();
+    private ExecutorService executor;
     private LinkedBlockingQueue<UpgradeStatus> statuses = new LinkedBlockingQueue<UpgradeStatus>();
     /**
      * Maximum number of seconds to wait between status events before timing
@@ -46,12 +43,13 @@ public class AgentUpdater implements Runnable
      */
     private long pingInterval = 5000;
 
-    public AgentUpdater(Agent agent, String masterUrl, EventManager eventManager, SystemPaths systemPaths)
+    public AgentUpdater(Agent agent, String masterUrl, EventManager eventManager, SystemPaths systemPaths, ThreadFactory threadFactory)
     {
         this.agent = agent;
         this.masterUrl = masterUrl;
         this.eventManager = eventManager;
         this.systemPaths = systemPaths;
+        this.executor = Executors.newSingleThreadExecutor(threadFactory);
     }
 
     public void start()

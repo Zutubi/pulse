@@ -15,14 +15,14 @@ import java.util.List;
  * Represents the authority to perform some action on some group of projects.
  */
 @SymbolicName("zutubi.projectAclConfig")
-@Table(columns = {"group", "authorities"})
+@Table(columns = {"group", "allowedActions"})
 public class ProjectAclConfiguration extends AbstractConfiguration
 {
     @Reference
     @Required
     private GroupConfiguration group;
     @ItemPicker(optionProvider = "ProjectAuthorityProvider")
-    private List<String> authorities = new LinkedList<String>();
+    private List<String> allowedActions = new LinkedList<String>();
 
     public GroupConfiguration getGroup()
     {
@@ -34,13 +34,13 @@ public class ProjectAclConfiguration extends AbstractConfiguration
         this.group = group;
     }
 
-    public List<String> getAuthorities()
+    public List<String> getAllowedActions()
     {
-        return authorities;
+        return allowedActions;
     }
 
-    public void setAuthorities(List<String> authorities)
+    public void setAllowedActions(List<String> allowedActions)
     {
-        this.authorities = authorities;
+        this.allowedActions = allowedActions;
     }
 }

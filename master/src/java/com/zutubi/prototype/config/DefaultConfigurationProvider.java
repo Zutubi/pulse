@@ -9,6 +9,7 @@ import com.zutubi.util.Predicate;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.ThreadFactory;
 
 /**
  * Default implementation of the ConfigurationProvider interface, mostly
@@ -21,6 +22,7 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
     private ConfigurationPersistenceManager configurationPersistenceManager;
     private ConfigurationTemplateManager configurationTemplateManager;
     private EventManager eventManager;
+    private ThreadFactory threadFactory;
     private MultiplexingListener syncMux;
     private MultiplexingListener asyncMux;
 
@@ -30,7 +32,7 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
         eventManager.register(syncMux);
 
         asyncMux = new MultiplexingListener(ConfigurationEvent.class);
-        AsynchronousDelegatingListener asych = new AsynchronousDelegatingListener(asyncMux);
+        AsynchronousDelegatingListener asych = new AsynchronousDelegatingListener(asyncMux, threadFactory);
         eventManager.register(asych);
     }
 
@@ -160,6 +162,11 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
+    }
+
+    public void setThreadFactory(ThreadFactory threadFactory)
+    {
+        this.threadFactory = threadFactory;
     }
 
     private static class Listener implements EventListener

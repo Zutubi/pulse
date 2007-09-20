@@ -179,7 +179,7 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
 
     private User createUser()
     {
-        User user = new User("login1", "Login One");
+        User user = new User();
         UserConfiguration config = new UserConfiguration("login1", "Login One");
         user.setConfig(config);
         return user;

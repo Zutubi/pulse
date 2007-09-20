@@ -9,11 +9,14 @@ import com.zutubi.pulse.security.AcegiUtils;
  */
 public class ProjectConfigurationActions
 {
+    public static final String ACTION_PAUSE   = "pause";
+    public static final String ACTION_TRIGGER = "trigger";
+
     private ProjectManager projectManager;
 
     public void doTrigger(ProjectConfiguration projectConfig)
     {
-        String user = AcegiUtils.getLoggedInUser();
+        String user = AcegiUtils.getLoggedInUsername();
         if (user != null)
         {
             projectManager.triggerBuild(projectConfig, new ManualTriggerBuildReason(user), null, true);

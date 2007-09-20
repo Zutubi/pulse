@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -61,6 +62,7 @@ public class FatController implements EventListener, Stoppable
     private ProjectManager projectManager;
     private UserManager userManager;
     private ServiceTokenManager serviceTokenManager;
+    private ThreadFactory threadFactory;
 
     /**
      * When the fat controller is enabled, it will handle incoming build requests.
@@ -74,7 +76,7 @@ public class FatController implements EventListener, Stoppable
 
     public void init() throws SchedulerException
     {
-        asyncListener = new AsynchronousDelegatingListener(this);
+        asyncListener = new AsynchronousDelegatingListener(this, threadFactory);
         eventManager.register(asyncListener);
 
         JobDetail detail = new JobDetail(TIMEOUT_JOB_NAME, TIMEOUT_JOB_GROUP, TimeoutRecipeJob.class);
@@ -257,6 +259,7 @@ public class FatController implements EventListener, Stoppable
                 controller.setScmClientFactory(scmClientFactory);
                 controller.setUserManager(userManager);
                 controller.setConfigurationManager(configManager);
+                controller.setThreadFactory(threadFactory);
                 controller.init();
                 controller.run();
                 runningBuilds.add(controller);
@@ -398,5 +401,10 @@ public class FatController implements EventListener, Stoppable
     public void setScmClientFactory(DelegateScmClientFactory scmClientFactory)
     {
         this.scmClientFactory = scmClientFactory;
+    }
+
+    public void setThreadFactory(ThreadFactory threadFactory)
+    {
+        this.threadFactory = threadFactory;
     }
 }

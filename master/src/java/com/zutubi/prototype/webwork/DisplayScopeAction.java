@@ -109,7 +109,7 @@ public class DisplayScopeAction extends ActionSupport
     {
         if(prefixPath.contains("${principle}"))
         {
-            String principle = AcegiUtils.getLoggedInUser();
+            String principle = AcegiUtils.getLoggedInUsername();
             if (principle == null)
             {
                 return "guest";

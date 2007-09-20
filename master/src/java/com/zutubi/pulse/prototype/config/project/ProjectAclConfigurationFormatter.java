@@ -12,8 +12,8 @@ public class ProjectAclConfigurationFormatter
         return group == null ? null : group.getName();
     }
 
-    public String getAuthorities(ProjectAclConfiguration configuration)
+    public String getAllowedActions(ProjectAclConfiguration configuration)
     {
-        return configuration.getAuthorities().toString();
+        return configuration.getAllowedActions().toString();
     }
 }

@@ -2,6 +2,7 @@ package com.zutubi.pulse.events;
 
 import com.zutubi.pulse.test.PulseTestCase;
 
+import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -35,7 +36,7 @@ public class AsynchronousDelegatingListenerTest extends PulseTestCase
     public void testEventsExecutedOnSeparateThread() throws InterruptedException
     {
         WatiListener delegate = new WatiListener();
-        AsynchronousDelegatingListener l = new AsynchronousDelegatingListener(delegate);
+        AsynchronousDelegatingListener l = new AsynchronousDelegatingListener(delegate, Executors.defaultThreadFactory());
 
         l.handleEvent(new Event<Object>(this));
         // the listener thread is now waiting for the semaphore to release.

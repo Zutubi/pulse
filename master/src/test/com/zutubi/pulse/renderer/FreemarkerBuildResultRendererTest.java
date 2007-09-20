@@ -4,6 +4,7 @@ import com.zutubi.pulse.committransformers.LinkCommitMessageTransformer;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.SystemUtils;
 import com.zutubi.pulse.webwork.mapping.Urls;
@@ -306,7 +307,9 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
 
     private void personalBuildHelper(String type) throws Exception
     {
-        User user = new User("jason", "Jason Sankey");
+        UserConfiguration userConfig = new UserConfiguration("jason", "Jason Sankey");
+        User user = new User();
+        user.setConfig(userConfig);
         Project project = createProject();
         BuildResult result = new BuildResult(user, project, 12);
         initialiseResult(result);

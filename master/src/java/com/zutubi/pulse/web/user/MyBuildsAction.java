@@ -1,6 +1,9 @@
 package com.zutubi.pulse.web.user;
 
-import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.model.BuildColumns;
+import com.zutubi.pulse.model.BuildManager;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.web.ActionSupport;
 
@@ -15,7 +18,6 @@ public class MyBuildsAction extends ActionSupport
     private List<BuildResult> myBuilds;
 
     private BuildManager buildManager;
-    private UserManager userManager;
     private BuildColumns columns;
 
     public User getUser()
@@ -39,7 +41,7 @@ public class MyBuildsAction extends ActionSupport
 
     public String execute() throws Exception
     {
-        String login = AcegiUtils.getLoggedInUser();
+        String login = AcegiUtils.getLoggedInUsername();
         if (login == null)
         {
             return "guest";
@@ -58,10 +60,5 @@ public class MyBuildsAction extends ActionSupport
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
-    }
-
-    public void setUserManager(UserManager userManager)
-    {
-        this.userManager = userManager;
     }
 }

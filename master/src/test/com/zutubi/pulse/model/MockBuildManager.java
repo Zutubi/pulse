@@ -218,12 +218,6 @@ public class MockBuildManager implements BuildManager
         throw new RuntimeException("Method not implemented.");
     }
 
-    // debugging hack: need to work out a better way
-    public void executeInTransaction(Runnable r)
-    {
-        throw new RuntimeException("Method not implemented.");
-    }
-
     public List<Changelist> getLatestChangesForProject(Project project, int max)
     {
         throw new RuntimeException("Method not implemented.");

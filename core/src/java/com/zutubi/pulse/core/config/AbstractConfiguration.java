@@ -105,4 +105,25 @@ public abstract class AbstractConfiguration implements Configuration
     {
         getFieldErrors(field).clear();
     }
+
+    public int hashCode()
+    {
+        return new Long(handle).hashCode();
+    }
+
+    public boolean equals(Object obj)
+    {
+        if(obj == null)
+        {
+            return false;
+        }
+
+        if(!(obj instanceof AbstractConfiguration))
+        {
+            return false;
+        }
+
+        AbstractConfiguration otherConfig = (AbstractConfiguration) obj;
+        return otherConfig.handle != 0 && otherConfig.handle == handle;
+    }
 }

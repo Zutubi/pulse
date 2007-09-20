@@ -149,9 +149,4 @@ public class ProjectActionSupport extends ActionSupport
             }
         }
     }
-
-    public void setUserManager(UserManager userManager)
-    {
-        this.userManager = userManager;
-    }
 }

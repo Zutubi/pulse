@@ -1,34 +1,39 @@
 package com.zutubi.pulse.model;
 
+import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
-import org.acegisecurity.annotation.Secured;
+import com.zutubi.pulse.prototype.config.project.ProjectConfigurationActions;
+import com.zutubi.pulse.security.SecureParameter;
+import com.zutubi.pulse.security.SecureResult;
 
 import java.util.Collection;
 import java.util.List;
 
 /**
- * 
- *
  */
 public interface ProjectManager extends EntityManager<Project>
 {
     String GLOBAL_PROJECT_NAME = "global project template";
 
-    Collection<ProjectConfiguration> getAllProjectConfigs(boolean allowInvalid);
+    @SecureResult
+    List<ProjectConfiguration> getAllProjectConfigs(boolean allowInvalid);
 
+    @SecureResult
     ProjectConfiguration getProjectConfig(String name, boolean allowInvalid);
 
+    @SecureResult
     ProjectConfiguration getProjectConfig(long handle, boolean allowInvalid);
 
-    void saveProjectConfig(ProjectConfiguration config);
-
+    @SecureResult
     Project getProject(String name, boolean allowInvalid);
 
+    @SecureResult
     Project getProject(long id, boolean allowInvalid);
 
+    @SecureResult
     List<Project> getProjects(boolean allowInvalid);
 
     int getProjectCount();
@@ -37,52 +42,19 @@ public interface ProjectManager extends EntityManager<Project>
 
     void buildCompleted(long projectId, boolean successful);
 
-    @Secured({"ACL_PROJECT_WRITE"})
+    @SecureParameter(action = ProjectConfigurationActions.ACTION_PAUSE)
     Project pauseProject(Project project);
 
-    @Secured({"ACL_PROJECT_WRITE"})
+    @SecureParameter(action = ProjectConfigurationActions.ACTION_PAUSE)
     void resumeProject(Project project);
 
-    @Secured({"ROLE_ADMINISTRATOR"})
+    @SecureParameter(action = AccessManager.ACTION_DELETE)
     void delete(Project project);
 
     void save(Project project);
 
-    @Secured({"ACL_PROJECT_WRITE"})
+    @SecureParameter(action = AccessManager.ACTION_WRITE)
     void checkWrite(Project project);
-
-    /**
-     * Returns a list of all projects that allow administration by the given
-     * authority.
-     *
-     * @param authority authority to search by
-     * @return the projects that may be administered by principles with the
-     *         given authority
-     */
-    @Secured({"ROLE_ADMINISTRATOR"})
-    List<Project> getProjectsWithAdmin(String authority);
-
-    /**
-     * Updates the projects that allow administration by principles with the
-     * given authority.
-     *
-     * @param authority authority to update
-     * @param restrictToProjects if null, allow the authority to administer
-     *                           all projects, otherwise, restrict the
-     *                           authority to only administer the given
-     *                           projects
-     */
-    @Secured({"ROLE_ADMINISTRATOR"})
-    void updateProjectAdmins(String authority, List<Long> restrictToProjects);
-
-    /**
-     * Deletes all project ACL entries that are granted to the given
-     * authority.
-     *
-     * @param authority the authority to remove all ACLs for
-     */
-    @Secured({"ROLE_ADMINISTRATOR"})
-    void removeAcls(String authority);
 
     /**
      * Triggers a build of the given project by raising appropriate build
@@ -98,16 +70,21 @@ public interface ProjectManager extends EntityManager<Project>
      * @param force         if true, force a build to occur even if the
      *                      latest has been built
      */
+    @SecureParameter(action = ProjectConfigurationActions.ACTION_PAUSE, parameterType = ProjectConfiguration.class)
     void triggerBuild(ProjectConfiguration project, BuildReason reason, Revision revision, boolean force);
 
+    @SecureParameter(action = ProjectConfigurationActions.ACTION_PAUSE, parameterType = Project.class)
     void triggerBuild(long number, Project project, User user, PatchArchive archive) throws PulseException;
 
+    @SecureParameter(action = AccessManager.ACTION_READ)
     long getNextBuildNumber(Project project);
 
     void delete(BuildHostRequirements hostRequirements);
 
+    // These are secured as they use mapConfigsToProjects underneath
     Collection<ProjectGroup> getAllProjectGroups();
     ProjectGroup getProjectGroup(String name);
 
+    @SecureResult
     List<Project> mapConfigsToProjects(Collection<ProjectConfiguration> projects);
 }

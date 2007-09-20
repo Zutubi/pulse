@@ -13,12 +13,6 @@
 
         <property name="forceClean" column="FORCE_CLEAN" type="boolean"/>
 
-        <bag name="aclEntries" inverse="true" cascade="all,delete-orphan" lazy="false">
-            <cache usage="read-write"/>
-            <key column="PROJECT_ID"/>
-            <one-to-many class="com.zutubi.pulse.model.ProjectAclEntry"/>
-        </bag>
-
         <property name="nextBuildNumber" column="NEXT_BUILD_NUMBER" type="long"/>
 
         <property name="buildCount" type="int">
@@ -30,25 +24,4 @@
 
         <property name="lastPollTime" column="LAST_POLL_TIME" type="long"/>
     </class>
-
-    <class name="com.zutubi.pulse.model.ProjectAclEntry" table="PROJECT_ACL_ENTRY" lazy="false">
-        <cache usage="read-write"/>
-
-        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
-            <generator class="hilo"/>
-        </id>
-
-        <property name="recipient" type="string" length="511"/>
-
-        <property name="mask" type="int"/>
-
-        <many-to-one name="aclObjectIdentity" column="PROJECT_ID" class="com.zutubi.pulse.model.Project" not-null="true"/>
-    </class>
-
-    <query name="findByAcl"><![CDATA[
-        select project
-        from Project project
-        join project.aclEntries acl
-        where acl.recipient = :recipient
-    ]]></query>
 </hibernate-mapping>

@@ -10,6 +10,5 @@ public enum ServerPermission
     CREATE_PROJECT,
     DELETE_PROJECT,
     CREATE_USER,
-    DELETE_USER,
-    VIEW
+    DELETE_USER
 }

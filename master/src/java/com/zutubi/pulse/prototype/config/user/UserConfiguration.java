@@ -3,7 +3,10 @@ package com.zutubi.pulse.prototype.config.user;
 import com.zutubi.config.annotations.*;
 import com.zutubi.prototype.type.Extendable;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
+import com.zutubi.pulse.model.GrantedAuthority;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -11,13 +14,18 @@ import java.util.Map;
  *
  */
 @SymbolicName("zutubi.userConfig")
-@Form(fieldOrder = {"login", "name"})
+@Form(fieldOrder = {"login", "name", "authenticatedViaLdap", "password"})
 public class UserConfiguration extends AbstractConfiguration implements Extendable
 {
     @ID
     private String login;
     private String name;
+    @Password
     private String password;
+    @ControllingCheckbox(dependentFields = {"password"}, invert = true)
+    private boolean authenticatedViaLdap;
+    @Internal
+    private List<String> directAuthorities;
     private UserPreferencesConfiguration preferences = new UserPreferencesConfiguration();
 
     @Transient
@@ -28,10 +36,13 @@ public class UserConfiguration extends AbstractConfiguration implements Extendab
 
     public UserConfiguration()
     {
+        directAuthorities = new LinkedList<String>();
+        directAuthorities.add(GrantedAuthority.USER);
     }
 
     public UserConfiguration(String login, String name)
     {
+        this();
         this.login = login;
         this.name = name;
     }
@@ -54,6 +65,56 @@ public class UserConfiguration extends AbstractConfiguration implements Extendab
     public void setLogin(String login)
     {
         this.login = login;
+    }
+
+    public String getPassword()
+    {
+        return password;
+    }
+
+    public void setPassword(String password)
+    {
+        this.password = password;
+    }
+
+    public boolean isAuthenticatedViaLdap()
+    {
+        return authenticatedViaLdap;
+    }
+
+    public void setAuthenticatedViaLdap(boolean authenticatedViaLdap)
+    {
+        this.authenticatedViaLdap = authenticatedViaLdap;
+    }
+
+    public List<String> getDirectAuthorities()
+    {
+        return directAuthorities;
+    }
+
+    public void setDirectAuthorities(List<String> directAuthorities)
+    {
+        this.directAuthorities = directAuthorities;
+    }
+
+    public void addDirectAuthority(String authority)
+    {
+        directAuthorities.add(authority);
+    }
+
+    @Transient
+    public String getDefaultAuthority()
+    {
+        return "user:" + login;
+    }
+
+    @Transient
+    public String[] getGrantedAuthorities()
+    {
+        String[] result = new String[directAuthorities.size() + 1];
+        directAuthorities.toArray(result);
+        result[result.length - 1] = getDefaultAuthority();
+        return result;
     }
 
     public UserPreferencesConfiguration getPreferences()

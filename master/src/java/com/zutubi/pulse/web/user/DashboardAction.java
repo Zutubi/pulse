@@ -24,7 +24,6 @@ public class DashboardAction extends ActionSupport
     private List<Changelist> projectChangelists = null;
 
     private BuildManager buildManager;
-    private UserManager userManager;
 
     private boolean contactError = false;
     private BuildColumns columns;
@@ -85,7 +84,7 @@ public class DashboardAction extends ActionSupport
 
     public String execute() throws Exception
     {
-        String login = AcegiUtils.getLoggedInUser();
+        String login = AcegiUtils.getLoggedInUsername();
         if (login == null)
         {
             return "guest";
@@ -175,15 +174,5 @@ public class DashboardAction extends ActionSupport
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
-    }
-
-    /**
-     * Required resource.
-     *
-     * @param userManager instance
-     */
-    public void setUserManager(UserManager userManager)
-    {
-        this.userManager = userManager;
     }
 }

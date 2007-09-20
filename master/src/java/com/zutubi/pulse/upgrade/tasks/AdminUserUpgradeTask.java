@@ -1,10 +1,13 @@
 package com.zutubi.pulse.upgrade.tasks;
 
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.config.ConfigSupport;
+import com.zutubi.pulse.config.FileConfig;
 import com.zutubi.pulse.upgrade.ConfigurationAware;
 import com.zutubi.pulse.upgrade.UpgradeContext;
 import com.zutubi.pulse.util.JDBCUtils;
 
+import java.io.File;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -39,7 +42,8 @@ public class AdminUserUpgradeTask extends DatabaseUpgradeTask implements Configu
             if(rs.next())
             {
                 String login = rs.getString("login");
-                configurationManager.getAppConfig().setAdminLogin(login);
+                ConfigSupport appConfig = new ConfigSupport(new FileConfig(new File(configurationManager.getUserPaths().getUserConfigRoot(), "pulse.properties")));
+                appConfig.setProperty("admin.login", login);
             }
             else
             {

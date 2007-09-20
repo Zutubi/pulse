@@ -1,9 +1,9 @@
 package com.zutubi.pulse.security.ldap;
 
 import com.zutubi.pulse.model.AcegiUser;
-import com.zutubi.pulse.model.Group;
-import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.prototype.config.admin.LDAPConfiguration;
+import com.zutubi.pulse.prototype.config.group.GroupConfiguration;
+import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ public interface LdapManager
 
     void connect();
 
-    public User authenticate(String username, String password);
+    public UserConfiguration authenticate(String username, String password);
 
     public void addLdapRoles(AcegiUser user);
 
@@ -23,6 +23,6 @@ public interface LdapManager
 
     String getStatusMessage();
 
-    List<Group> testAuthenticate(LDAPConfiguration configuration, String testLogin, String testPassword);
+    List<GroupConfiguration> testAuthenticate(LDAPConfiguration configuration, String testLogin, String testPassword);
 
 }

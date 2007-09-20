@@ -21,13 +21,15 @@
             <result name="success" type="redirect">/</result>
         </action>
 
+        <!-- FIXME USERS
         <action name="signup" class="com.zutubi.pulse.web.admin.user.SignupUserAction">
             <result name="cancel" type="redirect">/</result>
             <result name="input" type="velocity">signup.vm</result>
             <result name="success" type="redirect">/</result>
             <result name="disabled" type="velocity">signup.vm</result>
         </action>
-
+        -->
+        
         <action name="dismissWelcome" class="com.zutubi.pulse.web.DismissWelcomeAction">
             <result name="success" type="redirect">/default.action</result>
         </action>
@@ -347,90 +349,9 @@
             <result name="success" type="redirect">/viewServerQueues.action</result>
         </action>
 
-        <!--
-        USERS
-        -->
-        <action name="userSettings" class="com.zutubi.pulse.web.admin.user.ViewUsersAction">
-            <interceptor-ref name="completeReadOnlyStack"/>
-            <result name="success" type="velocity">manage-users.vm</result>
-        </action>
-
-        <action name="viewUser" class="com.zutubi.pulse.web.admin.user.ViewUserAction">
-            <interceptor-ref name="completeReadOnlyStack"/>
-            <result name="success" type="velocity">view-user.vm</result>
-        </action>
-
-        <action name="viewUsers" class="com.zutubi.pulse.web.admin.user.ViewUsersAction">
-            <interceptor-ref name="defaultReadOnlyStack"/>
-            <result name="success" type="velocity">manage-users.vm</result>
-        </action>
-
-        <action name="createUser" class="com.zutubi.pulse.web.admin.user.CreateUserAction">
-            <interceptor-ref name="crudStack"/>
-            <result name="input" type="velocity">manage-users.vm</result>
-            <result name="cancel" type="redirect">userSettings.action?startPage=${startPage}</result>
-            <result name="success" type="redirect">userSettings.action?startPage=${startPage}</result>
-        </action>
-
-        <action name="deleteUser" class="com.zutubi.pulse.web.admin.user.DeleteUserAction">
-            <result name="input" type="velocity">manage-users.vm</result>
-            <result name="success" type="redirect">viewUsers.action?startPage=${startPage}</result>
-        </action>
-
         <action name="disableUser" class="com.zutubi.pulse.web.admin.user.DisableUserAction">
             <result name="input" type="velocity">undefined.vm</result>
             <result name="success" type="redirect">viewUsers.action?startPage=${startPage}</result>
-        </action>
-
-        <action name="editPassword" class="com.zutubi.pulse.web.admin.user.EditPasswordAction">
-            <result name="input" type="velocity">edit-user.vm</result>
-            <result name="error" type="velocity">edit-user.vm</result>
-            <result name="reset" type="redirect">viewUsers.action?startPage=${startPage}</result>
-            <result name="cancel" type="redirect">viewUsers.action?startPage=${startPage}</result>
-            <result name="success" type="redirect">viewUsers.action?startPage=${startPage}</result>
-        </action>
-
-        <action name="editUser" class="com.zutubi.pulse.web.admin.user.EditUserAction">
-            <result name="input" type="velocity">edit-user.vm</result>
-            <result name="cancel" type="redirect">viewUsers.action?startPage=${startPage}</result>
-            <result name="success" type="redirect">viewUsers.action?startPage=${startPage}</result>
-        </action>
-
-        <action name="viewGroups" class="com.zutubi.pulse.web.admin.user.ViewGroupsAction">
-            <interceptor-ref name="defaultReadOnlyStack"/>
-            <result name="success" type="velocity">manage-groups.vm</result>
-        </action>
-
-        <action name="createGroup" class="com.zutubi.pulse.web.admin.user.CreateGroupAction">
-            <interceptor-ref name="crudStack"/>
-            <result name="input" type="velocity">create-group.vm</result>
-            <result name="cancel" type="redirect">viewGroups.action?startPage=${startPage}</result>
-            <result name="success" type="redirect">viewGroups.action?startPage=${startPage}</result>
-        </action>
-
-        <action name="deleteGroup" class="com.zutubi.pulse.web.admin.user.DeleteGroupAction">
-            <result name="success" type="redirect">viewGroups.action?startPage=${startPage}</result>
-        </action>
-
-        <action name="editGroup" class="com.zutubi.pulse.web.admin.user.EditGroupAction">
-            <result name="input" type="velocity">edit-group.vm</result>
-            <result name="cancel" type="redirect">viewGroups.action?startPage=${startPage}</result>
-            <result name="success" type="redirect">viewGroups.action?startPage=${startPage}</result>
-        </action>
-
-        <action name="viewGroupMembers" class="com.zutubi.pulse.web.admin.user.ViewGroupMembersAction">
-            <interceptor-ref name="completeReadOnlyStack"/>
-            <result name="success" type="velocity">view-group-members.vm</result>
-        </action>
-
-        <action name="addGroupMembers" class="com.zutubi.pulse.web.admin.user.AddGroupMembersAction">
-            <result name="input" type="velocity">add-group-members.vm</result>
-            <result name="cancel" type="redirect">viewGroupMembers.action?groupId=${groupId}&amp;startPage=${startPage}</result>
-            <result name="success" type="redirect">viewGroupMembers.action?groupId=${groupId}&amp;startPage=${startPage}</result>
-        </action>
-
-        <action name="removeGroupMember" class="com.zutubi.pulse.web.admin.user.RemoveGroupMemberAction">
-            <result name="success" type="redirect">viewGroupMembers.action?groupId=${groupId}&amp;startPage=${startPage}</result>
         </action>
 
         <action name="editLicense" class="com.zutubi.pulse.web.admin.ManageLicenseAction">

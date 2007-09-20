@@ -8,6 +8,7 @@ import com.zutubi.pulse.model.persistence.ArtifactDao;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
 import com.zutubi.pulse.model.persistence.ChangelistDao;
 import com.zutubi.pulse.model.persistence.FileArtifactDao;
+import com.zutubi.pulse.security.PulseThreadFactory;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -33,14 +34,14 @@ public class DefaultBuildManager implements BuildManager
     private ChangelistDao changelistDao;
     private ProjectManager projectManager;
     private MasterConfigurationManager configurationManager;
-
+    private PulseThreadFactory threadFactory;
     private DatabaseConsole databaseConsole;
 
     private BlockingQueue<CleanupRequest> cleanupQueue = new LinkedBlockingQueue<CleanupRequest>();
 
     public void init()
     {
-        Thread cleanupThread = new Thread(new Runnable()
+        Thread cleanupThread = threadFactory.newThread(new Runnable()
         {
             @SuppressWarnings({"InfiniteLoopStatement"})
             public void run()
@@ -442,12 +443,6 @@ public class DefaultBuildManager implements BuildManager
         return artifact != null && artifact.canDecorate();
     }
 
-    // debugging hack: need to work out a better way
-    public void executeInTransaction(Runnable runnable)
-    {
-        runnable.run();
-    }
-
     public BuildResult getLatestBuildResult(Project project)
     {
         List<BuildResult> results = getLatestBuildResultsForProject(project, 1);
@@ -588,6 +583,11 @@ public class DefaultBuildManager implements BuildManager
     public void setDatabaseConsole(DatabaseConsole databaseConsole)
     {
         this.databaseConsole = databaseConsole;
+    }
+
+    public void setThreadFactory(PulseThreadFactory threadFactory)
+    {
+        this.threadFactory = threadFactory;
     }
 
     private class CleanupRequest

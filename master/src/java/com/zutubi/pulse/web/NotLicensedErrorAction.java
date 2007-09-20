@@ -3,19 +3,16 @@ package com.zutubi.pulse.web;
 import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.license.License;
 import com.zutubi.pulse.license.LicenseHolder;
-import com.zutubi.pulse.model.UserManager;
 
 import java.util.LinkedList;
 
 /**
- * <class-comment/>
  */
 public class NotLicensedErrorAction extends ActionSupport
 {
     private LinkedList<LicenseRestriction> restrictions;
 
     private AgentManager agentManager;
-    private UserManager userManager;
 
     public String doInput() throws Exception
     {
@@ -46,16 +43,6 @@ public class NotLicensedErrorAction extends ActionSupport
     public void setAgentManager(AgentManager agentManager)
     {
         this.agentManager = agentManager;
-    }
-
-    /**
-     * Required resource.
-     *
-     * @param userManager
-     */
-    public void setUserManager(UserManager userManager)
-    {
-        this.userManager = userManager;
     }
 
     public static class LicenseRestriction

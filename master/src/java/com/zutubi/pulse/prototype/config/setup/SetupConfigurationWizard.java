@@ -7,14 +7,16 @@ import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.wizard.WizardTransition;
 import com.zutubi.prototype.wizard.webwork.AbstractTypeWizard;
-import com.zutubi.pulse.bootstrap.MasterConfiguration;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.SetupManager;
 import com.zutubi.pulse.bootstrap.SystemConfigurationSupport;
-import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.model.AcegiUser;
+import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.prototype.config.admin.EmailConfiguration;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
+import com.zutubi.pulse.prototype.config.group.GroupConfiguration;
+import com.zutubi.pulse.prototype.config.group.ServerPermission;
 import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.util.logging.Logger;
@@ -23,6 +25,7 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -75,47 +78,30 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
             SimpleInstantiator instantiator = new SimpleInstantiator(configurationReferenceManager);
             AdminUserConfiguration adminConfig = (AdminUserConfiguration) instantiator.instantiate(adminConfigType, getCompletedStateForType(adminConfigType).getDataRecord());
             MutableRecord serverConfigRecord = getCompletedStateForType(serverConfigType).getDataRecord();
-            MasterConfiguration config = configurationManager.getAppConfig();
 
             // create the admin user.
-            User admin = new User();
-            admin.setLogin(adminConfig.getLogin());
-            admin.setName(adminConfig.getName());
-            userManager.setPassword(admin, adminConfig.getPassword());
-
-            admin.setEnabled(true);
-            admin.add(GrantedAuthority.USER);
-            admin.add(GrantedAuthority.ADMINISTRATOR);
-            config.setAdminLogin(admin.getLogin());
-            userManager.save(admin);
-
-            // make sure that we encode the password after we have a persistent user,
-            // since the users id is required. This is a little awkward...
-            userManager.setPassword(admin, adminConfig.getPassword());
-            userManager.save(admin);
-
             UserConfiguration adminUser = new UserConfiguration();
             adminUser.setLogin(adminConfig.getLogin());
             adminUser.setName(adminConfig.getName());
-            adminUser.setUserId(admin.getId());
+            adminUser.setPassword(adminConfig.getPassword());
+            adminUser.addDirectAuthority(ServerPermission.ADMINISTER.toString());
             configurationTemplateManager.insert(ConfigurationRegistry.USERS_SCOPE, adminUser);
             
             // create an administrators group (for convenience)
-            Group adminGroup = new Group("administrators");
-            adminGroup.addAdditionalAuthority(GrantedAuthority.ADMINISTRATOR);
-            adminGroup.addAdditionalAuthority(GrantedAuthority.PERSONAL);
-            userManager.addGroup(adminGroup);
+            GroupConfiguration adminGroup = new GroupConfiguration("administrators");
+            adminGroup.addServerPermission(ServerPermission.ADMINISTER);
+            adminGroup.addServerPermission(ServerPermission.PERSONAL_BUILD);
+            configurationTemplateManager.insert(ConfigurationRegistry.GROUPS_SCOPE, adminGroup);
 
             // and a project admins group that has write access to all projects
-            Group projectAdmins = new Group("project administrators");
-            projectAdmins.addAdditionalAuthority(GrantedAuthority.PERSONAL);
-            projectAdmins.setAdminAllProjects(true);
-            userManager.addGroup(projectAdmins);
+            GroupConfiguration projectAdmins = new GroupConfiguration("project administrators");
+            projectAdmins.addServerPermission(ServerPermission.PERSONAL_BUILD);
+            configurationTemplateManager.insert(ConfigurationRegistry.GROUPS_SCOPE, projectAdmins);
 
             // and a developers group that has personal build access (for convenience)
-            Group developersGroup = new Group("developers");
-            developersGroup.addAdditionalAuthority(GrantedAuthority.PERSONAL);
-            userManager.addGroup(developersGroup);
+            GroupConfiguration developersGroup = new GroupConfiguration("developers");
+            developersGroup.addServerPermission(ServerPermission.PERSONAL_BUILD);
+            configurationTemplateManager.insert(ConfigurationRegistry.GROUPS_SCOPE, developersGroup);
 
             // FIXME: should be using objects here so that we are not relying on magic strings.
             // apply the settings
@@ -131,7 +117,7 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
 
             // login as the admin user.  safe to directly create AcegiUser as
             // we know the user has no external authorities
-            AcegiUtils.loginAs(new AcegiUser(admin));
+            AcegiUtils.loginAs(new AcegiUser(userManager.getUser(adminUser.getLogin()), Collections.EMPTY_LIST));
 
             try
             {

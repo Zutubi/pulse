@@ -58,9 +58,9 @@ public class CompositeType extends AbstractType implements ComplexType
         }
         else
         {
-            if(!(property.getType() instanceof PrimitiveType))
+            if(!isSimpleProperty(property.getType()))
             {
-                throw new TypeException("Internal property '" + property.getName() + "' has non-primitive type");
+                throw new TypeException("Internal property '" + property.getName() + "' has non-simple type");
             }
 
             internalProperties.put(property.getName(), property);
@@ -136,8 +136,7 @@ public class CompositeType extends AbstractType implements ComplexType
         List<String> result = new LinkedList<String>();
         for(Map.Entry<String, TypeProperty> entry: properties.entrySet())
         {
-            Type type = entry.getValue().getType();
-            if(type instanceof SimpleType || type instanceof CollectionType && type.getTargetType() instanceof SimpleType)
+            if(isSimpleProperty(entry.getValue().getType()))
             {
                 result.add(entry.getKey());
             }
@@ -155,14 +154,18 @@ public class CompositeType extends AbstractType implements ComplexType
         List<String> result = new LinkedList<String>();
         for(Map.Entry<String, TypeProperty> entry: properties.entrySet())
         {
-            Type type = entry.getValue().getType();
-            if(type instanceof CompositeType || type instanceof CollectionType && type.getTargetType() instanceof ComplexType)
+            if(!isSimpleProperty(entry.getValue().getType()))
             {
                 result.add(entry.getKey());
             }
         }
 
         return result;
+    }
+
+    private boolean isSimpleProperty(Type propertyType)
+    {
+        return propertyType instanceof SimpleType || propertyType instanceof CollectionType && propertyType.getTargetType() instanceof SimpleType;
     }
 
     public boolean hasProperty(String propertyName)

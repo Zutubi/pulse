@@ -5,9 +5,6 @@ import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import org.acegisecurity.acl.basic.AclObjectIdentity;
 import org.acegisecurity.acl.basic.AclObjectIdentityAware;
 
-import java.util.LinkedList;
-import java.util.List;
-
 /**
  * 
  *
@@ -42,9 +39,6 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
     private Long lastPollTime;
     private boolean forceClean = false;
     private ProjectConfiguration config;
-
-    //FIXME: move these into the configuration.  They are not state.
-    private List<ProjectAclEntry> aclEntries;
 
     public Project()
     {
@@ -185,59 +179,6 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
     public AclObjectIdentity getAclObjectIdentity()
     {
         return this;
-    }
-
-    public List<ProjectAclEntry> getAclEntries()
-    {
-        if (aclEntries == null)
-        {
-            aclEntries = new LinkedList<ProjectAclEntry>();
-        }
-        return aclEntries;
-    }
-
-    private void setAclEntries(List<ProjectAclEntry> aclEntries)
-    {
-        this.aclEntries = aclEntries;
-    }
-
-    public boolean hasAdmin(String login)
-    {
-        for(ProjectAclEntry acl: getAclEntries())
-        {
-            if(acl.getRecipient().equals(login))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public void addAdmin(String recipient)
-    {
-        if(!hasAdmin(recipient))
-        {
-            getAclEntries().add(new ProjectAclEntry(recipient, this, ProjectAclEntry.WRITE));
-        }
-    }
-
-    public void removeAdmin(String login)
-    {
-        ProjectAclEntry remove = null;
-        for(ProjectAclEntry entry: getAclEntries())
-        {
-            if(entry.getRecipient().equals(login))
-            {
-                remove = entry;
-                break;
-            }
-        }
-
-        if(remove != null)
-        {
-            getAclEntries().remove(remove);
-        }
     }
 
     public ProjectConfiguration getConfig()

@@ -65,15 +65,18 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
     private MasterRecipeProcessor masterRecipeProcessor;
     private ServerMessagesHandler serverMessagesHandler;
     private StartupManager startupManager;
+    private ThreadFactory threadFactory;
 
     private LicenseManager licenseManager;
-    private ExecutorService pingService = Executors.newCachedThreadPool();
+    private ExecutorService pingService;
 
     private Map<Long, AgentUpdater> updaters = new TreeMap<Long, AgentUpdater>();
     private ReentrantLock updatersLock = new ReentrantLock();
 
     public void init()
     {
+        pingService = Executors.newCachedThreadPool(threadFactory);
+
         TypeListener<AgentConfiguration> listener = new TypeListener<AgentConfiguration>(AgentConfiguration.class)
         {
             public void postInsert(AgentConfiguration instance)
@@ -346,7 +349,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         agent.setAgentState(agentState);
 
         String masterUrl = "http://" + MasterAgentService.constructMasterLocation(configurationProvider.get(GeneralAdminConfiguration.class), configurationManager.getSystemConfig());
-        AgentUpdater updater = new AgentUpdater(agent, masterUrl, eventManager, configurationManager.getSystemPaths());
+        AgentUpdater updater = new AgentUpdater(agent, masterUrl, eventManager, configurationManager.getSystemPaths(), threadFactory);
         updatersLock.lock();
 
         try
@@ -649,6 +652,11 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
     public void setStartupManager(StartupManager startupManager)
     {
         this.startupManager = startupManager;
+    }
+
+    public void setThreadFactory(ThreadFactory threadFactory)
+    {
+        this.threadFactory = threadFactory;
     }
 
     private class Pinger implements Callable<SlaveStatus>

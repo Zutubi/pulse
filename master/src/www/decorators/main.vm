@@ -149,8 +149,8 @@
 #end
               </td>
               <td class="user" align="right">
-#if($principle)
-                  $principle.name [ <a id="prefs" href="$base/dashboard/preferences/">preferences</a>#if($canLogout) | <a id="logout" href="$base/logout.action">logout</a>#end ]
+#if($loggedInUser)
+                  #html($loggedInUser.config.name) [ <a id="prefs" href="$base/dashboard/preferences/">preferences</a>#if($canLogout) | <a id="logout" href="$base/logout.action">logout</a>#end ]
 #else
                   <a id="login" href="$base/login.action">login</a>
 #end
@@ -172,13 +172,13 @@
     #set ($selectedTab = $page.getProperty("page.selectedTab"))
 #end
       <ul id="nav">
-#if($principle)
+#if($loggedInUser)
         <li><a #if($selectedTab && $selectedTab == "dashboard")      class="active" #end id="tab.dashboard" href="$base/dashboard/home/">dashboard</a></li>
 #end
         <li><a #if($selectedTab && $selectedTab == "projects")       class="active" #end id="tab.projects" href="$base/browse/">browse</a></li>
         <li><a #if($selectedTab && $selectedTab == "queues")         class="active" #end id="tab.queues" href="$base/viewServerQueues.action">queues</a></li>
         <li><a #if($selectedTab && $selectedTab == "agents")         class="active" #end id="tab.agents" href="$base/agents/">agents</a></li>
-        #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
+        #auth("action=ADMINISTER")
         <li><a #if($selectedTab && $selectedTab == "administration") class="active" #end id="tab.administration" href="$base/admin/projects/">administration</a></li>
         #end
       </ul>

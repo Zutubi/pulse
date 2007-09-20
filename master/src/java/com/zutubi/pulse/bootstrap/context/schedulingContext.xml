@@ -23,6 +23,9 @@ This context requires:
         <property name="configLocation">
             <value>classpath:com/zutubi/pulse/bootstrap/quartz/quartz.properties</value>
         </property>
+        <property name="taskExecutor">
+            <ref bean="taskExecutor"/>
+        </property>
     </bean>
 
     <bean id="quartzJobFactory" class="com.zutubi.pulse.bootstrap.quartz.SpringJobFactory" init-method="init">

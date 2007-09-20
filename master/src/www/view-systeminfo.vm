@@ -53,7 +53,7 @@
                             </td>
                         </table>
                     </td>
-                    <td valign=top width="10%" align="left" nowrap>&nbsp;&nbsp;$action.getText("memory.free.percent", ["$percentageFree"]) #authorize("ifAllGranted=ROLE_ADMINISTRATOR") (<a href="$urls.agentAction($agent, 'gc')tab/info/">gc</a>) #end </td>
+                    <td valign=top width="10%" align="left" nowrap>&nbsp;&nbsp;$action.getText("memory.free.percent", ["$percentageFree"]) #auth("action=ADMINISTER") (<a href="$urls.agentAction($agent, 'gc')tab/info/">gc</a>) #end </td>
                 </tr>
             </table>
         </td>

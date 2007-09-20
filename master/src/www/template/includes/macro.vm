@@ -312,27 +312,10 @@
 ##
 ## Outputs a heading row for a content table with an action, restricted to specific roles
 ##
-#macro(restrictedHeadingRow $key $span $roles $actionKey $url $image $id)
+#macro(restrictedHeadingRow $key $span $role $actionKey $url $image $id)
     <tr>
         <th class="heading" colspan="$span">
-    #authorize("ifAllGranted=$roles")
-            <span class="action">
-                <a #if($id != "")id="$id"#end href="$url"><img alt="$action.getText($actionKey)" src="$base/images/$image"/>#wwtext("name=$actionKey")</a>
-            </span>
-    #end
-            #wwtext("name=$key")
-        </th>
-    </tr>
-#end
-
-##
-## Outputs a heading row for a content table with an action, restricted to
-## users that have write access to the domain object.
-##
-#macro(aclActionHeadingRow $key $span $actionKey $url $image $id $domainObject)
-    <tr>
-        <th class="heading" colspan="$span">
-    #acl("domainObject=$domainObject" "hasPermission=4,1")
+    #auth("action=$role")
             <span class="action">
                 <a #if($id != "")id="$id"#end href="$url"><img alt="$action.getText($actionKey)" src="$base/images/$image"/>#wwtext("name=$actionKey")</a>
             </span>
@@ -363,14 +346,6 @@
 ##
 #macro(editHeadingRow $key $span $url $id)
     #actionHeadingRow($key $span "edit" $url "pencil.gif" $id)
-#end
-
-##
-## Outputs a heading row with an edit action if the user has write access to
-## the given object
-##
-#macro(aclEditHeadingRow $key $span $url $id $domainObject)
-    #aclActionHeadingRow($key $span "edit" $url "pencil.gif" $id $domainObject)
 #end
 
 ##

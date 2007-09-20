@@ -16,7 +16,7 @@
         #parse("ajax/view-build-panel.vm")
     </div>
 
-#acl("domainObject=project" "hasPermission=4,1")
+#auth("resource=project" "action=write")
     #if($result.completed())
     <p>
         #set($confirm = $action.getText("build.delete.confirm", [$buildResult.number]))

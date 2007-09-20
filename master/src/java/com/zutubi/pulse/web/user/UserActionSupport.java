@@ -1,16 +1,11 @@
 package com.zutubi.pulse.web.user;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.pulse.UserLoginComparator;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.web.ActionSupport;
-import com.zutubi.pulse.web.admin.user.ViewUsersAction;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 /**
  *
@@ -18,11 +13,6 @@ import java.util.List;
  */
 public class UserActionSupport extends ActionSupport
 {
-    /**
-     * Useful resources commonly used by User related Actions.
-     */
-    private UserManager userManager;
-
     private MasterConfigurationManager configurationManager;
 
     /**
@@ -43,21 +33,6 @@ public class UserActionSupport extends ActionSupport
     private User user = null;
 
     /**
-     * Required resource.
-     *
-     * @param userManager
-     */
-    public void setUserManager(UserManager userManager)
-    {
-        this.userManager = userManager;
-    }
-
-    public UserManager getUserManager()
-    {
-        return userManager;
-    }
-
-    /**
      *
      * @return user id, or -1 if none specified.
      */
@@ -66,11 +41,6 @@ public class UserActionSupport extends ActionSupport
         return userId;
     }
 
-    /**
-     * Set the user id
-     *
-     * @param user
-     */
     public void setUserId(long user)
     {
         this.userId = user;
@@ -110,21 +80,6 @@ public class UserActionSupport extends ActionSupport
         return null;
     }
 
-    public User getAdminUser()
-    {
-        return userManager.getUser(getAdminLogin());
-    }
-
-    public boolean isAdminUser(User user)
-    {
-        return user.getLogin().equals(getAdminLogin());
-    }
-
-    private String getAdminLogin()
-    {
-        return getConfigurationManager().getAppConfig().getAdminLogin();
-    }
-
     protected User getUser(String userLogin)
     {
         return userManager.getUser(userLogin);
@@ -157,14 +112,6 @@ public class UserActionSupport extends ActionSupport
         {
             addFieldError("userLogin", "Unknown user '" + userLogin + "'");
         }
-    }
-
-    protected int getUserStartPage(User user)
-    {
-        List<User> all = getUserManager().getAllUsers();
-        Collections.sort(all, new UserLoginComparator());
-        int index = all.indexOf(user);
-        return index / ViewUsersAction.USERS_PER_PAGE;
     }
 
     public MasterConfigurationManager getConfigurationManager()

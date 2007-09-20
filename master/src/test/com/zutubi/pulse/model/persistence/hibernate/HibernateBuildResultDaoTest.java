@@ -1,11 +1,7 @@
 package com.zutubi.pulse.model.persistence.hibernate;
 
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.RecipeResultNode;
-import com.zutubi.pulse.model.TriggerBuildReason;
-import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
 import com.zutubi.pulse.model.persistence.ChangelistDao;
 import com.zutubi.pulse.model.persistence.ProjectDao;
@@ -276,7 +272,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     public void testGetOldestBuildsExcludesPersonal()
     {
-        User u1 = new User("u1", "u1");
+        User u1 = new User();
         userDao.save(u1);
 
         Project p1 = new Project();
@@ -300,7 +296,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
 
     public void testGetOldestBuildsIncludesPersonal()
     {
-        User u1 = new User("u1", "u1");
+        User u1 = new User();
         userDao.save(u1);
 
         Project p1 = new Project();
@@ -479,9 +475,9 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         Project p = new Project();
         projectDao.save(p);
 
-        User u1 = new User("u1", "u1");
-        User u2 = new User("u2", "u2");
-        User u3 = new User("u3", "u3");
+        User u1 = new User();
+        User u2 = new User();
+        User u3 = new User();
         userDao.save(u1);
         userDao.save(u2);
         userDao.save(u3);
@@ -516,9 +512,9 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         Project p = new Project();
         projectDao.save(p);
 
-        User u1 = new User("u1", "u1");
-        User u2 = new User("u2", "u2");
-        User u3 = new User("u3", "u3");
+        User u1 = new User();
+        User u2 = new User();
+        User u3 = new User();
         userDao.save(u1);
         userDao.save(u2);
         userDao.save(u3);
@@ -553,8 +549,8 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         Project p = new Project();
         projectDao.save(p);
 
-        User u1 = new User("u1", "u1");
-        User u2 = new User("u2", "u2");
+        User u1 = new User();
+        User u2 = new User();
         userDao.save(u1);
         userDao.save(u2);
 
@@ -582,7 +578,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         Project p = new Project();
         projectDao.save(p);
 
-        User u1 = new User("u1", "u1");
+        User u1 = new User();
         userDao.save(u1);
 
         BuildResult r1 = createPersonalBuild(u1, p, 1);
@@ -603,8 +599,8 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         Project p = new Project();
         projectDao.save(p);
 
-        User u1 = new User("u1", "u1");
-        User u2 = new User("u2", "u2");
+        User u1 = new User();
+        User u2 = new User();
         userDao.save(u1);
         userDao.save(u2);
 
@@ -628,8 +624,8 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         Project p = new Project();
         projectDao.save(p);
 
-        User u1 = new User("u1", "u1");
-        User u2 = new User("u2", "u2");
+        User u1 = new User();
+        User u2 = new User();
         userDao.save(u1);
         userDao.save(u2);
 

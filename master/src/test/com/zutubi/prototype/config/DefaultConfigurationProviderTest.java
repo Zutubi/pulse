@@ -12,6 +12,7 @@ import com.zutubi.pulse.core.config.AbstractConfiguration;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 /**
  *
@@ -31,6 +32,7 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
         provider.setEventManager(eventManager);
         provider.setTypeRegistry(typeRegistry);
         provider.setConfigurationPersistenceManager(configurationPersistenceManager);
+        provider.setThreadFactory(Executors.defaultThreadFactory());
         provider.init();
         
         typeRegistry.register(A.class);

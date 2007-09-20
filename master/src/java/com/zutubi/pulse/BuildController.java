@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -75,6 +76,7 @@ public class BuildController implements EventListener
     private List<ResourceProperty> buildProperties;
 
     private ScmClientFactory scmClientFactory;
+    private ThreadFactory threadFactory;
 
     public BuildController(AbstractBuildRequestEvent event)
     {
@@ -85,7 +87,7 @@ public class BuildController implements EventListener
     {
         this.projectConfig = request.getProjectConfig();
         this.project = projectManager.getProject(projectConfig.getProjectId(), false);
-        this.asyncListener = new AsynchronousDelegatingListener(this);
+        this.asyncListener = new AsynchronousDelegatingListener(this, threadFactory);
     }
 
     public void run()
@@ -725,5 +727,10 @@ public class BuildController implements EventListener
     public void setScmClientFactory(ScmClientFactory scmClientFactory)
     {
         this.scmClientFactory = scmClientFactory;
+    }
+
+    public void setThreadFactory(ThreadFactory threadFactory)
+    {
+        this.threadFactory = threadFactory;
     }
 }

@@ -5,11 +5,10 @@ import com.opensymphony.webwork.dispatcher.multipart.MultiPartRequestWrapper;
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.pulse.MasterBuildPaths;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.model.GrantedAuthority;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.personal.PatchArchive;
+import com.zutubi.pulse.prototype.config.group.ServerPermission;
 import com.zutubi.util.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.AccessDeniedException;
@@ -27,7 +26,6 @@ public class PersonalBuildAction extends ActionSupport
     private String version;
     private long number;
     private String errorMessage;
-    private UserManager userManager;
     private MasterConfigurationManager configurationManager;
 
     public void setProject(String project)
@@ -68,7 +66,7 @@ public class PersonalBuildAction extends ActionSupport
             return ERROR;
         }
 
-        if(!userManager.getPrinciple(user).hasAuthority(GrantedAuthority.PERSONAL))
+        if(!userManager.getPrinciple(user).hasAuthority(ServerPermission.PERSONAL_BUILD.toString()))
         {
             throw new AccessDeniedException("User does not have authority to submit personal build requests.");
         }
@@ -138,11 +136,6 @@ public class PersonalBuildAction extends ActionSupport
         }
 
         return SUCCESS;
-    }
-
-    public void setUserManager(UserManager userManager)
-    {
-        this.userManager = userManager;
     }
 
     public void setConfigurationManager(MasterConfigurationManager configurationManager)

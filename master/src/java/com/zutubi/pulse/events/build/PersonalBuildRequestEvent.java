@@ -58,7 +58,7 @@ public class PersonalBuildRequestEvent extends AbstractBuildRequestEvent
         String result = "Personal Build Request Event: " + number;
         if(user != null)
         {
-            result += ": " + user.getLogin();
+            result += ": " + user.getConfig().getLogin();
         }
         return result;
     }

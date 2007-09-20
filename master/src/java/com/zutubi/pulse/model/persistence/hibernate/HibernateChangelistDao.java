@@ -35,7 +35,7 @@ public class HibernateChangelistDao extends HibernateEntityDao<Changelist> imple
             {
                 Query queryObject = session.createQuery("from Changelist model where model.revision.author in (:logins) order by model.revision.time desc");
                 List<String> allLogins = new LinkedList<String>();
-                allLogins.add(user.getLogin());
+                allLogins.add(user.getConfig().getLogin());
                 allLogins.addAll(user.getConfig().getPreferences().getSettings().getAliases());
                 queryObject.setParameterList("logins", allLogins);
                 queryObject.setMaxResults(max);

@@ -1,7 +1,10 @@
 package com.zutubi.pulse.security;
 
+import com.zutubi.pulse.model.AcegiUser;
+import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.prototype.config.group.ServerPermission;
+import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 import org.acegisecurity.Authentication;
-import org.acegisecurity.GrantedAuthority;
 import org.acegisecurity.context.SecurityContextHolder;
 import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 import org.acegisecurity.userdetails.UserDetails;
@@ -11,13 +14,32 @@ import org.acegisecurity.userdetails.UserDetails;
  */
 public class AcegiUtils
 {
+    private static final AcegiUser systemUser;
+    static
+    {
+        UserConfiguration config = new UserConfiguration();
+        config.addDirectAuthority(ServerPermission.ADMINISTER.toString());
+        User user = new User();
+        user.setConfig(config);
+        systemUser = new AcegiUser(user, null);
+    }
+
+    /**
+     * Logs the current thread in as the system user, with priveleges to do
+     * everything.
+     */
+    public static void loginAsSystem()
+    {
+        loginAs(systemUser);
+    }
+    
     /**
      * A utility method to 'log in' the specified user. After this call, all authentication
      * requests will be made against the new user.
      *
      * @param targetUser user to log in as
      */
-    public static void loginAs(UserDetails targetUser)
+    public static void loginAs(AcegiUser targetUser)
     {
         UsernamePasswordAuthenticationToken targetUserRequest =
                 new UsernamePasswordAuthenticationToken(targetUser, targetUser.getPassword(), targetUser.getAuthorities());
@@ -35,15 +57,28 @@ public class AcegiUtils
      * @return the logged in user's login name, or null if there is no
      *         logged in user
      */
-    public static String getLoggedInUser()
+    public static String getLoggedInUsername()
+    {
+        AcegiUser user = getLoggedInUser();
+        if(user == null)
+        {
+            return null;
+        }
+        else
+        {
+            return user.getUsername();
+        }
+    }
+
+    public static AcegiUser getLoggedInUser()
     {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null)
         {
             Object principle = authentication.getPrincipal();
-            if (principle instanceof UserDetails)
+            if (principle instanceof AcegiUser)
             {
-                return ((UserDetails)principle).getUsername();
+                return ((AcegiUser) principle);
             }
         }
         return null;
@@ -59,7 +94,7 @@ public class AcegiUtils
      */
     public static boolean canLogout()
     {
-        if (getLoggedInUser() != null)
+        if (getLoggedInUsername() != null)
         {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if(authentication != null)
@@ -94,14 +129,8 @@ public class AcegiUtils
             Object principle = authentication.getPrincipal();
             if(principle instanceof UserDetails)
             {
-                UserDetails details = (UserDetails)principle;
-                for(GrantedAuthority authority: details.getAuthorities())
-                {
-                    if(authority.getAuthority().equals(role))
-                    {
-                        return true;
-                    }
-                }
+                AcegiUser details = (AcegiUser) principle;
+                return details.getGrantedAuthorities().contains(role);
             }
         }
 

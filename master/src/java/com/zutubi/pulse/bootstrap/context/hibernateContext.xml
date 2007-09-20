@@ -173,25 +173,6 @@ This context requires:
         </property>
     </bean>
 
-    <bean id="projectAclDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateProjectAclDao">
-        <property name="sessionFactory">
-            <ref bean="sessionFactory"/>
-        </property>
-    </bean>
-    <bean id="projectAclDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager">
-            <ref bean="transactionManager"/>
-        </property>
-        <property name="target">
-            <ref bean="projectAclDaoTarget"/>
-        </property>
-        <property name="transactionAttributes">
-            <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
-            </props>
-        </property>
-    </bean>
-
     <bean id="testCaseIndexDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateTestCaseIndexDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
@@ -262,26 +243,6 @@ This context requires:
         </property>
         <property name="target">
             <ref bean="userDaoTarget"/>
-        </property>
-        <property name="transactionAttributes">
-            <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
-            </props>
-        </property>
-    </bean>
-
-    <bean id="groupDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateGroupDao">
-        <property name="sessionFactory">
-            <ref bean="sessionFactory"/>
-        </property>
-    </bean>
-
-    <bean id="groupDao" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager">
-            <ref bean="transactionManager"/>
-        </property>
-        <property name="target">
-            <ref bean="groupDaoTarget"/>
         </property>
         <property name="transactionAttributes">
             <props>

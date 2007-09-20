@@ -2,11 +2,13 @@ package com.zutubi.pulse.upgrade.tasks;
 
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.config.ConfigSupport;
+import com.zutubi.pulse.config.FileConfig;
 import com.zutubi.pulse.upgrade.ConfigurationAware;
 import com.zutubi.pulse.upgrade.UpgradeContext;
 import com.zutubi.pulse.upgrade.UpgradeException;
 import com.zutubi.pulse.upgrade.UpgradeTask;
 
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -43,7 +45,7 @@ public class RenameHostNamePropertyUpgradeTask implements UpgradeTask, Configura
 
     public void execute(UpgradeContext context) throws UpgradeException
     {
-        ConfigSupport appConfig = (ConfigSupport) configurationManager.getAppConfig();
+        ConfigSupport appConfig = new ConfigSupport(new FileConfig(new File(configurationManager.getUserPaths().getUserConfigRoot(), "pulse.properties")));
         if (appConfig.hasProperty("host.name"))
         {
             String hostname = appConfig.getProperty("host.name");

@@ -4,6 +4,7 @@ import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 import com.zutubi.pulse.test.PulseTestCase;
 
 import java.util.ArrayList;
@@ -37,7 +38,7 @@ public class BuildAborterTest extends PulseTestCase
 
     public void testNoBuilds()
     {
-        projectManager.create(new Project());
+        projectManager.save(new Project());
         aborter.execute();
     }
 
@@ -75,7 +76,7 @@ public class BuildAborterTest extends PulseTestCase
     public void testCompletePersonalBuild()
     {
         Project project = new Project();
-        User user = new User("u", "u");
+        User user = newUser();
         BuildResult result = new BuildResult(user, project, 1);
         result.commence(10);
         result.complete();
@@ -95,7 +96,7 @@ public class BuildAborterTest extends PulseTestCase
     public void testIncompletePersonalBuild()
     {
         Project project = new Project();
-        User user = new User("u", "u");
+        User user = newUser();
         BuildResult result = new BuildResult(user, project, 1);
         result.commence(10);
 
@@ -111,5 +112,14 @@ public class BuildAborterTest extends PulseTestCase
 
         assertTrue(result.errored());
         assertTrue(result.getFeatures(Feature.Level.ERROR).get(0).getSummary().contains("shut down"));
+    }
+
+    private User newUser()
+    {
+        UserConfiguration config = new UserConfiguration("test", "test");
+        User user = new User();
+        user.setId(1);
+        user.setConfig(config);
+        return user;
     }
 }

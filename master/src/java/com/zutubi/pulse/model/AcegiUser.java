@@ -1,93 +1,78 @@
 package com.zutubi.pulse.model;
 
+import com.zutubi.prototype.security.Actor;
+import com.zutubi.pulse.prototype.config.group.GroupConfiguration;
+import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 import org.acegisecurity.userdetails.UserDetails;
 
-import java.util.LinkedList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  */
-public class AcegiUser implements UserDetails
+public class AcegiUser implements Actor, UserDetails
 {
     private String username;
     private String password;
-    private GrantedAuthority[] authorities;
-    /**
-     * Authorities granted for this session to this user.  These include
-     * authorities authorities inherited by being part of an LDAP group.
-     */
-    private List<String> transientAuthorities = new LinkedList<String>();
+    private Set<String> authoritySet;
+    private GrantedAuthority[] authorities = null;
     private boolean enabled;
     private boolean ldapAuthentication;
 
-    public AcegiUser(User user)
+    public AcegiUser(User user, List<GroupConfiguration> groups)
     {
-        username = user.getLogin();
-        password = user.getPassword();
-        initAuthorities(user);
+        UserConfiguration config = user.getConfig();
+        username = config.getLogin();
+        password = config.getPassword();
+        initAuthorities(config, groups);
         enabled = user.isEnabled();
-        ldapAuthentication = user.getLdapAuthentication();
+        ldapAuthentication = config.isAuthenticatedViaLdap();
     }
 
-    private void initAuthorities(User user)
+    public Set<String> getGrantedAuthorities()
     {
-        List<String> directAuthorities = user.getGrantedAuthorities();
-        int total = directAuthorities.size();
+        return authoritySet;
+    }
 
-        for(Group g: user.getGroups())
+    private synchronized void initAuthorities(UserConfiguration config, List<GroupConfiguration> groups)
+    {
+        authoritySet = new HashSet<String>();
+        for(String a: config.getGrantedAuthorities())
         {
-            total += g.getAuthorityCount();
+            authoritySet.add(a);
         }
 
-        authorities = new GrantedAuthority[total];
-        int i = 0;
-        for(String authority: directAuthorities)
+        if (groups != null)
         {
-            authorities[i++] = new GrantedAuthority(authority);
-        }
-
-        for(String authority: transientAuthorities)
-        {
-            authorities[i++] = new GrantedAuthority(authority);
-        }
-
-        for(Group g: user.getGroups())
-        {
-            for(GrantedAuthority authority: g.getAuthorities())
+            for(GroupConfiguration g: groups)
             {
-                authorities[i++] = authority;
+                for(String a: g.getGrantedAuthorities())
+                {
+                    authoritySet.add(a);
+                }
             }
         }
     }
 
-    public org.acegisecurity.GrantedAuthority[] getAuthorities()
+    public synchronized org.acegisecurity.GrantedAuthority[] getAuthorities()
     {
-        int total = authorities.length + transientAuthorities.size();
-        GrantedAuthority[] result = new GrantedAuthority[total];
-
-        System.arraycopy(authorities, 0, result, 0, authorities.length);
-
-        int i = authorities.length;
-        for(String authority: transientAuthorities)
+        if(authorities == null)
         {
-            result[i++] = new GrantedAuthority(authority);
-        }
-
-        return result;
-    }
-
-    public boolean hasAuthority(String authority)
-    {
-        org.acegisecurity.GrantedAuthority[] authorities = getAuthorities();
-        for(org.acegisecurity.GrantedAuthority a: authorities)
-        {
-            if(a.getAuthority().equals(authority))
+            authorities = new GrantedAuthority[authoritySet.size()];
+            int i = 0;
+            for(String authority: authoritySet)
             {
-                return true;
+                authorities[i++] = new GrantedAuthority(authority);
             }
         }
 
-        return false;
+        return authorities;
+    }
+
+    public synchronized boolean hasAuthority(String authority)
+    {
+        return authoritySet.contains(authority);
     }
 
     public String getPassword()
@@ -125,11 +110,9 @@ public class AcegiUser implements UserDetails
         return ldapAuthentication;
     }
 
-    public void addTransientAuthority(String authority)
+    public synchronized void addTransientAuthority(String authority)
     {
-        if(!transientAuthorities.contains(authority))
-        {
-            transientAuthorities.add(authority);
-        }
+        authoritySet.add(authority);
+        authorities = null;
     }
 }

@@ -63,5 +63,10 @@
     </bean>
 
     <bean id="eventDispatcher" class="com.zutubi.pulse.events.SynchronousDispatcher"/>
-    
+
+    <bean id="threadFactory" class="com.zutubi.pulse.security.PulseThreadFactory"/>
+
+    <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+        <property name="threadFactory" ref="threadFactory"/>
+    </bean>    
 </beans>

@@ -14,16 +14,11 @@ import java.io.IOException;
 import java.util.Properties;
 
 /**
- * <class-comment/>
  */
 public class SimpleMasterConfigurationManager extends AbstractConfigurationManager implements MasterConfigurationManager
 {
     private SystemConfiguration sysConfig;
-
-    private MasterConfiguration appConfig;
-
     private DatabaseConfig dbConfig;
-
     private Data data;
 
     public SystemConfiguration getSystemConfig()
@@ -54,22 +49,6 @@ public class SimpleMasterConfigurationManager extends AbstractConfigurationManag
             sysConfig = new SystemConfigurationSupport(system, user);
         }
         return sysConfig;
-    }
-
-    public MasterConfiguration getAppConfig()
-    {
-        if (appConfig == null)
-        {
-            MasterUserPaths paths = getUserPaths();
-            if (paths == null)
-            {
-                // default values only.
-                return new MasterConfigurationSupport();
-            }
-            Config user = new FileConfig(new File(paths.getUserConfigRoot(), "pulse.properties"));
-            appConfig = new MasterConfigurationSupport(user);
-        }
-        return appConfig;
     }
 
     public MasterUserPaths getUserPaths()

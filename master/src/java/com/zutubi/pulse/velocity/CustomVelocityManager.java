@@ -44,7 +44,7 @@ public class CustomVelocityManager extends VelocityManager
             }
         }
 
-        String login = AcegiUtils.getLoggedInUser();
+        String login = AcegiUtils.getLoggedInUsername();
         if (login != null && getUserManager() != null)
         {
             User user = getUserManager().getUser(login);

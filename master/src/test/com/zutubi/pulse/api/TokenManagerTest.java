@@ -1,15 +1,12 @@
 package com.zutubi.pulse.api;
 
-import com.zutubi.pulse.license.LicenseManager;
-import com.zutubi.pulse.model.DefaultUserManager;
+import com.mockobjects.dynamic.Mock;
+import com.zutubi.pulse.model.AcegiUser;
 import com.zutubi.pulse.model.GrantedAuthority;
-import com.zutubi.pulse.model.MockBuildManager;
 import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.model.persistence.GroupDao;
-import com.zutubi.pulse.model.persistence.UserDao;
-import com.zutubi.pulse.model.persistence.mock.MockGroupDao;
-import com.zutubi.pulse.model.persistence.mock.MockUserDao;
-import com.zutubi.pulse.security.ldap.AcegiLdapManager;
+import com.zutubi.pulse.model.UserManager;
+import com.zutubi.pulse.prototype.config.group.ServerPermission;
+import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.util.Constants;
 import org.acegisecurity.Authentication;
@@ -22,26 +19,28 @@ import org.acegisecurity.userdetails.UserDetails;
  */
 public class TokenManagerTest extends PulseTestCase
 {
-    DefaultUserManager userManager;
-    DefaultTokenManager tokenManager;
+    private DefaultTokenManager tokenManager;
+    private Mock mock;
 
     protected void setUp() throws Exception
     {
         super.setUp();
-        UserDao userDao = new MockUserDao();
-        userDao.save(new User("jason", "Jason Sankey", "password", GrantedAuthority.USER, GrantedAuthority.ADMINISTRATOR));
-        userDao.save(new User("dan", "Daniel Ostermeier", "insecure", GrantedAuthority.USER));
-        userDao.save(new User("anon", "A. Nonymous", "none"));
+        User jason = newUser("jason", "Jason Sankey", "password", GrantedAuthority.USER, ServerPermission.ADMINISTER.toString());
+        jason.setId(1);
+        User dan = newUser("dan", "Daniel Ostermeier", "insecure", GrantedAuthority.USER);
+        dan.setId(2);
+        User anon = newUser("anon", "A. Nonymous", "none");
+        anon.setId(3);
+        mock = new Mock(UserManager.class);
+        mock.matchAndReturn("getUser", "jason", jason);
+        mock.matchAndReturn("getUser", "dan", dan);
+        mock.matchAndReturn("getUser", "anon", anon);
+        mock.matchAndReturn("getUser", "nosuchuser", null);
+        mock.matchAndReturn("getPrinciple", jason, new AcegiUser(jason, null));
+        mock.matchAndReturn("getPrinciple", dan, new AcegiUser(dan, null));
+        mock.matchAndReturn("getPrinciple", anon, new AcegiUser(anon, null));
 
-        GroupDao groupDao = new MockGroupDao();
-
-        userManager = new DefaultUserManager();
-        userManager.setUserDao(userDao);
-        userManager.setGroupDao(groupDao);
-        userManager.setLicenseManager(new LicenseManager());
-        userManager.setBuildManager(new MockBuildManager());
-        userManager.setLdapManager(new AcegiLdapManager());
-
+        final UserManager userManager = (UserManager) mock.proxy();
         tokenManager = new DefaultTokenManager();
         tokenManager.setUserManager(userManager);
         tokenManager.setAuthenticationManager(new AuthenticationManager()
@@ -55,7 +54,7 @@ public class TokenManagerTest extends PulseTestCase
                     throw new BadCredentialsException("Invalid username");
                 }
 
-                if(!u.getPassword().equals(token.getCredentials()))
+                if(!u.getConfig().getPassword().equals(token.getCredentials()))
                 {
                     throw new BadCredentialsException("Invalid password");
                 }
@@ -64,6 +63,19 @@ public class TokenManagerTest extends PulseTestCase
                 return new UsernamePasswordAuthenticationToken(token.getPrincipal(), token.getCredentials(), details.getAuthorities());
             }
         });
+    }
+
+    private User newUser(String login, String name, String password, String... authorities)
+    {
+        User user = new User();
+        UserConfiguration config = new UserConfiguration(login, name);
+        config.setPassword(password);
+        for (String authority: authorities)
+        {
+            config.addDirectAuthority(authority);
+        }
+        user.setConfig(config);
+        return user;
     }
 
     public void testLoginUnknownUser() throws Exception
@@ -155,15 +167,15 @@ public class TokenManagerTest extends PulseTestCase
     public void testUserOrAdminAccess() throws Exception
     {
         String token = tokenManager.login("jason", "password");
-        tokenManager.verifyRoleIn(token, GrantedAuthority.USER, GrantedAuthority.ADMINISTRATOR);
+        tokenManager.verifyRoleIn(token, GrantedAuthority.USER, ServerPermission.ADMINISTER.toString());
 
         token = tokenManager.login("dan", "insecure");
-        tokenManager.verifyRoleIn(token, GrantedAuthority.USER, GrantedAuthority.ADMINISTRATOR);
+        tokenManager.verifyRoleIn(token, GrantedAuthority.USER, ServerPermission.ADMINISTER.toString());
 
         token = tokenManager.login("anon", "none");
         try
         {
-            tokenManager.verifyRoleIn(token, GrantedAuthority.USER, GrantedAuthority.ADMINISTRATOR);
+            tokenManager.verifyRoleIn(token, GrantedAuthority.USER, ServerPermission.ADMINISTER.toString());
         }
         catch (AuthenticationException e)
         {
@@ -182,7 +194,9 @@ public class TokenManagerTest extends PulseTestCase
     public void testRemoveUser() throws Exception
     {
         String token = tokenManager.login("jason", "password");
-        userManager.delete(userManager.getUser("jason"));
+        mock = new Mock(UserManager.class);
+        mock.matchAndReturn("getUser", "jason", null);
+        tokenManager.setUserManager((UserManager) mock.proxy());
         assertFalse(tokenManager.logout(token));
     }
 

@@ -1,8 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
 <hibernate-mapping>
-
-    <!-- -->
     <class name="com.zutubi.pulse.model.User" table="LOCAL_USER" lazy="false">
         <cache usage="read-write"/>
         
@@ -10,35 +8,7 @@
             <generator class="hilo"/>
         </id>
 
-        <property name="login" column="LOGIN" type="string" length="255"/>
-
-        <property name="name" column="NAME" type="string" not-null="false" length="255"/>
-
-        <property name="password" column="PASSWORD" type="string" not-null="false" length="255"/>
-
         <property name="enabled" column="ENABLED" type="boolean"/>
-
-        <map name="properties" table="USER_PROPERTIES" lazy="false">
-            <cache usage="read-write"/>
-            <key column="USER_ID"/>
-            <index column="PROPERTY_KEY" type="string" length="255"/>
-            <element column="PROPERTY_VALUE" type="string" length="4095"/>
-        </map>
-
-        <idbag name="grantedAuthorities" table="USER_AUTHORITIES" cascade="all,delete-orphan" lazy="false">
-            <cache usage="read-write"/>
-            <collection-id column="ID" type="long">
-                <generator class="hilo"/>
-            </collection-id>
-            <key column="USER_ID"/>
-            <element type="string" column="AUTHORITY" not-null="true" length="255"/>
-        </idbag>
-
-        <set name="groups" table="GROUP_USERS" lazy="false" inverse="true" cascade="none">
-            <cache usage="read-write"/>
-            <key column="USER_ID"/>
-            <many-to-many class="com.zutubi.pulse.model.Group" column="GROUP_ID"/>
-        </set>
 
         <property name="nextBuildNumber" column="NEXT_BUILD_NUMBER" type="long"/>
     </class>

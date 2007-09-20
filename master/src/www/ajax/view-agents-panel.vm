@@ -4,7 +4,7 @@
         #contentHeading("agent.name" 1)
         #contentHeading("agent.location" 1)
         #contentHeading("agent.status" 1)
-#authorize("ifAllGranted=ROLE_ADMINISTRATOR")
+#auth("action=ADMINISTER")
         #contentHeading("actions" 3)
 #end
     </tr>
@@ -15,7 +15,7 @@
         #staticCell($agent.location)
         #if($agent.enabled)
             #staticCell($agent.status.prettyString)
-#authorize("ifAllGranted=ROLE_ADMINISTRATOR")
+#auth("action=ADMINISTER")
             #linkCell("agent.ping.$agent.config.name" "agent.ping" "$urls.agentAction($agent, 'ping')")
             #linkCell("agent.disable.$agent.config.name" "agent.disable" "$urls.agentAction($agent, 'disable')")
 #end
@@ -24,26 +24,26 @@
                 #set($status = "$action.getText('agent.upgrading') [$agent.upgradeState.toString().toLowerCase()]")
 
                 #staticCell($status)
-#authorize("ifAllGranted=ROLE_ADMINISTRATOR")
+#auth("action=ADMINISTER")
                 #contentCell("agent.ping")
                 #contentCell("agent.enable")
 #end
             #elseif($action.failedUpgrade($agent))
                 #contentCell("agent.failed.upgrade")
-#authorize("ifAllGranted=ROLE_ADMINISTRATOR")
+#auth("action=ADMINISTER")
                 #contentCell("agent.ping")
                 #linkCell("agent.enable.$agent.config.name" "agent.enable" "$urls.agentAction($agent, 'enable')")
 #end
             #else
                 ## Just plain disabled
                 #contentCell("agent.disabled")
-#authorize("ifAllGranted=ROLE_ADMINISTRATOR")
+#auth("action=ADMINISTER")
                 #contentCell("agent.ping")
                 #linkCell("agent.enable.$agent.config.name" "agent.enable" "$urls.agentAction($agent, 'enable')")
 #end
             #end
         #end
-#authorize("ifAllGranted=ROLE_ADMINISTRATOR")
+#auth("action=ADMINISTER")
         #editCell("$base/admin/${agent.config.configurationPath}/" "edit_$h_agentName")
 #end
     </tr>

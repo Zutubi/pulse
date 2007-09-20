@@ -12,40 +12,24 @@ import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.events.AgentEvent;
-import com.zutubi.pulse.events.AgentRemovedEvent;
-import com.zutubi.pulse.events.AgentStatusEvent;
-import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.core.scm.ScmClient;
+import com.zutubi.pulse.core.scm.ScmClientFactory;
+import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.scm.config.ScmConfiguration;
+import com.zutubi.pulse.events.*;
 import com.zutubi.pulse.events.EventListener;
-import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.events.build.RecipeCompletedEvent;
-import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
-import com.zutubi.pulse.events.build.RecipeErrorEvent;
-import com.zutubi.pulse.events.build.RecipeEvent;
-import com.zutubi.pulse.events.build.RecipeStatusEvent;
+import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.model.BuildReason;
 import com.zutubi.pulse.model.TriggerBuildReason;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.project.types.TypeConfiguration;
 import com.zutubi.pulse.scm.ScmChangeEvent;
-import com.zutubi.pulse.core.scm.ScmClient;
-import com.zutubi.pulse.core.scm.ScmClientFactory;
-import com.zutubi.pulse.core.scm.ScmException;
-import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.util.Constants;
 import com.zutubi.util.logging.Logger;
 
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -111,6 +95,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     private MasterConfigurationManager configurationManager;
     private GeneralAdminConfiguration adminConfiguration;
     private ScmClientFactory scmClientFactory;
+    private ThreadFactory threadFactory;
 
     public ThreadedRecipeQueue()
     {
@@ -148,7 +133,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
             throw new IllegalStateException("The queue is already running.");
         }
         LOG.debug("start();");
-        executor = Executors.newSingleThreadExecutor();
+        executor = Executors.newSingleThreadExecutor(threadFactory);
         executor.execute(this);
     }
 
@@ -821,6 +806,11 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
+    }
+
+    public void setThreadFactory(ThreadFactory threadFactory)
+    {
+        this.threadFactory = threadFactory;
     }
 
     private static class DispatchedRequest

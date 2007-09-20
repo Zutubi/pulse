@@ -11,12 +11,6 @@ public interface MasterConfigurationManager extends ConfigurationManager, DataRe
 {
     public static final String CONFIG_DIR = ".pulse";
     
-    /**
-     * 
-     * @return system configuration.
-     */
-    MasterConfiguration getAppConfig();
-
     MasterUserPaths getUserPaths();
 
     void setPulseData(File pulseHome);
