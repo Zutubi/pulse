@@ -4,6 +4,7 @@ import com.zutubi.config.annotations.*;
 import com.zutubi.prototype.type.Extendable;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.model.GrantedAuthority;
+import com.zutubi.validation.annotations.Required;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -14,15 +15,15 @@ import java.util.Map;
  *
  */
 @SymbolicName("zutubi.userConfig")
-@Form(fieldOrder = {"login", "name", "authenticatedViaLdap", "password"})
+@Form(fieldOrder = {"login", "name", "authenticatedViaLdap"})
 public class UserConfiguration extends AbstractConfiguration implements Extendable
 {
     @ID
     private String login;
+    @Required
     private String name;
-    @Password
+    @Internal
     private String password;
-    @ControllingCheckbox(dependentFields = {"password"}, invert = true)
     private boolean authenticatedViaLdap;
     @Internal
     private List<String> directAuthorities;

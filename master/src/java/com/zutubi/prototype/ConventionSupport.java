@@ -28,6 +28,11 @@ public class ConventionSupport
         return loadClass(type, "Display");
     }
 
+    public static Class getCreator(Type type)
+    {
+        return loadClass(type, "Creator");
+    }
+
     private static Class loadClass(Type type, String suffix)
     {
         // we need to search up the inheritence hierarchy.

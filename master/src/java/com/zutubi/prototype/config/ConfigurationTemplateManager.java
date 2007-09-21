@@ -59,7 +59,7 @@ public class ConfigurationTemplateManager
      * @return the record at the given location, or null if no record exists
      *         at that location
      * @throws IllegalArgumentException if the path does not refer to a
-     *         persistent scope
+     *                                  persistent scope
      */
     public Record getRecord(String path)
     {
@@ -221,7 +221,7 @@ public class ConfigurationTemplateManager
         // Determine the path at which the record will be inserted.  This is
         // type-dependent.
         String newPath = type.getInsertionPath(path, record);
-        if(pathExists(newPath))
+        if (pathExists(newPath))
         {
             throw new IllegalArgumentException("Invalid insertion path '" + newPath + "': record already exists (use save to modify)");
         }
@@ -341,7 +341,7 @@ public class ConfigurationTemplateManager
                 {
                     Configuration configuration = (Configuration) instance;
                     eventManager.publish(new PostInsertEvent(this, configuration, !concretePath.equals(configuration.getConfigurationPath())));
-                    updateInternalProperties(configuration);
+                    updateSimpleProperties(configuration);
                 }
             }
         }
@@ -353,39 +353,51 @@ public class ConfigurationTemplateManager
         return instance != null && typeRegistry.getType(instance.getClass()) != null;
     }
 
-    private void updateInternalProperties(Configuration configuration)
+    private void updateSimpleProperties(Configuration configuration)
     {
         String path = configuration.getConfigurationPath();
         CompositeType type = (CompositeType) getType(path);
-        if (type.hasInternalProperties())
+        List<String> simpleProperties = type.getSimplePropertyNames();
+        if (type.hasInternalProperties() || simpleProperties.size() > 0)
         {
             MutableRecord mutable = recordManager.select(path).copy(false);
-            for (TypeProperty property : type.getInternalProperties())
+            for (String name : simpleProperties)
             {
-                try
-                {
-                    Object value = property.getValue(configuration);
-                    if (value != null)
-                    {
-                        value = property.getType().unstantiate(value);
-                    }
+                TypeProperty property = type.getProperty(name);
+                updateProperty(configuration, property, mutable);
+            }
 
-                    if (value == null)
-                    {
-                        mutable.remove(property.getName());
-                    }
-                    else
-                    {
-                        mutable.put(property.getName(), value);
-                    }
-                }
-                catch (Exception e)
-                {
-                    LOG.severe(e);
-                }
+            for(TypeProperty property: type.getInternalProperties())
+            {
+                updateProperty(configuration, property, mutable);
             }
 
             recordManager.update(path, mutable);
+        }
+    }
+
+    private void updateProperty(Configuration configuration, TypeProperty property, MutableRecord record)
+    {
+        try
+        {
+            Object value = property.getValue(configuration);
+            if (value != null)
+            {
+                value = property.getType().unstantiate(value);
+            }
+
+            if (value == null)
+            {
+                record.remove(property.getName());
+            }
+            else
+            {
+                record.put(property.getName(), value);
+            }
+        }
+        catch (Exception e)
+        {
+            LOG.severe(e);
         }
     }
 
@@ -513,7 +525,7 @@ public class ConfigurationTemplateManager
                 {
                     // Then we have a composite
                     validateInstance(type, instance, parentInstance, PathUtils.getBaseName(path), concrete, false, null);
-                    if(!instance.isValid())
+                    if (!instance.isValid())
                     {
                         instances.markInvalid(path);
                     }
@@ -629,7 +641,7 @@ public class ConfigurationTemplateManager
      */
     public boolean isDeeplyValid(String path)
     {
-        if(instances.get(path) != null)
+        if (instances.get(path) != null)
         {
             return instances.isValid(path);
         }
@@ -1185,7 +1197,7 @@ public class ConfigurationTemplateManager
         getCleanupTasks(path).execute();
         refreshCaches();
 
-        for(PostDeleteEvent event: events)
+        for (PostDeleteEvent event : events)
         {
             eventManager.publish(event);
         }
@@ -1194,7 +1206,7 @@ public class ConfigurationTemplateManager
     public int deleteAll(final String pathPattern)
     {
         List<String> paths = recordManager.getAllPaths(pathPattern);
-        for(String path: paths)
+        for (String path : paths)
         {
             delete(path);
         }
@@ -1241,9 +1253,8 @@ public class ConfigurationTemplateManager
     /**
      * Load the object at the specified path, ensuring that it is of the expected type.
      *
-     * @param path      of the instance to retrieve
-     * @param clazz     defines the required type of the instance to be retrieved
-     * 
+     * @param path  of the instance to retrieve
+     * @param clazz defines the required type of the instance to be retrieved
      * @return instance
      */
     @SuppressWarnings({"unchecked"})
@@ -1479,14 +1490,14 @@ public class ConfigurationTemplateManager
      */
     public boolean pathExists(String path)
     {
-        if(path.length() == 0)
+        if (path.length() == 0)
         {
             return false;
         }
         else
         {
             String[] elements = PathUtils.getPathElements(path);
-            if(configurationPersistenceManager.getScopeInfo(elements[0]) == null)
+            if (configurationPersistenceManager.getScopeInfo(elements[0]) == null)
             {
                 return false;
             }

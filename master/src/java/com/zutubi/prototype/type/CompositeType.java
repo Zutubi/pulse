@@ -321,10 +321,6 @@ public class CompositeType extends AbstractType implements ComplexType
                 {
                     propertyToXmlRpc(entry, record, result);
                 }
-                for (Map.Entry<String, TypeProperty> entry : internalProperties.entrySet())
-                {
-                    propertyToXmlRpc(entry, record, result);
-                }
 
                 return result;
             }
@@ -389,10 +385,6 @@ public class CompositeType extends AbstractType implements ComplexType
             {
                 propertyFromXmlRpc(property, rpcForm, result);
             }
-            for (TypeProperty property : internalProperties.values())
-            {
-                propertyFromXmlRpc(property, rpcForm, result);
-            }
 
             return result;
         }
@@ -411,7 +403,7 @@ public class CompositeType extends AbstractType implements ComplexType
 
     private boolean recognisedProperty(String property)
     {
-        return property.equals(XML_RPC_SYMBOLIC_NAME) || properties.containsKey(property) || internalProperties.containsKey(property);
+        return property.equals(XML_RPC_SYMBOLIC_NAME) || properties.containsKey(property);
     }
 
     private void propertyFromXmlRpc(TypeProperty property, Hashtable rpcForm, MutableRecord result) throws TypeException

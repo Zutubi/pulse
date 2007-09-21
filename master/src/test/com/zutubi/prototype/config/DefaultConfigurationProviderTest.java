@@ -15,8 +15,6 @@ import java.util.List;
 import java.util.concurrent.Executors;
 
 /**
- *
- *
  */
 public class DefaultConfigurationProviderTest extends AbstractConfigurationSystemTestCase
 {

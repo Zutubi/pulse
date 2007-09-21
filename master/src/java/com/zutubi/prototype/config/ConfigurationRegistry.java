@@ -1,10 +1,12 @@
 package com.zutubi.prototype.config;
 
 import com.zutubi.config.annotations.ConfigurationCheck;
+import com.zutubi.prototype.ConventionSupport;
 import com.zutubi.prototype.type.*;
 import com.zutubi.pulse.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.config.ConfigurationCheckHandler;
+import com.zutubi.pulse.core.config.ConfigurationCreator;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
@@ -283,6 +285,17 @@ public class ConfigurationRegistry
 
                     // FIXME should verify that everything in the check type would land in one form
                     checkTypeMapping.put(type, checkType);
+                }
+
+                Class creatorClass = ConventionSupport.getCreator(type);
+                if(creatorClass != null)
+                {
+                    if(!ConfigurationCreator.class.isAssignableFrom(creatorClass))
+                    {
+                        throw new TypeException("Creator type '" + creatorClass.getName() + "' does not implement ConfigurationCreator");
+                    }
+                    
+                    typeRegistry.register(creatorClass);
                 }
             }
         };

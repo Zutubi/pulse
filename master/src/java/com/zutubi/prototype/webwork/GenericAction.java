@@ -1,14 +1,12 @@
 package com.zutubi.prototype.webwork;
 
+import com.opensymphony.util.TextUtils;
 import com.zutubi.prototype.ConventionSupport;
 import com.zutubi.prototype.actions.Actions;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.util.bean.ObjectFactory;
-import com.opensymphony.util.TextUtils;
 
 /**
- *
- *
  */
 public class GenericAction extends PrototypeSupport
 {
@@ -18,14 +16,8 @@ public class GenericAction extends PrototypeSupport
      * The action that should be executed.
      */
     private String action;
-
     private String newPath;
 
-    /**
-     * Setter for the action property
-     *
-     * @param action identifies the action to be executed
-     */
     public void setAction(String action)
     {
         this.action = action;

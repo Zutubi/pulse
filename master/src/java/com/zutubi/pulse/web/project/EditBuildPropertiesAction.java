@@ -180,6 +180,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
             {
                 addFieldError("revision", "Unable to get pulse file for revision: " + e.getMessage());
                 LOG.severe(e);
+                renderForm();
                 return INPUT;
             }
         }

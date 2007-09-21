@@ -77,7 +77,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider
         else
         {
             LOG.debug("Authenticating user '" + user.getUsername() + "' via stored password");
-//            super.additionalAuthenticationChecks(userDetails, authentication);
+            super.additionalAuthenticationChecks(userDetails, authentication);
         }
     }
 

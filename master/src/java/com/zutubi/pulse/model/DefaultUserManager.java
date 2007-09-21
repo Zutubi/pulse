@@ -67,7 +67,8 @@ public class DefaultUserManager implements UserManager, ConfigurationInjector.Co
                 User user = new User();
                 userDao.save(user);
                 instance.setUserId(user.getId());
-
+                instance.setPassword(passwordEncoder.encodePassword(instance.getPassword(), null));
+                
                 userConfigsById.put(user.getId(), instance);
             }
 
@@ -238,6 +239,7 @@ public class DefaultUserManager implements UserManager, ConfigurationInjector.Co
     {
         String encodedPassword = passwordEncoder.encodePassword(rawPassword, null);
         user.getConfig().setPassword(encodedPassword);
+        configurationProvider.save(user.getConfig());
     }
 
     public void setPasswordEncoder(PasswordEncoder passwordEncoder)
