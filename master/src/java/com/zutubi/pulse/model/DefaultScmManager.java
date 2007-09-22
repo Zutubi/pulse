@@ -200,7 +200,6 @@ public class DefaultScmManager implements ScmManager, Stoppable
                 return;
             }
 
-            // We need to move this CVS specific code into the cvs implementation specific code.
             if (scm.isQuietPeriodEnabled())
             {
                 // are we waiting

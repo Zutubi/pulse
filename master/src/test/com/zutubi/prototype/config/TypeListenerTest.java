@@ -683,16 +683,6 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         assertId("sample/a", 1);
     }
 
-    public void testSimplePropertyUpdatedPostInsert()
-    {
-        IDAssigningListener<A> listener = new IDAssigningListener<A>(A.class);
-        listener.register(provider);
-
-        configurationTemplateManager.insertRecord("sample", createA("a"));
-        MutableRecord r = (MutableRecord) configurationTemplateManager.getRecord("sample/a");
-        assertEquals("edited:a", r.get("name"));
-    }
-
     public void testNewConcreteAssignedId()
     {
         IDAssigningListener<A> listener = new IDAssigningListener<A>(A.class);
