@@ -341,7 +341,7 @@ public class ConfigurationTemplateManager
                 {
                     Configuration configuration = (Configuration) instance;
                     eventManager.publish(new PostInsertEvent(this, configuration, !concretePath.equals(configuration.getConfigurationPath())));
-                    updateSimpleProperties(configuration);
+                    updateInternalProperties(configuration);
                 }
             }
         }
@@ -353,54 +353,42 @@ public class ConfigurationTemplateManager
         return instance != null && typeRegistry.getType(instance.getClass()) != null;
     }
 
-    private void updateSimpleProperties(Configuration configuration)
+    private void updateInternalProperties(Configuration configuration)
     {
         String path = configuration.getConfigurationPath();
         CompositeType type = (CompositeType) getType(path);
-        List<String> simpleProperties = type.getSimplePropertyNames();
-        if (type.hasInternalProperties() || simpleProperties.size() > 0)
+        if (type.hasInternalProperties())
         {
             MutableRecord mutable = recordManager.select(path).copy(false);
-            for (String name : simpleProperties)
+            for (TypeProperty property : type.getInternalProperties())
             {
-                TypeProperty property = type.getProperty(name);
-                updateProperty(configuration, property, mutable);
-            }
+                try
+                {
+                    Object value = property.getValue(configuration);
+                    if (value != null)
+                    {
+                        value = property.getType().unstantiate(value);
+                    }
 
-            for(TypeProperty property: type.getInternalProperties())
-            {
-                updateProperty(configuration, property, mutable);
+                    if (value == null)
+                    {
+                        mutable.remove(property.getName());
+                    }
+                    else
+                    {
+                        mutable.put(property.getName(), value);
+                    }
+                }
+                catch (Exception e)
+                {
+                    LOG.severe(e);
+                }
             }
 
             recordManager.update(path, mutable);
         }
     }
-
-    private void updateProperty(Configuration configuration, TypeProperty property, MutableRecord record)
-    {
-        try
-        {
-            Object value = property.getValue(configuration);
-            if (value != null)
-            {
-                value = property.getType().unstantiate(value);
-            }
-
-            if (value == null)
-            {
-                record.remove(property.getName());
-            }
-            else
-            {
-                record.put(property.getName(), value);
-            }
-        }
-        catch (Exception e)
-        {
-            LOG.severe(e);
-        }
-    }
-
+    
     private CompositeType checkRecordType(Type expectedType, MutableRecord record)
     {
         if (!(expectedType instanceof CompositeType))
