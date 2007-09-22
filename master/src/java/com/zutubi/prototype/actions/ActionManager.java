@@ -27,6 +27,11 @@ public class ActionManager
 
     public List<String> getActions(Object configurationInstance)
     {
+        if(configurationInstance == null)
+        {
+            return Collections.EMPTY_LIST;
+        }
+        
         CompositeType type = getType(configurationInstance);
         ConfigurationActions actions = getConfigurationActions(type);
         try
