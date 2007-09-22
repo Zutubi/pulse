@@ -1,11 +1,11 @@
 package com.zutubi.pulse.prototype.config.project.triggers;
 
 import com.zutubi.pulse.scheduling.Scheduler;
-import com.zutubi.pulse.scheduling.Trigger;
 import com.zutubi.pulse.scheduling.SchedulingException;
+import com.zutubi.pulse.scheduling.Trigger;
 
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  *

@@ -2,7 +2,7 @@ package com.zutubi.prototype.webwork;
 
 import com.opensymphony.util.TextUtils;
 import com.zutubi.prototype.ConventionSupport;
-import com.zutubi.prototype.actions.Actions;
+import com.zutubi.prototype.actions.ActionManager;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.config.ConfigurationRegistry;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
@@ -31,9 +31,8 @@ public class ConfigurationUIModel
 {
     private ConfigurationPersistenceManager configurationPersistenceManager;
     private ConfigurationTemplateManager configurationTemplateManager;
-
     private ConfigurationRegistry configurationRegistry;
-
+    private ActionManager actionManager;
     private ObjectFactory objectFactory;
 
     private Record record;
@@ -132,19 +131,12 @@ public class ConfigurationUIModel
             configurationCheckAvailable = configurationRegistry.getConfigurationCheckType(ctype) != null;
         }
 
-        // determine the actions.
         if (!(type instanceof CollectionType))
         {
-            Class actionHandler = ConventionSupport.getActions(type);
-            if (actionHandler != null)
+            // determine the actions.
+            if (configurationTemplateManager.isConcrete(parentPath, record))
             {
-                // do not show actions for template records.
-                if (configurationTemplateManager.isConcrete(parentPath, record))
-                {
-                    Actions actionSupport = new Actions();
-                    actionSupport.setObjectFactory(objectFactory);
-                    actions = actionSupport.getActions(actionHandler, configurationTemplateManager.getInstance(path));
-                }
+                actions = actionManager.getActions(configurationTemplateManager.getInstance(path));
             }
 
             Class displayHandler = ConventionSupport.getDisplay(type);
@@ -295,5 +287,10 @@ public class ConfigurationUIModel
     public void setObjectFactory(ObjectFactory objectFactory)
     {
         this.objectFactory = objectFactory;
+    }
+
+    public void setActionManager(ActionManager actionManager)
+    {
+        this.actionManager = actionManager;
     }
 }

@@ -29,6 +29,7 @@
     <bean id="configurationPersistenceManager" class="com.zutubi.prototype.config.ConfigurationPersistenceManager" autowire="byName"/>
     <bean id="configurationReferenceManager" class="com.zutubi.prototype.config.ConfigurationReferenceManager" autowire="byName"/>
     <bean id="configurationTemplateManager" class="com.zutubi.prototype.config.ConfigurationTemplateManager" autowire="byName"/>
+    <bean id="actionManager" class="com.zutubi.prototype.actions.ActionManager" autowire="byName"/>
 
     <bean id="formDescriptorFactory" class="com.zutubi.prototype.FormDescriptorFactory" autowire="byName" init-method="init"/>
     <bean id="freemarkerConfiguration" class="com.zutubi.pulse.bootstrap.freemarker.FreemarkerConfigurationFactoryBean" autowire="byName"/>

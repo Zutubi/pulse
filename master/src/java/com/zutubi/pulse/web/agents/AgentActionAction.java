@@ -1,11 +1,9 @@
 package com.zutubi.pulse.web.agents;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.prototype.actions.Actions;
-import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.actions.ActionManager;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.webwork.mapping.Urls;
-import com.zutubi.util.bean.ObjectFactory;
 
 /**
  * Used to execute a named config action with/on an agent.
@@ -14,8 +12,7 @@ public class AgentActionAction extends AgentActionBase
 {
     private String action;
     private String tab;
-    private ObjectFactory objectFactory;
-    private TypeRegistry typeRegistry;
+    private ActionManager actionManager;
 
     public void setAction(String action)
     {
@@ -45,9 +42,7 @@ public class AgentActionAction extends AgentActionBase
 
         try
         {
-            Actions actions = new Actions();
-            actions.setObjectFactory(objectFactory);
-            actions.checkAndExecute(action, config, typeRegistry);
+            actionManager.execute(action, config);
             return SUCCESS;
         }
         catch (Exception e)
@@ -57,13 +52,8 @@ public class AgentActionAction extends AgentActionBase
         }
     }
 
-    public void setObjectFactory(ObjectFactory objectFactory)
+    public void setActionManager(ActionManager actionManager)
     {
-        this.objectFactory = objectFactory;
-    }
-
-    public void setTypeRegistry(TypeRegistry typeRegistry)
-    {
-        this.typeRegistry = typeRegistry;
+        this.actionManager = actionManager;
     }
 }

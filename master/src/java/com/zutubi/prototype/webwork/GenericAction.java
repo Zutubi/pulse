@@ -1,16 +1,14 @@
 package com.zutubi.prototype.webwork;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.prototype.ConventionSupport;
-import com.zutubi.prototype.actions.Actions;
+import com.zutubi.prototype.actions.ActionManager;
 import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.util.bean.ObjectFactory;
 
 /**
  */
 public class GenericAction extends PrototypeSupport
 {
-    private ObjectFactory objectFactory;
+    private ActionManager actionManager;
 
     /**
      * The action that should be executed.
@@ -32,20 +30,9 @@ public class GenericAction extends PrototypeSupport
     {
         CompositeType type = (CompositeType) configurationTemplateManager.getType(path);
 
-        // lookup the action handler.
-        Class handlerClass = ConventionSupport.getActions(type);
-        if (handlerClass == null)
-        {
-            addActionError("No action handler available for '" + type.getSymbolicName() +"'");
-            return ERROR;
-        }
-
         // need the configuration instance.
         Object config = configurationTemplateManager.getInstance(path);
-
-        Actions actions = new Actions();
-        actions.setObjectFactory(objectFactory);
-        actions.execute(handlerClass, action, config);
+        actionManager.execute(action, config);
 
         doRender();
 
@@ -63,8 +50,8 @@ public class GenericAction extends PrototypeSupport
         return SUCCESS;
     }
 
-    public void setObjectFactory(ObjectFactory objectFactory)
+    public void setActionManager(ActionManager actionManager)
     {
-        this.objectFactory = objectFactory;
+        this.actionManager = actionManager;
     }
 }

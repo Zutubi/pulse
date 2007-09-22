@@ -1,9 +1,10 @@
 package com.zutubi.prototype.table;
 
-import com.zutubi.prototype.actions.Actions;
+import com.zutubi.prototype.actions.ConfigurationActions;
+import com.zutubi.util.logging.Logger;
 
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
@@ -11,19 +12,18 @@ import java.util.LinkedList;
  */
 public class ActionDescriptor
 {
-    private List<String> defaultActions = new LinkedList<String>();
+    private static final Logger LOG = Logger.getLogger(ActionDescriptor.class);
 
-    private Class actionHandlerClass;
-    private Actions actionSupport;
+    private List<String> defaultActions = new LinkedList<String>();
+    private ConfigurationActions configurationActions;
 
     public ActionDescriptor()
     {
     }
 
-    public void addActionHandler(Class actionHandler, Actions actions)
+    public void setConfigurationActions(ConfigurationActions configurationActions)
     {
-        this.actionHandlerClass = actionHandler;
-        this.actionSupport = actions;
+        this.configurationActions = configurationActions;
     }
 
     public void addDefaultAction(String action)
@@ -35,9 +35,13 @@ public class ActionDescriptor
     {
         List<String> actions = new LinkedList<String>();
         actions.addAll(defaultActions);
-        if (actionHandlerClass != null)
+        try
         {
-            actions.addAll(actionSupport.getActions(actionHandlerClass, instance));
+            actions.addAll(configurationActions.getActions(instance));
+        }
+        catch (Exception e)
+        {
+            LOG.severe(e);
         }
         return actions;
     }

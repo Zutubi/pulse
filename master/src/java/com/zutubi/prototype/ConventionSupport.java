@@ -13,9 +13,9 @@ public class ConventionSupport
         return loadClass(type, "Wizard");
     }
 
-    public static Class getActions(Type type)
+    public static Class getActions(Class clazz)
     {
-        return loadClass(type, "Actions");
+        return loadClass(clazz, "Actions");
     }
 
     public static Class getFormatter(Type type)
@@ -36,7 +36,11 @@ public class ConventionSupport
     private static Class loadClass(Type type, String suffix)
     {
         // we need to search up the inheritence hierarchy.
-        Class clazz = type.getClazz();
+        return loadClass(type.getClazz(), suffix);
+    }
+
+    private static Class loadClass(Class clazz, String suffix)
+    {
         while (clazz != Object.class)
         {
             try

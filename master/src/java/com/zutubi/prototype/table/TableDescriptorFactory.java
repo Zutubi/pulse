@@ -1,12 +1,10 @@
 package com.zutubi.prototype.table;
 
 import com.zutubi.config.annotations.Table;
-import com.zutubi.prototype.ConventionSupport;
-import com.zutubi.prototype.actions.Actions;
+import com.zutubi.prototype.actions.ActionManager;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.PrimitiveType;
 import com.zutubi.prototype.webwork.PrototypeUtils;
-import com.zutubi.util.bean.ObjectFactory;
 
 /**
  * The table descriptor factory is an implementation of a descriptor factory that uses an objects type definition
@@ -15,7 +13,7 @@ import com.zutubi.util.bean.ObjectFactory;
  */
 public class TableDescriptorFactory
 {
-    private ObjectFactory objectFactory;
+    private ActionManager actionManager;
 
     public TableDescriptor create(CompositeType type)
     {
@@ -25,15 +23,8 @@ public class TableDescriptorFactory
         ActionDescriptor ad = new ActionDescriptor();
         ad.addDefaultAction("edit");
         ad.addDefaultAction("delete");
+        ad.setConfigurationActions(actionManager.getConfigurationActions(type));
         td.addActionDescriptor(ad);
-
-        Class handler = ConventionSupport.getActions(type);
-        if (handler != null)
-        {
-            Actions actions = new Actions();
-            actions.setObjectFactory(objectFactory);
-            ad.addActionHandler(handler, actions);
-        }
 
         // does the table has a Table annotation defining the columns to be rendered?
         Table tableAnnotation = (Table) type.getAnnotation(Table.class);
@@ -63,8 +54,8 @@ public class TableDescriptorFactory
         return td;
     }
 
-    public void setObjectFactory(ObjectFactory objectFactory)
+    public void setActionManager(ActionManager actionManager)
     {
-        this.objectFactory = objectFactory;
+        this.actionManager = actionManager;
     }
 }
