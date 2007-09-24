@@ -1,5 +1,6 @@
 package com.zutubi.pulse.validation;
 
+import com.zutubi.prototype.actions.ActionManager;
 import com.zutubi.prototype.config.AbstractConfigurationSystemTestCase;
 import com.zutubi.prototype.config.ConfigurationRegistry;
 import com.zutubi.prototype.type.TypeException;
@@ -22,6 +23,7 @@ public class AbstractValidationTestCase extends AbstractConfigurationSystemTestC
         configurationRegistry.setConfigurationPersistenceManager(configurationPersistenceManager);
         configurationRegistry.setConfigurationTemplateManager(configurationTemplateManager);
         configurationRegistry.setTypeRegistry(typeRegistry);
+        configurationRegistry.setActionManager(new ActionManager());
         configurationRegistry.initSetup();
         configurationRegistry.init();
     }
