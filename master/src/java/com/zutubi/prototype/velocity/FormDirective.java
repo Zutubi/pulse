@@ -7,7 +7,6 @@ import com.zutubi.prototype.TemplateFormDecorator;
 import com.zutubi.prototype.model.Form;
 import com.zutubi.prototype.model.HiddenFieldDescriptor;
 import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.TemplateRecord;
@@ -100,9 +99,7 @@ public class FormDirective extends PrototypeDirective
             Map params = createPropertyMap(contextAdapter, node);
             wireParams(params);
 
-            Type type = lookupType();
-
-            CompositeType ctype = (CompositeType) type;
+            CompositeType ctype = (CompositeType) lookupType();
             Record data = lookupRecord();
 
             String path = lookupPath();
@@ -131,7 +128,7 @@ public class FormDirective extends PrototypeDirective
             formDescriptor.add(hiddenFieldDescriptor);
 
             // Create the context object used to define the freemarker rendering context
-            Map<String, Object> context = initialiseContext(type.getClazz());
+            Map<String, Object> context = initialiseContext(ctype.getClazz());
 
             Form form = formDescriptor.instantiate(lookupPath(), data);
             if(TextUtils.stringSet(action))

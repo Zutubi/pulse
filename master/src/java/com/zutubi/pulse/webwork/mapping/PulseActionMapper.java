@@ -95,7 +95,7 @@ public class PulseActionMapper implements ActionMapper
 
             String requestedAction = actionSubmit[0];
             params.put("submitField", actionSubmit[1]);
-            params.put("action", requestedAction);
+            params.put("actionName", requestedAction);
             params.put("path", path);
             try
             {
@@ -129,6 +129,12 @@ public class PulseActionMapper implements ActionMapper
             {
                 actionSubmit[0] = query.substring(0, index);
                 actionSubmit[1] = query.substring(index + 1);
+
+                index = actionSubmit[1].indexOf('&');
+                if(index >= 0)
+                {
+                    actionSubmit[1] = actionSubmit[1].substring(0, index);
+                }
             }
             else
             {

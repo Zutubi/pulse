@@ -65,7 +65,7 @@
             var detailPane = Ext.get('detail-pane').getUpdateManager().defaultUrl;
             var oldPath = detailPane.substring('$base/aconfig/'.length, detailPane.length);
             
-            runAjaxRequest('$base/aconfig/' + path + '=&newPath=' + oldPath);
+            runAjaxRequest('$base/aconfig/' + path + '=input&newPath=' + oldPath);
         }
 
         var deletePath = function(path)

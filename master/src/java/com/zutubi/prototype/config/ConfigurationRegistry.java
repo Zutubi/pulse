@@ -2,7 +2,11 @@ package com.zutubi.prototype.config;
 
 import com.zutubi.config.annotations.ConfigurationCheck;
 import com.zutubi.prototype.ConventionSupport;
+import com.zutubi.prototype.actions.ActionManager;
+import com.zutubi.prototype.actions.ConfigurationAction;
+import com.zutubi.prototype.actions.ConfigurationActions;
 import com.zutubi.prototype.type.*;
+import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.config.ConfigurationCheckHandler;
@@ -55,6 +59,7 @@ public class ConfigurationRegistry
     private TypeRegistry typeRegistry;
     private ConfigurationPersistenceManager configurationPersistenceManager;
     private ConfigurationTemplateManager configurationTemplateManager;
+    private ActionManager actionManager;
 
     public void initSetup()
     {
@@ -250,7 +255,7 @@ public class ConfigurationRegistry
         projectConfig.addProperty(new ExtensionTypeProperty(name, mapType));
     }
 
-    public <T extends Configuration> CompositeType registerConfigurationType(Class<T> clazz) throws TypeException
+    public <T extends Configuration> CompositeType registerConfigurationType(final Class<T> clazz) throws TypeException
     {
         // Type callback that looks for ConfigurationCheck annotations
         TypeHandler handler = new TypeHandler()
@@ -297,10 +302,33 @@ public class ConfigurationRegistry
                     
                     typeRegistry.register(creatorClass);
                 }
+
+                Class actionsClass = ConventionSupport.getActions(clazz);
+                if(actionsClass != null)
+                {
+                    ConfigurationActions configurationActions = actionManager.getConfigurationActions(type);
+                    for(ConfigurationAction action: configurationActions.getAvailableActions())
+                    {
+                        if(action.hasArgument())
+                        {
+                            registerTransientConfiguration(getActionProperty(type, action.getName()), action.getArgumentClass());
+                        }
+                    }
+                }
             }
         };
 
         return typeRegistry.register(clazz, handler);
+    }
+
+    public static String getActionPath(CompositeType configurationType, String actionName)
+    {
+        return PathUtils.getPath(TRANSIENT_SCOPE,  configurationType.getSymbolicName() + ".actions." + actionName);
+    }
+
+    public static String getActionProperty(CompositeType configurationType, String actionName)
+    {
+        return configurationType.getSymbolicName() + ".actions." + actionName;
     }
 
     public CompositeType getConfigurationCheckType(CompositeType type)
@@ -326,5 +354,10 @@ public class ConfigurationRegistry
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
         this.configurationTemplateManager = configurationTemplateManager;
+    }
+
+    public void setActionManager(ActionManager actionManager)
+    {
+        this.actionManager = actionManager;
     }
 }

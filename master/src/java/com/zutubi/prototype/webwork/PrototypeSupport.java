@@ -34,7 +34,7 @@ public class PrototypeSupport extends ActionSupport implements MessagesProvider
 
     public boolean isCancelSelected()
     {
-        return "cancel".equals(submitField) || "reset".equals(submitField);
+        return isSelected("cancel") || isSelected("reset");
     }
 
     public boolean isSaveSelected()
@@ -44,27 +44,37 @@ public class PrototypeSupport extends ActionSupport implements MessagesProvider
 
     public boolean isConfirmSelected()
     {
-        return "confirm".equals(submitField);
+        return isSelected("confirm");
     }
 
     public boolean isDeleteSelected()
     {
-        return "delete".equals(submitField);
+        return isSelected("delete");
+    }
+
+    public boolean isInputSelected()
+    {
+        return isSelected("input");
     }
 
     public boolean isPreviousSelected()
     {
-        return "previous".equals(submitField);
+        return isSelected("previous");
     }
 
     public boolean isNextSelected()
     {
-        return "next".equals(submitField);
+        return isSelected("next");
     }
 
     public boolean isFinishSelected()
     {
-        return "finish".equals(submitField);
+        return isSelected("finish");
+    }
+
+    private boolean isSelected(String s)
+    {
+        return s.equals(submitField);
     }
 
     public void setSubmitField(String submitField)

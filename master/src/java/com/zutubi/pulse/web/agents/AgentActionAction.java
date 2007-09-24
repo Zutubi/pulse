@@ -42,7 +42,7 @@ public class AgentActionAction extends AgentActionBase
 
         try
         {
-            actionManager.execute(action, config);
+            actionManager.execute(action, config, null);
             return SUCCESS;
         }
         catch (Exception e)

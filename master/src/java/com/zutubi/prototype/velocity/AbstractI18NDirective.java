@@ -1,8 +1,10 @@
 package com.zutubi.prototype.velocity;
 
+import com.opensymphony.util.TextUtils;
 import com.zutubi.i18n.Messages;
-import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.Type;
+import com.zutubi.prototype.type.TypeRegistry;
 
 /**
  *
@@ -10,6 +12,11 @@ import com.zutubi.prototype.type.CompositeType;
  */
 public abstract class AbstractI18NDirective extends PrototypeDirective
 {
+    /**
+     * Symbolic name for a type that should be used as the messages context.
+     * This overrides default type lookup.
+     */
+    protected String context;
     /**
      * The I18N message key.  This field is required.
      */
@@ -20,21 +27,18 @@ public abstract class AbstractI18NDirective extends PrototypeDirective
      */
     private String property;
 
-    /**
-     * Setter for the <code>key</code> property.
-     *
-     * @param key
-     */
+    private TypeRegistry typeRegistry;
+
+    public void setContext(String context)
+    {
+        this.context = context;
+    }
+
     public void setKey(String key)
     {
         this.key = key;
     }
 
-    /**
-     * Setter for the <code>property</code> property.
-     *
-     * @param property
-     */
     public void setProperty(String property)
     {
         this.property = property;
@@ -42,7 +46,16 @@ public abstract class AbstractI18NDirective extends PrototypeDirective
 
     protected Messages getMessages()
     {
-        Type type = lookupType();
+        Type type;
+        if(TextUtils.stringSet(context))
+        {
+            type = typeRegistry.getType(context);
+        }
+        else
+        {
+            type = lookupType();
+        }
+
         if (type == null)
         {
             return lookupMessages();
@@ -58,5 +71,10 @@ public abstract class AbstractI18NDirective extends PrototypeDirective
         }
 
         return Messages.getInstance(type.getClazz());
+    }
+
+    public void setTypeRegistry(TypeRegistry typeRegistry)
+    {
+        this.typeRegistry = typeRegistry;
     }
 }

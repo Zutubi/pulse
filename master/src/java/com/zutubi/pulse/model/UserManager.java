@@ -48,7 +48,7 @@ public interface UserManager extends EntityManager<User>, UserDetailsService
 
     AcegiUser getPrinciple(User user);
 
-    void setPassword(User user, String rawPassword);
+    void setPassword(UserConfiguration user, String rawPassword);
 
     long getNextBuildNumber(User user);
 

@@ -1,6 +1,7 @@
 package com.zutubi.prototype;
 
 import com.zutubi.prototype.type.Type;
+import com.zutubi.pulse.core.config.Configuration;
 
 /**
  *
@@ -13,7 +14,7 @@ public class ConventionSupport
         return loadClass(type, "Wizard");
     }
 
-    public static Class getActions(Class clazz)
+    public static Class getActions(Class<? extends Configuration> clazz)
     {
         return loadClass(clazz, "Actions");
     }

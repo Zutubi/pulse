@@ -45,6 +45,11 @@ public class ConfigurationAction
         return argumentClass;
     }
 
+    public boolean hasArgument()
+    {
+        return argumentClass != null;
+    }
+
     public Method getMethod()
     {
         return method;

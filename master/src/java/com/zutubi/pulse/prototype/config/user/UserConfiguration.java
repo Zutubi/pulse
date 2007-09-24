@@ -11,11 +11,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
- *
+ * Configuration for a user of Pulse, including accoutn details and the
+ * user's personal preferences.
  */
 @SymbolicName("zutubi.userConfig")
 @Form(fieldOrder = {"login", "name", "authenticatedViaLdap"})
+@Table(columns = {"login", "name"})
 public class UserConfiguration extends AbstractConfiguration implements Extendable
 {
     @ID

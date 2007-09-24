@@ -130,6 +130,11 @@ public class ConfigurationActions
         return availableActions.get(name);
     }
 
+    public Iterable<ConfigurationAction> getAvailableActions()
+    {
+        return availableActions.values();
+    }
+
     public boolean hasAction(String name)
     {
         return getAction(name) != null;
@@ -191,7 +196,7 @@ public class ConfigurationActions
         }
         else
         {
-            if(!argumentClass.isInstance(argument))
+            if(argument != null && !argumentClass.isInstance(argument))
             {
                 throw new IllegalArgumentException("Invoking action '" + name + "' of type '" + configurationClass.getName() + "': argument instance is of wrong type: expecting '" + argumentClass.getName() + "', got '" + argument.getClass().getName() + "'");
             }

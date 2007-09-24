@@ -229,17 +229,11 @@ public class DefaultUserManager implements UserManager, ConfigurationInjector.Co
         return new AcegiUser(user, groupsByUser.get(user.getConfig()));
     }
 
-    /**
-     * Update the password for this user.
-     *
-     * @param user
-     * @param rawPassword
-     */
-    public void setPassword(User user, String rawPassword)
+    public void setPassword(UserConfiguration user, String rawPassword)
     {
         String encodedPassword = passwordEncoder.encodePassword(rawPassword, null);
-        user.getConfig().setPassword(encodedPassword);
-        configurationProvider.save(user.getConfig());
+        user.setPassword(encodedPassword);
+        configurationProvider.save(user);
     }
 
     public void setPasswordEncoder(PasswordEncoder passwordEncoder)

@@ -3,6 +3,7 @@ package com.zutubi.prototype.actions;
 import com.zutubi.prototype.ConventionSupport;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
@@ -45,13 +46,13 @@ public class ActionManager
         }
     }
 
-    public void execute(String actionName, Object configurationInstance)
+    public void execute(String actionName, Configuration configurationInstance, Configuration argumentInstance)
     {
         CompositeType type = getType(configurationInstance);
         ConfigurationActions actions = getConfigurationActions(type);
         try
         {
-            actions.execute(actionName, configurationInstance, null);
+            actions.execute(actionName, configurationInstance, argumentInstance);
         }
         catch (Exception e)
         {
