@@ -9,6 +9,4 @@ public interface RecordSerialiser
     void serialise(String path, Record record, boolean deep) throws RecordSerialiseException;
 
     MutableRecord deserialise(String path, RecordHandler handler) throws RecordSerialiseException;
-
-    void delete(String path) throws RecordSerialiseException;
 }

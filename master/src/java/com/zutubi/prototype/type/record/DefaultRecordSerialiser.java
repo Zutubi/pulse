@@ -147,6 +147,11 @@ public class DefaultRecordSerialiser implements RecordSerialiser
         return element;
     }
 
+    public MutableRecord deserialise(String path)
+    {
+        return deserialise(path, new NoopRecordHandler());
+    }
+
     public MutableRecord deserialise(String path, RecordHandler handler)
     {
         File dir = new File(baseDirectory, path);
@@ -156,12 +161,6 @@ public class DefaultRecordSerialiser implements RecordSerialiser
         }
 
         return deserialise(dir, handler, "");
-    }
-
-    public void delete(String path) throws RecordSerialiseException
-    {
-        File dir = new File(baseDirectory, path);
-        FileSystemUtils.rmdir(dir);
     }
 
     private MutableRecord deserialise(File dir, RecordHandler handler, String path)

@@ -6,6 +6,9 @@ import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.MockRecordSerialiser;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.RecordManager;
+import com.zutubi.prototype.type.record.store.RecordStore;
+import com.zutubi.prototype.type.record.store.InMemoryRecordStore;
+import com.zutubi.prototype.transaction.TransactionManager;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.events.DefaultEventManager;
 import com.zutubi.util.bean.DefaultObjectFactory;
@@ -32,6 +35,7 @@ public abstract class AbstractConfigurationSystemTestCase extends TestCase
     protected ConfigurationPersistenceManager configurationPersistenceManager;
     protected ConfigurationTemplateManager configurationTemplateManager;
     protected ConfigurationReferenceManager configurationReferenceManager;
+    protected TransactionManager transactionManager;
 
     protected void setUp() throws Exception
     {
@@ -48,8 +52,14 @@ public abstract class AbstractConfigurationSystemTestCase extends TestCase
         typeRegistry = new TypeRegistry();
         eventManager = new DefaultEventManager();
 
+        transactionManager = new TransactionManager();
+
+        InMemoryRecordStore inMemory = new InMemoryRecordStore();
+        inMemory.setTransactionManager(transactionManager);
+
         recordManager = new RecordManager();
-        recordManager.setRecordSerialiser(new MockRecordSerialiser());
+        recordManager.setTransactionManager(transactionManager);
+        recordManager.setRecordStore(inMemory);
         recordManager.init();
 
         configurationPersistenceManager = new ConfigurationPersistenceManager();

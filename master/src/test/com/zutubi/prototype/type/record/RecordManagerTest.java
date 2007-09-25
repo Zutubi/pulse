@@ -1,8 +1,11 @@
 package com.zutubi.prototype.type.record;
 
+import com.zutubi.prototype.transaction.TransactionManager;
+import com.zutubi.prototype.transaction.UserTransaction;
+import com.zutubi.prototype.type.record.store.FileSystemRecordStore;
+import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.Sort;
-import junit.framework.TestCase;
 
 import java.io.File;
 import java.util.Collections;
@@ -13,21 +16,28 @@ import java.util.Map;
  *
  *
  */
-public class RecordManagerTest extends TestCase
+public class RecordManagerTest extends PulseTestCase
 {
     private File tempDir;
     private RecordManager recordManager;
+    private TransactionManager transactionManager;
+    private UserTransaction userTransaction;
 
     protected void setUp() throws Exception
     {
         super.setUp();
 
         tempDir = FileSystemUtils.createTempDir(getName(), "");
+        transactionManager = new TransactionManager();
+        userTransaction = new UserTransaction(transactionManager);
+
         newRecordManager();
     }
 
     protected void tearDown() throws Exception
     {
+        userTransaction = null;
+        transactionManager = null;
         recordManager = null;
         if (!FileSystemUtils.rmdir(tempDir))
         {
@@ -46,10 +56,11 @@ public class RecordManagerTest extends TestCase
         recordManager.insert("hello/world", record);
 
         Record hello = recordManager.select("hello");
+        assertNotNull(hello);
         assertNotNull(hello.get("world"));
     }
 
-    public void testLoad()
+    public void testSelectByPath()
     {
         MutableRecordImpl record = new MutableRecordImpl();
         record.putMeta("key", "value");
@@ -178,26 +189,26 @@ public class RecordManagerTest extends TestCase
         }
     }
 
-    public void testLoadAll()
+    public void testSelectAll()
     {
         // setup test data.
         recordManager.insert("a", new MutableRecordImpl());
         recordManager.insert("a/b", new MutableRecordImpl());
         recordManager.insert("a/b/c", new MutableRecordImpl());
 
-        assertLoadedRecordCount("a", 1);
-        assertLoadedRecordCount("a/b", 1);
-        assertLoadedRecordCount("a/b/c", 1);
-        assertLoadedRecordCount("a/b/c/d", 0);
+        assertSelectedRecordCount("a", 1);
+        assertSelectedRecordCount("a/b", 1);
+        assertSelectedRecordCount("a/b/c", 1);
+        assertSelectedRecordCount("a/b/c/d", 0);
 
-        assertLoadedRecordCount("a/*/c", 1);
-        assertLoadedRecordCount("*/*/*", 1);
+        assertSelectedRecordCount("a/*/c", 1);
+        assertSelectedRecordCount("*/*/*", 1);
 
         recordManager.insert("a/b/d", new MutableRecordImpl());
-        assertLoadedRecordCount("a/b/*", 2);
+        assertSelectedRecordCount("a/b/*", 2);
     }
 
-    public void testLoadAllHandlesNullInput()
+    public void testSelectAllHandlesNullInput()
     {
         try
         {
@@ -210,23 +221,23 @@ public class RecordManagerTest extends TestCase
         }
     }
 
-    public void testLoadAllMatchesSimpleKey()
+    public void testSelectAllMatchesSimpleKey()
     {
         MutableRecord record = new MutableRecordImpl();
         record.put("simple", "value");
         recordManager.insert("a", record);
         recordManager.insert("a/nested", new MutableRecordImpl());
         
-        assertLoadedRecordCount("a/*", 1);
+        assertSelectedRecordCount("a/*", 1);
     }
 
-    private void assertLoadedRecordCount(String path, int count)
+    private void assertSelectedRecordCount(String path, int count)
     {
         Map<String, Record> records = recordManager.selectAll(path);
         assertEquals(count, records.size());
     }
 
-    public void testLoadAllEmptyPath()
+    public void testSelectAllEmptyPath()
     {
         try
         {
@@ -239,7 +250,7 @@ public class RecordManagerTest extends TestCase
         }
     }
 
-    public void testLoadEmptyPath()
+    public void testSelectEmptyPath()
     {
         try
         {
@@ -252,7 +263,7 @@ public class RecordManagerTest extends TestCase
         }
     }
 
-    public void testLoadHandlesNullInput()
+    public void testSelectHandlesNullInput()
     {
         try
         {
@@ -318,6 +329,7 @@ public class RecordManagerTest extends TestCase
                 assertNextHandle(nextHandle, handle);
                 handle = nextHandle;
             }
+            userTransaction.commit();
         }
     }
 
@@ -343,12 +355,14 @@ public class RecordManagerTest extends TestCase
         assertNull(recordManager.getPathForHandle(100));
     }
 
-    public void testHandleMapAferReload()
+    public void testHandleMapAfterReload()
     {
         recordManager.insert("r1", new MutableRecordImpl());
         recordManager.insert("r2", new MutableRecordImpl());
         assertHandleToPath("r1");
         assertHandleToPath("r2");
+        userTransaction.commit();
+        
         newRecordManager();
         assertHandleToPath("r1");
         assertHandleToPath("r2");
@@ -486,10 +500,102 @@ public class RecordManagerTest extends TestCase
         assertNotNull(loaded.get("quux"));
     }
 
+    //---( transactional tests: focus on record handles )---
+
+    public void testCommit()
+    {
+        MutableRecord record = new MutableRecordImpl();
+        record.put("foo", "bar");
+
+        final Record insertedRecord = recordManager.insert("path", record);
+
+        assertNotNull(recordManager.select("path"));
+        executeOnSeparateThread(new Runnable()
+        {
+            public void run()
+            {
+                assertNull(recordManager.select("path"));
+                assertNull(recordManager.getPathForHandle(insertedRecord.getHandle()));
+            }
+        });
+
+        userTransaction.commit();
+
+        assertNotNull(recordManager.select("path"));
+        executeOnSeparateThread(new Runnable()
+        {
+            public void run()
+            {
+                assertNotNull(recordManager.select("path"));
+                assertNotNull(recordManager.getPathForHandle(insertedRecord.getHandle()));
+            }
+        });
+    }
+
+    public void testRollback()
+    {
+        MutableRecord record = new MutableRecordImpl();
+        record.put("foo", "bar");
+
+        recordManager.insert("path", record);
+
+        assertNotNull(recordManager.select("path"));
+        executeOnSeparateThread(new Runnable()
+        {
+            public void run()
+            {
+                assertNull(recordManager.select("path"));
+            }
+        });
+
+        final Record insertedRecord = recordManager.select("path");
+
+        userTransaction.rollback();
+
+        assertNull(recordManager.select("path"));
+        assertNull(recordManager.getPathForHandle(insertedRecord.getHandle()));
+    }
+
+    public void testNoSurroundingTransaction()
+    {
+        // close the existing transaction.
+        userTransaction.commit();
+
+        MutableRecord record = new MutableRecordImpl();
+        record.put("foo", "bar");
+        final Record insertedRecord = recordManager.insert("path", record);
+
+        assertNotNull(recordManager.select("path"));
+        executeOnSeparateThread(new Runnable()
+        {
+            public void run()
+            {
+                assertNotNull(recordManager.select("path"));
+            }
+        });
+
+        assertEquals("path", recordManager.getPathForHandle(insertedRecord.getHandle()));
+        executeOnSeparateThread(new Runnable()
+        {
+            public void run()
+            {
+                assertEquals("path", recordManager.getPathForHandle(insertedRecord.getHandle()));
+            }
+        });
+    }
+
     private void newRecordManager()
     {
+        FileSystemRecordStore recordStore = new FileSystemRecordStore();
+        recordStore.setTransactionManager(transactionManager);
+        recordStore.setPersistenceDir(tempDir);
+        recordStore.init();
+
         recordManager = new RecordManager();
-        recordManager.setRecordSerialiser(new DefaultRecordSerialiser(tempDir));
+        recordManager.setTransactionManager(transactionManager);
+        recordManager.setRecordStore(recordStore);
         recordManager.init();
+
+        userTransaction.begin();
     }
 }

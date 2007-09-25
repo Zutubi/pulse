@@ -12,8 +12,4 @@ public class MockRecordSerialiser implements RecordSerialiser
     {
         return new MutableRecordImpl();
     }
-
-    public void delete(String path) throws RecordSerialiseException
-    {
-    }
 }

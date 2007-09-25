@@ -1,12 +1,17 @@
 package com.zutubi.prototype.config;
 
-import com.zutubi.prototype.config.types.*;
+import com.zutubi.prototype.config.types.CircularObject;
+import com.zutubi.prototype.config.types.CompositeCollectionObject;
+import com.zutubi.prototype.config.types.CompositeObject;
+import com.zutubi.prototype.config.types.SimpleCollectionObject;
+import com.zutubi.prototype.config.types.SimpleObject;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.MapType;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.TypeRegistry;
-import com.zutubi.prototype.type.record.MockRecordSerialiser;
 import com.zutubi.prototype.type.record.RecordManager;
+import com.zutubi.prototype.type.record.store.InMemoryRecordStore;
+import com.zutubi.prototype.transaction.TransactionManager;
 import junit.framework.TestCase;
 
 import java.util.Arrays;
@@ -18,6 +23,8 @@ public class ConfigurationPersistenceManagerTest extends TestCase
     private ConfigurationPersistenceManager manager = null;
     private TypeRegistry typeRegistry = null;
     private RecordManager recordManager = null;
+    
+    private TransactionManager transactionManager;
 
     protected void setUp() throws Exception
     {
@@ -26,15 +33,27 @@ public class ConfigurationPersistenceManagerTest extends TestCase
         typeRegistry = new TypeRegistry();
         recordManager = new RecordManager();
         typeRegistry.setHandleAllocator(recordManager);
-        recordManager.setRecordSerialiser(new MockRecordSerialiser());
+        
+        transactionManager = new TransactionManager();
+
+        InMemoryRecordStore inMemory = new InMemoryRecordStore();
+        inMemory.setTransactionManager(transactionManager);
+
+        recordManager = new RecordManager();
+        recordManager.setTransactionManager(transactionManager);
+        recordManager.setRecordStore(inMemory);
         recordManager.init();
+
         manager = new ConfigurationPersistenceManager();
         manager.setTypeRegistry(typeRegistry);
         manager.setRecordManager(recordManager);
+
+        transactionManager.begin();
     }
 
     protected void tearDown() throws Exception
     {
+        transactionManager = null;
         recordManager = null;
         typeRegistry = null;
         manager = null;

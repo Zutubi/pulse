@@ -356,4 +356,37 @@ public abstract class PulseTestCase extends TestCase
             assertEquals(expected[i], got.get(i));
         }
     }
+
+    protected void executeOnSeparateThread(final Runnable r)
+    {
+        try
+        {
+            final AssertionFailedError[] afe = new AssertionFailedError[1];
+            Thread thread = new Thread(new Runnable()
+            {
+                public void run()
+                {
+                    try
+                    {
+                        r.run();
+                    }
+                    catch (AssertionFailedError e)
+                    {
+                        afe[0] = e;
+                    }
+                }
+            });
+            thread.start();
+            thread.join();
+
+            if (afe[0] != null)
+            {
+                throw afe[0];
+            }
+        }
+        catch (InterruptedException e)
+        {
+            // noop.
+        }
+    }    
 }
