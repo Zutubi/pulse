@@ -271,18 +271,9 @@ The beans defined within the security subsystem need not be accessed by other co
                 /rss.action*=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER
                 /view/**/*=ROLE_GUEST,ROLE_USER
                 /file/**/*=ROLE_GUEST,ROLE_USER
-                /admin/**/*=ADMINISTER
+                /admin/**/*=ROLE_USER,ADMINISTER
                 /**/*.action*=ROLE_GUEST,ROLE_USER
             </value>
         </property>
     </bean>
-
-    <!-- Our own security management -->
-    <bean id="accessManager" class="com.zutubi.prototype.security.DefaultAccessManager" autowire="byName"/>
-    <bean id="globalAuthorityProvider" class="com.zutubi.pulse.security.GlobalAuthorityProvider" autowire="byName"/>
-    <bean id="projectConfigurationAuthorityProvider" class="com.zutubi.pulse.security.ProjectConfigurationAuthorityProvider" autowire="byName"/>
-    <bean id="projectAuthorityProvider" class="com.zutubi.pulse.security.ProjectAuthorityProvider" autowire="byName"/>
-    <bean id="buildResultAuthorityProvider" class="com.zutubi.pulse.security.BuildResultAuthorityProvider" autowire="byName"/>
-
-    <bean id="securityInterceptor" class="com.zutubi.pulse.security.SecurityInterceptor" autowire="byName"/>
 </beans>

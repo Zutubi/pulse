@@ -76,7 +76,7 @@ public interface ProjectManager extends EntityManager<Project>
     @SecureParameter(action = ProjectConfigurationActions.ACTION_PAUSE, parameterType = Project.class)
     void triggerBuild(long number, Project project, User user, PatchArchive archive) throws PulseException;
 
-    @SecureParameter(action = AccessManager.ACTION_READ)
+    @SecureParameter(action = AccessManager.ACTION_VIEW)
     long getNextBuildNumber(Project project);
 
     void delete(BuildHostRequirements hostRequirements);

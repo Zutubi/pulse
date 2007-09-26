@@ -13,6 +13,13 @@ public class ConfigurationAction
      */
     private String name;
     /**
+     * Name of the permission needed to execute this action.  By default, the
+     * action name itself is used.  However, related actions can be grouped
+     * under one permission (e.g. the "pause" permission is used for both
+     * "pause" and "resume").
+     */
+    private String permissionName;
+    /**
      * The type of the argument passed to the action.  If null, the action
      * accepts no argument.
      */
@@ -28,7 +35,7 @@ public class ConfigurationAction
         this.method = method;
     }
 
-    public ConfigurationAction(String name, Class argumentClass, Method method)
+    public ConfigurationAction(String name, String permissionName, Class argumentClass, Method method)
     {
         this.name = name;
         this.argumentClass = argumentClass;
@@ -38,6 +45,11 @@ public class ConfigurationAction
     public String getName()
     {
         return name;
+    }
+
+    public String getPermissionName()
+    {
+        return permissionName;
     }
 
     public Class getArgumentClass()

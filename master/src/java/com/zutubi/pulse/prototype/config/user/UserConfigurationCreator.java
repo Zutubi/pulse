@@ -1,9 +1,6 @@
 package com.zutubi.pulse.prototype.config.user;
 
-import com.zutubi.config.annotations.ControllingCheckbox;
-import com.zutubi.config.annotations.ID;
-import com.zutubi.config.annotations.Password;
-import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.*;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.core.config.ConfigurationCreator;
 import com.zutubi.validation.Validateable;
@@ -15,6 +12,7 @@ import com.zutubi.validation.annotations.Required;
  * password.
  */
 @SymbolicName("zutubi.userConfigCreator")
+@Form(fieldOrder = {"login", "name", "authenticatedViaLdap", "password", "confirmPassword"})
 public class UserConfigurationCreator extends AbstractConfiguration implements ConfigurationCreator<UserConfiguration>, Validateable
 {
     @ID

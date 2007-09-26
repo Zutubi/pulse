@@ -18,15 +18,19 @@
         <td class="content">${value?string}</td>
 </#list>
         <td class="content">
+<#assign firstaction = true/>
 <#list table.getActions(item) as action>
-    <#assign actionlabel>${action}.label</#assign>
-<#if action == "edit">
-        <a href="${base}/config/${item.configurationPath}">${"edit.label"?i18n}</a>
-<#elseif action == "delete">
-        <a href="${base}/config/${item.configurationPath}?${action}=confirm">${"delete.label"?i18n}</a>
-<#else>
-        <a href="${base}/config/${item.configurationPath}?${action}">${actionlabel?i18n}</a>
-</#if>
+    <#assign actionlabel = "${action}.label"/>
+    <#if action == "view">
+        <#assign suffix = ""/>
+    <#elseif action == "delete">
+        <#assign suffix = "?${action}=confirm"/>
+    <#else>
+        <#assign suffix = "?${action}"/>
+    <#/if>
+        |
+    <a href="${base}/config/${item.configurationPath}${suffix}">${actionlabel?i18n}</a>
+    <assign firstaction = false/>
 </#list>
         </td>
     </tr>
@@ -36,7 +40,9 @@
         <td class="content" colspan="${tablewidth}">${"no.data.available"?i18n}</td>
     </tr>
 </#if>
+<#if table.addAllowed>
     <tr>
         <td class="content" colspan="${tablewidth}"><a href="${base}/config/${path}?wizard">${"add.label"?i18n}</a></td>
     </tr>
+</#if>
 </table>

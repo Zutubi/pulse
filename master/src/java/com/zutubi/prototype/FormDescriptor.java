@@ -27,6 +27,7 @@ public class FormDescriptor extends AbstractDescriptor
     private String action = DEFAULT_ACTION;
     private List<FieldDescriptor> fieldDescriptors = new LinkedList<FieldDescriptor>();
     private List<String> actions = new LinkedList<String>();
+    private boolean readOnly = false;
     private boolean displayMode = false;
 
     /**
@@ -111,6 +112,7 @@ public class FormDescriptor extends AbstractDescriptor
         form.setName(name);
         form.setId(id);
         form.setAction(PrototypeUtils.getConfigURL(path, action, null, namespace));
+        form.setReadOnly(readOnly);
         form.setDisplayMode(displayMode);
         form.setAjax(ajax);
         form.addAll(getParameters());
@@ -183,6 +185,11 @@ public class FormDescriptor extends AbstractDescriptor
             }
         }
         return ordered;
+    }
+
+    public void setReadOnly(boolean readOnly)
+    {
+        this.readOnly = readOnly;
     }
 
     public void setDisplayMode(boolean displayMode)

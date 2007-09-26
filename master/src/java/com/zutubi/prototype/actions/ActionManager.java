@@ -1,16 +1,15 @@
 package com.zutubi.prototype.actions;
 
 import com.zutubi.prototype.ConventionSupport;
+import com.zutubi.prototype.config.ConfigurationSecurityManager;
+import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Provides support for executing actions on configuration instances.  For
@@ -25,45 +24,80 @@ public class ActionManager
     private Map<CompositeType, ConfigurationActions> actionsByType = new HashMap<CompositeType, ConfigurationActions>();
     private ObjectFactory objectFactory;
     private TypeRegistry typeRegistry;
+    private ConfigurationSecurityManager configurationSecurityManager;
 
-    public List<String> getActions(Object configurationInstance)
+    public List<String> getActions(Configuration configurationInstance, boolean includeDefault)
     {
-        if(configurationInstance == null)
+        List<String> result = new LinkedList<String>();
+
+        if (configurationInstance != null)
         {
-            return Collections.EMPTY_LIST;
+            String path = configurationInstance.getConfigurationPath();
+            if (includeDefault)
+            {
+                if(configurationSecurityManager.hasPermission(path, AccessManager.ACTION_VIEW))
+                {
+                    result.add(AccessManager.ACTION_VIEW);
+                }
+
+                if(configurationSecurityManager.hasPermission(path, AccessManager.ACTION_DELETE))
+                {
+                    result.add(AccessManager.ACTION_DELETE);
+                }
+            }
+
+            CompositeType type = getType(configurationInstance);
+            ConfigurationActions configurationActions = getConfigurationActions(type);
+            try
+            {
+                List<ConfigurationAction> actions = configurationActions.getActions(configurationInstance);
+                for (ConfigurationAction action : actions)
+                {
+                    if (configurationSecurityManager.hasPermission(path, action.getPermissionName()))
+                    {
+                        result.add(action.getName());
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                LOG.severe(e);
+                return Collections.EMPTY_LIST;
+            }
         }
-        
-        CompositeType type = getType(configurationInstance);
-        ConfigurationActions actions = getConfigurationActions(type);
-        try
-        {
-            return actions.getActions(configurationInstance);
-        }
-        catch (Exception e)
-        {
-            LOG.severe(e);
-            return Collections.EMPTY_LIST;
-        }
+
+        return result;
     }
 
     public void execute(String actionName, Configuration configurationInstance, Configuration argumentInstance)
     {
         CompositeType type = getType(configurationInstance);
         ConfigurationActions actions = getConfigurationActions(type);
-        try
+        ConfigurationAction action = actions.getAction(actionName);
+
+        if (action != null)
         {
-            actions.execute(actionName, configurationInstance, argumentInstance);
+            configurationSecurityManager.ensurePermission(configurationInstance.getConfigurationPath(), action.getPermissionName());
+
+            try
+            {
+                actions.execute(actionName, configurationInstance, argumentInstance);
+            }
+            catch (Exception e)
+            {
+                LOG.severe(e);
+            }
         }
-        catch (Exception e)
+        else
         {
-            LOG.severe(e);
+            LOG.warning("Request for unrecognised action '" + actionName + "' on path '" + configurationInstance.getConfigurationPath() + "'");
         }
     }
 
     private CompositeType getType(Object configurationInstance)
     {
         CompositeType type = typeRegistry.getType(configurationInstance.getClass());
-        if(type == null)
+        if (type == null)
         {
             throw new IllegalArgumentException("Invalid instance: not of configuration type");
         }
@@ -73,7 +107,7 @@ public class ActionManager
     public synchronized ConfigurationActions getConfigurationActions(CompositeType type)
     {
         ConfigurationActions actions = actionsByType.get(type);
-        if(actions == null)
+        if (actions == null)
         {
             Class configurationClass = type.getClazz();
             actions = new ConfigurationActions(configurationClass, ConventionSupport.getActions(configurationClass), objectFactory);
@@ -91,5 +125,10 @@ public class ActionManager
     public void setTypeRegistry(TypeRegistry typeRegistry)
     {
         this.typeRegistry = typeRegistry;
+    }
+
+    public void setConfigurationSecurityManager(ConfigurationSecurityManager configurationSecurityManager)
+    {
+        this.configurationSecurityManager = configurationSecurityManager;
     }
 }

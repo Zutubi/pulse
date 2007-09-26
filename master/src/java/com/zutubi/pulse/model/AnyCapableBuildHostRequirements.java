@@ -60,7 +60,7 @@ public class AnyCapableBuildHostRequirements extends AbstractBuildHostRequiremen
         catch (PulseException e)
         {
             // Continue, assuming no further requirements.
-            LOG.warning("Unable to load resource requirements from pulse file: " + e.getMessage(), e);
+            LOG.warning("Unable to load resource requirements from pulse file for project '" + request.getProject().getName() + "': " + e.getMessage(), e);
         }
 
         return true;

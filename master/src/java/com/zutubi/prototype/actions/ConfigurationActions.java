@@ -1,12 +1,17 @@
 package com.zutubi.prototype.actions;
 
+import com.zutubi.config.annotations.Permission;
+import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.util.ReflectionUtils;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Describes a bunch of available actions for a configuration type.
@@ -94,7 +99,7 @@ public class ConfigurationActions
 
                 // ok, we have an action here.
                 String action = methodToAction(methodName);
-                availableActions.put(action, new ConfigurationAction(action, argumentType, method));
+                availableActions.put(action, new ConfigurationAction(action, getPermissionName(method), argumentType, method));
             }
         }
     }
@@ -108,6 +113,18 @@ public class ConfigurationActions
             actionName = actionName + methodName.substring(3);
         }
         return actionName;
+    }
+
+    private String getPermissionName(Method method)
+    {
+        String permissionName = AccessManager.ACTION_WRITE;
+        Permission permission = method.getAnnotation(Permission.class);
+        if(permission != null)
+        {
+            permissionName = permission.value();
+        }
+
+        return permissionName;
     }
 
     public Class getConfigurationClass()
@@ -140,34 +157,38 @@ public class ConfigurationActions
         return getAction(name) != null;
     }
 
-    @SuppressWarnings({"UnusedAssignment"})
-    public List<String> getActions(Object configurationInstance) throws Exception
+    List<ConfigurationAction> getActions(Object configurationInstance) throws Exception
     {
-        List<String> actions;
+        List<ConfigurationAction> actions;
         if (actionListingMethod == null)
         {
-            actions = new LinkedList<String>(availableActions.keySet());
+            actions = new LinkedList<ConfigurationAction>(availableActions.values());
         }
         else
         {
+            List<String> actionNames = new LinkedList<String>();
+
             Object actionHandler = objectFactory.buildBean(actionHandlerClass);
             if (actionListingMethod.getParameterTypes().length == 0)
             {
-                actions = (List<String>) actionListingMethod.invoke(actionHandler);
+                actionNames = (List<String>) actionListingMethod.invoke(actionHandler);
             }
             else
             {
-                actions = (List<String>) actionListingMethod.invoke(actionHandler, configurationInstance);
+                actionNames = (List<String>) actionListingMethod.invoke(actionHandler, configurationInstance);
             }
 
-            Iterator<String> it = actions.iterator();
-            while(it.hasNext())
+            actions = new LinkedList<ConfigurationAction>();
+            for(String actionName: actionNames)
             {
-                String action = it.next();
-                if(!availableActions.containsKey(action))
+                ConfigurationAction action = availableActions.get(actionName);
+                if(action != null)
+                {
+                    actions.add(action);
+                }
+                else
                 {
                     LOG.warning("Dropping action '" + action + "' from class '" + configurationClass.getName() + "' because no corresponding method was found");
-                    it.remove();
                 }
             }
         }
@@ -175,7 +196,7 @@ public class ConfigurationActions
         return actions;
     }
 
-    public void execute(String name, Object configurationInstance, Object argument) throws Exception
+    void execute(String name, Object configurationInstance, Object argument) throws Exception
     {
         ConfigurationAction action = availableActions.get(name);
         if(action == null)

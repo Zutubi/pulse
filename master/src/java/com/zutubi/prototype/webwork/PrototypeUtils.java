@@ -3,7 +3,9 @@ package com.zutubi.prototype.webwork;
 import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ValidationAware;
 import com.zutubi.i18n.Messages;
+import com.zutubi.prototype.config.ConfigurationSecurityManager;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
+import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.MutableRecordImpl;
@@ -98,19 +100,19 @@ public class PrototypeUtils
         return record;
     }
 
-    public static boolean isFolder(String path, ConfigurationTemplateManager configurationTemplateManager)
+    public static boolean isFolder(String path, ConfigurationTemplateManager configurationTemplateManager, ConfigurationSecurityManager configurationSecurityManager)
     {
         Type type = configurationTemplateManager.getType(path);
-        return (type instanceof MapType) || getPathListing(path, type, configurationTemplateManager).size() > 0;
+        return (type instanceof MapType) || getPathListing(path, type, configurationTemplateManager, configurationSecurityManager).size() > 0;
     }
 
-    public static boolean isLeaf(String path, ConfigurationTemplateManager configurationTemplateManager)
+    public static boolean isLeaf(String path, ConfigurationTemplateManager configurationTemplateManager, ConfigurationSecurityManager configurationSecurityManager)
     {
-        return !isFolder(path, configurationTemplateManager);
+        return !isFolder(path, configurationTemplateManager, configurationSecurityManager);
     }
 
     @SuppressWarnings({"unchecked"})
-    public static List<String> getPathListing(String path, Type type, ConfigurationTemplateManager configurationTemplateManager)
+    public static List<String> getPathListing(String path, Type type, ConfigurationTemplateManager configurationTemplateManager, ConfigurationSecurityManager configurationSecurityManager)
     {
         List<String> listing = Collections.EMPTY_LIST;
 
@@ -131,7 +133,7 @@ public class PrototypeUtils
             listing = ((CompositeType)type).getNestedPropertyNames();
         }
 
-        return listing;
+        return configurationSecurityManager.filterPaths(path, listing, AccessManager.ACTION_VIEW);
     }
 
     public static List<String> getEmbeddedCollections(CompositeType ctype)
@@ -167,7 +169,7 @@ public class PrototypeUtils
             {
                 if (configurationTemplateManager.isPersistent(path))
                 {
-                    return getDisplayName(path, configurationTemplateManager.getType(parentPath), configurationTemplateManager.getRecord(path), configurationTemplateManager);
+                    return getDisplayName(path, configurationTemplateManager.getType(parentPath), configurationTemplateManager.getRecord(path));
                 }
                 else
                 {
@@ -191,7 +193,7 @@ public class PrototypeUtils
         }
     }
 
-    public static String getDisplayName(String path, ComplexType parentType, Record value, ConfigurationTemplateManager configurationTemplateManager)
+    public static String getDisplayName(String path, ComplexType parentType, Record value)
     {
         // One of:
         //   - the id, if this object is within a map
@@ -250,9 +252,8 @@ public class PrototypeUtils
         }
         else
         {
-            // Default that works for english.  We could also i18n this part
-            // to allow defaults for other languages.
-            return "update " + messages.format(KEY_LABEL);
+            // Default is just the label.
+            return messages.format(KEY_LABEL);
         }
     }
 

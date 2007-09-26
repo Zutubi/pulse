@@ -1,16 +1,19 @@
 package com.zutubi.prototype.config;
 
+import com.zutubi.prototype.security.Actor;
+import com.zutubi.prototype.security.ActorProvider;
+import com.zutubi.prototype.security.DefaultAccessManager;
+import com.zutubi.prototype.transaction.TransactionManager;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.TypeRegistry;
-import com.zutubi.prototype.type.record.MockRecordSerialiser;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.RecordManager;
-import com.zutubi.prototype.type.record.store.RecordStore;
 import com.zutubi.prototype.type.record.store.InMemoryRecordStore;
-import com.zutubi.prototype.transaction.TransactionManager;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.events.DefaultEventManager;
+import com.zutubi.pulse.security.AcegiUtils;
+import com.zutubi.pulse.security.GlobalAuthorityProvider;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.validation.DefaultValidationManager;
@@ -35,7 +38,9 @@ public abstract class AbstractConfigurationSystemTestCase extends TestCase
     protected ConfigurationPersistenceManager configurationPersistenceManager;
     protected ConfigurationTemplateManager configurationTemplateManager;
     protected ConfigurationReferenceManager configurationReferenceManager;
+    protected ConfigurationSecurityManager configurationSecurityManager;
     protected TransactionManager transactionManager;
+    protected DefaultAccessManager accessManager;
 
     protected void setUp() throws Exception
     {
@@ -62,6 +67,16 @@ public abstract class AbstractConfigurationSystemTestCase extends TestCase
         recordManager.setRecordStore(inMemory);
         recordManager.init();
 
+        accessManager = new DefaultAccessManager();
+        accessManager.setActorProvider(new ActorProvider()
+        {
+            public Actor getActor()
+            {
+                return AcegiUtils.getSystemUser();
+            }
+        });
+        new GlobalAuthorityProvider().setAccessManager(accessManager);
+
         configurationPersistenceManager = new ConfigurationPersistenceManager();
         configurationPersistenceManager.setTypeRegistry(typeRegistry);
         configurationPersistenceManager.setRecordManager(recordManager);
@@ -79,7 +94,12 @@ public abstract class AbstractConfigurationSystemTestCase extends TestCase
         configurationReferenceManager.setConfigurationTemplateManager(configurationTemplateManager);
         configurationReferenceManager.setConfigurationPersistenceManager(configurationPersistenceManager);
 
+        configurationSecurityManager = new ConfigurationSecurityManager();
+        configurationSecurityManager.setAccessManager(accessManager);
+        configurationSecurityManager.setConfigurationTemplateManager(configurationTemplateManager);
+
         configurationTemplateManager.setConfigurationReferenceManager(configurationReferenceManager);
+        configurationTemplateManager.setConfigurationSecurityManager(configurationSecurityManager);
 
         typeRegistry.setConfigurationReferenceManager(configurationReferenceManager);
         typeRegistry.setHandleAllocator(recordManager);

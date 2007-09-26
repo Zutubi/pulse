@@ -1,9 +1,13 @@
 package com.zutubi.pulse.prototype.config.project;
 
 import com.zutubi.prototype.ListOptionProvider;
+import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.prototype.type.TypeProperty;
+import com.zutubi.util.Sort;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -20,7 +24,9 @@ public class ProjectAuthorityProvider extends ListOptionProvider
 
     public List<String> getOptions(Object instance, String parentPath, TypeProperty property)
     {
-        // FIXME Need to add actions here
-        return Arrays.asList("administer", "cancel build", "read", "view source", "write");
+        List<String> options = new LinkedList<String>();
+        options.addAll(Arrays.asList(AccessManager.ACTION_ADMINISTER, AccessManager.ACTION_VIEW, AccessManager.ACTION_WRITE, ProjectConfigurationActions.ACTION_PAUSE, ProjectConfigurationActions.ACTION_TRIGGER, "cancel build", "view source"));
+        Collections.sort(options, new Sort.StringComparator());
+        return options;
     }
 }

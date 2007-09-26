@@ -54,7 +54,7 @@ public interface BuildManager
     @SecureResult
     List<BuildResult> getLatestBuildResultsForProject(Project project, int max);
 
-    @SecureParameter(parameterType = Project.class, action = AccessManager.ACTION_READ)
+    @SecureParameter(parameterType = Project.class, action = AccessManager.ACTION_VIEW)
     public int getBuildCount(Project project, ResultState[] states);
 
     /**
@@ -64,7 +64,7 @@ public interface BuildManager
      * @param after lower number for the count range, not inclusive
      * @param upTo  upper number of the count range, inclusive
      */
-    @SecureParameter(parameterType = Project.class, action = AccessManager.ACTION_READ)
+    @SecureParameter(parameterType = Project.class, action = AccessManager.ACTION_VIEW)
     int getBuildCount(Project project, long after, long upTo);
 
     /**
@@ -130,7 +130,7 @@ public interface BuildManager
     @SecureResult
     BuildResult getPreviousBuildResult(BuildResult result);
 
-    @SecureParameter(action = AccessManager.ACTION_READ)
+    @SecureParameter(action = AccessManager.ACTION_VIEW)
     Revision getPreviousRevision(Project project);
 
     /**
@@ -140,16 +140,16 @@ public interface BuildManager
      * @param max  the maximum number of results to return
      * @return a list of up to max of the most recent changes for the user
      */
-    @SecureParameter(parameterType = User.class, action = AccessManager.ACTION_READ)
+    @SecureParameter(parameterType = User.class, action = AccessManager.ACTION_VIEW)
     List<Changelist> getLatestChangesForUser(User user, int max);
 
-    @SecureParameter(parameterType = Project.class, action = AccessManager.ACTION_READ)
+    @SecureParameter(parameterType = Project.class, action = AccessManager.ACTION_VIEW)
     List<Changelist> getLatestChangesForProject(Project project, int max);
 
-    @SecureParameter(parameterType = Project.class, action = AccessManager.ACTION_READ)
+    @SecureParameter(parameterType = Project.class, action = AccessManager.ACTION_VIEW)
     List<Changelist> getLatestChangesForProjects(Project[] projects, int max);
 
-    @SecureParameter(action = AccessManager.ACTION_READ)
+    @SecureParameter(action = AccessManager.ACTION_VIEW)
     List<Changelist> getChangesForBuild(BuildResult result);
 
     @SecureParameter(action = AccessManager.ACTION_WRITE)

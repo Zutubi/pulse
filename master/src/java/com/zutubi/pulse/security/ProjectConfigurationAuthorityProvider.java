@@ -36,6 +36,6 @@ public class ProjectConfigurationAuthorityProvider implements AuthorityProvider<
 
     public void setAccessManager(DefaultAccessManager accessManager)
     {
-        accessManager.registerProvider(ProjectConfiguration.class, this);
+        accessManager.registerAuthorityProvider(ProjectConfiguration.class, this);
     }
 }

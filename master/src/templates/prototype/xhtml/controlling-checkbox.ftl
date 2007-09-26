@@ -38,6 +38,7 @@
 
     function setEnabledState(checkbox)
     {
+<#if !form.readOnly>
         if(!form.rendered)
         {
             return;
@@ -75,6 +76,7 @@
             }
         });
     </#if>
+</#if>
     }
 
     var checkbox = form.findField('${parameters.id}');

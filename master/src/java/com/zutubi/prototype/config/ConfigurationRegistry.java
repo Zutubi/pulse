@@ -5,6 +5,7 @@ import com.zutubi.prototype.ConventionSupport;
 import com.zutubi.prototype.actions.ActionManager;
 import com.zutubi.prototype.actions.ConfigurationAction;
 import com.zutubi.prototype.actions.ConfigurationActions;
+import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.cleanup.config.CleanupConfiguration;
@@ -15,6 +16,7 @@ import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.prototype.config.group.GroupConfiguration;
+import com.zutubi.pulse.prototype.config.group.ServerPermission;
 import com.zutubi.pulse.prototype.config.misc.LoginConfiguration;
 import com.zutubi.pulse.prototype.config.misc.TransientConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
@@ -60,6 +62,7 @@ public class ConfigurationRegistry
     private ConfigurationPersistenceManager configurationPersistenceManager;
     private ConfigurationTemplateManager configurationTemplateManager;
     private ActionManager actionManager;
+    private ConfigurationSecurityManager configurationSecurityManager;
 
     public void initSetup()
     {
@@ -78,6 +81,16 @@ public class ConfigurationRegistry
     {
         try
         {
+            // Security
+            configurationSecurityManager.registerGlobalPermission(PROJECTS_SCOPE, AccessManager.ACTION_CREATE, ServerPermission.CREATE_PROJECT.toString());
+            configurationSecurityManager.registerGlobalPermission(PROJECTS_SCOPE, AccessManager.ACTION_DELETE, ServerPermission.DELETE_PROJECT.toString());
+            configurationSecurityManager.registerGlobalPermission(USERS_SCOPE, AccessManager.ACTION_CREATE, ServerPermission.CREATE_USER.toString());
+            configurationSecurityManager.registerGlobalPermission(USERS_SCOPE, AccessManager.ACTION_DELETE, ServerPermission.DELETE_USER.toString());
+
+            configurationSecurityManager.registerOwnedScope(PROJECTS_SCOPE);
+            configurationSecurityManager.registerOwnedScope(USERS_SCOPE);
+            
+            // Types
             transientConfig = registerConfigurationType(TransientConfiguration.class);
             configurationPersistenceManager.register(TRANSIENT_SCOPE, transientConfig, false);
 
@@ -359,5 +372,10 @@ public class ConfigurationRegistry
     public void setActionManager(ActionManager actionManager)
     {
         this.actionManager = actionManager;
+    }
+
+    public void setConfigurationSecurityManager(ConfigurationSecurityManager configurationSecurityManager)
+    {
+        this.configurationSecurityManager = configurationSecurityManager;
     }
 }

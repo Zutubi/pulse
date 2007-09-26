@@ -490,7 +490,7 @@
         <action name="ls" class="com.zutubi.prototype.webwork.LsAction">
             <param name="basePath">config</param>
             <result name="success" type="flexjson">listing</result>
-            <result name="error" type="json">error.xml</result>
+            <result name="error" type="json">/ajax/error.xml</result>
         </action>
 
         <action name="check" class="com.zutubi.prototype.webwork.CheckAction">
@@ -512,7 +512,7 @@
         <action name="ls" class="com.zutubi.prototype.webwork.LsAction">
             <param name="basePath">templates</param>
             <result name="success" type="flexjson">listing</result>
-            <result name="error" type="json">error.xml</result>
+            <result name="error" type="json">/ajax/error.xml</result>
         </action>
 
         <action name="display" class="com.zutubi.prototype.webwork.DisplayTemplateAction">

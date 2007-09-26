@@ -10,18 +10,41 @@ public interface AccessManager
     public static final String ACTION_ADMINISTER = "administer";
     public static final String ACTION_CREATE = "create";
     public static final String ACTION_DELETE = "delete";
-    public static final String ACTION_READ = "read";
+    public static final String ACTION_VIEW = "view";
     public static final String ACTION_WRITE = "write";
+
+    /**
+     * Returns the currently-applicable actor, or null if there is no such
+     * actor.  For example, if the calling thread is "logged in" as a user,
+     * that user is returned.
+     *
+     * @return the calling thread's actor
+     */
+    Actor getActor();
 
     /**
      * Determines if the given actor has permission to perform the given
      * action on the given resource.
      *
      * @param actor    the actor trying to perform the action
-     * @param action   the action the user wants to perform
+     * @param action   the action the actor wants to perform
      * @param resource the resource being acted on, may be null for a
      *                 "global" action
-     * @return true iff the user has permission to perform the action
+     * @return true iff the actor has permission to perform the action
      */
     boolean hasPermission(Actor actor, String action, Object resource);
+
+    /**
+     * Determines if the current actor has permission to perform the given
+     * action on the given resource.
+     *
+     * @see #getActor()
+     * @see #hasPermission(Actor, String, Object)
+     *
+     * @param action   the action the actor wants to perform
+     * @param resource the resource being acted on, may be null for a
+     *                 "global" action
+     * @return true iff the actor has permission to perform the action
+     */
+    boolean hasPermission(String action, Object resource);
 }

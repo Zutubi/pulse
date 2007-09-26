@@ -13,5 +13,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface SecureResult
 {
-    public String value() default AccessManager.ACTION_READ;
+    public String value() default AccessManager.ACTION_VIEW;
 }

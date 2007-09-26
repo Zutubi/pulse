@@ -5,8 +5,10 @@ import com.zutubi.prototype.ConventionSupport;
 import com.zutubi.prototype.actions.ActionManager;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.config.ConfigurationRegistry;
+import com.zutubi.prototype.config.ConfigurationSecurityManager;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.format.Display;
+import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.ComplexType;
 import com.zutubi.prototype.type.CompositeType;
@@ -31,6 +33,7 @@ public class ConfigurationUIModel
 {
     private ConfigurationPersistenceManager configurationPersistenceManager;
     private ConfigurationTemplateManager configurationTemplateManager;
+    private ConfigurationSecurityManager configurationSecurityManager;
     private ConfigurationRegistry configurationRegistry;
     private ActionManager actionManager;
     private ObjectFactory objectFactory;
@@ -57,6 +60,8 @@ public class ConfigurationUIModel
 
     private List<String> displayFields = new LinkedList<String>();
 
+    private boolean writable;
+    private boolean embedded = false;
     private boolean displayMode = true;
     private boolean configurationCheckAvailable = false;
 
@@ -100,6 +105,7 @@ public class ConfigurationUIModel
             ComplexType parentType = configurationTemplateManager.getType(parentPath);
             if (PrototypeUtils.isEmbeddedCollection(parentType))
             {
+                embedded = true;
                 displayMode = false;
             }
         }
@@ -128,6 +134,7 @@ public class ConfigurationUIModel
             });
 
             extensions.addAll(((CompositeType) targetType).getExtensions());
+            writable = configurationSecurityManager.hasPermission(path, AccessManager.ACTION_WRITE);
             configurationCheckAvailable = configurationRegistry.getConfigurationCheckType(ctype) != null;
         }
 
@@ -136,7 +143,7 @@ public class ConfigurationUIModel
             // determine the actions.
             if (configurationTemplateManager.isConcrete(parentPath, record))
             {
-                actions = actionManager.getActions(configurationTemplateManager.getInstance(path));
+                actions = actionManager.getActions(configurationTemplateManager.getInstance(path), false);
             }
 
             Class displayHandler = ConventionSupport.getDisplay(type);
@@ -264,6 +271,16 @@ public class ConfigurationUIModel
         return displayFields;
     }
 
+    public boolean isWritable()
+    {
+        return writable;
+    }
+
+    public boolean isEmbedded()
+    {
+        return embedded;
+    }
+
     public boolean isDisplayMode()
     {
         return displayMode;
@@ -292,5 +309,10 @@ public class ConfigurationUIModel
     public void setActionManager(ActionManager actionManager)
     {
         this.actionManager = actionManager;
+    }
+
+    public void setConfigurationSecurityManager(ConfigurationSecurityManager configurationSecurityManager)
+    {
+        this.configurationSecurityManager = configurationSecurityManager;
     }
 }

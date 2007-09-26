@@ -50,13 +50,6 @@
             diskExpiryThreadIntervalSeconds="120"
             />
 
-    <cache name="AclEntries"
-           maxElementsInMemory="1000"
-           eternal="false"
-           timeToIdleSeconds="100"
-           timeToLiveSeconds="200"
-           overflowToDisk="false"/>
-
     <cache name="BuildResultsRss"
            maxElementsInMemory="2000"
            eternal="true"

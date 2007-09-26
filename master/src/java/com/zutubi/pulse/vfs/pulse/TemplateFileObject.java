@@ -1,10 +1,13 @@
 package com.zutubi.pulse.vfs.pulse;
 
+import com.zutubi.prototype.config.ConfigurationSecurityManager;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.config.TemplateHierarchy;
 import com.zutubi.prototype.config.TemplateNode;
+import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
+import com.zutubi.util.Predicate;
 import com.zutubi.util.Sort;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
@@ -23,6 +26,7 @@ public class TemplateFileObject extends AbstractPulseFileObject
 {
     private TemplateNode node;
     private ConfigurationTemplateManager configurationTemplateManager;
+    private ConfigurationSecurityManager configurationSecurityManager;
 
     public TemplateFileObject(final FileName name, final AbstractFileSystem fs) throws FileSystemException
     {
@@ -53,13 +57,22 @@ public class TemplateFileObject extends AbstractPulseFileObject
     {
         if(node != null)
         {
-            List<String> childNodes = CollectionUtils.map(node.getChildren(), new Mapping<TemplateNode, String>()
+            List<TemplateNode> visibleChildren = CollectionUtils.filter(node.getChildren(), new Predicate<TemplateNode>()
+            {
+                public boolean satisfied(TemplateNode templateNode)
+                {
+                    return configurationSecurityManager.hasPermission(templateNode.getPath(), AccessManager.ACTION_VIEW);
+                }
+            });
+
+            List<String> childNodes = CollectionUtils.map(visibleChildren, new Mapping<TemplateNode, String>()
             {
                 public String map(TemplateNode templateNode)
                 {
                     return templateNode.getId();
                 }
             });
+
 
             String[] children = new String[childNodes.size()];
             childNodes.toArray(children);
@@ -83,5 +96,10 @@ public class TemplateFileObject extends AbstractPulseFileObject
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
         this.configurationTemplateManager = configurationTemplateManager;
+    }
+
+    public void setConfigurationSecurityManager(ConfigurationSecurityManager configurationSecurityManager)
+    {
+        this.configurationSecurityManager = configurationSecurityManager;
     }
 }

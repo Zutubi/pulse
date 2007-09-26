@@ -1,12 +1,13 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.prototype.config.*;
+import com.zutubi.prototype.security.AccessManager;
+import com.zutubi.prototype.security.Actor;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.DefaultSetupManager;
-import com.zutubi.pulse.cache.ehcache.CustomAclEntryCache;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseException;
@@ -53,11 +54,11 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
     private ChangelistIsolator changelistIsolator;
     private DelegateScmClientFactory scmClientManager;
     private LicenseManager licenseManager;
-    private CustomAclEntryCache projectAclEntryCache;
 
     private ConfigurationProvider configurationProvider;
     private TypeRegistry typeRegistry;
     private ConfigurationTemplateManager configurationTemplateManager;
+    private AccessManager accessManager;
 
     private Map<String, ProjectConfiguration> nameToConfig = new HashMap<String, ProjectConfiguration>();
     private Map<Long, ProjectConfiguration> idToConfig = new HashMap<Long, ProjectConfiguration>();
@@ -528,9 +529,11 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
 
         for(Map.Entry<String, Set<ProjectConfiguration>> entry: labelToConfigs.entrySet())
         {
-            ProjectGroup group = new ProjectGroup(entry.getKey());
-            group.addAll(mapConfigsToProjects(entry.getValue()));
-            groups.add(group);
+            ProjectGroup group = createProjectGroup(entry.getKey(), entry.getValue());
+            if(group.getProjects().size() > 0)
+            {
+                groups.add(group);
+            }
         }
         
         return groups;
@@ -538,11 +541,28 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
 
     public ProjectGroup getProjectGroup(String name)
     {
-        ProjectGroup group = new ProjectGroup(name);
         Set<ProjectConfiguration> projects = labelToConfigs.get(name);
-        if(projects != null)
+        if(projects == null)
         {
-            group.addAll(mapConfigsToProjects(projects));
+            // Return an empty group.
+            return new ProjectGroup(name);
+        }
+        else
+        {
+            return createProjectGroup(name, projects);
+        }
+    }
+
+    private ProjectGroup createProjectGroup(String name, Set<ProjectConfiguration> projectConfigs)
+    {
+        ProjectGroup group = new ProjectGroup(name);
+        Actor actor = accessManager.getActor();
+        for(ProjectConfiguration config: projectConfigs)
+        {
+            if(accessManager.hasPermission(actor, AccessManager.ACTION_VIEW, config))
+            {
+                group.add(projectDao.findById(config.getProjectId()));
+            }
         }
 
         return group;
@@ -588,11 +608,6 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
         this.testCaseIndexDao = testCaseIndexDao;
     }
 
-    public void setProjectAclEntryCache(CustomAclEntryCache projectAclEntryCache)
-    {
-        this.projectAclEntryCache = projectAclEntryCache;
-    }
-
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)
     {
         this.configurationProvider = configurationProvider;
@@ -616,5 +631,10 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
     public void setScmClientManager(DelegateScmClientFactory scmClientManager)
     {
         this.scmClientManager = scmClientManager;
+    }
+
+    public void setAccessManager(AccessManager accessManager)
+    {
+        this.accessManager = accessManager;
     }
 }

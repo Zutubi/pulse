@@ -14,6 +14,7 @@ public class Form extends UIComponent
     private static final String PARAMETER_ID = "id";
     private static final String PARAMETER_ACTION = "action";
     private static final String PARAMETER_DISPLAY_MODE = "displayMode";
+    private static final String PARAMETER_READ_ONLY = "readOnly";
     private static final String PARAMETER_AJAX = "ajax";
 
     /**
@@ -69,6 +70,16 @@ public class Form extends UIComponent
     public void setDisplayMode(boolean displayMode)
     {
         parameters.put(PARAMETER_DISPLAY_MODE, displayMode);
+    }
+
+    public boolean getReadOnly()
+    {
+        return (Boolean) parameters.get(PARAMETER_READ_ONLY);
+    }
+
+    public void setReadOnly(boolean readOnly)
+    {
+        parameters.put(PARAMETER_READ_ONLY, readOnly);
     }
 
     public boolean getAjax()

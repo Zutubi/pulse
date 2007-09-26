@@ -4,6 +4,7 @@ import com.zutubi.prototype.webwork.TransientAction;
 import com.zutubi.pulse.bootstrap.SetupManager;
 import com.zutubi.pulse.license.LicenseManager;
 import com.zutubi.pulse.prototype.config.setup.SetupLicenseConfiguration;
+import com.zutubi.pulse.security.AcegiUtils;
 
 /**
  */
@@ -35,9 +36,17 @@ public class SetupLicenseAction extends TransientAction<SetupLicenseConfiguratio
 
     protected String complete(SetupLicenseConfiguration instance)
     {
-        String licenseKey = instance.getLicense().replaceAll("\n", "");
-        licenseManager.installLicense(licenseKey);
-        setupManager.requestLicenseComplete();
+        AcegiUtils.loginAsSystem();
+        try
+        {
+            String licenseKey = instance.getLicense().replaceAll("\n", "");
+            licenseManager.installLicense(licenseKey);
+            setupManager.requestLicenseComplete();
+        }
+        finally
+        {
+            AcegiUtils.logout();
+        }
         return SUCCESS;
     }
 

@@ -22,6 +22,6 @@ public class UserConfigurationAuthorityProvider implements AuthorityProvider<Use
 
     public void setAccessManager(DefaultAccessManager accessManager)
     {
-        accessManager.registerProvider(UserConfiguration.class, this);
+        accessManager.registerAuthorityProvider(UserConfiguration.class, this);
     }
 }

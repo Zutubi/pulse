@@ -37,6 +37,7 @@ width of its contents.  Floating it works, but hurts other things.
         var defaultSubmit = function() {};
         var buttonConfig;
 
+    <#if !form.readOnly>
         <#list form.submitFields as submitField>
             <#if submitField.parameters.default?exists>
                 defaultSubmit = function()
@@ -51,7 +52,8 @@ width of its contents.  Floating it works, but hurts other things.
             </#if>
             form.addButton(buttonConfig, function() { submitForm('${submitField.value}'); });
         </#list>
-
+    </#if>
+    
         <#include "/prototype/xhtml/form-fields.ftl"/>
 
         return form;

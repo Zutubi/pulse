@@ -2,6 +2,8 @@ package com.zutubi.prototype.table;
 
 import com.zutubi.config.annotations.Table;
 import com.zutubi.prototype.actions.ActionManager;
+import com.zutubi.prototype.config.ConfigurationSecurityManager;
+import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.PrimitiveType;
 import com.zutubi.prototype.webwork.PrototypeUtils;
@@ -14,16 +16,14 @@ import com.zutubi.prototype.webwork.PrototypeUtils;
 public class TableDescriptorFactory
 {
     private ActionManager actionManager;
+    private ConfigurationSecurityManager configurationSecurityManager;
 
-    public TableDescriptor create(CompositeType type)
+    public TableDescriptor create(String path, CompositeType type)
     {
-        TableDescriptor td = new TableDescriptor(PrototypeUtils.getTableHeading(type));
+        TableDescriptor td = new TableDescriptor(PrototypeUtils.getTableHeading(type), configurationSecurityManager.hasPermission(path, AccessManager.ACTION_CREATE));
 
         // default actions.
-        ActionDescriptor ad = new ActionDescriptor();
-        ad.addDefaultAction("edit");
-        ad.addDefaultAction("delete");
-        ad.setConfigurationActions(actionManager.getConfigurationActions(type));
+        ActionDescriptor ad = new ActionDescriptor(actionManager);
         td.addActionDescriptor(ad);
 
         // does the table has a Table annotation defining the columns to be rendered?
@@ -57,5 +57,10 @@ public class TableDescriptorFactory
     public void setActionManager(ActionManager actionManager)
     {
         this.actionManager = actionManager;
+    }
+
+    public void setConfigurationSecurityManager(ConfigurationSecurityManager configurationSecurityManager)
+    {
+        this.configurationSecurityManager = configurationSecurityManager;
     }
 }

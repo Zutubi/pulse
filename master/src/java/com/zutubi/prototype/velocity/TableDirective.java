@@ -79,7 +79,7 @@ public class TableDirective extends PrototypeDirective
             TableDescriptorFactory tableFactory = new TableDescriptorFactory();
             ComponentContext.autowire(tableFactory);
 
-            TableDescriptor tableDescriptor = tableFactory.create((CompositeType) collectionType.getTargetType());
+            TableDescriptor tableDescriptor = tableFactory.create(path, (CompositeType) collectionType.getTargetType());
 
             Type type = ((CollectionType)collectionType).getCollectionType();
             

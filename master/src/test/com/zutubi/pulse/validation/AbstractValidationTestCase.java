@@ -22,6 +22,7 @@ public class AbstractValidationTestCase extends AbstractConfigurationSystemTestC
         configurationRegistry = new ConfigurationRegistry();
         configurationRegistry.setConfigurationPersistenceManager(configurationPersistenceManager);
         configurationRegistry.setConfigurationTemplateManager(configurationTemplateManager);
+        configurationRegistry.setConfigurationSecurityManager(configurationSecurityManager);
         configurationRegistry.setTypeRegistry(typeRegistry);
         configurationRegistry.setActionManager(new ActionManager());
         configurationRegistry.initSetup();

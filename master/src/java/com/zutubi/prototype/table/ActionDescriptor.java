@@ -1,6 +1,7 @@
 package com.zutubi.prototype.table;
 
-import com.zutubi.prototype.actions.ConfigurationActions;
+import com.zutubi.prototype.actions.ActionManager;
+import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.util.logging.Logger;
 
 import java.util.LinkedList;
@@ -8,41 +9,30 @@ import java.util.List;
 
 /**
  *
- *
  */
 public class ActionDescriptor
 {
     private static final Logger LOG = Logger.getLogger(ActionDescriptor.class);
 
-    private List<String> defaultActions = new LinkedList<String>();
-    private ConfigurationActions configurationActions;
+    private ActionManager actionManager;
 
-    public ActionDescriptor()
+    public ActionDescriptor(ActionManager actionManager)
     {
-    }
-
-    public void setConfigurationActions(ConfigurationActions configurationActions)
-    {
-        this.configurationActions = configurationActions;
-    }
-
-    public void addDefaultAction(String action)
-    {
-        defaultActions.add(action);
+        this.actionManager = actionManager;
     }
 
     public List<String> getActions(Object instance)
     {
         List<String> actions = new LinkedList<String>();
-        actions.addAll(defaultActions);
         try
         {
-            actions.addAll(configurationActions.getActions(instance));
+            actions.addAll(actionManager.getActions((Configuration) instance, true));
         }
         catch (Exception e)
         {
             LOG.severe(e);
         }
+
         return actions;
     }
 }

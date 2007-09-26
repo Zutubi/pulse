@@ -14,6 +14,7 @@ public class TableDescriptor
      * Heading for this table, already i18n'd.
      */
     private String heading;
+    private boolean addAllowed;
     /**
      * The columns descriptors associated with this table descriptor.
      */
@@ -21,9 +22,10 @@ public class TableDescriptor
 
     private ActionDescriptor actions = null;
 
-    public TableDescriptor(String heading)
+    public TableDescriptor(String heading, boolean addAllowed)
     {
         this.heading = heading;
+        this.addAllowed = addAllowed;
     }
 
     public String getHeading()
@@ -59,5 +61,10 @@ public class TableDescriptor
     public void addActionDescriptor(ActionDescriptor ad)
     {
         this.actions = ad;
+    }
+
+    public boolean isAddAllowed()
+    {
+        return addAllowed;
     }
 }

@@ -1,6 +1,8 @@
 package com.zutubi.pulse.api;
 
+import com.zutubi.prototype.config.ConfigurationSecurityManager;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
+import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.*;
 import com.zutubi.pulse.ShutdownManager;
@@ -24,6 +26,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
     private EventManager eventManager;
     private ShutdownManager shutdownManager;
     private ConfigurationTemplateManager configurationTemplateManager;
+    private ConfigurationSecurityManager configurationSecurityManager;
     private TypeRegistry typeRegistry;
     private RecordManager recordManager;
 
@@ -72,204 +75,271 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
 
     public Boolean configPathExists(String token, String path) throws AuthenticationException
     {
-        tokenManager.verifyUser(token);
-        return configurationTemplateManager.pathExists(path);
+        tokenManager.loginUser(token);
+        try
+        {
+            return configurationTemplateManager.pathExists(path) && configurationSecurityManager.hasPermission(path, AccessManager.ACTION_VIEW);
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
     }
 
     public Vector<String> getConfigListing(String token, String path) throws AuthenticationException, TypeException
     {
-        tokenManager.verifyUser(token);
+        tokenManager.loginUser(token);
+        try
+        {
+            Vector<String> result;
 
-        if(path.length() == 0)
-        {
-            return new Vector<String>(configurationTemplateManager.getRootListing());
-        }
-        else
-        {
-            Type type = configurationTemplateManager.getType(path);
-            if(type instanceof CollectionType)
+            if(path.length() == 0)
             {
-                CollectionType collectionType = (CollectionType) type;
-                if(collectionType.getCollectionType() instanceof ComplexType)
-                {
-                    Record record = configurationTemplateManager.getRecord(path);
-                    return new Vector<String>(collectionType.getOrder(record));
-                }
-                else
-                {
-                    throw new IllegalArgumentException("Path refers to simple collection");
-                }
+                result = new Vector<String>(configurationTemplateManager.getRootListing());
             }
             else
             {
-                CompositeType compositeType = (CompositeType) type;
-                return new Vector<String>(compositeType.getNestedPropertyNames());
+                Type type = configurationTemplateManager.getType(path);
+                if(type instanceof CollectionType)
+                {
+                    CollectionType collectionType = (CollectionType) type;
+                    if(collectionType.getCollectionType() instanceof ComplexType)
+                    {
+                        Record record = configurationTemplateManager.getRecord(path);
+                        result = new Vector<String>(collectionType.getOrder(record));
+                    }
+                    else
+                    {
+                        throw new IllegalArgumentException("Path refers to simple collection");
+                    }
+                }
+                else
+                {
+                    CompositeType compositeType = (CompositeType) type;
+                    result = new Vector<String>(compositeType.getNestedPropertyNames());
+                }
             }
+
+            configurationSecurityManager.filterPaths(path, result, AccessManager.ACTION_VIEW);
+            return result;
+        }
+        finally
+        {
+            tokenManager.logoutUser();
         }
     }
 
     public Object getConfig(String token, String path) throws AuthenticationException, TypeException
     {
-        tokenManager.verifyUser(token);
+        tokenManager.loginUser(token);
 
-        Object instance = configurationTemplateManager.getInstance(path);
-        if(instance == null)
+        try
         {
-            throw new IllegalArgumentException("Path '" + path + "' does not exist");
-        }
+            Object instance = configurationTemplateManager.getInstance(path);
+            if(instance == null)
+            {
+                throw new IllegalArgumentException("Path '" + path + "' does not exist");
+            }
 
-        Type t = configurationTemplateManager.getType(path);
-        return t.toXmlRpc(t.unstantiate(instance));
+            configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_VIEW);
+
+            Type t = configurationTemplateManager.getType(path);
+            return t.toXmlRpc(t.unstantiate(instance));
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
     }
 
     public Object getRawConfig(String token, String path) throws AuthenticationException, TypeException
     {
-        tokenManager.verifyUser(token);
-
-        Record record = recordManager.select(path);
-        if(record == null)
+        tokenManager.loginUser(token);
+        try
         {
-            throw new IllegalArgumentException("Path '" + path + "' does not exist");
-        }
+            Record record = recordManager.select(path);
+            if(record == null)
+            {
+                throw new IllegalArgumentException("Path '" + path + "' does not exist");
+            }
 
-        Type t = configurationTemplateManager.getType(path);
-        return t.toXmlRpc(record);
+            configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_VIEW);
+
+            Type t = configurationTemplateManager.getType(path);
+            return t.toXmlRpc(record);
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
     }
 
     public String insertConfig(String token, String path, Hashtable config) throws AuthenticationException, TypeException, ValidationException
     {
-        tokenManager.verifyAdmin(token);
-
-        ComplexType pathType = configurationTemplateManager.getType(path);
-        CompositeType expectedType = (CompositeType) pathType.getTargetType();
-
-        String parentPath;
-        String baseName;
-        if(pathType instanceof CollectionType)
+        tokenManager.loginUser(token);
+        try
         {
-            parentPath = path;
-            baseName = null;
-        }
-        else
-        {
-            parentPath = PathUtils.getParentPath(path);
-            baseName = PathUtils.getBaseName(path);
-        }
+            ComplexType pathType = configurationTemplateManager.getType(path);
+            CompositeType expectedType = (CompositeType) pathType.getTargetType();
 
-        if(configurationTemplateManager.isTemplatedCollection(parentPath))
+            String parentPath;
+            String baseName;
+            if(pathType instanceof CollectionType)
+            {
+                parentPath = path;
+                baseName = null;
+            }
+            else
+            {
+                parentPath = PathUtils.getParentPath(path);
+                baseName = PathUtils.getBaseName(path);
+            }
+
+            if(configurationTemplateManager.isTemplatedCollection(parentPath))
         {
             throw new IllegalArgumentException("Invalid path '" + path + "': use insertTemplatedConfig to insert into templated collections");
-        }
+            }
 
-        String symbolicName = CompositeType.getTypeFromXmlRpc(config);
-        CompositeType type = configurationTemplateManager.typeCheck(expectedType, symbolicName);
-        MutableRecord record = type.fromXmlRpc(config);
+            String symbolicName = CompositeType.getTypeFromXmlRpc(config);
+            CompositeType type = configurationTemplateManager.typeCheck(expectedType, symbolicName);
+            MutableRecord record = type.fromXmlRpc(config);
 
-        Configuration instance = configurationTemplateManager.validate(parentPath, baseName, record, true);
-        if(!type.isValid(instance))
+            Configuration instance = configurationTemplateManager.validate(parentPath, baseName, record, true);
+            if(!type.isValid(instance))
         {
             throw new ValidationException(type, instance);
-        }
+            }
 
-        return configurationTemplateManager.insertRecord(path, record);
+            return configurationTemplateManager.insertRecord(path, record);
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
     }
 
     public String insertTemplatedConfig(String token, String templateParentPath, Hashtable config, boolean template) throws AuthenticationException, TypeException, ValidationException
     {
-        tokenManager.verifyAdmin(token);
-
-        String insertPath = PathUtils.getParentPath(templateParentPath);
-        if(insertPath == null)
+        tokenManager.loginUser(token);
+        try
         {
-            throw new IllegalArgumentException("Invalid templateParentPath '" + templateParentPath + "': no parent path");
-        }
+            String insertPath = PathUtils.getParentPath(templateParentPath);
+            if (insertPath == null)
+            {
+                throw new IllegalArgumentException("Invalid templateParentPath '" + templateParentPath + "': no parent path");
+            }
 
-        if(!configurationTemplateManager.isTemplatedCollection(insertPath))
+            if (!configurationTemplateManager.isTemplatedCollection(insertPath))
+            {
+                throw new IllegalArgumentException("Invalid templateParentPath '" + templateParentPath + "': parent path '" + insertPath + "' is not a templated collection, use insertConfig instead");
+            }
+
+            TemplateRecord templateParent = (TemplateRecord) configurationTemplateManager.getRecord(templateParentPath);
+            if (templateParent == null)
+            {
+                throw new IllegalArgumentException("Invalid templateParentPath '" + templateParentPath + "': template parent does not exist");
+            }
+
+            if (configurationTemplateManager.isConcrete(insertPath, templateParent))
+            {
+                throw new IllegalArgumentException("Invalid templateParentPath '" + templateParentPath + "': template parent is concrete and thus cannot be inherited from");
+            }
+
+            CompositeType expectedType = (CompositeType) templateParent.getType();
+
+            String symbolicName = CompositeType.getTypeFromXmlRpc(config);
+            CompositeType type = configurationTemplateManager.typeCheck(expectedType, symbolicName);
+            MutableRecord record = type.fromXmlRpc(config);
+            configurationTemplateManager.setParentTemplate(record, templateParent.getHandle());
+            if (template)
+            {
+                configurationTemplateManager.markAsTemplate(record);
+            }
+
+            Configuration instance = configurationTemplateManager.validate(insertPath, null, record, true);
+            if (!type.isValid(instance))
+            {
+                throw new ValidationException(type, instance);
+            }
+
+            return configurationTemplateManager.insertRecord(insertPath, record);
+        }
+        finally
         {
-            throw new IllegalArgumentException("Invalid templateParentPath '" + templateParentPath + "': parent path '" + insertPath + "' is not a templated collection, use insertConfig instead");
+            tokenManager.logoutUser();
         }
-
-        TemplateRecord templateParent = (TemplateRecord) configurationTemplateManager.getRecord(templateParentPath);
-        if(templateParent == null)
-        {
-            throw new IllegalArgumentException("Invalid templateParentPath '" + templateParentPath + "': template parent does not exist");
-        }
-
-        if(configurationTemplateManager.isConcrete(insertPath, templateParent))
-        {
-            throw new IllegalArgumentException("Invalid templateParentPath '" + templateParentPath + "': template parent is concrete and thus cannot be inherited from");
-        }
-
-        CompositeType expectedType = (CompositeType) templateParent.getType();
-
-        String symbolicName = CompositeType.getTypeFromXmlRpc(config);
-        CompositeType type = configurationTemplateManager.typeCheck(expectedType, symbolicName);
-        MutableRecord record = type.fromXmlRpc(config);
-        configurationTemplateManager.setParentTemplate(record, templateParent.getHandle());
-        if(template)
-        {
-            configurationTemplateManager.markAsTemplate(record);
-        }
-
-        Configuration instance = configurationTemplateManager.validate(insertPath, null, record, true);
-        if(!type.isValid(instance))
-        {
-            throw new ValidationException(type, instance);
-        }
-
-        return configurationTemplateManager.insertRecord(insertPath, record);
     }
 
     public String saveConfig(String token, String path, Hashtable config, boolean deep) throws AuthenticationException, TypeException, ValidationException
     {
-        tokenManager.verifyAdmin(token);
-
-        Record existingRecord = configurationTemplateManager.getRecord(path);
-        if(existingRecord == null)
+        tokenManager.loginUser(token);
+        try
         {
-            throw new IllegalArgumentException("Invalid path '" + path + "': no existing record found (use insert to create new records)");
-        }
+            Record existingRecord = configurationTemplateManager.getRecord(path);
+            if(existingRecord == null)
+            {
+                throw new IllegalArgumentException("Invalid path '" + path + "': no existing record found (use insert to create new records)");
+            }
 
-        String existingSymbolicName = existingRecord.getSymbolicName();
-        if(existingSymbolicName == null)
-        {
-            throw new IllegalArgumentException("Invalid path '" + path + "': path refers to a collection (manipulate collections using insert and delete)");
-        }
+            String existingSymbolicName = existingRecord.getSymbolicName();
+            if(existingSymbolicName == null)
+            {
+                throw new IllegalArgumentException("Invalid path '" + path + "': path refers to a collection (manipulate collections using insert and delete)");
+            }
 
-        String symbolicName = CompositeType.getTypeFromXmlRpc(config);
-        if(!existingSymbolicName.equals(symbolicName))
+            String symbolicName = CompositeType.getTypeFromXmlRpc(config);
+            if(!existingSymbolicName.equals(symbolicName))
         {
             throw new IllegalArgumentException("Expecting type '" + existingSymbolicName + "', found '" + symbolicName + "' (type cannot be changed by saving)");
-        }
-        
-        CompositeType type = typeRegistry.getType(existingSymbolicName);
-        MutableRecord record = type.fromXmlRpc(config);
+            }
 
-        Configuration instance = configurationTemplateManager.validate(PathUtils.getParentPath(path), PathUtils.getBaseName(path), record, deep);
-        if((deep && !type.isValid(instance)) || !instance.isValid())
+            CompositeType type = typeRegistry.getType(existingSymbolicName);
+            MutableRecord record = type.fromXmlRpc(config);
+
+            Configuration instance = configurationTemplateManager.validate(PathUtils.getParentPath(path), PathUtils.getBaseName(path), record, deep);
+            if((deep && !type.isValid(instance)) || !instance.isValid())
+            {
+                throw new ValidationException(type, instance);
+            }
+
+            return configurationTemplateManager.saveRecord(path, record, deep);
+        }
+        finally
         {
-            throw new ValidationException(type, instance);
+            tokenManager.logoutUser();
         }
-
-        return configurationTemplateManager.saveRecord(path, record, deep);
     }
 
     public boolean deleteConfig(String token, String path) throws AuthenticationException
     {
-        tokenManager.verifyAdmin(token);
-        if(configurationTemplateManager.getRecord(path) == null)
+        tokenManager.loginUser(token);
+        try
         {
-            return false;
-        }
+            if(configurationTemplateManager.getRecord(path) == null)
+            {
+                return false;
+            }
 
-        configurationTemplateManager.delete(path);
-        return true;
+            configurationTemplateManager.delete(path);
+            return true;
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
     }
 
     public int deleteAllConfigs(String token, String pathPattern) throws AuthenticationException
     {
-        tokenManager.verifyAdmin(token);
-        return configurationTemplateManager.deleteAll(pathPattern);
+        tokenManager.loginUser(token);
+        try
+        {
+            return configurationTemplateManager.deleteAll(pathPattern);
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
     }
     
 //    public Vector<String> getAllUserLogins(String token) throws AuthenticationException
@@ -1574,5 +1644,10 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
     public void setRecordManager(RecordManager recordManager)
     {
         this.recordManager = recordManager;
+    }
+
+    public void setConfigurationSecurityManager(ConfigurationSecurityManager configurationSecurityManager)
+    {
+        this.configurationSecurityManager = configurationSecurityManager;
     }
 }

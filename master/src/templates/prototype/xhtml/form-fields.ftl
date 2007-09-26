@@ -5,12 +5,20 @@ hiddenFields.push({id: 'submitField', name: 'submitField', value: ''});
 
 <#list form.fields as field>
     <#assign parameters=field.parameters>
-    fieldConfig = { width: 200 };
+    fieldConfig = {
+        width: 200
+    <#if form.readOnly>
+      , disabled: true
+    </#if>
+    };
     <#include "${parameters.type}.ftl"/>
 </#list>
 
 function handleKeypress(evt)
 {
+<#if form.readOnly>
+    return true;
+<#else>
     if (evt.getKey() == evt.RETURN)
     {
         defaultSubmit();
@@ -21,6 +29,7 @@ function handleKeypress(evt)
     {
         return true;
     }
+</#if>
 }
 
 function updateButtons()
@@ -82,13 +91,14 @@ Ext.onReady(function()
     }
 </#list>
 
+<#if !form.readOnly>
     var buttonEl;
-<#list form.submitFields as submitField>
-    buttonEl = form.buttons[${submitField_index}].el.child('button:first');
-    buttonEl.set({tabindex: window.nextTabindex++ });
-    buttonEl.dom.id = buttonEl.id = 'zfid.${submitField.value}';
-</#list>
-
+    <#list form.submitFields as submitField>
+        buttonEl = form.buttons[${submitField_index}].el.child('button:first');
+        buttonEl.set({tabindex: window.nextTabindex++ });
+        buttonEl.dom.id = buttonEl.id = 'zfid.${submitField.value}';
+    </#list>
+</#if>
     form.rendered = true;
     form.fireEvent('render', form);
 });

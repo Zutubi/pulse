@@ -4,7 +4,6 @@ import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.security.AcegiUtils;
 import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;
@@ -77,7 +76,7 @@ public class AuthDirective extends AbstractDirective
         }
         wireParams(params);
 
-        if (action != null && accessManager.hasPermission(AcegiUtils.getLoggedInUser(), action, resource))
+        if (action != null && accessManager.hasPermission(action, resource))
         {
             String body = extractBodyContext(node, context);
             writer.write(body);

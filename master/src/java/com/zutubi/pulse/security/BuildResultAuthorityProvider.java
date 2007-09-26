@@ -32,7 +32,7 @@ public class BuildResultAuthorityProvider implements AuthorityProvider<BuildResu
 
     public void setAccessManager(DefaultAccessManager accessManager)
     {
-        accessManager.registerProvider(BuildResult.class, this);
+        accessManager.registerAuthorityProvider(BuildResult.class, this);
     }
 
     public void setProjectConfigurationAuthorityProvider(ProjectConfigurationAuthorityProvider projectConfigurationAuthorityProvider)

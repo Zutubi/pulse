@@ -27,6 +27,7 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ThreadFactory;
 
 /**
  */
@@ -41,6 +42,7 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
     private MasterConfigurationManager configurationManager;
     private SetupManager setupManager;
     private ConfigurationReferenceManager configurationReferenceManager;
+    private ThreadFactory threadFactory;
 
     public void initialise()
     {
@@ -75,6 +77,42 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
 
         try
         {
+            UserConfiguration adminUser = saveConfiguration();
+
+            // login as the admin user.  safe to directly create AcegiUser as
+            // we know the user has no external authorities
+            AcegiUtils.loginAs(new AcegiUser(userManager.getUser(adminUser.getLogin()), Collections.EMPTY_LIST));
+
+            try
+            {
+                // ensure that this runs in a separate thread so that the
+                // use can receive appropriate feedback.
+                threadFactory.newThread(new Runnable()
+                {
+                    public void run()
+                    {
+                        setupManager.requestSetupComplete();
+                    }
+                }).start();
+            }
+            catch (Exception e)
+            {
+                LOG.severe(e);
+            }
+        }
+        catch (TypeException e)
+        {
+            LOG.severe(e);
+        }
+
+    }
+
+    private UserConfiguration saveConfiguration() throws TypeException
+    {
+        AcegiUtils.loginAsSystem();
+        
+        try
+        {
             SimpleInstantiator instantiator = new SimpleInstantiator(configurationReferenceManager);
             AdminUserConfiguration adminConfig = (AdminUserConfiguration) instantiator.instantiate(adminConfigType, getCompletedStateForType(adminConfigType).getDataRecord());
             MutableRecord serverConfigRecord = getCompletedStateForType(serverConfigType).getDataRecord();
@@ -86,7 +124,7 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
             adminUser.setPassword(adminConfig.getPassword());
             adminUser.addDirectAuthority(ServerPermission.ADMINISTER.toString());
             configurationTemplateManager.insert(ConfigurationRegistry.USERS_SCOPE, adminUser);
-            
+
             // create an administrators group (for convenience)
             GroupConfiguration adminGroup = new GroupConfiguration("administrators");
             adminGroup.addServerPermission(ServerPermission.ADMINISTER);
@@ -114,33 +152,12 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
 
             // Now copy over the email properties
             extractAndSave(EmailConfiguration.class, serverConfigRecord);
-
-            // login as the admin user.  safe to directly create AcegiUser as
-            // we know the user has no external authorities
-            AcegiUtils.loginAs(new AcegiUser(userManager.getUser(adminUser.getLogin()), Collections.EMPTY_LIST));
-
-            try
-            {
-                // ensure that this runs in a separate thread so that the
-                // use can receive appropriate feedback.
-                new Thread(new Runnable()
-                {
-                    public void run()
-                    {
-                        setupManager.requestSetupComplete();
-                    }
-                }).start();
-            }
-            catch (Exception e)
-            {
-                LOG.severe(e);
-            }
+            return adminUser;
         }
-        catch (TypeException e)
+        finally
         {
-            LOG.severe(e);
+            AcegiUtils.logout();
         }
-
     }
 
     private String getMasterHost(String baseUrl)
@@ -217,5 +234,10 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
     public void setConfigurationReferenceManager(ConfigurationReferenceManager configurationReferenceManager)
     {
         this.configurationReferenceManager = configurationReferenceManager;
+    }
+
+    public void setThreadFactory(ThreadFactory threadFactory)
+    {
+        this.threadFactory = threadFactory;
     }
 }

@@ -8,6 +8,7 @@ import com.zutubi.pulse.vfs.local.DefaultLocalFileProvider;
 import com.zutubi.pulse.vfs.pulse.PulseFileProvider;
 import com.zutubi.util.bean.ObjectFactory;
 import org.apache.commons.vfs.FileSystemManager;
+import org.apache.commons.vfs.cache.NullFilesCache;
 import org.apache.commons.vfs.impl.DefaultFileSystemManager;
 import org.apache.commons.vfs.provider.ram.RamFileProvider;
 import org.springframework.beans.factory.FactoryBean;
@@ -34,9 +35,9 @@ public class VfsManagerFactoryBean implements FactoryBean
                 if (instance == null)
                 {
                     instance = new DefaultFileSystemManager();
+                    instance.setFilesCache(new NullFilesCache());
                     instance.addProvider("local", new DefaultLocalFileProvider());
                     instance.addProvider("ram", new RamFileProvider());
-
                     AgentFileProvider agentFileProviderfileProvider = new AgentFileProvider();
                     agentFileProviderfileProvider.setAgentManager(agentManager);
                     agentFileProviderfileProvider.setSlaveProxyFactory(proxyFactory);
@@ -44,7 +45,6 @@ public class VfsManagerFactoryBean implements FactoryBean
                     instance.addProvider("agent", agentFileProviderfileProvider);
 
                     PulseFileProvider pulseFileProvider = objectFactory.buildBean(PulseFileProvider.class);
-
                     instance.addProvider("pulse", pulseFileProvider);
 
                     instance.init();

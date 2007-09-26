@@ -1,6 +1,8 @@
 package com.zutubi.prototype.actions;
 
 import com.zutubi.pulse.core.config.AbstractConfiguration;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
 import com.zutubi.util.Sort;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import junit.framework.TestCase;
@@ -72,13 +74,21 @@ public class ConfigurationActionsTest extends TestCase
         assertSame(arg, obj);
     }
 
-    private void assertActions(List<String> got, String... expected)
+    private void assertActions(List<ConfigurationAction> got, String... expected)
     {
         assertEquals(expected.length, got.size());
-        Collections.sort(got, new Sort.StringComparator());
+        List<String> gotNames = CollectionUtils.map(got, new Mapping<ConfigurationAction, String>()
+        {
+            public String map(ConfigurationAction configurationAction)
+            {
+                return configurationAction.getName();
+            }
+        });
+
+        Collections.sort(gotNames, new Sort.StringComparator());
         for (int i = 0; i < expected.length; i++)
         {
-            assertEquals(expected[i], got.get(i));
+            assertEquals(expected[i], gotNames.get(i));
         }
     }
 

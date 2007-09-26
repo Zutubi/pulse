@@ -1,5 +1,6 @@
 package com.zutubi.pulse.vfs.pulse;
 
+import com.zutubi.prototype.config.ConfigurationSecurityManager;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.type.ComplexType;
 import com.zutubi.prototype.type.Type;
@@ -20,6 +21,7 @@ import java.util.List;
 public class ConfigFileObject extends AbstractPulseFileObject
 {
     private ConfigurationTemplateManager configurationTemplateManager;
+    private ConfigurationSecurityManager configurationSecurityManager;
     /**
      * This is the path into the configuration subsystem.
      */
@@ -73,12 +75,12 @@ public class ConfigFileObject extends AbstractPulseFileObject
 
     public String getDisplayName()
     {
-        return PrototypeUtils.getDisplayName(path, parentType, value, configurationTemplateManager);
+        return PrototypeUtils.getDisplayName(path, parentType, value);
     }
 
     protected FileType doGetType() throws Exception
     {
-        if(type == null || PrototypeUtils.isFolder(path, configurationTemplateManager))
+        if(type == null || PrototypeUtils.isFolder(path, configurationTemplateManager, configurationSecurityManager))
         {
             return FileType.FOLDER;
         }
@@ -102,12 +104,17 @@ public class ConfigFileObject extends AbstractPulseFileObject
 
     protected String[] doListChildren() throws Exception
     {
-        List<String> listing = PrototypeUtils.getPathListing(path, type, configurationTemplateManager);
+        List<String> listing = PrototypeUtils.getPathListing(path, type, configurationTemplateManager, configurationSecurityManager);
         return listing.toArray(new String[listing.size()]);
     }
 
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
         this.configurationTemplateManager = configurationTemplateManager;
+    }
+
+    public void setConfigurationSecurityManager(ConfigurationSecurityManager configurationSecurityManager)
+    {
+        this.configurationSecurityManager = configurationSecurityManager;
     }
 }

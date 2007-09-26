@@ -197,7 +197,7 @@ public class SecurityInterceptor implements MethodInterceptor
 
     private boolean checkAccess(Object resource, String action)
     {
-        return resource == null || accessManager.hasPermission(AcegiUtils.getLoggedInUser(), action, resource);
+        return resource == null || accessManager.hasPermission(action, resource);
     }
 
     private String getMethodName(MethodInvocation methodInvocation)

@@ -3,6 +3,7 @@ package com.zutubi.prototype.config;
 import com.zutubi.prototype.config.events.PostDeleteEvent;
 import com.zutubi.prototype.config.events.PostInsertEvent;
 import com.zutubi.prototype.config.events.PostSaveEvent;
+import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.*;
 import com.zutubi.pulse.core.config.Configuration;
@@ -34,6 +35,7 @@ public class ConfigurationTemplateManager
     private RecordManager recordManager;
     private ConfigurationPersistenceManager configurationPersistenceManager;
     private ConfigurationReferenceManager configurationReferenceManager;
+    private ConfigurationSecurityManager configurationSecurityManager;
     private EventManager eventManager;
     private ValidationManager validationManager;
     private int refreshCount = 0;
@@ -215,6 +217,7 @@ public class ConfigurationTemplateManager
     public String insertRecord(final String path, MutableRecord record)
     {
         checkPersistent(path);
+        configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_CREATE);
 
         ComplexType type = getType(path);
 
@@ -862,6 +865,7 @@ public class ConfigurationTemplateManager
     public String saveRecord(String path, MutableRecord record, boolean deep)
     {
         checkPersistent(path);
+        configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_WRITE);
 
         if (record.getSymbolicName() == null)
         {
@@ -1168,6 +1172,7 @@ public class ConfigurationTemplateManager
     public void delete(final String path)
     {
         checkPersistent(path);
+        configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_DELETE);
 
         List<PostDeleteEvent> events = new LinkedList<PostDeleteEvent>();
         for (String concretePath : getDescendentPaths(path, false, true))
@@ -1576,5 +1581,10 @@ public class ConfigurationTemplateManager
     public void setValidationManager(ValidationManager validationManager)
     {
         this.validationManager = validationManager;
+    }
+
+    public void setConfigurationSecurityManager(ConfigurationSecurityManager configurationSecurityManager)
+    {
+        this.configurationSecurityManager = configurationSecurityManager;
     }
 }

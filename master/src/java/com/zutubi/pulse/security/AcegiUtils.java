@@ -24,6 +24,11 @@ public class AcegiUtils
         systemUser = new AcegiUser(user, null);
     }
 
+    public static AcegiUser getSystemUser()
+    {
+        return systemUser;
+    }
+    
     /**
      * Logs the current thread in as the system user, with priveleges to do
      * everything.

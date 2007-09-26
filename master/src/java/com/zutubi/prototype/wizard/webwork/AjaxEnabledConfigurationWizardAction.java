@@ -1,5 +1,6 @@
 package com.zutubi.prototype.wizard.webwork;
 
+import com.zutubi.prototype.config.ConfigurationSecurityManager;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.webwork.ConfigurationErrors;
 import com.zutubi.prototype.webwork.ConfigurationPanel;
@@ -17,6 +18,8 @@ public class AjaxEnabledConfigurationWizardAction extends ConfigurationWizardAct
     private ConfigurationPanel configurationPanel;
     private ConfigurationResponse configurationResponse;
     private ConfigurationErrors configurationErrors;
+
+    private ConfigurationSecurityManager configurationSecurityManager;
 
     public ConfigurationPanel getConfigurationPanel()
     {
@@ -53,7 +56,7 @@ public class AjaxEnabledConfigurationWizardAction extends ConfigurationWizardAct
                 {
                     // Then we added something.
                     String displayName = PrototypeUtils.getDisplayName(newPath, configurationTemplateManager);
-                    configurationResponse.addAddedFile(new ConfigurationResponse.Addition(newPath, displayName, configurationTemplateManager.getTemplatePath(newPath), PrototypeUtils.isLeaf(newPath, configurationTemplateManager)));
+                    configurationResponse.addAddedFile(new ConfigurationResponse.Addition(newPath, displayName, configurationTemplateManager.getTemplatePath(newPath), PrototypeUtils.isLeaf(newPath, configurationTemplateManager, configurationSecurityManager)));
                 }
             }
         }
@@ -82,5 +85,10 @@ public class AjaxEnabledConfigurationWizardAction extends ConfigurationWizardAct
     private boolean isEmbeddedCollection(String insertPath)
     {
         return PrototypeUtils.isEmbeddedCollection(configurationTemplateManager.getType(insertPath));
+    }
+
+    public void setConfigurationSecurityManager(ConfigurationSecurityManager configurationSecurityManager)
+    {
+        this.configurationSecurityManager = configurationSecurityManager;
     }
 }

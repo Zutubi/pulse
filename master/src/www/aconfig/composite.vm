@@ -13,8 +13,18 @@
                 handleConfigurationResponse(action.result);
             });
         </script>
+    #if($config.writable)
         #parse("/aconfig/check.vm")
+    #end
     </div>
+    #if($config.embedded && !$config.writable)
+        <p>
+            <a class="unadorned" href="#" onclick="selectPath('$config.parentPath'); return false">
+                <img src="$base/images/resultset_previous.gif"/>
+            </a>
+            <a href="#" onclick="selectPath('$config.parentPath'); return false">back</a>
+        </p>
+    #end
 #end
 
 #macro(renderstate)
@@ -80,12 +90,18 @@
 #else
     ## We don't know what type we are dealing with, it needs to be configured
     ## by a wizard.
+    #if($config.writable)
     <table class="template-actions" cellspacing="5px">
         <tr>
             <th><a href="#" class="unadorned" onclick="addToPath('${config.path}'); return false"><img alt="configure" src="$base/images/pencil.gif"/></a> <a href="#" onclick="addToPath('${config.path}'); return false">configure</a></th>
             <td>configure a #i18n("key=label") using the wizard</td>
         </tr>
     </table>
+    #else
+    <p>
+        No #i18n("key=label") configured.
+    </p>
+    #end
 #end
 
     </tr>

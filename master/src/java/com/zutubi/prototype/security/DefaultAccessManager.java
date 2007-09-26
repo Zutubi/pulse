@@ -13,24 +13,30 @@ public class DefaultAccessManager implements AccessManager
 {
     private static final Logger LOG = Logger.getLogger(DefaultAccessManager.class);
 
-    private AuthorityProvider globalProvider;
-    private Map<Class, AuthorityProvider> providers = new HashMap<Class, AuthorityProvider>();
+    private ActorProvider actorProvider;
+    private AuthorityProvider globalAuthorityProvider;
+    private Map<Class, AuthorityProvider> authorityProviders = new HashMap<Class, AuthorityProvider>();
     private Set<String> defaultAuthorities = new HashSet<String>();
     private Set<String> superAuthorities = new HashSet<String>();
 
-    public void registerProvider(AuthorityProvider<Object> provider)
+    public void registerAuthorityProvider(AuthorityProvider<Object> provider)
     {
-        globalProvider = provider;
+        globalAuthorityProvider = provider;
     }
 
-    public <T> void registerProvider(Class<T> clazz, AuthorityProvider<T> provider)
+    public <T> void registerAuthorityProvider(Class<T> clazz, AuthorityProvider<T> provider)
     {
-        providers.put(clazz, provider);
+        authorityProviders.put(clazz, provider);
     }
 
     public void addSuperAuthority(String authority)
     {
         superAuthorities.add(authority);
+    }
+
+    public Actor getActor()
+    {
+        return actorProvider.getActor();
     }
 
     public boolean hasPermission(Actor actor, String action, Object resource)
@@ -53,7 +59,8 @@ public class DefaultAccessManager implements AccessManager
             // Be conservative: if the resource is deliberately unprotected,
             // then this question should not be asked.  Hence we assume a
             // mistake and refuse access just in case.            
-            LOG.warning("Request to access resource of type '" + resource.getClass().getName() + "' denied as no provider was found");
+            String type = resource == null ? "<null>" : resource.getClass().getName();
+            LOG.warning("Request to access resource of type '" + type + "' denied as no provider was found");
             return false;
         }
 
@@ -69,18 +76,28 @@ public class DefaultAccessManager implements AccessManager
         return false;
     }
 
+    public boolean hasPermission(String action, Object resource)
+    {
+        return hasPermission(getActor(), action, resource);
+    }
+
     private AuthorityProvider getProvider(Object resource)
     {
         AuthorityProvider provider;
         if (resource == null)
         {
-            provider = globalProvider;
+            provider = globalAuthorityProvider;
         }
         else
         {
             Class clazz = resource.getClass();
-            provider = providers.get(clazz);
+            provider = authorityProviders.get(clazz);
         }
         return provider;
+    }
+
+    public void setActorProvider(ActorProvider actorProvider)
+    {
+        this.actorProvider = actorProvider;
     }
 }

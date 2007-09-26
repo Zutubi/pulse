@@ -22,6 +22,6 @@ public class GlobalAuthorityProvider implements AuthorityProvider<Object>
     public void setAccessManager(DefaultAccessManager accessManager)
     {
         accessManager.addSuperAuthority(ServerPermission.ADMINISTER.toString());
-        accessManager.registerProvider(this);
+        accessManager.registerAuthorityProvider(this);
     }
 }
