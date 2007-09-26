@@ -2,10 +2,10 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.BuildService;
 import com.zutubi.pulse.RecipeDispatchRequest;
-import com.zutubi.pulse.util.logging.Logger;
-import com.zutubi.pulse.core.PulseFileLoader;
 import com.zutubi.pulse.core.ObjectFactory;
 import com.zutubi.pulse.core.PulseException;
+import com.zutubi.pulse.core.PulseFileLoader;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.util.List;
 
@@ -47,7 +47,7 @@ public class AnyCapableBuildHostRequirements extends AbstractBuildHostRequiremen
         catch (PulseException e)
         {
             // Continue, assuming no further requirements.
-            LOG.warning("Unable to load resource requirements from pulse file: " + e.getMessage(), e);
+            LOG.warning("Unable to load resource requirements from pulse file for project '" + request.getBuild().getProject().getName() + "': " + e.getMessage(), e);
         }
 
         return true;
