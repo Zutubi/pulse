@@ -3,7 +3,7 @@ package com.zutubi.prototype.type.record;
 /**
  * A record that supports writing to properties.
  */
-public interface MutableRecord extends Record
+public interface MutableRecord extends Record, Cloneable
 {
     /**
      * Set the symbolic name for the data contained by this record.  The symbolic name defines the type of the

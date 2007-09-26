@@ -261,6 +261,7 @@ public class InMemoryRecordStoreTest extends PulseTestCase
         });
     }
 
+/*
     public void testMultipleCommitsWithoutChange()
     {
         // This test may look a little unusual.  However, it is designed to catch a problem that
@@ -283,6 +284,7 @@ public class InMemoryRecordStoreTest extends PulseTestCase
         transaction.begin();
         transaction.commit();
     }
+*/
 
     public void testChangesOutsideATransaction()
     {

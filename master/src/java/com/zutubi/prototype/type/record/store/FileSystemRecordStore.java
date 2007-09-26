@@ -93,7 +93,14 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
         
         if (!activeTransaction)
         {
-            commit();
+            if (prepare())
+            {
+                commit();
+            }
+            else
+            {
+                rollback();
+            }
         }
         return result;
     }
@@ -155,6 +162,11 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
     {
         // write contents to .active directory.
         File active = new File(persistenceDir, ACTIVE_TXN_DIR);
+        if (!active.mkdirs())
+        {
+            return false;
+        }
+        
         DefaultRecordSerialiser serialiser = new DefaultRecordSerialiser(active);
         serialiser.serialise("", inMemoryStore.select(), true);
         

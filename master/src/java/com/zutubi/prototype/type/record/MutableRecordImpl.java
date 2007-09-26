@@ -8,7 +8,7 @@ import java.util.Set;
 /**
  * Simple record that holds key:value data, along with meta data.
  */
-public class MutableRecordImpl extends AbstractMutableRecord
+public class MutableRecordImpl extends AbstractMutableRecord 
 {
     private Map<String, String> meta = null;
 
@@ -150,5 +150,10 @@ public class MutableRecordImpl extends AbstractMutableRecord
             data = new HashMap<String, Object>();
         }
         return data;
+    }
+
+    protected Object clone() throws CloneNotSupportedException
+    {
+        return copy(true);
     }
 }

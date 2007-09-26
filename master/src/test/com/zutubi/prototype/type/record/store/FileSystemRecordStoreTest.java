@@ -158,4 +158,25 @@ public class FileSystemRecordStoreTest extends PulseTestCase
 
         assertNull(recordStore.select().get("path"));
     }
+
+    // ensure that changes made outside the scope of a transaction are handled correctly.
+    public void testAutoCommit()
+    {
+        // close the default transaction.
+        transaction.commit();
+
+        // update the data.
+        MutableRecordImpl newRecord = new MutableRecordImpl();
+        newRecord.put("a", "b");
+
+        recordStore.insert("path", newRecord);
+
+        // restart
+        recordStore = new FileSystemRecordStore();
+        recordStore.setPersistenceDir(persistentDir);
+        recordStore.init();
+
+        // assert that it was successfully persisted.
+        assertNotNull(recordStore.select().get("path"));
+    }
 }

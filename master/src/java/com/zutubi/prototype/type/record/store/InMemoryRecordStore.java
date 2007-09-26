@@ -1,7 +1,7 @@
 package com.zutubi.prototype.type.record.store;
 
 import com.zutubi.prototype.transaction.TransactionManager;
-import com.zutubi.prototype.transaction.TransactionResource;
+import com.zutubi.prototype.transaction.TransactionalCache;
 import com.zutubi.prototype.type.record.ImmutableRecord;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.MutableRecordImpl;
@@ -12,29 +12,25 @@ import com.zutubi.prototype.type.record.Record;
  *
  *
  */
-public class InMemoryRecordStore implements RecordStore, TransactionResource
+public class InMemoryRecordStore implements RecordStore
 {
-    private MutableRecord base;
-
-    private ThreadLocal<MutableRecord> baseHolder = new ThreadLocal<MutableRecord>();
-
-    private TransactionManager transactionManager;
+    private TransactionalCache<MutableRecord> cache = new MutableRecordTransactionalCache();
 
     public InMemoryRecordStore()
     {
-        base = new MutableRecordImpl();
+        this(new MutableRecordImpl());
     }
 
     public InMemoryRecordStore(MutableRecord base)
     {
-        this.base = base;
+        cache.set("base", base);
     }
 
     public Record insert(final String path, final Record record)
     {
-        return execute(new Executable()
+        return (Record) cache.execute("base", new TransactionalCache.Action<MutableRecord>()
         {
-            public Record execute(MutableRecord base)
+            public Object execute(MutableRecord base)
             {
                 return insert(base, path, record);
             }
@@ -43,9 +39,9 @@ public class InMemoryRecordStore implements RecordStore, TransactionResource
 
     public Record update(final String path, final Record record)
     {
-        return execute(new Executable()
+        return (Record) cache.execute("base", new TransactionalCache.Action<MutableRecord>()
         {
-            public Record execute(MutableRecord base)
+            public Object execute(MutableRecord base)
             {
                 return update(base, path, record);
             }
@@ -54,9 +50,9 @@ public class InMemoryRecordStore implements RecordStore, TransactionResource
 
     public Record delete(final String path)
     {
-        return execute(new Executable()
+        return (Record) cache.execute("base", new TransactionalCache.Action<MutableRecord>()
         {
-            public Record execute(MutableRecord base)
+            public Object execute(MutableRecord base)
             {
                 return delete(base, path);
             }
@@ -65,38 +61,9 @@ public class InMemoryRecordStore implements RecordStore, TransactionResource
 
     public void setTransactionManager(TransactionManager transactionManager)
     {
-        this.transactionManager = transactionManager;
+        this.cache.setTransactionManager(transactionManager);
     }
 
-    private static interface Executable
-    {
-        Record execute(MutableRecord record);
-    }
-    
-    private synchronized Record execute(Executable action)
-    {
-        // ensure that we are part of the transaction.
-        boolean activeTransaction = transactionManager.getTransaction() != null;
-        if (activeTransaction)
-        {
-            transactionManager.getTransaction().enlistResource(this);
-        }
-
-        MutableRecord writeableState = baseHolder.get();
-        if (writeableState == null)
-        {
-            writeableState = base.copy(true);
-            baseHolder.set(writeableState);
-        }
-
-        Record result = action.execute(writeableState);
-        if (!activeTransaction)
-        {
-            commit();
-        }
-        return result;
-    }
-    
     private Record insert(MutableRecord base, String path, Record newRecord)
     {
         MutableRecord record = newRecord.copy(true);
@@ -208,40 +175,31 @@ public class InMemoryRecordStore implements RecordStore, TransactionResource
 
     public Record select()
     {
-        MutableRecord record = baseHolder.get();
-        if (record != null)
+        return new ImmutableRecord(cache.get("base"));
+    }
+
+    private class MutableRecordTransactionalCache extends TransactionalCache<MutableRecord>
+    {
+        public MutableRecord copy(MutableRecord v)
         {
-            return new ImmutableRecord(record);
+            return v.copy(true);
         }
-
-        // ensure that no one external changes our internal state. 
-        return new ImmutableRecord(base);
     }
 
-    //---( transactional implementation )---
-    
-    public boolean prepare()
+/*
+    boolean prepare()
     {
-        // no work required here.
-        return true;
+        return cache.prepare();
     }
 
-    public void commit()
+    void commit()
     {
-        if (baseHolder.get() == null)
-        {
-            // no changes recorded.
-            return;
-        }
-
-        base = baseHolder.get();
-        baseHolder.set(null);
+        cache.commit();
     }
 
-    public void rollback()
+    void rollback()
     {
-        // clear out any state data that we had.
-        baseHolder.set(null);
+        cache.rollback();
     }
-
+*/
 }
