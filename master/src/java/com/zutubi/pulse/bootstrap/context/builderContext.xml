@@ -96,7 +96,17 @@
         </property>
     </bean>
 
-    <bean id="agentManager" class="com.zutubi.pulse.agent.DefaultAgentManager" autowire="byName" init-method="init"/>
+    <bean id="agentManagerTarget" class="com.zutubi.pulse.agent.DefaultAgentManager" autowire="byName" init-method="init"/>
+    <bean id="agentManager" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="target">
+            <ref bean="agentManagerTarget"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <value>securityInterceptor</value>
+            </list>
+        </property>
+    </bean>
 
     <bean id="recipeProcessor" class="com.zutubi.pulse.core.RecipeProcessor" autowire="byName" init-method="init"/>
 

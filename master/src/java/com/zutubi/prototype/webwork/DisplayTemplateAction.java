@@ -79,6 +79,11 @@ public class DisplayTemplateAction extends ActionSupport implements MessagesProv
         return node.isConcrete();
     }
 
+    public boolean isPermanent()
+    {
+        return record.isPermanent();
+    }
+    
     public Messages getMessages()
     {
         return Messages.getInstance(type.getTargetType().getClazz());

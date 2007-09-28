@@ -268,11 +268,15 @@ The beans defined within the security subsystem need not be accessed by other co
                 /logout.action=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER
                 /=ROLE_USER,ROLE_GUEST
                 /default.action=ROLE_GUEST,ROLE_USER
+                /xmlrpc/**=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER
                 /rss.action*=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER
                 /view/**/*=ROLE_GUEST,ROLE_USER
                 /file/**/*=ROLE_GUEST,ROLE_USER
-                /admin/**/*=ROLE_USER,ADMINISTER
-                /**/*.action*=ROLE_GUEST,ROLE_USER
+                /admin/settings/**=ADMINISTER
+                /admin/users/**=ADMINISTER
+                /admin/groups/**=ADMINISTER
+                /admin/plugins/**=ADMINISTER
+                /**=ROLE_GUEST,ROLE_USER
             </value>
         </property>
     </bean>

@@ -1,7 +1,7 @@
 package com.zutubi.prototype.type.record;
 
-import java.util.Set;
 import java.util.Collection;
+import java.util.Set;
 
 /**
  *
@@ -74,6 +74,11 @@ public class ImmutableRecord implements Record
     public long getHandle()
     {
         return delegate.getHandle();
+    }
+
+    public boolean isPermanent()
+    {
+        return delegate.isPermanent();
     }
 
     public boolean isCollection()

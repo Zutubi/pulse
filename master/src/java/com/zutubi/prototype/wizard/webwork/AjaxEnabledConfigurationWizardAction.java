@@ -84,7 +84,7 @@ public class AjaxEnabledConfigurationWizardAction extends ConfigurationWizardAct
 
     private boolean isEmbeddedCollection(String insertPath)
     {
-        return PrototypeUtils.isEmbeddedCollection(configurationTemplateManager.getType(insertPath));
+        return insertPath != null && PrototypeUtils.isEmbeddedCollection(configurationTemplateManager.getType(insertPath));
     }
 
     public void setConfigurationSecurityManager(ConfigurationSecurityManager configurationSecurityManager)

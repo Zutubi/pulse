@@ -1,8 +1,10 @@
 package com.zutubi.pulse.prototype.config;
 
-import com.zutubi.prototype.MapOptionProvider;
 import com.zutubi.prototype.MapOption;
+import com.zutubi.prototype.MapOptionProvider;
 import com.zutubi.prototype.config.ConfigurationReferenceManager;
+import com.zutubi.prototype.security.AccessManager;
+import com.zutubi.prototype.security.Actor;
 import com.zutubi.prototype.type.ReferenceType;
 import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.pulse.core.config.Configuration;
@@ -21,8 +23,9 @@ import java.util.Map;
 public class DefaultReferenceOptionProvider extends MapOptionProvider
 {
     private static final Logger LOG = Logger.getLogger(DefaultReferenceOptionProvider.class);
-    
+
     private ConfigurationReferenceManager configurationReferenceManager;
+    private AccessManager accessManager;
 
     public MapOption getEmptyOption(Object instance, String parentPath, TypeProperty property)
     {
@@ -30,29 +33,38 @@ public class DefaultReferenceOptionProvider extends MapOptionProvider
         return new MapOption("0", "");
     }
 
-    public Map<String,String> getMap(Object instance, String path, TypeProperty property)
+    public Map<String, String> getMap(Object instance, String path, TypeProperty property)
     {
         ReferenceType referenceType = (ReferenceType) property.getType().getTargetType();
         Collection<Configuration> referencable = configurationReferenceManager.getReferencableInstances(referenceType.getReferencedType(), path);
         Map<String, String> options = new LinkedHashMap<String, String>();
 
-        for(Configuration r: referencable)
+        Actor actor = accessManager.getActor();
+        for (Configuration r : referencable)
         {
-            try
+            if (accessManager.hasPermission(actor, AccessManager.ACTION_VIEW, r))
             {
-                options.put(Long.toString(r.getHandle()), (String) BeanUtils.getProperty(referenceType.getIdProperty(), r));
-            }
-            catch (BeanException e)
-            {
-                LOG.severe(e);
+                try
+                {
+                    options.put(Long.toString(r.getHandle()), (String) BeanUtils.getProperty(referenceType.getIdProperty(), r));
+                }
+                catch (BeanException e)
+                {
+                    LOG.severe(e);
+                }
             }
         }
-        
+
         return options;
     }
 
     public void setConfigurationReferenceManager(ConfigurationReferenceManager configurationReferenceManager)
     {
         this.configurationReferenceManager = configurationReferenceManager;
+    }
+
+    public void setAccessManager(AccessManager accessManager)
+    {
+        this.accessManager = accessManager;
     }
 }

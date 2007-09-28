@@ -13,6 +13,12 @@ import java.util.Set;
  */
 public interface UserManager extends EntityManager<User>, UserDetailsService
 {
+    String ALL_USERS_GROUP_NAME       = "all users";
+    String ANONYMOUS_USERS_GROUP_NAME = "anonymous users";
+    String PROJECT_ADMINS_GROUP_NAME  = "project administrators";
+    String ADMINS_GROUP_NAME          = "administrators";
+    String DEVELOPERS_GROUP_NAME      = "developers";
+
     UserConfiguration getUserConfig(String login);
 
     /**

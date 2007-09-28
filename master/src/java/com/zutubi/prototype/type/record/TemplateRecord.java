@@ -45,7 +45,7 @@ public class TemplateRecord extends AbstractRecord
     public String getMeta(String key)
     {
         String value = moi.getMeta(key);
-        if (value == null)
+        if (value == null && !key.equals(PERMANENT_KEY))
         {
             value = parent == null ? null : parent.getMeta(key);
         }

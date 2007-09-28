@@ -261,10 +261,12 @@
     #openTabs()
         #adminTab("projects" "$base/admin/projects/" $selected)
         #adminTab("agents" "$base/admin/agents/" $selected)
+#auth("action=ADMINISTER")
         #adminTab("settings" "$base/admin/settings/" $selected)
         #adminTab("users" "$base/admin/users" $selected)
         #adminTab("groups" "$base/admin/groups" $selected)
         #adminTab("plugins" "$base/admin/plugins/" $selected)
+#end
 #closeTabs()
 #end
 
@@ -566,7 +568,7 @@
 #macro(actionCellId $actionKey $url $image $id $span)
     <td class="content"
 #if($span)
-        rowspan="$span"
+        colspan="$span"
 #end
     >
         <a href="$url"
@@ -625,7 +627,7 @@
 ## Outputs an edit cell for a content table with a  row span
 ##
 #macro(editCellSpan $url $id $span)
-    #actionCellId("edit" $url "pencil.gif" $id $span)
+    #actionCellId("configure" $url "pencil.gif" $id $span)
 #end
 
 ##

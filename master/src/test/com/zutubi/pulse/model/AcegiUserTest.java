@@ -1,5 +1,6 @@
 package com.zutubi.pulse.model;
 
+import com.zutubi.pulse.prototype.config.group.BuiltinGroupConfiguration;
 import com.zutubi.pulse.prototype.config.group.GroupConfiguration;
 import com.zutubi.pulse.prototype.config.group.ServerPermission;
 import com.zutubi.pulse.prototype.config.user.UserConfiguration;
@@ -39,7 +40,7 @@ public class AcegiUserTest extends PulseTestCase
     {
         User u = newUser("a", "b");
         AcegiUser a = new AcegiUser(u, Collections.EMPTY_LIST);
-        a.addTransientAuthority("tran");
+        a.addGroup(new BuiltinGroupConfiguration("test", "tran"));
         assertAuthorities(a, "tran");
     }
 
@@ -48,10 +49,10 @@ public class AcegiUserTest extends PulseTestCase
         User u = newUser("a", "b");
         GroupConfiguration g = new GroupConfiguration("g1");
         g.setHandle(1);
-        g.addServerPermission(ServerPermission.CREATE_USER);
+        g.addServerPermission(ServerPermission.CREATE_PROJECT);
         AcegiUser a = new AcegiUser(u, Arrays.asList(g));
-        a.addTransientAuthority("ta");
-        assertAuthorities(a, "group:g1", ServerPermission.CREATE_USER.toString(), "ta");
+        a.addGroup(new BuiltinGroupConfiguration("test", "ta"));
+        assertAuthorities(a, "group:g1", ServerPermission.CREATE_PROJECT.toString(), "ta");
     }
 
     private User newUser(String login, String name)

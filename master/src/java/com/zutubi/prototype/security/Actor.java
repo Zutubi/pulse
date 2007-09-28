@@ -8,5 +8,6 @@ import java.util.Set;
  */
 public interface Actor
 {
+    String getUsername();
     Set<String> getGrantedAuthorities();
 }

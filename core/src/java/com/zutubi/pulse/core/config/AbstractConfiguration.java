@@ -14,6 +14,7 @@ public abstract class AbstractConfiguration implements Configuration
 {
     private long handle;
     private String configurationPath;
+    private boolean permanent;
     private List<String> instanceErrors = new LinkedList<String>();
     private Map<String, List<String>> fieldErrors = new HashMap<String, List<String>>();
 
@@ -35,6 +36,16 @@ public abstract class AbstractConfiguration implements Configuration
     public void setConfigurationPath(String configurationPath)
     {
         this.configurationPath = configurationPath;
+    }
+
+    public boolean isPermanent()
+    {
+        return permanent;
+    }
+
+    public void setPermanent(boolean permanent)
+    {
+        this.permanent = permanent;
     }
 
     @Transient

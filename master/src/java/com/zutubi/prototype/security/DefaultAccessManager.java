@@ -90,8 +90,20 @@ public class DefaultAccessManager implements AccessManager
         }
         else
         {
-            Class clazz = resource.getClass();
-            provider = authorityProviders.get(clazz);
+            // Try direct hit on class
+            provider = authorityProviders.get(resource.getClass());
+            if(provider == null)
+            {
+                // OK, see if a superclass is known.
+                for(Map.Entry<Class, AuthorityProvider> entry: authorityProviders.entrySet())
+                {
+                    if(entry.getKey().isInstance(resource))
+                    {
+                        provider = entry.getValue();
+                        break;
+                    }
+                }
+            }
         }
         return provider;
     }

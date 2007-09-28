@@ -262,10 +262,7 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
                     for(GroupConfiguration group: groups)
                     {
                         LOG.debug("Adding user '" + details.getUsername() + "' to group '" + group.getName() + "' via LDAP");
-                        for (String authority : group.getGrantedAuthorities())
-                        {
-                            user.addTransientAuthority(authority);
-                        }
+                        user.addGroup(group);
                     }
                 }
                 catch (Exception e)

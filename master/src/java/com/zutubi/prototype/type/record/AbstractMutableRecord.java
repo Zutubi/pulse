@@ -9,4 +9,9 @@ public abstract class AbstractMutableRecord extends AbstractRecord implements Mu
     {
         putMeta(HANDLE_KEY, Long.toString(id));
     }
+
+    public void setPermanent(boolean permanent)
+    {
+        putMeta(PERMANENT_KEY, Boolean.toString(permanent));
+    }
 }

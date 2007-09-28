@@ -1,6 +1,6 @@
 package com.zutubi.pulse.prototype.config.project;
 
-import com.zutubi.pulse.prototype.config.group.GroupConfiguration;
+import com.zutubi.pulse.prototype.config.group.AbstractGroupConfiguration;
 
 /**
  */
@@ -8,7 +8,7 @@ public class ProjectAclConfigurationFormatter
 {
     public String getGroup(ProjectAclConfiguration configuration)
     {
-        GroupConfiguration group = configuration.getGroup();
+        AbstractGroupConfiguration group = configuration.getGroup();
         return group == null ? null : group.getName();
     }
 

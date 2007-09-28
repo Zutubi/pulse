@@ -226,4 +226,9 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
     {
         this.permissions = permissions;
     }
+
+    public void addPermission(ProjectAclConfiguration permission)
+    {
+        permissions.add(permission);
+    }
 }

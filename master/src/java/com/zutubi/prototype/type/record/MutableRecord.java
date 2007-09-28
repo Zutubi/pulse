@@ -34,4 +34,6 @@ public interface MutableRecord extends Record, Cloneable
     void update(Record record);
 
     void setHandle(long handle);
+
+    void setPermanent(boolean permanenet);
 }

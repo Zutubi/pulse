@@ -12,7 +12,7 @@ import com.zutubi.pulse.security.AcegiUtils;
 public class HideDashboardProjectAction extends UserActionSupport
 {
     private long id;
-    private ConfigurationProvider connfigurationProvider;
+    private ConfigurationProvider configurationProvider;
 
     public long getId()
     {
@@ -40,7 +40,7 @@ public class HideDashboardProjectAction extends UserActionSupport
         Project p = projectManager.getProject(id, false);
         if(p != null)
         {
-            dashboardConfig = connfigurationProvider.deepClone(dashboardConfig);
+            dashboardConfig = configurationProvider.deepClone(dashboardConfig);
             if(dashboardConfig.isShowAllProjects())
             {
                 dashboardConfig.setShowAllProjects(false);
@@ -48,14 +48,14 @@ public class HideDashboardProjectAction extends UserActionSupport
             }
 
             dashboardConfig.getShownProjects().remove(p.getConfig());
+            configurationProvider.save(dashboardConfig);
         }
 
-        userManager.save(user);
         return SUCCESS;
     }
 
-    public void setConnfigurationProvider(ConfigurationProvider connfigurationProvider)
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
     {
-        this.connfigurationProvider = connfigurationProvider;
+        this.configurationProvider = configurationProvider;
     }
 }

@@ -4,7 +4,9 @@ import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.config.ConfigurationRegistry;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.config.TypeListener;
+import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
@@ -23,8 +25,11 @@ import com.zutubi.pulse.logging.ServerMessagesHandler;
 import com.zutubi.pulse.model.AgentState;
 import com.zutubi.pulse.model.AgentStateManager;
 import com.zutubi.pulse.model.ResourceManager;
+import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
+import com.zutubi.pulse.prototype.config.agent.AgentAclConfiguration;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
+import com.zutubi.pulse.prototype.config.group.AbstractGroupConfiguration;
 import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.services.UpgradeStatus;
@@ -44,7 +49,6 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 
     // ping timeout in seconds.
     private static final int PING_TIMEOUT = Integer.getInteger("pulse.agent.ping.timeout", 45);
-    private static final String GLOBAL_AGENT_NAME = "global agent template";
     private static final String MASTER_AGENT_NAME = "master agent";
     private static final int DEFAULT_AGENT_PORT = 8090;
 
@@ -107,26 +111,50 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         licenseManager.addAuthorisation(addAgentAuthorisation);
 
         // ensure that we create the default master agent.
+        ensureDefaultAgentsDefined();
+    }
+
+    private void ensureDefaultAgentsDefined()
+    {
         if (DefaultSetupManager.initialInstallation)
         {
-            CompositeType agentType = typeRegistry.getType(AgentConfiguration.class);
-            MutableRecord globalTemplate = agentType.createNewRecord(false);
-            globalTemplate.put("name", GLOBAL_AGENT_NAME);
-            globalTemplate.put("port", Integer.toString(DEFAULT_AGENT_PORT));
-            globalTemplate.put("remote", "true");
+            try
+            {
+                AgentConfiguration globalAgent = new AgentConfiguration();
+                globalAgent.setName(GLOBAL_AGENT_NAME);
+                globalAgent.setRemote(true);
+                globalAgent.setPort(DEFAULT_AGENT_PORT);
+                globalAgent.setPermanent(true);
+                
+                // All users can view all agents by default.
+                AbstractGroupConfiguration group = configurationProvider.get(PathUtils.getPath(ConfigurationRegistry.GROUPS_SCOPE, UserManager.ALL_USERS_GROUP_NAME), AbstractGroupConfiguration.class);
+                globalAgent.addPermission(new AgentAclConfiguration(group, AccessManager.ACTION_VIEW));
 
-            configurationTemplateManager.markAsTemplate(globalTemplate);
-            configurationTemplateManager.insertRecord(ConfigurationRegistry.AGENTS_SCOPE, globalTemplate);
+                // Anonymous users can view all agents by default (but only
+                // when anonymous access is explicitly enabled).
+                group = configurationProvider.get(PathUtils.getPath(ConfigurationRegistry.GROUPS_SCOPE, UserManager.ANONYMOUS_USERS_GROUP_NAME), AbstractGroupConfiguration.class);
+                globalAgent.addPermission(new AgentAclConfiguration(group, AccessManager.ACTION_VIEW));
 
-            // reload the template so that we have the handle.
-            Record persistedGlobalTemplate = configurationTemplateManager.getRecord(PathUtils.getPath(ConfigurationRegistry.AGENTS_SCOPE, GLOBAL_AGENT_NAME));
+                CompositeType agentType = typeRegistry.getType(AgentConfiguration.class);
+                MutableRecord globalTemplate = agentType.unstantiate(globalAgent);
+                configurationTemplateManager.markAsTemplate(globalTemplate);
+                configurationTemplateManager.insertRecord(ConfigurationRegistry.AGENTS_SCOPE, globalTemplate);
 
-            MutableRecord masterAgent = agentType.createNewRecord(false);
-            masterAgent.put("name", MASTER_AGENT_NAME);
-            masterAgent.put("remote", "false");
+                // reload the template so that we have the handle.
+                Record persistedGlobalTemplate = configurationTemplateManager.getRecord(PathUtils.getPath(ConfigurationRegistry.AGENTS_SCOPE, GLOBAL_AGENT_NAME));
 
-            configurationTemplateManager.setParentTemplate(masterAgent, persistedGlobalTemplate.getHandle());
-            configurationTemplateManager.insertRecord(ConfigurationRegistry.AGENTS_SCOPE, masterAgent);
+                AgentConfiguration masterAgent = new AgentConfiguration();
+                masterAgent.setName(MASTER_AGENT_NAME);
+                masterAgent.setRemote(false);
+
+                MutableRecord masterAgentRecord = agentType.unstantiate(masterAgent);
+                configurationTemplateManager.setParentTemplate(masterAgentRecord, persistedGlobalTemplate.getHandle());
+                configurationTemplateManager.insertRecord(ConfigurationRegistry.AGENTS_SCOPE, masterAgentRecord);
+            }
+            catch (TypeException e)
+            {
+                LOG.severe("Unable to create default agents: " + e.getMessage(), e);
+            }
         }
     }
 
@@ -233,19 +261,9 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         return agents.size();
     }
 
-    public void enableAgent(long handle)
+    public void setAgentState(AgentConfiguration agentConfig, AgentState.EnableState state)
     {
-        setAgentState(handle, AgentState.EnableState.ENABLED);
-    }
-
-    public void disableAgent(long handle)
-    {
-        setAgentState(handle, AgentState.EnableState.DISABLED);
-    }
-
-    public void setAgentState(long handle, AgentState.EnableState state)
-    {
-        Agent agent = agents.get(handle);
+        Agent agent = agents.get(agentConfig.getHandle());
         if (agent != null)
         {
             AgentState agentState = agentStateManager.getAgentState(agent.getId());
@@ -481,9 +499,9 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         }
     }
 
-    public void pingAgent(long handle)
+    public void pingAgent(AgentConfiguration agent)
     {
-        pingAgent(agents.get(handle));
+        pingAgent(agents.get(agent.getHandle()));
     }
 
     public void agentAdded(AgentConfiguration agentConfig)

@@ -7,6 +7,7 @@ import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.license.LicenseManager;
 import com.zutubi.pulse.license.authorisation.AddUserAuthorisation;
 import com.zutubi.pulse.model.persistence.UserDao;
+import com.zutubi.pulse.prototype.config.group.BuiltinGroupConfiguration;
 import com.zutubi.pulse.prototype.config.group.GroupConfiguration;
 import com.zutubi.pulse.prototype.config.user.DashboardConfiguration;
 import com.zutubi.pulse.prototype.config.user.UserConfiguration;
@@ -41,6 +42,7 @@ public class DefaultUserManager implements UserManager, ConfigurationInjector.Co
     private ConfigurationProvider configurationProvider;
     private Map<UserConfiguration, List<GroupConfiguration>> groupsByUser;
     private Map<Long, UserConfiguration> userConfigsById = new HashMap<Long, UserConfiguration>();
+    private BuiltinGroupConfiguration allUsersGroup;
 
     public void init()
     {
@@ -107,6 +109,8 @@ public class DefaultUserManager implements UserManager, ConfigurationInjector.Co
                 userGroups.add(group);
             }
         }
+
+        allUsersGroup = getBuiltinGroup(ALL_USERS_GROUP_NAME);
     }
 
     private void initUsersById()
@@ -115,6 +119,11 @@ public class DefaultUserManager implements UserManager, ConfigurationInjector.Co
         {
             userConfigsById.put(user.getUserId(), user);
         }
+    }
+
+    private BuiltinGroupConfiguration getBuiltinGroup(String name)
+    {
+        return configurationProvider.get(PathUtils.getPath(ConfigurationRegistry.GROUPS_SCOPE, name), BuiltinGroupConfiguration.class);
     }
 
     /**
@@ -165,7 +174,7 @@ public class DefaultUserManager implements UserManager, ConfigurationInjector.Co
         user = getUser(user.getId());
         long number = user.getNextBuildNumber();
         user.setNextBuildNumber(number + 1);
-        save(user);
+        userDao.save(user);
         return number;
     }
 
@@ -199,6 +208,7 @@ public class DefaultUserManager implements UserManager, ConfigurationInjector.Co
     public AcegiUser getPrinciple(User user)
     {
         AcegiUser principle = new AcegiUser(user, groupsByUser.get(user.getConfig()));
+        principle.addGroup(allUsersGroup);
         getLdapManager().addLdapRoles(principle);
         return principle;
     }
@@ -213,8 +223,8 @@ public class DefaultUserManager implements UserManager, ConfigurationInjector.Co
      * the returned details are not fully initialised!  Use #getUserDetails
      * instead.
      *
-     * @param username
-     * @return
+     * @param username login of the user to retrieve
+     * @return the user details for the given login
      * @throws UsernameNotFoundException
      * @throws DataAccessException
      */
@@ -226,7 +236,9 @@ public class DefaultUserManager implements UserManager, ConfigurationInjector.Co
             throw new UsernameNotFoundException("Unknown user");
         }
 
-        return new AcegiUser(user, groupsByUser.get(user.getConfig()));
+        AcegiUser principle = new AcegiUser(user, groupsByUser.get(user.getConfig()));
+        principle.addGroup(allUsersGroup);
+        return principle;
     }
 
     public void setPassword(UserConfiguration user, String rawPassword)

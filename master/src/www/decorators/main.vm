@@ -178,9 +178,7 @@
         <li><a #if($selectedTab && $selectedTab == "projects")       class="active" #end id="tab.projects" href="$base/browse/">browse</a></li>
         <li><a #if($selectedTab && $selectedTab == "queues")         class="active" #end id="tab.queues" href="$base/viewServerQueues.action">queues</a></li>
         <li><a #if($selectedTab && $selectedTab == "agents")         class="active" #end id="tab.agents" href="$base/agents/">agents</a></li>
-        #auth("action=ADMINISTER")
         <li><a #if($selectedTab && $selectedTab == "administration") class="active" #end id="tab.administration" href="$base/admin/projects/">administration</a></li>
-        #end
       </ul>
       <div class="clear"></div>
       </div>

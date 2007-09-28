@@ -6,8 +6,6 @@
 <beans>
     <bean id="objectFactory" class="com.zutubi.pulse.spring.SpringObjectFactory"/>
 
-    <bean id="threadFactory" class="com.zutubi.pulse.security.PulseThreadFactory"/>
-
     <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
         <property name="threadFactory" ref="threadFactory"/>
     </bean>

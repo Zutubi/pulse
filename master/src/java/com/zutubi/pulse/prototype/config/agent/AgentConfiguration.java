@@ -1,17 +1,14 @@
 package com.zutubi.pulse.prototype.config.agent;
 
-import com.zutubi.config.annotations.ControllingCheckbox;
-import com.zutubi.config.annotations.Form;
-import com.zutubi.config.annotations.Internal;
-import com.zutubi.config.annotations.NoInherit;
-import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.Table;
+import com.zutubi.config.annotations.*;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.core.config.NamedConfiguration;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.validation.annotations.Numeric;
 import com.zutubi.validation.annotations.Required;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,6 +29,17 @@ public class AgentConfiguration extends AbstractConfiguration implements NamedCo
     @Numeric(min = 1)
     private int port = 8090;
     private Map<String, Resource> resources;
+    private List<AgentAclConfiguration> permissions = new LinkedList<AgentAclConfiguration>();
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
 
     public boolean isRemote()
     {
@@ -83,13 +91,18 @@ public class AgentConfiguration extends AbstractConfiguration implements NamedCo
         this.resources = resources;
     }
 
-    public String getName()
+    public List<AgentAclConfiguration> getPermissions()
     {
-        return name;
+        return permissions;
     }
 
-    public void setName(String name)
+    public void setPermissions(List<AgentAclConfiguration> permissions)
     {
-        this.name = name;
+        this.permissions = permissions;
+    }
+
+    public void addPermission(AgentAclConfiguration permission)
+    {
+        permissions.add(permission);
     }
 }

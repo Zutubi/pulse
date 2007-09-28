@@ -12,7 +12,7 @@ import java.util.List;
 
 /**
  * Provides options for the available project authorities, which includes
- * built in authorities like read and write as well as authorities mapped to
+ * built in authorities like view and write as well as authorities mapped to
  * actions.
  */
 public class ProjectAuthorityProvider extends ListOptionProvider

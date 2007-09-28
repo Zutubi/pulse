@@ -4,8 +4,10 @@ import com.zutubi.prototype.config.*;
 import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.prototype.security.Actor;
 import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.DefaultSetupManager;
 import com.zutubi.pulse.core.BuildException;
@@ -25,6 +27,8 @@ import com.zutubi.pulse.model.persistence.ProjectDao;
 import com.zutubi.pulse.model.persistence.TestCaseIndexDao;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.prototype.config.LabelConfiguration;
+import com.zutubi.pulse.prototype.config.group.AbstractGroupConfiguration;
+import com.zutubi.pulse.prototype.config.project.ProjectAclConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.project.types.TypeConfiguration;
 import com.zutubi.pulse.scheduling.Scheduler;
@@ -118,12 +122,35 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
     {
         if (DefaultSetupManager.initialInstallation)
         {
-            CompositeType projectType = typeRegistry.getType(ProjectConfiguration.class);
-            MutableRecord globalTemplate = projectType.createNewRecord(true);
-            globalTemplate.put("name", GLOBAL_PROJECT_NAME);
-            globalTemplate.put("description", "The global template is the base of the project template hierarchy.  Configuration shared among all projects should be added here.");
-            configurationTemplateManager.markAsTemplate(globalTemplate);
-            configurationTemplateManager.insertRecord(ConfigurationRegistry.PROJECTS_SCOPE, globalTemplate);
+            try
+            {
+                ProjectConfiguration globalProject = new ProjectConfiguration();
+                globalProject.setName(GLOBAL_PROJECT_NAME);
+                globalProject.setDescription("The global template is the base of the project template hierarchy.  Configuration shared among all projects should be added here.");
+                globalProject.setPermanent(true);
+                
+                // All users can view all projects by default.
+                AbstractGroupConfiguration group = configurationProvider.get(PathUtils.getPath(ConfigurationRegistry.GROUPS_SCOPE, UserManager.ALL_USERS_GROUP_NAME), AbstractGroupConfiguration.class);
+                globalProject.addPermission(new ProjectAclConfiguration(group, AccessManager.ACTION_VIEW));
+
+                // Anonymous users can view all projects by default (but only
+                // when anonymous access is explicitly enabled).
+                group = configurationProvider.get(PathUtils.getPath(ConfigurationRegistry.GROUPS_SCOPE, UserManager.ANONYMOUS_USERS_GROUP_NAME), AbstractGroupConfiguration.class);
+                globalProject.addPermission(new ProjectAclConfiguration(group, AccessManager.ACTION_VIEW));
+                
+                // Project admins can do just that
+                group = configurationProvider.get(PathUtils.getPath(ConfigurationRegistry.GROUPS_SCOPE, UserManager.PROJECT_ADMINS_GROUP_NAME), AbstractGroupConfiguration.class);
+                globalProject.addPermission(new ProjectAclConfiguration(group, AccessManager.ACTION_ADMINISTER));
+
+                CompositeType projectType = typeRegistry.getType(ProjectConfiguration.class);
+                MutableRecord globalTemplate = projectType.unstantiate(globalProject);
+                configurationTemplateManager.markAsTemplate(globalTemplate);
+                configurationTemplateManager.insertRecord(ConfigurationRegistry.PROJECTS_SCOPE, globalTemplate);
+            }
+            catch (TypeException e)
+            {
+                LOG.severe("Unable to create global project template: " + e.getMessage(), e);
+            }
         }
     }
 

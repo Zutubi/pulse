@@ -24,8 +24,8 @@ public class ConfigurationTemplateManager
 {
     private static final Logger LOG = Logger.getLogger(ConfigurationTemplateManager.class);
 
-    private static final String PARENT_KEY = "parentHandle";
-    private static final String TEMPLATE_KEY = "template";
+    private static final String PARENT_KEY    = "parentHandle";
+    private static final String TEMPLATE_KEY  = "template";
 
     private DefaultInstanceCache instances = new DefaultInstanceCache();
     private DefaultInstanceCache incompleteInstances = new DefaultInstanceCache();
@@ -420,6 +420,7 @@ public class ConfigurationTemplateManager
         List<String> allowedTypes = new LinkedList<String>();
         allowedTypes.add(expectedType.getSymbolicName());
         allowedTypes.addAll(expectedType.getExtensions());
+        allowedTypes.addAll(expectedType.getInternalExtensions());
         CompositeType gotType = typeRegistry.getType(symbolicName);
         if (gotType == null)
         {
@@ -1174,6 +1175,16 @@ public class ConfigurationTemplateManager
         checkPersistent(path);
         configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_DELETE);
 
+        Record record = recordManager.select(path);
+        if(record == null)
+        {
+            throw new IllegalArgumentException("No such path '" + path + "'");
+        }
+        if(record.isPermanent())
+        {
+            throw new IllegalArgumentException("Cannot delete instance at path '" + path + "': marked permanent");
+        }
+        
         List<PostDeleteEvent> events = new LinkedList<PostDeleteEvent>();
         for (String concretePath : getDescendentPaths(path, false, true))
         {
@@ -1217,6 +1228,7 @@ public class ConfigurationTemplateManager
             Configuration clone = (Configuration) instantiator.instantiate(type, record);
             clone.setConfigurationPath(instance.getConfigurationPath());
             clone.setHandle(instance.getHandle());
+            clone.setPermanent(instance.isPermanent());
             return (T) clone;
         }
         catch (TypeException e)

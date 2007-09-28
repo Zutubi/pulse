@@ -28,6 +28,10 @@ public class CompositeType extends AbstractType implements ComplexType
      * The list of symbolic names of types that 'extend' this type.
      */
     private List<String> extensions = new LinkedList<String>();
+    /**
+     * Extensions that are created internally but not via UIs.
+     */
+    private List<String> internalExtensions = new LinkedList<String>();
 
     /**
      * Those properties that are marked with the @Internal annotation.
@@ -198,9 +202,14 @@ public class CompositeType extends AbstractType implements ComplexType
         return Collections.unmodifiableList(extensions);
     }
 
-    public void setExtensions(List<String> extensions)
+    public void addInternalExtension(String symbolicName)
     {
-        this.extensions = extensions;
+        internalExtensions.add(symbolicName);
+    }
+
+    public List<String> getInternalExtensions()
+    {
+        return Collections.unmodifiableList(internalExtensions);
     }
 
     public Configuration instantiate(Object data, Instantiator instantiator) throws TypeException
@@ -295,6 +304,14 @@ public class CompositeType extends AbstractType implements ComplexType
             for (TypeProperty property : internalProperties.values())
             {
                 unstantiateProperty(property, instance, result);
+            }
+
+            if(instance instanceof Configuration)
+            {
+                if(((Configuration)instance).isPermanent())
+                {
+                    result.setPermanent(true);
+                }
             }
 
             return result;
@@ -494,7 +511,7 @@ public class CompositeType extends AbstractType implements ComplexType
 
     public CompositeType getActualType(Object value)
     {
-        if(value == null || getExtensions().size() == 0)
+        if(value == null || extensions.size() == 0 && internalExtensions.size() == 0)
         {
             return this;
         }

@@ -5,6 +5,7 @@ import com.zutubi.pulse.security.AcegiSecurityManager;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.ThreadFactory;
 
 /**
  */
@@ -13,6 +14,7 @@ public class ProcessSetupStartupTask implements Runnable, StartupTask
     private List<String> coreContexts;
     private List<String> setupContexts;
     private Semaphore setupCompleteFlag = new Semaphore(0);
+    private ThreadFactory threadFactory;
 
     public ProcessSetupStartupTask()
     {
@@ -36,7 +38,7 @@ public class ProcessSetupStartupTask implements Runnable, StartupTask
         // i) set the system starting pages (periodically refresh)
         webManager.deploySetup();
 
-        Thread setupThread = new Thread(this);
+        Thread setupThread = threadFactory.newThread(this);
         setupThread.start();
         try
         {
@@ -66,5 +68,10 @@ public class ProcessSetupStartupTask implements Runnable, StartupTask
     public void finaliseSetup()
     {
         setupCompleteFlag.release();
+    }
+
+    public void setThreadFactory(ThreadFactory threadFactory)
+    {
+        this.threadFactory = threadFactory;
     }
 }

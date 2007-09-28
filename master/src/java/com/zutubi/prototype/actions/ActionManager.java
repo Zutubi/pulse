@@ -40,7 +40,7 @@ public class ActionManager
                     result.add(AccessManager.ACTION_VIEW);
                 }
 
-                if(configurationSecurityManager.hasPermission(path, AccessManager.ACTION_DELETE))
+                if(!configurationInstance.isPermanent() && configurationSecurityManager.hasPermission(path, AccessManager.ACTION_DELETE))
                 {
                     result.add(AccessManager.ACTION_DELETE);
                 }

@@ -92,5 +92,7 @@ public interface Record
      */
     long getHandle();
 
+    boolean isPermanent();
+
     boolean isCollection();
 }

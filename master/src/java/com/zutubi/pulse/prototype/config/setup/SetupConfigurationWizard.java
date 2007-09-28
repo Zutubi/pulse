@@ -11,10 +11,12 @@ import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.SetupManager;
 import com.zutubi.pulse.bootstrap.SystemConfigurationSupport;
 import com.zutubi.pulse.model.AcegiUser;
+import com.zutubi.pulse.model.GrantedAuthority;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.prototype.config.admin.EmailConfiguration;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
+import com.zutubi.pulse.prototype.config.group.BuiltinGroupConfiguration;
 import com.zutubi.pulse.prototype.config.group.GroupConfiguration;
 import com.zutubi.pulse.prototype.config.group.ServerPermission;
 import com.zutubi.pulse.prototype.config.user.UserConfiguration;
@@ -119,25 +121,38 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
 
             // create the admin user.
             UserConfiguration adminUser = new UserConfiguration();
+            adminUser.setPermanent(true);
             adminUser.setLogin(adminConfig.getLogin());
             adminUser.setName(adminConfig.getName());
             adminUser.setPassword(adminConfig.getPassword());
             adminUser.addDirectAuthority(ServerPermission.ADMINISTER.toString());
             configurationTemplateManager.insert(ConfigurationRegistry.USERS_SCOPE, adminUser);
 
+            // Special all-users group.
+            BuiltinGroupConfiguration allUsersGroup = new BuiltinGroupConfiguration(UserManager.ALL_USERS_GROUP_NAME, GrantedAuthority.USER);
+            allUsersGroup.setPermanent(true);
+            configurationTemplateManager.insert(ConfigurationRegistry.GROUPS_SCOPE, allUsersGroup);
+
+            // Special anonymous users group.
+            BuiltinGroupConfiguration anonymousUsersGroup = new BuiltinGroupConfiguration(UserManager.ANONYMOUS_USERS_GROUP_NAME, GrantedAuthority.GUEST);
+            allUsersGroup.setPermanent(true);
+            configurationTemplateManager.insert(ConfigurationRegistry.GROUPS_SCOPE, anonymousUsersGroup);
+            
             // create an administrators group (for convenience)
-            GroupConfiguration adminGroup = new GroupConfiguration("administrators");
+            GroupConfiguration adminGroup = new GroupConfiguration(UserManager.ADMINS_GROUP_NAME);
             adminGroup.addServerPermission(ServerPermission.ADMINISTER);
             adminGroup.addServerPermission(ServerPermission.PERSONAL_BUILD);
             configurationTemplateManager.insert(ConfigurationRegistry.GROUPS_SCOPE, adminGroup);
 
-            // and a project admins group that has write access to all projects
-            GroupConfiguration projectAdmins = new GroupConfiguration("project administrators");
+            // and a project admins group that has admin access to all projects
+            GroupConfiguration projectAdmins = new GroupConfiguration(UserManager.PROJECT_ADMINS_GROUP_NAME);
             projectAdmins.addServerPermission(ServerPermission.PERSONAL_BUILD);
+            projectAdmins.addServerPermission(ServerPermission.CREATE_PROJECT);
+            projectAdmins.addServerPermission(ServerPermission.DELETE_PROJECT);
             configurationTemplateManager.insert(ConfigurationRegistry.GROUPS_SCOPE, projectAdmins);
 
             // and a developers group that has personal build access (for convenience)
-            GroupConfiguration developersGroup = new GroupConfiguration("developers");
+            GroupConfiguration developersGroup = new GroupConfiguration(UserManager.DEVELOPERS_GROUP_NAME);
             developersGroup.addServerPermission(ServerPermission.PERSONAL_BUILD);
             configurationTemplateManager.insert(ConfigurationRegistry.GROUPS_SCOPE, developersGroup);
 

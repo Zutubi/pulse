@@ -5,14 +5,15 @@ import com.zutubi.config.annotations.Reference;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Table;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
-import com.zutubi.pulse.prototype.config.group.GroupConfiguration;
+import com.zutubi.pulse.prototype.config.group.AbstractGroupConfiguration;
 import com.zutubi.validation.annotations.Required;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Represents the authority to perform some action on some group of projects.
+ * Represents the authority to perform some action on some project.
  */
 @SymbolicName("zutubi.projectAclConfig")
 @Table(columns = {"group", "allowedActions"})
@@ -20,16 +21,26 @@ public class ProjectAclConfiguration extends AbstractConfiguration
 {
     @Reference
     @Required
-    private GroupConfiguration group;
+    private AbstractGroupConfiguration group;
     @ItemPicker(optionProvider = "ProjectAuthorityProvider")
     private List<String> allowedActions = new LinkedList<String>();
 
-    public GroupConfiguration getGroup()
+    public ProjectAclConfiguration()
+    {
+    }
+
+    public ProjectAclConfiguration(AbstractGroupConfiguration group, String... allowedActions)
+    {
+        this.group = group;
+        this.allowedActions.addAll(Arrays.asList(allowedActions));
+    }
+
+    public AbstractGroupConfiguration getGroup()
     {
         return group;
     }
 
-    public void setGroup(GroupConfiguration group)
+    public void setGroup(AbstractGroupConfiguration group)
     {
         this.group = group;
     }

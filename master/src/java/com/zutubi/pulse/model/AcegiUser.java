@@ -1,6 +1,7 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.prototype.security.Actor;
+import com.zutubi.pulse.prototype.config.group.AbstractGroupConfiguration;
 import com.zutubi.pulse.prototype.config.group.GroupConfiguration;
 import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 import org.acegisecurity.userdetails.UserDetails;
@@ -47,11 +48,16 @@ public class AcegiUser implements Actor, UserDetails
         {
             for(GroupConfiguration g: groups)
             {
-                for(String a: g.getGrantedAuthorities())
-                {
-                    authoritySet.add(a);
-                }
+                addGroupAuthorities(g);
             }
+        }
+    }
+
+    private void addGroupAuthorities(AbstractGroupConfiguration g)
+    {
+        for(String a: g.getGrantedAuthorities())
+        {
+            authoritySet.add(a);
         }
     }
 
@@ -110,9 +116,9 @@ public class AcegiUser implements Actor, UserDetails
         return ldapAuthentication;
     }
 
-    public synchronized void addTransientAuthority(String authority)
+    public synchronized void addGroup(AbstractGroupConfiguration group)
     {
-        authoritySet.add(authority);
+        addGroupAuthorities(group);
         authorities = null;
     }
 }

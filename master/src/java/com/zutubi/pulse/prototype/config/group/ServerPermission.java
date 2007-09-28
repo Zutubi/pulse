@@ -8,7 +8,5 @@ public enum ServerPermission
     ADMINISTER,
     PERSONAL_BUILD,
     CREATE_PROJECT,
-    DELETE_PROJECT,
-    CREATE_USER,
-    DELETE_USER
+    DELETE_PROJECT
 }

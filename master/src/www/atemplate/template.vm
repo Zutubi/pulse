@@ -12,6 +12,7 @@
         <td>jump to the configuration for this #i18n("key=label") #if(!$concrete) template #end</td>
     </tr>
 #if(!$concrete)
+#auth("path=$path" "action=create")
     <tr>
         #actionHeader("add.new" "add new" "add" "addToPath('$path', false)")
         <td>add a new #i18n("key=label") as a child of this template</td>
@@ -21,35 +22,13 @@
         <td>add a new #i18n("key=label") template as a child of this template</td>
     </tr>
 #end
-#if(!$rootTemplate || $node.children.size() == 0)
+#end
+#if(!$permanent && $node.children.size() == 0)
+#auth("path=$path" "action=delete")
     <tr>
         #actionHeader("delete" "delete" "delete" "deletePath('$path')")
         <td>delete this #i18n("key=label") #if(!$concrete) template #end</td>
     </tr>
 #end
-</table>
-
-<!--
-#if(!$rootTemplate || $node.children.size() > 0)
-<div class="panel">
-    <h3 class="header">navigate</h3>
-    #if($node.parent)
-    <p>
-    Parent:
-        <a href="#" onclick="selectTemplate('$node.parent.templatePath')">$!webwork.htmlEncode($node.parent.id)</a>
-    </p>
-    #end
-
-    #if($node.children.size() > 0)
-    <p>
-    Children:
-        <ul class="template-children">
-    #foreach($child in $node.children)
-            <li><a href="#" onclick="selectTemplate('$child.templatePath'); return false">$!webwork.htmlEncode($child.id)</a></li>
-    #end
-        </ul>
-    </p>
-    #end
-</div>
 #end
--->
+</table>

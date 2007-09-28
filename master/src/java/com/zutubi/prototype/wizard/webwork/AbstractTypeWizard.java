@@ -79,14 +79,15 @@ public abstract class AbstractTypeWizard implements Wizard
         }
         else
         {
-            int extensionCount = baseType.getExtensions().size();
+            List<String> extensions = baseType.getExtensions();
+            int extensionCount = extensions.size();
             if(extensionCount < 2)
             {
                 // No point showing the first state, just check if we are
                 // configuring a type itself or a type with only one extension.
                 if(extensionCount == 1)
                 {
-                    type = typeRegistry.getType(baseType.getExtensions().get(0));
+                    type = typeRegistry.getType(extensions.get(0));
                 }
 
                 return addSingleStepState(previousStates, parentPath, baseType, type, null);

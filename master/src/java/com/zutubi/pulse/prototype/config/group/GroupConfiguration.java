@@ -4,7 +4,6 @@ import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.Reference;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Transient;
-import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
 import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 
 import java.util.LinkedList;
@@ -16,11 +15,10 @@ import java.util.List;
  */
 @SymbolicName("zutubi.groupConfig")
 @Form(fieldOrder = {"name", "members", "serverPermissions"})
-public class GroupConfiguration extends AbstractNamedConfiguration
+public class GroupConfiguration extends AbstractGroupConfiguration
 {
     @Reference
     private List<UserConfiguration> members = new LinkedList<UserConfiguration>();
-    private List<ServerPermission> serverPermissions = new LinkedList<ServerPermission>();
 
     public GroupConfiguration()
     {
@@ -41,38 +39,9 @@ public class GroupConfiguration extends AbstractNamedConfiguration
         this.members = members;
     }
 
-    public List<ServerPermission> getServerPermissions()
-    {
-        return serverPermissions;
-    }
-
-    public void setServerPermissions(List<ServerPermission> serverPermissions)
-    {
-        this.serverPermissions = serverPermissions;
-    }
-
-    public void addServerPermission(ServerPermission permission)
-    {
-        serverPermissions.add(permission);
-    }
-
     @Transient
     public String getDefaultAuthority()
     {
         return "group:" + getName();
-    }
-
-    @Transient
-    public String[] getGrantedAuthorities()
-    {
-        String[] result = new String[serverPermissions.size() + 1];
-        int i = 0;
-        for(ServerPermission perm: serverPermissions)
-        {
-            result[i++] = perm.toString();
-        }
-
-        result[i] = getDefaultAuthority();
-        return result;
     }
 }

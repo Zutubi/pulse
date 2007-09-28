@@ -821,9 +821,9 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             return onlineAgents.get(handle);
         }
 
-        public void pingAgent(long handle)
+        public void pingAgent(AgentConfiguration agentConfig)
         {
-            throw new RuntimeException("Method not implemented.");
+            throw new RuntimeException("Method not yet implemented.");
         }
 
         public void pingAgents()
@@ -853,17 +853,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             onlineAgents.put(agentConfig.getHandle(), agent);
         }
 
-        public void enableAgent(long handle)
-        {
-            throw new RuntimeException("Method not yet implemented.");
-        }
-
-        public void disableAgent(long handle)
-        {
-            throw new RuntimeException("Method not yet implemented.");
-        }
-
-        public void setAgentState(long handle, AgentState.EnableState state)
+        public void setAgentState(AgentConfiguration agent, AgentState.EnableState state)
         {
             throw new RuntimeException("Method not yet implemented.");
         }

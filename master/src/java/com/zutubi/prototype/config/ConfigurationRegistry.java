@@ -15,6 +15,8 @@ import com.zutubi.pulse.core.config.ConfigurationCreator;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
+import com.zutubi.pulse.prototype.config.group.AbstractGroupConfiguration;
+import com.zutubi.pulse.prototype.config.group.BuiltinGroupConfiguration;
 import com.zutubi.pulse.prototype.config.group.GroupConfiguration;
 import com.zutubi.pulse.prototype.config.group.ServerPermission;
 import com.zutubi.pulse.prototype.config.misc.LoginConfiguration;
@@ -84,9 +86,8 @@ public class ConfigurationRegistry
             // Security
             configurationSecurityManager.registerGlobalPermission(PROJECTS_SCOPE, AccessManager.ACTION_CREATE, ServerPermission.CREATE_PROJECT.toString());
             configurationSecurityManager.registerGlobalPermission(PROJECTS_SCOPE, AccessManager.ACTION_DELETE, ServerPermission.DELETE_PROJECT.toString());
-            configurationSecurityManager.registerGlobalPermission(USERS_SCOPE, AccessManager.ACTION_CREATE, ServerPermission.CREATE_USER.toString());
-            configurationSecurityManager.registerGlobalPermission(USERS_SCOPE, AccessManager.ACTION_DELETE, ServerPermission.DELETE_USER.toString());
 
+            configurationSecurityManager.registerOwnedScope(AGENTS_SCOPE);
             configurationSecurityManager.registerOwnedScope(PROJECTS_SCOPE);
             configurationSecurityManager.registerOwnedScope(USERS_SCOPE);
             
@@ -227,9 +228,16 @@ public class ConfigurationRegistry
 
             // group configuration .
 
+            CompositeType groupConfig = registerConfigurationType(AbstractGroupConfiguration.class);
+            registerConfigurationType(GroupConfiguration.class);
+            registerConfigurationType(BuiltinGroupConfiguration.class);
+
+            groupConfig.addExtension("zutubi.groupConfig");
+            groupConfig.addInternalExtension("zutubi.builtinGroupConfig");
+
             MapType groupCollection = new MapType();
             groupCollection.setTypeRegistry(typeRegistry);
-            groupCollection.setCollectionType(registerConfigurationType(GroupConfiguration.class));
+            groupCollection.setCollectionType(groupConfig);
 
             configurationPersistenceManager.register(GROUPS_SCOPE, groupCollection);
 

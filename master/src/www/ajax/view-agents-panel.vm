@@ -4,19 +4,27 @@
         #contentHeading("agent.name" 1)
         #contentHeading("agent.location" 1)
         #contentHeading("agent.status" 1)
-#auth("action=ADMINISTER")
         #contentHeading("actions" 3)
-#end
     </tr>
 #foreach($agent in $agents)
+    #set($span = 3)
+#auth("resource=agent" "action=ping")
+    #set($span = $span - 1)
+#end
+#auth("resource=agent" "action=disable")
+    #set($span = $span - 1)
+#end
+
     <tr>
         #set($h_agentName = $!webwork.htmlEncode($agent.config.name))
         #dynamicLinkCell($h_agentName "$urls.agentStatus($agent)")
         #staticCell($agent.location)
         #if($agent.enabled)
             #staticCell($agent.status.prettyString)
-#auth("action=ADMINISTER")
+#auth("resource=agent" "action=ping")
             #linkCell("agent.ping.$agent.config.name" "agent.ping" "$urls.agentAction($agent, 'ping')")
+#end
+#auth("resource=agent" "action=disable")
             #linkCell("agent.disable.$agent.config.name" "agent.disable" "$urls.agentAction($agent, 'disable')")
 #end
         #else
@@ -24,28 +32,32 @@
                 #set($status = "$action.getText('agent.upgrading') [$agent.upgradeState.toString().toLowerCase()]")
 
                 #staticCell($status)
-#auth("action=ADMINISTER")
+#auth("resource=agent" "action=ping")
                 #contentCell("agent.ping")
+#end
+#auth("resource=agent" "action=disable")
                 #contentCell("agent.enable")
 #end
             #elseif($action.failedUpgrade($agent))
                 #contentCell("agent.failed.upgrade")
-#auth("action=ADMINISTER")
+#auth("resource=agent" "action=ping")
                 #contentCell("agent.ping")
+#end
+#auth("resource=agent" "action=enable")
                 #linkCell("agent.enable.$agent.config.name" "agent.enable" "$urls.agentAction($agent, 'enable')")
 #end
             #else
                 ## Just plain disabled
                 #contentCell("agent.disabled")
-#auth("action=ADMINISTER")
+#auth("resource=agent" "action=ping")
                 #contentCell("agent.ping")
+#end
+#auth("resource=agent" "action=disable")
                 #linkCell("agent.enable.$agent.config.name" "agent.enable" "$urls.agentAction($agent, 'enable')")
 #end
             #end
         #end
-#auth("action=ADMINISTER")
-        #editCell("$base/admin/${agent.config.configurationPath}/" "edit_$h_agentName")
-#end
+        #editCellSpan("$base/admin/${agent.config.configurationPath}/" "edit_$h_agentName" $span)
     </tr>
 #end
 </table>

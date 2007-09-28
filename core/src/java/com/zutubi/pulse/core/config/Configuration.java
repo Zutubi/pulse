@@ -18,6 +18,10 @@ public interface Configuration
     String getConfigurationPath();
     void setConfigurationPath(String configurationPath);
 
+    @Transient
+    boolean isPermanent();
+    void setPermanent(boolean permanent);
+
     /**
      * @return true if there are no validation errors recorded directly on
      *         this instance.

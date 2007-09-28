@@ -1,5 +1,6 @@
 package com.zutubi.pulse.security;
 
+import com.zutubi.prototype.security.Actor;
 import com.zutubi.pulse.model.AcegiUser;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.prototype.config.group.ServerPermission;
@@ -7,6 +8,7 @@ import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 import org.acegisecurity.Authentication;
 import org.acegisecurity.context.SecurityContextHolder;
 import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
+import org.acegisecurity.providers.anonymous.AnonymousAuthenticationToken;
 import org.acegisecurity.userdetails.UserDetails;
 
 /**
@@ -64,26 +66,27 @@ public class AcegiUtils
      */
     public static String getLoggedInUsername()
     {
-        AcegiUser user = getLoggedInUser();
-        if(user == null)
-        {
-            return null;
-        }
-        else
-        {
-            return user.getUsername();
-        }
+        Actor actor = getLoggedInUser();
+        return actor == null ? null : actor.getUsername();
     }
 
-    public static AcegiUser getLoggedInUser()
+    public static Actor getLoggedInUser()
     {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null)
         {
-            Object principle = authentication.getPrincipal();
-            if (principle instanceof AcegiUser)
+            if(authentication instanceof AnonymousAuthenticationToken)
             {
-                return ((AcegiUser) principle);
+                AnonymousAuthenticationToken token = (AnonymousAuthenticationToken) authentication;
+                return new AnonymousActor(token);
+            }
+            else
+            {
+                Object principle = authentication.getPrincipal();
+                if (principle instanceof AcegiUser)
+                {
+                    return ((AcegiUser) principle);
+                }
             }
         }
         return null;

@@ -117,11 +117,14 @@ public class ConfigurationSecurityManager
                     }
 
                     // No direct permission, see if any descendents have permission.
-                    for(String descendentPath: configurationTemplateManager.getDescendentPaths(resource.getConfigurationPath(), true, false))
+                    if (resource != null)
                     {
-                        if(accessManager.hasPermission(action, configurationTemplateManager.getInstance(descendentPath)))
+                        for(String descendentPath: configurationTemplateManager.getDescendentPaths(resource.getConfigurationPath(), true, false))
                         {
-                            return true;
+                            if(accessManager.hasPermission(action, configurationTemplateManager.getInstance(descendentPath)))
+                            {
+                                return true;
+                            }
                         }
                     }
 

@@ -1,7 +1,9 @@
 package com.zutubi.pulse.velocity;
 
+import com.opensymphony.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.xwork.util.OgnlValueStack;
+import com.zutubi.prototype.config.ConfigurationSecurityManager;
 import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import org.apache.velocity.context.InternalContextAdapter;
@@ -16,12 +18,16 @@ import java.util.Map;
 
 /**
  * A velocity directive that allows a block to be shown only if the logged in
- * user has the authority to perform an action on some given resource or on
- * the server (when no resource is specified).
+ * user has the authority to perform an action on some given resource, path
+ * or globally (when no resource or path is specified).
  * For example:
  *
  * #auth("resource=project" "action=trigger")
  *   <a href="$urls.projectActions($project)trigger/">trigger</a>
+ * #end
+ *
+ * #auth("path=users" "action=create")
+ *   <a href="#" onclick="addToPath('users')">add new</a>
  * #end
  *
  * #auth("action=ADMINISTER")
@@ -33,7 +39,9 @@ public class AuthDirective extends AbstractDirective
     private static final String PARAM_RESOURCE_NAME = "resource";
 
     private AccessManager accessManager;
+    private ConfigurationSecurityManager configurationSecurityManager;
     private Object resource;
+    private String path;
     private String action;
 
     public AuthDirective()
@@ -76,17 +84,26 @@ public class AuthDirective extends AbstractDirective
         }
         wireParams(params);
 
-        if (action != null && accessManager.hasPermission(action, resource))
+        if(action != null)
         {
-            String body = extractBodyContext(node, context);
-            writer.write(body);
+            if(TextUtils.stringSet(path) && configurationSecurityManager.hasPermission(path, action) || accessManager.hasPermission(action, resource))
+            {
+                String body = extractBodyContext(node, context);
+                writer.write(body);
+            }
         }
+        
         return true;
     }
 
     public void setResource(Object resource)
     {
         this.resource = resource;
+    }
+
+    public void setPath(String path)
+    {
+        this.path = path;
     }
 
     public void setAction(String action)
@@ -97,5 +114,10 @@ public class AuthDirective extends AbstractDirective
     public void setAccessManager(AccessManager accessManager)
     {
         this.accessManager = accessManager;
+    }
+
+    public void setConfigurationSecurityManager(ConfigurationSecurityManager configurationSecurityManager)
+    {
+        this.configurationSecurityManager = configurationSecurityManager;
     }
 }

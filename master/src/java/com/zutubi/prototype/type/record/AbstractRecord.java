@@ -12,6 +12,7 @@ import java.util.Set;
 public abstract class AbstractRecord implements Record
 {
     protected static final String HANDLE_KEY = "handle";
+    protected static final String PERMANENT_KEY = "permanent";
     protected static final long UNDEFINED = 0;
 
     public long getHandle()
@@ -30,6 +31,11 @@ public abstract class AbstractRecord implements Record
         }
 
         return UNDEFINED;
+    }
+
+    public boolean isPermanent()
+    {
+        return Boolean.valueOf(getMeta(PERMANENT_KEY));
     }
 
     public boolean isCollection()
