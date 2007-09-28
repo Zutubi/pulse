@@ -85,7 +85,7 @@ public class ConfigurationRegistry
         {
             // Security
             configurationSecurityManager.registerGlobalPermission(PROJECTS_SCOPE, AccessManager.ACTION_CREATE, ServerPermission.CREATE_PROJECT.toString());
-            configurationSecurityManager.registerGlobalPermission(PROJECTS_SCOPE, AccessManager.ACTION_DELETE, ServerPermission.DELETE_PROJECT.toString());
+            configurationSecurityManager.registerGlobalPermission(PathUtils.getPath(PROJECTS_SCOPE, PathUtils.WILDCARD_ANY_ELEMENT), AccessManager.ACTION_DELETE, ServerPermission.DELETE_PROJECT.toString());
 
             configurationSecurityManager.registerOwnedScope(AGENTS_SCOPE);
             configurationSecurityManager.registerOwnedScope(PROJECTS_SCOPE);

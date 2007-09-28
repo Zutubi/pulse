@@ -13,7 +13,7 @@ import java.util.*;
  */
 public class ConfigurationSecurityManager
 {
-    private Map<PathPermission, String> globalPermissions = new HashMap<PathPermission, String>();
+    private List<PathPermission> globalPermissions = new LinkedList<PathPermission>();
     private Set<String> ownedScopes = new HashSet<String>();
 
     private AccessManager accessManager;
@@ -26,14 +26,14 @@ public class ConfigurationSecurityManager
      * "FooConfiguration" (action "create" on path "foo") may be mapped to a
      * global "CREATE_FOO" action.
      *
-     * @param path         path for the action to be mapped
+     * @param pathPattern  path pattern for the action to be mapped
      * @param action       the action to be mapped
      * @param globalAction the global action that should be used in place of
      *                     the normal path/action check
      */
-    public void registerGlobalPermission(String path, String action, String globalAction)
+    public void registerGlobalPermission(String pathPattern, String action, String globalAction)
     {
-        globalPermissions.put(new PathPermission(path, action), globalAction);
+        globalPermissions.add(new PathPermission(pathPattern, action, globalAction));
     }
 
     /**
@@ -100,7 +100,7 @@ public class ConfigurationSecurityManager
      */
     public boolean hasPermission(String path, String action)
     {
-        String global = globalPermissions.get(new PathPermission(path, action));
+        String global = getGlobalPermission(path, action);
         if(global == null)
         {
             if(configurationTemplateManager.isPersistent(path))
@@ -135,8 +135,12 @@ public class ConfigurationSecurityManager
                     if(AccessManager.ACTION_CREATE.equals(action) || AccessManager.ACTION_DELETE.equals(action))
                     {
                         // Create and delete permissions are translated to a write to
-                        // the parent path (which is the path passed through).
+                        // the parent path (which is the path passed through for create).
                         action = AccessManager.ACTION_WRITE;
+                        if(AccessManager.ACTION_DELETE.equals(action))
+                        {
+                            path = PathUtils.getParentPath(path);
+                        }
                     }
 
                     Configuration resource = findOwningResource(path);
@@ -153,6 +157,19 @@ public class ConfigurationSecurityManager
         {
             return accessManager.hasPermission(global, null);
         }
+    }
+
+    private String getGlobalPermission(String path, String action)
+    {
+        for(PathPermission pp: globalPermissions)
+        {
+            if(pp.matches(path, action))
+            {
+                return pp.getGlobalAction();
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -218,41 +235,35 @@ public class ConfigurationSecurityManager
 
     private static class PathPermission
     {
-        private String path;
+        private String pathPattern;
         private String action;
+        private String globalAction;
 
-        public PathPermission(String path, String action)
+        public PathPermission(String pathPattern, String action, String globalAction)
         {
-            this.path = path;
+            this.pathPattern = pathPattern;
             this.action = action;
+            this.globalAction = globalAction;
         }
 
-        public boolean equals(Object o)
+        public String getPathPattern()
         {
-            if (this == o)
-            {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass())
-            {
-                return false;
-            }
-
-            PathPermission that = (PathPermission) o;
-
-            if (action != null ? !action.equals(that.action) : that.action != null)
-            {
-                return false;
-            }
-            return !(path != null ? !path.equals(that.path) : that.path != null);
+            return pathPattern;
         }
 
-        public int hashCode()
+        public String getAction()
         {
-            int result;
-            result = (path != null ? path.hashCode() : 0);
-            result = 31 * result + (action != null ? action.hashCode() : 0);
-            return result;
+            return action;
+        }
+
+        public String getGlobalAction()
+        {
+            return globalAction;
+        }
+
+        public boolean matches(String path, String action)
+        {
+            return action.equals(this.action) && PathUtils.pathMatches(pathPattern, path);
         }
     }
 }

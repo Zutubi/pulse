@@ -4,6 +4,7 @@ import com.zutubi.config.annotations.Reference;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.prototype.config.events.ConfigurationEvent;
 import com.zutubi.prototype.config.events.PostInsertEvent;
+import com.zutubi.prototype.security.*;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.MapType;
 import com.zutubi.prototype.type.TemplatedMapType;
@@ -18,10 +19,7 @@ import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.validation.annotations.Required;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  *
@@ -60,6 +58,14 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         configurationPersistenceManager.register("template", templatedMap);
         configurationPersistenceManager.register("referer", mapReferer);
         configurationPersistenceManager.register("referee", mapReferee);
+
+        accessManager.registerAuthorityProvider(MockA.class, new AuthorityProvider<MockA>()
+        {
+            public Set<String> getAllowedAuthorities(String action, MockA resource)
+            {
+                return new HashSet<String>(Arrays.asList(action));
+            }
+        });
     }
 
     protected void tearDown() throws Exception
@@ -107,6 +113,28 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         catch(IllegalArgumentException e)
         {
             assertEquals("Invalid insertion path 'sample/a/mock': record already exists (use save to modify)", e.getMessage());
+        }
+    }
+
+    public void testInsertNoPermission()
+    {
+        configurationSecurityManager.registerGlobalPermission("sample", AccessManager.ACTION_CREATE, AccessManager.ACTION_CREATE);
+        accessManager.setActorProvider(new ActorProvider()
+        {
+            public Actor getActor()
+            {
+                return new DefaultActor("test", AccessManager.ACTION_DELETE, AccessManager.ACTION_VIEW, AccessManager.ACTION_WRITE);
+            }
+        });
+
+        try
+        {
+            configurationTemplateManager.insert("sample", new MockA("a"));
+            fail();
+        }
+        catch (Exception e)
+        {
+            assertEquals("Permission to create at path 'sample' denied", e.getMessage());
         }
     }
 
@@ -262,6 +290,31 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         a = configurationTemplateManager.getInstance(path, MockA.class);
         assertEquals(0, a.getCs().size());
     }
+
+    public void testSaveNoPermission()
+    {
+        configurationTemplateManager.insert("sample", new MockA("a"));
+
+        accessManager.setActorProvider(new ActorProvider()
+        {
+            public Actor getActor()
+            {
+                return new DefaultActor("test", AccessManager.ACTION_CREATE, AccessManager.ACTION_DELETE, AccessManager.ACTION_VIEW);
+            }
+        });
+
+        try
+        {
+            configurationTemplateManager.save(configurationTemplateManager.getInstance("sample/a"));
+
+            fail();
+        }
+        catch (Exception e)
+        {
+            assertEquals("Permission to write at path 'sample/a' denied", e.getMessage());
+        }
+    }
+
 
     public void testRename()
     {
@@ -616,6 +669,59 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         // Are both record and instance gone?
         assertNoSuchPath(path);
         assertEmptyMap("sample");
+    }
+
+    public void testDeletePermanent()
+    {
+        try
+        {
+            MockA a = new MockA("mock");
+            a.setPermanent(true);
+            String path = configurationTemplateManager.insert("sample", a);
+
+            configurationTemplateManager.delete(path);
+            fail();
+        }
+        catch(IllegalArgumentException e)
+        {
+            assertEquals("Cannot delete instance at path 'sample/mock': marked permanent", e.getMessage());
+        }
+    }
+
+    public void testDeleteNoPermission()
+    {
+        configurationTemplateManager.insert("sample", new MockA("a"));
+        configurationSecurityManager.registerGlobalPermission("sample/*", AccessManager.ACTION_DELETE, AccessManager.ACTION_DELETE);
+        accessManager.setActorProvider(new ActorProvider()
+        {
+            public Actor getActor()
+            {
+                return new DefaultActor("test", AccessManager.ACTION_CREATE, AccessManager.ACTION_VIEW, AccessManager.ACTION_WRITE);
+            }
+        });
+
+        try
+        {
+            configurationTemplateManager.delete("sample/a");
+            fail();
+        }
+        catch (Exception e)
+        {
+            assertEquals("Permission to delete at path 'sample/a' denied", e.getMessage());
+        }
+    }
+
+    public void testDeleteNonExistant()
+    {
+        try
+        {
+            configurationTemplateManager.delete("sample/nope");
+            fail();
+        }
+        catch(IllegalArgumentException e)
+        {
+            assertEquals("No such path 'sample/nope'", e.getMessage());
+        }
     }
 
     public void testDeleteAllTrivial()
