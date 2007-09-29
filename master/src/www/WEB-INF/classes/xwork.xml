@@ -21,15 +21,12 @@
             <result name="success" type="redirect">/</result>
         </action>
 
-        <!-- FIXME USERS
         <action name="signup" class="com.zutubi.pulse.web.admin.user.SignupUserAction">
             <result name="cancel" type="redirect">/</result>
             <result name="input" type="velocity">signup.vm</result>
             <result name="success" type="redirect">/</result>
-            <result name="disabled" type="velocity">signup.vm</result>
         </action>
-        -->
-        
+
         <action name="dismissWelcome" class="com.zutubi.pulse.web.DismissWelcomeAction">
             <result name="success" type="redirect">/default.action</result>
         </action>

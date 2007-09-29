@@ -36,6 +36,7 @@ import com.zutubi.pulse.prototype.config.user.*;
 import com.zutubi.pulse.prototype.config.user.contacts.ContactConfiguration;
 import com.zutubi.pulse.prototype.config.user.contacts.EmailContactConfiguration;
 import com.zutubi.pulse.prototype.config.user.contacts.JabberContactConfiguration;
+import com.zutubi.pulse.security.GlobalAuthorityProvider;
 import com.zutubi.util.logging.Logger;
 
 import java.util.HashMap;
@@ -84,7 +85,9 @@ public class ConfigurationRegistry
         try
         {
             // Security
+            configurationSecurityManager.registerGlobalPermission(USERS_SCOPE, AccessManager.ACTION_CREATE, GlobalAuthorityProvider.CREATE_USER);
             configurationSecurityManager.registerGlobalPermission(PROJECTS_SCOPE, AccessManager.ACTION_CREATE, ServerPermission.CREATE_PROJECT.toString());
+            configurationSecurityManager.registerGlobalPermission(PathUtils.getPath(PROJECTS_SCOPE, PathUtils.WILDCARD_ANY_ELEMENT), AccessManager.ACTION_CREATE, ServerPermission.CREATE_PROJECT.toString());
             configurationSecurityManager.registerGlobalPermission(PathUtils.getPath(PROJECTS_SCOPE, PathUtils.WILDCARD_ANY_ELEMENT), AccessManager.ACTION_DELETE, ServerPermission.DELETE_PROJECT.toString());
 
             configurationSecurityManager.registerOwnedScope(AGENTS_SCOPE);
@@ -96,6 +99,7 @@ public class ConfigurationRegistry
             configurationPersistenceManager.register(TRANSIENT_SCOPE, transientConfig, false);
 
             registerTransientConfiguration("login", LoginConfiguration.class);
+            registerTransientConfiguration("signup", SignupUserConfiguration.class);
 
             CompositeType typeConfig = registerConfigurationType(TypeConfiguration.class);
             registerConfigurationType(AntTypeConfiguration.class);

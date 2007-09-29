@@ -43,6 +43,11 @@ public class ProjectHierarchyPage extends SeleniumPage
         return urls.adminProjects();
     }
 
+    public boolean isAddPresent()
+    {
+        return selenium.isElementPresent(LINK_ADD);
+    }
+    
     public void clickAdd()
     {
         selenium.click(LINK_ADD);

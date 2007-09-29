@@ -75,6 +75,16 @@ public class XmlRpcHelper
         return (T) xmlRpcClient.execute("RemoteApi." + function, argVector);
     }
 
+    public <T> T getConfig(String path) throws Exception
+    {
+        return (T)call("getConfig", path);
+    }
+
+    public String saveConfig(String path, Hashtable<String, Object> config, boolean deep) throws Exception
+    {
+        return call("saveConfig", path, config, deep);
+    }
+
     public String insertSimpleProject(String name, boolean template) throws Exception
     {
         return insertSimpleProject(name, ProjectManager.GLOBAL_PROJECT_NAME, template);

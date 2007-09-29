@@ -27,6 +27,7 @@ public abstract class SeleniumPage
      * test).
      */
     private String title;
+    private static final String TITLE_PREFIX = ":: pulse :: ";
 
     public SeleniumPage(Selenium selenium, Urls urls, String id)
     {
@@ -58,7 +59,12 @@ public abstract class SeleniumPage
 
         if (title != null)
         {
-            Assert.assertEquals(title, selenium.getTitle());
+            String gotTitle = selenium.getTitle();
+            if(gotTitle.startsWith(TITLE_PREFIX))
+            {
+                gotTitle = gotTitle.substring(TITLE_PREFIX.length());
+            }
+            Assert.assertEquals(title, gotTitle);
         }
     }
 

@@ -4,6 +4,7 @@ import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.forms.admin.AddProjectWizard;
 import com.zutubi.pulse.acceptance.forms.admin.SelectTypeState;
+import com.zutubi.pulse.acceptance.pages.LoginPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.webwork.mapping.Urls;
 import com.zutubi.util.RandomUtils;
@@ -61,11 +62,9 @@ public class SeleniumTestBase extends TestCase
 
     private void login(String username, String password)
     {
-        goTo(urls.login());
-        selenium.type("j_username", username);
-        selenium.type("j_password", password);
-        selenium.click("login");
-        selenium.waitForPageToLoad("30000");
+        LoginPage page = new LoginPage(selenium, urls);
+        page.goTo();
+        page.login(username, password);
     }
 
     protected void loginAsAdmin()
@@ -81,6 +80,11 @@ public class SeleniumTestBase extends TestCase
     protected void assertElementPresent(String id)
     {
         SeleniumUtils.assertElementPresent(selenium, id);
+    }
+
+    protected void assertElementNotPresent(String id)
+    {
+        SeleniumUtils.assertElementNotPresent(selenium, id);
     }
 
     protected void assertTextPresent(String text)

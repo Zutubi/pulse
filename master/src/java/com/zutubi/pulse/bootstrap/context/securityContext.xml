@@ -266,6 +266,9 @@ The beans defined within the security subsystem need not be accessed by other co
                 /signup*.action*=ROLE_ANONYMOUS
                 /login.action*=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER
                 /logout.action=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER
+                /js/**=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER
+                /css/**=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER
+                /images/**=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER
                 /=ROLE_USER,ROLE_GUEST
                 /default.action=ROLE_GUEST,ROLE_USER
                 /xmlrpc/**=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER

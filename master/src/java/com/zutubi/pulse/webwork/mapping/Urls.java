@@ -20,6 +20,11 @@ public class Urls
         this.baseUrl = baseUrl;
     }
 
+    public String base()
+    {
+        return baseUrl + "/";
+    }
+
     public String login()
     {
         return baseUrl + "/login.action";
