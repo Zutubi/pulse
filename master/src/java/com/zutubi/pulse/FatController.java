@@ -1,5 +1,6 @@
 package com.zutubi.pulse;
 
+import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.model.Entity;
@@ -63,6 +64,7 @@ public class FatController implements EventListener, Stoppable
     private UserManager userManager;
     private ServiceTokenManager serviceTokenManager;
     private ThreadFactory threadFactory;
+    private AccessManager accessManager;
 
     /**
      * When the fat controller is enabled, it will handle incoming build requests.
@@ -76,6 +78,7 @@ public class FatController implements EventListener, Stoppable
 
     public void init() throws SchedulerException
     {
+        buildQueue.setAccessManager(accessManager);
         asyncListener = new AsynchronousDelegatingListener(this, threadFactory);
         eventManager.register(asyncListener);
 
@@ -407,4 +410,10 @@ public class FatController implements EventListener, Stoppable
     {
         this.threadFactory = threadFactory;
     }
+
+    public void setAccessManager(AccessManager accessManager)
+    {
+        this.accessManager = accessManager;
+    }
+
 }

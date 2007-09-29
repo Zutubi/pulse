@@ -171,8 +171,6 @@ public interface BuildManager
 
     boolean isSpaceAvailableForBuild();
 
-    boolean canCancel(BuildResult build, User user);
-
     CommandResult getCommandResultByArtifact(long artifactId);
 
     CommandResult getCommandResult(long id, String commandName);

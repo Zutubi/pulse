@@ -88,8 +88,6 @@ public class ViewBuildAction extends CommandActionBase
         getCommandResult();
 
         BuildResult result = getRequiredBuildResult();
-        checkPermissions(result);
-
         result.loadFeatures(configurationManager.getDataDirectory());
 
         if(result.completed())

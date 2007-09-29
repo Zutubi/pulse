@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web.server;
 
-import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.pulse.FatController;
+import com.zutubi.pulse.web.ActionSupport;
 
 /**
  * <class comment/>

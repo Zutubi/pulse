@@ -5,6 +5,7 @@ import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.xwork.TextProvider;
 import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.i18n.Messages;
+import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.model.Project;
@@ -49,6 +50,7 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
     private transient final TextProvider textProvider = new TextProviderSupport(getClass(), this);
 
     protected String cancel;
+    protected AccessManager accessManager;
     protected ProjectManager projectManager;
     protected String changeUrl;
     private User loggedInUser = null;
@@ -188,17 +190,9 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
         }
     }
 
-    public boolean canWrite(Project project)
+    public boolean hasPermission(String action, Object resource)
     {
-        try
-        {
-            getProjectManager().checkWrite(project);
-            return true;
-        }
-        catch(Exception e)
-        {
-            return false;
-        }
+        return accessManager.hasPermission(action, resource);
     }
 
     public ProjectManager getProjectManager()
@@ -305,5 +299,10 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
     public final void setUserManager(UserManager userManager)
     {
         this.userManager = userManager;
+    }
+
+    public final void setAccessManager(AccessManager accessManager)
+    {
+        this.accessManager = accessManager;
     }
 }

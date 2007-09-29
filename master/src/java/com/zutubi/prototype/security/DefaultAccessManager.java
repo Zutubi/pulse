@@ -1,6 +1,7 @@
 package com.zutubi.prototype.security;
 
 import com.zutubi.util.logging.Logger;
+import org.acegisecurity.AccessDeniedException;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -79,6 +80,19 @@ public class DefaultAccessManager implements AccessManager
     public boolean hasPermission(String action, Object resource)
     {
         return hasPermission(getActor(), action, resource);
+    }
+
+    public void ensurePermission(Actor actor, String action, Object resource)
+    {
+        if(!hasPermission(actor, action, resource))
+        {
+            throw new AccessDeniedException("Permission to perform action '" + action + "' denied");
+        }
+    }
+
+    public void ensurePermission(String action, Object resource)
+    {
+        ensurePermission(getActor(), action, resource);
     }
 
     private AuthorityProvider getProvider(Object resource)

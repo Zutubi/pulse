@@ -3,6 +3,7 @@ package com.zutubi.pulse.web.project;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.prototype.config.project.BuildOptionsConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.project.ProjectConfigurationActions;
 
 import java.io.File;
 
@@ -26,8 +27,7 @@ public class BrowseProjectDirAction extends BuildActionBase
     public String execute() throws Exception
     {
         BuildResult buildResult = getRequiredBuildResult();
-        checkPermissions(buildResult);
-        getProjectManager().checkWrite(buildResult.getProject());
+        accessManager.ensurePermission(ProjectConfigurationActions.ACTION_VIEW_SOURCE, buildResult.getProject());
 
         // this value is going to be written to the vm template and evaluated by javascript, so
         // we need to ensure that we escape the escape char.

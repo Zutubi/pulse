@@ -291,11 +291,6 @@ public class MockBuildManager implements BuildManager
         return true;
     }
 
-    public boolean canCancel(BuildResult build, User user)
-    {
-        throw new RuntimeException("Method not implemented.");
-    }
-
     public CommandResult getCommandResultByArtifact(long artifactId)
     {
         throw new RuntimeException("Method not implemented.");

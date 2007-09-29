@@ -27,8 +27,11 @@
             #contentCell("queue.revision.floating")
         #end
             #contentCell($request.prettyQueueTime)
-
+        #if($action.canCancel($request))
             #actionCell("cancel" "cancelQueuedBuild.action?id=$request.id" "cancel.gif")
+        #else
+            #contentCell("empty.cell")
+        #end
         </tr>
     #end
 #else

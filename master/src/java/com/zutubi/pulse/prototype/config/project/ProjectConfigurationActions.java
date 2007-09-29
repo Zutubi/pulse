@@ -14,9 +14,11 @@ import java.util.List;
  */
 public class ProjectConfigurationActions
 {
-    public static final String ACTION_PAUSE = "pause";
-    public static final String ACTION_RESUME = "resume";
-    public static final String ACTION_TRIGGER = "trigger";
+    public static final String ACTION_CANCEL_BUILD = "cancel build";
+    public static final String ACTION_PAUSE        = "pause";
+    public static final String ACTION_RESUME       = "resume";
+    public static final String ACTION_VIEW_SOURCE  = "view source";
+    public static final String ACTION_TRIGGER      = "trigger";
 
     private ProjectManager projectManager;
 

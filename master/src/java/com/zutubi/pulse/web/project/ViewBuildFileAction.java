@@ -27,8 +27,6 @@ public class ViewBuildFileAction extends BuildActionBase
     public String execute()
     {
         BuildResult result = getRequiredBuildResult();
-        checkPermissions(result);        
-
         FileInputStream is = null;
         ByteArrayOutputStream os = null;
 

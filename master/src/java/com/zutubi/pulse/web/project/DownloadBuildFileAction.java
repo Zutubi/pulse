@@ -35,8 +35,6 @@ public class DownloadBuildFileAction extends BuildActionBase
     public String execute() throws Exception
     {
         BuildResult result = getRequiredBuildResult();
-        checkPermissions(result);
-
         try
         {
             File file = new File(result.getAbsoluteOutputDir(configurationManager.getDataDirectory()), BuildResult.PULSE_FILE);

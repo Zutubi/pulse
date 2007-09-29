@@ -48,7 +48,7 @@
                 #actionCellTitle("reports-#uce($project.name)" "reporting.tab" "$urls.projectReports($project)" "chart_bar.gif")
                 #actionCellTitle("history-#uce($project.name)" "history.tab" "$urls.projectHistory($project)" "time.gif")
                 #actionCellTitle("config-#uce($project.name)" "configuration.tab" "$base/admin/projects/#uce($project.name)/" "pencil.gif")
-            #if($action.canWrite($project))
+            #if($action.hasPermission("trigger", $project))
                 #actionCellTitle("trigger-#uce($project.name)" "buildspec.trigger" "/triggerBuild.action?projectName=#uce($project.name)" "lightning.gif")
             #else
                 <td class="content">&nbsp;</td>

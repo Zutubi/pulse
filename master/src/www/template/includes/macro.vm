@@ -223,7 +223,7 @@
         #buildTab($result "tests" $selected)
         #buildTab($result "file" $selected)
         #buildTab($result "artifacts" $selected)
-#if($action.canWrite($result.project))
+#if($action.hasPermission("view source", $result.project))
         #buildTab($result "wc" $selected)
 #end
     #closeTabs()
@@ -990,7 +990,7 @@
 ## Outputs an action cell for viewing the working copy for a build
 ##
 #macro(workingCopyCell $project $result $multiProject)
-    #if($action.canWrite($project) || $result.personal)
+    #if($action.hasPermission("view source", $project))
         <td class="content">
             <a href="$urls.buildWorkingCopy($result)" class="unadorned" title="working copy"><img alt="view working copy" src="$base/images/page_gear.gif"/></a>
         </td>

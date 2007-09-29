@@ -95,8 +95,6 @@ public class ViewChangesAction extends BuildActionBase
             return "personal";
         }
 
-        checkPermissions(result);
-
         previous = getPrevious(ResultState.getCompletedStates());
         if(sinceBuild == 0)
         {

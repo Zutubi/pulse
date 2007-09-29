@@ -1,7 +1,9 @@
 package com.zutubi.pulse;
 
+import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.events.build.AbstractBuildRequestEvent;
+import com.zutubi.pulse.prototype.config.project.ProjectConfigurationActions;
 
 import java.util.*;
 
@@ -20,6 +22,7 @@ public class BuildQueue
      * user (for personal builds).
      */
     private Map<Object, List<AbstractBuildRequestEvent>> requests;
+    private AccessManager accessManager;
 
     public BuildQueue()
     {
@@ -138,8 +141,10 @@ public class BuildQueue
                     it.next();
                     while(it.hasNext())
                     {
-                        if (it.next().getId() == id)
+                        AbstractBuildRequestEvent event = it.next();
+                        if (event.getId() == id)
                         {
+                            accessManager.ensurePermission(ProjectConfigurationActions.ACTION_CANCEL_BUILD, event);
                             it.remove();
                             return true;
                         }
@@ -148,5 +153,10 @@ public class BuildQueue
             }
         }
         return false;
+    }
+
+    public void setAccessManager(AccessManager accessManager)
+    {
+        this.accessManager = accessManager;
     }
 }

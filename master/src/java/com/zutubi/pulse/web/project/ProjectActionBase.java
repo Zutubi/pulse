@@ -4,12 +4,9 @@ import com.opensymphony.util.TextUtils;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.model.BuildManager;
-import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.pulse.web.LookupErrorException;
-import org.acegisecurity.AccessDeniedException;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -99,18 +96,6 @@ public class ProjectActionBase extends ActionSupport
         }
 
         return project;
-    }
-
-    public void checkPermissions(BuildResult result)
-    {
-        if(result.isPersonal())
-        {
-            User user = getLoggedInUser();
-            if(!result.getUser().equals(user))
-            {
-                throw new AccessDeniedException("Only the owner can view a personal build");
-            }
-        }
     }
 
     public void setBuildManager(BuildManager buildManager)

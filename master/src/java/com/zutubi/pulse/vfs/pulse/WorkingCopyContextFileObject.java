@@ -53,21 +53,8 @@ public class WorkingCopyContextFileObject extends AbstractPulseFileObject implem
 
     private BuildResult getBuildResult() throws FileSystemException
     {
-        BuildResultProvider provider = (BuildResultProvider) getAncestor(BuildResultProvider.class);
+        BuildResultProvider provider = getAncestor(BuildResultProvider.class);
         return provider.getBuildResult();
-    }
-
-    private long getBuildResultId()
-    {
-        try
-        {
-            BuildResultProvider provider = (BuildResultProvider) getAncestor(BuildResultProvider.class);
-            return provider.getBuildResultId();
-        }
-        catch (FileSystemException e)
-        {
-            return -1;
-        }
     }
 
     public boolean isLocal()

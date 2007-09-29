@@ -1,8 +1,10 @@
 package com.zutubi.pulse.vfs.pulse;
 
+import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.project.ProjectConfigurationActions;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
@@ -11,6 +13,8 @@ import org.apache.commons.vfs.provider.AbstractFileSystem;
  */
 public abstract class AbstractBuildFileObject extends AbstractPulseFileObject implements BuildResultProvider, AddressableFileObject, ProjectProvider
 {
+    private AccessManager accessManager;
+
     public AbstractBuildFileObject(final FileName name, final AbstractFileSystem fs)
     {
         super(name, fs);
@@ -21,6 +25,7 @@ public abstract class AbstractBuildFileObject extends AbstractPulseFileObject im
         String name = fileName.getBaseName();
         if (name.equals("wc"))
         {
+            accessManager.ensurePermission(ProjectConfigurationActions.ACTION_VIEW_SOURCE, getBuildResult());
             return objectFactory.buildBean(WorkingCopyContextFileObject.class,
                     new Class[]{FileName.class, AbstractFileSystem.class},
                     new Object[]{fileName, pfs}
@@ -79,4 +84,9 @@ public abstract class AbstractBuildFileObject extends AbstractPulseFileObject im
 
     public abstract BuildResult getBuildResult();
     public abstract long getBuildResultId();
+
+    public void setAccessManager(AccessManager accessManager)
+    {
+        this.accessManager = accessManager;
+    }
 }

@@ -76,8 +76,6 @@ public class TailRecipeLogAction extends StageActionBase
         initialiseProperties();
 
         BuildResult buildResult = getRequiredBuildResult();
-        checkPermissions(buildResult);
-
         RecipeResultNode resultNode = getRequiredRecipeResultNode();
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
         File recipeLog = new File(paths.getRecipeDir(buildResult, resultNode.getResult().getId()), RecipeResult.RECIPE_LOG);

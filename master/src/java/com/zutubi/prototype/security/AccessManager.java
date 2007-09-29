@@ -47,4 +47,34 @@ public interface AccessManager
      * @return true iff the actor has permission to perform the action
      */
     boolean hasPermission(String action, Object resource);
+
+    /**
+     * Ensures the given actor has permission to perform the given action on
+     * the given resource, throwing an exception if they do not.
+     *
+     * @see #hasPermission(Actor, String, Object)
+     *
+     * @param actor    the actor trying to perform the action
+     * @param action   the action the actor wants to perform
+     * @param resource the resource being acted on, may be null for a
+     *                 "global" action
+     * @throws org.acegisecurity.AccessDeniedException if permission is
+     *         denied
+     */
+    void ensurePermission(Actor actor, String action, Object resource);
+
+    /**
+     * Ensures that the current actor has permission to perform the given
+     * action on the given resource, throwing an exception if they do not.
+     *
+     * @see #getActor()
+     * @see #ensurePermission(Actor, String, Object)
+     *
+     * @param action   the action the actor wants to perform
+     * @param resource the resource being acted on, may be null for a
+     *                 "global" action
+     * @throws org.acegisecurity.AccessDeniedException if permission is
+     *         denied
+     */
+    void ensurePermission(String action, Object resource);
 }

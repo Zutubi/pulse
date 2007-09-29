@@ -468,26 +468,6 @@ public class DefaultBuildManager implements BuildManager
         return buildResultDao.findLatestSuccessful();
     }
 
-    public boolean canCancel(BuildResult build, User user)
-    {
-        if(build.isPersonal())
-        {
-            return build.getUser().equals(user);
-        }
-        else
-        {
-            try
-            {
-                projectManager.checkWrite(build.getProject());
-                return true;
-            }
-            catch (Exception e)
-            {
-                return false;
-            }
-        }
-    }
-
     public void cleanupResult(BuildResult build, boolean rmdir)
     {
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);

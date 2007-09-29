@@ -1,10 +1,12 @@
 package com.zutubi.pulse.web.server;
 
+import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.pulse.FatController;
 import com.zutubi.pulse.RecipeDispatchRequest;
 import com.zutubi.pulse.RecipeQueue;
 import com.zutubi.pulse.events.build.AbstractBuildRequestEvent;
 import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.prototype.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.web.ActionSupport;
 
 import java.util.*;
@@ -19,6 +21,7 @@ public class ViewServerQueuesAction extends ActionSupport
     private FatController fatController;
     private RecipeQueue recipeQueue;
     private BuildManager buildManager;
+    private AccessManager accessManager;
 
     public List<AbstractBuildRequestEvent> getBuildQueue()
     {
@@ -40,15 +43,9 @@ public class ViewServerQueuesAction extends ActionSupport
         return recipeQueueSnapshot;
     }
 
-    public boolean canCancel(BuildResult build)
+    public boolean canCancel(Object resource)
     {
-        Object principle = getPrinciple();
-        if(principle != null && principle instanceof String)
-        {
-            return buildManager.canCancel(build, userManager.getUser((String)principle));
-        }
-
-        return false;
+        return accessManager.hasPermission(ProjectConfigurationActions.ACTION_CANCEL_BUILD, resource);
     }
 
     public String execute() throws Exception
@@ -125,5 +122,10 @@ public class ViewServerQueuesAction extends ActionSupport
     public void setProjectManager(ProjectManager projectManager)
     {
         this.projectManager = projectManager;
+    }
+
+    public void setAccessManager(AccessManager accessManager)
+    {
+        this.accessManager = accessManager;
     }
 }

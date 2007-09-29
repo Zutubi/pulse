@@ -25,7 +25,13 @@ public class ProjectAuthorityProvider extends ListOptionProvider
     public List<String> getOptions(Object instance, String parentPath, TypeProperty property)
     {
         List<String> options = new LinkedList<String>();
-        options.addAll(Arrays.asList(AccessManager.ACTION_ADMINISTER, AccessManager.ACTION_VIEW, AccessManager.ACTION_WRITE, ProjectConfigurationActions.ACTION_PAUSE, ProjectConfigurationActions.ACTION_TRIGGER, "cancel build", "view source"));
+        options.addAll(Arrays.asList(AccessManager.ACTION_ADMINISTER,
+                                     AccessManager.ACTION_VIEW,
+                                     AccessManager.ACTION_WRITE,
+                                     ProjectConfigurationActions.ACTION_PAUSE,
+                                     ProjectConfigurationActions.ACTION_TRIGGER,
+                                     ProjectConfigurationActions.ACTION_CANCEL_BUILD,
+                                     ProjectConfigurationActions.ACTION_VIEW_SOURCE));
         Collections.sort(options, new Sort.StringComparator());
         return options;
     }
