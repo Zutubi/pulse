@@ -1,11 +1,13 @@
 package com.zutubi.pulse.web.server;
 
-import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.pulse.FatController;
 import com.zutubi.pulse.RecipeDispatchRequest;
 import com.zutubi.pulse.RecipeQueue;
 import com.zutubi.pulse.events.build.AbstractBuildRequestEvent;
-import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.model.BuildManager;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.prototype.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.web.ActionSupport;
 
@@ -21,7 +23,6 @@ public class ViewServerQueuesAction extends ActionSupport
     private FatController fatController;
     private RecipeQueue recipeQueue;
     private BuildManager buildManager;
-    private AccessManager accessManager;
 
     public List<AbstractBuildRequestEvent> getBuildQueue()
     {
@@ -117,15 +118,5 @@ public class ViewServerQueuesAction extends ActionSupport
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
-    }
-
-    public void setProjectManager(ProjectManager projectManager)
-    {
-        this.projectManager = projectManager;
-    }
-
-    public void setAccessManager(AccessManager accessManager)
-    {
-        this.accessManager = accessManager;
     }
 }

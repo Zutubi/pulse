@@ -200,11 +200,6 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
         return projectManager;
     }
 
-    public void setProjectManager(ProjectManager projectManager)
-    {
-        this.projectManager = projectManager;
-    }
-    
     public void updateChangeUrl(Project project, Revision revision)
     {
         try
@@ -294,6 +289,11 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
         }
 
         return loggedInUser;
+    }
+
+    public final void setProjectManager(ProjectManager projectManager)
+    {
+        this.projectManager = projectManager;
     }
 
     public final void setUserManager(UserManager userManager)
