@@ -131,7 +131,7 @@
         <table>
             <tr>
               <td class="logo">
-                  :: <a href="$base/default.action">pulse 2 [ M3 ]</a> ::
+                  :: <a href="$base/default.action">pulse 2 [ M4 ]</a> ::
 #if($u_projectName)
                   <a href="$urls.projectHome($u_projectName)">$h_projectName</a>
 #end

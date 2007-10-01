@@ -35,6 +35,15 @@
             the configuration system allows you to configure a hierarchy of projects/agents, and shows
             the inheritance relationship of fields.
         </p>
+
+        <h3><a href="/admin/users/">New Security System</a></h3>
+        <p>
+            User and group management has been updated to allow finer-grained control of security.  It is
+            now possible to assign more specific privileges to groups using ACLs, controlling access to
+            both projects and agents.  It is also possible to configure permissions for all users and
+            anonymous users via two special groups.
+        </p>
+
         <h3><a href="/admin/plugins/">Plugins</a></h3>
         <p>
             Support for various tools is being extracted into plugins.  The plugin UI is raw at the moment,
@@ -47,12 +56,6 @@
     <p>
         As we are moving things over to a new architecture in Pulse 2.0, some Pulse 1.2 features are not
         yet available.  They will be readded in future EAP builds:
-
-        <h3>User Management</h3>
-        <p>
-            User management is currently disabled, as it will be moved over to the new configuration system.
-            At the same time we will be adding a much-requested feature: finer grained permissions.
-        </p>
 
         <h3>Project Configuration</h3>
         <p>

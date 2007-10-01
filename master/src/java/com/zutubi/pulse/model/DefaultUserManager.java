@@ -76,7 +76,7 @@ public class DefaultUserManager implements UserManager, ConfigurationInjector.Co
 
             public void postDelete(UserConfiguration instance)
             {
-                // FIXME USERS cleanup the user and personal builds ...
+                // FIXME cleanup the user and personal builds ...
                 // Deleting a user removes them from groups
                 initGroupsByUser();
 
