@@ -30,6 +30,7 @@ public class Form extends UIComponent
     {
         parameters.put(PARAMETER_AJAX, true);
         parameters.put(PARAMETER_DISPLAY_MODE, false);
+        parameters.put(PARAMETER_READ_ONLY, false);
     }
 
     public String getName()

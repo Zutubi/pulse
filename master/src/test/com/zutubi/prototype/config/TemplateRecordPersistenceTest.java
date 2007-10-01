@@ -438,6 +438,44 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         }
     }
 
+    public void testDeepClonePreservesInherited()
+    {
+        insertGlobal();
+        insertChild();
+
+        Project child = (Project) configurationTemplateManager.getInstance("project/child");
+        Project clone = configurationTemplateManager.deepClone(child);
+
+        assertEquals("default", clone.getStages().get("default").getName());
+    }
+
+    public void testDeepCloneAndSavePreservesInheritedListItems()
+    {
+        insertGlobal();
+        insertChild();
+
+        configurationTemplateManager.insertRecord("project/global/propertiesList", createProperty("gp1", "gv1"));
+
+        Project child = (Project) configurationTemplateManager.getInstance("project/child");
+        Project clone = configurationTemplateManager.deepClone(child);
+        clone.getPropertiesList().add(new Property("new", "value"));
+        configurationTemplateManager.save(clone);
+        
+        child = (Project) configurationTemplateManager.getInstance("project/child");
+        Property property = child.getPropertiesList().get(0);
+        assertNotNull(property);
+        assertEquals("gp1", property.getName());
+
+        clone = configurationTemplateManager.deepClone(child);
+        clone.getPropertiesList().add(new Property("newer", "value"));
+        configurationTemplateManager.save(clone);
+
+        child = (Project) configurationTemplateManager.getInstance("project/child");
+        property = child.getPropertiesList().get(0);
+        assertNotNull(property);
+        assertEquals("gp1", property.getName());
+    }
+
     private void insertGlobal()
     {
         MutableRecord global = createGlobal();

@@ -53,6 +53,7 @@ public class BuildRevision
     public BuildRevision(Revision revision, String pulseFile, boolean user)
     {
         assert(revision != null);
+
         this.revision = revision;
         this.pulseFile = pulseFile;
         fixed = true;

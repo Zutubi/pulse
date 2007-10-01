@@ -478,6 +478,40 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         assertEquals("er", er.getName());
     }
 
+    public void testDeepClonePreservesPaths() throws TypeException
+    {
+        MockA a = new MockA("a");
+        a.setMock(new MockB("b"));
+        a.getCs().put("c", new MockC("c"));
+        a.getDs().add(new MockD("d"));
+        configurationTemplateManager.insert("sample", a);
+
+        a = (MockA) configurationTemplateManager.getInstance("sample/a");
+        
+        MockA clone = configurationTemplateManager.deepClone(a);
+        assertEquals(a.getConfigurationPath(), clone.getConfigurationPath());
+        assertEquals(a.getMock().getConfigurationPath(), clone.getMock().getConfigurationPath());
+        assertEquals(a.getCs().get("c").getConfigurationPath(), clone.getCs().get("c").getConfigurationPath());
+        assertEquals(a.getDs().get(0).getConfigurationPath(), clone.getDs().get(0).getConfigurationPath());
+    }
+
+    public void testDeepClonePreservesHandles() throws TypeException
+    {
+        MockA a = new MockA("a");
+        a.setMock(new MockB("b"));
+        a.getCs().put("c", new MockC("c"));
+        a.getDs().add(new MockD("d"));
+        configurationTemplateManager.insert("sample", a);
+
+        a = (MockA) configurationTemplateManager.getInstance("sample/a");
+
+        MockA clone = configurationTemplateManager.deepClone(a);
+        assertEquals(a.getHandle(), clone.getHandle());
+        assertEquals(a.getMock().getHandle(), clone.getMock().getHandle());
+        assertEquals(a.getCs().get("c").getHandle(), clone.getCs().get("c").getHandle());
+        assertEquals(a.getDs().get(0).getHandle(), clone.getDs().get(0).getHandle());
+    }
+
     public void testValidate() throws TypeException
     {
         MutableRecord record = typeA.createNewRecord(true);

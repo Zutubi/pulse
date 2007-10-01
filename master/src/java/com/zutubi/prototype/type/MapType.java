@@ -224,7 +224,12 @@ public class MapType extends CollectionType
 
     public String getSavePath(String path, Record record)
     {
-        return PathUtils.getPath(PathUtils.getParentPath(path), (String) record.get(keyProperty));
+        String name = (String) record.get(keyProperty);
+        if(name == null)
+        {
+            throw new IllegalArgumentException("blarg!");
+        }
+        return PathUtils.getPath(PathUtils.getParentPath(path), name);
     }
 
     private static interface FromRecord

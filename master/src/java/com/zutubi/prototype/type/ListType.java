@@ -4,6 +4,7 @@ import com.zutubi.prototype.type.record.HandleAllocator;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.config.ConfigurationList;
 import com.zutubi.util.GraphFunction;
 
@@ -126,7 +127,16 @@ public class ListType extends CollectionType
         List<String> order = new ArrayList<String>(collection.size());
         for(Object o: collection)
         {
-            String key = Long.toString(handleAllocator.allocateHandle());
+            String key;
+            if(o instanceof Configuration && ((Configuration)o).getConfigurationPath() != null)
+            {
+                key = PathUtils.getBaseName(((Configuration)o).getConfigurationPath());
+            }
+            else
+            {
+                key = Long.toString(handleAllocator.allocateHandle());
+            }
+            
             try
             {
                 result.put(key, toRecord.convert(collectionType, o));

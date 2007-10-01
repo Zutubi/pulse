@@ -1220,15 +1220,13 @@ public class ConfigurationTemplateManager
     @SuppressWarnings({"unchecked"})
     public <T extends Configuration> T deepClone(T instance)
     {
-        Record record = recordManager.select(instance.getConfigurationPath());
-        CompositeType type = typeRegistry.getType(instance.getClass());
-        SimpleInstantiator instantiator = new SimpleInstantiator(configurationReferenceManager);
+        String path = instance.getConfigurationPath();
+        Record record = getRecord(path);
+        ComplexType type = getType(path);
+        PersistentInstantiator instantiator = new PersistentInstantiator(path, isConcrete(PathUtils.getParentPath(path), record), new DefaultInstanceCache(), new DefaultInstanceCache(), configurationReferenceManager);
         try
         {
-            Configuration clone = (Configuration) instantiator.instantiate(type, record);
-            clone.setConfigurationPath(instance.getConfigurationPath());
-            clone.setHandle(instance.getHandle());
-            clone.setPermanent(instance.isPermanent());
+            Configuration clone = (Configuration) instantiator.instantiate(path, false, type, record);
             return (T) clone;
         }
         catch (TypeException e)

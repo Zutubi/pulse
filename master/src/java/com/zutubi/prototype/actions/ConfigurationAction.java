@@ -38,6 +38,7 @@ public class ConfigurationAction
     public ConfigurationAction(String name, String permissionName, Class argumentClass, Method method)
     {
         this.name = name;
+        this.permissionName = permissionName;
         this.argumentClass = argumentClass;
         this.method = method;
     }
