@@ -96,11 +96,10 @@ public class SaveAction extends PrototypeSupport
         }
         else
         {
-            String displayName = PrototypeUtils.getDisplayName(path, configurationTemplateManager);
-            String newDisplayName = PrototypeUtils.getDisplayName(newPath, configurationTemplateManager);
             response = new ConfigurationResponse(newPath, configurationTemplateManager.getTemplatePath(newPath));
-            if(!newPath.equals(path) || !newDisplayName.equals(displayName))
+            if(!newPath.equals(path))
             {
+                String newDisplayName = PrototypeUtils.getDisplayName(newPath, configurationTemplateManager);
                 response.addRenamedPath(new ConfigurationResponse.Rename(path, newPath, newDisplayName));
             }
 
