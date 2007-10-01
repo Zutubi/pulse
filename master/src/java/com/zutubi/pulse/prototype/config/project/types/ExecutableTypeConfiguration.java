@@ -1,14 +1,15 @@
 package com.zutubi.pulse.prototype.config.project.types;
 
-import com.zutubi.config.annotations.SymbolicName;
 import com.opensymphony.util.TextUtils;
+import com.zutubi.config.annotations.Form;
+import com.zutubi.config.annotations.SymbolicName;
 import org.apache.velocity.VelocityContext;
 
 /**
- *
- *
+ * A project that is built by running a single arbitrary command.
  */
 @SymbolicName("zutubi.executableTypeConfig")
+@Form(fieldOrder = {"workingDir", "executable", "arguments", "postProcessors"})
 public class ExecutableTypeConfiguration extends TemplateTypeConfiguration
 {
     /**
