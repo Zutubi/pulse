@@ -135,7 +135,7 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
 
             // Special anonymous users group.
             BuiltinGroupConfiguration anonymousUsersGroup = new BuiltinGroupConfiguration(UserManager.ANONYMOUS_USERS_GROUP_NAME, GrantedAuthority.GUEST);
-            allUsersGroup.setPermanent(true);
+            anonymousUsersGroup.setPermanent(true);
             configurationTemplateManager.insert(ConfigurationRegistry.GROUPS_SCOPE, anonymousUsersGroup);
             
             // create an administrators group (for convenience)
