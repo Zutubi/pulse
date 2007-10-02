@@ -1,7 +1,7 @@
 package com.zutubi.prototype.type.record.store;
 
 import com.zutubi.prototype.transaction.TransactionManager;
-import com.zutubi.prototype.transaction.TransactionalCache;
+import com.zutubi.prototype.transaction.TransactionalWrapper;
 import com.zutubi.prototype.type.record.ImmutableRecord;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.MutableRecordImpl;
@@ -14,7 +14,7 @@ import com.zutubi.prototype.type.record.Record;
  */
 public class InMemoryRecordStore implements RecordStore
 {
-    private TransactionalCache<MutableRecord> cache = new MutableRecordTransactionalCache();
+    private TransactionalWrapper<MutableRecord> wrapper;
 
     public InMemoryRecordStore()
     {
@@ -23,12 +23,12 @@ public class InMemoryRecordStore implements RecordStore
 
     public InMemoryRecordStore(MutableRecord base)
     {
-        cache.set("base", base);
+        wrapper = new MutableRecordTransactionalWrapper(base);
     }
 
     public Record insert(final String path, final Record record)
     {
-        return (Record) cache.execute("base", new TransactionalCache.Action<MutableRecord>()
+        return (Record) wrapper.execute(new TransactionalWrapper.Action<MutableRecord>()
         {
             public Object execute(MutableRecord base)
             {
@@ -39,7 +39,7 @@ public class InMemoryRecordStore implements RecordStore
 
     public Record update(final String path, final Record record)
     {
-        return (Record) cache.execute("base", new TransactionalCache.Action<MutableRecord>()
+        return (Record) wrapper.execute(new TransactionalWrapper.Action<MutableRecord>()
         {
             public Object execute(MutableRecord base)
             {
@@ -50,7 +50,7 @@ public class InMemoryRecordStore implements RecordStore
 
     public Record delete(final String path)
     {
-        return (Record) cache.execute("base", new TransactionalCache.Action<MutableRecord>()
+        return (Record) wrapper.execute(new TransactionalWrapper.Action<MutableRecord>()
         {
             public Object execute(MutableRecord base)
             {
@@ -61,7 +61,7 @@ public class InMemoryRecordStore implements RecordStore
 
     public void setTransactionManager(TransactionManager transactionManager)
     {
-        this.cache.setTransactionManager(transactionManager);
+        this.wrapper.setTransactionManager(transactionManager);
     }
 
     private Record insert(MutableRecord base, String path, Record newRecord)
@@ -175,31 +175,19 @@ public class InMemoryRecordStore implements RecordStore
 
     public Record select()
     {
-        return new ImmutableRecord(cache.get("base"));
+        return new ImmutableRecord(wrapper.get());
     }
 
-    private class MutableRecordTransactionalCache extends TransactionalCache<MutableRecord>
+    private class MutableRecordTransactionalWrapper extends TransactionalWrapper<MutableRecord>
     {
+        public MutableRecordTransactionalWrapper(MutableRecord global)
+        {
+            super(global);
+        }
+
         public MutableRecord copy(MutableRecord v)
         {
             return v.copy(true);
         }
     }
-
-/*
-    boolean prepare()
-    {
-        return cache.prepare();
-    }
-
-    void commit()
-    {
-        cache.commit();
-    }
-
-    void rollback()
-    {
-        cache.rollback();
-    }
-*/
 }

@@ -14,13 +14,13 @@ import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.events.DefaultEventManager;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.security.GlobalAuthorityProvider;
+import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.validation.DefaultValidationManager;
 import com.zutubi.validation.ValidatorProvider;
 import com.zutubi.validation.providers.AnnotationValidatorProvider;
 import com.zutubi.validation.providers.ReflectionValidatorProvider;
-import junit.framework.TestCase;
 
 import java.util.Arrays;
 
@@ -28,7 +28,7 @@ import java.util.Arrays;
  *
  *
  */
-public abstract class AbstractConfigurationSystemTestCase extends TestCase
+public abstract class AbstractConfigurationSystemTestCase extends PulseTestCase
 {
     protected ObjectFactory objectFactory = new DefaultObjectFactory();
     protected DefaultValidationManager validationManager;
@@ -87,6 +87,7 @@ public abstract class AbstractConfigurationSystemTestCase extends TestCase
         configurationTemplateManager.setTypeRegistry(typeRegistry);
         configurationTemplateManager.setConfigurationPersistenceManager(configurationPersistenceManager);
         configurationTemplateManager.setValidationManager(validationManager);
+//        configurationTemplateManager.setTransactionManager(transactionManager);
         
         configurationReferenceManager = new ConfigurationReferenceManager();
         configurationReferenceManager.setRecordManager(recordManager);
@@ -101,6 +102,8 @@ public abstract class AbstractConfigurationSystemTestCase extends TestCase
         configurationTemplateManager.setConfigurationReferenceManager(configurationReferenceManager);
         configurationTemplateManager.setConfigurationSecurityManager(configurationSecurityManager);
 
+        configurationTemplateManager.init();
+        
         typeRegistry.setConfigurationReferenceManager(configurationReferenceManager);
         typeRegistry.setHandleAllocator(recordManager);
     }

@@ -261,31 +261,6 @@ public class InMemoryRecordStoreTest extends PulseTestCase
         });
     }
 
-/*
-    public void testMultipleCommitsWithoutChange()
-    {
-        // This test may look a little unusual.  However, it is designed to catch a problem that
-        // existed in the original implementation of the InMemoryRecordStore.commit, a problem that
-        // did not show up when being run via the transaction manager interface.
-
-        MutableRecordImpl newRecord = new MutableRecordImpl();
-        newRecord.put("a", "b");
-        recordStore.insert("path", newRecord);
-        transaction.commit();
-
-        assertNotNull(recordStore.select().get("path"));
-
-        recordStore.prepare();
-        recordStore.commit();
-
-        assertNotNull(recordStore.select().get("path"));
-
-        // now lets test this using the 'transaction' interface
-        transaction.begin();
-        transaction.commit();
-    }
-*/
-
     public void testChangesOutsideATransaction()
     {
         transactionManager.commit();

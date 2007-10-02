@@ -40,6 +40,8 @@ public class Transaction
      */
     public void commit()
     {
+        assertActiveTransaction();
+
         this.transactionManager.commit();
     }
 
@@ -48,6 +50,8 @@ public class Transaction
      */
     public void rollback()
     {
+        assertActiveTransaction();
+
         this.transactionManager.rollback();
     }
 
@@ -85,6 +89,9 @@ public class Transaction
      */
     public void enlistResource(TransactionResource resource)
     {
+        // can only enlist a resource if this transaction is considered active.
+        assertActiveTransaction();
+        
         if (!getResources().contains(resource))
         {
             getResources().add(resource);
@@ -93,11 +100,17 @@ public class Transaction
 
     public void delistResource(TransactionResource resource)
     {
+        // can only delist a resource if this transaction is considered active.
+        assertActiveTransaction();
+
         getResources().remove(resource);
     }
 
     public void registerSynchronization(Synchronization sync)
     {
+        // can only register a synchronisation if this transaction is considered active.
+        assertActiveTransaction();
+
         if (!getSynchronizations().contains(sync))
         {
             getSynchronizations().add(sync);
@@ -120,5 +133,16 @@ public class Transaction
             resources = new LinkedList<TransactionResource>();
         }
         return resources;
+    }
+
+    /**
+     * Assert that this transaction is in an active state.
+     */
+    void assertActiveTransaction()
+    {
+        if (status != TransactionStatus.ACTIVE && status != TransactionStatus.ROLLBACKONLY)
+        {
+            throw new IllegalStateException("Invalid transaction status: " + status.toString().toLowerCase());
+        }
     }
 }

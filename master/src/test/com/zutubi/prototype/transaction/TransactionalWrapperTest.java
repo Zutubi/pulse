@@ -6,7 +6,7 @@ import com.zutubi.pulse.test.PulseTestCase;
  *
  *
  */
-public class TransactionalCacheTest extends PulseTestCase
+public class TransactionalWrapperTest extends PulseTestCase
 {
     protected void setUp() throws Exception
     {

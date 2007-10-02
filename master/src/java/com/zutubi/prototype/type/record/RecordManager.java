@@ -1,8 +1,7 @@
 package com.zutubi.prototype.type.record;
 
-import com.zutubi.prototype.transaction.TransactionResource;
 import com.zutubi.prototype.transaction.TransactionManager;
-import com.zutubi.prototype.transaction.Transaction;
+import com.zutubi.prototype.transaction.TransactionalWrapper;
 import com.zutubi.prototype.type.record.store.RecordStore;
 
 import java.util.HashMap;
@@ -20,14 +19,12 @@ import java.util.concurrent.atomic.AtomicLong;
  * {@link com.zutubi.prototype.config.ConfigurationTemplateManager} should
  * be used.
  */
-public class RecordManager implements HandleAllocator, TransactionResource
+public class RecordManager implements HandleAllocator
 {
     private static final long UNDEFINED = 0;
 
-    private ThreadLocal<RecordManagerState> handleMappingHolder = new ThreadLocal<RecordManagerState>();
-    
-    private Map<Long, String> handleToPathMapping = new HashMap<Long, String>();
-    
+    private TransactionalWrapper<RecordManagerState> stateWrapper;
+
     /**
      * The current highest handle allocated.
      */
@@ -40,6 +37,8 @@ public class RecordManager implements HandleAllocator, TransactionResource
     public void init()
     {
         final long[] highest = {0L};
+
+        final Map<Long, String> handleToPathMapping = new HashMap<Long, String>();
 
         Record baseRecord = recordStore.select();
         traverse(baseRecord, new RecordHandler()
@@ -56,6 +55,9 @@ public class RecordManager implements HandleAllocator, TransactionResource
             }
         });
 
+        stateWrapper = new RecordManagerStateTransactionalWrapper(new RecordManagerState(handleToPathMapping));
+        stateWrapper.setTransactionManager(transactionManager);
+        
         nextHandle.set(highest[0]);
     }
 
@@ -150,36 +152,7 @@ public class RecordManager implements HandleAllocator, TransactionResource
 
     private RecordManagerState getState()
     {
-        RecordManagerState state = handleMappingHolder.get();
-        if (state != null)
-        {
-            return state;
-        }
-        return new RecordManagerState(this.handleToPathMapping);
-    }
-
-    //--- transactional resource interface implementation ---//
-
-    public boolean prepare()
-    {
-        return true;
-    }
-
-    public void commit()
-    {
-        RecordManagerState state = handleMappingHolder.get();
-        if (state == null)
-        {
-            return;
-        }
-
-        this.handleToPathMapping = state.handleToPathMap;
-        handleMappingHolder.set(null);
-    }
-
-    public void rollback()
-    {
-        handleMappingHolder.set(null);
+        return stateWrapper.get();
     }
 
     private void allocateHandles(MutableRecord record)
@@ -234,15 +207,16 @@ public class RecordManager implements HandleAllocator, TransactionResource
     {
         checkPath(path);
 
-        return execute(new Executable()
+        return (Record) stateWrapper.execute(new TransactionalWrapper.Action<RecordManagerState>()
         {
-            public Record execute(RecordManagerState state)
+            public Object execute(RecordManagerState state)
             {
                 allocateHandles((MutableRecord) newRecord);
                 state.addToHandleMap(path, newRecord);
                 return recordStore.insert(path, newRecord);
             }
         });
+
     }
 
     /**
@@ -277,9 +251,9 @@ public class RecordManager implements HandleAllocator, TransactionResource
     {
         checkPath(path);
 
-        return execute(new Executable()
+        return (Record) stateWrapper.execute(new TransactionalWrapper.Action<RecordManagerState>()
         {
-            public Record execute(RecordManagerState state)
+            public Object execute(RecordManagerState state)
             {
                 Record deletedRecord = recordStore.delete(path);
                 if (deletedRecord != null)
@@ -333,35 +307,6 @@ public class RecordManager implements HandleAllocator, TransactionResource
         return record;
     }
 
-    private static interface Executable
-    {
-        Record execute(RecordManagerState state);
-    }
-
-    private Record execute(Executable action)
-    {
-        // ensure that we are part of the transaction.
-        boolean activeTransaction = transactionManager.getTransaction() != null;
-        if (activeTransaction)
-        {
-            transactionManager.getTransaction().enlistResource(this);
-        }
-
-        RecordManagerState writeableState = handleMappingHolder.get();
-        if (writeableState == null)
-        {
-            writeableState = new RecordManagerState(handleToPathMapping);
-            handleMappingHolder.set(writeableState);
-        }
-
-        Record result = action.execute(writeableState);
-        if (!activeTransaction)
-        {
-            commit();
-        }
-        return result;
-    }
-
     public void setRecordStore(RecordStore recordStore)
     {
         this.recordStore = recordStore;
@@ -378,6 +323,11 @@ public class RecordManager implements HandleAllocator, TransactionResource
     private class RecordManagerState
     {
         Map<Long, String> handleToPathMap;
+
+        public RecordManagerState()
+        {
+            this(new HashMap<Long, String>());
+        }
 
         public RecordManagerState(Map<Long, String> handleToPathMap)
         {
@@ -411,6 +361,18 @@ public class RecordManager implements HandleAllocator, TransactionResource
                 removeFromHandleMap((Record) record.get(key));
             }
         }
+    }
 
+    private class RecordManagerStateTransactionalWrapper extends TransactionalWrapper<RecordManagerState>
+    {
+        public RecordManagerStateTransactionalWrapper(RecordManagerState global)
+        {
+            super(global);
+        }
+
+        public RecordManagerState copy(RecordManagerState o)
+        {
+            return new RecordManagerState(o);
+        }
     }
 }
