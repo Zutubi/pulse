@@ -772,6 +772,21 @@ div.popup-actions {
 }
 
 /*
+ * Wizards
+ */
+
+.wizardsteps{
+    padding-right:1.5em;
+}
+
+.wizardstep {
+}
+
+.currentwizardstep {
+    font-weight:bold;
+}
+
+/*
  * Plugins section.
  */
 

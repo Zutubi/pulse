@@ -1,11 +1,8 @@
-<link rel="stylesheet" type="text/css" href="/css/prototype.css" media="screen"/>
-
 <h2>${"label"?i18n}</h2>
 <p class="introduction">
     ${"introduction"?i18n}
 </p>
 
-<#-- TODO: review the css classes used here. -->
 <#if wizard.decorate == true>
 <table>
     <tr>

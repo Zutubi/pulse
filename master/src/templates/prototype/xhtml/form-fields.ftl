@@ -50,6 +50,8 @@ function updateButtons()
 
 Ext.onReady(function()
 {
+    Ext.Ajax.timeout = 60000;
+
     form.render('${form.id}');
     form.el.dom.action = '${base}/${form.action}';
     for(var i = 0; i < hiddenFields.length; i++)
