@@ -4,13 +4,12 @@ import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
 import com.zutubi.config.annotations.Transient;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.prototype.config.project.BuildOptionsConfiguration;
-import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.core.scm.DelegateScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
-import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.pulse.prototype.config.project.BuildOptionsConfiguration;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.test.PulseTestCase;
 
 import java.util.Arrays;
@@ -175,7 +174,7 @@ public class ChangelistIsolatorTest extends PulseTestCase
         isolator = new ChangelistIsolator(buildManager);
         isolator.setScmClientFactory(new DelegateScmClientFactory()
         {
-            public ScmClient createClient(Configuration config) throws ScmException
+            public ScmClient createClient(ScmConfiguration config) throws ScmException
             {
                 return scmClient;
             }
