@@ -1,12 +1,10 @@
 package com.zutubi.pulse.core.scm;
 
-import com.zutubi.pulse.core.config.Configuration;
-
 /**
  *
  *
  */
-public interface ScmClientFactory<T extends Configuration>
+public interface ScmClientFactory<T extends com.zutubi.pulse.core.scm.config.ScmConfiguration>
 {
     ScmClient createClient(T config) throws ScmException;
 }

@@ -10,7 +10,6 @@ import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.DefaultSetupManager;
-import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.config.NamedConfigurationComparator;
@@ -370,7 +369,7 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
             String pulseFile = getPulseFile(projectConfig, revision, archive);
             eventManager.publish(new PersonalBuildRequestEvent(this, number, new BuildRevision(revision, pulseFile, false), user, archive, projectConfig));
         }
-        catch (BuildException e)
+        catch (Exception e)
         {
             throw new PulseException(e.getMessage(), e);
         }
@@ -392,13 +391,13 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
             String pulseFile = getPulseFile(project.getConfig(), revision, null);
             eventManager.publish(new BuildRequestEvent(this, reason, project, new BuildRevision(revision, pulseFile, reason.isUser())));
         }
-        catch (BuildException e)
+        catch (Exception e)
         {
             LOG.severe("Unable to obtain pulse file for project '" + project.getName() + "', revision '" + revision.getRevisionString() + "': " + e.getMessage(), e);
         }
     }
 
-    private String getPulseFile(ProjectConfiguration projectConfig, Revision revision, PatchArchive patch) throws BuildException
+    private String getPulseFile(ProjectConfiguration projectConfig, Revision revision, PatchArchive patch) throws Exception
     {
         TypeConfiguration type = projectConfig.getType();
         ComponentContext.autowire(type);

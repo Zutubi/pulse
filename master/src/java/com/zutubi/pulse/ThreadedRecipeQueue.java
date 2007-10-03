@@ -227,7 +227,15 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     {
         ProjectConfiguration projectConfig = dispatchRequest.getProject().getConfig();
         TypeConfiguration type = projectConfig.getType();
-        String pulseFile = type.getPulseFile(dispatchRequest.getRequest().getId(), projectConfig, revision, null);
+        String pulseFile;
+        try
+        {
+            pulseFile = type.getPulseFile(dispatchRequest.getRequest().getId(), projectConfig, revision, null);
+        }
+        catch (Exception e)
+        {
+            throw new BuildException("Unable to retrieve pulse file: " + e.getMessage(), e);
+        }
         dispatchRequest.getRevision().update(revision, pulseFile);
     }
 
