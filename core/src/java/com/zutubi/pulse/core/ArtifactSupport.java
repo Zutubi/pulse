@@ -1,9 +1,9 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.validation.annotations.Required;
-import com.zutubi.validation.annotations.Name;
-import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.model.StoredFileArtifact;
+import com.zutubi.validation.annotations.Constraint;
+import com.zutubi.validation.annotations.Required;
 
 import java.util.List;
 
@@ -23,7 +23,7 @@ public abstract class ArtifactSupport implements Artifact
      * @return the name of the artifact.
      */
     @Required
-    @Name
+    @Constraint("ArtifactNameValidator")
     public String getName()
     {
         return name;

@@ -146,7 +146,7 @@ public class AnnotationValidatorProvider implements ValidatorProvider
 
     private boolean isConstraint(Annotation annotation)
     {
-        return annotation.annotationType().getAnnotation(Constraint.class) != null;
+        return annotation instanceof Constraint || annotation.annotationType().getAnnotation(Constraint.class) != null;
     }
 
     private List<Validator> validatorsFromConstraints(Class clazz, List<Annotation> constraints, PropertyDescriptor descriptor)
@@ -154,7 +154,16 @@ public class AnnotationValidatorProvider implements ValidatorProvider
         List<Validator> validators = new LinkedList<Validator>();
         for (Annotation annotation : constraints)
         {
-            Constraint constraint = annotation.annotationType().getAnnotation(Constraint.class);
+            Constraint constraint;
+            if(annotation instanceof Constraint)
+            {
+                constraint = (Constraint) annotation;
+            }
+            else
+            {
+                constraint = annotation.annotationType().getAnnotation(Constraint.class);
+            }
+            
             for (String validatorClassName : constraint.value())
             {
                 try

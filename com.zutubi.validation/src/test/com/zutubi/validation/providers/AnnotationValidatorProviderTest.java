@@ -1,10 +1,7 @@
 package com.zutubi.validation.providers;
 
 import com.zutubi.validation.Validator;
-import com.zutubi.validation.annotations.Email;
-import com.zutubi.validation.annotations.Name;
-import com.zutubi.validation.annotations.Regex;
-import com.zutubi.validation.annotations.Required;
+import com.zutubi.validation.annotations.*;
 import com.zutubi.validation.mock.*;
 import com.zutubi.validation.validators.*;
 import junit.framework.TestCase;
@@ -113,9 +110,9 @@ public class AnnotationValidatorProviderTest extends TestCase
         assertTrue(validators.get(3) instanceof RegexValidator);
     }
 
-    public void testConstraintDefinedOnField()
+    public void testIndirectConstraintsOnField()
     {
-        MockConstraintsDefinedOnField mock = new MockConstraintsDefinedOnField();
+        MockIndirectConstraintsOnField mock = new MockIndirectConstraintsOnField();
         List<Validator> validators = provider.getValidators(mock, null);
         assertEquals(4, validators.size());
         assertTrue(validators.get(0) instanceof RequiredValidator);
@@ -124,7 +121,16 @@ public class AnnotationValidatorProviderTest extends TestCase
         assertTrue(validators.get(3) instanceof RegexValidator);
     }
 
-    public class MockConstraintsDefinedOnField
+    public void testDirectConstraintsOnField()
+    {
+        MockDirectConstraintsOnField mock = new MockDirectConstraintsOnField();
+        List<Validator> validators = provider.getValidators(mock, null);
+        assertEquals(2, validators.size());
+        assertTrue(validators.get(0) instanceof RequiredValidator);
+        assertTrue(validators.get(1) instanceof EmailValidator);
+    }
+
+    public class MockIndirectConstraintsOnField
     {
         @Required @Email @Name @Regex(pattern = ".")
         private String field;
@@ -140,4 +146,19 @@ public class AnnotationValidatorProviderTest extends TestCase
         }
     }
 
+    public class MockDirectConstraintsOnField
+    {
+        @Constraint({"com.zutubi.validation.validators.RequiredValidator", "com.zutubi.validation.validators.EmailValidator"})
+        private String field;
+
+        public String getField()
+        {
+            return field;
+        }
+
+        public void setField(String field)
+        {
+            this.field = field;
+        }
+    }
 }
