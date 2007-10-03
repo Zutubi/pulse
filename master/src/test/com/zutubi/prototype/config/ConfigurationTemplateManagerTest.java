@@ -603,14 +603,14 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     public void testCachedTemplateInstancesAreValidated() throws TypeException
     {
         MutableRecord record = typeA.createNewRecord(true);
-        record.put("name", "a+");
+        record.put("name", "a$");
         configurationTemplateManager.markAsTemplate(record);
         configurationTemplateManager.insertRecord("template", record);
 
-        MockA instance = configurationTemplateManager.getInstance("template/a+", MockA.class);
+        MockA instance = configurationTemplateManager.getInstance("template/a$", MockA.class);
         final List<String> errors = instance.getFieldErrors("name");
         assertEquals(1, errors.size());
-        assertEquals("name must consist of an alphanumeric character followed by zero or more alphanumeric characters mixed with characters ' ', '.', '-' or '_'", errors.get(0));
+        assertTrue(errors.get(0).contains("dollar sign"));
     }
 
     public void testCachedTemplateInstancesAreValidatedAsTemplates() throws TypeException
