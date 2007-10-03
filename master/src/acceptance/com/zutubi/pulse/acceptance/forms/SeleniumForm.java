@@ -138,7 +138,7 @@ public abstract class SeleniumForm
         selenium.click("zfid." + id);
         if (!ajax)
         {
-            selenium.waitForPageToLoad("30000");
+            selenium.waitForPageToLoad("60000");
         }
     }
 

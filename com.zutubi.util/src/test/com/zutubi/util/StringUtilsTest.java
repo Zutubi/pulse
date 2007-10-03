@@ -2,6 +2,7 @@ package com.zutubi.util;
 
 import junit.framework.TestCase;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -376,9 +377,9 @@ public class StringUtilsTest extends TestCase
         assertEquals("agzALZ0369_-!~.'()*", StringUtils.uriComponentEncode("agzALZ0369_-!~.'()*"));
     }
 
-    public void testURIComponentEncodeNonASCII()
+    public void testURIComponentEncodeNonASCII() throws UnsupportedEncodingException
     {
-        assertEquals("\u1234", StringUtils.uriComponentEncode("\u1234"));
+        assertEquals("%e1%88%b4", StringUtils.uriComponentEncode("\u1234"));
     }
 
     public void testURIComponentEncodeForwardSlash()
@@ -394,6 +395,72 @@ public class StringUtilsTest extends TestCase
     public void testURIComponentEncodeMixedFirstEncoded()
     {
         assertEquals("%3ahelp%2b%26m%24e", StringUtils.uriComponentEncode(":help+&m$e"));
+    }
+
+    public void testURIComponentDecodeEmpty()
+    {
+        assertEquals("", StringUtils.uriComponentDecode(""));
+    }
+
+    public void testURIComponentDecodeTrailingPercent()
+    {
+        assertEquals("%", StringUtils.uriComponentDecode("%"));
+    }
+
+    public void testURIComponentDecodeIncompletePercent()
+    {
+        assertEquals("%e", StringUtils.uriComponentDecode("%e"));
+    }
+
+    public void testURIComponentDecodeInvalidPercent()
+    {
+        assertEquals("%zz", StringUtils.uriComponentDecode("%zz"));
+    }
+
+    public void testURIComponentDecodePercent()
+    {
+        assertEquals("\u0001", StringUtils.uriComponentDecode("%01"));
+    }
+
+    public void testURIComponentDecodeMultiplePercents()
+    {
+        assertEquals("\u0001\u0002\u0003\u0004\u0005", StringUtils.uriComponentDecode("%01%02%03%04%05"));
+    }
+
+    public void testURIComponentDecodeBeginsWithPercent()
+    {
+        assertEquals("\u0001abc", StringUtils.uriComponentDecode("%01abc"));
+    }
+
+    public void testURIComponentDecodeEndsWithPercent()
+    {
+        assertEquals("abc\u0001", StringUtils.uriComponentDecode("abc%01"));
+    }
+
+    public void testURIComponentDecodeInvalidUTF8()
+    {
+        // FFFD is a replacement used when the incoming character is "unknown"
+        assertEquals("\ufffd", StringUtils.uriComponentDecode("%e0"));
+    }
+
+    public void testURIComponentRoundTripNonASCII()
+    {
+        uriComponentHelper("\u1234");
+    }
+
+    public void testURIComponentRoundTripNoChange()
+    {
+        uriComponentHelper("agzALZ0369_-!~.'()*");
+    }
+
+    public void testURIComponentRoundTripSomeSpecials()
+    {
+        uriComponentHelper("a/b%c@@f%%");
+    }
+
+    private void uriComponentHelper(String s)
+    {
+        assertEquals(s, StringUtils.uriComponentDecode(StringUtils.uriComponentEncode(s)));
     }
 
     private void splitHelper(String s, String... expected)

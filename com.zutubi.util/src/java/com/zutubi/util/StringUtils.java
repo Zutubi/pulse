@@ -598,6 +598,18 @@ public class StringUtils
         return pluralNoun;
     }
 
+    /**
+     * Encodes the given string such that it may be used as a component in a
+     * URI (i.e. part of the path in the URI).  Note only a single path
+     * component should be passed as the path separator (/) is encoded by
+     * this method.  Non-ASCII characters are encoded to UTF-8 and then
+     * represented in the result as %-encoded bytes.
+     *
+     * @see #uriComponentDecode(String)
+     *
+     * @param in the string to encode
+     * @return the input string encoded as a valid URI path component
+     */
     public static String uriComponentEncode(String in)
     {
         StringBuilder sb = null;
@@ -618,8 +630,20 @@ public class StringUtils
                     sb = new StringBuilder(in.substring(0, i));
                 }
 
-                sb.append('%');
-                sb.append(toHexString(c));
+                try
+                {
+                    byte[] bytes = in.substring(i, i + 1).getBytes("UTF-8");
+                    for (byte b: bytes)
+                    {
+                        sb.append('%');
+                        sb.append(toHexString(b));
+                    }
+                }
+                catch (UnsupportedEncodingException e)
+                {
+                    // Programmer error: not handleable
+                    throw new RuntimeException(e);
+                }
             }
         }
 
@@ -631,6 +655,96 @@ public class StringUtils
         {
             return sb.toString();
         }
+    }
+
+    /**
+     * Decodes a URI path component back into a Java string.  The input
+     * should have all non-ASCII characters and URI-special characters
+     * represented as %-encoded bytes.  Sequences of such bytes are decoded
+     * using UTF-8 to give a Java string.
+     *
+     * @see #uriComponentEncode(String)
+     *
+     * @param in the string to decode
+     * @return decoded version of the input string
+     */
+    public static String uriComponentDecode(String in)
+    {
+        StringBuilder sb = null;
+        byte[] bytes = null;
+        int byteOffset = 0;
+
+        for(int i = 0; i < in.length(); i++)
+        {
+            char c = in.charAt(i);
+            if(c == '%')
+            {
+                if(sb == null)
+                {
+                    sb = new StringBuilder(in.substring(0, i));
+                }
+
+                if(bytes == null)
+                {
+                    // Max number of escaped octets possible.
+                    bytes = new byte[in.length() / 3];
+                }
+
+                if(i < in.length() - 2)
+                {
+                    // Decode to octet
+                    try
+                    {
+                        bytes[byteOffset] = fromHexString(in.substring(i + 1, i + 3));
+                        byteOffset++;
+                        i += 2;
+                    }
+                    catch(NumberFormatException e)
+                    {
+                        sb.append(c);
+                    }
+                }
+                else
+                {
+                    sb.append(c);
+                }
+            }
+            else
+            {
+                byteOffset = decodeAndAppendBytes(bytes, byteOffset, sb);
+                if(sb != null)
+                {
+                    sb.append(c);
+                }
+            }
+        }
+
+        if(sb == null)
+        {
+            return in;
+        }
+        else
+        {
+            decodeAndAppendBytes(bytes, byteOffset, sb);
+            return sb.toString();
+        }
+    }
+
+    private static int decodeAndAppendBytes(byte[] bytes, int byteOffset, StringBuilder sb)
+    {
+        if(byteOffset > 0)
+        {
+            try
+            {
+                sb.append(new String(bytes, 0, byteOffset, "UTF-8"));
+                byteOffset = 0;
+            }
+            catch (UnsupportedEncodingException e)
+            {
+                throw new RuntimeException(e);
+            }
+        }
+        return byteOffset;
     }
 
     private static boolean allowedInURIComponent(char c)
@@ -664,13 +778,31 @@ public class StringUtils
         }
         else
         {
-            return true;
+            return false;
         }
     }
 
-    private static String toHexString(char c)
+    private static String toHexString(byte c)
     {
-        return Integer.toString(c, 16);
+        return Integer.toString(c < 0 ? c + 256 : c, 16);
+    }
+
+    private static byte fromHexString(String s)
+    {
+        if(s.length() != 2)
+        {
+            throw new NumberFormatException("Expecting two-character string to conver to a single byte");
+        }
+
+        int v = Integer.parseInt(s, 16);
+        if(v > Byte.MAX_VALUE)
+        {
+            return (byte)(v - 256);
+        }
+        else
+        {
+            return (byte)v;
+        }
     }
 
     /**

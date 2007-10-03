@@ -7,6 +7,7 @@ hiddenFields.push({id: 'submitField', name: 'submitField', value: ''});
     <#assign parameters=field.parameters>
     fieldConfig = {
         width: 200
+      , validateOnBlur: false
     <#if form.readOnly>
       , disabled: true
     </#if>

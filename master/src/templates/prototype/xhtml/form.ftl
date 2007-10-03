@@ -15,7 +15,7 @@ width of its contents.  Floating it works, but hurts other things.
     {
         var form = new ZUTUBI.Form({
             method: 'post',
-            waitMsgTarget: true
+            waitMsgTarget: 'center'
         });
 
         function submitForm(value)
