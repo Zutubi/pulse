@@ -110,7 +110,6 @@ public class ConfigurationUIModel
             }
         }
 
-        instance = configurationTemplateManager.getInstance(path);
         type = configurationTemplateManager.getType(path);
         targetType = type.getTargetType();
 

@@ -1348,6 +1348,11 @@ public class ConfigurationTemplateManager implements Synchronization
     public Configuration getInstance(String path)
     {
         State state = getState();
+        if (state == null)
+        {
+            return null;    
+        }
+
         Configuration instance = state.instances.get(path);
         if (instance == null)
         {
@@ -1359,7 +1364,11 @@ public class ConfigurationTemplateManager implements Synchronization
 
     private ConfigurationTemplateManager.State getState()
     {
-        return stateWrapper.get();
+        if (stateWrapper != null)
+        {
+            return stateWrapper.get();
+        }
+        return null;
     }
 
     /**
@@ -1680,17 +1689,24 @@ public class ConfigurationTemplateManager implements Synchronization
     {
         List<Event> eventsToPublish = new LinkedList<Event>();
         State state = getState();
-        
+
         eventsToPublish.addAll(state.pendingEvents);
         state.pendingEvents.clear();
 
         // we only want to generate events if the transaction that made the changes is successful.
         if (status == TransactionStatus.COMMITTED)
         {
+            userTransaction.begin();
             for (Event event : eventsToPublish)
             {
                 eventManager.publish(event);
+                if (event instanceof PostInsertEvent)
+                {
+                    PostInsertEvent postInsertEvent = (PostInsertEvent) event;
+                    updateInternalProperties(postInsertEvent.getInstance());
+                }
             }
+            userTransaction.commit();
         }
     }
 

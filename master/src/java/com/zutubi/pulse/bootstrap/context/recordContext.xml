@@ -18,7 +18,7 @@
     
     <bean id="recordManager" class="com.zutubi.prototype.type.record.RecordManager">
         <property name="transactionManager">
-            <ref local="recordTransactionManager"/>
+            <ref bean="recordTransactionManager"/>
         </property>
     </bean>
 
@@ -27,12 +27,10 @@
             <ref local="recordRoot"/>
         </property>
         <property name="transactionManager">
-            <ref local="recordTransactionManager"/>
+            <ref bean="recordTransactionManager"/>
         </property>
     </bean>
 
-    <bean id="recordTransactionManager" class="com.zutubi.prototype.transaction.TransactionManager" autowire="byName"/>
-    
     <bean id="configurationProvider" class="com.zutubi.prototype.config.DefaultConfigurationProvider" autowire="byName"/>
 </beans>
         
