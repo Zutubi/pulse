@@ -9,6 +9,7 @@ import com.zutubi.prototype.transaction.Transaction;
 import com.zutubi.prototype.transaction.TransactionManager;
 import com.zutubi.prototype.transaction.TransactionStatus;
 import com.zutubi.prototype.transaction.TransactionalWrapper;
+import com.zutubi.prototype.transaction.UserTransaction;
 import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.*;
 import com.zutubi.pulse.core.config.Configuration;
@@ -23,6 +24,8 @@ import com.zutubi.validation.ValidationManager;
 import com.zutubi.validation.i18n.MessagesTextProvider;
 
 import java.util.*;
+
+import org.acegisecurity.AccessDeniedException;
 
 /**
  */
@@ -45,6 +48,8 @@ public class ConfigurationTemplateManager implements Synchronization
 
     private TransactionManager transactionManager;
 
+    private UserTransaction userTransaction;
+
     private ValidationManager validationManager;
     private int refreshCount = 0;
 
@@ -52,6 +57,8 @@ public class ConfigurationTemplateManager implements Synchronization
     {
         stateWrapper = new StateTransactionalWrapper();
         stateWrapper.setTransactionManager(transactionManager);
+
+        userTransaction = new UserTransaction(transactionManager);
 
         refreshCaches();
     }
@@ -205,7 +212,33 @@ public class ConfigurationTemplateManager implements Synchronization
         return record;
     }
 
-    public String insert(String path, Object instance)
+    private Object executeInsideTransaction(Action a)
+    {
+        userTransaction.begin();
+        try
+        {
+            Object result = a.execute();
+            userTransaction.commit();
+            return result;
+        }
+        catch (RuntimeException e)
+        {
+            userTransaction.rollback();
+            throw e;
+        }
+        catch (Throwable t)
+        {
+            userTransaction.rollback();
+            throw new ConfigRuntimeException(t);
+        }
+    }
+
+    private interface Action
+    {
+        Object execute() throws Exception;
+    }
+
+    public String insert(final String path, Object instance)
     {
         CompositeType type = typeRegistry.getType(instance.getClass());
         if (type == null)
@@ -215,8 +248,14 @@ public class ConfigurationTemplateManager implements Synchronization
 
         try
         {
-            MutableRecord record = type.unstantiate(instance);
-            return insertRecord(path, record);
+            final MutableRecord record = type.unstantiate(instance);
+            return (String) executeInsideTransaction(new Action()
+            {
+                public Object execute() throws Exception
+                {
+                    return insertRecord(path, record);
+                }
+            });
         }
         catch (TypeException e)
         {
@@ -225,70 +264,78 @@ public class ConfigurationTemplateManager implements Synchronization
     }
 
     @SuppressWarnings({"unchecked"})
-    public String insertRecord(final String path, MutableRecord record)
+    public String insertRecord(final String path, final MutableRecord r)
     {
         checkPersistent(path);
         configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_CREATE);
 
-        ComplexType type = getType(path);
-
-        // Determine the path at which the record will be inserted.  This is
-        // type-dependent.
-        String newPath = type.getInsertionPath(path, record);
-        if (pathExists(newPath))
+        return (String) executeInsideTransaction(new Action()
         {
-            throw new IllegalArgumentException("Invalid insertion path '" + newPath + "': record already exists (use save to modify)");
-        }
-
-        Type expectedType;
-        if (type instanceof CollectionType)
-        {
-            expectedType = type.getTargetType();
-        }
-        else
-        {
-            // If we are inserting into an object, then the object is defined by the parent path, and the record
-            // must represent data for that objects specified property.
-            String parentPath = PathUtils.getParentPath(path);
-            CompositeType parentType = (CompositeType) configurationPersistenceManager.getType(parentPath);
-            expectedType = parentType.getDeclaredPropertyType(PathUtils.getBaseName(path));
-        }
-
-        CompositeType actualType = checkRecordType(expectedType, record);
-
-        // If inserting into a template path, we have two cases:
-        //   - Inserting a new entry in the top collection (e.g. a project).
-        //     In this case we need to build a skeleton out of the parent.
-        //   - Inserting within an existing template.  In this case we need
-        //     to add matching skeletons to our descendents.
-        final String[] elements = PathUtils.getPathElements(newPath);
-        final String scope = elements[0];
-        ConfigurationScopeInfo scopeInfo = configurationPersistenceManager.getScopeInfo(scope);
-        if (scopeInfo.isTemplated())
-        {
-            if (elements.length == 2)
+            public Object execute() throws Exception
             {
-                // Brand new, if we have a parent we need to skeletonise.
-                record = applyParentSkeleton(newPath, record, actualType);
-            }
-            else
-            {
-                TemplateHierarchy hierarchy = getTemplateHierarchy(scope);
-                TemplateNode node = hierarchy.getNodeById(elements[1]);
+                MutableRecord record = r;
 
-                if (!node.isConcrete())
+                ComplexType type = getType(path);
+
+                // Determine the path at which the record will be inserted.  This is
+                // type-dependent.
+                String newPath = type.getInsertionPath(path, record);
+                if (pathExists(newPath))
                 {
-                    addInheritedSkeletons(elements, actualType, record, node);
+                    throw new IllegalArgumentException("Invalid insertion path '" + newPath + "': record already exists (use save to modify)");
                 }
+
+                Type expectedType;
+                if (type instanceof CollectionType)
+                {
+                    expectedType = type.getTargetType();
+                }
+                else
+                {
+                    // If we are inserting into an object, then the object is defined by the parent path, and the record
+                    // must represent data for that objects specified property.
+                    String parentPath = PathUtils.getParentPath(path);
+                    CompositeType parentType = (CompositeType) configurationPersistenceManager.getType(parentPath);
+                    expectedType = parentType.getDeclaredPropertyType(PathUtils.getBaseName(path));
+                }
+
+                CompositeType actualType = checkRecordType(expectedType, record);
+
+                // If inserting into a template path, we have two cases:
+                //   - Inserting a new entry in the top collection (e.g. a project).
+                //     In this case we need to build a skeleton out of the parent.
+                //   - Inserting within an existing template.  In this case we need
+                //     to add matching skeletons to our descendents.
+                final String[] elements = PathUtils.getPathElements(newPath);
+                final String scope = elements[0];
+                ConfigurationScopeInfo scopeInfo = configurationPersistenceManager.getScopeInfo(scope);
+                if (scopeInfo.isTemplated())
+                {
+                    if (elements.length == 2)
+                    {
+                        // Brand new, if we have a parent we need to skeletonise.
+                        record = applyParentSkeleton(newPath, record, actualType);
+                    }
+                    else
+                    {
+                        TemplateHierarchy hierarchy = getTemplateHierarchy(scope);
+                        TemplateNode node = hierarchy.getNodeById(elements[1]);
+
+                        if (!node.isConcrete())
+                        {
+                            addInheritedSkeletons(elements, actualType, record, node);
+                        }
+                    }
+                }
+
+                recordManager.insert(newPath, record);
+                refreshCaches();
+                State state = getState();
+                raiseInsertEvents(state.instances, getDescendentPaths(newPath, false, true));
+
+                return newPath;
             }
-        }
-
-        recordManager.insert(newPath, record);
-        refreshCaches();
-        State state = getState();
-        raiseInsertEvents(state.instances, getDescendentPaths(newPath, false, true));
-
-        return newPath;
+        });
     }
 
     private MutableRecord applyParentSkeleton(String newPath, MutableRecord record, CompositeType actualType)
@@ -825,7 +872,7 @@ public class ConfigurationTemplateManager implements Synchronization
      *                                  of an unknown type or does not meet the requirements of
      *                                  saveRecord
      */
-    public String save(Configuration instance)
+    public String save(final Configuration instance)
     {
         if (instance.getConfigurationPath() == null)
         {
@@ -838,17 +885,23 @@ public class ConfigurationTemplateManager implements Synchronization
             throw new IllegalArgumentException("Attempt to save instance of an unknown class '" + instance.getClass().getName() + "'");
         }
 
-        MutableRecord record;
         try
         {
-            record = type.unstantiate(instance);
+            final MutableRecord record = type.unstantiate(instance);
+
+            return (String) executeInsideTransaction(new Action()
+            {
+                public Object execute() throws Exception
+                {
+                    return saveRecord(instance.getConfigurationPath(), record, true);
+                }
+            });
         }
         catch (TypeException e)
         {
             throw new ConfigRuntimeException(e);
         }
 
-        return saveRecord(instance.getConfigurationPath(), record, true);
     }
 
     /**
@@ -886,7 +939,7 @@ public class ConfigurationTemplateManager implements Synchronization
      * @throws IllegalArgumentException when the arguments do not meet the
      *                                  criteria outlined
      */
-    public String saveRecord(String path, MutableRecord record, boolean deep)
+    public String saveRecord(final String path, final MutableRecord record, final boolean deep)
     {
         checkPersistent(path);
         configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_WRITE);
@@ -896,13 +949,13 @@ public class ConfigurationTemplateManager implements Synchronization
             throw new IllegalArgumentException("Record has no type (note that collections should not be saved directly)");
         }
 
-        Record existingRecord = getRecord(path);
+        final Record existingRecord = getRecord(path);
         if (existingRecord == null)
         {
             throw new IllegalArgumentException("Illegal path '" + path + "': no existing record found");
         }
 
-        String parentPath = PathUtils.getParentPath(path);
+        final String parentPath = PathUtils.getParentPath(path);
         if (parentPath == null)
         {
             throw new IllegalArgumentException("Illegal path '" + path + "': no parent record");
@@ -914,47 +967,55 @@ public class ConfigurationTemplateManager implements Synchronization
             throw new IllegalArgumentException("Saved record has type '" + record.getSymbolicName() + "' which does not match existing type '" + existingRecord.getSymbolicName() + "'");
         }
 
-        ComplexType parentType = configurationPersistenceManager.getType(parentPath);
-        String newPath = parentType.getSavePath(path, record);
-        CompositeType type = typeRegistry.getType(record.getSymbolicName());
+        final ConfigurationTemplateManager source = this;
 
-        MutableRecord newRecord = updateRecord(existingRecord, record, type);
-        if (newPath.equals(path))
+        return (String) executeInsideTransaction(new Action()
         {
-            // Regular update
-            recordManager.update(newPath, newRecord);
-        }
-        else
-        {
-            // We need to update the path by moving.  If templating, this
-            // means also moving all children, *except* at the top level.
-            if (existingRecord instanceof TemplateRecord)
+            public Object execute() throws Exception
             {
-                moveDescendents(path, newPath);
+                ComplexType parentType = configurationPersistenceManager.getType(parentPath);
+                String newPath = parentType.getSavePath(path, record);
+                CompositeType type = typeRegistry.getType(record.getSymbolicName());
+
+                MutableRecord newRecord = updateRecord(existingRecord, record, type);
+                if (newPath.equals(path))
+                {
+                    // Regular update
+                    recordManager.update(newPath, newRecord);
+                }
+                else
+                {
+                    // We need to update the path by moving.  If templating, this
+                    // means also moving all children, *except* at the top level.
+                    if (existingRecord instanceof TemplateRecord)
+                    {
+                        moveDescendents(path, newPath);
+                    }
+
+                    recordManager.move(path, newPath);
+                    recordManager.update(newPath, newRecord);
+                }
+
+                refreshCaches();
+
+                State state = getState();
+                for (String concretePath : getDescendentPaths(newPath, false, true))
+                {
+                    Configuration instance = state.instances.get(concretePath);
+                    if (isComposite(instance))
+                    {
+                        publishEvent(new PostSaveEvent(source, instance));
+                    }
+                }
+
+                if (deep)
+                {
+                    synchroniseChildRecords(newPath, existingRecord, record);
+                }
+
+                return newPath;
             }
-
-            recordManager.move(path, newPath);
-            recordManager.update(newPath, newRecord);
-        }
-
-        refreshCaches();
-
-        State state = getState();
-        for (String concretePath : getDescendentPaths(newPath, false, true))
-        {
-            Configuration instance = state.instances.get(concretePath);
-            if (isComposite(instance))
-            {
-                publishEvent(new PostSaveEvent(this, instance));
-            }
-        }
-
-        if (deep)
-        {
-            synchroniseChildRecords(newPath, existingRecord, record);
-        }
-
-        return newPath;
+        });
     }
 
     private void synchroniseChildRecords(String path, Record existingRecord, MutableRecord record)
@@ -1209,38 +1270,52 @@ public class ConfigurationTemplateManager implements Synchronization
             throw new IllegalArgumentException("Cannot delete instance at path '" + path + "': marked permanent");
         }
 
+        final ConfigurationTemplateManager source = this;
 
-        State state = getState();
-        List<PostDeleteEvent> events = new LinkedList<PostDeleteEvent>();
-        for (String concretePath : getDescendentPaths(path, false, true))
+        executeInsideTransaction(new Action()
         {
-            for (Object instance : state.instances.getAllDescendents(concretePath))
+            public Object execute() throws Exception
             {
-                if (isComposite(instance))
+                State state = getState();
+                List<PostDeleteEvent> events = new LinkedList<PostDeleteEvent>();
+                for (String concretePath : getDescendentPaths(path, false, true))
                 {
-                    Configuration configuration = (Configuration) instance;
-                    events.add(new PostDeleteEvent(this, configuration, !concretePath.equals(configuration.getConfigurationPath())));
+                    for (Object instance : state.instances.getAllDescendents(concretePath))
+                    {
+                        if (isComposite(instance))
+                        {
+                            Configuration configuration = (Configuration) instance;
+                            events.add(new PostDeleteEvent(source, configuration, !concretePath.equals(configuration.getConfigurationPath())));
+                        }
+                    }
                 }
+
+                getCleanupTasks(path).execute();
+                refreshCaches();
+
+                for (PostDeleteEvent event : events)
+                {
+                    publishEvent(event);
+                }
+                return null;
             }
-        }
-
-        getCleanupTasks(path).execute();
-        refreshCaches();
-
-        for (PostDeleteEvent event : events)
-        {
-            publishEvent(event);
-        }
+        });
     }
 
     public int deleteAll(final String pathPattern)
     {
-        List<String> paths = recordManager.getAllPaths(pathPattern);
-        for (String path : paths)
+        return (Integer)executeInsideTransaction(new Action()
         {
-            delete(path);
-        }
-        return paths.size();
+            public Object execute() throws Exception
+            {
+                List<String> paths = recordManager.getAllPaths(pathPattern);
+                for (String path : paths)
+                {
+                    delete(path);
+                }
+                return paths.size();
+            }
+        });
     }
 
     @SuppressWarnings({"unchecked"})
