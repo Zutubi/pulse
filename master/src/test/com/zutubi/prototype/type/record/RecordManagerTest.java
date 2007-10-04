@@ -510,7 +510,7 @@ public class RecordManagerTest extends PulseTestCase
         final Record insertedRecord = recordManager.insert("path", record);
 
         assertNotNull(recordManager.select("path"));
-        executeOnSeparateThread(new Runnable()
+        executeOnSeparateThreadAndWait(new Runnable()
         {
             public void run()
             {
@@ -522,7 +522,7 @@ public class RecordManagerTest extends PulseTestCase
         userTransaction.commit();
 
         assertNotNull(recordManager.select("path"));
-        executeOnSeparateThread(new Runnable()
+        executeOnSeparateThreadAndWait(new Runnable()
         {
             public void run()
             {
@@ -540,7 +540,7 @@ public class RecordManagerTest extends PulseTestCase
         recordManager.insert("path", record);
 
         assertNotNull(recordManager.select("path"));
-        executeOnSeparateThread(new Runnable()
+        executeOnSeparateThreadAndWait(new Runnable()
         {
             public void run()
             {
@@ -566,7 +566,7 @@ public class RecordManagerTest extends PulseTestCase
         final Record insertedRecord = recordManager.insert("path", record);
 
         assertNotNull(recordManager.select("path"));
-        executeOnSeparateThread(new Runnable()
+        executeOnSeparateThreadAndWait(new Runnable()
         {
             public void run()
             {
@@ -575,7 +575,7 @@ public class RecordManagerTest extends PulseTestCase
         });
 
         assertEquals("path", recordManager.getPathForHandle(insertedRecord.getHandle()));
-        executeOnSeparateThread(new Runnable()
+        executeOnSeparateThreadAndWait(new Runnable()
         {
             public void run()
             {

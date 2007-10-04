@@ -96,7 +96,7 @@ public class InMemoryRecordStoreTest extends PulseTestCase
         newRecord.put("a", "b");
         recordStore.insert("path", newRecord);
 
-        executeOnSeparateThread(new Runnable()
+        executeOnSeparateThreadAndWait(new Runnable()
         {
             public void run()
             {
@@ -150,7 +150,7 @@ public class InMemoryRecordStoreTest extends PulseTestCase
         update.put("c", "d");
         recordStore.update("path", update);
 
-        executeOnSeparateThread(new Runnable()
+        executeOnSeparateThreadAndWait(new Runnable()
         {
             public void run()
             {
@@ -200,7 +200,7 @@ public class InMemoryRecordStoreTest extends PulseTestCase
 
         recordStore.delete("path");
 
-        executeOnSeparateThread(new Runnable()
+        executeOnSeparateThreadAndWait(new Runnable()
         {
             public void run()
             {
@@ -215,7 +215,7 @@ public class InMemoryRecordStoreTest extends PulseTestCase
         newRecord.put("a", "b");
         recordStore.insert("path", newRecord);
 
-        executeOnSeparateThread(new Runnable()
+        executeOnSeparateThreadAndWait(new Runnable()
         {
             public void run()
             {
@@ -225,7 +225,7 @@ public class InMemoryRecordStoreTest extends PulseTestCase
 
         transaction.commit();
 
-        executeOnSeparateThread(new Runnable()
+        executeOnSeparateThreadAndWait(new Runnable()
         {
             public void run()
             {
@@ -241,7 +241,7 @@ public class InMemoryRecordStoreTest extends PulseTestCase
         recordStore.insert("path", newRecord);
 
         assertNotNull(recordStore.select().get("path"));
-        executeOnSeparateThread(new Runnable()
+        executeOnSeparateThreadAndWait(new Runnable()
         {
             public void run()
             {
@@ -252,7 +252,7 @@ public class InMemoryRecordStoreTest extends PulseTestCase
         transaction.rollback();
 
         assertNull(recordStore.select().get("path"));
-        executeOnSeparateThread(new Runnable()
+        executeOnSeparateThreadAndWait(new Runnable()
         {
             public void run()
             {
@@ -270,7 +270,7 @@ public class InMemoryRecordStoreTest extends PulseTestCase
         recordStore.insert("path", newRecord);
 
         // the change is available immediately.
-        executeOnSeparateThread(new Runnable()
+        executeOnSeparateThreadAndWait(new Runnable()
         {
             public void run()
             {

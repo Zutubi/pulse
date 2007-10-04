@@ -320,7 +320,7 @@ public abstract class PulseTestCase extends TestCase
     {
         int retries = 0;
 
-        while(true)
+        while (true)
         {
             Socket sock = new Socket();
             try
@@ -330,7 +330,7 @@ public abstract class PulseTestCase extends TestCase
             }
             catch (IOException e)
             {
-                if(retries++ < 10)
+                if (retries++ < 10)
                 {
                     try
                     {
@@ -351,13 +351,13 @@ public abstract class PulseTestCase extends TestCase
     protected <T> void assertListEquals(List<T> got, T... expected)
     {
         assertEquals(expected.length, got.size());
-        for(int i = 0; i < expected.length; i++)
+        for (int i = 0; i < expected.length; i++)
         {
             assertEquals(expected[i], got.get(i));
         }
     }
 
-    protected void executeOnSeparateThread(final Runnable r)
+    protected void executeOnSeparateThreadAndWait(final Runnable r)
     {
         try
         {
@@ -388,5 +388,17 @@ public abstract class PulseTestCase extends TestCase
         {
             // noop.
         }
-    }    
+    }
+
+    protected void executeOnSeparateThread(final Runnable r)
+    {
+        Thread thread = new Thread(new Runnable()
+        {
+            public void run()
+            {
+                r.run();
+            }
+        });
+        thread.start();
+    }
 }

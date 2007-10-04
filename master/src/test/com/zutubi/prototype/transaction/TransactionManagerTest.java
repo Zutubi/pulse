@@ -1,13 +1,13 @@
 package com.zutubi.prototype.transaction;
 
-import junit.framework.TestCase;
+import com.zutubi.pulse.test.PulseTestCase;
 import junit.framework.Assert;
 
 /**
  *
  *
  */
-public class TransactionManagerTest extends TestCase
+public class TransactionManagerTest extends PulseTestCase
 {
     private TransactionManager transactionManager;
 
@@ -65,7 +65,7 @@ public class TransactionManagerTest extends TestCase
         assertTrue(resource.isRolledback());
     }
 
-    public void testRollbackDueToPreparFailure()
+    public void testRollbackDueToPrepareFailure()
     {
         UserTransaction userTransaction = new UserTransaction(transactionManager);
         userTransaction.begin();
@@ -178,6 +178,49 @@ public class TransactionManagerTest extends TestCase
         assertEquals(TransactionStatus.ROLLEDBACK, transaction.getStatus());
     }
 
+    public void testSerialisationOfTransactions()
+    {
+        UserTransaction userTransaction = new UserTransaction(transactionManager);
+        userTransaction.begin();
+
+        final TransactionalResource e = new TransactionalResource(transactionManager);
+
+        executeOnSeparateThread(new Runnable()
+        {
+            public void run()
+            {
+                UserTransaction userTransaction = new UserTransaction(transactionManager);
+                userTransaction.begin();
+
+                e.interactWithMe();
+
+                userTransaction.commit();
+            }
+        });
+
+        pause();
+
+        assertFalse(e.isInteractionOccured());
+
+        userTransaction.commit();
+
+        pause();
+
+        assertTrue(e.isInteractionOccured());
+    }
+
+    private void pause()
+    {
+        try
+        {
+            Thread.sleep(500);
+        }
+        catch (InterruptedException e1)
+        {
+            // noop.
+        }
+    }
+
     private class TransactionalResource implements TransactionResource
     {
         private TransactionManager transactionManager;
@@ -185,7 +228,7 @@ public class TransactionManagerTest extends TestCase
         private boolean prepared = false;
         private boolean committed = false;
         private boolean rolledback = false;
-
+        private boolean interactionOccured = false;
         private boolean preparationResponse = true;
 
         public TransactionalResource(TransactionManager transactionManager)
@@ -197,6 +240,8 @@ public class TransactionManagerTest extends TestCase
         {
             Transaction txn = this.transactionManager.getTransaction();
             txn.enlistResource(this);
+
+            interactionOccured = true;
         }
 
         public void setPreparationResponse(boolean preparationResponse)
@@ -244,6 +289,11 @@ public class TransactionManagerTest extends TestCase
         public boolean isRolledback()
         {
             return rolledback;
+        }
+
+        public boolean isInteractionOccured()
+        {
+            return interactionOccured;
         }
     }
 }

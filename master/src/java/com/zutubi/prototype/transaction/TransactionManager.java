@@ -1,6 +1,7 @@
 package com.zutubi.prototype.transaction;
 
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * The transaction manager is responsible for managing the systems transactions.  It begins, rolls back,
@@ -14,7 +15,7 @@ public class TransactionManager
 {
     private ThreadLocal<Transaction> transactionHolder = new ThreadLocal<Transaction>();
 
-    final AtomicBoolean activeTransaction = new AtomicBoolean(false);
+    private Lock activeTransaction = new ReentrantLock();
 
     public TransactionManager()
     {
@@ -42,13 +43,15 @@ public class TransactionManager
         // current thread, then we wait until it is completed before continuing.  We are effectively
         // waiting on the transaction lock becoming available.
 
-
         if (transactionHolder.get() == null)
         {
             // No transaction in progress, so start one.
             Transaction txn = new Transaction(this);
             txn.setStatus(TransactionStatus.ACTIVE);
             transactionHolder.set(txn);
+
+            activeTransaction.lock();
+
         }
         else
         {
@@ -108,6 +111,9 @@ public class TransactionManager
             }
 
             currentTransaction.setStatus(TransactionStatus.COMMITTED);
+
+            transactionHolder.set(null);
+            activeTransaction.unlock();
         }
         else
         {
@@ -115,7 +121,6 @@ public class TransactionManager
 
             //Question: indicate the failure to commit by throwing an exception?
         }
-        transactionHolder.set(null);
 
         for (Synchronization synchronization : currentTransaction.getSynchronizations())
         {
@@ -147,6 +152,7 @@ public class TransactionManager
         currentTransaction.setStatus(TransactionStatus.ROLLEDBACK);
 
         transactionHolder.set(null);
+        activeTransaction.unlock();
 
         for (Synchronization synchronization : currentTransaction.getSynchronizations())
         {

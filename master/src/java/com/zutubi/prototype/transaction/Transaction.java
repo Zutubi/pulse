@@ -30,6 +30,13 @@ public class Transaction
      */
     private TransactionStatus status = TransactionStatus.INACTIVE;
 
+    /**
+     * Transaction depth represents the nested depth of the transaction, and is used
+     * to ensure that a transaction is not commited when nested within another transaction
+     * begin - commit.
+     */
+    private int depth;
+
     Transaction(TransactionManager transactionManager)
     {
         this.transactionManager = transactionManager;
@@ -144,5 +151,15 @@ public class Transaction
         {
             throw new IllegalStateException("Invalid transaction status: " + status.toString().toLowerCase());
         }
+    }
+
+    void setDepth(int depth)
+    {
+        this.depth = depth;
+    }
+
+    int getDepth()
+    {
+        return depth;
     }
 }

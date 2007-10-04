@@ -60,7 +60,7 @@ public class FileSystemRecordStoreTest extends PulseTestCase
         assertNotNull(inserted);
 
         // assert that it is not visible to other threads.
-        executeOnSeparateThread(new Runnable()
+        executeOnSeparateThreadAndWait(new Runnable()
         {
             public void run()
             {
@@ -72,7 +72,7 @@ public class FileSystemRecordStoreTest extends PulseTestCase
         transaction.commit();
 
         // assert that it is available to other threads.
-        executeOnSeparateThread(new Runnable()
+        executeOnSeparateThreadAndWait(new Runnable()
         {
             public void run()
             {
@@ -103,7 +103,7 @@ public class FileSystemRecordStoreTest extends PulseTestCase
         assertNull(deleted);
 
         // assert that it is not visible to other threads.
-        executeOnSeparateThread(new Runnable()
+        executeOnSeparateThreadAndWait(new Runnable()
         {
             public void run()
             {
@@ -118,7 +118,7 @@ public class FileSystemRecordStoreTest extends PulseTestCase
         assertNull(deleted);
 
         // assert that it is available to other threads.
-        executeOnSeparateThread(new Runnable()
+        executeOnSeparateThreadAndWait(new Runnable()
         {
             public void run()
             {
