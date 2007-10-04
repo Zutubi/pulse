@@ -2,6 +2,8 @@
 
 set -e
 
+. "$(dirname $0)/common.inc"
+
 if [[ $# -ne 1 ]]
 then
     echo "Usage: $0 <version>"
@@ -9,8 +11,12 @@ then
 fi
 
 version=$1
+
+"$scripts/teardown-services.sh"
+
+# Kill pulse
 export PULSE_HOME=
-./pulse-accept/pulse-${version}/bin/pulse shutdown -p 8889
+"$working/pulse-accept/pulse-${version}/bin/pulse" shutdown -p 8889
 
 # Wait for it to shut down
 while netstat -an | grep 8889 > /dev/null
@@ -18,12 +24,5 @@ do
     sleep 2
 done
 sleep 10
-
-# Kill selenium if we started it
-pidFile=./pulse-accept/selenium-pid.txt
-if [[ -f $pidFile ]]
-then
-    kill $(cat $pidFile)
-fi
 
 exit 0

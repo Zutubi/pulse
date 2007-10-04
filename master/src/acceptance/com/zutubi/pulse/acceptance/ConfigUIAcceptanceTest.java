@@ -63,17 +63,17 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         }
     }
 
-    // FIXME restore when we have a local svn server running
-//    public void testCheckForm() throws Exception
-//    {
-//        loginAsAdmin();
-//        ensureProject(CHECK_PROJECT);
-//        goTo(urls.adminProject(CHECK_PROJECT) + "scm/");
-//        SubversionForm form = new SubversionForm(selenium);
-//        form.waitFor();
-//        CheckForm checkForm = new CheckForm(form);
-//        checkForm.checkAndAssertResult(true, "ok");
-//    }
+    public void testCheckForm() throws Exception
+    {
+        loginAsAdmin();
+        ensureProject(CHECK_PROJECT);
+        goTo(urls.adminProject(CHECK_PROJECT) + "scm/");
+        SubversionForm form = new SubversionForm(selenium);
+        form.waitFor();
+        form.setFormElement("url", "svn://localhost:3088/");
+        CheckForm checkForm = new CheckForm(form);
+        checkForm.checkAndAssertResult(true, "ok");
+    }
 
     public void testCheckFormFailure() throws Exception
     {

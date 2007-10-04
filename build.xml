@@ -77,9 +77,8 @@
         <delete file="slave/etc/service.token"/>
         <delete file="slave/etc/runtime.properties"/>
 
-        <!-- clean out the acceptance test playground. -->
-        <delete dir="pulse-accept"/>
-        <delete dir="upgradetest"/>
+        <!-- clean out the script/test playground. -->
+        <delete dir="working"/>
 
         <!-- clean out the user.home/.pulse/* directory -->
         <delete dir="${user.home}/.pulse"/>        
@@ -442,11 +441,11 @@
 
         <echo message="Extract and start pulse-${pulse.version}.${extension}"/>
         <exec executable="bash" spawn="true">
-            <arg line="acceptance-test-prep.sh build/pulse-${pulse.version}.${extension}"/>
+            <arg line="scripts/acceptance-test-prep.sh build/pulse-${pulse.version}.${extension}"/>
         </exec>
 
         <exec executable="bash">
-            <arg line="acceptance-test-wait.sh"/>
+            <arg line="scripts/acceptance-test-wait.sh"/>
         </exec>
 
         <echo message="Start acceptance test suite."/>
@@ -476,7 +475,7 @@
             <report format="frames" todir="${report.dir}/html"/>
         </junitreport>
         <exec executable="bash">
-            <arg line="acceptance-test-post.sh ${pulse.version}"/>
+            <arg line="scripts/acceptance-test-post.sh ${pulse.version}"/>
         </exec>
         <fail message="One or more acceptance tests failed.  See the reports (${report.dir}) for details."
               if="test.failed"/>

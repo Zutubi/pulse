@@ -2,12 +2,7 @@
 
 set -e
 
-# Reports a fatal error and bails out
-fatal()
-{
-    echo $1
-    exit 1
-}
+. "$(dirname $0)/common.inc"
 
 if [[ $# -ne 1 ]]
 then
@@ -21,24 +16,24 @@ then
     fatal "Package '$package' does not exist."
 fi
 
+"$scripts/setup-services.sh"
+
 # Prepare a temp directory to test within
-top="$(pwd)"
-tmpDir=pulse-accept
-rm -rf $tmpDir
-mkdir $tmpDir
+acceptDir="$working/pulse-accept"
+rm -rf $acceptDir
+mkdir $acceptDir
 
 # Unpack that shiny new package
 extension="${package##*.}"
 if [[ $extension == "gz" ]]
 then
-    tar -zxv -C $tmpDir -f "$package"
+    tar -zxv -C $acceptDir -f "$package"
     extension=tar.gz
 else
-    unzip -d $tmpDir "$package"
+    unzip -d $acceptDir "$package"
 fi
 
 packageName="$(basename $package .$extension)"
-pushd "$tmpDir/$packageName"
 
 # Now create an appropriate database.config.properties file
 case "$PULSE_DB" in
@@ -73,7 +68,7 @@ case "$PULSE_DB" in
         ;;
 esac
 
-cat > versions/*/system/config/database.properties.template << EOF
+cat > "$acceptDir/$packageName"/versions/*/system/config/database.properties.template << EOF
 jdbc.driverClassName=$PULSE_DB_DRIVER
 jdbc.url=$PULSE_DB_URL
 jdbc.username=$PULSE_DB_USER
@@ -84,18 +79,11 @@ hibernate.jdbc.batch_size=0
 hibernate.jdbc.use_scrollable_resultsets=false
 EOF
 
-cp "$top/master/src/acceptance/drivers/"* versions/*/lib
-
-# Make sure selenium is running
-if ! netstat -an | grep 4444 > /dev/null
-then
-    java -jar "../..//master/src/acceptance/misc/"selenium-server-*.jar > ../selenium-stdout.txt 2> ../selenium-stderr.txt &
-    echo $! > ../selenium-pid.txt
-fi
+cp "$top/master/src/acceptance/drivers/"* "$acceptDir/$packageName"/versions/*/lib
 
 # Fire it up!
 export PULSE_HOME=
-"$(pwd)/bin/pulse" start -p 8889 -f config.properties > ../stdout.txt 2> ../stderr.txt
+"$acceptDir/$packageName/bin/pulse" start -p 8889 -f config.properties > ../stdout.txt 2> ../stderr.txt
 
 trap ERR
 

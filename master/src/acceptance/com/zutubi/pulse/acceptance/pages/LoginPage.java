@@ -12,7 +12,7 @@ public class LoginPage extends SeleniumPage
 
     public LoginPage(Selenium selenium, Urls urls)
     {
-        super(selenium, urls, "j_acegi_security_check", "login");
+        super(selenium, urls, "login-logo", "login");
     }
 
     public String getUrl()

@@ -31,7 +31,7 @@ def removeDir(dead):
         
         
 def createTestDir():
-    name = 'upgradetest'
+    name = 'working/upgradetest'
     if os.path.exists(name):
         removeDir(name)
     os.makedirs(name)
