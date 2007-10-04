@@ -80,10 +80,7 @@ public class FileSystemRecordStoreTest extends PulseTestCase
             }
         });
 
-        // restart
-        recordStore = new FileSystemRecordStore();
-        recordStore.setPersistenceDir(persistentDir);
-        recordStore.init();
+        restartRecordStore();
 
         // assert that it was successfully persisted.
         assertNotNull(recordStore.select().get("path"));
@@ -129,10 +126,7 @@ public class FileSystemRecordStoreTest extends PulseTestCase
             }
         });
 
-        // restart
-        recordStore = new FileSystemRecordStore();
-        recordStore.setPersistenceDir(persistentDir);
-        recordStore.init();
+        restartRecordStore();
 
         // assert that it was successfully persisted.
         assertNull(recordStore.select().get("path"));
@@ -151,10 +145,7 @@ public class FileSystemRecordStoreTest extends PulseTestCase
         // ensure that we have rolled back to the blank state.
         assertNull(recordStore.select().get("path"));
 
-        // restart
-        recordStore = new FileSystemRecordStore();
-        recordStore.setPersistenceDir(persistentDir);
-        recordStore.init();
+        restartRecordStore();
 
         assertNull(recordStore.select().get("path"));
     }
@@ -172,11 +163,18 @@ public class FileSystemRecordStoreTest extends PulseTestCase
         recordStore.insert("path", newRecord);
 
         // restart
-        recordStore = new FileSystemRecordStore();
-        recordStore.setPersistenceDir(persistentDir);
-        recordStore.init();
+        restartRecordStore();
 
         // assert that it was successfully persisted.
         assertNotNull(recordStore.select().get("path"));
     }
+
+    private void restartRecordStore()
+    {
+        recordStore = new FileSystemRecordStore();
+        recordStore.setPersistenceDir(persistentDir);
+        recordStore.setTransactionManager(transactionManager);
+        recordStore.init();
+    }
+
 }

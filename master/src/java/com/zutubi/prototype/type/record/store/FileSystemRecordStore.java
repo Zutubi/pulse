@@ -8,6 +8,7 @@ import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.util.FileSystemUtils;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  *
@@ -18,12 +19,15 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
     private static final String BACKUP_DIR = ".backup";
     private static final String ACTIVE_TXN_DIR = ".active";
     private static final String PERSISTENT_DIR = "data";
+    private static final String JOURNAL_DIR = ".journal";
 
     private File persistenceDir;
 
     private InMemoryRecordStore inMemoryStore;
 
     private TransactionManager transactionManager;
+
+    private Journal journal;
 
     public FileSystemRecordStore()
     {
@@ -45,6 +49,27 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
 
         inMemoryStore = new InMemoryRecordStore(base);
         inMemoryStore.setTransactionManager(transactionManager);
+
+        File journalDir = new File(persistenceDir, JOURNAL_DIR);
+        journalDir.mkdirs();
+        journal = new Journal(journalDir);
+
+        // apply existing journal entries.
+        for (JournalEntry entry : journal.getEntries())
+        {
+            if (entry.getAction().equals("insert"))
+            {
+                inMemoryStore.insert(entry.getPath(), entry.getRecord());
+            }
+            else if (entry.getAction().equals("update"))
+            {
+                inMemoryStore.update(entry.getPath(), entry.getRecord());
+            }
+            else if (entry.getAction().equals("delete"))
+            {
+                inMemoryStore.delete(entry.getPath());
+            }
+        }
     }
 
     public Record insert(final String path, final Record record)
@@ -88,41 +113,36 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
         {
             transactionManager.getTransaction().enlistResource(this);
         }
+        else
+        {
+            transactionManager.begin();
+            transactionManager.getTransaction().enlistResource(this);
+        }
 
         Record result = action.execute(inMemoryStore);
-        
+
         if (!activeTransaction)
         {
-            if (prepare())
-            {
-                commit();
-            }
-            else
-            {
-                rollback();
-            }
+            transactionManager.commit();
         }
         return result;
     }
 
     private Record insert(RecordStore base, String path, Record record)
     {
-        // For now, simply delegate the state storage to the in memory record store.
-        // Later, we will record these actions in a transaction journal
+        journal.add(new JournalEntry("insert", path, record));
         return base.insert(path, record);
     }
 
     private Record update(RecordStore base, String path, Record record)
     {
-        // For now, simply delegate the state storage to the in memory record store.
-        // Later, we will record these actions in a transaction journal
+        journal.add(new JournalEntry("update", path, record));
         return base.update(path, record);
     }
 
     private Record delete(RecordStore base, String path)
     {
-        // For now, simply delegate the state storage to the in memory record store.
-        // Later, we will record these actions in a transaction journal
+        journal.add(new JournalEntry("delete", path));
         return base.delete(path);
     }
 
@@ -160,17 +180,28 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
 
     public boolean prepare()
     {
-        // write contents to .active directory.
-        File active = new File(persistenceDir, ACTIVE_TXN_DIR);
-        if (!active.mkdirs())
+        // check journal size. If size > x, then flush
+        if (journal.size() > 100)
         {
-            return false;
+            journal.clear();
+
+            // compact.
+            // write contents to .active directory.
+            File active = new File(persistenceDir, ACTIVE_TXN_DIR);
+            if (!active.mkdirs())
+            {
+                return false;
+            }
+
+            DefaultRecordSerialiser serialiser = new DefaultRecordSerialiser(active);
+            serialiser.serialise("", inMemoryStore.select(), true);
+
+            return true;
         }
-        
-        DefaultRecordSerialiser serialiser = new DefaultRecordSerialiser(active);
-        serialiser.serialise("", inMemoryStore.select(), true);
-        
-        return true;
+        else
+        {
+            return journal.prepare();
+        }
     }
 
     public void commit()
@@ -195,11 +226,14 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
         {
             FileSystemUtils.rmdir(dotbackup);
         }
+
+        journal.commit();
     }
 
     public void rollback()
     {
         recover();
+        journal.rollback();
     }
 
     private void recover()
