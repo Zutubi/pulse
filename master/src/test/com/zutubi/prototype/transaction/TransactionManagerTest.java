@@ -209,6 +209,50 @@ public class TransactionManagerTest extends PulseTestCase
         assertTrue(e.isInteractionOccured());
     }
 
+    public void testNestedTransaction()
+    {
+        UserTransaction userTransaction = new UserTransaction(transactionManager);
+        userTransaction.begin();
+
+        assertEquals(TransactionStatus.ACTIVE, userTransaction.getStatus());
+
+        userTransaction.begin();
+
+        // do something here.
+        TransactionalResource e = new TransactionalResource(transactionManager);
+        e.interactWithMe();
+
+        userTransaction.commit();
+
+        assertEquals(TransactionStatus.ACTIVE, userTransaction.getStatus());
+
+        userTransaction.commit();
+
+        assertTrue(e.isCommitted());
+    }
+
+    public void testNestedTransactionRollback()
+    {
+        UserTransaction userTransaction = new UserTransaction(transactionManager);
+        userTransaction.begin();
+
+        assertEquals(TransactionStatus.ACTIVE, userTransaction.getStatus());
+
+        userTransaction.begin();
+
+        // do something here.
+        TransactionalResource e = new TransactionalResource(transactionManager);
+        e.interactWithMe();
+
+        userTransaction.rollback();
+
+        assertEquals(TransactionStatus.ROLLBACKONLY, userTransaction.getStatus());
+
+        userTransaction.commit();
+
+        assertTrue(e.isRolledback());
+    }
+
     private void pause()
     {
         try

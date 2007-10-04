@@ -43,10 +43,12 @@ public class TransactionManager
         // current thread, then we wait until it is completed before continuing.  We are effectively
         // waiting on the transaction lock becoming available.
 
-        if (transactionHolder.get() == null)
+
+        Transaction txn = transactionHolder.get();
+        if (txn == null)
         {
             // No transaction in progress, so start one.
-            Transaction txn = new Transaction(this);
+            txn = new Transaction(this);
             txn.setStatus(TransactionStatus.ACTIVE);
             transactionHolder.set(txn);
 
@@ -56,9 +58,10 @@ public class TransactionManager
         else
         {
             // track the transaction depth...
+            txn.setDepth(txn.getDepth() + 1);
         }
 
-        return transactionHolder.get();
+        return txn;
     }
 
     public void commit() throws TransactionException
@@ -67,6 +70,13 @@ public class TransactionManager
         if (currentTransaction == null)
         {
             throw new TransactionException("No active transaction available.");
+        }
+
+        // check the txn depth.
+        if (currentTransaction.getDepth() > 0)
+        {
+            currentTransaction.setDepth(currentTransaction.getDepth() - 1);
+            return;
         }
 
         if (isRollbackOnly(currentTransaction))
@@ -142,6 +152,14 @@ public class TransactionManager
             throw new TransactionException("No active transaction available.");
         }
         
+        // check the txn depth.
+        if (currentTransaction.getDepth() > 0)
+        {
+            currentTransaction.setDepth(currentTransaction.getDepth() - 1);
+            currentTransaction.setStatus(TransactionStatus.ROLLBACKONLY);
+            return;
+        }
+
         currentTransaction.setStatus(TransactionStatus.ROLLINGBACK);
 
         for (TransactionResource resource : currentTransaction.getResources())
