@@ -1,31 +1,42 @@
 package com.zutubi.pulse.prototype.config.project;
 
+import com.zutubi.config.annotations.Form;
+import com.zutubi.config.annotations.Reference;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Transient;
 import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
 import com.zutubi.pulse.core.config.ResourceProperty;
-import com.zutubi.pulse.model.AnyCapableBuildHostRequirements;
-import com.zutubi.pulse.model.BuildHostRequirements;
 import com.zutubi.pulse.model.ResourceRequirement;
+import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 
 import java.util.List;
 import java.util.Map;
 
 /**
- *
- *
+ *  A build stage is a component of a build that represents the execution of a
+ * single recipe on an agent.  Stages execute independently and in parallel
+ * where possible, and the build result is the aggregation of all stage
+ * results.
  */
 @SymbolicName("zutubi.stageConfig")
+@Form(fieldOrder = {"name", "recipe", "agent"})
 public class BuildStageConfiguration extends AbstractNamedConfiguration
 {
-    @Transient
-    private BuildHostRequirements hostRequirements = new AnyCapableBuildHostRequirements();
-    
+    @Reference(optionProvider = "BuildStageAgentOptionProvider")
+    private AgentConfiguration agent;
     private String recipe;
-
     private Map<String, ResourceProperty> properties;
-
     private List<ResourceRequirement> requirements;
+
+    public AgentConfiguration getAgent()
+    {
+        return agent;
+    }
+
+    public void setAgent(AgentConfiguration agent)
+    {
+        this.agent = agent;
+    }
 
     public String getRecipe()
     {
@@ -62,13 +73,16 @@ public class BuildStageConfiguration extends AbstractNamedConfiguration
         this.requirements = requirements;
     }
 
-    public BuildHostRequirements getHostRequirements()
+    @Transient
+    public AgentRequirements getAgentRequirements()
     {
-        return hostRequirements;
-    }
-
-    public void setHostRequirements(BuildHostRequirements hostRequirements)
-    {
-        this.hostRequirements = hostRequirements;
+        if(agent == null)
+        {
+            return new AnyCapableAgentRequirements();
+        }
+        else
+        {
+            return new SpecificAgentRequirements(agent);
+        }
     }
 }

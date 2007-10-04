@@ -159,7 +159,7 @@ public class BuildController implements EventListener
             boolean incremental = !request.isPersonal() && checkoutScheme == CheckoutScheme.INCREMENTAL_UPDATE;
             List<ResourceProperty> recipeProperties = new LinkedList<ResourceProperty>(buildProperties);
             RecipeRequest recipeRequest = new RecipeRequest(projectConfig.getName(), recipeResult.getId(), stage.getRecipe(), incremental, true, projectConfig.getOptions().getRetainWorkingCopy(), getResourceRequirements(stage), recipeProperties);
-            RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(project, stage.getHostRequirements(), request.getRevision(), recipeRequest, buildResult);
+            RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(project, stage.getAgentRequirements(), request.getRevision(), recipeRequest, buildResult);
             DefaultRecipeLogger logger = new DefaultRecipeLogger(new File(paths.getRecipeDir(buildResult, recipeResult.getId()), RecipeResult.RECIPE_LOG));
             RecipeResultNode previousRecipe = previousSuccessful == null ? null : previousSuccessful.findResultNodeByHandle(stage.getHandle());
             RecipeController rc = new RecipeController(buildResult, childResultNode, dispatchRequest, request.isPersonal(), incremental, previousRecipe, logger, collector);

@@ -27,10 +27,14 @@ import com.zutubi.pulse.events.build.RecipeCompletedEvent;
 import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.logging.CustomLogRecord;
-import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.model.AgentState;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.UnknownBuildReason;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
+import com.zutubi.pulse.prototype.config.project.AgentRequirements;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.project.types.CustomTypeConfiguration;
 import com.zutubi.pulse.scm.ScmChangeEvent;
@@ -742,7 +746,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         Project project = new Project();
         project.setConfig(projectConfig);
         BuildResult result = new BuildResult(new UnknownBuildReason(), project, 100, false);
-        BuildHostRequirements requirements = new MockBuildHostRequirements(type);
+        AgentRequirements requirements = new MockAgentRequirements(type);
         RecipeRequest request = new RecipeRequest("project", id, null, null, null, false, false, false, null, new LinkedList<ResourceProperty>());
         request.setBootstrapper(new ChainBootstrapper());
         return new RecipeDispatchRequest(project, requirements, new BuildRevision(), request, result);
@@ -899,6 +903,11 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             throw new RuntimeException("Method not yet implemented.");
         }
 
+        public AgentConfiguration getAgentConfig()
+        {
+            throw new RuntimeException("Method not yet implemented.");
+        }
+
         public boolean hasResource(String resource, String version)
         {
             throw new RuntimeException("Method not implemented.");
@@ -958,18 +967,18 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         }
     }
 
-    class MockBuildHostRequirements implements BuildHostRequirements
+    class MockAgentRequirements implements AgentRequirements
     {
         private long type;
 
-        public MockBuildHostRequirements(long type)
+        public MockAgentRequirements(long type)
         {
             this.type = type;
         }
 
-        public BuildHostRequirements copy()
+        public AgentRequirements copy()
         {
-            return new MockBuildHostRequirements(type);
+            return new MockAgentRequirements(type);
         }
 
         public boolean fulfilledBy(RecipeDispatchRequest request, AgentService service)

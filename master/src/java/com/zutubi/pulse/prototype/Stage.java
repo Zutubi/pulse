@@ -1,9 +1,9 @@
 package com.zutubi.pulse.prototype;
 
 import com.zutubi.pulse.core.model.PersistentName;
-import com.zutubi.pulse.model.BuildHostRequirements;
 import com.zutubi.pulse.model.PostBuildAction;
 import com.zutubi.pulse.model.ResourceRequirement;
+import com.zutubi.pulse.prototype.config.project.AgentRequirements;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -16,7 +16,7 @@ import java.util.Map;
 public class Stage
 {
     private PersistentName pname;
-    private BuildHostRequirements hostRequirements;
+    private AgentRequirements hostRequirements;
     private String recipe;
     private List<ResourceRequirement> resourceRequirements = new LinkedList<ResourceRequirement>();
     private Map<String, PostBuildAction> postActions = new LinkedHashMap<String, PostBuildAction>();

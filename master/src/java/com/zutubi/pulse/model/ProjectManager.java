@@ -79,8 +79,6 @@ public interface ProjectManager extends EntityManager<Project>
     @SecureParameter(action = AccessManager.ACTION_VIEW)
     long getNextBuildNumber(Project project);
 
-    void delete(BuildHostRequirements hostRequirements);
-
     // These are secured as they use mapConfigsToProjects underneath
     Collection<ProjectGroup> getAllProjectGroups();
     ProjectGroup getProjectGroup(String name);

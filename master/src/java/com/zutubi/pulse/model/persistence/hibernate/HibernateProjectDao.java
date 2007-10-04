@@ -1,13 +1,9 @@
 package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.zutubi.pulse.model.BuildHostRequirements;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.RunExecutablePostBuildAction;
 import com.zutubi.pulse.model.TagPostBuildAction;
 import com.zutubi.pulse.model.persistence.ProjectDao;
-import com.zutubi.util.logging.Logger;
-
-import java.util.List;
 
 /**
  * 
@@ -15,8 +11,6 @@ import java.util.List;
  */
 public class HibernateProjectDao extends HibernateEntityDao<Project> implements ProjectDao
 {
-    private static final Logger LOG = Logger.getLogger(HibernateEntityDao.class);
-
     public Class persistentClass()
     {
         return Project.class;
@@ -40,15 +34,5 @@ public class HibernateProjectDao extends HibernateEntityDao<Project> implements 
     public RunExecutablePostBuildAction findRunExecutablePostBuildAction(long id)
     {
         return  (RunExecutablePostBuildAction) getHibernateTemplate().load(RunExecutablePostBuildAction.class, id);
-    }
-
-    public List<Project> findByAdminAuthority(String recipient)
-    {
-        return findByNamedQuery("findByAcl", "recipient", recipient);
-    }
-
-    public void delete(BuildHostRequirements hostRequirements)
-    {
-        getHibernateTemplate().delete(hostRequirements);
     }
 }

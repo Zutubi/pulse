@@ -614,11 +614,6 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
         state.setConfig(idToConfig.get(state.getId()));
     }
 
-    public void delete(BuildHostRequirements hostRequirements)
-    {
-        projectDao.delete(hostRequirements);
-    }
-
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;

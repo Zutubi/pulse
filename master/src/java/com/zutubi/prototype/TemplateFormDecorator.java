@@ -2,10 +2,10 @@ package com.zutubi.prototype;
 
 import com.zutubi.config.annotations.NoInherit;
 import com.zutubi.config.annotations.NoOverride;
+import com.zutubi.prototype.model.OptionFieldDescriptor;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.TemplateRecord;
-import com.zutubi.prototype.model.SelectFieldDescriptor;
 
 import java.lang.annotation.Annotation;
 
@@ -76,15 +76,15 @@ public class TemplateFormDecorator
         // user to not specify a value.
         for (FieldDescriptor field : descriptor.getFieldDescriptors())
         {
-            if(field instanceof SelectFieldDescriptor)
+            if(field instanceof OptionFieldDescriptor)
             {
-                SelectFieldDescriptor select = (SelectFieldDescriptor) field;
-                if (!select.getMultiple())
+                OptionFieldDescriptor optionFieldDescriptor = (OptionFieldDescriptor) field;
+                if (!optionFieldDescriptor.getMultiple())
                 {
-                    Object emptyOption = select.getEmptyOption();
+                    Object emptyOption = optionFieldDescriptor.getEmptyOption();
                     if(emptyOption != null)
                     {
-                        select.getList().add(0, emptyOption);
+                        optionFieldDescriptor.getList().add(0, emptyOption);
                     }
                 }
             }

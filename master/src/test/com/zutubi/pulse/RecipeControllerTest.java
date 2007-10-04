@@ -14,6 +14,7 @@ import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
+import com.zutubi.pulse.prototype.config.project.AnyCapableAgentRequirements;
 import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.services.UpgradeState;
 import com.zutubi.pulse.test.PulseTestCase;
@@ -60,7 +61,7 @@ public class RecipeControllerTest extends PulseTestCase
 
         RecipeRequest recipeRequest = new RecipeRequest("project", rootResult.getId(), rootResult.getRecipeName());
         BuildResult build = new BuildResult();
-        dispatchRequest = new RecipeDispatchRequest(new Project(), new MasterBuildHostRequirements(), new BuildRevision(), recipeRequest, null);
+        dispatchRequest = new RecipeDispatchRequest(new Project(), new AnyCapableAgentRequirements(), new BuildRevision(), recipeRequest, null);
         recipeController = new RecipeController(build, rootNode, dispatchRequest, false, false, null, logger, resultCollector);
         recipeController.setRecipeQueue(recipeQueue);
         recipeController.setBuildManager(buildManager);
@@ -472,6 +473,11 @@ public class RecipeControllerTest extends PulseTestCase
         }
 
         public List<CustomLogRecord> getRecentMessages()
+        {
+            throw new RuntimeException("Method not yet implemented.");
+        }
+
+        public AgentConfiguration getAgentConfig()
         {
             throw new RuntimeException("Method not yet implemented.");
         }

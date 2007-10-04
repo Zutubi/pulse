@@ -3,6 +3,7 @@ package com.zutubi.pulse;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.logging.CustomLogRecord;
+import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.services.SlaveStatus;
 
 import java.io.File;
@@ -19,6 +20,8 @@ public interface AgentService extends RemoteService
     List<Resource> discoverResources();
     SystemInfo getSystemInfo();
     List<CustomLogRecord> getRecentMessages();
+
+    AgentConfiguration getAgentConfig();
 
     /**
      * Returns true iff the service has the given version of the given

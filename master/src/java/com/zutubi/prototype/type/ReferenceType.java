@@ -61,7 +61,7 @@ public class ReferenceType extends SimpleType implements Type
         }
         else
         {
-            // Zero handle == null reference.
+            // Zero or negative handle == null reference.
             return null;
         }
     }

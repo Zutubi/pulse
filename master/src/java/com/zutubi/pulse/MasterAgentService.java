@@ -91,6 +91,11 @@ public class MasterAgentService implements AgentService
         return serverMessagesHandler.takeSnapshot();
     }
 
+    public AgentConfiguration getAgentConfig()
+    {
+        return agentConfig;
+    }
+
     public boolean hasResource(String resource, String version)
     {
         return getResourceManager().getAgentRepository(agentConfig.getHandle()).hasResource(resource, version);

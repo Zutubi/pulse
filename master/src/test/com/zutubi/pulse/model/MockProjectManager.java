@@ -2,6 +2,7 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.personal.PatchArchive;
+import com.zutubi.pulse.prototype.config.project.AgentRequirements;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 
 import java.util.*;
@@ -93,7 +94,7 @@ public class MockProjectManager implements ProjectManager
         throw new RuntimeException("Method not yet implemented.");
     }
 
-    public void delete(BuildHostRequirements hostRequirements)
+    public void delete(AgentRequirements hostRequirements)
     {
         throw new RuntimeException("Method not yet implemented.");
     }

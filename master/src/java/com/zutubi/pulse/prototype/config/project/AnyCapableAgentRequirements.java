@@ -1,4 +1,4 @@
-package com.zutubi.pulse.model;
+package com.zutubi.pulse.prototype.config.project;
 
 import com.zutubi.pulse.AgentService;
 import com.zutubi.pulse.RecipeDispatchRequest;
@@ -6,26 +6,24 @@ import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.PulseFileLoader;
 import com.zutubi.pulse.core.PulseFileLoaderFactory;
+import com.zutubi.pulse.model.ResourceRequirement;
 import com.zutubi.util.logging.Logger;
 
 import java.util.List;
 
 /**
+ * Requirements that allow a stage to be dispatched to any agent that has the
+ * required resources.
  */
-public class AnyCapableBuildHostRequirements extends AbstractBuildHostRequirements
+public class AnyCapableAgentRequirements implements AgentRequirements
 {
-    private static final Logger LOG = Logger.getLogger(AnyCapableBuildHostRequirements.class);
+    private static final Logger LOG = Logger.getLogger(AnyCapableAgentRequirements.class);
 
     private PulseFileLoaderFactory fileLoaderFactory;
 
-    public AnyCapableBuildHostRequirements()
+    public AnyCapableAgentRequirements()
     {
         ComponentContext.autowire(this);
-    }
-
-    public BuildHostRequirements copy()
-    {
-        return new AnyCapableBuildHostRequirements();
     }
 
     public boolean fulfilledBy(RecipeDispatchRequest request, AgentService service)
@@ -64,11 +62,6 @@ public class AnyCapableBuildHostRequirements extends AbstractBuildHostRequiremen
         }
 
         return true;
-    }
-
-    public String getSummary()
-    {
-        return "[any]";
     }
 
     public void setFileLoaderFactory(PulseFileLoaderFactory fileLoaderFactory)

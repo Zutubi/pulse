@@ -1,11 +1,8 @@
 package com.zutubi.pulse.model.persistence;
 
-import com.zutubi.pulse.model.BuildHostRequirements;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.RunExecutablePostBuildAction;
 import com.zutubi.pulse.model.TagPostBuildAction;
-
-import java.util.List;
 
 /**
  * 
@@ -21,7 +18,4 @@ public interface ProjectDao extends EntityDao<Project>
 
     RunExecutablePostBuildAction findRunExecutablePostBuildAction(long id);
 
-    List<Project> findByAdminAuthority(String authority);
-
-    void delete(BuildHostRequirements hostRequirements);
 }
