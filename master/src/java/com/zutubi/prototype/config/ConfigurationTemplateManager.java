@@ -4,11 +4,17 @@ import com.zutubi.prototype.config.events.PostDeleteEvent;
 import com.zutubi.prototype.config.events.PostInsertEvent;
 import com.zutubi.prototype.config.events.PostSaveEvent;
 import com.zutubi.prototype.security.AccessManager;
+import com.zutubi.prototype.transaction.Synchronization;
+import com.zutubi.prototype.transaction.Transaction;
+import com.zutubi.prototype.transaction.TransactionManager;
+import com.zutubi.prototype.transaction.TransactionStatus;
+import com.zutubi.prototype.transaction.TransactionalWrapper;
 import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.*;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.config.ConfigurationList;
 import com.zutubi.pulse.core.config.ConfigurationMap;
+import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.ValidationContext;
@@ -20,28 +26,33 @@ import java.util.*;
 
 /**
  */
-public class ConfigurationTemplateManager
+public class ConfigurationTemplateManager implements Synchronization
 {
     private static final Logger LOG = Logger.getLogger(ConfigurationTemplateManager.class);
 
     private static final String PARENT_KEY    = "parentHandle";
     private static final String TEMPLATE_KEY  = "template";
 
-    private DefaultInstanceCache instances = new DefaultInstanceCache();
-    private DefaultInstanceCache incompleteInstances = new DefaultInstanceCache();
-    private Map<String, TemplateHierarchy> templateHierarchies = new HashMap<String, TemplateHierarchy>();
+    private StateTransactionalWrapper stateWrapper;
 
     private TypeRegistry typeRegistry;
     private RecordManager recordManager;
     private ConfigurationPersistenceManager configurationPersistenceManager;
     private ConfigurationReferenceManager configurationReferenceManager;
     private ConfigurationSecurityManager configurationSecurityManager;
+
     private EventManager eventManager;
+
+    private TransactionManager transactionManager;
+
     private ValidationManager validationManager;
     private int refreshCount = 0;
 
     public void init()
     {
+        stateWrapper = new StateTransactionalWrapper();
+        stateWrapper.setTransactionManager(transactionManager);
+
         refreshCaches();
     }
 
@@ -274,7 +285,8 @@ public class ConfigurationTemplateManager
 
         recordManager.insert(newPath, record);
         refreshCaches();
-        raiseInsertEvents(getDescendentPaths(newPath, false, true));
+        State state = getState();
+        raiseInsertEvents(state.instances, getDescendentPaths(newPath, false, true));
 
         return newPath;
     }
@@ -332,7 +344,7 @@ public class ConfigurationTemplateManager
         return result;
     }
 
-    private void raiseInsertEvents(List<String> concretePaths)
+    private void raiseInsertEvents(DefaultInstanceCache instances, List<String> concretePaths)
     {
         // For every new concrete path that has appeared (possibly inherited)
         for (String concretePath : concretePaths)
@@ -343,7 +355,7 @@ public class ConfigurationTemplateManager
                 if (isComposite(instance))
                 {
                     Configuration configuration = (Configuration) instance;
-                    eventManager.publish(new PostInsertEvent(this, configuration, !concretePath.equals(configuration.getConfigurationPath())));
+                    publishEvent(new PostInsertEvent(this, configuration, !concretePath.equals(configuration.getConfigurationPath())));
                     updateInternalProperties(configuration);
                 }
             }
@@ -439,13 +451,23 @@ public class ConfigurationTemplateManager
     private void refreshCaches()
     {
         configurationReferenceManager.clear();
-        refreshInstances();
-        refreshTemplateHierarchies();
+        stateWrapper.execute(new TransactionalWrapper.Action<State>()
+        {
+            public Object execute(State state)
+            {
+                refreshInstances(state);
+                refreshTemplateHierarchies(state);
+                return null;
+            }
+        });
         refreshCount++;
     }
 
-    private void refreshInstances()
+    private void refreshInstances(State state)
     {
+        DefaultInstanceCache instances = state.instances;
+        DefaultInstanceCache incompleteInstances = state.incompleteInstances;
+        
         instances.clear();
         incompleteInstances.clear();
 
@@ -560,9 +582,9 @@ public class ConfigurationTemplateManager
         return !Boolean.valueOf(record.getMeta(TEMPLATE_KEY));
     }
 
-    private void refreshTemplateHierarchies()
+    private void refreshTemplateHierarchies(State state)
     {
-        templateHierarchies.clear();
+        state.templateHierarchies.clear();
         for (ConfigurationScopeInfo scope : configurationPersistenceManager.getScopes())
         {
             if (scope.isTemplated())
@@ -599,7 +621,7 @@ public class ConfigurationTemplateManager
                     root = createTemplateNode(record, scope.getScopeName(), idProperty, recordsByParent);
                 }
 
-                templateHierarchies.put(scope.getScopeName(), new TemplateHierarchy(scope.getScopeName(), root));
+                state.templateHierarchies.put(scope.getScopeName(), new TemplateHierarchy(scope.getScopeName(), root));
             }
         }
     }
@@ -633,13 +655,14 @@ public class ConfigurationTemplateManager
      */
     public boolean isDeeplyValid(String path)
     {
-        if (instances.get(path) != null)
+        State state = getState();
+        if (state.instances.get(path) != null)
         {
-            return instances.isValid(path);
+            return state.instances.isValid(path);
         }
         else
         {
-            return incompleteInstances.isValid(path);
+            return state.incompleteInstances.isValid(path);
         }
     }
 
@@ -916,12 +939,13 @@ public class ConfigurationTemplateManager
 
         refreshCaches();
 
+        State state = getState();
         for (String concretePath : getDescendentPaths(newPath, false, true))
         {
-            Configuration instance = instances.get(concretePath);
+            Configuration instance = state.instances.get(concretePath);
             if (isComposite(instance))
             {
-                eventManager.publish(new PostSaveEvent(this, instance));
+                publishEvent(new PostSaveEvent(this, instance));
             }
         }
 
@@ -1184,11 +1208,13 @@ public class ConfigurationTemplateManager
         {
             throw new IllegalArgumentException("Cannot delete instance at path '" + path + "': marked permanent");
         }
-        
+
+
+        State state = getState();
         List<PostDeleteEvent> events = new LinkedList<PostDeleteEvent>();
         for (String concretePath : getDescendentPaths(path, false, true))
         {
-            for (Object instance : instances.getAllDescendents(concretePath))
+            for (Object instance : state.instances.getAllDescendents(concretePath))
             {
                 if (isComposite(instance))
                 {
@@ -1203,7 +1229,7 @@ public class ConfigurationTemplateManager
 
         for (PostDeleteEvent event : events)
         {
-            eventManager.publish(event);
+            publishEvent(event);
         }
     }
 
@@ -1227,6 +1253,8 @@ public class ConfigurationTemplateManager
         try
         {
             Configuration clone = (Configuration) instantiator.instantiate(path, false, type, record);
+            clone.setConfigurationPath(instance.getConfigurationPath());
+            clone.setHandle(instance.getHandle());
             return (T) clone;
         }
         catch (TypeException e)
@@ -1244,13 +1272,19 @@ public class ConfigurationTemplateManager
      */
     public Configuration getInstance(String path)
     {
-        Configuration instance = instances.get(path);
+        State state = getState();
+        Configuration instance = state.instances.get(path);
         if (instance == null)
         {
-            instance = incompleteInstances.get(path);
+            instance = state.incompleteInstances.get(path);
         }
 
         return instance;
+    }
+
+    private ConfigurationTemplateManager.State getState()
+    {
+        return stateWrapper.get();
     }
 
     /**
@@ -1298,10 +1332,11 @@ public class ConfigurationTemplateManager
     @SuppressWarnings({"unchecked"})
     public <T extends Configuration> void getAllInstances(String path, Collection<T> result, boolean allowIncomplete)
     {
-        instances.getAllMatchingPathPattern(path, (Collection<Configuration>) result);
+        State state = getState();
+        state.instances.getAllMatchingPathPattern(path, (Collection<Configuration>) result);
         if (allowIncomplete)
         {
-            incompleteInstances.getAllMatchingPathPattern(path, (Collection<Configuration>) result);
+            state.incompleteInstances.getAllMatchingPathPattern(path, (Collection<Configuration>) result);
         }
     }
 
@@ -1318,9 +1353,10 @@ public class ConfigurationTemplateManager
         List<String> paths = configurationPersistenceManager.getConfigurationPaths(type);
         if (paths != null)
         {
+            State state = getState();
             for (String path : paths)
             {
-                instances.getAllMatchingPathPattern(path, (Collection<Configuration>) result);
+                state.instances.getAllMatchingPathPattern(path, (Collection<Configuration>) result);
             }
         }
 
@@ -1361,7 +1397,7 @@ public class ConfigurationTemplateManager
 
     public Set<String> getTemplateScopes()
     {
-        return templateHierarchies.keySet();
+        return getState().templateHierarchies.keySet();
     }
 
     public TemplateHierarchy getTemplateHierarchy(String scope)
@@ -1377,7 +1413,7 @@ public class ConfigurationTemplateManager
             throw new IllegalArgumentException("Request for template hierarchy for non-templated scope '" + scope + "'");
         }
 
-        return templateHierarchies.get(scope);
+        return getState().templateHierarchies.get(scope);
     }
 
     public String getTemplatePath(String path)
@@ -1389,7 +1425,7 @@ public class ConfigurationTemplateManager
             ConfigurationScopeInfo scope = configurationPersistenceManager.getScopeInfo(elements[0]);
             if (scope != null && scope.isTemplated())
             {
-                TemplateHierarchy hierarchy = templateHierarchies.get(scope.getScopeName());
+                TemplateHierarchy hierarchy = getState().templateHierarchies.get(scope.getScopeName());
                 TemplateNode node = hierarchy.getNodeById(elements[1]);
                 if (node != null)
                 {
@@ -1563,6 +1599,43 @@ public class ConfigurationTemplateManager
         return refreshCount;
     }
 
+    //---( implementation of the transactional synchronization interface. )---
+
+    public void postCompletion(TransactionStatus status)
+    {
+        List<Event> eventsToPublish = new LinkedList<Event>();
+        State state = getState();
+        
+        eventsToPublish.addAll(state.pendingEvents);
+        state.pendingEvents.clear();
+
+        // we only want to generate events if the transaction that made the changes is successful.
+        if (status == TransactionStatus.COMMITTED)
+        {
+            for (Event event : eventsToPublish)
+            {
+                eventManager.publish(event);
+            }
+        }
+    }
+
+    private void publishEvent(Event evt)
+    {
+        // If we are inside an action transaction, then we capture this event until
+        // the transaction is committed.  Otherwise, we publish it straight away.
+        Transaction txn = transactionManager.getTransaction();
+        if (txn != null)
+        {
+            //FIXME: What happens if this transaction is in the process of committing or rolling back?
+            txn.registerSynchronization(this);
+            getState().pendingEvents.add(evt);
+        }
+        else
+        {
+            eventManager.publish(evt);
+        }
+    }
+
     public void setTypeRegistry(TypeRegistry typeRegistry)
     {
         this.typeRegistry = typeRegistry;
@@ -1596,5 +1669,48 @@ public class ConfigurationTemplateManager
     public void setConfigurationSecurityManager(ConfigurationSecurityManager configurationSecurityManager)
     {
         this.configurationSecurityManager = configurationSecurityManager;
+    }
+
+    public void setTransactionManager(TransactionManager transactionManager)
+    {
+        this.transactionManager = transactionManager;
+    }
+
+    /**
+     * The state class encapsulates the state of the configuration template manager that is subject to
+     * transactional control / isolation etc.
+     *
+     */
+    private class State
+    {
+        /**
+         * Cache of complete instances.
+         */
+        DefaultInstanceCache instances = new DefaultInstanceCache();
+        /**
+         * Cache of incomplete instances.
+         */
+        DefaultInstanceCache incompleteInstances = new DefaultInstanceCache();
+
+        Map<String, TemplateHierarchy> templateHierarchies = new HashMap<String, TemplateHierarchy>();
+
+        /**
+         * A list of events to be published if the current transaction commits.
+         */
+        List<Event> pendingEvents = new LinkedList<Event>();
+    }
+
+    private class StateTransactionalWrapper extends TransactionalWrapper<State>
+    {
+        public StateTransactionalWrapper()
+        {
+            super(new State());
+        }
+
+        public State copy(State v)
+        {
+            // caches are always fully refreshed after a change, so a standard copy is not required.
+            return new State();
+        }
     }
 }

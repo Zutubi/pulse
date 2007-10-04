@@ -4,6 +4,8 @@ import com.zutubi.config.annotations.Reference;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.prototype.config.events.ConfigurationEvent;
 import com.zutubi.prototype.config.events.PostInsertEvent;
+import com.zutubi.prototype.config.events.PostSaveEvent;
+import com.zutubi.prototype.config.events.PostDeleteEvent;
 import com.zutubi.prototype.security.*;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.MapType;
@@ -11,12 +13,14 @@ import com.zutubi.prototype.type.TemplatedMapType;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.transaction.UserTransaction;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.config.NamedConfiguration;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
+import com.zutubi.pulse.events.AllEventListener;
 import com.zutubi.validation.annotations.Required;
 
 import java.util.*;
@@ -487,7 +491,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         configurationTemplateManager.insert("sample", a);
 
         a = (MockA) configurationTemplateManager.getInstance("sample/a");
-        
+
         MockA clone = configurationTemplateManager.deepClone(a);
         assertEquals(a.getConfigurationPath(), clone.getConfigurationPath());
         assertEquals(a.getMock().getConfigurationPath(), clone.getMock().getConfigurationPath());
@@ -807,7 +811,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         a = configurationTemplateManager.getInstance(path, MockA.class);
         assertEquals(1, a.getDs().size());
         assertEquals("d2", a.getDs().get(0).getName());
-        
+
         Record aRecord = configurationTemplateManager.getRecord(path);
         Record dsRecord = (Record) aRecord.get("ds");
         assertEquals(1, dsRecord.size());
@@ -843,7 +847,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         child = configurationTemplateManager.getInstance(childPath, MockA.class);
         assertEquals(1, child.getDs().size());
         assertEquals("pd", child.getDs().get(0).getName());
-        
+
         Record loadedChild = configurationTemplateManager.getRecord(childPath);
         Record dsRecord = (Record) loadedChild.get("ds");
         assertEquals(1, dsRecord.size());
@@ -876,6 +880,136 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         MockA a = new MockA("mock");
         String path = configurationTemplateManager.insert("sample", a);
         assertTrue(configurationTemplateManager.pathExists(path));
+    }
+
+    public void testEventGeneratedOnSave()
+    {
+        MockA a = new MockA("a");
+        configurationTemplateManager.insert("sample", a);
+
+        RecordingEventListener listener = new RecordingEventListener();
+        eventManager.register(listener);
+
+        assertEquals(0, listener.getEvents().size());
+
+        MockA instance = (MockA) configurationTemplateManager.getInstance("sample/a");
+        instance.setB("B");
+
+        configurationTemplateManager.save(instance);
+
+        assertEquals(1, listener.getEvents().size());
+        Event evt = listener.getEvents().get(0);
+        assertTrue(evt instanceof PostSaveEvent);
+    }
+
+    public void testEventsGeneratedOnInsert()
+    {
+        RecordingEventListener listener = new RecordingEventListener();
+        eventManager.register(listener);
+
+        MockA a = new MockA("a");
+        configurationTemplateManager.insert("sample", a);
+
+        assertEquals(1, listener.getEvents().size());
+        Event evt = listener.getEvents().get(0);
+        assertTrue(evt instanceof PostInsertEvent);
+    }
+
+    public void testEventsGeneratedOnDelete()
+    {
+        MockA a = new MockA("a");
+        configurationTemplateManager.insert("sample", a);
+
+        RecordingEventListener listener = new RecordingEventListener();
+        eventManager.register(listener);
+
+        assertEquals(0, listener.getEvents().size());
+
+        configurationTemplateManager.delete("sample/a");
+
+        assertEquals(1, listener.getEvents().size());
+        Event evt = listener.getEvents().get(0);
+        assertTrue(evt instanceof PostDeleteEvent);
+    }
+
+    public void testEventsArePublishedOnPostCommit()
+    {
+        UserTransaction transaction = new UserTransaction(transactionManager);
+        transaction.begin();
+
+        RecordingEventListener listener = new RecordingEventListener();
+        eventManager.register(listener);
+
+        MockA a = new MockA("a");
+        configurationTemplateManager.insert("sample", a);
+
+        assertEquals(0, listener.getEvents().size());
+
+        transaction.commit();
+
+        assertEquals(1, listener.getEvents().size());
+    }
+
+    public void testEventsAreNotPublishedOnPostRollback()
+    {
+        UserTransaction transaction = new UserTransaction(transactionManager);
+        transaction.begin();
+
+        RecordingEventListener listener = new RecordingEventListener();
+        eventManager.register(listener);
+
+        MockA a = new MockA("a");
+        configurationTemplateManager.insert("sample", a);
+
+        assertEquals(0, listener.getEvents().size());
+
+        transaction.rollback();
+
+        assertEquals(0, listener.getEvents().size());
+    }
+
+    public void testInstanceCacheAwareOfRollback()
+    {
+        UserTransaction transaction = new UserTransaction(transactionManager);
+        transaction.begin();
+
+        MockA a = new MockA("a");
+        configurationTemplateManager.insert("sample", a);
+
+        assertNotNull(configurationTemplateManager.getInstance("sample/a"));
+
+        transaction.rollback();
+
+        assertNull(configurationTemplateManager.getInstance("sample/a"));
+    }
+
+    public void testInstanceCacheThreadIsolation()
+    {
+        UserTransaction transaction = new UserTransaction(transactionManager);
+        transaction.begin();
+
+        MockA a = new MockA("a");
+        configurationTemplateManager.insert("sample", a);
+
+        assertNotNull(configurationTemplateManager.getInstance("sample/a"));
+
+        executeOnSeparateThreadAndWait(new Runnable()
+        {
+            public void run()
+            {
+                assertNull(configurationTemplateManager.getInstance("sample/a"));
+            }
+        });
+
+        transaction.commit();
+
+        executeOnSeparateThreadAndWait(new Runnable()
+        {
+            public void run()
+            {
+                assertNotNull(configurationTemplateManager.getInstance("sample/a"));
+            }
+        });
     }
 
     private void assertNoSuchPath(String path)
@@ -1104,6 +1238,21 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         public MockReferee(String name)
         {
             super(name);
+        }
+    }
+
+    private class RecordingEventListener extends AllEventListener
+    {
+        private List<Event> events = new LinkedList<Event>();
+
+        public void handleEvent(Event evt)
+        {
+            events.add(evt);
+        }
+
+        public List<Event> getEvents()
+        {
+            return events;
         }
     }
 }
