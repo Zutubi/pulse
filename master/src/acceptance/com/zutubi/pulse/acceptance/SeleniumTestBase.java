@@ -9,6 +9,7 @@ import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.webwork.mapping.Urls;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.StringUtils;
+import com.opensymphony.util.TextUtils;
 import junit.framework.TestCase;
 
 import java.net.URL;
@@ -48,7 +49,14 @@ public class SeleniumTestBase extends TestCase
         baseUrl = "http://localhost:" + port + "/";
         urls = new Urls("");
         random = RandomUtils.randomString(10);
-        selenium = new DefaultSelenium("localhost", 4444, "*firefox", "http://localhost:" + port + "/");
+
+        String browser = System.getenv("PULSE_SELENIUM_BROWSER");
+        if(!TextUtils.stringSet(browser))
+        {
+            browser = "*firefox";
+        }
+
+        selenium = new DefaultSelenium("localhost", 4444, browser, "http://localhost:" + port + "/");
         selenium.start();
     }
 

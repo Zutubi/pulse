@@ -82,8 +82,9 @@ EOF
 cp "$top/master/src/acceptance/drivers/"* "$acceptDir/$packageName"/versions/*/lib
 
 # Fire it up!
+pushd "$acceptDir"
 export PULSE_HOME=
-"$acceptDir/$packageName/bin/pulse" start -p 8889 -f config.properties > ../stdout.txt 2> ../stderr.txt
+"./$packageName/bin/pulse" start -p 8889 -f config.properties > stdout.txt 2> stderr.txt
 
 trap ERR
 
