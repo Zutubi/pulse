@@ -317,6 +317,9 @@ public class RecordManagerTest extends PulseTestCase
 
     public void testHandlesAreUniqueAcrossRuns()
     {
+        // close the default transaction.
+        userTransaction.commit();
+
         long handle = 0;
         for (int i = 0; i < 10; i++)
         {
