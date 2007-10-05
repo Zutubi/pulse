@@ -814,4 +814,34 @@ public class StringUtilsTest extends TestCase
     {
         assertEquals(expected, StringUtils.toValidHtmlName(in));
     }
+
+    public void testStripLineBreaksEmpty()
+    {
+        assertEquals("", StringUtils.stripLineBreaks(""));
+    }
+
+    public void testStripLineBreaksNoBreaks()
+    {
+        assertEquals("no line breaks!", StringUtils.stripLineBreaks("no line breaks!"));
+    }
+
+    public void testStripLineBreaksLineFeed()
+    {
+        assertEquals("", StringUtils.stripLineBreaks("\n"));
+    }
+
+    public void testStripLineBreaksCarriageReturn()
+    {
+        assertEquals("", StringUtils.stripLineBreaks("\r"));
+    }
+
+    public void testStripLineBreaksCarriageReturnLineFeed()
+    {
+        assertEquals("", StringUtils.stripLineBreaks("\r\n"));
+    }
+
+    public void testStripLineBreaksAmongstText()
+    {
+        assertEquals("afewlineswithvarious breaksin between", StringUtils.stripLineBreaks("a\nfew\rlines\r\nwith\n\nvarious breaks\n\rin between\r\r"));
+    }
 }

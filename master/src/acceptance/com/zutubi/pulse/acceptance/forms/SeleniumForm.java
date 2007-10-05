@@ -4,6 +4,7 @@ import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.SeleniumUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
+import com.zutubi.util.StringUtils;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
@@ -45,7 +46,9 @@ public abstract class SeleniumForm
 
     public void waitFor()
     {
-        SeleniumUtils.waitForElement(selenium, getFormName());
+        // Wait for the last field as the forms are lazily rendered
+        String[] fields = getFieldNames();
+        SeleniumUtils.waitForElement(selenium, getFieldId(fields[fields.length - 1]));
     }
 
     public void assertFormPresent()
@@ -69,9 +72,9 @@ public abstract class SeleniumForm
         return "//*[@id='" + getFormName() + "']/form" + (rest == null ? "" : rest);
     }
 
-    private String getFieldLocator(String name)
+    private String getFieldId(String name)
     {
-        return getLocator("//*[@name='" + name + "']");
+        return "zfid." + name;
     }
 
     /**
@@ -92,7 +95,7 @@ public abstract class SeleniumForm
 
     public String[] getSelectOptions(String name)
     {
-        return selenium.getSelectOptions(getFieldLocator(name));
+        return selenium.getSelectOptions(getFieldId(name));
     }
 
     public String[] getComboBoxOptions(String name)
@@ -144,7 +147,7 @@ public abstract class SeleniumForm
 
     public String getFieldValue(String name)
     {
-        return selenium.getValue(getFieldLocator(name));
+        return selenium.getValue(getFieldId(name));
     }
 
     public void setFormElement(String name, String value)
@@ -155,7 +158,7 @@ public abstract class SeleniumForm
 
     private void setFormElement(String name, String value, int type)
     {
-        String locator = getFieldLocator(name);
+        String locator = getFieldId(name);
         switch (type)
         {
             case TEXTFIELD:
@@ -241,7 +244,7 @@ public abstract class SeleniumForm
             switch (types[i])
             {
                 case TEXTFIELD:
-                    TestCase.assertEquals(values[i], getFieldValue(fieldName));
+                    TestCase.assertEquals(StringUtils.stripLineBreaks(values[i]), StringUtils.stripLineBreaks(getFieldValue(fieldName)));
                     break;
                 case CHECKBOX:
                     TestCase.assertEquals(Boolean.valueOf(values[i]) ? "on" : "off", getFieldValue(fieldName));
@@ -309,7 +312,7 @@ public abstract class SeleniumForm
 
     public void assertMultiValues(String name, String... values)
     {
-        String[] gotValues = selenium.getSelectedValues(getFieldLocator(name));
+        String[] gotValues = selenium.getSelectedValues(getFieldId(name));
         Assert.assertEquals(values.length, gotValues.length);
         for (int i = 0; i < values.length; i++)
         {
@@ -329,7 +332,7 @@ public abstract class SeleniumForm
             set = new String[0];
         }
 
-        String fieldLocator = getFieldLocator(name);
+        String fieldLocator = getFieldId(name);
         for(String value: set)
         {
             selenium.addSelection(fieldLocator, "value=" + value);
@@ -350,11 +353,11 @@ public abstract class SeleniumForm
     {
         if (b)
         {
-            selenium.check(getFieldLocator(name));
+            selenium.check(getFieldId(name));
         }
         else
         {
-            selenium.uncheck(getFieldLocator(name));
+            selenium.uncheck(getFieldId(name));
         }
     }
 

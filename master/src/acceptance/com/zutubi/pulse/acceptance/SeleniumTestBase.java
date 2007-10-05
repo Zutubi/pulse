@@ -50,13 +50,7 @@ public class SeleniumTestBase extends TestCase
         urls = new Urls("");
         random = RandomUtils.randomString(10);
 
-        String browser = System.getenv("PULSE_SELENIUM_BROWSER");
-        if(!TextUtils.stringSet(browser))
-        {
-            browser = "*firefox";
-        }
-
-        selenium = new DefaultSelenium("localhost", 4444, browser, "http://localhost:" + port + "/");
+        selenium = new DefaultSelenium("localhost", 4444, "*firefox", "http://localhost:" + port + "/");
         selenium.start();
     }
 

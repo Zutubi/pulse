@@ -978,4 +978,9 @@ public class StringUtils
     {
         return c >= '0' && c <= '9';
     }
+
+    public static String stripLineBreaks(String s)
+    {
+        return s.replaceAll("\r|\n", "");
+    }
 }
