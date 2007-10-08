@@ -1487,9 +1487,9 @@
     <li class="file-artifact">
     #set($trimmedPath = $artifact.trimmedPath($fileArtifact))
     #if($showArtifactLink)
-        <a href="$base/view/$result.id/${artifact.id}${fileArtifact.pathUrl}">$trimmedPath</a>
+        <a href="$base/view/$result.id/${artifact.id}/${fileArtifact.pathUrl}">$trimmedPath</a>
         #if($fileArtifact.canDecorate())
-            [<a href="$urls.commandArtifacts($build, $result)$fileArtifact.pathUrl/">decorated</a>]
+            [<a href="$urls.commandArtifacts($build, $result)$fileArtifact.pathUrl">decorated</a>]
         #end
     #else
         $trimmedPath

@@ -1,11 +1,12 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.pulse.acceptance.forms.admin.BuildStageForm;
+import com.zutubi.pulse.acceptance.pages.admin.ListPage;
+import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
+import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
+import com.zutubi.pulse.acceptance.pages.browse.BuildDetailedViewPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectsPage;
-import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
-import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
-import com.zutubi.pulse.acceptance.pages.admin.ListPage;
-import com.zutubi.pulse.acceptance.forms.admin.BuildStageForm;
 
 /**
  * An acceptance test that adds a very simple project and runs a build as a
@@ -59,6 +60,28 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         stageForm.applyFormElements("", agentHandle);
 
         triggerSuccessfulBuild(random);
+    }
+
+    public void testDetailedView() throws Exception
+    {
+        ensureProject(random);
+        loginAsAdmin();
+        triggerSuccessfulBuild(random);
+
+        BuildDetailedViewPage detailedViewPage = new BuildDetailedViewPage(selenium, urls, random, 1);
+        detailedViewPage.goTo();
+        SeleniumUtils.assertNotVisible(selenium, "link=env.txt");
+        detailedViewPage.clickCommand("default", "build");
+        SeleniumUtils.assertVisible(selenium, "link=env.txt");
+        selenium.click("link=env.txt");
+        selenium.waitForPageToLoad("10000");
+        assertTextPresent("Process Environment");
+
+        detailedViewPage.goTo();
+        detailedViewPage.clickCommand("default", "build");
+        selenium.click("link=decorated");
+        selenium.waitForPageToLoad("10000");
+        assertElementPresent("decorated");
     }
 
     private void triggerSuccessfulBuild(String projectName)

@@ -104,7 +104,7 @@ public class XmlRpcHelper
     {
         Hashtable<String, Object> scm = new Hashtable<String, Object>();
         scm.put(BaseXmlRpcAcceptanceTest.SYMBOLIC_NAME_KEY, "zutubi.svnConfig");
-        scm.put("url", "svn://localhost/test/trunk");
+        scm.put("url", "svn://localhost:3088/accept/trunk/triviant");
         scm.put("checkoutScheme", "CLEAN_CHECKOUT");
         scm.put("monitor", false);
 

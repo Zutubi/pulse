@@ -17,7 +17,7 @@
 <body>
     #buildTabs($result "details")
 
-    <table class="twopane">
+    <table id='#id("${project.name}-build-${result.number}-detailed")' class="twopane">
         <tr>
             <td class="leftpane">
                 <p>
@@ -40,7 +40,7 @@
             #if($node.result.commandResults.size() > 0)
                                <ul>
                 #foreach($commandResult in $node.result.commandResults)
-                                   <li>
+                                   <li id='#id("stage-${node.stageName}-command-${commandResult.commandName}")'>
                                        <a href="#" id="nav_$commandResult.id" onclick="selectNode('$commandResult.id'); return false;">
                                            #statusImage($commandResult true)
                                            $!webwork.htmlEncode($commandResult.commandName)
@@ -125,6 +125,4 @@
     <script type="text/javascript">
         selectNode(selectedNode);
     </script>
-
-
 </html>

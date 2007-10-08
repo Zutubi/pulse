@@ -127,4 +127,14 @@ public class SeleniumUtils
         Assert.assertNotNull(value);
         Assert.assertTrue(value.length() > 0);
     }
+
+    public static void assertVisible(Selenium selenium, String locator)
+    {
+        Assert.assertTrue(selenium.isVisible(locator));
+    }
+
+    public static void assertNotVisible(Selenium selenium, String locator)
+    {
+        Assert.assertFalse(selenium.isVisible(locator));
+    }
 }
