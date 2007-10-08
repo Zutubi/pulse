@@ -154,7 +154,15 @@ public abstract class SeleniumForm
         selenium.click("zfid." + id);
         if (!ajax)
         {
-            selenium.waitForPageToLoad("60000");
+            try
+            {
+                selenium.waitForPageToLoad("60000");
+            }
+            catch (Exception e)
+            {
+                selenium.captureScreenshot("c:/failure.png");
+                throw new RuntimeException(e);
+            }
         }
     }
 
