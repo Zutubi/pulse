@@ -35,23 +35,16 @@ function handleKeypress(evt)
 
 function updateButtons()
 {
-    var dirty = form.isDirty();
-    for(var i = 0; i < form.buttons.length; i++)
-    {
-        if(dirty)
-        {
-            form.buttons[i].enable();
-        }
-        else
-        {
-            form.buttons[i].disable();
-        }
-    }
+    form.updateButtons();
 }
 
 Ext.onReady(function()
 {
     Ext.Ajax.timeout = 60000;
+
+<#if form.displayMode?default(false)>
+    form.displayMode = true;
+</#if>
 
     form.render('${form.id}');
     form.el.dom.action = '${base}/${form.action}';
@@ -87,10 +80,8 @@ Ext.onReady(function()
     <#if parameters.submitOnEnter?default(true)>
         el.on('keypress', function(event){ return handleKeypress(event); });
     </#if>
-    <#if form.displayMode?default(false)>
         el.on('keyup', updateButtons);
         el.on('click', updateButtons);
-    </#if>
     }
 </#list>
 

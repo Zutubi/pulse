@@ -75,9 +75,19 @@ public class XmlRpcHelper
         return (T) xmlRpcClient.execute("RemoteApi." + function, argVector);
     }
 
+    public boolean configPathExists(String path) throws Exception
+    {
+        return (Boolean)call("configPathExists", path);
+    }
+
     public <T> T getConfig(String path) throws Exception
     {
         return (T)call("getConfig", path);
+    }
+
+    public String getConfigHandle(String path) throws Exception
+    {
+        return call("getConfigHandle", path);
     }
 
     public String saveConfig(String path, Hashtable<String, Object> config, boolean deep) throws Exception
@@ -128,7 +138,7 @@ public class XmlRpcHelper
     public String ensureProject(String name) throws Exception
     {
         String path = "projects/" + name;
-        if(!((Boolean)call("configPathExists", path)))
+        if(!configPathExists(path))
         {
             insertSimpleProject(name, false);
         }
@@ -144,5 +154,16 @@ public class XmlRpcHelper
         agent.put("host", name);
 
         return call("insertTemplatedConfig", "agents/global agent template", agent, false);
+    }
+
+    public String ensureAgent(String name) throws Exception
+    {
+        String path = "agents/" + name;
+        if(!configPathExists(path))
+        {
+            insertSimpleAgent(name);
+        }
+
+        return path;
     }
 }

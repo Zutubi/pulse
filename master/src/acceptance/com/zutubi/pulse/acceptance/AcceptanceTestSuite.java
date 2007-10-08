@@ -25,6 +25,9 @@ public class AcceptanceTestSuite
         suite.addTestSuite(ProjectLabelAcceptanceTest.class);
         suite.addTestSuite(AnonymousAccessAcceptanceTest.class);
 
+        //---( build tests )---
+        suite.addTestSuite(BuildAcceptanceTest.class);
+        
         //---( other acceptance tests )---
 //        suite.addTestSuite(StartupShutdownAcceptanceTest.class);
         return suite;

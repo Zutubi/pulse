@@ -738,14 +738,14 @@
         <td class="warning">
             #statusImage($result $showAnimated)
         </td>
-        <td class="warning">
+        <td #if($result.number) id='#id("${result.project.name}.build.${result.number}.status")' #end class="warning">
             $result.state.prettyString
         </td>
     #else
         <td class="$result.state.string">
             #statusImage($result $showAnimated)
         </td>
-        <td class="$result.state.string">
+        <td #if($result.number) id='#id("${result.project.name}.build.${result.number}.status")' #end class="$result.state.string">
             $result.state.prettyString
         </td>
     #end
@@ -1675,33 +1675,6 @@
     #end
 #end
 
-#
-# Shows a table with recent builds for a project
-#
-#macro(projectRecentBuilds $id $key $recentBuilds $rssEnabled $project)
-    <table id="$id" class="content">
-        <tr>
-            <th class="heading" colspan="$recentColumns.getTotalSpan($project)">
-                <span class="action">
-                #if($loggedInUser)
-                    <a class="unadorned" href="#" id="columns-popup-link-project.recent" onclick="recentPopup.popup(); return false"><img src="$base/images/text_columns.gif"/></a>
-                #end
-                #if($rssEnabled == "true")
-                    <a class="unadorned" id="rss.builds" href="rss.action?projectId=$project.id"><img alt="$action.getText('rss')" src="$base/images/feed-icon-16x16.gif"/></a>
-                #end
-                </span>
-                #wwtext("name=$key")
-            </th>
-        </tr>
-        #buildTableHeading($recentColumns $project)
-    #foreach($buildResult in $recentBuilds)
-        #buildTableRow($buildResult $recentColumns false)
-    #end
-    </table>
-
-    #buildTableColumns($recentColumns "project.recent")
-#end
-
 #macro( contactPointIcon $contact)
     #if ($contact.class.name == 'com.zutubi.pulse.model.EmailContactPoint')<img alt="email" src="$base/images/email_16.png"/>#end
 #end
@@ -2332,7 +2305,9 @@
 #macro(buildTableCell $buildResult $columns $key $multiProject)
     #set($project = $buildResult.project)
     #if($key == "id")
-        #dynamicRightLinkCell($buildResult.number "$urls.build($buildResult)")
+        <td class="content-right" id='#id("${buildResult.project.name}.build.${buildResult.number}.id")'>
+            <a href="$urls.build($buildResult)">$buildResult.number</a>
+        </td>
     #elseif($key == "project")
         #projectClassCell($project)
     #elseif($key == "status")

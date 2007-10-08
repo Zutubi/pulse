@@ -42,6 +42,11 @@ public abstract class SeleniumPage
         this.id = id;
     }
 
+    public String getId()
+    {
+        return id;
+    }
+
     public void goTo()
     {
         selenium.open(getUrl());

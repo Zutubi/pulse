@@ -152,6 +152,26 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         }
     }
 
+    public String getConfigHandle(String token, String path) throws AuthenticationException, TypeException
+    {
+        tokenManager.loginUser(token);
+
+        try
+        {
+            Record record = configurationTemplateManager.getRecord(path);
+            if(record == null)
+            {
+                throw new IllegalArgumentException("Path '" + path + "' does not exist");
+            }
+
+            return Long.toString(record.getHandle());
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
     public Object getRawConfig(String token, String path) throws AuthenticationException, TypeException
     {
         tokenManager.loginUser(token);

@@ -44,7 +44,7 @@
     </div>
 #end
 
-<h2>$!webwork.htmlEncode($config.displayName)</h2>
+<h2 id='#id($config.path)'>$!webwork.htmlEncode($config.displayName)</h2>
 <p class="introduction">
     #i18n("key=introduction")
 </p>

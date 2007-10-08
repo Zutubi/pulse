@@ -18,7 +18,27 @@
 
         #if($recentBuilds.size() > 0)
             <h2 class="section">#wwtext("name=recent.builds")</h2>
-            #projectRecentBuilds("recent.builds" "recent.builds" $recentBuilds $rssEnabled $project)
+            <table id="recent.builds" class="content">
+                <tr>
+                    <th class="heading" colspan="$recentColumns.getTotalSpan($project)">
+                        <span class="action">
+                        #if($loggedInUser)
+                            <a class="unadorned" href="#" id="columns-popup-link-project.recent" onclick="recentPopup.popup(); return false"><img src="$base/images/text_columns.gif"/></a>
+                        #end
+                        #if($rssEnabled == "true")
+                            <a class="unadorned" id="rss.builds" href="rss.action?projectId=$project.id"><img alt="$action.getText('rss')" src="$base/images/feed-icon-16x16.gif"/></a>
+                        #end
+                        </span>
+                        #wwtext("name=recent.builds")
+                    </th>
+                </tr>
+                #buildTableHeading($recentColumns $project)
+            #foreach($buildResult in $recentBuilds)
+                #buildTableRow($buildResult $recentColumns false)
+            #end
+            </table>
+
+            #buildTableColumns($recentColumns "project.recent")
         #end
 
             <h2 class="section">#wwtext("name=latest.changes")</h2>

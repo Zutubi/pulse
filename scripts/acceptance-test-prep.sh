@@ -10,30 +10,31 @@ then
 fi
 
 package="$1"
+agentPackage="${package/pulse/pulse-agent}"
 
 if [[ ! -f "$package" ]]
 then
     fatal "Package '$package' does not exist."
 fi
 
+if [[ ! -f "$agentPackage" ]]
+then
+    fatal "Agent package '$agentPackage' does not exist."
+fi
+
 "$scripts/setup-services.sh"
 
 # Prepare a temp directory to test within
 acceptDir="$working/pulse-accept"
-rm -rf $acceptDir
-mkdir $acceptDir
+rm -rf "$acceptDir"
+mkdir "$acceptDir"
 
-# Unpack that shiny new package
-extension="${package##*.}"
-if [[ $extension == "gz" ]]
-then
-    tar -zxv -C $acceptDir -f "$package"
-    extension=tar.gz
-else
-    unzip -d $acceptDir "$package"
-fi
+# Unpack those shiny new packages
+unpack "$package" "$acceptDir"
+unpack "$agentPackage" "$acceptDir"
 
-packageName="$(basename $package .$extension)"
+packageName="$(basename ${package%@(.tar.gz|.zip)})"
+agentPackageName="$(basename ${agentPackage%@(.tar.gz|.zip)})"
 
 # Now create an appropriate database.config.properties file
 case "$PULSE_DB" in
@@ -81,9 +82,14 @@ EOF
 
 cp "$top/master/src/acceptance/drivers/"* "$acceptDir/$packageName"/versions/*/lib
 
-# Fire it up!
 pushd "$acceptDir"
 export PULSE_HOME=
+
+# Start up a background agent
+"./$agentPackageName/bin/pulse" start -f agent.config.properties -d agent-data > agent-stdout.txt 2> agent-stderr.txt &
+echo $! > agent.pid
+
+# Now start the master
 "./$packageName/bin/pulse" start -p 8889 -f config.properties > stdout.txt 2> stderr.txt
 
 trap ERR

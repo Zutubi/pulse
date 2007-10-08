@@ -16,11 +16,13 @@ public class ProjectHierarchyPage extends SeleniumPage
     public static final String LINK_CONFIGURE = "configure";
     public static final String LINK_DELETE = "delete";
 
+    private String project;
     private boolean template;
 
     public ProjectHierarchyPage(Selenium selenium, Urls urls, String project, boolean template)
     {
         super(selenium, urls, "projects/" + project);
+        this.project = project;
         this.template = template;
     }
 
@@ -61,5 +63,13 @@ public class ProjectHierarchyPage extends SeleniumPage
     public void setTemplate(boolean template)
     {
         this.template = template;
+    }
+
+    public ProjectConfigPage clickConfigure()
+    {
+        selenium.click(LINK_CONFIGURE);
+        ProjectConfigPage configPage = new ProjectConfigPage(selenium, urls, project, template);
+        configPage.waitFor();
+        return configPage;
     }
 }

@@ -42,7 +42,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
             loginAsAdmin();
             ListPage labelsPage = new ListPage(selenium, urls, labelsPath);
             labelsPage.goTo();
-            labelsPage.addItem();
+            labelsPage.clickAdd();
 
             LabelForm labelForm = new LabelForm(selenium);
             labelForm.waitFor();
@@ -51,8 +51,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
             labelsPage.waitFor();
             String baseName = getNewestListItem(labelsPath);
             labelsPage.assertItemPresent(baseName, "view", "delete");
-            DeleteConfirmPage deleteConfirmPage = labelsPage.deleteItem(baseName);
-            deleteConfirmPage.waitFor();
+            DeleteConfirmPage deleteConfirmPage = labelsPage.clickDelete(baseName);
             labelsPage = deleteConfirmPage.confirm();
 
             labelsPage.assertItemNotPresent(baseName);

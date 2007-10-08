@@ -46,9 +46,7 @@
 </#if>
     var combo = new Ext.form.ComboBox(fieldConfig);
     form.add(combo);
-<#if form.displayMode?default(false)>
     combo.on('select', updateButtons);
-</#if>
 }());
 
 <#include "/prototype/xhtml/controlfooter.ftl" />

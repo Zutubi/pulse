@@ -14,9 +14,12 @@ version=$1
 
 "$scripts/teardown-services.sh"
 
-# Kill pulse
+# Kill pulse agent and master
+pushd "$working/pulse-accept"
 export PULSE_HOME=
-"$working/pulse-accept/pulse-${version}/bin/pulse" shutdown -p 8889
+./pulse-agent-${version}/bin/pulse shutdown -f agent.config.properties
+./pulse-${version}/bin/pulse shutdown -p 8889
+popd
 
 # Wait for it to shut down
 while netstat -an | grep 8889 > /dev/null

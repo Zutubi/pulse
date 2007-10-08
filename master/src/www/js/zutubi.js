@@ -492,6 +492,20 @@ ZUTUBI.Form = function(config)
 };
 
 Ext.extend(ZUTUBI.Form, Ext.form.Form, {
+    displayMode: false,
+
+    add : function()
+    {
+        var a = arguments;
+        for(var i = 0, len = a.length; i < len; i++)
+        {
+            a[i].form = this;
+        }
+        
+        ZUTUBI.Form.superclass.add.apply(this, a);
+        return this;
+    },
+
     annotateField: function(id, imageName, tooltip)
     {
         var rowEl = Ext.get('x-form-row-' + id);
@@ -500,6 +514,25 @@ Ext.extend(ZUTUBI.Form, Ext.form.Form, {
         if(tooltip)
         {
             imageEl.dom.qtip = tooltip;
+        }
+    },
+
+    updateButtons: function()
+    {
+        if(this.displayMode)
+        {
+            var dirty = this.isDirty();
+            for(var i = 0; i < this.buttons.length; i++)
+            {
+                if(dirty)
+                {
+                    this.buttons[i].enable();
+                }
+                else
+                {
+                    this.buttons[i].disable();
+                }
+            }
         }
     }
 });

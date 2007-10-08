@@ -78,7 +78,7 @@
         <delete file="slave/etc/runtime.properties"/>
 
         <!-- clean out the script/test playground. -->
-        <delete dir="working"/>
+        <delete dir="working/pulse-accept"/>
 
         <!-- clean out the user.home/.pulse/* directory -->
         <delete dir="${user.home}/.pulse"/>        

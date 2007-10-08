@@ -1,3 +1,5 @@
+shopt -s extglob
+
 scripts="$(dirname $0)"
 top="$scripts/.."
 working="$top/working"
@@ -7,6 +9,22 @@ fatal()
 {
     echo $1
     exit 1
+}
+
+# Unpacks a package, magically determining how from the extension
+#  $1: path of package to unpack
+#  $2: directory to unpack to
+unpack()
+{
+    echo "Unpacking $1..."
+    extension="${1##*.}"
+    if [[ $extension == "gz" ]]
+    then
+        tar -zxv -C "$2" -f "$1"
+    else
+        unzip -d "$2" "$1"
+    fi
+    echo "Unpacked."
 }
 
 # Sets up some required external service

@@ -49,9 +49,7 @@
 
     var picker = new ZUTUBI.ItemPicker(fieldConfig);
     form.add(picker);
-<#if form.displayMode?default(false)>
     picker.on('change', updateButtons);
-</#if>
 }());
 
 <#include "/prototype/xhtml/controlfooter.ftl" />

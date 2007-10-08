@@ -39,9 +39,7 @@
 </#if>
     var select = new ZUTUBI.Select(fieldConfig);
     form.add(select);
-<#if form.displayMode?default(false)>
     select.on('change', updateButtons);
-</#if>
 }());
 
 <#include "/prototype/xhtml/controlfooter.ftl" />

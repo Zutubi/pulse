@@ -9,6 +9,7 @@ import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.webwork.mapping.Urls;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.ExceptionWrappingRunnable;
 import com.opensymphony.util.TextUtils;
 import junit.framework.TestCase;
 
@@ -157,7 +158,29 @@ public class SeleniumTestBase extends TestCase
         hierarchyPage.assertPresent();
     }
 
-    protected void ensureProject(String name) throws Exception
+    protected void ensureProject(final String name) throws Exception
+    {
+        doRpc(new ExceptionWrappingRunnable()
+        {
+            public void innerRun() throws Exception
+            {
+                xmlRpcHelper.ensureProject(name);
+            }
+        });
+    }
+
+    protected void ensureAgent(final String name) throws Exception
+    {
+        doRpc(new ExceptionWrappingRunnable()
+        {
+            public void innerRun() throws Exception
+            {
+                xmlRpcHelper.ensureAgent(name);
+            }
+        });
+    }
+
+    private void doRpc(Runnable runnable) throws Exception
     {
         boolean loggedIn = false;
         if (!xmlRpcHelper.isLoggedIn())
@@ -168,7 +191,7 @@ public class SeleniumTestBase extends TestCase
 
         try
         {
-            xmlRpcHelper.ensureProject(name);
+            runnable.run();
         }
         finally
         {

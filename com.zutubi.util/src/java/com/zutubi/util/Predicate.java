@@ -1,7 +1,7 @@
 package com.zutubi.util;
 
 /**
- * Simple binary predicate.
+ * Single-argument condition.
  */
 public interface Predicate<T>
 {

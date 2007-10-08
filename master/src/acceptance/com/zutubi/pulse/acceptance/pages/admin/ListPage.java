@@ -59,14 +59,21 @@ public class ListPage extends SeleniumPage
         return action + ":" + baseName;
     }
 
-    public void addItem()
+    public void clickAdd()
     {
         selenium.click(ADD_LINK);
     }
 
-    public DeleteConfirmPage deleteItem(String baseName)
+    public void clickView(String baseName)
+    {
+        selenium.click(getActionId("view", baseName));
+    }
+
+    public DeleteConfirmPage clickDelete(String baseName)
     {
         selenium.click(getActionId("delete", baseName));
-        return new DeleteConfirmPage(selenium, urls, PathUtils.getPath(path, baseName));
+        DeleteConfirmPage deleteConfirmPage = new DeleteConfirmPage(selenium, urls, PathUtils.getPath(path, baseName));
+        deleteConfirmPage.waitFor();
+        return deleteConfirmPage;
     }
 }

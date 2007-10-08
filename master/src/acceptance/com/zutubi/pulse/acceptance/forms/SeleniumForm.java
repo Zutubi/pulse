@@ -21,9 +21,10 @@ public abstract class SeleniumForm
     protected static final int MULTI_SELECT = 8;
 
     protected Selenium selenium;
+    protected boolean inherited = false;
     protected boolean ajax = true;
 
-    public SeleniumForm(Selenium selenium)
+    protected SeleniumForm(Selenium selenium)
     {
         this.selenium = selenium;
     }
@@ -32,6 +33,13 @@ public abstract class SeleniumForm
     {
         this.selenium = selenium;
         this.ajax = ajax;
+    }
+
+    public SeleniumForm(Selenium selenium, boolean ajax, boolean inherited)
+    {
+        this.selenium = selenium;
+        this.ajax = ajax;
+        this.inherited = inherited;
     }
 
     public Selenium getSelenium()
@@ -47,7 +55,7 @@ public abstract class SeleniumForm
     public void waitFor()
     {
         // Wait for the last field as the forms are lazily rendered
-        String[] fields = getFieldNames();
+        String[] fields = getActualFieldNames();
         SeleniumUtils.waitForElement(selenium, getFieldId(fields[fields.length - 1]));
     }
 
@@ -121,6 +129,11 @@ public abstract class SeleniumForm
         submitFormElements("next", args);
     }
 
+    public void applyFormElements(String... args)
+    {
+        submitFormElements("apply", args);
+    }
+
     public void saveFormElements(String... args)
     {
         submitFormElements("save", args);
@@ -158,31 +171,30 @@ public abstract class SeleniumForm
 
     private void setFormElement(String name, String value, int type)
     {
-        String locator = getFieldId(name);
+        String id = getFieldId(name);
         switch (type)
         {
             case TEXTFIELD:
                 if (value != null)
                 {
-                    selenium.type(locator, value);
+                    selenium.type(id, value);
                 }
                 break;
             case COMBOBOX:
                 if (value != null)
                 {
-                    // Combos are custom ext widgets, so we just poke a
-                    // value into the underlying hidden input field.
-                    selenium.getEval("selenium.browserbot.getCurrentWindow().document.getElementById('" + name + "').value = '" + value + "';");
+                    // Combos are custom ext widgets.
+                    selenium.getEval("var field = selenium.browserbot.getCurrentWindow().Ext.getCmp('" + id + "'); field.setValue('" + value + "'); field.form.updateButtons()");
                 }
                 break;
             case CHECKBOX:
                 if(Boolean.valueOf(value))
                 {
-                    selenium.check(locator);
+                    selenium.check(id);
                 }
                 else
                 {
-                    selenium.uncheck(locator);
+                    selenium.uncheck(id);
                 }
                 break;
             case RADIOBOX:
@@ -206,7 +218,7 @@ public abstract class SeleniumForm
     private int getFieldType(String name)
     {
         int i;
-        String[] names = getFieldNames();
+        String[] names = getActualFieldNames();
         for(i = 0; i < names.length; i++)
         {
             if(names[i].equals(name))
@@ -215,17 +227,17 @@ public abstract class SeleniumForm
             }
         }
 
-        return getFieldTypes()[i];
+        return getActualFieldTypes()[i];
     }
 
     public void setFormElements(String... values)
     {
-        int[] types = getFieldTypes();
+        int[] types = getActualFieldTypes();
         Assert.assertEquals(values.length, types.length);
 
         for (int i = 0; i < types.length; i++)
         {
-            String name = getFieldNames()[i];
+            String name = getActualFieldNames()[i];
             String value = values[i];
             setFormElement(name, value, types[i]);
         }
@@ -235,12 +247,12 @@ public abstract class SeleniumForm
     {
         assertFormPresent();
 
-        int[] types = getFieldTypes();
+        int[] types = getActualFieldTypes();
         Assert.assertEquals(values.length, types.length);
 
         for (int i = 0; i < types.length; i++)
         {
-            String fieldName = getFieldNames()[i];
+            String fieldName = getActualFieldNames()[i];
             switch (types[i])
             {
                 case TEXTFIELD:
@@ -271,7 +283,7 @@ public abstract class SeleniumForm
                             expected = new String[0];
                         }
 
-                        assertMultiValues(getFieldNames()[i], expected);
+                        assertMultiValues(getActualFieldNames()[i], expected);
                     }
                 default:
                     break;
@@ -286,7 +298,7 @@ public abstract class SeleniumForm
 
     public String[] getDefaultValues()
     {
-        int[] types = getFieldTypes();
+        int[] types = getActualFieldTypes();
 
         String[] defaultValues = new String[types.length];
         for (int i = 0; i < types.length; i++)
@@ -298,7 +310,7 @@ public abstract class SeleniumForm
 
     public String[] getFormValues()
     {
-        String[] fieldNames = getFieldNames();
+        String[] fieldNames = getActualFieldNames();
         String[] formValues = new String[fieldNames.length];
         CollectionUtils.mapToArray(fieldNames, new Mapping<String, String>()
         {
@@ -359,6 +371,30 @@ public abstract class SeleniumForm
         {
             selenium.uncheck(getFieldId(name));
         }
+    }
+
+    private String[] getActualFieldNames()
+    {
+        String[] fieldNames = getFieldNames();
+        if(inherited)
+        {
+            String[] temp = fieldNames;
+            fieldNames = new String[fieldNames.length - 1];
+            System.arraycopy(temp, 1, fieldNames, 0, temp.length - 1);
+        }
+        return fieldNames;
+    }
+
+    private int[] getActualFieldTypes()
+    {
+        int[] fieldTypes = getFieldTypes();
+        if(inherited)
+        {
+            int[] temp = fieldTypes;
+            fieldTypes = new int[fieldTypes.length - 1];
+            System.arraycopy(temp, 1, fieldTypes, 0, temp.length - 1);
+        }
+        return fieldTypes;
     }
 
     public abstract String getFormName();
