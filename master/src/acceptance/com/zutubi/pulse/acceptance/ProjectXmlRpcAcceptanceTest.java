@@ -1,7 +1,5 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.util.RandomUtils;
-
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -54,7 +52,7 @@ public class ProjectXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         Hashtable<String, Object> createdScm = (Hashtable<String, Object>) createdProject.get("scm");
         assertNotNull(createdScm);
         assertEquals("zutubi.svnConfig", createdScm.get(SYMBOLIC_NAME_KEY));
-        assertEquals("svn://localhost/test/trunk", createdScm.get("url"));
+        assertEquals("svn://localhost:3088/accept/trunk/triviant", createdScm.get("url"));
         assertEquals("CLEAN_CHECKOUT", createdScm.get("checkoutScheme"));
         assertEquals(false, createdScm.get("monitor"));
 
