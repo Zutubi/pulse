@@ -5,6 +5,7 @@ import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.util.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,23 +51,55 @@ public class JournalTest extends PulseTestCase
     {
         Journal journal = new Journal(tmp);
         assertNotNull(journal.getEntries());
-        assertEquals(0, journal.getEntries().size());
         assertEquals(0, journal.size());
     }
 
-    public void testBlankJournalCommit()
+    public void testBlankJournalCommit() throws IOException
     {
         Journal journal = new Journal(tmp);
+        assertTrue(journal.prepare());
         journal.commit();
+
+        File index = new File(tmp, "index");
+        assertTrue(index.isFile());
+        assertEquals("", IOUtils.fileToString(index));
     }
 
-    public void testBlankJournalRollback()
+    public void testBlankJournalRollback() throws IOException
     {
         Journal journal = new Journal(tmp);
-        journal.rollback();        
+        assertTrue(journal.prepare());
+        journal.rollback();
+
+        File index = new File(tmp, "index");
+        assertFalse(index.isFile());
     }
 
-    public void testSingleAddAndRetrieve() throws IOException
+    public void testAddSingleEntry()
+    {
+        Journal journal = new Journal(tmp);
+        journal.add(new JournalEntry("action", "path", createSampleRecord()));
+        assertEquals(1, journal.size());
+        assertEquals("action", journal.get(0).getAction());
+        assertEquals("path", journal.get(0).getPath());
+    }
+
+    public void testPersistenceOfSingleEntry() throws IOException
+    {
+        Journal journal = new Journal(tmp);
+        journal.add(new JournalEntry("action", "path", createSampleRecord()));
+
+        commit(journal);
+
+        File index = new File(tmp, "index");
+        assertTrue(index.isFile());
+        assertEquals("1\naction\npath\n", IOUtils.fileToString(index));
+
+        File persistentRecord = new File(tmp, "1");
+        assertTrue(persistentRecord.isDirectory());
+    }
+
+    public void testLoadingOfSingleEntry()
     {
         Journal journal = new Journal(tmp);
         journal.add(new JournalEntry("action", "path", createSampleRecord()));
@@ -92,33 +125,54 @@ public class JournalTest extends PulseTestCase
         journal.add(new JournalEntry("2", "path"));
         journal.add(new JournalEntry("3", "path"));
         
+        assertEquals(3, journal.size());
+        assertNotNull(journal.getEntries());
+        assertEquals("1", journal.get(0).getAction());
+        assertEquals("2", journal.get(1).getAction());
+        assertEquals("3", journal.get(2).getAction());
+    }
+
+    public void testOrderingAcrossRestart()
+    {
+        Journal journal = new Journal(tmp);
+        journal.add(new JournalEntry("1", "path"));
+        journal.add(new JournalEntry("2", "path"));
+        journal.add(new JournalEntry("3", "path"));
         commit(journal);
 
         journal = new Journal(tmp);
         assertEquals(3, journal.size());
-
-        List<JournalEntry> entries = journal.getEntries();
-        assertNotNull(entries);
-        assertEquals("1", entries.get(0).getAction());
-        assertEquals("2", entries.get(1).getAction());
-        assertEquals("3", entries.get(2).getAction());
+        assertNotNull(journal.getEntries());
+        assertEquals("1", journal.get(0).getAction());
+        assertEquals("2", journal.get(1).getAction());
+        assertEquals("3", journal.get(2).getAction());
     }
 
     public void testClearJournal()
     {
+        // setup test data.
         Journal journal = new Journal(tmp);
-        journal.add(new JournalEntry("action", "path"));
-        journal.add(new JournalEntry("action", "path"));
+        journal.add(new JournalEntry("action", "path", createSampleRecord()));
+        journal.add(new JournalEntry("action", "path", createSampleRecord()));
         commit(journal);
 
         journal = new Journal(tmp);
         assertEquals(2, journal.size());
 
+        assertTrue(new File(tmp, "1").isDirectory());
+        assertTrue(new File(tmp, "2").isDirectory());
+
         journal.clear();
+        assertEquals(0, journal.size());
+
         commit(journal);
 
-        journal = new Journal(tmp);
         assertEquals(0, journal.size());
+
+        // verify the journal directory.
+        assertTrue(new File(tmp, "index").isFile());
+        assertFalse(new File(tmp, "1").isDirectory());
+        assertFalse(new File(tmp, "2").isDirectory());
     }
 
     public void testClearJournalRollback()

@@ -23,6 +23,10 @@ public class InMemoryRecordStore implements RecordStore
 
     public InMemoryRecordStore(MutableRecord base)
     {
+        if (base == null)
+        {
+            base = new MutableRecordImpl();
+        }
         wrapper = new MutableRecordTransactionalWrapper(base);
     }
 

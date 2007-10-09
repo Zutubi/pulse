@@ -97,6 +97,7 @@ public class Journal
         FileWriter writer = null;
         try
         {
+            indexFile.createNewFile();
             writer = new FileWriter(indexFile);
             for (JournalEntry entry : journalEntries)
             {

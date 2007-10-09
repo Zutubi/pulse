@@ -8,7 +8,6 @@ import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.util.FileSystemUtils;
 
 import java.io.File;
-import java.io.IOException;
 
 /**
  *
@@ -21,13 +20,17 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
     private static final String PERSISTENT_DIR = "data";
     private static final String JOURNAL_DIR = ".journal";
 
+    private static final int DEFAULT_COMPACTION_INTERVAL = 100;
+
     private File persistenceDir;
 
     private InMemoryRecordStore inMemoryStore;
 
     private TransactionManager transactionManager;
 
-    private Journal journal;
+    protected Journal journal;
+
+    private int compactionInterval = DEFAULT_COMPACTION_INTERVAL;
 
     public FileSystemRecordStore()
     {
@@ -151,6 +154,11 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
         this.transactionManager = transactionManager;
     }
 
+    public void setJournalCompactionInterval(int i)
+    {
+        this.compactionInterval = i;
+    }
+
     private static interface Executable
     {
         Record execute(RecordStore record);
@@ -181,9 +189,10 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
     public boolean prepare()
     {
         // check journal size. If size > x, then flush
-        if (journal.size() > 100)
+        if (journal.size() >= compactionInterval)
         {
             journal.clear();
+            journal.prepare();
 
             // compact.
             // write contents to .active directory.
@@ -210,23 +219,28 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
         // data -> .backup
         File data = new File(persistenceDir, PERSISTENT_DIR);
         File dotbackup = new File(persistenceDir, BACKUP_DIR);
-        if (data.isDirectory())
-        {
-            FileSystemUtils.rename(data, dotbackup);
-        }
-
-        // .active -> .current
         File active = new File(persistenceDir, ACTIVE_TXN_DIR);
+
         if (active.isDirectory())
         {
-            FileSystemUtils.rename(active, data);
-        }
+            // only if there are changes do we commit them.
+            if (data.isDirectory())
+            {
+                FileSystemUtils.rename(data, dotbackup);
+            }
 
-        if (dotbackup.isDirectory())
-        {
-            FileSystemUtils.rmdir(dotbackup);
-        }
+            // .active -> .current
+            if (active.isDirectory())
+            {
+                FileSystemUtils.rename(active, data);
+            }
 
+            if (dotbackup.isDirectory())
+            {
+                FileSystemUtils.rmdir(dotbackup);
+            }
+        }
+        
         journal.commit();
     }
 

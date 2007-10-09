@@ -4,6 +4,7 @@ import com.zutubi.prototype.transaction.TransactionManager;
 import com.zutubi.prototype.transaction.UserTransaction;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.MutableRecordImpl;
+import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 
@@ -31,12 +32,8 @@ public class FileSystemRecordStoreTest extends PulseTestCase
 
         transactionManager = new TransactionManager();
         transaction = new UserTransaction(transactionManager);
-        transaction.begin();
 
-        recordStore = new FileSystemRecordStore();
-        recordStore.setTransactionManager(transactionManager);
-        recordStore.setPersistenceDir(persistentDir);
-        recordStore.init();
+        restartRecordStore();
     }
 
     protected void tearDown() throws Exception
@@ -50,6 +47,8 @@ public class FileSystemRecordStoreTest extends PulseTestCase
 
     public void testInsert()
     {
+        transaction.begin();
+
         MutableRecordImpl newRecord = new MutableRecordImpl();
         newRecord.put("a", "b");
 
@@ -88,6 +87,8 @@ public class FileSystemRecordStoreTest extends PulseTestCase
 
     public void testDelete()
     {
+        transaction.begin();
+
         // setup.
         MutableRecordImpl newRecord = new MutableRecordImpl();
         newRecord.put("a", "b");
@@ -134,6 +135,8 @@ public class FileSystemRecordStoreTest extends PulseTestCase
 
     public void testRollback()
     {
+        transaction.begin();
+
         // start the transaction.
         MutableRecordImpl newRecord = new MutableRecordImpl();
         newRecord.put("a", "b");
@@ -153,9 +156,6 @@ public class FileSystemRecordStoreTest extends PulseTestCase
     // ensure that changes made outside the scope of a transaction are handled correctly.
     public void testAutoCommit()
     {
-        // close the default transaction.
-        transaction.commit();
-
         // update the data.
         MutableRecordImpl newRecord = new MutableRecordImpl();
         newRecord.put("a", "b");
@@ -169,6 +169,51 @@ public class FileSystemRecordStoreTest extends PulseTestCase
         assertNotNull(recordStore.select().get("path"));
     }
 
+    public void testJournalRollover()
+    {
+        recordStore.setJournalCompactionInterval(3);
+
+        transaction.begin();
+        recordStore.insert("a", createSampleRecord());
+        transaction.commit();
+
+        assertEquals(1, recordStore.select().size());
+        assertEquals(1, recordStore.journal.size());
+
+        transaction.begin();
+        recordStore.insert("b", createSampleRecord());
+        transaction.commit();
+
+        assertEquals(2, recordStore.select().size());
+        assertEquals(2, recordStore.journal.size());
+
+        transaction.begin();
+        recordStore.insert("c", createSampleRecord());
+        transaction.commit();
+
+        assertEquals(3, recordStore.select().size());
+        assertEquals(0, recordStore.journal.size());
+
+        transaction.begin();
+        recordStore.insert("d", createSampleRecord());
+        transaction.commit();
+
+        assertEquals(4, recordStore.select().size());
+        assertEquals(1, recordStore.journal.size());
+
+        restartRecordStore();
+
+        assertEquals(4, recordStore.select().size());
+        assertEquals(1, recordStore.journal.size());
+    }
+
+    private Record createSampleRecord()
+    {
+        MutableRecord record = new MutableRecordImpl();
+        record.put("a", "b");
+        return record;
+    }
+
     private void restartRecordStore()
     {
         recordStore = new FileSystemRecordStore();
@@ -176,5 +221,4 @@ public class FileSystemRecordStoreTest extends PulseTestCase
         recordStore.setTransactionManager(transactionManager);
         recordStore.init();
     }
-
 }
