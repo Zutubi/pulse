@@ -22,6 +22,7 @@ width of its contents.  Floating it works, but hurts other things.
         {
             Ext.get('submitField').dom.value = value;
     <#if form.ajax>
+            window.formSubmitting = true;
             form.submit({
                 clientValidation: false,
                 waitMsg: 'Submitting...'

@@ -15,6 +15,7 @@
         {
             if(form.isValid())
             {
+                window.formSubmitting = true;
                 form.submit({
                     clientValidation: false
                 });

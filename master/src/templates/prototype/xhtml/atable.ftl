@@ -1,4 +1,4 @@
-<table width="60%">
+<table id="config.table" width="60%">
 <#assign tablewidth = table.columns?size + 1/>
     <tr>
         <th class="heading" colspan="${tablewidth}">${table.heading?html}</th>

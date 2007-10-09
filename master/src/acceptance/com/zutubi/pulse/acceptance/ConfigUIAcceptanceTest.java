@@ -4,6 +4,7 @@ import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.acceptance.forms.admin.*;
 import com.zutubi.pulse.acceptance.pages.admin.DeleteConfirmPage;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
+import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
 import com.zutubi.pulse.model.ProjectManager;
 
 /**
@@ -109,4 +110,47 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         checkForm.checkAndAssertResult(false, "unable to check configuration due to validation errors", "");
         assertTextPresent("emailAddress requires a value");
     }
+
+    public void testClearItemPicker() throws Exception
+    {
+        ensureProject(random);
+
+        loginAsAdmin();
+        ProjectConfigPage configPage = new ProjectConfigPage(selenium, urls, random, false);
+        configPage.goTo();
+        ListPage listPage = configPage.selectCollection("permissions", "permissions");
+        listPage.assertCellContent(0, 1, "[view]");
+
+        selenium.click("link=view");
+        ProjectAclForm form = new ProjectAclForm(selenium);
+        form.waitFor();
+        form.assertFormElements("all users", "view");
+        form.saveFormElements(null, "");
+        listPage.waitFor();
+
+        listPage.assertCellContent(0, 1, "[]");
+        selenium.click("link=view");
+        form = new ProjectAclForm(selenium);
+        form.waitFor();
+        form.assertFormElements("all users", "");
+    }
+
+    public void testClearMultiSelect() throws Exception
+    {
+        ensureProject(random);
+
+        loginAsAdmin();
+        ProjectConfigPage configPage = new ProjectConfigPage(selenium, urls, random, false);
+        configPage.goTo();
+        AntTypeForm form = configPage.selectComposite("project type", new AntTypeForm(selenium));
+        form.assertFormElements("", "build.xml", "", "", "");
+        form.applyFormElements(null, null, null, null, "ant");
+        form.waitFor();
+        form.assertFormElements("", "build.xml", "", "", "ant");
+
+        form.applyFormElements(null, null, null, null, "");
+        form.waitFor();
+        form.assertFormElements("", "build.xml", "", "", "");
+    }
+
 }

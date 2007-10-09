@@ -40,6 +40,8 @@
     var select = new ZUTUBI.Select(fieldConfig);
     form.add(select);
     select.on('change', updateButtons);
+
+    hiddenFields.push({name: '${parameters.name}.default', value: ''});
 }());
 
 <#include "/prototype/xhtml/controlfooter.ftl" />

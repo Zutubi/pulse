@@ -8,17 +8,20 @@ import com.zutubi.util.StringUtils;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
+import java.util.List;
+
 /**
  * <class-comment/>
  */
 public abstract class SeleniumForm
 {
-    protected static final int TEXTFIELD = 3;
-    protected static final int CHECKBOX = 4;
-    protected static final int RADIOBOX = 5;
-    protected static final int COMBOBOX = 6;
+    protected static final int TEXTFIELD      = 3;
+    protected static final int CHECKBOX       = 4;
+    protected static final int RADIOBOX       = 5;
+    protected static final int COMBOBOX       = 6;
     protected static final int MULTI_CHECKBOX = 7;
-    protected static final int MULTI_SELECT = 8;
+    protected static final int MULTI_SELECT   = 8;
+    protected static final int ITEM_PICKER    = 9;
 
     protected Selenium selenium;
     protected boolean inherited = false;
@@ -54,6 +57,9 @@ public abstract class SeleniumForm
 
     public void waitFor()
     {
+        // Make sure there is no form in the process of submitting.
+        SeleniumUtils.waitForVariable(selenium, "formSubmitting", SeleniumUtils.DEFAULT_TIMEOUT, true);
+        
         // Wait for the last field as the forms are lazily rendered
         String[] fields = getActualFieldNames();
         SeleniumUtils.waitForElement(selenium, getFieldId(fields[fields.length - 1]));
@@ -168,7 +174,15 @@ public abstract class SeleniumForm
 
     public String getFieldValue(String name)
     {
-        return selenium.getValue(getFieldId(name));
+        int type = getFieldType(name);
+        switch(type)
+        {
+            case ITEM_PICKER:
+            case MULTI_SELECT:
+                return selenium.getEval("selenium.browserbot.getCurrentWindow().Ext.getCmp('" + getFieldId(name) + "').getValue();");
+            default:
+                return selenium.getValue(getFieldId(name));
+        }
     }
 
     public void setFormElement(String name, String value)
@@ -191,8 +205,22 @@ public abstract class SeleniumForm
             case COMBOBOX:
                 if (value != null)
                 {
-                    // Combos are custom ext widgets.
-                    selenium.getEval("var field = selenium.browserbot.getCurrentWindow().Ext.getCmp('" + id + "'); field.setValue('" + value + "'); field.form.updateButtons()");
+                    setComponentValue(id, "'" + value + "'");
+                }
+                break;
+            case ITEM_PICKER:
+            case MULTI_SELECT:
+                if (value != null)
+                {
+                    String[] values = convertMultiValue(value);
+                    List<String> quotedValues = CollectionUtils.map(values, new Mapping<String, String>()
+                    {
+                        public String map(String s)
+                        {
+                            return "'" + s + "'";
+                        }
+                    });
+                    setComponentValue(id, quotedValues.toString());
                 }
                 break;
             case CHECKBOX:
@@ -212,7 +240,6 @@ public abstract class SeleniumForm
                 }
                 break;
             case MULTI_CHECKBOX:
-            case MULTI_SELECT:
                 if (value != null)
                 {
                     setMultiValues(name, value);
@@ -221,6 +248,14 @@ public abstract class SeleniumForm
             default:
                 break;
         }
+    }
+
+    private void setComponentValue(String id, String value)
+    {
+        // Custom Ext widgets are tricky to manage.  Since we are
+        // not testing the widgets themselves, just go direct to
+        // the setValue method.
+        selenium.getEval("var field = selenium.browserbot.getCurrentWindow().Ext.getCmp('" + id + "'); field.setValue(" + value + "); field.form.updateButtons()");
     }
 
     private int getFieldType(String name)
@@ -276,22 +311,13 @@ public abstract class SeleniumForm
                 case COMBOBOX:
                     TestCase.assertEquals(values[i], getFieldValue(fieldName));
                     break;
+                case ITEM_PICKER:
                 case MULTI_CHECKBOX:
                 case MULTI_SELECT:
                     if (values[i] != null)
                     {
-                        String[] expected;
-
-                        if (values[i].length() > 0)
-                        {
-                            expected = values[i].split(",");
-                        }
-                        else
-                        {
-                            expected = new String[0];
-                        }
-
-                        assertMultiValues(getActualFieldNames()[i], expected);
+                        String[] expected = convertMultiValue(values[i]);
+                        assertMultiValues(fieldName, expected);
                     }
                 default:
                     break;
@@ -332,7 +358,8 @@ public abstract class SeleniumForm
 
     public void assertMultiValues(String name, String... values)
     {
-        String[] gotValues = selenium.getSelectedValues(getFieldId(name));
+        String fieldValue = getFieldValue(name);
+        String[] gotValues = fieldValue.length() == 0 ? new String[0] : fieldValue.split(",");
         Assert.assertEquals(values.length, gotValues.length);
         for (int i = 0; i < values.length; i++)
         {
@@ -341,6 +368,17 @@ public abstract class SeleniumForm
     }
 
     public void setMultiValues(String name, String values)
+    {
+        String[] set = convertMultiValue(values);
+
+        String fieldLocator = getFieldId(name);
+        for(String value: set)
+        {
+            selenium.addSelection(fieldLocator, "value=" + value);
+        }
+    }
+
+    private String[] convertMultiValue(String values)
     {
         String[] set;
         if (values.length() > 0)
@@ -351,12 +389,7 @@ public abstract class SeleniumForm
         {
             set = new String[0];
         }
-
-        String fieldLocator = getFieldId(name);
-        for(String value: set)
-        {
-            selenium.addSelection(fieldLocator, "value=" + value);
-        }
+        return set;
     }
 
     public void setRadioboxSelected(String fieldName, String selectedOption)

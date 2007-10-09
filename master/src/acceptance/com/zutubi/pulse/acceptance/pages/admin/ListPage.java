@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance.pages.admin;
 
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.pulse.acceptance.IDs;
 import com.zutubi.pulse.acceptance.SeleniumUtils;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.webwork.mapping.Urls;
@@ -41,6 +42,11 @@ public class ListPage extends SeleniumPage
         SeleniumUtils.assertElementNotPresent(selenium, getItemId(baseName));
     }
 
+    public void assertCellContent(int itemIndex, int columnIndex, String text)
+    {
+        SeleniumUtils.assertCellContents(selenium, IDs.COLLECTION_TABLE, itemIndex + 2, columnIndex, text);
+    }
+    
     private String getItemId(String baseName)
     {
         return "item:" + baseName;

@@ -63,6 +63,8 @@
         <script type="text/javascript" src="$base/js/zutubi.js"></script>
         <script type="text/javascript">
             Ext.BLANK_IMAGE_URL = '$base/images/default/s.gif';
+
+            window.formSubmitting = false;
             
             var layout;
             var nestedLayout;

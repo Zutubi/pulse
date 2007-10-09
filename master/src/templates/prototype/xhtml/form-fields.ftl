@@ -1,3 +1,8 @@
+form.on('actioncomplete', function() { window.formSubmitting = false; });
+<#if form.displayMode?default(false)>
+    form.displayMode = true;
+</#if>
+
 var fieldConfig;
 var hiddenFields = [];
 
@@ -41,10 +46,6 @@ function updateButtons()
 Ext.onReady(function()
 {
     Ext.Ajax.timeout = 60000;
-
-<#if form.displayMode?default(false)>
-    form.displayMode = true;
-</#if>
 
     form.render('${form.id}');
     form.el.dom.action = '${base}/${form.action}';

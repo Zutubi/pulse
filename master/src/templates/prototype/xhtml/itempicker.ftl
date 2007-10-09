@@ -50,6 +50,8 @@
     var picker = new ZUTUBI.ItemPicker(fieldConfig);
     form.add(picker);
     picker.on('change', updateButtons);
+
+    hiddenFields.push({name: '${parameters.name}.default', value: ''});
 }());
 
 <#include "/prototype/xhtml/controlfooter.ftl" />

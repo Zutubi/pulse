@@ -16,7 +16,12 @@ public class SeleniumUtils
 
     public static void waitForVariable(Selenium selenium, String variable, long timeout)
     {
-        selenium.waitForCondition("selenium.browserbot.getCurrentWindow()." + variable, Long.toString(timeout));
+        waitForVariable(selenium, variable, timeout, false);
+    }
+    
+    public static void waitForVariable(Selenium selenium, String variable, long timeout, boolean inverse)
+    {
+        selenium.waitForCondition((inverse ? "!" : "") + "selenium.browserbot.getCurrentWindow()." + variable, Long.toString(timeout));
     }
 
     public static String evalVariable(Selenium selenium, String variable)
@@ -136,5 +141,10 @@ public class SeleniumUtils
     public static void assertNotVisible(Selenium selenium, String locator)
     {
         Assert.assertFalse(selenium.isVisible(locator));
+    }
+
+    public static void assertCellContents(Selenium selenium, String tableLocator, int row, int column, String text)
+    {
+        Assert.assertEquals(text, selenium.getTable(tableLocator + "." + row + "." + column));
     }
 }
