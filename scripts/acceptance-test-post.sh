@@ -17,7 +17,7 @@ version=$1
 # Kill pulse agent and master
 pushd "$working/pulse-accept"
 export PULSE_HOME=
-./pulse-agent-${version}/bin/pulse shutdown -f agent.config.properties -d agent-data
+./pulse-agent-${version}/bin/pulse shutdown -p 8890 -f agent.config.properties -d agent-data
 ./pulse-${version}/bin/pulse shutdown -p 8889
 popd
 

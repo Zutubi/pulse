@@ -157,6 +157,7 @@ public class XmlRpcHelper
         agent.put(SYMBOLIC_NAME_KEY, "zutubi.agentConfig");
         agent.put("name", name);
         agent.put("host", name);
+        agent.put("port", 8890);
 
         return call("insertTemplatedConfig", "agents/global agent template", agent, false);
     }

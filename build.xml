@@ -296,7 +296,13 @@
     </target>
 
     <target name="package.master" depends="init">
+        <!-- Check that all plugins will be included in some package -->
+	<exec executable="python" failonerror="true">
+            <arg line="scripts/check-plugins.py"/>
+	</exec>
+
         <build-package-deps module="master"/>
+
         <antcall target="assemble.package.local"/>
         <antcall target="assemble.package.slave"/>
 

@@ -108,7 +108,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
             assertEquals("zutubi.agentConfig", agentConfig.get(SYMBOLIC_NAME_KEY));
             assertEquals(agentName, agentConfig.get("name"));
             assertEquals(agentName, agentConfig.get("host"));
-            assertEquals(8090, agentConfig.get("port"));
+            assertEquals(8890, agentConfig.get("port"));
             assertEquals(true, agentConfig.get("remote"));
         }
         finally
@@ -147,7 +147,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
             assertEquals("zutubi.agentConfig", agentConfig.get(SYMBOLIC_NAME_KEY));
             assertEquals(agentName, agentConfig.get("name"));
             assertEquals(agentName, agentConfig.get("host"));
-            assertFalse(agentConfig.containsKey("port"));
+            assertEquals(8890, agentConfig.get("port"));
             assertFalse(agentConfig.containsKey("remote"));
         }
         finally
