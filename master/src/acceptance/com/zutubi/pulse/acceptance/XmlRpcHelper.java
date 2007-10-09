@@ -172,4 +172,14 @@ public class XmlRpcHelper
 
         return path;
     }
+
+    public void logError(String message) throws Exception
+    {
+        call("logError", message);
+    }
+
+    public void logWarning(String message) throws Exception
+    {
+        call("logWarning", message);
+    }
 }

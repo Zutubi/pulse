@@ -1,4 +1,4 @@
-    <table class="columns">
+    <table id="server.activity" class="columns">
     <tr><td>
 
     <table class="fill-content">

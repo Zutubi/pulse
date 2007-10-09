@@ -50,6 +50,6 @@
     #end
     </table>
 
-    <a href="$base/viewServerQueues.action">#wwtext("name=view.server.queues")</a>
+    <a href="$urls.serverActivity()">#wwtext("name=server.activity")</a>
 </body>
 </html>

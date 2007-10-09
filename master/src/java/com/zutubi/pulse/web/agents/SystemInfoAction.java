@@ -2,6 +2,8 @@ package com.zutubi.pulse.web.agents;
 
 import com.zutubi.pulse.SystemInfo;
 import com.zutubi.pulse.agent.Agent;
+import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.StartupManager;
 import com.zutubi.util.logging.Logger;
 
 /**
@@ -14,28 +16,38 @@ public class SystemInfoAction extends AgentActionBase
 
     private SystemInfo info;
 
+    private ConfigurationManager configurationManager;
+    private StartupManager startupManager;
+
     /**
      */
     public String execute()
     {
-        Agent agent = getRequiredAgent();
-        if(agent.isOnline())
+        Agent agent = getAgent();
+        if(agent == null)
         {
-            try
-            {
-                info = agent.getService().getSystemInfo();
-            }
-            catch(RuntimeException e)
-            {
-                addActionError("Unable to contact agent: " + e.getMessage());
-                LOG.warning(e);
-            }
+            info = SystemInfo.getSystemInfo(configurationManager, startupManager);
         }
         else
         {
-            addActionError("Agent is not online.");
+            if(agent.isOnline())
+            {
+                try
+                {
+                    info = agent.getService().getSystemInfo();
+                }
+                catch(RuntimeException e)
+                {
+                    addActionError("Unable to contact agent: " + e.getMessage());
+                    LOG.warning(e);
+                }
+            }
+            else
+            {
+                addActionError("Agent is not online.");
+            }
         }
-        
+
         // The UI will handle agent errors
         return SUCCESS;
     }
@@ -49,5 +61,15 @@ public class SystemInfoAction extends AgentActionBase
     public SystemInfo getInfo()
     {
         return info;
+    }
+
+    public void setConfigurationManager(ConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
+    }
+
+    public void setStartupManager(StartupManager startupManager)
+    {
+        this.startupManager = startupManager;
     }
 }

@@ -1,32 +1,30 @@
-#helpTag("Agent+Messages+Tab")
+#helpTag("Server+Messages+Tab")
 #authorisationTags($principle)
-#agentTags()
+<content tag="selectedTab">server</content>
 <html>
 <head>
-    <title>#wwtext("name=agents")</title>
+    <title>#wwtext("name=server.messages")</title>
 </head>
 <body>
-    #agentTabs("messages")
+    #serverTabs("messages")
 
 #if($action.hasErrors())
-    #parse("/agent-error.vm")
+    #parse("/template/includes/actionerrors.vm")
 #else
-    <table class="fill-content">
-        <tr><th colspan="5">$action.getText("messages.count", ["$pagingSupport.totalItems"])</td></tr>
-        #pagingRow("$urls.agentMessages($agent)" "" $pagingSupport)
+    <table id="server.messages.$pagingSupport.startPage" class="fill-content">
+        <tr><th class="content-centre" colspan="5">$action.getText("messages.count", ["$pagingSupport.totalItems"])</td></tr>
+        #pagingRow("$urls.serverMessages()" "" $pagingSupport)
     </table>
 
-#foreach($record in $records)
-    #serverMessage($record)
-#end
+    #foreach($record in $records)
+        #serverMessage($record)
+    #end
 
-#if($records.size() > 0)
+    #if($records.size() > 0)
     <table class="fill-content">
-        #pagingRow("$urls.agentMessages($agent)" "" $pagingSupport)
-        <tr><th colspan="5">$action.getText("messages.count", ["$pagingSupport.totalItems"])</td></tr>
+        #pagingRow("$urls.serverMessages()" "" $pagingSupport)
+        <tr><th class="content-centre" colspan="5">$action.getText("messages.count", ["$pagingSupport.totalItems"])</td></tr>
     </table>
+    #end
 #end
-
-#end
-
 </html>

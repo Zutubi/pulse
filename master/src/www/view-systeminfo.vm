@@ -1,21 +1,36 @@
-#helpTag("Agent+Info+Tab")
+#if($agentName)
+    #helpTag("Agent+Info+Tab")
+#else
+    #helpTag("Server+Info+Tab")
+    <content tag="selectedTab">server</content>
+#end
 #authorisationTags($principle)
-#agentTags()
+#if($agentName)
+    #agentTags()
+#end
 <html>
 <head>
-    <title>#wwtext("name=agents")</title>
+    <title>#if($agentName) #wwtext("name=agents") #else #wwtext("name=server.info") #end</title>
 </head>
 <body>
+#if($agentName)
     #agentTabs("info")
+#else
+    #serverTabs("info")
+#end
 
 #if($action.hasErrors())
+    #if($agentName)
         #parse("agent-error.vm")
+    #else
+        #parse("/template/includes/actionerrors.vm")
+    #end
 #else
 
 #set ($propertiesMap = $info.systemProperties)
 #set ($properties = ["system.date", "system.time", "system.uptime", "java.version", "java.vendor", "java.vm.name", "java.runtime.name", "user.name", "user.timezone", "os.name", "memory.total", "memory.used", "memory.free"])
 
-    <table class="columns" width="90%">
+    <table id="server.info" class="columns" width="90%">
         <tr>
             <td class="columns" width="40%">
 
@@ -53,7 +68,7 @@
                             </td>
                         </table>
                     </td>
-                    <td valign=top width="10%" align="left" nowrap>&nbsp;&nbsp;$action.getText("memory.free.percent", ["$percentageFree"]) #auth("action=ADMINISTER") (<a href="$urls.agentAction($agent, 'gc')tab/info/">gc</a>) #end </td>
+                    <td valign=top width="10%" align="left" nowrap>&nbsp;&nbsp;$action.getText("memory.free.percent", ["$percentageFree"]) #if($agentName) #auth("action=ADMINISTER") (<a href="$urls.agentAction($agent, 'gc')tab/info/">gc</a>) #end #end </td>
                 </tr>
             </table>
         </td>

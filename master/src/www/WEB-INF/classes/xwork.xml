@@ -58,6 +58,11 @@
             <result name="success" type="velocity">/view-agent-status.vm</result>
         </action>
 
+        <action name="agentMessages" class="com.zutubi.pulse.web.agents.ServerMessagesAction">
+            <interceptor-ref name="completeReadOnlyStack"/>
+            <result name="success" type="velocity">/agent-messages.vm</result>
+        </action>
+
         <action name="serverMessages" class="com.zutubi.pulse.web.agents.ServerMessagesAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">/server-messages.vm</result>

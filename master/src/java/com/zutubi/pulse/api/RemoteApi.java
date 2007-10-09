@@ -12,6 +12,7 @@ import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.system.SystemStartedEvent;
+import com.zutubi.util.logging.Logger;
 
 import java.util.Hashtable;
 import java.util.Vector;
@@ -22,6 +23,8 @@ import java.util.Vector;
 // FIXME
 public class RemoteApi implements com.zutubi.pulse.events.EventListener
 {
+    private static final Logger LOG = Logger.getLogger(RemoteApi.class);
+
     private TokenManager tokenManager;
     private EventManager eventManager;
     private ShutdownManager shutdownManager;
@@ -360,6 +363,20 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         {
             tokenManager.logoutUser();
         }
+    }
+
+    public boolean logError(String token, String message) throws AuthenticationException
+    {
+        tokenManager.verifyAdmin(token);
+        LOG.severe(message);
+        return true;
+    }
+
+    public boolean logWarning(String token, String message) throws AuthenticationException
+    {
+        tokenManager.verifyAdmin(token);
+        LOG.warning(message);
+        return true;
     }
     
 //    public Vector<String> getAllUserLogins(String token) throws AuthenticationException

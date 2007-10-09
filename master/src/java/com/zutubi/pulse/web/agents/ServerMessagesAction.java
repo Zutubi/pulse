@@ -16,7 +16,7 @@ public class ServerMessagesAction extends ServerMessagesActionSupport
 {
     private static final Logger LOG = Logger.getLogger(ServerMessagesAction.class);
     
-    private List<CustomLogRecord> records;
+    private List<CustomLogRecord> records = null;
     private PagingSupport pagingSupport = new PagingSupport(10);
 
     public List<CustomLogRecord> getRecords()
@@ -36,27 +36,38 @@ public class ServerMessagesAction extends ServerMessagesActionSupport
 
     public String execute() throws Exception
     {
-        Agent agent = getRequiredAgent();
-        if(agent.isOnline())
+        Agent agent = getAgent();
+        if(agent == null)
         {
-            try
-            {
-                records = agent.getService().getRecentMessages();
-                Collections.reverse(records);
-                pagingSupport.setTotalItems(records.size());
-                records = records.subList(pagingSupport.getStartOffset(), pagingSupport.getEndOffset());
-            }
-            catch(HessianRuntimeException e)
-            {
-                LOG.warning(e);
-                addActionError("Unable to contact agent: " + e.getMessage());
-            }
+            records = serverMessagesHandler.takeSnapshot();
         }
         else
         {
-            addActionError("Agent is not online.");
+            if(agent.isOnline())
+            {
+                try
+                {
+                    records = agent.getService().getRecentMessages();
+                }
+                catch(HessianRuntimeException e)
+                {
+                    LOG.warning(e);
+                    addActionError("Unable to contact agent: " + e.getMessage());
+                }
+            }
+            else
+            {
+                addActionError("Agent is not online.");
+            }
         }
-        
+
+        if(records != null)
+        {
+            Collections.reverse(records);
+            pagingSupport.setTotalItems(records.size());
+            records = records.subList(pagingSupport.getStartOffset(), pagingSupport.getEndOffset());
+        }
+
         return SUCCESS;
     }
 }

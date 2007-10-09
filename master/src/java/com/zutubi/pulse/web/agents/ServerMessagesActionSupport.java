@@ -1,6 +1,7 @@
 package com.zutubi.pulse.web.agents;
 
 import com.zutubi.pulse.logging.CustomLogRecord;
+import com.zutubi.pulse.logging.ServerMessagesHandler;
 
 import java.util.logging.Level;
 
@@ -9,6 +10,8 @@ import java.util.logging.Level;
  */
 public class ServerMessagesActionSupport extends AgentActionBase
 {
+    protected ServerMessagesHandler serverMessagesHandler;
+
     public boolean isError(CustomLogRecord record)
     {
         return record.getLevel().intValue() == Level.SEVERE.intValue();
@@ -24,5 +27,8 @@ public class ServerMessagesActionSupport extends AgentActionBase
         return record.getStackTrace().length() > 0;
     }
 
-
+    public void setServerMessagesHandler(ServerMessagesHandler serverMessagesHandler)
+    {
+        this.serverMessagesHandler = serverMessagesHandler;
+    }
 }

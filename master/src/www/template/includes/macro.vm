@@ -230,6 +230,24 @@
 #end
 
 ##
+## Shows a server tab of the given name with the given action name
+##
+#macro(serverTab $name $selected)
+    #tabItem("tab.server.$name" $name "$urls.server()$name/" $selected)
+#end
+
+##
+## Shows the tab bar for project pages with the given tab selected.
+##
+#macro(serverTabs $selected)
+    #openTabs()
+        #serverTab("activity" $selected)
+        #serverTab("messages" $selected)
+        #serverTab("info" $selected)
+    #closeTabs()
+#end
+
+##
 ## Shows an agent tab of the given name with the given action name
 ##
 #macro(agentTab $name $selected)
@@ -1707,7 +1725,7 @@
                 <tr>
                     <td class="content-centre">
         #if($pager.startPage > 0)
-                        <a href="${url}0/${extraParams}" class="unadorned">
+                        <a href="${url}0/${extraParams}" id="page.latest" class="unadorned">
         #end
                             #image("$base/images/resultset_first.gif" "page.latest") #wwtext("name=page.latest")
         #if($pager.startPage > 0)
@@ -1716,7 +1734,7 @@
                     </td>
                     <td class="content-centre">
         #if($pager.startPage > 0)
-                        <a href="${url}$previousPage/${extraParams}" class="unadorned">
+                        <a href="${url}$previousPage/${extraParams}" id="page.previous" class="unadorned">
         #end
                             #image("$base/images/resultset_previous.gif" "page.newer") #wwtext("name=page.newer")
         #if($pager.startPage > 0)
@@ -1728,7 +1746,7 @@
             #set($pageNumber = $pageIndex + 1)
                         &nbsp;
             #if($pageIndex != $pager.startPage)
-                        <a href="${url}$pageIndex/${extraParams}">
+                        <a href="${url}$pageIndex/${extraParams}" id="page.$pageNumber">
             #end
                             $pageNumber#if($pageIndex != $pager.startPage)</a>#end
         #end
@@ -1736,7 +1754,7 @@
                     </td>
                     <td class="content-centre">
         #if($pager.startPage < $lastPage)
-                        <a href="${url}$nextPage/${extraParams}" class="unadorned">
+                        <a href="${url}$nextPage/${extraParams}" id="page.next" class="unadorned">
         #end
                             #wwtext("name=page.older") #image("$base/images/resultset_next.gif" "page.older")
         #if($pager.startPage < $lastPage)
@@ -1745,7 +1763,7 @@
                     </td>
                     <td class="content-centre">
         #if($pager.startPage < $lastPage)
-                        <a href="${url}$lastPage/${extraParams}" class="unadorned">
+                        <a href="${url}$lastPage/${extraParams}" id="page.oldest" class="unadorned">
         #end
                             #wwtext("name=page.oldest") #image("$base/images/resultset_last.gif" "page.oldest")
         #if($pager.startPage < $lastPage)

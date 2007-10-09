@@ -1,16 +1,16 @@
-#helpTag("Queues+Section")
+#helpTag("Server+Activity+Tab")
 #authorisationTags($principle)
-<content tag="selectedTab">queues</content>
+<content tag="selectedTab">server</content>
 <html>
 <head>
-    <title>#wwtext("name=queues")</title>
+    <title>#wwtext("name=server.activity")</title>
     <script type="text/javascript" src="$base/js/prototype.js"></script>
     <script type="text/javascript">
         #updater("$base/ajax/viewServerQueuesPanel.action" "panel" $principle)
     </script>
 </head>
 <body>
-    <h1>:: #wwtext("name=queues") ::</h1>
+    #serverTabs("activity")
     
     <div id="panel">
         #parse("ajax/view-server-queues-panel.vm")

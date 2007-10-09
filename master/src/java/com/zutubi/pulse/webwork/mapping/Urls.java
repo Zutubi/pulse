@@ -196,6 +196,26 @@ public class Urls
         return StringUtils.uriComponentEncode(node.getStageName()) + "/";
     }
 
+    public String server()
+    {
+        return baseUrl + "/server/";
+    }
+
+    public String serverActivity()
+    {
+        return server() + "activity/";
+    }
+
+    public String serverMessages()
+    {
+        return server() + "messages/";
+    }
+
+    public String serverInfo()
+    {
+        return server() + "info/";
+    }
+
     public String agents()
     {
         return baseUrl + "/agents/";
