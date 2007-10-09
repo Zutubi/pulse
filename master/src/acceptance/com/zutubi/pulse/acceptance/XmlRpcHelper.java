@@ -90,6 +90,11 @@ public class XmlRpcHelper
         return call("getConfigHandle", path);
     }
 
+    public String insertConfig(String path, Hashtable<String, Object> config) throws Exception
+    {
+        return call("insertConfig", path, config);
+    }
+
     public String saveConfig(String path, Hashtable<String, Object> config, boolean deep) throws Exception
     {
         return call("saveConfig", path, config, deep);
@@ -135,15 +140,15 @@ public class XmlRpcHelper
         return call("insertTemplatedConfig", "projects/" + parent, project, template);
     }
 
-    public String ensureProject(String name) throws Exception
+    public boolean ensureProject(String name) throws Exception
     {
-        String path = "projects/" + name;
-        if(!configPathExists(path))
+        if(!configPathExists("projects/" + name))
         {
             insertSimpleProject(name, false);
+            return true;
         }
 
-        return path;
+        return false;
     }
 
     public String insertSimpleAgent(String name) throws Exception

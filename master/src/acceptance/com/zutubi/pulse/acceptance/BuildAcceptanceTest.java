@@ -8,13 +8,16 @@ import com.zutubi.pulse.acceptance.pages.browse.BuildDetailedViewPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectsPage;
 
+import java.util.Hashtable;
+
 /**
  * An acceptance test that adds a very simple project and runs a build as a
  * sanity test.
  */
 public class BuildAcceptanceTest extends SeleniumTestBase
 {
-    private static final String AGENT_NAME = "localhost";
+    private static final String AGENT_NAME   = "localhost";
+    private static final String PROJECT_NAME = "BuildAcceptanceTest-Project";
 
     protected void setUp() throws Exception
     {
@@ -64,11 +67,10 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
     public void testDetailedView() throws Exception
     {
-        ensureProject(random);
         loginAsAdmin();
-        triggerSuccessfulBuild(random);
+        ensureBuild();
 
-        BuildDetailedViewPage detailedViewPage = new BuildDetailedViewPage(selenium, urls, random, 1);
+        BuildDetailedViewPage detailedViewPage = new BuildDetailedViewPage(selenium, urls, PROJECT_NAME, 1);
         detailedViewPage.goTo();
         SeleniumUtils.assertNotVisible(selenium, "link=env.txt");
         detailedViewPage.clickCommand("default", "build");
@@ -82,6 +84,46 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         selenium.click("link=decorated");
         selenium.waitForPageToLoad("10000");
         assertElementPresent("decorated");
+    }
+
+    public void testPulseEnvironmentVariables() throws Exception
+    {
+        xmlRpcHelper.loginAsAdmin();
+        try
+        {
+            loginAsAdmin();
+            ensureProject(random);
+
+            Hashtable<String, Object> property = new Hashtable<String, Object>();
+            property.put(BaseXmlRpcAcceptanceTest.SYMBOLIC_NAME_KEY, "zutubi.resourceProperty");
+            property.put("name", "pname");
+            property.put("value", "pvalue");
+            property.put("addToEnvironment", true);
+            xmlRpcHelper.insertConfig("projects/" + random + "/properties", property);
+        }
+        finally
+        {
+            xmlRpcHelper.logout();
+        }
+
+        triggerSuccessfulBuild(random);
+
+        BuildDetailedViewPage detailedViewPage = new BuildDetailedViewPage(selenium, urls, random, 1);
+        detailedViewPage.goTo();
+        detailedViewPage.clickCommand("default", "build");
+        selenium.click("link=env.txt");
+        selenium.waitForPageToLoad("10000");
+        assertTextPresent("pname=pvalue");
+        assertTextPresent("PULSE_PNAME=pvalue");
+        assertTextPresent("PULSE_BUILD_NUMBER=1");
+    }
+
+    private void ensureBuild() throws Exception
+    {
+        if(ensureProject(PROJECT_NAME))
+        {
+            triggerSuccessfulBuild(PROJECT_NAME);
+        }
     }
 
     private void triggerSuccessfulBuild(String projectName)

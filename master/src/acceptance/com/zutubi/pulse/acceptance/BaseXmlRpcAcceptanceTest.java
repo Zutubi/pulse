@@ -87,7 +87,7 @@ public class BaseXmlRpcAcceptanceTest extends TestCase
         return helper.insertSimpleProject(name, false);
     }
 
-    public String ensureProject(String name) throws Exception
+    public boolean ensureProject(String name) throws Exception
     {
         return helper.ensureProject(name);
     }

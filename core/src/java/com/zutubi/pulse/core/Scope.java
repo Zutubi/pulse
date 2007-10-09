@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.model.Property;
 import com.zutubi.pulse.core.config.ResourceProperty;
+import com.zutubi.pulse.core.model.Property;
 import com.zutubi.util.Sort;
 import com.zutubi.util.logging.Logger;
 
@@ -182,7 +182,7 @@ public class Scope
         Map<String, String> env = new TreeMap<String, String>();
         for(ReferenceInfo i: merged)
         {
-            if(i.addToEnvironment)
+            if(i.addToEnvironment && i.reference.getValue() != null)
             {
                 env.put(i.reference.getName(), (String) i.reference.getValue());
             }

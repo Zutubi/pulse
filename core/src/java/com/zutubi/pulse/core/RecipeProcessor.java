@@ -83,7 +83,7 @@ public class RecipeProcessor
             BootstrapCommand bootstrapCommand = new BootstrapCommand(request.getBootstrapper());
 
             // Now we can load the recipe from the pulse file
-            PulseFile pulseFile = loadPulseFile(request, paths.getBaseDir(), resourceRepository, context, recipeStartTime);
+            PulseFile pulseFile = loadPulseFile(request, paths.getBaseDir(), resourceRepository, globalScope, context, recipeStartTime);
 
             String recipeName = request.getRecipeName();
             if (!TextUtils.stringSet(recipeName))
@@ -214,10 +214,8 @@ public class RecipeProcessor
         return context;
     }
 
-    private PulseFile loadPulseFile(RecipeRequest request, File baseDir, ResourceRepository resourceRepository, BuildContext buildContext, long recipeStartTime) throws BuildException
+    private PulseFile loadPulseFile(RecipeRequest request, File baseDir, ResourceRepository resourceRepository, Scope globalScope, BuildContext buildContext, long recipeStartTime) throws BuildException
     {
-        // prepare the global scope for the pulse file.
-        Scope globalScope = new Scope();
         globalScope.add(new Property("base.dir", baseDir.getAbsolutePath()));
         globalScope.add(new Property("recipe.timestamp", BuildContext.PULSE_BUILD_TIMESTAMP_FORMAT.format(new Date(recipeStartTime))));
         globalScope.add(new Property("recipe.timestamp.millis", Long.toString(recipeStartTime)));
