@@ -16,6 +16,9 @@
             <#assign itemValue = item/>
         </#if>
 
+        <#if itemValue == "">
+            <#assign itemValue = "[not set]"/>
+        </#if>
     data.push(['${itemKey?js_string}', '${itemValue?js_string}']);
     </#list>
 
