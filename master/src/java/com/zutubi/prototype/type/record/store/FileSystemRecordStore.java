@@ -22,6 +22,10 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
 
     private static final int DEFAULT_COMPACTION_INTERVAL = 100;
 
+    private static final String ACTION_DELETE = "delete";
+    private static final String ACTION_INSERT = "insert";
+    private static final String ACTION_UPDATE = "update";
+
     private File persistenceDir;
 
     private InMemoryRecordStore inMemoryStore;
@@ -60,15 +64,15 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
         // apply existing journal entries.
         for (JournalEntry entry : journal.getEntries())
         {
-            if (entry.getAction().equals("insert"))
+            if (entry.getAction().equals(ACTION_INSERT))
             {
                 inMemoryStore.insert(entry.getPath(), entry.getRecord());
             }
-            else if (entry.getAction().equals("update"))
+            else if (entry.getAction().equals(ACTION_UPDATE))
             {
                 inMemoryStore.update(entry.getPath(), entry.getRecord());
             }
-            else if (entry.getAction().equals("delete"))
+            else if (entry.getAction().equals(ACTION_DELETE))
             {
                 inMemoryStore.delete(entry.getPath());
             }
@@ -133,19 +137,19 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
 
     private Record insert(RecordStore base, String path, Record record)
     {
-        journal.add(new JournalEntry("insert", path, record));
+        journal.add(new JournalEntry(ACTION_INSERT, path, record));
         return base.insert(path, record);
     }
 
     private Record update(RecordStore base, String path, Record record)
     {
-        journal.add(new JournalEntry("update", path, record));
+        journal.add(new JournalEntry(ACTION_UPDATE, path, record));
         return base.update(path, record);
     }
 
     private Record delete(RecordStore base, String path)
     {
-        journal.add(new JournalEntry("delete", path));
+        journal.add(new JournalEntry(ACTION_DELETE, path));
         return base.delete(path);
     }
 

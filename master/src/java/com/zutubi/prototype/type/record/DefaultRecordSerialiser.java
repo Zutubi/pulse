@@ -4,6 +4,7 @@ import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.XMLUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import nu.xom.*;
 
@@ -40,7 +41,7 @@ public class DefaultRecordSerialiser implements RecordSerialiser
 
     public void serialise(String path, Record record, boolean deep)
     {
-        File storageDir = new File(baseDirectory, path);
+        File storageDir = getStorageDir(path);
         if (!storageDir.isDirectory())
         {
             if (!storageDir.mkdir())
@@ -84,6 +85,12 @@ public class DefaultRecordSerialiser implements RecordSerialiser
                 }
             }
         }
+    }
+
+    private File getStorageDir(String path)
+    {
+        path = StringUtils.uriComponentEncodeAndJoin(File.separator, PathUtils.getPathElements(path));
+        return new File(baseDirectory, path);
     }
 
     private File getRecordFile(File dir)
@@ -154,7 +161,7 @@ public class DefaultRecordSerialiser implements RecordSerialiser
 
     public MutableRecord deserialise(String path, RecordHandler handler)
     {
-        File dir = new File(baseDirectory, path);
+        File dir = getStorageDir(path);
         if (!dir.isDirectory())
         {
             throw new RecordSerialiseException("No record found at path '" + path + "': directory '" + dir.getAbsolutePath() + "' does not exist");
@@ -182,7 +189,8 @@ public class DefaultRecordSerialiser implements RecordSerialiser
 
             for (File childDir : dir.listFiles(new SubrecordDirFileFilter()))
             {
-                record.put(childDir.getName(), deserialise(childDir, handler, PathUtils.getPath(path, childDir.getName())));
+                String childKey = StringUtils.uriComponentDecode(childDir.getName());
+                record.put(childKey, deserialise(childDir, handler, PathUtils.getPath(path, childKey)));
             }
 
             handler.handle(path, record);

@@ -599,6 +599,77 @@ public class StringUtils
     }
 
     /**
+     * @see #uriComponentEncodeAndJoin(String, String[])
+     *
+     * @param separator used as the glue when joining the encoded strings,
+     *                  should consist only of characters that cannot appear
+     *                  in a URL component verbatim
+     * @param pieces    strings to encode and join
+     * @return the given strings encoded and joined together using the given
+     *         separator
+     */
+    public static String uriComponentEncodeAndJoin(String separator, Collection<String> pieces)
+    {
+        return uriComponentEncodeAndJoin(separator, pieces.toArray(new String[pieces.size()]));
+    }
+
+    /**
+     * Encodes each of the given strings then joins them with the given separator.
+     *
+     * @see #splitAndUriComponentDecode(String, String)
+     *
+     * @param separator used as the glue when joining the encoded strings,
+     *                  should consist only of characters that cannot appear
+     *                  in a URL component verbatim
+     * @param pieces    strings to encode and join
+     * @return the given strings encoded and joined together using the given
+     *         separator
+     */
+    public static String uriComponentEncodeAndJoin(String separator, String... pieces)
+    {
+        StringBuilder result = new StringBuilder(pieces.length * 32);
+        boolean first = true;
+        for(String s: pieces)
+        {
+            if(first)
+            {
+                first = false;
+            }
+            else
+            {
+                result.append(separator);
+            }
+
+            result.append(uriComponentEncode(s));
+        }
+
+        return result.toString();
+    }
+
+    /**
+     * The inverse of {@link #uriComponentEncodeAndJoin(String, String[])}.
+     * Splits the given string at occurences of the given separator then
+     * decodes the resulting pieces.
+     *
+     * @see #uriComponentEncodeAndJoin(String, String[])
+     * 
+     * @param separator string to split on
+     * @param s         the string to be split
+     * @return the pieces derived by splitting at the separator and decoding
+     *         each piece
+     */
+    public static Collection<String> splitAndUriComponentDecode(String separator, String s)
+    {
+        String[] pieces = s.split(separator);
+        List<String> result = new ArrayList<String>(pieces.length);
+        for(String item: pieces)
+        {
+            result.add(uriComponentDecode(item));
+        }
+        return result;
+    }
+
+    /**
      * Encodes the given string such that it may be used as a component in a
      * URI (i.e. part of the path in the URI).  Note only a single path
      * component should be passed as the path separator (/) is encoded by

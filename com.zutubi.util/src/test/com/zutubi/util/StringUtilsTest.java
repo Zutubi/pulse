@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -365,6 +366,46 @@ public class StringUtilsTest extends TestCase
     public void testUrlEncodePathEmpty()
     {
         assertEquals("", StringUtils.urlEncodePath(""));
+    }
+
+    public void testURIComponentEncodeAndJoinEmpty()
+    {
+        assertEquals("", StringUtils.uriComponentEncodeAndJoin(","));
+    }
+
+    public void testURIComponentEncodeAndJoinSingle()
+    {
+        assertEquals("piece%20here", StringUtils.uriComponentEncodeAndJoin(",", "piece here"));
+    }
+
+    public void testURIComponentEncodeAndJoinMultiple()
+    {
+        assertEquals("one,two%20and,three%20", StringUtils.uriComponentEncodeAndJoin(",", "one", "two and", "three "));
+    }
+
+    public void testURIComponentEncodeAndJoinEmptyPiece()
+    {
+        assertEquals(",wow", StringUtils.uriComponentEncodeAndJoin(",", "", "wow"));
+    }
+
+    public void testSplitAndUrlComponentDecodeEmpty()
+    {
+        assertEquals(a(""), StringUtils.splitAndUriComponentDecode(",", ""));
+    }
+
+    public void testSplitAndUrlComponentDecodeSingle()
+    {
+        assertEquals(a("hey there"), StringUtils.splitAndUriComponentDecode(",", "hey%20there"));
+    }
+
+    public void testSplitAndUrlComponentDecodeMultiple()
+    {
+        assertEquals(a("one", "two and", "three "), StringUtils.splitAndUriComponentDecode(",", "one,two%20and,three%20"));
+    }
+
+    public void testSplitAndUrlComponentDecodeEmptyPiece()
+    {
+        assertEquals(a("", "wow"), StringUtils.splitAndUriComponentDecode(",", ",wow"));
     }
 
     public void testURIComponentEncodeEmpty()
@@ -843,5 +884,20 @@ public class StringUtilsTest extends TestCase
     public void testStripLineBreaksAmongstText()
     {
         assertEquals("afewlineswithvarious breaksin between", StringUtils.stripLineBreaks("a\nfew\rlines\r\nwith\n\nvarious breaks\n\rin between\r\r"));
+    }
+
+    private <T> T[] a(T... a)
+    {
+        return a;
+    }
+
+    private void assertEquals(String[] expected, Collection<String> got)
+    {
+        assertEquals(expected.length, got.size());
+        int i = 0;
+        for(String s: got)
+        {
+            assertEquals(expected[i++], s);
+        }
     }
 }

@@ -72,11 +72,22 @@ public class DefaultRecordSerialiserTest extends PulseTestCase
 
     public void testUnsupportedNameNested() throws IOException
     {
-        // TODO
-//        MutableRecord record = new MutableRecordImpl();
-//        record.setSymbolicName("ouchy");
-//        record.put("<>~!@#$%^&*()`-=_+{}[]\\'\"|:;,.?/", createSimple());
-//        assertRoundTrip("test", record, true);
+        MutableRecord record = new MutableRecordImpl();
+        record.setSymbolicName("ouchy");
+        record.put("<>~!@#%^&*()`-=_+{}[]'\"|:;,.?", createSimple());
+        assertRoundTrip("test", record, true);
+    }
+
+    public void testUnsupportedNameMultiNested() throws IOException
+    {
+        MutableRecord grandchild = createSimple();
+        MutableRecord child = new MutableRecordImpl();
+        child.setSymbolicName("ouchy");
+        child.put("<>~!@#%^&*()`-=_+{}[]'\"|:;,.?", grandchild);
+        MutableRecord root = new MutableRecordImpl();
+        root.setSymbolicName("ouchy");
+        root.put("<>~!@#%^&*()`-=_+{}[]'\"|:;,.?", child);
+        assertRoundTrip("test", root, true);
     }
 
     public void testShallowSave() throws IOException

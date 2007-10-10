@@ -15,6 +15,7 @@ public abstract class CollectionType extends AbstractType implements ComplexType
 {
     public static final String HIDDEN_KEY = "hidden";
     public static final String ORDER_KEY  = "order";
+    private static final String SEPARATOR = ",";
 
     private Type collectionType;
 
@@ -56,7 +57,7 @@ public abstract class CollectionType extends AbstractType implements ComplexType
             return new ArrayList<String>(0);
         }
 
-        return split(order);
+        return StringUtils.splitAndUriComponentDecode(SEPARATOR, order);
     }
 
     public Collection<String> getOrder(Record record)
@@ -74,19 +75,21 @@ public abstract class CollectionType extends AbstractType implements ComplexType
 
     protected void setOrder(MutableRecord record, Collection<String> order)
     {
-        record.putMeta(ORDER_KEY, join(order));
+        record.putMeta(ORDER_KEY, StringUtils.uriComponentEncodeAndJoin(SEPARATOR, order));
     }
 
     public void hideItem(MutableRecord record, String key)
     {
         Set<String> hiddenKeys = getHiddenKeys(record);
         hiddenKeys.add(key);
-        record.putMeta(HIDDEN_KEY, join(hiddenKeys));
+        record.putMeta(HIDDEN_KEY, StringUtils.uriComponentEncodeAndJoin(SEPARATOR, hiddenKeys));
     }
 
     public void unhideItem(MutableRecord record, String key)
     {
-        
+        Set<String> hiddenKeys = getHiddenKeys(record);
+        hiddenKeys.remove(key);
+        record.put(HIDDEN_KEY, StringUtils.uriComponentEncodeAndJoin(SEPARATOR, hiddenKeys));
     }
 
     private Set<String> getHiddenKeys(MutableRecord record)
@@ -98,35 +101,8 @@ public abstract class CollectionType extends AbstractType implements ComplexType
         }
         else
         {
-            return new HashSet<String>(split(hidden));
+            return new HashSet<String>(StringUtils.splitAndUriComponentDecode(SEPARATOR, hidden));
         }
-    }
-
-    private static String join(Collection<String> c)
-    {
-        StringBuilder result = new StringBuilder(c.size() * 32);
-        for(String s: c)
-        {
-            if(result.length() > 0)
-            {
-                result.append(',');
-            }
-
-            result.append(StringUtils.uriComponentDecode(s));
-        }
-
-        return result.toString();
-    }
-
-    private static Collection<String> split(String s)
-    {
-        String[] pieces = s.split(",");
-        List<String> result = new ArrayList<String>(pieces.length);
-        for(String item: pieces)
-        {
-            result.add(StringUtils.uriComponentEncode(item));
-        }
-        return result;
     }
 
     protected abstract Comparator<String> getKeyComparator();

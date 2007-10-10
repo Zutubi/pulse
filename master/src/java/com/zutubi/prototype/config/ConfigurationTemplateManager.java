@@ -4,12 +4,7 @@ import com.zutubi.prototype.config.events.PostDeleteEvent;
 import com.zutubi.prototype.config.events.PostInsertEvent;
 import com.zutubi.prototype.config.events.PostSaveEvent;
 import com.zutubi.prototype.security.AccessManager;
-import com.zutubi.prototype.transaction.Synchronization;
-import com.zutubi.prototype.transaction.Transaction;
-import com.zutubi.prototype.transaction.TransactionManager;
-import com.zutubi.prototype.transaction.TransactionStatus;
-import com.zutubi.prototype.transaction.TransactionalWrapper;
-import com.zutubi.prototype.transaction.UserTransaction;
+import com.zutubi.prototype.transaction.*;
 import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.*;
 import com.zutubi.pulse.core.config.Configuration;
@@ -24,8 +19,6 @@ import com.zutubi.validation.ValidationManager;
 import com.zutubi.validation.i18n.MessagesTextProvider;
 
 import java.util.*;
-
-import org.acegisecurity.AccessDeniedException;
 
 /**
  */
