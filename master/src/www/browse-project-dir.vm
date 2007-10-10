@@ -44,7 +44,7 @@
 #end
 </head>
 <body>
-    #buildTabs($buildResult "working-dir")
+    #buildTabs($buildResult "wc")
 
 <h3>#wwtext("name=working.copy")</h3>
 

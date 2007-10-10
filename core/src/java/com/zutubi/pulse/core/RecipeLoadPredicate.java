@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core;
 
+import com.opensymphony.util.TextUtils;
 import nu.xom.Element;
 
 /**
@@ -20,12 +21,12 @@ public class RecipeLoadPredicate implements TypeLoadPredicate
     {
         if(type instanceof Recipe)
         {
-            if(recipeName == null)
+            if(!TextUtils.stringSet(recipeName))
             {
                 recipeName = pulseFile.getDefaultRecipe();
             }
 
-            if(recipeName == null)
+            if(!TextUtils.stringSet(recipeName))
             {
                 return false;
             }

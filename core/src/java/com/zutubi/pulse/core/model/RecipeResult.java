@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core.model;
 
+import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -129,7 +130,7 @@ public class RecipeResult extends Result
 
     public static String getRecipeSafe(String recipeName)
     {
-        if (recipeName == null)
+        if (!TextUtils.stringSet(recipeName))
         {
             return "[default]";
         }
