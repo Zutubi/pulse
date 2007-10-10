@@ -11,7 +11,7 @@ import java.util.List;
  *
  *
  */
-public class FieldDescriptor extends AbstractDescriptor
+public class FieldDescriptor extends AbstractParameterised implements Descriptor
 {
     private FormDescriptor form;
     private Object value;

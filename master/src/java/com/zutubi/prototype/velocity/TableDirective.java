@@ -1,11 +1,11 @@
 package com.zutubi.prototype.velocity;
 
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
+import com.zutubi.prototype.model.Table;
 import com.zutubi.prototype.table.TableDescriptor;
 import com.zutubi.prototype.table.TableDescriptorFactory;
 import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.util.logging.Logger;
@@ -70,7 +70,7 @@ public class TableDirective extends PrototypeDirective
             Map params = createPropertyMap(contextAdapter, node);
             wireParams(params);
 
-            Type collectionType = configurationTemplateManager.getType(path);
+            CollectionType collectionType = (CollectionType) configurationTemplateManager.getType(path);
             
             // lookup the data.
             Collection data = getTableData(path);
@@ -79,16 +79,15 @@ public class TableDirective extends PrototypeDirective
             TableDescriptorFactory tableFactory = new TableDescriptorFactory();
             ComponentContext.autowire(tableFactory);
 
-            TableDescriptor tableDescriptor = tableFactory.create(path, (CompositeType) collectionType.getTargetType());
+            CompositeType type = (CompositeType) collectionType.getCollectionType();
+            TableDescriptor tableDescriptor = tableFactory.create(path, type);
+            Table table = tableDescriptor.instantiate(path, data);
 
-            Type type = ((CollectionType)collectionType).getCollectionType();
-            
             // handle rendering of the freemarker template.
             Map<String, Object> context = initialiseContext(type.getClazz());
-            context.put("table", tableDescriptor);
+            context.put("table", table);
             context.put("path", path);
             context.put("embedded", PrototypeUtils.isEmbeddedCollection(collectionType));
-            context.put("data", data);
 
             String templateName = "table.ftl";
             if (ajax)

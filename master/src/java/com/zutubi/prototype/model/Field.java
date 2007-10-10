@@ -1,10 +1,12 @@
 package com.zutubi.prototype.model;
 
+import com.zutubi.prototype.AbstractParameterised;
+
 /**
  *
  *
  */
-public class Field extends UIComponent
+public class Field extends AbstractParameterised
 {
     public String getName()
     {

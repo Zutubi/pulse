@@ -7,7 +7,7 @@ import java.util.Map;
  *
  *
  */
-public abstract class AbstractDescriptor implements Descriptor
+public abstract class AbstractParameterised implements Parameterised
 {
     protected Map<String, Object> parameters = new HashMap<String, Object>();
 
@@ -36,9 +36,9 @@ public abstract class AbstractDescriptor implements Descriptor
         return this.parameters.get(key);
     }
 
-    public Object getParameter(String key, Object defaultValue)
+    public <T> T getParameter(String key, T defaultValue)
     {
-        Object value = parameters.get(key);
+        T value = (T) parameters.get(key);
         if(value == null)
         {
             value = defaultValue;

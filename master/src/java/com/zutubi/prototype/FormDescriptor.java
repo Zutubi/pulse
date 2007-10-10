@@ -18,7 +18,7 @@ import java.util.List;
  *
  *
  */
-public class FormDescriptor extends AbstractDescriptor
+public class FormDescriptor extends AbstractParameterised implements Descriptor
 {
     private static final String DEFAULT_ACTION = "save";
 

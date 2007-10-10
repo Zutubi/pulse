@@ -2,23 +2,11 @@ package com.zutubi.prototype;
 
 import com.zutubi.prototype.type.record.Record;
 
-import java.util.Map;
-
 /**
  *
  *
  */
-public interface Descriptor
+public interface Descriptor extends Parameterised
 {
-    void addParameter(String key, Object value);
-
-    void addAll(Map<String, Object> parameters);
-
-    Map<String, Object> getParameters();
-
     Object instantiate(String path, Record record);
-
-    boolean hasParameter(String key);
-
-    Object getParameter(String key);
 }

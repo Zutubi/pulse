@@ -1,5 +1,7 @@
 package com.zutubi.prototype.model;
 
+import com.zutubi.prototype.AbstractParameterised;
+
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -8,7 +10,7 @@ import java.util.List;
  *
  *
  */
-public class Form extends UIComponent
+public class Form extends AbstractParameterised
 {
     private static final String PARAMETER_NAME = "name";
     private static final String PARAMETER_ID = "id";

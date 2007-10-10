@@ -1,58 +1,55 @@
 <table id="config.table" width="60%">
-<#assign tablewidth = table.columns?size + 1/>
     <tr>
-        <th class="heading" colspan="${tablewidth}">${table.heading?html}</th>
+        <th class="heading" colspan="${table.width?c}">${table.heading?html}</th>
     </tr>
     <tr>
-<#list table.columns as column>
-<#assign header = "${column.name}.label"/>
-        <th class="content">${header?i18n}</th>
+<#list table.headers as header>
+        <th class="content">${header?html}</th>
 </#list>
         <th class="content">${"actions.label"?i18n}</th>
     </tr>
-<#if data?exists && data?size &gt; 0>
-    <#list data as item>
-        <#assign rawId = "item:${baseName(item)}"/>
+<#list table.rows as row>
+    <#assign rawId = "item:${row.baseName}"/>
     <tr id="${rawId?id}">
-        <#list table.columns as column>
-            <#assign value = column.getValue(item)/>
-        <td class="content">${value?string?html}</td>
-        </#list>
-        <td class="content" width="5%">
-        <#assign first = true/>
-        <#list table.getActions(item) as action>
-            <#assign actionlabel = "${action}.label"/>
-            <#assign actionId = "${action}:${baseName(item)}"/>
-            <#if !first>
-    |
-            </#if>
-    <a id="${actionId?id}"
-            <#if action == "view">
-                <#if embedded>
-                    <#assign clickAction = "edit"/>
-                <#else>
-                    <#assign clickAction = "select"/>
-                </#if>
-        onclick="${clickAction}Path('${item.configurationPath}'); return false">${"view.label"?i18n}<#t>
-            <#elseif action == "delete">
-        onclick="deletePath('${item.configurationPath}'); return false;">${"delete.label"?i18n}<#t>
-            <#else>
-        onclick="actionPath('${item.configurationPath}?${action}'); return false;">${actionlabel?i18n}<#t>
-            </#if>
-            </a><#lt>
-            <#assign first = false/>
-        </#list>
-        </td>
-    </tr>
+    <#list row.cells as cell>
+        <td class="content" colspan="${cell.span?c}">${cell.content?html}</td>
     </#list>
-<#else>
-    <tr>
-        <td class="content" colspan="${tablewidth}">${"no.data.available"?i18n}</td>
+    <#if row.actions?exists>
+        <td class="content" width="5%">
+        <#if row.actions?size &gt; 0>
+            <#assign first = true/>
+            <#list row.actions as rowAction>
+                <#assign actionId = "${rowAction.action}:${row.baseName}"/>
+                <#if !first>
+            |
+                </#if>
+            <a id="${actionId?id}"
+                <#if rowAction.action == "view">
+                    <#if embedded>
+                        <#assign clickAction = "edit"/>
+                    <#else>
+                        <#assign clickAction = "select"/>
+                    </#if>
+                onclick="${clickAction}Path('${row.path}'); return false">
+                <#elseif rowAction.action == "delete">
+                onclick="deletePath('${row.path}'); return false;">
+                <#else>
+                onclick="actionPath('${row.path}?${action}'); return false;">
+                </#if>
+                ${rowAction.label?html}<#t>
+            </a><#lt>
+                <#assign first = false/>
+            </#list>
+        <#else>
+        &nbsp;
+        </#if>
+        </td>
+    </#if>
     </tr>
-</#if>
+</#list>
 <#if table.addAllowed>
     <tr>
-        <td class="content" colspan="${tablewidth}"><a id="map:add" onclick="addToPath('${path}'); return false;">${"add.label"?i18n}</a></td>
+        <td class="content" colspan="${table.width}"><a id="map:add" onclick="addToPath('${path}'); return false;">${"add.label"?i18n}</a></td>
     </tr>
 </#if>
 </table>

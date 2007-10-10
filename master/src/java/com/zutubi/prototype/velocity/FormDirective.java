@@ -120,7 +120,7 @@ public class FormDirective extends PrototypeDirective
 
             if (data != null && data instanceof TemplateRecord)
             {
-                TemplateFormDecorator templateDecorator = new TemplateFormDecorator(data);
+                TemplateFormDecorator templateDecorator = new TemplateFormDecorator((TemplateRecord) data);
                 templateDecorator.decorate(formDescriptor);
             }
 

@@ -3,6 +3,7 @@ package com.zutubi.prototype;
 import com.zutubi.prototype.model.HiddenFieldDescriptor;
 import com.zutubi.prototype.model.Wizard;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.prototype.wizard.TypeWizardState;
 import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.prototype.wizard.WizardTransition;
@@ -17,7 +18,7 @@ import java.util.List;
  *
  *
  */
-public class WizardDescriptor extends AbstractDescriptor
+public class WizardDescriptor extends AbstractParameterised implements Descriptor
 {
     private AbstractTypeWizard wizardInstance;
 
@@ -45,9 +46,9 @@ public class WizardDescriptor extends AbstractDescriptor
         formDescriptor.setAjax(ajax);
         formDescriptor.setNamespace(namespace);
 
-        if (wizardInstance.isTemplate())
+        if (wizardInstance.isTemplate() && record instanceof TemplateRecord)
         {
-            TemplateFormDecorator templateDecorator = new TemplateFormDecorator(record);
+            TemplateFormDecorator templateDecorator = new TemplateFormDecorator((TemplateRecord) record);
             templateDecorator.decorate(formDescriptor);
         }
 

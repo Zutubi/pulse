@@ -4,7 +4,6 @@ import com.zutubi.config.annotations.NoInherit;
 import com.zutubi.config.annotations.NoOverride;
 import com.zutubi.prototype.model.OptionFieldDescriptor;
 import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.TemplateRecord;
 
 import java.lang.annotation.Annotation;
@@ -15,18 +14,17 @@ import java.lang.annotation.Annotation;
  */
 public class TemplateFormDecorator
 {
-    private Record record;
+    private TemplateRecord templateRecord;
 
-    public TemplateFormDecorator(Record record)
+    public TemplateFormDecorator(TemplateRecord record)
     {
-        this.record = record;
+        this.templateRecord = record;
     }
 
     public FormDescriptor decorate(FormDescriptor descriptor)
     {
-        if (record != null && record instanceof TemplateRecord)
+        if (templateRecord != null)
         {
-            TemplateRecord templateRecord = (TemplateRecord) record;
             TemplateRecord parentRecord = templateRecord.getParent();
             CompositeType type = (CompositeType) templateRecord.getType();
 
