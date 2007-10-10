@@ -7,6 +7,7 @@ import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.acceptance.pages.browse.BuildDetailedViewPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectsPage;
+import com.zutubi.pulse.agent.AgentManager;
 
 import java.util.Hashtable;
 
@@ -30,7 +31,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         goTo(urls.adminProjects());
         addProject(random);
 
-        triggerSuccessfulBuild(random);
+        triggerSuccessfulBuild(random, AgentManager.MASTER_AGENT_NAME);
     }
 
     public void testAgentBuild() throws Exception
@@ -62,7 +63,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         stageForm.applyFormElements("", agentHandle);
 
-        triggerSuccessfulBuild(random);
+        triggerSuccessfulBuild(random, AGENT_NAME);
     }
 
     public void testDetailedView() throws Exception
@@ -106,7 +107,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
             xmlRpcHelper.logout();
         }
 
-        triggerSuccessfulBuild(random);
+        triggerSuccessfulBuild(random, AgentManager.MASTER_AGENT_NAME);
 
         BuildDetailedViewPage detailedViewPage = new BuildDetailedViewPage(selenium, urls, random, 1);
         detailedViewPage.goTo();
@@ -122,11 +123,11 @@ public class BuildAcceptanceTest extends SeleniumTestBase
     {
         if(ensureProject(PROJECT_NAME))
         {
-            triggerSuccessfulBuild(PROJECT_NAME);
+            triggerSuccessfulBuild(PROJECT_NAME, AgentManager.MASTER_AGENT_NAME);
         }
     }
 
-    private void triggerSuccessfulBuild(String projectName)
+    private void triggerSuccessfulBuild(String projectName, String agent)
     {
         ProjectsPage projectsPage = new ProjectsPage(selenium, urls);
         projectsPage.goTo();
@@ -136,8 +137,9 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
         ProjectHomePage home = new ProjectHomePage(selenium, urls, projectName);
         home.goTo();
-        String statusId = IDs.buildNumberCell(projectName, 1);
+        String statusId = IDs.buildStatusCell(projectName, 1);
         SeleniumUtils.refreshUntilElement(selenium, statusId);
         SeleniumUtils.refreshUntilText(selenium, statusId, "success");
+        SeleniumUtils.assertText(selenium, IDs.stageAgentCell(projectName, 1, "default"), agent);
     }
 }

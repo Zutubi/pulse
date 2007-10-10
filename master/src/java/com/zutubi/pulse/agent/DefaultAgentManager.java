@@ -49,7 +49,6 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 
     // ping timeout in seconds.
     private static final int PING_TIMEOUT = Integer.getInteger("pulse.agent.ping.timeout", 45);
-    private static final String MASTER_AGENT_NAME = "master agent";
     private static final int DEFAULT_AGENT_PORT = 8090;
 
     private final int masterBuildNumber = Version.getVersion().getBuildNumberAsInt();

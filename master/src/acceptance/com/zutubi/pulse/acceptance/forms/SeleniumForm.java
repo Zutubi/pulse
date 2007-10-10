@@ -57,9 +57,6 @@ public abstract class SeleniumForm
 
     public void waitFor()
     {
-        // Make sure there is no form in the process of submitting.
-        SeleniumUtils.waitForVariable(selenium, "formSubmitting", SeleniumUtils.DEFAULT_TIMEOUT, true);
-        
         // Wait for the last field as the forms are lazily rendered
         String[] fields = getActualFieldNames();
         SeleniumUtils.waitForElement(selenium, getFieldId(fields[fields.length - 1]));
@@ -158,7 +155,11 @@ public abstract class SeleniumForm
     private void submit(String id)
     {
         selenium.click("zfid." + id);
-        if (!ajax)
+        if (ajax)
+        {
+            SeleniumUtils.waitForVariable(selenium, "formSubmitting", SeleniumUtils.DEFAULT_TIMEOUT, true);            
+        }
+        else
         {
             selenium.waitForPageToLoad("60000");
         }

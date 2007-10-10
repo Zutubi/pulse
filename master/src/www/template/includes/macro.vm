@@ -486,6 +486,14 @@
 
 ##
 ## Outputs a cell for a content table with the given dynamic content, which
+## should be escaped with an id.
+##
+#macro(dynamicIdCell $id $content)
+    <td id='#id($id)' class="content">$!webwork.htmlEncode($content)</td>
+#end
+
+##
+## Outputs a cell for a content table with the given dynamic content, which
 ## should be escaped, with a link to somewhere and right justified...
 ##
 #macro(dynamicRightLinkCell $content $url)
@@ -1305,7 +1313,7 @@
         #dynamicLinkCell($resultNode.stageName "$urls.stageDetails($build, $resultNode)")
     #end
         #dynamicCell($recipe.recipeNameSafe)
-        #dynamicCell($resultNode.hostSafe)
+        #dynamicIdCell("${build.project.name}.build.${build.number}.stage.${resultNode.stageName}.agent" $resultNode.hostSafe)
         #statusCell($recipe $showAnimated)
         #testResultsCell($build $resultNode $recipe)
         #dateClassCell($recipe)

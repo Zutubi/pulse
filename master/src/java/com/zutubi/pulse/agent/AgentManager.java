@@ -14,6 +14,7 @@ import java.util.List;
 public interface AgentManager
 {
     String GLOBAL_AGENT_NAME = "global agent template";
+    String MASTER_AGENT_NAME = "master";
 
     @SecureResult
     List<Agent> getAllAgents();

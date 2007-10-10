@@ -1,4 +1,5 @@
 form.on('actioncomplete', function() { window.formSubmitting = false; });
+form.on('actionfailed', function() { window.formSubmitting = false; });
 <#if form.displayMode?default(false)>
     form.displayMode = true;
 </#if>
