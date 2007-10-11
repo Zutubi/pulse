@@ -85,6 +85,10 @@
             <result name="success" type="velocity">/view-projects.vm</result>
         </action>
 
+        <action name="projectAction" class="com.zutubi.pulse.web.project.ProjectActionAction">
+            <result name="success" type="redirect">${redirect}</result>
+        </action>
+
         <action name="viewBuild" class="com.zutubi.pulse.web.project.ViewBuildAction">
             <interceptor-ref name="ajaxReadOnlyStack"/>
             <result name="success" type="velocity">/view-build.vm</result>

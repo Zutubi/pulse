@@ -119,10 +119,6 @@
                 </tr>
             </table>
 
-<!--
-FIXME: Hide link to the configuration for users that cannot edit.  Also add
-project action links.
--->
             <table class="fill-content">
                 #headingRow("project.basics" 2)
                 #dynamicRow("project.name" $project.name)
@@ -135,12 +131,27 @@ project action links.
             #if($project.url && $project.url.length() > 0)
                 #dynamicLinkRow("project.url" "homepage" $project.url)
             #end
+            #set($candidateActions = [["write", "pencil", "$base/admin/projects/#uce($project.name)/", "configure"], ["trigger", "lightning", "$urls.projectAction($u_projectName, 'trigger')tab/home/", "trigger"]])
+            #set($actionCount = 0)
+            #foreach($actionSpec in $candidateActions)
+                #if($action.hasPermission($actionSpec.get(0), $project))
+                    #set($actionCount = $actionCount + 1)
+                #end
+            #end
+            #if($actionCount > 0)
+                #foreach($actionSpec in $candidateActions)
                 <tr>
-                    <th class="content-row"">#wwtext("name=actions")</th>
+                    #if($velocityCount == 1)
+                    <th class="content-row" rowspan="$actionCount">#wwtext("name=actions")</th>
+                    #end
                     <td class="content">
-                        <img src="$base/images/pencil.gif"/> <a href="$base/admin/projects/#uce($project.name)/">#wwtext("name=project.configure")</a>
+#auth("resource=project" "action=$actionSpec.get(0)")
+                        <img src="$base/images/${actionSpec.get(1)}.gif"/> <a href="$actionSpec.get(2)">#wwtext("name=project.$actionSpec.get(3)")</a>
+#end
                     </td>
                 </tr>
+                #end
+            #end
             </table>
         </td>
     </tr>

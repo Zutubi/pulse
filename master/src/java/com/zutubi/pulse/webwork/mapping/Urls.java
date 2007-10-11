@@ -90,6 +90,16 @@ public class Urls
         return projectChanges(project) + Long.toString(id) + "/";
     }
 
+    public String projectActions(Object project)
+    {
+        return project(project) + "actions/";
+    }
+
+    public String projectAction(Object project, String action)
+    {
+        return projectActions(project) + action + "/";
+    }
+    
     public String build(BuildResult build)
     {
         return projectBuilds(build.getProject()) + Long.toString(build.getNumber()) + "/";

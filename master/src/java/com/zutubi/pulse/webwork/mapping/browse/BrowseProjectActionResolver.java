@@ -17,6 +17,7 @@ public class BrowseProjectActionResolver extends StaticMapActionResolver
         addMapping("history", new PagedActionResolver("history"));
         addMapping("builds", new ProjectBuildsActionResolver());
         addMapping("changes", new ChangelistsActionResolver());
+        addMapping("actions", new ProjectActionsActionResolver());
 
         addParameter("projectName", project);
     }
