@@ -4,6 +4,7 @@ import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.XMLUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
+import com.zutubi.util.Predicate;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import nu.xom.*;
@@ -89,7 +90,30 @@ public class DefaultRecordSerialiser implements RecordSerialiser
 
     private File getStorageDir(String path)
     {
-        path = StringUtils.uriComponentEncodeAndJoin(File.separator, PathUtils.getPathElements(path));
+        path = StringUtils.encodeAndJoin(new Predicate<Character>()
+        {
+            public boolean satisfied(Character character)
+            {
+                if(StringUtils.isAsciiAlphaNumeric(character))
+                {
+                    return true;
+                }
+                else
+                {
+                    // A few more likely-used characters
+                    switch(character)
+                    {
+                        case ' ':
+                        case '-':
+                        case '_':
+                        case '.':
+                            return true;
+                    }
+                }
+
+                return false;
+            }
+        }, File.separatorChar, PathUtils.getPathElements(path));
         return new File(baseDirectory, path);
     }
 

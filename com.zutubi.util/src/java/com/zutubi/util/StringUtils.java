@@ -598,34 +598,55 @@ public class StringUtils
         return pluralNoun;
     }
 
-    /**
-     * @see #uriComponentEncodeAndJoin(String, String[])
-     *
-     * @param separator used as the glue when joining the encoded strings,
-     *                  should consist only of characters that cannot appear
-     *                  in a URL component verbatim
-     * @param pieces    strings to encode and join
-     * @return the given strings encoded and joined together using the given
-     *         separator
-     */
-    public static String uriComponentEncodeAndJoin(String separator, Collection<String> pieces)
+    public static String encodeAndJoin(char separator, Collection<String> pieces)
     {
-        return uriComponentEncodeAndJoin(separator, pieces.toArray(new String[pieces.size()]));
+        return encodeAndJoin(separator, pieces.toArray(new String[pieces.size()]));
+    }
+
+    public static String encodeAndJoin(final char separator, String... pieces)
+    {
+        return encodeAndJoin(new Predicate<Character>()
+        {
+            public boolean satisfied(Character character)
+            {
+                return !character.equals(separator) && !character.equals('%');
+            }
+        }, separator, pieces);
     }
 
     /**
-     * Encodes each of the given strings then joins them with the given separator.
+     * @see #encodeAndJoin(Predicate, char, String[]) 
      *
-     * @see #splitAndUriComponentDecode(String, String)
-     *
-     * @param separator used as the glue when joining the encoded strings,
-     *                  should consist only of characters that cannot appear
-     *                  in a URL component verbatim
-     * @param pieces    strings to encode and join
+     * @param allowedCharacters a condition that is true for characters that
+     *                          are allowed in the result verbatim (i.e. not
+     *                          encoded)
+     * @param separator         used as the glue when joining the encoded
+     *                          strings, must be a disallowed character
+     * @param pieces            strings to encode and join
      * @return the given strings encoded and joined together using the given
      *         separator
      */
-    public static String uriComponentEncodeAndJoin(String separator, String... pieces)
+    public static String encodeAndJoin(Predicate<Character> allowedCharacters, char separator, Collection<String> pieces)
+    {
+        return encodeAndJoin(allowedCharacters, separator, pieces.toArray(new String[pieces.size()]));
+    }
+
+    /**
+     * Encodes each of the given strings then joins them with the given
+     * separator.
+     *
+     * @see #splitAndDecode(char, String)
+     *
+     * @param allowedCharacters a condition that is true for characters that
+     *                          are allowed in the result verbatim (i.e. not
+     *                          encoded)
+     * @param separator         used as the glue when joining the encoded
+     *                          strings, must be a disallowed character
+     * @param pieces            strings to encode and join
+     * @return the given strings encoded and joined together using the given
+     *         separator
+     */
+    public static String encodeAndJoin(Predicate<Character> allowedCharacters, char separator, String... pieces)
     {
         StringBuilder result = new StringBuilder(pieces.length * 32);
         boolean first = true;
@@ -640,27 +661,27 @@ public class StringUtils
                 result.append(separator);
             }
 
-            result.append(uriComponentEncode(s));
+            result.append(percentEncode(s, allowedCharacters));
         }
 
         return result.toString();
     }
 
     /**
-     * The inverse of {@link #uriComponentEncodeAndJoin(String, String[])}.
+     * The inverse of {@link #encodeAndJoin(Predicate, char, String[])}
      * Splits the given string at occurences of the given separator then
      * decodes the resulting pieces.
      *
-     * @see #uriComponentEncodeAndJoin(String, String[])
+     * @see #encodeAndJoin (String, String[])
      * 
-     * @param separator string to split on
+     * @param separator character to split on
      * @param s         the string to be split
      * @return the pieces derived by splitting at the separator and decoding
      *         each piece
      */
-    public static Collection<String> splitAndUriComponentDecode(String separator, String s)
+    public static Collection<String> splitAndDecode(char separator, String s)
     {
-        String[] pieces = s.split(separator);
+        String[] pieces = s.split(Character.toString(separator));
         List<String> result = new ArrayList<String>(pieces.length);
         for(String item: pieces)
         {
@@ -670,24 +691,25 @@ public class StringUtils
     }
 
     /**
-     * Encodes the given string such that it may be used as a component in a
-     * URI (i.e. part of the path in the URI).  Note only a single path
-     * component should be passed as the path separator (/) is encoded by
-     * this method.  Non-ASCII characters are encoded to UTF-8 and then
-     * represented in the result as %-encoded bytes.
+     * Encodes the given string based on the given set of allow characters.
+     * Non-allowed characters are encoded to UTF-8 and then represented in
+     * the result as %-encoded bytes.
      *
      * @see #uriComponentDecode(String)
      *
-     * @param in the string to encode
+     * @param in                the string to encode
+     * @param allowedCharacters a condition that is true for characters that
+     *                          are allowed in the result verbatim (i.e. not
+     *                          encoded)
      * @return the input string encoded as a valid URI path component
      */
-    public static String uriComponentEncode(String in)
+    public static String percentEncode(String in, Predicate<Character> allowedCharacters)
     {
         StringBuilder sb = null;
         for(int i = 0; i < in.length(); i++)
         {
             char c = in.charAt(i);
-            if(allowedInURIComponent(c))
+            if(allowedCharacters.satisfied(c))
             {
                 if(sb != null)
                 {
@@ -729,17 +751,16 @@ public class StringUtils
     }
 
     /**
-     * Decodes a URI path component back into a Java string.  The input
-     * should have all non-ASCII characters and URI-special characters
-     * represented as %-encoded bytes.  Sequences of such bytes are decoded
+     * Decodes a percent-encoded string into a Java string.  The decode
+     * searches for %-encoded bytes, sequences of such bytes are decoded
      * using UTF-8 to give a Java string.
      *
-     * @see #uriComponentEncode(String)
+     * @see #percentEncode(String, Predicate)
      *
      * @param in the string to decode
      * @return decoded version of the input string
      */
-    public static String uriComponentDecode(String in)
+    public static String percentDecode(String in)
     {
         StringBuilder sb = null;
         byte[] bytes = null;
@@ -799,6 +820,46 @@ public class StringUtils
             decodeAndAppendBytes(bytes, byteOffset, sb);
             return sb.toString();
         }
+    }
+
+    /**
+     * Encodes the given string such that it may be used as a component in a
+     * URI (i.e. part of the path in the URI).  Note only a single path
+     * component should be passed as the path separator (/) is encoded by
+     * this method.  Non-ASCII characters are encoded to UTF-8 and then
+     * represented in the result as %-encoded bytes.
+     *
+     * @see #percentEncode(String, Predicate)
+     * @see #uriComponentDecode(String)
+     *
+     * @param in the string to encode
+     * @return the input string encoded as a valid URI path component
+     */
+    public static String uriComponentEncode(String in)
+    {
+        return percentEncode(in, new Predicate<Character>()
+        {
+            public boolean satisfied(Character character)
+            {
+                return allowedInURIComponent(character);
+            }
+        });
+    }
+
+    /**
+     * Decodes a URI path component back into a Java string.  The input
+     * should have all non-ASCII characters and URI-special characters
+     * represented as %-encoded bytes.  Sequences of such bytes are decoded
+     * using UTF-8 to give a Java string.
+     *
+     * @see #uriComponentEncode(String)
+     *
+     * @param in the string to decode
+     * @return decoded version of the input string
+     */
+    public static String uriComponentDecode(String in)
+    {
+        return percentDecode(in);
     }
 
     private static int decodeAndAppendBytes(byte[] bytes, int byteOffset, StringBuilder sb)

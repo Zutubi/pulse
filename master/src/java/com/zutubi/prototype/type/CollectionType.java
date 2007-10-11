@@ -15,7 +15,8 @@ public abstract class CollectionType extends AbstractType implements ComplexType
 {
     public static final String HIDDEN_KEY = "hidden";
     public static final String ORDER_KEY  = "order";
-    private static final String SEPARATOR = ",";
+    
+    private static final char SEPARATOR = ',';
 
     private Type collectionType;
 
@@ -57,7 +58,7 @@ public abstract class CollectionType extends AbstractType implements ComplexType
             return new ArrayList<String>(0);
         }
 
-        return StringUtils.splitAndUriComponentDecode(SEPARATOR, order);
+        return StringUtils.splitAndDecode(SEPARATOR, order);
     }
 
     public Collection<String> getOrder(Record record)
@@ -75,21 +76,21 @@ public abstract class CollectionType extends AbstractType implements ComplexType
 
     protected void setOrder(MutableRecord record, Collection<String> order)
     {
-        record.putMeta(ORDER_KEY, StringUtils.uriComponentEncodeAndJoin(SEPARATOR, order));
+        record.putMeta(ORDER_KEY, StringUtils.encodeAndJoin(SEPARATOR, order));
     }
 
     public void hideItem(MutableRecord record, String key)
     {
         Set<String> hiddenKeys = getHiddenKeys(record);
         hiddenKeys.add(key);
-        record.putMeta(HIDDEN_KEY, StringUtils.uriComponentEncodeAndJoin(SEPARATOR, hiddenKeys));
+        record.putMeta(HIDDEN_KEY, StringUtils.encodeAndJoin(SEPARATOR, hiddenKeys));
     }
 
     public void unhideItem(MutableRecord record, String key)
     {
         Set<String> hiddenKeys = getHiddenKeys(record);
         hiddenKeys.remove(key);
-        record.put(HIDDEN_KEY, StringUtils.uriComponentEncodeAndJoin(SEPARATOR, hiddenKeys));
+        record.put(HIDDEN_KEY, StringUtils.encodeAndJoin(SEPARATOR, hiddenKeys));
     }
 
     private Set<String> getHiddenKeys(MutableRecord record)
@@ -101,7 +102,7 @@ public abstract class CollectionType extends AbstractType implements ComplexType
         }
         else
         {
-            return new HashSet<String>(StringUtils.splitAndUriComponentDecode(SEPARATOR, hidden));
+            return new HashSet<String>(StringUtils.splitAndDecode(SEPARATOR, hidden));
         }
     }
 

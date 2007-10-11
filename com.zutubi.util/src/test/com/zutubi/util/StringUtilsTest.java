@@ -368,44 +368,61 @@ public class StringUtilsTest extends TestCase
         assertEquals("", StringUtils.urlEncodePath(""));
     }
 
-    public void testURIComponentEncodeAndJoinEmpty()
+    public void testEncodeAndJoinEmpty()
     {
-        assertEquals("", StringUtils.uriComponentEncodeAndJoin(","));
+        assertEquals("", StringUtils.encodeAndJoin(','));
     }
 
-    public void testURIComponentEncodeAndJoinSingle()
+    public void testEncodeAndJoinSingle()
     {
-        assertEquals("piece%20here", StringUtils.uriComponentEncodeAndJoin(",", "piece here"));
+        assertEquals("piece%2chere", StringUtils.encodeAndJoin(',', "piece,here"));
     }
 
-    public void testURIComponentEncodeAndJoinMultiple()
+    public void testEncodeAndJoinMultiple()
     {
-        assertEquals("one,two%20and,three%20", StringUtils.uriComponentEncodeAndJoin(",", "one", "two and", "three "));
+        assertEquals("one,two%2cand,three%2c", StringUtils.encodeAndJoin(',', "one", "two,and", "three,"));
     }
 
-    public void testURIComponentEncodeAndJoinEmptyPiece()
+    public void testEncodeAndJoinEmptyPiece()
     {
-        assertEquals(",wow", StringUtils.uriComponentEncodeAndJoin(",", "", "wow"));
+        assertEquals(",wow", StringUtils.encodeAndJoin(',', "", "wow"));
     }
 
-    public void testSplitAndUrlComponentDecodeEmpty()
+    public void testSplitAndDecodeEmpty()
     {
-        assertEquals(a(""), StringUtils.splitAndUriComponentDecode(",", ""));
+        assertEquals(a(""), StringUtils.splitAndDecode(',', ""));
     }
 
-    public void testSplitAndUrlComponentDecodeSingle()
+    public void testSplitAndDecodeSingle()
     {
-        assertEquals(a("hey there"), StringUtils.splitAndUriComponentDecode(",", "hey%20there"));
+        assertEquals(a("hey,there"), StringUtils.splitAndDecode(',', "hey%2cthere"));
     }
 
-    public void testSplitAndUrlComponentDecodeMultiple()
+    public void testSplitAndDecodeMultiple()
     {
-        assertEquals(a("one", "two and", "three "), StringUtils.splitAndUriComponentDecode(",", "one,two%20and,three%20"));
+        assertEquals(a("one", "two and", "three "), StringUtils.splitAndDecode(',', "one,two%20and,three%20"));
     }
 
-    public void testSplitAndUrlComponentDecodeEmptyPiece()
+    public void testSplitAndDecodeEmptyPiece()
     {
-        assertEquals(a("", "wow"), StringUtils.splitAndUriComponentDecode(",", ",wow"));
+        assertEquals(a("", "wow"), StringUtils.splitAndDecode(',', ",wow"));
+    }
+
+    public void testShortHandJoinEncoded()
+    {
+        joinEncodedHelper(',', "hello", "there,sailor");
+    }
+
+    public void testShortHandJoinEncodedPercent()
+    {
+        joinEncodedHelper(',', "hello", "there%2csailor");
+    }
+
+    private void joinEncodedHelper(char separator, String... pieces)
+    {
+        String joined = StringUtils.encodeAndJoin(separator, pieces);
+        Collection<String> split = StringUtils.splitAndDecode(separator, joined);
+        assertEquals(pieces, split);
     }
 
     public void testURIComponentEncodeEmpty()
