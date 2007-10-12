@@ -48,7 +48,8 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
 //    {
 //        structDefs.put(Project.class, new String[]{"id", "name", "description", "url"});
 //    }
-//
+
+    //
     public RemoteApi()
     {
         // can remove this call when we sort out autowiring from the XmlRpcServlet.
@@ -96,17 +97,17 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         {
             Vector<String> result;
 
-            if(path.length() == 0)
+            if (path.length() == 0)
             {
                 result = new Vector<String>(configurationTemplateManager.getRootListing());
             }
             else
             {
                 Type type = configurationTemplateManager.getType(path);
-                if(type instanceof CollectionType)
+                if (type instanceof CollectionType)
                 {
                     CollectionType collectionType = (CollectionType) type;
-                    if(collectionType.getCollectionType() instanceof ComplexType)
+                    if (collectionType.getCollectionType() instanceof ComplexType)
                     {
                         Record record = configurationTemplateManager.getRecord(path);
                         result = new Vector<String>(collectionType.getOrder(record));
@@ -132,6 +133,19 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         }
     }
 
+    public Hashtable<String, Object> createDefaultConfig(String token, String symbolicName) throws AuthenticationException, TypeException
+    {
+        tokenManager.verifyUser(token);
+        CompositeType type = typeRegistry.getType(symbolicName);
+        if (type == null)
+        {
+            throw new IllegalArgumentException("Unrecognised symbolic name '" + symbolicName + "'");
+        }
+
+        MutableRecord record = type.createNewRecord(true);
+        return type.toXmlRpc(record);
+    }
+
     public Object getConfig(String token, String path) throws AuthenticationException, TypeException
     {
         tokenManager.loginUser(token);
@@ -139,7 +153,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         try
         {
             Object instance = configurationTemplateManager.getInstance(path);
-            if(instance == null)
+            if (instance == null)
             {
                 throw new IllegalArgumentException("Path '" + path + "' does not exist");
             }
@@ -162,7 +176,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         try
         {
             Record record = configurationTemplateManager.getRecord(path);
-            if(record == null)
+            if (record == null)
             {
                 throw new IllegalArgumentException("Path '" + path + "' does not exist");
             }
@@ -181,7 +195,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         try
         {
             Record record = recordManager.select(path);
-            if(record == null)
+            if (record == null)
             {
                 throw new IllegalArgumentException("Path '" + path + "' does not exist");
             }
@@ -207,7 +221,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
 
             String parentPath;
             String baseName;
-            if(pathType instanceof CollectionType)
+            if (pathType instanceof CollectionType)
             {
                 parentPath = path;
                 baseName = null;
@@ -218,9 +232,9 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
                 baseName = PathUtils.getBaseName(path);
             }
 
-            if(configurationTemplateManager.isTemplatedCollection(parentPath))
-        {
-            throw new IllegalArgumentException("Invalid path '" + path + "': use insertTemplatedConfig to insert into templated collections");
+            if (configurationTemplateManager.isTemplatedCollection(parentPath))
+            {
+                throw new IllegalArgumentException("Invalid path '" + path + "': use insertTemplatedConfig to insert into templated collections");
             }
 
             String symbolicName = CompositeType.getTypeFromXmlRpc(config);
@@ -228,9 +242,9 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
             MutableRecord record = type.fromXmlRpc(config);
 
             Configuration instance = configurationTemplateManager.validate(parentPath, baseName, record, true);
-            if(!type.isValid(instance))
-        {
-            throw new ValidationException(type, instance);
+            if (!type.isValid(instance))
+            {
+                throw new ValidationException(type, instance);
             }
 
             return configurationTemplateManager.insertRecord(path, record);
@@ -299,28 +313,28 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         try
         {
             Record existingRecord = configurationTemplateManager.getRecord(path);
-            if(existingRecord == null)
+            if (existingRecord == null)
             {
                 throw new IllegalArgumentException("Invalid path '" + path + "': no existing record found (use insert to create new records)");
             }
 
             String existingSymbolicName = existingRecord.getSymbolicName();
-            if(existingSymbolicName == null)
+            if (existingSymbolicName == null)
             {
                 throw new IllegalArgumentException("Invalid path '" + path + "': path refers to a collection (manipulate collections using insert and delete)");
             }
 
             String symbolicName = CompositeType.getTypeFromXmlRpc(config);
-            if(!existingSymbolicName.equals(symbolicName))
-        {
-            throw new IllegalArgumentException("Expecting type '" + existingSymbolicName + "', found '" + symbolicName + "' (type cannot be changed by saving)");
+            if (!existingSymbolicName.equals(symbolicName))
+            {
+                throw new IllegalArgumentException("Expecting type '" + existingSymbolicName + "', found '" + symbolicName + "' (type cannot be changed by saving)");
             }
 
             CompositeType type = typeRegistry.getType(existingSymbolicName);
             MutableRecord record = type.fromXmlRpc(config);
 
             Configuration instance = configurationTemplateManager.validate(PathUtils.getParentPath(path), PathUtils.getBaseName(path), record, deep);
-            if((deep && !type.isValid(instance)) || !instance.isValid())
+            if ((deep && !type.isValid(instance)) || !instance.isValid())
             {
                 throw new ValidationException(type, instance);
             }
@@ -338,7 +352,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         tokenManager.loginUser(token);
         try
         {
-            if(configurationTemplateManager.getRecord(path) == null)
+            if (configurationTemplateManager.getRecord(path) == null)
             {
                 return false;
             }
@@ -378,7 +392,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         LOG.warning(message);
         return true;
     }
-    
+
 //    public Vector<String> getAllUserLogins(String token) throws AuthenticationException
 //    {
 //        tokenManager.verifyAdmin(token);
@@ -1675,7 +1689,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
 
     public Class[] getHandledEvents()
     {
-        return new Class[] { SystemStartedEvent.class } ;
+        return new Class[]{SystemStartedEvent.class};
     }
 
     public void setRecordManager(RecordManager recordManager)

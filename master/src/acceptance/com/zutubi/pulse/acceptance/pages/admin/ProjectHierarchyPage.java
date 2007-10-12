@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance.pages.admin;
 
 import com.thoughtworks.selenium.Selenium;
+import com.zutubi.pulse.acceptance.SeleniumUtils;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.webwork.mapping.Urls;
 import com.zutubi.util.CollectionUtils;
@@ -45,6 +46,15 @@ public class ProjectHierarchyPage extends SeleniumPage
         return urls.adminProjects();
     }
 
+    public void goTo()
+    {
+        selenium.open(getUrl());
+        String linkLocator = "link=" + project;
+        SeleniumUtils.waitForLocator(selenium, linkLocator);
+        selenium.click(linkLocator);
+        waitFor();
+    }
+
     public boolean isAddPresent()
     {
         return selenium.isElementPresent(LINK_ADD);
@@ -68,8 +78,12 @@ public class ProjectHierarchyPage extends SeleniumPage
     public ProjectConfigPage clickConfigure()
     {
         selenium.click(LINK_CONFIGURE);
-        ProjectConfigPage configPage = new ProjectConfigPage(selenium, urls, project, template);
-        configPage.waitFor();
-        return configPage;
+        return new ProjectConfigPage(selenium, urls, project, template);
+    }
+
+    public DeleteConfirmPage clickDelete()
+    {
+        selenium.click(LINK_DELETE);
+        return new DeleteConfirmPage(selenium, urls, getId());
     }
 }

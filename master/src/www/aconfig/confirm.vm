@@ -1,5 +1,8 @@
+#set($taskCount = 0)
+#set($invisibleCount = 0)
 #macro(showTask $cleanupTask $indent)
-    <tr>
+    #set($taskCount = $taskCount + 1)
+    <tr id="task:$taskCount">
         <td class="content">
             ${indent}$!webwork.htmlEncode($cleanupTask.affectedPath)
         </td>
@@ -8,18 +11,22 @@
         </td>
     </tr>
     #foreach($childTask in $cleanupTask.cascaded)
-        #if(!$childTask.internal)
-            #showTask($childTask "&nbsp;&nbsp;&nbsp;&nbsp;$indent")
+        #if($action.hasPermission("view", $childTask.affectedPath))
+            #if(!$childTask.internal)
+                #showTask($childTask "&nbsp;&nbsp;&nbsp;&nbsp;$indent")
+            #end
+        #else
+            #set($invisibleCount = $invisibleCount + 1)
         #end
     #end
 #end
 
-<h2 id='#id("delete:$path")'>#wwtext("name=confirm.delete")</h2>
+<h2>#wwtext("name=confirm.delete")</h2>
 <p>
     #wwtext("name=confirm.delete.blurb")
 </p>
 
-<table class="form">
+<table id='#id("delete:$path")' class="form">
     <tr>
         <th class="content">#wwtext("name=affected.path")</th>
         <th class="content">#wwtext("name=action")</th>
@@ -27,11 +34,18 @@
     #showTask($task "")
     <tr>
         <td class="submit" colspan="2">
-            <a href="#" id="confirm.delete" onclick="runAjaxRequest('$base/aconfig/$path?delete=delete'); return false;"/>delete</a>
-            <a href="#" id="cancel.delete" onclick="selectPath('$parentPath'); return false;"/>cancel</a>
+            <img src="$base/images/delete.gif" alt="delete"/> <a href="#" id="confirm.delete" onclick="runAjaxRequest('$base/aconfig/$path?delete=delete'); return false;"/>delete</a>
+            &nbsp;&nbsp;&nbsp;
+            <img src="$base/images/cancel.gif" alt="cancel"/> <a href="#" id="cancel.delete" onclick="runAjaxRequest('$base/aconfig/$path?delete=cancel'); return false;"/>cancel</a>
         </td>
     </tr>
 </table>
 
+#if($invisibleCount > 0)
+<p id="further.tasks">
+    <b>Note</b>: A further #if($invisibleCount > 1) $invisibleCount tasks are required that are #else task is required that is #end not
+    visible to you with your current permissions.
+</p>
+#end
 </body>
 </html>

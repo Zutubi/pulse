@@ -29,14 +29,42 @@ public class SeleniumUtils
         return selenium.getEval("selenium.browserbot.getCurrentWindow()." + variable);       
     }
 
-    public static void waitForElement(Selenium selenium, String id)
+    public static void waitForElementId(Selenium selenium, String id)
     {
-        waitForElement(selenium, id, DEFAULT_TIMEOUT);
+        waitForElementId(selenium, id, DEFAULT_TIMEOUT);
     }
 
-    public static void waitForElement(Selenium selenium, String id, long timeout)
+    public static void waitForElementId(Selenium selenium, String id, long timeout)
     {
         selenium.waitForCondition("selenium.browserbot.getCurrentWindow().document.getElementById('" + StringUtils.toValidHtmlName(id) + "') != null", Long.toString(timeout));
+    }
+
+    public static void waitForLocator(Selenium selenium, String locator)
+    {
+        waitForLocator(selenium, locator, DEFAULT_TIMEOUT);
+    }
+
+    public static void waitForLocator(Selenium selenium, String locator, long timeout)
+    {
+        long startTime = System.currentTimeMillis();
+        while(System.currentTimeMillis() - startTime < timeout)
+        {
+            if(selenium.isElementPresent(locator))
+            {
+                return;
+            }
+
+            try
+            {
+                Thread.sleep(1000);
+            }
+            catch (InterruptedException e)
+            {
+                // Ignore
+            }
+        }
+
+        throw new SeleniumException("Timeout out after " + timeout + "ms");
     }
 
     public static void refreshUntilElement(Selenium selenium, String id)
@@ -116,6 +144,11 @@ public class SeleniumUtils
         Assert.assertTrue(selenium.isTextPresent(text));
     }
 
+    public static void assertTextNotPresent(Selenium selenium, String text)
+    {
+        Assert.assertFalse(selenium.isTextPresent(text));
+    }
+
     public static void assertLinkPresent(Selenium selenium, String id)
     {
         Assert.assertTrue(CollectionUtils.contains(selenium.getAllLinks(), StringUtils.toValidHtmlName(id)));
@@ -145,6 +178,6 @@ public class SeleniumUtils
 
     public static void assertCellContents(Selenium selenium, String tableLocator, int row, int column, String text)
     {
-        Assert.assertEquals(text, selenium.getTable(tableLocator + "." + row + "." + column));
+        Assert.assertEquals(text, selenium.getTable(StringUtils.toValidHtmlName(tableLocator + "." + row + "." + column)));
     }
 }

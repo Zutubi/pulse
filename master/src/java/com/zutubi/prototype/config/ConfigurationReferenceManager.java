@@ -136,7 +136,7 @@ public class ConfigurationReferenceManager
                 ReferenceCleanupTaskProvider provider = getCleanupTaskProvider(referencingPath);
                 if (provider != null)
                 {
-                    RecordCleanupTask task = provider.getAction(path, referencingPath);
+                    RecordCleanupTask task = provider.getTask(path, referencingPath);
                     if (task != null)
                     {
                         result.addCascaded(task);
@@ -151,8 +151,15 @@ public class ConfigurationReferenceManager
         String parentPath = PathUtils.getParentPath(referencingPath);
         String baseName = PathUtils.getBaseName(referencingPath);
 
-        CompositeType parentType = (CompositeType) configurationTemplateManager.getType(parentPath);
-        TypeProperty property = parentType.getProperty(baseName);
+        ComplexType parentType = configurationTemplateManager.getType(parentPath);
+        if(parentType instanceof CollectionType)
+        {
+            baseName = PathUtils.getBaseName(parentPath);
+            parentPath = PathUtils.getParentPath(parentPath);
+            parentType = configurationTemplateManager.getType(parentPath);
+        }
+
+        TypeProperty property = ((CompositeType)parentType).getProperty(baseName);
         Reference ref = property.getAnnotation(Reference.class);
         try
         {

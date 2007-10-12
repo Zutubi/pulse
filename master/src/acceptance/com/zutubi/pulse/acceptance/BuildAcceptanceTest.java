@@ -55,6 +55,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, random, false);
         hierarchyPage.assertPresent();
         ProjectConfigPage configPage = hierarchyPage.clickConfigure();
+        configPage.waitFor();
         ListPage stagesPage = configPage.selectCollection(ProjectConfigPage.BUILD_STAGES_BASE, ProjectConfigPage.BUILD_STAGES_DISPLAY);
         stagesPage.clickView("default");
 

@@ -59,7 +59,7 @@ public abstract class SeleniumForm
     {
         // Wait for the last field as the forms are lazily rendered
         String[] fields = getActualFieldNames();
-        SeleniumUtils.waitForElement(selenium, getFieldId(fields[fields.length - 1]));
+        SeleniumUtils.waitForElementId(selenium, getFieldId(fields[fields.length - 1]));
     }
 
     public void assertFormPresent()

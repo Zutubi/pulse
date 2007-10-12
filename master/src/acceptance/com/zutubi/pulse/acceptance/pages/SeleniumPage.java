@@ -55,7 +55,7 @@ public abstract class SeleniumPage
 
     public void waitFor()
     {
-        SeleniumUtils.waitForElement(selenium, id);
+        SeleniumUtils.waitForElementId(selenium, id);
     }
 
     public void assertPresent()

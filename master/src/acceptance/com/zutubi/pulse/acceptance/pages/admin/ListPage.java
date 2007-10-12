@@ -78,8 +78,6 @@ public class ListPage extends SeleniumPage
     public DeleteConfirmPage clickDelete(String baseName)
     {
         selenium.click(getActionId("delete", baseName));
-        DeleteConfirmPage deleteConfirmPage = new DeleteConfirmPage(selenium, urls, PathUtils.getPath(path, baseName));
-        deleteConfirmPage.waitFor();
-        return deleteConfirmPage;
+        return new DeleteConfirmPage(selenium, urls, PathUtils.getPath(path, baseName));
     }
 }

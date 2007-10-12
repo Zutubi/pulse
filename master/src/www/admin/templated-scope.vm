@@ -262,6 +262,7 @@
                     templateTree.render();
 
 #if($configTreePath)
+                    templateTree.expandToPath('$templateTreePath');
                     createConfigTree('$owner');
                     configTree.selectConfigPath('$configTreePath');
                     visibleTree = configTree;

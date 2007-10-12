@@ -1578,13 +1578,21 @@ public class ConfigurationTemplateManager implements Synchronization
                 }
                 else if (parentType instanceof CompositeType)
                 {
-                    Type propertyType = ((CompositeType) parentType).getProperty(baseName).getType();
-                    if (!(propertyType instanceof ComplexType))
+                    TypeProperty property = ((CompositeType) parentType).getProperty(baseName);
+                    if (property != null)
                     {
-                        throw new IllegalArgumentException("Invalid path '" + path + "': references non-complex type");
-                    }
+                        Type propertyType = property.getType();
+                        if (!(propertyType instanceof ComplexType))
+                        {
+                            throw new IllegalArgumentException("Invalid path '" + path + "': references non-complex type");
+                        }
 
-                    return (ComplexType) propertyType;
+                        return (ComplexType) propertyType;
+                    }
+                    else
+                    {
+                        throw new IllegalArgumentException("Invalid path '" + path + "': references unknown property '" + baseName + "' of type '" + parentType.getSymbolicName() + "'");
+                    }
                 }
                 else
                 {

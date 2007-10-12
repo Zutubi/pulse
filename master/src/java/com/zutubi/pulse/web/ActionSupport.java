@@ -5,6 +5,7 @@ import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.xwork.TextProvider;
 import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.i18n.Messages;
+import com.zutubi.prototype.config.ConfigurationSecurityManager;
 import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
@@ -52,9 +53,10 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
     protected String cancel;
     protected AccessManager accessManager;
     protected ProjectManager projectManager;
+    protected UserManager userManager;
+    protected ConfigurationSecurityManager configurationSecurityManager;
     protected String changeUrl;
     private User loggedInUser = null;
-    protected UserManager userManager;
 
     public boolean isCancelled()
     {
@@ -195,6 +197,11 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
         return accessManager.hasPermission(action, resource);
     }
 
+    public boolean hasPermission(String action, String path)
+    {
+        return configurationSecurityManager.hasPermission(path, action);
+    }
+
     public ProjectManager getProjectManager()
     {
         return projectManager;
@@ -304,5 +311,10 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
     public final void setAccessManager(AccessManager accessManager)
     {
         this.accessManager = accessManager;
+    }
+
+    public final void setConfigurationSecurityManager(ConfigurationSecurityManager configurationSecurityManager)
+    {
+        this.configurationSecurityManager = configurationSecurityManager;
     }
 }

@@ -62,7 +62,7 @@ public class SeleniumTestBase extends TestCase
         super.tearDown();
     }
 
-    private void login(String username, String password)
+    protected void login(String username, String password)
     {
         LoginPage page = new LoginPage(selenium, urls);
         page.goTo();
@@ -74,6 +74,12 @@ public class SeleniumTestBase extends TestCase
         login("admin", "admin");
     }
 
+    protected void logout()
+    {
+        selenium.click("logout");
+        selenium.waitForPageToLoad("30000");
+    }
+    
     protected void goTo(String location)
     {
         selenium.open(StringUtils.join("/", true, baseUrl, location));
@@ -94,6 +100,11 @@ public class SeleniumTestBase extends TestCase
         SeleniumUtils.assertTextPresent(selenium, text);
     }
 
+    protected void assertTextNotPresent(String text)
+    {
+        SeleniumUtils.assertTextNotPresent(selenium, text);
+    }
+
     protected void assertLinkPresent(String id)
     {
         SeleniumUtils.assertLinkPresent(selenium, id);
@@ -106,12 +117,12 @@ public class SeleniumTestBase extends TestCase
 
     protected void waitForElement(String id)
     {
-        SeleniumUtils.waitForElement(selenium, id);
+        SeleniumUtils.waitForElementId(selenium, id);
     }
 
     protected void waitForElement(String id, long timeout)
     {
-        SeleniumUtils.waitForElement(selenium, id, timeout);
+        SeleniumUtils.waitForElementId(selenium, id, timeout);
     }
 
     protected void addProject(String name)

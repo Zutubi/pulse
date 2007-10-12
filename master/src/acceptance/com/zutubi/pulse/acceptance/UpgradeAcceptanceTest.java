@@ -251,7 +251,7 @@ public class UpgradeAcceptanceTest extends SeleniumTestBase
         // waiting..
         assertTextPresent("Upgrade Progress");
 
-        SeleniumUtils.waitForElement(selenium, "upgrade.complete", 120000);
+        SeleniumUtils.waitForElementId(selenium, "upgrade.complete", 120000);
 
         assertTextPresent("Upgrade Complete");
         assertTextPresent("The upgrade has been successful");

@@ -1,11 +1,19 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.prototype.config.ConfigurationRegistry;
+import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.prototype.config.group.GroupConfiguration;
+import com.zutubi.pulse.prototype.config.project.ProjectAclConfiguration;
+import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 import org.apache.xmlrpc.XmlRpcClient;
 
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -75,9 +83,36 @@ public class XmlRpcHelper
         return (T) xmlRpcClient.execute("RemoteApi." + function, argVector);
     }
 
+    public String getSymbolicName(Class<? extends Configuration> clazz)
+    {
+        return clazz.getAnnotation(SymbolicName.class).value();
+    }
+
     public boolean configPathExists(String path) throws Exception
     {
         return (Boolean)call("configPathExists", path);
+    }
+
+    public Hashtable<String, Object> createEmptyConfig(Class<? extends Configuration> clazz)
+    {
+        return createEmptyConfig(getSymbolicName(clazz));
+    }
+
+    public Hashtable<String, Object> createEmptyConfig(String symbolicName)
+    {
+        Hashtable<String, Object> result = new Hashtable<String, Object>();
+        result.put(SYMBOLIC_NAME_KEY, symbolicName);
+        return result;
+    }
+
+    public Hashtable<String, Object> createDefaultConfig(Class<? extends Configuration> clazz) throws Exception
+    {
+        return createDefaultConfig(getSymbolicName(clazz));
+    }
+
+    public Hashtable<String, Object> createDefaultConfig(String symbolicName) throws Exception
+    {
+        return call("createDefaultConfig", symbolicName);
     }
 
     public <T> T getConfig(String path) throws Exception
@@ -107,18 +142,15 @@ public class XmlRpcHelper
 
     public String insertSimpleProject(String name, String parent, boolean template) throws Exception
     {
-        Hashtable<String, Object> scm = new Hashtable<String, Object>();
-        scm.put(BaseXmlRpcAcceptanceTest.SYMBOLIC_NAME_KEY, "zutubi.svnConfig");
+        Hashtable<String, Object> scm = createEmptyConfig("zutubi.svnConfig");
         scm.put("url", "svn://localhost:3088/accept/trunk/triviant");
         scm.put("checkoutScheme", "CLEAN_CHECKOUT");
         scm.put("monitor", false);
 
-        Hashtable<String, Object> type = new Hashtable<String, Object>();
-        type.put(BaseXmlRpcAcceptanceTest.SYMBOLIC_NAME_KEY, "zutubi.antTypeConfig");
+        Hashtable<String, Object> type = createEmptyConfig("zutubi.antTypeConfig");
         type.put("file", "build.xml");
 
-        Hashtable<String, Object> project = new Hashtable<String, Object>();
-        project.put(BaseXmlRpcAcceptanceTest.SYMBOLIC_NAME_KEY, "zutubi.projectConfig");
+        Hashtable<String, Object> project = createEmptyConfig("zutubi.projectConfig");
         project.put("name", name);
         project.put("scm", scm);
         project.put("type", type);
@@ -133,8 +165,7 @@ public class XmlRpcHelper
 
     public String insertTrivialProject(String name, String parent, boolean template) throws Exception
     {
-        Hashtable<String, Object> project = new Hashtable<String, Object>();
-        project.put(BaseXmlRpcAcceptanceTest.SYMBOLIC_NAME_KEY, "zutubi.projectConfig");
+        Hashtable<String, Object> project = createEmptyConfig("zutubi.projectConfig");
         project.put("name", name);
 
         return call("insertTemplatedConfig", "projects/" + parent, project, template);
@@ -151,10 +182,17 @@ public class XmlRpcHelper
         return false;
     }
 
+    public String addProjectPermissions(String projectPath, String groupPath, String... actions) throws Exception
+    {
+        Hashtable<String, Object> permission = createDefaultConfig(ProjectAclConfiguration.class);
+        permission.put("group", groupPath);
+        permission.put("allowedActions", new Vector<String>(Arrays.asList(actions)));
+        return insertConfig(PathUtils.getPath(projectPath, "permissions"), permission);
+    }
+
     public String insertSimpleAgent(String name) throws Exception
     {
-        Hashtable<String, Object> agent = new Hashtable<String, Object>();
-        agent.put(SYMBOLIC_NAME_KEY, "zutubi.agentConfig");
+        Hashtable<String, Object> agent = createEmptyConfig("zutubi.agentConfig");
         agent.put("name", name);
         agent.put("host", name);
         agent.put("port", 8890);
@@ -171,6 +209,24 @@ public class XmlRpcHelper
         }
 
         return path;
+    }
+
+    public String insertTrivialUser(String login) throws Exception
+    {
+        Hashtable<String, Object> user = createDefaultConfig(UserConfiguration.class);
+        user.put("login", login);
+        user.put("name", login);
+//        user.put("password", login);
+        return insertConfig(ConfigurationRegistry.USERS_SCOPE, user);
+    }
+
+    public String insertGroup(String name, List<String> memberPaths, String... serverPermissions) throws Exception
+    {
+        Hashtable<String, Object> group = createDefaultConfig(GroupConfiguration.class);
+        group.put("name", name);
+        group.put("members", new Vector<String>(memberPaths));
+        group.put("serverPermissions", new Vector<String>(Arrays.asList(serverPermissions)));
+        return insertConfig(ConfigurationRegistry.GROUPS_SCOPE, group);
     }
 
     public void logError(String message) throws Exception

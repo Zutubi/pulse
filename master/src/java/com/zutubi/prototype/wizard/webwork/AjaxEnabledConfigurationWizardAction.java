@@ -1,6 +1,5 @@
 package com.zutubi.prototype.wizard.webwork;
 
-import com.zutubi.prototype.config.ConfigurationSecurityManager;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.webwork.ConfigurationErrors;
 import com.zutubi.prototype.webwork.ConfigurationPanel;
@@ -18,8 +17,6 @@ public class AjaxEnabledConfigurationWizardAction extends ConfigurationWizardAct
     private ConfigurationPanel configurationPanel;
     private ConfigurationResponse configurationResponse;
     private ConfigurationErrors configurationErrors;
-
-    private ConfigurationSecurityManager configurationSecurityManager;
 
     public ConfigurationPanel getConfigurationPanel()
     {
@@ -85,10 +82,5 @@ public class AjaxEnabledConfigurationWizardAction extends ConfigurationWizardAct
     private boolean isEmbeddedCollection(String insertPath)
     {
         return insertPath != null && PrototypeUtils.isEmbeddedCollection(configurationTemplateManager.getType(insertPath));
-    }
-
-    public void setConfigurationSecurityManager(ConfigurationSecurityManager configurationSecurityManager)
-    {
-        this.configurationSecurityManager = configurationSecurityManager;
     }
 }

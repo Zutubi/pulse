@@ -3,6 +3,7 @@ package com.zutubi.prototype.config.cleanup;
 import com.zutubi.prototype.ConventionSupport;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.security.PulseThreadFactory;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
@@ -63,7 +64,7 @@ public class ConfigurationCleanupManager
             }
             else
             {
-                task.run();
+                AcegiUtils.runAsSystem(task);
             }
         }
         catch (Exception e)

@@ -53,6 +53,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
             String baseName = getNewestListItem(labelsPath);
             labelsPage.assertItemPresent(baseName, "view", "delete");
             DeleteConfirmPage deleteConfirmPage = labelsPage.clickDelete(baseName);
+            deleteConfirmPage.waitFor();
             labelsPage = deleteConfirmPage.confirm();
 
             labelsPage.assertItemNotPresent(baseName);

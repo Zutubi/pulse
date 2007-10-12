@@ -318,7 +318,7 @@ public class CompositeType extends AbstractType implements ComplexType
         }
     }
 
-    public Object toXmlRpc(Object data) throws TypeException
+    public Hashtable<String, Object> toXmlRpc(Object data) throws TypeException
     {
         if(data == null)
         {

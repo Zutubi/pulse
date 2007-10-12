@@ -1,9 +1,7 @@
 package com.zutubi.prototype.config.cleanup;
 
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
-import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.prototype.type.ReferenceType;
-import com.zutubi.prototype.type.TypeProperty;
+import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.validation.annotations.Required;
@@ -15,7 +13,7 @@ public class DefaultReferenceCleanupTaskProvider implements ReferenceCleanupTask
     private ConfigurationTemplateManager configurationTemplateManager;
     private RecordManager recordManager;
 
-    public RecordCleanupTask getAction(String deletedPath, String referencingPath)
+    public RecordCleanupTask getTask(String deletedPath, String referencingPath)
     {
         // Default behaviour:
         //   - if referencing path is a simple property
@@ -26,8 +24,15 @@ public class DefaultReferenceCleanupTaskProvider implements ReferenceCleanupTask
         String parentPath = PathUtils.getParentPath(referencingPath);
         String baseName = PathUtils.getBaseName(referencingPath);
 
-        CompositeType parentType = (CompositeType) configurationTemplateManager.getType(parentPath);
-        TypeProperty property = parentType.getProperty(baseName);
+        ComplexType parentType = configurationTemplateManager.getType(parentPath);
+        if(parentType instanceof CollectionType)
+        {
+            baseName = PathUtils.getBaseName(parentPath);
+            parentPath = PathUtils.getParentPath(parentPath);
+            parentType = configurationTemplateManager.getType(parentPath);
+        }
+
+        TypeProperty property = ((CompositeType) parentType).getProperty(baseName);
         if(property.getType() instanceof ReferenceType)
         {
             if(property.getAnnotation(Required.class) != null)

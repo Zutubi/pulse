@@ -7,6 +7,7 @@ import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.license.LicenseManager;
 import com.zutubi.pulse.license.authorisation.AddUserAuthorisation;
 import com.zutubi.pulse.model.persistence.UserDao;
+import com.zutubi.pulse.prototype.config.group.AbstractGroupConfiguration;
 import com.zutubi.pulse.prototype.config.group.BuiltinGroupConfiguration;
 import com.zutubi.pulse.prototype.config.group.GroupConfiguration;
 import com.zutubi.pulse.prototype.config.user.DashboardConfiguration;
@@ -95,18 +96,22 @@ public class DefaultUserManager implements UserManager, ConfigurationInjector.Co
     private void initGroupsByUser()
     {
         groupsByUser = new HashMap<UserConfiguration, List<GroupConfiguration>>();
-        for(GroupConfiguration group: configurationProvider.getAll(GroupConfiguration.class))
+        for(AbstractGroupConfiguration abstractGroup: configurationProvider.getAll(AbstractGroupConfiguration.class))
         {
-            for(UserConfiguration member: group.getMembers())
+            if(abstractGroup instanceof GroupConfiguration)
             {
-                List<GroupConfiguration> userGroups = groupsByUser.get(member);
-                if(userGroups == null)
+                GroupConfiguration group = (GroupConfiguration) abstractGroup;
+                for(UserConfiguration member: group.getMembers())
                 {
-                    userGroups = new LinkedList<GroupConfiguration>();
-                    groupsByUser.put(member, userGroups);
-                }
+                    List<GroupConfiguration> userGroups = groupsByUser.get(member);
+                    if(userGroups == null)
+                    {
+                        userGroups = new LinkedList<GroupConfiguration>();
+                        groupsByUser.put(member, userGroups);
+                    }
 
-                userGroups.add(group);
+                    userGroups.add(group);
+                }
             }
         }
 

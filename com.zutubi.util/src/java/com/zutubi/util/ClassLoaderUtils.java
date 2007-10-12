@@ -15,7 +15,22 @@ public class ClassLoaderUtils
     {
         if(!className.contains("."))
         {
-            className = annotatedClass.getPackage().getName() + "." + className;
+            String prefix = annotatedClass.getName();
+            int index = prefix.lastIndexOf('$');
+            char separator = '$';
+
+            if(index < 0)
+            {
+                index = prefix.lastIndexOf('.');
+                separator = '.';
+            }
+
+            if(index >= 0)
+            {
+                prefix = prefix.substring(0, index);
+            }
+
+            className = prefix + separator + className;
         }
 
         return (Class<V>) annotatedClass.getClassLoader().loadClass(className);

@@ -34,7 +34,7 @@
                 <#elseif rowAction.action == "delete">
                 onclick="deletePath('${row.path}'); return false;">
                 <#else>
-                onclick="actionPath('${row.path}?${action}'); return false;">
+                onclick="actionPath('${row.path}?${rowAction.action}'); return false;">
                 </#if>
                 ${rowAction.label?html}<#t>
             </a><#lt>

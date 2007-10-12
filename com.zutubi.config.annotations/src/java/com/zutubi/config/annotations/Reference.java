@@ -17,5 +17,5 @@ import java.lang.annotation.Target;
 public @interface Reference
 {
     String optionProvider() default "com.zutubi.pulse.prototype.config.DefaultReferenceOptionProvider";
-    String cleanupTaskProvider() default "com.zutubi.prototype.config.DefaultReferenceCleanupTaskProvider";
+    String cleanupTaskProvider() default "com.zutubi.prototype.config.cleanup.DefaultReferenceCleanupTaskProvider";
 }

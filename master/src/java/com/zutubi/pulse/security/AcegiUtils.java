@@ -12,7 +12,7 @@ import org.acegisecurity.providers.anonymous.AnonymousAuthenticationToken;
 import org.acegisecurity.userdetails.UserDetails;
 
 /**
- * <class-comment/>
+ * Utility functions for the security system.
  */
 public class AcegiUtils
 {
@@ -51,6 +51,42 @@ public class AcegiUtils
         UsernamePasswordAuthenticationToken targetUserRequest =
                 new UsernamePasswordAuthenticationToken(targetUser, targetUser.getPassword(), targetUser.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(targetUserRequest);
+    }
+
+    /**
+     * Runs the given task as the given user, then restores the original
+     * user.
+     *
+     * @see #runAsSystem(Runnable)
+     * 
+     * @param user     user to run the task as
+     * @param runnable the task to run
+     */
+    public static void runAsUser(AcegiUser user, Runnable runnable)
+    {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        try
+        {
+            loginAs(user);
+            runnable.run();
+        }
+        finally
+        {
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
+    }
+
+    /**
+     * Runs the given task as the system user, then restores the original
+     * user.
+     *
+     * @see #runAsUser(com.zutubi.pulse.model.AcegiUser, Runnable)
+     *
+     * @param runnable the task to run
+     */
+    public static void runAsSystem(Runnable runnable)
+    {
+        runAsUser(systemUser, runnable);
     }
 
     public static void logout()

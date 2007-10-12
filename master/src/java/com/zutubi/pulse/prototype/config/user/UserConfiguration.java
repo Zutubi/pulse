@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Configuration for a user of Pulse, including accoutn details and the
+ * Configuration for a user of Pulse, including account details and the
  * user's personal preferences.
  */
 @SymbolicName("zutubi.userConfig")

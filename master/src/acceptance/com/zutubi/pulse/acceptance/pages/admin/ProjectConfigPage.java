@@ -48,4 +48,10 @@ public class ProjectConfigPage extends SeleniumPage
         listPage.waitFor();
         return listPage;
     }
+
+    public ProjectHierarchyPage clickHierarchy()
+    {
+        selenium.click("//span[text()='hierarchy']");
+        return new ProjectHierarchyPage(selenium, urls, project, template);
+    }
 }
