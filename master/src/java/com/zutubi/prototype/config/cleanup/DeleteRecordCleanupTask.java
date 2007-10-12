@@ -1,4 +1,4 @@
-package com.zutubi.prototype.config;
+package com.zutubi.prototype.config.cleanup;
 
 import com.zutubi.prototype.type.record.RecordManager;
 
@@ -20,9 +20,8 @@ public class DeleteRecordCleanupTask extends RecordCleanupTaskSupport
         this.recordManager = recordManager;
     }
 
-    public void execute()
+    public void run()
     {
-        super.execute();
         recordManager.delete(getAffectedPath());
     }
 

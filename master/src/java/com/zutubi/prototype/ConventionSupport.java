@@ -19,6 +19,11 @@ public class ConventionSupport
         return loadClass(clazz, "Actions");
     }
 
+    public static Class getCleanupTasks(Class<? extends Configuration> clazz)
+    {
+        return loadClass(clazz, "CleanupTasks");
+    }
+
     public static Class getFormatter(Type type)
     {
         return loadClass(type, "Formatter");
@@ -42,11 +47,16 @@ public class ConventionSupport
 
     private static Class loadClass(Class clazz, String suffix)
     {
+        if(clazz.isArray() || clazz.isPrimitive())
+        {
+            return null;
+        }
+        
         while (clazz != Object.class)
         {
             try
             {
-                String className = clazz.getCanonicalName() + suffix;
+                String className = clazz.getName() + suffix;
                 return clazz.getClassLoader().loadClass(className);
             }
             catch (ClassNotFoundException e)

@@ -1,5 +1,8 @@
 package com.zutubi.prototype.config;
 
+import com.zutubi.prototype.config.cleanup.ConfigurationCleanupManager;
+import com.zutubi.prototype.config.cleanup.DeleteRecordCleanupTask;
+import com.zutubi.prototype.config.cleanup.RecordCleanupTask;
 import com.zutubi.prototype.config.events.PostDeleteEvent;
 import com.zutubi.prototype.config.events.PostInsertEvent;
 import com.zutubi.prototype.config.events.PostSaveEvent;
@@ -36,6 +39,7 @@ public class ConfigurationTemplateManager implements Synchronization
     private ConfigurationPersistenceManager configurationPersistenceManager;
     private ConfigurationReferenceManager configurationReferenceManager;
     private ConfigurationSecurityManager configurationSecurityManager;
+    private ConfigurationCleanupManager configurationCleanupManager;
 
     private EventManager eventManager;
 
@@ -224,6 +228,11 @@ public class ConfigurationTemplateManager implements Synchronization
             userTransaction.rollback();
             throw new ConfigRuntimeException(t);
         }
+    }
+
+    public void setConfigurationCleanupManager(ConfigurationCleanupManager configurationCleanupManager)
+    {
+        this.configurationCleanupManager = configurationCleanupManager;
     }
 
     private interface Action
@@ -1244,6 +1253,7 @@ public class ConfigurationTemplateManager implements Synchronization
             result.addCascaded(getCleanupTasks(descendentPath));
         }
 
+        configurationCleanupManager.addCustomCleanupTasks(result);
         configurationReferenceManager.addReferenceCleanupTasks(path, result);
         return result;
     }
@@ -1283,7 +1293,7 @@ public class ConfigurationTemplateManager implements Synchronization
                     }
                 }
 
-                getCleanupTasks(path).execute();
+                configurationCleanupManager.runCleanupTasks(getCleanupTasks(path));
                 refreshCaches();
 
                 for (PostDeleteEvent event : events)

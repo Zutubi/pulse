@@ -1,4 +1,4 @@
-package com.zutubi.prototype.config;
+package com.zutubi.prototype.config.cleanup;
 
 /**
  */

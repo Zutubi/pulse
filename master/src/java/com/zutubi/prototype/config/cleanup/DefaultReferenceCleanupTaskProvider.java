@@ -1,5 +1,6 @@
-package com.zutubi.prototype.config;
+package com.zutubi.prototype.config.cleanup;
 
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.ReferenceType;
 import com.zutubi.prototype.type.TypeProperty;

@@ -1,6 +1,10 @@
 package com.zutubi.prototype.config;
 
 import com.zutubi.config.annotations.Reference;
+import com.zutubi.prototype.config.cleanup.DefaultReferenceCleanupTaskProvider;
+import com.zutubi.prototype.config.cleanup.DeleteRecordCleanupTask;
+import com.zutubi.prototype.config.cleanup.RecordCleanupTask;
+import com.zutubi.prototype.config.cleanup.ReferenceCleanupTaskProvider;
 import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;

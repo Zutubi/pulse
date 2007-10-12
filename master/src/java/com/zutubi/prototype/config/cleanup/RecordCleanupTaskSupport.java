@@ -1,4 +1,4 @@
-package com.zutubi.prototype.config;
+package com.zutubi.prototype.config.cleanup;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -36,12 +36,9 @@ public abstract class RecordCleanupTaskSupport implements RecordCleanupTask
         }
     }
 
-    public void execute()
+    public boolean isAsynchronous()
     {
-        for(RecordCleanupTask cascade: cascaded)
-        {
-            cascade.execute();
-        }
+        return false;
     }
 
     public boolean isInternal()

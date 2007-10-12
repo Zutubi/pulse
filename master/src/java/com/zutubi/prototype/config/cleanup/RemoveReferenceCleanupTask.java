@@ -1,4 +1,4 @@
-package com.zutubi.prototype.config;
+package com.zutubi.prototype.config.cleanup;
 
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
@@ -22,10 +22,8 @@ public class RemoveReferenceCleanupTask extends RecordCleanupTaskSupport
         this.recordManager = recordManager;
     }
 
-    public void execute()
+    public void run()
     {
-        super.execute();
-        
         String parentPath = PathUtils.getParentPath(getAffectedPath());
         String baseName = PathUtils.getBaseName(getAffectedPath());
 

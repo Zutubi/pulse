@@ -1,4 +1,4 @@
-package com.zutubi.prototype.config;
+package com.zutubi.prototype.config.cleanup;
 
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
@@ -19,10 +19,8 @@ public class NullifyReferenceCleanupTask extends RecordCleanupTaskSupport
         this.recordManager = recordManager;
     }
 
-    public void execute()
+    public void run()
     {
-        super.execute();
-        
         String parentPath = PathUtils.getParentPath(getAffectedPath());
         Record parentRecord = recordManager.select(parentPath);
         if (parentRecord != null)

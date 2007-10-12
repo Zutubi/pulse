@@ -3,6 +3,8 @@ package com.zutubi.prototype.actions;
 import com.zutubi.config.annotations.Permission;
 import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
 import com.zutubi.util.ReflectionUtils;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
@@ -39,17 +41,15 @@ public class ConfigurationActions
     {
         if (actionHandlerClass != null)
         {
-            Method[] methods = actionHandlerClass.getMethods();
-            for (Method method : methods)
+            actionListingMethod = CollectionUtils.find(actionHandlerClass.getMethods(), new Predicate<Method>()
             {
-                if (method.getName().equals("getActions") &&
-                    (ReflectionUtils.acceptsParameters(method) || ReflectionUtils.acceptsParameters(method, configurationClass)) &&
-                    ReflectionUtils.returnsParameterisedType(method, List.class, String.class))
+                public boolean satisfied(Method method)
                 {
-                    actionListingMethod = method;
-                    break;
+                    return method.getName().equals("getActions") &&
+                           (ReflectionUtils.acceptsParameters(method) || ReflectionUtils.acceptsParameters(method, configurationClass)) &&
+                           ReflectionUtils.returnsParameterisedType(method, List.class, String.class);
                 }
-            }
+            });
         }
     }
 
@@ -166,7 +166,7 @@ public class ConfigurationActions
         }
         else
         {
-            List<String> actionNames = new LinkedList<String>();
+            List<String> actionNames;
 
             Object actionHandler = objectFactory.buildBean(actionHandlerClass);
             if (actionListingMethod.getParameterTypes().length == 0)

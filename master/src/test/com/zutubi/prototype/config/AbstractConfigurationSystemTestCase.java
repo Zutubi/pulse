@@ -1,5 +1,6 @@
 package com.zutubi.prototype.config;
 
+import com.zutubi.prototype.config.cleanup.ConfigurationCleanupManager;
 import com.zutubi.prototype.security.Actor;
 import com.zutubi.prototype.security.ActorProvider;
 import com.zutubi.prototype.security.DefaultAccessManager;
@@ -14,6 +15,7 @@ import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.events.DefaultEventManager;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.security.GlobalAuthorityProvider;
+import com.zutubi.pulse.security.PulseThreadFactory;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.bean.ObjectFactory;
@@ -39,8 +41,10 @@ public abstract class AbstractConfigurationSystemTestCase extends PulseTestCase
     protected ConfigurationTemplateManager configurationTemplateManager;
     protected ConfigurationReferenceManager configurationReferenceManager;
     protected ConfigurationSecurityManager configurationSecurityManager;
+    protected ConfigurationCleanupManager configurationCleanupManager;
     protected TransactionManager transactionManager;
     protected DefaultAccessManager accessManager;
+    private PulseThreadFactory threadFactory;
 
     protected void setUp() throws Exception
     {
@@ -54,6 +58,7 @@ public abstract class AbstractConfigurationSystemTestCase extends PulseTestCase
         validatorProvider.setDelegates(Arrays.asList(reflectionProvider, annotationProvider));
         validationManager.setProviders(Arrays.asList((ValidatorProvider) validatorProvider));
 
+        threadFactory = new PulseThreadFactory();
         typeRegistry = new TypeRegistry();
         eventManager = new DefaultEventManager();
 
@@ -99,10 +104,17 @@ public abstract class AbstractConfigurationSystemTestCase extends PulseTestCase
         configurationSecurityManager.setAccessManager(accessManager);
         configurationSecurityManager.setConfigurationTemplateManager(configurationTemplateManager);
 
+        configurationCleanupManager = new ConfigurationCleanupManager();
+        configurationCleanupManager.setConfigurationTemplateManager(configurationTemplateManager);
+        configurationCleanupManager.setObjectFactory(objectFactory);
+        configurationCleanupManager.setThreadFactory(threadFactory);
+
         configurationTemplateManager.setConfigurationReferenceManager(configurationReferenceManager);
         configurationTemplateManager.setConfigurationSecurityManager(configurationSecurityManager);
+        configurationTemplateManager.setConfigurationCleanupManager(configurationCleanupManager);
 
         configurationTemplateManager.init();
+        configurationCleanupManager.init();
         
         typeRegistry.setConfigurationReferenceManager(configurationReferenceManager);
         typeRegistry.setHandleAllocator(recordManager);

@@ -1,6 +1,6 @@
 package com.zutubi.prototype.webwork;
 
-import com.zutubi.prototype.config.RecordCleanupTask;
+import com.zutubi.prototype.config.cleanup.RecordCleanupTask;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.validation.i18n.MessagesTextProvider;
 import com.zutubi.validation.i18n.TextProvider;

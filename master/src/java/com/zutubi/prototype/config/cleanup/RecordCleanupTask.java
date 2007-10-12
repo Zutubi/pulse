@@ -1,4 +1,4 @@
-package com.zutubi.prototype.config;
+package com.zutubi.prototype.config.cleanup;
 
 import java.util.List;
 import java.util.Set;
@@ -9,14 +9,27 @@ import java.util.Set;
  * actions may cascade.  The root action itself is always the deletion of the
  * original record.
  */
-public interface RecordCleanupTask
+public interface RecordCleanupTask extends Runnable
 {
     /**
      * Executes the cleanup task.  Note that tasks <b>must</b> be robust to
      * paths having been deleted by previous tasks.  That is, no task can
      * assume that any record it may intend to change still exists.
      */
-    void execute();
+    void run();
+
+    /**
+     * Indicates whether this task should run synchronously when the config
+     * delete occurs or in the background.  Note that configuration changes
+     * <b>must</b> be executed synchronously so that the configuration is
+     * consistent at the end of the delete.  Tasks that cleanup external
+     * information (such as state objects) can run asynchronously to improve
+     * the responsiveness of the UI.
+     *
+     * @return true if this task should be executed asynchronously in the
+     *         background.
+     */
+    boolean isAsynchronous();
 
     /**
      * @return true if this is an internal task that the user need not be
