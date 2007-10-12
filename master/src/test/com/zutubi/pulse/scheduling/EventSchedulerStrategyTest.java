@@ -44,7 +44,7 @@ public class EventSchedulerStrategyTest extends SchedulerStrategyTestBase
         scheduler.schedule(trigger);
 
         assertFalse(triggerHandler.wasTriggered());
-        eventManager.publish(new Event(this));
+        eventManager.publish(new Event<Object>(this));
         assertFalse(triggerHandler.wasTriggered());
         assertEquals(0, trigger.getTriggerCount());
         eventManager.publish(new TestEvent(this));
@@ -68,7 +68,7 @@ public class EventSchedulerStrategyTest extends SchedulerStrategyTestBase
 
     protected void activateTrigger(Trigger trigger)
     {
-        eventManager.publish(new Event(this));
+        eventManager.publish(new Event<Object>(this));
     }
 
     protected Trigger createTrigger()
@@ -78,7 +78,7 @@ public class EventSchedulerStrategyTest extends SchedulerStrategyTestBase
         return trigger;
     }
 
-    private class TestEvent extends Event
+    private class TestEvent extends Event<Object>
     {
         public TestEvent(Object source)
         {
