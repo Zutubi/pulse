@@ -143,9 +143,26 @@ public class DefaultScheduler implements Scheduler, EventListener
     {
         assertScheduled(trigger);
         SchedulerStrategy impl = getStrategy(trigger);
+
+        TriggerState requiredState = trigger.getState();
+
         impl.unschedule(trigger);
+
+        // save changes to the trigger.
         triggerDao.save(trigger);
-        impl.schedule(trigger);
+
+        switch (requiredState)
+        {
+            case SCHEDULED:
+                impl.schedule(trigger);
+                break;
+            case PAUSED:
+                // There is a possibility that the trigger will trigger between
+                // these method calls.  Is it enough to chance the API to a single call?..
+                impl.schedule(trigger);
+                impl.pause(trigger);
+                break;
+        }
     }
 
     public void pause(String group) throws SchedulingException

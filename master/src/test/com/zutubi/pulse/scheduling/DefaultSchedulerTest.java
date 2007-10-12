@@ -94,4 +94,20 @@ public class DefaultSchedulerTest extends TestCase
         assertEquals(TriggerState.SCHEDULED, scheduler.getTrigger("c", Trigger.DEFAULT_GROUP).getState());
 
     }
+
+    /**
+     * CIB-1264: renaming paused trigger re-enables it.
+     */
+    public void testUpdatePausedTriggerRemainsPaused() throws SchedulingException
+    {
+        NoopTrigger trigger = new NoopTrigger("a");
+
+        scheduler.schedule(trigger);
+        scheduler.pause(trigger);
+        assertEquals(TriggerState.PAUSED, trigger.getState());
+
+        trigger.setName("b");
+        scheduler.update(trigger);
+        assertEquals(TriggerState.PAUSED, trigger.getState());
+    }
 }
