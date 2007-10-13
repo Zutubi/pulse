@@ -46,7 +46,7 @@ public class DefaultReferenceCleanupTaskProvider implements ReferenceCleanupTask
         }
         else
         {
-            return new RemoveReferenceCleanupTask(deletedPath, referencingPath, recordManager);
+            return new RemoveReferenceCleanupTask(referencingPath, recordManager);
         }
     }
 

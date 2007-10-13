@@ -1,14 +1,20 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.prototype.config.ConfigurationRegistry;
+import com.zutubi.prototype.security.AccessManager;
+import com.zutubi.pulse.acceptance.pages.admin.AgentHierarchyPage;
 import com.zutubi.pulse.acceptance.pages.admin.DeleteConfirmPage;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectsPage;
+import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.prototype.config.LabelConfiguration;
+import com.zutubi.pulse.prototype.config.user.UserConfigurationActions;
 import com.zutubi.pulse.prototype.config.group.ServerPermission;
 import com.zutubi.pulse.prototype.config.project.triggers.BuildCompletedTriggerConfiguration;
+import com.zutubi.pulse.prototype.config.project.BuildStageConfiguration;
 
 import java.util.Arrays;
 import java.util.Hashtable;
@@ -175,6 +181,74 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
 
         dashboard = xmlRpcHelper.getConfig(dashboardPath);
         assertEquals(0, ((Vector) dashboard.get("shownProjects")).size());
+
+        // Make sure that it is not missing just because the reference is now
+        // broken
+        assertTrue(xmlRpcHelper.isConfigValid(dashboardPath));
+    }
+
+    public void testDeleteAgent() throws Exception
+    {
+        String path = xmlRpcHelper.insertSimpleAgent(random);
+        loginAsAdmin();
+        AgentHierarchyPage hierarchyPage = new AgentHierarchyPage(selenium, urls, random, false);
+        hierarchyPage.goTo();
+        DeleteConfirmPage confirmPage = hierarchyPage.clickDelete();
+        confirmPage.waitFor();
+        confirmPage.assertTasks(path, ACTION_DELETE_RECORD, path, "delete agent state");
+        confirmPage.clickDelete();
+
+        AgentHierarchyPage globalPage = new AgentHierarchyPage(selenium, urls, AgentManager.GLOBAL_AGENT_NAME, true);
+        globalPage.waitFor();
+
+        assertFalse(xmlRpcHelper.configPathExists(path));
+    }
+
+    public void testDeleteAgentWithBuildStageReference() throws Exception
+    {
+        String agentName = "agent-" + random;
+        String agentPath = xmlRpcHelper.insertSimpleAgent(agentName);
+        String projectName = "project-" + random;
+        String projectPath = xmlRpcHelper.insertSimpleProject(projectName, false);
+
+        Hashtable <String, Object> stage = xmlRpcHelper.createEmptyConfig(BuildStageConfiguration.class);
+        stage.put("name", "agent");
+        stage.put("agent", agentPath);
+        stage.put("recipe", "");
+        String stagePath = xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, "stages"), stage);
+
+        loginAsAdmin();
+        AgentHierarchyPage hierarchyPage = new AgentHierarchyPage(selenium, urls, agentName, false);
+        hierarchyPage.goTo();
+        DeleteConfirmPage confirmPage = hierarchyPage.clickDelete();
+        confirmPage.waitFor();
+        confirmPage.assertTasks(agentPath, ACTION_DELETE_RECORD, agentPath, "delete agent state", PathUtils.getPath(stagePath, "agent"), "null out reference");
+        confirmPage.clickDelete();
+
+        AgentHierarchyPage globalPage = new AgentHierarchyPage(selenium, urls, AgentManager.GLOBAL_AGENT_NAME, true);
+        globalPage.waitFor();
+        assertFalse(xmlRpcHelper.configPathExists(agentPath));
+
+        assertTrue(xmlRpcHelper.isConfigValid(stagePath));
+        stage = xmlRpcHelper.getConfig(stagePath);
+        assertNull(stage.get("agent"));
+    }
+
+    public void testDeleteUser() throws Exception
+    {
+        String path = xmlRpcHelper.insertTrivialUser(random);
+        loginAsAdmin();
+        
+        ListPage usersPage = new ListPage(selenium, urls, ConfigurationRegistry.USERS_SCOPE);
+        usersPage.goTo();
+        usersPage.assertItemPresent(random, AccessManager.ACTION_VIEW, AccessManager.ACTION_DELETE, UserConfigurationActions.ACTION_SET_PASSWORD);
+        DeleteConfirmPage confirmPage = usersPage.clickDelete(random);
+        confirmPage.waitFor();
+        confirmPage.assertTasks(path, ACTION_DELETE_RECORD, path, "delete user state");
+        confirmPage.clickDelete();
+
+        usersPage.waitFor();
+        usersPage.assertItemNotPresent(random);
     }
 
     private String insertBuildCompletedTrigger(String refereePath, String refererPath) throws Exception
@@ -182,7 +256,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         Hashtable<String, Object> trigger = xmlRpcHelper.createEmptyConfig(BuildCompletedTriggerConfiguration.class);
         trigger.put("name", "test");
         trigger.put("project", refereePath);
-        return xmlRpcHelper.insertConfig(PathUtils.getPath(refererPath, "trigger"), trigger);
+        return xmlRpcHelper.insertConfig(PathUtils.getPath(refererPath, "triggers"), trigger);
     }
 
     private String insertLabel(String projectPath) throws Exception

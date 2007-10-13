@@ -3,12 +3,32 @@ package com.zutubi.util;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.List;
+import java.util.LinkedList;
 
 /**
  */
 public class ReflectionUtils
 {
+    public static List<Field> getDeclaredFields(Class clazz, Class stopClazz)
+    {
+        if(stopClazz == null)
+        {
+            stopClazz = Object.class;
+        }
+
+        List<Field> result = new LinkedList<Field>();
+        while(clazz != null && clazz != stopClazz)
+        {
+            result.addAll(Arrays.asList(clazz.getDeclaredFields()));
+            clazz = clazz.getSuperclass();
+        }
+
+        return result;
+    }
+    
     /**
      * Returns true if the given method will accept parameters of the given
      * types.  Unlike {@link Class#getMethod(String, Class[])}, the parameter

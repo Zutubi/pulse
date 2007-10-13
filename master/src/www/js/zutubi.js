@@ -989,7 +989,10 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
         for(var i = 0; i < value.length; i++)
         {
             var text = this.getTextForValue(value[i]);
-            this.appendItem(text, value[i]);
+            if(text)
+            {
+                this.appendItem(text, value[i]);
+            }
         }
     },
 
@@ -1002,7 +1005,14 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
         else
         {
             var record = this.optionStore.data.find(function(r) { return r.get(this.valueField) == value; }, this);
-            return record.get(this.displayField);
+            if(record)
+            {
+                return record.get(this.displayField);
+            }
+            else
+            {
+                return null;
+            }
         }
     },
 

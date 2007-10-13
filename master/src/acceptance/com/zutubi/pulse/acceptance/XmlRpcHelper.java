@@ -125,6 +125,11 @@ public class XmlRpcHelper
         return call("getConfigHandle", path);
     }
 
+    public boolean isConfigValid(String path) throws Exception
+    {
+        return (Boolean) call("isConfigValid", path);
+    }
+    
     public String insertConfig(String path, Hashtable<String, Object> config) throws Exception
     {
         return call("insertConfig", path, config);
@@ -133,6 +138,11 @@ public class XmlRpcHelper
     public String saveConfig(String path, Hashtable<String, Object> config, boolean deep) throws Exception
     {
         return call("saveConfig", path, config, deep);
+    }
+
+    public void deleteAllConfigs(String pathPattern) throws Exception
+    {
+        call("deleteAllConfigs", pathPattern);
     }
 
     public String insertSimpleProject(String name, boolean template) throws Exception

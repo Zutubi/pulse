@@ -71,6 +71,11 @@ public class ConfigurationReferenceManager
     public Configuration resolveReference(String fromPath, long toHandle, Instantiator instantiator) throws TypeException
     {
         String toPath = recordManager.getPathForHandle(toHandle);
+        if(toPath == null)
+        {
+            throw new TypeException("Broken reference to unknown handle '" + toHandle + "'");
+        }
+
         if (fromPath != null)
         {
             indexReference(fromPath, toPath);
@@ -82,7 +87,7 @@ public class ConfigurationReferenceManager
             Record record = configurationTemplateManager.getRecord(toPath);
             if (record == null || record.getSymbolicName() == null)
             {
-                throw new TypeException("Broken reference to '" + toPath + "'");
+                throw new TypeException("Broken reference to unknown path '" + toPath + "'");
             }
 
             Type type = typeRegistry.getType(record.getSymbolicName());

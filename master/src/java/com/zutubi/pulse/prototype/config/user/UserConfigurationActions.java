@@ -11,6 +11,8 @@ import java.util.List;
  */
 public class UserConfigurationActions
 {
+    public static final String ACTION_SET_PASSWORD = "setPassword";
+    
     private UserManager userManager;
 
     public List<String> getActions(UserConfiguration user)
@@ -21,7 +23,7 @@ public class UserConfigurationActions
         }
         else
         {
-            return Arrays.asList("setPassword");
+            return Arrays.asList(ACTION_SET_PASSWORD);
         }
     }
 

@@ -6,6 +6,7 @@ import com.zutubi.config.annotations.Table;
 import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.prototype.config.user.contacts.ContactConfiguration;
+import com.zutubi.validation.annotations.Required;
 
 /**
  * Abstract base for subscriptions.
@@ -14,6 +15,7 @@ import com.zutubi.pulse.prototype.config.user.contacts.ContactConfiguration;
 @Table(columns = {"name"})
 public abstract class SubscriptionConfiguration extends AbstractNamedConfiguration
 {
+    @Required
     @Reference
     private ContactConfiguration contact;
 

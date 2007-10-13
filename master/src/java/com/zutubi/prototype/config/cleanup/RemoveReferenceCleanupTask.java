@@ -7,48 +7,45 @@ import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 
+import java.util.Arrays;
+
 /**
  * A record cleanup task that removes a reference from a collection.
  */
 public class RemoveReferenceCleanupTask extends RecordCleanupTaskSupport
 {
-    private String deletedPath;
     private RecordManager recordManager;
 
-    public RemoveReferenceCleanupTask(String deletedPath, String referencingPath, RecordManager recordManager)
+    public RemoveReferenceCleanupTask(String referencingPath, RecordManager recordManager)
     {
         super(referencingPath);
-        this.deletedPath = deletedPath;
         this.recordManager = recordManager;
     }
 
     public void run()
     {
-        String parentPath = PathUtils.getParentPath(getAffectedPath());
-        String baseName = PathUtils.getBaseName(getAffectedPath());
+        String collectionPath = PathUtils.getParentPath(getAffectedPath());
+        String itemName = PathUtils.getBaseName(getAffectedPath());
+        int itemIndex = Integer.parseInt(itemName);
+        String parentPath = PathUtils.getParentPath(collectionPath);
+        String baseName = PathUtils.getBaseName(collectionPath);
 
         Record parentRecord = recordManager.select(parentPath);
         if (parentRecord != null)
         {
             MutableRecord newValues = parentRecord.copy(false);
             String[] references = (String[]) newValues.get(baseName);
-            references = CollectionUtils.filterToArray(references, new Predicate<String>()
+            String[] newReferences = new String[references.length - 1];
+
+            for(int srcIndex = 0, destIndex = 0; srcIndex < references.length; srcIndex++)
             {
-                public boolean satisfied(String s)
+                if(srcIndex != itemIndex)
                 {
-                    return !s.equals(deletedPath);
+                    newReferences[destIndex++] = references[srcIndex];
                 }
-            });
-
-            if(references.length > 0)
-            {
-                newValues.put(baseName, references);
-            }
-            else
-            {
-                newValues.remove(baseName);
             }
 
+            newValues.put(baseName, newReferences);
             recordManager.update(parentPath, newValues);
         }
     }

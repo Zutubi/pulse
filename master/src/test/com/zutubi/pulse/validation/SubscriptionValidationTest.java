@@ -14,23 +14,11 @@ import com.zutubi.util.bean.DefaultObjectFactory;
 public class SubscriptionValidationTest extends AbstractValidationTestCase
 {
     private String subscriptionPath;
+    private NotifyConditionFactory notifyConditionFactory;
 
     protected void setUp() throws Exception
     {
-        objectFactory = new DefaultObjectFactory()
-        {
-            @SuppressWarnings({ "unchecked" })
-            public <V> V buildBean(Class<V> clazz) throws Exception
-            {
-                Object bean = super.buildBean(clazz);
-                if(bean instanceof SubscriptionConditionValidator)
-                {
-                    ((SubscriptionConditionValidator)bean).setNotifyConditionFactory(new NotifyConditionFactory());
-                }
-
-                return (V) bean;
-            }
-        };
+        notifyConditionFactory = new NotifyConditionFactory();
 
         super.setUp();
         UserConfiguration user = new UserConfiguration("admin", "admin");

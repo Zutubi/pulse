@@ -5,85 +5,22 @@ import com.zutubi.pulse.acceptance.SeleniumUtils;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.webwork.mapping.Urls;
 import com.zutubi.util.CollectionUtils;
+import com.zutubi.prototype.config.ConfigurationRegistry;
 import junit.framework.Assert;
 
 /**
  * The page shown when looking at a project in the heirarchy view.
  */
-public class ProjectHierarchyPage extends SeleniumPage
+public class ProjectHierarchyPage extends HierarchyPage
 {
-    public static final String LINK_ADD = "add.new";
-    public static final String LINK_ADD_TEMPLATE = "add.template";
-    public static final String LINK_CONFIGURE = "configure";
-    public static final String LINK_DELETE = "delete";
-
-    private String project;
-    private boolean template;
-
     public ProjectHierarchyPage(Selenium selenium, Urls urls, String project, boolean template)
     {
-        super(selenium, urls, "projects/" + project);
-        this.project = project;
-        this.template = template;
-    }
-
-    public void assertPresent()
-    {
-        super.assertPresent();
-        
-        String[] links = selenium.getAllLinks();
-        if (template)
-        {
-            Assert.assertTrue(CollectionUtils.contains(links, LINK_ADD));
-            Assert.assertTrue(CollectionUtils.contains(links, LINK_ADD_TEMPLATE));
-        }
-
-        Assert.assertTrue(CollectionUtils.contains(links, LINK_CONFIGURE));
-    }
-
-    public String getUrl()
-    {
-        return urls.adminProjects();
-    }
-
-    public void goTo()
-    {
-        selenium.open(getUrl());
-        String linkLocator = "link=" + project;
-        SeleniumUtils.waitForLocator(selenium, linkLocator);
-        selenium.click(linkLocator);
-        waitFor();
-    }
-
-    public boolean isAddPresent()
-    {
-        return selenium.isElementPresent(LINK_ADD);
-    }
-    
-    public void clickAdd()
-    {
-        selenium.click(LINK_ADD);
-    }
-
-    public void clickAddTemplate()
-    {
-        selenium.click(LINK_ADD_TEMPLATE);
-    }
-
-    public void setTemplate(boolean template)
-    {
-        this.template = template;
+        super(selenium, urls, ConfigurationRegistry.PROJECTS_SCOPE, project, template);
     }
 
     public ProjectConfigPage clickConfigure()
     {
         selenium.click(LINK_CONFIGURE);
-        return new ProjectConfigPage(selenium, urls, project, template);
-    }
-
-    public DeleteConfirmPage clickDelete()
-    {
-        selenium.click(LINK_DELETE);
-        return new DeleteConfirmPage(selenium, urls, getId());
+        return new ProjectConfigPage(selenium, urls, baseName, template);
     }
 }

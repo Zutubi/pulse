@@ -153,7 +153,7 @@ public class ConfigurationRegistry
             MapType triggers = new MapType();
             triggers.setTypeRegistry(typeRegistry);
             triggers.setCollectionType(triggerConfig);
-            projectConfig.addProperty(new ExtensionTypeProperty("trigger", triggers));
+            projectConfig.addProperty(new ExtensionTypeProperty("triggers", triggers));
 
             // Artifacts.
             CompositeType artifactConfig = registerConfigurationType(ArtifactConfiguration.class);

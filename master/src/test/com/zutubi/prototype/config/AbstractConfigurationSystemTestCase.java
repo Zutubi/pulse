@@ -19,6 +19,7 @@ import com.zutubi.pulse.security.PulseThreadFactory;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.bean.ObjectFactory;
+import com.zutubi.util.bean.WiringObjectFactory;
 import com.zutubi.validation.DefaultValidationManager;
 import com.zutubi.validation.ValidatorProvider;
 import com.zutubi.validation.providers.AnnotationValidatorProvider;
@@ -32,7 +33,7 @@ import java.util.Arrays;
  */
 public abstract class AbstractConfigurationSystemTestCase extends PulseTestCase
 {
-    protected ObjectFactory objectFactory = new DefaultObjectFactory();
+    protected WiringObjectFactory objectFactory = new WiringObjectFactory();
     protected DefaultValidationManager validationManager;
     protected TypeRegistry typeRegistry;
     protected DefaultEventManager eventManager;
@@ -119,6 +120,8 @@ public abstract class AbstractConfigurationSystemTestCase extends PulseTestCase
         
         typeRegistry.setConfigurationReferenceManager(configurationReferenceManager);
         typeRegistry.setHandleAllocator(recordManager);
+
+        objectFactory.initProperties(this);
     }
 
     protected void tearDown() throws Exception

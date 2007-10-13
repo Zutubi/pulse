@@ -175,6 +175,8 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
 
         try
         {
+            configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_VIEW);
+
             Record record = configurationTemplateManager.getRecord(path);
             if (record == null)
             {
@@ -204,6 +206,26 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
 
             Type t = configurationTemplateManager.getType(path);
             return t.toXmlRpc(record);
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    public boolean isConfigValid(String token, String path) throws AuthenticationException
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            Configuration instance = configurationTemplateManager.getInstance(path);
+            if(instance == null)
+            {
+                throw new IllegalArgumentException("Path '" + path + "' does not exist");
+            }
+
+            configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_VIEW);
+            return instance.isValid();
         }
         finally
         {

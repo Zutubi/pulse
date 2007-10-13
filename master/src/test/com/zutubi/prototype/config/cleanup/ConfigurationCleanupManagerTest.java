@@ -112,15 +112,14 @@ public class ConfigurationCleanupManagerTest extends AbstractConfigurationSystem
         assertEquals(PathUtils.getPath(refererPath, "ee"), cascaded.getAffectedPath());
     }
 
-    // FIXME can't run due to autowiring difficulties
-//    public void testReferenceCleanupTaskList()
-//    {
-//        RecordCleanupTask task = configurationTemplateManager.getCleanupTasks(listRefereePath);
-//        assertEquals(1, task.getCascaded().size());
-//        RecordCleanupTask cascaded = task.getCascaded().get(0);
-//        assertTrue(cascaded instanceof RemoveReferenceCleanupTask);
-//        assertEquals(PathUtils.getPath(listRefererPath, "ees"), cascaded.getAffectedPath());
-//    }
+    public void testReferenceCleanupTaskList()
+    {
+        RecordCleanupTask task = configurationTemplateManager.getCleanupTasks(listRefereePath);
+        assertEquals(1, task.getCascaded().size());
+        RecordCleanupTask cascaded = task.getCascaded().get(0);
+        assertTrue(cascaded instanceof RemoveReferenceCleanupTask);
+        assertEquals(PathUtils.getPath(listRefererPath, "ees", "0"), cascaded.getAffectedPath());
+    }
 
     @SymbolicName("noCustomTasks")
     public static class NoCustomTasksConfiguration extends AbstractNamedConfiguration
