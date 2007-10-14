@@ -1,7 +1,8 @@
 package com.zutubi.pulse.prototype.config.project.types;
 
-import com.zutubi.config.annotations.SymbolicName;
 import com.opensymphony.util.TextUtils;
+import com.zutubi.config.annotations.Form;
+import com.zutubi.config.annotations.SymbolicName;
 import org.apache.velocity.VelocityContext;
 
 /**
@@ -9,6 +10,7 @@ import org.apache.velocity.VelocityContext;
  *
  */
 @SymbolicName("zutubi.makeTypeConfig")
+@Form(fieldOrder = {"workigDir", "makefile", "targets", "arguments", "postProcessors"})
 public class MakeTypeConfiguration extends TemplateTypeConfiguration
 {
     private String makefile;

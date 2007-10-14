@@ -1,8 +1,8 @@
 package com.zutubi.pulse.prototype.config.project.types;
 
-import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.Form;
 import com.opensymphony.util.TextUtils;
+import com.zutubi.config.annotations.Form;
+import com.zutubi.config.annotations.SymbolicName;
 import org.apache.velocity.VelocityContext;
 
 /**
@@ -10,7 +10,7 @@ import org.apache.velocity.VelocityContext;
  *
  */
 @SymbolicName("zutubi.antTypeConfig")
-@Form(fieldOrder = {"work", "file", "target", "args"})
+@Form(fieldOrder = {"work", "file", "target", "args", "postProcessors"})
 public class AntTypeConfiguration extends TemplateTypeConfiguration
 {
     private String work;

@@ -1,9 +1,6 @@
 package com.zutubi.pulse.prototype.config.project;
 
-import com.zutubi.config.annotations.ItemPicker;
-import com.zutubi.config.annotations.Reference;
-import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.Table;
+import com.zutubi.config.annotations.*;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.prototype.config.group.AbstractGroupConfiguration;
 import com.zutubi.validation.annotations.Required;
@@ -17,6 +14,7 @@ import java.util.List;
  */
 @SymbolicName("zutubi.projectAclConfig")
 @Table(columns = {"group", "allowedActions"})
+@Form(fieldOrder = {"group", "allowedActions"})
 public class ProjectAclConfiguration extends AbstractConfiguration
 {
     @Reference

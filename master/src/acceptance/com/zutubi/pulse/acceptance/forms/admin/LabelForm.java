@@ -13,4 +13,9 @@ public class LabelForm extends ConfigurationForm
     {
         super(selenium, LabelConfiguration.class);
     }
+
+    public String[] getFieldNames()
+    {
+        return new String[]{"label"};
+    }
 }

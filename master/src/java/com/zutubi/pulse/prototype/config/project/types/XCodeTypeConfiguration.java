@@ -1,7 +1,8 @@
 package com.zutubi.pulse.prototype.config.project.types;
 
-import com.zutubi.config.annotations.SymbolicName;
 import com.opensymphony.util.TextUtils;
+import com.zutubi.config.annotations.Form;
+import com.zutubi.config.annotations.SymbolicName;
 import org.apache.velocity.VelocityContext;
 
 /**
@@ -9,6 +10,7 @@ import org.apache.velocity.VelocityContext;
  *
  */
 @SymbolicName("zutubi.xcodeTypeConfig")
+@Form(fieldOrder = {"workingDir", "project", "configuration", "target", "action", "settings", "postProcessors"})
 public class XCodeTypeConfiguration extends TemplateTypeConfiguration
 {
     private String workingDir = null;
