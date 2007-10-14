@@ -1,26 +1,16 @@
 package com.zutubi.pulse.acceptance.forms.admin;
 
 import com.thoughtworks.selenium.Selenium;
-import com.zutubi.pulse.acceptance.forms.SeleniumForm;
+import com.zutubi.pulse.acceptance.forms.ConfigurationForm;
 import com.zutubi.pulse.prototype.config.admin.EmailConfiguration;
 
 /**
  */
-public class EmailSettingsForm extends SeleniumForm
+public class EmailSettingsForm extends ConfigurationForm
 {
     public EmailSettingsForm(Selenium selenium)
     {
-        super(selenium);
-    }
-
-    public String getFormName()
-    {
-        return EmailConfiguration.class.getName();
-    }
-
-    public String[] getFieldNames()
-    {
-        return new String[]{ "host", "ssl", "from", "username", "password", "subjectPrefix", "customPort", "port", "localhost" };
+        super(selenium, EmailConfiguration.class);
     }
 
     public int[] getFieldTypes()

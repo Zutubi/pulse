@@ -26,6 +26,8 @@ public class PrototypeUtils
     private static final String KEY_FORM_HEADING = "form.heading";
     private static final String KEY_TABLE_HEADING = "table.heading";
 
+    private static final String[] EMPTY_ARRAY = {};
+
     public static String getConfigURL(String path, String action, String submitField)
     {
         return getConfigURL(path, action, submitField, null);
@@ -90,6 +92,12 @@ public class PrototypeUtils
 
             if (Collection.class.isAssignableFrom(property.getClazz()))
             {
+                if(parameterValue.length == 1 && parameterValue[0].length() == 0)
+                {
+                    // This indicates an empty array: something the UI is
+                    // incapable of sending directly for custom components.
+                    parameterValue = EMPTY_ARRAY;
+                }
                 record.put(propertyName, parameterValue);
             }
             else

@@ -290,4 +290,14 @@ public class Urls
     {
         return adminProjects() + project + "/";
     }
+
+    private String adminGroups()
+    {
+        return admin() + "groups/";
+    }
+
+    public String adminGroup(String group)
+    {
+        return adminGroups() + group + "/";
+    }
 }

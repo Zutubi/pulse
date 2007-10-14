@@ -11,13 +11,13 @@ import junit.framework.TestCase;
 import java.util.List;
 
 /**
- * <class-comment/>
+ * Base for form classes: supports methods for reading and writing fields and
+ * submitting forms.
  */
 public abstract class SeleniumForm
 {
     protected static final int TEXTFIELD      = 3;
     protected static final int CHECKBOX       = 4;
-    protected static final int RADIOBOX       = 5;
     protected static final int COMBOBOX       = 6;
     protected static final int MULTI_CHECKBOX = 7;
     protected static final int MULTI_SELECT   = 8;
@@ -74,13 +74,7 @@ public abstract class SeleniumForm
 
     private boolean isFormPresent()
     {
-        String formLocator = getLocator(null);
-        return selenium.isElementPresent(formLocator);
-    }
-
-    private String getLocator(String rest)
-    {
-        return "//*[@id='" + getFormName() + "']/form" + (rest == null ? "" : rest);
+        return selenium.isElementPresent(getFormName());
     }
 
     private String getFieldId(String name)
@@ -226,12 +220,6 @@ public abstract class SeleniumForm
                     selenium.uncheck(id);
                 }
                 break;
-            case RADIOBOX:
-                if (value != null)
-                {
-                    setRadioboxSelected(name, value);
-                }
-                break;
             case MULTI_CHECKBOX:
                 if (value != null)
                 {
@@ -297,10 +285,6 @@ public abstract class SeleniumForm
                 case CHECKBOX:
                     TestCase.assertEquals(Boolean.valueOf(values[i]) ? "on" : "off", getFieldValue(fieldName));
                     break;
-                case RADIOBOX:
-                    // FIXME
-                    TestCase.fail();
-                    break;
                 case COMBOBOX:
                     TestCase.assertEquals(values[i], getFieldValue(fieldName));
                     break;
@@ -316,23 +300,6 @@ public abstract class SeleniumForm
                     break;
             }
         }
-    }
-
-    public void assertFormReset()
-    {
-        assertFormElements(getDefaultValues());
-    }
-
-    public String[] getDefaultValues()
-    {
-        int[] types = getActualFieldTypes();
-
-        String[] defaultValues = new String[types.length];
-        for (int i = 0; i < types.length; i++)
-        {
-            defaultValues[i] = "";
-        }
-        return defaultValues;
     }
 
     public String[] getFormValues()
@@ -383,28 +350,6 @@ public abstract class SeleniumForm
             set = new String[0];
         }
         return set;
-    }
-
-    public void setRadioboxSelected(String fieldName, String selectedOption)
-    {
-        TestCase.fail();
-    }
-
-    public void assertRadioboxSelected(String fieldName, String option)
-    {
-        TestCase.fail();
-    }
-
-    public void setCheckboxChecked(String name, boolean b)
-    {
-        if (b)
-        {
-            selenium.check(getFieldId(name));
-        }
-        else
-        {
-            selenium.uncheck(getFieldId(name));
-        }
     }
 
     private String[] getActualFieldNames()
