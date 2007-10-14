@@ -23,6 +23,7 @@ public class AcceptanceTestSuite
         //---( web ui acceptance tests )---
         suite.addTestSuite(ConfigUIAcceptanceTest.class);
         suite.addTestSuite(DeleteAcceptanceTest.class);
+        suite.addTestSuite(GroupAcceptanceTest.class);
         suite.addTestSuite(ProjectLabelAcceptanceTest.class);
         suite.addTestSuite(AnonymousAccessAcceptanceTest.class);
         suite.addTestSuite(ServerSectionAcceptanceTest.class);
