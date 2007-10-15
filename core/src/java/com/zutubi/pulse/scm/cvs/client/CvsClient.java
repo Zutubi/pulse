@@ -170,8 +170,11 @@ public class CvsClient
         update.setPruneDirectories(true);
         update.setBuildDirectories(true);
         update.setResetStickyOnes(true);
+
         if (revision != null)
         {
+            // If the revision represents a tag, then we do not expect a date. Otherwise, a date
+            // is acceptable.  It would be nice if there were a way to enforce/check this.
             if (TextUtils.stringSet(revision.getBranch()))
             {
                 update.setUpdateByRevision(revision.getBranch());
@@ -199,6 +202,8 @@ public class CvsClient
         checkout.setModule(module);
         checkout.setRecursive(recursive);
 
+        // If the revision represents a tag, then we do not expect a date. Otherwise, a date
+        // is acceptable.  It would be nice if there were a way to enforce/check this.
         if (TextUtils.stringSet(revision.getBranch()))
         {
             checkout.setCheckoutByRevision(revision.getBranch());
