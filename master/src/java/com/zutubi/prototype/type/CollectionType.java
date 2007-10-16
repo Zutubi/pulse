@@ -13,9 +13,8 @@ import java.util.*;
  */
 public abstract class CollectionType extends AbstractType implements ComplexType
 {
-    public static final String HIDDEN_KEY = "hidden";
     public static final String ORDER_KEY  = "order";
-    
+
     private static final char SEPARATOR = ',';
 
     private Type collectionType;
@@ -77,33 +76,6 @@ public abstract class CollectionType extends AbstractType implements ComplexType
     protected void setOrder(MutableRecord record, Collection<String> order)
     {
         record.putMeta(ORDER_KEY, StringUtils.encodeAndJoin(SEPARATOR, order));
-    }
-
-    public void hideItem(MutableRecord record, String key)
-    {
-        Set<String> hiddenKeys = getHiddenKeys(record);
-        hiddenKeys.add(key);
-        record.putMeta(HIDDEN_KEY, StringUtils.encodeAndJoin(SEPARATOR, hiddenKeys));
-    }
-
-    public void unhideItem(MutableRecord record, String key)
-    {
-        Set<String> hiddenKeys = getHiddenKeys(record);
-        hiddenKeys.remove(key);
-        record.put(HIDDEN_KEY, StringUtils.encodeAndJoin(SEPARATOR, hiddenKeys));
-    }
-
-    private Set<String> getHiddenKeys(MutableRecord record)
-    {
-        String hidden = record.getMeta(HIDDEN_KEY);
-        if(hidden == null)
-        {
-            return new HashSet<String>();
-        }
-        else
-        {
-            return new HashSet<String>(StringUtils.splitAndDecode(SEPARATOR, hidden));
-        }
     }
 
     protected abstract Comparator<String> getKeyComparator();

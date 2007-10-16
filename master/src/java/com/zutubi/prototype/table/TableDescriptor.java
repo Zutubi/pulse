@@ -1,20 +1,26 @@
 package com.zutubi.prototype.table;
 
 import com.zutubi.prototype.AbstractParameterised;
+import com.zutubi.prototype.Descriptor;
 import com.zutubi.prototype.actions.ActionManager;
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.i18n.Messages;
 import com.zutubi.prototype.model.Cell;
 import com.zutubi.prototype.model.Row;
 import com.zutubi.prototype.model.RowAction;
 import com.zutubi.prototype.model.Table;
+import com.zutubi.prototype.security.AccessManager;
+import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.logging.Logger;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,31 +30,37 @@ import java.util.List;
  *
  *
  */
-public class TableDescriptor extends AbstractParameterised
+public class TableDescriptor extends AbstractParameterised implements Descriptor
 {
     private static final Logger LOG = Logger.getLogger(TableDescriptor.class);
 
     public static final String PARAM_HEADING = "heading";
     public static final String PARAM_ADD_ALLOWED = "addAllowed";
 
+    private CollectionType collectionType;
     private CompositeType type;
     /**
      * The columns descriptors associated with this table descriptor.
      */
     private List<ColumnDescriptor> columns = new LinkedList<ColumnDescriptor>();
+    private ConfigurationTemplateManager configurationTemplateManager;
     private ActionManager actionManager;
 
-    public TableDescriptor(CompositeType type, boolean addAllowed, ActionManager actionManager)
+    public TableDescriptor(CollectionType collectionType, boolean addAllowed, ConfigurationTemplateManager configurationTemplateManager, ActionManager actionManager)
     {
-        this.actionManager = actionManager;
-        this.type = type;
+        this.collectionType = collectionType;
+        this.type = (CompositeType) collectionType.getCollectionType();
+
         addParameter(PARAM_HEADING, PrototypeUtils.getTableHeading(type));
         addParameter(PARAM_ADD_ALLOWED, addAllowed);
+
+        this.configurationTemplateManager = configurationTemplateManager;
+        this.actionManager = actionManager;
     }
 
-    public Table instantiate(String path, Collection<Configuration> data)
+    public Table instantiate(String path, Record data)
     {
-        int width = columns.size() + 1;
+        int width = columns.size() + 2;
         Table table = new Table(width);
 
         Messages messages = Messages.getInstance(type.getClazz());
@@ -60,13 +72,16 @@ public class TableDescriptor extends AbstractParameterised
 
         if(data != null && data.size() > 0)
         {
-            for(Configuration instance: data)
+            for(String key: collectionType.getOrder(data))
             {
-                Row row = new Row(instance.getConfigurationPath(), getActions(instance, messages));
+                String itemPath = PathUtils.getPath(path, key);
+                Configuration instance = configurationTemplateManager.getInstance(itemPath);
+                Row row = new Row(itemPath, getActions(instance, messages));
                 for(ColumnDescriptor column: columns)
                 {
                     row.addCell(new Cell(column.getValue(instance).toString()));
                 }
+                applyDecorations(data, key, row, messages);
                 table.addRow(row);
             }
         }
@@ -79,6 +94,42 @@ public class TableDescriptor extends AbstractParameterised
 
         table.addAll(parameters);
         return table;
+    }
+
+    private void applyDecorations(Record data, String key, Row row, Messages messages)
+    {
+        if(data instanceof TemplateRecord)
+        {
+            TemplateRecord templateRecord = (TemplateRecord) data;
+            String itemOwner = templateRecord.getOwner(key);
+            if(!itemOwner.equals(templateRecord.getOwner()))
+            {
+                row.addParameter("inheritedFrom", itemOwner);
+                transformDeleteAction(row, "hide", messages);
+            }
+            else
+            {
+                TemplateRecord templateParent = templateRecord.getParent();
+                if(templateParent != null)
+                {
+                    String parentItemOwner = templateParent.getOwner(key);
+                    if(parentItemOwner != null)
+                    {
+                        row.addParameter("overriddenOwner", parentItemOwner);
+                        transformDeleteAction(row, "revert", messages);
+                    }
+                }
+            }
+        }
+    }
+
+    private void transformDeleteAction(Row row, String action, Messages messages)
+    {
+        RowAction deleteAction = row.getAction(AccessManager.ACTION_DELETE);
+        if(deleteAction != null)
+        {
+            deleteAction.setLabel(messages.format(action + ".label"));
+        }
     }
 
     private List<RowAction> getActions(Object instance, final Messages messages)

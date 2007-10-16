@@ -1,10 +1,13 @@
 package com.zutubi.prototype.type.record;
 
 import com.zutubi.config.annotations.NoInherit;
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.ComplexType;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeProperty;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.StringUtils;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -14,6 +17,12 @@ import java.util.Set;
  */
 public class TemplateRecord extends AbstractRecord
 {
+    public static final String HIDDEN_KEY = "hidden";
+
+    private static final char SEPARATOR = ',';
+    private static final String[] NO_INHERIT_META_KEYS = { HANDLE_KEY, PERMANENT_KEY, SYMBOLIC_NAME_KEY,
+                                                           ConfigurationTemplateManager.PARENT_KEY,
+                                                           ConfigurationTemplateManager.TEMPLATE_KEY };
     /**
      * Id of the owning object.  For example, the name of the project his
      * record lives in.  This may be empty for new template records.
@@ -45,9 +54,9 @@ public class TemplateRecord extends AbstractRecord
     public String getMeta(String key)
     {
         String value = moi.getMeta(key);
-        if (value == null && !key.equals(PERMANENT_KEY))
+        if (value == null && canInheritMeta(key))
         {
-            value = parent == null ? null : parent.getMeta(key);
+            value = parent.getMeta(key);
         }
 
         return value;
@@ -76,6 +85,11 @@ public class TemplateRecord extends AbstractRecord
     public Object get(String key)
     {
         // This is where magic happens.
+        if(getHiddenKeys(moi).contains(key))
+        {
+            return null;
+        }
+
         Object value = moi.get(key);
         if (value == null)
         {
@@ -113,13 +127,11 @@ public class TemplateRecord extends AbstractRecord
             return false;
         }
 
-        // If we have a declared order that omits this key, we cannot inherit
-        // a value.
-        if (declaredOrder != null && !declaredOrder.contains(key))
-        {
-            return false;
-        }
+        return !markedNoInherit(key);
+    }
 
+    private boolean markedNoInherit(String key)
+    {
         // Composite properties explicitly marked NoInherit cannot be
         // inherited.
         if (type instanceof CompositeType)
@@ -128,25 +140,38 @@ public class TemplateRecord extends AbstractRecord
             TypeProperty property = ctype.getProperty(key);
             if (property != null && property.getAnnotation(NoInherit.class) != null)
             {
-                return false;
+                return true;
             }
         }
+        return false;
+    }
 
-        return true;
+    private boolean canInheritMeta(String key)
+    {
+        // No parent, nothing to inherit.
+        if (parent == null)
+        {
+            return false;
+        }
+
+        return !CollectionUtils.contains(NO_INHERIT_META_KEYS, key);
     }
 
     public Set<String> keySet()
     {
+        Set<String> result;
         if (declaredOrder != null)
         {
-            return new HashSet<String>(declaredOrder);
+            result = new HashSet<String>(declaredOrder);
         }
         else
         {
-            Set<String> set = parent == null ? new HashSet<String>() : new HashSet<String>(parent.keySet());
-            set.addAll(moi.keySet());
-            return set;
+            result = parent == null ? new HashSet<String>() : new HashSet<String>(parent.keySet());
+            result.addAll(moi.keySet());
         }
+
+        result.removeAll(getHiddenKeys(moi));
+        return result;
     }
 
     public Set<String> metaKeySet()
@@ -208,7 +233,7 @@ public class TemplateRecord extends AbstractRecord
 
     public String getOwner(String key)
     {
-        if (isSignificant(type, key, moi.get(key)))
+        if (isSignificant(key, moi.get(key)))
         {
             return owner;
         }
@@ -222,10 +247,10 @@ public class TemplateRecord extends AbstractRecord
         }
     }
 
-    private boolean isSignificant(ComplexType type, String key, Object value)
+    private boolean isSignificant(String key, Object value)
     {
-        // If we can't inherit a value, we own it even if it is null.
-        if (!canInherit(key))
+        // If we can't inherit a composite property, we own it even if it is null.
+        if (!canInherit(key) && type instanceof CompositeType)
         {
             return true;
         }
@@ -237,27 +262,8 @@ public class TemplateRecord extends AbstractRecord
 
         if (value instanceof Record)
         {
-            Record record = (Record) value;
-            if (record.isCollection())
-            {
-                // Only ordered collections have an owner, and that is
-                // whoever's order applies.  If there is no order, the
-                // record is owned by the root of the template tree.
-                return CollectionType.getDeclaredOrder(record) != null || parent == null;
-            }
-            else
-            {
-                CompositeType actualType = (CompositeType) type.getActualPropertyType(key, value);
-                for (String property : actualType.getPropertyNames())
-                {
-                    if (isSignificant(actualType, property, record.get(property)))
-                    {
-                        return true;
-                    }
-                }
-
-                return false;
-            }
+            TemplateRecord templateRecord = (TemplateRecord) get(key);
+            return !templateRecord.isSkeleton();
         }
 
         return true;
@@ -266,9 +272,12 @@ public class TemplateRecord extends AbstractRecord
     public boolean isSkeleton()
     {
         // If we do not override anything, then we are a skeleton.
-        if(declaredOrder != null)
+        for(String metaKey: moi.metaKeySet())
         {
-            return false;
+            if(!CollectionUtils.contains(NO_INHERIT_META_KEYS, metaKey))
+            {
+                return false;
+            }
         }
 
         if(moi.simpleKeySet().size() > 0)
@@ -290,5 +299,32 @@ public class TemplateRecord extends AbstractRecord
     public MutableRecord copy(boolean deep)
     {
         throw new UnsupportedOperationException("Record is not mutable.");
+    }
+
+    public static void hideItem(MutableRecord record, String key)
+    {
+        Set<String> hiddenKeys = getHiddenKeys(record);
+        hiddenKeys.add(key);
+        record.putMeta(HIDDEN_KEY, StringUtils.encodeAndJoin(SEPARATOR, hiddenKeys));
+    }
+
+    public static void unhideItem(MutableRecord record, String key)
+    {
+        Set<String> hiddenKeys = getHiddenKeys(record);
+        hiddenKeys.remove(key);
+        record.put(HIDDEN_KEY, StringUtils.encodeAndJoin(SEPARATOR, hiddenKeys));
+    }
+
+    public static Set<String> getHiddenKeys(Record record)
+    {
+        String hidden = record.getMeta(HIDDEN_KEY);
+        if(hidden == null)
+        {
+            return new HashSet<String>();
+        }
+        else
+        {
+            return new HashSet<String>(StringUtils.splitAndDecode(SEPARATOR, hidden));
+        }
     }
 }

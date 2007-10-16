@@ -1,9 +1,6 @@
 package com.zutubi.pulse.core.scm.config;
 
-import com.zutubi.config.annotations.ControllingCheckbox;
-import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.Transient;
-import com.zutubi.config.annotations.Wizard;
+import com.zutubi.config.annotations.*;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.core.scm.CheckoutScheme;
 import com.zutubi.validation.annotations.Numeric;
@@ -12,7 +9,8 @@ import com.zutubi.validation.annotations.Required;
 import java.util.List;
 
 /**
- *
+ * Base for SCM configuration types.  All SCM plugins must support at least
+ * this configuration.
  */
 @SymbolicName("zutubi.scmConfig")
 public abstract class ScmConfiguration extends AbstractConfiguration
@@ -46,6 +44,7 @@ public abstract class ScmConfiguration extends AbstractConfiguration
     @Wizard.Ignore
     private int quietPeriod = 1;
 
+    @StringList
     @Wizard.Ignore
     private List<String> filterPaths;
 

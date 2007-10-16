@@ -14,16 +14,14 @@ public class MutableRecordImpl extends AbstractMutableRecord
 
     private Map<String, Object> data = null;
 
-    private static final String SYMBOLIC_NAME = "symbolicName";
-
     public void setSymbolicName(String name)
     {
-        getMeta().put(SYMBOLIC_NAME, name);
+        getMeta().put(SYMBOLIC_NAME_KEY, name);
     }
 
     public String getSymbolicName()
     {
-        return getMeta().get(SYMBOLIC_NAME);
+        return getMeta().get(SYMBOLIC_NAME_KEY);
     }
 
     public void putMeta(String key, String value)

@@ -1,8 +1,6 @@
 package com.zutubi.prototype.config;
 
-import com.zutubi.prototype.config.cleanup.ConfigurationCleanupManager;
-import com.zutubi.prototype.config.cleanup.DeleteRecordCleanupTask;
-import com.zutubi.prototype.config.cleanup.RecordCleanupTask;
+import com.zutubi.prototype.config.cleanup.*;
 import com.zutubi.prototype.config.events.PostDeleteEvent;
 import com.zutubi.prototype.config.events.PostInsertEvent;
 import com.zutubi.prototype.config.events.PostSaveEvent;
@@ -29,8 +27,8 @@ public class ConfigurationTemplateManager implements Synchronization
 {
     private static final Logger LOG = Logger.getLogger(ConfigurationTemplateManager.class);
 
-    private static final String PARENT_KEY    = "parentHandle";
-    private static final String TEMPLATE_KEY  = "template";
+    public static final String PARENT_KEY    = "parentHandle";
+    public static final String TEMPLATE_KEY  = "template";
 
     private StateTransactionalWrapper stateWrapper;
 
@@ -209,12 +207,12 @@ public class ConfigurationTemplateManager implements Synchronization
         return record;
     }
 
-    private Object executeInsideTransaction(Action a)
+    private <T> T executeInsideTransaction(Action<T> a)
     {
         userTransaction.begin();
         try
         {
-            Object result = a.execute();
+            T result = a.execute();
             userTransaction.commit();
             return result;
         }
@@ -235,9 +233,9 @@ public class ConfigurationTemplateManager implements Synchronization
         this.configurationCleanupManager = configurationCleanupManager;
     }
 
-    private interface Action
+    private interface Action<T>
     {
-        Object execute() throws Exception;
+        T execute() throws Exception;
     }
 
     public String insert(final String path, Object instance)
@@ -251,9 +249,9 @@ public class ConfigurationTemplateManager implements Synchronization
         try
         {
             final MutableRecord record = type.unstantiate(instance);
-            return (String) executeInsideTransaction(new Action()
+            return executeInsideTransaction(new Action<String>()
             {
-                public Object execute() throws Exception
+                public String execute() throws Exception
                 {
                     return insertRecord(path, record);
                 }
@@ -271,9 +269,9 @@ public class ConfigurationTemplateManager implements Synchronization
         checkPersistent(path);
         configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_CREATE);
 
-        return (String) executeInsideTransaction(new Action()
+        return executeInsideTransaction(new Action<String>()
         {
-            public Object execute() throws Exception
+            public String execute() throws Exception
             {
                 MutableRecord record = r;
 
@@ -333,7 +331,7 @@ public class ConfigurationTemplateManager implements Synchronization
                 recordManager.insert(newPath, record);
                 refreshCaches();
                 State state = getState();
-                raiseInsertEvents(state.instances, getDescendentPaths(newPath, false, true));
+                raiseInsertEvents(state.instances, getDescendentPaths(newPath, false, true, false));
 
                 return newPath;
             }
@@ -891,9 +889,9 @@ public class ConfigurationTemplateManager implements Synchronization
         {
             final MutableRecord record = type.unstantiate(instance);
 
-            return (String) executeInsideTransaction(new Action()
+            return executeInsideTransaction(new Action<String>()
             {
-                public Object execute() throws Exception
+                public String execute() throws Exception
                 {
                     return saveRecord(instance.getConfigurationPath(), record, true);
                 }
@@ -971,9 +969,9 @@ public class ConfigurationTemplateManager implements Synchronization
 
         final ConfigurationTemplateManager source = this;
 
-        return (String) executeInsideTransaction(new Action()
+        return executeInsideTransaction(new Action<String>()
         {
-            public Object execute() throws Exception
+            public String execute() throws Exception
             {
                 ComplexType parentType = configurationPersistenceManager.getType(parentPath);
                 String newPath = parentType.getSavePath(path, record);
@@ -1001,7 +999,7 @@ public class ConfigurationTemplateManager implements Synchronization
                 refreshCaches();
 
                 State state = getState();
-                for (String concretePath : getDescendentPaths(newPath, false, true))
+                for (String concretePath : getDescendentPaths(newPath, false, true, false))
                 {
                     Configuration instance = state.instances.get(concretePath);
                     if (isComposite(instance))
@@ -1169,7 +1167,7 @@ public class ConfigurationTemplateManager implements Synchronization
     }
 
     @SuppressWarnings({"unchecked"})
-    public List<String> getDescendentPaths(String path, boolean strict, final boolean concreteOnly)
+    public List<String> getDescendentPaths(String path, boolean strict, final boolean concreteOnly, final boolean includeHidden)
     {
         String[] elements = PathUtils.getPathElements(path);
         if (elements.length > 1)
@@ -1194,7 +1192,11 @@ public class ConfigurationTemplateManager implements Synchronization
                     {
                         if (!concreteOnly || node.isConcrete())
                         {
-                            result.add(remainderPath == null ? node.getPath() : PathUtils.getPath(node.getPath(), remainderPath));
+                            String descendentPath = remainderPath == null ? node.getPath() : PathUtils.getPath(node.getPath(), remainderPath);
+                            if(includeHidden || pathExists(descendentPath))
+                            {
+                                result.add(descendentPath);
+                            }
                         }
                         return true;
                     }
@@ -1242,17 +1244,94 @@ public class ConfigurationTemplateManager implements Synchronization
         return false;
     }
 
-    public RecordCleanupTask getCleanupTasks(String path)
+    public RecordCleanupTask getCleanupTasks(final String path)
+    {
+        return executeInsideTransaction(new Action<RecordCleanupTask>()
+        {
+            public RecordCleanupTask execute() throws Exception
+            {
+                if(!pathExists(path))
+                {
+                    throw new IllegalArgumentException("Invalid path '" + path + "': does not exist");
+                }
+
+                String[] pathElements = PathUtils.getPathElements(path);
+                if(pathElements.length == 1)
+                {
+                    throw new IllegalArgumentException("Invalid path '" + path + "': cannot delete a scope");
+                }
+
+                if(isTemplatedPath(path))
+                {
+                    RecordCleanupTaskSupport result;
+                    if(pathElements.length == 2)
+                    {
+                        // Deleting an entire templated instance
+                        result = new DeleteRecordCleanupTask(path, false, recordManager);
+                    }
+                    else
+                    {
+                        // We are not deleting an entire templated instance.
+                        // We need to determine if this is a hide or actual
+                        // delete.
+                        String parentPath = PathUtils.getParentPath(path);
+                        String baseName = PathUtils.getBaseName(path);
+                        TemplateRecord parentRecord = (TemplateRecord) getRecord(parentPath);
+                        TemplateRecord parentsTemplateParent = parentRecord.getParent();
+
+                        if(parentsTemplateParent == null || !parentsTemplateParent.containsKey(baseName))
+                        {
+                            // This record does not exist in the parent: it
+                            // has been added at this level.  It should be
+                            // deleted.
+                            result = new DeleteRecordCleanupTask(path, false, recordManager);
+                        }
+                        else
+                        {
+                            // The record exists in the parent.  It should be
+                            // hidden.
+                            result = new HideRecordCleanupTask(path, false, recordManager);
+                        }
+                    }
+
+                    // All descendents must be deleted.
+                    List<String> descendentPaths = getDescendentPaths(path, true, false, true);
+                    for (String descendentPath : descendentPaths)
+                    {
+                        result.addCascaded(getDescendentCleanupTasks(descendentPath));
+                    }
+
+                    configurationCleanupManager.addCustomCleanupTasks(result);
+                    configurationReferenceManager.addReferenceCleanupTasks(path, result);
+                    return result;
+                }
+                else
+                {
+                    // Much simpler, just delete the record and run custom
+                    // and reference cleanup tasks.
+                    return getDeleteTask(path);
+                }
+            }
+        });
+    }
+
+    private RecordCleanupTask getDescendentCleanupTasks(String path)
+    {
+        if(pathExists(path))
+        {
+            return getDeleteTask(path);
+        }
+        else
+        {
+            // It must be already hidden in the parent, clean up the hidden
+            // key if it exists at this level.
+            return new CleanupHiddenKeyCleanupTask(path, recordManager);
+        }
+    }
+
+    private RecordCleanupTask getDeleteTask(String path)
     {
         DeleteRecordCleanupTask result = new DeleteRecordCleanupTask(path, isSkeleton(path), recordManager);
-
-        // If this is a templated scope, all descendents must also be deleted
-        List<String> descendentPaths = getDescendentPaths(path, true, false);
-        for (String descendentPath : descendentPaths)
-        {
-            result.addCascaded(getCleanupTasks(descendentPath));
-        }
-
         configurationCleanupManager.addCustomCleanupTasks(result);
         configurationReferenceManager.addReferenceCleanupTasks(path, result);
         return result;
@@ -1281,7 +1360,7 @@ public class ConfigurationTemplateManager implements Synchronization
             {
                 State state = getState();
                 List<PostDeleteEvent> events = new LinkedList<PostDeleteEvent>();
-                for (String concretePath : getDescendentPaths(path, false, true))
+                for (String concretePath : getDescendentPaths(path, false, true, false))
                 {
                     for (Object instance : state.instances.getAllDescendents(concretePath))
                     {
@@ -1307,9 +1386,9 @@ public class ConfigurationTemplateManager implements Synchronization
 
     public int deleteAll(final String pathPattern)
     {
-        return (Integer)executeInsideTransaction(new Action()
+        return executeInsideTransaction(new Action<Integer>()
         {
-            public Object execute() throws Exception
+            public Integer execute() throws Exception
             {
                 List<String> paths = recordManager.getAllPaths(pathPattern);
                 for (String path : paths)

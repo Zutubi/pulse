@@ -50,10 +50,6 @@ public class RecordManager implements HandleAllocator
                 {
                     highest[0] = handle;
                 }
-if(handleToPathMapping.containsKey(handle))
-{
-    System.out.println("dup handle " + handle + " path " + path + " existing path " + handleToPathMapping.get(handle));
-}
                 handleToPathMapping.put(handle, path);
             }
         });
@@ -349,10 +345,6 @@ if(handleToPathMapping.containsKey(handle))
 
         private void addToHandleMap(String path, Record record)
         {
-            if(handleToPathMap.containsKey(record.getHandle()))
-            {
-                System.out.println("dup handle " + record.getHandle() + " path " + path + " existing path " + handleToPathMap.get(record.getHandle()));
-            }
             handleToPathMap.put(record.getHandle(), path);
             for (String key : record.nestedKeySet())
             {

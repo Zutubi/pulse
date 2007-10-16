@@ -1,11 +1,10 @@
 package com.zutubi.pulse.core.scm.svn;
 
-import com.zutubi.pulse.core.scm.ScmClientFactory;
+import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.scm.ScmClient;
+import com.zutubi.pulse.core.scm.ScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.svn.config.SvnConfiguration;
-import com.zutubi.util.StringUtils;
-import com.opensymphony.util.TextUtils;
 
 /**
  *
@@ -40,13 +39,9 @@ public class SvnClientFactory implements ScmClientFactory<SvnConfiguration>
         }
 
         client.setExcludedPaths(config.getFilterPaths());
-
-        if(TextUtils.stringSet(config.getExternalMonitorPaths()))
+        for(String path: config.getExternalMonitorPaths())
         {
-            for(String path: StringUtils.split(config.getExternalMonitorPaths()))
-            {
-                client.addExternalPath(path);
-            }
+            client.addExternalPath(path);
         }
 
         client.setVerifyExternals(config.getVerifyExternals());

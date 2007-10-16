@@ -6,16 +6,43 @@
 <#list table.headers as header>
         <th class="content">${header?html}</th>
 </#list>
-        <th class="content">${"actions.label"?i18n}</th>
+        <th class="content" colspan="2">${"actions.label"?i18n}</th>
     </tr>
 <#list table.rows as row>
     <#assign rawId = "item:${row.baseName}"/>
     <tr id="${rawId?id}">
+    <#-- Data cells. -->
     <#list row.cells as cell>
         <td class="content" colspan="${cell.span?c}">${cell.content?html}</td>
     </#list>
+
     <#if row.actions?exists>
-        <td class="content" width="5%">
+        <#-- Annotations, e.g. template decoration. -->
+        <td class="content" width="1%">
+        <#assign annotationCount = 0/>
+        <#if row.parameters.inheritedFrom?exists>
+            <#assign annotationCount = annotationCount + 1/>
+            <#assign annotationId = "inherited:${row.baseName}"/>
+            <img id="${annotationId?id}" src="${base}/images/inherited.gif" alt="inherited"/>
+            <script type="text/javascript>
+                Ext.get("${annotationId?id?js_string}").dom.qtip = "inherited from ${row.parameters.inheritedFrom}";
+            </script>
+        </#if>
+        <#if row.parameters.overriddenOwner?exists>
+            <#assign annotationCount = annotationCount + 1/>
+            <#assign annotationId = "overridden:${row.baseName}"/>
+            <img id="${annotationId?id}" src="${base}/images/overridden.gif" alt="overridden"/>
+            <script type="text/javascript>
+                Ext.get("${annotationId?id?js_string}").dom.qtip = "overrides value defined by ${row.parameters.overriddenOwner}";
+            </script>
+        </#if>
+        <#if annotationCount == 0>
+            &nbsp;
+        </#if>
+        </td>
+
+        <#-- Action links. -->
+        <td class="content" width="1%">
         <#if row.actions?size &gt; 0>
             <#assign first = true/>
             <#list row.actions as rowAction>

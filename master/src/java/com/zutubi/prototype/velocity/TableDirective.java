@@ -5,7 +5,7 @@ import com.zutubi.prototype.model.Table;
 import com.zutubi.prototype.table.TableDescriptor;
 import com.zutubi.prototype.table.TableDescriptorFactory;
 import com.zutubi.prototype.type.CollectionType;
-import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.util.logging.Logger;
@@ -73,18 +73,17 @@ public class TableDirective extends PrototypeDirective
             CollectionType collectionType = (CollectionType) configurationTemplateManager.getType(path);
             
             // lookup the data.
-            Collection data = getTableData(path);
+            Record data = configurationTemplateManager.getRecord(path);
 
             // generate the table descriptor based on the type of the results.
             TableDescriptorFactory tableFactory = new TableDescriptorFactory();
             ComponentContext.autowire(tableFactory);
 
-            CompositeType type = (CompositeType) collectionType.getCollectionType();
-            TableDescriptor tableDescriptor = tableFactory.create(path, type);
+            TableDescriptor tableDescriptor = tableFactory.create(path, collectionType);
             Table table = tableDescriptor.instantiate(path, data);
 
             // handle rendering of the freemarker template.
-            Map<String, Object> context = initialiseContext(type.getClazz());
+            Map<String, Object> context = initialiseContext(collectionType.getCollectionType().getClazz());
             context.put("table", table);
             context.put("path", path);
             context.put("embedded", PrototypeUtils.isEmbeddedCollection(collectionType));

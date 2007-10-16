@@ -31,9 +31,9 @@ public class ConfigurationCleanupManager
         executor = Executors.newCachedThreadPool(threadFactory);
     }
 
-    public void addCustomCleanupTasks(DeleteRecordCleanupTask deleteTask)
+    public void addCustomCleanupTasks(RecordCleanupTaskSupport topTask)
     {
-        String path = deleteTask.getAffectedPath();
+        String path = topTask.getAffectedPath();
         Configuration instance = configurationTemplateManager.getInstance(path);
 
         if (instance != null)
@@ -44,7 +44,7 @@ public class ConfigurationCleanupManager
                 List<RecordCleanupTask> customTasks = getCleanupTaskFinder(clazz).getCleanupTasks(instance);
                 for (RecordCleanupTask task : customTasks)
                 {
-                    deleteTask.addCascaded(task);
+                    topTask.addCascaded(task);
                 }
             }
             catch (Exception e)

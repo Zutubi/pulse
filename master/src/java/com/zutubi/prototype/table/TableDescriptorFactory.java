@@ -3,7 +3,9 @@ package com.zutubi.prototype.table;
 import com.zutubi.config.annotations.Table;
 import com.zutubi.prototype.actions.ActionManager;
 import com.zutubi.prototype.config.ConfigurationSecurityManager;
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.security.AccessManager;
+import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.PrimitiveType;
 
@@ -16,10 +18,12 @@ public class TableDescriptorFactory
 {
     private ActionManager actionManager;
     private ConfigurationSecurityManager configurationSecurityManager;
+    private ConfigurationTemplateManager configurationTemplateManager;
 
-    public TableDescriptor create(String path, CompositeType type)
+    public TableDescriptor create(String path, CollectionType collectionType)
     {
-        TableDescriptor td = new TableDescriptor(type, configurationSecurityManager.hasPermission(path, AccessManager.ACTION_CREATE), actionManager);
+        CompositeType type = (CompositeType) collectionType.getCollectionType();
+        TableDescriptor td = new TableDescriptor(collectionType, configurationSecurityManager.hasPermission(path, AccessManager.ACTION_CREATE), configurationTemplateManager, actionManager);
 
         // does the table has a Table annotation defining the columns to be rendered?
         Table tableAnnotation = (Table) type.getAnnotation(Table.class);
@@ -55,5 +59,10 @@ public class TableDescriptorFactory
     public void setConfigurationSecurityManager(ConfigurationSecurityManager configurationSecurityManager)
     {
         this.configurationSecurityManager = configurationSecurityManager;
+    }
+
+    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
+    {
+        this.configurationTemplateManager = configurationTemplateManager;
     }
 }

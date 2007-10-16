@@ -2,8 +2,8 @@ package com.zutubi.prototype.config;
 
 import com.zutubi.config.annotations.Reference;
 import com.zutubi.prototype.config.cleanup.DefaultReferenceCleanupTaskProvider;
-import com.zutubi.prototype.config.cleanup.DeleteRecordCleanupTask;
 import com.zutubi.prototype.config.cleanup.RecordCleanupTask;
+import com.zutubi.prototype.config.cleanup.RecordCleanupTaskSupport;
 import com.zutubi.prototype.config.cleanup.ReferenceCleanupTaskProvider;
 import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.PathUtils;
@@ -131,7 +131,7 @@ public class ConfigurationReferenceManager
         return instances;
     }
 
-    public void addReferenceCleanupTasks(String path, DeleteRecordCleanupTask result)
+    public void addReferenceCleanupTasks(String path, RecordCleanupTaskSupport result)
     {
         List<String> index = references.get(path);
         if (index != null)

@@ -1,16 +1,16 @@
 package com.zutubi.pulse.core.scm.svn.config;
 
-import com.zutubi.config.annotations.ConfigurationCheck;
-import com.zutubi.config.annotations.Form;
-import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.Wizard;
+import com.zutubi.config.annotations.*;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.core.scm.svn.SvnClient;
 import com.zutubi.validation.annotations.Required;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  */
-@Form(fieldOrder = { "url", "username", "password", "keyfile", "keyfilePassphrase", "externalMonitorPaths", "verifyExternals", "monitor", "checkoutScheme", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod" })
+@Form(fieldOrder = { "url", "username", "password", "keyfile", "keyfilePassphrase", "checkoutScheme", "filterPaths", "externalMonitorPaths", "verifyExternals", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod" })
 @ConfigurationCheck("SvnConfigurationCheckHandler")
 @SymbolicName("zutubi.svnConfig")
 public class SvnConfiguration extends ScmConfiguration
@@ -22,9 +22,9 @@ public class SvnConfiguration extends ScmConfiguration
     private String keyfile;
     private String keyfilePassphrase;
 
-    // FIXME: add a validator that splits this field
     @Wizard.Ignore
-    private String externalMonitorPaths;
+    @StringList
+    private List<String> externalMonitorPaths = new LinkedList<String>();
     @Wizard.Ignore
     private boolean verifyExternals;
 
@@ -104,54 +104,12 @@ public class SvnConfiguration extends ScmConfiguration
         return null;
     }
 
-/*
-    public SvnClient createClient() throws ScmException
-    {
-        SvnClient client;
-        if (!TextUtils.stringSet(keyfile))
-        {
-            if (TextUtils.stringSet(username))
-            {
-                client = new SvnClient(url, username, password);
-            }
-            else
-            {
-                client = new SvnClient(url);
-            }
-        }
-        else
-        {
-            if (TextUtils.stringSet(keyfilePassphrase))
-            {
-                client = new SvnClient(url, username, password, keyfile, keyfilePassphrase);
-            }
-            else
-            {
-                client = new SvnClient(url, username, password, keyfile);
-            }
-        }
-
-        client.setExcludedPaths(getFilterPaths());
-
-        if(TextUtils.stringSet(externalMonitorPaths))
-        {
-            for(String path: StringUtils.split(externalMonitorPaths))
-            {
-                client.addExternalPath(path);
-            }
-        }
-
-        client.setVerifyExternals(getVerifyExternals());
-        return client;
-    }
-*/
-
-    public String getExternalMonitorPaths()
+    public List<String> getExternalMonitorPaths()
     {
         return externalMonitorPaths;
     }
 
-    public void setExternalMonitorPaths(String externalMonitorPaths)
+    public void setExternalMonitorPaths(List<String> externalMonitorPaths)
     {
         this.externalMonitorPaths = externalMonitorPaths;
     }
