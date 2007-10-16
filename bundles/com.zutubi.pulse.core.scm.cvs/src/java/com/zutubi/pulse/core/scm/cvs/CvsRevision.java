@@ -58,57 +58,84 @@ public class CvsRevision //extends Revision
     }
 
 
-    public CvsRevision(String revisionString) throws ScmException
+    public CvsRevision(String revStr) throws ScmException
     {
-        String[] parts = revisionString.split(":");
-        if (parts.length == 1)
-        {
-            // Try a date without a time: yyyymmdd
-            setDate(revisionString, revisionString, new SimpleDateFormat("yyyyMMdd"));
-        }
-        else if (parts.length == 3)
-        {
-            // Should just be a date, in DATE_FORMAT format
-            setDate(revisionString, revisionString, DATE_FORMAT);
-        }
-        else if (parts.length == 5)
-        {
-            // Should be the output of generateRevisionString
-            parts = revisionString.split(":", 3);
-
-            if (parts[0].length() > 0)
-            {
-                setAuthor(parts[0]);
-            }
-
-            if (parts[1].length() > 0)
-            {
-                setBranch(parts[1]);
-            }
-
-            if (parts[2].length() > 0)
-            {
-                setDate(parts[2], revisionString, DATE_FORMAT);
-            }
-        }
-        else
-        {
-            throw new ScmException("Invalid CVS revision '" + revisionString + "' (must be a date, or <author>:<branch>:<date>)");
-        }
-
-        setRevisionString(generateRevisionString());
-    }
-
-    private void setDate(String s, String revisionString, DateFormat dateFormat) throws ScmException
-    {
+        // special case formats:
+        // a) date and time.
         try
         {
-            setDate(dateFormat.parse(s));
+            setDate(DATE_FORMAT.parse(revStr));
+            return;
         }
         catch (ParseException e)
         {
-            throw new ScmException("Invalid CVS revision '" + revisionString + "': date is invalid: " + e.getMessage());
+            // noop.
         }
+
+        // b) just a date, no time.
+        DateFormat format = new SimpleDateFormat("yyyyMMdd");
+        try
+        {
+            setDate(format.parse(revStr));
+            return;
+        }
+        catch (ParseException e)
+        {
+            // noop.
+        }
+
+        // <author>:<branch/tag>:<date>
+        if (revStr == null || revStr.indexOf(":") == -1 || revStr.substring(revStr.indexOf(":")).indexOf(":") == -1)
+        {
+            throw new ScmException("Invalid CVS revision '" + revStr + "' (must be a date, or <author>:<branch>:<date>)");
+        }
+
+        String author = revStr.substring(0, revStr.indexOf(":"));
+        String remainder = revStr.substring(revStr.indexOf(":") + 1);
+        String branch = remainder.substring(0, remainder.indexOf(":"));
+        String date = remainder.substring(remainder.indexOf(":") + 1);
+
+        if (author != null && !author.equals(""))
+        {
+            setAuthor(author);
+        }
+        if (branch != null && !branch.equals(""))
+        {
+            setBranch(branch);
+        }
+
+        if (date != null && date.equals(""))
+        {
+            return;
+        }
+
+        // accept two types of date format.
+        try
+        {
+            setDate(DATE_FORMAT.parse(date));
+            return;
+        }
+        catch (ParseException e)
+        {
+            // noop.
+        }
+
+        try
+        {
+            setDate(format.parse(date));
+            return;
+        }
+        catch (ParseException e)
+        {
+            // noop.
+        }
+
+        if (!revStr.equals(""))
+        {
+            throw new ScmException("Invalid CVS revision '" + revStr + "' (must be a date, or <author>:<branch>:<date>)");
+        }
+
+        setRevisionString(generateRevisionString());
     }
 
     private String generateRevisionString()

@@ -267,8 +267,25 @@ public class CvsClientTest extends PulseTestCase
         }
         catch (ScmException e)
         {
-            assertEquals("Invalid CVS revision 'baddate': date is invalid: Unparseable date: \"baddate\"", e.getMessage());
+            assertEquals("Invalid CVS revision 'baddate' (must be a date, or <author>:<branch>:<date>)", e.getMessage());
         }
     }
 
+    public void testGetRevisionForHead() throws ScmException
+    {
+        CvsClient cvsClient = new CvsClient(cvsRoot, "unit-test", null, null);
+        Revision revision = cvsClient.getRevision("::");
+        assertNull(revision.getAuthor());
+        assertNull(revision.getBranch());
+        assertNull(revision.getDate());
+    }
+
+    public void testGetRevisionBranchOnly() throws ScmException
+    {
+        CvsClient client = new CvsClient(cvsRoot, "unit-test", null, null);
+        Revision revision = client.getRevision(":BRANCH:");
+        assertNull(revision.getAuthor());
+        assertEquals("BRANCH", revision.getBranch());
+        assertNull(revision.getDate());
+    }
 }
