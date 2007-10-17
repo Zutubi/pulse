@@ -653,6 +653,20 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         hideStageAndAssertEvents("project/child/stages/default");
     }
 
+    public void testHideListItem()
+    {
+        insertGlobal();
+        insertChild();
+
+        String path = configurationTemplateManager.insertRecord("project/global/propertiesList", createProperty("foo", "bar"));
+        path = path.replace("global", "child");
+
+        Listener listener = registerListener();
+        configurationTemplateManager.delete(path);
+        listener.assertEvents(new PostDeleteEventSpec(path, false));
+        assertHiddenItem(path);
+    }
+
     public void testHideCompositeProperty()
     {
         MutableRecord global = createGlobal();
@@ -885,11 +899,40 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         insertChild();
 
         String path = "project/child/stages/default";
-        hideStage(path);
+        configurationTemplateManager.delete(path);
         Listener listener = registerListener();
         configurationTemplateManager.restore(path);
-        assertStage(path);
         listener.assertEvents(new PostInsertEventSpec(path, false), new PostInsertEventSpec(path + "/properties/p1", true));
+        assertStage(path);
+        TemplateRecord stagesRecord = (TemplateRecord) configurationTemplateManager.getRecord(PathUtils.getParentPath(path));
+        assertEquals("global", stagesRecord.getOwner("default"));
+    }
+
+    public void testRestoreListItem()
+    {
+        insertGlobal();
+        insertChild();
+
+        String path = configurationTemplateManager.insertRecord("project/global/propertiesList", createProperty("foo", "bar"));
+        path = path.replace("global", "child");
+
+        configurationTemplateManager.delete(path);
+        Listener listener = registerListener();
+        configurationTemplateManager.restore(path);
+        listener.assertEvents(new PostInsertEventSpec(path, false));
+        assertTrue(configurationTemplateManager.pathExists(path));
+        assertEquals("foo", configurationTemplateManager.getRecord(path).get("name"));
+    }
+
+    public void testHideAfterRestore()
+    {
+        insertGlobal();
+        insertChild();
+
+        String path = "project/child/stages/default";
+        configurationTemplateManager.delete(path);
+        configurationTemplateManager.restore(path);
+        hideStageAndAssertEvents(path);
     }
 
     public void testModifyAfterRestore()
@@ -898,7 +941,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         insertChild();
 
         String path = "project/child/stages/default";
-        hideStage(path);
+        configurationTemplateManager.delete(path);
         configurationTemplateManager.restore(path);
         Stage stage = configurationTemplateManager.getInstance(path, Stage.class);
         stage.setRecipe("edited");
@@ -909,7 +952,53 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
 
         assertEquals("edited", configurationTemplateManager.getInstance(path, Stage.class).getRecipe());
     }
-    
+
+    public void testInsertChildAfterRestore()
+    {
+        insertGlobal();
+        insertChild();
+
+        String path = "project/child/stages/default";
+        configurationTemplateManager.delete(path);
+        configurationTemplateManager.restore(path);
+        Stage stage = configurationTemplateManager.getInstance(path, Stage.class);
+        stage.addProperty("new", "value");
+
+        Listener listener = registerListener();
+        configurationTemplateManager.save(stage);
+        listener.assertEvents(new PostInsertEventSpec(path + "/properties/new", false));
+
+        assertEquals("value", configurationTemplateManager.getInstance(path, Stage.class).getProperties().get("new").getValue());
+    }
+
+    public void testRestoreWithDescendent()
+    {
+        insertToGrandchild();
+
+        String path = "project/child/stages/default";
+        configurationTemplateManager.delete(path);
+        Listener listener = registerListener();
+        configurationTemplateManager.restore(path);
+        String gcStagePath = "project/grandchild/stages/default";
+        listener.assertEvents(new PostInsertEventSpec(gcStagePath, false), new PostInsertEventSpec(gcStagePath + "/properties/p1", true));
+        assertStage(gcStagePath);
+    }
+
+    public void testRestoreAfterHideWithDescendentAlreadyHidden()
+    {
+        insertToGrandchild();
+
+        String gcStagePath = "project/grandchild/stages/default";
+        configurationTemplateManager.delete(gcStagePath);
+        String cStagePath = "project/child/stages/default";
+        configurationTemplateManager.delete(cStagePath);
+
+        Listener listener = registerListener();
+        configurationTemplateManager.restore(cStagePath);
+        listener.assertEvents(new PostInsertEventSpec(gcStagePath, false), new PostInsertEventSpec(gcStagePath + "/properties/p1", true));
+        assertStage(gcStagePath);
+    }
+
     private void insertToGrandchild()
     {
         insertGlobal();
@@ -921,7 +1010,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
     {
         configurationTemplateManager.delete(stagePath);
         assertFalse(configurationTemplateManager.pathExists(stagePath));
-        assertHiddenStage(stagePath);
+        assertHiddenItem(stagePath);
     }
 
     private void assertStage(String stagePath)
@@ -938,15 +1027,15 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertTrue(properties.containsKey("p1"));
     }
 
-    private void assertHiddenStage(String stagePath)
+    private void assertHiddenItem(String path)
     {
-        String stagesPath = PathUtils.getParentPath(stagePath);
-        assertTrue(configurationTemplateManager.pathExists(stagesPath));
-        TemplateRecord record = (TemplateRecord) configurationTemplateManager.getRecord(stagesPath);
+        String parentPath = PathUtils.getParentPath(path);
+        assertTrue(configurationTemplateManager.pathExists(parentPath));
+        TemplateRecord record = (TemplateRecord) configurationTemplateManager.getRecord(parentPath);
         assertEquals(0, record.keySet().size());
         Set<String> hidden = TemplateRecord.getHiddenKeys(record);
         assertEquals(1, hidden.size());
-        assertTrue(hidden.contains(PathUtils.getBaseName(stagePath)));
+        assertTrue(hidden.contains(PathUtils.getBaseName(path)));
     }
 
     private void assertDeletedStage(String stagePath)
