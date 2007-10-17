@@ -28,7 +28,7 @@ public class CleanupHiddenKeyCleanupTask extends RecordCleanupTaskSupport
         if(parent != null && TemplateRecord.getHiddenKeys(parent).contains(baseName))
         {
             MutableRecord mutableParent = parent.copy(false);
-            TemplateRecord.hideItem(mutableParent, baseName);
+            TemplateRecord.restoreItem(mutableParent, baseName);
             recordManager.update(parentPath, mutableParent);
         }
     }

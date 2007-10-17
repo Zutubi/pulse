@@ -21,4 +21,25 @@ public class ConfigurationEvent extends Event<ConfigurationTemplateManager>
     {
         return instance;
     }
+
+
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+
+        ConfigurationEvent event = (ConfigurationEvent) o;
+        return instance == null ? event.instance == null : instance.equals(event.instance);
+    }
+
+    public int hashCode()
+    {
+        return (instance != null ? instance.hashCode() : 0);
+    }
 }

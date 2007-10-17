@@ -3,24 +3,24 @@ package com.zutubi.prototype.config;
 import com.zutubi.config.annotations.Reference;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.prototype.config.events.ConfigurationEvent;
+import com.zutubi.prototype.config.events.PostDeleteEvent;
 import com.zutubi.prototype.config.events.PostInsertEvent;
 import com.zutubi.prototype.config.events.PostSaveEvent;
-import com.zutubi.prototype.config.events.PostDeleteEvent;
 import com.zutubi.prototype.security.*;
+import com.zutubi.prototype.transaction.UserTransaction;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.MapType;
 import com.zutubi.prototype.type.TemplatedMapType;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.transaction.UserTransaction;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.config.NamedConfiguration;
+import com.zutubi.pulse.events.AllEventListener;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
-import com.zutubi.pulse.events.AllEventListener;
 import com.zutubi.validation.annotations.Required;
 
 import java.util.*;
@@ -830,7 +830,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
         MutableRecord parentRecord = typeA.unstantiate(parent);
         configurationTemplateManager.markAsTemplate(parentRecord);
-        String parentPath = configurationTemplateManager.insert("template", parent);
+        String parentPath = configurationTemplateManager.insertRecord("template", parentRecord);
 
         Record loadedParent = configurationTemplateManager.getRecord(parentPath);
 

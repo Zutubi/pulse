@@ -20,6 +20,32 @@ public class PostDeleteEvent extends ConfigurationEvent
         return cascaded;
     }
 
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+        if (!super.equals(o))
+        {
+            return false;
+        }
+
+        PostDeleteEvent event = (PostDeleteEvent) o;
+        return cascaded == event.cascaded;
+    }
+
+    public int hashCode()
+    {
+        int result = super.hashCode();
+        result = 31 * result + (cascaded ? 1 : 0);
+        return result;
+    }
+
     public String toString()
     {
         return "Post Delete Event: " + getInstance().getConfigurationPath();

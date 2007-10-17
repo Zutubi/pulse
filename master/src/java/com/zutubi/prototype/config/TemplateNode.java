@@ -105,6 +105,14 @@ public class TemplateNode
         }
     }
 
+    public void forEachAncestor(NodeHandler callback, boolean strict)
+    {
+        if((strict || callback.handle(this)) && parent != null)
+        {
+            parent.forEachAncestor(callback, false);
+        }
+    }
+
     public void forEachDescendent(NodeHandler callback, boolean strict)
     {
         if(strict || callback.handle(this))

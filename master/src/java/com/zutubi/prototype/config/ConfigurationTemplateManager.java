@@ -13,6 +13,8 @@ import com.zutubi.pulse.core.config.ConfigurationList;
 import com.zutubi.pulse.core.config.ConfigurationMap;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventManager;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.ValidationException;
@@ -135,11 +137,14 @@ public class ConfigurationTemplateManager implements Synchronization
      * Returns the path of the parent record in the template hierarchy, or
      * null if no such parent exists.
      *
-     * @param path   path of the record
-     * @param record record to get the parent of
+     * @param path     path of the record
+     * @param record   record to get the parent of
+     * @param required if true and the parent does not exist, an
+     *                 IllegalArgumentException is thrown
      * @return the parent records path or null is there is no valid parent
+     * @throws IllegalArgumentException if a required parent is not found
      */
-    private String getTemplateParentPath(String path, Record record)
+    private String getTemplateParentPath(String path, Record record, boolean required)
     {
         String result = null;
         long handle = getTemplateParentHandle(path, record);
@@ -148,7 +153,14 @@ public class ConfigurationTemplateManager implements Synchronization
             result = recordManager.getPathForHandle(handle);
             if (result == null)
             {
-                LOG.severe("Record at path '" + path + "' has reference to unknown parent '" + handle + "'");
+                if(required)
+                {
+                    throw new IllegalArgumentException("Invalid parent handle '" + handle + "'");
+                }
+                else
+                {
+                    LOG.severe("Record at path '" + path + "' has reference to unknown parent '" + handle + "'");
+                }
             }
         }
 
@@ -167,7 +179,7 @@ public class ConfigurationTemplateManager implements Synchronization
         }
 
         TemplateRecord parentTemplateRecord = null;
-        String parentOwningPath = getTemplateParentPath(owningPath, owningRecord);
+        String parentOwningPath = getTemplateParentPath(owningPath, owningRecord, false);
         if (parentOwningPath != null)
         {
             parentTemplateRecord = (TemplateRecord) getRecord(parentOwningPath);
@@ -318,12 +330,14 @@ public class ConfigurationTemplateManager implements Synchronization
                     }
                     else
                     {
+                        checkBasenameUniqueInHierarchy(path, newPath, elements);
+
                         TemplateHierarchy hierarchy = getTemplateHierarchy(scope);
                         TemplateNode node = hierarchy.getNodeById(elements[1]);
 
                         if (!node.isConcrete())
                         {
-                            addInheritedSkeletons(elements, actualType, record, node);
+                            addInheritedSkeletons(elements[0], PathUtils.getPath(2, elements), actualType, record, node);
                         }
                     }
                 }
@@ -338,12 +352,40 @@ public class ConfigurationTemplateManager implements Synchronization
         });
     }
 
+    private void checkBasenameUniqueInHierarchy(String path, String newPath, String[] newPathElements)
+    {
+        String ancestorPath = findAncestorPath(newPath);
+        if(ancestorPath != null)
+        {
+            throw new IllegalArgumentException("Unable to insert record with name '" + newPathElements[newPathElements.length - 1] + "' into path '" + path + "': a record with this name already exists in ancestor '" + PathUtils.getPathElements(ancestorPath)[1] + "'");
+        }
+
+        List<String> descendentPaths = getDescendentPaths(newPath, true, false, false);
+        if(descendentPaths.size() > 0)
+        {
+            List<String> descendentNames = CollectionUtils.map(descendentPaths, new Mapping<String, String>()
+            {
+                public String map(String descendentPath)
+                {
+                    return PathUtils.getPathElements(descendentPath)[1];
+                }
+            });
+
+            throw new IllegalArgumentException("Unable to insert record with name '" + newPathElements[newPathElements.length - 1] + "' into path '" + path + "': a record with this name already exists in descendents " + descendentNames);
+        }
+    }
+
     private MutableRecord applyParentSkeleton(String newPath, MutableRecord record, CompositeType actualType)
     {
-        String templateParentPath = getTemplateParentPath(newPath, record);
+        String templateParentPath = getTemplateParentPath(newPath, record, true);
         if (templateParentPath != null)
         {
             TemplateRecord templateParent = (TemplateRecord) getRecord(templateParentPath);
+            if(isConcrete(templateParent))
+            {
+                throw new IllegalArgumentException("Cannot inherit from concrete path '" + templateParentPath + "'");
+            }
+            
             TemplateRecord parentSkeleton = new TemplateRecord(null, null, actualType, createSkeletonRecord(actualType, templateParent.getMoi()));
             TemplateRecord template = new TemplateRecord(null, parentSkeleton, actualType, record);
             record = template.flatten();
@@ -353,16 +395,15 @@ public class ConfigurationTemplateManager implements Synchronization
         return record;
     }
 
-    private void addInheritedSkeletons(final String[] pathElements, CompositeType actualType, MutableRecord record, TemplateNode node)
+    private void addInheritedSkeletons(final String scope, final String remainderPath, CompositeType actualType, Record record, TemplateNode node)
     {
-        final String remainderPath = PathUtils.getPath(2, pathElements);
         final Record skeleton = createSkeletonRecord(actualType, record);
 
         node.forEachDescendent(new TemplateNode.NodeHandler()
         {
             public boolean handle(TemplateNode templateNode)
             {
-                String descendentPath = PathUtils.getPath(pathElements[0], templateNode.getId(), remainderPath);
+                String descendentPath = PathUtils.getPath(scope, templateNode.getId(), remainderPath);
                 if (recordManager.select(descendentPath) == null)
                 {
                     recordManager.insert(descendentPath, skeleton);
@@ -1166,6 +1207,46 @@ public class ConfigurationTemplateManager implements Synchronization
         }
     }
 
+    public String findAncestorPath(String path)
+    {
+        String[] elements = PathUtils.getPathElements(path);
+        if (elements.length > 1)
+        {
+            String scope = elements[0];
+            ConfigurationScopeInfo scopeInfo = configurationPersistenceManager.getScopeInfo(scope);
+            if (scopeInfo == null)
+            {
+                throw new IllegalArgumentException("Invalid path '" + path + "': references unknown scope '" + scope + "'");
+            }
+
+            if (scopeInfo.isTemplated())
+            {
+                final String[] result = new String[1];
+                TemplateHierarchy hierarchy = getTemplateHierarchy(scope);
+                TemplateNode node = hierarchy.getNodeById(elements[1]);
+                final String remainderPath = elements.length == 2 ? null : PathUtils.getPath(2, elements);
+
+                node.forEachAncestor(new TemplateNode.NodeHandler()
+                {
+                    public boolean handle(TemplateNode node)
+                    {
+                        String ancestorPath = remainderPath == null ? node.getPath() : PathUtils.getPath(node.getPath(), remainderPath);
+                        if (pathExists(ancestorPath))
+                        {
+                            result[0] = ancestorPath;
+                            return false;
+                        }
+                        return true;
+                    }
+                }, true);
+
+                return result[0];
+            }
+        }
+
+        return null;
+    }
+
     @SuppressWarnings({"unchecked"})
     public List<String> getDescendentPaths(String path, boolean strict, final boolean concreteOnly, final boolean includeHidden)
     {
@@ -1288,9 +1369,16 @@ public class ConfigurationTemplateManager implements Synchronization
                         }
                         else
                         {
-                            // The record exists in the parent.  It should be
-                            // hidden.
-                            result = new HideRecordCleanupTask(path, false, recordManager);
+                            // The record exists in the parent.  Check it is
+                            // a collection item, and if so hide it.
+                            if(parentRecord.isCollection())
+                            {
+                                result = new HideRecordCleanupTask(path, false, recordManager);
+                            }
+                            else
+                            {
+                                throw new IllegalArgumentException("Invalid path '" + path + "': cannot delete an inherited composite property");
+                            }
                         }
                     }
 
@@ -1400,6 +1488,57 @@ public class ConfigurationTemplateManager implements Synchronization
         });
     }
 
+    public void restore(final String path)
+    {
+        checkPersistent(path);
+        final String[] pathElements = PathUtils.getPathElements(path);
+        if(pathElements.length <= 2)
+        {
+            throw new IllegalArgumentException("Invalid path '" + path + "': only records nested within a template can have been hidden");
+        }
+
+        final String scope = pathElements[0];
+        ConfigurationScopeInfo scopeInfo = configurationPersistenceManager.getScopeInfo(scope);
+        if(!scopeInfo.isTemplated())
+        {
+            throw new IllegalArgumentException("Invalid path '" + path + "': not a templated scope");
+        }
+
+        final String parentPath = PathUtils.getParentPath(path);
+
+        executeInsideTransaction(new Action<Object>()
+        {
+            public Object execute() throws Exception
+            {
+                TemplateRecord parentRecord = (TemplateRecord) getRecord(parentPath);
+                if(parentRecord == null)
+                {
+                    throw new IllegalArgumentException("Invalid path '" + path + "': parent does not exist");
+                }
+
+                MutableRecord parentCopy = parentRecord.getMoi().copy(false);
+                if(!(TemplateRecord.restoreItem(parentCopy, PathUtils.getBaseName(path))))
+                {
+                    throw new IllegalArgumentException("Invalid path '" + path + "': not hidden");
+                }
+
+                recordManager.update(parentPath, parentCopy);
+
+                // Now we need to restore the skeletons at this path and all
+                // descendents.
+                TemplateRecord templateParent = getParentRecord(pathElements);
+                TemplateHierarchy templateHierarchy = getTemplateHierarchy(scope);
+                TemplateNode node = templateHierarchy.getNodeById(pathElements[1]);
+                addInheritedSkeletons(scope, PathUtils.getPath(2, pathElements), typeRegistry.getType(templateParent.getSymbolicName()), templateParent.getMoi(), node.getParent());
+
+                refreshCaches();
+                State state = getState();
+                raiseInsertEvents(state.instances, getDescendentPaths(path, false, true, false));
+                return null;
+            }
+        });
+    }
+
     @SuppressWarnings({"unchecked"})
     public <T extends Configuration> T deepClone(T instance)
     {
@@ -1442,6 +1581,33 @@ public class ConfigurationTemplateManager implements Synchronization
         }
 
         return instance;
+    }
+
+    /**
+     * Returns all instances with paths that start with the given prefix.
+     * Any instance stored directly at the prefix path would also be
+     * returned.
+     *
+     * @param prefix          prefix path used to find instances
+     * @param allowIncomplete if true, the result will also include
+     *                        non-concrete instances that live under the path
+     * @return all instances stored at or below the given path prefix
+     */
+    public Collection<Configuration> getInstancesByPathPrefix(String prefix, boolean allowIncomplete)
+    {
+        State state = getState();
+        if (state == null)
+        {
+            return Collections.EMPTY_LIST;
+        }
+
+        Collection<Configuration> instances = state.instances.getAllDescendents(prefix);
+        if (allowIncomplete)
+        {
+            instances.addAll(state.incompleteInstances.getAllDescendents(prefix));
+        }
+
+        return instances;
     }
 
     private ConfigurationTemplateManager.State getState()

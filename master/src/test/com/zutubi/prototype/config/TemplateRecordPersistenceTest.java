@@ -2,17 +2,22 @@ package com.zutubi.prototype.config;
 
 import com.zutubi.config.annotations.NoInherit;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.prototype.config.events.ConfigurationEvent;
+import com.zutubi.prototype.config.events.PostDeleteEvent;
+import com.zutubi.prototype.config.events.PostInsertEvent;
+import com.zutubi.prototype.config.events.PostSaveEvent;
 import com.zutubi.prototype.type.CompositeType;
+import com.zutubi.prototype.type.MapType;
 import com.zutubi.prototype.type.TemplatedMapType;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Tests that the records returned by the CTM are template records with
@@ -27,6 +32,8 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
     private static final String GLOBAL_DESCRIPTION = "this is the daddy of them all";
     private static final String CHILD_PROJECT = "child";
     private static final String CHILD_DESCRIPTION = "my own way baby!";
+    private static final String GRANDCHILD_PROJECT = "grandchild";
+    private static final String GRANDCHILD_DESCRIPTION = "nkotb";
 
     protected void setUp() throws Exception
     {
@@ -35,11 +42,16 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         projectType = typeRegistry.register(Project.class);
         propertyType = typeRegistry.getType(Property.class);
         stageType = typeRegistry.getType(Stage.class);
-        TemplatedMapType top = new TemplatedMapType();
-        top.setTypeRegistry(typeRegistry);
-        top.setCollectionType(projectType);
+        TemplatedMapType templatedMapType = new TemplatedMapType();
+        templatedMapType.setTypeRegistry(typeRegistry);
+        templatedMapType.setCollectionType(projectType);
 
-        configurationPersistenceManager.register("project", top);
+        MapType mapType = new MapType();
+        mapType.setTypeRegistry(typeRegistry);
+        mapType.setCollectionType(projectType);
+
+        configurationPersistenceManager.register("project", templatedMapType);
+        configurationPersistenceManager.register("nproject", mapType);
     }
 
     protected void tearDown() throws Exception
@@ -184,6 +196,59 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertEquals("bar", property.get("value"));
         assertEquals(GLOBAL_PROJECT, property.getOwner("value"));
         assertNull(property.getMoi().get("value"));
+    }
+
+    public void testInsertChildOfInvalid()
+    {
+        insertGlobal();
+        insertChild();
+
+        MutableRecord grandchild = createProject("grand", "test");
+        configurationTemplateManager.setParentTemplate(grandchild, 9999999);
+        failedInsertHelper("project", grandchild, "Invalid parent handle '9999999'");
+    }
+
+    public void testInsertChildOfConcrete()
+    {
+        insertGlobal();
+        insertChild();
+
+        MutableRecord grandchild = createProject("grand", "test");
+        configurationTemplateManager.setParentTemplate(grandchild, configurationTemplateManager.getInstance("project/child").getHandle());
+        failedInsertHelper("project", grandchild, "Cannot inherit from concrete path 'project/child'");
+    }
+
+    public void testInsertPathAlreadyInDescendent()
+    {
+        insertGlobal();
+        MutableRecord child = createChild();
+        MutableRecord childStages = (MutableRecord) child.get("stages");
+        String stageName = "test";
+        childStages.put(stageName, createStage(stageName));
+        configurationTemplateManager.insertRecord("project", child);
+
+        failedInsertHelper("project/global/stages", createStage(stageName), "Unable to insert record with name 'test' into path 'project/global/stages': a record with this name already exists in descendents [child]");
+    }
+
+    public void testInsertPathHiddenInAncestor()
+    {
+        insertToGrandchild();
+        configurationTemplateManager.delete("project/child/stages/default");
+
+        failedInsertHelper("project/grandchild/stages", createStage("default"), "Unable to insert record with name 'default' into path 'project/grandchild/stages': a record with this name already exists in ancestor 'global'");
+    }
+
+    private void failedInsertHelper(String path, MutableRecord record, String message)
+    {
+        try
+        {
+            configurationTemplateManager.insertRecord(path, record);
+            fail();
+        }
+        catch (IllegalArgumentException e)
+        {
+            assertEquals(message, e.getMessage());
+        }
     }
 
     public void testSimpleOverride()
@@ -476,6 +541,322 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertEquals("gp1", property.getName());
     }
 
+    public void testHideInherited()
+    {
+        insertGlobal();
+        insertChild();
+
+        hideStageAndAssertEvents("project/child/stages/default");
+    }
+
+    public void testHideCompositeProperty()
+    {
+        MutableRecord global = createGlobal();
+        String propertyName = "prop";
+        global.put("property", createProperty(propertyName, "value"));
+        configurationTemplateManager.insertRecord("project", global);
+        insertChild();
+
+        String path = "project/child/property";
+        try
+        {
+            configurationTemplateManager.delete(path);
+            fail();
+        }
+        catch(IllegalArgumentException e)
+        {
+            assertEquals("Invalid path '" + path + "': cannot delete an inherited composite property", e.getMessage());
+        }
+    }
+
+    public void testHideOverriddenSimpleProperty()
+    {
+        insertGlobal();
+        insertChild();
+
+        String stagePath = "project/child/stages/default";
+        Stage stage = configurationTemplateManager.getInstance(stagePath, Stage.class);
+        stage.setRecipe("over");
+        configurationTemplateManager.save(stage);
+
+        hideStageAndAssertEvents(stagePath);
+    }
+
+    public void testHideOverriddenNestedItem()
+    {
+        insertGlobal();
+        insertChild();
+
+        String propertyPath = "project/child/stages/default/properties/p1";
+        Property property = configurationTemplateManager.getInstance(propertyPath, Property.class);
+        property.setValue("over");
+        configurationTemplateManager.save(property);
+
+        hideStageAndAssertEvents("project/child/stages/default");
+    }
+
+    public void testHideOverriddenNewNestedItem()
+    {
+        insertGlobal();
+        insertChild();
+
+        String stagePath = "project/child/stages/default";
+        Stage stage = configurationTemplateManager.getInstance(stagePath, Stage.class);
+        stage.addProperty("new", "item");
+        configurationTemplateManager.save(stage);
+
+        Listener listener = registerListener();
+        hideStage(stagePath);
+        listener.assertEvents(new PostDeleteEventSpec(stagePath, false),
+                              new PostDeleteEventSpec(stagePath + "/properties/p1", true),
+                              new PostDeleteEventSpec(stagePath + "/properties/new", true));
+    }
+
+    public void testHideOverriddenAlreadyHiddenNestedItem()
+    {
+        insertGlobal();
+        insertChild();
+
+        String stagePath = "project/child/stages/default";
+        configurationTemplateManager.delete(stagePath + "/properties/p1");
+
+        Listener listener = registerListener();
+        hideStage(stagePath);
+        listener.assertEvents(new PostDeleteEventSpec(stagePath, false));
+    }
+
+    public void testHideIndirectlyInherited()
+    {
+        insertToGrandchild();
+
+        hideStageAndAssertEvents("project/grandchild/stages/default");
+    }
+
+    public void testHideInheritedWithDescendent()
+    {
+        insertToGrandchild();
+
+        String gcStagePath = "project/grandchild/stages/default";
+        hideStageAndAssertEvents("project/child/stages/default", gcStagePath);
+        assertDeletedStage(gcStagePath);
+    }
+
+    public void testHideDescendentOverridesSimpleProperty()
+    {
+        insertToGrandchild();
+
+        String gcStagePath = "project/grandchild/stages/default";
+        Stage stage = configurationTemplateManager.getInstance(gcStagePath, Stage.class);
+        stage.setRecipe("over");
+        configurationTemplateManager.save(stage);
+
+        hideStageAndAssertEvents("project/child/stages/default", gcStagePath);
+        assertDeletedStage(gcStagePath);
+    }
+
+    public void testHideDescendentOverridesNestedItem()
+    {
+        insertToGrandchild();
+
+        String propertyPath = "project/grandchild/stages/default/properties/p1";
+        Property property = configurationTemplateManager.getInstance(propertyPath, Property.class);
+        property.setValue("over");
+        configurationTemplateManager.save(property);
+
+        hideStageAndAssertEvents("project/child/stages/default", "project/grandchild/stages/default");
+    }
+
+    public void testHideDescendentAddsNewNestedItem()
+    {
+        insertToGrandchild();
+
+        String gcStagePath = "project/grandchild/stages/default";
+        Stage stage = configurationTemplateManager.getInstance(gcStagePath, Stage.class);
+        stage.addProperty("new", "item");
+        configurationTemplateManager.save(stage);
+
+        Listener listener = registerListener();
+        hideStage("project/child/stages/default");
+        listener.assertEvents(new PostDeleteEventSpec(gcStagePath, false),
+                              new PostDeleteEventSpec(gcStagePath + "/properties/p1", true),
+                              new PostDeleteEventSpec(gcStagePath + "/properties/new", true));
+        assertDeletedStage(gcStagePath);
+    }
+
+    public void testHideDescendentHidesNestedItem()
+    {
+        insertToGrandchild();
+
+        String gcStagePath = "project/grandchild/stages/default";
+        configurationTemplateManager.delete(gcStagePath + "/properties/p1");
+
+        Listener listener = registerListener();
+        hideStage("project/child/stages/default");
+        listener.assertEvents(new PostDeleteEventSpec(gcStagePath, false));
+        assertDeletedStage(gcStagePath);
+    }
+
+    public void testHideDescendentAlreadyHidden()
+    {
+        insertToGrandchild();
+
+        String gcStagePath = "project/grandchild/stages/default";
+        configurationTemplateManager.delete(gcStagePath);
+
+        Listener listener = registerListener();
+        hideStage("project/child/stages/default");
+        listener.assertEvents();
+        assertDeletedStage(gcStagePath);
+    }
+
+    public void testHideInheritedWithIndirectDescendent()
+    {
+        insertGlobal();
+        insertTemplateChild();
+        insertTemplateGrandchild();
+
+        MutableRecord greatGrandchild = createProject("greatgrandchild", "omg");
+        configurationTemplateManager.setParentTemplate(greatGrandchild, configurationTemplateManager.getRecord("project/grandchild").getHandle());
+        configurationTemplateManager.insertRecord("project", greatGrandchild);
+
+        String ggcStagePath = "project/greatgrandchild/stages/default";
+        hideStageAndAssertEvents("project/child/stages/default", ggcStagePath);
+        assertDeletedStage(ggcStagePath);
+    }
+
+    public void testRestoreEmptyPath()
+    {
+        failedRestoreHelper("", "Invalid path: path is empty");
+    }
+
+    public void testRestoreUnknownScope()
+    {
+        failedRestoreHelper("unknown", "Invalid path 'unknown': references non-existant root scope 'unknown'");
+    }
+
+    public void testRestoreShortPath()
+    {
+        failedRestoreHelper("project/foo", "Invalid path 'project/foo': only records nested within a template can have been hidden");
+    }
+
+    public void testRestoreNonTemplatedScope()
+    {
+        failedRestoreHelper("nproject/foo/bar", "Invalid path 'nproject/foo/bar': not a templated scope");
+    }
+
+    public void testRestoreNoSuchPath()
+    {
+        failedRestoreHelper("project/foo/bar", "Invalid path 'project/foo/bar': parent does not exist");
+    }
+
+    public void testRestoreRootNotHidden()
+    {
+        insertGlobal();
+        failedRestoreHelper("project/global/stages/default", "Invalid path 'project/global/stages/default': not hidden");
+    }
+
+    public void testRestoreNotHidden()
+    {
+        insertGlobal();
+        insertChild();
+        failedRestoreHelper("project/child/stages/default", "Invalid path 'project/child/stages/default': not hidden");
+    }
+
+    private void failedRestoreHelper(String path, String message)
+    {
+        try
+        {
+            configurationTemplateManager.restore(path);
+            fail();
+        }
+        catch(IllegalArgumentException e)
+        {
+            assertEquals(message, e.getMessage());
+        }
+    }
+
+    public void testRestoreInherited()
+    {
+        insertGlobal();
+        insertChild();
+
+        String path = "project/child/stages/default";
+        hideStage(path);
+        Listener listener = registerListener();
+        configurationTemplateManager.restore(path);
+        assertStage(path);
+        listener.assertEvents(new PostInsertEventSpec(path, false), new PostInsertEventSpec(path + "/properties/p1", true));
+    }
+
+    private void insertToGrandchild()
+    {
+        insertGlobal();
+        insertTemplateChild();
+        insertGrandchild();
+    }
+
+    private void hideStage(String stagePath)
+    {
+        configurationTemplateManager.delete(stagePath);
+        assertFalse(configurationTemplateManager.pathExists(stagePath));
+        assertHiddenStage(stagePath);
+    }
+
+    private void assertStage(String stagePath)
+    {
+        assertTrue(configurationTemplateManager.pathExists(stagePath));
+        
+        String stagesPath = PathUtils.getParentPath(stagePath);
+        TemplateRecord parent = (TemplateRecord) configurationTemplateManager.getRecord(stagesPath);
+        assertEquals(1, parent.size());
+        assertEquals(0, TemplateRecord.getHiddenKeys(parent).size());
+        TemplateRecord record = (TemplateRecord) parent.get("default");
+        TemplateRecord properties = (TemplateRecord) record.get("properties");
+        assertEquals(1, properties.size());
+        assertTrue(properties.containsKey("p1"));
+    }
+
+    private void assertHiddenStage(String stagePath)
+    {
+        String stagesPath = PathUtils.getParentPath(stagePath);
+        assertTrue(configurationTemplateManager.pathExists(stagesPath));
+        TemplateRecord record = (TemplateRecord) configurationTemplateManager.getRecord(stagesPath);
+        assertEquals(0, record.keySet().size());
+        Set<String> hidden = TemplateRecord.getHiddenKeys(record);
+        assertEquals(1, hidden.size());
+        assertTrue(hidden.contains(PathUtils.getBaseName(stagePath)));
+    }
+
+    private void assertDeletedStage(String stagePath)
+    {
+        assertFalse(configurationTemplateManager.pathExists(stagePath));
+        String stagesPath = PathUtils.getParentPath(stagePath);
+        assertTrue(configurationTemplateManager.pathExists(stagesPath));
+        TemplateRecord record = (TemplateRecord) configurationTemplateManager.getRecord(stagesPath);
+        assertEquals(0, record.keySet().size());
+        Set<String> hidden = TemplateRecord.getHiddenKeys(record);
+        assertEquals(0, hidden.size());
+    }
+
+    private void hideStageAndAssertEvents(String stagePath)
+    {
+        hideStageAndAssertEvents(stagePath, stagePath);
+    }
+
+    private void hideStageAndAssertEvents(String deletePath, String concretePath)
+    {
+        Listener listener = registerListener();
+        hideStage(deletePath);
+        listener.assertEvents(new PostDeleteEventSpec(concretePath, false), new PostDeleteEventSpec(concretePath + "/properties/p1", true));
+    }
+
+    private Listener registerListener()
+    {
+        Listener listener = new Listener();
+        eventManager.register(listener);
+        return listener;
+    }
+
     private void insertGlobal()
     {
         MutableRecord global = createGlobal();
@@ -495,10 +876,37 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         configurationTemplateManager.insertRecord("project", child);
     }
 
+    private void insertTemplateChild()
+    {
+        MutableRecord child = createChild();
+        configurationTemplateManager.markAsTemplate(child);
+        configurationTemplateManager.insertRecord("project", child);
+    }
+
     private MutableRecord createChild()
     {
         MutableRecord child = createProject(CHILD_PROJECT, CHILD_DESCRIPTION);
         configurationTemplateManager.setParentTemplate(child, configurationTemplateManager.getRecord("project/global").getHandle());
+        return child;
+    }
+
+    private void insertGrandchild()
+    {
+        MutableRecord grandchild = createGrandchild();
+        configurationTemplateManager.insertRecord("project", grandchild);
+    }
+
+    private void insertTemplateGrandchild()
+    {
+        MutableRecord grandchild = createGrandchild();
+        configurationTemplateManager.markAsTemplate(grandchild);
+        configurationTemplateManager.insertRecord("project", grandchild);
+    }
+
+    private MutableRecord createGrandchild()
+    {
+        MutableRecord child = createProject(GRANDCHILD_PROJECT, GRANDCHILD_DESCRIPTION);
+        configurationTemplateManager.setParentTemplate(child, configurationTemplateManager.getRecord("project/child").getHandle());
         return child;
     }
 
@@ -577,6 +985,110 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertEquals(owner, stage.getOwner());
         assertEquals(GLOBAL_PROJECT, stage.getOwner("name"));
         assertEquals("default", stage.get("name"));
+    }
+
+    public static class Listener implements com.zutubi.pulse.events.EventListener
+    {
+        private List<ConfigurationEvent> events = new LinkedList<ConfigurationEvent>();
+
+        public List<ConfigurationEvent> getEvents()
+        {
+            return events;
+        }
+
+        public void clearEvents()
+        {
+            events.clear();
+        }
+
+        public void assertEvents(EventSpec... expectedEvents)
+        {
+            assertEquals(expectedEvents.length, events.size());
+            for(final EventSpec spec: expectedEvents)
+            {
+                ConfigurationEvent matchingEvent = CollectionUtils.find(events, new Predicate<ConfigurationEvent>()
+                {
+                    public boolean satisfied(ConfigurationEvent event)
+                    {
+                        return spec.matches(event);
+                    }
+                });
+
+                assertNotNull("Expected event '" + spec.toString() + "' missing", matchingEvent);
+            }
+        }
+
+        public void handleEvent(Event evt)
+        {
+            events.add((ConfigurationEvent) evt);
+        }
+
+        public Class[] getHandledEvents()
+        {
+            return new Class[]{ConfigurationEvent.class};
+        }
+    }
+
+    public static abstract class EventSpec
+    {
+        private String path;
+        private Class<? extends ConfigurationEvent> eventClass;
+
+        protected EventSpec(String path, Class<? extends ConfigurationEvent> eventClass)
+        {
+            this.path = path;
+            this.eventClass = eventClass;
+        }
+
+        public boolean matches(ConfigurationEvent event)
+        {
+            return eventClass.isInstance(event) && event.getInstance().getConfigurationPath().equals(path);
+        }
+
+        public String toString()
+        {
+            return eventClass.getSimpleName() + ": " + path;
+        }
+    }
+
+    public static class PostInsertEventSpec extends EventSpec
+    {
+        private boolean cascaded;
+
+        public PostInsertEventSpec(String path, boolean cascaded)
+        {
+            super(path, PostInsertEvent.class);
+            this.cascaded = cascaded;
+        }
+
+        public boolean matches(ConfigurationEvent event)
+        {
+            return super.matches(event) && ((PostInsertEvent)event).isCascaded() == cascaded;
+        }
+    }
+
+    public static class PostDeleteEventSpec extends EventSpec
+    {
+        private boolean cascaded;
+
+        public PostDeleteEventSpec(String path, boolean cascaded)
+        {
+            super(path, PostDeleteEvent.class);
+            this.cascaded = cascaded;
+        }
+
+        public boolean matches(ConfigurationEvent event)
+        {
+            return super.matches(event) && ((PostDeleteEvent)event).isCascaded() == cascaded;
+        }
+    }
+
+    public static class PostSaveEventSpec extends EventSpec
+    {
+        public PostSaveEventSpec(String path)
+        {
+            super(path, PostSaveEvent.class);
+        }
     }
 
     public static enum Coolness
@@ -715,6 +1227,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
     public static class Stage extends AbstractNamedConfiguration
     {
         private Map<String, Property> properties = new HashMap<String, Property>();
+        private String recipe;
 
         public Stage()
         {
@@ -723,6 +1236,16 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         public Stage(String name)
         {
             super(name);
+        }
+
+        public String getRecipe()
+        {
+            return recipe;
+        }
+
+        public void setRecipe(String recipe)
+        {
+            this.recipe = recipe;
         }
 
         public Map<String, Property> getProperties()

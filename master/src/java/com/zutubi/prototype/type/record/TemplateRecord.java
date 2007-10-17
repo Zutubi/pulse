@@ -20,7 +20,7 @@ public class TemplateRecord extends AbstractRecord
     public static final String HIDDEN_KEY = "hidden";
 
     private static final char SEPARATOR = ',';
-    private static final String[] NO_INHERIT_META_KEYS = { HANDLE_KEY, PERMANENT_KEY, SYMBOLIC_NAME_KEY,
+    private static final String[] NO_INHERIT_META_KEYS = { HANDLE_KEY, HIDDEN_KEY, PERMANENT_KEY, SYMBOLIC_NAME_KEY,
                                                            ConfigurationTemplateManager.PARENT_KEY,
                                                            ConfigurationTemplateManager.TEMPLATE_KEY };
     /**
@@ -285,6 +285,11 @@ public class TemplateRecord extends AbstractRecord
             return false;
         }
 
+        if(getHiddenKeys(moi).size() > 0)
+        {
+            return false;
+        }
+
         for(String key: nestedKeySet())
         {
             if(!((TemplateRecord)get(key)).isSkeleton())
@@ -308,11 +313,20 @@ public class TemplateRecord extends AbstractRecord
         record.putMeta(HIDDEN_KEY, StringUtils.encodeAndJoin(SEPARATOR, hiddenKeys));
     }
 
-    public static void unhideItem(MutableRecord record, String key)
+    public static boolean restoreItem(MutableRecord record, String key)
     {
         Set<String> hiddenKeys = getHiddenKeys(record);
-        hiddenKeys.remove(key);
-        record.put(HIDDEN_KEY, StringUtils.encodeAndJoin(SEPARATOR, hiddenKeys));
+        boolean result = hiddenKeys.remove(key);
+        if(hiddenKeys.size() == 0)
+        {
+            record.removeMeta(HIDDEN_KEY);
+        }
+        else
+        {
+            record.putMeta(HIDDEN_KEY, StringUtils.encodeAndJoin(SEPARATOR, hiddenKeys));
+        }
+
+        return result;
     }
 
     public static Set<String> getHiddenKeys(Record record)
