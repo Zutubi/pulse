@@ -78,9 +78,25 @@ public abstract class CommandTestBase extends PulseTestCase implements EventList
         // need to add the build number to the global scope in the same way that the recipe processor does.
         if (buildContext != null && buildContext.getBuildNumber() > 0)
         {
-            Scope scope = new Scope();
-            scope.add(new Property("build.number", Long.toString(buildContext.getBuildNumber())));
-            recipeContext.setGlobalScope(scope);
+            Scope globalScope = new Scope();
+            globalScope.add(new Property("build.number", Long.toString(buildContext.getBuildNumber())));
+            recipeContext.setGlobalScope(globalScope);
+
+            // ensure that the scope is correctly set up for the executable
+            // command -> that it is wired to the global scope.
+            if (command instanceof ExecutableCommand)
+            {
+                ExecutableCommand executableCommand = (ExecutableCommand) command;
+                Scope commandScope = executableCommand.getScope();
+                if (commandScope != null)
+                {
+                    commandScope.setParent(globalScope);
+                }
+                else
+                {
+                    executableCommand.setScope(new Scope(globalScope));    
+                }
+            }
         }
 
         recipe.execute(recipeContext);
