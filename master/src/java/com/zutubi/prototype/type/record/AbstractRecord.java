@@ -5,6 +5,7 @@ import com.zutubi.util.Predicate;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Arrays;
 
 /**
  * Convenient abstract base for record implementations.
@@ -43,6 +44,72 @@ public abstract class AbstractRecord implements Record
     public boolean isCollection()
     {
         return getSymbolicName() == null;
+    }
+
+    public boolean shallowEquals(Record other)
+    {
+        if(other == null)
+        {
+            return false;
+        }
+
+        Set<String> metaKeys = metaKeySet();
+        Set<String> otherMetaKeys = other.metaKeySet();
+        if(!metaKeys.equals(otherMetaKeys))
+        {
+            return false;
+        }
+
+        for(String key: metaKeys)
+        {
+            if(!getMeta(key).equals(other.getMeta(key)))
+            {
+                return false;
+            }
+        }
+
+        Set<String> simpleKeys = simpleKeySet();
+        Set<String> otherSimpleKeys = other.simpleKeySet();
+        if(!simpleKeys.equals(otherSimpleKeys))
+        {
+            return false;
+        }
+
+        for(String key: simpleKeys)
+        {
+            if (!valuesEqual(get(key), other.get(key)))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public boolean valuesEqual(Object value, Object otherValue)
+    {
+        if(value == null)
+        {
+            return otherValue == null;
+        }
+        else if(otherValue == null)
+        {
+            return false;
+        }
+
+        if(value instanceof Object[])
+        {
+            if(!(otherValue instanceof Object[]) || !Arrays.equals((Object[])value, (Object[])otherValue))
+            {
+                return false;
+            }
+        }
+        else if(otherValue instanceof Object[] || !value.equals(otherValue))
+        {
+            return false;
+        }
+
+        return true;
     }
 
     public Set<String> simpleKeySet()
@@ -92,7 +159,7 @@ public abstract class AbstractRecord implements Record
 
         for(String key: keySet())
         {
-            if(!get(key).equals(other.get(key)))
+            if(!valuesEqual(get(key), other.get(key)))
             {
                 return false;
             }

@@ -95,4 +95,25 @@ public interface Record
     boolean isPermanent();
 
     boolean isCollection();
+
+    /**
+     * Returns true if the two given simple values are equal.  This handles
+     * both nulls and the different types of object which may be present as
+     * simple values.
+     *
+     * @param v1 the first value
+     * @param v2 the second value
+     * @return true if the two values are equal
+     */
+    boolean valuesEqual(Object v1, Object v2);
+
+    /**
+     * Returns true if the meta and simple keys and values in the given
+     * record are the same as in this record.
+     *
+     * @param other record to test equality to
+     * @return true iff the other record's simple values are the same as this
+     *         record
+     */
+    boolean shallowEquals(Record other);
 }

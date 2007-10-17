@@ -990,39 +990,46 @@ public class ConfigurationTemplateManager implements Synchronization
             throw new IllegalArgumentException("Record has no type (note that collections should not be saved directly)");
         }
 
-        final Record existingRecord = getRecord(path);
-        if (existingRecord == null)
-        {
-            throw new IllegalArgumentException("Illegal path '" + path + "': no existing record found");
-        }
-
-        final String parentPath = PathUtils.getParentPath(path);
-        if (parentPath == null)
-        {
-            throw new IllegalArgumentException("Illegal path '" + path + "': no parent record");
-        }
-
-        // Type check of incoming record.
-        if (!existingRecord.getSymbolicName().equals(record.getSymbolicName()))
-        {
-            throw new IllegalArgumentException("Saved record has type '" + record.getSymbolicName() + "' which does not match existing type '" + existingRecord.getSymbolicName() + "'");
-        }
-
-        final ConfigurationTemplateManager source = this;
-
         return executeInsideTransaction(new Action<String>()
         {
             public String execute() throws Exception
             {
+                final Record existingRecord = getRecord(path);
+                if (existingRecord == null)
+                {
+                    throw new IllegalArgumentException("Illegal path '" + path + "': no existing record found");
+                }
+
+                final String parentPath = PathUtils.getParentPath(path);
+                if (parentPath == null)
+                {
+                    throw new IllegalArgumentException("Illegal path '" + path + "': no parent record");
+                }
+
+                // Type check of incoming record.
+                if (!existingRecord.getSymbolicName().equals(record.getSymbolicName()))
+                {
+                    throw new IllegalArgumentException("Saved record has type '" + record.getSymbolicName() + "' which does not match existing type '" + existingRecord.getSymbolicName() + "'");
+                }
+
                 ComplexType parentType = configurationPersistenceManager.getType(parentPath);
                 String newPath = parentType.getSavePath(path, record);
                 CompositeType type = typeRegistry.getType(record.getSymbolicName());
 
                 MutableRecord newRecord = updateRecord(existingRecord, record, type);
+                boolean updated = true;
                 if (newPath.equals(path))
                 {
-                    // Regular update
-                    recordManager.update(newPath, newRecord);
+                    // Regular update, first check if there are any changes
+                    // to apply or if we can elide this save.
+                    if(newRecord.shallowEquals(recordManager.select(path)))
+                    {
+                        updated = false;
+                    }
+                    else
+                    {
+                        recordManager.update(newPath, newRecord);
+                    }
                 }
                 else
                 {
@@ -1037,15 +1044,18 @@ public class ConfigurationTemplateManager implements Synchronization
                     recordManager.update(newPath, newRecord);
                 }
 
-                refreshCaches();
-
-                State state = getState();
-                for (String concretePath : getDescendentPaths(newPath, false, true, false))
+                if (updated)
                 {
-                    Configuration instance = state.instances.get(concretePath);
-                    if (isComposite(instance))
+                    refreshCaches();
+
+                    State state = getState();
+                    for (String concretePath : getDescendentPaths(newPath, false, true, false))
                     {
-                        publishEvent(new PostSaveEvent(source, instance));
+                        Configuration instance = state.instances.get(concretePath);
+                        if (isComposite(instance))
+                        {
+                            publishEvent(new PostSaveEvent(ConfigurationTemplateManager.this, instance));
+                        }
                     }
                 }
 
@@ -1182,7 +1192,7 @@ public class ConfigurationTemplateManager implements Synchronization
             // specify what happens when removing using a key set iterator?
             for (String key : record.simpleKeySet())
             {
-                if (record.get(key).equals(emptyChild.get(key)))
+                if (record.valuesEqual(record.get(key), emptyChild.get(key)))
                 {
                     dead.add(key);
                 }
@@ -1430,22 +1440,20 @@ public class ConfigurationTemplateManager implements Synchronization
         checkPersistent(path);
         configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_DELETE);
 
-        Record record = recordManager.select(path);
-        if(record == null)
-        {
-            throw new IllegalArgumentException("No such path '" + path + "'");
-        }
-        if(record.isPermanent())
-        {
-            throw new IllegalArgumentException("Cannot delete instance at path '" + path + "': marked permanent");
-        }
-
-        final ConfigurationTemplateManager source = this;
-
         executeInsideTransaction(new Action()
         {
             public Object execute() throws Exception
             {
+                Record record = recordManager.select(path);
+                if(record == null)
+                {
+                    throw new IllegalArgumentException("No such path '" + path + "'");
+                }
+                if(record.isPermanent())
+                {
+                    throw new IllegalArgumentException("Cannot delete instance at path '" + path + "': marked permanent");
+                }
+
                 State state = getState();
                 List<PostDeleteEvent> events = new LinkedList<PostDeleteEvent>();
                 for (String concretePath : getDescendentPaths(path, false, true, false))
@@ -1455,7 +1463,7 @@ public class ConfigurationTemplateManager implements Synchronization
                         if (isComposite(instance))
                         {
                             Configuration configuration = (Configuration) instance;
-                            events.add(new PostDeleteEvent(source, configuration, !concretePath.equals(configuration.getConfigurationPath())));
+                            events.add(new PostDeleteEvent(ConfigurationTemplateManager.this, configuration, !concretePath.equals(configuration.getConfigurationPath())));
                         }
                     }
                 }

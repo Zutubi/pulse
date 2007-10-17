@@ -76,13 +76,14 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
 
         // check the save events.
         a = configurationTemplateManager.getCloneOfInstance(path, A.class);
+        a.setField("edited");
         configurationTemplateManager.save(a);
-        listener.assertNextEvent(PostSaveEvent.class, "sample/a");
+        listener.assertNextEvent(PostSaveEvent.class, "sample/edited");
         listener.assertNoMoreEvents();
 
         // check the delete events.
-        configurationTemplateManager.delete("sample/a");
-        listener.assertNextEvent(PostDeleteEvent.class, "sample/a");
+        configurationTemplateManager.delete("sample/edited");
+        listener.assertNextEvent(PostDeleteEvent.class, "sample/edited");
         listener.assertNoMoreEvents();
     }
 
@@ -103,33 +104,32 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
         includingChildren.assertNoMoreEvents();
         excludingChildren.assertNoMoreEvents();
 
-        B b = new B("b");
-
-        String bPath = configurationTemplateManager.insert("sample/a/b", b);
+        configurationTemplateManager.insert("sample/a/b", new B("b"));
         includingChildren.assertNextEvent(PostInsertEvent.class, "sample/a/b");
         includingChildren.assertNoMoreEvents();
         excludingChildren.assertNoMoreEvents();
 
         // check the save events.
         a = configurationTemplateManager.getCloneOfInstance(aPath, A.class);
+        a.setField("edited");
         configurationTemplateManager.save(a);
         // including listening at "sample", will see everything that happens below it.
-        includingChildren.assertNextEvent(PostSaveEvent.class, "sample/a");
-        includingChildren.assertNextEvent(PostSaveEvent.class, "sample/a/b");
+        includingChildren.assertNextEvent(PostSaveEvent.class, "sample/edited");
         includingChildren.assertNoMoreEvents();
         // excludingChildren listening at "sample", will not see changes to "sample/a"
         excludingChildren.assertNoMoreEvents();
 
-        b = configurationTemplateManager.getCloneOfInstance(bPath, B.class);
+        B b = configurationTemplateManager.getCloneOfInstance("sample/edited/b", B.class);
+        b.setField("edited");
         configurationTemplateManager.save(b);
-        includingChildren.assertNextEvent(PostSaveEvent.class, "sample/a/b");
+        includingChildren.assertNextEvent(PostSaveEvent.class, "sample/edited/b");
         includingChildren.assertNoMoreEvents();
         excludingChildren.assertNoMoreEvents();
 
         // check the delete events.
-        configurationTemplateManager.delete("sample/a");
-        includingChildren.assertNextEvent(PostDeleteEvent.class, "sample/a");
-        includingChildren.assertNextEvent(PostDeleteEvent.class, "sample/a/b");
+        configurationTemplateManager.delete("sample/edited");
+        includingChildren.assertNextEvent(PostDeleteEvent.class, "sample/edited");
+        includingChildren.assertNextEvent(PostDeleteEvent.class, "sample/edited/b");
         includingChildren.assertNoMoreEvents();
         // excludingChildren listenening at "sample", will not see changes to "sample/a"
         excludingChildren.assertNoMoreEvents();

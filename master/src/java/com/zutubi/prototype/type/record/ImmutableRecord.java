@@ -85,4 +85,14 @@ public class ImmutableRecord implements Record
     {
         return delegate.isCollection();
     }
+
+    public boolean valuesEqual(Object v1, Object v2)
+    {
+        return delegate.valuesEqual(v1, v2);
+    }
+
+    public boolean shallowEquals(Record other)
+    {
+        return delegate.shallowEquals(other);
+    }
 }

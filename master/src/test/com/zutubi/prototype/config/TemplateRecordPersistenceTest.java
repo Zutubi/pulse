@@ -9,6 +9,7 @@ import com.zutubi.prototype.config.events.PostSaveEvent;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.MapType;
 import com.zutubi.prototype.type.TemplatedMapType;
+import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.TemplateRecord;
@@ -179,6 +180,22 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertNull(template.getMoi().get("url"));
     }
 
+    public void testScrubArrayOnInsert()
+    {
+        MutableRecord record = createGlobal();
+        record.put("coolnesses", new String[]{Coolness.PULSE.toString()});
+        configurationTemplateManager.insertRecord("project", record);
+
+        record = createChild();
+        record.put("coolnesses", new String[]{Coolness.PULSE.toString()});
+        configurationTemplateManager.insertRecord("project", record);
+
+        TemplateRecord template = (TemplateRecord) configurationTemplateManager.getRecord("project/child");
+        assertTrue(Arrays.equals(new String[]{Coolness.PULSE.toString()}, (String[]) template.get("coolnesses")));
+        assertEquals(GLOBAL_PROJECT, template.getOwner("coolnesses"));
+        assertNull(template.getMoi().get("coolnesses"));
+    }
+
     public void testScrubOnInsertDeep()
     {
         MutableRecord record = createGlobal();
@@ -228,6 +245,15 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         configurationTemplateManager.insertRecord("project", child);
 
         failedInsertHelper("project/global/stages", createStage(stageName), "Unable to insert record with name 'test' into path 'project/global/stages': a record with this name already exists in descendents [child]");
+    }
+
+    public void testInsertPathAlreadyHidden()
+    {
+        insertGlobal();
+        insertChild();
+        configurationTemplateManager.delete("project/child/stages/default");
+
+        failedInsertHelper("project/child/stages", createStage("default"), "Unable to insert record with name 'default' into path 'project/child/stages': a record with this name already exists in ancestor 'global'");
     }
 
     public void testInsertPathHiddenInAncestor()
@@ -385,6 +411,84 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertNotNull(childProperty);
         assertEquals(GLOBAL_PROJECT, childProperty.getOwner("name"));
         assertEquals(GLOBAL_PROJECT, childProperty.getOwner("value"));
+    }
+
+    public void testSaveOptimisedAway()
+    {
+        insertGlobal();
+        insertChild();
+
+        String path = "project/child";
+        Project instance = configurationTemplateManager.getInstance(path, Project.class);
+        Listener listener = registerListener();
+        configurationTemplateManager.saveRecord(path, recordManager.select(path).copy(false));
+        listener.assertEvents();
+        assertSame(instance, configurationTemplateManager.getInstance(path, Project.class));
+    }
+
+    public void testShallowSaveOptimisedAwayDespiteNestedChange()
+    {
+        insertGlobal();
+        insertChild();
+
+        String path = "project/child";
+        Project instance = configurationTemplateManager.getInstance(path, Project.class);
+        Listener listener = registerListener();
+        MutableRecord record = recordManager.select(path).copy(false);
+        record.put("property", createProperty("foo", "bar"));
+        configurationTemplateManager.saveRecord(path, record);
+
+        listener.assertEvents();
+        assertSame(instance, configurationTemplateManager.getInstance(path, Project.class));
+    }
+
+    public void testDeepSaveNotOptimisedAwayWhenNestedChange() throws TypeException
+    {
+        insertGlobal();
+        insertChild();
+
+        String path = "project/child";
+        Project instance = configurationTemplateManager.getInstance(path, Project.class);
+        Listener listener = registerListener();
+        MutableRecord record = projectType.unstantiate(instance);
+        record.put("property", createProperty("foo", "bar"));
+        configurationTemplateManager.saveRecord(path, record, true);
+
+        listener.assertEvents(new PostInsertEventSpec(path + "/property", false));
+        Project newInstance = configurationTemplateManager.getInstance(path, Project.class);
+        assertNotSame(instance, newInstance);
+        assertEquals("bar", newInstance.getProperty().getValue());
+    }
+
+    public void testInstanceSaveOptimisedAway()
+    {
+        insertGlobal();
+        insertChild();
+
+        String path = "project/child";
+        Project instance = configurationTemplateManager.getInstance(path, Project.class);
+        Listener listener = registerListener();
+        configurationTemplateManager.save(instance);
+        listener.assertEvents();
+        assertSame(instance, configurationTemplateManager.getInstance(path, Project.class));
+    }
+
+    public void testInstanceSaveNotOptimisedAwayWhenNestedChange() throws TypeException
+    {
+        insertGlobal();
+        insertChild();
+
+        String path = "project/child";
+        Project instance = configurationTemplateManager.getInstance(path, Project.class);
+        Listener listener = registerListener();
+        Project clone = configurationTemplateManager.deepClone(instance);
+        clone.setProperty(new Property("foo", "bar"));
+        configurationTemplateManager.save(clone);
+
+        listener.assertEvents(new PostInsertEventSpec(path + "/property", false));
+        Project newInstance = configurationTemplateManager.getInstance(path, Project.class);
+        assertNotSame(instance, newInstance);
+        assertEquals("bar", newInstance.getProperty().getValue());
     }
 
     public void testNoInheritValuesAreNotScrubbed()
@@ -788,6 +892,24 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         listener.assertEvents(new PostInsertEventSpec(path, false), new PostInsertEventSpec(path + "/properties/p1", true));
     }
 
+    public void testModifyAfterRestore()
+    {
+        insertGlobal();
+        insertChild();
+
+        String path = "project/child/stages/default";
+        hideStage(path);
+        configurationTemplateManager.restore(path);
+        Stage stage = configurationTemplateManager.getInstance(path, Stage.class);
+        stage.setRecipe("edited");
+
+        Listener listener = registerListener();
+        configurationTemplateManager.save(stage);
+        listener.assertEvents(new PostSaveEventSpec(path));
+
+        assertEquals("edited", configurationTemplateManager.getInstance(path, Stage.class).getRecipe());
+    }
+    
     private void insertToGrandchild()
     {
         insertGlobal();

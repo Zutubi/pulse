@@ -227,7 +227,7 @@ public class MapType extends CollectionType
         String name = (String) record.get(keyProperty);
         if(name == null)
         {
-            throw new IllegalArgumentException("blarg!");
+            throw new IllegalArgumentException("Record has no " + keyProperty);
         }
         return PathUtils.getPath(PathUtils.getParentPath(path), name);
     }
