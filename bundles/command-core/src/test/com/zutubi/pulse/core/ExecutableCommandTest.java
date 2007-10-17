@@ -329,6 +329,56 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
         }
     }
 
+
+    public void testAcceptableNamesOnWindows()
+    {
+        if (!SystemUtils.IS_WINDOWS)
+        {
+            return;
+        }
+
+        ExecutableCommand cmd = new ExecutableCommand();
+        assertTrue(cmd.acceptableName("^"));
+        assertTrue(cmd.acceptableName("<"));
+        assertTrue(cmd.acceptableName(">"));
+        assertTrue(cmd.acceptableName("|"));
+        assertTrue(cmd.acceptableName("&"));
+        assertTrue(cmd.acceptableName(" "));
+
+        assertFalse(cmd.acceptableName("="));
+    }
+
+    public void testAcceptableNames()
+    {
+        ExecutableCommand cmd = new ExecutableCommand();
+        assertTrue(cmd.acceptableName("a"));
+        assertTrue(cmd.acceptableName("Z"));
+        assertTrue(cmd.acceptableName("2"));
+
+        assertFalse(cmd.acceptableName("env.something"));
+    }
+
+    public void testConvertNames()
+    {
+        ExecutableCommand cmd = new ExecutableCommand();
+        assertEquals("PULSE_A", cmd.convertName("a"));
+        assertEquals("PULSE_1", cmd.convertName("1"));
+    }
+
+    public void testWindowsEnvironmentNames() throws Exception
+    {
+        if (SystemUtils.IS_WINDOWS)
+        {
+            Scope scope = new Scope();
+            scope.add(new ResourceProperty("a<>", "b", true, false, false));
+            ExecutableCommand command = new ExecutableCommand();
+            command.setScope(scope);
+            command.setExe("dir");
+
+            runCommand(command);
+        }
+    }
+
     private CommandResult runCommand(ExecutableCommand command, long buildNumber)
     {
         BuildContext buildContext = new BuildContext();

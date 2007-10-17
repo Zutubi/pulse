@@ -463,15 +463,26 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
      * @return return false if the name contains the 'env.' prefix, or contains an unsupported
      * character
      */
-    private boolean acceptableName(String name)
+    protected boolean acceptableName(String name)
     {
-        return !name.startsWith("env.") && name.matches("[-a-zA-Z._]+");
+        if(name.startsWith("env."))
+        {
+            return false;
+        }
+
+        if (SystemUtils.IS_WINDOWS)
+        {
+            return name.matches("[-a-zA-Z._0-9<>|&^% ]+");
+        }
+
+        return name.matches("[-a-zA-Z._0-9]+");
     }
 
-    private String convertName(String name)
+    protected String convertName(String name)
     {
         name = name.toUpperCase();
         name = name.replaceAll("\\.", "_");
+
         return "PULSE_" + name;
     }
 
