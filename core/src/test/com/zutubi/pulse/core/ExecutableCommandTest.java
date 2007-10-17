@@ -203,7 +203,7 @@ public class ExecutableCommandTest extends PulseTestCase
         execute(command, result);
         assertTrue(result.succeeded());
         String output = getOutput();
-        assertTrue(output.contains("test variable value"));
+        assertTrue(output, output.contains("test variable value"));
     }
 
     public void testEnvironmentDetailsAreCaptured() throws IOException
@@ -225,9 +225,9 @@ public class ExecutableCommandTest extends PulseTestCase
         assertEquals("text/plain", envArtifact.getType());
 
         String output = getEnv();
-        assertTrue(output.contains("Command Line:"));
-        assertTrue(output.contains("Process Environment:"));
-        assertTrue(output.contains("Resources:"));
+        assertTrue(output, output.contains("Command Line:"));
+        assertTrue(output, output.contains("Process Environment:"));
+        assertTrue(output, output.contains("Resources:"));
 
         artifact = artifacts.get(1);
         StoredFileArtifact outputArtifact = artifact.getChildren().get(0);
@@ -243,7 +243,7 @@ public class ExecutableCommandTest extends PulseTestCase
         execute(command, result, 1234);
 
         String output = getEnv();
-        assertTrue(output.contains("PULSE_BUILD_NUMBER=1234"));
+        assertTrue(output, output.contains("PULSE_BUILD_NUMBER=1234"));
     }
 
     public void testBuildNumberNotAddedToEnvironmentWhenNotSpecified() throws IOException
@@ -262,12 +262,12 @@ public class ExecutableCommandTest extends PulseTestCase
         if (runningInPulse)
         {
             // should only appear once.
-            assertTrue(output.indexOf("PULSE_BUILD_NUMBER") == output.lastIndexOf("PULSE_BUILD_NUMBER"));
+            assertTrue(output, output.indexOf("PULSE_BUILD_NUMBER") == output.lastIndexOf("PULSE_BUILD_NUMBER"));
         }
         else
         {
             // does not appear.
-            assertFalse(output.contains("PULSE_BUILD_NUMBER"));
+            assertFalse(output, output.contains("PULSE_BUILD_NUMBER"));
         }
 
     }
@@ -285,7 +285,7 @@ public class ExecutableCommandTest extends PulseTestCase
         execute(command, result, 1234);
 
         String output = getEnv();
-        assertTrue(output.toLowerCase().contains("path=somedir" + File.pathSeparator));
+        assertTrue(output, output.toLowerCase().contains("path=somedir" + File.pathSeparator));
     }
 
     public void testNoSuchExecutableOnWindows()
@@ -331,8 +331,8 @@ public class ExecutableCommandTest extends PulseTestCase
             {
                 String message = e.getMessage();
                 boolean java15 = message.contains("Working directory 'nosuchworkdir' does not exist");
-                boolean jaav16 = message.endsWith("The directory name is invalid");
-                assertTrue(java15 || jaav16);
+                boolean java16 = message.endsWith("The directory name is invalid");
+                assertTrue(java15 || java16);
             }
         }
     }
@@ -377,9 +377,19 @@ public class ExecutableCommandTest extends PulseTestCase
 
         if(buildNumber > 0)
         {
-            Scope scope = new Scope();
-            scope.add(new Property("build.number", Long.toString(buildNumber)));
-            context.setGlobalScope(scope);
+            Scope globalScope = new Scope();
+            globalScope.add(new Property("build.number", Long.toString(buildNumber)));
+            context.setGlobalScope(globalScope);
+
+            Scope commandScope = command.getScope();
+            if (commandScope != null)
+            {
+                commandScope.setParent(globalScope);
+            }
+            else
+            {
+                command.setScope(new Scope(globalScope));    
+            }
         }
         command.execute(context, result);
     }

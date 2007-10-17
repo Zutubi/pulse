@@ -13,13 +13,12 @@ import java.util.Map;
  */
 public class ScopeTest extends PulseTestCase
 {
-    private Scope parent;
     private Scope scope;
 
     protected void setUp() throws Exception
     {
         super.setUp();
-        parent = new Scope();
+        Scope parent = new Scope();
         scope = new Scope(parent);
         parent.add(new Property("parent only", "parent"));
         parent.add(new Property("parent and child", "parent"));
@@ -38,6 +37,12 @@ public class ScopeTest extends PulseTestCase
         scope.add(new ResourceProperty("parent and child resource", "child resource", true, true, false));
 
         scope.add(new ResourceProperty("not added", "not added", false, false, false));
+    }
+
+    protected void tearDown() throws Exception
+    {
+        scope = null;
+        super.tearDown();
     }
 
     public void testProperty()
@@ -203,6 +208,19 @@ public class ScopeTest extends PulseTestCase
         Scope s = new Scope();
         s.add(new ResourceProperty("myvar", "this ${ is invalid", false, true, true));
         assertEquals("this ${ is invalid", s.getReference("myvar").getValue());        
+    }
+
+    public void testGetReferencesIncludesParents()
+    {
+        Scope parent = new Scope();
+        Scope child = new Scope(parent);
+
+        parent.add(new ResourceProperty("name", "value"));
+
+        List<Reference> references = child.getReferences();
+        assertEquals(1, references.size());
+        assertEquals("name", references.get(0).getName());
+        assertEquals("value", references.get(0).getValue());
     }
 
     private String getValue(String name)

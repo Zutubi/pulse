@@ -443,10 +443,9 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
             childEnvironment.put(setting.getName(), setting.getValue());
         }
 
-        Scope globalScope = context.getGlobalScope();
-        if(globalScope != null)
+        if (scope != null)
         {
-            for(Reference reference: globalScope.getReferences())
+            for(Reference reference: scope.getReferences())
             {
                 if(acceptableName(reference.getName()) && reference.getValue() instanceof String)
                 {

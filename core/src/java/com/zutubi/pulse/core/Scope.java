@@ -35,14 +35,26 @@ public class Scope
         return parent;
     }
 
+    public void setParent(Scope parent)
+    {
+        this.parent = parent;
+    }
+
     public List<Reference> getReferences()
     {
         List<Reference> result = new ArrayList<Reference>(references.size());
+
+        if (parent != null)
+        {
+            result.addAll(parent.getReferences());
+        }
+
         for(ReferenceInfo info: references)
         {
             result.add(info.reference);
         }
 
+/*
         final Sort.StringComparator stringComp = new Sort.StringComparator();
         Collections.sort(result, new Comparator<Reference>()
         {
@@ -51,7 +63,7 @@ public class Scope
                 return stringComp.compare(r1.getName(), r2.getName());
             }
         });
-        
+*/
         return result;
     }
 
