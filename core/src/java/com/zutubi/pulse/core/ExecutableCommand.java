@@ -457,20 +457,36 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
         }
     }
 
-    private boolean acceptableName(String name)
+    protected boolean acceptableName(String name)
     {
         if(name.startsWith("env."))
         {
             return false;
         }
 
-        return name.matches("[-a-zA-Z._]+");
+        if (SystemUtils.IS_WINDOWS)
+        {
+            return name.matches("[-a-zA-Z._0-9<>|&^% ]+");
+        }
+
+        return name.matches("[-a-zA-Z._0-9]+");
     }
 
-    private String convertName(String name)
+    protected String convertName(String name)
     {
         name = name.toUpperCase();
         name = name.replaceAll("\\.", "_");
+
+        if (SystemUtils.IS_WINDOWS)
+        {
+            // escape special characters.
+            name = name.replaceAll("\\^", "^^");
+            name = name.replaceAll("<", "^<");
+            name = name.replaceAll(">", "^>");
+            name = name.replaceAll("\\|", "^|");
+            name = name.replaceAll("&", "^&");
+        }
+
         return "PULSE_" + name;
     }
 

@@ -352,6 +352,53 @@ public class ExecutableCommandTest extends PulseTestCase
         }
     }
 
+    public void testAcceptableNamesOnWindows()
+    {
+        if (!SystemUtils.IS_WINDOWS)
+        {
+            return;
+        }
+
+        ExecutableCommand cmd = new ExecutableCommand();
+        assertTrue(cmd.acceptableName("^"));
+        assertTrue(cmd.acceptableName("<"));
+        assertTrue(cmd.acceptableName(">"));
+        assertTrue(cmd.acceptableName("|"));
+        assertTrue(cmd.acceptableName("&"));
+        assertTrue(cmd.acceptableName(" "));
+
+        assertFalse(cmd.acceptableName("="));
+    }
+
+    public void testAcceptableNames()
+    {
+        ExecutableCommand cmd = new ExecutableCommand();
+        assertTrue(cmd.acceptableName("a"));
+        assertTrue(cmd.acceptableName("Z"));
+        assertTrue(cmd.acceptableName("2"));
+
+        assertFalse(cmd.acceptableName("env.something"));
+    }
+
+    public void testConvertNamesOnWindows()
+    {
+        if (!SystemUtils.IS_WINDOWS)
+        {
+            return;
+        }
+
+        ExecutableCommand cmd = new ExecutableCommand();
+        assertEquals("PULSE_$%", cmd.convertName("$%"));
+        assertEquals("PULSE_BLAH^^^<^>^|^& ", cmd.convertName("blah^<>|& "));
+    }
+
+    public void testConvertNames()
+    {
+        ExecutableCommand cmd = new ExecutableCommand();
+        assertEquals("PULSE_A", cmd.convertName("a"));
+        assertEquals("PULSE_1", cmd.convertName("1"));
+    }
+
     private String getOutput() throws IOException
     {
         return IOUtils.fileToString(new File(outputDirectory, Command.OUTPUT_ARTIFACT_NAME + "/output.txt"));
