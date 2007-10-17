@@ -477,16 +477,6 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
         name = name.toUpperCase();
         name = name.replaceAll("\\.", "_");
 
-        if (SystemUtils.IS_WINDOWS)
-        {
-            // escape special characters.
-            name = name.replaceAll("\\^", "^^");
-            name = name.replaceAll("<", "^<");
-            name = name.replaceAll(">", "^>");
-            name = name.replaceAll("\\|", "^|");
-            name = name.replaceAll("&", "^&");
-        }
-
         return "PULSE_" + name;
     }
 

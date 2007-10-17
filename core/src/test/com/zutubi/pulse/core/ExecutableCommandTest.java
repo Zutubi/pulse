@@ -380,23 +380,29 @@ public class ExecutableCommandTest extends PulseTestCase
         assertFalse(cmd.acceptableName("env.something"));
     }
 
-    public void testConvertNamesOnWindows()
-    {
-        if (!SystemUtils.IS_WINDOWS)
-        {
-            return;
-        }
-
-        ExecutableCommand cmd = new ExecutableCommand();
-        assertEquals("PULSE_$%", cmd.convertName("$%"));
-        assertEquals("PULSE_BLAH^^^<^>^|^& ", cmd.convertName("blah^<>|& "));
-    }
-
     public void testConvertNames()
     {
         ExecutableCommand cmd = new ExecutableCommand();
         assertEquals("PULSE_A", cmd.convertName("a"));
         assertEquals("PULSE_1", cmd.convertName("1"));
+    }
+
+    public void testWindowsEnvironmentNames() throws IOException
+    {
+        if (SystemUtils.IS_WINDOWS)
+        {
+            Scope scope = new Scope();
+            scope.add(new ResourceProperty("a<>", "b", true, false, false));
+            ExecutableCommand command = new ExecutableCommand();
+            command.setScope(scope);
+            command.setExe("dir");
+
+            CommandResult result = new CommandResult("success");
+            execute(command, result);
+            assertTrue(result.succeeded());
+
+            System.out.println(getEnv());
+        }
     }
 
     private String getOutput() throws IOException
