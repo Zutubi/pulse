@@ -4,6 +4,8 @@
 <head>
     <title>#wwtext("name=administration")</title>
 	<script type="text/javascript">
+	    var actionInProgress = false;
+
         var configTree;
         var templateTree;
         var visibleTree;
@@ -51,6 +53,8 @@
                             maskedElement.unmask();
                         }
                     }
+
+                    actionInProgress = false;
                 },
 
                 failure: function(response)
@@ -59,12 +63,15 @@
                     {
                         maskedElement.unmask();
                     }
+
+                    actionInProgress = false;
                 }
             }
         }
 
         var runAjaxRequest = function(url)
         {
+            actionInProgress = true;
             var pane = Ext.get('center');
             pane.mask('Please wait...');
             Ext.lib.Ajax.request('get', url, getAjaxCallback(pane));

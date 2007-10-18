@@ -16,11 +16,13 @@ public class DeleteConfirmPage extends SeleniumPage
     public static final String CONFIRM_LINK = "confirm.delete";
     public static final String CANCEL_LINK = "cancel.delete";
     private String path;
+    private boolean hide;
 
-    public DeleteConfirmPage(Selenium selenium, Urls urls, String path)
+    public DeleteConfirmPage(Selenium selenium, Urls urls, String path, boolean hide)
     {
         super(selenium, urls, "delete:" + path);
         this.path = path;
+        this.hide = hide;
     }
 
     public String getUrl()
@@ -55,7 +57,7 @@ public class DeleteConfirmPage extends SeleniumPage
             SeleniumUtils.assertCellContents(selenium, getId(), i + 1, 1, pathActionPairs[i * 2 + 1]);
         }
 
-        SeleniumUtils.assertCellContents(selenium, getId(), i + 1, 0, "delete    cancel");
+        SeleniumUtils.assertCellContents(selenium, getId(), i + 1, 0, (hide ? "hide" : "delete") + "    cancel");
     }
 
     public void clickDelete()

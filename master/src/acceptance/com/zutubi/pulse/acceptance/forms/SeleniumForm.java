@@ -151,7 +151,7 @@ public abstract class SeleniumForm
         selenium.click("zfid." + id);
         if (ajax)
         {
-            SeleniumUtils.waitForVariable(selenium, "formSubmitting", SeleniumUtils.DEFAULT_TIMEOUT, true);            
+            SeleniumUtils.waitForVariable(selenium, "formSubmitting", SeleniumUtils.DEFAULT_TIMEOUT, true);
         }
         else
         {

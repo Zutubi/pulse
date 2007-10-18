@@ -1,0 +1,67 @@
+package com.zutubi.pulse.acceptance.pages.admin;
+
+import com.thoughtworks.selenium.Selenium;
+import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.pulse.acceptance.forms.SeleniumForm;
+import com.zutubi.pulse.acceptance.pages.SeleniumPage;
+import com.zutubi.pulse.webwork.mapping.Urls;
+import junit.framework.Assert;
+
+/**
+ * Base for config pages that appear when the "configuration" tab is selected
+ * in the tree pane.
+ */
+public abstract class ConfigPage extends SeleniumPage
+{
+    public ConfigPage(Selenium selenium, Urls urls, String id)
+    {
+        super(selenium, urls, id);
+    }
+
+    public ConfigPage(Selenium selenium, Urls urls, String id, String title)
+    {
+        super(selenium, urls, id, title);
+    }
+
+    public <T extends SeleniumForm> T clickComposite(String displayName, T expectedForm)
+    {
+        selenium.click(getTreeLinkLocator(displayName));
+        return expectedForm;
+    }
+
+    public ListPage clickCollection(String baseName, String displayName)
+    {
+        selenium.click(getTreeLinkLocator(displayName));
+        return new ListPage(selenium, urls, PathUtils.getPath(getId(), baseName));
+    }
+
+    public void expandTreeNode(String path)
+    {
+        selenium.getEval("selenium.browserbot.currentWindow.configTree.getNodeByConfigPath('" + path + "').expand()");
+    }
+
+    public String getTreeLinkLocator(String displayName)
+    {
+        return "link=" + displayName;
+    }
+
+    public boolean isTreeLinkPresent(String displayName)
+    {
+        return selenium.isElementPresent(getTreeLinkLocator(displayName));
+    }
+
+    public void assertTreeLinkPresent(String displayName)
+    {
+        Assert.assertTrue(isTreeLinkPresent(displayName));
+    }
+
+    public void assertTreeLinkNotPresent(String displayName)
+    {
+        Assert.assertFalse(isTreeLinkPresent(displayName));
+    }
+
+    protected String getHierarchyLocator()
+    {
+        return "//span[text()='hierarchy']";
+    }
+}

@@ -4,17 +4,19 @@ import com.thoughtworks.selenium.Selenium;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.acceptance.IDs;
 import com.zutubi.pulse.acceptance.SeleniumUtils;
-import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.webwork.mapping.Urls;
 
 /**
  * A page in the admin UI that displays a list of composites.  The list is
  * shown in a table with edit and delete links, and there are no child nodes.
  */
-public class ListPage extends SeleniumPage
+public class ListPage extends ConfigPage
 {
-    private static final String ADD_LINK = "map:add";
+    public static final String ANNOTATION_INHERITED  = "inherited";
+    public static final String ANNOTATION_OVERRIDDEN = "overridden";
+    public static final String ANNOTATION_HIDDEN     = "hidden";
 
+    private static final String ADD_LINK = "map:add";
     private String path;
 
     public ListPage(Selenium selenium, Urls urls, String path)
@@ -28,9 +30,16 @@ public class ListPage extends SeleniumPage
         return urls.admin() + path + "/";
     }
 
-    public void assertItemPresent(String baseName, String... actions)
+    public void assertItemPresent(String baseName, String annotation, String... actions)
     {
         SeleniumUtils.assertElementPresent(selenium, getItemId(baseName));
+
+        if(annotation == null)
+        {
+            annotation = "noan";
+        }
+        SeleniumUtils.assertElementPresent(selenium, annotation + ":" + baseName);
+
         for(String action: actions)
         {
             SeleniumUtils.assertLinkPresent(selenium, getActionId(action, baseName));
@@ -77,7 +86,15 @@ public class ListPage extends SeleniumPage
 
     public DeleteConfirmPage clickDelete(String baseName)
     {
-        selenium.click(getActionId("delete", baseName));
-        return new DeleteConfirmPage(selenium, urls, PathUtils.getPath(path, baseName));
+        String actionId = getActionId("delete", baseName);
+        boolean isHide = "hide".equals(selenium.getText(actionId));
+        selenium.click(actionId);
+        return new DeleteConfirmPage(selenium, urls, PathUtils.getPath(path, baseName), isHide);
+    }
+
+    public void clickRestore(String baseName)
+    {
+        selenium.click(getActionId("restore", baseName));
+        SeleniumUtils.waitForVariable(selenium, "actionInProgress", SeleniumUtils.DEFAULT_TIMEOUT, true);
     }
 }

@@ -1,15 +1,12 @@
 package com.zutubi.pulse.acceptance.pages.admin;
 
 import com.thoughtworks.selenium.Selenium;
-import com.zutubi.prototype.type.record.PathUtils;
-import com.zutubi.pulse.acceptance.forms.SeleniumForm;
-import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.webwork.mapping.Urls;
 
 /**
  * The page shown when looking at a project in the configuration view.
  */
-public class ProjectConfigPage extends SeleniumPage
+public class ProjectConfigPage extends ConfigPage
 {
     public static final String BUILD_STAGES_BASE    = "stages";
     public static final String BUILD_STAGES_DISPLAY = "build stages";
@@ -24,34 +21,14 @@ public class ProjectConfigPage extends SeleniumPage
         this.template = template;
     }
 
-    public void assertPresent()
-    {
-        super.assertPresent();
-    }
-
     public String getUrl()
     {
         return urls.adminProject(project);
     }
 
-    public <T extends SeleniumForm> T selectComposite(String displayName, T expectedForm)
-    {
-        selenium.click("link=" + displayName);
-        expectedForm.waitFor();
-        return expectedForm;
-    }
-
-    public ListPage selectCollection(String baseName, String displayName)
-    {
-        selenium.click("link=" + displayName);
-        ListPage listPage = new ListPage(selenium, urls, PathUtils.getPath(getId(), baseName));
-        listPage.waitFor();
-        return listPage;
-    }
-
     public ProjectHierarchyPage clickHierarchy()
     {
-        selenium.click("//span[text()='hierarchy']");
+        selenium.click(super.getHierarchyLocator());
         return new ProjectHierarchyPage(selenium, urls, project, template);
     }
 }

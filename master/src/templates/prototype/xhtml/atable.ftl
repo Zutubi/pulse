@@ -40,7 +40,8 @@
             <@annotation id="hidden" baseName=row.baseName qtip="hidden item defined at ${row.parameters.hiddenFrom}"/>
         </#if>
         <#if annotationCount == 0>
-            &nbsp;
+            <#assign rawId = "noan:${row.baseName}"/>
+            <span id="${rawId?id}">-</span>
         </#if>
         </td>
 

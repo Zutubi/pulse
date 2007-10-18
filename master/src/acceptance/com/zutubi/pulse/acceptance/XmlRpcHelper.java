@@ -140,6 +140,11 @@ public class XmlRpcHelper
         return call("saveConfig", path, config, deep);
     }
 
+    public boolean deleteConfig(String path) throws Exception
+    {
+        return (Boolean) call("deleteConfig", path);
+    }
+
     public void deleteAllConfigs(String pathPattern) throws Exception
     {
         call("deleteAllConfigs", pathPattern);

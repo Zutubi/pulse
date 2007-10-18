@@ -51,7 +51,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
             labelsPage.waitFor();
             String baseName = getNewestListItem(labelsPath);
-            labelsPage.assertItemPresent(baseName, "view", "delete");
+            labelsPage.assertItemPresent(baseName, null, "view", "delete");
             DeleteConfirmPage deleteConfirmPage = labelsPage.clickDelete(baseName);
             deleteConfirmPage.waitFor();
             labelsPage = deleteConfirmPage.confirm();
@@ -119,7 +119,8 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         ProjectConfigPage configPage = new ProjectConfigPage(selenium, urls, random, false);
         configPage.goTo();
-        ListPage listPage = configPage.selectCollection("permissions", "permissions");
+        ListPage listPage = configPage.clickCollection("permissions", "permissions");
+        listPage.waitFor();
         listPage.assertCellContent(0, 1, "[view]");
 
         selenium.click("link=view");
@@ -143,7 +144,8 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         ProjectConfigPage configPage = new ProjectConfigPage(selenium, urls, random, false);
         configPage.goTo();
-        AntTypeForm form = configPage.selectComposite("project type", new AntTypeForm(selenium));
+        AntTypeForm form = configPage.clickComposite("project type", new AntTypeForm(selenium));
+        form.waitFor();
         form.assertFormElements("", "build.xml", "", "", "");
         form.applyFormElements(null, null, null, null, "ant");
         form.waitFor();

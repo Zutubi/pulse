@@ -1,11 +1,11 @@
 package com.zutubi.pulse.acceptance.pages.admin;
 
-import com.zutubi.pulse.acceptance.pages.SeleniumPage;
+import com.thoughtworks.selenium.Selenium;
+import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.acceptance.SeleniumUtils;
+import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.webwork.mapping.Urls;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.prototype.type.record.PathUtils;
-import com.thoughtworks.selenium.Selenium;
 import junit.framework.Assert;
 
 /**
@@ -81,6 +81,6 @@ public class HierarchyPage extends SeleniumPage
     public DeleteConfirmPage clickDelete()
     {
         selenium.click(LINK_DELETE);
-        return new DeleteConfirmPage(selenium, urls, getId());
+        return new DeleteConfirmPage(selenium, urls, getId(), false);
     }
 }
