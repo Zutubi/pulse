@@ -37,8 +37,14 @@ public class Transaction
      */
     private int depth;
 
-    Transaction(TransactionManager transactionManager)
+    /**
+     * Transaction id, unique to all transactions within a particular transaction manager.
+     */
+    private long id;
+
+    Transaction(long id, TransactionManager transactionManager)
     {
+        this.id = id;
         this.transactionManager = transactionManager;
     }
 
@@ -161,5 +167,10 @@ public class Transaction
     int getDepth()
     {
         return depth;
+    }
+
+    public long getId()
+    {
+        return id;
     }
 }

@@ -13,6 +13,8 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class TransactionManager
 {
+    private static long nextTransactionId = 1;
+
     private ThreadLocal<Transaction> transactionHolder = new ThreadLocal<Transaction>();
 
     private Lock activeTransaction = new ReentrantLock();
@@ -48,7 +50,7 @@ public class TransactionManager
         if (txn == null)
         {
             // No transaction in progress, so start one.
-            txn = new Transaction(this);
+            txn = new Transaction(nextTransactionId++, this);
             txn.setStatus(TransactionStatus.ACTIVE);
             transactionHolder.set(txn);
 

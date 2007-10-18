@@ -25,6 +25,28 @@ public class TransactionManagerTest extends PulseTestCase
         super.tearDown();
     }
 
+    // check that the transaction ids are unique and sequentially increasing(?)
+    public void testUniqueTransactionIdsAllocatedToTransactions()
+    {
+        UserTransaction userTransaction = new UserTransaction(transactionManager);
+        userTransaction.begin();
+
+        long id = transactionManager.getTransaction().getId();
+
+        userTransaction.commit();
+        userTransaction.begin();
+
+        assertTrue(id < transactionManager.getTransaction().getId());
+        id = transactionManager.getTransaction().getId();
+
+        userTransaction.rollback();
+        userTransaction.begin();
+
+        assertTrue(id < transactionManager.getTransaction().getId());
+
+        userTransaction.commit();
+    }
+
     public void testSimpleCommitTransactionFlow()
     {
         UserTransaction userTransaction = new UserTransaction(transactionManager);
