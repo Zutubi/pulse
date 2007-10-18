@@ -306,6 +306,11 @@ public class TemplateRecord extends AbstractRecord
         throw new UnsupportedOperationException("Record is not mutable.");
     }
 
+    public Set<String> getHiddenKeys()
+    {
+        return getHiddenKeys(moi);
+    }
+
     public static void hideItem(MutableRecord record, String key)
     {
         Set<String> hiddenKeys = getHiddenKeys(record);

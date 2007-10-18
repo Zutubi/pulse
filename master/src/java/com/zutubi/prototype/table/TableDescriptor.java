@@ -21,6 +21,7 @@ import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.logging.Logger;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -70,22 +71,45 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
             table.addHeader(messages.format(column.getName() + ".label"));
         }
 
-        if(data != null && data.size() > 0)
+        if(data != null)
         {
             for(String key: collectionType.getOrder(data))
             {
                 String itemPath = PathUtils.getPath(path, key);
                 Configuration instance = configurationTemplateManager.getInstance(itemPath);
                 Row row = new Row(itemPath, getActions(instance, messages));
-                for(ColumnDescriptor column: columns)
-                {
-                    row.addCell(new Cell(column.getValue(instance).toString()));
-                }
+                addCells(row, instance);
                 applyDecorations(data, key, row, messages);
                 table.addRow(row);
             }
+
+            if(data instanceof TemplateRecord)
+            {
+                TemplateRecord templateRecord = (TemplateRecord) data;
+                TemplateRecord templateParent = templateRecord.getParent();
+                if(templateParent != null)
+                {
+                    String parentId = templateParent.getOwner();
+                    String[] elements = PathUtils.getPathElements(path);
+                    String parentPath = PathUtils.getPath(elements[0], parentId, PathUtils.getPath(2, elements));
+
+                    List<String> hiddenKeys = new LinkedList<String>(templateRecord.getHiddenKeys());
+                    Collections.sort(hiddenKeys, collectionType.getKeyComparator());
+                    for(String hidden: hiddenKeys)
+                    {
+                        String parentItemPath = PathUtils.getPath(parentPath, hidden);
+                        Configuration instance = configurationTemplateManager.getInstance(parentItemPath);
+                        Row row = new Row(PathUtils.getPath(path, hidden), Arrays.asList(new RowAction("restore", messages.format("restore.label"))));
+                        addCells(row, instance);
+                        row.addParameter("hiddenFrom", templateParent.getOwner(hidden));
+                        row.addParameter("cls", "item-hidden");
+                        table.addRow(row);
+                    }
+                }
+            }
         }
-        else
+
+        if(table.getRows().size() == 0)
         {
             Row nothingRow = new Row();
             nothingRow.addCell(new Cell(width, messages.format("no.data.available")));
@@ -94,6 +118,14 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
 
         table.addAll(parameters);
         return table;
+    }
+
+    private void addCells(Row row, Configuration instance)
+    {
+        for(ColumnDescriptor column: columns)
+        {
+            row.addCell(new Cell(column.getValue(instance).toString()));
+        }
     }
 
     private void applyDecorations(Record data, String key, Row row, Messages messages)
@@ -116,7 +148,7 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
                     if(parentItemOwner != null)
                     {
                         row.addParameter("overriddenOwner", parentItemOwner);
-                        transformDeleteAction(row, "revert", messages);
+                        transformDeleteAction(row, "hide", messages);
                     }
                 }
             }

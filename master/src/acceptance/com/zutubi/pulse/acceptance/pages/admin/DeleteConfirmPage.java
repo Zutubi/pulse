@@ -55,7 +55,7 @@ public class DeleteConfirmPage extends SeleniumPage
             SeleniumUtils.assertCellContents(selenium, getId(), i + 1, 1, pathActionPairs[i * 2 + 1]);
         }
 
-        SeleniumUtils.assertCellContents(selenium, getId(), i + 1, 0, "delete     cancel");
+        SeleniumUtils.assertCellContents(selenium, getId(), i + 1, 0, "delete    cancel");
     }
 
     public void clickDelete()

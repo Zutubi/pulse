@@ -21,9 +21,15 @@
     #end
 #end
 
-<h2>#wwtext("name=confirm.delete")</h2>
+#if($hide)
+   #set($label = "hide")
+#else
+   #set($label = "delete"))
+#end
+
+<h2>#wwtext("name=confirm.${label}")</h2>
 <p>
-    #wwtext("name=confirm.delete.blurb")
+    #wwtext("name=confirm.${label}.blurb")
 </p>
 
 <table id='#id("delete:$path")' class="form">
@@ -34,8 +40,8 @@
     #showTask($task "")
     <tr>
         <td class="submit" colspan="2">
-            <img src="$base/images/delete.gif" alt="delete"/> <a href="#" id="confirm.delete" onclick="runAjaxRequest('$base/aconfig/$path?delete=delete'); return false;"/>delete</a>
-            &nbsp;&nbsp;&nbsp;
+            <img src="$base/images/delete.gif" alt="delete"/> <a href="#" id="confirm.delete" onclick="runAjaxRequest('$base/aconfig/$path?delete=delete'); return false;"/>$label</a>
+            &nbsp;&nbsp;
             <img src="$base/images/cancel.gif" alt="cancel"/> <a href="#" id="cancel.delete" onclick="runAjaxRequest('$base/aconfig/$path?delete=cancel'); return false;"/>cancel</a>
         </td>
     </tr>

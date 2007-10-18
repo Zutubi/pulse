@@ -273,7 +273,7 @@ public class ListType extends CollectionType
         return path;
     }
 
-    protected Comparator<String> getKeyComparator()
+    public Comparator<String> getKeyComparator()
     {
         // We want the items to appear in their inserted order.  We rely on
         // the ever-increasing handles to allow this.

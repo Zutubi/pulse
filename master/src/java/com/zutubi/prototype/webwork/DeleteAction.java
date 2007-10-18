@@ -1,5 +1,6 @@
 package com.zutubi.prototype.webwork;
 
+import com.zutubi.prototype.config.cleanup.HideRecordCleanupTask;
 import com.zutubi.prototype.config.cleanup.RecordCleanupTask;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.validation.i18n.MessagesTextProvider;
@@ -16,6 +17,11 @@ public class DeleteAction extends PrototypeSupport
     private ConfigurationPanel newPanel;
 
     private TextProvider textProvider;
+
+    public boolean isHide()
+    {
+        return task instanceof HideRecordCleanupTask;
+    }
 
     public RecordCleanupTask getTask()
     {
@@ -59,7 +65,10 @@ public class DeleteAction extends PrototypeSupport
                 configurationTemplateManager.delete(path);
 
                 response = new ConfigurationResponse(parentPath, newTemplatePath);
-                response.addRemovedPath(path);
+                if (!configurationTemplateManager.pathExists(path))
+                {
+                    response.addRemovedPath(path);
+                }
                 path = response.getNewPath();
                 return SUCCESS;
             }

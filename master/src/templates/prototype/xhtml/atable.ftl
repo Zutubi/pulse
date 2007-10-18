@@ -1,3 +1,12 @@
+<#macro annotation baseName id qtip>
+    <#assign annotationCount = annotationCount + 1/>
+    <#assign annotationId = "${id}:${baseName}"/>
+    <img id="${annotationId?id}" src="${base}/images/${id}.gif" alt="${id}"/>
+    <script type="text/javascript>
+        Ext.get("${annotationId?id?js_string}").dom.qtip = "${qtip}";
+    </script>
+</#macro>
+
 <table id="config.table" width="60%">
     <tr>
         <th class="heading" colspan="${table.width?c}">${table.heading?html}</th>
@@ -10,10 +19,11 @@
     </tr>
 <#list table.rows as row>
     <#assign rawId = "item:${row.baseName}"/>
-    <tr id="${rawId?id}">
+    <tr id="${rawId?id}"
+    ><#t/>
     <#-- Data cells. -->
     <#list row.cells as cell>
-        <td class="content" colspan="${cell.span?c}">${cell.content?html}</td>
+        <td class="content ${row.parameters.cls?default('')}" colspan="${cell.span?c}">${cell.content?html}</td>
     </#list>
 
     <#if row.actions?exists>
@@ -21,20 +31,13 @@
         <td class="content" width="1%">
         <#assign annotationCount = 0/>
         <#if row.parameters.inheritedFrom?exists>
-            <#assign annotationCount = annotationCount + 1/>
-            <#assign annotationId = "inherited:${row.baseName}"/>
-            <img id="${annotationId?id}" src="${base}/images/inherited.gif" alt="inherited"/>
-            <script type="text/javascript>
-                Ext.get("${annotationId?id?js_string}").dom.qtip = "inherited from ${row.parameters.inheritedFrom}";
-            </script>
+            <@annotation id="inherited" baseName=row.baseName qtip="inherited from ${row.parameters.inheritedFrom}"/>
         </#if>
         <#if row.parameters.overriddenOwner?exists>
-            <#assign annotationCount = annotationCount + 1/>
-            <#assign annotationId = "overridden:${row.baseName}"/>
-            <img id="${annotationId?id}" src="${base}/images/overridden.gif" alt="overridden"/>
-            <script type="text/javascript>
-                Ext.get("${annotationId?id?js_string}").dom.qtip = "overrides value defined by ${row.parameters.overriddenOwner}";
-            </script>
+            <@annotation id="overridden" baseName=row.baseName qtip="overrides value defined by ${row.parameters.overriddenOwner}"/>
+        </#if>
+        <#if row.parameters.hiddenFrom?exists>
+            <@annotation id="hidden" baseName=row.baseName qtip="hidden item defined at ${row.parameters.hiddenFrom}"/>
         </#if>
         <#if annotationCount == 0>
             &nbsp;

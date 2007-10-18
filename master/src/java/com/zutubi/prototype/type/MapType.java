@@ -171,7 +171,7 @@ public class MapType extends CollectionType
         }
     }
 
-    protected Comparator<String> getKeyComparator()
+    public Comparator<String> getKeyComparator()
     {
         // Lexicographical ordering by the key.
         return new Sort.StringComparator();

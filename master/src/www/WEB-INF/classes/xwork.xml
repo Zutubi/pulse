@@ -493,6 +493,11 @@
             <result name="cancel" type="flexjson">configurationResponse</result>
         </action>
 
+        <action name="restore" class="com.zutubi.prototype.webwork.RestoreAction">
+            <result name="success" type="flexjson">configurationResponse</result>
+            <result name="cancel" type="flexjson">configurationResponse</result>
+        </action>
+
         <action name="ls" class="com.zutubi.prototype.webwork.LsAction">
             <param name="basePath">config</param>
             <result name="success" type="flexjson">listing</result>

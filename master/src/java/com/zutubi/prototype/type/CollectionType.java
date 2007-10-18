@@ -78,7 +78,7 @@ public abstract class CollectionType extends AbstractType implements ComplexType
         record.putMeta(ORDER_KEY, StringUtils.encodeAndJoin(SEPARATOR, order));
     }
 
-    protected abstract Comparator<String> getKeyComparator();
+    public abstract Comparator<String> getKeyComparator();
 
     @SuppressWarnings({"unchecked"})
     public MutableRecord createNewRecord(boolean applyDefaults)
