@@ -10,6 +10,7 @@ import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectsPage;
 import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.model.ResourceRequirement;
 import com.zutubi.pulse.prototype.config.LabelConfiguration;
 import com.zutubi.pulse.prototype.config.group.ServerPermission;
 import com.zutubi.pulse.prototype.config.project.BuildStageConfiguration;
@@ -378,6 +379,66 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         stagesPage.assertItemPresent("default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_DELETE);
         stagesPage.expandTreeNode(stagesPath);
         stagesPage.assertTreeLinkPresent("default");
+    }
+
+    public void testHideListItem() throws Exception
+    {
+        String parentName = random + "-parent";
+        String childName = random + "-child";
+
+        String parentPath = xmlRpcHelper.insertSimpleProject(parentName, true);
+        String childPath = xmlRpcHelper.insertSimpleProject(childName, parentName, false);
+
+        String parentReqsPath = PathUtils.getPath(parentPath, "requirements");
+        String childReqsPath = PathUtils.getPath(childPath, "requirements");
+        Hashtable<String, Object> req = xmlRpcHelper.createEmptyConfig(ResourceRequirement.class);
+        req.put("resource", "foo");
+        String parentReqPath = xmlRpcHelper.insertConfig(parentReqsPath, req);
+        String baseName = PathUtils.getBaseName(parentReqPath);
+        String childReqPath = PathUtils.getPath(childReqsPath, baseName);
+
+        loginAsAdmin();
+
+        ListPage reqsPage = new ListPage(selenium, urls, childReqsPath);
+        reqsPage.goTo();
+        reqsPage.assertItemPresent(baseName, ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_DELETE);
+        DeleteConfirmPage confirmPage = reqsPage.clickDelete(baseName);
+        confirmPage.waitFor();
+        confirmPage.assertTasks(childReqPath, ACTION_HIDE_RECORD);
+        confirmPage.clickDelete();
+
+        reqsPage.waitFor();
+        reqsPage.assertItemPresent(baseName, ListPage.ANNOTATION_HIDDEN, ACTION_RESTORE);
+        assertFalse(xmlRpcHelper.configPathExists(childReqPath));
+    }
+
+    public void testRestoreListItem() throws Exception
+    {
+        String parentName = random + "-parent";
+        String childName = random + "-child";
+
+        String parentPath = xmlRpcHelper.insertSimpleProject(parentName, true);
+        String childPath = xmlRpcHelper.insertSimpleProject(childName, parentName, false);
+
+        String parentReqsPath = PathUtils.getPath(parentPath, "requirements");
+        String childReqsPath = PathUtils.getPath(childPath, "requirements");
+        Hashtable<String, Object> req = xmlRpcHelper.createEmptyConfig(ResourceRequirement.class);
+        req.put("resource", "foo");
+        String parentReqPath = xmlRpcHelper.insertConfig(parentReqsPath, req);
+        String baseName = PathUtils.getBaseName(parentReqPath);
+        String childReqPath = PathUtils.getPath(childReqsPath, baseName);
+        xmlRpcHelper.deleteConfig(childReqPath);
+
+        loginAsAdmin();
+
+        ListPage reqsPage = new ListPage(selenium, urls, childReqsPath);
+        reqsPage.goTo();
+        reqsPage.assertItemPresent(baseName, ListPage.ANNOTATION_HIDDEN, ACTION_RESTORE);
+        reqsPage.clickRestore(baseName);
+
+        reqsPage.waitFor();
+        reqsPage.assertItemPresent(baseName, ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_DELETE);
+        assertTrue(xmlRpcHelper.configPathExists(childReqPath));
     }
 
     private String insertBuildCompletedTrigger(String refereePath, String refererPath) throws Exception
