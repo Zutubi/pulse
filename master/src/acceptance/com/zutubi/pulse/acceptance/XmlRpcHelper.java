@@ -231,7 +231,6 @@ public class XmlRpcHelper
         Hashtable<String, Object> user = createDefaultConfig(UserConfiguration.class);
         user.put("login", login);
         user.put("name", login);
-//        user.put("password", login);
         return insertConfig(ConfigurationRegistry.USERS_SCOPE, user);
     }
 

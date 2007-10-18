@@ -543,8 +543,8 @@ public class ConfigurationTemplateManager implements Synchronization
         {
             public Object execute(State state)
             {
-                refreshInstances(state);
                 refreshTemplateHierarchies(state);
+                refreshInstances(state);
                 return null;
             }
         });
@@ -626,7 +626,7 @@ public class ConfigurationTemplateManager implements Synchronization
                 if (type != null)
                 {
                     // Then we have a composite
-                    validateInstance(type, instance, parentInstance, PathUtils.getBaseName(path), concrete, false, null);
+                    validateInstance(type, instance, PathUtils.getParentPath(path), PathUtils.getBaseName(path), concrete, false, null);
                     if (!instance.isValid())
                     {
                         instances.markInvalid(path);
@@ -795,9 +795,8 @@ public class ConfigurationTemplateManager implements Synchronization
         instance = (Configuration) instantiator.instantiate(type, subject);
 
         // Now apply validations via using the validation manager.
-        Configuration parentInstance = parentPath == null ? null : getInstance(parentPath);
         boolean concrete = isConcrete(parentPath, subject);
-        validateInstance(type, instance, parentInstance, baseName, concrete, deep, ignoredFields);
+        validateInstance(type, instance, parentPath, baseName, concrete, deep, ignoredFields);
 
         return (T) instance;
     }
@@ -808,22 +807,22 @@ public class ConfigurationTemplateManager implements Synchronization
      *
      * @param type           instance type
      * @param instance       instance to validate
-     * @param parentInstance parent instance, or null if this is a top-level
+     * @param parentPath     parent path, or null if this is a top-level
      *                       instance
      * @param baseName       base name of the instances path, may be null for
      *                       a new instance
      * @param concrete       if true, the validation will check for
      *                       completeness
      */
-    public void validateInstance(CompositeType type, Configuration instance, Configuration parentInstance, String baseName, boolean concrete)
+    public void validateInstance(CompositeType type, Configuration instance, String parentPath, String baseName, boolean concrete)
     {
-        validateInstance(type, instance, parentInstance, baseName, concrete, false, null);
+        validateInstance(type, instance, parentPath, baseName, concrete, false, null);
     }
 
-    private void validateInstance(CompositeType type, Configuration instance, Configuration parentInstance, String baseName, boolean concrete, boolean deep, Set<String> ignoredFields)
+    private void validateInstance(CompositeType type, Configuration instance, String parentPath, String baseName, boolean concrete, boolean deep, Set<String> ignoredFields)
     {
         MessagesTextProvider textProvider = new MessagesTextProvider(type.getClazz());
-        ValidationContext context = new ConfigurationValidationContext(instance, textProvider, parentInstance, baseName, !concrete);
+        ValidationContext context = new ConfigurationValidationContext(instance, textProvider, parentPath, baseName, !concrete, this);
         if (ignoredFields != null)
         {
             context.addIgnoredFields(ignoredFields);
@@ -870,14 +869,14 @@ public class ConfigurationTemplateManager implements Synchronization
             {
                 if (nestedType instanceof CompositeType)
                 {
-                    validateInstance(validateType, nestedInstance, instance, property.getName(), concrete, true, null);
+                    validateInstance(validateType, nestedInstance, instance.getConfigurationPath(), property.getName(), concrete, true, null);
                 }
                 else if (nestedType instanceof ListType)
                 {
                     ConfigurationList list = (ConfigurationList) nestedInstance;
                     for (Object element : list)
                     {
-                        validateInstance(validateType, (Configuration) element, nestedInstance, null, concrete, true, null);
+                        validateInstance(validateType, (Configuration) element, nestedInstance.getConfigurationPath(), null, concrete, true, null);
                     }
                 }
                 else if (nestedType instanceof MapType)
@@ -885,7 +884,7 @@ public class ConfigurationTemplateManager implements Synchronization
                     ConfigurationMap<Configuration> map = (ConfigurationMap) nestedInstance;
                     for (Map.Entry<String, Configuration> entry : map.entrySet())
                     {
-                        validateInstance(validateType, entry.getValue(), nestedInstance, entry.getKey(), concrete, true, null);
+                        validateInstance(validateType, entry.getValue(), nestedInstance.getConfigurationPath(), entry.getKey(), concrete, true, null);
                     }
                 }
                 else

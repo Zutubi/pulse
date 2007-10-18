@@ -14,27 +14,30 @@ public class ConfigurationValidationContext implements ValidationContext
 {
     private Configuration instance;
     private TextProvider textProvider;
-    private Object parentInstance;
+    private String parentPath;
     private String baseName;
     private boolean ignoreRequired;
     private boolean ignoreAllFields = false;
     private Set<String> ignoredFields = new HashSet<String>();
 
-    public ConfigurationValidationContext(Configuration instance, TextProvider textProvider, Object parentInstance, String baseName, boolean ignoreRequired)
+    private ConfigurationTemplateManager configurationTemplateManager;
+
+    public ConfigurationValidationContext(Configuration instance, TextProvider textProvider, String parentPath, String baseName, boolean ignoreRequired, ConfigurationTemplateManager configurationTemplateManager)
     {
         this.instance = instance;
         this.textProvider = textProvider;
-        this.parentInstance = parentInstance;
+        this.parentPath = parentPath;
         this.baseName = baseName;
         this.ignoreRequired = ignoreRequired;
+        this.configurationTemplateManager = configurationTemplateManager;
     }
 
     /**
-     * @return the parent object of the object being validated.
+     * @return the parent path of the object being validated
      */
-    public Object getParentInstance()
+    public String getParentPath()
     {
-        return parentInstance;
+        return parentPath;
     }
 
     /**
@@ -73,6 +76,11 @@ public class ConfigurationValidationContext implements ValidationContext
     {
         ignoreAllFields = true;
         instance.clearFieldErrors();
+    }
+
+    public ConfigurationTemplateManager getConfigurationTemplateManager()
+    {
+        return configurationTemplateManager;
     }
 
     public void addActionError(String error)

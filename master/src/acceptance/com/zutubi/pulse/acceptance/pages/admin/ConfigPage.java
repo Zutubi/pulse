@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance.pages.admin;
 
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.pulse.acceptance.SeleniumUtils;
 import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.webwork.mapping.Urls;
@@ -37,7 +38,8 @@ public abstract class ConfigPage extends SeleniumPage
 
     public void expandTreeNode(String path)
     {
-        selenium.getEval("selenium.browserbot.currentWindow.configTree.getNodeByConfigPath('" + path + "').expand()");
+        selenium.getEval("var window = selenium.browserbot.currentWindow; window.nodeExpanded = false; var node = window.configTree.getNodeByConfigPath('" + path + "'); node.expand(false, true, function() { window.nodeExpanded = true; })");
+        SeleniumUtils.waitForVariable(selenium, "nodeExpanded", SeleniumUtils.DEFAULT_TIMEOUT);
     }
 
     public String getTreeLinkLocator(String displayName)
