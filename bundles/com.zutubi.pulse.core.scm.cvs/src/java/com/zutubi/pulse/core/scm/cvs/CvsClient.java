@@ -41,6 +41,9 @@ public class CvsClient implements ScmClient, DataCacheAware
     private String root;
     private String password;
 
+    /**
+     * Data cache.
+     */
     private Map<Object, Object> cache;
 
     /**
@@ -414,7 +417,6 @@ public class CvsClient implements ScmClient, DataCacheAware
         }
 
         List<Changelist> changelists = getChanges(since, null);
-        changelists = ScmUtils.filterExcludes(changelists, new ScmFilepathFilter(excludedPaths));
         return changelists.size() > 0;
     }
 
@@ -426,8 +428,6 @@ public class CvsClient implements ScmClient, DataCacheAware
         // can be very expensive if there are a large number of changes. So, for high volume repositories, we would
         // expect recent changes.  For lower volume repositories, we would expect spread further apart. We stop looking
         // once we get to two years ago without any changes.
-
-        LogInformationAnalyser analyser = new LogInformationAnalyser(getUid(), CVSRoot.parse(root));
 
         Calendar cal = Calendar.getInstance();
 
@@ -441,10 +441,10 @@ public class CvsClient implements ScmClient, DataCacheAware
             cal.add(Calendar.DAY_OF_YEAR, -increment);
 
             CvsRevision since = new CvsRevision("", branch, "", cal.getTime());
-            latestUpdate = analyser.latestUpdate(core.rlog(module, since, null));
-            if (latestUpdate != null)
+            List<Revision> revisions = getRevisions(convertRevision(since), null);
+            if (revisions.size() > 0)
             {
-                return convertRevision(new CvsRevision(latestUpdate.getAuthor(), branch, latestUpdate.getMessage(), latestUpdate.getDate()));
+                return revisions.get(revisions.size() - 1);
             }
 
             // We have checked more than two years back, and still no changes. We
@@ -463,6 +463,7 @@ public class CvsClient implements ScmClient, DataCacheAware
 
     public List<ScmFile> browse(String path, Revision revision) throws ScmException
     {
+        //TODO: listing is based on the availability of the remote list command, available on 1.12.x cvs servers.
         List<ScmFile> listing = new LinkedList<ScmFile>();
 
         for (RlsInfo info : core.list(path))

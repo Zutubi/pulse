@@ -20,13 +20,15 @@ public class CvsClientFactory implements ScmClientFactory<CvsConfiguration>
     {
         try
         {
-            return objectFactory.buildBean(CvsClient.class, CONSTRUCTOR_ARGS,
+            CvsClient client = objectFactory.buildBean(CvsClient.class, CONSTRUCTOR_ARGS,
                     new Object[]{config.getRoot(),
                             config.getModule(),
                             config.getPassword(),
                             config.getBranch()
                     }
             );
+            client.setExcludedPaths(config.getFilterPaths());
+            return client;
         }
         catch (Exception e)
         {
