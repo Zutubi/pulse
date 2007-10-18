@@ -328,8 +328,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         assertEquals("2006-03-10 04:00:00 GMT", SERVER_DATE.format(latestUpdate));
 
         since = new CvsRevision("", "", "", LOCAL_DATE.parse("2006-03-12 02:00:00"));
-        latestUpdate = analyser.latestUpdate(cvs.rlog(module, since, null)).getDate();
-        assertNull(latestUpdate);
+        assertNull(analyser.latestUpdate(cvs.rlog(module, since, null)));
 
         since = new CvsRevision("", "", "", SERVER_DATE.parse("2006-03-10 03:59:59 GMT"));
         latestUpdate = analyser.latestUpdate(cvs.rlog(module, since, null)).getDate();

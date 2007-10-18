@@ -213,13 +213,20 @@ public class CvsCore
         tag.setOverrideExistingTag(moveExisting);
         tag.setRecursive(true);
 
-        if (TextUtils.stringSet(revision.getBranch()))
+        if (revision != null)
         {
-            tag.setTagByRevision(revision.getBranch());
+            if (TextUtils.stringSet(revision.getBranch()))
+            {
+                tag.setTagByRevision(revision.getBranch());
+            }
+            if (revision.getDate() != null)
+            {
+                tag.setTagByDate(SERVER_DATE.format(revision.getDate()));
+            }
         }
-        if (revision.getDate() != null)
+        else
         {
-            tag.setTagByDate(SERVER_DATE.format(revision.getDate()));
+            tag.setMatchHeadIfRevisionNotFound(true);
         }
 
         if (!executeCommand(tag, null, null))
