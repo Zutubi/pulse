@@ -12,7 +12,7 @@ import java.net.URLEncoder;
 /**
  * A change viwer implementation for linking to a Trac instance.
  */
-@Form(fieldOrder = {"name", "baseURL", "projectPath"})
+@Form(fieldOrder = {"baseURL", "projectPath"})
 @SymbolicName("zutubi.tracChangeViewerConfig")
 public class TracChangeViewer extends BasePathChangeViewer
 {

@@ -25,6 +25,11 @@ public class ListPage extends ConfigPage
         this.path = path;
     }
 
+    public String getPath()
+    {
+        return path;
+    }
+
     public String getUrl()
     {
         return urls.admin() + path + "/";

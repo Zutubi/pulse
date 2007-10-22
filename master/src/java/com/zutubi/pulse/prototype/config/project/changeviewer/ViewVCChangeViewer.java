@@ -9,7 +9,7 @@ import com.zutubi.util.StringUtils;
 /**
  * A change viewer for linking to ViewVC.
  */
-@Form(fieldOrder = {"name", "baseURL", "projectPath"})
+@Form(fieldOrder = {"baseURL", "projectPath"})
 @SymbolicName("zutubi.viewVCChangeViewerConfig")
 public class ViewVCChangeViewer extends BasePathChangeViewer
 {

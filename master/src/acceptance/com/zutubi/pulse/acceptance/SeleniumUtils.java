@@ -149,14 +149,19 @@ public class SeleniumUtils
         Assert.assertFalse(selenium.isTextPresent(text));
     }
 
+    public static boolean isLinkPresent(Selenium selenium, String id)
+    {
+        return CollectionUtils.contains(selenium.getAllLinks(), StringUtils.toValidHtmlName(id));
+    }
+
     public static void assertLinkPresent(Selenium selenium, String id)
     {
-        Assert.assertTrue(CollectionUtils.contains(selenium.getAllLinks(), StringUtils.toValidHtmlName(id)));
+        Assert.assertTrue(isLinkPresent(selenium, id));
     }
 
     public static void assertLinkNotPresent(Selenium selenium, String id)
     {
-        Assert.assertFalse(CollectionUtils.contains(selenium.getAllLinks(), StringUtils.toValidHtmlName(id)));
+        Assert.assertFalse(isLinkPresent(selenium, id));
     }
 
     public static void assertFormFieldNotEmpty(Selenium selenium, String id)

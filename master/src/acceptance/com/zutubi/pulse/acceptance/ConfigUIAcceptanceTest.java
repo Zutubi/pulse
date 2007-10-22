@@ -2,11 +2,13 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.acceptance.forms.admin.*;
+import com.zutubi.pulse.acceptance.pages.admin.CompositePage;
 import com.zutubi.pulse.acceptance.pages.admin.DeleteConfirmPage;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.prototype.config.project.changeviewer.CustomChangeViewerConfiguration;
 
 import java.util.Hashtable;
 
@@ -147,7 +149,8 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         ProjectConfigPage configPage = new ProjectConfigPage(selenium, urls, random, false);
         configPage.goTo();
-        AntTypeForm form = configPage.clickComposite("project type", new AntTypeForm(selenium));
+        configPage.clickComposite("type", "project type");
+        AntTypeForm form = new AntTypeForm(selenium);
         form.waitFor();
         form.assertFormElements("", "build.xml", "", "", "");
         form.applyFormElements(null, null, null, null, "ant");
@@ -283,7 +286,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         }
     }
 
-    public void tetNameValidationDuplicateInAncestor() throws Exception
+    public void testNameValidationDuplicateInAncestor() throws Exception
     {
         xmlRpcHelper.loginAsAdmin();
         try
@@ -311,6 +314,39 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
             form.finishFormElements("p1", "value", null, null, null);
             form.assertFormPresent();
             assertTextPresent("name is already in use in ancestor \"" + parentName + "\", please select another name");
+        }
+        finally
+        {
+            xmlRpcHelper.logout();
+        }
+    }
+
+    public void testCannotConfigureOverriddenPath() throws Exception
+    {
+        xmlRpcHelper.loginAsAdmin();
+        try
+        {
+            String parentName = random + "-parent";
+            String childName = random + "-child";
+            String parentPath = xmlRpcHelper.insertTrivialProject(parentName, true);
+            String childPath = xmlRpcHelper.insertTrivialProject(childName, parentName, false);
+
+            // At this point we should be allowed to configure in the parent
+            loginAsAdmin();
+            CompositePage compositePage = new CompositePage(selenium, urls, PathUtils.getPath(parentPath, "changeViewer"));
+            compositePage.goTo();
+            assertTrue(compositePage.isConfigureLinkPresent());
+            
+            String childChangeViewerPath = PathUtils.getPath(childPath, "changeViewer");
+            Hashtable<String, Object> changeViewer = xmlRpcHelper.createEmptyConfig(CustomChangeViewerConfiguration.class);
+            changeViewer.put("changesetURL", "dummy");
+            xmlRpcHelper.insertConfig(childChangeViewerPath, changeViewer);
+
+            // Now the child exists we should no longer be able to configure
+            // in the parent.
+            compositePage.goTo();
+            assertFalse(compositePage.isConfigureLinkPresent());
+            compositePage.assertConfiguredDescendents(childName);
         }
         finally
         {

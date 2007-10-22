@@ -17,6 +17,8 @@ import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
 import com.zutubi.util.bean.ObjectFactory;
 
 import java.text.Collator;
@@ -59,6 +61,8 @@ public class ConfigurationUIModel
     private List<String> actions = new LinkedList<String>();
 
     private List<String> displayFields = new LinkedList<String>();
+
+    private List<String> configuredDescendents = Collections.EMPTY_LIST;
 
     private boolean writable;
     private boolean embedded = false;
@@ -111,6 +115,7 @@ public class ConfigurationUIModel
         }
 
         type = configurationTemplateManager.getType(path);
+        instance = configurationTemplateManager.getInstance(path);
         targetType = type.getTargetType();
 
         if (targetType instanceof CompositeType)
@@ -142,7 +147,7 @@ public class ConfigurationUIModel
             // determine the actions.
             if (configurationTemplateManager.isConcrete(parentPath, record))
             {
-                actions = actionManager.getActions(configurationTemplateManager.getInstance(path), false);
+                actions = actionManager.getActions(instance, false);
             }
 
             Class displayHandler = ConventionSupport.getDisplay(type);
@@ -155,6 +160,19 @@ public class ConfigurationUIModel
                     displaySupport.setObjectFactory(objectFactory);
                     displayFields = displaySupport.getDisplayFields(displayHandler);
                 }
+            }
+
+            if(instance == null)
+            {
+                // Is this path configured in any descendents?
+                List<String> descendentPaths = configurationTemplateManager.getDescendentPaths(path, true, false, false);
+                configuredDescendents = CollectionUtils.map(descendentPaths, new Mapping<String, String>()
+                {
+                    public String map(String s)
+                    {
+                        return PathUtils.getPathElements(s)[1];
+                    }
+                });
             }
         }
 
@@ -268,6 +286,11 @@ public class ConfigurationUIModel
     public List<String> getDisplayFields()
     {
         return displayFields;
+    }
+
+    public List<String> getConfiguredDescendents()
+    {
+        return configuredDescendents;
     }
 
     public boolean isWritable()

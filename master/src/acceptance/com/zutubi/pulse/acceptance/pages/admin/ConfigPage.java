@@ -3,7 +3,6 @@ package com.zutubi.pulse.acceptance.pages.admin;
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.acceptance.SeleniumUtils;
-import com.zutubi.pulse.acceptance.forms.SeleniumForm;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.webwork.mapping.Urls;
 import junit.framework.Assert;
@@ -24,10 +23,12 @@ public abstract class ConfigPage extends SeleniumPage
         super(selenium, urls, id, title);
     }
 
-    public <T extends SeleniumForm> T clickComposite(String displayName, T expectedForm)
+    public abstract String getPath();
+
+    public CompositePage clickComposite(String relativePath, String displayName)
     {
         selenium.click(getTreeLinkLocator(displayName));
-        return expectedForm;
+        return new CompositePage(selenium, urls, PathUtils.getPath(getPath(), relativePath));
     }
 
     public ListPage clickCollection(String baseName, String displayName)

@@ -9,7 +9,7 @@ import com.zutubi.util.StringUtils;
 /**
  * A ChangeViewer for linking to a Fisheye instance.
  */
-@Form(fieldOrder = {"name", "baseUrl", "projectPath"})
+@Form(fieldOrder = {"baseURL", "projectPath"})
 @SymbolicName("zutubi.fisheyeChangeViewerConfig")
 public class FisheyeConfiguration extends BasePathChangeViewer
 {

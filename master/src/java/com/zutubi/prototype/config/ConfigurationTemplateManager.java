@@ -1495,6 +1495,16 @@ public class ConfigurationTemplateManager implements Synchronization
         });
     }
 
+    /**
+     * Restores a hidden collection item.  The path given must refer to a
+     * collection item that is currently hidden.  Restoring the item causes
+     * it to reappear at the restored and all descendent levels, which will
+     * lead to insert events for concrete descendents.
+     * 
+     * @param path the path to restore: must be currently hidden
+     * @throws IllegalArgumentException if path does not refer to a
+     *         currently-hidden path
+     */
     public void restore(final String path)
     {
         checkPersistent(path);

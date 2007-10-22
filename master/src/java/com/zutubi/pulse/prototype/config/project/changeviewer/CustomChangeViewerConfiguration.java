@@ -20,7 +20,7 @@ import java.util.TimeZone;
  * A change viewer that can be configured to suit a custom system y providing
  * URLs with embedded variables.
  */
-@Form(fieldOrder = {"name", "changesetURL", "fileViewURL", "fielDownloadURL", "fileDiffURL"})
+@Form(fieldOrder = {"changesetURL", "fileViewURL", "fielDownloadURL", "fileDiffURL"})
 @SymbolicName("zutubi.customChangeViewerConfig")
 public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
 {

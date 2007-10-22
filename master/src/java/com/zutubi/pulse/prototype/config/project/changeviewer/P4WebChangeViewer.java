@@ -9,7 +9,7 @@ import com.zutubi.util.StringUtils;
 /**
  * A ChangeViewer for linking to a P4Web instance.
  */
-@Form(fieldOrder = {"name", "baseURL", "projectPath"})
+@Form(fieldOrder = {"baseURL", "projectPath"})
 @SymbolicName("zutubi.p4WebChangeViewerConfig")
 public class P4WebChangeViewer extends BasePathChangeViewer
 {
