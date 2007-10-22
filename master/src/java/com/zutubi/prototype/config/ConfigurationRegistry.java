@@ -150,9 +150,7 @@ public class ConfigurationRegistry
             triggerConfig.addExtension("zutubi.cronTriggerConfig");
             triggerConfig.addExtension("zutubi.scmTriggerConfig");
 
-            MapType triggers = new MapType();
-            triggers.setTypeRegistry(typeRegistry);
-            triggers.setCollectionType(triggerConfig);
+            MapType triggers = new MapType(triggerConfig, typeRegistry);
             projectConfig.addProperty(new ExtensionTypeProperty("triggers", triggers));
 
             // Artifacts.
@@ -171,24 +169,17 @@ public class ConfigurationRegistry
             commitConfig.addExtension("zutubi.jiraCommitMessageConfig");
             commitConfig.addExtension("zutubi.customCommitMessageConfig");
 
-            MapType commitTransformers = new MapType();
-            commitTransformers.setTypeRegistry(typeRegistry);
-            commitTransformers.setCollectionType(commitConfig);
+            MapType commitTransformers = new MapType(commitConfig, typeRegistry);
             projectConfig.addProperty(new ExtensionTypeProperty("commit", commitTransformers));
 
             // define the root level scope.
-            TemplatedMapType projectCollection = new TemplatedMapType();
-            projectCollection.setTypeRegistry(typeRegistry);
-            projectCollection.setCollectionType(projectConfig);
-
+            TemplatedMapType projectCollection = new TemplatedMapType(projectConfig, typeRegistry);
             configurationPersistenceManager.register(PROJECTS_SCOPE, projectCollection);
 
             // register project configuration.  This will eventually be handled as an extension point
             registerProjectMapExtension("cleanup", CleanupConfiguration.class);
 
-            TemplatedMapType agentCollection = new TemplatedMapType();
-            agentCollection.setTypeRegistry(typeRegistry);
-            agentCollection.setCollectionType(registerConfigurationType(AgentConfiguration.class));
+            TemplatedMapType agentCollection = new TemplatedMapType(registerConfigurationType(AgentConfiguration.class), typeRegistry);
             configurationPersistenceManager.register(AGENTS_SCOPE, agentCollection);
 
             CompositeType globalConfig = registerConfigurationType(GlobalConfiguration.class);
@@ -196,10 +187,7 @@ public class ConfigurationRegistry
 
             // user configuration.
 
-            MapType userCollection = new MapType();
-            userCollection.setTypeRegistry(typeRegistry);
-            userCollection.setCollectionType(registerConfigurationType(UserConfiguration.class));
-
+            MapType userCollection = new MapType(registerConfigurationType(UserConfiguration.class), typeRegistry);
             configurationPersistenceManager.register(USERS_SCOPE, userCollection);
 
             // contacts configuration
@@ -239,10 +227,7 @@ public class ConfigurationRegistry
             groupConfig.addExtension("zutubi.groupConfig");
             groupConfig.addInternalExtension("zutubi.builtinGroupConfig");
 
-            MapType groupCollection = new MapType();
-            groupCollection.setTypeRegistry(typeRegistry);
-            groupCollection.setCollectionType(groupConfig);
-
+            MapType groupCollection = new MapType(groupConfig, typeRegistry);
             configurationPersistenceManager.register(GROUPS_SCOPE, groupCollection);
 
         }
@@ -267,13 +252,11 @@ public class ConfigurationRegistry
 
     private void registerProjectMapExtension(String name, Class clazz) throws TypeException
     {
-        // create the map type.
-        MapType mapType = new MapType();
-        mapType.setTypeRegistry(typeRegistry);
-
         // register the new type.
         CompositeType type = registerConfigurationType(clazz);
-        mapType.setCollectionType(type);
+
+        // create the map type.
+        MapType mapType = new MapType(type, typeRegistry);
 
         // register the new type with the project as an extension point.
         CompositeType projectConfig = typeRegistry.getType(ProjectConfiguration.class);

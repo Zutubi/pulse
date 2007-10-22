@@ -40,23 +40,14 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
         typeA = typeRegistry.register(MockA.class);
         typeB = typeRegistry.getType(MockB.class);
-        MapType mapA = new MapType();
-        mapA.setTypeRegistry(typeRegistry);
-        mapA.setCollectionType(typeA);
+        MapType mapA = new MapType(typeA, typeRegistry);
 
-        MapType templatedMap = new TemplatedMapType();
-        templatedMap.setTypeRegistry(typeRegistry);
-        templatedMap.setCollectionType(typeA);
+        MapType templatedMap = new TemplatedMapType(typeA, typeRegistry);
 
         CompositeType typeReferer = typeRegistry.register(MockReferer.class);
         CompositeType typeReferee = typeRegistry.getType(MockReferee.class);
-        MapType mapReferer = new MapType();
-        mapReferer.setTypeRegistry(typeRegistry);
-        mapReferer.setCollectionType(typeReferer);
-
-        MapType mapReferee = new MapType();
-        mapReferee.setTypeRegistry(typeRegistry);
-        mapReferee.setCollectionType(typeReferee);
+        MapType mapReferer = new MapType(typeReferer, typeRegistry);
+        MapType mapReferee = new MapType(typeReferee, typeRegistry);
 
         configurationPersistenceManager.register("sample", mapA);
         configurationPersistenceManager.register("template", templatedMap);

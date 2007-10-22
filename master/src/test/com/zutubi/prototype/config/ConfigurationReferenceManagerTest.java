@@ -22,8 +22,6 @@ public class ConfigurationReferenceManagerTest extends AbstractConfigurationSyst
 {
     private CompositeType projectType;
     private CompositeType stageType;
-    private CompositeType actionType;
-    private CompositeType subscriptionType;
 
     protected void setUp() throws Exception
     {
@@ -31,22 +29,16 @@ public class ConfigurationReferenceManagerTest extends AbstractConfigurationSyst
         
         projectType = typeRegistry.register(Project.class);
         stageType = typeRegistry.register(Stage.class);
-        actionType = typeRegistry.register(Action.class);
-        subscriptionType = typeRegistry.register(Subscription.class);
+        typeRegistry.register(Action.class);
+        CompositeType subscriptionType = typeRegistry.register(Subscription.class);
 
-        TemplatedMapType templated = new TemplatedMapType();
-        templated.setTypeRegistry(typeRegistry);
-        templated.setCollectionType(projectType);
+        TemplatedMapType templated = new TemplatedMapType(projectType, typeRegistry);
         configurationPersistenceManager.register("template", templated);
 
-        MapType project = new MapType();
-        project.setTypeRegistry(typeRegistry);
-        project.setCollectionType(projectType);
+        MapType project = new MapType(projectType, typeRegistry);
         configurationPersistenceManager.register("project", project);
 
-        MapType subscription = new MapType();
-        subscription.setTypeRegistry(typeRegistry);
-        subscription.setCollectionType(subscriptionType);
+        MapType subscription = new MapType(subscriptionType, typeRegistry);
         configurationPersistenceManager.register("subscription", subscription);
 
         Project p1 = new Project("p1");

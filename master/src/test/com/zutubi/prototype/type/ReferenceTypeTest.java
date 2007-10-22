@@ -21,9 +21,7 @@ public class ReferenceTypeTest extends AbstractConfigurationSystemTestCase
         CompositeType refereeType = typeRegistry.getType(Referee.class);
         referenceType = new ReferenceType(refereeType, configurationReferenceManager);
 
-        MapType refererMap = new MapType();
-        refererMap.setTypeRegistry(typeRegistry);
-        refererMap.setCollectionType(refererType);
+        MapType refererMap = new MapType(refererType, typeRegistry);
         configurationPersistenceManager.register("refs", refererMap);
     }
 

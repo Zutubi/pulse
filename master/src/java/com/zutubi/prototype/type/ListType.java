@@ -18,9 +18,9 @@ public class ListType extends CollectionType
 {
     private HandleAllocator handleAllocator;
 
-    public ListType(HandleAllocator handleAllocator)
+    public ListType(HandleAllocator handleAllocator, Type collectionType, TypeRegistry typeRegistry) throws TypeException
     {
-        super(LinkedList.class);
+        super(LinkedList.class, collectionType, typeRegistry);
         this.handleAllocator = handleAllocator;
     }
 

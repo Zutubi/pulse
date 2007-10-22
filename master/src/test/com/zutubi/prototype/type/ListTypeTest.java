@@ -27,14 +27,10 @@ public class ListTypeTest extends TypeTestCase
 
         mockAType = typeRegistry.register(MockA.class);
 
-        listType = new ListType(recordManager);
-        listType.setTypeRegistry(typeRegistry);
-        listType.setCollectionType(mockAType);
+        listType = new ListType(recordManager, mockAType, typeRegistry);
 
         PrimitiveType stringType = new PrimitiveType(String.class);
-        simpleListType = new ListType(recordManager);
-        simpleListType.setTypeRegistry(typeRegistry);
-        simpleListType.setCollectionType(stringType);
+        simpleListType = new ListType(recordManager, stringType, typeRegistry);
     }
 
     protected void tearDown() throws Exception

@@ -1,17 +1,13 @@
 package com.zutubi.prototype.config;
 
-import com.zutubi.prototype.config.types.CircularObject;
-import com.zutubi.prototype.config.types.CompositeCollectionObject;
-import com.zutubi.prototype.config.types.CompositeObject;
-import com.zutubi.prototype.config.types.SimpleCollectionObject;
-import com.zutubi.prototype.config.types.SimpleObject;
+import com.zutubi.prototype.config.types.*;
+import com.zutubi.prototype.transaction.TransactionManager;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.MapType;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.prototype.type.record.store.InMemoryRecordStore;
-import com.zutubi.prototype.transaction.TransactionManager;
 import junit.framework.TestCase;
 
 import java.util.Arrays;
@@ -96,8 +92,7 @@ public class ConfigurationPersistenceManagerTest extends TestCase
     public void testIndexTopLevelCollection() throws TypeException
     {
         CompositeType simple = typeRegistry.register(SimpleObject.class);
-        MapType top = new MapType();
-        top.setCollectionType(simple);
+        MapType top = new MapType(simple, typeRegistry);
         manager.register("top", top);
         assertEquals(Arrays.asList("top/*"), manager.getConfigurationPaths(simple));
     }

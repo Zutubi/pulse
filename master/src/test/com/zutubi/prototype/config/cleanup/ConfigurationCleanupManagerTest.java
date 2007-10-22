@@ -47,9 +47,7 @@ public class ConfigurationCleanupManagerTest extends AbstractConfigurationSystem
     private void registerMap(Class clazz, String scope) throws TypeException
     {
         CompositeType noCustomTasksType = typeRegistry.register(clazz);
-        MapType noCustomTasksMap = new MapType();
-        noCustomTasksMap.setCollectionType(noCustomTasksType);
-        noCustomTasksMap.setTypeRegistry(typeRegistry);
+        MapType noCustomTasksMap = new MapType(noCustomTasksType, typeRegistry);
         configurationPersistenceManager.register(scope, noCustomTasksMap);
     }
 

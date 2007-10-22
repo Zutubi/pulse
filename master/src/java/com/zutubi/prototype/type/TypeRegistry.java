@@ -212,46 +212,50 @@ public class TypeRegistry
                         ParameterizedType parameterizedType = (ParameterizedType) type;
                         Class clazz = (Class) parameterizedType.getRawType();
 
-                        Class valueClass = null;
-                        CollectionType collection = null;
+                        Class valueClass;
+                        CollectionType propertyType = null;
+                        Type collectionType;
                         if (List.class.isAssignableFrom(clazz))
                         {
                             valueClass = (Class) parameterizedType.getActualTypeArguments()[0];
-                            collection = new ListType(handleAllocator);
+                        }
+                        else if (Map.class.isAssignableFrom(clazz))
+                        {
+                            valueClass = (Class) parameterizedType.getActualTypeArguments()[1];
                         }
                         else
-                        {
-                            if (Map.class.isAssignableFrom(clazz))
-                            {
-                                valueClass = (Class) parameterizedType.getActualTypeArguments()[1];
-                                collection = new MapType();
-                            }
-                        }
-
-                        if (collection == null)
                         {
                             continue;
                         }
 
-                        collection.setTypeRegistry(this);
                         if (classMapping.containsKey(valueClass))
                         {
-                            collection.setCollectionType(checkReferenceType(property, classMapping.get(valueClass)));
+                            collectionType = checkReferenceType(property, classMapping.get(valueClass));
                         }
                         else
                         {
                             SimpleType simpleType = getSimpleType(valueClass);
                             if (simpleType != null)
                             {
-                                collection.setCollectionType(simpleType);
+                                collectionType = simpleType;
                             }
                             else
                             {
                                 CompositeType compositeType = register(valueClass, handler);
-                                collection.setCollectionType(checkReferenceType(property, compositeType));
+                                collectionType = checkReferenceType(property, compositeType);
                             }
                         }
-                        property.setType(collection);
+
+                        if (List.class.isAssignableFrom(clazz))
+                        {
+                            propertyType = new ListType(handleAllocator, collectionType, this);
+                        }
+                        else if (Map.class.isAssignableFrom(clazz))
+                        {
+                            propertyType = new MapType(collectionType, this);
+                        }
+
+                        property.setType(propertyType);
                     }
                 }
                 prototype.addProperty(property);

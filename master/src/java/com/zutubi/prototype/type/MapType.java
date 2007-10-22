@@ -27,9 +27,38 @@ public class MapType extends CollectionType
 
     private String keyProperty;
 
-    public MapType()
+    public MapType(Type collectionType, TypeRegistry typeRegistry) throws TypeException
     {
-        super(HashMap.class);
+        super(HashMap.class, collectionType, typeRegistry);
+    }
+
+    protected void verifyCollectionType(Type collectionType) throws TypeException
+    {
+        super.verifyCollectionType(collectionType);
+
+        if(!(collectionType instanceof CompositeType))
+        {
+            throw new TypeException("Maps may only contain composite types");
+        }
+
+        CompositeType compositeType = (CompositeType) collectionType;
+
+        // Unfortunately we cannot use the type registry information as we
+        // are part way through registration and cyclical type structures
+        // mean that the ID property may not yet have been found.
+        try
+        {
+            keyProperty = AnnotationUtils.getPropertyAnnotatedWith(compositeType.getClazz(), ID.class);
+        }
+        catch (IntrospectionException e)
+        {
+            LOG.severe(e);
+        }
+
+        if(keyProperty == null)
+        {
+            throw new TypeException("Types stored in maps must have an @ID property");
+        }
     }
 
     @SuppressWarnings({"unchecked"})
@@ -140,35 +169,6 @@ public class MapType extends CollectionType
         }
 
         return result;
-    }
-
-    public void setCollectionType(Type collectionType) throws TypeException
-    {
-        super.setCollectionType(collectionType);
-
-        if(!(collectionType instanceof CompositeType))
-        {
-            throw new TypeException("Maps may only contain composite types");
-        }
-
-        CompositeType compositeType = (CompositeType) collectionType;
-
-        // Unfortunately we cannot use the type registry information as we
-        // are part way through registration and cyclical type structures
-        // mean that the ID property may not yet have been found.
-        try
-        {
-            keyProperty = AnnotationUtils.getPropertyAnnotatedWith(compositeType.getClazz(), ID.class);
-        }
-        catch (IntrospectionException e)
-        {
-            LOG.severe(e);
-        }
-
-        if(keyProperty == null)
-        {
-            throw new TypeException("Types stored in maps must have an @ID property");
-        }
     }
 
     public Comparator<String> getKeyComparator()

@@ -19,14 +19,20 @@ public abstract class CollectionType extends AbstractType implements ComplexType
 
     private Type collectionType;
 
-    public CollectionType(Class type)
+    public CollectionType(Class type, Type collectionType, TypeRegistry typeRegistry) throws TypeException
     {
         super(type);
+        verifyCollectionType(collectionType);
+        this.collectionType = collectionType;
+        this.typeRegistry = typeRegistry;
     }
 
-    public CollectionType(Class type, String symbolicName)
+    protected void verifyCollectionType(Type collectionType) throws TypeException
     {
-        super(type, symbolicName);
+        if(collectionType instanceof CollectionType)
+        {
+            throw new TypeException("Collection cannot itself hold a collection type");
+        }
     }
 
     public Type getTargetType()
@@ -37,11 +43,6 @@ public abstract class CollectionType extends AbstractType implements ComplexType
     public Type getCollectionType()
     {
         return collectionType;
-    }
-
-    public void setCollectionType(Type collectionType) throws TypeException
-    {
-        this.collectionType = collectionType;
     }
 
     public static Collection<String> getDeclaredOrder(Record record)

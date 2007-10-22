@@ -24,9 +24,7 @@ public class MapTypeTest extends TypeTestCase
 
         mockAType = typeRegistry.register(MockA.class);
 
-        mapType = new MapType();
-        mapType.setTypeRegistry(typeRegistry);
-        mapType.setCollectionType(typeRegistry.getType(MockA.class));
+        mapType = new MapType(typeRegistry.getType(MockA.class), typeRegistry);
     }
 
     protected void tearDown() throws Exception

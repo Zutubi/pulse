@@ -27,7 +27,6 @@ public class ConfigurationSecurityManagerTest extends AbstractConfigurationSyste
     private String pathGlobal;
     private String pathChild;
     private String pathB1;
-    private String pathB2;
     private String pathNestedB;
 
     protected void setUp() throws Exception
@@ -65,7 +64,7 @@ public class ConfigurationSecurityManagerTest extends AbstractConfigurationSyste
         pathChild = configurationTemplateManager.insertRecord(SCOPE_A_TEMPLATED, record);
 
         pathB1 = configurationTemplateManager.insert(SCOPE_B, new MockB("b1"));
-        pathB2 = configurationTemplateManager.insert(SCOPE_B, new MockB("b2"));
+        configurationTemplateManager.insert(SCOPE_B, new MockB("b2"));
 
         pathNestedB = ((MockA) configurationTemplateManager.getInstance(pathA1)).getB().getConfigurationPath();
     }
@@ -73,9 +72,7 @@ public class ConfigurationSecurityManagerTest extends AbstractConfigurationSyste
     private CompositeType registerMap(Class clazz, String scope, boolean templated) throws TypeException
     {
         CompositeType type = typeRegistry.register(clazz);
-        MapType mapType = templated ? new TemplatedMapType() : new MapType();
-        mapType.setTypeRegistry(typeRegistry);
-        mapType.setCollectionType(type);
+        MapType mapType = templated ? new TemplatedMapType(type, typeRegistry) : new MapType(type, typeRegistry);
         configurationPersistenceManager.register(scope, mapType);
         return type;
     }
