@@ -150,7 +150,14 @@ public class ListType extends CollectionType
 
         if (isOrdered() && order.size() > 0)
         {
-            setOrder(result, order);
+            // Only set an explicit order when it is different from the
+            // default.  This prevents instance saves from unnecessarily
+            // adding an explicit order to a collection.
+            List<String> defaultOrder = getOrder(result);
+            if(!order.equals(defaultOrder))
+            {
+                setOrder(result, order);
+            }
         }
 
         return result;
@@ -273,7 +280,7 @@ public class ListType extends CollectionType
         return path;
     }
 
-    public Comparator<String> getKeyComparator()
+    public Comparator<String> getKeyComparator(Record record)
     {
         // We want the items to appear in their inserted order.  We rely on
         // the ever-increasing handles to allow this.

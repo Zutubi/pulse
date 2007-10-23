@@ -1,9 +1,6 @@
 package com.zutubi.pulse.prototype.config.project;
 
-import com.zutubi.config.annotations.Form;
-import com.zutubi.config.annotations.Reference;
-import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.Transient;
+import com.zutubi.config.annotations.*;
 import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.model.ResourceRequirement;
@@ -25,6 +22,7 @@ public class BuildStageConfiguration extends AbstractNamedConfiguration
     @Reference(optionProvider = "BuildStageAgentOptionProvider")
     private AgentConfiguration agent;
     private String recipe;
+    @Ordered
     private Map<String, ResourceProperty> properties;
     private List<ResourceRequirement> requirements;
 

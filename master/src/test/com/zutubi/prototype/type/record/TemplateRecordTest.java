@@ -79,4 +79,39 @@ public class TemplateRecordTest extends PulseTestCase
         Set<String> hidden = TemplateRecord.getHiddenKeys(record);
         assertEquals(0, hidden.size());
     }
+
+    public void testContainsKey()
+    {
+        MutableRecord record = new MutableRecordImpl();
+        record.put("foo", "bar");
+        TemplateRecord template = new TemplateRecord("test", null, null, record);
+        assertTrue(template.containsKey("foo"));
+        assertFalse(template.containsKey("bar"));
+    }
+
+    public void testContainsKeyInherited()
+    {
+        MutableRecord parentRecord = new MutableRecordImpl();
+        parentRecord.put("foo", "bar");
+        TemplateRecord parent = new TemplateRecord("parent", null, null, parentRecord);
+        MutableRecordImpl childRecord = new MutableRecordImpl();
+        childRecord.put("quux", "quuux");
+        TemplateRecord child = new TemplateRecord("child", parent, null, childRecord);
+        assertTrue(child.containsKey("quux"));
+        assertTrue(child.containsKey("foo"));
+        assertFalse(child.containsKey("bar"));
+        assertFalse(parent.containsKey("quux"));
+    }
+
+    public void testContainsKeyHidden()
+    {
+        MutableRecord parentRecord = new MutableRecordImpl();
+        parentRecord.put("foo", "bar");
+        TemplateRecord parent = new TemplateRecord("parent", null, null, parentRecord);
+        MutableRecordImpl childRecord = new MutableRecordImpl();
+        TemplateRecord child = new TemplateRecord("child", parent, null, childRecord);
+        assertTrue(child.containsKey("foo"));
+        TemplateRecord.hideItem(childRecord, "foo");
+        assertFalse(child.containsKey("foo"));
+    }
 }

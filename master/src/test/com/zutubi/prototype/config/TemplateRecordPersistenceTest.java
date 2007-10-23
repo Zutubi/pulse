@@ -1,18 +1,17 @@
 package com.zutubi.prototype.config;
 
 import com.zutubi.config.annotations.NoInherit;
+import com.zutubi.config.annotations.Ordered;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.prototype.config.events.ConfigurationEvent;
 import com.zutubi.prototype.config.events.PostDeleteEvent;
 import com.zutubi.prototype.config.events.PostInsertEvent;
 import com.zutubi.prototype.config.events.PostSaveEvent;
-import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.prototype.type.MapType;
-import com.zutubi.prototype.type.TemplatedMapType;
-import com.zutubi.prototype.type.TypeException;
+import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.TemplateRecord;
+import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.util.CollectionUtils;
@@ -599,7 +598,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         long globalHandle = configurationTemplateManager.getRecord("project/global").getHandle();
         for(int i = 0; i < 10; i++)
         {
-            insertLargeProject("project" + i, globalHandle, 3, 5);
+            insertLargeProject("project" + i, globalHandle, 2, 2);
         }
     }
 
@@ -1057,6 +1056,303 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         listener.assertEvents(new PostDeleteEventSpec(concretePath, false), new PostDeleteEventSpec(concretePath + "/properties/p1", true));
     }
 
+    public void testSetOrderEmptyPath()
+    {
+        failedSetOrderHelper("", Collections.EMPTY_LIST, "Invalid path: path is empty");
+    }
+
+    public void testSetOrderNoSuchPath()
+    {
+        failedSetOrderHelper("project/path", Collections.EMPTY_LIST, "Invalid path 'project/path': references unknown child 'path' of collection");
+    }
+
+    public void testSetOrderNotACollection()
+    {
+        insertGlobal();
+        failedSetOrderHelper("project/global/property", Collections.EMPTY_LIST, "Invalid path 'project/global/property': does not refer to a collection");
+    }
+
+    public void testSetOrderNonOrderedCollection()
+    {
+        insertGlobal();
+        failedSetOrderHelper("project/global/properties", Collections.EMPTY_LIST, "Invalid path 'project/global/properties': collection is not ordered");
+    }
+
+    public void testSetOrderInvalidKey()
+    {
+        insertGlobal();
+        failedSetOrderHelper("project/global/stages", Arrays.asList("foo"), "Invalid order: item 'foo' does not exist in collection at path 'project/global/stages'");
+    }
+
+    public void testSetOrderHiddenKey()
+    {
+        insertGlobal();
+        insertChild();
+
+        // Should work now
+        configurationTemplateManager.setOrder("project/child/stages", Arrays.asList("default"));
+
+        configurationTemplateManager.delete("project/child/stages/default");
+
+        // And fail now
+        failedSetOrderHelper("project/child/stages", Arrays.asList("default"), "Invalid order: item 'default' does not exist in collection at path 'project/child/stages'");
+    }
+
+    private void failedSetOrderHelper(String path, List<String> order, String message)
+    {
+        try
+        {
+            configurationTemplateManager.setOrder(path, order);
+            fail();
+        }
+        catch(IllegalArgumentException e)
+        {
+            assertEquals(message, e.getMessage());
+        }
+    }
+
+    public void testSetOrder()
+    {
+        MutableRecord project = createProject("test", "desc");
+        configurationTemplateManager.insertRecord("nproject", project);
+        String stagesPath = "nproject/test/stages";
+        insertStage(stagesPath, "one", 0);
+        insertStage(stagesPath, "two", 0);
+        assertEquals(Arrays.asList("one", "two"), getOrder(stagesPath));
+
+        Listener listener = registerListener();
+        configurationTemplateManager.setOrder(stagesPath, Arrays.asList("two", "one"));
+        listener.assertEvents(new PostSaveEventSpec("nproject/test"));
+        assertEquals(Arrays.asList("two", "one"), getOrder(stagesPath));
+    }
+
+    public void testSetOrderIncomplete()
+    {
+        MutableRecord project = createProject("test", "desc");
+        configurationTemplateManager.insertRecord("nproject", project);
+        String stagesPath = "nproject/test/stages";
+        insertStage(stagesPath, "one", 0);
+        insertStage(stagesPath, "two", 0);
+        insertStage(stagesPath, "three", 0);
+        
+        configurationTemplateManager.setOrder(stagesPath, Arrays.asList("two", "three"));
+        assertEquals(Arrays.asList("two", "three", "one"), getOrder(stagesPath));
+    }
+
+    public void testAddAfterSettingOrder()
+    {
+        MutableRecord project = createProject("test", "desc");
+        configurationTemplateManager.insertRecord("nproject", project);
+        String stagesPath = "nproject/test/stages";
+        insertStage(stagesPath, "one", 0);
+        insertStage(stagesPath, "two", 0);
+        
+        configurationTemplateManager.setOrder(stagesPath, Arrays.asList("two", "one"));
+        assertEquals(Arrays.asList("two", "one"), getOrder(stagesPath));
+        insertStage(stagesPath, "three", 0);
+        assertEquals(Arrays.asList("two", "one", "three"), getOrder(stagesPath));
+    }
+
+    public void testDeleteAfterSettingOrder()
+    {
+        MutableRecord project = createProject("test", "desc");
+        configurationTemplateManager.insertRecord("nproject", project);
+        String stagesPath = "nproject/test/stages";
+        insertStage(stagesPath, "one", 0);
+        insertStage(stagesPath, "two", 0);
+        insertStage(stagesPath, "three", 0);
+
+        configurationTemplateManager.setOrder(stagesPath, Arrays.asList("three", "two", "one"));
+        assertEquals(Arrays.asList("three", "two", "one"), getOrder(stagesPath));
+        configurationTemplateManager.delete(PathUtils.getPath(stagesPath, "three"));
+        assertEquals(Arrays.asList("two", "one"), getOrder(stagesPath));
+
+        // Re-insert to also check that it lands at the end again (i.e. order
+        // was actually cleaned).
+        insertStage(stagesPath, "three", 0);
+        assertEquals(Arrays.asList("two", "one", "three"), getOrder(stagesPath));
+    }
+
+    public void testSetOrderTemplated()
+    {
+        insertGlobal();
+        insertChild();
+        String stagesPath = "project/global/stages";
+        insertStage(stagesPath, "default2", 0);
+        assertEquals(Arrays.asList("default", "default2"), getOrder(stagesPath));
+
+        Listener listener = registerListener();
+        configurationTemplateManager.setOrder(stagesPath, Arrays.asList("default2", "default"));
+        listener.assertEvents(new PostSaveEventSpec("project/child"));
+        assertEquals(Arrays.asList("default2", "default"), getOrder(stagesPath));
+    }
+
+    public void testSetOrderInheritedItems()
+    {
+        insertGlobal();
+        insertChild();
+
+        String stagesPath = "project/child/stages";
+        insertStage(stagesPath, "childs", 0);
+        assertEquals(Arrays.asList("default", "childs"), getOrder(stagesPath));
+
+        configurationTemplateManager.setOrder(stagesPath, Arrays.asList("childs", "default"));
+        assertEquals(Arrays.asList("childs", "default"), getOrder(stagesPath));
+    }
+
+    public void testInheritOrder()
+    {
+        insertGlobal();
+        insertChild();
+
+        String parentStagesPath = "project/global/stages";
+        insertStage(parentStagesPath, "default2", 0);
+
+        String childStagesPath = "project/child/stages";
+        insertStage(childStagesPath, "childs", 0);
+
+        assertEquals(Arrays.asList("default", "default2", "childs"), getOrder(childStagesPath));
+
+        configurationTemplateManager.setOrder(parentStagesPath, Arrays.asList("default2", "default"));
+        assertEquals(Arrays.asList("default2", "default", "childs"), getOrder(childStagesPath));
+        TemplateRecord childTemplate = (TemplateRecord) configurationTemplateManager.getRecord(childStagesPath);
+        assertEquals("global", childTemplate.getMetaOwner(CollectionType.ORDER_KEY));
+    }
+
+    public void testOverrideOrder()
+    {
+        insertGlobal();
+        insertChild();
+
+        String parentStagesPath = "project/global/stages";
+        insertStage(parentStagesPath, "default2", 0);
+
+        String childStagesPath = "project/child/stages";
+        insertStage(childStagesPath, "childs", 0);
+
+        configurationTemplateManager.setOrder(parentStagesPath, Arrays.asList("default2", "default"));
+        configurationTemplateManager.setOrder(childStagesPath, Arrays.asList("default", "childs", "default2"));
+        assertEquals(Arrays.asList("default", "childs", "default2"), getOrder(childStagesPath));
+        TemplateRecord childTemplate = (TemplateRecord) configurationTemplateManager.getRecord(childStagesPath);
+        assertEquals("child", childTemplate.getMetaOwner(CollectionType.ORDER_KEY));
+    }
+
+    public void testInheritedOrderRefersToHidden()
+    {
+        insertGlobal();
+        insertChild();
+
+        String parentStagesPath = "project/global/stages";
+        insertStage(parentStagesPath, "default2", 0);
+        insertStage(parentStagesPath, "default3", 0);
+
+        String childStagesPath = "project/child/stages";
+        insertStage(childStagesPath, "childs", 0);
+
+        String hidePath = "project/child/stages/default2";
+        configurationTemplateManager.delete(hidePath);
+        configurationTemplateManager.setOrder(parentStagesPath, Arrays.asList("default2", "default", "default3"));
+        assertEquals(Arrays.asList("default", "default3", "childs"), getOrder(childStagesPath));
+        configurationTemplateManager.restore(hidePath);
+        assertEquals(Arrays.asList("default2", "default", "default3", "childs"), getOrder(childStagesPath));
+    }
+
+    public void testHideItemInInheritedOrder()
+    {
+        insertGlobal();
+        insertChild();
+
+        String parentStagesPath = "project/global/stages";
+        insertStage(parentStagesPath, "default2", 0);
+        insertStage(parentStagesPath, "default3", 0);
+
+        String childStagesPath = "project/child/stages";
+        insertStage(childStagesPath, "childs", 0);
+
+        configurationTemplateManager.setOrder(parentStagesPath, Arrays.asList("default2", "default", "default3"));
+        assertEquals(Arrays.asList("default2", "default", "default3", "childs"), getOrder(childStagesPath));
+
+        String hidePath = "project/child/stages/default2";
+        configurationTemplateManager.delete(hidePath);
+        assertEquals(Arrays.asList("default", "default3", "childs"), getOrder(childStagesPath));
+
+        configurationTemplateManager.restore(hidePath);
+        assertEquals(Arrays.asList("default2", "default", "default3", "childs"), getOrder(childStagesPath));
+    }
+
+    public void testDeleteItemInDescendentOrder()
+    {
+        insertGlobal();
+        insertChild();
+
+        String parentStagesPath = "project/global/stages";
+        insertStage(parentStagesPath, "default2", 0);
+        insertStage(parentStagesPath, "default3", 0);
+
+        String childStagesPath = "project/child/stages";
+        insertStage(childStagesPath, "childs", 0);
+
+        configurationTemplateManager.setOrder(childStagesPath, Arrays.asList("default2", "default", "childs", "default3"));
+        assertEquals(Arrays.asList("default2", "default", "childs", "default3"), getOrder(childStagesPath));
+        configurationTemplateManager.delete(PathUtils.getPath(parentStagesPath, "default"));
+        assertEquals(Arrays.asList("default2", "childs", "default3"), getOrder(childStagesPath));
+
+        // Insert again and it should now appear at the end
+        insertStage(parentStagesPath, "default", 0);
+        assertEquals(Arrays.asList("default2", "childs", "default3", "default"), getOrder(childStagesPath));
+    }
+
+    public void testHideAfterSettingOrder()
+    {
+        insertGlobal();
+        insertChild();
+
+        String parentStagesPath = "project/global/stages";
+        insertStage(parentStagesPath, "default2", 0);
+        insertStage(parentStagesPath, "default3", 0);
+
+        String childStagesPath = "project/child/stages";
+        insertStage(childStagesPath, "childs", 0);
+
+        configurationTemplateManager.setOrder(childStagesPath, Arrays.asList("default2", "default", "childs", "default3"));
+        assertEquals(Arrays.asList("default2", "default", "childs", "default3"), getOrder(childStagesPath));
+        String hidePath = PathUtils.getPath(childStagesPath, "default");
+        configurationTemplateManager.delete(hidePath);
+        assertEquals(Arrays.asList("default2", "childs", "default3"), getOrder(childStagesPath));
+
+        // Restore it and it should now appear at the end
+        configurationTemplateManager.restore(hidePath);
+        assertEquals(Arrays.asList("default2", "childs", "default3", "default"), getOrder(childStagesPath));
+    }
+
+    public void testHideItemInDescendentOrder()
+    {
+        insertToGrandchild();
+
+        String parentStagesPath = "project/global/stages";
+        insertStage(parentStagesPath, "default2", 0);
+
+        String gcStagesPath = "project/grandchild/stages";
+        insertStage(gcStagesPath, "gcs", 0);
+
+        configurationTemplateManager.setOrder(gcStagesPath, Arrays.asList("default2", "default", "gcs"));
+        assertEquals(Arrays.asList("default2", "default", "gcs"), getOrder(gcStagesPath));
+        String hidePath = "project/child/stages/default2";
+        configurationTemplateManager.delete(hidePath);
+        assertEquals(Arrays.asList("default", "gcs"), getOrder(gcStagesPath));
+
+        // Restore it and it should now appear at the end
+        configurationTemplateManager.restore(hidePath);
+        assertEquals(Arrays.asList("default", "gcs", "default2"), getOrder(gcStagesPath));
+    }
+
+    private List<String> getOrder(String path)
+    {
+        CollectionType type = configurationTemplateManager.getType(path, CollectionType.class);
+        Record record = configurationTemplateManager.getRecord(path);
+        return type.getOrder(record);
+    }
+
     private Listener registerListener()
     {
         Listener listener = new Listener();
@@ -1316,6 +1612,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         private String url;
         private Property property;
         private Map<String, Property> properties = new HashMap<String, Property>();
+        @Ordered
         private Map<String, Stage> stages = new HashMap<String, Stage>();
         private List<Coolness> coolnesses = new LinkedList<Coolness>();
         private List<Property> propertiesList = new LinkedList<Property>();

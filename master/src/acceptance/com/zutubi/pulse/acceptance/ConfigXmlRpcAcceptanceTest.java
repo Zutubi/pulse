@@ -1,11 +1,10 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.util.Sort;
+import com.zutubi.util.RandomUtils;
+import com.zutubi.prototype.type.record.PathUtils;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Hashtable;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * Tests for the remote API functions dealing with configuration.  Other
@@ -476,6 +475,39 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertEquals(2, call("deleteAllConfigs", path + "/properties/*"));
         loadedProperties = call("getConfig", path + "/properties");
         assertEquals(0, loadedProperties.size());
+    }
+
+    public void testRestore() throws Exception
+    {
+        String random = RandomUtils.randomString(10);
+        String parentName = random + "-parent";
+        String childName = random + "-child";
+        helper.insertSimpleProject(parentName, true);
+        String childPath = helper.insertSimpleProject(childName, parentName, false);
+
+        String stagesPath = PathUtils.getPath(childPath, "stages");
+        String hidePath = PathUtils.getPath(stagesPath, "default");
+        helper.deleteConfig(hidePath);
+        assertEquals(0, helper.getConfigListing(stagesPath).size());
+        helper.restoreConfig(hidePath);
+        Vector<String> listing = helper.getConfigListing(stagesPath);
+        assertEquals(1, listing.size());
+        assertEquals("default", listing.get(0));
+    }
+
+    public void testSetOrder() throws Exception
+    {
+        String random = RandomUtils.randomString(10);
+        String path = helper.insertSimpleProject(random, true);
+        String propertiesPath = PathUtils.getPath(path, "properties");
+        Hashtable<String, Object> p1 = createProperty("p1", "v1");
+        Hashtable<String, Object> p2 = createProperty("p2", "v2");
+        helper.insertConfig(propertiesPath, p1);
+        helper.insertConfig(propertiesPath, p2);
+
+        assertEquals(Arrays.asList("p1", "p2"), new LinkedList<String>(helper.getConfigListing(propertiesPath)));
+        helper.setConfigOrder(propertiesPath, "p2", "p1");
+        assertEquals(Arrays.asList("p2", "p1"), new LinkedList<String>(helper.getConfigListing(propertiesPath)));
     }
 
     private Hashtable<String, Object> createProperty(String name, String value)

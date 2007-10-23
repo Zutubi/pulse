@@ -28,8 +28,6 @@ import java.util.List;
 
 /**
  * The table descriptor represents the model used to render a table to the UI.
- *
- *
  */
 public class TableDescriptor extends AbstractParameterised implements Descriptor
 {
@@ -37,6 +35,7 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
 
     public static final String PARAM_HEADING = "heading";
     public static final String PARAM_ADD_ALLOWED = "addAllowed";
+    public static final String PARAM_ORDER_ALLOWED = "orderAllowed";
 
     private CollectionType collectionType;
     private CompositeType type;
@@ -47,13 +46,14 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
     private ConfigurationTemplateManager configurationTemplateManager;
     private ActionManager actionManager;
 
-    public TableDescriptor(CollectionType collectionType, boolean addAllowed, ConfigurationTemplateManager configurationTemplateManager, ActionManager actionManager)
+    public TableDescriptor(CollectionType collectionType, boolean orderAllowed, boolean addAllowed, ConfigurationTemplateManager configurationTemplateManager, ActionManager actionManager)
     {
         this.collectionType = collectionType;
         this.type = (CompositeType) collectionType.getCollectionType();
 
         addParameter(PARAM_HEADING, PrototypeUtils.getTableHeading(type));
         addParameter(PARAM_ADD_ALLOWED, addAllowed);
+        addParameter(PARAM_ORDER_ALLOWED, orderAllowed && collectionType.isOrdered());
 
         this.configurationTemplateManager = configurationTemplateManager;
         this.actionManager = actionManager;
@@ -61,45 +61,49 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
 
     public Table instantiate(String path, Record data)
     {
-        int width = columns.size() + 2;
+        int width = columns.size() + (getParameter(PARAM_ORDER_ALLOWED, false) ? 3 : 2);
         Table table = new Table(width);
+        table.addAll(parameters);
 
         Messages messages = Messages.getInstance(type.getClazz());
 
-        for(ColumnDescriptor column: columns)
+        for (ColumnDescriptor column : columns)
         {
             table.addHeader(messages.format(column.getName() + ".label"));
         }
 
-        if(data != null)
+        if (data != null)
         {
-            for(String key: collectionType.getOrder(data))
+            for (String key : collectionType.getOrder(data))
             {
                 String itemPath = PathUtils.getPath(path, key);
                 Configuration instance = configurationTemplateManager.getInstance(itemPath);
-                Row row = new Row(itemPath, getActions(instance, messages));
+                Row row = new Row(itemPath, false, getActions(instance, messages));
                 addCells(row, instance);
-                applyDecorations(data, key, row, messages);
+                applyRowDecorations(data, key, row, messages);
                 table.addRow(row);
             }
 
-            if(data instanceof TemplateRecord)
+            if (data instanceof TemplateRecord)
             {
                 TemplateRecord templateRecord = (TemplateRecord) data;
                 TemplateRecord templateParent = templateRecord.getParent();
-                if(templateParent != null)
+
+                applyTableDecorations(table, templateRecord, templateParent);
+
+                if (templateParent != null)
                 {
                     String parentId = templateParent.getOwner();
                     String[] elements = PathUtils.getPathElements(path);
                     String parentPath = PathUtils.getPath(elements[0], parentId, PathUtils.getPath(2, elements));
 
                     List<String> hiddenKeys = new LinkedList<String>(templateRecord.getHiddenKeys());
-                    Collections.sort(hiddenKeys, collectionType.getKeyComparator());
-                    for(String hidden: hiddenKeys)
+                    Collections.sort(hiddenKeys, collectionType.getKeyComparator(data));
+                    for (String hidden : hiddenKeys)
                     {
                         String parentItemPath = PathUtils.getPath(parentPath, hidden);
                         Configuration instance = configurationTemplateManager.getInstance(parentItemPath);
-                        Row row = new Row(PathUtils.getPath(path, hidden), Arrays.asList(new RowAction("restore", messages.format("restore.label"))));
+                        Row row = new Row(PathUtils.getPath(path, hidden), true, Arrays.asList(new RowAction("restore", messages.format("restore.label"))));
                         addCells(row, instance);
                         row.addParameter("hiddenFrom", templateParent.getOwner(hidden));
                         row.addParameter("cls", "item-hidden");
@@ -109,32 +113,55 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
             }
         }
 
-        if(table.getRows().size() == 0)
+        if (table.getRows().size() == 0)
         {
             Row nothingRow = new Row();
             nothingRow.addCell(new Cell(width, messages.format("no.data.available")));
             table.addRow(nothingRow);
         }
 
-        table.addAll(parameters);
         return table;
+    }
+
+    private void applyTableDecorations(Table table, TemplateRecord templateRecord, TemplateRecord templateParent)
+    {
+        if (table.isOrderable())
+        {
+            String owner = templateRecord.getOwner();
+            if (owner != null)
+            {
+                String orderOwner = templateRecord.getMetaOwner(CollectionType.ORDER_KEY);
+                if (!owner.equals(orderOwner))
+                {
+                    table.addParameter("orderInheritedFrom", orderOwner);
+                }
+                else if (templateParent != null)
+                {
+                    String parentOrderOwner = templateParent.getMetaOwner(CollectionType.ORDER_KEY);
+                    if(parentOrderOwner != null)
+                    {
+                        table.addParameter("orderOverriddenOwner", parentOrderOwner);
+                    }
+                }
+            }
+        }
     }
 
     private void addCells(Row row, Configuration instance)
     {
-        for(ColumnDescriptor column: columns)
+        for (ColumnDescriptor column : columns)
         {
             row.addCell(new Cell(column.getValue(instance).toString()));
         }
     }
 
-    private void applyDecorations(Record data, String key, Row row, Messages messages)
+    private void applyRowDecorations(Record data, String key, Row row, Messages messages)
     {
-        if(data instanceof TemplateRecord)
+        if (data instanceof TemplateRecord)
         {
             TemplateRecord templateRecord = (TemplateRecord) data;
             String itemOwner = templateRecord.getOwner(key);
-            if(!itemOwner.equals(templateRecord.getOwner()))
+            if (!itemOwner.equals(templateRecord.getOwner()))
             {
                 row.addParameter("inheritedFrom", itemOwner);
                 transformDeleteAction(row, "hide", messages);
@@ -142,10 +169,10 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
             else
             {
                 TemplateRecord templateParent = templateRecord.getParent();
-                if(templateParent != null)
+                if (templateParent != null)
                 {
                     String parentItemOwner = templateParent.getOwner(key);
-                    if(parentItemOwner != null)
+                    if (parentItemOwner != null)
                     {
                         row.addParameter("overriddenOwner", parentItemOwner);
                         transformDeleteAction(row, "hide", messages);
@@ -158,7 +185,7 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
     private void transformDeleteAction(Row row, String action, Messages messages)
     {
         RowAction deleteAction = row.getAction(AccessManager.ACTION_DELETE);
-        if(deleteAction != null)
+        if (deleteAction != null)
         {
             deleteAction.setLabel(messages.format(action + ".label"));
         }

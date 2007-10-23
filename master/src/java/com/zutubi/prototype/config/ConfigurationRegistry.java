@@ -170,6 +170,7 @@ public class ConfigurationRegistry
             commitConfig.addExtension("zutubi.customCommitMessageConfig");
 
             MapType commitTransformers = new MapType(commitConfig, typeRegistry);
+            commitTransformers.setOrdered(true);
             projectConfig.addProperty(new ExtensionTypeProperty("commit", commitTransformers));
 
             // define the root level scope.

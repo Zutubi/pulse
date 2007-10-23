@@ -498,6 +498,16 @@
             <result name="cancel" type="flexjson">configurationResponse</result>
         </action>
 
+        <action name="up" class="com.zutubi.prototype.webwork.OrderAction">
+            <param name="moveUp">true</param>
+            <result name="success" type="flexjson">configurationResponse</result>
+        </action>
+
+        <action name="down" class="com.zutubi.prototype.webwork.OrderAction">
+            <param name="moveUp">false</param>
+            <result name="success" type="flexjson">configurationResponse</result>
+        </action>
+
         <action name="ls" class="com.zutubi.prototype.webwork.LsAction">
             <param name="basePath">config</param>
             <result name="success" type="flexjson">listing</result>

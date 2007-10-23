@@ -2,7 +2,6 @@ package com.zutubi.prototype.type.record;
 
 import com.zutubi.config.annotations.NoInherit;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
-import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.ComplexType;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeProperty;
@@ -31,7 +30,6 @@ public class TemplateRecord extends AbstractRecord
     private TemplateRecord parent;
     private ComplexType type;
     private Record moi;
-    private Collection<String> declaredOrder = null;
 
     public TemplateRecord(String owner, TemplateRecord parent, ComplexType type, Record moi)
     {
@@ -39,11 +37,6 @@ public class TemplateRecord extends AbstractRecord
         this.parent = parent;
         this.type = type;
         this.moi = moi;
-
-        if (type instanceof CollectionType)
-        {
-            declaredOrder = CollectionType.getDeclaredOrder(moi);
-        }
     }
 
     public String getSymbolicName()
@@ -74,7 +67,7 @@ public class TemplateRecord extends AbstractRecord
 
     public boolean containsKey(String key)
     {
-        return moi.containsKey(key) || parent != null && parent.containsKey(key);
+        return keySet().contains(key);
     }
 
     public boolean containsValue(String value)
@@ -85,7 +78,7 @@ public class TemplateRecord extends AbstractRecord
     public Object get(String key)
     {
         // This is where magic happens.
-        if(getHiddenKeys(moi).contains(key))
+        if(getHiddenKeys().contains(key))
         {
             return null;
         }
@@ -159,18 +152,13 @@ public class TemplateRecord extends AbstractRecord
 
     public Set<String> keySet()
     {
-        Set<String> result;
-        if (declaredOrder != null)
+        Set<String> result = new HashSet<String>(moi.keySet());
+        if(parent != null)
         {
-            result = new HashSet<String>(declaredOrder);
+            result.addAll(parent.keySet());
         }
-        else
-        {
-            result = parent == null ? new HashSet<String>() : new HashSet<String>(parent.keySet());
-            result.addAll(moi.keySet());
-        }
-
-        result.removeAll(getHiddenKeys(moi));
+        
+        result.removeAll(getHiddenKeys());
         return result;
     }
 
@@ -247,6 +235,22 @@ public class TemplateRecord extends AbstractRecord
         }
     }
 
+    public String getMetaOwner(String key)
+    {
+        if(moi.metaKeySet().contains(key))
+        {
+            return owner;
+        }
+        else if(parent != null)
+        {
+            return parent.getMetaOwner(key);
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     private boolean isSignificant(String key, Object value)
     {
         // If we can't inherit a composite property, we own it even if it is null.
@@ -285,7 +289,7 @@ public class TemplateRecord extends AbstractRecord
             return false;
         }
 
-        if(getHiddenKeys(moi).size() > 0)
+        if(getHiddenKeys().size() > 0)
         {
             return false;
         }

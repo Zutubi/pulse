@@ -99,7 +99,32 @@ public class ListPage extends ConfigPage
 
     public void clickRestore(String baseName)
     {
-        selenium.click(getActionId("restore", baseName));
+        clickRefreshingAction(baseName, "restore");
+    }
+
+    public void clickUp(String baseName)
+    {
+        clickRefreshingAction(baseName, "up");
+    }
+
+    public void clickDown(String baseName)
+    {
+        clickRefreshingAction(baseName, "down");
+    }
+
+    private void clickRefreshingAction(String baseName, String action)
+    {
+        selenium.click(getActionId(action, baseName));
         SeleniumUtils.waitForVariable(selenium, "actionInProgress", SeleniumUtils.DEFAULT_TIMEOUT, true);
+    }
+
+    public boolean isOrderInheritedPresent()
+    {
+        return selenium.isElementPresent("order-inherited");
+    }
+
+    public boolean isOrderOverriddenPresent()
+    {
+        return selenium.isElementPresent("order-overridden");
     }
 }

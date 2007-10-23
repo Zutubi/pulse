@@ -3,6 +3,7 @@ package com.zutubi.prototype.type;
 import com.zutubi.config.annotations.Reference;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Transient;
+import com.zutubi.config.annotations.Ordered;
 import com.zutubi.prototype.config.ConfigurationReferenceManager;
 import com.zutubi.prototype.type.record.HandleAllocator;
 import com.zutubi.pulse.core.config.Configuration;
@@ -250,9 +251,14 @@ public class TypeRegistry
                         {
                             propertyType = new ListType(handleAllocator, collectionType, this);
                         }
-                        else if (Map.class.isAssignableFrom(clazz))
+                        else
                         {
                             propertyType = new MapType(collectionType, this);
+                        }
+
+                        if(property.getAnnotation(Ordered.class) != null)
+                        {
+                            propertyType.setOrdered(true);
                         }
 
                         property.setType(propertyType);

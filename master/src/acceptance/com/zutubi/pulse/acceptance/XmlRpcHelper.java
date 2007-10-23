@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
+import java.io.ByteArrayOutputStream;
 
 /**
  */
@@ -115,6 +116,11 @@ public class XmlRpcHelper
         return call("createDefaultConfig", symbolicName);
     }
 
+    public Vector<String> getConfigListing(String path) throws Exception
+    {
+        return call("getConfigListing", path);
+    }
+
     public <T> T getConfig(String path) throws Exception
     {
         return (T)call("getConfig", path);
@@ -150,6 +156,16 @@ public class XmlRpcHelper
         call("deleteAllConfigs", pathPattern);
     }
 
+    public void restoreConfig(String path) throws Exception
+    {
+        call("restoreConfig", path);
+    }
+
+    public void setConfigOrder(String path, String... order) throws Exception
+    {
+        call("setConfigOrder", path, new Vector<String>(Arrays.asList(order)));
+    }
+    
     public String insertSimpleProject(String name, boolean template) throws Exception
     {
         return insertSimpleProject(name, ProjectManager.GLOBAL_PROJECT_NAME, template);

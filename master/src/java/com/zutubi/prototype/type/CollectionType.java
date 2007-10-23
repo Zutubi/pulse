@@ -1,6 +1,5 @@
 package com.zutubi.prototype.type;
 
-import com.zutubi.config.annotations.Ordered;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.type.record.Record;
@@ -18,6 +17,7 @@ public abstract class CollectionType extends AbstractType implements ComplexType
     private static final char SEPARATOR = ',';
 
     private Type collectionType;
+    private boolean ordered = false;
 
     public CollectionType(Class type, Type collectionType, TypeRegistry typeRegistry) throws TypeException
     {
@@ -45,41 +45,51 @@ public abstract class CollectionType extends AbstractType implements ComplexType
         return collectionType;
     }
 
-    public static Collection<String> getDeclaredOrder(Record record)
+    public static List<String> getDeclaredOrder(Record record)
     {
         String order = record.getMeta(ORDER_KEY);
-        if (order == null)
+        if(order == null || order.length() == 0)
         {
-            return null;
+            return new LinkedList<String>();
         }
 
-        if(order.length() == 0)
-        {
-            return new ArrayList<String>(0);
-        }
-
-        return StringUtils.splitAndDecode(SEPARATOR, order);
+        return new LinkedList(StringUtils.splitAndDecode(SEPARATOR, order));
     }
 
-    public Collection<String> getOrder(Record record)
+    public List<String> getOrder(Record record)
     {
-        Collection<String> order = getDeclaredOrder(record);
-        if(order == null)
+        List<String> order = getDeclaredOrder(record);
+
+        // Remove non-existant keys
+        Set<String> keySet = record.keySet();
+        Iterator<String> it = order.iterator();
+        while (it.hasNext())
         {
-            List<String> defaultOrder = new ArrayList<String>(record.keySet());
-            Collections.sort(defaultOrder, getKeyComparator());
-            order = defaultOrder;
+            String key = it.next();
+
+            // Filter out keys that do not exist (can validly happen with
+            // hidden items and inherited orders).
+            if(!keySet.contains(key))
+            {
+                it.remove();
+            }
         }
+
+        // Add remaining keys (i.e. those not represented in the order)
+        List<String> remaining = new LinkedList<String>(keySet);
+        remaining.removeAll(order);
+        Collections.sort(remaining, getKeyComparator(record));
+        order.addAll(remaining);
 
         return order;
     }
 
-    protected void setOrder(MutableRecord record, Collection<String> order)
+    public static void setOrder(MutableRecord record, Collection<String> order)
     {
         record.putMeta(ORDER_KEY, StringUtils.encodeAndJoin(SEPARATOR, order));
     }
 
-    public abstract Comparator<String> getKeyComparator();
+    public abstract Comparator<String> getKeyComparator(Record record);
 
     @SuppressWarnings({"unchecked"})
     public MutableRecord createNewRecord(boolean applyDefaults)
@@ -89,7 +99,12 @@ public abstract class CollectionType extends AbstractType implements ComplexType
 
     public boolean isOrdered()
     {
-        return getAnnotation(Ordered.class) != null;
+        return ordered;
+    }
+
+    public void setOrdered(boolean ordered)
+    {
+        this.ordered = ordered;
     }
 
     public boolean isTemplated()

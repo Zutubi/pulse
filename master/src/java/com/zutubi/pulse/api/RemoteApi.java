@@ -401,6 +401,34 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         }
     }
 
+    public boolean restoreConfig(String token, String path) throws AuthenticationException
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            configurationTemplateManager.restore(path);
+            return true;
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    public boolean setConfigOrder(String token, String path, Vector<String> order) throws AuthenticationException
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            configurationTemplateManager.setOrder(path, order);
+            return true;
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
     public boolean logError(String token, String message) throws AuthenticationException
     {
         tokenManager.verifyAdmin(token);

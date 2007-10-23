@@ -9,6 +9,7 @@ import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.prototype.config.project.changeviewer.CustomChangeViewerConfiguration;
+import com.zutubi.pulse.prototype.config.project.triggers.ScmBuildTriggerConfiguration;
 
 import java.util.Hashtable;
 
@@ -19,6 +20,21 @@ import java.util.Hashtable;
 public class ConfigUIAcceptanceTest extends SeleniumTestBase
 {
     private static final String CHECK_PROJECT = "config-check-project";
+
+    private static final String ACTION_DOWN = "down";
+    private static final String ACTION_UP   = "up";
+
+    protected void setUp() throws Exception
+    {
+        super.setUp();
+        xmlRpcHelper.loginAsAdmin();
+    }
+
+    protected void tearDown() throws Exception
+    {
+        xmlRpcHelper.logout();
+        super.tearDown();
+    }
 
     public void testEmptyOptionsAddedForSelects() throws Exception
     {
@@ -36,37 +52,29 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
     public void testDeleteListItemFromTemplateChild() throws Exception
     {
-        xmlRpcHelper.loginAsAdmin();
-        try
-        {
-            String parentName = random + "-parent";
-            String childName = random + "-child";
-            xmlRpcHelper.insertTrivialProject(parentName, true);
-            String childPath = xmlRpcHelper.insertSimpleProject(childName, parentName, false);
-            String labelsPath = PathUtils.getPath(childPath, "labels");
+        String parentName = random + "-parent";
+        String childName = random + "-child";
+        xmlRpcHelper.insertTrivialProject(parentName, true);
+        String childPath = xmlRpcHelper.insertSimpleProject(childName, parentName, false);
+        String labelsPath = PathUtils.getPath(childPath, "labels");
 
-            loginAsAdmin();
-            ListPage labelsPage = new ListPage(selenium, urls, labelsPath);
-            labelsPage.goTo();
-            labelsPage.clickAdd();
+        loginAsAdmin();
+        ListPage labelsPage = new ListPage(selenium, urls, labelsPath);
+        labelsPage.goTo();
+        labelsPage.clickAdd();
 
-            LabelForm labelForm = new LabelForm(selenium);
-            labelForm.waitFor();
-            labelForm.finishFormElements("my-label");
+        LabelForm labelForm = new LabelForm(selenium);
+        labelForm.waitFor();
+        labelForm.finishFormElements("my-label");
 
-            labelsPage.waitFor();
-            String baseName = getNewestListItem(labelsPath);
-            labelsPage.assertItemPresent(baseName, null, "view", "delete");
-            DeleteConfirmPage deleteConfirmPage = labelsPage.clickDelete(baseName);
-            deleteConfirmPage.waitFor();
-            labelsPage = deleteConfirmPage.confirm();
+        labelsPage.waitFor();
+        String baseName = getNewestListItem(labelsPath);
+        labelsPage.assertItemPresent(baseName, null, "view", "delete");
+        DeleteConfirmPage deleteConfirmPage = labelsPage.clickDelete(baseName);
+        deleteConfirmPage.waitFor();
+        labelsPage = deleteConfirmPage.confirm();
 
-            labelsPage.assertItemNotPresent(baseName);
-        }
-        finally
-        {
-            xmlRpcHelper.logout();
-        }
+        labelsPage.assertItemNotPresent(baseName);
     }
 
     public void testCheckForm() throws Exception
@@ -164,193 +172,281 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
     public void testNameValidationDuplicate() throws Exception
     {
-        xmlRpcHelper.loginAsAdmin();
-        try
-        {
-            String projectPath = xmlRpcHelper.insertTrivialProject(random, false);
-            String propertiesPath = PathUtils.getPath(projectPath, "properties");
-            Hashtable<String, Object> property = xmlRpcHelper.createEmptyConfig(ResourceProperty.class);
-            property.put("name", "p1");
-            xmlRpcHelper.insertConfig(propertiesPath, property);
+        String projectPath = xmlRpcHelper.insertTrivialProject(random, false);
+        String propertiesPath = getPropertiesPath(projectPath);
+        insertProperty(projectPath);
 
-            loginAsAdmin();
-            ListPage propertiesPage = new ListPage(selenium, urls, propertiesPath);
-            propertiesPage.goTo();
-            propertiesPage.clickAdd();
+        loginAsAdmin();
+        ListPage propertiesPage = new ListPage(selenium, urls, propertiesPath);
+        propertiesPage.goTo();
+        propertiesPage.clickAdd();
 
-            ResourcePropertyForm form = new ResourcePropertyForm(selenium, false);
-            form.waitFor();
-            form.finishFormElements("p1", "value", null, null, null);
-            form.assertFormPresent();
-            assertTextPresent("name is already in use, please select another name");
-        }
-        finally
-        {
-            xmlRpcHelper.logout();
-        }        
+        ResourcePropertyForm form = new ResourcePropertyForm(selenium, false);
+        form.waitFor();
+        form.finishFormElements("p1", "value", null, null, null);
+        form.assertFormPresent();
+        assertTextPresent("name is already in use, please select another name");
     }
 
     public void testNameValidationDuplicateInherited() throws Exception
     {
-        xmlRpcHelper.loginAsAdmin();
-        try
-        {
-            String parentName = random + "-parent";
-            String parentPath = xmlRpcHelper.insertTrivialProject(parentName, true);
-            String parentPropertiesPath = PathUtils.getPath(parentPath, "properties");
-            Hashtable<String, Object> property = xmlRpcHelper.createEmptyConfig(ResourceProperty.class);
-            property.put("name", "p1");
-            xmlRpcHelper.insertConfig(parentPropertiesPath, property);
-            String childPath = xmlRpcHelper.insertTrivialProject(random + "-child", parentName, false);
+        String parentName = random + "-parent";
+        String parentPath = xmlRpcHelper.insertTrivialProject(parentName, true);
+        insertProperty(parentPath);
+        String childPath = xmlRpcHelper.insertTrivialProject(random + "-child", parentName, false);
 
-            loginAsAdmin();
-            ListPage propertiesPage = new ListPage(selenium, urls, PathUtils.getPath(childPath, "properties"));
-            propertiesPage.goTo();
-            propertiesPage.clickAdd();
+        loginAsAdmin();
+        ListPage propertiesPage = new ListPage(selenium, urls, getPropertiesPath(childPath));
+        propertiesPage.goTo();
+        propertiesPage.clickAdd();
 
-            ResourcePropertyForm form = new ResourcePropertyForm(selenium, false);
-            form.waitFor();
-            form.finishFormElements("p1", "value", null, null, null);
-            form.assertFormPresent();
-            assertTextPresent("name is already in use, please select another name");
-        }
-        finally
-        {
-            xmlRpcHelper.logout();
-        }
+        ResourcePropertyForm form = new ResourcePropertyForm(selenium, false);
+        form.waitFor();
+        form.finishFormElements("p1", "value", null, null, null);
+        form.assertFormPresent();
+        assertTextPresent("name is already in use, please select another name");
     }
 
     public void testNameValidationDuplicateInDescendent() throws Exception
     {
-        xmlRpcHelper.loginAsAdmin();
-        try
-        {
-            String parentName = random + "-parent";
-            String childName = random + "-child";
-            String parentPath = xmlRpcHelper.insertTrivialProject(parentName, true);
-            String childPath = xmlRpcHelper.insertTrivialProject(childName, parentName, false);
-            String childPropertiesPath = PathUtils.getPath(childPath, "properties");
-            Hashtable<String, Object> property = xmlRpcHelper.createEmptyConfig(ResourceProperty.class);
-            property.put("name", "p1");
-            xmlRpcHelper.insertConfig(childPropertiesPath, property);
+        String parentName = random + "-parent";
+        String childName = random + "-child";
+        String parentPath = xmlRpcHelper.insertTrivialProject(parentName, true);
+        String childPath = xmlRpcHelper.insertTrivialProject(childName, parentName, false);
+        insertProperty(childPath);
 
-            loginAsAdmin();
-            ListPage propertiesPage = new ListPage(selenium, urls, PathUtils.getPath(parentPath, "properties"));
-            propertiesPage.goTo();
-            propertiesPage.assertItemNotPresent("p1");
-            propertiesPage.clickAdd();
+        loginAsAdmin();
+        ListPage propertiesPage = new ListPage(selenium, urls, getPropertiesPath(parentPath));
+        propertiesPage.goTo();
+        propertiesPage.assertItemNotPresent("p1");
+        propertiesPage.clickAdd();
 
-            ResourcePropertyForm form = new ResourcePropertyForm(selenium, false);
-            form.waitFor();
-            form.finishFormElements("p1", "value", null, null, null);
-            form.assertFormPresent();
-            assertTextPresent("name is already in use in descendent \"" + childName + "\", please select another name");
-        }
-        finally
-        {
-            xmlRpcHelper.logout();
-        }
+        ResourcePropertyForm form = new ResourcePropertyForm(selenium, false);
+        form.waitFor();
+        form.finishFormElements("p1", "value", null, null, null);
+        form.assertFormPresent();
+        assertTextPresent("name is already in use in descendent \"" + childName + "\", please select another name");
     }
 
     public void testNameValidationDuplicateInDescendents() throws Exception
     {
-        xmlRpcHelper.loginAsAdmin();
-        try
-        {
-            String parentName = random + "-parent";
-            String child1Name = random + "-child1";
-            String child2Name = random + "-child2";
-            String parentPath = xmlRpcHelper.insertTrivialProject(parentName, true);
-            String child1Path = xmlRpcHelper.insertTrivialProject(child1Name, parentName, false);
-            String child2Path = xmlRpcHelper.insertTrivialProject(child2Name, parentName, false);
-            Hashtable<String, Object> property = xmlRpcHelper.createEmptyConfig(ResourceProperty.class);
-            property.put("name", "p1");
-            xmlRpcHelper.insertConfig(PathUtils.getPath(child1Path, "properties"), property);
-            xmlRpcHelper.insertConfig(PathUtils.getPath(child2Path, "properties"), property);
+        String parentName = random + "-parent";
+        String child1Name = random + "-child1";
+        String child2Name = random + "-child2";
+        String parentPath = xmlRpcHelper.insertTrivialProject(parentName, true);
+        String child1Path = xmlRpcHelper.insertTrivialProject(child1Name, parentName, false);
+        String child2Path = xmlRpcHelper.insertTrivialProject(child2Name, parentName, false);
+        insertProperty(child1Path);
+        insertProperty(child2Path);
 
-            loginAsAdmin();
-            ListPage propertiesPage = new ListPage(selenium, urls, PathUtils.getPath(parentPath, "properties"));
-            propertiesPage.goTo();
-            propertiesPage.assertItemNotPresent("p1");
-            propertiesPage.clickAdd();
+        loginAsAdmin();
+        ListPage propertiesPage = new ListPage(selenium, urls, getPropertiesPath(parentPath));
+        propertiesPage.goTo();
+        propertiesPage.assertItemNotPresent("p1");
+        propertiesPage.clickAdd();
 
-            ResourcePropertyForm form = new ResourcePropertyForm(selenium, false);
-            form.waitFor();
-            form.finishFormElements("p1", "value", null, null, null);
-            form.assertFormPresent();
-            assertTextPresent("name is already in use in descendents [" + child1Name + ", " + child2Name + "], please select another name");
-        }
-        finally
-        {
-            xmlRpcHelper.logout();
-        }
+        ResourcePropertyForm form = new ResourcePropertyForm(selenium, false);
+        form.waitFor();
+        form.finishFormElements("p1", "value", null, null, null);
+        form.assertFormPresent();
+        assertTextPresent("name is already in use in descendents [" + child1Name + ", " + child2Name + "], please select another name");
     }
 
     public void testNameValidationDuplicateInAncestor() throws Exception
     {
-        xmlRpcHelper.loginAsAdmin();
-        try
-        {
-            String parentName = random + "-parent";
-            String childName = random + "-child";
-            String parentPath = xmlRpcHelper.insertTrivialProject(parentName, true);
-            String childPath = xmlRpcHelper.insertTrivialProject(childName, parentName, false);
-            String parentPropertiesPath = PathUtils.getPath(parentPath, "properties");
-            Hashtable<String, Object> property = xmlRpcHelper.createEmptyConfig(ResourceProperty.class);
-            property.put("name", "p1");
-            xmlRpcHelper.insertConfig(parentPropertiesPath, property);
+        String parentName = random + "-parent";
+        String childName = random + "-child";
+        String parentPath = xmlRpcHelper.insertTrivialProject(parentName, true);
+        String childPath = xmlRpcHelper.insertTrivialProject(childName, parentName, false);
+        insertProperty(parentPath);
 
-            String childPropertiesPath = PathUtils.getPath(childPath, "properties");
-            xmlRpcHelper.deleteConfig(PathUtils.getPath(childPropertiesPath, "p1"));
+        String childPropertiesPath = getPropertiesPath(childPath);
+        xmlRpcHelper.deleteConfig(PathUtils.getPath(childPropertiesPath, "p1"));
 
-            loginAsAdmin();
-            ListPage propertiesPage = new ListPage(selenium, urls, childPropertiesPath);
-            propertiesPage.goTo();
-            propertiesPage.assertItemPresent("p1", ListPage.ANNOTATION_HIDDEN);
-            propertiesPage.clickAdd();
+        loginAsAdmin();
+        ListPage propertiesPage = new ListPage(selenium, urls, childPropertiesPath);
+        propertiesPage.goTo();
+        propertiesPage.assertItemPresent("p1", ListPage.ANNOTATION_HIDDEN);
+        propertiesPage.clickAdd();
 
-            ResourcePropertyForm form = new ResourcePropertyForm(selenium, false);
-            form.waitFor();
-            form.finishFormElements("p1", "value", null, null, null);
-            form.assertFormPresent();
-            assertTextPresent("name is already in use in ancestor \"" + parentName + "\", please select another name");
-        }
-        finally
-        {
-            xmlRpcHelper.logout();
-        }
+        ResourcePropertyForm form = new ResourcePropertyForm(selenium, false);
+        form.waitFor();
+        form.finishFormElements("p1", "value", null, null, null);
+        form.assertFormPresent();
+        assertTextPresent("name is already in use in ancestor \"" + parentName + "\", please select another name");
     }
 
     public void testCannotConfigureOverriddenPath() throws Exception
     {
-        xmlRpcHelper.loginAsAdmin();
-        try
-        {
-            String parentName = random + "-parent";
-            String childName = random + "-child";
-            String parentPath = xmlRpcHelper.insertTrivialProject(parentName, true);
-            String childPath = xmlRpcHelper.insertTrivialProject(childName, parentName, false);
+        String parentName = random + "-parent";
+        String childName = random + "-child";
+        String parentPath = xmlRpcHelper.insertTrivialProject(parentName, true);
+        String childPath = xmlRpcHelper.insertTrivialProject(childName, parentName, false);
 
-            // At this point we should be allowed to configure in the parent
-            loginAsAdmin();
-            CompositePage compositePage = new CompositePage(selenium, urls, PathUtils.getPath(parentPath, "changeViewer"));
-            compositePage.goTo();
-            assertTrue(compositePage.isConfigureLinkPresent());
-            
-            String childChangeViewerPath = PathUtils.getPath(childPath, "changeViewer");
-            Hashtable<String, Object> changeViewer = xmlRpcHelper.createEmptyConfig(CustomChangeViewerConfiguration.class);
-            changeViewer.put("changesetURL", "dummy");
-            xmlRpcHelper.insertConfig(childChangeViewerPath, changeViewer);
+        // At this point we should be allowed to configure in the parent
+        loginAsAdmin();
+        CompositePage compositePage = new CompositePage(selenium, urls, PathUtils.getPath(parentPath, "changeViewer"));
+        compositePage.goTo();
+        assertTrue(compositePage.isConfigureLinkPresent());
 
-            // Now the child exists we should no longer be able to configure
-            // in the parent.
-            compositePage.goTo();
-            assertFalse(compositePage.isConfigureLinkPresent());
-            compositePage.assertConfiguredDescendents(childName);
-        }
-        finally
-        {
-            xmlRpcHelper.logout();
-        }
+        String childChangeViewerPath = PathUtils.getPath(childPath, "changeViewer");
+        Hashtable<String, Object> changeViewer = xmlRpcHelper.createEmptyConfig(CustomChangeViewerConfiguration.class);
+        changeViewer.put("changesetURL", "dummy");
+        xmlRpcHelper.insertConfig(childChangeViewerPath, changeViewer);
+
+        // Now the child exists we should no longer be able to configure
+        // in the parent.
+        compositePage.goTo();
+        assertFalse(compositePage.isConfigureLinkPresent());
+        compositePage.assertConfiguredDescendents(childName);
+    }
+
+    public void testOrderLinks() throws Exception
+    {
+        String path = orderPrelude();
+
+        loginAsAdmin();
+        ListPage listPage = new ListPage(selenium, urls, getPropertiesPath(path));
+        listPage.goTo();
+        listPage.assertItemPresent("p1", null, ACTION_DOWN);
+        listPage.assertActionsNotPresent("p1", ACTION_UP);
+        listPage.assertItemPresent("p2", null, ACTION_DOWN, ACTION_UP);
+        listPage.assertItemPresent("p3", null, ACTION_UP);
+        listPage.assertActionsNotPresent("p3", ACTION_DOWN);
+    }
+
+    public void testMoveUp() throws Exception
+    {
+        String path = orderPrelude();
+
+        loginAsAdmin();
+        ListPage listPage = new ListPage(selenium, urls, getPropertiesPath(path));
+        listPage.goTo();
+        listPage.assertCellContent(1, 0, "p2");
+        listPage.assertCellContent(2, 0, "p3");
+        listPage.clickUp("p3");
+        listPage.waitFor();
+        listPage.assertCellContent(1, 0, "p3");
+        listPage.assertCellContent(2, 0, "p2");
+    }
+
+    public void testMoveDown() throws Exception
+    {
+        String path = orderPrelude();
+
+        loginAsAdmin();
+        ListPage listPage = new ListPage(selenium, urls, getPropertiesPath(path));
+        listPage.goTo();
+        listPage.assertCellContent(1, 0, "p2");
+        listPage.assertCellContent(2, 0, "p3");
+        listPage.clickDown("p2");
+        listPage.waitFor();
+        listPage.assertCellContent(2, 0, "p2");
+        listPage.assertCellContent(1, 0, "p3");
+    }
+
+    private String orderPrelude() throws Exception
+    {
+        String path = xmlRpcHelper.insertTrivialProject(random, false);
+        insertProperty(path, "p1");
+        insertProperty(path, "p2");
+        insertProperty(path, "p3");
+        return path;
+    }
+
+    public void testOrderLinksNotPresentForUnorderedCollection() throws Exception
+    {
+        String path = xmlRpcHelper.insertTrivialProject(random, false);
+        Hashtable<String, Object> trigger = xmlRpcHelper.createDefaultConfig(ScmBuildTriggerConfiguration.class);
+        trigger.put("name", "t1");
+        String triggersPath = PathUtils.getPath(path, "triggers");
+        xmlRpcHelper.insertConfig(triggersPath, trigger);
+        trigger.put("name", "t2");
+        xmlRpcHelper.insertConfig(triggersPath, trigger);
+
+        loginAsAdmin();
+        ListPage listPage = new ListPage(selenium, urls, triggersPath);
+        listPage.goTo();
+        assertTextNotPresent("order");
+        listPage.assertItemPresent("t1", null);
+        listPage.assertItemPresent("t2", null);
+        listPage.assertActionsNotPresent("t1", ACTION_UP, ACTION_DOWN);
+        listPage.assertActionsNotPresent("t2", ACTION_UP, ACTION_DOWN);
+    }
+
+    public void testOrderLinksNotPresentWithNoWritePermission() throws Exception
+    {
+        String path = orderPrelude();
+
+        xmlRpcHelper.insertTrivialUser(random);
+        login(random, "");
+        ListPage listPage = new ListPage(selenium, urls, getPropertiesPath(path));
+        listPage.goTo();
+        assertTextNotPresent("order");
+        listPage.assertItemPresent("p1", null);
+        listPage.assertItemPresent("p2", null);
+        listPage.assertItemPresent("p3", null);
+        listPage.assertActionsNotPresent("p1", ACTION_UP, ACTION_DOWN);
+        listPage.assertActionsNotPresent("p2", ACTION_UP, ACTION_DOWN);
+        listPage.assertActionsNotPresent("p3", ACTION_UP, ACTION_DOWN);
+    }
+
+    public void testInheritedOrder() throws Exception
+    {
+        String parentName = random + "-parent";
+        String childName = random + "-child";
+        String parentPath = xmlRpcHelper.insertTrivialProject(parentName, true);
+        String childPath = xmlRpcHelper.insertTrivialProject(childName, parentName, false);
+
+        insertProperty(parentPath, "p1");
+        insertProperty(parentPath, "p2");
+        
+        loginAsAdmin();
+        ListPage listPage = new ListPage(selenium, urls, getPropertiesPath(childPath));
+        listPage.goTo();
+        assertFalse(listPage.isOrderInheritedPresent());
+        assertFalse(listPage.isOrderOverriddenPresent());
+
+        xmlRpcHelper.setConfigOrder(getPropertiesPath(parentPath), "p2", "p1");
+        listPage.goTo();
+        assertTrue(listPage.isOrderInheritedPresent());
+        assertFalse(listPage.isOrderOverriddenPresent());
+    }
+
+    public void testOverriddenOrder() throws Exception
+    {
+        String parentName = random + "-parent";
+        String childName = random + "-child";
+        String parentPath = xmlRpcHelper.insertTrivialProject(parentName, true);
+        String childPath = xmlRpcHelper.insertTrivialProject(childName, parentName, false);
+
+        insertProperty(parentPath, "p1");
+        insertProperty(parentPath, "p2");
+
+        xmlRpcHelper.setConfigOrder(getPropertiesPath(parentPath), "p2", "p1");
+        xmlRpcHelper.setConfigOrder(getPropertiesPath(childPath), "p1", "p2");
+        
+        loginAsAdmin();
+        ListPage listPage = new ListPage(selenium, urls, getPropertiesPath(childPath));
+        listPage.goTo();
+        assertFalse(listPage.isOrderInheritedPresent());
+        assertTrue(listPage.isOrderOverriddenPresent());
+    }
+
+    private void insertProperty(String projectPath) throws Exception
+    {
+        insertProperty(projectPath, "p1");
+    }
+
+    private void insertProperty(String projectPath, String name) throws Exception
+    {
+        Hashtable<String, Object> property = xmlRpcHelper.createEmptyConfig(ResourceProperty.class);
+        property.put("name", name);
+        xmlRpcHelper.insertConfig(getPropertiesPath(projectPath), property);
+    }
+
+    private String getPropertiesPath(String projectPath)
+    {
+        return PathUtils.getPath(projectPath, "properties");
     }
 }

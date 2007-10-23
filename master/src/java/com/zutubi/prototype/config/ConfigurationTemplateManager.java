@@ -1046,16 +1046,7 @@ public class ConfigurationTemplateManager implements Synchronization
                 if (updated)
                 {
                     refreshCaches();
-
-                    State state = getState();
-                    for (String concretePath : getDescendentPaths(newPath, false, true, false))
-                    {
-                        Configuration instance = state.instances.get(concretePath);
-                        if (isComposite(instance))
-                        {
-                            publishEvent(new PostSaveEvent(ConfigurationTemplateManager.this, instance));
-                        }
-                    }
+                    raiseSaveEvents(newPath);
                 }
 
                 if (deep)
@@ -1066,6 +1057,19 @@ public class ConfigurationTemplateManager implements Synchronization
                 return newPath;
             }
         });
+    }
+
+    private void raiseSaveEvents(String path)
+    {
+        State state = getState();
+        for (String concretePath : getDescendentPaths(path, false, true, false))
+        {
+            Configuration instance = state.instances.get(concretePath);
+            if (isComposite(instance))
+            {
+                publishEvent(new PostSaveEvent(this, instance));
+            }
+        }
     }
 
     private void synchroniseChildRecords(String path, Record existingRecord, MutableRecord record)
@@ -1391,32 +1395,36 @@ public class ConfigurationTemplateManager implements Synchronization
                         }
                     }
 
+                    addAdditionalTasks(path, result);
+
                     // All descendents must be deleted.
                     List<String> descendentPaths = getDescendentPaths(path, true, false, true);
                     for (String descendentPath : descendentPaths)
                     {
-                        result.addCascaded(getDescendentCleanupTasks(descendentPath));
+                        result.addCascaded(getDescendentCleanupTask(descendentPath));
                     }
 
-                    configurationCleanupManager.addCustomCleanupTasks(result);
-                    configurationReferenceManager.addReferenceCleanupTasks(path, result);
                     return result;
                 }
                 else
                 {
                     // Much simpler, just delete the record and run custom
                     // and reference cleanup tasks.
-                    return getDeleteTask(path);
+                    DeleteRecordCleanupTask result = new DeleteRecordCleanupTask(path, false, recordManager);
+                    addAdditionalTasks(path, result);
+                    return result;
                 }
             }
         });
     }
 
-    private RecordCleanupTask getDescendentCleanupTasks(String path)
+    private RecordCleanupTask getDescendentCleanupTask(String path)
     {
         if(pathExists(path))
         {
-            return getDeleteTask(path);
+            DeleteRecordCleanupTask result = new DeleteRecordCleanupTask(path, isSkeleton(path), recordManager);
+            addAdditionalTasks(path, result);
+            return result;
         }
         else
         {
@@ -1426,12 +1434,21 @@ public class ConfigurationTemplateManager implements Synchronization
         }
     }
 
-    private RecordCleanupTask getDeleteTask(String path)
+    private void addAdditionalTasks(String path, RecordCleanupTaskSupport task)
     {
-        DeleteRecordCleanupTask result = new DeleteRecordCleanupTask(path, isSkeleton(path), recordManager);
-        configurationCleanupManager.addCustomCleanupTasks(result);
-        configurationReferenceManager.addReferenceCleanupTasks(path, result);
-        return result;
+        String parentPath = PathUtils.getParentPath(path);
+        Record parentRecord = getRecord(parentPath);
+        if(parentRecord != null && parentRecord.isCollection())
+        {
+            CollectionType collectionType = getType(parentPath, CollectionType.class);
+            if (collectionType.isOrdered())
+            {
+                task.addCascaded(new CleanupOrderCleanupTask(path, recordManager));
+            }
+        }
+
+        configurationCleanupManager.addCustomCleanupTasks(task);
+        configurationReferenceManager.addReferenceCleanupTasks(path, task);
     }
 
     public void delete(final String path)
@@ -1508,6 +1525,8 @@ public class ConfigurationTemplateManager implements Synchronization
     public void restore(final String path)
     {
         checkPersistent(path);
+        configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_WRITE);
+
         final String[] pathElements = PathUtils.getPathElements(path);
         if(pathElements.length <= 2)
         {
@@ -1551,6 +1570,73 @@ public class ConfigurationTemplateManager implements Synchronization
                 refreshCaches();
                 State state = getState();
                 raiseInsertEvents(state.instances, getDescendentPaths(path, false, true, false));
+                return null;
+            }
+        });
+    }
+
+    /**
+     * Sets the order for the items in a collection.  The given path must
+     * refer to an ordered collection, and all keys in the given order must
+     * exist in the collection.  The given order need not contain a key for
+     * every item in the collection: orders may be incomplete.
+     *
+     * @param path  path of an ordered collection to set the order for
+     * @param order the new order of the keys in the collection
+     * @throws IllegalArgumentException if path does not refer to an ordered
+     *         collection or the given order contains a key that does not
+     *         exist in the collection
+     */
+    public void setOrder(final String path, final Collection<String> order)
+    {
+        checkPersistent(path);
+        configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_WRITE);
+
+        executeInsideTransaction(new Action<Object>()
+        {
+            public Object execute() throws Exception
+            {
+                Type type = getType(path);
+                if(!(type instanceof CollectionType))
+                {
+                    throw new IllegalArgumentException("Invalid path '" + path + "': does not refer to a collection");
+                }
+
+                CollectionType collectionType = (CollectionType) type;
+                if(!collectionType.isOrdered())
+                {
+                    throw new IllegalArgumentException("Invalid path '" + path + "': collection is not ordered");
+                }
+
+                Record record = getRecord(path);
+                if(record == null)
+                {
+                    throw new IllegalArgumentException("Invalid path '" + path + "': does not exist");
+                }
+
+                for(String key: order)
+                {
+                    if(!record.containsKey(key))
+                    {
+                        throw new IllegalArgumentException("Invalid order: item '" + key + "' does not exist in collection at path '" + path + "'");
+                    }
+                }
+
+                MutableRecord mutable;
+                if(record instanceof TemplateRecord)
+                {
+                    mutable = ((TemplateRecord) record).getMoi().copy(false);
+                }
+                else
+                {
+                    mutable = record.copy(false);
+                }
+
+                CollectionType.setOrder(mutable, order);
+                recordManager.update(path, mutable);
+
+                refreshCaches();
+                raiseSaveEvents(PathUtils.getParentPath(path));
                 return null;
             }
         });

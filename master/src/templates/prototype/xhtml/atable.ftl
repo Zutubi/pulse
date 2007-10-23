@@ -15,6 +15,23 @@
 <#list table.headers as header>
         <th class="content">${header?html}</th>
 </#list>
+<#if table.orderable>
+        <th class="content">
+           ${"order.label"?i18n}
+<#if table.parameters.orderInheritedFrom?exists>
+            <img id="order-inherited" src="${base}/images/inherited.gif" alt="order inherited"/>
+            <script type="text/javascript>
+                Ext.get("order-inherited").dom.qtip = "order inherited from ${table.parameters.orderInheritedFrom}";
+            </script>
+</#if>
+<#if table.parameters.orderOverriddenOwner?exists>
+            <img id="order-overridden" src="${base}/images/overridden.gif" alt="order overridden"/>
+            <script type="text/javascript>
+                Ext.get("order-overridden").dom.qtip = "overrides order defined by ${table.parameters.orderOverriddenOwner}";
+            </script>
+</#if>
+       </th>
+</#if>
         <th class="content" colspan="2">${"actions.label"?i18n}</th>
     </tr>
 <#list table.rows as row>
@@ -25,6 +42,24 @@
     <#list row.cells as cell>
         <td class="content ${row.parameters.cls?default('')}" colspan="${cell.span?c}">${cell.content?html}</td>
     </#list>
+
+    <#-- Up/down ordering arrows -->
+    <#if table.orderable>
+        <td class="content" width="1%">
+        <#if table.visibleRowCount == 1 || row.parameters.hiddenFrom?exists>
+            &nbsp;
+        <#else>
+            <#if !table.isLastVisible(row)>
+                <#assign actionId = "down:${row.baseName}"/>
+            <a class="unadorned" id="${actionId?id}" href="#" onclick="actionPath('${row.path}?down'); return false;"><img src="${base}/images/resultset_down.gif" alt="move down"/></a>
+            </#if>
+            <#if !table.isFirstVisible(row)>
+                <#assign actionId = "up:${row.baseName}"/>
+            <a class="unadorned" id="${actionId?id}" href="#" onclick="actionPath('${row.path}?up'); return false;"><img src="${base}/images/resultset_up.gif" alt="move up"/></a>
+            </#if>
+        </#if>
+        </td>
+    </#if>
 
     <#if row.actions?exists>
         <#-- Annotations, e.g. template decoration. -->

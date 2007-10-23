@@ -171,10 +171,34 @@ public class MapType extends CollectionType
         return result;
     }
 
-    public Comparator<String> getKeyComparator()
+    public Comparator<String> getKeyComparator(final Record record)
     {
-        // Lexicographical ordering by the key.
-        return new Sort.StringComparator();
+        if(isOrdered())
+        {
+            // Insertion order: determined by the handle
+            return new Comparator<String>()
+            {
+                public int compare(String o1, String o2)
+                {
+                    Record r1 = (Record) record.get(o1);
+                    Record r2 = (Record) record.get(o2);
+
+                    if(r1 == null || r2 == null)
+                    {
+                        return 0;
+                    }
+                    else
+                    {
+                        return (int) (r1.getHandle() - r2.getHandle());
+                    }
+                }
+            };
+        }
+        else
+        {
+            // Lexicographical ordering by the key.
+            return new Sort.StringComparator();
+        }
     }
 
     public String getKeyProperty()

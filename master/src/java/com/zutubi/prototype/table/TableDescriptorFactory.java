@@ -23,7 +23,7 @@ public class TableDescriptorFactory
     public TableDescriptor create(String path, CollectionType collectionType)
     {
         CompositeType type = (CompositeType) collectionType.getCollectionType();
-        TableDescriptor td = new TableDescriptor(collectionType, configurationSecurityManager.hasPermission(path, AccessManager.ACTION_CREATE), configurationTemplateManager, actionManager);
+        TableDescriptor td = new TableDescriptor(collectionType, configurationSecurityManager.hasPermission(path, AccessManager.ACTION_WRITE), configurationSecurityManager.hasPermission(path, AccessManager.ACTION_CREATE), configurationTemplateManager, actionManager);
 
         // does the table has a Table annotation defining the columns to be rendered?
         Table tableAnnotation = (Table) type.getAnnotation(Table.class);

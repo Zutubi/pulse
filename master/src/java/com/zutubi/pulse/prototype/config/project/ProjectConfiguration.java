@@ -40,11 +40,13 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
     private ScmConfiguration scm;
 
     private TypeConfiguration type;
-    
+
+    @Ordered
     private Map<String, ResourceProperty> properties;
 
     private BuildOptionsConfiguration options;
 
+    @Ordered
     private Map<String, BuildStageConfiguration> stages;
 
     private List<ResourceRequirement> requirements;
@@ -56,7 +58,8 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
     @Transient
     private Map<String, Object> extensions = new HashMap<String, Object>();
 
-    @Transient // FIXME sort this out later.
+    @Transient
+    @Ordered
     private List<PostBuildActionConfiguration> postBuildActions = new LinkedList<PostBuildActionConfiguration>();
 
     private ChangeViewerConfiguration changeViewer;
