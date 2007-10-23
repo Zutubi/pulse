@@ -69,4 +69,9 @@ public class BuildResultExpressions
     {
         return Order.desc("stamps.endTime");
     }
+
+    public static Order orderByDescId()
+    {
+        return Order.desc("id");
+    }
 }

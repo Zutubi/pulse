@@ -3,7 +3,11 @@ package com.zutubi.pulse.web.rss;
 import com.sun.syndication.feed.WireFeed;
 import com.sun.syndication.feed.module.content.ContentModule;
 import com.sun.syndication.feed.module.content.ContentModuleImpl;
-import com.sun.syndication.feed.synd.*;
+import com.sun.syndication.feed.synd.SyndContent;
+import com.sun.syndication.feed.synd.SyndContentImpl;
+import com.sun.syndication.feed.synd.SyndEntry;
+import com.sun.syndication.feed.synd.SyndEntryImpl;
+import com.sun.syndication.feed.synd.SyndFeedImpl;
 import com.zutubi.pulse.ResultNotifier;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.cache.Cache;
@@ -19,11 +23,16 @@ import com.zutubi.pulse.search.SearchQuery;
 import com.zutubi.pulse.web.project.ProjectActionSupport;
 import com.zutubi.pulse.xwork.results.JITFeed;
 import org.hibernate.criterion.Expression;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 
 import java.io.StringWriter;
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * <class-comment/>
@@ -279,7 +288,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
             query.add(BuildResultExpressions.buildResultCompleted());
             query.setFirstResult(0);
             query.setMaxResults(10);
-            query.add(Order.desc("stamps.endTime"));
+            query.add(BuildResultExpressions.orderByDescId());
             query.setProjection(Projections.id());
             return query;
         }
