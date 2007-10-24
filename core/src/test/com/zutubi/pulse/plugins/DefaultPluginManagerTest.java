@@ -156,6 +156,10 @@ public class DefaultPluginManagerTest extends PulseTestCase
         {
             assertEquals("Unable to load plugin: Invalid plugin: no symbolic name", e.getMessage());
         }
+        finally
+        {
+            pluginManager.destroy();
+        }
     }
 
     public void testInstallBadJarFile() throws Exception
@@ -169,6 +173,10 @@ public class DefaultPluginManagerTest extends PulseTestCase
         catch(PluginException e)
         {
             assertEquals("Unable to load plugin: java.util.zip.ZipException: error in opening zip file", e.getMessage());
+        }
+        finally
+        {
+            pluginManager.destroy();
         }
     }
 
