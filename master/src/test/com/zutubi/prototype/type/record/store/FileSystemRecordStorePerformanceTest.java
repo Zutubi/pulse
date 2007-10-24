@@ -34,7 +34,7 @@ public class FileSystemRecordStorePerformanceTest extends PulseTestCase
         transactionManager = new TransactionManager();
         transaction = new UserTransaction(transactionManager);
 
-        FSRecordStore fileSystemRecordStore = new FSRecordStore();
+        FileSystemRecordStore fileSystemRecordStore = new FileSystemRecordStore();
         fileSystemRecordStore.setTransactionManager(transactionManager);
         fileSystemRecordStore.setPersistenceDirectory(persistentDirectory);
         fileSystemRecordStore.init();

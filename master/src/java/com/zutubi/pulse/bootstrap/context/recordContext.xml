@@ -22,7 +22,7 @@
         </property>
     </bean>
 
-    <bean id="recordStore" class="com.zutubi.prototype.type.record.store.FSRecordStore" init-method="initAndStartAutoCompaction" destroy-method="stopAutoCompaction">
+    <bean id="recordStore" class="com.zutubi.prototype.type.record.store.FileSystemRecordStore" init-method="initAndStartAutoCompaction" destroy-method="stopAutoCompaction">
         <property name="persistenceDirectory">
             <ref local="recordRoot"/>
         </property>
