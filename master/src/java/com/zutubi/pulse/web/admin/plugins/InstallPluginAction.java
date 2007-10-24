@@ -1,5 +1,6 @@
 package com.zutubi.pulse.web.admin.plugins;
 
+import com.opensymphony.util.TextUtils;
 import com.opensymphony.webwork.ServletActionContext;
 import com.opensymphony.webwork.dispatcher.multipart.MultiPartRequestWrapper;
 import com.zutubi.util.logging.Logger;
@@ -13,6 +14,18 @@ import java.util.Collection;
 public class InstallPluginAction extends PluginActionSupport
 {
     private static final Logger LOG = Logger.getLogger(InstallPluginAction.class);
+
+    private String pluginPath;
+
+    public String getPluginPath()
+    {
+        return pluginPath;
+    }
+
+    public void setPluginPath(String pluginPath)
+    {
+        this.pluginPath = pluginPath;
+    }
 
     public void validate()
     {
@@ -28,7 +41,12 @@ public class InstallPluginAction extends PluginActionSupport
         }
     }
 
-    public String execute() throws Exception
+    public String doInput() throws Exception
+    {
+        return INPUT;
+    }
+
+    public String doUpload() throws Exception
     {
         MultiPartRequestWrapper multiWrapper = (MultiPartRequestWrapper) ServletActionContext.getRequest();
 
@@ -57,6 +75,41 @@ public class InstallPluginAction extends PluginActionSupport
         try
         {
             pluginManager.installPlugin(fileNames[0], files[0].toURL());
+        }
+        catch (Exception e)
+        {
+            LOG.warning(e);
+            addActionError(e.getMessage());
+            return ERROR;
+        }
+
+        return SUCCESS;
+    }
+
+    public String doLocal() throws Exception
+    {
+        if(!TextUtils.stringSet(pluginPath))
+        {
+            addFieldError("pluginPath", "path is required");
+            return INPUT;
+        }
+
+        File pluginFile = new File(pluginPath);
+        if(!pluginFile.exists())
+        {
+            addFieldError("pluginPath", "file does not exist");
+            return INPUT;
+        }
+
+        if(!pluginFile.isFile())
+        {
+            addFieldError("pluginPath", "not a regular file");
+            return INPUT;
+        }
+
+        try
+        {
+            pluginManager.installPlugin(pluginFile.toURL());
         }
         catch (Exception e)
         {

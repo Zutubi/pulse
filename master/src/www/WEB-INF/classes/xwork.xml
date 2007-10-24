@@ -377,8 +377,8 @@
         <action name="installPlugin" class="com.zutubi.pulse.web.admin.plugins.InstallPluginAction">
             <result name="input" type="velocity">addplugin.vm</result>
             <result name="error" type="velocity">addplugin.vm</result>
-            <result name="success" type="redirect">/admin/plugins.action</result>
-            <result name="cancel" type="redirect">/admin/plugins.action</result>
+            <result name="success" type="redirect">/admin/plugins/</result>
+            <result name="cancel" type="redirect">/admin/plugins/</result>
         </action>
 
         <action name="display" class="com.zutubi.prototype.webwork.DisplayScopeAction">
@@ -559,7 +559,7 @@
         </action>
 
         <action name="enablePlugin" class="com.zutubi.pulse.web.admin.plugins.EnablePluginAction">
-            <result name="success" type="redirect">/admin/plugins.action</result>
+            <result name="success" type="httpheader">200</result>
         </action>
 
         <action name="disablePlugin" class="com.zutubi.pulse.web.admin.plugins.DisablePluginAction">
@@ -582,6 +582,9 @@
             <result name="success" type="velocity">tree/filedialog.vm</result>
         </action>
 
+        <action name="pluginFileDialog" class="com.zutubi.pulse.web.admin.plugins.PluginFileDialogAction">
+            <result name="success" type="velocity">tree/filedialog.vm</result>
+        </action>
     </package>
 
 </xwork>

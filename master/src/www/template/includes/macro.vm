@@ -1121,7 +1121,7 @@
 ##
 #macro(continueCancel $tabIndex)
     #openSubmit()
-        #wwsubmit("name=continue" "value=%{getText('continue.name')}" "tabindex=$tabIndex")
+        #wwsubmit("name=continue" "id=continue" "value=%{getText('continue.name')}" "tabindex=$tabIndex")
         #set($tabIndex = $tabIndex + 1)
         #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=$tabIndex")
     #closeSubmit()
@@ -1141,9 +1141,9 @@
 ##
 #macro(upload $tabIndex)
     #openSubmit()
-        #wwsubmit("name=upload" "value=%{getText('upload.name')}" "tabindex=$tabIndex")
+        #wwsubmit("name=upload" "id=upload" "value=%{getText('upload.name')}" "tabindex=$tabIndex")
         #set($tabIndex = $tabIndex + 1)
-        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=$tabIndex")
+        #wwsubmit("name=cancel" "id=cancel" "value=%{getText('cancel.name')}" "tabindex=$tabIndex")
     #closeSubmit()
 #end
 
@@ -2591,19 +2591,19 @@
 #end
 
 #macro(pluginLink $plugin)
-    <a href="#" onclick="selectPlugin('$plugin.id'); return false;">
+    <a id="select:$plugin.id" href="#" onclick="selectPlugin('$plugin.id'); return false;">
         $!webwork.htmlEncode($plugin.name)
     </a>
 #end
 
 #macro(pluginDisable $plugin)
-    <img alt="disable" src="$base/images/cancel.gif"/> <a href="#" onclick="pluginAction('$plugin.id', 'disable'); return false;">#wwtext("name=plugin.disable")</a>
+    <img alt="disable" src="$base/images/cancel.gif"/> <a href="#" id="disable:$plugin.id" onclick="pluginAction('$plugin.id', 'disable'); return false;">#wwtext("name=plugin.disable")</a>
 #end
 
 #macro(pluginEnable $plugin)
-    <img alt="enable" src="$base/images/accept.gif"/> <a href="#" onclick="pluginAction('$plugin.id', 'enable'); return false;">#wwtext("name=plugin.enable")</a>
+    <img alt="enable" src="$base/images/accept.gif"/> <a href="#" id="enable:$plugin.id" onclick="pluginAction('$plugin.id', 'enable'); return false;">#wwtext("name=plugin.enable")</a>
 #end
 
 #macro(pluginUninstall $plugin)
-    <img alt="delete" src="$base/images/delete.gif"/> <a href="#" onclick="pluginAction('$plugin.id', 'uninstall'); return false;">#wwtext("name=plugin.uninstall")</a>
+    <img alt="delete" src="$base/images/delete.gif"/> <a href="#" id="uninstall:$plugin.id" onclick="pluginAction('$plugin.id', 'uninstall'); return false;">#wwtext("name=plugin.uninstall")</a>
 #end

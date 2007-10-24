@@ -486,6 +486,11 @@ public class DefaultPluginManager implements PluginManager, EventListener
 
             BundleDescription bundleDescription = platformAdmin.getFactory().createBundleDescription(temporaryState, manifest, getBundleLocation(pluginFile), highestBundleId + 1);
 
+            if(bundleDescription.getSymbolicName() == null)
+            {
+                throw new PluginException("Invalid plugin: no symbolic name");
+            }
+
             temporaryState.addBundle(bundleDescription);
             temporaryState.resolve();
         }

@@ -15,17 +15,22 @@
 
 <h2 style="margin-bottom: 10px">:: #html($plugin.name) ::</h2>
 
-<table class="detail">
+<table id="details:$plugin.id" class="detail">
     #pluginRow("plugin.name" $plugin.name)
     <tr>
         #pluginHeader("plugin.state")
-        <td class="detail">
+        <td id="plugin.status" class="detail">
             #pluginStateImage($plugin) $plugin.state.toString().toLowerCase()
         </td>
     </tr>
     
-#if($plugin.disabled && $plugin.errorMessage)
-    #pluginRow("plugin.error" $plugin.errorMessage)
+#if(!$plugin.enabled && $plugin.errorMessage)
+    <tr>
+        #pluginHeader("plugin.error")
+        <td if="plugin.error" class="detail">
+            <img src="$base/images/error.gif" alt="error"/> #html($plugin.errorMessage)
+        </td>
+    </tr>
 #end
     #pluginRow("plugin.id" $plugin.id)
     #pluginRow("plugin.version" $plugin.version)

@@ -22,6 +22,7 @@ public class DefaultPluginManagerTest extends PulseTestCase
     private URL producer11URL;
     private URL producer2URL;
     private URL consumer1URL;
+    private File bundleDir;
 
     protected void setUp() throws Exception
     {
@@ -42,7 +43,7 @@ public class DefaultPluginManagerTest extends PulseTestCase
         pluginManager = new DefaultPluginManager();
         pluginManager.setPluginPaths(paths);
 
-        File bundleDir = getTestDataDir("core", "test-bundles");
+        bundleDir = getTestDataDir("core", "test-bundles");
         producer1URL = new File(bundleDir, "com.zutubi.bundles.producer_1.0.0.jar").toURL();
         producer11URL = new File(bundleDir, "com.zutubi.bundles.producer_1.1.0.jar").toURL();
         producer2URL = new File(bundleDir, "com.zutubi.bundles.producer_2.0.0.jar").toURL();
@@ -140,6 +141,34 @@ public class DefaultPluginManagerTest extends PulseTestCase
         finally
         {
             pluginManager.destroy();
+        }
+    }
+
+    public void testInstallBadManifest() throws Exception
+    {
+        init();
+        try
+        {
+            pluginManager.installPlugin(new File(bundleDir, "empty.jar").toURL());
+            fail();
+        }
+        catch(PluginException e)
+        {
+            assertEquals("Unable to load plugin: Invalid plugin: no symbolic name", e.getMessage());
+        }
+    }
+
+    public void testInstallBadJarFile() throws Exception
+    {
+        init();
+        try
+        {
+            pluginManager.installPlugin(new File(bundleDir, "bad.jar").toURL());
+            fail();
+        }
+        catch(PluginException e)
+        {
+            assertEquals("Unable to load plugin: java.util.zip.ZipException: error in opening zip file", e.getMessage());
         }
     }
 

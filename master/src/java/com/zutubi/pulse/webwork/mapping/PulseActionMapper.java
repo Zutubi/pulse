@@ -245,6 +245,14 @@ public class PulseActionMapper implements ActionMapper
     {
         if(path.startsWith("plugins"))
         {
+            // /admin/plugins?<action>=<method> takes you to:
+            //   <action>Plugin.action!<method>
+            if(TextUtils.stringSet(request.getQueryString()))
+            {
+                String[] pieces = request.getQueryString().split("=", 2);
+                return new ActionMapping(pieces[0] + "Plugin", ADMIN_NAMESPACE, pieces.length > 1 ? pieces[1] : null, null);
+            }
+
             // /admin/plugins/<id> takes you to the plugins view, selecting a
             // plugin with the given id if any is specified.
             Map<String, String> params = new HashMap<String, String>();

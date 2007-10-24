@@ -41,22 +41,23 @@ public class SeleniumUtils
 
     public static void waitForLocator(Selenium selenium, String locator)
     {
-        waitForLocator(selenium, locator, DEFAULT_TIMEOUT);
+        waitForLocator(selenium, locator, DEFAULT_TIMEOUT, false);
     }
 
-    public static void waitForLocator(Selenium selenium, String locator, long timeout)
+    public static void waitForLocator(Selenium selenium, String locator, long timeout, boolean invert)
     {
         long startTime = System.currentTimeMillis();
         while(System.currentTimeMillis() - startTime < timeout)
         {
-            if(selenium.isElementPresent(locator))
+            boolean present = selenium.isElementPresent(locator);
+            if(present && !invert || !present && invert)
             {
                 return;
             }
 
             try
             {
-                Thread.sleep(1000);
+                Thread.sleep(300);
             }
             catch (InterruptedException e)
             {

@@ -92,7 +92,7 @@ public abstract class AbstractExtensionManager implements IExtensionChangeHandle
 
     protected void handleExtensionError(IExtension extension, Throwable t)
     {
-        handleExtensionError(extension, t.getMessage());
+        handleExtensionError(extension, t.getClass().getName() + ": " + t.getMessage());
     }
 
     protected void handleExtensionError(IExtension extension, String message)

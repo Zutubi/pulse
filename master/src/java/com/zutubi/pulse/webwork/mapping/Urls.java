@@ -300,4 +300,14 @@ public class Urls
     {
         return adminGroups() + group + "/";
     }
+
+    public String adminPlugins()
+    {
+        return admin() + "plugins/";
+    }
+
+    public String adminPlugin(String id)
+    {
+        return adminPlugins() + id + "/";
+    }
 }
