@@ -315,7 +315,7 @@ public class RecordManagerTest extends PulseTestCase
         assertNotSame(h1, h2);
     }
 
-    public void testHandlesAreUniqueAcrossRuns()
+    public void testHandlesAreUniqueAcrossRuns() throws Exception
     {
         // close the default transaction.
         userTransaction.commit();
@@ -358,7 +358,7 @@ public class RecordManagerTest extends PulseTestCase
         assertNull(recordManager.getPathForHandle(100));
     }
 
-    public void testHandleMapAfterReload()
+    public void testHandleMapAfterReload() throws Exception
     {
         recordManager.insert("r1", new MutableRecordImpl());
         recordManager.insert("r2", new MutableRecordImpl());
@@ -587,11 +587,11 @@ public class RecordManagerTest extends PulseTestCase
         });
     }
 
-    private void newRecordManager()
+    private void newRecordManager() throws Exception
     {
         FileSystemRecordStore recordStore = new FileSystemRecordStore();
         recordStore.setTransactionManager(transactionManager);
-        recordStore.setPersistenceDir(tempDir);
+        recordStore.setPersistenceDirectory(tempDir);
         recordStore.init();
 
         recordManager = new RecordManager();

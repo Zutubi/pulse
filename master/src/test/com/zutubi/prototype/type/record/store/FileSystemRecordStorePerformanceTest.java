@@ -1,14 +1,14 @@
 package com.zutubi.prototype.type.record.store;
 
-import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.transaction.TransactionManager;
 import com.zutubi.prototype.transaction.UserTransaction;
+import com.zutubi.prototype.type.record.MutableRecordImpl;
+import com.zutubi.prototype.type.record.Record;
+import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.util.FileSystemUtils;
 
-import java.util.Random;
 import java.io.File;
+import java.util.Random;
 
 /**
  *
@@ -17,41 +17,43 @@ import java.io.File;
 public class FileSystemRecordStorePerformanceTest extends PulseTestCase
 {
 
-    private FileSystemRecordStore recordStore;
+    private RecordStore recordStore;
 
     private TransactionManager transactionManager;
 
     private UserTransaction transaction;
 
-    private File persistentDir;
+    private File persistentDirectory;
 
     protected void setUp() throws Exception
     {
         super.setUp();
 
-        persistentDir = FileSystemUtils.createTempDir();
+        persistentDirectory = FileSystemUtils.createTempDir();
 
         transactionManager = new TransactionManager();
         transaction = new UserTransaction(transactionManager);
 
-        recordStore = new FileSystemRecordStore();
-        recordStore.setTransactionManager(transactionManager);
-        recordStore.setPersistenceDir(persistentDir);
-        recordStore.init();
+        FSRecordStore fileSystemRecordStore = new FSRecordStore();
+        fileSystemRecordStore.setTransactionManager(transactionManager);
+        fileSystemRecordStore.setPersistenceDirectory(persistentDirectory);
+        fileSystemRecordStore.init();
+
+        recordStore = fileSystemRecordStore;
     }
 
     protected void tearDown() throws Exception
     {
         transactionManager = null;
 
-        removeDirectory(persistentDir);
+        removeDirectory(persistentDirectory);
 
         super.tearDown();
     }
 
     public void testPerformanceOfLargeRecordSetsOutsideTransaction()
     {
-        failAfterXTime(1000, new Runnable()
+        failAfterXTime(2500, new Runnable()
         {
             public void run()
             {
@@ -65,7 +67,7 @@ public class FileSystemRecordStorePerformanceTest extends PulseTestCase
 
     public void testPerformanceOfLargeRecordSetsInsideTransaction()
     {
-        failAfterXTime(1000, new Runnable()
+        failAfterXTime(2500, new Runnable()
         {
             public void run()
             {
@@ -77,6 +79,42 @@ public class FileSystemRecordStorePerformanceTest extends PulseTestCase
                 transaction.commit();
             }
         });
+    }
+
+/*
+    public void testIt() throws Exception
+    {
+        FSRecordStore recordStore = new FSRecordStore();
+        recordStore.setTransactionManager(transactionManager);
+        recordStore.setPersistenceDirectory(persistentDirectory);
+        recordStore.setCompactionInterval(10);
+        recordStore.initAndStartAutoCompaction();
+
+        for (int i = 0; i < 1000; i++)
+        {
+            String s = "path_" + i;
+            try
+            {
+                recordStore.insert(s, createRandomRecord());
+            }
+            catch (Exception e)
+            {
+                System.out.println(s);
+                e.printStackTrace();
+            }
+            Thread.sleep(200);
+        }
+
+        recordStore.stopAutoCompaction();
+    }
+*/
+
+    private void time(Runnable r)
+    {
+        long start = System.currentTimeMillis();
+        r.run();
+        long end = System.currentTimeMillis();
+        System.out.println("" + (end - start));
     }
 
     private void failAfterXTime(long timeout, Runnable r)
@@ -95,13 +133,17 @@ public class FileSystemRecordStorePerformanceTest extends PulseTestCase
     private Record createRandomRecord()
     {
         Random rand = new Random(System.currentTimeMillis());
+        return createSampleRecord(rand.nextInt(6), rand.nextInt(10));
+    }
 
+    private Record createSampleRecord(int depth, int keys)
+    {
         MutableRecordImpl random = new MutableRecordImpl();
-        for (int i = 0; i < rand.nextInt(10); i++)
+        for (int i = 0; i < keys; i++)
         {
             random.put("key" + i, "value");
         }
-        for (int i = 0; i < rand.nextInt(6); i++)
+        for (int i = 0; i < depth; i++)
         {
             random.put("nested" + i, random.copy(true));
         }

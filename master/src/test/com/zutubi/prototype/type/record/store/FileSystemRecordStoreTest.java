@@ -7,6 +7,7 @@ import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.util.IOUtils;
 
 import java.io.File;
 
@@ -16,209 +17,210 @@ import java.io.File;
  */
 public class FileSystemRecordStoreTest extends PulseTestCase
 {
-    private FileSystemRecordStore recordStore;
-
+    private FileSystemRecordStore recordStore = null;
+    private File persistentDirectory = null;
     private TransactionManager transactionManager;
-
-    private UserTransaction transaction;
-
-    private File persistentDir;
 
     protected void setUp() throws Exception
     {
         super.setUp();
 
-        persistentDir = FileSystemUtils.createTempDir();
-
+        persistentDirectory = FileSystemUtils.createTempDir();
         transactionManager = new TransactionManager();
-        transaction = new UserTransaction(transactionManager);
 
         restartRecordStore();
+    }
+
+    private void restartRecordStore() throws Exception
+    {
+        recordStore = new FileSystemRecordStore();
+        recordStore.setTransactionManager(transactionManager);
+        recordStore.setPersistenceDirectory(persistentDirectory);
+        recordStore.init();
     }
 
     protected void tearDown() throws Exception
     {
+        removeDirectory(persistentDirectory);
         transactionManager = null;
-        
-        removeDirectory(persistentDir);
+        recordStore = null;
 
         super.tearDown();
     }
 
+    //---( a set of sanity checks of the basic functions. )---
+
     public void testInsert()
     {
-        transaction.begin();
+        Record sample = createSampleRecord();
+        recordStore.insert("sample", sample);
 
-        MutableRecordImpl newRecord = new MutableRecordImpl();
-        newRecord.put("a", "b");
+        Record stored = (Record) recordStore.select().get("sample");
+        assertEquals(sample.get("a"), stored.get("a"));
+    }
 
-        recordStore.insert("path", newRecord);
+    public void testUpdate()
+    {
+        MutableRecord sample = createSampleRecord();
+        recordStore.insert("sample", sample);
 
-        // assert that it can be selected.
-        MutableRecord inserted = (MutableRecord) recordStore.select().get("path");
-        assertNotNull(inserted);
+        sample.put("c", "c");
 
-        // assert that it is not visible to other threads.
-        executeOnSeparateThreadAndWait(new Runnable()
-        {
-            public void run()
-            {
-                assertNull(recordStore.select().get("path"));
-            }
-        });
+        // ensure that updating the original sample does not update the internal record store.
+        Record stored = (Record) recordStore.select().get("sample");
+        assertNull(stored.get("c"));
 
-        // commit.
-        transaction.commit();
-
-        // assert that it is available to other threads.
-        executeOnSeparateThreadAndWait(new Runnable()
-        {
-            public void run()
-            {
-                assertNotNull(recordStore.select().get("path"));
-            }
-        });
-
-        restartRecordStore();
-
-        // assert that it was successfully persisted.
-        assertNotNull(recordStore.select().get("path"));
+        recordStore.update("sample", sample);
+        stored = (Record) recordStore.select().get("sample");
+        assertEquals(sample.get("c"), stored.get("c"));
     }
 
     public void testDelete()
     {
-        transaction.begin();
+        Record sample = createSampleRecord();
+        recordStore.insert("sample", sample);
 
-        // setup.
-        MutableRecordImpl newRecord = new MutableRecordImpl();
-        newRecord.put("a", "b");
-        recordStore.insert("path", newRecord);
+        recordStore.delete("sample");
+        assertNull(recordStore.select().get("sample"));
+    }
 
-        transaction.commit();
-        transaction.begin();
-        
-        assertNotNull(recordStore.delete("path"));
+    //---( check that the index files are correctly generated. )---
 
-        // assert that it can be selected.
-        MutableRecord deleted = (MutableRecord) recordStore.select().get("path");
-        assertNull(deleted);
+    public void testPersistentFiles()
+    {
+        Record sample = createSampleRecord();
+        recordStore.insert("sample", sample);
 
-        // assert that it is not visible to other threads.
+        assertTrue(new File(persistentDirectory, "index").isFile());
+        assertFalse(new File(persistentDirectory, "index.new").isFile());
+        assertFalse(new File(persistentDirectory, "index.backup").isFile());
+
+        // check that the journal entry is written to disk
+        assertTrue(new File(persistentDirectory, "1").exists());
+
+        assertFalse(new File(persistentDirectory, "2").exists());
+        recordStore.update("sample", sample);
+        assertTrue(new File(persistentDirectory, "2").exists());
+
+        assertFalse(new File(persistentDirectory, "3").exists());
+        recordStore.delete("sample");
+        assertTrue(new File(persistentDirectory, "3").exists());
+    }
+
+    public void testCompaction() throws Exception
+    {
+        File snapshot = new File(persistentDirectory, "snapshot");
+        File snapshotId = new File(snapshot, "snapshot_id.txt");
+
+        assertFalse(snapshot.exists());
+
+        Record sample = createSampleRecord();
+
+        // insert generates one journal entry.
+        recordStore.insert("sample", sample);
+        assertFalse(snapshot.exists());
+
+        // compaction removes this journal entry.
+        recordStore.compactNow();
+        assertTrue(snapshot.exists());
+        assertEquals("1", IOUtils.fileToString(new File(snapshot, "snapshot_id.txt")));
+
+        // ensure that the journal entry id is correct
+        assertFalse(new File(persistentDirectory, "2").exists());
+        recordStore.update("sample", sample);
+        assertTrue(new File(persistentDirectory, "2").exists());
+
+        recordStore.compactNow();
+        assertEquals("2", IOUtils.fileToString(new File(snapshot, "snapshot_id.txt")));
+    }
+
+    public void testCompactionOnRestart() throws Exception
+    {
+        File snapshot = new File(persistentDirectory, "snapshot");
+
+        Record sample = createSampleRecord();
+
+        // insert generates one journal entry.
+        recordStore.insert("sample", sample);
+        recordStore.update("sample", sample);
+        recordStore.update("sample", sample);
+
+        restartRecordStore();
+        assertTrue(snapshot.exists());
+        assertTrue(new File(snapshot, "sample").exists());
+        assertEquals("3", IOUtils.fileToString(new File(snapshot, "snapshot_id.txt")));
+
+        // restart should cleanup unused journal files.
+    }
+
+    public void testMutlipleRestartsAndTxns() throws Exception
+    {
+        for (int i = 0; i < 20; i++)
+        {
+            recordStore.insert("path_" + i, createSampleRecord());
+            restartRecordStore();
+        }
+    }
+
+    public void testRestartOnPersistenceDirectoryWithNoData() throws Exception
+    {
+        restartRecordStore();
+    }
+
+    public void testCompactionDuringTransaction() throws Exception
+    {
+        File snapshot = new File(persistentDirectory, "snapshot");
+
+        Record sample = createSampleRecord();
+
+        // insert generates one journal entry.
+        recordStore.insert("sample", sample);
+
+        UserTransaction txn = new UserTransaction(transactionManager);
+        txn.begin();
+
+        recordStore.update("sample", sample);
+
         executeOnSeparateThreadAndWait(new Runnable()
         {
             public void run()
             {
-                assertNotNull(recordStore.select().get("path"));
+                try
+                {
+                    recordStore.compactNow();
+                }
+                catch (Exception e)
+                {
+                    fail("Exception thrown during test: " + e.getClass().getName() + " " + e.getMessage());
+                }
             }
         });
 
-        // commit.
-        transaction.commit();
+        recordStore.update("sample", sample);
+        txn.commit();
 
-        deleted = (MutableRecord) recordStore.select().get("path");
-        assertNull(deleted);
-
-        // assert that it is available to other threads.
-        executeOnSeparateThreadAndWait(new Runnable()
-        {
-            public void run()
-            {
-                assertNull(recordStore.select().get("path"));
-            }
-        });
-
-        restartRecordStore();
-
-        // assert that it was successfully persisted.
-        assertNull(recordStore.select().get("path"));
+        // snapshot should be from before the transaction started and so only contain journal entry 1.
+        assertTrue(snapshot.exists());
+        assertEquals("1", IOUtils.fileToString(new File(snapshot, "snapshot_id.txt")));
     }
 
-    public void testRollback()
+    public void testTransactionRollbackBeforeFirstCommit()
     {
-        transaction.begin();
+        UserTransaction txn = new UserTransaction(transactionManager);
+        txn.begin();
 
-        // start the transaction.
-        MutableRecordImpl newRecord = new MutableRecordImpl();
-        newRecord.put("a", "b");
-        recordStore.insert("path", newRecord);
+        recordStore.insert("sample", createSampleRecord());
 
-        // rollback.
-        transaction.rollback();
-
-        // ensure that we have rolled back to the blank state.
-        assertNull(recordStore.select().get("path"));
-
-        restartRecordStore();
-
-        assertNull(recordStore.select().get("path"));
+        txn.rollback();
     }
 
-    // ensure that changes made outside the scope of a transaction are handled correctly.
-    public void testAutoCommit()
+    //---( helper methods. )---
+
+    private MutableRecord createSampleRecord()
     {
-        // update the data.
-        MutableRecordImpl newRecord = new MutableRecordImpl();
-        newRecord.put("a", "b");
-
-        recordStore.insert("path", newRecord);
-
-        // restart
-        restartRecordStore();
-
-        // assert that it was successfully persisted.
-        assertNotNull(recordStore.select().get("path"));
-    }
-
-    public void testJournalRollover()
-    {
-        recordStore.setJournalCompactionInterval(3);
-
-        transaction.begin();
-        recordStore.insert("a", createSampleRecord());
-        transaction.commit();
-
-        assertEquals(1, recordStore.select().size());
-        assertEquals(1, recordStore.journal.size());
-
-        transaction.begin();
-        recordStore.insert("b", createSampleRecord());
-        transaction.commit();
-
-        assertEquals(2, recordStore.select().size());
-        assertEquals(2, recordStore.journal.size());
-
-        transaction.begin();
-        recordStore.insert("c", createSampleRecord());
-        transaction.commit();
-
-        assertEquals(3, recordStore.select().size());
-        assertEquals(0, recordStore.journal.size());
-
-        transaction.begin();
-        recordStore.insert("d", createSampleRecord());
-        transaction.commit();
-
-        assertEquals(4, recordStore.select().size());
-        assertEquals(1, recordStore.journal.size());
-
-        restartRecordStore();
-
-        assertEquals(4, recordStore.select().size());
-        assertEquals(1, recordStore.journal.size());
-    }
-
-    private Record createSampleRecord()
-    {
-        MutableRecord record = new MutableRecordImpl();
-        record.put("a", "b");
-        return record;
-    }
-
-    private void restartRecordStore()
-    {
-        recordStore = new FileSystemRecordStore();
-        recordStore.setPersistenceDir(persistentDir);
-        recordStore.setTransactionManager(transactionManager);
-        recordStore.init();
+        MutableRecord sample = new MutableRecordImpl();
+        sample.put("a", "a");
+        sample.put("b", "b");
+        return sample;
     }
 }

@@ -1,5 +1,7 @@
 package com.zutubi.prototype.transaction;
 
+import com.zutubi.util.logging.Logger;
+
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -13,6 +15,8 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class TransactionManager
 {
+    private static final Logger LOG = Logger.getLogger(TransactionManager.class);
+
     private static long nextTransactionId = 1;
 
     private ThreadLocal<Transaction> transactionHolder = new ThreadLocal<Transaction>();
@@ -44,7 +48,6 @@ public class TransactionManager
         // Indicate that a transaction is in progress. If that transaction is not associated with the
         // current thread, then we wait until it is completed before continuing.  We are effectively
         // waiting on the transaction lock becoming available.
-
 
         Transaction txn = transactionHolder.get();
         if (txn == null)
@@ -106,6 +109,7 @@ public class TransactionManager
             }
             catch (Throwable e)
             {
+                LOG.warning("Failed to prepare transaction resource, marking transaction for rollback.", e);
                 canCommit = false;
             }
 
