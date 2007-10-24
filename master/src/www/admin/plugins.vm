@@ -23,19 +23,12 @@
                     init : function() {
                         centerRegion = nestedLayout.getRegion('center');
                         var centerPanel = centerRegion.getPanel(0);
-                        centerPanel.setTitle('all plugins');
                         centerPanel.getEl().setStyle('margin', '0');
-                        centerRegion.titleEl.show();
                         
-                        nestedLayout.addRegion('north', {
-                            split: false,
-                            titlebar: false
-                        });
-
                         nestedLayout.addRegion('west', {
                             split:true,
                             initialSize: 300,
-                            titlebar: true,
+                            titlebar: false,
                             collapsible: true,
                             animate: true,
                             tabPosition: 'top',
@@ -43,8 +36,7 @@
                         });
 
                         nestedLayout.beginUpdate();
-                        nestedLayout.add('north', new Ext.ContentPanel('innernorth', {title: 'inner north'}));
-                        nestedLayout.add('west', new Ext.ContentPanel('plugin-tree', {title: 'plugins'}));
+                        nestedLayout.add('west', new Ext.ContentPanel('plugin-tree', {titlebar: false}));
                         nestedLayout.endUpdate();
 
                         this.createTree();
@@ -66,12 +58,10 @@
                            path = node.getIdPath();
                            if(path == 'plugins')
                            {
-                               centerRegion.getPanel(0).setTitle('all plugins');
                                url = '$base/ajax/admin/allPlugins.action';
                            }
                            else
                            {
-                               centerRegion.getPanel(0).setTitle('plugin details');
                                url = '$base/ajax/admin/viewPlugin.action?id=' + node.data.id;
                            }
 
@@ -151,15 +141,12 @@
 <body>
     #adminTabs("plugins")
 
-    <div id="innernorth" style="padding: 4px; padding-bottom: 12px; border-bottom: 1px solid #ccc">
-    </div>
-
-    <div id="plugin-tree">
+    <div id="plugin-tree" style="padding: 10px">
         <div id="error"></div>
         <div id="loading" style="display:none;"><img src="$base/images/treeview/loading.gif" alt="loading..."/></div>
         <div id="tree"></div>
     </div>
 
-    <div id="detail-pane" style="min-height: 100%"></div>
+    <div id="detail-pane" style="padding: 10px; min-height: 100%"></div>
 </body>
 </html>

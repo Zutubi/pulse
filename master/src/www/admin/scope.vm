@@ -131,7 +131,7 @@
                     tree = new ZUTUBI.ConfigTree('config-tree', {
 #if($prefixPath)
                         pathPrefix: '$prefixPath',
- #end
+#end
                         animate: false,
                         loader: loader,
                         title: 'config'

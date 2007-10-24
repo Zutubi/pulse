@@ -1,4 +1,5 @@
-<table style="width: 100%">
+<table>
+    #headingRow("all.plugins" 6)
     <tr>
         #contentHeading("name" 1)
         #contentHeading("id" 1)

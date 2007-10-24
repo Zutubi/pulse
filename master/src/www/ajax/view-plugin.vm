@@ -13,6 +13,8 @@
     </tr>
 #end
 
+<h2 style="margin-bottom: 10px">:: #html($plugin.name) ::</h2>
+
 <table class="detail">
     #pluginRow("plugin.name" $plugin.name)
     <tr>
