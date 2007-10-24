@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class FileSystemRecordStore implements RecordStore, TransactionResource
 {
-    private static final Logger LOG = Logger.getLogger(FSRecordStore.class);
+    private static final Logger LOG = Logger.getLogger(FileSystemRecordStore.class);
 
     private static final String ACTION_INSERT = "insert";
     private static final String ACTION_UPDATE = "update";
