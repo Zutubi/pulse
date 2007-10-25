@@ -81,33 +81,59 @@ public class FileSystemRecordStorePerformanceTest extends PulseTestCase
         });
     }
 
-/*
-    public void testIt() throws Exception
+    public void simplePerformanceTest() throws Exception
     {
-        FSRecordStore recordStore = new FSRecordStore();
+        FileSystemRecordStore recordStore = new FileSystemRecordStore();
         recordStore.setTransactionManager(transactionManager);
         recordStore.setPersistenceDirectory(persistentDirectory);
         recordStore.setCompactionInterval(10);
         recordStore.initAndStartAutoCompaction();
 
-        for (int i = 0; i < 1000; i++)
+        System.out.println(persistentDirectory.getAbsolutePath());
+
+        for (int j = 0; j < 500; j++)
         {
-            String s = "path_" + i;
-            try
+            long time = 0;
+            for (int i = 0; i < 10; i++)
             {
-                recordStore.insert(s, createRandomRecord());
+                String s = "path_" + (i + 10 * j);
+                try
+                {
+                    long start = System.currentTimeMillis();
+                    Record record = createRandomRecord();
+                    recordStore.insert(s, record);
+                    long end = System.currentTimeMillis();
+                    time = time + (end - start);
+                }
+                catch (Exception e)
+                {
+                    System.out.println(s);
+                    e.printStackTrace();
+                }
+                Thread.sleep(200);
             }
-            catch (Exception e)
-            {
-                System.out.println(s);
-                e.printStackTrace();
-            }
-            Thread.sleep(200);
+            System.out.println("Average("+(j + 1)+"): " + (time / 10) + "    dir list length: " + persistentDirectory.list().length + "   size of store: " + sizeOfStore(recordStore));
         }
 
         recordStore.stopAutoCompaction();
     }
-*/
+
+    private long sizeOfStore(RecordStore store)
+    {
+        Record r = store.select();
+        return countNested(r);        
+    }
+
+    private long countNested(Record r)
+    {
+        long count = 0;
+        for (String key : r.nestedKeySet())
+        {
+            count++;
+            count = count + countNested((Record) r.get(key));
+        }
+        return count;
+    }
 
     private void time(Runnable r)
     {

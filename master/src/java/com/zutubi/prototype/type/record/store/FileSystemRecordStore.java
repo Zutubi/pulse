@@ -3,10 +3,13 @@ package com.zutubi.prototype.type.record.store;
 import com.zutubi.prototype.transaction.TransactionManager;
 import com.zutubi.prototype.transaction.TransactionResource;
 import com.zutubi.prototype.transaction.TransactionException;
+import com.zutubi.prototype.transaction.Transaction;
 import com.zutubi.prototype.type.record.DefaultRecordSerialiser;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.MutableRecordImpl;
+import com.zutubi.prototype.type.record.XmlRecordSerialiser;
+import com.zutubi.prototype.type.record.NoopRecordHandler;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.util.IOUtils;
@@ -65,6 +68,8 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
 
     private long latestSnapshotId = 0;
 
+    private FS fileSystem = new DefaultFS();
+
     private File snapshotDirectory;
     private File backupSnapshotDirectory;
     private File newSnapshotDirectory;
@@ -87,9 +92,14 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
     {
     }
 
-    public void setCompactionInterval(long compactionInterval)
+    /**
+     * The interval (in seconds) between automatic compaction runs.
+     *  
+     * @param interval interval in seconds.
+     */
+    public void setCompactionInterval(long interval)
     {
-        this.compactionInterval = compactionInterval;
+        this.compactionInterval = interval;
     }
 
     public void initAndStartAutoCompaction() throws Exception
@@ -98,7 +108,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
         startAutoCompaction();
     }
 
-    public void startAutoCompaction()
+    protected void startAutoCompaction()
     {
         stopRequested = false;
         autoCompaction = new Thread(new Runnable()
@@ -135,7 +145,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
         autoCompaction.start();
     }
 
-    public void stopAutoCompaction()
+    protected void stopAutoCompaction()
     {
         lock.lock();
         try
@@ -151,7 +161,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
 
     public void init() throws Exception
     {
-        if (!persistenceDirectory.exists() && !persistenceDirectory.mkdirs())
+        if (!fileSystem.exists(persistenceDirectory) && !fileSystem.mkdirs(persistenceDirectory))
         {
             throw new IOException("Failed to create the record store persistence directory: " + persistenceDirectory.getAbsolutePath());
         }
@@ -169,27 +179,27 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
         backupJournalIndexFile = new File(persistenceDirectory, "index.backup");
 
         // is this the first time we are initialising this directory?
-        if (!initialised.exists())
+        if (!fileSystem.exists(initialised))
         {
-            if (!initialised.createNewFile())
+            if (!fileSystem.createNewFile(initialised))
             {
                 throw new IOException("Failed to write to the record store persistence directory: " + persistenceDirectory.getAbsolutePath());
             }
         }
         else
         {
-            if (newSnapshotDirectory.exists() || snapshotDirectory.exists() || backupSnapshotDirectory.exists())
+            if (fileSystem.exists(newSnapshotDirectory) || fileSystem.exists(snapshotDirectory) || fileSystem.exists(backupSnapshotDirectory))
             {
                 recoverSnapshot(newSnapshotDirectory, snapshotDirectory, backupSnapshotDirectory);
             }
-            if (newJournalIndexFile.exists() || journalIndexFile.exists() || backupJournalIndexFile.exists())
+            if (fileSystem.exists(newJournalIndexFile) || fileSystem.exists(journalIndexFile) || fileSystem.exists(backupJournalIndexFile))
             {
                 recoverIndex(newJournalIndexFile, journalIndexFile, backupJournalIndexFile);
             }
         }
 
         MutableRecord latestSnapshot = new MutableRecordImpl();
-        if (snapshotDirectory.exists())
+        if (fileSystem.exists(snapshotDirectory))
         {
             DefaultRecordSerialiser recordSerialiser = new DefaultRecordSerialiser(snapshotDirectory);
             latestSnapshot = recordSerialiser.deserialise("");
@@ -256,38 +266,42 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
 
     private List<JournalEntry> readJournal() throws IOException
     {
-        List<JournalEntry> journal = new LinkedList<JournalEntry>();
-        if (journalIndexFile.exists())
+        try
         {
-            BufferedReader reader = null;
-            try
+            List<JournalEntry> journal = new LinkedList<JournalEntry>();
+            if (fileSystem.exists(journalIndexFile))
             {
-                reader = new BufferedReader(new FileReader(journalIndexFile));
-                String line;
-                while ((line = reader.readLine()) != null)
+                BufferedReader reader = null;
+                try
                 {
-                    int id = Integer.valueOf(line);
+                    reader = new BufferedReader(new FileReader(journalIndexFile));
+                    String line;
+                    while ((line = reader.readLine()) != null)
+                    {
+                        long id = Long.valueOf(line);
+                        String action = reader.readLine();
+                        String path = reader.readLine();
+                        long txnId = Long.valueOf(reader.readLine());
 
-                    String action = reader.readLine();
-                    String path = reader.readLine();
-                    File recordDir = new File(persistenceDirectory, line);
+                        File recordDir = new File(persistenceDirectory, line);
 
-                    //TODO: possible optimisation, delay the loading of the record until it is requested.
-                    //      This is only an optimisation if we do not start 'caching' the journal.
-                    // load the record.
-//                    Record record = readRecord(recordDir);
-
-                    JournalEntry journalEntry = new JournalEntry(action, path, recordDir);
-                    journalEntry.setId(id);
-                    journal.add(journalEntry);
+                        JournalEntry journalEntry = new JournalEntry(action, path, recordDir);
+                        journalEntry.setId(id);
+                        journalEntry.setTxnId(txnId);
+                        journal.add(journalEntry);
+                    }
+                }
+                finally
+                {
+                    IOUtils.close(reader);
                 }
             }
-            finally
-            {
-                IOUtils.close(reader);
-            }
+            return journal;
         }
-        return journal;
+        catch (NumberFormatException e)
+        {
+            throw new IOException("Contents of the journal index are invalid. Reason: " + e.getMessage());
+        }
     }
 
     //---( TransactionResource implementation )---
@@ -321,17 +335,19 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
             // any problems here trigger a commit failure. This will result in a rollback, so we can handle the
             // necessary cleanup then.
 
-            if (this.newJournalIndexFile.exists() && !delete(this.newJournalIndexFile))
+            if (fileSystem.exists(this.newJournalIndexFile) && !delete(this.newJournalIndexFile))
             {
                 throw new IOException("Failed to delete " + this.newJournalIndexFile.getAbsolutePath());
             }
 
-            if (!this.newJournalIndexFile.createNewFile())
+            if (!fileSystem.createNewFile(this.newJournalIndexFile))
             {
                 throw new IOException("Failed to create " + this.newJournalIndexFile.getAbsolutePath());
             }
 
             writer = new FileWriter(this.newJournalIndexFile);
+
+            long txnId = getCurrentTransactionId();
 
             for (JournalEntry entry : newJournalIndex)
             {
@@ -341,13 +357,15 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
                 writer.append('\n');
                 writer.append(entry.getPath());
                 writer.append('\n');
+                writer.append(Long.toString(txnId));
+                writer.append('\n');
             }
 
             // record the soon to be committed journal entries.
             for (JournalEntry entry : activeJournal)
             {
                 File journalEntry = new File(persistenceDirectory, Long.toString(entry.getId()));
-                if (journalEntry.exists() && !delete(journalEntry))
+                if (fileSystem.exists(journalEntry) && !delete(journalEntry))
                 {
                     throw new IOException("Failed to delete old journal entry: " + journalEntry.getAbsolutePath());
                 }
@@ -371,29 +389,40 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
         }
     }
 
+    private long getCurrentTransactionId()
+    {
+        long txnId = -1;
+        Transaction txn = transactionManager.getTransaction();
+        if (txn != null)
+        {
+            txnId = txn.getId();
+        }
+        return txnId;
+    }
+
     public synchronized void commit() throws TransactionException
     {
         // commit the journal entries.
-        if (newJournalIndexFile.exists())
+        if (fileSystem.exists(newJournalIndexFile))
         {
-            if (backupJournalIndexFile.exists() && !delete(backupJournalIndexFile))
+            if (fileSystem.exists(backupJournalIndexFile) && !delete(backupJournalIndexFile))
             {
                 throw new TransactionException("Failed to clean up stale backup.");
             }
 
-            if (journalIndexFile.exists() && !journalIndexFile.renameTo(backupJournalIndexFile))
+            if (fileSystem.exists(journalIndexFile) && !fileSystem.renameTo(journalIndexFile, backupJournalIndexFile))
             {
                 // This is a problem, any failures during the commit will leave things in an inconsistent state.
                 // Will need to generate an exception that triggers a full refresh...
                 throw new TransactionException("Failed to backup existing journal index.");
             }
 
-            if (!newJournalIndexFile.renameTo(journalIndexFile))
+            if (!fileSystem.renameTo(newJournalIndexFile, journalIndexFile))
             {
                 throw new TransactionException("Failed to commit new journal index.");
             }
 
-            if (backupJournalIndexFile.exists())
+            if (fileSystem.exists(backupJournalIndexFile))
             {
                 delete(backupJournalIndexFile);
             }
@@ -426,7 +455,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
         for (JournalEntry entry : activeJournal)
         {
             File journalEntry = new File(persistenceDirectory, Long.toString(entry.getId()));
-            if (journalEntry.exists() && !delete(journalEntry))
+            if (fileSystem.exists(journalEntry) && !delete(journalEntry))
             {
                 // although unexpected, it doesnt matter too much.  A failure to delete will result
                 // in a attempt to delete it at a later stage.
@@ -441,16 +470,16 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
     private void recoverIndex(File newIndex, File index, File backupIndex)
     {
         // attempt a recovery.
-        if (newIndex.exists() && !delete(newIndex))
+        if (fileSystem.exists(newIndex) && !delete(newIndex))
         {
             // problem, is it fatal? If we dont fail now, we will fail when we try to commit the next transaction..
             LOG.warning("Failed to delete uncommitted journal index during index recovery.");
         }
 
-        if (index.exists())
+        if (fileSystem.exists(index))
         {
             // we have a committed index, cleanup the backup if it exists.
-            if (backupIndex.exists())
+            if (fileSystem.exists(backupIndex))
             {
                 delete(backupIndex);
             }
@@ -458,7 +487,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
         else
         {
             // rollback the backup.
-            if (!backupIndex.exists())
+            if (!fileSystem.exists(backupIndex))
             {
                 // if the backup does not exist, then the original file did not exist either, so there is
                 // nothing to do here.  No need to be overly paranoid.
@@ -469,7 +498,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
             }
             else
             {
-                if (!backupIndex.renameTo(index))
+                if (!fileSystem.renameTo(backupIndex, index))
                 {
                     // problem, we failed to rollback to the index backup, not much we can do here.
                     throw new TransactionException("Failed to recover transaction, failed to rollback backup index.");
@@ -558,31 +587,31 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
         return result;
     }
 
-    private boolean writeRecord(File dir, Record r) throws IOException
+    private boolean writeRecord(File file, Record record) throws IOException
     {
-        if (!dir.exists() && !dir.mkdirs())
+        if (!fileSystem.exists(file) && !fileSystem.createNewFile(file))
         {
             // problems....
-            throw new IOException();
+            throw new IOException("Failed to create new journal entry. " + file.getAbsolutePath());
         }
 
-        if (r == null)
+        if (record == null)
         {
             return true;
         }
 
-        DefaultRecordSerialiser serialiser = new DefaultRecordSerialiser(dir);
-        serialiser.serialise("", r, true);
+        XmlRecordSerialiser serialiser = new XmlRecordSerialiser();
+        serialiser.serialise(file, record);
 
         return true;
     }
 
-    private Record readRecord(File dir)
+    private Record readRecord(File file)
     {
-        if (dir.isDirectory())
+        if (file.exists())
         {
-            DefaultRecordSerialiser serialiser = new DefaultRecordSerialiser(dir);
-            return serialiser.deserialise("");
+            XmlRecordSerialiser serialiser = new XmlRecordSerialiser();
+            return serialiser.deserialise(file, new NoopRecordHandler());
         }
         return null;
     }
@@ -616,13 +645,13 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
             }
 
             // prepare the snapshot directory.
-            if (newSnapshotDirectory.exists() && !delete(newSnapshotDirectory))
+            if (fileSystem.exists(newSnapshotDirectory) && !delete(newSnapshotDirectory))
             {
                 // problem preparing directories for snapshot dump
                 throw new IOException("Failed to cleanup stale snapshot directory: " + newSnapshotDirectory.getAbsolutePath());
             }
 
-            if (!newSnapshotDirectory.mkdirs())
+            if (!fileSystem.mkdirs(newSnapshotDirectory))
             {
                 // problem preparing directories for snapshot dump
                 throw new IOException("Failed to create new snapshot directory: " + newSnapshotDirectory.getAbsolutePath());
@@ -635,7 +664,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
             try
             {
                 File newSnapshotJournalIdFile = new File(newSnapshotDirectory, "snapshot_id.txt");
-                if (!newSnapshotJournalIdFile.createNewFile())
+                if (!fileSystem.createNewFile(newSnapshotJournalIdFile))
                 {
                     throw new IOException("Failed to create new snapshot id file: " + newSnapshotJournalIdFile.getAbsolutePath());
                 }
@@ -650,21 +679,21 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
 
             // now we commit these changes by swapping in this directory for the old one.
 
-            if (snapshotDirectory.exists())
+            if (fileSystem.exists(snapshotDirectory))
             {
-                if (backupSnapshotDirectory.exists() && !delete(backupSnapshotDirectory))
+                if (fileSystem.exists(backupSnapshotDirectory) && !delete(backupSnapshotDirectory))
                 {
                     // problem clearing space for the backup
                     throw new IOException("Failed to clean up stale snapshot backup: " + backupSnapshotDirectory.getAbsolutePath());
                 }
-                if (!snapshotDirectory.renameTo(backupSnapshotDirectory))
+                if (!fileSystem.renameTo(snapshotDirectory, backupSnapshotDirectory))
                 {
                     // problem with the backup...
                     throw new IOException("Failed to create snapshot backup: " + backupSnapshotDirectory.getAbsolutePath());
                 }
             }
 
-            if (!newSnapshotDirectory.renameTo(snapshotDirectory))
+            if (!fileSystem.renameTo(newSnapshotDirectory, snapshotDirectory))
             {
                 // problem with the commit. need to recover.
                 throw new IOException("Failed to commit snapshot to " + snapshotDirectory.getAbsolutePath());
@@ -672,7 +701,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
 
             latestSnapshotId = snapshotJournalId;
 
-            if (backupSnapshotDirectory.exists() && !delete(backupSnapshotDirectory))
+            if (fileSystem.exists(backupSnapshotDirectory) && !delete(backupSnapshotDirectory))
             {
                 // problem cleaning up backup. non fatal, but needs to be resolved before next commit else it will fail.
                 LOG.severe("Failed to cleanup snapshop backup.");
@@ -693,16 +722,16 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
     private void recoverSnapshot(File newSnapshotDirectory, File snapshotDirectory, File backupSnapshotDirectory) throws IOException
     {
         // attempt a recovery.
-        if (newSnapshotDirectory.exists() && !delete(newSnapshotDirectory))
+        if (fileSystem.exists(newSnapshotDirectory) && !delete(newSnapshotDirectory))
         {
             // problem, but just log it and continue recovery. Do not override current exception.
             throw new IOException();
         }
 
-        if (snapshotDirectory.exists())
+        if (fileSystem.exists(snapshotDirectory))
         {
             // we have a committed snapshot directory, cleanup the backup if it exists.
-            if (backupSnapshotDirectory.exists())
+            if (fileSystem.exists(backupSnapshotDirectory))
             {
                 delete(backupSnapshotDirectory);
             }
@@ -710,7 +739,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
         else
         {
             // rollback the backup.
-            if (!backupSnapshotDirectory.exists())
+            if (!fileSystem.exists(backupSnapshotDirectory))
             {
                 // if the backup does not exist, then the original file did not exist either, so there is
                 // nothing to do here.  No need to be overly paranoid.
@@ -721,7 +750,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
             }
             else
             {
-                if (!backupSnapshotDirectory.renameTo(snapshotDirectory))
+                if (!fileSystem.renameTo(backupSnapshotDirectory, snapshotDirectory))
                 {
                     // problem, we failed to rollback to the snapshot backup, not much we can do here.
                     // LOG this sad state of affairs.
@@ -756,7 +785,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
             if (id <= latestSnapshotId)
             {
                 File deadFile = new File(journalEntry.getParentFile(), journalEntry.getName() + ".dead");
-                journalEntry.renameTo(deadFile);
+                fileSystem.renameTo(journalEntry, deadFile);
             }
         }
 
@@ -778,26 +807,26 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
 
     private boolean delete(File file)
     {
-        if (!file.exists())
+        if (!fileSystem.exists(file))
         {
             return true;
         }
 
-        boolean deleteSuccessful = false;
+        boolean deleteSuccessful;
         if (file.isDirectory())
         {
             deleteSuccessful = FileSystemUtils.rmdir(file);
         }
         else
         {
-            deleteSuccessful = file.delete();
+            deleteSuccessful = fileSystem.delete(file);
         }
 
         if (!deleteSuccessful && !file.getName().endsWith(".dead"))
         {
             // rename...
             File deadFile = new File(file.getParentFile(), file.getName() + System.currentTimeMillis() + ".dead");
-            deleteSuccessful = file.renameTo(deadFile);
+            deleteSuccessful = fileSystem.renameTo(file, deadFile);
         }
 
         return deleteSuccessful;
@@ -806,7 +835,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
     public class JournalEntry
     {
         private long id;
-
+        private long txnId = -1;
         private String action;
         private String path;
         private Record record;
@@ -875,6 +904,16 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
         void setId(long id)
         {
             this.id = id;
+        }
+
+        public long getTxnId()
+        {
+            return txnId;
+        }
+
+        void setTxnId(long txnId)
+        {
+            this.txnId = txnId;
         }
     }
 
