@@ -50,7 +50,7 @@
             is generated: so plugin authors do not need to write any UI code!
         </p>
 
-        <h3>Predicable URLS</h3>
+        <h3>Predictable URLS</h3>
         <p>
             The URL scheme used to access Pulses' resources has been reviewed and updated, allowing improved
             access to the UI, functionality and resources.  
