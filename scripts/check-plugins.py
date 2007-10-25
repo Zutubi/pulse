@@ -9,6 +9,8 @@ import sys
 import xml.sax
 import xml.sax.handler
 
+IGNORED_PLUGINS = set(["com.zutubi.pulse.core.postprocessors.test"])
+
 allPlugins = set()
 packagedPlugins = set()
 
@@ -41,7 +43,7 @@ def main():
     packageDir = os.path.join(topDir, "package")
     processIvyFiles(packageDir, PackageHandler())    
     processIvyFiles(bundlesDir, BundleHandler())    
-    unpackaged = allPlugins - packagedPlugins
+    unpackaged = allPlugins - packagedPlugins - IGNORED_PLUGINS
     for plugin in unpackaged:
         print plugin
     sys.exit(len(unpackaged))
