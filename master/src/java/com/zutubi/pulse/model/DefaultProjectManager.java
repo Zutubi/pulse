@@ -12,18 +12,23 @@ import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.DefaultSetupManager;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseException;
+import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.NamedConfigurationComparator;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.model.TestCaseIndex;
 import com.zutubi.pulse.core.scm.DelegateScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.BuildRequestEvent;
 import com.zutubi.pulse.events.build.PersonalBuildRequestEvent;
+import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
 import com.zutubi.pulse.license.LicenseManager;
 import com.zutubi.pulse.license.authorisation.AddProjectAuthorisation;
 import com.zutubi.pulse.model.persistence.ProjectDao;
 import com.zutubi.pulse.model.persistence.TestCaseIndexDao;
+import com.zutubi.pulse.model.persistence.AgentStateDao;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.prototype.config.LabelConfiguration;
 import com.zutubi.pulse.prototype.config.group.AbstractGroupConfiguration;
@@ -43,7 +48,7 @@ import java.util.*;
  * 
  *
  */
-public class DefaultProjectManager implements ProjectManager, ConfigurationInjector.ConfigurationSetter<Project>
+public class DefaultProjectManager implements ProjectManager, ConfigurationInjector.ConfigurationSetter<Project>, EventListener
 {
     private static final Logger LOG = Logger.getLogger(DefaultProjectManager.class);
 
@@ -57,6 +62,7 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
     private ChangelistIsolator changelistIsolator;
     private DelegateScmClientFactory scmClientManager;
     private LicenseManager licenseManager;
+    private AgentStateDao agentStateDao;
 
     private ConfigurationProvider configurationProvider;
     private TypeRegistry typeRegistry;
@@ -490,11 +496,6 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
         {
             project.buildCompleted();
 
-            if (project.isForceClean())
-            {
-                project.setForceClean(false);
-            }
-
             project.setBuildCount(project.getBuildCount() + 1);
             if(successful)
             {
@@ -609,19 +610,71 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
         return result;
     }
 
+    public void removeReferencesToAgent(long agentStateId)
+    {
+        for(Project p: getProjects(true))
+        {
+            if(p.clearForceCleanForAgent(agentStateId))
+            {
+                projectDao.save(p);
+            }
+        }
+    }
+
+    public void markForCleanBuild(Project project)
+    {
+        boolean changed = false;
+        for(AgentState agentState: agentStateDao.findAll())
+        {
+            if(project.setForceCleanForAgent(agentState))
+            {
+                changed = true;
+            }
+        }
+
+        if(changed)
+        {
+            projectDao.save(project);
+        }
+    }
+
     public void setConfiguration(Project state)
     {
         state.setConfig(idToConfig.get(state.getId()));
     }
 
-    public void setEventManager(EventManager eventManager)
+    public void handleEvent(Event evt)
     {
-        this.eventManager = eventManager;
+        RecipeDispatchedEvent rde = (RecipeDispatchedEvent) evt;
+        RecipeRequest request = rde.getRequest();
+        ProjectConfiguration projectConfig = nameToConfig.get(request.getProject());
+        if(projectConfig != null)
+        {
+            Project project = projectDao.findById(projectConfig.getProjectId());
+            if(project != null)
+            {
+                if(project.clearForceCleanForAgent(rde.getAgent().getId()))
+                {
+                    projectDao.save(project);
+                }
+            }
+        }
+    }
+
+    public Class[] getHandledEvents()
+    {
+        return new Class[] { RecipeDispatchedEvent.class };
     }
 
     public void setLicenseManager(LicenseManager licenseManager)
     {
         this.licenseManager = licenseManager;
+    }
+
+    public void setEventManager(EventManager eventManager)
+    {
+        eventManager.register(this);
+        this.eventManager = eventManager;
     }
 
     public void setTestCaseIndexDao(TestCaseIndexDao testCaseIndexDao)
@@ -657,5 +710,10 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
     public void setAccessManager(AccessManager accessManager)
     {
         this.accessManager = accessManager;
+    }
+
+    public void setAgentStateDao(AgentStateDao agentStateDao)
+    {
+        this.agentStateDao = agentStateDao;
     }
 }

@@ -19,6 +19,7 @@ public class ProjectConfigurationActions
     public static final String ACTION_RESUME       = "resume";
     public static final String ACTION_VIEW_SOURCE  = "view source";
     public static final String ACTION_TRIGGER      = "trigger";
+    public static final String ACTION_MARK_CLEAN   = "clean";
 
     private ProjectManager projectManager;
 
@@ -26,6 +27,7 @@ public class ProjectConfigurationActions
     {
         List<String> result = new LinkedList<String>();
         result.add(ACTION_TRIGGER);
+        result.add(ACTION_MARK_CLEAN);
         Project project = projectManager.getProject(instance.getProjectId(), true);
         if (project != null)
         {
@@ -69,6 +71,15 @@ public class ProjectConfigurationActions
         if (project != null)
         {
             projectManager.resumeProject(project);
+        }
+    }
+
+    public void doClean(ProjectConfiguration projectConfig)
+    {
+        Project project = projectManager.getProject(projectConfig.getProjectId(), true);
+        if (project != null)
+        {
+            projectManager.markForCleanBuild(project);
         }
     }
 

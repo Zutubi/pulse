@@ -85,4 +85,9 @@ public interface ProjectManager extends EntityManager<Project>
 
     @SecureResult
     List<Project> mapConfigsToProjects(Collection<ProjectConfiguration> projects);
+
+    void removeReferencesToAgent(long agentStateId);
+
+    @SecureParameter(action = AccessManager.ACTION_WRITE)
+    void markForCleanBuild(Project project);
 }

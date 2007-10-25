@@ -1,9 +1,15 @@
 package com.zutubi.pulse.model;
 
+import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
 import org.acegisecurity.acl.basic.AclObjectIdentity;
 import org.acegisecurity.acl.basic.AclObjectIdentityAware;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * 
@@ -37,8 +43,8 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
     private int buildCount = 0;
     private int successCount = 0;
     private Long lastPollTime;
-    private boolean forceClean = false;
     private ProjectConfiguration config;
+    private List<AgentState> forceCleanAgents = new LinkedList<AgentState>();
 
     public Project()
     {
@@ -57,16 +63,6 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
     public State getState()
     {
         return state;
-    }
-
-    public boolean isForceClean()
-    {
-        return forceClean;
-    }
-
-    public void setForceClean(boolean forceClean)
-    {
-        this.forceClean = forceClean;
     }
 
     /**
@@ -204,5 +200,53 @@ public class Project extends Entity implements AclObjectIdentity, AclObjectIdent
     public String getDescription()
     {
         return config == null ? null : config.getDescription();
+    }
+
+    public List<AgentState> getForceCleanAgents()
+    {
+        return forceCleanAgents;
+    }
+
+    public boolean isForceCleanForAgent(final long agentStateId)
+    {
+        return CollectionUtils.find(forceCleanAgents, new Predicate<AgentState>()
+        {
+            public boolean satisfied(AgentState agentState)
+            {
+                return agentState.getId() == agentStateId;
+            }
+        }) != null;
+    }
+
+    public void setForceCleanAgents(List<AgentState> forceCleanAgents)
+    {
+        this.forceCleanAgents = forceCleanAgents;
+    }
+
+    public boolean setForceCleanForAgent(AgentState agentState)
+    {
+        if(!isForceCleanForAgent(agentState.getId()))
+        {
+            forceCleanAgents.add(agentState);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public boolean clearForceCleanForAgent(final long agentStateId)
+    {
+        int sizeBefore = forceCleanAgents.size();
+        forceCleanAgents = CollectionUtils.filter(forceCleanAgents, new Predicate<AgentState>()
+        {
+            public boolean satisfied(AgentState agentState)
+            {
+                return agentState.getId() != agentStateId;
+            }
+        });
+
+        return forceCleanAgents.size() != sizeBefore;
     }
 }

@@ -91,6 +91,11 @@
            eternal="true"
            overflowToDisk="false"/>
 
+    <cache name="com.zutubi.pulse.model.Project.forceCleanAgents"
+           maxElementsInMemory="1000"
+           eternal="true"
+           overflowToDisk="false"/>
+
     <cache name="com.zutubi.pulse.core.model.PersistentName"
            maxElementsInMemory="5000"
            eternal="true"

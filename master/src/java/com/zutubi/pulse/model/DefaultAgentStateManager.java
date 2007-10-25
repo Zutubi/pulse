@@ -17,12 +17,13 @@ public class DefaultAgentStateManager implements AgentStateManager
 {
     private static final Logger LOG = Logger.getLogger(DefaultAgentStateManager.class);
 
-    private AgentStateDao agentStateDao;
-    private Scheduler scheduler;
-
     private static final String PING_NAME = "ping";
     private static final String PING_GROUP = "services";
     private static final long PING_FREQUENCY = Long.getLong("pulse.agent.ping.interval", 60);
+
+    private AgentStateDao agentStateDao;
+    private Scheduler scheduler;
+    private ProjectManager projectManager;
 
     public void init()
     {
@@ -63,6 +64,7 @@ public class DefaultAgentStateManager implements AgentStateManager
         AgentState agentState = agentStateDao.findById(id);
         if (agentState != null)
         {
+            projectManager.removeReferencesToAgent(id);
             agentStateDao.delete(agentState);
         }
     }
@@ -85,5 +87,10 @@ public class DefaultAgentStateManager implements AgentStateManager
     public void setScheduler(Scheduler scheduler)
     {
         this.scheduler = scheduler;
+    }
+
+    public void setProjectManager(ProjectManager projectManager)
+    {
+        this.projectManager = projectManager;
     }
 }

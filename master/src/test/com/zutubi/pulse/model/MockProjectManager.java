@@ -4,6 +4,8 @@ import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.prototype.config.project.AgentRequirements;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
+import com.zutubi.pulse.security.SecureParameter;
+import com.zutubi.prototype.security.AccessManager;
 
 import java.util.*;
 
@@ -90,6 +92,16 @@ public class MockProjectManager implements ProjectManager
     }
 
     public List<Project> mapConfigsToProjects(Collection<ProjectConfiguration> projects)
+    {
+        throw new RuntimeException("Method not yet implemented.");
+    }
+
+    public void removeReferencesToAgent(long agentStateId)
+    {
+        throw new RuntimeException("Method not yet implemented.");
+    }
+
+    public void markForCleanBuild(Project project)
     {
         throw new RuntimeException("Method not yet implemented.");
     }

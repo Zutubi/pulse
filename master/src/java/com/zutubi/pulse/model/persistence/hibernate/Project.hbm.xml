@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
 <hibernate-mapping>
-
     <class name="com.zutubi.pulse.model.Project" table="PROJECT" lazy="false">
         <cache usage="read-write"/>
 
@@ -11,7 +10,10 @@
 
         <property name="stateName" column="STATE" type="string" length="31"/>
 
-        <property name="forceClean" column="FORCE_CLEAN" type="boolean"/>
+        <bag name="forceCleanAgents" table="FORCE_CLEAN_AGENTS" lazy="false" cascade="save-update">
+ 	        <key column="PROJECT_ID"/>
+            <many-to-many class="com.zutubi.pulse.model.AgentState" column="AGENT_ID"/>
+ 	    </bag>
 
         <property name="nextBuildNumber" column="NEXT_BUILD_NUMBER" type="long"/>
 

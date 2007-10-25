@@ -182,10 +182,6 @@
             <result name="cancel" type="redirect">/browse/projects/${u_projectName}/</result>
         </action>
 
-        <action name="forceCleanBuild" class="com.zutubi.pulse.web.project.ForceCleanBuildAction">
-            <result name="success" type="redirect">/viewBuildSpecification.action?id=${id}&amp;projectId=${projectId}</result>
-        </action>
-
         <action name="viewArtifact" class="com.zutubi.pulse.web.project.ViewArtifactAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">/view-artifact.vm</result>

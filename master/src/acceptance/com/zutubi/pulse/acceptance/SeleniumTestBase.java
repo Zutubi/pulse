@@ -50,7 +50,7 @@ public class SeleniumTestBase extends TestCase
         urls = new Urls("");
         random = RandomUtils.randomString(10);
 
-        selenium = new DefaultSelenium("localhost", 4444, "*firefox", "http://localhost:" + port + "/");
+        selenium = new DefaultSelenium("localhost", 4446, "*firefox", "http://localhost:" + port + "/");
         selenium.start();
     }
 

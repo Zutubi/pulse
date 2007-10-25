@@ -24,7 +24,7 @@
 #if($hide)
    #set($label = "hide")
 #else
-   #set($label = "delete"))
+   #set($label = "delete")
 #end
 
 <h2>#wwtext("name=confirm.${label}")</h2>

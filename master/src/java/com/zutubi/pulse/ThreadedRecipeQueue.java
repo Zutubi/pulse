@@ -524,17 +524,18 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         unavailableAgents.add(agent);
         executingAgents.put(recipeRequest.getId(), agent);
 
-        BuildContext context = createBuildContext(request, recipeRequest, buildRevision);
+        BuildContext context = createBuildContext(request, recipeRequest, buildRevision, agent);
         dispatchedQueue.offer(new DispatchedRequest(recipeRequest, context, agent));
 
         return true;
     }
 
-    private BuildContext createBuildContext(RecipeDispatchRequest request, RecipeRequest recipeRequest, BuildRevision buildRevision)
+    private BuildContext createBuildContext(RecipeDispatchRequest request, RecipeRequest recipeRequest, BuildRevision buildRevision, Agent agent)
     {
         BuildContext context = new BuildContext();
         context.setBuildNumber(request.getBuild().getNumber());
         context.setProjectName(recipeRequest.getProject());
+        context.setCleanBuild(request.getProject().isForceCleanForAgent(agent.getId()));
 
         BuildReason buildReason = request.getBuild().getReason();
         context.addProperty("build.reason", buildReason.getSummary());

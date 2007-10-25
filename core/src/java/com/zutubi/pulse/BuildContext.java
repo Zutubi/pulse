@@ -28,6 +28,7 @@ public class BuildContext
      * The name of the project being built.
      */
     private String projectName;
+    private boolean cleanBuild;
 
     public long getBuildNumber()
     {
@@ -77,5 +78,15 @@ public class BuildContext
     public void addProperty(String name, String value)
     {
         properties.put(name, value);
+    }
+
+    public boolean isCleanBuild()
+    {
+        return cleanBuild;
+    }
+
+    public void setCleanBuild(boolean cleanBuild)
+    {
+        this.cleanBuild = cleanBuild;
     }
 }

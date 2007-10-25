@@ -23,15 +23,13 @@ public class ProjectRepoBootstrapper implements Bootstrapper
     private final ScmConfiguration scmConfig;
     private BuildRevision revision;
     private String agent;
-    private boolean forceClean;
     private ScmBootstrapper childBootstrapper;
 
-    public ProjectRepoBootstrapper(String projectName, ScmConfiguration scmConfig, BuildRevision revision, boolean forceClean)
+    public ProjectRepoBootstrapper(String projectName, ScmConfiguration scmConfig, BuildRevision revision)
     {
         this.projectName = projectName;
         this.scmConfig = scmConfig;
         this.revision = revision;
-        this.forceClean = forceClean;
     }
 
     public void bootstrap(final CommandContext context) throws BuildException
@@ -43,7 +41,9 @@ public class ProjectRepoBootstrapper implements Bootstrapper
         }
 
         // run the scm bootstrapper on the local directory,
-        childBootstrapper = selectBootstrapper(paths.getPersistentWorkDir());
+        BuildContext buildContext = context.getBuildContext();
+        boolean cleanBuild = buildContext != null && buildContext.isCleanBuild();
+        childBootstrapper = selectBootstrapper(cleanBuild, paths.getPersistentWorkDir());
         childBootstrapper.prepare(agent);
 
         RecipePaths mungedPaths = new RecipePaths()
@@ -101,9 +101,9 @@ public class ProjectRepoBootstrapper implements Bootstrapper
         }
     }
 
-    private ScmBootstrapper selectBootstrapper(final File localDir)
+    private ScmBootstrapper selectBootstrapper(boolean cleanBuild, final File localDir)
     {
-        if(forceClean && localDir.exists())
+        if(cleanBuild && localDir.exists())
         {
             if(!FileSystemUtils.rmdir(localDir))
             {
