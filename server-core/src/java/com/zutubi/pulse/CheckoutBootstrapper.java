@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.pulse.core.scm.ScmContext;
+import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.util.logging.Logger;
 
@@ -25,6 +26,7 @@ public class CheckoutBootstrapper extends ScmBootstrapper
 
     public ScmClient bootstrap(ScmContext context)
     {
+        ScmClient scm = null;
         try
         {
             String id = null;
@@ -34,12 +36,13 @@ public class CheckoutBootstrapper extends ScmBootstrapper
             }
             context.setId(id);
             context.setRevision(revision.getRevision());
-            ScmClient scm = createScmClient();
+            scm = createScmClient();
             scm.checkout(context, this);
             return scm;
         }
         catch (ScmException e)
         {
+            ScmClientUtils.close(scm);
             LOG.severe(e);
             throw new BuildException("Error checking out from SCM: " + e.getMessage(), e);
         }

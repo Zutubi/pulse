@@ -7,6 +7,7 @@ import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.pulse.core.scm.ScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
@@ -169,6 +170,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
         ScmConfiguration scm = projectConfig.getScm();
         long projectId = projectConfig.getProjectId();
         Project project = projectManager.getProject(projectId, false);
+        ScmClient client = null;
 
         try
         {
@@ -184,7 +186,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
             projectManager.save(project);
 
             // when was the last time that we checked? if never, get the latest revision.
-            ScmClient client = scmClientFactory.createClient(scm);
+            client = scmClientFactory.createClient(scm);
             if (!latestRevisions.containsKey(projectId))
             {
                 latestRevisions.put(projectId, client.getLatestRevision());
@@ -255,6 +257,10 @@ public class DefaultScmManager implements ScmManager, Stoppable
             // This needs to be brought to the attention of the user since its likely to
             // be the result of a configuration problem.
             LOG.warning(e.getMessage(), e);
+        }
+        finally
+        {
+            ScmClientUtils.close(client);
         }
     }
 

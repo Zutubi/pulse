@@ -5,6 +5,7 @@ import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.pulse.core.scm.ScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.scm.ScmClientUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -44,19 +45,26 @@ public class ChangelistIsolator
             }
         }
 
-        if (latestBuiltRevision == null)
+        ScmClient client = null;
+        try
         {
-            // The spec has never been built or even requested.  Just build
-            // the latest (we need to start somewhere!).
-            ScmClient client = scmClientFactory.createClient(projectConfig.getScm());
-            result = Arrays.asList(client.getLatestRevision());
+            client = scmClientFactory.createClient(projectConfig.getScm());
+            if (latestBuiltRevision == null)
+            {
+                // The spec has never been built or even requested.  Just build
+                // the latest (we need to start somewhere!).
+                result = Arrays.asList(client.getLatestRevision());
+            }
+            else
+            {
+                // We now have the last requested revision, return every revision
+                // since then.
+                result = client.getRevisions(latestBuiltRevision, null);
+            }
         }
-        else
+        finally
         {
-            // We now have the last requested revision, return every revision
-            // since then.
-            ScmClient client = scmClientFactory.createClient(projectConfig.getScm());
-            result = client.getRevisions(latestBuiltRevision, null);
+            ScmClientUtils.close(client);
         }
 
         if (result.size() > 0)

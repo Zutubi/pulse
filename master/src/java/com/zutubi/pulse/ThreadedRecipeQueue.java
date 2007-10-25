@@ -15,6 +15,7 @@ import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.pulse.core.scm.ScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.events.*;
 import com.zutubi.pulse.events.EventListener;
@@ -214,12 +215,21 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
             eventManager.publish(new RecipeStatusEvent(this, dispatchRequest.getRequest().getId(), "Initialising build revision..."));
             ProjectConfiguration projectConfig = dispatchRequest.getProject().getConfig();
             ScmConfiguration scm = projectConfig.getScm();
-            ScmClient client = scmClientFactory.createClient(scm);
-            Revision revision = client.getLatestRevision();
 
-            // May throw a BuildException
-            updateRevision(dispatchRequest, revision);
-            eventManager.publish(new RecipeStatusEvent(this, dispatchRequest.getRequest().getId(), "Revision initialised to '" + revision.getRevisionString() + "'"));
+            ScmClient client = null;
+            try
+            {
+                client = scmClientFactory.createClient(scm);
+                Revision revision = client.getLatestRevision();
+
+                // May throw a BuildException
+                updateRevision(dispatchRequest, revision);
+                eventManager.publish(new RecipeStatusEvent(this, dispatchRequest.getRequest().getId(), "Revision initialised to '" + revision.getRevisionString() + "'"));
+            }
+            finally
+            {
+                ScmClientUtils.close(client);
+            }
         }
     }
 

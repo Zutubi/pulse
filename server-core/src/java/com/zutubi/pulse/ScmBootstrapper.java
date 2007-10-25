@@ -7,12 +7,7 @@ import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.CommandContext;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Change;
-import com.zutubi.pulse.core.scm.ScmCancelledException;
-import com.zutubi.pulse.core.scm.ScmClient;
-import com.zutubi.pulse.core.scm.ScmContext;
-import com.zutubi.pulse.core.scm.ScmEventHandler;
-import com.zutubi.pulse.core.scm.ScmClientFactory;
-import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.scm.*;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.util.ForkOutputStream;
@@ -113,6 +108,10 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmEventHandler
             catch (Exception e)
             {
                 LOG.warning("Unable to capture SCM connection details: " + e.getMessage(), e);
+            }
+            finally
+            {
+                ScmClientUtils.close(client);
             }
         }
     }

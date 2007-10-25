@@ -15,6 +15,7 @@ import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.pulse.core.scm.ScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.model.ManualTriggerBuildReason;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
@@ -156,9 +157,10 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         Revision r = null;
         if(TextUtils.stringSet(revision))
         {
+            ScmClient client = null;
             try
             {
-                ScmClient client = scmClientFactory.createClient(projectConfig.getScm());
+                client = scmClientFactory.createClient(projectConfig.getScm());
                 r = client.getRevision(revision);
             }
             catch (ScmException e)
@@ -168,7 +170,11 @@ public class EditBuildPropertiesAction extends ProjectActionBase
                 renderForm();
                 return INPUT;
             }
-
+            finally
+            {
+                ScmClientUtils.close(client);
+            }
+            
             // CIB-1162: Make sure we can get a pulse file at this revision
             try
             {

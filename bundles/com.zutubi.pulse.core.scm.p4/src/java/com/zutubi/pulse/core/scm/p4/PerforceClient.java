@@ -505,6 +505,10 @@ public class PerforceClient extends CachingScmClient
         this.core.setEnv(ENV_CLIENT, resolveClient(null, false));
     }
 
+    public void close()
+    {
+    }
+
     public Set<ScmCapability> getCapabilities()
     {
         return new HashSet<ScmCapability>(Arrays.asList(ScmCapability.values()));

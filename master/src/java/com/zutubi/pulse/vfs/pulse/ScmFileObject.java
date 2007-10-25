@@ -1,9 +1,6 @@
 package com.zutubi.pulse.vfs.pulse;
 
-import com.zutubi.pulse.core.scm.ScmClient;
-import com.zutubi.pulse.core.scm.ScmClientFactory;
-import com.zutubi.pulse.core.scm.ScmException;
-import com.zutubi.pulse.core.scm.ScmFile;
+import com.zutubi.pulse.core.scm.*;
 import com.zutubi.pulse.vfs.FileAction;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
@@ -72,15 +69,20 @@ public class ScmFileObject extends AbstractPulseFileObject
     {
         if (scmChildren == null)
         {
+            ScmClient client = null;
             try
             {
-                ScmClient client = scmClientFactory.createClient(getAncestor(ScmProvider.class).getScm());
+                client = scmClientFactory.createClient(getAncestor(ScmProvider.class).getScm());
                 scmChildren = client.browse(scmFile.getPath(), null);
             }
             catch (ScmException e)
             {
                 LOG.warning(e);
                 throw new FileSystemException("Unable to list SCM directory '" + scmFile.getPath() + "': " + e.getMessage(), e);
+            }
+            finally
+            {
+                ScmClientUtils.close(client);
             }
         }
         return scmChildren;
@@ -112,15 +114,20 @@ public class ScmFileObject extends AbstractPulseFileObject
         }
         else
         {
+            ScmClient client = null;
             try
             {
-                ScmClient client = scmClientFactory.createClient(getAncestor(ScmProvider.class).getScm());
+                client = scmClientFactory.createClient(getAncestor(ScmProvider.class).getScm());
                 return client.getLocation();
             }
             catch (Exception e)
             {
                 LOG.warning(e);
                 return super.getDisplayName();
+            }
+            finally
+            {
+                ScmClientUtils.close(client);
             }
         }
     }

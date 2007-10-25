@@ -16,7 +16,14 @@ public class PerforceConfigurationCheckHandler extends ConfigurationCheckHandler
     public void test(PerforceConfiguration configuration) throws ScmException
     {
         PerforceClient client = (PerforceClient) scmClientFactory.createClient(configuration);
-        client.testConnection();
+        try
+        {
+            client.testConnection();
+        }
+        finally
+        {
+            client.close();
+        }
     }
 
     public void setScmClientFactory(ScmClientFactory scmClientFactory)

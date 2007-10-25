@@ -1,9 +1,6 @@
 package com.zutubi.pulse.core.scm.svn;
 
-import com.zutubi.pulse.core.scm.ScmException;
-import com.zutubi.pulse.core.scm.AbstractScmIntegrationTestCase;
-import com.zutubi.pulse.core.scm.NumericalRevision;
-import com.zutubi.pulse.core.scm.ExpectedTestResults;
+import com.zutubi.pulse.core.scm.*;
 import com.zutubi.pulse.core.model.Revision;
 
 import java.util.List;
@@ -38,6 +35,7 @@ public class SvnIntegrationTest extends AbstractScmIntegrationTestCase
 
     protected void tearDown() throws Exception
     {
+        ScmClientUtils.close(client);
         client = null;
         prefix = null;
 

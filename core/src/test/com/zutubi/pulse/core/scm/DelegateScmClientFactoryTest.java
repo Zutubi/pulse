@@ -30,7 +30,14 @@ public class DelegateScmClientFactoryTest extends TestCase
     {
         ScmClient client = factory.createClient(new MockScmConfiguration());
         assertNotNull(client);
-        assertTrue(client instanceof MockScmClient);
+        try
+        {
+            assertTrue(client instanceof MockScmClient);
+        }
+        finally
+        {
+            client.close();
+        }
     }
 
     public void testDataCache() throws ScmException
@@ -42,5 +49,8 @@ public class DelegateScmClientFactoryTest extends TestCase
         MockScmClient anotherClient = (MockScmClient) factory.createClient(new MockScmConfiguration());
         assertNotNull(anotherClient.cache);
         assertEquals("value", anotherClient.cache.get("key"));
+
+        client.close();
+        anotherClient.close();
     }
 }

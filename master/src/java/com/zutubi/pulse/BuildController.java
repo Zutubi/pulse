@@ -272,9 +272,10 @@ public class BuildController implements EventListener
     {
         // TODO: preferrable to move this out (maybe to the request)
         PersonalBuildRequestEvent pbr = ((PersonalBuildRequestEvent) request);
+        ScmClient client = null;
         try
         {
-            ScmClient client = scmClientFactory.createClient(projectConfig.getScm());
+            client = scmClientFactory.createClient(projectConfig.getScm());
             FileStatus.EOLStyle localEOL = client.getEOLPolicy();
             initialBootstrapper = new PatchBootstrapper(initialBootstrapper, pbr.getUser().getId(), pbr.getNumber(), localEOL);
         }
@@ -282,6 +283,11 @@ public class BuildController implements EventListener
         {
             throw new BuildException("Unable to determine SCM end-of-line policy: " + e.getMessage(), e);
         }
+        finally
+        {
+            ScmClientUtils.close(client);
+        }
+
         return initialBootstrapper;
     }
 
@@ -509,19 +515,23 @@ public class BuildController implements EventListener
         if (!buildResult.isUserRevision())
         {
             ScmConfiguration scm = projectConfig.getScm();
-            // FIXME: locate previous revision for this project
             Revision previousRevision = buildManager.getPreviousRevision(project);
 
             if (previousRevision != null)
             {
+                ScmClient client = null;
                 try
                 {
-                    ScmClient client = scmClientFactory.createClient(scm);
+                    client = scmClientFactory.createClient(scm);
                     getChangeSince(client, previousRevision, revision);
                 }
                 catch (ScmException e)
                 {
                     LOG.warning("Unable to retrieve changelist details from SCM server: " + e.getMessage(), e);
+                }
+                finally
+                {
+                    ScmClientUtils.close(client);
                 }
             }
         }

@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.ScmFile;
 import com.zutubi.pulse.core.scm.ScmContext;
+import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.ZipUtils;
@@ -117,6 +118,7 @@ public class SvnClientTest extends PulseTestCase
 
     protected void tearDown() throws Exception
     {
+        ScmClientUtils.close(server);
         context = null;
         server = null;
         serverProcess.destroy();
@@ -155,16 +157,25 @@ public class SvnClientTest extends PulseTestCase
     {
         server.tag(createRevision(1), TAG_PATH, false);
 
-        SvnClient confirmServer = new SvnClient(TAG_PATH, "jsankey", "password");
-        List<ScmFile> files = getSortedListing(confirmServer);
+        SvnClient confirmServer = null;
 
-        assertEquals(3, files.size());
-        assertEquals("afolder", files.get(0).getName());
-        assertEquals("bfolder", files.get(1).getName());
-        assertEquals("foo", files.get(2).getName());
+        try
+        {
+            confirmServer = new SvnClient(TAG_PATH, "jsankey", "password");
+            List<ScmFile> files = getSortedListing(confirmServer);
 
-        String foo = IOUtils.inputStreamToString(confirmServer.retrieve("foo", null));
-        assertEquals("", foo);
+            assertEquals(3, files.size());
+            assertEquals("afolder", files.get(0).getName());
+            assertEquals("bfolder", files.get(1).getName());
+            assertEquals("foo", files.get(2).getName());
+
+            String foo = IOUtils.inputStreamToString(confirmServer.retrieve("foo", null));
+            assertEquals("", foo);
+        }
+        finally
+        {
+            ScmClientUtils.close(confirmServer);
+        }
     }
 
     public void testMoveTag() throws ScmException, IOException
@@ -182,16 +193,24 @@ public class SvnClientTest extends PulseTestCase
 
     private void assertTaggedRev8() throws ScmException, IOException
     {
-        SvnClient confirmServer = new SvnClient(TAG_PATH, "jsankey", "password");
-        List<ScmFile> files = getSortedListing(confirmServer);
+        SvnClient confirmServer = null;
+        try
+        {
+            confirmServer = new SvnClient(TAG_PATH, "jsankey", "password");
+            List<ScmFile> files = getSortedListing(confirmServer);
 
-        assertEquals(3, files.size());
-        assertEquals("afolder", files.get(0).getName());
-        assertEquals("bfolder", files.get(1).getName());
-        assertEquals("foo", files.get(2).getName());
+            assertEquals(3, files.size());
+            assertEquals("afolder", files.get(0).getName());
+            assertEquals("bfolder", files.get(1).getName());
+            assertEquals("foo", files.get(2).getName());
 
-        String foo = IOUtils.inputStreamToString(confirmServer.retrieve("foo", null));
-        assertEquals("hello\n", foo);
+            String foo = IOUtils.inputStreamToString(confirmServer.retrieve("foo", null));
+            assertEquals("hello\n", foo);
+        }
+        finally
+        {
+            ScmClientUtils.close(confirmServer);
+        }
     }
 
     public void testUnmovableTag() throws ScmException
@@ -267,8 +286,16 @@ public class SvnClientTest extends PulseTestCase
 
     public void testCheckNonExistantPathHTTP() throws Exception
     {
-        SvnClient server = new SvnClient("https://svn.apache.org/repos/asf", "anonymous", "");
-        assertFalse(server.pathExists(createRevision(1), SVNURL.parseURIEncoded("https://svn.apache.org/repos/asf/nosuchpath/")));
+        SvnClient server = null;
+        try
+        {
+            server = new SvnClient("https://svn.apache.org/repos/asf", "anonymous", "");
+            assertFalse(server.pathExists(createRevision(1), SVNURL.parseURIEncoded("https://svn.apache.org/repos/asf/nosuchpath/")));
+        }
+        finally
+        {
+            ScmClientUtils.close(server);
+        }
     }
 
     private void assertRevision(File dir, int revision) throws IOException

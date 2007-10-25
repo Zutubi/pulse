@@ -5,6 +5,7 @@ import com.zutubi.config.annotations.Transient;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.pulse.core.scm.ScmClientFactory;
+import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.util.IOUtils;
@@ -33,14 +34,17 @@ public class VersionedTypeConfiguration extends TypeConfiguration
 
     public String getPulseFile(long id, ProjectConfiguration projectConfig, Revision revision, PatchArchive patch) throws Exception
     {
-        ScmClient scmClient = scmClientFactory.createClient(projectConfig.getScm());
-        InputStream is = scmClient.retrieve(pulseFileName, revision);
+        ScmClient scmClient = null;
+        InputStream is = null;
         try
         {
+            scmClient = scmClientFactory.createClient(projectConfig.getScm());
+            is = scmClient.retrieve(pulseFileName, revision);
             return IOUtils.inputStreamToString(is);
         }
         finally
         {
+            ScmClientUtils.close(scmClient);
             IOUtils.close(is);
         }
     }

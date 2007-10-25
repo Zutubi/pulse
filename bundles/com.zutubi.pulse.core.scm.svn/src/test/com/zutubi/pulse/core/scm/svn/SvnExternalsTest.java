@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.ScmCancelledException;
 import com.zutubi.pulse.core.scm.ScmEventHandler;
 import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.ZipUtils;
@@ -135,6 +136,7 @@ public class SvnExternalsTest extends PulseTestCase
 
     protected void tearDown() throws Exception
     {
+        ScmClientUtils.close(server);
         server = null;
         svnProcess.destroy();
         svnProcess.waitFor();
@@ -266,16 +268,24 @@ public class SvnExternalsTest extends PulseTestCase
 
     public static void main(String[] argv) throws ScmException
     {
-        SvnClient server = new SvnClient("http://svn.nuxeo.org/nuxeo/bundles/ECM-trunk");
-        server.addExternalPath(".");
-        List<Changelist> changelists = server.getChanges(createRevision(6600), createRevision(6603));
-        for(Changelist list: changelists)
+        SvnClient server = null;
+        try
         {
-            System.out.println(list.getRevision().getRevisionString() + ": " + list.getComment());
-            for(Change change: list.getChanges())
+            server = new SvnClient("http://svn.nuxeo.org/nuxeo/bundles/ECM-trunk");
+            server.addExternalPath(".");
+            List<Changelist> changelists = server.getChanges(createRevision(6600), createRevision(6603));
+            for(Changelist list: changelists)
             {
-                System.out.println("    " + change.toString());
+                System.out.println(list.getRevision().getRevisionString() + ": " + list.getComment());
+                for(Change change: list.getChanges())
+                {
+                    System.out.println("    " + change.toString());
+                }
             }
+        }
+        finally
+        {
+            ScmClientUtils.close(server);
         }
     }
 

@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.model.Revision;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Closeable;
 import java.util.List;
 import java.util.Set;
 
@@ -14,6 +15,12 @@ import java.util.Set;
  */
 public interface ScmClient
 {
+    /**
+     * Must be called to release resources when this client is not longer
+     * required.  No other methods may be called after closing.
+     */
+    void close();
+
     /**
      * Returns the functionality that this implementation supports, as a set
      * of capabilities.  Each method's documentation indicates the capability

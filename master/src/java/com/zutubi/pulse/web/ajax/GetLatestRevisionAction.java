@@ -3,6 +3,7 @@ package com.zutubi.pulse.web.ajax;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.pulse.core.scm.ScmClientFactory;
+import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.web.project.ProjectActionSupport;
 
 /**
@@ -40,9 +41,10 @@ public class GetLatestRevisionAction extends ProjectActionSupport
         }
         else
         {
+            ScmClient client = null;
             try
             {
-                ScmClient client = scmClientFactory.createClient(project.getConfig().getScm());
+                client = scmClientFactory.createClient(project.getConfig().getScm());
                 latestRevision = client.getLatestRevision().getRevisionString();
                 successful = true;
             }
@@ -50,7 +52,10 @@ public class GetLatestRevisionAction extends ProjectActionSupport
             {
                 error = e.toString();
             }
-
+            finally
+            {
+                ScmClientUtils.close(client);
+            }
         }
         
         return SUCCESS;

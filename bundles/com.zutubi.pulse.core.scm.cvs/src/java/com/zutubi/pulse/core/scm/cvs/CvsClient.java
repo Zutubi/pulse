@@ -82,6 +82,10 @@ public class CvsClient implements ScmClient, DataCacheAware
         this.excludedPaths = excluded;
     }
 
+    public void close()
+    {
+    }
+
     public Set<ScmCapability> getCapabilities()
     {
         return new HashSet<ScmCapability>(Arrays.asList(ScmCapability.values()));

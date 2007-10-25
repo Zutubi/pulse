@@ -18,7 +18,14 @@ public class CvsConfigurationCheckHandler extends ConfigurationCheckHandlerSuppo
     public void test(CvsConfiguration configuration) throws ScmException
     {
         CvsClient client = (CvsClient) scmClientFactory.createClient(configuration);
-        client.testConnection();
+        try
+        {
+            client.testConnection();
+        }
+        finally
+        {
+            client.close();
+        }
     }
 
     public void setScmClientFactory(ScmClientFactory<com.zutubi.pulse.core.scm.config.ScmConfiguration> scmClientManager)

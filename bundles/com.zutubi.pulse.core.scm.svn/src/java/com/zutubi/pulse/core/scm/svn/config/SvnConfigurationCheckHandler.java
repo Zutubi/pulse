@@ -19,7 +19,14 @@ public class SvnConfigurationCheckHandler extends ConfigurationCheckHandlerSuppo
     public void test(SvnConfiguration configuration) throws ScmException
     {
         SvnClient client = (SvnClient) scmClientFactory.createClient(configuration);
-        client.testConnection();
+        try
+        {
+            client.testConnection();
+        }
+        finally
+        {
+            client.close();
+        }
     }
 
     public void setScmClientFactory(ScmClientFactory scmClientFactory)

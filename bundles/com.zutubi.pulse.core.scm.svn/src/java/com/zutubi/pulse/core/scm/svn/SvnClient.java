@@ -232,9 +232,24 @@ public class SvnClient implements ScmClient
         this.verifyExternals = verifyExternals;
     }
 
+    protected void finalize() throws Throwable
+    {
+        super.finalize();
+        close();
+    }
+
     //=======================================================================
     // ScmClient interface
     //=======================================================================
+
+    public void close()
+    {
+        if (repository != null)
+        {
+            repository.closeSession();
+            repository = null;
+        }
+    }
 
     public Set<ScmCapability> getCapabilities()
     {
