@@ -132,7 +132,7 @@ public class AsyncProcessTest extends PulseTestCase
 
     private void joinThread(Thread thread) throws InterruptedException
     {
-        thread.join(1000);
+        thread.join(5000);
         assertFalse(thread.isAlive());
     }
 
