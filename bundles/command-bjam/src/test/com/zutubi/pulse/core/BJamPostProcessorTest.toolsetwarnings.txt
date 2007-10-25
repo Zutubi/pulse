@@ -1,0 +1,14 @@
+warning: No toolsets are configured.
+warning: Configuring default toolset "gcc".
+warning: If the default is wrong, you may not be able to build C++ programs.
+warning: Use the "--toolset=xxxxx" option to override our guess.
+warning: For more configuration options, please consult
+warning: http://boost.org/boost-build2/doc/html/bbv2/advanced/configuration.html
+...found 9 targets...
+...updating 5 targets...
+MkDir1 bin
+MkDir1 bin/gcc-4.1.2
+MkDir1 bin/gcc-4.1.2/debug
+gcc.compile.c++ bin/gcc-4.1.2/debug/hello.o
+gcc.link bin/gcc-4.1.2/debug/hello
+...updated 5 targets...

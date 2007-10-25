@@ -33,7 +33,6 @@ public class FormDescriptorFactory
 
     private static final Logger LOG = Logger.getLogger(FormDescriptorFactory.class);
 
-    // FIXME: extract these mappings to make them extendable.
     private static final Map<Class, String> defaultFieldTypeMapping = new HashMap<Class, String>();
     static
     {
@@ -52,7 +51,6 @@ public class FormDescriptorFactory
 
     public void init()
     {
-        // FIXME: incomplete
         registerFieldType(FieldType.CHECKBOX, CheckboxFieldDescriptor.class);
         registerFieldType(FieldType.CONTROLLING_CHECKBOX, ControllingCheckboxFieldDescriptor.class);
         registerFieldType(FieldType.HIDDEN, HiddenFieldDescriptor.class);

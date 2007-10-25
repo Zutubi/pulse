@@ -103,6 +103,7 @@ public class ConfigurationRegistry
 
             CompositeType typeConfig = registerConfigurationType(TypeConfiguration.class);
             registerConfigurationType(AntTypeConfiguration.class);
+            registerConfigurationType(BJamTypeConfiguration.class);
             registerConfigurationType(CustomTypeConfiguration.class);
             registerConfigurationType(ExecutableTypeConfiguration.class);
             registerConfigurationType(MavenTypeConfiguration.class);
@@ -112,6 +113,7 @@ public class ConfigurationRegistry
             registerConfigurationType(XCodeTypeConfiguration.class);
 
             typeConfig.addExtension("zutubi.antTypeConfig");
+            typeConfig.addExtension("zutubi.bjamTypeConfig");
             typeConfig.addExtension("zutubi.customTypeConfig");
             typeConfig.addExtension("zutubi.executableTypeConfig");
             typeConfig.addExtension("zutubi.mavenTypeConfig");
@@ -297,7 +299,7 @@ public class ConfigurationRegistry
 
                     CompositeType checkType = typeRegistry.register(checkClass);
 
-                    // FIXME should verify that everything in the check type would land in one form
+                    // TODO should verify that everything in the check type would land in one form
                     checkTypeMapping.put(type, checkType);
                 }
 

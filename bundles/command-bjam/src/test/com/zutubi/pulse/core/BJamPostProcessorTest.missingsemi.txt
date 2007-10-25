@@ -1,0 +1,13 @@
+Jamroot:2: in modules.load
+*** argument error
+* rule use-project ( id : where )
+* called with: ( /library-example/foo : util/foo build-project app )
+* extra argument build-project
+/home/jsankey/archives/boost_1_34_1/tools/build/v2/build/project.jam:951:see definition of rule 'use-project' being called
+/home/jsankey/archives/boost_1_34_1/tools/build/v2/build/project.jam:312: in load-jamfile
+/home/jsankey/archives/boost_1_34_1/tools/build/v2/build/project.jam:68: in load
+/home/jsankey/archives/boost_1_34_1/tools/build/v2/build/project.jam:170: in project.find
+/home/jsankey/archives/boost_1_34_1/tools/build/v2/build-system.jam:237: in load
+/home/jsankey/archives/boost_1_34_1/tools/build/v2/example/../kernel/modules.jam:261: in import
+/home/jsankey/archives/boost_1_34_1/tools/build/v2/example/../kernel/bootstrap.jam:132: in boost-build
+/home/jsankey/archives/boost_1_34_1/tools/build/v2/example/boost-build.jam:6: in module scope

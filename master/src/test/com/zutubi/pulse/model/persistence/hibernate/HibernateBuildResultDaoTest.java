@@ -94,18 +94,12 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         Project project = new Project();
         projectDao.save(project);
 
-        // Ditto for spec
-
-
         BuildResult buildResult = new BuildResult(new TriggerBuildReason("scm trigger"), project, 11, false);
         buildResult.commence();
         buildResult.setRevision(revision);
-/*
-        //FIXME: how is the stage going to be made accessible? and persistent?
-        RecipeResultNode recipeNode = new RecipeResultNode(node.getStage().getPname(), recipeResult);
+        RecipeResultNode recipeNode = new RecipeResultNode("stage name", 123, recipeResult);
         recipeNode.setHost("test host");
         buildResult.getRoot().addChild(recipeNode);
-*/
 
         buildResultDao.save(buildResult);
         commitAndRefreshTransaction();

@@ -156,7 +156,6 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
             developersGroup.addServerPermission(ServerPermission.PERSONAL_BUILD);
             configurationTemplateManager.insert(ConfigurationRegistry.GROUPS_SCOPE, developersGroup);
 
-            // FIXME: should be using objects here so that we are not relying on magic strings.
             // apply the settings
             CompositeType generalType = typeRegistry.getType(GeneralAdminConfiguration.class);
             MutableRecord record = generalType.createNewRecord(true);

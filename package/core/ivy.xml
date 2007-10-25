@@ -23,6 +23,7 @@
 
         <!-- Prepackaged plugins -->
         <dependency org="zutubi" name="com.zutubi.pulse.core.commands.ant" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.bjam" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.commands.core" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.commands.make" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.commands.maven" rev="latest.integration" conf="prepackaged-bundles->bundle"/>

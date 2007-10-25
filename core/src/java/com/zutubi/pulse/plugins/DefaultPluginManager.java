@@ -117,7 +117,6 @@ public class DefaultPluginManager implements PluginManager, EventListener
     {
         for(ExtensionManager extensionManager: extensionManagers)
         {
-            // FIXME
             ComponentContext.autowire(extensionManager);
             extensionManager.initialiseExtensions();
         }

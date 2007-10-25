@@ -119,8 +119,6 @@ public class GenericAction extends PrototypeSupport
                     actionManager.execute(actionName, config, argument);
                 }
 
-                // FIXME: want to trigger a reload of the same page, not necessarily always a reload of the configs path, since
-                // the action may be triggered from multiple locations.
                 if (TextUtils.stringSet(newPath))
                 {
                     response = new ConfigurationResponse(newPath, null);

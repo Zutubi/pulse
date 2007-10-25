@@ -359,7 +359,7 @@ public class RegexPostProcessor implements PostProcessor, Validateable
         }
     }
 
-    protected void addErrorRegexs(String[] errorRegexs)
+    protected void addErrorRegexs(String... errorRegexs)
     {
         for (String errorRegex : errorRegexs)
         {
@@ -369,7 +369,7 @@ public class RegexPostProcessor implements PostProcessor, Validateable
         }
     }
 
-    protected void addWarningRegexs(String[] warningRegexs)
+    protected void addWarningRegexs(String... warningRegexs)
     {
         for (String warningRegex : warningRegexs)
         {

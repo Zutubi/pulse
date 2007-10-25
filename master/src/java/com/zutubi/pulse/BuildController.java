@@ -627,7 +627,7 @@ public class BuildController implements EventListener
 
     private void completeBuild()
     {
-        // FIXME: If there is an SQL problem while saving the build result, the build becomes stuck and the server
+        // If there is an SQL problem while saving the build result, the build becomes stuck and the server
         // needs to be restarted to clear it up.  To prevent the need for server restarts, we catch and log the exception
         // and continue.  This leaves the build result in an incorrect state, but will allow builds to continue. The
         // builds will be cleaned up next time the server restarts.  THIS IS ONLY A TEMPORARY FIX UNTIL WE WORK OUT

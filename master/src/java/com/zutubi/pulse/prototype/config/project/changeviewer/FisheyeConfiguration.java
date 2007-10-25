@@ -57,7 +57,6 @@ public class FisheyeConfiguration extends BasePathChangeViewer
 
     private String getChangesetString(Revision revision)
     {
-        //FIXME: Can not statically reference the CvsRevision type.
         ScmConfiguration scm = lookupScmConfiguration();
         if (scm.getType().equals("cvs"))
         {
