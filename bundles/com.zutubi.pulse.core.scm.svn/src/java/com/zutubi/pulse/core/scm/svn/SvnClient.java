@@ -19,6 +19,7 @@ import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
 import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
 import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
+import org.tmatesoft.svn.core.internal.wc.admin.SVNAdminAreaFactory;
 import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 import org.tmatesoft.svn.core.wc.*;
@@ -135,7 +136,8 @@ public class SvnClient implements ScmClient
         // Initialise SVN library
         DAVRepositoryFactory.setup();
         SVNRepositoryFactoryImpl.setup();
-
+        SVNAdminAreaFactory.setUpgradeEnabled(false);
+        
         this.url = url;
 
         try
