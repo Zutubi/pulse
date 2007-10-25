@@ -40,7 +40,7 @@ public class PerforceClientTest extends PulseTestCase
         tmpDir = FileSystemUtils.createTempDir(getClass().getName(), "");
         File repoDir = new File(tmpDir, "repo");
 
-        File repoZip = getTestDataFile("server-core", "repo", "zip");
+        File repoZip = getTestDataFile("bundles/com.zutubi.pulse.core.scm.p4", "repo", "zip");
         ZipUtils.extractZip(repoZip, repoDir);
 
         // Restore from checkpoint
@@ -115,6 +115,7 @@ public class PerforceClientTest extends PulseTestCase
         getServer("depot-client");
 
         ScmContext context = new ScmContext();
+        context.setRevision(createRevision(1));
         context.setDir(workDir);
 
         Revision revision = client.checkout(context, null);
@@ -319,13 +320,24 @@ public class PerforceClientTest extends PulseTestCase
         assertEquals(0, revisions.size());
     }
 
+    public void testGetRevisionsSinceFiltered() throws ScmException
+    {
+        getServer(TEST_CLIENT);
+        client.setExcludedPaths(Arrays.asList("//depot2/*"));
+        List<Revision> revisions = client.getRevisions(createRevision(5), null);
+        assertEquals(1, revisions.size());
+        assertEquals("7", revisions.get(0).getRevisionString());
+    }
+
     public void testCheckoutThenUpdate() throws ScmException, IOException
     {
         getServer("depot-client");
 
         ScmContext context = new ScmContext();
+        context.setId("my-id");
         context.setDir(workDir);
-
+        context.setRevision(createRevision(1));
+        
         Revision got = client.checkout(context, null);
         assertEquals("1", got.getRevisionString());
         checkDirectory("checkoutRevision");
@@ -344,7 +356,8 @@ public class PerforceClientTest extends PulseTestCase
 
         ScmContext context = new ScmContext();
         context.setDir(workDir);
-
+        context.setId("my-id");
+        
         client.checkout(context, null);
 
         List<Change> changes = updateChanges("my-id", workDir, null);
@@ -513,7 +526,7 @@ public class PerforceClientTest extends PulseTestCase
 
     private File getDataRoot()
     {
-        return new File(getPulseRoot(), FileSystemUtils.composeFilename("server-core", "src", "test", "com", "zutubi", "pulse", "servercore", "scm", "p4", "data"));
+        return new File(getPulseRoot(), FileSystemUtils.composeFilename("bundles", "com.zutubi.pulse.core.scm.p4", "src", "test", "com", "zutubi", "pulse", "core", "scm", "p4", "data"));
     }
 
     private List<Change> checkoutChanges(String id, File dir, Revision revision, long expectedRevision) throws ScmException

@@ -10,12 +10,7 @@ public class CachingScmFile extends ScmFile
 {
     private List<ScmFile> children = new LinkedList<ScmFile>();
 
-    public CachingScmFile(String name, boolean isDirectory, ScmFile parent, String path)
-    {
-        super(path, name, isDirectory);
-    }
-
-    public CachingScmFile(boolean isDirectory, ScmFile parent, String path)
+    public CachingScmFile(String path, boolean isDirectory)
     {
         super(path, isDirectory);
     }

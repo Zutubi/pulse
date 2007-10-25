@@ -246,7 +246,15 @@ public class SvnClient implements ScmClient
     {
         if (repository != null)
         {
-            repository.closeSession();
+            try
+            {
+                repository.closeSession();
+            }
+            catch (Exception e)
+            {
+                LOG.warning(e);
+            }
+
             repository = null;
         }
     }

@@ -20,21 +20,6 @@ public abstract class CachingScmClient implements ScmClient, ScmCachePopulator
         List<Revision> newRevisions = getRevisions(revision, null);
         return newRevisions.size() > 0;
     }
-/*
-
-    public ScmFile getFile(String path) throws ScmException
-    {
-        Map<String, CachingScmFile> cachedListing = ScmFileCache.getInstance().lookup(this);
-        if (cachedListing.containsKey(path))
-        {
-            return cachedListing.get(path);
-        }
-        else
-        {
-            throw new ScmException("Path '" + path + "' does not exist");
-        }
-    }
-*/
 
     public List<ScmFile> browse(String path, Revision revision) throws ScmException
     {
@@ -66,7 +51,7 @@ public abstract class CachingScmClient implements ScmClient, ScmCachePopulator
 
             if (!item.cachedListing.containsKey(path))
             {
-                CachingScmFile f = new CachingScmFile(name, tokens.hasMoreTokens(), parent, path);
+                CachingScmFile f = new CachingScmFile(path, tokens.hasMoreTokens());
                 if (parent != null)
                 {
                     parent.addChild(f);

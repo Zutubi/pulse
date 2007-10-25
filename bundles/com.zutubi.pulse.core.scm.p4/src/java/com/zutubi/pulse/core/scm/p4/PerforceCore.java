@@ -64,7 +64,7 @@ public class PerforceCore
 
     public NumericalRevision convertRevision(Revision rev)
     {
-        return new NumericalRevision(rev.getAuthor(), rev.getComment(), rev.getDate(), rev.getRevisionString());
+        return rev == null ? null : new NumericalRevision(rev.getAuthor(), rev.getComment(), rev.getDate(), rev.getRevisionString());
     }
 
     public Map<String, String> getEnv()

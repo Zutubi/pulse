@@ -232,12 +232,17 @@ public class PerforceClient extends CachingScmClient
         }
     }
 
+    private Revision convertRevision(NumericalRevision rev)
+    {
+        return new Revision(rev.getAuthor(), rev.getComment(), rev.getDate(), rev.getRevisionString());
+    }
+
     public void populate(ScmFileCache.CacheItem item) throws ScmException
     {
         item.cachedRevision = getLatestRevision();
         item.cachedListing = new TreeMap<String, CachingScmFile>();
 
-        CachingScmFile rootFile = new CachingScmFile("", true, null, "");
+        CachingScmFile rootFile = new CachingScmFile("", true);
         item.cachedListing.put("", rootFile);
 
         String clientName = updateClient(null, null, null);
@@ -454,7 +459,7 @@ public class PerforceClient extends CachingScmClient
             }
         }
 
-        return revision;
+        return convertRevision(numericalRevision);
     }
 
     private String getChangelistComment(String[] lines, int affectedFilesIndex)
@@ -622,13 +627,12 @@ public class PerforceClient extends CachingScmClient
                 while (matcher.find())
                 {
                     NumericalRevision revision = new NumericalRevision(Long.parseLong(matcher.group(1)));
-                    result.add(0, core.convertRevision(revision));
-
-                    if (changes != null)
+                    Changelist list = getChangelist(clientName, revision.getRevisionNumber());
+                    if (list != null)
                     {
-                        Changelist list = getChangelist(clientName, revision.getRevisionNumber());
+                        result.add(0, core.convertRevision(revision));
 
-                        if (list != null)
+                        if (changes != null)
                         {
                             changes.add(0, list);
                         }
