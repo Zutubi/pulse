@@ -2,15 +2,19 @@ package com.zutubi.prototype.type.record.store;
 
 import com.zutubi.prototype.transaction.TransactionManager;
 import com.zutubi.prototype.transaction.UserTransaction;
+import com.zutubi.prototype.transaction.Transaction;
+import com.zutubi.prototype.transaction.TransactionStatus;
+import com.zutubi.prototype.type.record.DefaultRecordSerialiser;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.type.record.DefaultRecordSerialiser;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.IOUtils;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Random;
 
 /**
  *
@@ -21,6 +25,7 @@ public class FileSystemRecordStoreTest extends PulseTestCase
     private FileSystemRecordStore recordStore = null;
     private File persistentDirectory = null;
     private TransactionManager transactionManager;
+    private static final Random RAND = new Random(System.currentTimeMillis());
 
     protected void setUp() throws Exception
     {
@@ -362,7 +367,177 @@ public class FileSystemRecordStoreTest extends PulseTestCase
         assertTrue(new File(persistentDirectory, "1").exists());
     }
 
-    // test restart recovery when shutdown occured during a transaction. 
+    // test restart recovery when shutdown occured during a transaction.
+    public void testRecoveryOfSnapshotAfterInitialSnapshotDump() throws Exception
+    {
+        MutableRecord sample = createRandomSampleRecord();
+        recordStore.insert("sample", sample);
+        recordStore.compactNow();
+
+        File snapshot = new File(persistentDirectory, "snapshot");
+        File newSnapshot = new File(persistentDirectory, "snapshot.new");
+
+        assertTrue(snapshot.exists());
+        assertFalse(newSnapshot.exists());
+
+        MutableRecord newSample = createRandomSampleRecord();
+        DefaultRecordSerialiser serialiser = new DefaultRecordSerialiser(newSnapshot);
+        serialiser.serialise("", newSample, true);
+        
+        assertTrue(newSnapshot.exists());
+
+        restartRecordStore();
+
+        assertEquals(sample, recordStore.select().get("sample"));
+        assertFalse(newSnapshot.exists());
+    }
+
+    public void testRecoveryOfSnapshotAfterBackup() throws Exception
+    {
+        MutableRecord sample = createRandomSampleRecord();
+        recordStore.insert("sample", sample);
+        recordStore.compactNow();
+
+        File snapshot = new File(persistentDirectory, "snapshot");
+        File newSnapshot = new File(persistentDirectory, "snapshot.new");
+        File backupSnapshot = new File(persistentDirectory, "snapshot.backup");
+
+        assertTrue(snapshot.renameTo(backupSnapshot));
+
+        MutableRecord newSample = createRandomSampleRecord();
+        DefaultRecordSerialiser serialiser = new DefaultRecordSerialiser(newSnapshot);
+        serialiser.serialise("", newSample, true);
+
+        assertTrue(newSnapshot.exists());
+        assertTrue(backupSnapshot.exists());
+        assertFalse(snapshot.exists());
+
+        restartRecordStore();
+
+        assertEquals(sample, recordStore.select().get("sample"));
+        assertFalse(newSnapshot.exists());
+        assertFalse(backupSnapshot.exists());
+    }
+
+    public void testRecoveryCleanupOfBackupAfterNewSnapshotCommit() throws Exception
+    {
+        MutableRecord sample = createRandomSampleRecord();
+        recordStore.insert("sample", sample);
+        recordStore.compactNow();
+
+        File snapshot = new File(persistentDirectory, "snapshot");
+        File backupSnapshot = new File(persistentDirectory, "snapshot.backup");
+
+        assertTrue(snapshot.renameTo(backupSnapshot));
+
+        MutableRecord newSample = createRandomSampleRecord();
+        DefaultRecordSerialiser serialiser = new DefaultRecordSerialiser(snapshot);
+        serialiser.serialise("sample", newSample, true);
+        IOUtils.copyFile(new File(backupSnapshot, "snapshot_id.txt"), new File(snapshot, "snapshot_id.txt"));
+
+        assertTrue(backupSnapshot.exists());
+        assertTrue(snapshot.exists());
+
+        restartRecordStore();
+
+        assertEquals(newSample, recordStore.select().get("sample"));
+        assertFalse(backupSnapshot.exists());
+    }
+
+    // simulate failure to write a transactional file.
+    public void testFailureToCreateNewSnapshotDirectoryDuringCompaction() throws IOException
+    {
+        MutableRecord sample = createRandomSampleRecord();
+        recordStore.insert("sample", sample);
+
+        recordStore.setFileSystem(new DefaultFS()
+        {
+            public boolean mkdirs(File file)
+            {
+                if (file.equals(new File(persistentDirectory, "snapshot.new")))
+                {
+                    return false;
+                }
+                return super.mkdirs(file);
+            }
+        });
+
+        try
+        {
+            recordStore.compactNow();
+            fail("Expected IOException.");
+        }
+        catch (IOException e)
+        {
+            assertTrue(e.getMessage().contains("Failed to create new snapshot directory"));
+        }
+
+        // ensure that everything is still ok.
+        assertEquals(sample, recordStore.select().get("sample"));
+
+        // ensure that a subsequent compact is successful.
+        recordStore.setFileSystem(new DefaultFS());
+        recordStore.compactNow();
+    }
+
+    public void testFailureToWriteNewIndexDuringTransaction()
+    {
+        MutableRecord sample = createRandomSampleRecord();
+        recordStore.setFileSystem(new DefaultFS()
+        {
+            public boolean createNewFile(File file) throws IOException
+            {
+                if (file.getName().equals("index.new"))
+                {
+                    return false;
+                }
+                return super.createNewFile(file);
+            }
+        });
+        
+        assertNull(recordStore.select().get("sample"));
+        UserTransaction txn = new UserTransaction(transactionManager);
+        txn.begin();
+
+        Transaction transaction = transactionManager.getTransaction();
+
+        recordStore.insert("sample", sample);
+        txn.commit();
+
+        assertNull(recordStore.select().get("sample"));
+        assertEquals(TransactionStatus.ROLLEDBACK, transaction.getStatus());
+    }
+
+    public void testFailureToWriteNewJournalEntryDuringTransaction()
+    {
+        MutableRecord sample = createRandomSampleRecord();
+        recordStore.setFileSystem(new DefaultFS()
+        {
+            public boolean createNewFile(File file) throws IOException
+            {
+                try
+                {
+                    Integer.parseInt(file.getName());
+                    return false;
+                }
+                catch (NumberFormatException e)
+                {
+                    return super.createNewFile(file);
+                }
+            }
+        });
+        
+        UserTransaction txn = new UserTransaction(transactionManager);
+        txn.begin();
+
+        Transaction transaction = transactionManager.getTransaction();
+
+        recordStore.insert("sample", sample);
+        txn.commit();
+
+        assertNull(recordStore.select().get("sample"));
+        assertEquals(TransactionStatus.ROLLEDBACK, transaction.getStatus());
+    }
 
     //---( helper methods. )---
 
@@ -372,6 +547,16 @@ public class FileSystemRecordStoreTest extends PulseTestCase
         sample.put("a", "a");
         sample.put("b", "b");
         return sample;
+    }
+
+    private MutableRecord createRandomSampleRecord()
+    {
+        MutableRecord randomSample = new MutableRecordImpl();
+        for (int i = 0; i < RAND.nextInt(10); i++)
+        {
+            randomSample.put(Integer.toString(i), Integer.toString(RAND.nextInt(20)));
+        }
+        return randomSample;
     }
 
     private void assertEquals(Record expected, Record actual)

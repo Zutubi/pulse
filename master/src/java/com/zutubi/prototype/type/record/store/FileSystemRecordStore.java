@@ -102,6 +102,11 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
         this.compactionInterval = interval;
     }
 
+    public void setFileSystem(FS fileSystem)
+    {
+        this.fileSystem = fileSystem;
+    }
+
     public void initAndStartAutoCompaction() throws Exception
     {
         init();
@@ -711,7 +716,15 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
         }
         catch (IOException e)
         {
-            recoverSnapshot(newSnapshotDirectory, snapshotDirectory, backupSnapshotDirectory);
+            try
+            {
+                recoverSnapshot(newSnapshotDirectory, snapshotDirectory, backupSnapshotDirectory);
+            }
+            catch (IOException e1)
+            {
+                // Just log this exception, do not override the original exception.
+                LOG.severe(e1);
+            }
 
             latestSnapshotId = oldSnapshotId;
 
@@ -724,8 +737,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
         // attempt a recovery.
         if (fileSystem.exists(newSnapshotDirectory) && !delete(newSnapshotDirectory))
         {
-            // problem, but just log it and continue recovery. Do not override current exception.
-            throw new IOException();
+            throw new IOException("Failed to delete the new snapshot: " + newSnapshotDirectory.getAbsolutePath());
         }
 
         if (fileSystem.exists(snapshotDirectory))
