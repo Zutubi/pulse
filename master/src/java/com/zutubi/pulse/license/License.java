@@ -19,15 +19,11 @@ public class License
     private Date expiryDate;
 
     public static final int UNRESTRICTED = -1;
+    public static final int UNSPECIFIED  = -2;
 
-    public static final int UNSPECIFIED = -2;
-
-    private int supportedProjects = UNRESTRICTED;
-
-    private int supportedUsers = UNRESTRICTED;
-
-    private int supportedAgents = UNRESTRICTED;
-
+    private int supportedProjects      = UNRESTRICTED;
+    private int supportedUsers         = UNRESTRICTED;
+    private int supportedAgents        = UNRESTRICTED;
     private int supportedContactPoints = UNSPECIFIED;
 
     public License(LicenseType type, String holder)
@@ -166,7 +162,7 @@ public class License
                 ObjectUtils.equals(type, other.type) &&
                 ObjectUtils.equals(supportedAgents, other.supportedAgents) &&
                 ObjectUtils.equals(supportedUsers, other.supportedUsers) &&
-                ObjectUtils.equals(supportedContactPoints, other.supportedContactPoints) &&
+                ObjectUtils.equals(getSupportedContactPoints(), other.getSupportedContactPoints()) &&
                 ObjectUtils.equals(supportedProjects, other.supportedProjects);
     }
 

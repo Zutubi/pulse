@@ -13,6 +13,8 @@ import java.io.IOException;
 public class DataTest extends PulseTestCase
 {
     private File dataDir;
+    private DefaultSystemPaths systemPaths;
+    private File tempDir;
 
     public DataTest()
     {
@@ -27,13 +29,20 @@ public class DataTest extends PulseTestCase
     {
         super.setUp();
 
-        dataDir = FileSystemUtils.createTempDir(DataTest.class.getName(), "");
+        tempDir = FileSystemUtils.createTempDir(DataTest.class.getName(), "");
+        dataDir = new File(tempDir, "data");
         dataDir.delete();
+
+        systemPaths = new DefaultSystemPaths(new File(tempDir, "pulse-home"), new File(tempDir, "version-home"));
+        File configRoot = systemPaths.getConfigRoot();
+        configRoot.mkdirs();
+        File dbtemplate = new File(configRoot, "database.properties.template");
+        dbtemplate.createNewFile();
     }
 
     protected void tearDown() throws Exception
     {
-        removeDirectory(dataDir);
+        removeDirectory(tempDir);
 
         super.tearDown();
     }
@@ -49,7 +58,7 @@ public class DataTest extends PulseTestCase
         assertTrue(dataDir.mkdirs());
         assertFalse(data.isInitialised());
 
-        data.init(new DefaultSystemPaths(new File("."), new File(".")));
+        data.init(systemPaths);
 
         assertTrue(data.isInitialised());
         assertTrue(dataDir.exists());
@@ -59,7 +68,7 @@ public class DataTest extends PulseTestCase
     public void testVersionDetails() throws IOException
     {
         Data data = new Data(dataDir);
-        data.init(new DefaultSystemPaths(new File("."), new File(".")));
+        data.init(systemPaths);
 
         Version v = Version.getVersion();
         Version dataVersion = data.getVersion();

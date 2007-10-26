@@ -25,11 +25,21 @@ public class ServiceTokenManagerTest extends PulseTestCase
         super.setUp();
         tempDir = FileSystemUtils.createTempDir(ServiceTokenManager.class.getName(), "");
         tokenManager = new ServiceTokenManager();
-        DefaultSystemPaths paths = new DefaultSystemPaths(tempDir, tempDir);
-        paths.getConfigRoot().mkdirs();
+        UserPaths paths = new UserPaths()
+        {
+            public File getData()
+            {
+                return tempDir;
+            }
+
+            public File getUserConfigRoot()
+            {
+                return tempDir;
+            }
+        };
 
         Mock mockConfigurationManager = new Mock(ConfigurationManager.class);
-        mockConfigurationManager.matchAndReturn("getSystemPaths", C.ANY_ARGS, paths);
+        mockConfigurationManager.matchAndReturn("getUserPaths", C.ANY_ARGS, paths);
         configManager = (ConfigurationManager) mockConfigurationManager.proxy();
 
         tokenManager.setConfigurationManager(configManager);
