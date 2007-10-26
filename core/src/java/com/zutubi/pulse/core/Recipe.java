@@ -175,31 +175,33 @@ public class Recipe implements Reference
 
     public void execute(RecipeContext context)
     {
-        // TODO: support continuing build when errors occur. Take care: exceptions.
-
+        boolean success = true;
         for (int i = 0; i < commands.size(); i++)
         {
             Command command = commands.get(i);
-            CommandResult result = new CommandResult(command.getName());
-
-            File commandOutput = new File(context.getPaths().getOutputDir(), getCommandDirName(i, result));
-            if (!commandOutput.mkdirs())
+            if (success || command.isForce())
             {
-                throw new BuildException("Could not create command output directory '" + commandOutput.getAbsolutePath() + "'");
-            }
+                CommandResult result = new CommandResult(command.getName());
 
-            CommandContext commandContext = createCommandContext(context, commandOutput);
+                File commandOutput = new File(context.getPaths().getOutputDir(), getCommandDirName(i, result));
+                if (!commandOutput.mkdirs())
+                {
+                    throw new BuildException("Could not create command output directory '" + commandOutput.getAbsolutePath() + "'");
+                }
 
-            if (!executeCommand(commandContext, result, command))
-            {
-                return;
-            }
-
-            switch (result.getState())
-            {
-                case FAILURE:
-                case ERROR:
+                CommandContext commandContext = createCommandContext(context, commandOutput);
+                if (!executeCommand(commandContext, result, command))
+                {
+                    // Recipe terminated.
                     return;
+                }
+
+                switch (result.getState())
+                {
+                    case FAILURE:
+                    case ERROR:
+                        success = false;
+                }
             }
         }
     }

@@ -40,6 +40,11 @@ public interface Command
     void setName(String name);
 
     /**
+     * @return true if this command should run even if a prior command has failed
+     */
+    boolean isForce();
+
+    /**
      * The terminate method allows the commands execution to be interupted.
      */
     void terminate();

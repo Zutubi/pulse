@@ -45,7 +45,7 @@ public class BootstrapCommand implements Command
 
     public List<String> getArtifactNames()
     {
-        return Arrays.asList(new String[]{OUTPUT_NAME});
+        return Arrays.asList(OUTPUT_NAME);
     }
 
     public String getName()
@@ -56,6 +56,11 @@ public class BootstrapCommand implements Command
     public void setName(String name)
     {
         // Ignored
+    }
+
+    public boolean isForce()
+    {
+        return false;
     }
 
     public void terminate()

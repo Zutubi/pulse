@@ -4,7 +4,6 @@ import com.zutubi.pulse.core.model.TestCaseResult;
 import com.zutubi.pulse.core.model.TestSuiteResult;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 
@@ -14,17 +13,7 @@ public class CppUnitReportPostProcessorTest extends XMLReportPostProcessorTestBa
 {
     public CppUnitReportPostProcessorTest()
     {
-        this(null);
-    }
-
-    public CppUnitReportPostProcessorTest(String name)
-    {
-        super(name, new CppUnitReportPostProcessor());
-    }
-
-    public void setUp() throws IOException
-    {
-        pp = new CppUnitReportPostProcessor();
+        super(new CppUnitReportPostProcessor());
     }
 
     protected File getOutputDir()

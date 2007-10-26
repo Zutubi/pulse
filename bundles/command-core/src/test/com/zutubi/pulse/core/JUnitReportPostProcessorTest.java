@@ -11,12 +11,7 @@ public class JUnitReportPostProcessorTest extends XMLReportPostProcessorTestBase
 {
     public JUnitReportPostProcessorTest()
     {
-        this(null);
-    }
-
-    public JUnitReportPostProcessorTest(String name)
-    {
-        super(name, new JUnitReportPostProcessor());
+        super(new JUnitReportPostProcessor());
     }
 
     protected File getOutputDir()

@@ -7,6 +7,7 @@ import com.zutubi.util.Constants;
 import com.zutubi.util.ForkOutputStream;
 import com.zutubi.util.IOUtils;
 import com.zutubi.validation.annotations.Required;
+import com.opensymphony.util.TextUtils;
 
 import java.io.*;
 import java.util.*;
@@ -34,12 +35,15 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
     private String exe;
     private List<Arg> args = new LinkedList<Arg>();
     private File workingDir;
+    private String inputFile;
+    private String outputFile;
     private List<Environment> env = new LinkedList<Environment>();
 
     private Scope scope;
 
     private Process child;
     private CancellableReader reader;
+    private CancellableReader writer;
     private volatile boolean terminated = false;
 
     private PrecapturedArtifact outputArtifact;
@@ -81,6 +85,8 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
             throw new BuildException("Unable to create directory for the output artifact '" + outputFileDir.getAbsolutePath() + "'");
         }
 
+        File inFile = checkInputFile(workingDir);
+        
         if (terminatedCheck(cmdResult))
         {
             // Catches the case where we were asked to terminate before
@@ -109,29 +115,24 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
         }
 
         // capture the command output.
-        File outputFile = new File(outputFileDir, OUTPUT_FILENAME);
+        File outputArtifact = new File(outputFileDir, OUTPUT_FILENAME);
 
         try
         {
             // initialise the output artifacts.
             initialiseOutputArtifact();
 
-            FileOutputStream outputFileStream = new FileOutputStream(outputFile);
-            OutputStream output;
-
-            if (context.getOutputStream() != null)
-            {
-                output = new ForkOutputStream(outputFileStream, context.getOutputStream());
-            }
-            else
-            {
-                output = outputFileStream;
-            }
-
+            OutputStream output = getOutputStream(context, workingDir, outputArtifact);
             InputStream input = child.getInputStream();
             reader = new CancellableReader(input, output);
             reader.start();
 
+            if(inFile != null)
+            {
+                writer = new CancellableReader(new FileInputStream(inFile), child.getOutputStream());
+                writer.start();
+            }
+            
             if (terminatedCheck(cmdResult))
             {
                 return;
@@ -165,6 +166,18 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
                 cmdResult.error("Unable to cleanly terminate the child process tree.  It is likely that some orphaned processes remain.");
             }
 
+            if (writer != null)
+            {
+                if (writer.waitFor(10))
+                {
+                    IOException ioe = writer.getIoError();
+                    if (ioe != null)
+                    {
+                        throw new BuildException(ioe);
+                    }
+                }
+            }
+            
             String commandLine = extractCommandLine(builder);
 
             if (result == 0)
@@ -202,6 +215,60 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
                 child.destroy();
             }
         }
+    }
+    private OutputStream getOutputStream(CommandContext context, File workingDir, File outputArtifact) throws FileNotFoundException
+    {
+        List<OutputStream> outputs = new ArrayList<OutputStream>(3);
+        outputs.add(new FileOutputStream(outputArtifact));
+
+        if(context.getOutputStream() != null)
+        {
+            outputs.add(context.getOutputStream());
+        }
+
+        if(TextUtils.stringSet(outputFile))
+            {
+                try
+                {
+                    outputs.add(new FileOutputStream(new File(workingDir, outputFile)));
+            }
+            catch (FileNotFoundException e)
+            {
+                throw new BuildException("Unable to create output file '" + outputFile + "': " + e.getMessage(), e);
+            }
+        }
+
+        OutputStream output;
+        if (outputs.size() > 1)
+        {
+            output = new ForkOutputStream(outputs.toArray(new OutputStream[outputs.size()]));
+        }
+        else
+        {
+            output = outputs.get(0);
+        }
+        return output;
+    }
+
+    private File checkInputFile(File workingDir)
+    {
+        if(TextUtils.stringSet(inputFile))
+        {
+            File input = new File(workingDir, inputFile);
+            if(!input.exists())
+            {
+                throw new BuildException("Input file '" + input.getAbsolutePath() + "' does not exist");
+            }
+
+            if(!input.canRead())
+            {
+                throw new BuildException("Input file '" + input.getAbsolutePath() + "' is not readable");
+            }
+
+            return input;
+        }
+
+        return null;
     }
 
     private void initialiseOutputArtifact()
@@ -546,6 +613,16 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
     public void setWorkingDir(File d)
     {
         this.workingDir = d;
+    }
+
+    public void setInputFile(String inputFile)
+    {
+        this.inputFile = inputFile;
+    }
+
+    public void setOutputFile(String outputFile)
+    {
+        this.outputFile = outputFile;
     }
 
     public Arg createArg()

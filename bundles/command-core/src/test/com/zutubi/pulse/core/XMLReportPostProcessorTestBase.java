@@ -11,25 +11,9 @@ public abstract class XMLReportPostProcessorTestBase extends PulseTestCase
 {
     protected XMLReportPostProcessor pp;
 
-    public XMLReportPostProcessorTestBase(XMLReportPostProcessor pp)
+    protected XMLReportPostProcessorTestBase(XMLReportPostProcessor pp)
     {
         this.pp = pp;
-    }
-
-    public XMLReportPostProcessorTestBase(String name, XMLReportPostProcessor pp)
-    {
-        super(name);
-        this.pp = pp;
-    }
-
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-    }
-
-    protected void tearDown() throws Exception
-    {
-        super.tearDown();
     }
 
     protected abstract File getOutputDir();

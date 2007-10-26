@@ -16,10 +16,8 @@ import java.util.TreeSet;
  * A command group represents a command and a set of artifact definitions.
  *
  */
-public class CommandGroup implements Command, Validateable
+public class CommandGroup extends CommandSupport implements Validateable
 {
-    private String name;
-
     private Command command = null;
 
     private List<Artifact> artifacts = new LinkedList<Artifact>();
@@ -34,23 +32,13 @@ public class CommandGroup implements Command, Validateable
 
         if (!TextUtils.stringSet(this.command.getName()))
         {
-            this.command.setName(name);
+            this.command.setName(getName());
         }
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
     }
 
     public void terminate()
     {
         command.terminate();
-    }
-
-    public String getName()
-    {
-        return name;
     }
 
     public FileArtifact createArtifact()

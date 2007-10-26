@@ -43,12 +43,23 @@ public class XMLUtils
 
     public static String getText(Element element, String defaultValue)
     {
+        return getText(element, defaultValue, true);   
+    }
+
+    public static String getText(Element element, String defaultValue, boolean trim)
+    {
         if (element.getChildCount() > 0)
         {
             Node child = element.getChild(0);
             if(child != null && child instanceof Text)
             {
-                return child.getValue().trim();
+                String value = child.getValue();
+                if(trim)
+                {
+                    value = value.trim();
+                }
+
+                return value;
             }
         }
 

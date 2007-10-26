@@ -4,7 +4,6 @@ import com.zutubi.pulse.core.model.TestCaseResult;
 import com.zutubi.pulse.core.model.TestSuiteResult;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 
 /**
@@ -13,22 +12,7 @@ public class UnitTestPlusPlusReportPostProcessorTest extends XMLReportPostProces
 {
     public UnitTestPlusPlusReportPostProcessorTest()
     {
-        this(null);
-    }
-
-    public UnitTestPlusPlusReportPostProcessorTest(String name)
-    {
-        super(name, new UnitTestPlusPlusReportPostProcessor());
-    }
-
-    public void setUp() throws IOException
-    {
-        pp = new UnitTestPlusPlusReportPostProcessor();
-    }
-
-    public void tearDown() throws Exception
-    {
-        super.tearDown();
+        super(new UnitTestPlusPlusReportPostProcessor());
     }
 
     protected File getOutputDir()
