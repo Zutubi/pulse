@@ -307,10 +307,9 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
         List<Feature> features = result.getFeatures(Feature.Level.ERROR);
         assertEquals(1, features.size());
         String message = features.get(0).getSummary();
-        assertTrue(message.contains("Working directory 'nosuchworkdir' does not exist"));
         boolean java15 = message.contains("Working directory 'nosuchworkdir' does not exist");
-        boolean jaav16 = message.endsWith("The directory name is invalid");
-        assertTrue(java15 || jaav16);
+        boolean java16 = message.endsWith("The directory name is invalid");
+        assertTrue(java15 || java16);
     }
 
     public void testProcessId() throws IOException, ClassNotFoundException, NoSuchFieldException, IllegalAccessException
