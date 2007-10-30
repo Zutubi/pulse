@@ -1,8 +1,14 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.util.logging.Logger;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -15,6 +21,8 @@ import java.util.Properties;
  */
 public class Version implements Comparable
 {
+    private static final Logger LOG = Logger.getLogger(Version.class);
+
     /**
      * The resource name relative to the location of this class.
      */
@@ -42,7 +50,7 @@ public class Version implements Comparable
 
     public static final int INVALID = -1;
 
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("d-MMMM-yyyy");
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("d-MM-yyyy");
 
     /**
      * The value of the version number property.
@@ -107,6 +115,7 @@ public class Version implements Comparable
         }
         catch (ParseException e)
         {
+            LOG.severe("Failed to parse '" + getBuildDate() + "'", e);
             return null;
         }
     }
@@ -131,6 +140,7 @@ public class Version implements Comparable
         }
         catch (ParseException e)
         {
+            LOG.severe("Failed to parse '" + getReleaseDate() + "'.", e);
             return null;
         }
     }
