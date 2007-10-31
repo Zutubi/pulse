@@ -98,7 +98,7 @@ public class FileSystemRecordStoreTest extends PulseTestCase
         MutableRecord sample = createSampleRecord();
         recordStore.insert("sample", sample);
         recordStore.update("sample", sample);
-        
+
         restartRecordStore();
 
         Record stored = (Record) recordStore.select().get("sample");
@@ -383,7 +383,7 @@ public class FileSystemRecordStoreTest extends PulseTestCase
         MutableRecord newSample = createRandomSampleRecord();
         DefaultRecordSerialiser serialiser = new DefaultRecordSerialiser(newSnapshot);
         serialiser.serialise("", newSample, true);
-        
+
         assertTrue(newSnapshot.exists());
 
         restartRecordStore();
@@ -494,7 +494,7 @@ public class FileSystemRecordStoreTest extends PulseTestCase
                 return super.createNewFile(file);
             }
         });
-        
+
         assertNull(recordStore.select().get("sample"));
         UserTransaction txn = new UserTransaction(transactionManager);
         txn.begin();
@@ -526,7 +526,7 @@ public class FileSystemRecordStoreTest extends PulseTestCase
                 }
             }
         });
-        
+
         UserTransaction txn = new UserTransaction(transactionManager);
         txn.begin();
 
@@ -537,6 +537,20 @@ public class FileSystemRecordStoreTest extends PulseTestCase
 
         assertNull(recordStore.select().get("sample"));
         assertEquals(TransactionStatus.ROLLEDBACK, transaction.getStatus());
+    }
+
+    public void testCorrectHandlingOfEmptyUncompactedRecordsOnRestart() throws Exception
+    {
+        MutableRecordImpl empty = new MutableRecordImpl();
+
+        UserTransaction txn = new UserTransaction(transactionManager);
+        txn.begin();
+        recordStore.insert("empty", empty);
+        txn.commit();
+
+        restartRecordStore();
+
+        assertEquals(empty, recordStore.select().get("empty"));
     }
 
     //---( helper methods. )---
@@ -578,7 +592,7 @@ public class FileSystemRecordStoreTest extends PulseTestCase
         assertEquals(expected.nestedKeySet(), actual.nestedKeySet());
         for (String key : expected.nestedKeySet())
         {
-            assertEquals((Record)expected.get(key), (Record)actual.get(key));
+            assertEquals((Record) expected.get(key), (Record) actual.get(key));
         }
     }
 }

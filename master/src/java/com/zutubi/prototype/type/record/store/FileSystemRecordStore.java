@@ -594,10 +594,10 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
 
     private boolean writeRecord(File file, Record record) throws IOException
     {
-        if (!fileSystem.exists(file) && !fileSystem.createNewFile(file))
+        if (fileSystem.exists(file))
         {
             // problems....
-            throw new IOException("Failed to create new journal entry. " + file.getAbsolutePath());
+            throw new IOException("Can not write journal entry. File already exists. " + file.getAbsolutePath());
         }
 
         if (record == null)
@@ -613,12 +613,8 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
 
     private Record readRecord(File file)
     {
-        if (file.exists())
-        {
-            XmlRecordSerialiser serialiser = new XmlRecordSerialiser();
-            return serialiser.deserialise(file, new NoopRecordHandler());
-        }
-        return null;
+        XmlRecordSerialiser serialiser = new XmlRecordSerialiser();
+        return serialiser.deserialise(file, new NoopRecordHandler());
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -906,6 +902,11 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
                 record = readRecord(recordDir);
             }
             return record;
+        }
+
+        public File getRecordDir()
+        {
+            return recordDir;
         }
 
         long getId()
