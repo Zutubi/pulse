@@ -145,7 +145,8 @@ public class FileSystemRecordStoreTest extends PulseTestCase
 
         assertFalse(new File(persistentDirectory, "3").exists());
         recordStore.delete("sample");
-        assertTrue(new File(persistentDirectory, "3").exists());
+        // for a delete, no record is written.
+        assertFalse(new File(persistentDirectory, "3").exists());
     }
 
     public void testCompaction() throws Exception
@@ -513,16 +514,16 @@ public class FileSystemRecordStoreTest extends PulseTestCase
         MutableRecord sample = createRandomSampleRecord();
         recordStore.setFileSystem(new DefaultFS()
         {
-            public boolean createNewFile(File file) throws IOException
+            public boolean exists(File file)
             {
                 try
                 {
                     Integer.parseInt(file.getName());
-                    return false;
+                    return true;
                 }
                 catch (NumberFormatException e)
                 {
-                    return super.createNewFile(file);
+                    return super.exists(file);
                 }
             }
         });
