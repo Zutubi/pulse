@@ -11,6 +11,7 @@ import com.zutubi.util.Mapping;
 import com.zutubi.util.logging.Logger;
 
 import java.util.*;
+import java.lang.reflect.Modifier;
 
 /**
  * A composite represents a user-defined Java type, i.e. a class.  Composites
@@ -192,9 +193,29 @@ public class CompositeType extends AbstractType implements ComplexType
         return Collections.unmodifiableList(new LinkedList<TypeProperty>(internalProperties.values()));
     }
 
-    public void addExtension(String symbolicName)
+    public boolean isExtendable()
     {
-        this.extensions.add(symbolicName);
+        int modifiers = getClazz().getModifiers();
+        return Modifier.isAbstract(modifiers) || Modifier.isInterface(modifiers);
+    }
+
+    private void checkExtension(CompositeType type) throws TypeException
+    {
+        if(!isExtendable())
+        {
+            throw new TypeException("Class '" + getClass().getName() + "' is not extendable");
+        }
+
+        if(!this.getClazz().isAssignableFrom(type.getClazz()))
+        {
+            throw new TypeException("Extension class '" + type.getClazz().getName() + "' is not a subtype of '" + getClazz().getName() + "'");
+        }
+    }
+
+    void addExtension(CompositeType type) throws TypeException
+    {
+        checkExtension(type);
+        this.extensions.add(type.getSymbolicName());
     }
 
     public List<String> getExtensions()
@@ -202,9 +223,9 @@ public class CompositeType extends AbstractType implements ComplexType
         return Collections.unmodifiableList(extensions);
     }
 
-    public void addInternalExtension(String symbolicName)
+    void addInternalExtension(CompositeType type)
     {
-        internalExtensions.add(symbolicName);
+        internalExtensions.add(type.getSymbolicName());
     }
 
     public List<String> getInternalExtensions()

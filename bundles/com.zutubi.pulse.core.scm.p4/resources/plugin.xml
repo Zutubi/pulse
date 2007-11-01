@@ -2,7 +2,7 @@
 <?eclipse version="3.2"?>
 <plugin>
     <extension point="com.zutubi.pulse.core.config">
-        <config class="com.zutubi.pulse.core.scm.p4.config.PerforceConfiguration" extends="zutubi.scmConfig"/>
+        <config class="com.zutubi.pulse.core.scm.p4.config.PerforceConfiguration"/>
     </extension>
     <extension point="com.zutubi.pulse.core.scms">
         <scm name="p4" factory-class="com.zutubi.pulse.core.scm.p4.PerforceClientFactory" working-copy-class="com.zutubi.pulse.core.scm.p4.PerforceWorkingCopy"/>

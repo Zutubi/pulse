@@ -5,7 +5,7 @@ package com.zutubi.pulse.events;
  */
 public interface EventListener extends java.util.EventListener
 {
-    void handleEvent(Event evt);
+    void handleEvent(Event event);
 
     Class[] getHandledEvents();
 }

@@ -2,18 +2,17 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Property;
-import com.zutubi.util.Sort;
-import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.util.*;
 
 /**
- * <class-comment/>
+ * A scope holds named references and has a parent.  When looking up a
+ * reference by name, if it is not found in this scope the lookup is
+ * deferred to the parent.
  */
 public class Scope
 {
-    private static final Logger LOG = Logger.getLogger(Scope.class);
     private static final boolean RETAIN_ENVIRONMENT_CASE = System.getProperty("pulse.retain.environment.case") != null;
 
     private Scope parent;
@@ -54,16 +53,6 @@ public class Scope
             result.add(info.reference);
         }
 
-/*
-        final Sort.StringComparator stringComp = new Sort.StringComparator();
-        Collections.sort(result, new Comparator<Reference>()
-        {
-            public int compare(Reference r1, Reference r2)
-            {
-                return stringComp.compare(r1.getName(), r2.getName());
-            }
-        });
-*/
         return result;
     }
 

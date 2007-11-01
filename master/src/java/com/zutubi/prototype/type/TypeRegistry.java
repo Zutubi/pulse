@@ -1,14 +1,12 @@
 package com.zutubi.prototype.type;
 
-import com.zutubi.config.annotations.Reference;
-import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.Transient;
-import com.zutubi.config.annotations.Ordered;
+import com.zutubi.config.annotations.*;
 import com.zutubi.prototype.config.ConfigurationReferenceManager;
 import com.zutubi.prototype.type.record.HandleAllocator;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.util.AnnotationUtils;
 import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.ReflectionUtils;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -119,6 +117,8 @@ public class TypeRegistry
                     classMapping.remove(clazz);
                     throw e;
                 }
+
+                checkForExtensionParent(type);
             }
 
             if (symbolicName != null)
@@ -131,6 +131,28 @@ public class TypeRegistry
         catch (TypeException e)
         {
             throw new TypeException("Registering class '" + clazz.getName() + "': " + e.getMessage(), e);
+        }
+    }
+
+    private void checkForExtensionParent(CompositeType type) throws TypeException
+    {
+        if(!type.isExtendable())
+        {
+            for(Class superClass: ReflectionUtils.getSupertypes(type.getClazz(), Object.class, true))
+            {
+                CompositeType superType = getType(superClass);
+                if(superType != null && superType.isExtendable())
+                {
+                    if(type.getAnnotation(Internal.class) != null)
+                    {
+                        superType.addInternalExtension(type);
+                    }
+                    else
+                    {
+                        superType.addExtension(type);
+                    }
+                }
+            }
         }
     }
 

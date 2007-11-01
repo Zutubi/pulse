@@ -1654,6 +1654,7 @@ public class ConfigurationTemplateManager implements Synchronization
             Configuration clone = (Configuration) instantiator.instantiate(path, false, type, record);
             clone.setConfigurationPath(instance.getConfigurationPath());
             clone.setHandle(instance.getHandle());
+            clone.setConcrete(instance.isConcrete());
             return (T) clone;
         }
         catch (TypeException e)
@@ -1913,16 +1914,9 @@ public class ConfigurationTemplateManager implements Synchronization
                 ComplexType parentType = parentRecord.getType();
                 String baseName = pathElements[pathElements.length - 1];
                 Object value = parentRecord.get(baseName);
-                if (value != null)
+                if (value != null && value instanceof TemplateRecord)
                 {
-                    if (value instanceof TemplateRecord)
-                    {
-                        return ((TemplateRecord) value).getType();
-                    }
-                    else
-                    {
-                        throw new IllegalArgumentException("Invalid path '" + path + "': references non-complex type");
-                    }
+                    return ((TemplateRecord) value).getType();
                 }
                 else if (parentType instanceof CompositeType)
                 {

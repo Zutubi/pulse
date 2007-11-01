@@ -275,7 +275,7 @@ public class CleanupManager
         public void handleEvent(Event evt)
         {
             BuildCompletedEvent completedEvent = (BuildCompletedEvent) evt;
-            BuildResult result = completedEvent.getResult();
+            BuildResult result = completedEvent.getBuildResult();
 
             if(result.isPersonal())
             {

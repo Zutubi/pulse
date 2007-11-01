@@ -7,6 +7,7 @@ import com.zutubi.config.annotations.Transient;
 /**
  */
 @SymbolicName("zutubi.builtinGroupConfig")
+@Internal
 public class BuiltinGroupConfiguration extends AbstractGroupConfiguration
 {
     @Internal

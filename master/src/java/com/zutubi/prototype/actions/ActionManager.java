@@ -30,7 +30,7 @@ public class ActionManager
     {
         List<String> result = new LinkedList<String>();
 
-        if (configurationInstance != null)
+        if (configurationInstance != null && configurationInstance.isConcrete())
         {
             String path = configurationInstance.getConfigurationPath();
             if (includeDefault)

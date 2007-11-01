@@ -7,6 +7,8 @@ import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.FeaturePersister;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.events.build.*;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.RecipeResultNode;
@@ -28,7 +30,6 @@ public class RecipeController
     private RecipeResultNode recipeResultNode;
     private RecipeResult recipeResult;
     private RecipeDispatchRequest dispatchRequest;
-    private boolean personal;
     private boolean incremental;
     private RecipeResultNode previousSuccessful;
     private RecipeLogger logger;
@@ -39,14 +40,14 @@ public class RecipeController
 
     private RecipeQueue queue;
     private AgentService agentService;
+    private EventManager eventManager;
 
-    public RecipeController(BuildResult buildResult, RecipeResultNode recipeResultNode, RecipeDispatchRequest dispatchRequest, boolean personal, boolean incremental, RecipeResultNode previousSuccessful, RecipeLogger logger, RecipeResultCollector collector)
+    public RecipeController(BuildResult buildResult, RecipeResultNode recipeResultNode, RecipeDispatchRequest dispatchRequest, boolean incremental, RecipeResultNode previousSuccessful, RecipeLogger logger, RecipeResultCollector collector)
     {
         this.buildResult = buildResult;
         this.recipeResultNode = recipeResultNode;
         this.recipeResult = recipeResultNode.getResult();
         this.dispatchRequest = dispatchRequest;
-        this.personal = personal;
         this.incremental = incremental;
         this.previousSuccessful = previousSuccessful;
         this.logger = logger;
@@ -230,17 +231,7 @@ public class RecipeController
         recipeResult.complete();
         recipeResult.abortUnfinishedCommands();
 
-        if (!personal)
-        {
-            // FIXME: re-enable post build actions via the configuration objects.
-/*
-            for(PostBuildAction action: specNode.getPostActions())
-            {
-                ComponentContext.autowire(action);
-                action.execute(projectConfig, buildResult, recipeResultNode, buildProperties);
-            }
-*/
-        }
+        eventManager.publish(new PostStageEvent(this, buildResult, recipeResultNode));
 
         buildManager.save(recipeResult);
         logger.complete(recipeResult);
@@ -363,5 +354,10 @@ public class RecipeController
     public void setRecipeQueue(RecipeQueue queue)
     {
         this.queue = queue;
+    }
+
+    public void setEventManager(EventManager eventManager)
+    {
+        this.eventManager = eventManager;
     }
 }

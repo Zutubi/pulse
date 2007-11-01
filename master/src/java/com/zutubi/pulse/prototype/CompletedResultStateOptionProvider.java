@@ -13,11 +13,6 @@ public class CompletedResultStateOptionProvider extends EnumOptionProvider
 {
     protected boolean includeOption(Enum e)
     {
-        if(e instanceof ResultState)
-        {
-            return ((ResultState)e).isCompleted();
-        }
-
-        return false;
+        return e instanceof ResultState && ((ResultState) e).isCompleted();
     }
 }

@@ -46,13 +46,6 @@
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="extends" type="string">
-            <annotation>
-               <documentation>
-                  The symbolic name of the type extended by this configuraiton, if any.
-               </documentation>
-            </annotation>
-         </attribute>
       </complexType>
    </element>
 </schema>

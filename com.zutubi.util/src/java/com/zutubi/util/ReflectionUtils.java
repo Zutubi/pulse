@@ -1,17 +1,78 @@
 package com.zutubi.util;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.List;
-import java.util.LinkedList;
+import java.lang.reflect.*;
+import java.util.*;
 
 /**
  */
 public class ReflectionUtils
 {
+    public static List<Class> getSuperclasses(Class clazz, Class stopClazz, boolean strict)
+    {
+        List<Class> superClasses = new LinkedList<Class>();
+
+        if(strict)
+        {
+            if(clazz == stopClazz)
+            {
+                return superClasses;
+            }
+
+            clazz = clazz.getSuperclass();
+        }
+
+        while(clazz != null && clazz != stopClazz)
+        {
+            superClasses.add(clazz);
+            clazz = clazz.getSuperclass();
+        }
+
+        return superClasses;
+    }
+
+    private static Set<Class> getInterfacesTransitive(Class clazz)
+    {
+        Queue<Class> toProcess = new LinkedList<Class>();
+        toProcess.addAll(Arrays.asList(clazz.getInterfaces()));
+        Set<Class> superInterfaces = new HashSet<Class>();
+        while(!toProcess.isEmpty())
+        {
+            clazz = toProcess.remove();
+            superInterfaces.add(clazz);
+            toProcess.addAll(Arrays.asList(clazz.getInterfaces()));
+        }
+
+        return superInterfaces;
+    }
+
+    public static Set<Class> getSupertypes(Class clazz, Class stopClazz, boolean strict)
+    {
+        List<Class> superClasses = getSuperclasses(clazz, stopClazz, false);
+        Set<Class> superTypes = new HashSet<Class>();
+        for(Class superClazz: superClasses)
+        {
+            if(superClazz != clazz || !strict)
+            {
+                superTypes.add(superClazz);
+            }
+
+            superTypes.addAll(getInterfacesTransitive(superClazz));
+        }
+
+        return superTypes;
+    }
+
+    public static Set<Class> getImplementedInterfaces(Class clazz, Class stopClazz, boolean strict)
+    {
+        return CollectionUtils.filter(getSupertypes(clazz, stopClazz, strict), new Predicate<Class>()
+        {
+            public boolean satisfied(Class aClass)
+            {
+                return Modifier.isInterface(aClass.getModifiers());
+            }
+        }, new HashSet<Class>());
+    }
+
     public static List<Field> getDeclaredFields(Class clazz, Class stopClazz)
     {
         if(stopClazz == null)

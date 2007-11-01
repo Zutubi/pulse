@@ -2,22 +2,28 @@ package com.zutubi.pulse.events.build;
 
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.core.model.Result;
 
 /**
  */
 public class BuildEvent extends Event<Object>
 {
-    private BuildResult result;
+    private BuildResult buildResult;
 
-    public BuildEvent(Object source, BuildResult result)
+    public BuildEvent(Object source, BuildResult buildResult)
     {
         super(source);
-        this.result = result;
+        this.buildResult = buildResult;
     }
 
-    public BuildResult getResult()
+    public BuildResult getBuildResult()
     {
-        return result;
+        return buildResult;
+    }
+
+    public Result getResult()
+    {
+        return buildResult;
     }
 
     public String toString()

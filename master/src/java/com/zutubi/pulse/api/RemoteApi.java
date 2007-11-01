@@ -909,7 +909,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
 //                {
 //                    public void process(RecipeResultNode recipeResultNode)
 //                    {
-//                        RecipeResult recipeResult = recipeResultNode.getResult();
+//                        RecipeResult recipeResult = recipeResultNode.getBuildResult();
 //                        if(recipeResult != null)
 //                        {
 //                            String stage = recipeResultNode.getStage();

@@ -52,7 +52,7 @@ public class ConventionSupport
             return null;
         }
         
-        while (clazz != Object.class)
+        while (clazz != null && clazz != Object.class)
         {
             try
             {

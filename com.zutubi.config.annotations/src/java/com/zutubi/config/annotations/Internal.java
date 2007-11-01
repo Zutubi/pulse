@@ -9,7 +9,7 @@ import java.lang.annotation.RetentionPolicy;
  * Used to mark properties that should not appear in external interfaces.
  * These properties are manipulated in code only.
  */
-@Target({ElementType.METHOD, ElementType.FIELD})
+@Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Internal
 {

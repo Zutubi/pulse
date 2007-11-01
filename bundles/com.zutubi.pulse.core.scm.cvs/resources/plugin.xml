@@ -2,7 +2,7 @@
 <?eclipse version="3.2"?>
 <plugin>
     <extension point="com.zutubi.pulse.core.config">
-        <config class="com.zutubi.pulse.core.scm.cvs.config.CvsConfiguration" extends="zutubi.scmConfig"/>
+        <config class="com.zutubi.pulse.core.scm.cvs.config.CvsConfiguration"/>
     </extension>
     <extension point="com.zutubi.pulse.core.scms">
         <scm name="cvs" factory-class="com.zutubi.pulse.core.scm.cvs.CvsClientFactory" working-copy-class="com.zutubi.pulse.core.scm.cvs.CvsWorkingCopy"/>

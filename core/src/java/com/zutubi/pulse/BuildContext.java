@@ -1,6 +1,7 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.repository.FileRepository;
+import com.zutubi.pulse.core.Scope;
 
 import java.text.SimpleDateFormat;
 import java.util.HashMap;

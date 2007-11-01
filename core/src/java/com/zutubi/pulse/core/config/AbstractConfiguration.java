@@ -14,6 +14,7 @@ public abstract class AbstractConfiguration implements Configuration
 {
     private long handle;
     private String configurationPath;
+    private boolean concrete;
     private boolean permanent;
     private List<String> instanceErrors = new LinkedList<String>();
     private Map<String, List<String>> fieldErrors = new HashMap<String, List<String>>();
@@ -36,6 +37,16 @@ public abstract class AbstractConfiguration implements Configuration
     public void setConfigurationPath(String configurationPath)
     {
         this.configurationPath = configurationPath;
+    }
+
+    public boolean isConcrete()
+    {
+        return concrete;
+    }
+
+    public void setConcrete(boolean concrete)
+    {
+        this.concrete = concrete;
     }
 
     public boolean isPermanent()

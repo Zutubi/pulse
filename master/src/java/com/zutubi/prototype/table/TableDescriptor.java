@@ -69,7 +69,8 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
 
         for (ColumnDescriptor column : columns)
         {
-            table.addHeader(messages.format(column.getName() + ".label"));
+            String key = column.getName() + ".label";
+            table.addHeader(format(messages, key));
         }
 
         if (data != null)
@@ -78,6 +79,7 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
             {
                 String itemPath = PathUtils.getPath(path, key);
                 Configuration instance = configurationTemplateManager.getInstance(itemPath);
+                messages = Messages.getInstance(instance.getClass());
                 Row row = new Row(itemPath, false, getActions(instance, messages));
                 addCells(row, instance);
                 applyRowDecorations(data, key, row, messages);
@@ -103,7 +105,8 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
                     {
                         String parentItemPath = PathUtils.getPath(parentPath, hidden);
                         Configuration instance = configurationTemplateManager.getInstance(parentItemPath);
-                        Row row = new Row(PathUtils.getPath(path, hidden), true, Arrays.asList(new RowAction("restore", messages.format("restore.label"))));
+                        messages = Messages.getInstance(instance.getClass());
+                        Row row = new Row(PathUtils.getPath(path, hidden), true, Arrays.asList(new RowAction("restore", format(messages, "restore.label"))));
                         addCells(row, instance);
                         row.addParameter("hiddenFrom", templateParent.getOwner(hidden));
                         row.addParameter("cls", "item-hidden");
@@ -111,13 +114,6 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
                     }
                 }
             }
-        }
-
-        if (table.getRows().size() == 0)
-        {
-            Row nothingRow = new Row();
-            nothingRow.addCell(new Cell(width, messages.format("no.data.available")));
-            table.addRow(nothingRow);
         }
 
         return table;
@@ -187,7 +183,7 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
         RowAction deleteAction = row.getAction(AccessManager.ACTION_DELETE);
         if (deleteAction != null)
         {
-            deleteAction.setLabel(messages.format(action + ".label"));
+            deleteAction.setLabel(format(messages, action + ".label"));
         }
     }
 
@@ -200,7 +196,7 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
             {
                 public RowAction map(String actionName)
                 {
-                    return new RowAction(actionName, messages.format(actionName + ".label"));
+                    return new RowAction(actionName, format(messages, actionName + ".label"));
                 }
             });
         }
@@ -214,5 +210,15 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
     public void addColumn(ColumnDescriptor descriptor)
     {
         columns.add(descriptor);
+    }
+
+    private String format(Messages messages, String key)
+    {
+        String value = messages.format(key);
+        if(value == null)
+        {
+            value = key;
+        }
+        return value;
     }
 }

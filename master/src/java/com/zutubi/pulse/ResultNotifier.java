@@ -62,7 +62,7 @@ public class ResultNotifier implements EventListener
     public void handleEvent(Event evt)
     {
         BuildCompletedEvent event = (BuildCompletedEvent) evt;
-        BuildResult buildResult = event.getResult();
+        BuildResult buildResult = event.getBuildResult();
 
         buildResult.loadFailedTestResults(configurationManager.getDataDirectory(), getFailureLimit());
 

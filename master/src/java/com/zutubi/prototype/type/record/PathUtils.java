@@ -121,6 +121,22 @@ public class PathUtils
         return getPath(newElements);
     }
 
+    public static String getPath(int beginIndex, int endIndex, String... pathElements)
+    {
+        if(endIndex >= pathElements.length)
+        {
+            return getPath(beginIndex, pathElements);
+        }
+        else if(beginIndex >= endIndex)
+        {
+            return "";
+        }
+
+        String [] newElements = new String[endIndex - beginIndex];
+        System.arraycopy(pathElements, beginIndex, newElements, 0, newElements.length);
+        return getPath(newElements);
+    }
+
     public static boolean pathMatches(String pattern, String path)
     {
         String[] patternParts = getPathElements(pattern);
@@ -205,5 +221,10 @@ public class PathUtils
     public static boolean elementMatches(String pattern, String element)
     {
         return pattern.equals(WILDCARD_ANY_ELEMENT) || pattern.equals(element);
+    }
+
+    public static String getPrefix(String path, int elements)
+    {
+        return getPath(0, elements, getPathElements(path));
     }
 }

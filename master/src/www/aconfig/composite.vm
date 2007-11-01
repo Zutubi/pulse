@@ -50,7 +50,7 @@
 </p>
 <table>
     <tr>
-#if($config.record || $config.extensions.size() == 0)
+#if($config.record || !$config.type.extendable)
         <td id="left-column">
             #if ($config.displayFields.size() > 0)
                 #renderstate()
@@ -90,28 +90,32 @@
 #else
     ## We don't know what type we are dealing with, it needs to be configured
     ## by a wizard.
-    #if($config.writable)
-        #if($config.configuredDescendents.size() == 0)
+    #if($config.extensions.size() > 0)
+        #if($config.writable)
+            #if($config.configuredDescendents.size() == 0)
     <table class="template-actions" cellspacing="5px">
         <tr>
             <th><a href="#" class="unadorned" onclick="addToPath('${config.path}'); return false"><img alt="configure" src="$base/images/pencil.gif"/></a> <a href="#" id="configure" onclick="addToPath('${config.path}'); return false">configure</a></th>
             <td>configure a #i18n("key=label") using the wizard</td>
         </tr>
     </table>
-        #else
+            #else
     <p>
         This path has been configured in the following descedents (and thus cannot be configured at this level):
         <ul>
-            #foreach($descendent in $config.configuredDescendents)
+                #foreach($descendent in $config.configuredDescendents)
             <li id='#id("cd-$descendent")'>#html($descendent)</li>
-            #end
+                #end
         </ul>
-        #end
+            #end
     </p>
-    #else
+        #else
     <p>
         No #i18n("key=label") configured.
     </p>
+        #end
+    #else
+        No extensions registered.
     #end
 #end
     </tr>

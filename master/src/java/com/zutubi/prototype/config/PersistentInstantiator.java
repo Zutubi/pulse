@@ -55,6 +55,7 @@ public class PersistentInstantiator implements Instantiator
                     Configuration configuration = (Configuration) instance;
                     configuration.setConfigurationPath(propertyPath);
                     configuration.setHandle(((Record) data).getHandle());
+                    configuration.setConcrete(concrete);
                     configuration.setPermanent(((Record) data).isPermanent());
 
                     if(concrete)

@@ -19,6 +19,10 @@ public interface Configuration
     void setConfigurationPath(String configurationPath);
 
     @Transient
+    boolean isConcrete();
+    void setConcrete(boolean concrete);
+
+    @Transient
     boolean isPermanent();
     void setPermanent(boolean permanent);
 

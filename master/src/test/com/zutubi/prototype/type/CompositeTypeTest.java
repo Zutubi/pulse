@@ -28,7 +28,6 @@ public class CompositeTypeTest extends TypeTestCase
         typeA = typeRegistry.register(ObjectTypeA.class);
         typeB = typeRegistry.getType(ObjectTypeB.class);
         typeBExtension = typeRegistry.register(ObjectTypeBExtension.class);
-        typeB.addExtension("typeBExtension");
     }
 
     protected void tearDown() throws Exception

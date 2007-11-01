@@ -22,6 +22,7 @@ import com.zutubi.pulse.prototype.config.group.ServerPermission;
 import com.zutubi.pulse.prototype.config.misc.LoginConfiguration;
 import com.zutubi.pulse.prototype.config.misc.TransientConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.project.hooks.*;
 import com.zutubi.pulse.prototype.config.project.changeviewer.*;
 import com.zutubi.pulse.prototype.config.project.commit.CommitMessageConfiguration;
 import com.zutubi.pulse.prototype.config.project.commit.CustomCommitMessageConfiguration;
@@ -112,16 +113,6 @@ public class ConfigurationRegistry
             registerConfigurationType(VersionedTypeConfiguration.class);
             registerConfigurationType(XCodeTypeConfiguration.class);
 
-            typeConfig.addExtension("zutubi.antTypeConfig");
-            typeConfig.addExtension("zutubi.bjamTypeConfig");
-            typeConfig.addExtension("zutubi.customTypeConfig");
-            typeConfig.addExtension("zutubi.executableTypeConfig");
-            typeConfig.addExtension("zutubi.mavenTypeConfig");
-            typeConfig.addExtension("zutubi.maven2TypeConfig");
-            typeConfig.addExtension("zutubi.makeTypeConfig");
-            typeConfig.addExtension("zutubi.versionedTypeConfig");
-            typeConfig.addExtension("zutubi.xcodeTypeConfig");
-
             // change viewer configuration
             CompositeType changeViewerConfig = registerConfigurationType(ChangeViewerConfiguration.class);
             registerConfigurationType(FisheyeConfiguration.class);
@@ -129,12 +120,6 @@ public class ConfigurationRegistry
             registerConfigurationType(P4WebChangeViewer.class);
             registerConfigurationType(TracChangeViewer.class);
             registerConfigurationType(ViewVCChangeViewer.class);
-
-            changeViewerConfig.addExtension("zutubi.fisheyeChangeViewerConfig");
-            changeViewerConfig.addExtension("zutubi.customChangeViewerConfig");
-            changeViewerConfig.addExtension("zutubi.p4WebChangeViewerConfig");
-            changeViewerConfig.addExtension("zutubi.tracChangeViewerConfig");
-            changeViewerConfig.addExtension("zutubi.viewVCChangeViewerConfig");
 
             // generated dynamically as new components are registered.
             CompositeType projectConfig = registerConfigurationType(ProjectConfiguration.class);
@@ -148,10 +133,6 @@ public class ConfigurationRegistry
             registerConfigurationType(CronBuildTriggerConfiguration.class);
             registerConfigurationType(ScmBuildTriggerConfiguration.class);
 
-            triggerConfig.addExtension("zutubi.buildCompletedConfig");
-            triggerConfig.addExtension("zutubi.cronTriggerConfig");
-            triggerConfig.addExtension("zutubi.scmTriggerConfig");
-
             MapType triggers = new MapType(triggerConfig, typeRegistry);
             projectConfig.addProperty(new ExtensionTypeProperty("triggers", triggers));
 
@@ -160,26 +141,28 @@ public class ConfigurationRegistry
             registerConfigurationType(FileArtifactConfiguration.class);
             registerConfigurationType(DirectoryArtifactConfiguration.class);
 
-            artifactConfig.addExtension("zutubi.fileArtifactConfig");
-            artifactConfig.addExtension("zutubi.directoryArtifactConfig");
-
             // commit message processors.
             CompositeType commitConfig = registerConfigurationType(CommitMessageConfiguration.class);
             registerConfigurationType(JiraCommitMessageConfiguration.class);
             registerConfigurationType(CustomCommitMessageConfiguration.class);
 
-            commitConfig.addExtension("zutubi.jiraCommitMessageConfig");
-            commitConfig.addExtension("zutubi.customCommitMessageConfig");
-
             MapType commitTransformers = new MapType(commitConfig, typeRegistry);
             commitTransformers.setOrdered(true);
             projectConfig.addProperty(new ExtensionTypeProperty("commit", commitTransformers));
 
+            // hooks
+            registerConfigurationType(ManualBuildHookConfiguration.class);
+            registerConfigurationType(AutoBuildHookConfiguration.class);
+            registerConfigurationType(PreBuildHookConfiguration.class);
+            registerConfigurationType(PostBuildHookConfiguration.class);
+            registerConfigurationType(PostStageHookConfiguration.class);
+            registerConfigurationType(RunExecutableTaskConfiguration.class);
+            
             // define the root level scope.
             TemplatedMapType projectCollection = new TemplatedMapType(projectConfig, typeRegistry);
             configurationPersistenceManager.register(PROJECTS_SCOPE, projectCollection);
 
-            // register project configuration.  This will eventually be handled as an extension point
+            // register cleanup configuration.  This will eventually be handled as an extension point
             registerProjectMapExtension("cleanup", CleanupConfiguration.class);
 
             TemplatedMapType agentCollection = new TemplatedMapType(registerConfigurationType(AgentConfiguration.class), typeRegistry);
@@ -198,16 +181,10 @@ public class ConfigurationRegistry
             registerConfigurationType(EmailContactConfiguration.class);
             registerConfigurationType(JabberContactConfiguration.class);
 
-            // sort out the extensions.
-            contactConfig.addExtension("zutubi.emailContactConfig");
-            contactConfig.addExtension("zutubi.jabberContactConfig");
-
             // user subscriptions
             CompositeType userSubscriptionConfig = typeRegistry.getType(SubscriptionConfiguration.class);
             registerConfigurationType(ProjectSubscriptionConfiguration.class);
             registerConfigurationType(PersonalSubscriptionConfiguration.class);
-            userSubscriptionConfig.addExtension("zutubi.projectSubscriptionConfig");
-            userSubscriptionConfig.addExtension("zutubi.personalSubscriptionConfig");
 
             // user subscription conditions
             CompositeType userSubscriptionConditionConfig = typeRegistry.getType(SubscriptionConditionConfiguration.class);
@@ -216,19 +193,11 @@ public class ConfigurationRegistry
             registerConfigurationType(CustomConditionConfiguration.class);
             registerConfigurationType(RepeatedUnsuccessfulConditionConfiguration.class);
 
-            userSubscriptionConditionConfig.addExtension("zutubi.allBuildsConditionConfig");
-            userSubscriptionConditionConfig.addExtension("zutubi.selectedBuildsConditionConfig");
-            userSubscriptionConditionConfig.addExtension("zutubi.customConditionConfig");
-            userSubscriptionConditionConfig.addExtension("zutubi.repeatedUnsuccessfulConditionConfig");
-
             // group configuration .
 
             CompositeType groupConfig = registerConfigurationType(AbstractGroupConfiguration.class);
             registerConfigurationType(GroupConfiguration.class);
             registerConfigurationType(BuiltinGroupConfiguration.class);
-
-            groupConfig.addExtension("zutubi.groupConfig");
-            groupConfig.addInternalExtension("zutubi.builtinGroupConfig");
 
             MapType groupCollection = new MapType(groupConfig, typeRegistry);
             configurationPersistenceManager.register(GROUPS_SCOPE, groupCollection);
@@ -238,13 +207,6 @@ public class ConfigurationRegistry
         {
             LOG.severe(e);
         }
-    }
-
-    public void registerExtension(Class extendedType, Class extensionType) throws TypeException
-    {
-        CompositeType extension = registerConfigurationType(extensionType);
-        CompositeType type = typeRegistry.getType(extendedType);
-        type.addExtension(extension.getSymbolicName());
     }
 
     public void registerTransientConfiguration(String propertyName, Class clazz) throws TypeException
@@ -268,7 +230,8 @@ public class ConfigurationRegistry
 
     public <T extends Configuration> CompositeType registerConfigurationType(final Class<T> clazz) throws TypeException
     {
-        // Type callback that looks for ConfigurationCheck annotations
+        // Type callback that looks for associated types (check annotations,
+        // creators, actions etc).
         TypeHandler handler = new TypeHandler()
         {
             public void handle(CompositeType type) throws TypeException

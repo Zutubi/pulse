@@ -145,16 +145,13 @@ public class ConfigurationUIModel
         if (!(type instanceof CollectionType))
         {
             // determine the actions.
-            if (configurationTemplateManager.isConcrete(parentPath, record))
-            {
-                actions = actionManager.getActions(instance, false);
-            }
+            actions = actionManager.getActions(instance, false);
 
             Class displayHandler = ConventionSupport.getDisplay(type);
             if (displayHandler != null)
             {
                 // do not show display fields for template records.
-                if (configurationTemplateManager.isConcrete(parentPath, record))
+                if (instance != null && instance.isConcrete())
                 {
                     Display displaySupport = new Display();
                     displaySupport.setObjectFactory(objectFactory);

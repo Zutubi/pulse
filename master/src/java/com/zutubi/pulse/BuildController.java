@@ -1,6 +1,5 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.BuildException;
@@ -19,7 +18,6 @@ import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.prototype.config.project.BuildOptionsConfiguration;
 import com.zutubi.pulse.prototype.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
-import com.zutubi.pulse.prototype.config.project.actions.PostBuildActionConfiguration;
 import com.zutubi.pulse.scheduling.quartz.TimeoutRecipeJob;
 import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.util.FileSystemUtils;
@@ -106,6 +104,8 @@ public class BuildController implements EventListener
         buildResult.queue();
         buildManager.save(buildResult);
 
+        eventManager.publish(new PreBuildEvent(this, buildResult));
+        
         // We handle this event ourselves: this ensures that all processing of
         // the build from this point forth is handled by the single thread in
         // our async listener.  Basically, given events could be coming from
@@ -162,7 +162,7 @@ public class BuildController implements EventListener
             RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(project, stage.getAgentRequirements(), request.getRevision(), recipeRequest, buildResult);
             DefaultRecipeLogger logger = new DefaultRecipeLogger(new File(paths.getRecipeDir(buildResult, recipeResult.getId()), RecipeResult.RECIPE_LOG));
             RecipeResultNode previousRecipe = previousSuccessful == null ? null : previousSuccessful.findResultNodeByHandle(stage.getHandle());
-            RecipeController rc = new RecipeController(buildResult, childResultNode, dispatchRequest, request.isPersonal(), incremental, previousRecipe, logger, collector);
+            RecipeController rc = new RecipeController(buildResult, childResultNode, dispatchRequest, incremental, previousRecipe, logger, collector);
             rc.setRecipeQueue(queue);
             rc.setBuildManager(buildManager);
             rc.setServiceTokenManager(serviceTokenManager);
@@ -191,7 +191,7 @@ public class BuildController implements EventListener
             if (evt instanceof BuildCommencedEvent)
             {
                 BuildCommencedEvent e = (BuildCommencedEvent) evt;
-                if (e.getResult() == buildResult)
+                if (e.getBuildResult() == buildResult)
                 {
                     handleBuildCommenced();
                 }
@@ -229,7 +229,7 @@ public class BuildController implements EventListener
 
     private void handleBuildCommenced()
     {
-// It is important that this directory is created *after* the build
+        // It is important that this directory is created *after* the build
         // result is commenced and saved to the database, so that the
         // database knows of the possibility of some other persistent
         // artifacts, even if an error occurs very early in the build.
@@ -639,14 +639,11 @@ public class BuildController implements EventListener
             buildResult.setHasWorkDir(projectConfig.getOptions().getRetainWorkingCopy());
             buildResult.complete();
 
-            if (!request.isPersonal())
-            {
-                for (PostBuildActionConfiguration action : projectConfig.getPostBuildActions())
-                {
-                    ComponentContext.autowire(action);
-                    action.execute();
-                }
-            }
+            // The timing of this event is important: handlers of this event
+            // are allowed to add information to and modify the state of the
+            // build result.  Hence it is crucial that indexing and a final
+            // save are done afterwards.
+            eventManager.publish(new PostBuildEvent(this, buildResult));
 
             // calculate the feature counts at the end of the build so that the result hierarchy does not need to
             // be traversed when this information is required.

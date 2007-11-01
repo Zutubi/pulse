@@ -11,6 +11,7 @@ import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.events.build.*;
+import com.zutubi.pulse.events.DefaultEventManager;
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
@@ -62,9 +63,10 @@ public class RecipeControllerTest extends PulseTestCase
         RecipeRequest recipeRequest = new RecipeRequest("project", rootResult.getId(), rootResult.getRecipeName());
         BuildResult build = new BuildResult();
         dispatchRequest = new RecipeDispatchRequest(new Project(), new AnyCapableAgentRequirements(), new BuildRevision(), recipeRequest, null);
-        recipeController = new RecipeController(build, rootNode, dispatchRequest, false, false, null, logger, resultCollector);
+        recipeController = new RecipeController(build, rootNode, dispatchRequest, false, null, logger, resultCollector);
         recipeController.setRecipeQueue(recipeQueue);
         recipeController.setBuildManager(buildManager);
+        recipeController.setEventManager(new DefaultEventManager());
     }
 
     protected void tearDown() throws Exception

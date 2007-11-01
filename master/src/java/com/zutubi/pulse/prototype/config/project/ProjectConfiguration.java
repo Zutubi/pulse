@@ -8,15 +8,13 @@ import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.model.ResourceRequirement;
 import com.zutubi.pulse.prototype.config.LabelConfiguration;
-import com.zutubi.pulse.prototype.config.project.actions.PostBuildActionConfiguration;
 import com.zutubi.pulse.prototype.config.project.changeviewer.ChangeViewerConfiguration;
+import com.zutubi.pulse.prototype.config.project.hooks.AutoBuildHookConfiguration;
+import com.zutubi.pulse.prototype.config.project.hooks.BuildHookConfiguration;
 import com.zutubi.pulse.prototype.config.project.types.TypeConfiguration;
 import com.zutubi.validation.annotations.Url;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  *
@@ -58,9 +56,8 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
     @Transient
     private Map<String, Object> extensions = new HashMap<String, Object>();
 
-    @Transient
     @Ordered
-    private List<PostBuildActionConfiguration> postBuildActions = new LinkedList<PostBuildActionConfiguration>();
+    private Map<String, BuildHookConfiguration> buildHooks = new LinkedHashMap<String, BuildHookConfiguration>();
 
     private ChangeViewerConfiguration changeViewer;
 
@@ -190,14 +187,14 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
         this.type = type;
     }
 
-    public List<PostBuildActionConfiguration> getPostBuildActions()
+    public Map<String, BuildHookConfiguration> getBuildHooks()
     {
-        return postBuildActions;
+        return buildHooks;
     }
 
-    public void setPostBuildActions(List<PostBuildActionConfiguration> postBuildActions)
+    public void setBuildHooks(Map<String, BuildHookConfiguration> buildHooks)
     {
-        this.postBuildActions = postBuildActions;
+        this.buildHooks = buildHooks;
     }
 
     public ChangeViewerConfiguration getChangeViewer()

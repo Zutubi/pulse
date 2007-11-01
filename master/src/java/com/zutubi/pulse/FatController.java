@@ -282,7 +282,7 @@ public class FatController implements EventListener, Stoppable
         lock.lock();
         try
         {
-            BuildResult result = event.getResult();
+            BuildResult result = event.getBuildResult();
             BuildController controller = (BuildController) event.getSource();
             runningBuilds.remove(controller);
 
