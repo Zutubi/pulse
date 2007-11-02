@@ -166,6 +166,7 @@ public class BuildController implements EventListener
             rc.setRecipeQueue(queue);
             rc.setBuildManager(buildManager);
             rc.setServiceTokenManager(serviceTokenManager);
+            rc.setEventManager(eventManager);
 
             TreeNode<RecipeController> child = new TreeNode<RecipeController>(rc);
             rcNode.add(child);

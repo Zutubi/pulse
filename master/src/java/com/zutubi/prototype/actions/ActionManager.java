@@ -30,7 +30,7 @@ public class ActionManager
     {
         List<String> result = new LinkedList<String>();
 
-        if (configurationInstance != null && configurationInstance.isConcrete())
+        if (configurationInstance != null)
         {
             String path = configurationInstance.getConfigurationPath();
             if (includeDefault)
@@ -46,23 +46,25 @@ public class ActionManager
                 }
             }
 
-            CompositeType type = getType(configurationInstance);
-            ConfigurationActions configurationActions = getConfigurationActions(type);
-            try
+            if (configurationInstance.isConcrete())
             {
-                List<ConfigurationAction> actions = configurationActions.getActions(configurationInstance);
-                for (ConfigurationAction action : actions)
+                CompositeType type = getType(configurationInstance);
+                ConfigurationActions configurationActions = getConfigurationActions(type);
+                try
                 {
-                    if (configurationSecurityManager.hasPermission(path, action.getPermissionName()))
+                    List<ConfigurationAction> actions = configurationActions.getActions(configurationInstance);
+                    for (ConfigurationAction action : actions)
                     {
-                        result.add(action.getName());
+                        if (configurationSecurityManager.hasPermission(path, action.getPermissionName()))
+                        {
+                            result.add(action.getName());
+                        }
                     }
                 }
-            }
-            catch (Exception e)
-            {
-                LOG.severe(e);
-                return Collections.EMPTY_LIST;
+                catch (Exception e)
+                {
+                    LOG.severe(e);
+                }
             }
         }
 
