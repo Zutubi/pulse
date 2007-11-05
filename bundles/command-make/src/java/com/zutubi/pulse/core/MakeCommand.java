@@ -9,30 +9,14 @@ public class MakeCommand extends ExecutableCommand
     private String makefile;
     private String targets;
 
-    private void checkExe()
+    public MakeCommand()
     {
-        if (getExe() == null)
-        {
-            Scope scope = getScope();
-            if (scope != null)
-            {
-                Reference ref = scope.getReference("make.bin");
-                if (ref != null && ref.getValue() instanceof String)
-                {
-                    setExe((String) ref.getValue());
-                }
-            }
-
-            if (getExe() == null)
-            {
-                setExe("make");
-            }
-        }
+        super("make");
     }
 
-    public void execute(CommandContext context, CommandResult cmdResult)
+    public void execute(ExecutionContext context, CommandResult cmdResult)
     {
-        checkExe();
+        setExeFromProperty(context, "make.bin");
 
         if (makefile != null)
         {
@@ -68,11 +52,4 @@ public class MakeCommand extends ExecutableCommand
     {
         this.targets = targets;
     }
-
-    public void setScope(Scope scope)
-    {
-        super.setScope(scope);
-        checkExe();
-    }
-
 }

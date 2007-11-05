@@ -10,30 +10,14 @@ public class BJamCommand extends ExecutableCommand
     private String jamfile;
     private String targets;
 
-    private void checkExe()
+    public BJamCommand()
     {
-        if (getExe() == null)
-        {
-            Scope scope = getScope();
-            if (scope != null)
-            {
-                Reference ref = scope.getReference("bjam.bin");
-                if (ref != null && ref.getValue() instanceof String)
-                {
-                    setExe((String) ref.getValue());
-                }
-            }
-
-            if (getExe() == null)
-            {
-                setExe("bjam");
-            }
-        }
+        super("bjam");
     }
 
-    public void execute(CommandContext context, CommandResult cmdResult)
+    public void execute(ExecutionContext context, CommandResult cmdResult)
     {
-        checkExe();
+        setExeFromProperty(context, "bjam.bin");
 
         if (jamfile != null)
         {
@@ -76,11 +60,4 @@ public class BJamCommand extends ExecutableCommand
     {
         this.targets = targets;
     }
-
-    public void setScope(Scope scope)
-    {
-        super.setScope(scope);
-        checkExe();
-    }
-
 }

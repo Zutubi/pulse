@@ -11,13 +11,11 @@ import java.util.List;
  * 
  *
  */
-public class PostProcessorGroup implements PostProcessor
+public class PostProcessorGroup extends SelfReference implements PostProcessor
 {
-    private String name;
-
     private List<PostProcessor> processors = new LinkedList<PostProcessor>();
 
-    public void process(StoredFileArtifact artifact, CommandResult result, CommandContext context)
+    public void process(StoredFileArtifact artifact, CommandResult result, ExecutionContext context)
     {
         for (PostProcessor processor : processors)
         {
@@ -28,21 +26,6 @@ public class PostProcessorGroup implements PostProcessor
     public void add(PostProcessor processor)
     {
         processors.add(processor);
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public Object getValue()
-    {
-        return this;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
     }
 
     public int size()

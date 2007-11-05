@@ -1,13 +1,9 @@
-package com.zutubi.pulse.core.model;
-
-import com.zutubi.pulse.core.Reference;
-
+package com.zutubi.pulse.core;
 
 /**
- * 
- *
+ * A simple string-valued reference.
  */
-public class Property extends Entity implements Reference
+public class Property implements Reference
 {
     private String name;
     private String value;

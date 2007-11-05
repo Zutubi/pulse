@@ -3,7 +3,7 @@ package com.zutubi.pulse;
 import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.BootstrapperSupport;
 import com.zutubi.pulse.core.BuildException;
-import com.zutubi.pulse.core.CommandContext;
+import com.zutubi.pulse.core.ExecutionContext;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -21,7 +21,7 @@ public class ChainBootstrapper extends BootstrapperSupport
         this.bootstrappers.addAll(Arrays.asList(bootstrappers));
     }
 
-    public void bootstrap(CommandContext context) throws BuildException
+    public void bootstrap(ExecutionContext context) throws BuildException
     {
         for (Bootstrapper bootstrapper : bootstrappers)
         {

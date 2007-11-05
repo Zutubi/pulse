@@ -1,10 +1,6 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.core.Bootstrapper;
-import com.zutubi.pulse.core.BuildException;
-import com.zutubi.pulse.core.BuildRevision;
-import com.zutubi.pulse.core.CommandContext;
-import com.zutubi.pulse.core.RecipePaths;
+import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.util.FileSystemUtils;
 
@@ -32,17 +28,16 @@ public class ProjectRepoBootstrapper implements Bootstrapper
         this.revision = revision;
     }
 
-    public void bootstrap(final CommandContext context) throws BuildException
+    public void bootstrap(final ExecutionContext context) throws BuildException
     {
-        final RecipePaths paths = context.getPaths();
+        final RecipePaths paths = context.getValue(BuildProperties.PROPERTY_RECIPE_PATHS, RecipePaths.class);
         if (paths.getPersistentWorkDir() == null)
         {
             throw new BuildException("Attempt to use update bootstrapping when no persistent working directory is available.");
         }
 
         // run the scm bootstrapper on the local directory,
-        BuildContext buildContext = context.getBuildContext();
-        boolean cleanBuild = buildContext != null && buildContext.isCleanBuild();
+        boolean cleanBuild = context.getBoolean(BuildProperties.PROPERTY_CLEAN_BUILD, false);
         childBootstrapper = selectBootstrapper(cleanBuild, paths.getPersistentWorkDir());
         childBootstrapper.prepare(agent);
 
@@ -64,14 +59,17 @@ public class ProjectRepoBootstrapper implements Bootstrapper
             }
         };
 
-        context.setRecipePaths(mungedPaths);
+        context.pushScope();
         try
         {
+            context.addValue(BuildProperties.PROPERTY_RECIPE_PATHS, mungedPaths);
+            context.setWorkingDir(mungedPaths.getBaseDir());
             childBootstrapper.bootstrap(context);
         }
         finally
         {
-            context.setRecipePaths(paths);
+            context.setWorkingDir(paths.getBaseDir());
+            context.popScope();
         }
 
         // If the checkout and base differ, then we need to copy over to the base.

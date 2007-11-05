@@ -1,12 +1,9 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.core.Bootstrapper;
-import com.zutubi.pulse.core.BuildException;
-import com.zutubi.pulse.core.CommandContext;
-import com.zutubi.pulse.core.PulseException;
+import com.zutubi.pulse.core.*;
+import com.zutubi.pulse.core.scm.FileStatus;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.repository.FileRepository;
-import com.zutubi.pulse.core.scm.FileStatus;
 
 import java.io.File;
 
@@ -33,14 +30,13 @@ public class PatchBootstrapper implements Bootstrapper
         this.localEOL = localEOL;
     }
 
-    public void bootstrap(CommandContext context) throws BuildException
+    public void bootstrap(ExecutionContext context) throws BuildException
     {
         delegate.bootstrap(context);
         try
         {
             // apply a patch prefix to the if one is specified. Used to work around a cvs issue.
-            
-            FileRepository fileRepository = context.getBuildContext().getFileRepository();
+            FileRepository fileRepository = context.getValue(BuildProperties.PROPERTY_FILE_REPOSITORY, FileRepository.class);
             PatchArchive patch = new PatchArchive(fileRepository.getPatchFile(userId, number));
             patch.apply(getBaseBuildDir(context), localEOL);
         }
@@ -60,14 +56,14 @@ public class PatchBootstrapper implements Bootstrapper
         delegate.terminate();
     }
 
-    private File getBaseBuildDir(CommandContext context)
+    private File getBaseBuildDir(ExecutionContext context)
     {
         // check if we need to apply a patch prefix for this bootstrap. 
 
         String defaultPrefix = System.getProperty(DEFAULT_PATCH_BOOSTRAP_PREFIX);
 
         String projectPrefix = null;
-        String projectName = context.getBuildContext().getProjectName();
+        String projectName = context.getString(BuildProperties.PROPERTY_PROJECT);
         if (projectName != null)
         {
             projectPrefix = System.getProperty(PATCH_BOOSTRAP_PREFIX + "." + projectName);
@@ -85,8 +81,8 @@ public class PatchBootstrapper implements Bootstrapper
 
         if (prefix != null)
         {
-            return new File(context.getPaths().getBaseDir(), prefix);
+            return new File(context.getWorkingDir(), prefix);
         }
-        return context.getPaths().getBaseDir();
+        return context.getWorkingDir();
     }
 }

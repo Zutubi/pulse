@@ -23,7 +23,7 @@ public abstract class CommandSupport implements Command
         this.name = name;
     }
 
-    public void execute(CommandContext context, CommandResult result)
+    public void execute(ExecutionContext context, CommandResult result)
     {
     }
 

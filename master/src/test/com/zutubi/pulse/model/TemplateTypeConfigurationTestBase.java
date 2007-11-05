@@ -1,13 +1,10 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.core.*;
-import com.zutubi.pulse.core.model.Property;
+import com.zutubi.pulse.prototype.config.project.types.FileArtifactConfiguration;
+import com.zutubi.pulse.prototype.config.project.types.TemplateTypeConfiguration;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.prototype.config.project.types.TemplateTypeConfiguration;
-import com.zutubi.pulse.prototype.config.project.types.FileArtifactConfiguration;
 import com.zutubi.util.IOUtils;
-import com.zutubi.util.bean.DefaultObjectFactory;
 import org.apache.velocity.app.VelocityEngine;
 
 import java.io.File;

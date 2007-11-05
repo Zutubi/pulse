@@ -4,14 +4,15 @@ import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.Status;
 import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.BuildRevision;
+import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.events.DefaultEventManager;
+import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
@@ -489,7 +490,7 @@ public class RecipeControllerTest extends PulseTestCase
             throw new RuntimeException("Method not implemented.");
         }
 
-        public boolean build(RecipeRequest request, BuildContext context)
+        public boolean build(RecipeRequest request, ExecutionContext context)
         {
             throw new RuntimeException("Method not implemented.");
         }

@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.BuildContext;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.util.FileSystemUtils;
@@ -30,9 +29,9 @@ public class Maven2CommandTest extends ExecutableCommandTestBase
 
         Maven2Command command = new Maven2Command();
         command.setGoals("compile");
-        BuildContext buildContext = new BuildContext();
-        runCommand(command, buildContext);
-        assertEquals("1.0-SNAPSHOT", buildContext.getBuildVersion());
+        ExecutionContext context = new ExecutionContext();
+        runCommand(command, context);
+        assertEquals("1.0-SNAPSHOT", context.getVersion());
     }
 
     public void testNoTarget() throws Exception

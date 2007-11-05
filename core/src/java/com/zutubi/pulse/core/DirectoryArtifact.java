@@ -68,15 +68,15 @@ public class DirectoryArtifact extends LocalArtifact
         return result;
     }
 
-    public void capture(CommandResult result, CommandContext context)
+    public void capture(CommandResult result, ExecutionContext context)
     {
         if (base == null)
         {
-            base = context.getPaths().getBaseDir();
+            base = context.getWorkingDir();
         }
         else if (!base.isAbsolute())
         {
-            base = new File(context.getPaths().getBaseDir(), base.getPath());
+            base = new File(context.getWorkingDir(), base.getPath());
         }
 
         if (!base.exists())

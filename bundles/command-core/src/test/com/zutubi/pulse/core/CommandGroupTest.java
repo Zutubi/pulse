@@ -82,7 +82,7 @@ public class CommandGroupTest extends CommandTestBase
         artifact.setName("test-dri-artifact");
         artifact.setBase(new File("pffft"));
 
-        CommandResult result = testFailureWithMessage(group, "does not exist");
+        testFailureWithMessage(group, "does not exist");
     }
 
     public void testCaptureDirNonExistantNoFail() throws Exception
@@ -93,7 +93,7 @@ public class CommandGroupTest extends CommandTestBase
         artifact.setBase(new File("pffft"));
         artifact.setFailIfNotPresent(false);
 
-        CommandResult result = testSuccess(group);
+        testSuccess(group);
     }
     
     public void testMultiDirCapture() throws Exception
@@ -218,12 +218,11 @@ public class CommandGroupTest extends CommandTestBase
 
     private void execute(CommandGroup group, CommandResult result)
     {
-        RecipeContext recipeContext = new RecipeContext();
-        recipeContext.setRecipePaths(new SimpleRecipePaths(baseDir, null));
-        CommandContext context = new CommandContext();
-        context.setOutputDir(outputDir);
-        context.setRecipeContext(recipeContext);
-        
+        ExecutionContext context = new ExecutionContext();
+        context.addValue(BuildProperties.PROPERTY_RECIPE_PATHS, new SimpleRecipePaths(baseDir, null));
+        context.addString(BuildProperties.PROPERTY_OUTPUT_DIR, outputDir.getAbsolutePath());
+        context.setWorkingDir(baseDir);
+
         group.execute(context, result);
     }
 

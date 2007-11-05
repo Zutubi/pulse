@@ -16,7 +16,7 @@ public class SleepCommand extends CommandSupport
     private long interval;
     private Semaphore terminatedSemaphore = new Semaphore(0);
 
-    public void execute(CommandContext context, CommandResult result)
+    public void execute(ExecutionContext context, CommandResult result)
     {
         try
         {

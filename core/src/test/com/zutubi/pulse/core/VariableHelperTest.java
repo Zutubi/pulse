@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.model.Property;
 import junit.framework.TestCase;
 
 import java.util.Arrays;

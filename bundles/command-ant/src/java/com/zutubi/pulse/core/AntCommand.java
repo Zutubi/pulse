@@ -10,37 +10,14 @@ public class AntCommand extends ExecutableCommand
     private String buildFile;
     private String targets;
 
-    private void checkExe()
+    public AntCommand()
     {
-        if (getExe() == null)
-        {
-            Scope scope = getScope();
-            if (scope != null)
-            {
-                Reference ref = scope.getReference("ant.bin");
-                if (ref != null && ref.getValue() instanceof String)
-                {
-                    setExe((String) ref.getValue());
-                }
-            }
-
-            if (getExe() == null)
-            {
-                if (SystemUtils.IS_WINDOWS)
-                {
-                    setExe("ant.bat");
-                }
-                else
-                {
-                    setExe("ant");
-                }
-            }
-        }
+        super(SystemUtils.IS_WINDOWS ? "ant.bat" : "ant");
     }
 
-    public void execute(CommandContext context, CommandResult cmdResult)
+    public void execute(ExecutionContext context, CommandResult cmdResult)
     {
-        checkExe();
+        setExeFromProperty(context, "ant.bin");
 
         if (buildFile != null)
         {
@@ -78,11 +55,5 @@ public class AntCommand extends ExecutableCommand
     public void setTargets(String targets)
     {
         this.targets = targets;
-    }
-
-    public void setScope(Scope scope)
-    {
-        super.setScope(scope);
-        checkExe();
     }
 }

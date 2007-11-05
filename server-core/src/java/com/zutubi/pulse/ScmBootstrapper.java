@@ -1,24 +1,16 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.core.BootstrapCommand;
-import com.zutubi.pulse.core.Bootstrapper;
-import com.zutubi.pulse.core.BuildException;
-import com.zutubi.pulse.core.BuildRevision;
-import com.zutubi.pulse.core.CommandContext;
+import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.scm.*;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
-import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.util.ForkOutputStream;
 import com.zutubi.util.IOUtils;
 import com.zutubi.util.logging.Logger;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.List;
 
 /**
@@ -47,10 +39,10 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmEventHandler
         this.agent = agent;
     }
 
-    public void bootstrap(CommandContext context)
+    public void bootstrap(ExecutionContext context)
     {
-        File workDir = context.getPaths().getBaseDir();
-        File outDir = new File(context.getOutputDir(), BootstrapCommand.OUTPUT_NAME);
+        File workDir = context.getWorkingDir();
+        File outDir = new File(context.getString(BuildProperties.PROPERTY_OUTPUT_DIR), BootstrapCommand.OUTPUT_NAME);
         outDir.mkdirs();
 
         OutputStream out;
@@ -96,7 +88,7 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmEventHandler
                 List<ScmContext.Property> properties = scmContext.getProperties();
                 for (ScmContext.Property prop : properties)
                 {
-                    context.getGlobalScope().add(new ResourceProperty(
+                    context.getScope().add(new ResourceProperty(
                             prop.getName(),
                             prop.getValue(),
                             prop.isAddToEnvironment(),

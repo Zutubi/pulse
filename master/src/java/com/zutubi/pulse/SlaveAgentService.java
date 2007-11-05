@@ -4,6 +4,7 @@ import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.core.BuildException;
+import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.logging.CustomLogRecord;
@@ -85,7 +86,7 @@ public class SlaveAgentService implements AgentService
         return resourceManager.getAgentRepository(agentConfig.getHandle()).hasResource(resource, version);
     }
 
-    public boolean build(RecipeRequest request, BuildContext context)
+    public boolean build(RecipeRequest request, ExecutionContext context)
     {
         GeneralAdminConfiguration generalConfig = configurationProvider.get(GeneralAdminConfiguration.class);
         SystemConfiguration systemConfig = configurationManager.getSystemConfig();

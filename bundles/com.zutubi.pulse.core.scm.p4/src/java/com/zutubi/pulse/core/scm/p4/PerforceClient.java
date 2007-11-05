@@ -1,11 +1,11 @@
 package com.zutubi.pulse.core.scm.p4;
 
 import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.core.Property;
 import com.zutubi.pulse.core.Scope;
 import com.zutubi.pulse.core.VariableHelper;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.Property;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.*;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
@@ -14,22 +14,11 @@ import com.zutubi.pulse.util.process.AsyncProcess;
 import com.zutubi.pulse.util.process.BufferingCharHandler;
 import com.zutubi.util.logging.Logger;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

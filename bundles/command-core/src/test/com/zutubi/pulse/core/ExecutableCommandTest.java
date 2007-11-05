@@ -1,17 +1,16 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.BuildContext;
-import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.config.ResourceProperty;
+import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.util.IOUtils;
 import com.zutubi.pulse.util.SystemUtils;
+import com.zutubi.util.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.List;
 import java.net.URL;
+import java.util.List;
 
 /**
  * 
@@ -255,13 +254,12 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
     public void testResourcePathsAddedToEnvironment() throws IOException
     {
         ExecutableCommand command = new ExecutableCommand();
-        Scope scope = new Scope();
+        ExecutionContext context = new ExecutionContext();
         ResourceProperty rp = new ResourceProperty("java.bin.dir", "somedir", false, true, false);
-        scope.add(rp);
-        command.setScope(scope);
+        context.getScope().add(rp);
         command.setExe("echo");
 
-        CommandResult result = runCommand(command, 1234);
+        CommandResult result = runCommand(command, context);
 
         checkEnv(result, "path=somedir" + File.pathSeparator);
     }
@@ -275,7 +273,7 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
         ExecutableCommand command = new ExecutableCommand();
         command.setExe("thisfiledoesnotexist");
 
-        CommandResult result = null;
+        CommandResult result;
         result = runCommand(command, 1234);
         assertTrue(result.errored());
 
@@ -300,7 +298,7 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
         command.setExe("dir");
         command.setWorkingDir(new File("nosuchworkdir"));
 
-        CommandResult result = null;
+        CommandResult result;
         result = runCommand(command, 1234);
 
         assertTrue(result.errored());
@@ -368,22 +366,20 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
     {
         if (SystemUtils.IS_WINDOWS)
         {
-            Scope scope = new Scope();
-            scope.add(new ResourceProperty("a<>", "b", true, false, false));
+            ExecutionContext context = new ExecutionContext();
+            context.getScope().add(new ResourceProperty("a<>", "b", true, false, false));
             ExecutableCommand command = new ExecutableCommand();
-            command.setScope(scope);
             command.setExe("dir");
 
-            runCommand(command);
+            runCommand(command, context);
         }
     }
 
     private CommandResult runCommand(ExecutableCommand command, long buildNumber)
     {
-        BuildContext buildContext = new BuildContext();
-        buildContext.setBuildNumber(buildNumber);
-
-        return super.runCommand(command, buildContext);
+        ExecutionContext context = new ExecutionContext();
+        context.addString(BuildProperties.PROPERTY_BUILD_NUMBER, Long.toString(buildNumber));
+        return super.runCommand(command, context);
     }
 
 

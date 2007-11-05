@@ -7,27 +7,10 @@ import java.util.List;
  * 
  *
  */
-public class SimpleNestedType implements Reference
+public class SimpleNestedType extends SelfReference
 {
-    private String name;
-    
     private List<SimpleNestedType> nestedTypes = new LinkedList<SimpleNestedType>();
         
-    public String getName()
-    {
-        return name;
-    }
-
-    public Object getValue()
-    {
-        return this;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-    
     public void addNested(SimpleNestedType t)
     {
         nestedTypes.add(t);

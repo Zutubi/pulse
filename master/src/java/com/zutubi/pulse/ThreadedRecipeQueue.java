@@ -7,15 +7,13 @@ import com.zutubi.prototype.config.events.PostSaveEvent;
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.core.BuildException;
-import com.zutubi.pulse.core.BuildRevision;
-import com.zutubi.pulse.core.RecipeRequest;
-import com.zutubi.pulse.core.Stoppable;
+import com.zutubi.pulse.core.*;
+import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.pulse.core.scm.ScmClientFactory;
-import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
+import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.events.*;
 import com.zutubi.pulse.events.EventListener;
@@ -534,32 +532,32 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         unavailableAgents.add(agent);
         executingAgents.put(recipeRequest.getId(), agent);
 
-        BuildContext context = createBuildContext(request, recipeRequest, buildRevision, agent);
+        ExecutionContext context = createBuildContext(request, recipeRequest, buildRevision, agent);
         dispatchedQueue.offer(new DispatchedRequest(recipeRequest, context, agent));
 
         return true;
     }
 
-    private BuildContext createBuildContext(RecipeDispatchRequest request, RecipeRequest recipeRequest, BuildRevision buildRevision, Agent agent)
+    private ExecutionContext createBuildContext(RecipeDispatchRequest request, RecipeRequest recipeRequest, BuildRevision buildRevision, Agent agent)
     {
-        BuildContext context = new BuildContext();
-        context.setBuildNumber(request.getBuild().getNumber());
-        context.setProjectName(recipeRequest.getProject());
-        context.setCleanBuild(request.getProject().isForceCleanForAgent(agent.getId()));
+        ExecutionContext context = new ExecutionContext();
+        context.addString(PROPERTY_BUILD_NUMBER, Long.toString(request.getBuild().getNumber()));
+        context.addString(PROPERTY_PROJECT, recipeRequest.getProject());
+        context.addString(PROPERTY_CLEAN_BUILD, Boolean.toString(request.getProject().isForceCleanForAgent(agent.getId())));
 
         BuildReason buildReason = request.getBuild().getReason();
-        context.addProperty("build.reason", buildReason.getSummary());
+        context.addString(PROPERTY_BUILD_REASON, buildReason.getSummary());
         if(buildReason instanceof TriggerBuildReason)
         {
-            context.addProperty("build.trigger", ((TriggerBuildReason)buildReason).getTriggerName());
+            context.addString(PROPERTY_BUILD_TRIGGER, ((TriggerBuildReason)buildReason).getTriggerName());
         }
 
-        context.addProperty("build.revision", buildRevision.getRevision().getRevisionString());
-        context.addProperty("build.timestamp", BuildContext.PULSE_BUILD_TIMESTAMP_FORMAT.format(new Date(buildRevision.getTimestamp())));
-        context.addProperty("build.timestamp.millis", Long.toString(buildRevision.getTimestamp()));
-        context.addProperty("master.url", MasterAgentService.constructMasterUrl(adminConfiguration, configurationManager.getSystemConfig()));
-        context.addProperty("build.count", Integer.toString(request.getProject().getBuildCount()));
-        context.addProperty("success.count", Integer.toString(request.getProject().getSuccessCount()));
+        context.addString(PROPERTY_BUILD_REVISION, buildRevision.getRevision().getRevisionString());
+        context.addString(PROPERTY_BUILD_TIMESTAMP, TIMESTAMP_FORMAT.format(new Date(buildRevision.getTimestamp())));
+        context.addString(PROPERTY_BUILD_TIMESTAMP_MILLIS, Long.toString(buildRevision.getTimestamp()));
+        context.addString(PROPERTY_MASTER_URL, MasterAgentService.constructMasterUrl(adminConfiguration, configurationManager.getSystemConfig()));
+        context.addString(PROPERTY_BUILD_COUNT, Integer.toString(request.getProject().getBuildCount()));
+        context.addString(PROPERTY_SUCCESS_COUNT, Integer.toString(request.getProject().getSuccessCount()));
         return context;
     }
 
@@ -835,10 +833,10 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     private static class DispatchedRequest
     {
         RecipeRequest recipeRequest;
-        BuildContext context;
+        ExecutionContext context;
         Agent agent;
 
-        public DispatchedRequest(RecipeRequest recipeRequest, BuildContext context, Agent agent)
+        public DispatchedRequest(RecipeRequest recipeRequest, ExecutionContext context, Agent agent)
         {
             this.recipeRequest = recipeRequest;
             this.context = context;

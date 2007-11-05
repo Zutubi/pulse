@@ -1,14 +1,10 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.model.StoredArtifact;
-import com.zutubi.pulse.core.model.StoredFileArtifact;
-import com.zutubi.pulse.util.FileSystemUtils;
 
-import java.io.File;
 import java.util.Arrays;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * An adaptation between the command and Bootstrap interfaces that allows
@@ -28,7 +24,7 @@ public class BootstrapCommand implements Command
         this.bootstrapper = bootstrapper;
     }
 
-    public void execute(CommandContext context, CommandResult result)
+    public void execute(ExecutionContext context, CommandResult result)
     {
         bootstrapper.bootstrap(context);
     }

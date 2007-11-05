@@ -1,5 +1,6 @@
 package com.zutubi.pulse;
 
+import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.logging.CustomLogRecord;
@@ -34,17 +35,19 @@ public interface AgentService extends RemoteService
      */
     boolean hasResource(String resource, String version);
 
-    boolean build(RecipeRequest request, BuildContext context);
+    boolean build(RecipeRequest request, ExecutionContext context);
 
     /**
      * Collects files produced by the recipe execution to the given local
      * directories.  Note that working copy collection is optional.
      *
-     * @param recipeId   id of the recipe to collect results for
-     * @param outputDest local directory to receive the output files
-     *                   (artifacts)
-     * @param workDest   local directory to receive the working copy, or null
-     *                   if the working copy should not be collected
+     * @param project     name of the project
+     * @param recipeId    id of the recipe to collect results for
+     * @param incremental true for incremental builds
+     * @param outputDest  local directory to receive the output files
+     *                    (artifacts)
+     * @param workDest    local directory to receive the working copy, or null
+     *                    if the working copy should not be collected
      */
     void collectResults(String project, long recipeId, boolean incremental, File outputDest, File workDest);
 

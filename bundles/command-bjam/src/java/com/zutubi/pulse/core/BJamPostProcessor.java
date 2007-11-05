@@ -3,7 +3,7 @@ package com.zutubi.pulse.core;
 /**
  * A post processor that looks for error messages from Boost Jam (bjam).
  */
-public class BJamPostProcessor extends RegexPostProcessor implements PostProcessor
+public class BJamPostProcessor extends RegexPostProcessor
 {
     public BJamPostProcessor()
     {

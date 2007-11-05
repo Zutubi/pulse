@@ -2,9 +2,9 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.core.BootstrapperSupport;
 import com.zutubi.pulse.core.BuildException;
-import com.zutubi.pulse.core.CommandContext;
-import com.zutubi.util.IOUtils;
+import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.util.ZipUtils;
+import com.zutubi.util.IOUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -28,7 +28,7 @@ public class CopyBootstrapper extends BootstrapperSupport
         this.previousRecipeId = previousRecipeId;
     }
 
-    public void bootstrap(CommandContext context) throws BuildException
+    public void bootstrap(ExecutionContext context) throws BuildException
     {
         try
         {
@@ -38,7 +38,7 @@ public class CopyBootstrapper extends BootstrapperSupport
 
             // take url connection input stream and write contents to directory.
             FileOutputStream zos = null;
-            File zipName = new File(context.getPaths().getBaseDir().getAbsolutePath() + ".zip");
+            File zipName = new File(context.getWorkingDir().getAbsolutePath() + ".zip");
 
             try
             {
@@ -51,7 +51,7 @@ public class CopyBootstrapper extends BootstrapperSupport
                 IOUtils.close(zos);
             }
 
-            ZipUtils.extractZip(zipName, context.getPaths().getBaseDir());
+            ZipUtils.extractZip(zipName, context.getWorkingDir());
         }
         catch (MalformedURLException e)
         {

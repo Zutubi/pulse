@@ -1,18 +1,19 @@
 package com.zutubi.pulse.core;
 
 /**
- * A base class to simplify references implemented in the common way.
+ * A base class to simplify references that are named objects where the
+ * reference value is the object itself.
  */
-public class ReferenceSupport implements Reference
+public class SelfReference implements Reference
 {
     private String name;
 
-    public ReferenceSupport()
+    public SelfReference()
     {
 
     }
     
-    public ReferenceSupport(String name)
+    public SelfReference(String name)
     {
         this.name = name;
     }

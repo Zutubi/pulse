@@ -27,12 +27,9 @@ public abstract class XMLReportPostProcessorTestBase extends PulseTestCase
     {
         File outputDir = getOutputDir();
         TestSuiteResult testResults = new TestSuiteResult();
-        RecipeContext recipeContext = new RecipeContext();
-        recipeContext.setTestResults(testResults);
-
-        CommandContext context = new CommandContext();
-        context.setRecipeContext(recipeContext);
-        context.setOutputDir(outputDir);
+        ExecutionContext context = new ExecutionContext();
+        context.addValue(BuildProperties.PROPERTY_TEST_RESULTS, testResults);
+        context.addString(BuildProperties.PROPERTY_OUTPUT_DIR, outputDir.getAbsolutePath());
 
         for(String name: names)
         {

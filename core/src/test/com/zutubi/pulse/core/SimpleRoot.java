@@ -1,7 +1,5 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.model.Property;
-
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;

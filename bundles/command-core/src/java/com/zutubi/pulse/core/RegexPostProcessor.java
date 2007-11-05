@@ -20,11 +20,10 @@ import java.util.regex.Pattern;
  * A post processor that does line-by-line searching with regular expressions
  * to detect features.
  */
-public class RegexPostProcessor implements PostProcessor, Validateable
+public class RegexPostProcessor extends SelfReference implements PostProcessor, Validateable
 {
     private static final Logger LOG = Logger.getLogger(RegexPostProcessor.class.getName());
 
-    private String name;
     private List<RegexPattern> patterns;
     /**
      * If true, any errors detected during post-processing will trigger
@@ -58,25 +57,26 @@ public class RegexPostProcessor implements PostProcessor, Validateable
 
     public RegexPostProcessor(String name)
     {
-        this.name = name;
+        super(name);
         patterns = new LinkedList<RegexPattern>();
     }
 
-    public void process(StoredFileArtifact artifact, CommandResult result, CommandContext context)
+    public void process(StoredFileArtifact artifact, CommandResult result, ExecutionContext context)
     {
         List<PlainFeature> features = new LinkedList<PlainFeature>();
+        File outputDir = new File(context.getString(BuildProperties.PROPERTY_OUTPUT_DIR));
 
         if (leadingContext == 0 && trailingContext == 0)
         {
             // Optimise this common case
-            simpleProcess(context.getOutputDir(), artifact, result, features);
+            simpleProcess(outputDir, artifact, result, features);
         }
         else
         {
             BufferedReader reader = null;
             try
             {
-                File file = new File(context.getOutputDir(), artifact.getPath());
+                File file = new File(outputDir, artifact.getPath());
                 reader = new BufferedReader(new FileReader(file));
                 String line;
                 long lineNumber = 0;
@@ -279,21 +279,6 @@ public class RegexPostProcessor implements PostProcessor, Validateable
     public void addRegexPattern(RegexPattern pattern)
     {
         patterns.add(pattern);
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public Object getValue()
-    {
-        return this;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
     }
 
     public List<RegexPattern> getPatterns()

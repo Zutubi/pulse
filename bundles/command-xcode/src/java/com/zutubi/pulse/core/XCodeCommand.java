@@ -8,7 +8,6 @@ import com.zutubi.util.StringUtils;
 import java.util.List;
 
 /**
- * <class-comment/>
  */
 public class XCodeCommand extends ExecutableCommand
 {
@@ -19,30 +18,14 @@ public class XCodeCommand extends ExecutableCommand
     private String buildaction;
     private List<String> settings;
 
-    private void checkExe()
+    public XCodeCommand()
     {
-        if (getExe() == null)
-        {
-            Scope scope = getScope();
-            if (scope != null)
-            {
-                Reference ref = scope.getReference("xcode.bin");
-                if (ref != null && ref.getValue() instanceof String)
-                {
-                    setExe((String) ref.getValue());
-                }
-            }
-
-            if (getExe() == null)
-            {
-                setExe("xcodebuild");
-            }
-        }
+        super("xcodebuild");
     }
 
-    public void execute(CommandContext context, CommandResult cmdResult)
+    public void execute(ExecutionContext context, CommandResult cmdResult)
     {
-        checkExe();
+        setExeFromProperty(context, "xcode.bin");
 
         if (TextUtils.stringSet(project))
         {
@@ -132,11 +115,5 @@ public class XCodeCommand extends ExecutableCommand
     public void setSettings(List<String> settings)
     {
         this.settings = settings;
-    }
-
-    public void setScope(Scope scope)
-    {
-        super.setScope(scope);
-        checkExe();
     }
 }

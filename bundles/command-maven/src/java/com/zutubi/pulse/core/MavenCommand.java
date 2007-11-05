@@ -2,50 +2,23 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.util.SystemUtils;
-import com.zutubi.pulse.BuildContext;
 
 import java.io.File;
 
 /**
- * <class-comment/>
  */
 public class MavenCommand extends ExecutableCommand
 {
     private String targets;
 
-    private void checkExe()
+    public MavenCommand()
     {
-        if (getExe() == null)
-        {
-            Scope scope = getScope();
-
-            if (scope != null)
-            {
-                Reference ref = scope.getReference("maven.bin");
-                if (ref != null && ref.getValue() instanceof String)
-                {
-                    setExe((String) ref.getValue());
-                }
-            }
-
-            // use defaults.
-            if (getExe() == null)
-            {
-                if (SystemUtils.IS_WINDOWS)
-                {
-                    setExe("maven.bat");
-                }
-                else
-                {
-                    setExe("maven");
-                }
-            }
-        }
+        super(SystemUtils.IS_WINDOWS ? "maven.bat" : "maven");
     }
 
-    public void execute(CommandContext context, CommandResult cmdResult)
+    public void execute(ExecutionContext context, CommandResult cmdResult)
     {
-        checkExe();
+        setExeFromProperty(context, "maven.bin");
 
         if (targets != null)
         {
@@ -60,12 +33,7 @@ public class MavenCommand extends ExecutableCommand
 
         try
         {
-            BuildContext buildContext = context.getBuildContext();
-            if (buildContext != null)
-            {
-                String buildVersion = MavenUtils.extractVersion(new File(getWorkingDir(context.getPaths()), "maven.xml"), "currentVersion");
-                buildContext.setBuildVersion(buildVersion);
-            }
+            context.setVersion(MavenUtils.extractVersion(new File(getWorkingDir(context.getWorkingDir()), "maven.xml"), "currentVersion"));
         }
         catch (PulseException e)
         {
@@ -81,11 +49,5 @@ public class MavenCommand extends ExecutableCommand
     public void setTargets(String targets)
     {
         this.targets = targets;
-    }
-
-    public void setScope(Scope scope)
-    {
-        super.setScope(scope);
-        checkExe();
     }
 }

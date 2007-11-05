@@ -1,6 +1,5 @@
 package com.zutubi.pulse.slave;
 
-import com.zutubi.pulse.BuildContext;
 import com.zutubi.pulse.ChainBootstrapper;
 import com.zutubi.pulse.ServerBootstrapper;
 import com.zutubi.pulse.ServerRecipePaths;
@@ -55,7 +54,7 @@ public class SlaveRecipeProcessor
         return null;
     }
 
-    public void processRecipe(String master, long handle, RecipeRequest request, BuildContext context)
+    public void processRecipe(String master, long handle, RecipeRequest request, ExecutionContext context)
     {
         MasterService masterProxy = getMasterProxy(master);
         if(masterProxy != null)
@@ -64,13 +63,18 @@ public class SlaveRecipeProcessor
             ResourceRepository repo = new RemoteResourceRepository(handle, masterProxy, serviceTokenManager);
             ServerRecipePaths processorPaths = new ServerRecipePaths(request.getProject(), request.getId(), configurationManager.getUserPaths().getData(), request.isIncremental());
 
-            context.setFileRepository(new SlaveFileRepository(processorPaths.getRecipeRoot(), master, serviceTokenManager));
             Bootstrapper requestBootstrapper = request.getBootstrapper();
             request.setBootstrapper(new ChainBootstrapper(new ServerBootstrapper(), requestBootstrapper));
 
+            context.pushScope();
             try
             {
-                recipeProcessor.build(context, request, processorPaths, repo, true);
+                context.addValue(BuildProperties.PROPERTY_RECIPE_PATHS, processorPaths);
+                context.addValue(BuildProperties.PROPERTY_RESOURCE_REPOSITORY, repo);
+                context.addValue(BuildProperties.PROPERTY_FILE_REPOSITORY, new SlaveFileRepository(processorPaths.getRecipeRoot(), master, serviceTokenManager));
+                context.setOutputStream(new CommandOutputStream(eventManager, request.getId(), true));
+                context.setWorkingDir(processorPaths.getBaseDir());
+                recipeProcessor.build(context, request);
             }
             catch (BuildException e)
             {
@@ -86,6 +90,7 @@ public class SlaveRecipeProcessor
             }
             finally
             {
+                context.popScope();
                 eventManager.unregister(listener);
             }
         }

@@ -1,7 +1,5 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.BuildContext;
-
 /**
  * <class-comment/>
  */
@@ -44,9 +42,9 @@ public class MavenCommandTest extends ExecutableCommandTestBase
     {
         copyBuildFileToBaseDir("basic");
         MavenCommand command = new MavenCommand();
-        BuildContext buildContext = new BuildContext();
-        runCommand(command, buildContext);
-        assertEquals("1.0-SNAPSHOT", buildContext.getBuildVersion());
+        ExecutionContext context = new ExecutionContext();
+        runCommand(command, context);
+        assertEquals("1.0-SNAPSHOT", context.getVersion());
     }
 
     public void testRunSpecificTarget() throws Exception

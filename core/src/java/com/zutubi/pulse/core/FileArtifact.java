@@ -20,7 +20,7 @@ public class FileArtifact extends LocalArtifact
 
     }
 
-    public void capture(CommandResult result, CommandContext context)
+    public void capture(CommandResult result, ExecutionContext context)
     {
         // The specified file may or may not be absolute.  If it is absolute, then we need to jump through a few
         // hoops.
@@ -72,12 +72,11 @@ public class FileArtifact extends LocalArtifact
         else
         {
             // The file path is relative, we have our base directory, lets get to work.
-            File baseDir = context.getPaths().getBaseDir();
-            scanAndCaptureFiles(baseDir, file, result, context);
+            scanAndCaptureFiles(context.getWorkingDir(), file, result, context);
         }
     }
 
-    private void scanAndCaptureFiles(File baseDir, String file, CommandResult result, CommandContext context)
+    private void scanAndCaptureFiles(File baseDir, String file, CommandResult result, ExecutionContext context)
     {
         DirectoryScanner scanner = new DirectoryScanner();
         scanner.setBasedir(baseDir);

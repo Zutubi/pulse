@@ -4,8 +4,6 @@ import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.validation.annotations.Name;
-import com.zutubi.validation.annotations.Required;
 
 import java.io.File;
 import java.io.IOException;
@@ -108,14 +106,14 @@ public abstract class LocalArtifact extends ArtifactSupport
      * @param type     is the mime type of the artifact.
      * @return true if captured, false if ingored
      */
-    protected boolean captureFile(StoredArtifact artifact, File fromFile, String path, CommandResult result, CommandContext context, String type)
+    protected boolean captureFile(StoredArtifact artifact, File fromFile, String path, CommandResult result, ExecutionContext context, String type)
     {
-        if (ignoreStale && fromFile.lastModified() < context.getRecipeStartTime())
+        if (ignoreStale && fromFile.lastModified() < context.getLong(BuildProperties.PROPERTY_RECIPE_TIMESTAMP_MILLIS))
         {
             return false;
         }
 
-        File toFile = new File(context.getOutputDir(), path);
+        File toFile = new File(context.getString(BuildProperties.PROPERTY_OUTPUT_DIR), path);
         File parent = toFile.getParentFile();
 
         try

@@ -8,21 +8,10 @@ import java.io.File;
 
 /**
  */
-public abstract class TestReportPostProcessor implements PostProcessor
+public abstract class TestReportPostProcessor extends SelfReference implements PostProcessor
 {
-    private String name;
     private String suite;
     private boolean failOnFailure = true;
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
 
     public void setSuite(String suite)
     {
@@ -39,17 +28,19 @@ public abstract class TestReportPostProcessor implements PostProcessor
         this.failOnFailure = failOnFailure;
     }
 
-    public void process(StoredFileArtifact artifact, CommandResult result, CommandContext context)
+    public void process(StoredFileArtifact artifact, CommandResult result, ExecutionContext context)
     {
-        int brokenBefore = context.getTestResults().getSummary().getBroken();
+        TestSuiteResult testResults = context.getValue(BuildProperties.PROPERTY_TEST_RESULTS, TestSuiteResult.class);
+        File outputDir = new File(context.getString(BuildProperties.PROPERTY_OUTPUT_DIR));
+        int brokenBefore = testResults.getSummary().getBroken();
 
-        File file = new File(context.getOutputDir(), artifact.getPath());
+        File file = new File(outputDir, artifact.getPath());
         if(file.isFile())
         {
             TestSuiteResult parentSuite;
             if(suite == null)
             {
-                parentSuite = context.getTestResults();
+                parentSuite = testResults;
             }
             else
             {
@@ -60,12 +51,12 @@ public abstract class TestReportPostProcessor implements PostProcessor
 
             if(suite != null)
             {
-                context.getTestResults().add(parentSuite);
+                testResults.add(parentSuite);
             }
             
             if(failOnFailure && !result.failed() && !result.errored())
             {
-                int brokenAfter = context.getTestResults().getSummary().getBroken();
+                int brokenAfter = testResults.getSummary().getBroken();
                 if(brokenAfter > brokenBefore)
                 {
                     result.failure("One or more test cases failed.");
@@ -75,10 +66,4 @@ public abstract class TestReportPostProcessor implements PostProcessor
     }
 
     protected abstract void internalProcess(CommandResult result, File file, TestSuiteResult suite);
-
-    public Object getValue()
-    {
-        return this;
-    }
-
 }

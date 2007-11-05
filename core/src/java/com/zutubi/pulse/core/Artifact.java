@@ -15,5 +15,5 @@ public interface Artifact
      * @param result  command we are capturing artifacts from
      * @param context context in which the commmand was run
      */
-    void capture(CommandResult result, CommandContext context);
+    void capture(CommandResult result, ExecutionContext context);
 }

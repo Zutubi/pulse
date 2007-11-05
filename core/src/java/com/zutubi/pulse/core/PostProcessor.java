@@ -12,5 +12,5 @@ import com.zutubi.pulse.core.model.StoredFileArtifact;
  */
 public interface PostProcessor extends Reference
 {
-    void process(StoredFileArtifact artifact, CommandResult result, CommandContext context);
+    void process(StoredFileArtifact artifact, CommandResult result, ExecutionContext context);
 }

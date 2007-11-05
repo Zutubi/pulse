@@ -1,8 +1,8 @@
 package com.zutubi.pulse.slave.command;
 
+import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.slave.SlaveRecipeProcessor;
-import com.zutubi.pulse.BuildContext;
 
 /**
  */
@@ -15,9 +15,9 @@ public class RecipeCommand implements Runnable
     private long handle;
     private RecipeRequest request;
     private SlaveRecipeProcessor recipeProcessor;
-    private BuildContext context;
+    private ExecutionContext context;
 
-    public RecipeCommand(String master, long handle, RecipeRequest request, BuildContext context)
+    public RecipeCommand(String master, long handle, RecipeRequest request, ExecutionContext context)
     {
         this.master = master;
         this.handle = handle;

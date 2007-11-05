@@ -1,12 +1,12 @@
 package com.zutubi.pulse.local;
 
-import com.zutubi.pulse.resources.ResourceDiscoverer;
-import com.zutubi.pulse.dev.bootstrap.DevBootstrapManager;
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.plugins.PluginManager;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.config.Resource;
+import com.zutubi.pulse.dev.bootstrap.DevBootstrapManager;
 import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.plugins.PluginManager;
+import com.zutubi.pulse.resources.ResourceDiscoverer;
 import com.zutubi.util.IOUtils;
 import org.apache.commons.cli.*;
 
@@ -152,7 +152,11 @@ public class LocalBuild
 
             Bootstrapper bootstrapper = new LocalBootstrapper();
             RecipeRequest request = new RecipeRequest(0, bootstrapper, loadPulseFile(baseDir, pulseFileName), recipe);
-            recipeProcessor.build(null, request, paths, repository, false);
+            ExecutionContext context = new ExecutionContext();
+            context.setWorkingDir(baseDir);
+            context.addValue(BuildProperties.PROPERTY_RECIPE_PATHS, paths);
+            context.addValue(BuildProperties.PROPERTY_RESOURCE_REPOSITORY, repository);
+            recipeProcessor.build(context, request);
         }
         catch (FileNotFoundException e)
         {

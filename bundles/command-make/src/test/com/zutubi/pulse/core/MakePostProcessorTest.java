@@ -73,8 +73,8 @@ public class MakePostProcessorTest extends PulseTestCase
         File file = new File(url.toURI());
         StoredFileArtifact artifact = new StoredFileArtifact(file.getName());
 
-        CommandContext context = new CommandContext();
-        context.setOutputDir(file.getParentFile());
+        ExecutionContext context = new ExecutionContext();
+        context.addString(BuildProperties.PROPERTY_OUTPUT_DIR, file.getParentFile().getAbsolutePath());
 
         pp.process(artifact, new CommandResult("w00t"), context);
         return artifact.getFeatures();

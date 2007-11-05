@@ -1,11 +1,11 @@
 package com.zutubi.pulse.slave;
 
-import com.zutubi.pulse.BuildContext;
 import com.zutubi.pulse.SystemInfo;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.agent.Status;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.StartupManager;
+import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.filesystem.FileInfo;
@@ -121,7 +121,7 @@ public class SlaveServiceImpl implements SlaveService
 
     //---( Build API )---
 
-    public boolean build(String token, String master, long handle, RecipeRequest request, BuildContext context) throws InvalidTokenException
+    public boolean build(String token, String master, long handle, RecipeRequest request, ExecutionContext context) throws InvalidTokenException
     {
         serviceTokenManager.validateToken(token);
 

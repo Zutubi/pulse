@@ -1,15 +1,15 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.FileLoadException;
+import com.zutubi.pulse.core.Property;
 import com.zutubi.pulse.core.Scope;
 import com.zutubi.pulse.core.VariableHelper;
 import com.zutubi.pulse.core.config.ResourceProperty;
-import com.zutubi.pulse.core.model.Property;
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.pulse.core.scm.ScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 
 import java.util.List;
 

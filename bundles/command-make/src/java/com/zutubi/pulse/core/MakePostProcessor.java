@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
  * A post processor that looks for error messages from GNU-compatible make
  * programs.
  */
-public class MakePostProcessor extends RegexPostProcessor implements PostProcessor
+public class MakePostProcessor extends RegexPostProcessor
 {
     public MakePostProcessor()
     {

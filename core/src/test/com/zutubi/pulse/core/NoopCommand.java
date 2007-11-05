@@ -11,7 +11,7 @@ public class NoopCommand extends CommandSupport
 
     private boolean terminated;
 
-    public void execute(CommandContext context, CommandResult result)
+    public void execute(ExecutionContext context, CommandResult result)
     {
         executed = true;
 

@@ -17,7 +17,7 @@ public interface Command
      * @param context defines the context in which the command is being executed.
      * @param result defines the command result instance used by the command to record its execution details.
      */
-    void execute(CommandContext context, CommandResult result);
+    void execute(ExecutionContext context, CommandResult result);
 
     /**
      *

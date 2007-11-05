@@ -14,7 +14,7 @@ public class RecipeTest extends PulseTestCase
     private Recipe recipe;
     private DefaultEventManager eventManager;
     private RecipePaths paths;
-    private RecipeContext context;
+    private ExecutionContext context;
 
     public RecipeTest()
     {
@@ -38,8 +38,9 @@ public class RecipeTest extends PulseTestCase
         File outputDir = FileSystemUtils.createTempDir(getClass().getName(), ".out");
         paths = new SimpleRecipePaths(baseDir, outputDir);
 
-        context = new RecipeContext();
-        context.setRecipePaths(paths);
+        context = new ExecutionContext();
+        context.setWorkingDir(paths.getBaseDir());
+        context.addValue(BuildProperties.PROPERTY_RECIPE_PATHS, paths);
     }
 
     protected void tearDown() throws Exception

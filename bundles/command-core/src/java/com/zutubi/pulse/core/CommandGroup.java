@@ -62,7 +62,7 @@ public class CommandGroup extends CommandSupport implements Validateable
         return linkArtifact;
     }
 
-    public void execute(CommandContext context, CommandResult result)
+    public void execute(ExecutionContext context, CommandResult result)
     {
         command.execute(context, result);
     }

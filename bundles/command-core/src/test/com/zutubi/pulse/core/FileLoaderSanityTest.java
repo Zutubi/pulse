@@ -1,7 +1,5 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.model.Property;
-
 /**
  *
  *

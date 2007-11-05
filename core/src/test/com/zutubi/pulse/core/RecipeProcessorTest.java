@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.BuildContext;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.events.DefaultEventManager;
@@ -53,9 +52,9 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         // just a little bit of wiring tomfoolary to inject the event manager into the recipe.
         ObjectFactory factory = new DefaultObjectFactory()
         {
-            public Object buildBean(Class clazz) throws Exception
+            public <V> V buildBean(Class<V> clazz) throws Exception
             {
-                Object bean = super.buildBean(clazz);
+                V bean = super.buildBean(clazz);
                 if (bean instanceof Recipe)
                 {
                     ((Recipe)bean).setEventManager(eventManager);
@@ -87,7 +86,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
 
     public void testBasicRecipe() throws Exception
     {
-        recipeProcessor.build(new BuildContext(), new RecipeRequest(1, new SimpleBootstrapper(), getPulseFile("basic"), "default"), paths, resourceRepository, false);
+        recipeProcessor.build(makeContext(), new RecipeRequest(1, new SimpleBootstrapper(), getPulseFile("basic"), "default"));
         assertRecipeCommenced(1, "default");
         assertCommandCommenced(1, "bootstrap");
         assertCommandCompleted(1, ResultState.SUCCESS);
@@ -97,10 +96,19 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         assertNoMoreEvents();
     }
 
+    private ExecutionContext makeContext()
+    {
+        ExecutionContext context = new ExecutionContext();
+        context.setWorkingDir(paths.getBaseDir());
+        context.addValue(BuildProperties.PROPERTY_RECIPE_PATHS, paths);
+        context.addValue(BuildProperties.PROPERTY_RESOURCE_REPOSITORY, resourceRepository);
+        return context;
+    }
+
     public void testExceptionDuringBootstrap() throws Exception
     {
         ErrorBootstrapper bootstrapper = new ErrorBootstrapper(new BuildException("test exception"));
-        recipeProcessor.build(new BuildContext(), new RecipeRequest(1, bootstrapper, getPulseFile("basic"), "default"), paths, resourceRepository, false);
+        recipeProcessor.build(makeContext(), new RecipeRequest(1, bootstrapper, getPulseFile("basic"), "default"));
         assertRecipeCommenced(1, "default");
         assertCommandCommenced(1, "bootstrap");
         assertCommandError(1, "test exception");
@@ -112,7 +120,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
 
     public void testNoDefaultRecipe() throws Exception
     {
-        recipeProcessor.build(new BuildContext(), new RecipeRequest(1, new SimpleBootstrapper(), getPulseFile("nodefault"), null), paths, resourceRepository, false);
+        recipeProcessor.build(makeContext(), new RecipeRequest(1, new SimpleBootstrapper(), getPulseFile("nodefault"), null));
         assertRecipeCommenced(1, null);
         assertRecipeError(1, "Please specify a default recipe for your project.");
         assertNoMoreEvents();
@@ -120,7 +128,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
 
     public void testCommandFailure() throws Exception
     {
-        recipeProcessor.build(new BuildContext(), new RecipeRequest(1, new SimpleBootstrapper(), getPulseFile("basic"), "failure"), paths, resourceRepository, false);
+        recipeProcessor.build(makeContext(), new RecipeRequest(1, new SimpleBootstrapper(), getPulseFile("basic"), "failure"));
         assertRecipeCommenced(1, "failure");
         assertCommandCommenced(1, "bootstrap");
         assertCommandCompleted(1, ResultState.SUCCESS);
@@ -134,7 +142,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
 
     public void testCommandException() throws Exception
     {
-        recipeProcessor.build(new BuildContext(), new RecipeRequest(1, new SimpleBootstrapper(), getPulseFile("basic"), "exception"), paths, resourceRepository, false);
+        recipeProcessor.build(makeContext(), new RecipeRequest(1, new SimpleBootstrapper(), getPulseFile("basic"), "exception"));
         assertRecipeCommenced(1, "exception");
         assertCommandCommenced(1, "bootstrap");
         assertCommandCompleted(1, ResultState.SUCCESS);
@@ -148,7 +156,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
 
     public void testCommandUnexpectedException() throws Exception
     {
-        recipeProcessor.build(new BuildContext(), new RecipeRequest(1, new SimpleBootstrapper(), getPulseFile("basic"), "unexpected exception"), paths, resourceRepository, false);
+        recipeProcessor.build(makeContext(), new RecipeRequest(1, new SimpleBootstrapper(), getPulseFile("basic"), "unexpected exception"));
         assertRecipeCommenced(1, "unexpected exception");
         assertCommandCommenced(1, "bootstrap");
         assertCommandCompleted(1, ResultState.SUCCESS);
@@ -163,7 +171,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
     public void testTerminate() throws Exception
     {
         waitMode = true;
-        AsyncRunner runner = new AsyncRunner(recipeProcessor, 1, paths, new SimpleBootstrapper(), getPulseFile("basic"), "default");
+        AsyncRunner runner = new AsyncRunner(recipeProcessor, 1, new SimpleBootstrapper(), getPulseFile("basic"), "default");
         Thread thread = new Thread(runner);
         thread.start();
         assertRecipeCommenced(1, "default");
@@ -184,7 +192,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
     public void testTerminateRaceWithCommand() throws Exception
     {
         waitMode = true;
-        AsyncRunner runner = new AsyncRunner(recipeProcessor, 1, paths, new SimpleBootstrapper(), getPulseFile("basic"), "default");
+        AsyncRunner runner = new AsyncRunner(recipeProcessor, 1, new SimpleBootstrapper(), getPulseFile("basic"), "default");
         Thread thread = new Thread(runner);
         thread.start();
         assertRecipeCommenced(1, "default");
@@ -224,7 +232,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
     public void testTerminateDuringCommand() throws Exception
     {
         waitMode = true;
-        AsyncRunner runner = new AsyncRunner(recipeProcessor, 1, paths, new SimpleBootstrapper(), getPulseFile("basic"), "default");
+        AsyncRunner runner = new AsyncRunner(recipeProcessor, 1, new SimpleBootstrapper(), getPulseFile("basic"), "default");
         Thread thread = new Thread(runner);
         thread.start();
         assertRecipeCommenced(1, "default");
@@ -302,7 +310,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
 
     private RecipeCompletedEvent assertRecipeCompleted(long id, ResultState state)
     {
-        Event e = assertEvent(id);
+        Event<Object> e = assertEvent(id);
         assertTrue(e instanceof RecipeCompletedEvent);
 
         RecipeCompletedEvent ce = (RecipeCompletedEvent) e;
@@ -313,14 +321,6 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
     private void assertRecipeError(long id, String message)
     {
         RecipeCompletedEvent e = assertRecipeCompleted(id, ResultState.ERROR);
-        Feature feature = e.getResult().getFeatures().get(0);
-        assertEquals(Feature.Level.ERROR, feature.getLevel());
-        assertEquals(message, feature.getSummary());
-    }
-
-    private void assertRecipeFailure(long id, String message)
-    {
-        RecipeCompletedEvent e = assertRecipeCompleted(id, ResultState.FAILURE);
         Feature feature = e.getResult().getFeatures().get(0);
         assertEquals(Feature.Level.ERROR, feature.getLevel());
         assertEquals(message, feature.getSummary());
@@ -382,7 +382,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
 
     public class SimpleBootstrapper extends BootstrapperSupport
     {
-        public void bootstrap(CommandContext context) throws BuildException
+        public void bootstrap(ExecutionContext context) throws BuildException
         {
             // Do nothing.
         }
@@ -397,7 +397,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
             this.exception = exception;
         }
 
-        public void bootstrap(CommandContext context) throws BuildException
+        public void bootstrap(ExecutionContext context) throws BuildException
         {
             throw exception;
         }
@@ -412,16 +412,14 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
     {
         private RecipeProcessor recipeProcessor;
         private long id;
-        private RecipePaths paths;
         private Bootstrapper bootstrapper;
         private String source;
         private String recipe;
 
-        public AsyncRunner(RecipeProcessor recipeProcessor, long id, RecipePaths paths, Bootstrapper bootstrapper, String source, String recipe)
+        public AsyncRunner(RecipeProcessor recipeProcessor, long id, Bootstrapper bootstrapper, String source, String recipe)
         {
             this.recipeProcessor = recipeProcessor;
             this.id = id;
-            this.paths = paths;
             this.bootstrapper = bootstrapper;
             this.source = source;
             this.recipe = recipe;
@@ -429,7 +427,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
 
         public void run()
         {
-            recipeProcessor.build(new BuildContext(), new RecipeRequest(id, bootstrapper, source, recipe), paths, resourceRepository, false);
+            recipeProcessor.build(makeContext(), new RecipeRequest(id, bootstrapper, source, recipe));
         }
     }
 }

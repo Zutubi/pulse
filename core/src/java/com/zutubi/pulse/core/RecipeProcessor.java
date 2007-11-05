@@ -1,10 +1,9 @@
 package com.zutubi.pulse.core;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.pulse.BuildContext;
+import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceVersion;
-import com.zutubi.pulse.core.model.Property;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.TestSuitePersister;
 import com.zutubi.pulse.core.model.TestSuiteResult;
@@ -52,7 +51,7 @@ public class RecipeProcessor
         
     }
 
-    public void build(BuildContext context, RecipeRequest request, RecipePaths paths, ResourceRepository resourceRepository, boolean capture)
+    public void build(ExecutionContext context, RecipeRequest request)
     {
         // This result holds only the recipe details (stamps, state etc), not
         // the command results.  A full recipe result with command results is
@@ -67,23 +66,15 @@ public class RecipeProcessor
         eventManager.publish(new RecipeCommencedEvent(this, recipeResult.getId(), recipeResult.getRecipeName(), recipeResult.getStartTime()));
 
         CommandOutputStream outputStream = null;
-        Scope globalScope = new Scope();
+        long recipeStartTime = recipeResult.getStartTime();
+        pushRecipeContext(context, testResults, recipeStartTime, request.getId());
         try
         {
-            long recipeStartTime = recipeResult.getStartTime();
-
-            RecipeContext recipeContext = createRecipeContext(paths, testResults, globalScope, recipeStartTime, context, request.getId());
-            if(capture)
-            {
-                outputStream = new CommandOutputStream(eventManager, runningRecipe, true);
-                recipeContext.setOutputStream(outputStream);
-            }
-
             // Wrap bootstrapper in a command and run it.
             BootstrapCommand bootstrapCommand = new BootstrapCommand(request.getBootstrapper());
 
             // Now we can load the recipe from the pulse file
-            PulseFile pulseFile = loadPulseFile(request, paths.getBaseDir(), resourceRepository, globalScope, context, recipeStartTime);
+            PulseFile pulseFile = loadPulseFile(request, context);
 
             String recipeName = request.getRecipeName();
             if (!TextUtils.stringSet(recipeName))
@@ -105,7 +96,7 @@ public class RecipeProcessor
 
             runningRecipeInstance = recipe;
 
-            recipe.execute(recipeContext);
+            recipe.execute(context);
         }
         catch (BuildException e)
         {
@@ -121,6 +112,8 @@ public class RecipeProcessor
             IOUtils.close(outputStream);
             
             eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Storing test results..."));
+
+            RecipePaths paths = context.getValue(PROPERTY_RECIPE_PATHS, RecipePaths.class);
             writeTestResults(paths, testResults);
             recipeResult.setTestSummary(testResults.getSummary());
             eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Test results stored."));
@@ -129,11 +122,12 @@ public class RecipeProcessor
 
             recipeResult.complete();
             RecipeCompletedEvent completedEvent = new RecipeCompletedEvent(this, recipeResult);
-            if(context != null)
+            if(context.getVersion() != null)
             {
-                completedEvent.setBuildVersion(context.getBuildVersion());
+                completedEvent.setBuildVersion(context.getVersion());
             }
-            
+
+            context.popScope();
             eventManager.publish(completedEvent);
 
             runningLock.lock();
@@ -199,48 +193,37 @@ public class RecipeProcessor
         }
     }
 
-    private RecipeContext createRecipeContext(RecipePaths paths, TestSuiteResult testResults, Scope globalScope, long recipeStartTime, BuildContext buildContext, long recipeId)
+    private void pushRecipeContext(ExecutionContext context, TestSuiteResult testResults, long recipeStartTime , long recipeId)
     {
-        RecipeContext context = new RecipeContext();
-        context.setTestResults(testResults);
-        context.setRecipePaths(paths);
-        context.setGlobalScope(globalScope);
-        context.setRecipeStartTime(recipeStartTime);
-        context.setRecipeId(recipeId);
-        if (buildContext != null && buildContext.getBuildNumber() != -1)
-        {
-            context.setBuildContext(buildContext);
-        }
-        return context;
-    }
-
-    private PulseFile loadPulseFile(RecipeRequest request, File baseDir, ResourceRepository resourceRepository, Scope globalScope, BuildContext buildContext, long recipeStartTime) throws BuildException
-    {
-        globalScope.add(new Property("base.dir", baseDir.getAbsolutePath()));
-        globalScope.add(new Property("recipe.timestamp", BuildContext.PULSE_BUILD_TIMESTAMP_FORMAT.format(new Date(recipeStartTime))));
-        globalScope.add(new Property("recipe.timestamp.millis", Long.toString(recipeStartTime)));
-        if(buildContext != null)
-        {
-            for(Map.Entry<String, String> property: buildContext.getProperties().entrySet())
-            {
-                globalScope.add(new Property(property.getKey(), property.getValue()));
-            }
-
-            globalScope.add(new Property("build.number", Long.toString(buildContext.getBuildNumber())));
-        }
+        context.pushScope();
+        context.addString(PROPERTY_BASE_DIR, context.getWorkingDir().getAbsolutePath());
+        context.addString(PROPERTY_RECIPE_TIMESTAMP, BuildProperties.TIMESTAMP_FORMAT.format(new Date(recipeStartTime)));
+        context.addString(PROPERTY_RECIPE_TIMESTAMP_MILLIS, Long.toString(recipeStartTime));
+        context.addString(PROPERTY_RECIPE_ID, Long.toString(recipeId));
+        context.addValue(PROPERTY_TEST_RESULTS, testResults);
 
         Map<String, String> env = System.getenv();
         for(Map.Entry<String, String> var: env.entrySet())
         {
-            globalScope.addEnvironmentProperty(var.getKey(), var.getValue());
+            context.getScope().addEnvironmentProperty(var.getKey(), var.getValue());
         }
+    }
 
+    private PulseFile loadPulseFile(RecipeRequest request, ExecutionContext context) throws BuildException
+    {
+        // Use a separate scope for the Pulse file to avoid clashes between
+        // our own properties and those defined by the user.  Basically, in
+        // the Pulse file they can define whatever they like, but when we are
+        // actually executing things we do not want this to possibly clash
+        // with Pulse-internal things.
+        Scope globalScope = new Scope(context.getScope());
         if(request.getProperties() != null)
         {
             globalScope.add(request.getProperties());
         }
 
         // import the required resources into the pulse files scope.
+        ResourceRepository resourceRepository = context.getValue(PROPERTY_RESOURCE_REPOSITORY, ResourceRepository.class);
         importResources(resourceRepository, request.getResourceRequirements(), globalScope);
 
         // CIB-286: special case empty file for better reporting

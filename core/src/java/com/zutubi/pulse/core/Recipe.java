@@ -14,10 +14,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- *
- *
  */
-public class Recipe implements Reference
+public class Recipe extends SelfReference
 {
     private static final Logger LOG = Logger.getLogger(Recipe.class);
 
@@ -66,33 +64,6 @@ public class Recipe implements Reference
     {
     }
 
-    //---( implementation of the reference interface )---
-
-    /**
-     * Getter for the recipes name.
-     *
-     * @return the recipies name.
-     */
-    public String getName()
-    {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
-    /**
-     * Implementation of the value getter for the Reference interface.
-     *
-     * @return this
-     */
-    public Object getValue()
-    {
-        return this;
-    }
-
     /**
      * Add a new command instance to this recipe.
      *
@@ -107,7 +78,6 @@ public class Recipe implements Reference
      * Get the named command instance.
      *
      * @param name of the command being retrieved.
-     * 
      * @return the named command instance, or null if no matching command was found.
      */
     public Command getCommand(String name)
@@ -154,7 +124,7 @@ public class Recipe implements Reference
     }
 
     /**
-     * Terminate this 
+     * Terminate this
      */
     public void terminate()
     {
@@ -173,9 +143,10 @@ public class Recipe implements Reference
         }
     }
 
-    public void execute(RecipeContext context)
+    public void execute(ExecutionContext context)
     {
         boolean success = true;
+        File outputDir = context.getValue(BuildProperties.PROPERTY_RECIPE_PATHS, RecipePaths.class).getOutputDir();
         for (int i = 0; i < commands.size(); i++)
         {
             Command command = commands.get(i);
@@ -183,14 +154,13 @@ public class Recipe implements Reference
             {
                 CommandResult result = new CommandResult(command.getName());
 
-                File commandOutput = new File(context.getPaths().getOutputDir(), getCommandDirName(i, result));
+                File commandOutput = new File(outputDir, getCommandDirName(i, result));
                 if (!commandOutput.mkdirs())
                 {
                     throw new BuildException("Could not create command output directory '" + commandOutput.getAbsolutePath() + "'");
                 }
 
-                CommandContext commandContext = createCommandContext(context, commandOutput);
-                if (!executeCommand(commandContext, result, command))
+                if (!executeCommand(context, commandOutput, result, command))
                 {
                     // Recipe terminated.
                     return;
@@ -214,60 +184,73 @@ public class Recipe implements Reference
         return String.format("%08d-%s", i, result.getCommandName());
     }
 
-    private boolean executeCommand(CommandContext commandContext, CommandResult commandResult, Command command)
+    private boolean executeCommand(ExecutionContext context, File commandOutput, CommandResult commandResult, Command command)
     {
-        File commandOutput = commandContext.getOutputDir();
-
-        runningLock.lock();
-        if (terminating)
-        {
-            runningLock.unlock();
-            return false;
-        }
-
-        runningCommand = command;
-        runningLock.unlock();
-
-        commandResult.commence();
-        commandResult.setOutputDir(commandOutput.getPath());
-        eventManager.publish(new CommandCommencedEvent(this, commandContext.getRecipeId(), commandResult.getCommandName(), commandResult.getStartTime()));
-
+        pushCommandContext(context, commandOutput);
         try
         {
+            runningLock.lock();
+            if (terminating)
+            {
+                runningLock.unlock();
+                return false;
+            }
+
+            runningCommand = command;
+            runningLock.unlock();
+
+            commandResult.commence();
+            commandResult.setOutputDir(commandOutput.getPath());
+            long recipeId = context.getLong(BuildProperties.PROPERTY_RECIPE_ID);
+            eventManager.publish(new CommandCommencedEvent(this, recipeId, commandResult.getCommandName(), commandResult.getStartTime()));
+
             try
             {
-                command.execute(commandContext, commandResult);
+                try
+                {
+                    command.execute(context, commandResult);
+                }
+                finally
+                {
+                    // still need to process any available artifacts, even in the event of an error.
+                    processArtifacts(command, context, commandResult);
+                }
+            }
+            catch (BuildException e)
+            {
+                commandResult.error(e);
+            }
+            catch (Exception e)
+            {
+                LOG.severe(e);
+                commandResult.error(new BuildException("Unexpected error: " + e.getMessage(), e));
             }
             finally
             {
-                // still need to process any available artifacts, even in the event of an error.
-                processArtifacts(command, commandContext, commandResult);
+                runningLock.lock();
+                runningCommand = null;
+                runningLock.unlock();
+
+                commandResult.complete();
+                eventManager.publish(new CommandCompletedEvent(this, recipeId, commandResult));
             }
-        }
-        catch (BuildException e)
-        {
-            commandResult.error(e);
-        }
-        catch (Exception e)
-        {
-            LOG.severe(e);
-            commandResult.error(new BuildException("Unexpected error: " + e.getMessage(), e));
+            return true;
         }
         finally
         {
-            runningLock.lock();
-            runningCommand = null;
-            runningLock.unlock();
-
-            commandResult.complete();
-            eventManager.publish(new CommandCompletedEvent(this, commandContext.getRecipeId(), commandResult));
+            context.popScope();
         }
-        return true;
     }
 
-    private void processArtifacts(Command command, CommandContext context, CommandResult result)
+    private void pushCommandContext(ExecutionContext context, File commandOutput)
     {
-        for(Artifact artifact: command.getArtifacts())
+        context.pushScope();
+        context.addString(BuildProperties.PROPERTY_OUTPUT_DIR, commandOutput.getAbsolutePath());
+    }
+
+    private void processArtifacts(Command command, ExecutionContext context, CommandResult result)
+    {
+        for (Artifact artifact : command.getArtifacts())
         {
             try
             {
@@ -278,14 +261,6 @@ public class Recipe implements Reference
                 e.printStackTrace();
             }
         }
-    }
-
-    private CommandContext createCommandContext(RecipeContext recipeContext, File commandOutput)
-    {
-        CommandContext commandContext = new CommandContext();
-        commandContext.setRecipeContext(recipeContext);
-        commandContext.setOutputDir(commandOutput);
-        return commandContext;
     }
 
     /**

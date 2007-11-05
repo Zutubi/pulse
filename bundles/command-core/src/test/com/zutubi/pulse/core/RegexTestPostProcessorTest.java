@@ -143,12 +143,10 @@ public class RegexTestPostProcessorTest extends PulseTestCase
         pp.setAutoFail(autoFail);
 
         TestSuiteResult testResults = new TestSuiteResult();
-        RecipeContext recipeContext = new RecipeContext();
-        recipeContext.setTestResults(testResults);
-        CommandContext context = new CommandContext();
-        context.setOutputDir(tmpDir);
-        context.setRecipeContext(recipeContext);
-        
+        ExecutionContext context = new ExecutionContext();
+        context.addValue(BuildProperties.PROPERTY_TEST_RESULTS, testResults);
+        context.addString(BuildProperties.PROPERTY_OUTPUT_DIR, tmpDir.getAbsolutePath());
+
         pp.process(artifact, result, context);
         return testResults;
     }

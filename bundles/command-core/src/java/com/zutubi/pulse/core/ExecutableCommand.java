@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core;
 
+import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.jni.ProcessControl;
 import com.zutubi.pulse.util.SystemUtils;
@@ -7,7 +8,6 @@ import com.zutubi.util.Constants;
 import com.zutubi.util.ForkOutputStream;
 import com.zutubi.util.IOUtils;
 import com.zutubi.validation.annotations.Required;
-import com.opensymphony.util.TextUtils;
 
 import java.io.*;
 import java.util.*;
@@ -18,7 +18,7 @@ import java.util.*;
  * It exposes two built in artifacts. The command's output and its execution
  * environment.
  */
-public class ExecutableCommand extends CommandSupport implements ScopeAware
+public class ExecutableCommand extends CommandSupport
 {
     private static final String ENV_PATH = "PATH";
     private static final String SUPPRESSED_VALUE = "[value suppressed for security reasons]";
@@ -32,14 +32,14 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
     static final String OUTPUT_ARTIFACT_NAME = "command output";
     static final String OUTPUT_FILENAME = "output.txt";
 
+    @Required
     private String exe;
+    private boolean explicitExe = false;
     private List<Arg> args = new LinkedList<Arg>();
     private File workingDir;
     private String inputFile;
     private String outputFile;
     private List<Environment> env = new LinkedList<Environment>();
-
-    private Scope scope;
 
     private Process child;
     private CancellableReader reader;
@@ -60,26 +60,32 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
 
     }
 
-    public void execute(CommandContext context, CommandResult cmdResult)
+    protected ExecutableCommand(String defaultExe)
     {
-        File workingDir = getWorkingDir(context.getPaths());
-        ProcessBuilder builder = new ProcessBuilder(constructCommand(workingDir));
+        exe = defaultExe;
+    }
+
+    public void execute(ExecutionContext context, CommandResult cmdResult)
+    {
+        File workingDir = getWorkingDir(context.getWorkingDir());
+        ProcessBuilder builder = new ProcessBuilder(constructCommand(context, workingDir));
         builder.directory(workingDir);
         updateChildEnvironment(builder, context);
 
         builder.redirectErrorStream(true);
 
         // record the commands execution environment as an artifact.
+        File outputDir = new File(context.getString(BuildProperties.PROPERTY_OUTPUT_DIR));
         try
         {
-            captureExecutionEnvironmentArtifact(builder, context.getOutputDir());
+            captureExecutionEnvironmentArtifact(context, builder, outputDir);
         }
         catch (IOException e)
         {
             throw new BuildException("Unable to record the process execution environment. ", e);
         }
 
-        File outputFileDir = new File(context.getOutputDir(), OUTPUT_ARTIFACT_NAME);
+        File outputFileDir = new File(outputDir, OUTPUT_ARTIFACT_NAME);
         if (!outputFileDir.mkdir())
         {
             throw new BuildException("Unable to create directory for the output artifact '" + outputFileDir.getAbsolutePath() + "'");
@@ -216,7 +222,7 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
             }
         }
     }
-    private OutputStream getOutputStream(CommandContext context, File workingDir, File outputArtifact) throws FileNotFoundException
+    private OutputStream getOutputStream(ExecutionContext context, File workingDir, File outputArtifact) throws FileNotFoundException
     {
         List<OutputStream> outputs = new ArrayList<OutputStream>(3);
         outputs.add(new FileOutputStream(outputArtifact));
@@ -312,7 +318,7 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
      *
      * @throws IOException if there are problems recording the execution environment.
      */
-    private void captureExecutionEnvironmentArtifact(ProcessBuilder builder, File outputDir) throws IOException
+    private void captureExecutionEnvironmentArtifact(ExecutionContext context, ProcessBuilder builder, File outputDir) throws IOException
     {
         initialiseEnvironmentArtifact();
 
@@ -356,7 +362,9 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
         buffer.append(separator);
         buffer.append("Resources: (via scope)").append(separator);
         buffer.append("----------------------").append(separator);
-        if (scope != null && scope.getEnvironment().size() > 0)
+
+        Scope scope = context.getScope();
+        if (scope.getEnvironment().size() > 0)
         {
             for (Map.Entry<String, String> setting : scope.getEnvironment().entrySet())
             {
@@ -405,7 +413,7 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
         envArtifact.setType("text/plain");
     }
 
-    private List<String> constructCommand(File workingDir)
+    private List<String> constructCommand(ExecutionContext context, File workingDir)
     {
         String binary = exe;
 
@@ -421,7 +429,7 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
             }
             else
             {
-                exeFile = SystemUtils.findInPath(exe, scope == null ? null : scope.getPathDirectories());
+                exeFile = SystemUtils.findInPath(exe, context.getScope().getPathDirectories());
                 if (exeFile != null)
                 {
                     binary = exeFile.getAbsolutePath();
@@ -449,15 +457,15 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
      *   a) if it is absolute, this is the working directory.
      *   b) if it is relative, then it is taken as the directory relative to the base directory.
      *
-     * @param paths paths for the recipe we are executing in
+     * @param baseDir the base directory for the recipe
      *
      * @return working directory for the command.
      */
-    protected File getWorkingDir(RecipePaths paths)
+    protected File getWorkingDir(File baseDir)
     {
         if (workingDir == null)
         {
-            return paths.getBaseDir();
+            return baseDir;
         }
         else
         {
@@ -467,56 +475,49 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
             }
             else
             {
-                return new File(paths.getBaseDir(), workingDir.getPath());
+                return new File(baseDir, workingDir.getPath());
             }
         }
     }
 
-    private void updateChildEnvironment(ProcessBuilder builder, CommandContext context)
+    private void updateChildEnvironment(ProcessBuilder builder, ExecutionContext context)
     {
         Map<String, String> childEnvironment = builder.environment();
 
-        if (scope != null)
+        Scope scope = context.getScope();
+        for (Map.Entry<String, String> setting : scope.getEnvironment().entrySet())
         {
-            for (Map.Entry<String, String> setting : scope.getEnvironment().entrySet())
-            {
-                childEnvironment.put(setting.getKey(), setting.getValue());
-            }
-
-            /**
-             * Here, we are using a custom get property method that runs a case insensitive lookup of the ENV_PATH
-             * property. This is required because on Windows, the PATH variable is actually in the map as Path, and
-             * so is not matched. 
-             */
-            String pathKey = ENV_PATH;
-            String pathValue = scope.getPathPrefix();
-
-            String translatedKey = locateCaseInsensitiveMatch(ENV_PATH, childEnvironment);
-            if (translatedKey != null)
-            {
-                String path = childEnvironment.get(translatedKey);
-                pathKey = translatedKey;
-                pathValue = pathValue + path;
-            }
-
-            childEnvironment.put(pathKey, pathValue);
+            childEnvironment.put(setting.getKey(), setting.getValue());
         }
+
+        /**
+         * Here, we are using a custom get property method that runs a case insensitive lookup of the ENV_PATH
+         * property. This is required because on Windows, the PATH variable is actually in the map as Path, and
+         * so is not matched.
+         */
+        String pathKey = ENV_PATH;
+        String pathValue = scope.getPathPrefix();
+
+        String translatedKey = locateCaseInsensitiveMatch(ENV_PATH, childEnvironment);
+        if (translatedKey != null)
+        {
+            String path = childEnvironment.get(translatedKey);
+            pathKey = translatedKey;
+            pathValue = pathValue + path;
+        }
+
+        childEnvironment.put(pathKey, pathValue);
 
         for (Environment setting : env)
         {
             childEnvironment.put(setting.getName(), setting.getValue());
         }
 
-        if (scope != null)
+        for(Reference reference: scope.getReferences(String.class))
         {
-            for(Reference reference: scope.getReferences())
+            if(acceptableName(reference.getName()))
             {
-                if(acceptableName(reference.getName()) && reference.getValue() instanceof String)
-                {
-                    String value = (String) reference.getValue();
-
-                    childEnvironment.put(convertName(reference.getName()), value);
-                }
+                childEnvironment.put(convertName(reference.getName()), (String) reference.getValue());
             }
         }
     }
@@ -575,17 +576,11 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
         return null;
     }
 
-    protected Scope getScope()
-    {
-        return scope;
-    }
-
     public List<String> getArtifactNames()
     {
         return Arrays.asList(OUTPUT_ARTIFACT_NAME);
     }
 
-    @Required
     public String getExe()
     {
         return exe;
@@ -594,6 +589,7 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
     public void setExe(String exe)
     {
         this.exe = exe;
+        this.explicitExe = true;
     }
 
     /**
@@ -714,9 +710,16 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
         return args;
     }
 
-    public void setScope(Scope scope)
+    protected void setExeFromProperty(ExecutionContext context, String property)
     {
-        this.scope = scope;
+        if (!explicitExe)
+        {
+            String value = context.getString(property);
+            if (value != null)
+            {
+                setExe(value);
+            }
+        }
     }
 
     /**

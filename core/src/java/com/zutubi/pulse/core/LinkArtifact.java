@@ -20,7 +20,7 @@ public class LinkArtifact implements Artifact
 
     }
 
-    public void capture(CommandResult result, CommandContext context)
+    public void capture(CommandResult result, ExecutionContext context)
     {
         result.addArtifact(new StoredArtifact(name, url));
     }

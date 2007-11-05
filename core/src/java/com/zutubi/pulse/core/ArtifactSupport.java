@@ -39,7 +39,7 @@ public abstract class ArtifactSupport implements Artifact
         this.name = name;
     }
 
-    protected void processArtifact(StoredFileArtifact fileArtifact, CommandResult result, CommandContext context, List<ProcessArtifact> processes)
+    protected void processArtifact(StoredFileArtifact fileArtifact, CommandResult result, ExecutionContext context, List<ProcessArtifact> processes)
     {
         for (ProcessArtifact process : processes)
         {

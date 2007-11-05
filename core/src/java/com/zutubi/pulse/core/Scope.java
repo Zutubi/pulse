@@ -1,7 +1,6 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.config.ResourceProperty;
-import com.zutubi.pulse.core.model.Property;
 
 import java.io.File;
 import java.util.*;
@@ -56,6 +55,26 @@ public class Scope
         return result;
     }
 
+    public List<Reference> getReferences(Class type)
+    {
+        List<Reference> result = new ArrayList<Reference>(references.size());
+
+        if (parent != null)
+        {
+            result.addAll(parent.getReferences(type));
+        }
+
+        for(ReferenceInfo info: references)
+        {
+            if (type.isInstance(info.reference.getValue()))
+            {
+                result.add(info.reference);
+            }
+        }
+
+        return result;
+    }
+
     public boolean containsReference(String name)
     {
         return getReference(name) != null;
@@ -88,6 +107,17 @@ public class Scope
         return null;
     }
 
+    public <T> T getReferenceValue(String name, Class<T> type)
+    {
+        Reference r = getReference(name);
+        if(r == null || !type.isInstance(r.getValue()))
+        {
+            return null;
+        }
+
+        return (T) r.getValue();
+    }
+
     private Reference lookupPath(String name)
     {
         List<ReferenceInfo> merged = new LinkedList<ReferenceInfo>();
@@ -115,7 +145,7 @@ public class Scope
         Map<String, String> env = getEnvironment(merged);
         String var = name.substring(4);
         String value = env.get(var);
-        
+
         if(value == null)
         {
             ReferenceInfo info = directLookup(name, merged);
@@ -212,7 +242,7 @@ public class Scope
     public String getPathPrefix()
     {
         String result = "";
-        
+
         for(String dir: getPathDirectories())
         {
             result += dir;

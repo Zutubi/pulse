@@ -22,9 +22,9 @@ public class PrecapturedArtifact extends ArtifactSupport
         this.processes = processes;
     }
 
-    public void capture(CommandResult result, CommandContext context)
+    public void capture(CommandResult result, ExecutionContext context)
     {
-        File dir = new File(context.getOutputDir(), getName());
+        File dir = new File(context.getString(BuildProperties.PROPERTY_OUTPUT_DIR), getName());
         
         StoredArtifact storedArtifact = new StoredArtifact(getName());
 
