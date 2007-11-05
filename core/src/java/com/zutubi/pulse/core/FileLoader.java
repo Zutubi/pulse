@@ -1,14 +1,14 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.validation.CommandValidationException;
-import com.zutubi.util.IOUtils;
-import com.zutubi.util.bean.ObjectFactory;
-import com.zutubi.validation.i18n.MessagesTextProvider;
 import com.zutubi.pulse.validation.PulseValidationContext;
 import com.zutubi.pulse.validation.PulseValidationManager;
+import com.zutubi.util.IOUtils;
+import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.ValidationManager;
+import com.zutubi.validation.i18n.MessagesTextProvider;
 import nu.xom.*;
 
 import java.io.File;
@@ -97,7 +97,7 @@ public class FileLoader
 
             if (ScopeAware.class.isAssignableFrom(root.getClass()))
             {
-                ((ScopeAware) root).setScope(globalScope);
+                ((ScopeAware) root).setScope(globalScope.copy());
             }
 
             mapAttributesToProperties(rootElement, root, predicate, globalScope);
@@ -172,7 +172,7 @@ public class FileLoader
 
                 if (ScopeAware.class.isAssignableFrom(type.getClass()))
                 {
-                    ((ScopeAware) type).setScope(scope);
+                    ((ScopeAware) type).setScope(scope.copy());
                 }
 
                 if (ResourceAware.class.isAssignableFrom(type.getClass()))

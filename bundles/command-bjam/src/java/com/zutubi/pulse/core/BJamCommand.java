@@ -17,7 +17,7 @@ public class BJamCommand extends ExecutableCommand
 
     public void execute(ExecutionContext context, CommandResult cmdResult)
     {
-        setExeFromProperty(context, "bjam.bin");
+        setExeFromProperty("bjam.bin");
 
         if (jamfile != null)
         {

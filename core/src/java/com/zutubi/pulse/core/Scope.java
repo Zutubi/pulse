@@ -14,8 +14,8 @@ public class Scope
 {
     private static final boolean RETAIN_ENVIRONMENT_CASE = System.getProperty("pulse.retain.environment.case") != null;
 
+    // If you add a field, update copy()
     private Scope parent;
-
     private List<ReferenceInfo> references = new LinkedList<ReferenceInfo>();
 
     public Scope()
@@ -47,7 +47,7 @@ public class Scope
             result.addAll(parent.getReferences());
         }
 
-        for(ReferenceInfo info: references)
+        for (ReferenceInfo info : references)
         {
             result.add(info.reference);
         }
@@ -64,7 +64,7 @@ public class Scope
             result.addAll(parent.getReferences(type));
         }
 
-        for(ReferenceInfo info: references)
+        for (ReferenceInfo info : references)
         {
             if (type.isInstance(info.reference.getValue()))
             {
@@ -82,9 +82,9 @@ public class Scope
 
     public Reference getReference(String name)
     {
-        if(name.startsWith("env."))
+        if (name.startsWith("env."))
         {
-            if(name.equalsIgnoreCase("env.path"))
+            if (name.equalsIgnoreCase("env.path"))
             {
                 return lookupPath(name);
             }
@@ -95,11 +95,11 @@ public class Scope
         }
 
         ReferenceInfo info = directLookup(name, references);
-        if(info != null)
+        if (info != null)
         {
             return info.reference;
         }
-        else if(parent != null)
+        else if (parent != null)
         {
             return parent.getReference(name);
         }
@@ -110,7 +110,7 @@ public class Scope
     public <T> T getReferenceValue(String name, Class<T> type)
     {
         Reference r = getReference(name);
-        if(r == null || !type.isInstance(r.getValue()))
+        if (r == null || !type.isInstance(r.getValue()))
         {
             return null;
         }
@@ -125,7 +125,7 @@ public class Scope
 
         ReferenceInfo info = directLookup(name, merged, false);
         String value;
-        if(info == null || !(info.reference.getValue() instanceof String))
+        if (info == null || !(info.reference.getValue() instanceof String))
         {
             value = "";
         }
@@ -146,10 +146,10 @@ public class Scope
         String var = name.substring(4);
         String value = env.get(var);
 
-        if(value == null)
+        if (value == null)
         {
             ReferenceInfo info = directLookup(name, merged);
-            if(info == null)
+            if (info == null)
             {
                 return null;
             }
@@ -166,7 +166,7 @@ public class Scope
 
     public void setReference(Reference reference) throws FileLoadException
     {
-        if(directLookup(reference.getName(), references) != null)
+        if (directLookup(reference.getName(), references) != null)
         {
             throw new FileLoadException("'" + reference.getName() + "' is already defined in this scope.");
         }
@@ -211,9 +211,9 @@ public class Scope
     private Map<String, String> getEnvironment(List<ReferenceInfo> merged)
     {
         Map<String, String> env = new TreeMap<String, String>();
-        for(ReferenceInfo i: merged)
+        for (ReferenceInfo i : merged)
         {
-            if(i.addToEnvironment && i.reference.getValue() != null)
+            if (i.addToEnvironment && i.reference.getValue() != null)
             {
                 env.put(i.reference.getName(), (String) i.reference.getValue());
             }
@@ -228,9 +228,9 @@ public class Scope
         merge(merged);
 
         List<String> dirs = new LinkedList<String>();
-        for(ReferenceInfo i: merged)
+        for (ReferenceInfo i : merged)
         {
-            if(i.addToPath)
+            if (i.addToPath)
             {
                 dirs.add((String) i.reference.getValue());
             }
@@ -243,7 +243,7 @@ public class Scope
     {
         String result = "";
 
-        for(String dir: getPathDirectories())
+        for (String dir : getPathDirectories())
         {
             result += dir;
             result += File.pathSeparatorChar;
@@ -254,7 +254,7 @@ public class Scope
 
     public void add(Collection<ResourceProperty> properties)
     {
-        for(ResourceProperty resourceProperty: properties)
+        for (ResourceProperty resourceProperty : properties)
         {
             add(resourceProperty);
         }
@@ -275,7 +275,7 @@ public class Scope
      */
     public void addEnvironmentProperty(String name, String value)
     {
-        if(!RETAIN_ENVIRONMENT_CASE)
+        if (!RETAIN_ENVIRONMENT_CASE)
         {
             name = name.toUpperCase();
         }
@@ -290,20 +290,20 @@ public class Scope
 
     private ReferenceInfo directLookup(String name, List<ReferenceInfo> references, boolean caseSensitive)
     {
-        if(!caseSensitive)
+        if (!caseSensitive)
         {
             name = name.toLowerCase();
         }
 
-        for(ReferenceInfo i: references)
+        for (ReferenceInfo i : references)
         {
             String referenceName = i.reference.getName();
-            if(!caseSensitive)
+            if (!caseSensitive)
             {
                 referenceName = referenceName.toLowerCase();
             }
 
-            if(referenceName.equals(name))
+            if (referenceName.equals(name))
             {
                 return i;
             }
@@ -314,25 +314,33 @@ public class Scope
 
     private void merge(List<ReferenceInfo> merged)
     {
-        for(ReferenceInfo i: references)
+        for (ReferenceInfo i : references)
         {
-            if(directLookup(i.reference.getName(), merged) == null)
+            if (directLookup(i.reference.getName(), merged) == null)
             {
                 merged.add(i);
             }
         }
 
-        if(parent != null)
+        if (parent != null)
         {
             parent.merge(merged);
         }
     }
 
+    public Scope copy()
+    {
+        Scope copy = new Scope(parent == null ? null : parent.copy());
+        // Assumes reference infos are not mutated in some odd way
+        copy.references = new LinkedList<ReferenceInfo>(references);
+        return copy;
+    }
+
     private class ReferenceInfo
     {
-        public Reference reference;
-        public boolean addToPath;
-        public boolean addToEnvironment;
+        private Reference reference;
+        private boolean addToPath;
+        private boolean addToEnvironment;
 
         public ReferenceInfo(Reference reference)
         {
@@ -347,8 +355,8 @@ public class Scope
             if (p.getResolveVariables())
             {
                 try
-            {
-                value = VariableHelper.replaceVariables(p.getValue(), Scope.this, true);
+                {
+                    value = VariableHelper.replaceVariables(p.getValue(), Scope.this, true);
                 }
                 catch (FileLoadException e)
                 {

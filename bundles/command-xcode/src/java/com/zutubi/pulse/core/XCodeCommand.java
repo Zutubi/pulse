@@ -25,7 +25,7 @@ public class XCodeCommand extends ExecutableCommand
 
     public void execute(ExecutionContext context, CommandResult cmdResult)
     {
-        setExeFromProperty(context, "xcode.bin");
+        setExeFromProperty("xcode.bin");
 
         if (TextUtils.stringSet(project))
         {

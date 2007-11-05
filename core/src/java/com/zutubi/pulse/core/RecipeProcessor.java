@@ -201,12 +201,6 @@ public class RecipeProcessor
         context.addString(PROPERTY_RECIPE_TIMESTAMP_MILLIS, Long.toString(recipeStartTime));
         context.addString(PROPERTY_RECIPE_ID, Long.toString(recipeId));
         context.addValue(PROPERTY_TEST_RESULTS, testResults);
-
-        Map<String, String> env = System.getenv();
-        for(Map.Entry<String, String> var: env.entrySet())
-        {
-            context.getScope().addEnvironmentProperty(var.getKey(), var.getValue());
-        }
     }
 
     private PulseFile loadPulseFile(RecipeRequest request, ExecutionContext context) throws BuildException
@@ -217,6 +211,12 @@ public class RecipeProcessor
         // actually executing things we do not want this to possibly clash
         // with Pulse-internal things.
         Scope globalScope = new Scope(context.getScope());
+        Map<String, String> env = System.getenv();
+        for(Map.Entry<String, String> var: env.entrySet())
+        {
+            globalScope.addEnvironmentProperty(var.getKey(), var.getValue());
+        }
+
         if(request.getProperties() != null)
         {
             globalScope.add(request.getProperties());

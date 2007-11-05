@@ -18,7 +18,7 @@ public class MavenCommand extends ExecutableCommand
 
     public void execute(ExecutionContext context, CommandResult cmdResult)
     {
-        setExeFromProperty(context, "maven.bin");
+        setExeFromProperty("maven.bin");
 
         if (targets != null)
         {

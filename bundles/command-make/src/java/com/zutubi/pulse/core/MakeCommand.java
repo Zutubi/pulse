@@ -16,7 +16,7 @@ public class MakeCommand extends ExecutableCommand
 
     public void execute(ExecutionContext context, CommandResult cmdResult)
     {
-        setExeFromProperty(context, "make.bin");
+        setExeFromProperty("make.bin");
 
         if (makefile != null)
         {

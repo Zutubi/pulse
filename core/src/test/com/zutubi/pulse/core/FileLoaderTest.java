@@ -11,7 +11,6 @@ public class FileLoaderTest extends FileLoaderTestBase
         super.setUp();
 
         // initialise the loader some test objects.
-        loader.register("dependency", Dependency.class);
         loader.register("reference", SimpleReference.class);
         loader.register("nested", SimpleNestedType.class);
         loader.register("type", SimpleType.class);
@@ -71,23 +70,6 @@ public class FileLoaderTest extends FileLoaderTestBase
         assertTrue(a instanceof SomeReference);
         assertEquals("a", ((SomeReference) a).getSomeValue());
 
-    }
-
-    public void testDependency() throws Exception
-    {
-        PulseFile bf = new PulseFile();
-        loader.load(getInput("testDependency"), bf);
-
-        assertNotNull(bf.getDependencies());
-        assertEquals(1, bf.getDependencies().size());
-        assertEquals("1", bf.getDependencies().get(0).getName());
-        assertEquals("2", bf.getDependencies().get(0).getVersion());
-
-        Recipe recipe = bf.getRecipe(bf.getDefaultRecipe());
-        assertNotNull(recipe);
-        assertEquals(1, recipe.getDependencies().size());
-        assertEquals("a", recipe.getDependencies().get(0).getName());
-        assertEquals("b", recipe.getDependencies().get(0).getVersion());
     }
 
     public void testRegister() throws Exception

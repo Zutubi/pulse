@@ -20,7 +20,7 @@ public class Maven2Command extends ExecutableCommand
 
     public void execute(ExecutionContext context, CommandResult cmdResult)
     {
-        setExeFromProperty(context, "maven2.bin");
+        setExeFromProperty("maven2.bin");
 
         if (goals != null)
         {

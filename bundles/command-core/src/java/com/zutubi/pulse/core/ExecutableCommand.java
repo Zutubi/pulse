@@ -18,7 +18,7 @@ import java.util.*;
  * It exposes two built in artifacts. The command's output and its execution
  * environment.
  */
-public class ExecutableCommand extends CommandSupport
+public class ExecutableCommand extends CommandSupport implements ScopeAware
 {
     private static final String ENV_PATH = "PATH";
     private static final String SUPPRESSED_VALUE = "[value suppressed for security reasons]";
@@ -51,6 +51,7 @@ public class ExecutableCommand extends CommandSupport
 
     private List<ProcessArtifact> processes = new LinkedList<ProcessArtifact>();
     private List<String> suppressedEnvironment = Arrays.asList(System.getProperty("pulse.suppressed.environment.variables", "P4PASSWD").split(" +"));
+    private Scope scope;
 
     /**
      * Required no arg constructor.
@@ -68,9 +69,9 @@ public class ExecutableCommand extends CommandSupport
     public void execute(ExecutionContext context, CommandResult cmdResult)
     {
         File workingDir = getWorkingDir(context.getWorkingDir());
-        ProcessBuilder builder = new ProcessBuilder(constructCommand(context, workingDir));
+        ProcessBuilder builder = new ProcessBuilder(constructCommand(workingDir));
         builder.directory(workingDir);
-        updateChildEnvironment(builder, context);
+        updateChildEnvironment(builder);
 
         builder.redirectErrorStream(true);
 
@@ -78,7 +79,7 @@ public class ExecutableCommand extends CommandSupport
         File outputDir = new File(context.getString(BuildProperties.PROPERTY_OUTPUT_DIR));
         try
         {
-            captureExecutionEnvironmentArtifact(context, builder, outputDir);
+            captureExecutionEnvironmentArtifact(builder, outputDir);
         }
         catch (IOException e)
         {
@@ -318,7 +319,7 @@ public class ExecutableCommand extends CommandSupport
      *
      * @throws IOException if there are problems recording the execution environment.
      */
-    private void captureExecutionEnvironmentArtifact(ExecutionContext context, ProcessBuilder builder, File outputDir) throws IOException
+    private void captureExecutionEnvironmentArtifact(ProcessBuilder builder, File outputDir) throws IOException
     {
         initialiseEnvironmentArtifact();
 
@@ -363,8 +364,7 @@ public class ExecutableCommand extends CommandSupport
         buffer.append("Resources: (via scope)").append(separator);
         buffer.append("----------------------").append(separator);
 
-        Scope scope = context.getScope();
-        if (scope.getEnvironment().size() > 0)
+        if (scope != null && scope.getEnvironment().size() > 0)
         {
             for (Map.Entry<String, String> setting : scope.getEnvironment().entrySet())
             {
@@ -413,7 +413,7 @@ public class ExecutableCommand extends CommandSupport
         envArtifact.setType("text/plain");
     }
 
-    private List<String> constructCommand(ExecutionContext context, File workingDir)
+    private List<String> constructCommand(File workingDir)
     {
         String binary = exe;
 
@@ -429,7 +429,7 @@ public class ExecutableCommand extends CommandSupport
             }
             else
             {
-                exeFile = SystemUtils.findInPath(exe, context.getScope().getPathDirectories());
+                exeFile = scope == null ? null : SystemUtils.findInPath(exe, scope.getPathDirectories());
                 if (exeFile != null)
                 {
                     binary = exeFile.getAbsolutePath();
@@ -480,44 +480,49 @@ public class ExecutableCommand extends CommandSupport
         }
     }
 
-    private void updateChildEnvironment(ProcessBuilder builder, ExecutionContext context)
+    private void updateChildEnvironment(ProcessBuilder builder)
     {
         Map<String, String> childEnvironment = builder.environment();
 
-        Scope scope = context.getScope();
-        for (Map.Entry<String, String> setting : scope.getEnvironment().entrySet())
+        if (scope != null)
         {
-            childEnvironment.put(setting.getKey(), setting.getValue());
+            for (Map.Entry<String, String> setting : scope.getEnvironment().entrySet())
+            {
+                childEnvironment.put(setting.getKey(), setting.getValue());
+            }
+
+            /**
+             * Here, we are using a custom get property method that runs a case insensitive lookup of the ENV_PATH
+             * property. This is required because on Windows, the PATH variable is actually in the map as Path, and
+             * so is not matched.
+             */
+            String pathKey = ENV_PATH;
+            String pathValue = scope.getPathPrefix();
+
+            String translatedKey = locateCaseInsensitiveMatch(ENV_PATH, childEnvironment);
+            if (translatedKey != null)
+            {
+                String path = childEnvironment.get(translatedKey);
+                pathKey = translatedKey;
+                pathValue = pathValue + path;
+            }
+
+            childEnvironment.put(pathKey, pathValue);
         }
-
-        /**
-         * Here, we are using a custom get property method that runs a case insensitive lookup of the ENV_PATH
-         * property. This is required because on Windows, the PATH variable is actually in the map as Path, and
-         * so is not matched.
-         */
-        String pathKey = ENV_PATH;
-        String pathValue = scope.getPathPrefix();
-
-        String translatedKey = locateCaseInsensitiveMatch(ENV_PATH, childEnvironment);
-        if (translatedKey != null)
-        {
-            String path = childEnvironment.get(translatedKey);
-            pathKey = translatedKey;
-            pathValue = pathValue + path;
-        }
-
-        childEnvironment.put(pathKey, pathValue);
 
         for (Environment setting : env)
         {
             childEnvironment.put(setting.getName(), setting.getValue());
         }
 
-        for(Reference reference: scope.getReferences(String.class))
+        if (scope != null)
         {
-            if(acceptableName(reference.getName()))
+            for(Reference reference: scope.getReferences(String.class))
             {
-                childEnvironment.put(convertName(reference.getName()), (String) reference.getValue());
+                if(acceptableName(reference.getName()))
+                {
+                    childEnvironment.put(convertName(reference.getName()), (String) reference.getValue());
+                }
             }
         }
     }
@@ -710,16 +715,21 @@ public class ExecutableCommand extends CommandSupport
         return args;
     }
 
-    protected void setExeFromProperty(ExecutionContext context, String property)
+    protected void setExeFromProperty(String property)
     {
-        if (!explicitExe)
+        if (!explicitExe && scope != null)
         {
-            String value = context.getString(property);
+            String value = scope.getReferenceValue(property, String.class);
             if (value != null)
             {
                 setExe(value);
             }
         }
+    }
+
+    public void setScope(Scope scope)
+    {
+        this.scope = scope;
     }
 
     /**

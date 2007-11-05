@@ -38,9 +38,9 @@ public abstract class FileLoaderTestBase extends PulseTestCase
         PulseFile bf = new PulseFile();
         loader.load(getInput("basic"), bf);
 
-        Scope globalScope = bf.getGlobalScope();
-        assertTrue(globalScope.containsReference(name));
-        return (T) globalScope.getReference(name);
+        Reference r = bf.getReference(name);
+        assertNotNull(r);
+        return (T) r;
     }
 
     protected <T extends Command> T commandHelper(String name) throws PulseException

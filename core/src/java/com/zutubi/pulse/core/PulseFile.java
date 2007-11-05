@@ -7,14 +7,13 @@ import java.util.List;
 /**
  *
  */
-public class PulseFile implements ScopeAware
+public class PulseFile
 {
     private String defaultRecipe;
     private String name;
 
     private List<Recipe> recipes = new LinkedList<Recipe>();
-    private List<Dependency> dependencies = new LinkedList<Dependency>();
-    private Scope globalScope;
+    private List<Reference> references = new LinkedList<Reference>();
 
     public String getDefaultRecipe()
     {
@@ -24,11 +23,6 @@ public class PulseFile implements ScopeAware
     public void setDefaultRecipe(String defaultRecipe)
     {
         this.defaultRecipe = defaultRecipe;
-    }
-
-    public Scope getGlobalScope()
-    {
-        return globalScope;
     }
 
     public void addRecipe(Recipe r) throws FileLoadException
@@ -62,14 +56,26 @@ public class PulseFile implements ScopeAware
         return null;
     }
 
-    public List<Dependency> getDependencies()
+    public void add(Reference r) throws FileLoadException
     {
-        return Collections.unmodifiableList(dependencies);
+        references.add(r);
     }
 
-    public void addDependency(Dependency dependency)
+    public List<Reference> getReferences()
     {
-        dependencies.add(dependency);
+        return Collections.unmodifiableList(references);
+    }
+
+    public Reference getReference(String name)
+    {
+        for (Reference reference: references)
+        {
+            if (name.equals(reference.getName()))
+            {
+                return reference;
+            }
+        }
+        return null;
     }
 
     public String getName()
@@ -80,10 +86,5 @@ public class PulseFile implements ScopeAware
     public void setName(String name)
     {
         this.name = name;
-    }
-
-    public void setScope(Scope scope)
-    {
-        this.globalScope = scope;
     }
 }

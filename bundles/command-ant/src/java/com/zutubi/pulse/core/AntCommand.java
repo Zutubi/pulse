@@ -17,7 +17,7 @@ public class AntCommand extends ExecutableCommand
 
     public void execute(ExecutionContext context, CommandResult cmdResult)
     {
-        setExeFromProperty(context, "ant.bin");
+        setExeFromProperty("ant.bin");
 
         if (buildFile != null)
         {
