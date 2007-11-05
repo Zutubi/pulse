@@ -147,6 +147,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
                 }
             }
         });
+        autoCompaction.setName("File System Record Store Compaction.");
         autoCompaction.start();
     }
 

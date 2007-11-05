@@ -56,7 +56,7 @@
 </p>
 <p>
 #if ($monitor.isSuccessful())
-    The upgrade has completed. <a href="continue.action">continue</a>.
+    The upgrade has completed. <a id="continue" href="continue.action">continue</a>.
 #else
     The upgrade has failed. Please report this failure to <a href="mailto:support@zutubi.com">zutubi support</a>,
     including a screenshot of this page and your server log files.

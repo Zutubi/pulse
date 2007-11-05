@@ -2,7 +2,7 @@
 <head></head>
 
 <body>
-<h1>Upgrade Preview</h1>
+<h1 id="upgrade.preview">Upgrade Preview</h1>
 
 <p>
     The data directory being used by this installation of pulse contains an existing data directory from an older installation.
@@ -27,13 +27,6 @@
         </tr>
     </table>
 </p>
-<p style="width:50%; color: red; font-size: 125%">
-   This is an experimental release of Pulse 2.0 that <strong>does not</strong> support
-   an upgrade path.  Please modify your config.properties file to use a fresh
-   data path.  <strong>DO NOT</strong> attempt to use this version of Pulse with
-   production data.
-</p>
-
 <!--
 #if($upgradePreview.size() > 0)
 <p>
@@ -59,5 +52,13 @@
 #continue(1)
 #end
 -->
+
+<p style="width:50%; color: red; font-size: 125%">
+   This is an experimental release of Pulse 2.0 that <strong>does not</strong> support
+   an upgrade path.  Please modify your config.properties file to use a fresh
+   data path.  <strong>DO NOT</strong> attempt to use this version of Pulse with
+   production data.
+</p>
+
 </body>
 </html>

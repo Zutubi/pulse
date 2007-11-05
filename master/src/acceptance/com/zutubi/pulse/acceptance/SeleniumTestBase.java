@@ -34,12 +34,6 @@ public class SeleniumTestBase extends TestCase
         super();
     }
     
-    public SeleniumTestBase(String baseUrl)
-    {
-        super();
-        this.baseUrl = baseUrl;
-    }
-
     protected void setUp() throws Exception
     {
         super.setUp();

@@ -8,6 +8,7 @@ import com.zutubi.pulse.license.LicenseType;
 import com.zutubi.pulse.test.LicenseHelper;
 import com.zutubi.pulse.test.TestUtils;
 import com.zutubi.pulse.transfer.TransferAPI;
+import com.zutubi.pulse.transfer.TransferException;
 import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.ZipUtils;
@@ -16,6 +17,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.apache.commons.cli.ParseException;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -37,13 +39,12 @@ public class UpgradeAcceptanceTest extends SeleniumTestBase
     private String dialect = "org.hibernate.dialect.HSQLDialect";
     private String db;
 
-    public UpgradeAcceptanceTest()
-    {
-        super("http://localhost:8990");
-    }
-
     protected void setUp() throws Exception
     {
+        System.setProperty("pulse.port", "8990");
+        
+        super.setUp();
+
         tmpDir = FileSystemUtils.createTempDir("UAT", "");
         db = System.getenv("PULSE_DB");
     }
@@ -55,6 +56,7 @@ public class UpgradeAcceptanceTest extends SeleniumTestBase
             //throw new RuntimeException("Failed to remove the temporary directory: " + tmpDir.getAbsolutePath());
             System.out.println("failed to remove tmp directory due to earlier error.");
         }
+        super.tearDown();
     }
 
     public void testPostBuildActionSpecifications() throws Exception
@@ -114,6 +116,16 @@ public class UpgradeAcceptanceTest extends SeleniumTestBase
         configDir.mkdir();
         FileSystemUtils.copy(configDir, configFile);
 
+        restoreDatabase(buildDir);
+
+        setupServerProperties(build);
+        System.setProperty("bootstrap", "com/zutubi/pulse/bootstrap/ideaBootstrapContext.xml");
+
+        runUpgrade(build);
+    }
+
+    private void restoreDatabase(File buildDir) throws IOException, TransferException
+    {
         MutableConfiguration configuration = new MutableConfiguration();
         File mappingsDir = new File(buildDir, "mappings");
         String[] mappings = mappingsDir.list(new FilenameFilter()
@@ -133,10 +145,6 @@ public class UpgradeAcceptanceTest extends SeleniumTestBase
         configuration.setProperty("hibernate.dialect", dialect);
         TransferAPI transferAPI = new TransferAPI();
         transferAPI.restore(configuration, new File(buildDir, "dump.xml"), dataSource);
-
-        setupServerProperties(build);
-        System.setProperty("bootstrap", "com/zutubi/pulse/bootstrap/ideaBootstrapContext.xml");
-        runUpgrade(build);
     }
 
     private void setupMySQL()
@@ -235,18 +243,39 @@ public class UpgradeAcceptanceTest extends SeleniumTestBase
     private void runUpgrade(String build) throws Exception
     {
         // start pulse using the extracted data directory.
-        StartCommand start = new StartCommand();
-        assertEquals(0, start.execute(getBootContext("start", "-p", "8990", "-d", tmpDir.getAbsolutePath())));
+        final StartCommand start = new StartCommand();
+
+        Thread serverStartup = new Thread(new Runnable()
+        {
+            public void run()
+            {
+                try
+                {
+                    assertEquals(0, start.execute(getBootContext("start", "-p", "8990", "-d", tmpDir.getAbsolutePath())));
+                }
+                catch (ParseException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
+        serverStartup.start();
 
         // now we need to go to the Web UI and wait.
 
+        Thread.sleep(30000);
+
         goTo("/");
+
+        SeleniumUtils.waitForElementId(selenium, "upgrade.preview", 120000);
 
         // check that we have received the upgrade preview, and that the data is as expected.
         assertTextPresent("Upgrade Preview");
         assertTextPresent(build);
 
         selenium.click("continue");
+
+        SeleniumUtils.waitForElementId(selenium, "upgrade.progress", 120000);
 
         // waiting..
         assertTextPresent("Upgrade Progress");
@@ -257,6 +286,8 @@ public class UpgradeAcceptanceTest extends SeleniumTestBase
         assertTextPresent("The upgrade has been successful");
 
         selenium.click("continue");
+
+        Thread.sleep(30000);
 
         ShutdownCommand shutdown = new ShutdownCommand();
         shutdown.setExitJvm(false);
