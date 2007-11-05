@@ -335,7 +335,7 @@ public class Data implements MasterUserPaths
         return recordRoot;
     }
 
-    private Config getConfig()
+    public Config getConfig()
     {
         if (config == null)
         {

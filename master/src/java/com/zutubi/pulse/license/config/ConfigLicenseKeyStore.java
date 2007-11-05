@@ -43,8 +43,8 @@ public class ConfigLicenseKeyStore extends AbstractLicenseKeyStore
         configurationProvider.save(licenseConfiguration);
     }
 
-    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    public void setConfigurationProvider(ConfigurationProvider provider)
     {
-        this.configurationProvider = configurationProvider;
+        this.configurationProvider = provider;
     }
 }
