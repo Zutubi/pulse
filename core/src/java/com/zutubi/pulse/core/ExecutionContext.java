@@ -72,22 +72,19 @@ public class ExecutionContext
 
     private boolean asBoolean(Object value, boolean defaultValue)
     {
-        if(value == null)
+        if (value != null)
         {
-            return defaultValue;
+            if (value instanceof Boolean)
+            {
+                return (Boolean) value;
+            }
+            else if (value instanceof String)
+            {
+                return Boolean.parseBoolean((String) value);
+            }
         }
-        else if(value instanceof Boolean)
-        {
-            return (Boolean) value;
-        }
-        else if (value instanceof String)
-        {
-            return Boolean.parseBoolean((String) value);
-        }
-        else
-        {
-            return defaultValue;
-        }
+
+        return defaultValue;
     }
 
     public long getInternalLong(String name)
@@ -102,22 +99,26 @@ public class ExecutionContext
 
     private long asLong(Object value)
     {
-        if(value == null)
+        if (value != null)
         {
-            return 0;
+            if (value instanceof Long)
+            {
+                return (Long) value;
+            }
+            else if (value instanceof String)
+            {
+                try
+                {
+                    return Long.parseLong((String) value);
+                }
+                catch (NumberFormatException e)
+                {
+                    // Fall through
+                }
+            }
         }
-        else if(value instanceof Long)
-        {
-            return (Long) value;
-        }
-        else if (value instanceof String)
-        {
-            return Long.parseLong((String) value);
-        }
-        else
-        {
-            return 0;
-        }
+
+        return 0;
     }
 
     public File getInternalFile(String name)
@@ -132,22 +133,19 @@ public class ExecutionContext
 
     private File asFile(Object value)
     {
-        if(value == null)
+        if (value != null)
         {
-            return null;
+            if (value instanceof File)
+            {
+                return (File) value;
+            }
+            else if (value instanceof String)
+            {
+                return new File((String) value);
+            }
         }
-        else if(value instanceof File)
-        {
-            return (File) value;
-        }
-        else if (value instanceof String)
-        {
-            return new File((String) value);
-        }
-        else
-        {
-            return null;
-        }
+
+        return null;
     }
 
     public <T> T getInternalValue(String name, Class<T> type)
@@ -158,7 +156,7 @@ public class ExecutionContext
     public <T> T getValue(String name, Class<T> type)
     {
         T value = userScope.getReferenceValue(name, type);
-        if(value == null)
+        if (value == null)
         {
             value = internalScope.getReferenceValue(name, type);
         }

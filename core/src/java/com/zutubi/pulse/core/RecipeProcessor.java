@@ -199,16 +199,16 @@ public class RecipeProcessor
     {
         context.pushInternalScope();
         context.addInternalString(PROPERTY_BASE_DIR, context.getWorkingDir().getAbsolutePath());
-        if(context.getInternalString(PROPERTY_RECIPE) == null)
-        {
-            context.addInternalString(PROPERTY_RECIPE, "[default]");
-        }
         context.addInternalString(PROPERTY_RECIPE_TIMESTAMP, BuildProperties.TIMESTAMP_FORMAT.format(new Date(recipeStartTime)));
         context.addInternalString(PROPERTY_RECIPE_TIMESTAMP_MILLIS, Long.toString(recipeStartTime));
         context.addInternalValue(PROPERTY_TEST_RESULTS, testResults);
 
         context.pushScope();
         importResources(resourceRepository, request.getResourceRequirements(), context);
+        if(context.getInternalString(PROPERTY_RECIPE) == null)
+        {
+            context.addString(PROPERTY_RECIPE, "[default]");
+        }
     }
 
     private PulseFile loadPulseFile(RecipeRequest request, ExecutionContext context, ResourceRepository resourceRepository) throws BuildException
