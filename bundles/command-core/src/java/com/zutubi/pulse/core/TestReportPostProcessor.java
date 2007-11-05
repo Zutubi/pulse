@@ -30,8 +30,8 @@ public abstract class TestReportPostProcessor extends SelfReference implements P
 
     public void process(StoredFileArtifact artifact, CommandResult result, ExecutionContext context)
     {
-        TestSuiteResult testResults = context.getValue(BuildProperties.PROPERTY_TEST_RESULTS, TestSuiteResult.class);
-        File outputDir = new File(context.getString(BuildProperties.PROPERTY_OUTPUT_DIR));
+        TestSuiteResult testResults = context.getInternalValue(BuildProperties.PROPERTY_TEST_RESULTS, TestSuiteResult.class);
+        File outputDir = context.getInternalFile(BuildProperties.PROPERTY_OUTPUT_DIR);
         int brokenBefore = testResults.getSummary().getBroken();
 
         File file = new File(outputDir, artifact.getPath());

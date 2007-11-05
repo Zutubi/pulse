@@ -6,7 +6,6 @@ import com.zutubi.pulse.core.BuildProperties;
 import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.util.FileSystemUtils;
 
-import java.io.File;
 import java.io.IOException;
 
 /**
@@ -17,7 +16,7 @@ public class LocalBootstrapper extends BootstrapperSupport
     {
         try
         {
-            FileSystemUtils.cleanOutputDir(new File(context.getString(BuildProperties.PROPERTY_OUTPUT_DIR)));
+            FileSystemUtils.cleanOutputDir(context.getInternalFile(BuildProperties.PROPERTY_OUTPUT_DIR));
         }
         catch (IOException e)
         {

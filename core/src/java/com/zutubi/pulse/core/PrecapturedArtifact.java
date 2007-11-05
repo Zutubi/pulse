@@ -24,7 +24,7 @@ public class PrecapturedArtifact extends ArtifactSupport
 
     public void capture(CommandResult result, ExecutionContext context)
     {
-        File dir = new File(context.getString(BuildProperties.PROPERTY_OUTPUT_DIR), getName());
+        File dir = new File(context.getInternalFile(BuildProperties.PROPERTY_OUTPUT_DIR), getName());
         
         StoredArtifact storedArtifact = new StoredArtifact(getName());
 

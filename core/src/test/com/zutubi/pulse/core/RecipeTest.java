@@ -40,7 +40,7 @@ public class RecipeTest extends PulseTestCase
 
         context = new ExecutionContext();
         context.setWorkingDir(paths.getBaseDir());
-        context.addValue(BuildProperties.PROPERTY_RECIPE_PATHS, paths);
+        context.addInternalValue(BuildProperties.PROPERTY_RECIPE_PATHS, paths);
     }
 
     protected void tearDown() throws Exception

@@ -16,13 +16,18 @@ public class BuildProperties
     public static final String PROPERTY_BUILD_TIMESTAMP_MILLIS  = "build.timestamp.millis";
     public static final String PROPERTY_BUILD_TRIGGER           = "build.trigger";
     public static final String PROPERTY_CLEAN_BUILD             = "clean.build";
+    public static final String PROPERTY_COMPRESS_ARTIFACTS      = "compress.artifacts";
+    public static final String PROPERTY_COMPRESS_WORKING_DIR    = "compress.working.dir";
+    public static final String PROPERTY_INCREMENTAL_BUILD       = "incremental.build";
     public static final String PROPERTY_MASTER_URL              = "master.url";
     public static final String PROPERTY_PROJECT                 = "project";
     public static final String PROPERTY_SUCCESS_COUNT           = "success.count";
 
     // Recipe
+    public static final String PROPERTY_AGENT                   = "agent";
     public static final String PROPERTY_BASE_DIR                = "base.dir";
     public static final String PROPERTY_FILE_REPOSITORY         = "file.repository";
+    public static final String PROPERTY_RECIPE                  = "recipe";
     public static final String PROPERTY_RECIPE_ID               = "recipe.id";
     public static final String PROPERTY_RECIPE_PATHS            = "recipe.paths";
     public static final String PROPERTY_RECIPE_TIMESTAMP        = "recipe.timestamp";

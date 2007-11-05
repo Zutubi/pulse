@@ -1,7 +1,6 @@
 package com.zutubi.pulse.services;
 
 import com.zutubi.pulse.SystemInfo;
-import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.filesystem.FileInfo;
@@ -48,13 +47,12 @@ public interface SlaveService
      * @param master  location of the master for return messages
      * @param handle  handle of the agent, used in returned messages
      * @param request details of the recipe to build
-     * @param context existing context for the build
      * @return true if the request was accepted, false of the slave was busy
      *
      * @throws InvalidTokenException if the given token does not match the
      * slave's
      */
-    boolean build(String token, String master, long handle, RecipeRequest request, ExecutionContext context) throws InvalidTokenException;
+    boolean build(String token, String master, long handle, RecipeRequest request) throws InvalidTokenException;
 
     void cleanupRecipe(String token, String project, long recipeId, boolean incremental) throws InvalidTokenException;
 

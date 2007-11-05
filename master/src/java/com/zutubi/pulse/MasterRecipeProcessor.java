@@ -1,7 +1,10 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.core.*;
+import com.zutubi.pulse.core.RecipeProcessor;
+import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.core.ResourceRepository;
+import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.util.logging.Logger;
 
@@ -24,9 +27,9 @@ public class MasterRecipeProcessor implements Stoppable
         executor = Executors.newSingleThreadExecutor();
     }
 
-    public void processRecipe(RecipeRequest request, ExecutionContext context, ResourceRepository agentRepository)
+    public void processRecipe(RecipeRequest request, ResourceRepository agentRepository)
     {
-        executor.execute(new MasterRecipeRunner(request, recipeProcessor, eventManager, configurationManager, agentRepository, context));
+        executor.execute(new MasterRecipeRunner(request, recipeProcessor, eventManager, configurationManager, agentRepository));
     }
 
     public void setRecipeProcessor(RecipeProcessor recipeProcessor)

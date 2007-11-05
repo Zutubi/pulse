@@ -2,22 +2,18 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.BuildException;
-import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.FeaturePersister;
 import com.zutubi.pulse.core.model.RecipeResult;
-import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.RecipeResultNode;
-import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.util.logging.Logger;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  *

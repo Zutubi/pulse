@@ -64,7 +64,7 @@ public class RegexPostProcessor extends SelfReference implements PostProcessor, 
     public void process(StoredFileArtifact artifact, CommandResult result, ExecutionContext context)
     {
         List<PlainFeature> features = new LinkedList<PlainFeature>();
-        File outputDir = new File(context.getString(BuildProperties.PROPERTY_OUTPUT_DIR));
+        File outputDir = context.getInternalFile(BuildProperties.PROPERTY_OUTPUT_DIR);
 
         if (leadingContext == 0 && trailingContext == 0)
         {

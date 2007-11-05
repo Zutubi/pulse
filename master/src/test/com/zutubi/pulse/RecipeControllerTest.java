@@ -2,10 +2,7 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.Status;
-import com.zutubi.pulse.core.Bootstrapper;
-import com.zutubi.pulse.core.BuildRevision;
-import com.zutubi.pulse.core.ExecutionContext;
-import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.Feature;
@@ -61,7 +58,7 @@ public class RecipeControllerTest extends PulseTestCase
         childNode.setId(103);
         rootNode.addChild(childNode);
 
-        RecipeRequest recipeRequest = new RecipeRequest("project", rootResult.getId(), rootResult.getRecipeName());
+        RecipeRequest recipeRequest = new RecipeRequest(null, makeContext("project", rootResult.getId(), rootResult.getRecipeName()));
         BuildResult build = new BuildResult();
         dispatchRequest = new RecipeDispatchRequest(new Project(), new AnyCapableAgentRequirements(), new BuildRevision(), recipeRequest, null);
         recipeController = new RecipeController(build, rootNode, dispatchRequest, false, null, logger, resultCollector);
@@ -99,7 +96,7 @@ public class RecipeControllerTest extends PulseTestCase
 
         // After dispatching, the controller should handle a dispatched event
         // by recording the build service on the result node.
-        RecipeDispatchedEvent event = new RecipeDispatchedEvent(this, new RecipeRequest("project", rootResult.getId(), "test"), new MockAgent(buildService));
+        RecipeDispatchedEvent event = new RecipeDispatchedEvent(this, new RecipeRequest(null, makeContext("project", rootResult.getId(), "test")), new MockAgent(buildService));
         assertTrue(recipeController.handleRecipeEvent(event));
         assertEquals(buildService.getHostName(), rootNode.getHost());
 
@@ -244,6 +241,15 @@ public class RecipeControllerTest extends PulseTestCase
         assertTrue(results.size() > 0);
         CommandResult lastResult = results.get(results.size() - 1);
         assertEquals(ResultState.SUCCESS, lastResult.getState());
+    }
+
+    private ExecutionContext makeContext(String project, long id, String recipeName)
+    {
+        ExecutionContext context = new ExecutionContext();
+        context.addInternalString(BuildProperties.PROPERTY_PROJECT, project);
+        context.addInternalString(BuildProperties.PROPERTY_RECIPE_ID, Long.toString(id));
+        context.addInternalString(BuildProperties.PROPERTY_RECIPE, recipeName);
+        return context;
     }
 
     private RecipeErrorEvent sendError()
@@ -490,7 +496,7 @@ public class RecipeControllerTest extends PulseTestCase
             throw new RuntimeException("Method not implemented.");
         }
 
-        public boolean build(RecipeRequest request, ExecutionContext context)
+        public boolean build(RecipeRequest request)
         {
             throw new RuntimeException("Method not implemented.");
         }

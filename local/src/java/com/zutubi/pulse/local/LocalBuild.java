@@ -150,13 +150,14 @@ public class LocalBuild
 
             eventManager.register(new BuildStatusPrinter(paths.getBaseDir(), logStream));
 
-            Bootstrapper bootstrapper = new LocalBootstrapper();
-            RecipeRequest request = new RecipeRequest(0, bootstrapper, loadPulseFile(baseDir, pulseFileName), recipe);
             ExecutionContext context = new ExecutionContext();
             context.setWorkingDir(baseDir);
-            context.addValue(BuildProperties.PROPERTY_RECIPE_PATHS, paths);
-            context.addValue(BuildProperties.PROPERTY_RESOURCE_REPOSITORY, repository);
-            recipeProcessor.build(context, request);
+            context.addInternalValue(BuildProperties.PROPERTY_RECIPE_PATHS, paths);
+            context.addInternalValue(BuildProperties.PROPERTY_RESOURCE_REPOSITORY, repository);
+            context.addInternalString(BuildProperties.PROPERTY_RECIPE, recipe);
+            Bootstrapper bootstrapper = new LocalBootstrapper();
+            RecipeRequest request = new RecipeRequest(bootstrapper, loadPulseFile(baseDir, pulseFileName), context);
+            recipeProcessor.build(request);
         }
         catch (FileNotFoundException e)
         {

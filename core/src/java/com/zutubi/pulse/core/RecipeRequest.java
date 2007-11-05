@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.model.ResourceRequirement;
 
 import java.util.List;
@@ -12,14 +11,6 @@ import java.util.List;
  */
 public class RecipeRequest
 {
-    private String project;
-    private boolean incremental;
-    private boolean compressArtifacts;
-    private boolean compressWorkingCopy;
-    /**
-     * The unique identifier for the execution of this recipe.
-     */
-    private long id;
     /**
      * Used to bootstrap the working directory.
      */
@@ -30,71 +21,41 @@ public class RecipeRequest
      */
     private String pulseFileSource;
     /**
-     * The name of the recipe to execute, or null to execute the default.
-     */
-    private String recipeName;
-    /**
      * Required resources for the build.  If the pulse file is set lazily,
      * some requirements may be added at that time.
      */
     private List<ResourceRequirement> resourceRequirements;
     /**
-     * Properties to import into the global scope.
+     * Context for the recipe.
      */
-    private List<ResourceProperty> properties;
+    private ExecutionContext context;
 
-    public RecipeRequest(String project, long id, String recipeName)
+    public RecipeRequest(List<ResourceRequirement> resourceRequirements, ExecutionContext context)
     {
-        this(project, id, recipeName, false, false, false, null, null);
+        this(null, null, resourceRequirements, context);
     }
 
-    public RecipeRequest(String project, long id, String recipeName, boolean incremental, boolean compressArtifacts, boolean compressWorkingCopy, List<ResourceRequirement> resourceRequirements, List<ResourceProperty> properties)
+    public RecipeRequest(Bootstrapper bootstrapper, String pulseFileSource, ExecutionContext context)
     {
-        this(project, id, null, null, recipeName, incremental, compressArtifacts, compressWorkingCopy, resourceRequirements, properties);
+        this(bootstrapper, pulseFileSource, null, context);
     }
 
-    public RecipeRequest(long id, Bootstrapper bootstrapper, String pulseFileSource, String recipeName)
+    public RecipeRequest(Bootstrapper bootstrapper, String pulseFileSource, List<ResourceRequirement> resourceRequirements, ExecutionContext context)
     {
-        this(null, id, bootstrapper, pulseFileSource, recipeName, false, false, false, null, null);
-    }
-
-    public RecipeRequest(String project, long id, Bootstrapper bootstrapper, String pulseFileSource, String recipeName, boolean incremental, boolean compressArtifacts, boolean compressWorkingCopy, List<ResourceRequirement> resourceRequirements, List<ResourceProperty> properties)
-    {
-        this.project = project;
-        this.id = id;
         this.bootstrapper = bootstrapper;
         this.pulseFileSource = pulseFileSource;
-        this.recipeName = recipeName;
-        this.incremental = incremental;
-        this.compressArtifacts = compressArtifacts;
-        this.compressWorkingCopy = compressWorkingCopy;
         this.resourceRequirements = resourceRequirements;
-        this.properties = properties;
+        this.context = context;
     }
 
     public String getProject()
     {
-        return project;
-    }
-
-    public boolean isIncremental()
-    {
-        return incremental;
-    }
-
-    public boolean getCompressArtifacts()
-    {
-        return compressArtifacts;
-    }
-
-    public boolean getCompressWorkingCopy()
-    {
-        return compressWorkingCopy;
+        return context.getInternalString(BuildProperties.PROPERTY_PROJECT);
     }
 
     public long getId()
     {
-        return id;
+        return context.getInternalLong(BuildProperties.PROPERTY_RECIPE_ID);
     }
 
     public Bootstrapper getBootstrapper()
@@ -109,18 +70,19 @@ public class RecipeRequest
 
     public String getRecipeName()
     {
-        return recipeName;
+        return context.getInternalString(BuildProperties.PROPERTY_RECIPE);
     }
 
     public String getRecipeNameSafe()
     {
-        if(recipeName == null)
+        String recipe = getRecipeName();
+        if(recipe == null)
         {
             return "[default]";
         }
         else
         {
-            return recipeName;
+            return recipe;
         }
     }
 
@@ -144,20 +106,14 @@ public class RecipeRequest
         this.resourceRequirements = resourceRequirements;
     }
 
-    public List<ResourceProperty> getProperties()
+    public ExecutionContext getContext()
     {
-        return properties;
-    }
-
-    public void setProperties(List<ResourceProperty> properties)
-    {
-        this.properties = properties;
+        return context;
     }
 
     public void prepare(String agent)
     {
         bootstrapper.prepare(agent);
-        properties.add(new ResourceProperty("agent", agent));
-        properties.add(new ResourceProperty("recipe", recipeName == null ? "[default]" : recipeName));
+        context.addInternalString(BuildProperties.PROPERTY_AGENT, agent);
     }
 }

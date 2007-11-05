@@ -290,7 +290,7 @@ public class RegexPostProcessorTest extends PulseTestCase
 
         CommandResult result = new CommandResult("test");
         ExecutionContext context = new ExecutionContext();
-        context.addString(BuildProperties.PROPERTY_OUTPUT_DIR, tempDir.getAbsolutePath());
+        context.addInternalString(BuildProperties.PROPERTY_OUTPUT_DIR, tempDir.getAbsolutePath());
         pp.process(artifact, result, context);
         List<Feature> features = artifact.getFeatures();
         assertEquals(2, features.size());
@@ -356,7 +356,7 @@ public class RegexPostProcessorTest extends PulseTestCase
     {
         CommandResult result = new CommandResult("test");
         ExecutionContext context = new ExecutionContext();
-        context.addString(BuildProperties.PROPERTY_OUTPUT_DIR, tempDir.getAbsolutePath());
+        context.addInternalString(BuildProperties.PROPERTY_OUTPUT_DIR, tempDir.getAbsolutePath());
         pp.process(artifact, result, context);
         List<Feature> features = artifact.getFeatures();
 

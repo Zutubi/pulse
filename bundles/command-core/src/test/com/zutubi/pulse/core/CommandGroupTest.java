@@ -219,8 +219,8 @@ public class CommandGroupTest extends CommandTestBase
     private void execute(CommandGroup group, CommandResult result)
     {
         ExecutionContext context = new ExecutionContext();
-        context.addValue(BuildProperties.PROPERTY_RECIPE_PATHS, new SimpleRecipePaths(baseDir, null));
-        context.addString(BuildProperties.PROPERTY_OUTPUT_DIR, outputDir.getAbsolutePath());
+        context.addInternalValue(BuildProperties.PROPERTY_RECIPE_PATHS, new SimpleRecipePaths(baseDir, null));
+        context.addInternalString(BuildProperties.PROPERTY_OUTPUT_DIR, outputDir.getAbsolutePath());
         context.setWorkingDir(baseDir);
 
         group.execute(context, result);

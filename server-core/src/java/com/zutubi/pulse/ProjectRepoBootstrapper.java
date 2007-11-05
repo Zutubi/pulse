@@ -30,14 +30,14 @@ public class ProjectRepoBootstrapper implements Bootstrapper
 
     public void bootstrap(final ExecutionContext context) throws BuildException
     {
-        final RecipePaths paths = context.getValue(BuildProperties.PROPERTY_RECIPE_PATHS, RecipePaths.class);
+        final RecipePaths paths = context.getInternalValue(BuildProperties.PROPERTY_RECIPE_PATHS, RecipePaths.class);
         if (paths.getPersistentWorkDir() == null)
         {
             throw new BuildException("Attempt to use update bootstrapping when no persistent working directory is available.");
         }
 
         // run the scm bootstrapper on the local directory,
-        boolean cleanBuild = context.getBoolean(BuildProperties.PROPERTY_CLEAN_BUILD, false);
+        boolean cleanBuild = context.getInternalBoolean(BuildProperties.PROPERTY_CLEAN_BUILD, false);
         childBootstrapper = selectBootstrapper(cleanBuild, paths.getPersistentWorkDir());
         childBootstrapper.prepare(agent);
 
@@ -59,17 +59,17 @@ public class ProjectRepoBootstrapper implements Bootstrapper
             }
         };
 
-        context.pushScope();
+        context.pushInternalScope();
         try
         {
-            context.addValue(BuildProperties.PROPERTY_RECIPE_PATHS, mungedPaths);
+            context.addInternalValue(BuildProperties.PROPERTY_RECIPE_PATHS, mungedPaths);
             context.setWorkingDir(mungedPaths.getBaseDir());
             childBootstrapper.bootstrap(context);
         }
         finally
         {
             context.setWorkingDir(paths.getBaseDir());
-            context.popScope();
+            context.popInternalScope();
         }
 
         // If the checkout and base differ, then we need to copy over to the base.

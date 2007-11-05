@@ -210,13 +210,13 @@ public class FileArtifactTest extends PulseTestCase
         RecipePaths paths = new SimpleRecipePaths(tmpSourceDir, null);
         ExecutionContext context = new ExecutionContext();
         context.setWorkingDir(paths.getBaseDir());
-        context.addValue(BuildProperties.PROPERTY_RECIPE_PATHS, paths);
+        context.addInternalValue(BuildProperties.PROPERTY_RECIPE_PATHS, paths);
         if(recipeStartTime > 0)
         {
-            context.addString(BuildProperties.PROPERTY_RECIPE_TIMESTAMP_MILLIS, Long.toString(recipeStartTime));
+            context.addInternalString(BuildProperties.PROPERTY_RECIPE_TIMESTAMP_MILLIS, Long.toString(recipeStartTime));
         }
 
-        context.addString(BuildProperties.PROPERTY_OUTPUT_DIR, tmpOutputDir.getAbsolutePath());
+        context.addInternalString(BuildProperties.PROPERTY_OUTPUT_DIR, tmpOutputDir.getAbsolutePath());
 
         fileArtifactObject.capture(result, context);
     }

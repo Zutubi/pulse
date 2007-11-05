@@ -76,7 +76,7 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
         builder.redirectErrorStream(true);
 
         // record the commands execution environment as an artifact.
-        File outputDir = new File(context.getString(BuildProperties.PROPERTY_OUTPUT_DIR));
+        File outputDir = context.getInternalFile(BuildProperties.PROPERTY_OUTPUT_DIR);
         try
         {
             captureExecutionEnvironmentArtifact(builder, outputDir);

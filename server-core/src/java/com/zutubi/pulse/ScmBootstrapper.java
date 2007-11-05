@@ -42,7 +42,7 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmEventHandler
     public void bootstrap(ExecutionContext context)
     {
         File workDir = context.getWorkingDir();
-        File outDir = new File(context.getString(BuildProperties.PROPERTY_OUTPUT_DIR), BootstrapCommand.OUTPUT_NAME);
+        File outDir = new File(context.getInternalFile(BuildProperties.PROPERTY_OUTPUT_DIR), BootstrapCommand.OUTPUT_NAME);
         outDir.mkdirs();
 
         OutputStream out;
@@ -88,7 +88,7 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmEventHandler
                 List<ScmContext.Property> properties = scmContext.getProperties();
                 for (ScmContext.Property prop : properties)
                 {
-                    context.getScope().add(new ResourceProperty(
+                    context.add(new ResourceProperty(
                             prop.getName(),
                             prop.getValue(),
                             prop.isAddToEnvironment(),

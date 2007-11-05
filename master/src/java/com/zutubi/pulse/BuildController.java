@@ -1,10 +1,9 @@
 package com.zutubi.pulse;
 
+import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.core.Bootstrapper;
-import com.zutubi.pulse.core.BuildException;
-import com.zutubi.pulse.core.BuildRevision;
-import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.core.*;
+import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.scm.*;
@@ -15,6 +14,7 @@ import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.pulse.prototype.config.project.BuildOptionsConfiguration;
 import com.zutubi.pulse.prototype.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
@@ -60,6 +60,7 @@ public class BuildController implements EventListener
     private UserManager userManager;
     private BuildManager buildManager;
     private TestManager testManager;
+    private ConfigurationProvider configurationProvider;
     private MasterConfigurationManager configurationManager;
     private RecipeQueue queue;
     private RecipeResultCollector collector;
@@ -71,7 +72,7 @@ public class BuildController implements EventListener
     private Scheduler quartzScheduler;
     private ServiceTokenManager serviceTokenManager;
     private BuildResult previousSuccessful;
-    private List<ResourceProperty> buildProperties;
+    private ExecutionContext buildContext;
 
     private ScmClientFactory scmClientFactory;
     private ThreadFactory threadFactory;
@@ -123,12 +124,40 @@ public class BuildController implements EventListener
         buildResult = request.createResult(projectManager, userManager);
         buildManager.save(buildResult);
         previousSuccessful = getPreviousSuccessfulBuild();
-        buildProperties = new LinkedList<ResourceProperty>(projectConfig.getProperties().values());
-        buildProperties.add(new ResourceProperty("project", projectConfig.getName()));
 
+        createBuildContext();
         configure(root, buildResult.getRoot());
 
         return tree;
+    }
+
+    private void createBuildContext()
+    {
+        buildContext = new ExecutionContext();
+        buildContext.addInternalString(PROPERTY_BUILD_NUMBER, Long.toString(buildResult.getNumber()));
+        buildContext.addInternalString(PROPERTY_PROJECT, projectConfig.getName());
+
+        BuildReason buildReason = buildResult.getReason();
+        buildContext.addInternalString(PROPERTY_BUILD_REASON, buildReason.getSummary());
+        if(buildReason instanceof TriggerBuildReason)
+        {
+            buildContext.addInternalString(PROPERTY_BUILD_TRIGGER, ((TriggerBuildReason)buildReason).getTriggerName());
+        }
+
+        buildContext.addInternalString(PROPERTY_MASTER_URL, MasterAgentService.constructMasterUrl(configurationProvider.get(GeneralAdminConfiguration.class), configurationManager.getSystemConfig()));
+        buildContext.addInternalString(PROPERTY_BUILD_COUNT, Integer.toString(project.getBuildCount()));
+        buildContext.addInternalString(PROPERTY_SUCCESS_COUNT, Integer.toString(project.getSuccessCount()));
+
+        CheckoutScheme checkoutScheme = projectConfig.getScm().getCheckoutScheme();
+        buildContext.addInternalString(PROPERTY_INCREMENTAL_BUILD, Boolean.toString(!request.isPersonal() && checkoutScheme == CheckoutScheme.INCREMENTAL_UPDATE));
+
+        buildContext.addInternalString(PROPERTY_COMPRESS_ARTIFACTS, "true");
+        buildContext.addInternalString(PROPERTY_COMPRESS_WORKING_DIR, Boolean.toString(projectConfig.getOptions().getRetainWorkingCopy()));
+
+        for(ResourceProperty property: projectConfig.getProperties().values())
+        {
+            buildContext.add(property);
+        }
     }
 
     private BuildResult getPreviousSuccessfulBuild()
@@ -155,14 +184,16 @@ public class BuildController implements EventListener
             File recipeOutputDir = paths.getOutputDir(buildResult, recipeResult.getId());
             recipeResult.setAbsoluteOutputDir(configurationManager.getDataDirectory(), recipeOutputDir);
 
-            CheckoutScheme checkoutScheme = projectConfig.getScm().getCheckoutScheme();
-            boolean incremental = !request.isPersonal() && checkoutScheme == CheckoutScheme.INCREMENTAL_UPDATE;
-            List<ResourceProperty> recipeProperties = new LinkedList<ResourceProperty>(buildProperties);
-            RecipeRequest recipeRequest = new RecipeRequest(projectConfig.getName(), recipeResult.getId(), stage.getRecipe(), incremental, true, projectConfig.getOptions().getRetainWorkingCopy(), getResourceRequirements(stage), recipeProperties);
+            ExecutionContext recipeContext = new ExecutionContext(buildContext);
+            recipeContext.pushInternalScope();
+            recipeContext.addInternalString(PROPERTY_RECIPE_ID, Long.toString(recipeResult.getId()));
+            recipeContext.addInternalString(PROPERTY_RECIPE, stage.getRecipe());
+
+            RecipeRequest recipeRequest = new RecipeRequest(getResourceRequirements(stage), recipeContext);
             RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(project, stage.getAgentRequirements(), request.getRevision(), recipeRequest, buildResult);
             DefaultRecipeLogger logger = new DefaultRecipeLogger(new File(paths.getRecipeDir(buildResult, recipeResult.getId()), RecipeResult.RECIPE_LOG));
             RecipeResultNode previousRecipe = previousSuccessful == null ? null : previousSuccessful.findResultNodeByHandle(stage.getHandle());
-            RecipeController rc = new RecipeController(buildResult, childResultNode, dispatchRequest, incremental, previousRecipe, logger, collector);
+            RecipeController rc = new RecipeController(buildResult, childResultNode, dispatchRequest, buildContext.getInternalBoolean(PROPERTY_INCREMENTAL_BUILD, false), previousRecipe, logger, collector);
             rc.setRecipeQueue(queue);
             rc.setBuildManager(buildManager);
             rc.setServiceTokenManager(serviceTokenManager);
@@ -680,6 +711,11 @@ public class BuildController implements EventListener
     public long getBuildId()
     {
         return buildResult.getId();
+    }
+
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    {
+        this.configurationProvider = configurationProvider;
     }
 
     public void setConfigurationManager(MasterConfigurationManager configurationManager)

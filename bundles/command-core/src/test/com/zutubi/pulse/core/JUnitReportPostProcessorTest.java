@@ -143,8 +143,8 @@ public class JUnitReportPostProcessorTest extends XMLReportPostProcessorTestBase
         TestSuiteResult testResults = new TestSuiteResult();
 
         ExecutionContext context = new ExecutionContext();
-        context.addValue(BuildProperties.PROPERTY_TEST_RESULTS, testResults);
-        context.addString(BuildProperties.PROPERTY_OUTPUT_DIR, outputDir.getAbsolutePath());
+        context.addInternalValue(BuildProperties.PROPERTY_TEST_RESULTS, testResults);
+        context.addInternalString(BuildProperties.PROPERTY_OUTPUT_DIR, outputDir.getAbsolutePath());
 
         pp.process(artifact, result, context);
     }

@@ -108,12 +108,12 @@ public abstract class LocalArtifact extends ArtifactSupport
      */
     protected boolean captureFile(StoredArtifact artifact, File fromFile, String path, CommandResult result, ExecutionContext context, String type)
     {
-        if (ignoreStale && fromFile.lastModified() < context.getLong(BuildProperties.PROPERTY_RECIPE_TIMESTAMP_MILLIS))
+        if (ignoreStale && fromFile.lastModified() < context.getInternalLong(BuildProperties.PROPERTY_RECIPE_TIMESTAMP_MILLIS))
         {
             return false;
         }
 
-        File toFile = new File(context.getString(BuildProperties.PROPERTY_OUTPUT_DIR), path);
+        File toFile = new File(context.getInternalFile(BuildProperties.PROPERTY_OUTPUT_DIR), path);
         File parent = toFile.getParentFile();
 
         try

@@ -38,7 +38,7 @@ public class PrintCommand extends CommandSupport
             return;
         }
 
-        File outputFileDir = new File(context.getString(BuildProperties.PROPERTY_OUTPUT_DIR), "command output");
+        File outputFileDir = new File(context.getInternalFile(BuildProperties.PROPERTY_OUTPUT_DIR), "command output");
         if (!outputFileDir.mkdir())
         {
             throw new BuildException("Unable to create directory for output artifact '" + outputFileDir.getAbsolutePath() + "'");

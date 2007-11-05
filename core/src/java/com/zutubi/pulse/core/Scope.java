@@ -38,6 +38,16 @@ public class Scope
         this.parent = parent;
     }
 
+    public Scope getRoot()
+    {
+        if(parent == null)
+        {
+            return this;
+        }
+
+        return parent.getRoot();
+    }
+    
     public List<Reference> getReferences()
     {
         List<Reference> result = new ArrayList<Reference>(references.size());

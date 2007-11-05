@@ -7,12 +7,8 @@ import com.zutubi.pulse.agent.DefaultAgent;
 import com.zutubi.pulse.agent.Status;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.SimpleMasterConfigurationManager;
-import com.zutubi.pulse.core.BuildException;
-import com.zutubi.pulse.core.BuildRevision;
-import com.zutubi.pulse.core.ExecutionContext;
-import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.config.Resource;
-import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.DelegateScmClientFactory;
@@ -102,7 +98,6 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         queue.setEventManager(eventManager);
         queue.setAgentManager(agentManager);
         queue.setUnsatisfiableTimeout(-1);
-        queue.setConfigurationManager(configurationManager);
         queue.setConfigurationProvider(configurationProvider);
         queue.setScmClientFactory(new DelegateScmClientFactory()
         {
@@ -748,7 +743,10 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         project.setConfig(projectConfig);
         BuildResult result = new BuildResult(new UnknownBuildReason(), project, 100, false);
         AgentRequirements requirements = new MockAgentRequirements(type);
-        RecipeRequest request = new RecipeRequest("project", id, null, null, null, false, false, false, null, new LinkedList<ResourceProperty>());
+        ExecutionContext context = new ExecutionContext();
+        context.addInternalString(BuildProperties.PROPERTY_PROJECT, "project");
+        context.addInternalString(BuildProperties.PROPERTY_RECIPE_ID, Long.toString(id));
+        RecipeRequest request = new RecipeRequest(null, null, context);
         request.setBootstrapper(new ChainBootstrapper());
         return new RecipeDispatchRequest(project, requirements, new BuildRevision(), request, result);
     }
@@ -914,7 +912,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             throw new RuntimeException("Method not implemented.");
         }
 
-        public boolean build(RecipeRequest request, ExecutionContext context)
+        public boolean build(RecipeRequest request)
         {
             semaphore.release();
             if(throwError)

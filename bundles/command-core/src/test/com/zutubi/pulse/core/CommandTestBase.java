@@ -71,7 +71,7 @@ public abstract class CommandTestBase extends PulseTestCase implements EventList
      */
     protected CommandResult runCommand(Command command, ExecutionContext context)
     {
-        context.addValue(BuildProperties.PROPERTY_RECIPE_PATHS, new SimpleRecipePaths(baseDir, outputDir));
+        context.addInternalValue(BuildProperties.PROPERTY_RECIPE_PATHS, new SimpleRecipePaths(baseDir, outputDir));
         context.setWorkingDir(baseDir);
 
         Recipe recipe = new Recipe();

@@ -36,7 +36,7 @@ public class PatchBootstrapper implements Bootstrapper
         try
         {
             // apply a patch prefix to the if one is specified. Used to work around a cvs issue.
-            FileRepository fileRepository = context.getValue(BuildProperties.PROPERTY_FILE_REPOSITORY, FileRepository.class);
+            FileRepository fileRepository = context.getInternalValue(BuildProperties.PROPERTY_FILE_REPOSITORY, FileRepository.class);
             PatchArchive patch = new PatchArchive(fileRepository.getPatchFile(userId, number));
             patch.apply(getBaseBuildDir(context), localEOL);
         }
@@ -63,7 +63,7 @@ public class PatchBootstrapper implements Bootstrapper
         String defaultPrefix = System.getProperty(DEFAULT_PATCH_BOOSTRAP_PREFIX);
 
         String projectPrefix = null;
-        String projectName = context.getString(BuildProperties.PROPERTY_PROJECT);
+        String projectName = context.getInternalString(BuildProperties.PROPERTY_PROJECT);
         if (projectName != null)
         {
             projectPrefix = System.getProperty(PATCH_BOOSTRAP_PREFIX + "." + projectName);

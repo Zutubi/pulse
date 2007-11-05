@@ -1,5 +1,6 @@
 package com.zutubi.pulse;
 
+import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.Stoppable;
@@ -65,6 +66,7 @@ public class FatController implements EventListener, Stoppable
     private ServiceTokenManager serviceTokenManager;
     private ThreadFactory threadFactory;
     private AccessManager accessManager;
+    private ConfigurationProvider configurationProvider;
 
     /**
      * When the fat controller is enabled, it will handle incoming build requests.
@@ -260,6 +262,7 @@ public class FatController implements EventListener, Stoppable
                 controller.setScmClientFactory(scmClientFactory);
                 controller.setUserManager(userManager);
                 controller.setConfigurationManager(configManager);
+                controller.setConfigurationProvider(configurationProvider);
                 controller.setThreadFactory(threadFactory);
                 controller.init();
                 controller.run();
@@ -414,4 +417,8 @@ public class FatController implements EventListener, Stoppable
         this.accessManager = accessManager;
     }
 
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    {
+        this.configurationProvider = configurationProvider;
+    }
 }

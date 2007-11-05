@@ -7,7 +7,6 @@ import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.StartupManager;
 import com.zutubi.pulse.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.core.BuildException;
-import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.logging.CustomLogRecord;
@@ -102,9 +101,9 @@ public class MasterAgentService implements AgentService
         return getResourceManager().getAgentRepository(agentConfig.getHandle()).hasResource(resource, version);
     }
 
-    public boolean build(RecipeRequest request, ExecutionContext context)
+    public boolean build(RecipeRequest request)
     {
-        getMasterRecipeProcessor().processRecipe(request, context, getResourceManager().getAgentRepository(agentConfig.getHandle()));
+        getMasterRecipeProcessor().processRecipe(request, getResourceManager().getAgentRepository(agentConfig.getHandle()));
         return true;
     }
 

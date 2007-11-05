@@ -146,7 +146,7 @@ public class Recipe extends SelfReference
     public void execute(ExecutionContext context)
     {
         boolean success = true;
-        File outputDir = context.getValue(BuildProperties.PROPERTY_RECIPE_PATHS, RecipePaths.class).getOutputDir();
+        File outputDir = context.getInternalValue(BuildProperties.PROPERTY_RECIPE_PATHS, RecipePaths.class).getOutputDir();
         for (int i = 0; i < commands.size(); i++)
         {
             Command command = commands.get(i);
@@ -201,7 +201,7 @@ public class Recipe extends SelfReference
 
             commandResult.commence();
             commandResult.setOutputDir(commandOutput.getPath());
-            long recipeId = context.getLong(BuildProperties.PROPERTY_RECIPE_ID);
+            long recipeId = context.getInternalLong(BuildProperties.PROPERTY_RECIPE_ID);
             eventManager.publish(new CommandCommencedEvent(this, recipeId, commandResult.getCommandName(), commandResult.getStartTime()));
 
             try
@@ -238,14 +238,14 @@ public class Recipe extends SelfReference
         }
         finally
         {
-            context.popScope();
+            context.popInternalScope();
         }
     }
 
     private void pushCommandContext(ExecutionContext context, File commandOutput)
     {
-        context.pushScope();
-        context.addString(BuildProperties.PROPERTY_OUTPUT_DIR, commandOutput.getAbsolutePath());
+        context.pushInternalScope();
+        context.addInternalString(BuildProperties.PROPERTY_OUTPUT_DIR, commandOutput.getAbsolutePath());
     }
 
     private void processArtifacts(Command command, ExecutionContext context, CommandResult result)

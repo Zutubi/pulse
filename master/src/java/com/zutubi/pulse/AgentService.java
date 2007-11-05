@@ -1,6 +1,5 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.logging.CustomLogRecord;
@@ -35,7 +34,7 @@ public interface AgentService extends RemoteService
      */
     boolean hasResource(String resource, String version);
 
-    boolean build(RecipeRequest request, ExecutionContext context);
+    boolean build(RecipeRequest request);
 
     /**
      * Collects files produced by the recipe execution to the given local

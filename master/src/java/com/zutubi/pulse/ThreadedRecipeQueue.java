@@ -6,7 +6,6 @@ import com.zutubi.prototype.config.events.ConfigurationEvent;
 import com.zutubi.prototype.config.events.PostSaveEvent;
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.AgentManager;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.*;
 import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.model.Revision;
@@ -18,8 +17,6 @@ import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.events.*;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.build.*;
-import com.zutubi.pulse.model.BuildReason;
-import com.zutubi.pulse.model.TriggerBuildReason;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.project.types.TypeConfiguration;
@@ -91,7 +88,6 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     
     private AgentManager agentManager;
     private EventManager eventManager;
-    private MasterConfigurationManager configurationManager;
     private GeneralAdminConfiguration adminConfiguration;
     private ScmClientFactory scmClientFactory;
     private ThreadFactory threadFactory;
@@ -532,33 +528,15 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         unavailableAgents.add(agent);
         executingAgents.put(recipeRequest.getId(), agent);
 
-        ExecutionContext context = createBuildContext(request, recipeRequest, buildRevision, agent);
-        dispatchedQueue.offer(new DispatchedRequest(recipeRequest, context, agent));
+        ExecutionContext context = recipeRequest.getContext();
+        context.addInternalString(PROPERTY_BUILD_REVISION, buildRevision.getRevision().getRevisionString());
+        context.addInternalString(PROPERTY_BUILD_TIMESTAMP, TIMESTAMP_FORMAT.format(new Date(buildRevision.getTimestamp())));
+        context.addInternalString(PROPERTY_BUILD_TIMESTAMP_MILLIS, Long.toString(buildRevision.getTimestamp()));
+        context.addInternalString(PROPERTY_CLEAN_BUILD, Boolean.toString(request.getProject().isForceCleanForAgent(agent.getId())));
+
+        dispatchedQueue.offer(new DispatchedRequest(recipeRequest, agent));
 
         return true;
-    }
-
-    private ExecutionContext createBuildContext(RecipeDispatchRequest request, RecipeRequest recipeRequest, BuildRevision buildRevision, Agent agent)
-    {
-        ExecutionContext context = new ExecutionContext();
-        context.addString(PROPERTY_BUILD_NUMBER, Long.toString(request.getBuild().getNumber()));
-        context.addString(PROPERTY_PROJECT, recipeRequest.getProject());
-        context.addString(PROPERTY_CLEAN_BUILD, Boolean.toString(request.getProject().isForceCleanForAgent(agent.getId())));
-
-        BuildReason buildReason = request.getBuild().getReason();
-        context.addString(PROPERTY_BUILD_REASON, buildReason.getSummary());
-        if(buildReason instanceof TriggerBuildReason)
-        {
-            context.addString(PROPERTY_BUILD_TRIGGER, ((TriggerBuildReason)buildReason).getTriggerName());
-        }
-
-        context.addString(PROPERTY_BUILD_REVISION, buildRevision.getRevision().getRevisionString());
-        context.addString(PROPERTY_BUILD_TIMESTAMP, TIMESTAMP_FORMAT.format(new Date(buildRevision.getTimestamp())));
-        context.addString(PROPERTY_BUILD_TIMESTAMP_MILLIS, Long.toString(buildRevision.getTimestamp()));
-        context.addString(PROPERTY_MASTER_URL, MasterAgentService.constructMasterUrl(adminConfiguration, configurationManager.getSystemConfig()));
-        context.addString(PROPERTY_BUILD_COUNT, Integer.toString(request.getProject().getBuildCount()));
-        context.addString(PROPERTY_SUCCESS_COUNT, Integer.toString(request.getProject().getSuccessCount()));
-        return context;
     }
 
     public void stop(boolean force)
@@ -820,11 +798,6 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         this.scmClientFactory = scmClientFactory;
     }
 
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
-    {
-        this.configurationManager = configurationManager;
-    }
-
     public void setThreadFactory(ThreadFactory threadFactory)
     {
         this.threadFactory = threadFactory;
@@ -833,13 +806,11 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     private static class DispatchedRequest
     {
         RecipeRequest recipeRequest;
-        ExecutionContext context;
         Agent agent;
 
-        public DispatchedRequest(RecipeRequest recipeRequest, ExecutionContext context, Agent agent)
+        public DispatchedRequest(RecipeRequest recipeRequest, Agent agent)
         {
             this.recipeRequest = recipeRequest;
-            this.context = context;
             this.agent = agent;
         }
     }
@@ -862,7 +833,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
                 try
                 {
-                    dispatchedRequest.agent.getService().build(dispatchedRequest.recipeRequest, dispatchedRequest.context);
+                    dispatchedRequest.agent.getService().build(dispatchedRequest.recipeRequest);
                 }
                 catch (Exception e)
                 {

@@ -3,6 +3,7 @@ package com.zutubi.pulse.core;
 import com.opensymphony.util.TextUtils;
 import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.config.Resource;
+import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.config.ResourceVersion;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.TestSuitePersister;
@@ -51,7 +52,7 @@ public class RecipeProcessor
         
     }
 
-    public void build(ExecutionContext context, RecipeRequest request)
+    public void build(RecipeRequest request)
     {
         // This result holds only the recipe details (stamps, state etc), not
         // the command results.  A full recipe result with command results is
@@ -65,16 +66,17 @@ public class RecipeProcessor
         runningRecipe = recipeResult.getId();
         eventManager.publish(new RecipeCommencedEvent(this, recipeResult.getId(), recipeResult.getRecipeName(), recipeResult.getStartTime()));
 
-        CommandOutputStream outputStream = null;
+        ExecutionContext context = request.getContext();
         long recipeStartTime = recipeResult.getStartTime();
-        pushRecipeContext(context, testResults, recipeStartTime, request.getId());
+        ResourceRepository resourceRepository = context.getInternalValue(PROPERTY_RESOURCE_REPOSITORY, ResourceRepository.class);
+        pushRecipeContext(context, resourceRepository, testResults, recipeStartTime, request);
         try
         {
             // Wrap bootstrapper in a command and run it.
             BootstrapCommand bootstrapCommand = new BootstrapCommand(request.getBootstrapper());
 
             // Now we can load the recipe from the pulse file
-            PulseFile pulseFile = loadPulseFile(request, context);
+            PulseFile pulseFile = loadPulseFile(request, context, resourceRepository);
 
             String recipeName = request.getRecipeName();
             if (!TextUtils.stringSet(recipeName))
@@ -109,16 +111,14 @@ public class RecipeProcessor
         }
         finally
         {
-            IOUtils.close(outputStream);
-            
             eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Storing test results..."));
 
-            RecipePaths paths = context.getValue(PROPERTY_RECIPE_PATHS, RecipePaths.class);
+            RecipePaths paths = context.getInternalValue(PROPERTY_RECIPE_PATHS, RecipePaths.class);
             writeTestResults(paths, testResults);
             recipeResult.setTestSummary(testResults.getSummary());
             eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Test results stored."));
 
-            compressResults(paths, request.getCompressArtifacts(), request.getCompressWorkingCopy());
+            compressResults(paths, context.getInternalBoolean(PROPERTY_COMPRESS_ARTIFACTS, false), context.getInternalBoolean(PROPERTY_COMPRESS_WORKING_DIR, false));
 
             recipeResult.complete();
             RecipeCompletedEvent completedEvent = new RecipeCompletedEvent(this, recipeResult);
@@ -127,8 +127,10 @@ public class RecipeProcessor
                 completedEvent.setBuildVersion(context.getVersion());
             }
 
-            context.popScope();
             eventManager.publish(completedEvent);
+
+            context.popInternalScope();
+            context.popScope();
 
             runningLock.lock();
             runningRecipe = 0;
@@ -193,39 +195,32 @@ public class RecipeProcessor
         }
     }
 
-    private void pushRecipeContext(ExecutionContext context, TestSuiteResult testResults, long recipeStartTime , long recipeId)
+    private void pushRecipeContext(ExecutionContext context, ResourceRepository resourceRepository, TestSuiteResult testResults, long recipeStartTime, RecipeRequest request)
     {
+        context.pushInternalScope();
+        context.addInternalString(PROPERTY_BASE_DIR, context.getWorkingDir().getAbsolutePath());
+        if(context.getInternalString(PROPERTY_RECIPE) == null)
+        {
+            context.addInternalString(PROPERTY_RECIPE, "[default]");
+        }
+        context.addInternalString(PROPERTY_RECIPE_TIMESTAMP, BuildProperties.TIMESTAMP_FORMAT.format(new Date(recipeStartTime)));
+        context.addInternalString(PROPERTY_RECIPE_TIMESTAMP_MILLIS, Long.toString(recipeStartTime));
+        context.addInternalValue(PROPERTY_TEST_RESULTS, testResults);
+
         context.pushScope();
-        context.addString(PROPERTY_BASE_DIR, context.getWorkingDir().getAbsolutePath());
-        context.addString(PROPERTY_RECIPE_TIMESTAMP, BuildProperties.TIMESTAMP_FORMAT.format(new Date(recipeStartTime)));
-        context.addString(PROPERTY_RECIPE_TIMESTAMP_MILLIS, Long.toString(recipeStartTime));
-        context.addString(PROPERTY_RECIPE_ID, Long.toString(recipeId));
-        context.addValue(PROPERTY_TEST_RESULTS, testResults);
+        importResources(resourceRepository, request.getResourceRequirements(), context);
     }
 
-    private PulseFile loadPulseFile(RecipeRequest request, ExecutionContext context) throws BuildException
+    private PulseFile loadPulseFile(RecipeRequest request, ExecutionContext context, ResourceRepository resourceRepository) throws BuildException
     {
-        // Use a separate scope for the Pulse file to avoid clashes between
-        // our own properties and those defined by the user.  Basically, in
-        // the Pulse file they can define whatever they like, but when we are
-        // actually executing things we do not want this to possibly clash
-        // with Pulse-internal things.
-        Scope globalScope = new Scope(context.getScope());
+        Scope globalScope = new Scope(context.asScope());
         Map<String, String> env = System.getenv();
         for(Map.Entry<String, String> var: env.entrySet())
         {
             globalScope.addEnvironmentProperty(var.getKey(), var.getValue());
         }
 
-        if(request.getProperties() != null)
-        {
-            globalScope.add(request.getProperties());
-        }
-
         // import the required resources into the pulse files scope.
-        ResourceRepository resourceRepository = context.getValue(PROPERTY_RESOURCE_REPOSITORY, ResourceRepository.class);
-        importResources(resourceRepository, request.getResourceRequirements(), globalScope);
-
         // CIB-286: special case empty file for better reporting
         String pulseFileSource = request.getPulseFileSource();
         if(!TextUtils.stringSet(pulseFileSource))
@@ -253,7 +248,7 @@ public class RecipeProcessor
         }
     }
 
-    private void importResources(ResourceRepository resourceRepository, List<ResourceRequirement> resourceRequirements, Scope scope)
+    private void importResources(ResourceRepository resourceRepository, List<ResourceRequirement> resourceRequirements, ExecutionContext context)
     {
         if (resourceRequirements != null)
         {
@@ -265,7 +260,10 @@ public class RecipeProcessor
                     throw new BuildException("Unable to import required resource '" + requirement.getResource() + "'");
                 }
 
-                scope.add(resource.getProperties().values());
+                for(ResourceProperty property: resource.getProperties().values())
+                {
+                    context.add(property);
+                }
 
                 String importVersion = requirement.getVersion();
                 if(importVersion == null)
@@ -281,7 +279,10 @@ public class RecipeProcessor
                         throw new BuildException("Reference to non-existant version '" + importVersion + "' of resource '" + requirement.getResource() + "'");
                     }
 
-                    scope.add(version.getProperties().values());
+                    for(ResourceProperty property: version.getProperties().values())
+                    {
+                        context.add(property);
+                    }
                 }
             }
         }

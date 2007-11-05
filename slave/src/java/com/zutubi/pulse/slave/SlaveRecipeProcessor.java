@@ -10,6 +10,7 @@ import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.repository.SlaveFileRepository;
 import com.zutubi.pulse.services.MasterService;
 import com.zutubi.pulse.services.ServiceTokenManager;
+import com.zutubi.util.IOUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.net.MalformedURLException;
@@ -54,27 +55,30 @@ public class SlaveRecipeProcessor
         return null;
     }
 
-    public void processRecipe(String master, long handle, RecipeRequest request, ExecutionContext context)
+    public void processRecipe(String master, long handle, RecipeRequest request)
     {
         MasterService masterProxy = getMasterProxy(master);
         if(masterProxy != null)
         {
+            ExecutionContext context = request.getContext();
             EventListener listener = registerMasterListener(master, masterProxy, request.getId());
             ResourceRepository repo = new RemoteResourceRepository(handle, masterProxy, serviceTokenManager);
-            ServerRecipePaths processorPaths = new ServerRecipePaths(request.getProject(), request.getId(), configurationManager.getUserPaths().getData(), request.isIncremental());
+            ServerRecipePaths processorPaths = new ServerRecipePaths(request.getProject(), request.getId(), configurationManager.getUserPaths().getData(), context.getInternalBoolean(BuildProperties.PROPERTY_INCREMENTAL_BUILD, false));
 
             Bootstrapper requestBootstrapper = request.getBootstrapper();
             request.setBootstrapper(new ChainBootstrapper(new ServerBootstrapper(), requestBootstrapper));
 
-            context.pushScope();
+            context.pushInternalScope();
+            CommandOutputStream outputStream = null;
             try
             {
-                context.addValue(BuildProperties.PROPERTY_RECIPE_PATHS, processorPaths);
-                context.addValue(BuildProperties.PROPERTY_RESOURCE_REPOSITORY, repo);
-                context.addValue(BuildProperties.PROPERTY_FILE_REPOSITORY, new SlaveFileRepository(processorPaths.getRecipeRoot(), master, serviceTokenManager));
-                context.setOutputStream(new CommandOutputStream(eventManager, request.getId(), true));
+                context.addInternalValue(BuildProperties.PROPERTY_RECIPE_PATHS, processorPaths);
+                context.addInternalValue(BuildProperties.PROPERTY_RESOURCE_REPOSITORY, repo);
+                context.addInternalValue(BuildProperties.PROPERTY_FILE_REPOSITORY, new SlaveFileRepository(processorPaths.getRecipeRoot(), master, serviceTokenManager));
+                outputStream = new CommandOutputStream(eventManager, request.getId(), true);
+                context.setOutputStream(outputStream);
                 context.setWorkingDir(processorPaths.getBaseDir());
-                recipeProcessor.build(context, request);
+                recipeProcessor.build(request);
             }
             catch (BuildException e)
             {
@@ -90,7 +94,8 @@ public class SlaveRecipeProcessor
             }
             finally
             {
-                context.popScope();
+                IOUtils.close(outputStream);
+                context.popInternalScope();
                 eventManager.unregister(listener);
             }
         }

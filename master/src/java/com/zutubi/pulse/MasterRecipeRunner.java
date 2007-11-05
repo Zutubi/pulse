@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.repository.MasterFileRepository;
+import com.zutubi.util.IOUtils;
 import com.zutubi.util.logging.Logger;
 
 /**
@@ -19,16 +20,14 @@ public class MasterRecipeRunner implements Runnable
     private EventManager eventManager;
     private MasterConfigurationManager configurationManager;
     private ResourceRepository resourceRepository;
-    private ExecutionContext context;
 
-    public MasterRecipeRunner(RecipeRequest request, RecipeProcessor recipeProcessor, EventManager eventManager, MasterConfigurationManager configurationManager, ResourceRepository resourceRepository, ExecutionContext context)
+    public MasterRecipeRunner(RecipeRequest request, RecipeProcessor recipeProcessor, EventManager eventManager, MasterConfigurationManager configurationManager, ResourceRepository resourceRepository)
     {
         this.request = request;
         this.recipeProcessor = recipeProcessor;
         this.eventManager = eventManager;
         this.configurationManager = configurationManager;
         this.resourceRepository = resourceRepository;
-        this.context = context;
     }
 
     public void run()
@@ -36,18 +35,21 @@ public class MasterRecipeRunner implements Runnable
         Bootstrapper requestBootstrapper = request.getBootstrapper();
         request.setBootstrapper(new ChainBootstrapper(new ServerBootstrapper(), requestBootstrapper));
 
-        ServerRecipePaths recipePaths = new ServerRecipePaths(request.getProject(), request.getId(), configurationManager.getUserPaths().getData(), request.isIncremental());
+        ExecutionContext context = request.getContext();
+        ServerRecipePaths recipePaths = new ServerRecipePaths(request.getProject(), request.getId(), configurationManager.getUserPaths().getData(), context.getInternalBoolean(BuildProperties.PROPERTY_INCREMENTAL_BUILD, false));
 
-        context.pushScope();
+        CommandOutputStream outputStream = null;
+        context.pushInternalScope();
         try
         {
-            context.addValue(BuildProperties.PROPERTY_RECIPE_PATHS, recipePaths);
-            context.addValue(BuildProperties.PROPERTY_RESOURCE_REPOSITORY, resourceRepository);
-            context.addValue(BuildProperties.PROPERTY_FILE_REPOSITORY, new MasterFileRepository(configurationManager));
-            context.setOutputStream(new CommandOutputStream(eventManager, request.getId(), true));
+            context.addInternalValue(BuildProperties.PROPERTY_RECIPE_PATHS, recipePaths);
+            context.addInternalValue(BuildProperties.PROPERTY_RESOURCE_REPOSITORY, resourceRepository);
+            context.addInternalValue(BuildProperties.PROPERTY_FILE_REPOSITORY, new MasterFileRepository(configurationManager));
+            outputStream = new CommandOutputStream(eventManager, request.getId(), true);
+            context.setOutputStream(outputStream);
             context.setWorkingDir(recipePaths.getBaseDir());
 
-            recipeProcessor.build(context, request);
+            recipeProcessor.build(request);
         }
         catch (BuildException e)
         {
@@ -60,7 +62,8 @@ public class MasterRecipeRunner implements Runnable
         }
         finally
         {
-            context.popScope();
+            IOUtils.close(outputStream);
+            context.popInternalScope();
         }
     }
 
