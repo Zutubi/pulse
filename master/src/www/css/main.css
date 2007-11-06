@@ -686,8 +686,14 @@ td.clearbar {
     margin:1em;
     padding:0.5em;
     border: 1px solid #c00000;
+    color: #000;
     background-color: #ffdddd;
     text-align:center;
+}
+
+#statusmessage a {
+    color: #000;
+    border-color: #000;
 }
 
     /*------------------------------

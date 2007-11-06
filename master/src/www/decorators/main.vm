@@ -189,9 +189,6 @@
 
       <div id="center">
           $body
-          #if($license.expired)
-            <div id="statusmessage">#wwtext("name=license.expiry.notice")</div>
-          #end
       </div>
         
       <div id="south">
@@ -199,7 +196,13 @@
          <span style="font-weight: bold; color: red">:: EXPERIMENTAL :: (You have been warned!)</span>
          <b>::</b> copyright &copy; 2005-2007 <a href="http://zutubi.com/">zutubi pty ltd</a> <b>::</b>
          <a href="http://jira.zutubi.com/">report bug/request feature</a>
-      </div>
-        
+          #if($license.expired)
+              #if($license.evaluation)
+                  <div id="statusmessage">#wwtext("name=license.expiry.notice")</div>
+              #else
+                  <b>::</b> #wwtext("name=license.support.expiry.notice")
+              #end
+          #end
+      </div>        
     </body>
 </html>

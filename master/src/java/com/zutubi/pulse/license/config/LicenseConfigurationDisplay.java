@@ -1,9 +1,12 @@
 package com.zutubi.pulse.license.config;
 
-import com.zutubi.pulse.license.LicenseHolder;
-import com.zutubi.pulse.license.License;
 import com.zutubi.i18n.Messages;
+import com.zutubi.pulse.license.License;
+import com.zutubi.pulse.license.LicenseHolder;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -19,16 +22,25 @@ public class LicenseConfigurationDisplay
 
     public String getType()
     {
-        return LicenseHolder.getLicense().getType().toString();
+        return LicenseHolder.getLicense().getType().name().toLowerCase().replace("_", " ");
     }
 
     public String getExpiry()
     {
-        Date expiryDate = LicenseHolder.getLicense().getExpiryDate();
+        License license = LicenseHolder.getLicense();
+        Date expiryDate = license.getExpiryDate();
+
         if (expiryDate != null)
         {
-            //TODO: formatting of this date should be configurable for I18N purposes.
-            return expiryDate.toString();
+            DateFormat dateFormatter = new SimpleDateFormat("EEEEE, dd MMM yyyy");
+
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(expiryDate);
+            cal.set(Calendar.HOUR, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+            return dateFormatter.format(cal.getTime());
         }
         
         Messages messages = Messages.getInstance(LicenseConfiguration.class);
@@ -40,7 +52,8 @@ public class LicenseConfigurationDisplay
         License license = LicenseHolder.getLicense();
         if (license.isExpired())
         {
-            return "expired";
+            Messages messages = Messages.getInstance(LicenseConfiguration.class);
+            return messages.format(license.isEvaluation() ? "license.expired" : "license.support.expired");
         }
         return "active";
     }

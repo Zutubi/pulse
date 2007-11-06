@@ -3,8 +3,8 @@ package com.zutubi.pulse.license;
 import com.zutubi.util.Constants;
 import com.zutubi.util.ObjectUtils;
 
-import java.util.Date;
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * The license contains the details associated with a license, including the
@@ -100,6 +100,11 @@ public class License
         return type;
     }
 
+    public boolean isEvaluation()
+    {
+        return type == LicenseType.EVALUATION;
+    }
+    
     /**
      * Get the number of projects supported by this license.
      *
@@ -173,11 +178,7 @@ public class License
      */
     public boolean isExpired()
     {
-        if (expires())
-        {
-            return getDaysRemaining() == 0;
-        }
-        return false;
+        return expires() && getDaysRemaining() == 0;
     }
 
     /**
