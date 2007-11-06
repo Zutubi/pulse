@@ -23,7 +23,7 @@ public class DefaultSpecificationUpgradeTask extends DatabaseUpgradeTask
         return "Marks one build specification as the default for each project";
     }
 
-    public void execute(UpgradeContext context, Connection con) throws SQLException
+    public void execute(Connection con) throws SQLException
     {
         List<Long> projects = getAllProjects(con);
         for(Long id: projects)

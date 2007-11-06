@@ -2,12 +2,10 @@ package com.zutubi.pulse.upgrade.tasks;
 
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.upgrade.ConfigurationAware;
-import com.zutubi.pulse.upgrade.UpgradeContext;
 import com.zutubi.pulse.upgrade.UpgradeException;
 import com.zutubi.pulse.upgrade.UpgradeTask;
 import com.zutubi.util.logging.Logger;
 
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -29,7 +27,7 @@ public class BackupUpgradeTask implements UpgradeTask, ConfigurationAware
 
     public String getDescription()
     {
-        return "Creates a backup of your pulse database.";
+        return "Creates a backup of your embedded pulse database (will NOT backup an external database).";
     }
 
     public int getBuildNumber()
@@ -38,13 +36,13 @@ public class BackupUpgradeTask implements UpgradeTask, ConfigurationAware
         return -1;
     }
 
-    public void execute(UpgradeContext context) throws UpgradeException
+    public void execute() throws UpgradeException
     {
         try
         {
             configurationManager.getData().backup(configurationManager.getSystemPaths());
         }
-        catch (IOException e)
+        catch (Exception e)
         {
             LOG.severe(e);
             errors.add(e.getMessage());

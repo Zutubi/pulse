@@ -33,7 +33,7 @@ public class ChangeViewerUpgradeTask extends DatabaseUpgradeTask
         return true;
     }
 
-    public void execute(UpgradeContext context, Connection con) throws IOException, SQLException
+    public void execute(Connection con) throws IOException, SQLException
     {
         // Two tasks:
         //   - detect any SCMs with a change.viewer.url property and convert

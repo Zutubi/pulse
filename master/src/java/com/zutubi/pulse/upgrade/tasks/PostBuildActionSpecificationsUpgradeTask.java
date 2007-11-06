@@ -1,6 +1,5 @@
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.pulse.upgrade.UpgradeContext;
 import com.zutubi.pulse.util.JDBCUtils;
 
 import java.sql.Connection;
@@ -25,7 +24,7 @@ public class PostBuildActionSpecificationsUpgradeTask extends AbstractSchemaRefa
         return "Upgrades post build action storage of related build specifications (CIB-927)";
     }
 
-    protected void doRefactor(UpgradeContext context, Connection con, SchemaRefactor refactor) throws SQLException
+    protected void doRefactor(Connection con, SchemaRefactor refactor) throws SQLException
     {
         // All current specifications have exactly one post build action.  Move
         // it into the new POST_BUILD_ACTION_SPECIFICATIONS table, then drop

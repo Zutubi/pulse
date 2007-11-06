@@ -1,12 +1,12 @@
 package com.zutubi.pulse.upgrade.tasks;
 
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.util.IOUtils;
-import com.zutubi.util.logging.Logger;
 import com.zutubi.pulse.core.model.TestSuiteResult;
 import com.zutubi.pulse.core.model.TestSuitePersister;
 import com.zutubi.pulse.core.model.TestCaseResult;
 import com.zutubi.pulse.core.model.TestResult;
+import com.zutubi.util.logging.Logger;
+import com.zutubi.util.IOUtils;
 import nu.xom.*;
 
 import java.io.*;

@@ -1,7 +1,6 @@
 package com.zutubi.pulse.upgrade;
 
 import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.upgrade.tasks.MockUpgradeTask;
 import com.zutubi.util.ObjectUtils;
 
 /**
@@ -11,53 +10,80 @@ public class UpgradeProgressMonitorTest extends PulseTestCase
 {
     private UpgradeProgressMonitor monitor;
 
-    public UpgradeProgressMonitorTest()
-    {
-    }
-
-    public UpgradeProgressMonitorTest(String name)
-    {
-        super(name);
-    }
-
     protected void setUp() throws Exception
     {
         super.setUp();
+
         monitor = new UpgradeProgressMonitor();
     }
 
     protected void tearDown() throws Exception
     {
         monitor = null;
+
         super.tearDown();
     }
 
-    public void testUpgradeTaskNameCanBeReused()
+    public void testIndividualTaskStates()
     {
-        UpgradeTask a = new MockUpgradeTask();
-        UpgradeTask b = new MockUpgradeTask();
-        assertEquals(a.getName(), b.getName());
+        UpgradeTask taskA = new UpgradeTestCase.UpgradeTaskAdapter();
+        UpgradeTask taskB = new UpgradeTestCase.UpgradeTaskAdapter();
+        UpgradeTask taskC = new UpgradeTestCase.UpgradeTaskAdapter();
 
-        monitor.setTasks(ObjectUtils.asList(a, b));
+        UpgradeTaskGroup group = new UpgradeTaskGroup();
+        group.setTasks(ObjectUtils.asList(taskA, taskB, taskC));
 
-        monitor.start(a);
+        monitor.setTaskGroups(ObjectUtils.asList(group));
 
-        assertEquals(UpgradeTaskProgress.IN_PROGRESS, monitor.getTaskProgress(a).getStatus());
-        assertEquals(UpgradeTaskProgress.PENDING, monitor.getTaskProgress(b).getStatus());
+        monitor.start();
 
-        monitor.complete(a);
+        monitor.started(group);
 
-        assertEquals(UpgradeTaskProgress.COMPLETE, monitor.getTaskProgress(a).getStatus());
-        assertEquals(UpgradeTaskProgress.PENDING, monitor.getTaskProgress(b).getStatus());
+        assertEquals(UpgradeStatus.IN_PROGRESS, monitor.getProgress(group).getStatus());
 
-        monitor.start(b);
+        assertEquals(UpgradeStatus.PENDING, monitor.getProgress(taskA).getStatus());
+        assertEquals(UpgradeStatus.PENDING, monitor.getProgress(taskB).getStatus());
+        assertEquals(UpgradeStatus.PENDING, monitor.getProgress(taskC).getStatus());
 
-        assertEquals(UpgradeTaskProgress.COMPLETE, monitor.getTaskProgress(a).getStatus());
-        assertEquals(UpgradeTaskProgress.IN_PROGRESS, monitor.getTaskProgress(b).getStatus());
+        monitor.started(taskA);
+        assertEquals(UpgradeStatus.IN_PROGRESS, monitor.getProgress(taskA).getStatus());
+        assertEquals(UpgradeStatus.PENDING, monitor.getProgress(taskB).getStatus());
+        assertEquals(UpgradeStatus.PENDING, monitor.getProgress(taskC).getStatus());
 
-        monitor.failed(b);
+        monitor.completed(taskA);
+        assertEquals(UpgradeStatus.COMPLETED, monitor.getProgress(taskA).getStatus());
+        assertEquals(UpgradeStatus.PENDING, monitor.getProgress(taskB).getStatus());
+        assertEquals(UpgradeStatus.PENDING, monitor.getProgress(taskC).getStatus());
 
-        assertEquals(UpgradeTaskProgress.COMPLETE, monitor.getTaskProgress(a).getStatus());
-        assertEquals(UpgradeTaskProgress.FAILED, monitor.getTaskProgress(b).getStatus());
+        monitor.started(taskB);
+        assertEquals(UpgradeStatus.COMPLETED, monitor.getProgress(taskA).getStatus());
+        assertEquals(UpgradeStatus.IN_PROGRESS, monitor.getProgress(taskB).getStatus());
+        assertEquals(UpgradeStatus.PENDING, monitor.getProgress(taskC).getStatus());
+
+        monitor.failed(taskB);
+        assertEquals(UpgradeStatus.COMPLETED, monitor.getProgress(taskA).getStatus());
+        assertEquals(UpgradeStatus.FAILED, monitor.getProgress(taskB).getStatus());
+        assertEquals(UpgradeStatus.PENDING, monitor.getProgress(taskC).getStatus());
+
+        monitor.started(taskC);
+        assertEquals(UpgradeStatus.COMPLETED, monitor.getProgress(taskA).getStatus());
+        assertEquals(UpgradeStatus.FAILED, monitor.getProgress(taskB).getStatus());
+        assertEquals(UpgradeStatus.IN_PROGRESS, monitor.getProgress(taskC).getStatus());
+
+        monitor.aborted(taskC);
+        assertEquals(UpgradeStatus.COMPLETED, monitor.getProgress(taskA).getStatus());
+        assertEquals(UpgradeStatus.FAILED, monitor.getProgress(taskB).getStatus());
+        assertEquals(UpgradeStatus.ABORTED, monitor.getProgress(taskC).getStatus());
+
+        monitor.completed(group);
+
+        assertEquals(UpgradeStatus.COMPLETED, monitor.getProgress(group).getStatus());
+
+        monitor.finish();
+    }
+
+    public void testPercentageComplete()
+    {
+
     }
 }

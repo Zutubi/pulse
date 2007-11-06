@@ -4,18 +4,16 @@ import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.config.ConfigSupport;
 import com.zutubi.pulse.config.FileConfig;
 import com.zutubi.pulse.upgrade.ConfigurationAware;
-import com.zutubi.pulse.upgrade.UpgradeContext;
 import com.zutubi.pulse.upgrade.UpgradeException;
-import com.zutubi.pulse.upgrade.UpgradeTask;
 
-import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
+import java.io.File;
 
 /**
  * <class-comment/>
  */
-public class RenameHostNamePropertyUpgradeTask implements UpgradeTask, ConfigurationAware
+public class RenameHostNamePropertyUpgradeTask implements PulseUpgradeTask, ConfigurationAware
 {
     protected int buildNumber;
 
@@ -43,7 +41,7 @@ public class RenameHostNamePropertyUpgradeTask implements UpgradeTask, Configura
         this.buildNumber = buildNumber;
     }
 
-    public void execute(UpgradeContext context) throws UpgradeException
+    public void execute() throws UpgradeException
     {
         ConfigSupport appConfig = new ConfigSupport(new FileConfig(new File(configurationManager.getUserPaths().getUserConfigRoot(), "pulse.properties")));
         if (appConfig.hasProperty("host.name"))

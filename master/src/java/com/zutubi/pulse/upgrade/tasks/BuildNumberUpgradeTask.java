@@ -22,7 +22,7 @@ public class BuildNumberUpgradeTask extends DatabaseUpgradeTask
         return "Upgrade to store next build number with project";
     }
 
-    public void execute(UpgradeContext context, Connection con) throws SQLException
+    public void execute(Connection con) throws SQLException
     {
         CallableStatement stmt = null;
         ResultSet rs = null;

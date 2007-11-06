@@ -1,9 +1,7 @@
 package com.zutubi.pulse.upgrade.tasks;
 
 import com.zutubi.pulse.upgrade.DataSourceAware;
-import com.zutubi.pulse.upgrade.UpgradeContext;
 import com.zutubi.pulse.upgrade.UpgradeException;
-import com.zutubi.pulse.upgrade.UpgradeTask;
 import com.zutubi.pulse.util.JDBCUtils;
 import com.zutubi.pulse.condition.NotifyConditionFactory;
 import org.acegisecurity.providers.encoding.Md5PasswordEncoder;
@@ -17,7 +15,7 @@ import java.util.List;
 /**
  * <class-comment/>
  */
-public class FlexibleConditionUpgradeTask implements UpgradeTask, DataSourceAware
+public class FlexibleConditionUpgradeTask implements PulseUpgradeTask, DataSourceAware
 {
     private DataSource dataSource;
 
@@ -45,7 +43,7 @@ public class FlexibleConditionUpgradeTask implements UpgradeTask, DataSourceAwar
         this.buildNumber = buildNumber;
     }
 
-    public void execute(UpgradeContext context) throws UpgradeException
+    public void execute() throws UpgradeException
     {
         Connection con = null;
         try

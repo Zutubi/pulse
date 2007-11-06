@@ -1,7 +1,7 @@
 package com.zutubi.pulse.upgrade;
 
 /**
- * <class-comment/>
+ * @deprecated
  */
 public class UpgradeTaskProgress
 {

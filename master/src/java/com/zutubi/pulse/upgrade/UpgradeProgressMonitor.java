@@ -2,7 +2,10 @@ package com.zutubi.pulse.upgrade;
 
 import com.zutubi.pulse.util.TimeStamps;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * The Upgrade Progress Monitor is a class used to help track and display the status of the upgrade.
@@ -24,101 +27,27 @@ public class UpgradeProgressMonitor
     private int taskCount;
     private int tasksFinishedCount;
 
-    private int percentageComplete = 0;
-
-    private boolean error = false;
+    private int percentageComplete;
 
     /**
      * Implementation note:
-     *
+     * <p/>
      * Use a list here to ensure that the order of the task progress entries
      * remain in the same order as was passed to this monitor.
      */
-    private List<UpgradeTaskProgress> orderedProgressDetails = new LinkedList<UpgradeTaskProgress>();
+    private List<TaskUpgradeProgress> orderedProgressDetails = new LinkedList<TaskUpgradeProgress>();
 
-    private Map<UpgradeTask, UpgradeTaskProgress> progressLookupMap = new HashMap<UpgradeTask, UpgradeTaskProgress>();
+    private Map<UpgradeTask, TaskUpgradeProgress> taskProgressLookupMap = new HashMap<UpgradeTask, TaskUpgradeProgress>();
+    private Map<UpgradeTaskGroup, TaskGroupUpgradeProgress> groupProgressLookupMap = new HashMap<UpgradeTaskGroup, TaskGroupUpgradeProgress>();
 
-    /**
-     * Start the progress monitor.
-     */
-    protected void start()
+    public void start()
     {
         startTimestamp = System.currentTimeMillis();
-        percentageComplete = 0;
     }
 
-    /**
-     * Stop the progress monitor.
-     */
-    protected void stop()
+    public void finish()
     {
         finishTimestamp = System.currentTimeMillis();
-    }
-
-    /**
-     * Inform the progress monitor that the specified task has started.
-     *
-     * @param task
-     */
-    protected void start(UpgradeTask task)
-    {
-        getTaskProgress(task).setStatus(UpgradeTaskProgress.IN_PROGRESS);
-    }
-
-    /**
-     * Inform the progress montior that the specified task has completed.
-     *
-     * @param task
-     */
-    protected void complete(UpgradeTask task)
-    {
-        getTaskProgress(task).setStatus(UpgradeTaskProgress.COMPLETE);
-        tasksFinishedCount++;
-    }
-
-    /**
-     * Inform the progress monitor that the specified task has failed.
-     *
-     * @param task
-     */
-    protected void failed(UpgradeTask task)
-    {
-        UpgradeTaskProgress taskProgress = getTaskProgress(task);
-        taskProgress.setStatus(UpgradeTaskProgress.FAILED);
-
-        for (String msg : task.getErrors())
-        {
-            taskProgress.setMessage(msg);
-        }
-
-        tasksFinishedCount++;
-        error = true;
-    }
-
-    /**
-     * Inform the progress monitor that the specified task has been aborted.
-     *
-     * @param task
-     */
-    protected void aborted(UpgradeTask task)
-    {
-        getTaskProgress(task).setStatus(UpgradeTaskProgress.ABORTED);
-        tasksFinishedCount++;
-    }
-
-    public boolean isStarted()
-    {
-        return startTimestamp != 0;
-    }
-
-    public boolean isSuccessful()
-    {
-        return !error;
-    }
-
-    public boolean isError()
-    {
-        return error;
     }
 
     /**
@@ -147,6 +76,48 @@ public class UpgradeProgressMonitor
         return TimeStamps.getPrettyElapsed(elapsedTime);
     }
 
+    public TaskUpgradeProgress getProgress(UpgradeTask task)
+    {
+        return taskProgressLookupMap.get(task);
+    }
+
+    public TaskGroupUpgradeProgress getProgress(UpgradeTaskGroup group)
+    {
+        return groupProgressLookupMap.get(group);
+    }
+
+    public void started(UpgradeTask task)
+    {
+        TaskUpgradeProgress taskProgress = getProgress(task);
+        taskProgress.setStatus(UpgradeStatus.IN_PROGRESS);
+
+    }
+
+    public void aborted(UpgradeTask task)
+    {
+        TaskUpgradeProgress taskProgress = getProgress(task);
+        taskProgress.setStatus(UpgradeStatus.ABORTED);
+
+        tasksFinishedCount++;
+    }
+
+    public void failed(UpgradeTask task)
+    {
+        TaskUpgradeProgress taskProgress = getProgress(task);
+        taskProgress.setStatus(UpgradeStatus.FAILED);
+
+        tasksFinishedCount++;
+        error = true;
+    }
+
+    public void completed(UpgradeTask task)
+    {
+        TaskUpgradeProgress taskProgress = getProgress(task);
+        taskProgress.setStatus(UpgradeStatus.COMPLETED);
+
+        tasksFinishedCount++;
+    }
+
     public int getPercentageComplete()
     {
         if (percentageComplete != 0)
@@ -154,7 +125,7 @@ public class UpgradeProgressMonitor
             return percentageComplete;
         }
 
-        if(taskCount == 0)
+        if (taskCount == 0)
         {
             return 100;
         }
@@ -175,39 +146,62 @@ public class UpgradeProgressMonitor
         this.percentageComplete = percentageComplete;
     }
 
-    /**
-     * Specify the list of upgrade tasks that are being monitored. Note: the order
-     * of this list should mirror the order in which the tasks are executed.
-     *
-     * @param monitoredTasks
-     */
-    protected void setTasks(List<UpgradeTask> monitoredTasks)
+    public void setTaskGroups(List<UpgradeTaskGroup> monitoredGroups)
     {
-        for (UpgradeTask task : monitoredTasks)
+        taskCount = 0;
+
+        for (UpgradeTaskGroup group : monitoredGroups)
         {
-            UpgradeTaskProgress progress = new UpgradeTaskProgress(task);
-            progressLookupMap.put(task, progress);
-            orderedProgressDetails.add(progress);
+            TaskGroupUpgradeProgress groupProgress = new TaskGroupUpgradeProgress(group);
+            groupProgressLookupMap.put(group, groupProgress);
+
+            List<UpgradeTask> monitoredTasks = group.getTasks();
+            for (UpgradeTask task : monitoredTasks)
+            {
+                TaskUpgradeProgress taskProgress = new TaskUpgradeProgress(task);
+                taskProgressLookupMap.put(task, taskProgress);
+                orderedProgressDetails.add(taskProgress);
+            }
+            taskCount = taskCount + monitoredTasks.size();
         }
-        taskCount = monitoredTasks.size();
     }
 
-    /**
-     * Retrieve information about the status of the upgrade tasks.
-     *
-     * @return the list of task progress entries.
-     */
-    public List<UpgradeTaskProgress> getTaskProgress()
+    public void started(UpgradeTaskGroup group)
     {
-        return Collections.unmodifiableList(this.orderedProgressDetails);
+        TaskGroupUpgradeProgress groupProgress = getProgress(group);
+        groupProgress.setStatus(UpgradeStatus.IN_PROGRESS);
+
     }
 
-    /**
-     * Retrieve information about the status of the individual upgrade tasks.
-     *
-     */
-    public UpgradeTaskProgress getTaskProgress(UpgradeTask task)
+    public void completed(UpgradeTaskGroup group)
     {
-        return progressLookupMap.get(task);
+        TaskGroupUpgradeProgress groupProgress = getProgress(group);
+        groupProgress.setStatus(UpgradeStatus.COMPLETED);
+
+    }
+
+    public void aborted(UpgradeTaskGroup group)
+    {
+        TaskGroupUpgradeProgress groupProgress = getProgress(group);
+        groupProgress.setStatus(UpgradeStatus.ABORTED);
+
+    }
+
+    public boolean isStarted()
+    {
+        return startTimestamp != 0;
+    }
+
+
+    private boolean error = false;
+
+    public boolean isSuccessful()
+    {
+        return !error;
+    }
+
+    public boolean isError()
+    {
+        return error;
     }
 }

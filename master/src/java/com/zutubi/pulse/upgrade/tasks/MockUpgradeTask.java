@@ -39,7 +39,7 @@ public class MockUpgradeTask implements UpgradeTask
         return buildNumber;
     }
 
-    public void execute(UpgradeContext context) throws UpgradeException
+    public void execute() throws UpgradeException
     {
         executionCount++;
     }

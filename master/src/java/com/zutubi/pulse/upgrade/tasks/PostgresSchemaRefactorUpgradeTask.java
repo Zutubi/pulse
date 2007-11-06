@@ -1,7 +1,5 @@
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.pulse.upgrade.UpgradeContext;
-
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -26,7 +24,7 @@ public class PostgresSchemaRefactorUpgradeTask extends AbstractSchemaRefactorUpg
         return true;
     }
 
-    protected void doRefactor(UpgradeContext context, Connection con, SchemaRefactor refactor) throws SQLException
+    protected void doRefactor(Connection con, SchemaRefactor refactor) throws SQLException
     {
         refactor.renameTable("USER", "LOCAL_USER");
         refactor.renameColumn("CLEANUP_RULE", "limit", "RULE_LIMIT");

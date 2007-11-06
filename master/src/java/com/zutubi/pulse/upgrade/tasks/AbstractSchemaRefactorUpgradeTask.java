@@ -23,7 +23,7 @@ public abstract class AbstractSchemaRefactorUpgradeTask extends DatabaseUpgradeT
         return true;
     }
 
-    public void execute(UpgradeContext context, Connection con) throws IOException, SQLException
+    public void execute(Connection con) throws IOException, SQLException
     {
         // manually setup the hibernate configuration
         MutableConfiguration config = new MutableConfiguration();
@@ -44,10 +44,10 @@ public abstract class AbstractSchemaRefactorUpgradeTask extends DatabaseUpgradeT
 
         config.buildMappings();
         SchemaRefactor refactor = new SchemaRefactor(config, props);
-        doRefactor(context, con, refactor);
+        doRefactor(con, refactor);
     }
 
-    protected abstract void doRefactor(UpgradeContext context, Connection con, SchemaRefactor refactor) throws SQLException, IOException;
+    protected abstract void doRefactor(Connection con, SchemaRefactor refactor) throws SQLException, IOException;
 
     public void setDatabaseConsole(DatabaseConsole databaseConsole)
     {

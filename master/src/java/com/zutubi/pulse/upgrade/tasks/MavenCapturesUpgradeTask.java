@@ -1,6 +1,5 @@
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.pulse.upgrade.UpgradeContext;
 import com.zutubi.pulse.util.JDBCUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -28,7 +27,7 @@ public class MavenCapturesUpgradeTask extends DatabaseUpgradeTask
         return "This upgrade task adds artifacts to capture test reports for existing maven (and maven 2) projects";
     }
 
-    public void execute(UpgradeContext context, Connection con) throws SQLException
+    public void execute(Connection con) throws SQLException
     {
         // start migrating the data.
         // a) up all maven projects

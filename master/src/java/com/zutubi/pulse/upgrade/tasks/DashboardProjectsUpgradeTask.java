@@ -26,7 +26,7 @@ public class DashboardProjectsUpgradeTask extends DatabaseUpgradeTask
         return "Upgrade to convert to a new scheme for dashboard project preferences";
     }
 
-    public void execute(UpgradeContext context, Connection con) throws SQLException
+    public void execute(Connection con) throws SQLException
     {
         updateProperties(con);
         dropColumns(con);

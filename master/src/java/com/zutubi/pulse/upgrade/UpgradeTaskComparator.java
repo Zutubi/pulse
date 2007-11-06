@@ -9,6 +9,6 @@ public class UpgradeTaskComparator implements Comparator<UpgradeTask>
 {
     public int compare(UpgradeTask a, UpgradeTask b)
     {
-        return a.getBuildNumber() - b.getBuildNumber();
+        return 0;//a.getBuildNumber() - b.getBuildNumber();
     }
 }

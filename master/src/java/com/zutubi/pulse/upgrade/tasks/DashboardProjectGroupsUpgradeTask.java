@@ -28,7 +28,7 @@ public class DashboardProjectGroupsUpgradeTask extends DatabaseUpgradeTask
         return "Upgrade to allow project groups to be chosen for display on the dashboard";
     }
 
-    public void execute(UpgradeContext context, Connection con) throws SQLException, IOException
+    public void execute(Connection con) throws SQLException, IOException
     {
         updateUsers(con, getAllUsers(con), getAllProjects(con));
         dropTable(con);

@@ -1,6 +1,5 @@
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.pulse.upgrade.UpgradeContext;
 import com.zutubi.pulse.util.JDBCUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -29,7 +28,7 @@ public class ClonedProjectDataPatchUpgradeTask extends DatabaseUpgradeTask
                 "the scm details correctly. See CIB-409 for details.";
     }
 
-    public void execute(UpgradeContext context, Connection con) throws SQLException
+    public void execute(Connection con) throws SQLException
     {
         // locate projects referencing cloned scms.
         List<Long> clonedScms = new LinkedList<Long>();

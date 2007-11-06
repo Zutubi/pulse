@@ -52,7 +52,7 @@ public class EncodePasswordUpgradeTaskTest extends BaseUpgradeTaskTestCase
             // upgrade
             EncodePasswordUpgradeTask upgradeTask = new EncodePasswordUpgradeTask();
             upgradeTask.setDataSource(dataSource);
-            upgradeTask.execute(new MockUpgradeContext());
+            upgradeTask.execute();
 
             assertEquals(0, upgradeTask.getErrors().size());
 

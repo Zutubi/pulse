@@ -1,7 +1,5 @@
 package com.zutubi.pulse.upgrade;
 
-import com.zutubi.pulse.bootstrap.Data;
-
 import java.util.List;
 
 /**
@@ -12,18 +10,15 @@ public interface UpgradeManager
     /**
      * Returns true if the execution of upgrade tasks is required, false otherwise.
      *
-     * @param data represents the data directory being checked.
-     *
      * @return true if an upgrade is required before the specified data directory can be used, false otherwise.
      */
-    boolean isUpgradeRequired(Data data);
+    boolean isUpgradeRequired();
 
     /**
      * Prepare upgrade is the first step for the upgrade processing.
      *
-     * @param data the data instance to be upgraded.
      */
-    void prepareUpgrade(Data data);
+    void prepareUpgrade();
 
     /**
      * Preview the prepared upgrade.
@@ -31,9 +26,8 @@ public interface UpgradeManager
      * @return a list of upgrade tasks that will be executed if execute upgrade is called.
      *
      * @see #executeUpgrade()
-     * @see #prepareUpgrade(com.zutubi.pulse.bootstrap.Data) 
      */
-    List<UpgradeTask> previewUpgrade();
+    List<UpgradeTaskGroup> previewUpgrade();
 
     /**
      * Execute the required upgrade tasks.

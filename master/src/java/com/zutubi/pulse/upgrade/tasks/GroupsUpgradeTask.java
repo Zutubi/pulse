@@ -33,7 +33,7 @@ public class GroupsUpgradeTask extends DatabaseUpgradeTask
         return true;
     }
 
-    public void execute(UpgradeContext context, Connection con) throws SQLException
+    public void execute(Connection con) throws SQLException
     {
         // Current privileges are server admin and project administrators.  Schema:
         //

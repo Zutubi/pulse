@@ -21,7 +21,7 @@ public class EstimatedRunningTimeUpgradeTask extends DatabaseUpgradeTask
         return "Upgrade to result time stamps to support estimated running time";
     }
 
-    public void execute(UpgradeContext context, Connection con) throws SQLException
+    public void execute(Connection con) throws SQLException
     {
         addColumn("build_result", con);
         addColumn("recipe_result", con);

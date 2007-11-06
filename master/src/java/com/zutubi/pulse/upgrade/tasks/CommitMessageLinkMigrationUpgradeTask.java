@@ -14,7 +14,7 @@ import java.util.Properties;
  */
 public class CommitMessageLinkMigrationUpgradeTask extends DatabaseUpgradeTask
 {
-    public void execute(UpgradeContext context, Connection con) throws IOException, SQLException
+    public void execute(Connection con) throws IOException, SQLException
     {
         // set all TYPE fields to STANDARD.
         updateTypeField(con);

@@ -385,7 +385,7 @@ public class DefaultSetupManager implements SetupManager
 
     private boolean isUpgradeRequired()
     {
-        return upgradeManager.isUpgradeRequired(configurationManager.getData());
+        return upgradeManager.isUpgradeRequired();
     }
 
     private boolean isSetupRequired()

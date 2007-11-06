@@ -1,6 +1,5 @@
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.pulse.upgrade.UpgradeContext;
 import com.zutubi.pulse.util.JDBCUtils;
 
 import java.sql.CallableStatement;
@@ -27,7 +26,7 @@ public class PersistentNameUpgradeTask extends DatabaseUpgradeTask
         return "Changes the way build specifications and stages are associated with build results.";
     }
 
-    public void execute(UpgradeContext context, Connection con) throws SQLException
+    public void execute(Connection con) throws SQLException
     {
         nextId = HibernateUtils.getNextId(con);
 

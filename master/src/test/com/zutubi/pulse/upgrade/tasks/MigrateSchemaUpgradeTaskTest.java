@@ -42,7 +42,7 @@ public class MigrateSchemaUpgradeTaskTest extends BaseUpgradeTaskTestCase
         assertFalse(checkTableExists("TEST"));
 
         upgrade = newSchemaUpgrade("com/zutubi/pulse/upgrade/tasks/testSchemaMigration-v1.hbm.xml");
-        upgrade.execute(new MockUpgradeContext());
+        upgrade.execute();
 
         // after, tet that table is there.
         assertTrue(checkTableExists("TEST"));
@@ -57,13 +57,13 @@ public class MigrateSchemaUpgradeTaskTest extends BaseUpgradeTaskTestCase
         assertFalse(checkTableExists("TEST"));
 
         upgrade = newSchemaUpgrade("com/zutubi/pulse/upgrade/tasks/testSchemaMigration-v1.hbm.xml");
-        upgrade.execute(new MockUpgradeContext());
+        upgrade.execute();
 
         // after, tet that table is there.
         assertFalse(checkColumnExists("TEST", "NEW_COLUMN"));
 
         upgrade = newSchemaUpgrade("com/zutubi/pulse/upgrade/tasks/testSchemaMigration-v2.hbm.xml");
-        upgrade.execute(new MockUpgradeContext());
+        upgrade.execute();
 
         assertTrue(checkColumnExists("TEST", "NEW_COLUMN"));
     }

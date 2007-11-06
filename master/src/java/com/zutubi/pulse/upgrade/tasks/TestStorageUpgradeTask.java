@@ -1,18 +1,20 @@
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.pulse.upgrade.UpgradeContext;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.core.model.RecipeResult;
+import com.zutubi.pulse.core.model.TestCaseResult;
+import com.zutubi.pulse.core.model.TestResultSummary;
+import com.zutubi.pulse.core.model.TestSuiteResult;
 import com.zutubi.pulse.upgrade.ConfigurationAware;
 import com.zutubi.pulse.util.JDBCUtils;
 import com.zutubi.util.logging.Logger;
-import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.io.File;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  */
@@ -38,7 +40,7 @@ public class TestStorageUpgradeTask extends DatabaseUpgradeTask implements Confi
         return true;
     }
 
-    public void execute(UpgradeContext context, Connection con) throws SQLException
+    public void execute(Connection con) throws SQLException
     {
         // For every recipe, use the current data to construct a new,
         // TestSuiteResult.  This can be used to calculate the new test

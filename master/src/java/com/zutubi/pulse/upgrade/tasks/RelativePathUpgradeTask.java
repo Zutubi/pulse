@@ -1,6 +1,8 @@
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.pulse.upgrade.UpgradeContext;
+import com.zutubi.pulse.bootstrap.Data;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.upgrade.ConfigurationAware;
 import com.zutubi.pulse.util.JDBCUtils;
 
 import java.io.File;
@@ -11,8 +13,10 @@ import java.sql.SQLException;
 
 /**
  */
-public class RelativePathUpgradeTask extends DatabaseUpgradeTask
+public class RelativePathUpgradeTask extends DatabaseUpgradeTask implements ConfigurationAware
 {
+    private MasterConfigurationManager configurationManager;
+
     public String getName()
     {
         return "Relative paths";
@@ -23,11 +27,15 @@ public class RelativePathUpgradeTask extends DatabaseUpgradeTask
         return "Upgrade to change absolute paths into paths relative to data root";
     }
 
-    public void execute(UpgradeContext context, Connection con) throws SQLException
+    public void execute(Connection con) throws SQLException
     {
-        updateTable(con, "build_result", context.getData().getData().getAbsolutePath());
-        updateTable(con, "recipe_result", context.getData().getData().getAbsolutePath());
-        updateTable(con, "command_result", context.getData().getData().getAbsolutePath());
+        // this is part of the initialisation process of the data directory. However, if the data directory
+        // was created before this initialisation was introduced, the upgrade task is required.
+        Data data = configurationManager.getData();
+
+        updateTable(con, "build_result", data.getData().getAbsolutePath());
+        updateTable(con, "recipe_result", data.getData().getAbsolutePath());
+        updateTable(con, "command_result", data.getData().getAbsolutePath());
     }
 
     private void updateTable(Connection con, String table, String dataPath) throws SQLException
@@ -80,5 +88,10 @@ public class RelativePathUpgradeTask extends DatabaseUpgradeTask
     public boolean haltOnFailure()
     {
         return true;
+    }
+
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
     }
 }

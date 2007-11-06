@@ -22,7 +22,7 @@ public class DropBuildChangelistsUpgradeTask extends DatabaseUpgradeTask
         return "This upgrade tasks removes links from builds to changelists that are no longer required.";
     }
 
-    public void execute(UpgradeContext context, Connection con) throws SQLException
+    public void execute(Connection con) throws SQLException
     {
         CallableStatement stmt = null;
         try

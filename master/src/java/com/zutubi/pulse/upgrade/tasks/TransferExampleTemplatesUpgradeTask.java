@@ -1,7 +1,5 @@
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.pulse.upgrade.UpgradeTask;
-import com.zutubi.pulse.upgrade.UpgradeContext;
 import com.zutubi.pulse.upgrade.UpgradeException;
 import com.zutubi.pulse.upgrade.ConfigurationAware;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
@@ -13,7 +11,7 @@ import java.util.LinkedList;
 /**
  * <class comment/>
  */
-public class TransferExampleTemplatesUpgradeTask implements UpgradeTask, ConfigurationAware
+public class TransferExampleTemplatesUpgradeTask implements PulseUpgradeTask, ConfigurationAware
 {
     private int buildNumber;
 
@@ -40,7 +38,7 @@ public class TransferExampleTemplatesUpgradeTask implements UpgradeTask, Configu
         return buildNumber;
     }
 
-    public void execute(UpgradeContext context) throws UpgradeException
+    public void execute() throws UpgradeException
     {
         // this is part of the initialisation process of the data directory. However, if the data directory
         // was created before this initialisation was introduced, the upgrade task is required.

@@ -1,8 +1,7 @@
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.pulse.core.scm.CheckoutScheme;
-import com.zutubi.pulse.upgrade.UpgradeContext;
 import com.zutubi.pulse.util.JDBCUtils;
+import com.zutubi.pulse.core.scm.CheckoutScheme;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -25,7 +24,7 @@ public class IncrementalBuildUpgradeTask extends DatabaseUpgradeTask
         return "Upgrade to support new checkout schemes for incremental building";
     }
 
-    public void execute(UpgradeContext context, Connection con) throws SQLException
+    public void execute(Connection con) throws SQLException
     {
         // First, copy checkout schemes from the project to all specs, then
         // delete the column from the project table.  Care must be taken as

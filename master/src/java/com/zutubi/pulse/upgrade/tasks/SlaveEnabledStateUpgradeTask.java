@@ -27,7 +27,7 @@ public class SlaveEnabledStateUpgradeTask extends DatabaseUpgradeTask
         return true;
     }
 
-    public void execute(UpgradeContext context, Connection con) throws SQLException
+    public void execute(Connection con) throws SQLException
     {
         updateStates(con);
         dropColumn(con);

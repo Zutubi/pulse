@@ -102,11 +102,11 @@ public class CommitMessageLinkMigrationUpgradeTaskTest extends BaseUpgradeTaskTe
         schemaUpgrade.setDataSource(dataSource);
         schemaUpgrade.setDatabaseConfig(databaseConfig);
         schemaUpgrade.setBuildNumber(102001007);
-        schemaUpgrade.execute(new MockUpgradeContext());
+        schemaUpgrade.execute();
 
         CommitMessageLinkMigrationUpgradeTask task = new CommitMessageLinkMigrationUpgradeTask();
         task.setDataSource(dataSource);
-        task.execute(new MockUpgradeContext());
+        task.execute();
         assertEquals(0, task.getErrors().size());
     }
 

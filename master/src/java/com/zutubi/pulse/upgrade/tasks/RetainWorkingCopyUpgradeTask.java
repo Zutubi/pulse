@@ -22,7 +22,7 @@ public class RetainWorkingCopyUpgradeTask extends DatabaseUpgradeTask
         return "This upgrade tasks sets the retain working copy option for all existing build specifications.";
     }
 
-    public void execute(UpgradeContext context, Connection con) throws SQLException
+    public void execute(Connection con) throws SQLException
     {
         CallableStatement stmt = null;
         try

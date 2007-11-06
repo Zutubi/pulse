@@ -23,7 +23,7 @@ public class SubscriptionProjectsUpgradeTask extends DatabaseUpgradeTask
         return "Upgrades subscriptions to allow them to refer to multiple projects";
     }
 
-    public void execute(UpgradeContext context, Connection con) throws SQLException
+    public void execute(Connection con) throws SQLException
     {
         // All current subscriptions have exactly one project.  Move it into the new
         // SUBSCRIPTION_PROJECTS table, then drop the PROJECT_ID column from the

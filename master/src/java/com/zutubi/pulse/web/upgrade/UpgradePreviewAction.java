@@ -4,6 +4,7 @@ import com.zutubi.pulse.Version;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.Data;
 import com.zutubi.pulse.upgrade.UpgradeTask;
+import com.zutubi.pulse.upgrade.UpgradeTaskGroup;
 
 import java.util.List;
 
@@ -25,6 +26,7 @@ public class UpgradePreviewAction extends UpgradeActionSupport
     private Version newVersion;
 
     private MasterConfigurationManager configurationManager;
+    private List<UpgradeTaskGroup> upgradeGroupPreview;
 
     /**
      * Required resource.
@@ -39,6 +41,11 @@ public class UpgradePreviewAction extends UpgradeActionSupport
     public List<UpgradeTask> getUpgradePreview()
     {
         return upgradePreview;
+    }
+
+    public List<UpgradeTaskGroup> getUpgradeGroupPreview()
+    {
+        return upgradeGroupPreview;
     }
 
     /**
@@ -64,9 +71,12 @@ public class UpgradePreviewAction extends UpgradeActionSupport
         targetVersion = targetData.getVersion();
         newVersion = Version.getVersion();
 
-        upgradeManager.prepareUpgrade(targetData);
+        upgradeManager.prepareUpgrade();
 
-        upgradePreview = upgradeManager.previewUpgrade();
+        upgradeGroupPreview = upgradeManager.previewUpgrade();
+
+        upgradePreview = upgradeGroupPreview.get(0).getTasks();
+
         return SUCCESS;
     }
 

@@ -1,14 +1,12 @@
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.pulse.upgrade.UpgradeContext;
 import com.zutubi.pulse.util.JDBCUtils;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
-import java.io.IOException;
 
 /**
  */
@@ -29,7 +27,7 @@ public class OrphanedTriggerUpgradeTask extends DatabaseUpgradeTask
         return false;
     }
 
-    public void execute(UpgradeContext context, Connection con) throws SQLException
+    public void execute(Connection con) throws SQLException
     {
         List<Long> projects = getAllProjects(con);
 

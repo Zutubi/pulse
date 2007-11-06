@@ -1,6 +1,5 @@
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.pulse.upgrade.UpgradeContext;
 import com.zutubi.pulse.util.JDBCUtils;
 import com.zutubi.util.IOUtils;
 
@@ -34,7 +33,7 @@ public class TriggerBuildSpecificationUpgradeTask extends DatabaseUpgradeTask
         return "This upgrade task changes the way triggers refer to build specifications";
     }
 
-    public void execute(UpgradeContext context, Connection con) throws SQLException, IOException
+    public void execute(Connection con) throws SQLException, IOException
     {
         PreparedStatement ps = null;
         ResultSet rs = null;

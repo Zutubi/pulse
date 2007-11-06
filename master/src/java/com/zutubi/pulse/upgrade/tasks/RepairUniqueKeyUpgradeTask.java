@@ -23,7 +23,7 @@ public class RepairUniqueKeyUpgradeTask extends DatabaseUpgradeTask
         return "Repairs the unique key table which may have been damaged in a beta upgrade.";
     }
 
-    public void execute(UpgradeContext context, Connection con) throws SQLException
+    public void execute(Connection con) throws SQLException
     {
         CallableStatement stmt = null;
         ResultSet rs = null;

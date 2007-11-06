@@ -21,7 +21,7 @@ public class ResourceEnvironmentUpgradeTask extends DatabaseUpgradeTask
         return "Upgrade to resources to import values into the environment";
     }
 
-    public void execute(UpgradeContext context, Connection con) throws SQLException
+    public void execute(Connection con) throws SQLException
     {
         addPropertyColumns("resource_properties", con);
         addPropertyColumns("resource_version_properties", con);

@@ -3,8 +3,9 @@ package com.zutubi.pulse.upgrade;
 import java.util.List;
 
 /**
- * The upgrade task interface.  All upgrade tasks need to implement this interface.
+ * The upgrade task interface.
  *
+ * @author Daniel Ostermeier
  */
 public interface UpgradeTask
 {
@@ -29,24 +30,21 @@ public interface UpgradeTask
      *
      * For example: If the setting this to 301 will cause this task to
      * be executed on all installations with build version 300 and below (inclusive).
-     *
-     * @return the build number that triggers this upgrade task
      */
+/*
     int getBuildNumber();
+*/
 
     /**
      * Run this upgrade task.
      *
-     * @param context provides information about the upgrade.
-     *
-     * @throws UpgradeException on error
+     * @throws UpgradeException
      */
-    void execute(UpgradeContext context) throws UpgradeException;
+    void execute() throws UpgradeException;
 
     /**
      * The list of errors that this upgrade task encountered during execution.
      *
-     * @return the list of errors messages generated during the execution of this upgrade task. 
      */
     List<String> getErrors();
 
@@ -57,8 +55,6 @@ public interface UpgradeTask
      * For example: If this upgrade task requires a database connection and non is available
      * for whatever reason, then halt on failure should be true. Once the connection is available
      * then we can continue.
-     *
-     * @return true if the upgrade should halt if this upgrade fails.
      */
     boolean haltOnFailure();
 

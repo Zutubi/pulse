@@ -51,7 +51,7 @@ public class UserPropsUpgradeTaskTest extends BaseUpgradeTaskTestCase
         UserPropsSchemaUpgradeTask schemaUpgrade = new UserPropsSchemaUpgradeTask();
         schemaUpgrade.setDataSource(dataSource);
         schemaUpgrade.setDatabaseConfig(databaseConfig);
-        schemaUpgrade.execute(new MockUpgradeContext());
+        schemaUpgrade.execute();
 
         // check that the new table exists as expected
         assertTrue(JDBCUtils.tableExists(dataSource, "USER_PROPS"));
@@ -59,7 +59,7 @@ public class UserPropsUpgradeTaskTest extends BaseUpgradeTaskTestCase
         // run the data migration.
         UserPropsDataUpgradeTask dataUpgrade = new UserPropsDataUpgradeTask();
         dataUpgrade.setDataSource(dataSource);
-        dataUpgrade.execute(new MockUpgradeContext());
+        dataUpgrade.execute();
 
 
         // check that the data is as expected.

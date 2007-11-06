@@ -1,6 +1,5 @@
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.pulse.upgrade.UpgradeContext;
 import com.zutubi.pulse.util.JDBCUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -43,7 +42,7 @@ public class FeatureCountUpgradeTask extends DatabaseUpgradeTask
         return false;
     }
 
-    public void execute(UpgradeContext context, Connection con) throws IOException, SQLException
+    public void execute(Connection con) throws IOException, SQLException
     {
         // for each build result - evaluate the warning and feature count
         //  a) sum warning / error count for associated features.

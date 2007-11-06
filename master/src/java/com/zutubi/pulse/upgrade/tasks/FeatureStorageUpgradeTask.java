@@ -3,7 +3,6 @@ package com.zutubi.pulse.upgrade.tasks;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.upgrade.ConfigurationAware;
-import com.zutubi.pulse.upgrade.UpgradeContext;
 import com.zutubi.pulse.util.JDBCUtils;
 
 import java.io.File;
@@ -41,7 +40,7 @@ public class FeatureStorageUpgradeTask extends AbstractSchemaRefactorUpgradeTask
         return true;
     }
 
-    protected void doRefactor(UpgradeContext context, Connection con, SchemaRefactor refactor) throws SQLException, IOException
+    protected void doRefactor(Connection con, SchemaRefactor refactor) throws SQLException, IOException
     {
         persister = new OriginalFeaturePersister();
         try

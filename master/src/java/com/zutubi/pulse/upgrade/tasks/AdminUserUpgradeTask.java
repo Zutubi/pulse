@@ -4,7 +4,6 @@ import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.config.ConfigSupport;
 import com.zutubi.pulse.config.FileConfig;
 import com.zutubi.pulse.upgrade.ConfigurationAware;
-import com.zutubi.pulse.upgrade.UpgradeContext;
 import com.zutubi.pulse.util.JDBCUtils;
 
 import java.io.File;
@@ -30,7 +29,7 @@ public class AdminUserUpgradeTask extends DatabaseUpgradeTask implements Configu
         return "Marks one user as the special admin user";
     }
 
-    public void execute(UpgradeContext context, Connection con) throws SQLException
+    public void execute(Connection con) throws SQLException
     {
         CallableStatement stmt = null;
         ResultSet rs = null;
@@ -39,7 +38,7 @@ public class AdminUserUpgradeTask extends DatabaseUpgradeTask implements Configu
         {
             stmt = con.prepareCall("SELECT login FROM user ORDER BY id ASC LIMIT 1");
             rs = stmt.executeQuery();
-            if(rs.next())
+            if (rs.next())
             {
                 String login = rs.getString("login");
                 ConfigSupport appConfig = new ConfigSupport(new FileConfig(new File(configurationManager.getUserPaths().getUserConfigRoot(), "pulse.properties")));

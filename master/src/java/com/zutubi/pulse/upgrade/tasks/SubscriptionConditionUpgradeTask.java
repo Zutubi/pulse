@@ -21,7 +21,7 @@ public class SubscriptionConditionUpgradeTask extends DatabaseUpgradeTask
         return "Upgrades subscriptions to allow common cases to be configured more easily";
     }
 
-    public void execute(UpgradeContext context, Connection con) throws SQLException
+    public void execute(Connection con) throws SQLException
     {
         // All subscriptions with TYPE PROJECT should have their
         // NOTIFY_CONDITION column converted to a row in the

@@ -2,9 +2,7 @@ package com.zutubi.pulse.upgrade.tasks;
 
 import com.zutubi.pulse.bootstrap.DatabaseConfig;
 import com.zutubi.pulse.upgrade.DataSourceAware;
-import com.zutubi.pulse.upgrade.UpgradeContext;
 import com.zutubi.pulse.upgrade.UpgradeException;
-import com.zutubi.pulse.upgrade.UpgradeTask;
 import org.springframework.core.io.ClassPathResource;
 
 import javax.sql.DataSource;
@@ -16,7 +14,7 @@ import java.util.Properties;
 /**
  * <class-comment/>
  */
-public class MigrateSchemaUpgradeTask implements DataSourceAware, UpgradeTask
+public class MigrateSchemaUpgradeTask implements DataSourceAware, PulseUpgradeTask
 {
     private List<String> mappings = new LinkedList<String>();
 
@@ -63,7 +61,7 @@ public class MigrateSchemaUpgradeTask implements DataSourceAware, UpgradeTask
         return true;
     }
 
-    public void execute(UpgradeContext context) throws UpgradeException
+    public void execute() throws UpgradeException
     {
         try
         {

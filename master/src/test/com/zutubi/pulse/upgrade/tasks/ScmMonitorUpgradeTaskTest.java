@@ -47,12 +47,12 @@ public class ScmMonitorUpgradeTaskTest extends BaseUpgradeTaskTestCase
         ScmMonitorSchemaUpgradeTask schemaUpgrade = new ScmMonitorSchemaUpgradeTask();
         schemaUpgrade.setDataSource(dataSource);
         schemaUpgrade.setDatabaseConfig(databaseConfig);
-        schemaUpgrade.execute(new MockUpgradeContext());
+        schemaUpgrade.execute();
 
         // run the data migration.
         ScmMonitorDataUpgradeTask dataUpgrade = new ScmMonitorDataUpgradeTask();
         dataUpgrade.setDataSource(dataSource);
-        dataUpgrade.execute(new MockUpgradeContext());
+        dataUpgrade.execute();
 
         // ensure that all scms have correct monitor settings.
         Connection con = null;

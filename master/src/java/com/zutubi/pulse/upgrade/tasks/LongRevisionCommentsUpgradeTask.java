@@ -32,7 +32,7 @@ public class LongRevisionCommentsUpgradeTask extends DatabaseUpgradeTask
         return true;
     }
 
-    public void execute(UpgradeContext context, Connection con) throws SQLException
+    public void execute(Connection con) throws SQLException
     {
         PreparedStatement stmt = null;
         ResultSet rs = null;

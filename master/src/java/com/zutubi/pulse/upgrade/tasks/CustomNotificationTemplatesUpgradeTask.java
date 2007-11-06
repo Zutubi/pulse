@@ -27,7 +27,7 @@ public class CustomNotificationTemplatesUpgradeTask extends DatabaseUpgradeTask
         return "Upgrades subscriptions to allow a choice of notification templates";
     }
 
-    public void execute(UpgradeContext context, Connection con) throws SQLException, IOException
+    public void execute(Connection con) throws SQLException, IOException
     {
         // Currently:
         //   - Both personal and project build subscriptions have all fields,

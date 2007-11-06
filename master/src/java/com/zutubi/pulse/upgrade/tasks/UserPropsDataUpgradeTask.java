@@ -26,7 +26,7 @@ public class UserPropsDataUpgradeTask extends DatabaseUpgradeTask
                 "newly created USER_PROPS table.";
     }
 
-    public void execute(UpgradeContext context, Connection con) throws SQLException
+    public void execute(Connection con) throws SQLException
     {
         // start migrating the data.
         // a) read the data from the user table - one row at a time is fine.

@@ -29,9 +29,9 @@ public class ScmMonitorDataUpgradeTask extends DatabaseUpgradeTask
     }
 
     /**
-     * @see com.zutubi.pulse.upgrade.UpgradeTask#execute(com.zutubi.pulse.upgrade.UpgradeContext)
+     * @see com.zutubi.pulse.upgrade.UpgradeTask#execute()
      */
-    public void execute(UpgradeContext context, Connection con) throws SQLException
+    public void execute(Connection con) throws SQLException
     {
         PreparedStatement ps = null;
         try

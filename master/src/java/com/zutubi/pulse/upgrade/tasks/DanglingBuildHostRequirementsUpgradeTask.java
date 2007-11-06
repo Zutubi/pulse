@@ -31,7 +31,7 @@ public class DanglingBuildHostRequirementsUpgradeTask extends DatabaseUpgradeTas
         return true;
     }
 
-    public void execute(UpgradeContext context, Connection con) throws SQLException
+    public void execute(Connection con) throws SQLException
     {
         Set<Long> referenced = getAllReferenced(con);
         List<Long> unreferenced = getUnreferenced(con, referenced);

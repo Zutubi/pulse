@@ -44,7 +44,7 @@ public class DuplicateChangelistUpgradeTask extends DatabaseUpgradeTask
         return true;
     }
 
-    public void execute(UpgradeContext context, Connection con) throws IOException, SQLException
+    public void execute(Connection con) throws IOException, SQLException
     {
         try
         {

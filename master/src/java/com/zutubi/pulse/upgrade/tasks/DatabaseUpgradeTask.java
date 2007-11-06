@@ -1,27 +1,28 @@
 package com.zutubi.pulse.upgrade.tasks;
 
 import com.zutubi.pulse.upgrade.DataSourceAware;
-import com.zutubi.pulse.upgrade.UpgradeContext;
 import com.zutubi.pulse.upgrade.UpgradeException;
-import com.zutubi.pulse.upgrade.UpgradeTask;
-import com.zutubi.util.IOUtils;
 import com.zutubi.pulse.util.JDBCUtils;
 import com.zutubi.util.logging.Logger;
+import com.zutubi.util.IOUtils;
 
 import javax.sql.DataSource;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
-import java.io.IOException;
 
 /**
  * <class-comment/>
  */
-public abstract class DatabaseUpgradeTask implements UpgradeTask, DataSourceAware
+public abstract class DatabaseUpgradeTask implements PulseUpgradeTask, DataSourceAware
 {
     private static final Logger LOG = Logger.getLogger(DatabaseUpgradeTask.class);
 
@@ -56,13 +57,13 @@ public abstract class DatabaseUpgradeTask implements UpgradeTask, DataSourceAwar
         return buildNumber;
     }
 
-    public void execute(UpgradeContext context) throws UpgradeException
+    public void execute() throws UpgradeException
     {
         Connection connection = null;
         try
         {
             connection = dataSource.getConnection();
-            execute(context, connection);
+            execute(connection);
         }
         catch(IOException e)
         {
@@ -85,7 +86,7 @@ public abstract class DatabaseUpgradeTask implements UpgradeTask, DataSourceAwar
         return getErrors().size() > 0;
     }
 
-    public abstract void execute(UpgradeContext context, Connection con) throws IOException, SQLException;
+    public abstract void execute(Connection con) throws IOException, SQLException;
 
     protected List<Long> getAllProjects(Connection con) throws SQLException
     {

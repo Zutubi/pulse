@@ -1,8 +1,7 @@
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.util.logging.Logger;
 import com.zutubi.pulse.util.JDBCUtils;
-import com.zutubi.pulse.upgrade.UpgradeContext;
+import com.zutubi.util.logging.Logger;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -29,7 +28,7 @@ public class CopySharedBuildReasonDataPatchUpgradeTask extends DatabaseUpgradeTa
                 "by multiple build results. See CIB-723 for details.";
     }
 
-    public void execute(UpgradeContext context, Connection con) throws SQLException
+    public void execute(Connection con) throws SQLException
     {
         // Step A) Locate the build reasons referenced by multiple build results.
         List<Long> reasons = new LinkedList<Long>();

@@ -25,7 +25,7 @@ public class EncodePasswordUpgradeTask extends DatabaseUpgradeTask
                 "now encrypted in the database.";
     }
 
-    public void execute(UpgradeContext context, Connection con) throws SQLException
+    public void execute(Connection con) throws SQLException
     {
         List<IdPassword> results = new LinkedList<IdPassword>();
 

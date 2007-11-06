@@ -26,7 +26,7 @@ public class TriggerForceUpgradeTask extends DatabaseUpgradeTask
         return "Upgrade to triggers required for changelist isolation";
     }
 
-    public void execute(UpgradeContext context, Connection con) throws SQLException
+    public void execute(Connection con) throws SQLException
     {
         CallableStatement stmt = null;
         ResultSet rs = null;

@@ -24,7 +24,7 @@ public class DistributedUpgradeTask extends DatabaseUpgradeTask
         return "Data upgrade for 1.1 release stream";
     }
 
-    public void execute(UpgradeContext context, Connection con) throws SQLException
+    public void execute(Connection con) throws SQLException
     {
         // A hibernate schema upgrade task is used to add the new tables before
         // this task runs.

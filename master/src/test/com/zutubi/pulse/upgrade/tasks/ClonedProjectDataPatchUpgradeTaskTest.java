@@ -89,7 +89,7 @@ public class ClonedProjectDataPatchUpgradeTaskTest extends BaseUpgradeTaskTestCa
     {
         ClonedProjectDataPatchUpgradeTask task = new ClonedProjectDataPatchUpgradeTask();
         task.setDataSource(dataSource);
-        task.execute(new MockUpgradeContext());
+        task.execute();
         assertEquals(0, task.getErrors().size());
     }
 

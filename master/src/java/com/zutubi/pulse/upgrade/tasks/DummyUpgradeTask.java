@@ -34,7 +34,7 @@ public class DummyUpgradeTask implements UpgradeTask
         this.buildNumber = buildNumber;
     }
 
-    public void execute(UpgradeContext context) throws UpgradeException
+    public void execute() throws UpgradeException
     {
         // lets wait a bit.
         try
