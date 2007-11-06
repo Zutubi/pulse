@@ -352,6 +352,11 @@ public class Scope
         private boolean addToPath;
         private boolean addToEnvironment;
 
+        public ReferenceInfo()
+        {
+            // This constructor is to make hessian happy.
+        }
+
         public ReferenceInfo(Reference reference)
         {
             this.reference = reference;
