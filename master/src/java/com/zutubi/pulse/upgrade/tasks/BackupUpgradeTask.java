@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * <class comment/>
  */
-public class BackupUpgradeTask implements UpgradeTask, ConfigurationAware
+public class BackupUpgradeTask implements PulseUpgradeTask, ConfigurationAware
 {
     private static final Logger LOG = Logger.getLogger(BackupUpgradeTask.class);
     
