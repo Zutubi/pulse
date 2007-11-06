@@ -945,6 +945,126 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
 //        return result;
 //    }
 //
+//    public Vector<Hashtable<String, String>> getMessagesInBuild(String token, String projectName, final int id) throws AuthenticationException
+//    {
+//        tokenManager.verifyUser(token);
+//        final Project project = internalGetProject(projectName);
+//        final Vector<Hashtable<String, String>> result = new Vector<Hashtable<String, String>>();
+//
+//        buildManager.executeInTransaction(new Runnable()
+//        {
+//            public void run()
+//            {
+//                final BuildResult build = internalGetBuild(project, id);
+//                build.loadFeatures(configurationManager.getDataDirectory());
+//                for(Feature f: build.getFeatures())
+//                {
+//                    result.add(convertFeature(null, null, null, null, f));
+//                }
+//
+//                build.getRoot().forEachNode(new UnaryFunction<RecipeResultNode>()
+//                {
+//                    public void process(RecipeResultNode recipeResultNode)
+//                    {
+//                        RecipeResult recipeResult = recipeResultNode.getResult();
+//                        if(recipeResult != null)
+//                        {
+//                            String stage = recipeResultNode.getStage();
+//                            for(Feature f: recipeResult.getFeatures())
+//                            {
+//                                result.add(convertFeature(stage, null, null, null, f));
+//                            }
+//
+//                            for(CommandResult commandResult: recipeResult.getCommandResults())
+//                            {
+//                                String command = commandResult.getCommandName();
+//                                for(Feature f: commandResult.getFeatures())
+//                                {
+//                                    result.add(convertFeature(stage, command, null, null, f));
+//                                }
+//
+//                                for(StoredArtifact artifact: commandResult.getArtifacts())
+//                                {
+//                                    String artifactName = artifact.getName();
+//                                    for(StoredFileArtifact fileArtifact: artifact.getChildren())
+//                                    {
+//                                        String artifactPath = fileArtifact.getPath();
+//                                        for(Feature f: fileArtifact.getFeatures())
+//                                        {
+//                                            result.add(convertFeature(stage, command, artifactName, artifactPath, f));
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//                });
+//            }
+//        });
+//
+//        return result;
+//    }
+//
+//    public Vector<Hashtable<String, String>> getErrorMessagesInBuild(String token, String projectName, final int id) throws AuthenticationException
+//    {
+//        return getMessagesOfLevel(token, projectName, id, Feature.Level.ERROR);
+//    }
+//
+//    public Vector<Hashtable<String, String>> getWarningMessagesInBuild(String token, String projectName, final int id) throws AuthenticationException
+//    {
+//        return getMessagesOfLevel(token, projectName, id, Feature.Level.WARNING);
+//    }
+//
+//    public Vector<Hashtable<String, String>> getInfoMessagesInBuild(String token, String projectName, final int id) throws AuthenticationException
+//    {
+//        return getMessagesOfLevel(token, projectName, id, Feature.Level.INFO);
+//    }
+//
+//    private Vector<Hashtable<String, String>> getMessagesOfLevel(String token, String projectName, int id, Feature.Level level) throws AuthenticationException
+//    {
+//        Vector<Hashtable<String, String>> result = getMessagesInBuild(token, projectName, id);
+//        Iterator<Hashtable<String, String>> it = result.iterator();
+//        String levelString = level.getPrettyString();
+//        while(it.hasNext())
+//        {
+//            Hashtable<String, String> feature = it.next();
+//            if(!levelString.equals(feature.get("level")))
+//            {
+//                it.remove();
+//            }
+//        }
+//
+//        return result;
+//    }
+//
+//    private Hashtable<String, String> convertFeature(String stageName, String commandName, String artifactName, String artifactPath, Feature feature)
+//    {
+//        Hashtable<String, String> result = new Hashtable<String, String>();
+//        if(stageName != null)
+//        {
+//            result.put("stage", stageName);
+//        }
+//
+//        if(commandName != null)
+//        {
+//            result.put("command", commandName);
+//        }
+//
+//        if(artifactName != null)
+//        {
+//            result.put("artifact", artifactName);
+//        }
+//
+//        if(artifactPath != null)
+//        {
+//            result.put("path", artifactPath);
+//        }
+//
+//        result.put("level", feature.getLevel().getPrettyString());
+//        result.put("message", feature.getSummary());
+//        return result;
+//    }
+//
 //    public boolean triggerBuild(String token, String projectName, String buildSpecification) throws AuthenticationException
 //    {
 //        return triggerBuild(token, projectName, buildSpecification, null);
