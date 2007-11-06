@@ -24,7 +24,9 @@ public class Feature extends Entity
                     {
                         return "error";
                     }
-                }
+                };
+
+        public abstract String getPrettyString();
     }
 
     private Level level;
