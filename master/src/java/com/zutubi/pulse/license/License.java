@@ -104,6 +104,11 @@ public class License
         return type;
     }
 
+    public boolean isEvaluation()
+    {
+        return type == LicenseType.EVALUATION;
+    }
+
     /**
      * Get the number of projects supported by this license.
      *
@@ -177,11 +182,7 @@ public class License
      */
     public boolean isExpired()
     {
-        if (expires())
-        {
-            return getDaysRemaining() == 0;
-        }
-        return false;
+        return expires() && getDaysRemaining() == 0;
     }
 
     /**

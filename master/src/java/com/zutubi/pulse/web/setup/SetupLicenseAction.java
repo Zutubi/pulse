@@ -35,12 +35,6 @@ public class SetupLicenseAction extends SetupActionSupport
             if (l == null)
             {
                 addFieldError("license", getText("license.key.invalid"));
-                return;
-            }
-            if (l.isExpired())
-            {
-                addFieldError("license", getText("license.key.expired"));
-
             }
         }
         catch (LicenseException e)

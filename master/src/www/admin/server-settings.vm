@@ -71,11 +71,23 @@
                         #contentCell("license.type.$license.type")
                     </tr>
                     #dynamicRow("license.holder.field" $license.holder)
-                    #if($evaluationLicense)
-                        #dynamicRow("license.expiry.field" $expiryDate)
+                    #if($license.evaluation)
+                        #set($headerKey = "license.expiry.field")
                     #else
-                        #dynamicRow("license.support.expiry.field" $expiryDate)
+                        #set($headerKey = "license.support.expiry.field")
                     #end
+                    <tr>
+                        #contentRowHeading($headerKey)
+                        <td class="content">
+                        #if($license.expired)
+                            <span class="expired">
+                        #end
+                            $!webwork.htmlEncode($expiryDate)
+                        #if($license.expired)
+                            </span>
+                        #end
+                        </td>
+                    </tr>
                     #foreach($res in $restrictions)
                         #if($res.supported == -1)
                             #set($t = "$unrestricted")
@@ -84,13 +96,12 @@
                         #end
                         #dynamicRow("license.restriction.$res.entity" $t)
                     #end
-                    #if($action.supportedContactPoints == -1)
+                    #if($license.supportedContactPoints == -1)
                         #set($t = "$unrestricted")
                     #else
-                        #set($t = "$action.supportedContactPoints")
+                        #set($t = "$license.supportedContactPoints")
                     #end
                     #dynamicRow("license.restriction.contact" $t)
-
                 </table>
             </td>
             <td class="columns" width="40%">

@@ -412,7 +412,7 @@ td.inprogress, td.inprogress-right {
     color: #039;
 }
 
-td.terminating, td.terminating-right, td.test-failure {
+span.expired, td.terminating, td.terminating-right, td.test-failure {
     color: #b22;
 }
 

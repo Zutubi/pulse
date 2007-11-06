@@ -132,14 +132,17 @@
 
       <div class="content">
           $body
-          #if($license.expired)
+          #if($license.evaluation && $license.expired)
             <div id="statusmessage">#wwtext("name=license.expiry.notice")</div>
           #end
       </div>
       <div id="footer">
-         <b>::</b> <a href="http://zutubi.com/products/pulse/">pulse</a> ($version_number #$build_number) <b>::</b>
-         copyright &copy; 2005-2007 <a href="http://zutubi.com/">zutubi pty ltd</a> <b>::</b>
-         <a href="http://jira.zutubi.com/">report bug/request feature</a>
+          <b>::</b> <a href="http://zutubi.com/products/pulse/">pulse</a> ($version_number #$build_number) <b>::</b>
+          copyright &copy; 2005-2007 <a href="http://zutubi.com/">zutubi pty ltd</a> <b>::</b>
+          <a href="http://jira.zutubi.com/">report bug/request feature</a>
+          #if(!$license.evaluation && $license.expired)
+              <b>::</b> #wwtext("name=license.support.expiry.notice")
+          #end
       </div>
     </body>
 </html>

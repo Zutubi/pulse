@@ -62,12 +62,7 @@ public class ServerSettingsAction extends ActionSupport
 
     public int getSupportedContactPoints()
     {
-        return LicenseHolder.getLicense().getSupportedContactPoints();
-    }
-
-    public boolean isEvaluationLicense()
-    {
-        return license.getType() == LicenseType.EVALUATION;
+        return license.getSupportedContactPoints();
     }
 
     public String execute() throws Exception
@@ -100,9 +95,19 @@ public class ServerSettingsAction extends ActionSupport
             cal.set(Calendar.MINUTE, 0);
             cal.set(Calendar.SECOND, 0);
             cal.set(Calendar.MILLISECOND, 0);
-            return dateFormatter.format(cal.getTime());
+            String dateString = dateFormatter.format(cal.getTime());
+            if(license.isExpired())
+            {
+                dateString += " (" + getText(getLicenseExpiryKey()) + ")";
+            }
+            return dateString;
         }
         return "Never";
+    }
+
+    private String getLicenseExpiryKey()
+    {
+        return license.isEvaluation() ? "license.expired" : "license.support.expired";
     }
 
     public String getUnrestricted()
