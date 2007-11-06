@@ -120,7 +120,7 @@ public class LicenseManagementAcceptanceTest extends BaseAcceptanceTestCase
 
         // set a new license string.
         form.saveFormElements(expiredLicenseKey);
-        form.assertFormPresent();
+        form.assertFormNotPresent();
 
         assertTextPresent("expired");
     }

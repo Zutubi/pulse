@@ -117,12 +117,6 @@ public class SetupAcceptanceTest extends BaseAcceptanceTestCase
         licenseForm.assertFormElements(invalidLicenseKey);
         assertTextPresent("invalid");
 
-        // check that an expired license is not accepted.
-        licenseForm.nextFormElements(expiredLicenseKey);
-        licenseForm.assertFormPresent();
-        licenseForm.assertFormElements(expiredLicenseKey);
-        assertTextPresent("expired");
-
         // enter a valid license.
         licenseForm.nextFormElements(licenseKey);
         licenseForm.assertFormNotPresent();
