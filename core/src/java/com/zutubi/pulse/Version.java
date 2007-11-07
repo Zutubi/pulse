@@ -53,6 +53,11 @@ public class Version implements Comparable
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("d-MM-yyyy");
 
     /**
+     * For backwards compatibility only.
+     */
+    private static final SimpleDateFormat OLD_DATE_FORMAT = new SimpleDateFormat("d-MMMM-yyyy");
+
+    /**
      * The value of the version number property.
      */
     private String versionNumber;
@@ -115,8 +120,17 @@ public class Version implements Comparable
         }
         catch (ParseException e)
         {
-            LOG.severe("Failed to parse '" + getBuildDate() + "'", e);
-            return null;
+            // If the version details were taken from the file system, then they may be using the old format.
+            // So lets try it just in case.
+            try
+            {
+                return OLD_DATE_FORMAT.parse(getBuildDate());
+            }
+            catch (ParseException e1)
+            {
+                LOG.severe("Failed to parse '" + getBuildDate() + "'", e);
+                return null;
+            }
         }
     }
 
@@ -140,8 +154,17 @@ public class Version implements Comparable
         }
         catch (ParseException e)
         {
-            LOG.severe("Failed to parse '" + getReleaseDate() + "'.", e);
-            return null;
+            // If the version details were taken from the file system, then they may be using the old format.
+            // So lets try it just in case.
+            try
+            {
+                return OLD_DATE_FORMAT.parse(getReleaseDate());
+            }
+            catch (ParseException e1)
+            {
+                LOG.severe("Failed to parse '" + getReleaseDate() + "'.", e);
+                return null;
+            }
         }
     }
 
