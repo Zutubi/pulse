@@ -1,6 +1,7 @@
 package com.zutubi.pulse;
 
 import com.zutubi.util.IOUtils;
+import com.zutubi.util.logging.Logger;
 
 import java.io.*;
 import java.text.ParseException;
@@ -15,6 +16,8 @@ import java.util.Properties;
  */
 public class Version implements Comparable
 {
+    private static final Logger LOG = Logger.getLogger(Version.class);
+
     /**
      * The resource name relative to the location of this class.
      */
@@ -42,7 +45,12 @@ public class Version implements Comparable
 
     public static final int INVALID = -1;
 
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("d-MMMM-yyyy");
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("d-MM-yyyy");
+
+    /**
+     * For backwards compatibility only.
+     */
+    private static final SimpleDateFormat OLD_DATE_FORMAT = new SimpleDateFormat("d-MMMM-yyyy");
 
     /**
      * The value of the version number property.
@@ -107,7 +115,17 @@ public class Version implements Comparable
         }
         catch (ParseException e)
         {
-            return null;
+            // If the version details were taken from the file system, then they may be using the old format.
+            // So lets try it just in case.
+            try
+            {
+                return OLD_DATE_FORMAT.parse(getBuildDate());
+            }
+            catch (ParseException e1)
+            {
+                LOG.severe("Failed to parse '" + getBuildDate() + "'", e);
+                return null;
+            }
         }
     }
 
@@ -131,7 +149,17 @@ public class Version implements Comparable
         }
         catch (ParseException e)
         {
-            return null;
+            // If the version details were taken from the file system, then they may be using the old format.
+            // So lets try it just in case.
+            try
+            {
+                return OLD_DATE_FORMAT.parse(getReleaseDate());
+            }
+            catch (ParseException e1)
+            {
+                LOG.severe("Failed to parse '" + getReleaseDate() + "'.", e);
+                return null;
+            }
         }
     }
 
