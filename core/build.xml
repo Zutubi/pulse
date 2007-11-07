@@ -13,7 +13,7 @@
 
         <!-- replace the version.properties variables -->
         <tstamp>
-            <format property="build.date" pattern="d-MMMM-yyyy"/>
+            <format property="build.date" pattern="d-MM-yyyy"/>
         </tstamp>
         <property name="version.properties" value="${classes.dir}/com/zutubi/pulse/version.properties"/>
         <replace file="${version.properties}" token="@VERSION@" value="${pulse.version}"/>
