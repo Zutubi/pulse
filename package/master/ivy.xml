@@ -13,9 +13,14 @@
     <publications/>
 
     <dependencies>
+        <!-- Project module dependencies -->
         <dependency org="zutubi" name="pulse-server-core-package" rev="latest.integration" conf="*->@"/>
         <dependency org="zutubi" name="pulse-slave-package" rev="latest.integration" conf="build->@"/>
 
         <dependency org="zutubi" name="pulse-master" rev="latest.integration" conf="release->@"/>
+
+        <!-- Prepackaged plugins -->
+        <dependency org="zutubi" name="com.zutubi.pulse.master.hook.email" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.master.hook.tag" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
     </dependencies>
 </ivy-module>
