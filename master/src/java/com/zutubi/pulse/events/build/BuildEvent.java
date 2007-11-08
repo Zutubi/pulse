@@ -1,19 +1,22 @@
 package com.zutubi.pulse.events.build;
 
+import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.model.Result;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.core.model.Result;
 
 /**
  */
 public class BuildEvent extends Event<Object>
 {
     private BuildResult buildResult;
+    private ExecutionContext context;
 
-    public BuildEvent(Object source, BuildResult buildResult)
+    public BuildEvent(Object source, BuildResult buildResult, ExecutionContext context)
     {
         super(source);
         this.buildResult = buildResult;
+        this.context = context;
     }
 
     public BuildResult getBuildResult()
@@ -24,6 +27,11 @@ public class BuildEvent extends Event<Object>
     public Result getResult()
     {
         return buildResult;
+    }
+
+    public ExecutionContext getContext()
+    {
+        return context;
     }
 
     public String toString()

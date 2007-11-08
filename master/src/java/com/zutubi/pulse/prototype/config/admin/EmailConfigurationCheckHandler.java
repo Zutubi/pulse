@@ -5,6 +5,8 @@ import com.zutubi.pulse.core.config.ConfigurationCheckHandlerSupport;
 import com.zutubi.pulse.prototype.config.user.contacts.EmailContactConfiguration;
 import com.zutubi.validation.annotations.Required;
 
+import java.util.Arrays;
+
 /**
  */
 @SymbolicName("zutubi.emailConfigurationCheckHandler")
@@ -15,7 +17,7 @@ public class EmailConfigurationCheckHandler extends ConfigurationCheckHandlerSup
 
     public void test(EmailConfiguration configuration) throws Exception
     {
-        EmailContactConfiguration.sendMail(emailAddress, configuration, "Test Email", "text/plain", "Welcome to Zutubi Pulse!");
+        EmailContactConfiguration.sendMail(Arrays.asList(emailAddress), configuration, "Test Email", "text/plain", "Welcome to Zutubi Pulse!");
     }
 
     public String getEmailAddress()

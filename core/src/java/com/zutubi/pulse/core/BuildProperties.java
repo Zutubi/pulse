@@ -7,8 +7,13 @@ import java.text.SimpleDateFormat;
  */
 public class BuildProperties
 {
+    // Shared
+    public static final String PROPERTY_DIRECTORY               = "dir";
+    public static final String PROPERTY_STATUS                  = "status";
+
     // Build
     public static final String PROPERTY_BUILD_COUNT             = "build.count";
+    public static final String PROPERTY_BUILD_DIRECTORY         = "build.dir";
     public static final String PROPERTY_BUILD_NUMBER            = "build.number";
     public static final String PROPERTY_BUILD_REASON            = "build.reason";
     public static final String PROPERTY_BUILD_REVISION          = "build.revision";
@@ -22,6 +27,7 @@ public class BuildProperties
     public static final String PROPERTY_MASTER_URL              = "master.url";
     public static final String PROPERTY_PROJECT                 = "project";
     public static final String PROPERTY_SUCCESS_COUNT           = "success.count";
+    public static final String PROPERTY_TEST_SUMMARY            = "test.summary";
 
     // Recipe
     public static final String PROPERTY_AGENT                   = "agent";
@@ -40,5 +46,6 @@ public class BuildProperties
 
     // Other constants
     public static final SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+
 
 }

@@ -15,8 +15,8 @@ import java.util.concurrent.locks.ReentrantLock;
  * A wrapper around a Java process that handles running the process
  * asynchronously, including reading the output and error streams.
  * <p/>
- * Output is processed line by line into strings.  Each line is returned in
- * its own event.  The reading is buffered internally.
+ * Output can be handled as bytes (most efficient), characters or lines of
+ * characters.
  */
 public class AsyncProcess
 {

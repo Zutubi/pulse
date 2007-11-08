@@ -57,9 +57,9 @@ public abstract class AbstractType implements Type
         });
     }
 
-    public Annotation getAnnotation(final Class annotationType)
+    public <T extends Annotation> T getAnnotation(final Class<T> annotationType)
     {
-        return CollectionUtils.find(annotations, new Predicate<Annotation>()
+        return (T) CollectionUtils.find(annotations, new Predicate<Annotation>()
         {
             public boolean satisfied(Annotation annotation)
             {

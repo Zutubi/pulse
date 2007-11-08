@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+    <info organisation="zutubi" module="com.zutubi.pulse.master.hook.tag" status="integration">
+        <ivyauthor name="Zutubi" url="http://www.zutubi.com/"/>
+        <description homepage="http://www.zutubi.com/">
+
+        </description>
+    </info>
+
+    <configurations>
+        <conf name="build"/>
+        <conf name="source"/>
+        <conf name="bundle"/>
+        <conf name="external"/>
+        <conf name="bundled_3rd_party"/>
+    </configurations>
+
+    <publications>
+        <!-- The runtime artifacts for this module. -->
+        <artifact type="jar" conf="bundle,build"/>
+        <!-- The source artifacts for this module. -->
+        <artifact name="com.zutubi.pulse.master.hook.tag-src" type="jar" conf="source"/>
+    </publications>
+
+    <dependencies>
+        <dependency org="zutubi" name="com.zutubi.pulse.core" rev="latest.integration" conf="*->@"/>
+
+        <dependency org="zutubi" name="pulse-master" rev="latest.integration" conf="build->@"/>
+    </dependencies>
+</ivy-module>

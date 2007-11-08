@@ -1,12 +1,12 @@
 package com.zutubi.pulse.prototype.config.project.hooks;
 
 import com.zutubi.prototype.config.ConfigurationProvider;
+import com.zutubi.pulse.model.BuildManager;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.prototype.config.project.BuildSelectorConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
-import com.zutubi.pulse.model.BuildManager;
-import com.zutubi.pulse.model.ProjectManager;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.BuildResult;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -41,7 +41,7 @@ public class BuildHookConfigurationActions
                 BuildResult buildResult = buildManager.getByProjectAndVirtualId(project, build.getBuild());
                 if(buildResult != null)
                 {
-                    buildHookManager.executeTask(instance, buildResult);
+                    buildHookManager.manualTrigger(instance, buildResult);
                 }
             }
         }

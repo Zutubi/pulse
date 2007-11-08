@@ -38,7 +38,7 @@ public class BuildValidator extends FieldValidatorSupport
             }
 
             BuildResult buildResult = buildManager.getByProjectAndVirtualId(project, build);
-            if(buildResult == null)
+            if(buildResult == null || !buildResult.completed())
             {
                 context.addFieldError(getFieldName(), context.getText("invalid.build", build));
             }

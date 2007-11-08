@@ -1,5 +1,6 @@
 package com.zutubi.pulse.events.build;
 
+import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.model.BuildResult;
 
 /**
@@ -10,9 +11,9 @@ import com.zutubi.pulse.model.BuildResult;
  */
 public class PostBuildEvent extends BuildEvent
 {
-    public PostBuildEvent(Object source, BuildResult result)
+    public PostBuildEvent(Object source, BuildResult result, ExecutionContext context)
     {
-        super(source, result);
+        super(source, result, context);
     }
 
     public String toString()

@@ -13,7 +13,6 @@ import com.zutubi.pulse.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.user.SubscriptionConfiguration;
@@ -38,7 +37,6 @@ public class ResultNotifier implements EventListener
     private ConfigurationProvider configurationProvider;
     private BuildResultRenderer buildResultRenderer;
     private BuildManager buildManager;
-    private ProjectManager projectManager;
 
     public static int getFailureLimit()
     {
@@ -88,7 +86,7 @@ public class ResultNotifier implements EventListener
             if (subscription.conditionSatisfied(buildResult))
             {
                 String templateName = subscription.getTemplate();
-                RenderedResult rendered = renderResult(buildResult, dataMap, templateName, renderCache);
+                RenderedResult rendered = renderResult(buildResult, dataMap, buildResultRenderer, templateName, renderCache);
                 notifiedContactPoints.add(contactPoint.getHandle());
                 contactPoint.notify(buildResult, rendered.subject, rendered.content, buildResultRenderer.getTemplateInfo(templateName, buildResult.isPersonal()).getMimeType());
                 
@@ -128,9 +126,15 @@ public class ResultNotifier implements EventListener
         return dataMap;
     }
 
-    private RenderedResult renderResult(BuildResult result, Map<String, Object> dataMap, String template, Map<String, RenderedResult> cache)
+    public static RenderedResult renderResult(BuildResult buildResult, String baseUrl, BuildManager buildManager, BuildResultRenderer buildResultRenderer, String template)
     {
-        RenderedResult rendered = cache.get(template);
+        Map<String, Object> dataMap = getDataMap(buildResult, baseUrl, buildManager, buildResultRenderer);
+        return renderResult(buildResult, dataMap, buildResultRenderer, template, null);
+    }
+
+    private static RenderedResult renderResult(BuildResult result, Map<String, Object> dataMap, BuildResultRenderer buildResultRenderer, String template, Map<String, RenderedResult> cache)
+    {
+        RenderedResult rendered = cache == null ? null : cache.get(template);
         if(rendered == null)
         {
             StringWriter w = new StringWriter();
@@ -151,15 +155,18 @@ public class ResultNotifier implements EventListener
             }
 
             rendered = new RenderedResult(subject, content);
-            cache.put(template, rendered);
+            if (cache != null)
+            {
+                cache.put(template, rendered);
+            }
         }
 
         return rendered;
     }
 
-    private String getDefaultSubject(BuildResult result)
+    private static String getDefaultSubject(BuildResult result)
     {
-        ProjectConfiguration config = projectManager.getProjectConfig(result.getProject().getId(), true);
+        ProjectConfiguration config = result.getProject().getConfig();
         String prelude = result.isPersonal() ? "personal build " : (config.getName() + ": build ");
         return prelude + Long.toString(result.getNumber()) + ": " + result.getState().getPrettyString();
     }
@@ -194,12 +201,7 @@ public class ResultNotifier implements EventListener
         this.configurationProvider = configurationProvider;
     }
 
-    public void setProjectManager(ProjectManager projectManager)
-    {
-        this.projectManager = projectManager;
-    }
-
-    private class RenderedResult
+    public static class RenderedResult
     {
         String subject;
         String content;
@@ -208,6 +210,16 @@ public class ResultNotifier implements EventListener
         {
             this.subject = subject;
             this.content = content;
+        }
+
+        public String getSubject()
+        {
+            return subject;
+        }
+
+        public String getContent()
+        {
+            return content;
         }
     }
 }

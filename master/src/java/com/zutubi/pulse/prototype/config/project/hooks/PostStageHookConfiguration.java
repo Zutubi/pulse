@@ -1,15 +1,16 @@
 package com.zutubi.pulse.prototype.config.project.hooks;
 
 import com.zutubi.config.annotations.*;
-import com.zutubi.pulse.events.build.BuildEvent;
-import com.zutubi.pulse.events.build.PreBuildEvent;
-import com.zutubi.pulse.events.build.RecipeCommencedEvent;
-import com.zutubi.pulse.events.build.PostStageEvent;
-import com.zutubi.pulse.prototype.config.project.BuildStageConfiguration;
+import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.events.build.BuildEvent;
+import com.zutubi.pulse.events.build.PostStageEvent;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.RecipeResultNode;
+import com.zutubi.pulse.prototype.config.project.BuildStageConfiguration;
 
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * A post-stage hook is executed just after a build stage is completed.  The
@@ -80,21 +81,43 @@ public class PostStageHookConfiguration extends AutoBuildHookConfiguration
             else
             {
                 long stage = pse.getStageNode().getStageHandle();
-                for(BuildStageConfiguration stageConfig: stages)
-                {
-                    if(stageConfig.getHandle() == stage)
-                    {
-                        return stateMatches(pse);
-                    }
-                }
+                return stageMatches(stage) && stateMatches(pse);
             }
         }
 
         return false;
     }
 
+    public boolean appliesTo(BuildResult result)
+    {
+        return false;
+    }
+
+    public boolean appliesTo(RecipeResultNode result)
+    {
+        return stageMatches(result.getStageHandle());
+    }
+
+    private boolean stageMatches(long stage)
+    {
+        for(BuildStageConfiguration stageConfig: stages)
+        {
+            if(stageConfig.getHandle() == stage)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private boolean stateMatches(PostStageEvent pse)
     {
-        return runForAll || runForStates.contains(pse.getStageNode().getResult().getState());
+        RecipeResult result = pse.getStageNode().getResult();
+        return stateMatches(result);
+    }
+
+    private boolean stateMatches(RecipeResult result)
+    {
+        return runForAll || runForStates.contains(result.getState());
     }
 }

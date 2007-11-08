@@ -1,11 +1,8 @@
 package com.zutubi.pulse.prototype.config.project.hooks;
 
-import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
-import com.zutubi.pulse.events.build.BuildEvent;
-import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.Wizard;
-import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.Internal;
+import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.pulse.events.build.BuildEvent;
 
 /**
  * A build hook that is triggered automatically at some point in a build.
@@ -38,4 +35,14 @@ public abstract class AutoBuildHookConfiguration extends BuildHookConfiguration
     }
 
     public abstract boolean triggeredBy(BuildEvent event);
+
+    public boolean failOnError()
+    {
+        return isFailOnError();
+    }
+
+    public boolean enabled()
+    {
+        return isEnabled();
+    }
 }

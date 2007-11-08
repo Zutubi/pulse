@@ -6,8 +6,12 @@ import java.io.File;
 import java.io.OutputStream;
 
 /**
- * An environment in which commands are executed.  Consists of a scope,
+ * An environment in which commands are executed.  Consists of scopes,
  * working directory and output sink.
+ *
+ * The scopes are split into internal and external.  This gives us two
+ * separate namespaces so that we can ensure user-defined properties do
+ * not conflict with Pulse-internal properties.
  */
 public class ExecutionContext
 {
@@ -221,6 +225,12 @@ public class ExecutionContext
         userScope = new Scope(userScope);
     }
 
+    public void push()
+    {
+        pushInternalScope();
+        pushScope();
+    }
+
     public void popInternalScope()
     {
         this.internalScope = this.internalScope.getParent();
@@ -231,6 +241,12 @@ public class ExecutionContext
         this.userScope = this.userScope.getParent();
     }
 
+    public void pop()
+    {
+        popInternalScope();
+        popScope();
+    }
+    
     public File getWorkingDir()
     {
         return workingDir;

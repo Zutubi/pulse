@@ -1,11 +1,14 @@
 package com.zutubi.pulse.prototype.config.project.hooks;
 
-import com.zutubi.prototype.wizard.webwork.AbstractTypeWizard;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
-import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.type.record.TemplateRecord;
+import com.zutubi.prototype.wizard.webwork.AbstractTypeWizard;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -21,8 +24,34 @@ public class BuildHookConfigurationWizard extends AbstractTypeWizard
         hookType = typeRegistry.getType(BuildHookConfiguration.class);
         taskType = typeRegistry.getType(BuildHookTaskConfiguration.class);
 
+        List<CompositeType> taskExtensions = taskType.getExtensions();
         List<AbstractChainableState> states = addWizardStates(null, parentPath, hookType, templateParentRecord);
-        addWizardStates(states, null, taskType, (TemplateRecord) (templateParentRecord == null ? null : templateParentRecord.get("task")));
+        TemplateRecord inheritedRecord = (TemplateRecord) (templateParentRecord == null ? null : templateParentRecord.get("task"));
+        if(inheritedRecord == null)
+        {
+            for(AbstractChainableState previousState: states)
+            {
+                CompositeType type = previousState.getType();
+                List<CompositeType> compatibleTasks = filterTaskTypes(taskExtensions, type.getClazz());
+                addWizardStatesForExtensions(Arrays.asList(previousState), parentPath, taskType, compatibleTasks);
+            }
+        }
+        else
+        {
+            addWizardStates(states, null, taskType, inheritedRecord);
+        }
+    }
+
+    private List<CompositeType> filterTaskTypes(List<CompositeType> taskExtensions, final Class hookClass)
+    {
+        return CollectionUtils.filter(taskExtensions, new Predicate<CompositeType>()
+        {
+            public boolean satisfied(CompositeType compositeType)
+            {
+                CompatibleHooks compatible = compositeType.getAnnotation(CompatibleHooks.class);
+                 return compatible == null || CollectionUtils.contains(compatible.value(), hookClass);
+            }
+        });
     }
 
     public void doFinish()

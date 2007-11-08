@@ -2,6 +2,10 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.Status;
+import com.zutubi.pulse.bootstrap.Data;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.bootstrap.MasterUserPaths;
+import com.zutubi.pulse.bootstrap.SimpleMasterConfigurationManager;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.model.CommandResult;
@@ -59,9 +63,16 @@ public class RecipeControllerTest extends PulseTestCase
         rootNode.addChild(childNode);
 
         RecipeRequest recipeRequest = new RecipeRequest(null, makeContext("project", rootResult.getId(), rootResult.getRecipeName()));
-        BuildResult build = new BuildResult();
+        BuildResult build = new BuildResult(new ManualTriggerBuildReason("user"), new Project(), 1, false);
         dispatchRequest = new RecipeDispatchRequest(new Project(), new AnyCapableAgentRequirements(), new BuildRevision(), recipeRequest, null);
-        recipeController = new RecipeController(build, rootNode, dispatchRequest, false, null, logger, resultCollector);
+        MasterConfigurationManager configurationManager = new SimpleMasterConfigurationManager()
+        {
+            public MasterUserPaths getUserPaths()
+            {
+                return new Data(new File("test"));
+            }
+        };
+        recipeController = new RecipeController(build, rootNode, dispatchRequest, new ExecutionContext(), null, logger, resultCollector, configurationManager);
         recipeController.setRecipeQueue(recipeQueue);
         recipeController.setBuildManager(buildManager);
         recipeController.setEventManager(new DefaultEventManager());
@@ -130,6 +141,7 @@ public class RecipeControllerTest extends PulseTestCase
         List<CommandResult> commandResults = rootResult.getCommandResults();
         assertTrue(commandResults.size() > 0);
         CommandResult result = commandResults.get(commandResults.size() - 1);
+        result.setOutputDir("dummy");
         assertEquals(ResultState.IN_PROGRESS, result.getState());
         assertEquals(event.getName(), result.getCommandName());
 

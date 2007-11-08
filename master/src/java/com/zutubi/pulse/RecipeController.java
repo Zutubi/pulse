@@ -1,7 +1,10 @@
 package com.zutubi.pulse;
 
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.Bootstrapper;
 import com.zutubi.pulse.core.BuildException;
+import com.zutubi.pulse.core.BuildProperties;
+import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.FeaturePersister;
 import com.zutubi.pulse.core.model.RecipeResult;
@@ -26,7 +29,7 @@ public class RecipeController
     private RecipeResultNode recipeResultNode;
     private RecipeResult recipeResult;
     private RecipeDispatchRequest dispatchRequest;
-    private boolean incremental;
+    private ExecutionContext recipeContext;
     private RecipeResultNode previousSuccessful;
     private RecipeLogger logger;
     private RecipeResultCollector collector;
@@ -37,17 +40,19 @@ public class RecipeController
     private RecipeQueue queue;
     private AgentService agentService;
     private EventManager eventManager;
+    private MasterConfigurationManager configurationManager;
 
-    public RecipeController(BuildResult buildResult, RecipeResultNode recipeResultNode, RecipeDispatchRequest dispatchRequest, boolean incremental, RecipeResultNode previousSuccessful, RecipeLogger logger, RecipeResultCollector collector)
+    public RecipeController(BuildResult buildResult, RecipeResultNode recipeResultNode, RecipeDispatchRequest dispatchRequest, ExecutionContext recipeContext, RecipeResultNode previousSuccessful, RecipeLogger logger, RecipeResultCollector collector, MasterConfigurationManager configurationManager)
     {
         this.buildResult = buildResult;
         this.recipeResultNode = recipeResultNode;
         this.recipeResult = recipeResultNode.getResult();
         this.dispatchRequest = dispatchRequest;
-        this.incremental = incremental;
+        this.recipeContext = recipeContext;
         this.previousSuccessful = previousSuccessful;
         this.logger = logger;
         this.collector = collector;
+        this.configurationManager = configurationManager;
     }
 
     public void prepare(BuildResult buildResult)
@@ -209,6 +214,7 @@ public class RecipeController
     private void handleRecipeCompleted(RecipeCompletedEvent event)
     {
         RecipeResult result = event.getResult();
+        result.setOutputDir("dir");
         result.getStamps().setEndTime(System.currentTimeMillis());
         recipeResult.update(event.getResult());
         logger.log(event, recipeResult);
@@ -227,7 +233,8 @@ public class RecipeController
         recipeResult.complete();
         recipeResult.abortUnfinishedCommands();
 
-        eventManager.publish(new PostStageEvent(this, buildResult, recipeResultNode));
+        MasterBuildProperties.addStageProperties(recipeContext, buildResult, recipeResultNode, configurationManager, false);
+        eventManager.publish(new PostStageEvent(this, buildResult, recipeResultNode, recipeContext));
 
         buildManager.save(recipeResult);
         logger.complete(recipeResult);
@@ -244,7 +251,7 @@ public class RecipeController
         try
         {
             logger.collecting(recipeResult, collectWorkingCopy);
-            collector.collect(buildResult, recipeResult.getId(), collectWorkingCopy, incremental, agentService);
+            collector.collect(buildResult, recipeResult.getId(), collectWorkingCopy, recipeContext.getInternalBoolean(BuildProperties.PROPERTY_INCREMENTAL_BUILD, false), agentService);
         }
         catch (BuildException e)
         {
@@ -264,7 +271,7 @@ public class RecipeController
     {
         try
         {
-            collector.cleanup(buildResult, recipeResult.getId(), incremental, agentService);
+            collector.cleanup(buildResult, recipeResult.getId(), recipeContext.getInternalBoolean(BuildProperties.PROPERTY_INCREMENTAL_BUILD, false), agentService);
         }
         catch (Exception e)
         {

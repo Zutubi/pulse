@@ -1,10 +1,9 @@
 package com.zutubi.pulse;
 
 import com.zutubi.prototype.config.ConfigurationProvider;
+import static com.zutubi.pulse.MasterBuildProperties.*;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.*;
-import static com.zutubi.pulse.core.BuildProperties.*;
-import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.scm.*;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
@@ -66,6 +65,7 @@ public class BuildController implements EventListener
     private RecipeResultCollector collector;
     private BuildTree tree;
     private BuildResult buildResult;
+    private File buildDir;
     private AsynchronousDelegatingListener asyncListener;
     private List<TreeNode<RecipeController>> executingControllers = new LinkedList<TreeNode<RecipeController>>();
     private int pendingRecipes = 0;
@@ -99,13 +99,11 @@ public class BuildController implements EventListener
             throw new RuntimeException("Build result must be a persistent instance.");
         }
 
-        MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
-        File buildDir = paths.getBuildDir(buildResult);
         buildResult.setAbsoluteOutputDir(configurationManager.getDataDirectory(), buildDir);
         buildResult.queue();
         buildManager.save(buildResult);
 
-        eventManager.publish(new PreBuildEvent(this, buildResult));
+        eventManager.publish(new PreBuildEvent(this, buildResult, buildContext));
         
         // We handle this event ourselves: this ensures that all processing of
         // the build from this point forth is handled by the single thread in
@@ -113,7 +111,7 @@ public class BuildController implements EventListener
         // anywhere, even for different builds, it is much safer to ensure we
         // *only* use that thread after we have registered the listener.
         eventManager.register(asyncListener);
-        eventManager.publish(new BuildCommencedEvent(this, buildResult));
+        eventManager.publish(new BuildCommencedEvent(this, buildResult, buildContext));
     }
 
     public BuildTree createBuildTree()
@@ -125,39 +123,15 @@ public class BuildController implements EventListener
         buildManager.save(buildResult);
         previousSuccessful = getPreviousSuccessfulBuild();
 
-        createBuildContext();
+        MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
+        buildDir = paths.getBuildDir(buildResult);
+
+        buildContext = new ExecutionContext();
+        addBuildProperties(buildContext, buildResult, project, buildDir, MasterAgentService.constructMasterUrl(configurationProvider.get(GeneralAdminConfiguration.class), configurationManager.getSystemConfig()));
+
         configure(root, buildResult.getRoot());
 
         return tree;
-    }
-
-    private void createBuildContext()
-    {
-        buildContext = new ExecutionContext();
-        buildContext.addInternalString(PROPERTY_BUILD_NUMBER, Long.toString(buildResult.getNumber()));
-        buildContext.addInternalString(PROPERTY_PROJECT, projectConfig.getName());
-
-        BuildReason buildReason = buildResult.getReason();
-        buildContext.addInternalString(PROPERTY_BUILD_REASON, buildReason.getSummary());
-        if(buildReason instanceof TriggerBuildReason)
-        {
-            buildContext.addInternalString(PROPERTY_BUILD_TRIGGER, ((TriggerBuildReason)buildReason).getTriggerName());
-        }
-
-        buildContext.addInternalString(PROPERTY_MASTER_URL, MasterAgentService.constructMasterUrl(configurationProvider.get(GeneralAdminConfiguration.class), configurationManager.getSystemConfig()));
-        buildContext.addInternalString(PROPERTY_BUILD_COUNT, Integer.toString(project.getBuildCount()));
-        buildContext.addInternalString(PROPERTY_SUCCESS_COUNT, Integer.toString(project.getSuccessCount()));
-
-        CheckoutScheme checkoutScheme = projectConfig.getScm().getCheckoutScheme();
-        buildContext.addInternalString(PROPERTY_INCREMENTAL_BUILD, Boolean.toString(!request.isPersonal() && checkoutScheme == CheckoutScheme.INCREMENTAL_UPDATE));
-
-        buildContext.addInternalString(PROPERTY_COMPRESS_ARTIFACTS, "true");
-        buildContext.addInternalString(PROPERTY_COMPRESS_WORKING_DIR, Boolean.toString(projectConfig.getOptions().getRetainWorkingCopy()));
-
-        for(ResourceProperty property: projectConfig.getProperties().values())
-        {
-            buildContext.add(property);
-        }
     }
 
     private BuildResult getPreviousSuccessfulBuild()
@@ -193,7 +167,7 @@ public class BuildController implements EventListener
             RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(project, stage.getAgentRequirements(), request.getRevision(), recipeRequest, buildResult);
             DefaultRecipeLogger logger = new DefaultRecipeLogger(new File(paths.getRecipeDir(buildResult, recipeResult.getId()), RecipeResult.RECIPE_LOG));
             RecipeResultNode previousRecipe = previousSuccessful == null ? null : previousSuccessful.findResultNodeByHandle(stage.getHandle());
-            RecipeController rc = new RecipeController(buildResult, childResultNode, dispatchRequest, buildContext.getInternalBoolean(PROPERTY_INCREMENTAL_BUILD, false), previousRecipe, logger, collector);
+            RecipeController rc = new RecipeController(buildResult, childResultNode, dispatchRequest, recipeContext, previousRecipe, logger, collector, configurationManager);
             rc.setRecipeQueue(queue);
             rc.setBuildManager(buildManager);
             rc.setServiceTokenManager(serviceTokenManager);
@@ -526,12 +500,14 @@ public class BuildController implements EventListener
             LOG.warning("Unable to save pulse file for build: " + e.getMessage(), e);
         }
 
+        BuildRevision buildRevision = dispatchRequest.getRevision();
+        addRevisionProperties(buildContext, buildRevision);
         if (!buildResult.isPersonal())
         {
-            getChanges(dispatchRequest.getRevision());
+            getChanges(buildRevision);
         }
 
-        buildResult.commence(dispatchRequest.getRevision().getTimestamp());
+        buildResult.commence(buildRevision.getTimestamp());
         if (previousSuccessful != null)
         {
             buildResult.getStamps().setEstimatedRunningTime(previousSuccessful.getStamps().getElapsed());
@@ -675,7 +651,8 @@ public class BuildController implements EventListener
             // are allowed to add information to and modify the state of the
             // build result.  Hence it is crucial that indexing and a final
             // save are done afterwards.
-            eventManager.publish(new PostBuildEvent(this, buildResult));
+            addCompletedBuildProperties(buildContext, buildResult, configurationManager);
+            eventManager.publish(new PostBuildEvent(this, buildResult, buildContext));
 
             // calculate the feature counts at the end of the build so that the result hierarchy does not need to
             // be traversed when this information is required.
@@ -699,7 +676,7 @@ public class BuildController implements EventListener
         }
 
         eventManager.unregister(asyncListener);
-        eventManager.publish(new BuildCompletedEvent(this, buildResult));
+        eventManager.publish(new BuildCompletedEvent(this, buildResult, buildContext));
         asyncListener.stop(true);
     }
 

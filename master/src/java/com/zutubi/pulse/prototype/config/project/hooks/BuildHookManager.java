@@ -1,10 +1,21 @@
 package com.zutubi.pulse.prototype.config.project.hooks;
 
+import com.zutubi.prototype.config.ConfigurationProvider;
+import com.zutubi.pulse.MasterBuildProperties;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.model.Feature;
+import com.zutubi.pulse.core.model.Result;
+import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.BuildEvent;
+import com.zutubi.pulse.events.build.StageEvent;
 import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.RecipeResultNode;
+import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
+import com.zutubi.util.UnaryFunction;
 
 /**
  * Manages the execution of build hooks at various points in the build
@@ -12,6 +23,9 @@ import com.zutubi.pulse.model.BuildResult;
  */
 public class BuildHookManager implements EventListener
 {
+    private MasterConfigurationManager configurationManager;
+    private ConfigurationProvider configurationProvider;
+
     public void handleEvent(Event event)
     {
         BuildEvent be = (BuildEvent) event;
@@ -20,27 +34,68 @@ public class BuildHookManager implements EventListener
         {
             for(BuildHookConfiguration hook: buildResult.getProject().getConfig().getBuildHooks().values())
             {
-                if(hook.triggeredBy(be))
+                if(hook.enabled() && hook.triggeredBy(be))
                 {
-                    executeTask(hook, buildResult);
+                    RecipeResultNode resultNode = null;
+                    if(be instanceof StageEvent)
+                    {
+                        resultNode = ((StageEvent)be).getStageNode();
+                    }
+                    executeTask(hook, be.getContext(), be.getBuildResult(), resultNode, false);
                 }
             }
         }
     }
 
-    public void executeTask(BuildHookConfiguration hook, BuildResult buildResult)
+    public void manualTrigger(final BuildHookConfiguration hook, final BuildResult result)
     {
-        // Manual trigger:
-        //   - build hook: run over result
-        //   - stage hook: for each stage, if applicable, run over stage
-        //   - no fail on error behaviour?
-        // Event trigger:
-        //   - build hook: run over result
-        //   - stage hook: run over stage
+        final ExecutionContext context = new ExecutionContext();
+        MasterBuildProperties.addAllBuildProperties(context, result, configurationProvider.get(GeneralAdminConfiguration.class), configurationManager);
+        if (hook.appliesTo(result))
+        {
+            executeTask(hook, context, result, null, true);
+        }
+
+        result.getRoot().forEachNode(new UnaryFunction<RecipeResultNode>()
+        {
+            public void process(RecipeResultNode recipeResultNode)
+            {
+                if(hook.appliesTo(recipeResultNode))
+                {
+                    context.push();
+                    try
+                    {
+                        MasterBuildProperties.addStageProperties(context, result, recipeResultNode, configurationManager, false);
+                        executeTask(hook, context, result, recipeResultNode, true);
+                    }
+                    finally
+                    {
+                        context.pop();
+                    }
+                }
+            }
+        });
+    }
+
+    private void executeTask(BuildHookConfiguration hook, ExecutionContext context, BuildResult buildResult, RecipeResultNode resultNode, boolean manual)
+    {
         BuildHookTaskConfiguration task = hook.getTask();
-        // FIXME hooks
-        BuildHookContext context = new BuildHookContext();
-        task.execute(context);
+        try
+        {
+            task.execute(context, buildResult, resultNode);
+        }
+        catch (Exception e)
+        {
+            if(!manual)
+            {
+                Result result = resultNode == null ? buildResult : resultNode.getResult();
+                result.addFeature(Feature.Level.ERROR, "Error executing task for hook '" + hook.getName() + "': " + e.getMessage());
+                if (hook.failOnError())
+                {
+                    result.setState(ResultState.ERROR);
+                }
+            }
+        }
     }
 
     public Class[] getHandledEvents()
@@ -51,5 +106,15 @@ public class BuildHookManager implements EventListener
     public void setEventManager(EventManager eventManager)
     {
         eventManager.register(this);
+    }
+
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
+    }
+
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    {
+        this.configurationProvider = configurationProvider;
     }
 }

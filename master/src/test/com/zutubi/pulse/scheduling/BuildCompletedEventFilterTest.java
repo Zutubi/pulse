@@ -86,7 +86,7 @@ public class BuildCompletedEventFilterTest extends PulseTestCase
         user.setConfig(config);
         BuildResult result = new BuildResult(user, project, 1);
         result.setState(ResultState.SUCCESS);
-        assertFalse(filter.accept(createTrigger("SUCCESS"), new BuildCompletedEvent(this, result)));
+        assertFalse(filter.accept(createTrigger("SUCCESS"), new BuildCompletedEvent(this, result, null)));
     }
 
     private MockTrigger createTrigger(String s)
@@ -121,6 +121,6 @@ public class BuildCompletedEventFilterTest extends PulseTestCase
         project.setId(id);
         BuildResult result = new BuildResult(new UnknownBuildReason(), project, 1, false);
         result.setState(state);
-        return new BuildCompletedEvent(this, result);
+        return new BuildCompletedEvent(this, result, null);
     }
 }

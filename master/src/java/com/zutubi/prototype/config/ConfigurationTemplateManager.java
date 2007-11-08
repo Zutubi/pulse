@@ -517,8 +517,8 @@ public class ConfigurationTemplateManager implements Synchronization
      */
     public CompositeType typeCheck(CompositeType expectedType, String symbolicName)
     {
-        List<String> allowedTypes = new LinkedList<String>();
-        allowedTypes.add(expectedType.getSymbolicName());
+        List<CompositeType> allowedTypes = new LinkedList<CompositeType>();
+        allowedTypes.add(expectedType);
         allowedTypes.addAll(expectedType.getExtensions());
         allowedTypes.addAll(expectedType.getInternalExtensions());
         CompositeType gotType = typeRegistry.getType(symbolicName);
@@ -527,7 +527,7 @@ public class ConfigurationTemplateManager implements Synchronization
             throw new IllegalArgumentException("Unrecognised symbolic name '" + symbolicName + "'");
         }
 
-        if (!allowedTypes.contains(symbolicName))
+        if (!allowedTypes.contains(gotType))
         {
             // need to support type extensions here.
             throw new IllegalArgumentException("Expected type: " + expectedType.getClazz() + " but instead found " + gotType.getClazz());

@@ -18,7 +18,7 @@ public interface Type
 
     List<Annotation> getAnnotations(Class annotationType);
 
-    Annotation getAnnotation(Class annotationType);
+    <T extends Annotation> T getAnnotation(Class<T> annotationType);
 
     Type getTargetType();
 

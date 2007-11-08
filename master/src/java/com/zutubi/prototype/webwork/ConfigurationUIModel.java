@@ -137,7 +137,13 @@ public class ConfigurationUIModel
                 }
             });
 
-            extensions.addAll(((CompositeType) targetType).getExtensions());
+            extensions.addAll(CollectionUtils.map(((CompositeType) targetType).getExtensions(), new Mapping<CompositeType, String>()
+            {
+                public String map(CompositeType compositeType)
+                {
+                    return compositeType.getSymbolicName();
+                }
+            }));
             writable = configurationSecurityManager.hasPermission(path, AccessManager.ACTION_WRITE);
             configurationCheckAvailable = configurationRegistry.getConfigurationCheckType(ctype) != null;
         }

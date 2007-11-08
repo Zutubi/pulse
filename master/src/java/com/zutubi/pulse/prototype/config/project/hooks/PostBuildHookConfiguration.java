@@ -1,15 +1,17 @@
 package com.zutubi.pulse.prototype.config.project.hooks;
 
-import com.zutubi.pulse.events.build.BuildEvent;
-import com.zutubi.pulse.events.build.BuildCompletedEvent;
-import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.config.annotations.ControllingCheckbox;
-import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.Select;
+import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.events.build.BuildEvent;
+import com.zutubi.pulse.events.build.PostBuildEvent;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.RecipeResultNode;
 
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * A post build hookis run when a build completes.
@@ -45,12 +47,28 @@ public class PostBuildHookConfiguration extends AutoBuildHookConfiguration
 
     public boolean triggeredBy(BuildEvent event)
     {
-        if(event instanceof BuildCompletedEvent)
+        if(event instanceof PostBuildEvent)
         {
-            BuildCompletedEvent bce = (BuildCompletedEvent) event;
-            return runForAll || runForStates.contains(bce.getBuildResult().getState());
+            PostBuildEvent pbe = (PostBuildEvent) event;
+            BuildResult buildResult = pbe.getBuildResult();
+            return stateMatches(buildResult);
         }
 
+        return false;
+    }
+
+    private boolean stateMatches(BuildResult buildResult)
+    {
+        return runForAll || runForStates.contains(buildResult.getState());
+    }
+
+    public boolean appliesTo(BuildResult result)
+    {
+        return true;
+    }
+
+    public boolean appliesTo(RecipeResultNode result)
+    {
         return false;
     }
 }

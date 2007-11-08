@@ -4,10 +4,11 @@ import com.zutubi.prototype.config.ConfigurationEventListener;
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.config.events.ConfigurationEvent;
 import com.zutubi.prototype.config.events.PostSaveEvent;
+import static com.zutubi.pulse.MasterBuildProperties.PROPERTY_CLEAN_BUILD;
+import static com.zutubi.pulse.MasterBuildProperties.addRevisionProperties;
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.core.*;
-import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.pulse.core.scm.ScmClientFactory;
@@ -15,7 +16,6 @@ import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.events.*;
-import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
@@ -24,7 +24,10 @@ import com.zutubi.pulse.scm.ScmChangeEvent;
 import com.zutubi.util.Constants;
 import com.zutubi.util.logging.Logger;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
@@ -529,9 +532,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         executingAgents.put(recipeRequest.getId(), agent);
 
         ExecutionContext context = recipeRequest.getContext();
-        context.addInternalString(PROPERTY_BUILD_REVISION, buildRevision.getRevision().getRevisionString());
-        context.addInternalString(PROPERTY_BUILD_TIMESTAMP, TIMESTAMP_FORMAT.format(new Date(buildRevision.getTimestamp())));
-        context.addInternalString(PROPERTY_BUILD_TIMESTAMP_MILLIS, Long.toString(buildRevision.getTimestamp()));
+        addRevisionProperties(context, buildRevision);
         context.addInternalString(PROPERTY_CLEAN_BUILD, Boolean.toString(request.getProject().isForceCleanForAgent(agent.getId())));
 
         dispatchedQueue.offer(new DispatchedRequest(recipeRequest, agent));

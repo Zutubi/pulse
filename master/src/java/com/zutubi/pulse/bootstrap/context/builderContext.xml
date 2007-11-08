@@ -199,4 +199,5 @@
 
     <bean id="triggerManager" class="com.zutubi.pulse.prototype.config.project.triggers.TriggerManager" autowire="byName" init-method="init"/>
 
+    <bean id="buildHookManager" class="com.zutubi.pulse.prototype.config.project.hooks.BuildHookManager" autowire="byName"/>
 </beans>

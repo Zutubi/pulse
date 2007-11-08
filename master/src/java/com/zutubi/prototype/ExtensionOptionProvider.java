@@ -1,12 +1,14 @@
 package com.zutubi.prototype;
 
-import com.zutubi.prototype.type.TypeProperty;
+import com.zutubi.prototype.i18n.Messages;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
-import com.zutubi.prototype.type.TypeRegistry;
-import com.zutubi.prototype.i18n.Messages;
+import com.zutubi.prototype.type.TypeProperty;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * An option provider that lists the extensions for a particular type.  Used,
@@ -14,16 +16,15 @@ import java.util.*;
  */
 public class ExtensionOptionProvider extends MapOptionProvider
 {
-    private CompositeType type;
-    private TypeRegistry typeRegistry;
+    private List<CompositeType> extensions;
 
     public ExtensionOptionProvider()
     {
     }
 
-    public ExtensionOptionProvider(CompositeType type)
+    public ExtensionOptionProvider(List<CompositeType> extensions)
     {
-        this.type = type;
+        this.extensions = extensions;
     }
 
     public MapOption getEmptyOption(Object instance, String parentPath, TypeProperty property)
@@ -34,10 +35,10 @@ public class ExtensionOptionProvider extends MapOptionProvider
     @SuppressWarnings({"unchecked"})
     protected Map<String, String> getMap(Object instance, String parentPath, TypeProperty property)
     {
-        List<String> extensions;
-        if (type != null)
+        List<CompositeType> extensions;
+        if (this.extensions != null)
         {
-            extensions = type.getExtensions();
+            extensions = this.extensions;
         }
         else
         {
@@ -53,17 +54,12 @@ public class ExtensionOptionProvider extends MapOptionProvider
         }
 
         Map<String, String> options = new HashMap<String, String>(extensions.size());
-        for (String extension : extensions)
+        for (CompositeType extension : extensions)
         {
-            Messages messages = Messages.getInstance(typeRegistry.getType(extension).getClazz());
-            options.put(extension, messages.format("label"));
+            Messages messages = Messages.getInstance(extension.getClazz());
+            options.put(extension.getSymbolicName(), messages.format("label"));
         }
 
         return options;
-    }
-
-    public void setTypeRegistry(TypeRegistry typeRegistry)
-    {
-        this.typeRegistry = typeRegistry;
     }
 }

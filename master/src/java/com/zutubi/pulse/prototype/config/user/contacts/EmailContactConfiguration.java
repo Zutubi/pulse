@@ -12,7 +12,9 @@ import com.zutubi.util.logging.Logger;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -65,7 +67,7 @@ public class EmailContactConfiguration extends ContactConfiguration
 
         try
         {
-            sendMail(getAddress(), config, subject, mimeType, rendered);
+            sendMail(Arrays.asList(getAddress()), config, subject, mimeType, rendered);
         }
         catch (Exception e)
         {
@@ -74,7 +76,7 @@ public class EmailContactConfiguration extends ContactConfiguration
         }
     }
 
-    public static void sendMail(String address, final EmailConfiguration config, String subject, String mimeType, String message) throws MessagingException
+    public static void sendMail(List<String> emails, final EmailConfiguration config, String subject, String mimeType, String message) throws MessagingException
     {
         String prefix = config.getSubjectPrefix();
         if (TextUtils.stringSet(prefix))
@@ -149,8 +151,12 @@ public class EmailContactConfiguration extends ContactConfiguration
             msg.setFrom(new InternetAddress(config.getFrom()));
         }
 
-        InternetAddress toAddress = new InternetAddress(address);
-        msg.setRecipient(Message.RecipientType.TO, toAddress);
+        for(String email: emails)
+        {
+            InternetAddress toAddress = new InternetAddress(email);
+            msg.addRecipient(Message.RecipientType.TO, toAddress);
+        }
+
         msg.setSubject(subject);
         msg.setContent(message, mimeType);
         msg.setHeader("X-Mailer", "Zutubi-Pulse");

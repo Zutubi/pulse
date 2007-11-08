@@ -66,40 +66,44 @@ public abstract class AbstractTypeWizard implements Wizard
 
     protected List<AbstractChainableState> addWizardStates(List<AbstractChainableState> previousStates, String parentPath, CompositeType baseType, TemplateRecord templateParentRecord)
     {
-        CompositeType type = baseType;
 
         // If we have a template record, then we are configuring an override.
         // The type is pre-determined as it must be the same as the template
         // parent.
         if(templateParentRecord != null)
         {
-            type = typeRegistry.getType(templateParentRecord.getSymbolicName());
+            CompositeType type = typeRegistry.getType(templateParentRecord.getSymbolicName());
             TemplateRecord templateRecord = new TemplateRecord("", templateParentRecord, type, type.createNewRecord(false));
             return addSingleStepState(previousStates, parentPath, baseType, type, templateRecord);
         }
         else
         {
-            List<String> extensions = baseType.getExtensions();
-            int extensionCount = extensions.size();
-            if(extensionCount < 2)
-            {
-                // No point showing the first state, just check if we are
-                // configuring a type itself or a type with only one extension.
-                if(extensionCount == 1)
-                {
-                    type = typeRegistry.getType(extensions.get(0));
-                }
+            return addWizardStatesForExtensions(previousStates, parentPath, baseType, baseType.getExtensions());
+        }
+    }
 
-                return addSingleStepState(previousStates, parentPath, baseType, type, null);
-            }
-            else
+    protected List<AbstractChainableState> addWizardStatesForExtensions(List<AbstractChainableState> previousStates, String parentPath, CompositeType baseType, List<CompositeType> extensions)
+    {
+        CompositeType type = baseType;
+        int extensionCount = extensions.size();
+        if(extensionCount < 2)
+        {
+            // No point showing the first state, just check if we are
+            // configuring a type itself or a type with only one extension.
+            if(extensionCount == 1)
             {
-                // Extendable types give two wizard steps: a type selection,
-                // followed by a type-specific configure.
-                TwoStepStateBuilder stateBuilder = new TwoStepStateBuilder(ord++, parentPath, baseType, typeRegistry);
-                linkPreviousStates(previousStates, stateBuilder.getSelectState());
-                return stateBuilder.getChainableStates();
+                type = extensions.get(0);
             }
+
+            return addSingleStepState(previousStates, parentPath, baseType, type, null);
+        }
+        else
+        {
+            // Extendable types give two wizard steps: a type selection,
+            // followed by a type-specific configure.
+            TwoStepStateBuilder stateBuilder = new TwoStepStateBuilder(ord++, parentPath, baseType, extensions);
+            linkPreviousStates(previousStates, stateBuilder.getSelectState());
+            return stateBuilder.getChainableStates();
         }
     }
 
@@ -452,21 +456,20 @@ public abstract class AbstractTypeWizard implements Wizard
 
         private MutableRecord selectionRecord;
         private CompositeType baseType;
+        private List<CompositeType> extensions;
         private SelectWizardState selectState;
         private UnknownTypeState unknownTypeState;
         private Map<String, ConfigurationWizardState> configureStates = new TreeMap<String, ConfigurationWizardState>();
 
-        private TypeRegistry typeRegistry;
-
-        public TwoStepStateBuilder(int ord, String parentPath, CompositeType baseType, TypeRegistry typeRegistry)
+        public TwoStepStateBuilder(int ord, String parentPath, CompositeType baseType, List<CompositeType> extensions)
         {
-            this.typeRegistry = typeRegistry;
             this.baseType = baseType;
+            this.extensions = extensions;
             selectState = new SelectWizardState(ord);
             unknownTypeState = new UnknownTypeState(ord, baseType);
-            for(String symbolicName: baseType.getExtensions())
+            for(CompositeType extensionType: baseType.getExtensions())
             {
-                configureStates.put(symbolicName, new ConfigurationWizardState(ord, parentPath, this.typeRegistry.getType(symbolicName)));
+                configureStates.put(extensionType.getSymbolicName(), new ConfigurationWizardState(ord, parentPath, extensionType));
             }
             
             this.selectionRecord = new MutableRecordImpl();
@@ -553,8 +556,7 @@ public abstract class AbstractTypeWizard implements Wizard
                 select.setType("select");
                 select.addParameter("width", 300);
 
-                ExtensionOptionProvider optionProvider = new ExtensionOptionProvider(baseType);
-                optionProvider.setTypeRegistry(typeRegistry);
+                ExtensionOptionProvider optionProvider = new ExtensionOptionProvider(extensions);
                 select.setListKey(optionProvider.getOptionKey());
                 select.setListValue(optionProvider.getOptionValue());
                 select.setList(optionProvider.getOptions(null, null, null));

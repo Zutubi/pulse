@@ -10,8 +10,8 @@ import com.zutubi.util.GraphFunction;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.logging.Logger;
 
-import java.util.*;
 import java.lang.reflect.Modifier;
+import java.util.*;
 
 /**
  * A composite represents a user-defined Java type, i.e. a class.  Composites
@@ -28,11 +28,11 @@ public class CompositeType extends AbstractType implements ComplexType
     /**
      * The list of symbolic names of types that 'extend' this type.
      */
-    private List<String> extensions = new LinkedList<String>();
+    private List<CompositeType> extensions = new LinkedList<CompositeType>();
     /**
      * Extensions that are created internally but not via UIs.
      */
-    private List<String> internalExtensions = new LinkedList<String>();
+    private List<CompositeType> internalExtensions = new LinkedList<CompositeType>();
 
     /**
      * Those properties that are marked with the @Internal annotation.
@@ -215,20 +215,21 @@ public class CompositeType extends AbstractType implements ComplexType
     void addExtension(CompositeType type) throws TypeException
     {
         checkExtension(type);
-        this.extensions.add(type.getSymbolicName());
+        this.extensions.add(type);
     }
 
-    public List<String> getExtensions()
+    public List<CompositeType> getExtensions()
     {
         return Collections.unmodifiableList(extensions);
     }
 
-    void addInternalExtension(CompositeType type)
+    void addInternalExtension(CompositeType type) throws TypeException
     {
-        internalExtensions.add(type.getSymbolicName());
+        checkExtension(type);
+        internalExtensions.add(type);
     }
 
-    public List<String> getInternalExtensions()
+    public List<CompositeType> getInternalExtensions()
     {
         return Collections.unmodifiableList(internalExtensions);
     }

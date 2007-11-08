@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.config.ConfigurationCheckHandlerSupport;
 import com.zutubi.pulse.prototype.config.user.contacts.EmailContactConfiguration;
 
 import javax.mail.MessagingException;
+import java.util.Arrays;
 
 /**
  * Server settings page of the setup wizard.
@@ -26,6 +27,6 @@ public class ServerSettingsConfigurationCheckHandler extends ConfigurationCheckH
 
     public void test(ServerSettingsConfiguration configuration) throws MessagingException
     {
-        EmailContactConfiguration.sendMail(testAddress, configuration, "Test Email", "text/plain", "Welcome to Zutubi Pulse!");
+        EmailContactConfiguration.sendMail(Arrays.asList(testAddress), configuration, "Test Email", "text/plain", "Welcome to Zutubi Pulse!");
     }
 }
