@@ -17,7 +17,7 @@
             So where to next? Here are some helpful links to get get you started again.
             <ul>
                 <li><a href="$base/dashboard/home/">dashboard</a></li>
-                <li><a href="$base/viewProjects.action">projects</a></li>
+                <li><a href="$base/browse/">browse</a></li>
             </ul>
         </p>
     </div>

@@ -28,7 +28,7 @@
         #end
             #contentCell($request.prettyQueueTime)
         #if($action.canCancel($request))
-            #actionCell("cancel" "cancelQueuedBuild.action?id=$request.id" "cancel.gif")
+            #actionCell("cancel" "$base/cancelQueuedBuild.action?id=$request.id" "cancel.gif")
         #else
             #contentCell("empty.cell")
         #end
@@ -68,7 +68,7 @@
             #elapsedCell($buildResult)
 
         #if($action.canCancel($buildResult))
-            #actionCell("cancel" "cancelBuild.action?buildId=$buildResult.id" "cancel.gif")
+            #actionCell("cancel" "$base/cancelBuild.action?buildId=$buildResult.id" "cancel.gif")
         #else
             #contentCell("empty.cell")
         #end

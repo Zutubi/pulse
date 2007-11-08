@@ -46,11 +46,11 @@
         </action>
 
         <action name="cancelBuild" class="com.zutubi.pulse.web.server.CancelBuildAction">
-            <result name="success" type="redirect">viewServerQueues.action</result>
+            <result name="success" type="redirect">/server/activity/</result>
         </action>
 
         <action name="cancelQueuedBuild" class="com.zutubi.pulse.web.server.CancelQueuedBuildAction">
-            <result name="success" type="redirect">viewServerQueues.action</result>
+            <result name="success" type="redirect">/server/activity/</result>
         </action>
 
         <action name="viewAgentStatus" class="com.zutubi.pulse.web.agents.ViewAgentStatusAction">
