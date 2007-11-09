@@ -67,9 +67,14 @@ public class RecipeControllerTest extends PulseTestCase
         dispatchRequest = new RecipeDispatchRequest(new Project(), new AnyCapableAgentRequirements(), new BuildRevision(), recipeRequest, null);
         MasterConfigurationManager configurationManager = new SimpleMasterConfigurationManager()
         {
+            public File getDataDirectory()
+            {
+                return new File("test");
+            }
+
             public MasterUserPaths getUserPaths()
             {
-                return new Data(new File("test"));
+                return new Data(getDataDirectory());
             }
         };
         recipeController = new RecipeController(build, rootNode, dispatchRequest, new ExecutionContext(), null, logger, resultCollector, configurationManager);
