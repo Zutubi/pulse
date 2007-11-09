@@ -170,11 +170,11 @@ public class InMemoryRecordStore implements RecordStore
     private MutableRecord getChildRecord(MutableRecord record, String element)
     {
         Object obj = record.get(element);
-        if (obj == null || !(obj instanceof MutableRecordImpl))
+        if (obj == null || !(obj instanceof MutableRecord))
         {
             return null;
         }
-        return (MutableRecordImpl) obj;
+        return (MutableRecord) obj;
     }
 
     public Record select()

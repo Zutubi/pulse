@@ -223,11 +223,17 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
         List<JournalEntry> journal = new LinkedList<JournalEntry>();
         if (journalIndexFile.isFile())
         {
+            LOG.finest(Thread.currentThread().getId() + ": replay journal(start)");
+            LOG.finest(Thread.currentThread().getId() + ":   snapshotid: ("+latestSnapshotId+")");
             for (JournalEntry journalEntry : readJournal())
             {
                 // remove those entries that are already part of the snapshot.
                 if (latestSnapshotId < journalEntry.getId())
                 {
+                    journalEntry.getRecord(); // preload the record so that it appears in the logging.
+                    LOG.finest(Thread.currentThread().getId() + ":   applying("+journalEntry+")");
+
+
                     journal.add(journalEntry);
                     compactRequired = true;
 
@@ -238,9 +244,12 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
                         nextJournalEntryId = journalEntry.getId() + 1;
                     }
                 }
+                else
+                {
+                    LOG.finest(Thread.currentThread().getId() + ":   dropping("+journalEntry+")");
+                }
             }
 
-            // apply journal entries to snapshot prior to compact.
             for (JournalEntry journalEntry : journal)
             {
                 if (journalEntry.getAction().equals(ACTION_INSERT))
@@ -256,6 +265,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
                     inMemoryDelegate.delete(journalEntry.getPath());
                 }
             }
+            LOG.finest(Thread.currentThread().getId() + ": replay journal(end)");
         }
 
         // the last committed journal entry id is the id prior to the next journal entry.
@@ -314,6 +324,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
     public boolean prepare()
     {
         // prepare the journal entries.
+        LOG.finest(Thread.currentThread().getId() + ": prepare(start)");
 
         FileWriter writer = null;
         try
@@ -382,6 +393,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
                 }
             }
 
+            LOG.finest(Thread.currentThread().getId() + ": prepare(end)");
             return true;
         }
         catch (IOException e)
@@ -408,6 +420,8 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
 
     public synchronized void commit() throws TransactionException
     {
+        LOG.finest(Thread.currentThread().getId() + ": commit(start)");
+
         // commit the journal entries.
         if (fileSystem.exists(newJournalIndexFile))
         {
@@ -452,11 +466,14 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
 
         journal.addAll(activeJournal);
         activeJournal.clear();
+
+        LOG.finest(Thread.currentThread().getId() + ": commit(end)");
     }
 
     public void rollback() throws TransactionException
     {
         // rollback the journal entries
+        LOG.finest(Thread.currentThread().getId() + ": rollback(start)");
 
         for (JournalEntry entry : activeJournal)
         {
@@ -471,6 +488,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
         recoverIndex(newJournalIndexFile, journalIndexFile, backupJournalIndexFile);
 
         activeJournal.clear();
+        LOG.finest(Thread.currentThread().getId() + ": rollback(end)");
     }
 
     private void recoverIndex(File newIndex, File index, File backupIndex)
@@ -520,7 +538,10 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
         {
             public Record execute()
             {
-                activeJournal.add(new JournalEntry(ACTION_INSERT, path, record, nextJournalEntryId++));
+                JournalEntry journalEntry = new JournalEntry(ACTION_INSERT, path, record, nextJournalEntryId++);
+
+                LOG.finest(Thread.currentThread().getId() + ": ("+journalEntry+")");
+                activeJournal.add(journalEntry);
                 return inMemoryDelegate.insert(path, record);
             }
         });
@@ -532,7 +553,9 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
         {
             public Record execute()
             {
-                activeJournal.add(new JournalEntry(ACTION_UPDATE, path, record, nextJournalEntryId++));
+                JournalEntry journalEntry = new JournalEntry(ACTION_UPDATE, path, record, nextJournalEntryId++);
+                LOG.finest(Thread.currentThread().getId() + ": ("+journalEntry+")");
+                activeJournal.add(journalEntry);
                 return inMemoryDelegate.update(path, record);
             }
         });
@@ -544,7 +567,9 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
         {
             public Record execute()
             {
-                activeJournal.add(new JournalEntry(ACTION_DELETE, path, nextJournalEntryId++));
+                JournalEntry journalEntry = new JournalEntry(ACTION_DELETE, path, nextJournalEntryId++);
+                LOG.finest(Thread.currentThread().getId() + ": ("+journalEntry+")");
+                activeJournal.add(journalEntry);
                 return inMemoryDelegate.delete(path);
             }
         });
@@ -624,6 +649,8 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
 
     public void compactNow() throws IOException
     {
+        LOG.finest(Thread.currentThread().getId() + ": compact(start)");
+
         long oldSnapshotId = latestSnapshotId;
 
         try
@@ -631,6 +658,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
             // check if compact is required.
             if (lastCommittedJournalEntryId == latestSnapshotId)
             {
+                LOG.finest(Thread.currentThread().getId() + ": compact(not required)");
                 return;
             }
 
@@ -710,6 +738,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
             }
 
             cleanupJournalEntries();
+            LOG.finest(Thread.currentThread().getId() + ": compact(end)");
         }
         catch (IOException e)
         {
@@ -928,6 +957,13 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
         void setTxnId(long txnId)
         {
             this.txnId = txnId;
+        }
+
+        public String toString()
+        {
+            StringBuffer buffer = new StringBuffer(action).append(", ");
+            buffer.append(id).append(", ").append(path).append(", ").append(record != null);
+            return buffer.toString();
         }
     }
 
