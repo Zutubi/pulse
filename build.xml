@@ -6,8 +6,27 @@
 
     <property file="build.properties"/>
 
+    <property environment="env"/>
+
     <condition property="on.windows">
         <os family="windows"/>
+    </condition>
+
+    <!-- check if the nsis executable is available for packaging. -->
+    <condition property="nsis.found">
+        <or>
+            <available file="makensis" filepath="${env.PATH}"/>
+            <available file="makensis.exe" filepath="${env.PATH}"/>
+            <available file="makensis.exe" filepath="${env.Path}"/>
+        </or>
+    </condition>
+
+    <!-- indicate whether or not we can run the nsis phase of the packaging -->
+    <condition property="run.nsis">
+        <and>
+            <isset property="on.windows"/>
+            <isset property="nsis.found"/>
+        </and>
     </condition>
 
     <target name="clean" depends="clean.all"/>
@@ -145,7 +164,7 @@
         <antcall target="nsis.local"/>
     </target>
 
-    <target name="nsis.local" if="on.windows">
+    <target name="nsis.local" if="run.nsis">
         <property name="package.name.local" value="pulse-dev-${pulse.version}"/>
         <property name="package.root.local" value="build/package/${package.name.local}"/>
 
@@ -261,7 +280,7 @@
         <antcall target="nsis.slave"/>
     </target>
 
-    <target name="nsis.slave" if="on.windows">
+    <target name="nsis.slave" if="run.nsis">
         <property name="package.name.slave" value="pulse-agent-${pulse.version}"/>
         <property name="package.root.slave" value="build/package/${package.name.slave}"/>
 
@@ -394,7 +413,7 @@
         <antcall target="nsis.master"/>
     </target>
 
-    <target name="nsis.master" if="on.windows">
+    <target name="nsis.master" if="run.nsis">
         <property name="package.name.master" value="pulse-${pulse.version}"/>
         <property name="package.root.master" value="build/package/${package.name.master}"/>
 
