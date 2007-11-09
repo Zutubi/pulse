@@ -37,17 +37,14 @@ public class XmlRecordSerialiser
     // write the record to the specified file.
     public void serialise(File file, Record record) throws RecordSerialiseException
     {
-        if (record.metaKeySet().size() > 0 || record.simpleKeySet().size() > 0)
+        Document doc = recordToDocument(record);
+        try
         {
-            Document doc = recordToDocument(record);
-            try
-            {
-                XMLUtils.writeDocument(file, doc, false);
-            }
-            catch (IOException e)
-            {
-                throw new RecordSerialiseException(e);
-            }
+            XMLUtils.writeDocument(file, doc, false);
+        }
+        catch (IOException e)
+        {
+            throw new RecordSerialiseException(e);
         }
     }
 

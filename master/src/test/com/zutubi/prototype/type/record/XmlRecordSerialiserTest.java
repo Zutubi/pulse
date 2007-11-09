@@ -70,27 +70,30 @@ public class XmlRecordSerialiserTest extends PulseTestCase
         assertEquals("c", deserialisedChildRecord.get("c"));
     }
 
-    public void testEmptyRecordsAreNotTheSameAsNull()
-    {
-        MutableRecord record = new MutableRecordImpl();
-
-        File f = new File(tmpDir, "record.xml");
-
-        serialiser.serialise(f, record);
-
-        assertNotNull(serialiser.deserialise(f, new NoopRecordHandler()));
-    }
-
     public void testWritingAndReadingMultileRecords() throws IOException
     {
         for (int i = 0; i < 50; i++)
         {
             File f = new File(tmpDir, Integer.toString(i));
-
             serialiser.serialise(f, createRandomSampleRecord());
 
             serialiser.deserialise(f, new NoopRecordHandler());
         }
+    }
+
+    public void testEmptyRecordCreatesAFile()
+    {
+        File f = new File(tmpDir, "empty.xml");
+        assertFalse(f.isFile());
+
+        MutableRecord empty = new MutableRecordImpl();
+        serialiser.serialise(f, empty);
+
+        assertTrue(f.isFile());
+
+        MutableRecord result = serialiser.deserialise(f, new NoopRecordHandler());
+        assertNotNull(result);
+        assertEquals(empty, result);
     }
 
     private MutableRecord createRandomSampleRecord()

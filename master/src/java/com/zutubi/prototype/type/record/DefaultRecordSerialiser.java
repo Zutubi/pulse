@@ -54,8 +54,10 @@ public class DefaultRecordSerialiser implements RecordSerialiser
             }
         }
 
+/*
         if (record.metaKeySet().size() > 0 || record.simpleKeySet().size() > 0)
         {
+*/
             Document doc = recordToDocument(record);
             File file = getRecordFile(storageDir);
             try
@@ -66,7 +68,9 @@ public class DefaultRecordSerialiser implements RecordSerialiser
             {
                 throw new RecordSerialiseException(e);
             }
+/*
         }
+*/
 
         if (deep)
         {

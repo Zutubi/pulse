@@ -626,10 +626,12 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
             throw new IOException("Can not write journal entry. File already exists. " + file.getAbsolutePath());
         }
 
+/* should we ever be trying to write a null record?  This generic catch could be rather dangerous in hiding problems.
         if (record == null)
         {
             return true;
         }
+*/
 
         XmlRecordSerialiser serialiser = new XmlRecordSerialiser();
         serialiser.serialise(file, record);
