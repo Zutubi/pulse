@@ -100,30 +100,33 @@ public class XmlRecordSerialiser
 
     private void recordToDocument(Record record, Element root)
     {
-        for (String key : record.metaKeySet())
+        if (record != null)
         {
-            root.appendChild(createElement(ELEMENT_META, key, record.getMeta(key)));
-        }
-
-        for (String key : record.simpleKeySet())
-        {
-            Object value = record.get(key);
-            if (value instanceof String)
+            for (String key : record.metaKeySet())
             {
-                root.appendChild(createElement(ELEMENT_VALUE, key, (String) value));
+                root.appendChild(createElement(ELEMENT_META, key, record.getMeta(key)));
             }
-            else
-            {
-                root.appendChild(createElement(ELEMENT_ARRAY, key, (String[]) value));
-            }
-        }
 
-        for (String key : record.nestedKeySet())
-        {
-            Record nested = (Record) record.get(key);
-            Element nestedElement = createElement(ELEMENT_RECORD, key);
-            root.appendChild(nestedElement);
-            recordToDocument(nested, nestedElement);
+            for (String key : record.simpleKeySet())
+            {
+                Object value = record.get(key);
+                if (value instanceof String)
+                {
+                    root.appendChild(createElement(ELEMENT_VALUE, key, (String) value));
+                }
+                else
+                {
+                    root.appendChild(createElement(ELEMENT_ARRAY, key, (String[]) value));
+                }
+            }
+
+            for (String key : record.nestedKeySet())
+            {
+                Record nested = (Record) record.get(key);
+                Element nestedElement = createElement(ELEMENT_RECORD, key);
+                root.appendChild(nestedElement);
+                recordToDocument(nested, nestedElement);
+            }
         }
     }
 

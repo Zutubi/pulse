@@ -145,8 +145,7 @@ public class FileSystemRecordStoreTest extends PulseTestCase
 
         assertFalse(new File(persistentDirectory, "3").exists());
         recordStore.delete("sample");
-        // for a delete, no record is written.
-        assertFalse(new File(persistentDirectory, "3").exists());
+        assertTrue(new File(persistentDirectory, "3").exists());
     }
 
     public void testCompaction() throws Exception
