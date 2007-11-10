@@ -2,10 +2,7 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.acceptance.forms.admin.*;
-import com.zutubi.pulse.acceptance.pages.admin.CompositePage;
-import com.zutubi.pulse.acceptance.pages.admin.DeleteConfirmPage;
-import com.zutubi.pulse.acceptance.pages.admin.ListPage;
-import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
+import com.zutubi.pulse.acceptance.pages.admin.*;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.prototype.config.project.changeviewer.CustomChangeViewerConfiguration;
@@ -431,6 +428,57 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         listPage.goTo();
         assertFalse(listPage.isOrderInheritedPresent());
         assertTrue(listPage.isOrderOverriddenPresent());
+    }
+
+    public void testWizardOverridingConfigured() throws Exception
+    {
+        String parentName = random + "-parent";
+        String childName = random + "-child";
+        xmlRpcHelper.insertSimpleProject(parentName, true);
+
+        loginAsAdmin();
+        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, parentName, true);
+        hierarchyPage.goTo();
+        hierarchyPage.clickAdd();
+        AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(selenium);
+        projectState.waitFor();
+        projectState.nextFormElements(childName, null, null);
+        AddProjectWizard.SubversionState subversionState = new AddProjectWizard.SubversionState(selenium);
+        subversionState.waitFor();
+        subversionState.nextFormElements(null, null, null, null, null, null);
+        AddProjectWizard.AntState antState = new AddProjectWizard.AntState(selenium);
+        antState.waitFor();
+        antState.finishFormElements(null, null, null, null);
+
+        ProjectHierarchyPage childHierarchyPage = new ProjectHierarchyPage(selenium, urls, childName, false);
+        childHierarchyPage.waitFor();
+        ProjectConfigPage configPage = childHierarchyPage.clickConfigure();
+        configPage.waitFor();
+        CompositePage scmPage = configPage.clickComposite("scm", "scm");
+        scmPage.waitFor();
+        SubversionForm subversionForm = new SubversionForm(selenium);
+        subversionForm.waitFor();
+        subversionForm.assertFormElements("svn://localhost:3088/accept/trunk/triviant", null, null, null, null, null, null, null, null, null, null, null, null);
+    }
+
+    public void testWizardOverridingScrubRequired() throws Exception
+    {
+        String parentName = random + "-parent";
+        String childName = random + "-child";
+        xmlRpcHelper.insertSimpleProject(parentName, true);
+
+        loginAsAdmin();
+        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, parentName, true);
+        hierarchyPage.goTo();
+        hierarchyPage.clickAdd();
+        AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(selenium);
+        projectState.waitFor();
+        projectState.nextFormElements(childName, null, null);
+        AddProjectWizard.SubversionState subversionState = new AddProjectWizard.SubversionState(selenium);
+        subversionState.waitFor();
+        subversionState.nextFormElements("", null, null, null, null, null);
+        subversionState.assertFormPresent();
+        assertTextPresent("url requires a value");
     }
 
     private void insertProperty(String projectPath) throws Exception

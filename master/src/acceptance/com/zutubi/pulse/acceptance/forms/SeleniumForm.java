@@ -276,28 +276,31 @@ public abstract class SeleniumForm
 
         for (int i = 0; i < types.length; i++)
         {
-            String fieldName = getActualFieldNames()[i];
-            switch (types[i])
+            if (values[i] != null)
             {
-                case TEXTFIELD:
-                    TestCase.assertEquals(StringUtils.stripLineBreaks(values[i]), StringUtils.stripLineBreaks(getFieldValue(fieldName)));
-                    break;
-                case CHECKBOX:
-                    TestCase.assertEquals(Boolean.valueOf(values[i]) ? "on" : "off", getFieldValue(fieldName));
-                    break;
-                case COMBOBOX:
-                    TestCase.assertEquals(values[i], getFieldValue(fieldName));
-                    break;
-                case ITEM_PICKER:
-                case MULTI_CHECKBOX:
-                case MULTI_SELECT:
-                    if (values[i] != null)
-                    {
-                        String[] expected = convertMultiValue(values[i]);
-                        assertMultiValues(fieldName, expected);
-                    }
-                default:
-                    break;
+                String fieldName = getActualFieldNames()[i];
+                switch (types[i])
+                {
+                    case TEXTFIELD:
+                        TestCase.assertEquals(StringUtils.stripLineBreaks(values[i]), StringUtils.stripLineBreaks(getFieldValue(fieldName)));
+                        break;
+                    case CHECKBOX:
+                        TestCase.assertEquals(Boolean.valueOf(values[i]) ? "on" : "off", getFieldValue(fieldName));
+                        break;
+                    case COMBOBOX:
+                        TestCase.assertEquals(values[i], getFieldValue(fieldName));
+                        break;
+                    case ITEM_PICKER:
+                    case MULTI_CHECKBOX:
+                    case MULTI_SELECT:
+                        if (values[i] != null)
+                        {
+                            String[] expected = convertMultiValue(values[i]);
+                            assertMultiValues(fieldName, expected);
+                        }
+                    default:
+                        break;
+                }
             }
         }
     }

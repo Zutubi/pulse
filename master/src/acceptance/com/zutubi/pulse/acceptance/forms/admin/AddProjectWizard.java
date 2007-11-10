@@ -33,9 +33,9 @@ public class AddProjectWizard
         }
     }
 
-    public static class SvnState extends SeleniumForm
+    public static class SubversionState extends SeleniumForm
     {
-        public SvnState(Selenium selenium)
+        public SubversionState(Selenium selenium)
         {
             super(selenium);
         }

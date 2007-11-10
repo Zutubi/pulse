@@ -145,9 +145,9 @@ public class SeleniumTestBase extends TestCase
         scmTypeState.waitFor();
         scmTypeState.nextFormElements("zutubi.svnConfig");
 
-        AddProjectWizard.SvnState svnState = new AddProjectWizard.SvnState(selenium);
-        svnState.waitFor();
-        svnState.nextFormElements("svn://localhost:3088/accept/trunk/triviant", null, null, null, null, "CLEAN_CHECKOUT");
+        AddProjectWizard.SubversionState subversionState = new AddProjectWizard.SubversionState(selenium);
+        subversionState.waitFor();
+        subversionState.nextFormElements("svn://localhost:3088/accept/trunk/triviant", null, null, null, null, "CLEAN_CHECKOUT");
 
         SelectTypeState projectTypeState = new SelectTypeState(selenium);
         projectTypeState.waitFor();
