@@ -4,6 +4,7 @@ import com.zutubi.prototype.config.ConfigurationSecurityManager;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.type.ComplexType;
 import com.zutubi.prototype.type.Type;
+import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.webwork.PrototypeUtils;
@@ -100,6 +101,11 @@ public class ConfigFileObject extends AbstractPulseFileObject
         {
             return null;
         }
+    }
+
+    public String getIconCls()
+    {
+        return PrototypeUtils.getIconCls(type);
     }
 
     protected String[] doListChildren() throws Exception

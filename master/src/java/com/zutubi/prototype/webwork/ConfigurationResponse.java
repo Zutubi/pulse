@@ -124,9 +124,10 @@ public class ConfigurationResponse
         private String parentTemplatePath;
         private String baseName;
         private String displayName;
+        private String iconCls;
         private boolean leaf;
 
-        public Addition(String path, String displayName, String templatePath, boolean leaf)
+        public Addition(String path, String displayName, String templatePath, String iconCls, boolean leaf)
         {
             this.parentPath = PathUtils.getParentPath(path);
             if (templatePath != null)
@@ -135,6 +136,7 @@ public class ConfigurationResponse
             }
             this.baseName = PathUtils.getBaseName(path);
             this.displayName = displayName;
+            this.iconCls = iconCls;
             this.leaf = leaf;
         }
 
@@ -156,6 +158,11 @@ public class ConfigurationResponse
         public String getDisplayName()
         {
             return displayName;
+        }
+
+        public String getIconCls()
+        {
+            return iconCls;
         }
 
         public boolean isLeaf()

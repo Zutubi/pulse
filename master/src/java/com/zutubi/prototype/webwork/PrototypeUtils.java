@@ -14,6 +14,7 @@ import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.webwork.mapping.PulseActionMapper;
 import com.zutubi.util.StringUtils;
+import com.zutubi.config.annotations.Classification;
 
 import java.util.*;
 
@@ -312,5 +313,34 @@ public class PrototypeUtils
                 validationAware.addFieldError(fieldName, error);
             }
         }
+    }
+
+    public static String getClassification(ComplexType type)
+    {
+        Classification classification = type.getTargetType().getAnnotation(Classification.class);
+        if(classification != null)
+        {
+            if(type instanceof CompositeType)
+            {
+                if(TextUtils.stringSet(classification.single()))
+                {
+                    return classification.single();
+                }
+            }
+            else
+            {
+                if(TextUtils.stringSet(classification.collection()))
+                {
+                    return classification.collection();
+                }
+            }
+        }
+
+        return type instanceof CompositeType ? "composite" : "collection";
+    }
+
+    public static String getIconCls(ComplexType type)
+    {
+        return "config-" + getClassification(type) + "-icon";
     }
 }

@@ -12,6 +12,7 @@ import com.zutubi.pulse.core.config.AbstractConfiguration;
         "userBaseDn", "userFilter", "autoAddUsers", "emailAttribute", "groupBaseDn", "groupSearchFilter",
         "groupRoleAttribute", "searchGroupSubtree", "followReferrals", "escapeSpaceCharacters"})
 @ConfigurationCheck("LDAPConfigurationCheckHandler")
+@Classification(single = "security")
 public class LDAPConfiguration extends AbstractConfiguration
 {
     @ControllingCheckbox

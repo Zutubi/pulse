@@ -93,6 +93,18 @@ public class TemplateFileObject extends AbstractPulseFileObject
         return configurationTemplateManager.isDeeplyValid(node.getPath()) ? null : "config-invalid";
     }
 
+    public String getIconCls()
+    {
+        if(node != null && node.isConcrete())
+        {
+            return "config-concrete-icon";
+        }
+        else
+        {
+            return "config-template-icon";
+        }
+    }
+
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
         this.configurationTemplateManager = configurationTemplateManager;

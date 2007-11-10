@@ -873,6 +873,11 @@ table.template-actions
     font-weight: normal;
 }
 
+.x-tree-node a
+{
+    vertical-align: middle;
+}
+
 .x-tabs-bottom .x-tabs-wrap {
     border-top:1px solid #6593CF;
 }
@@ -891,6 +896,113 @@ table.template-actions
 /*
  * Config pages
  */
+.x-tree-node-collapsed .config-template-icon, .x-tree-node-expanded .config-template-icon, .x-tree-node-leaf .config-template-icon
+{
+	background-image: url(../images/bricks-mono.gif);
+    width: 20px;
+}
+
+.x-tree-node-collapsed .config-concrete-icon, .x-tree-node-expanded .config-concrete-icon, .x-tree-node-leaf .config-concrete-icon
+{
+	background-image: url(../images/bricks.gif);
+    width: 20px;
+}
+
+.x-tree-node-collapsed .config-collection-icon, .x-tree-node-expanded .config-collection-icon, .x-tree-node-leaf .config-collection-icon
+{
+	background-image: url(../images/table_multiple.gif);
+    width: 20px;
+}
+
+.x-tree-node-collapsed .config-composite-icon, .x-tree-node-expanded .config-composite-icon, .x-tree-node-leaf .config-composite-icon
+{
+	background-image: url(../images/table.gif);
+    width: 20px;
+}
+
+.x-tree-node-collapsed .config-user-icon, .x-tree-node-expanded .config-user-icon, .x-tree-node-leaf .config-user-icon
+{
+	background-image: url(../images/user.gif);
+    width: 20px;
+}
+
+.x-tree-node-collapsed .config-users-icon, .x-tree-node-expanded .config-users-icon, .x-tree-node-leaf .config-users-icon
+{
+	background-image: url(../images/folder_user.gif);
+    width: 20px;
+}
+
+.x-tree-node-collapsed .config-group-icon, .x-tree-node-expanded .config-group-icon, .x-tree-node-leaf .config-group-icon
+{
+	background-image: url(../images/group.gif);
+    width: 20px;
+}
+
+.x-tree-node-collapsed .config-settings-icon, .x-tree-node-expanded .config-settings-icon, .x-tree-node-leaf .config-settings-icon
+{
+	background-image: url(../images/cog.gif);
+    width: 20px;
+}
+
+.x-tree-node-collapsed .config-email-icon, .x-tree-node-expanded .config-email-icon, .x-tree-node-leaf .config-email-icon
+{
+	background-image: url(../images/email.gif);
+    width: 20px;
+}
+
+.x-tree-node-collapsed .config-logging-icon, .x-tree-node-expanded .config-logging-icon, .x-tree-node-leaf .config-logging-icon
+{
+	background-image: url(../images/script.gif);
+    width: 20px;
+}
+
+.x-tree-node-collapsed .config-security-icon, .x-tree-node-expanded .config-security-icon, .x-tree-node-leaf .config-security-icon
+{
+	background-image: url(../images/key.gif);
+    width: 20px;
+}
+
+.x-tree-node-collapsed .config-license-icon, .x-tree-node-expanded .config-license-icon, .x-tree-node-leaf .config-license-icon
+{
+	background-image: url(../images/page_key.gif);
+    width: 20px;
+}
+
+.x-tree-node-collapsed .config-general-icon, .x-tree-node-expanded .config-general-icon, .x-tree-node-leaf .config-general-icon
+{
+	background-image: url(../images/table_gear.gif);
+    width: 20px;
+}
+
+.x-tree-node-collapsed .config-jabber-icon, .x-tree-node-expanded .config-jabber-icon, .x-tree-node-leaf .config-jabber-icon
+{
+	background-image: url(../images/lightbulb.gif);
+    width: 20px;
+}
+
+.x-tree-node-collapsed .config-dashboard-icon, .x-tree-node-expanded .config-dashboard-icon, .x-tree-node-leaf .config-dashboard-icon
+{
+	background-image: url(../images/dashboard.gif);
+    width: 20px;
+}
+.x-tree-node-collapsed .config-contacts-icon, .x-tree-node-expanded .config-contacts-icon, .x-tree-node-leaf .config-contacts-icon
+{
+	background-image: url(../images/folder_email.gif);
+    width: 20px;
+}
+
+.x-tree-node-collapsed .config-favourites-icon, .x-tree-node-expanded .config-favourites-icon, .x-tree-node-leaf .config-favourites-icon
+{
+	background-image: url(../images/folder_star.gif);
+    width: 20px;
+}
+
+.x-tree-node-collapsed .config-favourite-icon, .x-tree-node-expanded .config-favourite-icon, .x-tree-node-leaf .config-favourite-icon
+{
+	background-image: url(../images/star.gif);
+    width: 20px;
+}
+
 .config-panel
 {
     border-bottom-style:dotted;

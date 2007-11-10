@@ -15,6 +15,7 @@ import java.util.List;
  */
 @SymbolicName("zutubi.userSettingConfig")
 @Form(labelWidth = 250, fieldOrder = {"aliases", "defaultAction", "myBuildsCount", "refreshingEnabled", "refreshInterval", "tailLines", "tailRefreshInterval"})
+@Classification(single = "general")
 public class UserSettingsConfiguration extends AbstractConfiguration
 {
     private static final String PROPERTY_DASHBOARD_BUILD_COUNT = "user.dashboardBuildCount";

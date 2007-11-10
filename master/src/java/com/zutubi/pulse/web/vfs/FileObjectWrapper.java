@@ -149,12 +149,20 @@ public class FileObjectWrapper
         return Collections.EMPTY_LIST;
     }
 
-    @SuppressWarnings({"unchecked"})
     public String getCls()
     {
         if (fo instanceof AbstractPulseFileObject)
         {
             return ((AbstractPulseFileObject)fo).getCls();
+        }
+        return null;
+    }
+
+    public String getIconCls()
+    {
+        if (fo instanceof AbstractPulseFileObject)
+        {
+            return ((AbstractPulseFileObject)fo).getIconCls();
         }
         return null;
     }

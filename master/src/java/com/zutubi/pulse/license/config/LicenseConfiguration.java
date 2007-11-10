@@ -2,6 +2,7 @@ package com.zutubi.pulse.license.config;
 
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.TextArea;
+import com.zutubi.config.annotations.Classification;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.license.LicenseKey;
 
@@ -10,6 +11,7 @@ import com.zutubi.pulse.license.LicenseKey;
  *
  */
 @SymbolicName("zutubu.licenseConfig")
+@Classification(single = "license")
 public class LicenseConfiguration extends AbstractConfiguration
 {
     @LicenseKey

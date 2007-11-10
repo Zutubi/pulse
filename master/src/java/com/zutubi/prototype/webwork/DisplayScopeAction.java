@@ -2,7 +2,9 @@ package com.zutubi.prototype.webwork;
 
 import com.opensymphony.util.TextUtils;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
+import com.zutubi.prototype.config.TemplateNode;
 import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.prototype.type.ComplexType;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.web.ActionSupport;
 
@@ -43,6 +45,7 @@ public class DisplayScopeAction extends ActionSupport
     private String configTreePath;
 
     private String templateTreePath;
+    private String configClassification;
 
 
     public String getSection()
@@ -105,6 +108,11 @@ public class DisplayScopeAction extends ActionSupport
         return templateTreePath;
     }
 
+    public String getConfigClassification()
+    {
+        return configClassification;
+    }
+
     public String execute() throws Exception
     {
         if(prefixPath.contains("${principle}"))
@@ -137,6 +145,8 @@ public class DisplayScopeAction extends ActionSupport
             tab = scope;
         }
         
+        boolean templated = configurationTemplateManager.isTemplatedPath(path);
+
         // if we have more than just the scope, evaluate the config tree and template tree paths.
         if (pathElements.length > 1)
         {
@@ -149,8 +159,25 @@ public class DisplayScopeAction extends ActionSupport
             // the template path is based on the owning path
             templateTreePath = configurationTemplateManager.getTemplatePath(PathUtils.getPath(scope, owner));
         }
-        
-        return configurationTemplateManager.isTemplatedPath(path) ? "template" : "config";
+
+        if(templated)
+        {
+            boolean concrete = true;
+            if(pathElements.length > 1)
+            {
+                TemplateNode node = configurationTemplateManager.getTemplateHierarchy(scope).getNodeById(owner);
+                concrete = node.isConcrete();
+            }
+
+            configClassification = concrete ? "concrete" : "template";
+        }
+        else
+        {
+            ComplexType type = configurationTemplateManager.getType(path, ComplexType.class);
+            configClassification = PrototypeUtils.getClassification(type);
+        }
+
+        return templated ? "template" : "config";
     }
 
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)

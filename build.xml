@@ -3,6 +3,7 @@
     <!-- Import general purpose macros. -->
     <import file="macros.xml"/>
 
+    <property file="build.properties"/>
     <property environment="env"/>
 
     <condition property="on.windows">

@@ -3,11 +3,13 @@ package com.zutubi.pulse.prototype.config.group;
 import com.zutubi.config.annotations.Internal;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Transient;
+import com.zutubi.config.annotations.Classification;
 
 /**
  */
 @SymbolicName("zutubi.builtinGroupConfig")
 @Internal
+@Classification(single = "group")
 public class BuiltinGroupConfiguration extends AbstractGroupConfiguration
 {
     @Internal

@@ -91,6 +91,17 @@ public abstract class AbstractPulseFileObject extends AbstractFileObject
     }
 
     /**
+     * Returns an icon classification for the object, which may be used for
+     * categorising or styling in the UI.
+     *
+     * @return an extra class name, or null for no extra class
+     */
+    public String getIconCls()
+    {
+        return null;
+    }
+
+    /**
      * Returns a java.io.File instance if this FileObject has a file system equivalent.
      *
      * @return returns a file, or null.

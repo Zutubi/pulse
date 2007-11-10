@@ -1,10 +1,12 @@
 package com.zutubi.prototype.wizard.webwork;
 
 import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.prototype.type.ComplexType;
 import com.zutubi.prototype.webwork.ConfigurationErrors;
 import com.zutubi.prototype.webwork.ConfigurationPanel;
 import com.zutubi.prototype.webwork.ConfigurationResponse;
 import com.zutubi.prototype.webwork.PrototypeUtils;
+import com.zutubi.prototype.config.TemplateNode;
 
 /**
  *
@@ -53,7 +55,20 @@ public class AjaxEnabledConfigurationWizardAction extends ConfigurationWizardAct
                 {
                     // Then we added something.
                     String displayName = PrototypeUtils.getDisplayName(newPath, configurationTemplateManager);
-                    configurationResponse.addAddedFile(new ConfigurationResponse.Addition(newPath, displayName, configurationTemplateManager.getTemplatePath(newPath), PrototypeUtils.isLeaf(newPath, configurationTemplateManager, configurationSecurityManager)));
+                    ComplexType type = configurationTemplateManager.getType(newPath, ComplexType.class);
+                    String iconCls;
+                    TemplateNode templateNode = configurationTemplateManager.getTemplateNode(newPath);
+                    if(templateNode == null)
+                    {
+                        iconCls = PrototypeUtils.getIconCls(type);
+                    }
+                    else
+                    {
+                        iconCls = "config-" + (templateNode.isConcrete() ? "concrete" : "template") + "-icon";
+                    }
+
+                    boolean leaf = PrototypeUtils.isLeaf(newPath, configurationTemplateManager, configurationSecurityManager);
+                    configurationResponse.addAddedFile(new ConfigurationResponse.Addition(newPath, displayName, configurationTemplateManager.getTemplatePath(newPath), iconCls, leaf));
                 }
             }
         }

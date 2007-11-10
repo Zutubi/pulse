@@ -1,9 +1,6 @@
 package com.zutubi.pulse.prototype.config.user.contacts;
 
-import com.zutubi.config.annotations.Internal;
-import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.Table;
-import com.zutubi.config.annotations.Transient;
+import com.zutubi.config.annotations.*;
 import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
 import com.zutubi.pulse.model.BuildResult;
 
@@ -13,6 +10,7 @@ import com.zutubi.pulse.model.BuildResult;
  */
 @SymbolicName("zutubi.userContactConfig")
 @Table(columns = {"name", "uid"})
+@Classification(collection = "contacts")
 public abstract class ContactConfiguration extends AbstractNamedConfiguration
 {
     @Internal

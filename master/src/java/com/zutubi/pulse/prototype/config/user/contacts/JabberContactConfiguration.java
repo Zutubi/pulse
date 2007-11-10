@@ -2,6 +2,7 @@ package com.zutubi.pulse.prototype.config.user.contacts;
 
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.Classification;
 import com.zutubi.pulse.jabber.JabberManager;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.NotificationException;
@@ -14,6 +15,7 @@ import org.jivesoftware.smack.XMPPConnection;
  */
 @SymbolicName("zutubi.jabberContactConfig")
 @Form(fieldOrder = {"name", "username"})
+@Classification(single = "jabber")
 public class JabberContactConfiguration extends ContactConfiguration
 {
     private static final Logger LOG = Logger.getLogger(JabberContactConfiguration.class);

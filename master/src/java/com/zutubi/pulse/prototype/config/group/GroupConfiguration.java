@@ -1,9 +1,6 @@
 package com.zutubi.pulse.prototype.config.group;
 
-import com.zutubi.config.annotations.Form;
-import com.zutubi.config.annotations.Reference;
-import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.Transient;
+import com.zutubi.config.annotations.*;
 import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 
 import java.util.LinkedList;
@@ -15,6 +12,7 @@ import java.util.List;
  */
 @SymbolicName("zutubi.groupConfig")
 @Form(fieldOrder = {"name", "members", "serverPermissions"})
+@Classification(single = "group")
 public class GroupConfiguration extends AbstractGroupConfiguration
 {
     @Reference

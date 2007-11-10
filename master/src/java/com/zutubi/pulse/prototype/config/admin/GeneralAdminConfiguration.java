@@ -4,6 +4,7 @@ import com.opensymphony.util.TextUtils;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.ControllingCheckbox;
+import com.zutubi.config.annotations.Classification;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 
 /**
@@ -12,6 +13,7 @@ import com.zutubi.pulse.core.config.AbstractConfiguration;
  */
 @SymbolicName("zutubi.generalConfig")
 @Form(fieldOrder={"baseUrl", "masterHost", "baseHelpUrl", "rssEnabled", "anonymousAccessEnabled", "anonymousSignupEnabled", "scmPollingInterval", "recipeTimeoutEnabled", "recipeTimeout" })
+@Classification(single = "general")
 public class GeneralAdminConfiguration extends AbstractConfiguration
 {
     private String baseUrl;

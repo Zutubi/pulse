@@ -2,11 +2,13 @@ package com.zutubi.pulse.prototype.config.admin;
 
 import com.zutubi.config.annotations.Select;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.Classification;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 
 /**
  */
 @SymbolicName("zutubi.loggingConfig")
+@Classification(single = "logging")
 public class LoggingConfiguration extends AbstractConfiguration
 {
     private String level = "default";

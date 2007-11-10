@@ -89,7 +89,7 @@
             }
         }
 
-        var createConfigTree = function(project)
+        var createConfigTree = function(project, cls, iconCls)
         {
             Ext.get('config-tree').update('');
 
@@ -106,6 +106,8 @@
             var root = new Ext.tree.AsyncTreeNode({
                 id: project,
                 text: project,
+                cls: cls,
+                iconCls: iconCls,
                 allowDrag: false,
                 allowDrop: false
             });
@@ -238,7 +240,7 @@
 
                             if(!configTree || configTree.getRootNode().id != node.id)
                             {
-                                createConfigTree(node.id);
+                                createConfigTree(node.id, node.attributes.cls, node.attributes.iconCls);
                             }
 
                             configTree.getSelectionModel().clearSelections();
@@ -270,7 +272,7 @@
 
 #if($configTreePath)
                     templateTree.expandToPath('$templateTreePath');
-                    createConfigTree('$owner');
+                    createConfigTree('$owner', null, 'config-${configClassification}-icon');
                     configTree.selectConfigPath('$configTreePath');
                     visibleTree = configTree;
 #else

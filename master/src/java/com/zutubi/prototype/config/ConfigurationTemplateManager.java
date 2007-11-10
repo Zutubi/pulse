@@ -1854,7 +1854,17 @@ public class ConfigurationTemplateManager implements Synchronization
 
     public String getTemplatePath(String path)
     {
-        String templatePath = null;
+        TemplateNode templateNode = getTemplateNode(path);
+        if (templateNode != null)
+        {
+            return templateNode.getTemplatePath();
+        }
+
+        return null;
+    }
+
+    public TemplateNode getTemplateNode(String path)
+    {
         String[] elements = PathUtils.getPathElements(path);
         if (elements.length == 2)
         {
@@ -1862,15 +1872,11 @@ public class ConfigurationTemplateManager implements Synchronization
             if (scope != null && scope.isTemplated())
             {
                 TemplateHierarchy hierarchy = getState().templateHierarchies.get(scope.getScopeName());
-                TemplateNode node = hierarchy.getNodeById(elements[1]);
-                if (node != null)
-                {
-                    templatePath = node.getTemplatePath();
-                }
+                return hierarchy.getNodeById(elements[1]);
             }
         }
 
-        return templatePath;
+        return null;
     }
 
     @SuppressWarnings({"unchecked"})

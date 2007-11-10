@@ -1,6 +1,7 @@
 package com.zutubi.pulse.prototype.config.admin;
 
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.Classification;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
@@ -12,6 +13,7 @@ import com.zutubi.pulse.license.config.LicenseConfiguration;
  * The global configuration scope, which holds server-wide configuration.
  */
 @SymbolicName("zutubi.globalConfig")
+@Classification(single = "settings")
 public class GlobalConfiguration extends AbstractConfiguration
 {
     public static final String SCOPE_NAME = "settings";

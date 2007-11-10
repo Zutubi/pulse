@@ -1,6 +1,7 @@
 package com.zutubi.prototype.type;
 
 import com.zutubi.config.annotations.Internal;
+import com.zutubi.config.annotations.Classification;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.type.record.Record;
@@ -9,6 +10,7 @@ import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.GraphFunction;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.logging.Logger;
+import com.opensymphony.util.TextUtils;
 
 import java.lang.reflect.Modifier;
 import java.util.*;

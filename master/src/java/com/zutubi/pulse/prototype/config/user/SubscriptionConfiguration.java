@@ -3,6 +3,7 @@ package com.zutubi.pulse.prototype.config.user;
 import com.zutubi.config.annotations.Reference;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Table;
+import com.zutubi.config.annotations.Classification;
 import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.prototype.config.user.contacts.ContactConfiguration;
@@ -13,6 +14,7 @@ import com.zutubi.validation.annotations.Required;
  */
 @SymbolicName("zutubi.subscriptionConfig")
 @Table(columns = {"name"})
+@Classification(collection = "favourites")
 public abstract class SubscriptionConfiguration extends AbstractNamedConfiguration
 {
     @Required

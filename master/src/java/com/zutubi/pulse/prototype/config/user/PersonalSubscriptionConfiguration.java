@@ -3,6 +3,7 @@ package com.zutubi.pulse.prototype.config.user;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.Select;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.Classification;
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.model.BuildResult;
 
@@ -11,6 +12,7 @@ import com.zutubi.pulse.model.BuildResult;
  */
 @SymbolicName("zutubi.personalSubscriptionConfig")
 @Form(fieldOrder = {"name", "contact", "template"})
+@Classification(single = "favourite")
 public class PersonalSubscriptionConfiguration extends SubscriptionConfiguration
 {
     @Select(optionProvider = "SubscriptionTemplateOptionProvider")

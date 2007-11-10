@@ -1,6 +1,7 @@
 package com.zutubi.pulse.prototype.config.user;
 
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.Classification;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.prototype.config.user.contacts.ContactConfiguration;
 
@@ -11,6 +12,7 @@ import java.util.Map;
  * Nested composite to store user preferences under their own path.
  */
 @SymbolicName("zutubi.userPreferencesConfig")
+@Classification(single = "settings")
 public class UserPreferencesConfiguration extends AbstractConfiguration
 {
     private UserSettingsConfiguration settings = new UserSettingsConfiguration();

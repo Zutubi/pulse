@@ -12,6 +12,7 @@ public class ExtFile
     private String text;
     private boolean leaf;
     private String cls;
+    private String iconCls;
 
     public ExtFile(FileObjectWrapper fo)
     {
@@ -19,6 +20,7 @@ public class ExtFile
         text = fo.getName();
         leaf = !fo.isContainer();
         cls = fo.getCls();
+        iconCls = fo.getIconCls();
     }
 
     public ExtFile(String id, String text, boolean leaf)
@@ -46,5 +48,10 @@ public class ExtFile
     public String getCls()
     {
         return cls;
+    }
+
+    public String getIconCls()
+    {
+        return iconCls;
     }
 }
