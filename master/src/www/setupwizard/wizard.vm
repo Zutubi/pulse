@@ -1,7 +1,10 @@
 <html>
 <body>
-
+<div class="config-panel">
     #pwizard("path=$action.path" "namespace=setupwizard")
-
+#if($state.hasConfigurationCheck())
+    #checkForm($action.path $state.type "wizardForm" "setupwizard")
+#end
+</div>
 </body>
 </html>

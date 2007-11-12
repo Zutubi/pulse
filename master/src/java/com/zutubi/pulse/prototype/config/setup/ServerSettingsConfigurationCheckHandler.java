@@ -3,6 +3,7 @@ package com.zutubi.pulse.prototype.config.setup;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.pulse.core.config.ConfigurationCheckHandlerSupport;
 import com.zutubi.pulse.prototype.config.user.contacts.EmailContactConfiguration;
+import com.zutubi.validation.annotations.Required;
 
 import javax.mail.MessagingException;
 import java.util.Arrays;
@@ -13,6 +14,7 @@ import java.util.Arrays;
 @SymbolicName("zutubi.serverSettingsConfigurationCheckHandler")
 public class ServerSettingsConfigurationCheckHandler extends ConfigurationCheckHandlerSupport<ServerSettingsConfiguration>
 {
+    @Required
     private String testAddress;
 
     public String getTestAddress()

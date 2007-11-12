@@ -3,6 +3,7 @@ package com.zutubi.prototype;
 import com.zutubi.prototype.model.Field;
 import com.zutubi.prototype.model.Form;
 import com.zutubi.prototype.model.SubmitFieldDescriptor;
+import com.zutubi.prototype.model.HiddenFieldDescriptor;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.pulse.webwork.mapping.PulseActionMapper;
@@ -116,8 +117,8 @@ public class FormDescriptor extends AbstractParameterised implements Descriptor
         form.setDisplayMode(displayMode);
         form.setAjax(ajax);
         form.addAll(getParameters());
+        
         List<String> fieldOrder = evaluateFieldOrder();
-
         for (String fieldName : fieldOrder)
         {
             FieldDescriptor fieldDescriptor = getFieldDescriptor(fieldName);

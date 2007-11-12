@@ -2,7 +2,6 @@
 <head>
     <title>#wwtext("name=license.setup")</title>
 </head>
-
 <body>
     <h1>:: #wwtext("name=license.setup") ::</h1>
 

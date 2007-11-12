@@ -122,6 +122,31 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         assertTextPresent("emailAddress requires a value");
     }
 
+    public void testCheckFormInWizard() throws Exception
+    {
+        loginAsAdmin();
+        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, ProjectManager.GLOBAL_PROJECT_NAME, false);
+        hierarchyPage.goTo();
+        hierarchyPage.clickAdd();
+        AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(selenium);
+        projectState.waitFor();
+        projectState.nextFormElements(random, null, null);
+
+        SelectTypeState scmTypeState = new SelectTypeState(selenium);
+        scmTypeState.waitFor();
+        scmTypeState.nextFormElements("zutubi.svnConfig");
+
+        AddProjectWizard.SubversionState subversionState = new AddProjectWizard.SubversionState(selenium);
+        subversionState.waitFor();
+
+        subversionState.setFormElement("url", "svn://localhost:3088/");
+        CheckForm checkForm = new CheckForm(subversionState);
+        checkForm.checkAndAssertResult(true, "ok");
+
+        subversionState.cancelFormElements(null, null, null, null, null, null);
+    }
+
+
     public void testClearItemPicker() throws Exception
     {
         ensureProject(random);

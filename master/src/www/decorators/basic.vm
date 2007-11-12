@@ -12,13 +12,20 @@
         <script type="text/javascript" src="/js/ext-all.js"></script>
         <script type="text/javascript" src="$base/js/main.js"></script>
         <script type="text/javascript" src="$base/js/zutubi.js"></script>
+        <style type="text/css">
+            #center
+            {
+                margin: 0;
+                text-align: center;
+            }
+        </style>
 		$head
 	</head>
-
-      <div style="text-align:center" class="content">
+    <body>
+      <div class="content" id="center">
           <table width="100%">
               <tr>
-                  <td align="center">
+                  <td align="center" style="padding: 12px;">
                       $body
                   </td>
               </tr>

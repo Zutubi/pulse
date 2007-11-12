@@ -8,6 +8,7 @@ import com.zutubi.prototype.FormDescriptor;
 import com.zutubi.prototype.FormDescriptorFactory;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
+import com.zutubi.prototype.config.ConfigurationRegistry;
 import com.zutubi.prototype.model.SelectFieldDescriptor;
 import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.MutableRecord;
@@ -63,6 +64,7 @@ public abstract class AbstractTypeWizard implements Wizard
     protected TypeRegistry typeRegistry;
     protected ConfigurationPersistenceManager configurationPersistenceManager;
     protected ConfigurationTemplateManager configurationTemplateManager;
+    private ConfigurationRegistry configurationRegistry;
 
     protected List<AbstractChainableState> addWizardStates(List<AbstractChainableState> previousStates, String parentPath, CompositeType baseType, TemplateRecord templateParentRecord)
     {
@@ -279,6 +281,11 @@ public abstract class AbstractTypeWizard implements Wizard
         this.configurationTemplateManager = configurationTemplateManager;
     }
 
+    public void setConfigurationRegistry(ConfigurationRegistry configurationRegistry)
+    {
+        this.configurationRegistry = configurationRegistry;
+    }
+
     public abstract class AbstractChainableState implements TypeWizardState
     {
         private TypeWizardState nextState;
@@ -370,6 +377,11 @@ public abstract class AbstractTypeWizard implements Wizard
         public boolean hasFields()
         {
             return getType().getSimplePropertyNames().size() > 0;
+        }
+
+        public boolean hasConfigurationCheck()
+        {
+            return configurationRegistry.getConfigurationCheckType(getType()) != null;
         }
     }
 
@@ -587,6 +599,11 @@ public abstract class AbstractTypeWizard implements Wizard
             {
                 return true;
             }
+
+            public boolean hasConfigurationCheck()
+            {
+                return false;
+            }
         }
 
         private class UnknownTypeState extends AbstractChainableState
@@ -651,6 +668,11 @@ public abstract class AbstractTypeWizard implements Wizard
             }
 
             public boolean hasFields()
+            {
+                return false;
+            }
+
+            public boolean hasConfigurationCheck()
             {
                 return false;
             }

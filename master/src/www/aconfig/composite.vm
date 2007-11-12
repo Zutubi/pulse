@@ -1,11 +1,12 @@
 #set($config = $action.configuration)
+#set($path = $config.path)
 
 #macro(renderform)
     <div class="config-panel">
         <h3 class="config-header">${config.formHeading}</h3>
         ##<!-- add some space around the form so that it does not sit directly on the border. -->
         <div class="config-form-container">
-            #pform("path=$config.path" "formName=mainform" "displayMode=$config.displayMode" "ajax=true" "namespace=aconfig")
+            #pform("path=$path" "formName=mainform" "displayMode=$config.displayMode" "ajax=true" "namespace=aconfig")
         </div>
         <script type="text/javascript">
             mainform.on('actioncomplete', function(form, action)
@@ -13,8 +14,8 @@
                 handleConfigurationResponse(action.result);
             });
         </script>
-    #if($config.writable)
-        #parse("/aconfig/check.vm")
+    #if($config.configurationCheckAvailable && $config.writable)
+       #checkForm($path $config.type "mainform" "aconfig")
     #end
     </div>
     #if($config.embedded && !$config.writable)
@@ -44,7 +45,7 @@
     </div>
 #end
 
-<h2 id='#id($config.path)'>$!webwork.htmlEncode($config.displayName)</h2>
+<h2 id='#id($path)'>$!webwork.htmlEncode($config.displayName)</h2>
 <p class="introduction">
     #i18n("key=introduction")
 </p>
@@ -67,7 +68,7 @@
             <p>
             <ul>
                 #foreach($action in $config.actions)
-                    <li>+ <a href="#" onclick="actionPath('${config.path}?${action}'); return false;">#i18n("key=${action}.label")</a></li>
+                    <li>+ <a href="#" onclick="actionPath('${path}?${action}'); return false;">#i18n("key=${action}.label")</a></li>
                 #end
             </ul>
             </p>
@@ -80,7 +81,7 @@
             <p>
             <ul>
                 #foreach($prop in $config.nestedProperties)
-                    <li>+ <a href="#" onclick="selectPath('${config.path}/${prop}'); return false;">#displayname("path=${config.path}/${prop}")</a></li>
+                    <li>+ <a href="#" onclick="selectPath('${path}/${prop}'); return false;">#displayname("path=${path}/${prop}")</a></li>
                 #end
             </ul>
             </p>
@@ -95,7 +96,7 @@
             #if($config.configuredDescendents.size() == 0)
     <table class="template-actions" cellspacing="5px">
         <tr>
-            <th><a href="#" class="unadorned" onclick="addToPath('${config.path}'); return false"><img alt="configure" src="$base/images/pencil.gif"/></a> <a href="#" id="configure" onclick="addToPath('${config.path}'); return false">configure</a></th>
+            <th><a href="#" class="unadorned" onclick="addToPath('${path}'); return false"><img alt="configure" src="$base/images/pencil.gif"/></a> <a href="#" id="configure" onclick="addToPath('${path}'); return false">configure</a></th>
             <td>configure a #i18n("key=label") using the wizard</td>
         </tr>
     </table>

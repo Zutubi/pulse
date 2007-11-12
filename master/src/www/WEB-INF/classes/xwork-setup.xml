@@ -42,7 +42,6 @@
         <action name="execute" class="com.zutubi.pulse.web.setup.SetupActionSupport">
             <result name="success" type="velocity">/system-setup.vm</result>
         </action>
-
     </package>
 
     <package name="setupwizard" namespace="/setupwizard" extends="webwork-default-package">
@@ -53,6 +52,12 @@
             <result name="step" type="velocity">wizard.vm</result>
             <result name="input" type="velocity">wizard.vm</result>
             <result name="success" type="redirect">/setup/execute.action</result>
+        </action>
+
+        <action name="check" class="com.zutubi.prototype.webwork.CheckAction">
+            <interceptor-ref name="ajaxStack"/>
+            <result name="input" type="flexjson">configurationErrors</result>
+            <result name="success" type="flexjson">checkResponse</result>
         </action>
     </package>
     
@@ -87,7 +92,6 @@
     </package>
 
     <package name="ajax" namespace="/ajax" extends="webwork-default-package">
-
         <default-interceptor-ref name="ajaxStack"/>
 
         <action name="ls" class="com.zutubi.pulse.web.vfs.LsAction">

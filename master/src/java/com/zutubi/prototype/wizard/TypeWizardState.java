@@ -22,4 +22,6 @@ public interface TypeWizardState extends WizardState
      * @return true iff this state has fields to be configured.
      */
     boolean hasFields();
+
+    boolean hasConfigurationCheck();
 }

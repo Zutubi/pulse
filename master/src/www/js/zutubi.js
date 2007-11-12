@@ -1190,3 +1190,44 @@ Ext.override(Ext.View, {
         }
     }
 });
+
+Ext.override(Ext.Element, {
+    mask: function(msg, msgCls)
+    {
+        if (!Ext.isIE7 && this.getStyle("position") == "static")
+        {
+            this.setStyle("position", "relative");
+        }
+
+        if (this._maskMsg)
+        {
+            this._maskMsg.remove();
+        }
+        if (this._mask)
+        {
+            this._mask.remove();
+        }
+
+        this._mask = Ext.DomHelper.append(this.dom, {cls:"ext-el-mask"}, true);
+
+        this.addClass("x-masked");
+        this._mask.setDisplayed(true);
+        if (typeof msg == 'string')
+        {
+            this._maskMsg = Ext.DomHelper.append(this.dom, {cls:"ext-el-mask-msg", cn:{tag:'div'}}, true);
+
+            var mm = this._maskMsg;
+            mm.dom.className = msgCls ? "ext-el-mask-msg " + msgCls : "ext-el-mask-msg";
+            mm.dom.firstChild.innerHTML = msg;
+            mm.setDisplayed(true);
+            mm.center(this);
+        }
+
+        if (Ext.isIE && !(Ext.isIE7 && Ext.isStrict) && this.getStyle('height') == 'auto')
+        {
+            this._mask.setHeight(this.getHeight());
+        }
+
+        return this._mask;
+    }
+});

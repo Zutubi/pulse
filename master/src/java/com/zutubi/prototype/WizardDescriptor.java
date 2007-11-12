@@ -83,6 +83,11 @@ public class WizardDescriptor extends AbstractParameterised implements Descripto
         hidden.setName(ConfigurationWizardInterceptor.STATE_ID_PARAMETER);
         hidden.setValue(wizardInstance.getCurrentState().getId());
 
+        hidden = new HiddenFieldDescriptor();
+        hidden.setName("symbolicName");
+        hidden.setValue(wizardInstance.getCurrentState().getType().getSymbolicName());
+        descriptor.add(hidden);
+
         descriptor.add(hidden);
     }
 

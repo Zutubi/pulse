@@ -7,7 +7,7 @@ import com.zutubi.prototype.FormDescriptorFactory;
 import com.zutubi.prototype.config.ConfigurationRegistry;
 import com.zutubi.prototype.model.Form;
 import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.prototype.type.Type;
+import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.util.logging.Logger;
@@ -34,10 +34,11 @@ public class CheckDirective extends PrototypeDirective
     private String action = "check";
     private String mainFormName = "form";
     private String checkFormName = "check";
+    private String symbolicName;
 
     private FormDescriptorFactory formDescriptorFactory;
-
     private ConfigurationRegistry configurationRegistry;
+    private TypeRegistry typeRegistry;
     private Configuration configuration;
 
     private String namespace;
@@ -82,6 +83,11 @@ public class CheckDirective extends PrototypeDirective
         this.namespace = namespace;
     }
 
+    public void setSymbolicName(String symbolicName)
+    {
+        this.symbolicName = symbolicName;
+    }
+
     public boolean render(InternalContextAdapter contextAdapter, Writer writer, Node node) throws IOException, ResourceNotFoundException, ParseErrorException
     {
         try
@@ -89,11 +95,9 @@ public class CheckDirective extends PrototypeDirective
             Map params = createPropertyMap(contextAdapter, node);
             wireParams(params);
 
-            Type type = lookupType();
-
-            CompositeType ctype = (CompositeType) type;
             String path = lookupPath();
-            CompositeType checkType = configurationRegistry.getConfigurationCheckType(ctype);
+            CompositeType type = typeRegistry.getType(symbolicName);
+            CompositeType checkType = configurationRegistry.getConfigurationCheckType(type);
 
             FormDescriptor formDescriptor = formDescriptorFactory.createDescriptor(PathUtils.getParentPath(path), null, checkType, "check");
             formDescriptor.setName(checkFormName);
@@ -144,5 +148,10 @@ public class CheckDirective extends PrototypeDirective
     public void setConfigurationRegistry(ConfigurationRegistry configurationRegistry)
     {
         this.configurationRegistry = configurationRegistry;
+    }
+
+    public void setTypeRegistry(TypeRegistry typeRegistry)
+    {
+        this.typeRegistry = typeRegistry;
     }
 }

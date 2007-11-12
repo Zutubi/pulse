@@ -1,4 +1,4 @@
-<h2 class="content">:: #i18n("key=license.request.evaluation") ::</h2>
+<h2 class="content" style="margin-top: 16px; margin-bottom: 8px">:: #i18n("key=license.request.evaluation") ::</h2>
 
 #pform("formName=requestForm" "path=$path" "action=ajax/requestLicense.action" "ajax=true")
 
