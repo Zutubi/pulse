@@ -58,7 +58,8 @@ public class XMLTransferSource extends XMLTransferSupport implements TransferSou
 
     protected void startTable(String uri, String localName, String qName, Attributes atts) throws TransferException
     {
-        // start table is delayed until we have the full table definition via the type def tags.
+        currentTable = new TransferTable();
+        currentTable.setName(atts.getValue("name"));
     }
 
     protected void endTable(String uri, String localName, String qName) throws TransferException
@@ -83,11 +84,6 @@ public class XMLTransferSource extends XMLTransferSupport implements TransferSou
         }
         target.row(convertedRow);
         row = null;
-    }
-
-    private void startTypeDefs(CharSequence uri, String localName, String qName, Attributes atts)
-    {
-        currentTable = new TransferTable();
     }
 
     private void startTypeDef(CharSequence uri, String localName, String qName, Attributes atts)
@@ -166,11 +162,6 @@ public class XMLTransferSource extends XMLTransferSupport implements TransferSou
                 if (localName.equals("c"))
                 {
                     startColumn(uri, localName, qName, atts);
-                }
-
-                if (localName.equals("type-defs"))
-                {
-                    startTypeDefs(uri, localName, qName, atts);
                 }
 
                 if (localName.equals("type-def"))
