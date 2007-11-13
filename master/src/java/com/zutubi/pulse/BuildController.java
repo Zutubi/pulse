@@ -163,7 +163,7 @@ public class BuildController implements EventListener
             recipeContext.addInternalString(PROPERTY_RECIPE_ID, Long.toString(recipeResult.getId()));
             recipeContext.addInternalString(PROPERTY_RECIPE, stage.getRecipe());
 
-            RecipeRequest recipeRequest = new RecipeRequest(getResourceRequirements(stage), recipeContext);
+            RecipeRequest recipeRequest = new RecipeRequest(getResourceRequirements(stage), new ExecutionContext(recipeContext));
             RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(project, stage.getAgentRequirements(), request.getRevision(), recipeRequest, buildResult);
             DefaultRecipeLogger logger = new DefaultRecipeLogger(new File(paths.getRecipeDir(buildResult, recipeResult.getId()), RecipeResult.RECIPE_LOG));
             RecipeResultNode previousRecipe = previousSuccessful == null ? null : previousSuccessful.findResultNodeByHandle(stage.getHandle());

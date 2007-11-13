@@ -21,7 +21,7 @@ public class BuildHookConfigurationActions
     private BuildHookManager buildHookManager;
     private ProjectManager projectManager;
     private BuildManager buildManager;
-    private ConfigurationProvider configurationProvider;
+    protected ConfigurationProvider configurationProvider;
 
     public List<String> getActions(BuildHookConfiguration instance)
     {

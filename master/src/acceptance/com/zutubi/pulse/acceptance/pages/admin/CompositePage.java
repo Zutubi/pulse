@@ -43,4 +43,26 @@ public class CompositePage extends ConfigPage
             SeleniumUtils.assertElementPresent(selenium, "cd-" + descendent);
         }
     }
+
+    public void clickAction(String action)
+    {
+        selenium.click("action." + action);
+    }
+
+    public void clickActionAndWait(String action)
+    {
+        clickAction(action);
+        SeleniumUtils.waitForVariable(selenium, "actionInProgress", SeleniumUtils.DEFAULT_TIMEOUT, true);
+        waitFor();
+    }
+
+    public String getState(String name)
+    {
+        return selenium.getText(getStateId(name));
+    }
+
+    private String getStateId(String name)
+    {
+        return "state." + name;
+    }
 }

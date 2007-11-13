@@ -29,7 +29,7 @@ public class BuildProperties
     public static final String PROPERTY_SUCCESS_COUNT           = "success.count";
     public static final String PROPERTY_TEST_SUMMARY            = "test.summary";
 
-    // Recipe
+    // Stage/Recipe
     public static final String PROPERTY_AGENT                   = "agent";
     public static final String PROPERTY_BASE_DIR                = "base.dir";
     public static final String PROPERTY_FILE_REPOSITORY         = "file.repository";
@@ -39,6 +39,7 @@ public class BuildProperties
     public static final String PROPERTY_RECIPE_TIMESTAMP        = "recipe.timestamp";
     public static final String PROPERTY_RECIPE_TIMESTAMP_MILLIS = "recipe.timestamp.millis";
     public static final String PROPERTY_RESOURCE_REPOSITORY     = "resource.repository";
+    public static final String PROPERTY_STAGE                   = "stage";
     public static final String PROPERTY_TEST_RESULTS            = "test.results";
 
     // Command

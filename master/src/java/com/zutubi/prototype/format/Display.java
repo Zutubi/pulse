@@ -1,6 +1,9 @@
 package com.zutubi.prototype.format;
 
 import com.zutubi.util.bean.ObjectFactory;
+import com.zutubi.util.ReflectionUtils;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
 
 import java.util.List;
 import java.util.LinkedList;
@@ -44,29 +47,35 @@ public class Display
         return displayFields;
     }
 
-    public Object format(Class displayHandler, String fieldName, Object obj) throws Exception
+    public Object format(Class displayHandler, String fieldName, final Object obj) throws Exception
     {
         // invoke the formatter method.
         Object displayHandlerInstance = objectFactory.buildBean(displayHandler);
-        String methodName = "get" + fieldName.substring(0, 1).toUpperCase();
-        if (fieldName.length() > 1)
-        {
-            methodName = methodName + fieldName.substring(1);
-        }
+        final String methodName = "get" + fieldName.substring(0, 1).toUpperCase() + (fieldName.length() > 1 ? fieldName.substring(1) : "");
 
         // this method may have none or one parameter.
-        try
+        Method method = CollectionUtils.find(displayHandler.getMethods(), new Predicate<Method>()
         {
-            Method method = displayHandler.getMethod(methodName, obj.getClass());
-            return method.invoke(displayHandlerInstance, obj);
-        }
-        catch (NoSuchMethodException e)
+            public boolean satisfied(Method method)
+            {
+                return method.getName().equals(methodName) &&
+                       (ReflectionUtils.acceptsParameters(method) || ReflectionUtils.acceptsParameters(method, obj.getClass()));
+            }
+        });
+
+        if(method != null)
         {
-            // noop.
+            if(method.getParameterTypes().length == 0)
+            {
+                return method.invoke(displayHandlerInstance);
+            }
+            else
+            {
+                return method.invoke(displayHandlerInstance, obj);
+            }
         }
-        
-        Method method = displayHandler.getMethod(methodName);
-        return method.invoke(displayHandlerInstance);
+
+        return "[method not found]";
     }
 
         /**

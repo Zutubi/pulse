@@ -13,8 +13,6 @@ public class AutoBuildHookConfigurationActions extends BuildHookConfigurationAct
     private static final String ACTION_DISABLE = "disable";
     private static final String ACTION_ENABLE  = "enable";
 
-    private ConfigurationProvider configurationProvider;
-
     public List<String> getActions(AutoBuildHookConfiguration instance)
     {
         List<String> actions = super.getActions(instance);
@@ -41,10 +39,5 @@ public class AutoBuildHookConfigurationActions extends BuildHookConfigurationAct
     {
         instance.setEnabled(false);
         configurationProvider.save(instance);
-    }
-
-    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
-    {
-        this.configurationProvider = configurationProvider;
     }
 }

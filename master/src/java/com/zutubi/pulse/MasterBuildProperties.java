@@ -104,17 +104,25 @@ public class MasterBuildProperties extends BuildProperties
 
     public static void addStageProperties(ExecutionContext context, BuildResult result, RecipeResultNode node, MasterConfigurationManager configurationManager, boolean includeName)
     {
+//        System.out.println("context = " + context);
+//        System.out.println("includeName = " + includeName);
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
 
         String name = node.getStageName();
         String prefix = "stage.";
 
+        RecipeResult recipeResult = node.getResult();
         if(includeName)
         {
             prefix += name + ".";
         }
+        else
+        {
+            context.addInternalString(PROPERTY_RECIPE, recipeResult.getRecipeNameSafe());
+            context.addInternalString(PROPERTY_STAGE, node.getStageName());
+            context.addInternalString(PROPERTY_STATUS, recipeResult.getState().getString());
+        }
 
-        RecipeResult recipeResult = node.getResult();
         context.addInternalString(prefix + PROPERTY_AGENT, node.getHostSafe());
         if(result != null)
         {

@@ -216,6 +216,37 @@ public class ScopeTest extends PulseTestCase
         assertEquals("value", references.get(0).getValue());
     }
 
+    public void testCopy()
+    {
+        Scope original = new Scope();
+        original.add(new Property("foo", "bar"));
+
+        Scope copy = original.copy();
+        assertEquals("bar", original.getReferenceValue("foo", String.class));
+        assertEquals("bar", copy.getReferenceValue("foo", String.class));
+        
+        original.add(new Property("foo", "baz"));
+        assertEquals("baz", original.getReferenceValue("foo", String.class));
+        assertEquals("bar", copy.getReferenceValue("foo", String.class));
+    }
+
+    public void testCopyWithParent()
+    {
+        Scope parent = new Scope();
+        parent.add(new Property("foo", "bar"));
+        Scope original = new Scope(parent);
+
+        Scope copy = original.copy();
+        assertEquals("bar", parent.getReferenceValue("foo", String.class));
+        assertEquals("bar", original.getReferenceValue("foo", String.class));
+        assertEquals("bar", copy.getReferenceValue("foo", String.class));
+
+        parent.add(new Property("foo", "baz"));
+        assertEquals("baz", parent.getReferenceValue("foo", String.class));
+        assertEquals("baz", original.getReferenceValue("foo", String.class));
+        assertEquals("bar", copy.getReferenceValue("foo", String.class));
+    }
+
     private String getValue(String name)
     {
         Reference reference = scope.getReference(name);

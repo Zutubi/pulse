@@ -7,22 +7,85 @@
     <script type="text/javascript" src="$base/js/prototype.js"></script>
     <script type="text/javascript">
         #updater("$base/ajax/viewBuildPanel.action?projectName=$u_projectName&buildVID=$buildResult.number" "panel" $principle)
+
+        function triggerHook(hookHandle)
+        {
+            var statusEl = Ext.get('status');
+            statusEl.enableDisplayMode();
+            statusEl.setVisible(false);
+
+            new Ajax.Request('${base}/ajax/triggerBuildHook.action',
+              {
+                  method:'get',
+                  parameters: 'projectName=$u_projectName&buildVID=$buildResult.number&hook=' + hookHandle,
+
+                  onSuccess: function(transport, response)
+                  {
+                      var response = eval("(" + transport.responseText + ")");
+                      if(response.success)
+                      {
+                          statusEl.update('<img src="${base}/images/accept.gif" alt="success"/> ' + response.detail);
+                      }
+                      else
+                      {
+                          statusEl.update('<img src="${base}/images/exclamation.gif" alt="success"/> Unable to trigger hook: ' + response.detail);
+                      }
+
+                      statusEl.setVisible(true, true);
+                  },
+
+                  onFailure: function()
+                  {
+                      statusEl.update('<img src="${base}/images/exclamation.gif" alt="success"/> Hook trigger failed.');
+                      statusEl.setVisible(true, true);
+                  }
+              });
+        }
     </script>
 </head>
 <body>
     #buildTabs($buildResult "summary")
 
+    <div id='#id("${project.name}-build-${result.number}-summary")'></div>
+    
+    <p id="status" class="status-message" style="display: none"></p>
+
+#auth("resource=project" "action=write")
+    <div id="action-column" style="margin-left: 20px; float: right;">
+        <table width="150" class="content">
+            <tr>
+                <th class="heading">actions</th>
+            </tr>
+    #if($result.completed())
+        #set($confirm = $action.getText("build.delete.confirm", [$buildResult.number]))
+            <tr>
+                <td class="content">
+                    <img alt="delete" src="$base/images/delete.gif"/>
+                    <a href="#" onclick="confirmUrl('$confirm', 'projectName=$u_projectName&amp;buildVID=$buildResult.number')">#wwtext("name=build.delete")</a>
+                </td>
+            </tr>
+    #end
+        </table>
+
+        <table width="150" class="content">
+            <tr>
+                <th class="heading">hooks</th>
+            </tr>
+    #if($hooks.size() > 0)
+        #foreach($hook in $hooks)
+            <tr>
+                <td class="content">
+                    <img alt="trigger" src="$base/images/lightning.gif"/>
+                    <a id='#id("hook.${hook.name}")' href="#" onclick="triggerHook('$hook.handle'); return false">#html($hook.name)</a>
+                </td>
+            </tr>
+        #end
+    #end
+        </table>
+    </div>
+#end
+
     <div id="panel">
         #parse("ajax/view-build-panel.vm")
     </div>
-
-#auth("resource=project" "action=write")
-    #if($result.completed())
-    <p>
-        #set($confirm = $action.getText("build.delete.confirm", [$buildResult.number]))
-        <a href="#" onclick="confirmUrl('$confirm', 'projectName=$u_projectName&amp;buildVID=$buildResult.number')"><img alt="delete" src="$base/images/delete.gif"/> #wwtext("name=build.delete")</a>
-    </p>
-    #end
-#end
-
 </html>

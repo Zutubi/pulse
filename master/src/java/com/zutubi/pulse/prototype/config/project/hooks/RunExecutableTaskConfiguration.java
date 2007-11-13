@@ -15,21 +15,24 @@ import com.zutubi.pulse.util.process.ForwardingByteHandler;
 import com.zutubi.pulse.util.process.NullByteHandler;
 import com.zutubi.validation.annotations.Numeric;
 import com.zutubi.validation.annotations.Required;
+import com.opensymphony.util.TextUtils;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.io.File;
 
 /**
  * Run executable tasks are used to execute an arbitrary command in a hook.
  */
 @SymbolicName("zutubi.runExecutableTaskConfig")
-@Form(fieldOrder = {"command", "arguments", "timeoutApplied", "timeout"})
+@Form(fieldOrder = {"command", "arguments", "workingDir", "timeoutApplied", "timeout"})
 public class RunExecutableTaskConfiguration extends AbstractConfiguration implements BuildHookTaskConfiguration
 {
     @Required
     private String command;
     private String arguments;
+    private String workingDir;
     @ControllingCheckbox(dependentFields = {"timeout"})
     private boolean timeoutApplied;
     @Numeric(min = 0)
@@ -53,6 +56,16 @@ public class RunExecutableTaskConfiguration extends AbstractConfiguration implem
     public void setArguments(String arguments)
     {
         this.arguments = arguments;
+    }
+
+    public String getWorkingDir()
+    {
+        return workingDir;
+    }
+
+    public void setWorkingDir(String workingDir)
+    {
+        this.workingDir = workingDir;
     }
 
     public boolean isTimeoutApplied()
@@ -88,6 +101,11 @@ public class RunExecutableTaskConfiguration extends AbstractConfiguration implem
 
             ProcessBuilder builder = new ProcessBuilder(commandLine);
             builder.redirectErrorStream(true);
+            if(TextUtils.stringSet(workingDir))
+            {
+                builder.directory(new File(workingDir));
+            }
+            
             ByteHandler byteHandler;
             if(context.getOutputStream() == null)
             {
@@ -101,11 +119,11 @@ public class RunExecutableTaskConfiguration extends AbstractConfiguration implem
             asyncProcess = new AsyncProcess(builder.start(), byteHandler, false);
             if (timeoutApplied)
             {
-                asyncProcess.waitForSuccess();
+                asyncProcess.waitForSuccessOrThrow(timeout, TimeUnit.SECONDS);
             }
             else
             {
-                asyncProcess.waitForSuccessOrThrow(timeout, TimeUnit.SECONDS);
+                asyncProcess.waitForSuccess();
             }
         }
         finally

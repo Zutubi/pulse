@@ -70,10 +70,10 @@ public interface ProjectManager extends EntityManager<Project>
      * @param force         if true, force a build to occur even if the
      *                      latest has been built
      */
-    @SecureParameter(action = ProjectConfigurationActions.ACTION_PAUSE, parameterType = ProjectConfiguration.class)
+    @SecureParameter(action = ProjectConfigurationActions.ACTION_TRIGGER, parameterType = ProjectConfiguration.class)
     void triggerBuild(ProjectConfiguration project, BuildReason reason, Revision revision, boolean force);
 
-    @SecureParameter(action = ProjectConfigurationActions.ACTION_PAUSE, parameterType = Project.class)
+    @SecureParameter(action = ProjectConfigurationActions.ACTION_TRIGGER, parameterType = Project.class)
     void triggerBuild(long number, Project project, User user, PatchArchive archive) throws PulseException;
 
     @SecureParameter(action = AccessManager.ACTION_VIEW)

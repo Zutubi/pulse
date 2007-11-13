@@ -16,7 +16,7 @@ import java.util.List;
  * A post-stage hook is executed just after a build stage is completed.  The
  * hook can be easily applied to multiple stages.
  */
-@SymbolicName("zutubi.preStageHookConfig")
+@SymbolicName("zutubi.postStageHookConfig")
 @Form(fieldOrder = {"name", "applyToAllStages", "stages", "runForAll", "runForStates", "failOnError"})
 public class PostStageHookConfiguration extends AutoBuildHookConfiguration
 {
@@ -74,15 +74,8 @@ public class PostStageHookConfiguration extends AutoBuildHookConfiguration
         if(event instanceof PostStageEvent)
         {
             PostStageEvent pse = (PostStageEvent) event;
-            if(applyToAllStages)
-            {
-                return stateMatches(pse);
-            }
-            else
-            {
-                long stage = pse.getStageNode().getStageHandle();
-                return stageMatches(stage) && stateMatches(pse);
-            }
+            long stage = pse.getStageNode().getStageHandle();
+            return stageMatches(stage) && stateMatches(pse);
         }
 
         return false;
@@ -100,6 +93,16 @@ public class PostStageHookConfiguration extends AutoBuildHookConfiguration
 
     private boolean stageMatches(long stage)
     {
+        if(stage == 0)
+        {
+            return false;
+        }
+        
+        if(applyToAllStages)
+        {
+            return true;
+        }
+        
         for(BuildStageConfiguration stageConfig: stages)
         {
             if(stageConfig.getHandle() == stage)

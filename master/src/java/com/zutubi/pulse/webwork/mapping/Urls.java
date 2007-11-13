@@ -115,6 +115,11 @@ public class Urls
         return build(build) + "summary/";
     }
 
+    public String buildSummary(Object project, String number)
+    {
+        return build(project, number) + "summary/";
+    }
+
     public String buildDetails(BuildResult build)
     {
         return build(build) + "details/";

@@ -31,6 +31,7 @@ public class AcceptanceTestSuite
 
         //---( build tests )---
         suite.addTestSuite(BuildAcceptanceTest.class);
+        suite.addTestSuite(BuildHookAcceptanceTest.class);
         
         //---( other acceptance tests )---
 //        suite.addTestSuite(StartupShutdownAcceptanceTest.class);

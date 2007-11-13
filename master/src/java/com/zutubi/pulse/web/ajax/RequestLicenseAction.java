@@ -11,14 +11,14 @@ import java.util.Vector;
  */
 public class RequestLicenseAction extends TransientAction<RequestLicenseConfiguration>
 {
-    private LicenseResult result;
+    private SimpleResult result;
 
     public RequestLicenseAction()
     {
         super("init/requestLicense");
     }
 
-    public LicenseResult getResult()
+    public SimpleResult getResult()
     {
         return result;
     }
@@ -39,34 +39,13 @@ public class RequestLicenseAction extends TransientAction<RequestLicenseConfigur
 
             String license = (String) client.execute("evaluation", args);
             license = StringUtils.wrapString(license, 50, null);
-            result = new LicenseResult(true, license);
+            result = new SimpleResult(true, license);
         }
         catch (Exception e)
         {
-            result = new LicenseResult(false, e.toString());
+            result = new SimpleResult(false, e.toString());
         }
         return SUCCESS;
     }
 
-    public static class LicenseResult
-    {
-        private boolean success;
-        private String detail;
-
-        public LicenseResult(boolean success, String detail)
-        {
-            this.success = success;
-            this.detail = detail;
-        }
-
-        public boolean isSuccess()
-        {
-            return success;
-        }
-
-        public String getDetail()
-        {
-            return detail;
-        }
-    }
 }

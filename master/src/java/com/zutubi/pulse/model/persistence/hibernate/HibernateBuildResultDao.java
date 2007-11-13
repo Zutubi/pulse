@@ -469,7 +469,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         return (BuildResult)findFirstByNamedQuery("findLatestSuccessful", false);
     }
 
-    private void intialise(BuildResult result)
+    public static void intialise(final BuildResult result)
     {
         Hibernate.initialize(result.getFeatures());
         for(RecipeResultNode node: result)

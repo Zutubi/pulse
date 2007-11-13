@@ -124,6 +124,38 @@ public class SeleniumUtils
         }
     }
 
+    public static void waitForVisible(final Selenium selenium, final String locator)
+    {
+        awaitCondition(DEFAULT_TIMEOUT, new Condition()
+        {
+            public boolean satisfied()
+            {
+                return selenium.isVisible(locator);
+            }
+        }, "locator '" + locator + "' to become visible");
+    }
+
+    private static void awaitCondition(long timeout, Condition condition, String conditionText)
+    {
+        long startTime = System.currentTimeMillis();
+        while(!condition.satisfied())
+        {
+            if(System.currentTimeMillis() - startTime > timeout)
+            {
+                throw new SeleniumException("Timed out after " + Long.toString(timeout) + "ms of waiting for " + conditionText);
+            }
+
+            try
+            {
+                Thread.sleep(1000);
+            }
+            catch (InterruptedException e)
+            {
+                throw new SeleniumException(e);
+            }
+        }
+    }
+
     public static void assertElementPresent(Selenium selenium, String id)
     {
         Assert.assertTrue("No element with id '" + id + "' found", selenium.isElementPresent(StringUtils.toValidHtmlName(id)));

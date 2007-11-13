@@ -15,6 +15,9 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeoutException;
 import java.io.ByteArrayOutputStream;
 
 /**
@@ -267,5 +270,50 @@ public class XmlRpcHelper
     public void logWarning(String message) throws Exception
     {
         call("logWarning", message);
+    }
+
+    public int getNextBuildNumber(String projectName) throws Exception
+    {
+        return (Integer) call("getNextBuildNumber", projectName);
+    }
+    
+    public void triggerBuild(String projectName) throws Exception
+    {
+        call("triggerBuild", projectName);
+    }
+
+    public Hashtable<String, Object> getBuild(String projectName, int number) throws Exception
+    {
+        Vector<Hashtable<String, Object>> build = call("getBuild", projectName, number);
+        if(build.size() == 0)
+        {
+            return null;
+        }
+        else
+        {
+            return build.get(0);
+        }
+    }
+
+    public int runBuild(String projectName, long timeout) throws Exception
+    {
+        int number = getNextBuildNumber(projectName);
+        triggerBuild(projectName);
+
+        long startTime = System.currentTimeMillis();
+        while(true)
+        {
+            if(System.currentTimeMillis() - startTime > timeout)
+            {
+                throw new TimeoutException("Timed out waiting for build " + number + " of project '" + projectName + "' to complete");
+            }
+
+            Thread.sleep(500);
+            Hashtable<String, Object> build = getBuild(projectName, number);
+            if(build != null && Boolean.TRUE.equals(build.get("completed")))
+            {
+                return number;
+            }
+        }
     }
 }

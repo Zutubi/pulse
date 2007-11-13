@@ -14,8 +14,12 @@ import com.zutubi.pulse.events.build.BuildEvent;
 import com.zutubi.pulse.events.build.StageEvent;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.RecipeResultNode;
+import com.zutubi.pulse.model.persistence.hibernate.HibernateBuildResultDao;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.util.UnaryFunction;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Manages the execution of build hooks at various points in the build
@@ -23,6 +27,8 @@ import com.zutubi.util.UnaryFunction;
  */
 public class BuildHookManager implements EventListener
 {
+    private ExecutorService executor = Executors.newSingleThreadExecutor();
+
     private MasterConfigurationManager configurationManager;
     private ConfigurationProvider configurationProvider;
 
@@ -32,6 +38,7 @@ public class BuildHookManager implements EventListener
         BuildResult buildResult = be.getBuildResult();
         if (!buildResult.isPersonal())
         {
+            ExecutionContext context = new ExecutionContext(be.getContext());
             for(BuildHookConfiguration hook: buildResult.getProject().getConfig().getBuildHooks().values())
             {
                 if(hook.enabled() && hook.triggeredBy(be))
@@ -41,7 +48,7 @@ public class BuildHookManager implements EventListener
                     {
                         resultNode = ((StageEvent)be).getStageNode();
                     }
-                    executeTask(hook, be.getContext(), be.getBuildResult(), resultNode, false);
+                    executeTask(hook, context, be.getBuildResult(), resultNode, false);
                 }
             }
         }
@@ -49,30 +56,37 @@ public class BuildHookManager implements EventListener
 
     public void manualTrigger(final BuildHookConfiguration hook, final BuildResult result)
     {
-        final ExecutionContext context = new ExecutionContext();
-        MasterBuildProperties.addAllBuildProperties(context, result, configurationProvider.get(GeneralAdminConfiguration.class), configurationManager);
-        if (hook.appliesTo(result))
+        HibernateBuildResultDao.intialise(result);
+        executor.execute(new Runnable()
         {
-            executeTask(hook, context, result, null, true);
-        }
-
-        result.getRoot().forEachNode(new UnaryFunction<RecipeResultNode>()
-        {
-            public void process(RecipeResultNode recipeResultNode)
+            public void run()
             {
-                if(hook.appliesTo(recipeResultNode))
+                final ExecutionContext context = new ExecutionContext();
+                MasterBuildProperties.addAllBuildProperties(context, result, configurationProvider.get(GeneralAdminConfiguration.class), configurationManager);
+                if (hook.appliesTo(result))
                 {
-                    context.push();
-                    try
-                    {
-                        MasterBuildProperties.addStageProperties(context, result, recipeResultNode, configurationManager, false);
-                        executeTask(hook, context, result, recipeResultNode, true);
-                    }
-                    finally
-                    {
-                        context.pop();
-                    }
+                    executeTask(hook, context, result, null, true);
                 }
+
+                result.getRoot().forEachNode(new UnaryFunction<RecipeResultNode>()
+                {
+                    public void process(RecipeResultNode recipeResultNode)
+                    {
+                        if(hook.appliesTo(recipeResultNode))
+                        {
+                            context.push();
+                            try
+                            {
+                                MasterBuildProperties.addStageProperties(context, result, recipeResultNode, configurationManager, false);
+                                executeTask(hook, context, result, recipeResultNode, true);
+                            }
+                            finally
+                            {
+                                context.pop();
+                            }
+                        }
+                    }
+                });
             }
         });
     }

@@ -7,15 +7,27 @@ import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.*;
 import com.zutubi.pulse.ShutdownManager;
 import com.zutubi.pulse.Version;
+import com.zutubi.pulse.util.TimeStamps;
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.core.scm.ScmClient;
+import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.scm.ScmClientUtils;
+import com.zutubi.pulse.core.scm.ScmClientFactory;
+import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.system.SystemStartedEvent;
 import com.zutubi.util.logging.Logger;
+import com.opensymphony.util.TextUtils;
 
 import java.util.Hashtable;
 import java.util.Vector;
+import java.util.List;
+import java.util.Date;
 
 /**
  * Implements a simple API for remote monitoring and control.
@@ -33,9 +45,10 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
     private TypeRegistry typeRegistry;
     private RecordManager recordManager;
 
-//    private BuildManager buildManager;
-//    private ProjectManager projectManager;
-//    private UserManager userManager;
+    private BuildManager buildManager;
+    private ProjectManager projectManager;
+    private ScmClientFactory<ScmConfiguration> scmClientFactory;
+    //    private UserManager userManager;
 //    private AgentManager agentManager;
 //    private AuthenticationManager authenticationManager;
 //
@@ -590,23 +603,29 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
 //
 //        return getNames(projects);
 //    }
-//
-//    public Vector<Hashtable<String, Object>> getBuild(String token, String projectName, int id) throws AuthenticationException
-//    {
-//        Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(1);
-//
-//        tokenManager.verifyUser(token);
-//        Project project = internalGetProject(projectName);
-//        BuildResult build = buildManager.getByProjectAndNumber(project, id);
-//        if (build == null)
-//        {
-//            return result;
-//        }
-//
-//        result.add(convertResult(build));
-//        return result;
-//    }
-//
+
+    public Vector<Hashtable<String, Object>> getBuild(String token, String projectName, int id) throws AuthenticationException
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(1);
+            Project project = internalGetProject(projectName, true);
+            BuildResult build = buildManager.getByProjectAndNumber(project, id);
+            if (build == null)
+            {
+                return result;
+            }
+
+            result.add(convertResult(build));
+            return result;
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
 //    public boolean deleteBuild(String token, String projectName, int id) throws AuthenticationException
 //    {
 //        tokenManager.loginUser(token);
@@ -694,41 +713,55 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
 //            return null;
 //        }
 //    }
-//
-//    public Vector<Hashtable<String, Object>> getLatestBuildsForProject(String token, String projectName, String buildSpecification, boolean completedOnly, int maxResults) throws AuthenticationException
-//    {
-//        tokenManager.verifyUser(token);
-//        Project project = internalGetProject(projectName);
-//
-//        PersistentName[] specs = null;
-//        if (TextUtils.stringSet(buildSpecification))
-//        {
-//            BuildSpecification spec = getBuildSpecification(project, buildSpecification);
-//            specs = new PersistentName[]{ spec.getPname() };
-//        }
-//
-//        ResultState[] states = null;
-//        if (completedOnly)
-//        {
-//            states = ResultState.getCompletedStates();
-//        }
-//
-//        List<BuildResult> builds = buildManager.queryBuilds(new Project[]{project}, states, specs, -1, -1, null, 0, maxResults, true);
-//        Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(builds.size());
-//        for (BuildResult build : builds)
-//        {
-//            Hashtable<String, Object> buildDetails = convertResult(build);
-//            result.add(buildDetails);
-//        }
-//
-//        return result;
-//    }
-//
-//    public Vector<Hashtable<String, Object>> getLatestBuildForProject(String token, String projectName, String buildSpecification, boolean completedOnly) throws AuthenticationException
-//    {
-//        return getLatestBuildsForProject(token, projectName, buildSpecification, completedOnly, 1);
-//    }
-//
+
+    public int getNextBuildNumber(String token, String projectName) throws AuthenticationException
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            Project project = internalGetProject(projectName, true);
+            return (int) project.getNextBuildNumber();
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    public Vector<Hashtable<String, Object>> getLatestBuildsForProject(String token, String projectName, boolean completedOnly, int maxResults) throws AuthenticationException
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            Project project = internalGetProject(projectName, true);
+
+            ResultState[] states = null;
+            if (completedOnly)
+            {
+                states = ResultState.getCompletedStates();
+            }
+
+            List<BuildResult> builds = buildManager.queryBuilds(new Project[]{project}, states, -1, -1, null, 0, maxResults, true);
+            Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(builds.size());
+            for (BuildResult build : builds)
+            {
+                Hashtable<String, Object> buildDetails = convertResult(build);
+                result.add(buildDetails);
+            }
+
+            return result;
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    public Vector<Hashtable<String, Object>> getLatestBuildForProject(String token, String projectName, boolean completedOnly) throws AuthenticationException
+    {
+        return getLatestBuildsForProject(token, projectName, completedOnly, 1);
+    }
+
 //    public Vector<Hashtable<String, Object>> getPersonalBuild(String token, int id) throws AuthenticationException
 //    {
 //        Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(1);
@@ -781,49 +814,43 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
 //    {
 //        return getLatestPersonalBuilds(token, completedOnly, 1);
 //    }
-//
-//    private Hashtable<String, Object> convertResult(BuildResult build)
-//    {
-//        Hashtable<String, Object> buildDetails = new Hashtable<String, Object>();
-//        buildDetails.put("id", (int) build.getNumber());
-//        buildDetails.put("project", build.getProject().getName());
-//        buildDetails.put("revision", getBuildRevision(build));
-//        buildDetails.put("specification", build.getBuildSpecification());
-//        buildDetails.put("status", build.getState().getPrettyString());
-//        buildDetails.put("completed", build.completed());
-//        buildDetails.put("succeeded", build.succeeded());
-//
-//        TimeStamps timeStamps = build.getStamps();
-//        buildDetails.put("startTime", new Date(timeStamps.getStartTime()));
-//        buildDetails.put("endTime", new Date(timeStamps.getEndTime()));
-//        if (timeStamps.hasEstimatedTimeRemaining())
-//        {
-//            buildDetails.put("progress", timeStamps.getEstimatedPercentComplete());
-//        }
-//        else
-//        {
-//            buildDetails.put("progress", -1);
-//        }
-//
-//        return buildDetails;
-//    }
-//
-//
-//    private String getBuildRevision(BuildResult build)
-// 	{
-//        BuildScmDetails details = build.getScmDetails();
-// 	 	if(details != null)
-// 	 	{
-// 	 	    Revision revision = details.getRevision();
-// 	 	    if(revision != null)
-// 	 	    {
-// 	 	        return revision.getRevisionString();
-// 	 	    }
-// 	 	}
-//
-//         return "";
-// 	}
-//
+
+    private Hashtable<String, Object> convertResult(BuildResult build)
+    {
+        Hashtable<String, Object> buildDetails = new Hashtable<String, Object>();
+        buildDetails.put("id", (int) build.getNumber());
+        buildDetails.put("project", build.getProject().getName());
+        buildDetails.put("revision", getBuildRevision(build));
+        buildDetails.put("status", build.getState().getPrettyString());
+        buildDetails.put("completed", build.completed());
+        buildDetails.put("succeeded", build.succeeded());
+
+        TimeStamps timeStamps = build.getStamps();
+        buildDetails.put("startTime", new Date(timeStamps.getStartTime()));
+        buildDetails.put("endTime", new Date(timeStamps.getEndTime()));
+        if (timeStamps.hasEstimatedTimeRemaining())
+        {
+            buildDetails.put("progress", timeStamps.getEstimatedPercentComplete());
+        }
+        else
+        {
+            buildDetails.put("progress", -1);
+        }
+
+        return buildDetails;
+    }
+
+    private String getBuildRevision(BuildResult build)
+ 	{
+        Revision revision = build.getRevision();
+        if(revision != null)
+        {
+            return revision.getRevisionString();
+        }
+
+         return "";
+ 	}
+
 //    public Vector<Hashtable<String, Object>> getChangesInBuild(String token, String projectName, int id) throws AuthenticationException
 //    {
 //        tokenManager.verifyUser(token);
@@ -1065,41 +1092,46 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
 //        return result;
 //    }
 //
-//    public boolean triggerBuild(String token, String projectName, String buildSpecification) throws AuthenticationException
-//    {
-//        return triggerBuild(token, projectName, buildSpecification, null);
-//    }
-//
-//    public boolean triggerBuild(String token, String projectName, String buildSpecification, String revision) throws AuthenticationException
-//    {
-//        try
-//        {
-//            tokenManager.loginUser(token);
-//            Project project = internalGetProject(projectName);
-//            getBuildSpecification(project, buildSpecification);
-//
-//            Revision r = null;
-//            if(TextUtils.stringSet(revision))
-//            {
-//                try
-//                {
-//                    r = project.getScm().createServer().getRevision(revision);
-//                }
-//                catch (SCMException e)
-//                {
-//                    throw new IllegalArgumentException("Unable to verify revision: " + e.getMessage());
-//                }
-//            }
-//
-//            projectManager.triggerBuild(project, buildSpecification, new RemoteTriggerBuildReason(), r, true);
-//            return true;
-//        }
-//        finally
-//        {
-//            tokenManager.logoutUser();
-//        }
-//    }
-//
+    public boolean triggerBuild(String token, String projectName) throws AuthenticationException
+    {
+        return triggerBuild(token, projectName, null);
+    }
+
+    public boolean triggerBuild(String token, String projectName, String revision) throws AuthenticationException
+    {
+        try
+        {
+            tokenManager.loginUser(token);
+            Project project = internalGetProject(projectName, false);
+
+            Revision r = null;
+            if(TextUtils.stringSet(revision))
+            {
+                ScmClient client = null;
+                try
+                {
+                    client = scmClientFactory.createClient(project.getConfig().getScm());
+                    r = client.getRevision(revision);
+                }
+                catch (ScmException e)
+                {
+                    throw new IllegalArgumentException("Unable to verify revision: " + e.getMessage());
+                }
+                finally
+                {
+                    ScmClientUtils.close(client);
+                }
+            }
+
+            projectManager.triggerBuild(project.getConfig(), new RemoteTriggerBuildReason(), r, true);
+            return true;
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
 //    public Vector<String> getProjectBuildSpecifications(String token, String projectName) throws AuthenticationException
 //    {
 //        tokenManager.verifyUser(token);
@@ -1737,17 +1769,17 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
 //    {
 //        OgnlUtils.setProperties(scmDetails, object);
 //    }
-//
-//    private Project internalGetProject(String projectName)
-//    {
-//        Project project = projectManager.getProject(projectName);
-//        if (project == null)
-//        {
-//            throw new IllegalArgumentException("Unknown project '" + projectName + "'");
-//        }
-//        return project;
-//    }
-//
+
+    private Project internalGetProject(String projectName, boolean allownIvalid)
+    {
+        Project project = projectManager.getProject(projectName, allownIvalid);
+        if (project == null)
+        {
+            throw new IllegalArgumentException("Unknown project '" + projectName + "'");
+        }
+        return project;
+    }
+
 //    private ProjectConfiguration internalGetProjectConfig(String projectName)
 //    {
 //        ProjectConfiguration project = projectManager.getProjectConfig(projectName);
@@ -1813,17 +1845,17 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
 //    {
 //        this.userManager = userManager;
 //    }
-//
-//    public void setBuildManager(BuildManager buildManager)
-//    {
-//        this.buildManager = buildManager;
-//    }
-//
-//    public void setProjectManager(ProjectManager projectManager)
-//    {
-//        this.projectManager = projectManager;
-//    }
-//
+
+    public void setBuildManager(BuildManager buildManager)
+    {
+        this.buildManager = buildManager;
+    }
+
+    public void setProjectManager(ProjectManager projectManager)
+    {
+        this.projectManager = projectManager;
+    }
+
 //    public void setAgentManager(AgentManager agentManager)
 //    {
 //        this.agentManager = agentManager;
@@ -1870,5 +1902,10 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
     public void setConfigurationSecurityManager(ConfigurationSecurityManager configurationSecurityManager)
     {
         this.configurationSecurityManager = configurationSecurityManager;
+    }
+
+    public void setScmClientFactory(ScmClientFactory<ScmConfiguration> scmClientFactory)
+    {
+        this.scmClientFactory = scmClientFactory;
     }
 }

@@ -332,9 +332,10 @@ public class VariableHelper
 
     private static String resolveReference(Scope properties, Token token, boolean allowUnresolved) throws FileLoadException
     {
-        if (properties.containsReference(token.value))
+        Reference reference = properties.getReference(token.value);
+        if (reference != null && reference.getValue() != null)
         {
-            Object obj = properties.getReference(token.value).getValue();
+            Object obj = reference.getValue();
             if (!(obj instanceof String))
             {
                 throw new FileLoadException("Reference to non string variable '" + token.value + "'");

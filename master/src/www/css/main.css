@@ -393,6 +393,13 @@ p.note {
     padding: 5px;
 }
 
+.status-message {
+    background: #ffffc0;
+    text-align: center;
+    padding: 5px;
+    border: dotted 1px #bbb
+}
+
 td.content, td.content-nowrap {
     white-space: nowrap;
 }
@@ -853,7 +860,6 @@ table.template-actions
 {
     width: 100%;
 }
-
 
 /*
  * For Ext.

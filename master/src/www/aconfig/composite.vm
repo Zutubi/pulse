@@ -37,7 +37,7 @@
             #foreach($field in $config.displayFields)
             <tr>
                 <td class="label" width="20%">#i18n("key=${field}.label")</td>
-                <td class="value #if($odd) odd #else even #end">$config.format($field)</td>
+                <td id='#id("state.$field")' class="value #if($odd) odd #else even #end">$config.format($field)</td>
             </tr>
                 #if($odd) #set($odd = false) #else #set($odd = true) #end
             #end
@@ -68,7 +68,7 @@
             <p>
             <ul>
                 #foreach($action in $config.actions)
-                    <li>+ <a href="#" onclick="actionPath('${path}?${action}'); return false;">#i18n("key=${action}.label")</a></li>
+                    <li>+ <a href="#" id='#id("action.${action}")' onclick="actionPath('${path}?${action}'); return false;">#i18n("key=${action}.label")</a></li>
                 #end
             </ul>
             </p>
