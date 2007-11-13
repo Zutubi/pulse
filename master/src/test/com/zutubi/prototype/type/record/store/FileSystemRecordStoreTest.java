@@ -73,7 +73,7 @@ public class FileSystemRecordStoreTest extends PulseTestCase
         restartRecordStore();
 
         Record stored = (Record) recordStore.select().get("sample");
-        assertEquals(sample.get("a"), stored.get("a"));
+        assertRecordsEquals(sample, stored);
     }
 
     public void testUpdate()
@@ -90,14 +90,18 @@ public class FileSystemRecordStoreTest extends PulseTestCase
         // now update the record store.
         recordStore.update("sample", sample);
         stored = (Record) recordStore.select().get("sample");
-        assertEquals(sample.get("c"), stored.get("c"));
+        assertRecordsEquals(sample, stored);
     }
 
     public void testUpdatePersistence() throws Exception
     {
         MutableRecord sample = createSampleRecord();
         recordStore.insert("sample", sample);
+        sample.put("c", "c");
         recordStore.update("sample", sample);
+
+        // ensure that the update is applied.
+        assertRecordsEquals(sample, recordStore.select().get("sample"));
 
         restartRecordStore();
 
@@ -269,7 +273,7 @@ public class FileSystemRecordStoreTest extends PulseTestCase
         // ensure that the snapshot is of the data from before the second transaction.
         DefaultRecordSerialiser serialiser = new DefaultRecordSerialiser(snapshot);
         Record snapshotRecord = serialiser.deserialise("sample");
-        assertEquals(sample, snapshotRecord);
+        assertRecordsEquals(sample, snapshotRecord);
     }
 
     public void testCompactionDuringRollbackTransaction() throws Exception
@@ -313,7 +317,7 @@ public class FileSystemRecordStoreTest extends PulseTestCase
         // ensure that the snapshot is of the data from before the second transaction.
         DefaultRecordSerialiser serialiser = new DefaultRecordSerialiser(snapshot);
         Record snapshotRecord = serialiser.deserialise("sample");
-        assertEquals(sample, snapshotRecord);
+        assertRecordsEquals(sample, snapshotRecord);
     }
 
     public void testTransactionRollback()
@@ -388,7 +392,7 @@ public class FileSystemRecordStoreTest extends PulseTestCase
 
         restartRecordStore();
 
-        assertEquals(sample, recordStore.select().get("sample"));
+        assertRecordsEquals(sample, recordStore.select().get("sample"));
         assertFalse(newSnapshot.exists());
     }
 
@@ -414,7 +418,7 @@ public class FileSystemRecordStoreTest extends PulseTestCase
 
         restartRecordStore();
 
-        assertEquals(sample, recordStore.select().get("sample"));
+        assertRecordsEquals(sample, recordStore.select().get("sample"));
         assertFalse(newSnapshot.exists());
         assertFalse(backupSnapshot.exists());
     }
@@ -440,7 +444,7 @@ public class FileSystemRecordStoreTest extends PulseTestCase
 
         restartRecordStore();
 
-        assertEquals(newSample, recordStore.select().get("sample"));
+        assertRecordsEquals(newSample, recordStore.select().get("sample"));
         assertFalse(backupSnapshot.exists());
     }
 
@@ -473,7 +477,7 @@ public class FileSystemRecordStoreTest extends PulseTestCase
         }
 
         // ensure that everything is still ok.
-        assertEquals(sample, recordStore.select().get("sample"));
+        assertRecordsEquals(sample, recordStore.select().get("sample"));
 
         // ensure that a subsequent compact is successful.
         recordStore.setFileSystem(new DefaultFS());
@@ -550,7 +554,7 @@ public class FileSystemRecordStoreTest extends PulseTestCase
 
         restartRecordStore();
 
-        assertEquals(empty, recordStore.select().get("empty"));
+        assertRecordsEquals(empty, recordStore.select().get("empty"));
     }
 
     /**
@@ -562,30 +566,30 @@ public class FileSystemRecordStoreTest extends PulseTestCase
      * at com.zutubi.prototype.type.record.store.InMemoryRecordStore.update(InMemoryRecordStore.java:46)
      * at com.zutubi.prototype.type.record.store.FileSystemRecordStore.init(FileSystemRecordStore.java:261)
      * at com.zutubi.prototype.type.record.store.FileSystemRecordStore.initAndStartAutoCompaction(FileSystemRecordStore.java:112)
-     *
      */
     public void testIAEOnSecondRestartBug() throws Exception
     {
-/*
-        recordStore.insert("a", new MutableRecordImpl());
+        MutableRecord sample = createRandomSampleRecord();
+        sample.put("nested", new MutableRecordImpl());
+        recordStore.insert("a", sample);
 
-        MutableRecord randomSample = createRandomSampleRecord();
-        randomSample.put("aNotSoRandomKey", createRandomSampleRecord());
-
-        recordStore.update("a", randomSample);
-
-        restartRecordStore();
-        
-        recordStore.compactNow();
-        recordStore.compactNow();
+        MutableRecord nested = createRandomSampleRecord();
+        sample.put("nested", nested);
+        recordStore.update("a/nested", nested);
 
         restartRecordStore();
 
-        recordStore.compactNow();
-        recordStore.compactNow();
+        restartRecordStore(); // this restart incorrectly sets internal values.
+        recordStore.compactNow(); // this compact stuffs things
 
-        restartRecordStore();
-*/
+        try
+        {
+            restartRecordStore(); // this restart highlights the problem.
+        }
+        catch (IllegalArgumentException e)
+        {
+            fail(e.getMessage());
+        }
     }
 
     //---( helper methods. )---
@@ -606,6 +610,11 @@ public class FileSystemRecordStoreTest extends PulseTestCase
             randomSample.put(Integer.toString(i), Integer.toString(RAND.nextInt(20)));
         }
         return randomSample;
+    }
+
+    private void assertRecordsEquals(Object expected, Object actual)
+    {
+        assertEquals((Record)expected, (Record)actual);
     }
 
     private void assertEquals(Record expected, Record actual)

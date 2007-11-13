@@ -268,12 +268,12 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
             LOG.warning(Thread.currentThread().getId() + ": replay journal(end)");
         }
 
-        // The last committed journal entry id is the id prior to the next journal entry.  Ensure
-        // that this last committed id is no lower than the latest snapshot id.
-        lastCommittedJournalEntryId = nextJournalEntryId - 1;
-        if (lastCommittedJournalEntryId < latestSnapshotId)
+        // The last committed journal entry id is at least the latest snapshot id (when there are no journal entries),
+        // or otherwise the highest journal entry. (which just happens to be nextJournalEntryId - 1
+        lastCommittedJournalEntryId = latestSnapshotId;
+        if (latestSnapshotId < nextJournalEntryId)
         {
-            lastCommittedJournalEntryId = latestSnapshotId;
+            lastCommittedJournalEntryId = nextJournalEntryId - 1;
         }
 
         // if we loaded any journal entries that were not already part of the snapshot, then compact.
@@ -671,7 +671,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
 
             // what is the snapshot data to be persisted?  We synchronize on this so that we can ensure that
             // no commits occur when we are taking the data snapshot.
-            Record newSnapshot = null;
+            Record newSnapshot;
             long snapshotJournalId = -1;
             synchronized(this)
             {

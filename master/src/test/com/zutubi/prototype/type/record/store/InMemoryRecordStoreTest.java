@@ -72,6 +72,21 @@ public class InMemoryRecordStoreTest extends PulseTestCase
         assertEquals("dd", storedRecord.getMeta("cc"));
     }
 
+    public void testUpdatesAreNotNested()
+    {
+        MutableRecordImpl record = new MutableRecordImpl();
+        record.put("a", "b");
+        recordStore.insert("path", record);
+
+        MutableRecordImpl nesting = new MutableRecordImpl();
+        nesting.put("b", "b");
+        record.put("nesting", nesting);
+        recordStore.update("path", record);
+
+        Record storedRecord = (Record) recordStore.select().get("path");
+        assertNull(storedRecord.get("nesting"));
+    }
+
     public void testSelect()
     {
         assertNotNull(recordStore.select());
