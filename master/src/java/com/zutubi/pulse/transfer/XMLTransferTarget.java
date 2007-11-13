@@ -4,13 +4,10 @@ import com.zutubi.pulse.util.JDBCTypes;
 import nu.xom.Attribute;
 import nu.xom.Document;
 import nu.xom.Element;
-import org.hibernate.mapping.Column;
-import org.hibernate.mapping.Table;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -99,10 +96,8 @@ public class XMLTransferTarget extends XMLTransferSupport implements TransferTar
             Element defs = new Element("type-defs");
             tableElement.appendChild(defs);
 
-            Iterator columns = table.getColumnIterator();
-            while (columns.hasNext())
+            for (Column column : table.getColumns())
             {
-                Column column = (Column) columns.next();
                 Element def = new Element("type-def");
                 def.addAttribute(new Attribute("name", column.getName()));
                 def.addAttribute(new Attribute("type", JDBCTypes.toString(column.getSqlTypeCode())));
@@ -127,7 +122,7 @@ public class XMLTransferTarget extends XMLTransferSupport implements TransferTar
             tableElement.appendChild(rowElement);
             serializer.writeStartTag(rowElement);
 
-            for (Column column : MappingUtils.getColumns(table))
+            for (Column column : table.getColumns())
             {
                 String columnName = column.getName();
 

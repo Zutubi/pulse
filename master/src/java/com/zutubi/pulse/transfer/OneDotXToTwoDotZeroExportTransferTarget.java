@@ -1,25 +1,21 @@
 package com.zutubi.pulse.transfer;
 
-import org.hibernate.mapping.Table;
-import org.hibernate.mapping.Column;
 
+import java.sql.Types;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.HashSet;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.sql.Types;
 
 /**
  * This transfer target is used to handle the data conversion from 1.2.x to 2.0.x.  As
  * the 1.2.x is exported, this object will filter out and adjust as necessary to map to the 2.0.x
  * schema.
- *
  */
 public class OneDotXToTwoDotZeroExportTransferTarget implements TransferTarget
 {
     private TransferTarget delegate;
-    private boolean endTableRequired;
+    private boolean transferringTable;
 
     private String currentTable;
 
@@ -67,15 +63,83 @@ public class OneDotXToTwoDotZeroExportTransferTarget implements TransferTarget
 
     public void startTable(Table table) throws TransferException
     {
-        if (transferTable(table))
+        if (renamedTables.containsKey(table.getName()))
         {
-            endTableRequired = true;
-            currentTable = table.getName();
+            table.setName(renamedTables.get(table.getName()));
+        }
+
+        if (transferredTables.contains(table.getName()))
+        {
+            transferringTable = true;
+
+            // make the necessary adjustments to the table.
+            table = updateTableIfRequired(table);
+        }
+
+        if (transferringTable)
+        {
             delegate.startTable(table);
         }
     }
 
+    private Table updateTableIfRequired(Table table)
+    {
+        TransferTable mutableTable = (TransferTable) table;
+        if (table.getName().equals("AGENT_STATE"))
+        {
+            mutableTable.remove(table.getColumn("NAME"));
+            mutableTable.remove(table.getColumn("HOST"));
+            mutableTable.remove(table.getColumn("PORT"));
+        }
+        else if (table.getName().equals("FILE_CHANGE"))
+        {
+            TransferColumn revisionIdColumn = (TransferColumn) mutableTable.getColumn("REVISION_ID");
+            revisionIdColumn.setName("REVISION_STRING");
+            revisionIdColumn.setSqlTypeCode(Types.VARCHAR);
+        }
+        else if (table.getName().equals("LOCAL_USER"))
+        {
+            mutableTable.remove(table.getColumn("LOGIN"));
+            mutableTable.remove(table.getColumn("NAME"));
+            mutableTable.remove(table.getColumn("PASSWORD"));
+            mutableTable.remove(table.getColumn("defaultAction"));
+            mutableTable.remove(table.getColumn("refreshInterval"));
+        }
+        else if (table.getName().equals("RECIPE_RESULT_NODE"))
+        {
+            TransferColumn stageNameColumn = (TransferColumn) mutableTable.getColumn("STAGE_NAME");
+            stageNameColumn.setName("stageName");
+            stageNameColumn.setSqlTypeCode(Types.VARCHAR);
+        }
+        else if (table.getName().equals("PROJECT"))
+        {
+            mutableTable.remove(table.getColumn("NAME"));
+            mutableTable.remove(table.getColumn("DESCRIPTION"));
+            mutableTable.remove(table.getColumn("URL"));
+            mutableTable.remove(table.getColumn("BOB_FILE_DETAILS"));
+            mutableTable.remove(table.getColumn("DEFAULT_SPECIFICATION"));
+            mutableTable.remove(table.getColumn("SCM"));
+            mutableTable.remove(table.getColumn("CHANGE_VIEWER"));
+        }
+        else if (currentTable.equals("TEST_CASE_INDEX"))
+        {
+            mutableTable.remove(table.getColumn("SPEC_ID"));
+        }
+
+        return null;
+    }
+
     public void row(Map<String, Object> row) throws TransferException
+    {
+        if (transferringTable)
+        {
+            row = updateRowIfRequired(row);
+
+            delegate.row(row);
+        }
+    }
+
+    private Map<String, Object> updateRowIfRequired(Map<String, Object> row)
     {
         // modify the row based on the table changes.
         if (currentTable.equals("AGENT_STATE"))
@@ -106,20 +170,24 @@ public class OneDotXToTwoDotZeroExportTransferTarget implements TransferTarget
             row.remove("SCM");
             row.remove("CHANGE_VIEWER");
         }
+        else if (currentTable.equals("RECIPE_RESULT_NODE"))
+        {
+            row.put("stageName", row.remove("STAGE_NAME"));
+        }
         else if (currentTable.equals("TEST_CASE_INDEX"))
         {
             row.remove("SPEC_ID");
         }
-        delegate.row(row);
+        return row;
     }
 
     public void endTable() throws TransferException
     {
-        if (endTableRequired)
+        if (transferringTable)
         {
             delegate.endTable();
             currentTable = null;
-            endTableRequired = false;
+            transferringTable = false;
         }
     }
 
@@ -131,43 +199,5 @@ public class OneDotXToTwoDotZeroExportTransferTarget implements TransferTarget
     public void close()
     {
         delegate.close();
-    }
-
-    private boolean transferTable(Table table)
-    {
-        if (renamedTables.containsKey(table.getName()))
-        {
-            table.setName(renamedTables.get(table.getName()));
-        }
-
-        if (table.getName().equals("FILE_CHANGE"))
-        {
-            Iterator cols = table.getColumnIterator();
-            while (cols.hasNext())
-            {
-                Column col = (Column) cols.next();
-                if (col.getName().equals("REVISION_ID"))
-                {
-                    col.setName("REVISION_STRING");
-                    col.setSqlTypeCode(Types.VARCHAR);
-                }
-            }
-
-        }
-        else if (table.getName().equals("RECIPE_RESULT_NODE"))
-        {
-            Iterator cols = table.getColumnIterator();
-            while (cols.hasNext())
-            {
-                Column col = (Column) cols.next();
-                if (col.getName().equals("STAGE_NAME"))
-                {
-                    col.setName("stageName");
-                    col.setSqlTypeCode(Types.VARCHAR);
-                }
-            }
-        }
-
-        return transferredTables.contains(table.getName());
     }
 }

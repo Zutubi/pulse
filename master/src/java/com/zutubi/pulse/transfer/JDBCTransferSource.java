@@ -55,6 +55,7 @@ public class JDBCTransferSource implements TransferSource
                 while (tables.hasNext())
                 {
                     Table table = (Table) tables.next();
+
                     List<Column> columns = MappingUtils.getColumns(table);
                     for (Column column : columns)
                     {
@@ -88,7 +89,7 @@ public class JDBCTransferSource implements TransferSource
     private void exportTable(TransferTarget target, Table table, Connection con, List<Column> columns)
             throws TransferException, SQLException
     {
-        target.startTable(table);
+        target.startTable(new HibernateTable(table));
 
         String sql = MappingUtils.sqlSelectAll(table);
 

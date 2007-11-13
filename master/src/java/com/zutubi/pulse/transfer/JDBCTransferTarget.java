@@ -1,11 +1,10 @@
 package com.zutubi.pulse.transfer;
 
 import com.zutubi.pulse.util.JDBCUtils;
+import com.zutubi.pulse.util.JDBCTypes;
 import com.zutubi.util.logging.Logger;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.mapping.Column;
-import org.hibernate.mapping.Table;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -57,6 +56,27 @@ public class JDBCTransferTarget implements TransferTarget
         try
         {
             this.table = table;
+
+            // Check that table somewhat matches the schemaTable it will be inserted into.  This verifies
+            // that the data from the transfer source tables matches the data for this transfer target.
+            org.hibernate.mapping.Table tableMapping = getTableMapping(table.getName());
+
+            for (Column column : table.getColumns())
+            {
+                // get mapped column.
+                org.hibernate.mapping.Column columnMapping = getColumnMapping(tableMapping, column.getName());
+                if (columnMapping == null)
+                {
+                    throw new TransferException("Transfer target does not contain column " + column.getName() + " in table " + table.getName());
+                }
+                if (columnMapping.getSqlTypeCode() != column.getSqlTypeCode())
+                {
+                    throw new TransferException("Column type mismatch for column " + column.getName() + ". " +
+                            "Export contains type " + JDBCTypes.toString(column.getSqlTypeCode()) + " " +
+                            "but we expected type " + JDBCTypes.toString(columnMapping.getSqlTypeCode()));
+                }
+            }
+
             insertSql = MappingUtils.sqlInsert(table);
             LOG.info(insertSql);
             insert = connection.prepareStatement(insertSql);
@@ -71,7 +91,7 @@ public class JDBCTransferTarget implements TransferTarget
     {
         try
         {
-            List<Column> columns = MappingUtils.getColumns(table);
+            List<Column> columns = table.getColumns();
             List<Object> data = new LinkedList<Object>();
             for (int i = 0; i < columns.size(); i++)
             {
@@ -142,7 +162,7 @@ public class JDBCTransferTarget implements TransferTarget
         Iterator tableMappings = configuration.getTableMappings();
         while (tableMappings.hasNext())
         {
-            Table table = (Table) tableMappings.next();
+            org.hibernate.mapping.Table table = (org.hibernate.mapping.Table) tableMappings.next();
             if (JDBCUtils.tableExists(connection, table.getName()))
             {
                 throw new JDBCTransferException("Unable to create the new database schema. The table '" + table.getName() + "' " +
@@ -192,5 +212,37 @@ public class JDBCTransferTarget implements TransferTarget
         {
             JDBCUtils.close(stmt);
         }
+    }
+
+    private org.hibernate.mapping.Table getTableMapping(String tableName)
+    {
+        Iterator tables = configuration.getTableMappings();
+        while (tables.hasNext())
+        {
+            org.hibernate.mapping.Table table = (org.hibernate.mapping.Table) tables.next();
+            if (table.getName().equals(tableName))
+            {
+                return table;
+            }
+        }
+        if (HibernateUniqueKeyTable.isTable(tableName))
+        {
+            return HibernateUniqueKeyTable.getMapping();
+        }
+        return null;
+    }
+
+    private org.hibernate.mapping.Column getColumnMapping(org.hibernate.mapping.Table table, String columnName)
+    {
+        Iterator iterator = table.getColumnIterator();
+        while (iterator.hasNext())
+        {
+            org.hibernate.mapping.Column column = (org.hibernate.mapping.Column) iterator.next();
+            if (column.getName().equals(columnName))
+            {
+                return column;
+            }
+        }
+        return null;
     }
 }

@@ -3,12 +3,12 @@ package com.zutubi.pulse.transfer;
 import com.zutubi.pulse.util.JDBCTypes;
 import nu.xom.Builder;
 import nu.xom.NodeFactory;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.mapping.Table;
 import org.xml.sax.Attributes;
 
 import java.io.InputStream;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  *
@@ -18,20 +18,18 @@ public class XMLTransferSource extends XMLTransferSupport implements TransferSou
 {
     private InputStream source;
 
+/*
     private Configuration configuration;
+*/
 
     private Map<String, String> row;
 
     private TransferTarget target;
 
-    /**
-     * The names of the columns, in the order in which the data is represented within the xml document.
-     */
-    private List<String> columnNames;
-    private Map<String, Integer> columnTypes;
+    private TransferTable currentTable;
 
-    private Iterator<String> columnIterator;
-    private String columnName;
+    private Column currentColumn;
+    private Iterator<Column> columnIterator;
 
     public void setSource(InputStream source)
     {
@@ -60,9 +58,7 @@ public class XMLTransferSource extends XMLTransferSupport implements TransferSou
 
     protected void startTable(String uri, String localName, String qName, Attributes atts) throws TransferException
     {
-        String tableName = atts.getValue("name");
-        Table table = getTable(tableName);
-        target.startTable(table);
+        // start table is delayed until we have the full table definition via the type def tags.
     }
 
     protected void endTable(String uri, String localName, String qName) throws TransferException
@@ -73,7 +69,7 @@ public class XMLTransferSource extends XMLTransferSupport implements TransferSou
     protected void startRow(String uri, String localName, String qName, Attributes atts)
     {
         row = new HashMap<String, String>();
-        columnIterator = columnNames.iterator();
+        columnIterator = currentTable.getColumns().iterator();
     }
 
     protected void endRow(String uri, String localName, String qName) throws TransferException
@@ -82,7 +78,7 @@ public class XMLTransferSource extends XMLTransferSupport implements TransferSou
         Map<String, Object> convertedRow = new HashMap<String, Object>();
         for (String key : row.keySet())
         {
-            Object value = fromText(columnTypes.get(key), row.get(key));
+            Object value = fromText(currentTable.getColumnType(key), row.get(key));
             convertedRow.put(key, value);
         }
         target.row(convertedRow);
@@ -91,8 +87,7 @@ public class XMLTransferSource extends XMLTransferSupport implements TransferSou
 
     private void startTypeDefs(CharSequence uri, String localName, String qName, Attributes atts)
     {
-        columnNames = new LinkedList<String>();
-        columnTypes = new HashMap<String, Integer>();
+        currentTable = new TransferTable();
     }
 
     private void startTypeDef(CharSequence uri, String localName, String qName, Attributes atts)
@@ -100,38 +95,48 @@ public class XMLTransferSource extends XMLTransferSupport implements TransferSou
         String columnName = atts.getValue("name");
         String columnType = atts.getValue("type");
 
-        columnNames.add(columnName);
-        columnTypes.put(columnName, JDBCTypes.valueOf(columnType));
+        TransferColumn column = new TransferColumn();
+        column.setName(columnName);
+        column.setSqlTypeCode(JDBCTypes.valueOf(columnType));
+        currentTable.add(column);
+    }
+
+    private void endTypeDefs(CharSequence uri, String localName, String qName) throws TransferException
+    {
+        // we now have the full table definition, so we can start the table.
+        target.startTable(currentTable);
     }
 
     protected void startColumn(String uri, String localName, String qName, Attributes atts)
     {
-        columnName = columnIterator.next();
+        currentColumn = columnIterator.next();
+
         if(atts.getValue("null") == null)
         {
-            row.put(columnName, "");
+            row.put(currentColumn.getName(), "");
         }
     }
 
     protected void endColumn(String uri, String localName, String qName)
     {
-        columnName = null;
+        currentColumn = null;
     }
 
+/*
     private Table getTable(String tableName)
     {
         Iterator tables = configuration.getTableMappings();
         while (tables.hasNext())
         {
-            Table table = (Table) tables.next();
+            org.hibernate.mapping.Table table = (org.hibernate.mapping.Table) tables.next();
             if (table.getName().equals(tableName))
             {
-                return table;
+                return new HibernateTable(table);
             }
         }
         if (HibernateUniqueKeyTable.isTable(tableName))
         {
-            return HibernateUniqueKeyTable.getMapping();
+            return new HibernateTable(HibernateUniqueKeyTable.getMapping());
         }
         return null;
     }
@@ -140,10 +145,10 @@ public class XMLTransferSource extends XMLTransferSupport implements TransferSou
     {
         this.configuration = configuration;
     }
+*/
 
     private class Callback extends NodeFactory
     {
-
         public void startElement(String uri, String localName, String qName, Attributes atts)
         {
             try
@@ -197,6 +202,11 @@ public class XMLTransferSource extends XMLTransferSupport implements TransferSou
                 {
                     endTable(uri, localName, qName);
                 }
+
+                if (localName.equals("type-defs"))
+                {
+                    endTypeDefs(uri, localName, qName);
+                }
             }
             catch (TransferException e)
             {
@@ -206,6 +216,7 @@ public class XMLTransferSource extends XMLTransferSupport implements TransferSou
 
         public void characters(char ch[], int start, int length)
         {
+            String columnName = currentColumn.getName();
             if (columnName != null)
             {
                 String str = new String(ch, start, length);

@@ -104,7 +104,6 @@ public class TransferAPI
             target.setConfiguration(configuration);
 
             XMLTransferSource source = new XMLTransferSource();
-            source.setConfiguration(configuration);
             source.setSource(inputStream);
 
             source.transferTo(target);
