@@ -451,7 +451,7 @@
         <mkdir dir="${report.dir}/xml"/>
         <mkdir dir="${report.dir}/html"/>
 
-        <javac srcdir="server-core/src/java" destdir="${build.dir}/classes" includes="**/LicenseEncoder*" debug="true">
+        <javac target="5" srcdir="server-core/src/java" destdir="${build.dir}/classes" includes="**/LicenseEncoder*" debug="true">
             <classpath>
                 <fileset dir="${build.dir}/lib">
                     <include name="**/*.jar"/>
