@@ -553,6 +553,41 @@ public class FileSystemRecordStoreTest extends PulseTestCase
         assertEquals(empty, recordStore.select().get("empty"));
     }
 
+    /**
+     * Caused by: java.lang.IllegalArgumentException: No record at path 'settings/licenseConfig'
+     * at com.zutubi.prototype.type.record.store.InMemoryRecordStore.update(InMemoryRecordStore.java:105)
+     * at com.zutubi.prototype.type.record.store.InMemoryRecordStore$2.execute(InMemoryRecordStore.java:50)
+     * at com.zutubi.prototype.type.record.store.InMemoryRecordStore$2.execute(InMemoryRecordStore.java:48)
+     * at com.zutubi.prototype.transaction.TransactionalWrapper.execute(TransactionalWrapper.java:51)
+     * at com.zutubi.prototype.type.record.store.InMemoryRecordStore.update(InMemoryRecordStore.java:46)
+     * at com.zutubi.prototype.type.record.store.FileSystemRecordStore.init(FileSystemRecordStore.java:261)
+     * at com.zutubi.prototype.type.record.store.FileSystemRecordStore.initAndStartAutoCompaction(FileSystemRecordStore.java:112)
+     *
+     */
+    public void testIAEOnSecondRestartBug() throws Exception
+    {
+/*
+        recordStore.insert("a", new MutableRecordImpl());
+
+        MutableRecord randomSample = createRandomSampleRecord();
+        randomSample.put("aNotSoRandomKey", createRandomSampleRecord());
+
+        recordStore.update("a", randomSample);
+
+        restartRecordStore();
+        
+        recordStore.compactNow();
+        recordStore.compactNow();
+
+        restartRecordStore();
+
+        recordStore.compactNow();
+        recordStore.compactNow();
+
+        restartRecordStore();
+*/
+    }
+
     //---( helper methods. )---
 
     private MutableRecord createSampleRecord()
