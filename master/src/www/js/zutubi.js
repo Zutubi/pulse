@@ -1108,9 +1108,10 @@ Ext.override(Ext.View, {
         }
         if (this.multiSelect || this.singleSelect)
         {
-            if (this.multiSelect && e.shiftKey && this.lastSelection)
+            if (this.multiSelect && e.shiftKey && this.getSelectionCount() > 0)
             {
-                this.select(this.getNodes(this.indexOf(this.lastSelection), index), false);
+                var lastIndex = this.getSelectedIndexes()[this.getSelectionCount() - 1];
+                this.select(this.getNodes(lastIndex, index), false);
             }
             else if (this.isSelected(this.getNode(item)) && e.ctrlKey)
             {
@@ -1119,7 +1120,6 @@ Ext.override(Ext.View, {
             else
             {
                 this.select(item, this.multiSelect && e.ctrlKey);
-                this.lastSelection = item;
             }
             e.preventDefault();
         }
@@ -1181,7 +1181,7 @@ Ext.override(Ext.View, {
                 {
                     Ext.fly(node).addClass(this.selectedClass);
                     this.selections.push(node);
-                    if (!suppressEvent)
+                    if (suppressEvent !== false)
                     {
                         this.fireEvent("selectionchange", this, this.selections);
                     }
