@@ -1,7 +1,5 @@
 package com.zutubi.pulse.scheduling;
 
-import com.zutubi.pulse.model.Project;
-
 /**
  * A trigger that fires based on a Cron-like expression.
  */
@@ -19,14 +17,6 @@ public class CronTrigger extends Trigger
     public CronTrigger(String cron, String name)
     {
         this(cron, name, DEFAULT_GROUP);
-    }
-
-    public CronTrigger copy(Project oldProject, Project newProject)
-    {
-        CronTrigger copy = new CronTrigger();
-        copyCommon(copy, oldProject, newProject);
-        copy.cron = cron;
-        return copy;
     }
 
     public CronTrigger(String cron, String name, String group)

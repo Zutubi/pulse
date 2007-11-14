@@ -3,10 +3,12 @@ package com.zutubi.pulse.scheduling;
 import com.zutubi.config.annotations.Transient;
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.model.NamedEntity;
-import com.zutubi.pulse.model.Project;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <class-comment/>
@@ -95,21 +97,6 @@ public abstract class Trigger extends Entity implements NamedEntity
      */
     @Transient
     public abstract String getType();
-
-    public abstract Trigger copy(Project oldProject, Project newProject);
-
-    protected void copyCommon(Trigger copy, Project oldProject, Project newProject)
-    {
-        copy.setProject(newProject.getId());
-        copy.dataMap = new TreeMap<Serializable, Serializable>();
-        for(Map.Entry<Serializable, Serializable> entry: dataMap.entrySet())
-        {
-            Serializable key = entry.getKey();
-            Serializable value = entry.getValue();
-            copy.dataMap.put(key, value);
-        }
-        copy.taskClass = taskClass;
-    }
 
     public String getEditKey()
     {

@@ -1,7 +1,6 @@
 package com.zutubi.pulse.scheduling;
 
 import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.model.Project;
 
 /**
  * The EventTrigger is triggered by the occurance of an event within the system.
@@ -21,16 +20,6 @@ public class EventTrigger extends Trigger
     public EventTrigger()
     {
 
-    }
-
-    public EventTrigger copy(Project oldProject, Project newProject)
-    {
-        EventTrigger copy = new EventTrigger();
-        copyCommon(copy, oldProject, newProject);
-        copy.triggers = new Class[triggers.length];
-        System.arraycopy(triggers, 0, copy.triggers, 0, triggers.length);
-        copy.filterClass = filterClass;
-        return copy;
     }
 
     public EventTrigger(Class<? extends Event> trigger)
