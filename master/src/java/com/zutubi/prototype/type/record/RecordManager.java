@@ -3,6 +3,7 @@ package com.zutubi.prototype.type.record;
 import com.zutubi.prototype.transaction.TransactionManager;
 import com.zutubi.prototype.transaction.TransactionalWrapper;
 import com.zutubi.prototype.type.record.store.RecordStore;
+import com.zutubi.util.logging.Logger;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +22,9 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class RecordManager implements HandleAllocator
 {
-    private static final long UNDEFINED = 0;
+    private static final Logger LOG = Logger.getLogger(RecordManager.class);
+
+    protected static final long UNDEFINED = 0;
 
     private TransactionalWrapper<RecordManagerState> stateWrapper;
 
@@ -49,6 +52,12 @@ public class RecordManager implements HandleAllocator
                 if (handle > highest[0])
                 {
                     highest[0] = handle;
+                }
+                // sanity check for duplicate handles.
+                if (handleToPathMapping.containsKey(handle))
+                {
+                    LOG.severe("Duplicate record handle detected for handle " + handle + " and paths '" +
+                            path + "' and '" + handleToPathMapping.get(handle) + "'");
                 }
                 handleToPathMapping.put(handle, path);
             }
@@ -154,6 +163,18 @@ public class RecordManager implements HandleAllocator
         return stateWrapper.get();
     }
 
+    private void clearHandles(MutableRecord record)
+    {
+        record.setHandle(UNDEFINED);
+        for (Object child : record.values())
+        {
+            if (child instanceof MutableRecord)
+            {
+                allocateHandles((MutableRecord) child);
+            }
+        }
+    }
+
     private void allocateHandles(MutableRecord record)
     {
         if (record.getHandle() == UNDEFINED)
@@ -187,11 +208,17 @@ public class RecordManager implements HandleAllocator
      * @param values a record holding new simple values to apply
      * @return the new record created by the update
      */
-    public synchronized Record update(String path, Record values)
+    public synchronized Record update(final String path, final Record values)
     {
         checkPath(path);
         
-        return recordStore.update(path, values);
+        return (Record) stateWrapper.execute(new TransactionalWrapper.Action<RecordManagerState>()
+        {
+            public Object execute(RecordManagerState state)
+            {
+                return recordStore.update(path, values);
+            }
+        });
     }
 
     /**
@@ -279,6 +306,8 @@ public class RecordManager implements HandleAllocator
         if (record != null)
         {
             MutableRecord copy = record.copy(true);
+            // the copy will copy the handles as well, so lets clear them to ensure reallocation on insert
+            clearHandles(copy);
             insert(destinationPath, copy);
             return copy;
         }
