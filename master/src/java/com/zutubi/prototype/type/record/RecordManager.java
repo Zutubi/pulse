@@ -170,7 +170,7 @@ public class RecordManager implements HandleAllocator
         {
             if (child instanceof MutableRecord)
             {
-                allocateHandles((MutableRecord) child);
+                clearHandles((MutableRecord) child);
             }
         }
     }

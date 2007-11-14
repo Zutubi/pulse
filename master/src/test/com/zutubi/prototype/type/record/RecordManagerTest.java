@@ -112,6 +112,7 @@ public class RecordManagerTest extends PulseTestCase
     {
         MutableRecordImpl record = new MutableRecordImpl();
         record.put("key", "value");
+        record.put("nested", record.copy(true));
 
         Record original = recordManager.insert("sourcePath", record);
         assertNull(recordManager.select("destinationPath"));
@@ -124,7 +125,8 @@ public class RecordManagerTest extends PulseTestCase
         // ensure that the copies have unique handles.
         assertTrue(original.getHandle() != RecordManager.UNDEFINED);
         assertTrue(copy.getHandle() != RecordManager.UNDEFINED);
-        assertFalse(original.getHandle() == copy.getHandle());
+        assertTrue(original.getHandle() != copy.getHandle());
+        assertTrue(((Record)original.get("nested")).getHandle() != ((Record)copy.get("nested")).getHandle());
 
         // ensure that changing the original does not change the copy
         record.put("anotherKey", "anotherValue");
