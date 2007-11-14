@@ -1034,7 +1034,7 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
         ZUTUBI.Select.superclass.onDisable.call(this);
         if(this.input)
         {
-            this.input.disable();
+            this.input.dom.disabled = true;
         }
         else
         {
@@ -1053,7 +1053,7 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
         ZUTUBI.Select.superclass.onEnable.call(this);
         if(this.input)
         {
-            this.input.enable();
+            this.input.dom.disabled = false;
         }
         else
         {
@@ -1135,7 +1135,7 @@ Ext.override(Ext.View, {
             {
                 Ext.fly(node).removeClass(this.selectedClass);
                 this.selections.remove(node);
-                if (!suppressEvent)
+                if (suppressEvent !== true)
                 {
                     this.fireEvent("selectionchange", this, this.selections);
                 }
@@ -1181,7 +1181,7 @@ Ext.override(Ext.View, {
                 {
                     Ext.fly(node).addClass(this.selectedClass);
                     this.selections.push(node);
-                    if (suppressEvent !== false)
+                    if (suppressEvent !== true)
                     {
                         this.fireEvent("selectionchange", this, this.selections);
                     }
