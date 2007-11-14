@@ -47,7 +47,7 @@ public class ConfigurationReferenceManagerTest extends AbstractConfigurationSyst
         configurationTemplateManager.insert("project", p1);
 
         Project p2 = new Project("p2");
-        p1.addStage(new Stage("p2s1"));
+        p2.addStage(new Stage("p2s1"));
         configurationTemplateManager.insert("project", p2);
 
         Project p3 = new Project("p3");
@@ -144,8 +144,8 @@ public class ConfigurationReferenceManagerTest extends AbstractConfigurationSyst
 
     public void testInheritedVisibleWithinConcrete()
     {
-        Collection<Configuration> ref = configurationReferenceManager.getReferencableInstances(stageType, "template/child/somewhere");
-        assertNamedConfigurations(ref, "default", "childStage", "grandchildStage");
+        Collection<Configuration> ref = configurationReferenceManager.getReferencableInstances(stageType, "template/concreteGrandchild/somewhere");
+        assertNamedConfigurations(ref, "default", "childStage", "concreteGrandchildStage");
     }
 
     private void assertConcreteProjects(Collection<Configuration> referenceable)

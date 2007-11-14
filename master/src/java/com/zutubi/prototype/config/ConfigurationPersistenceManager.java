@@ -187,7 +187,12 @@ public class ConfigurationPersistenceManager
         String scope = getClosestMatchingScope(type, path);
         if (scope != null)
         {
-            scope = PathUtils.getParentPath(scope);
+            String parent = PathUtils.getParentPath(scope);
+            ComplexType parentType = getType(parent);
+            if(parentType instanceof CollectionType && parentType.getTargetType().equals(type))
+            {
+                scope = parent;
+            }
         }
         return scope;
     }

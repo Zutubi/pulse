@@ -192,9 +192,11 @@ public class CollectionUtils
                     }
                 }
             }
+
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     public static <T> void print(Collection<T> c, Mapping<T, String> m)
