@@ -110,7 +110,7 @@
                 <include name="**/*Test.java"/>
                 <exclude name="**/Cvs*"/>
                 <exclude name="**/LogInformationAnalyserTest*"/>
-                <exclude name="**/Svn*"/>
+                <exclude name="**/*Subversion*Test*"/>
                 <exclude name="**/*WorkingCopyTest*"/>
                 <exclude name="**/LocalBuildTest.java"/>
                 <exclude name="**/*Perforce*Test*"/>
