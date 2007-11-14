@@ -223,15 +223,15 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
         List<JournalEntry> journal = new LinkedList<JournalEntry>();
         if (journalIndexFile.isFile())
         {
-            LOG.warning(Thread.currentThread().getId() + ": replay journal(start)");
-            LOG.warning(Thread.currentThread().getId() + ":   snapshotid: ("+latestSnapshotId+")");
+            LOG.finest(Thread.currentThread().getId() + ": replay journal(start)");
+            LOG.finest(Thread.currentThread().getId() + ":   snapshotid: ("+latestSnapshotId+")");
             for (JournalEntry journalEntry : readJournal())
             {
                 // remove those entries that are already part of the snapshot.
                 if (latestSnapshotId < journalEntry.getId())
                 {
                     journalEntry.getRecord(); // preload the record so that it appears in the logging.
-                    LOG.warning(Thread.currentThread().getId() + ":   applying("+journalEntry+")");
+                    LOG.finest(Thread.currentThread().getId() + ":   applying("+journalEntry+")");
 
 
                     journal.add(journalEntry);
@@ -246,7 +246,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
                 }
                 else
                 {
-                    LOG.warning(Thread.currentThread().getId() + ":   dropping("+journalEntry+")");
+                    LOG.finest(Thread.currentThread().getId() + ":   ignoring("+journalEntry+")");
                 }
             }
 
@@ -265,7 +265,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
                     inMemoryDelegate.delete(journalEntry.getPath());
                 }
             }
-            LOG.warning(Thread.currentThread().getId() + ": replay journal(end)");
+            LOG.finest(Thread.currentThread().getId() + ": replay journal(end)");
         }
 
         // The last committed journal entry id is at least the latest snapshot id (when there are no journal entries),
@@ -329,7 +329,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
     public boolean prepare()
     {
         // prepare the journal entries.
-        LOG.warning(Thread.currentThread().getId() + ": prepare(start)");
+        LOG.finest(Thread.currentThread().getId() + ": prepare(start)");
 
         FileWriter writer = null;
         try
@@ -398,7 +398,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
                 }
             }
 
-            LOG.warning(Thread.currentThread().getId() + ": prepare(end)");
+            LOG.finest(Thread.currentThread().getId() + ": prepare(end)");
             return true;
         }
         catch (IOException e)
@@ -425,7 +425,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
 
     public synchronized void commit() throws TransactionException
     {
-        LOG.warning(Thread.currentThread().getId() + ": commit(start)");
+        LOG.finest(Thread.currentThread().getId() + ": commit(start)");
 
         // commit the journal entries.
         if (fileSystem.exists(newJournalIndexFile))
@@ -472,13 +472,13 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
         journal.addAll(activeJournal);
         activeJournal.clear();
 
-        LOG.warning(Thread.currentThread().getId() + ": commit(end)");
+        LOG.finest(Thread.currentThread().getId() + ": commit(end)");
     }
 
     public void rollback() throws TransactionException
     {
         // rollback the journal entries
-        LOG.warning(Thread.currentThread().getId() + ": rollback(start)");
+        LOG.finest(Thread.currentThread().getId() + ": rollback(start)");
 
         for (JournalEntry entry : activeJournal)
         {
@@ -493,7 +493,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
         recoverIndex(newJournalIndexFile, journalIndexFile, backupJournalIndexFile);
 
         activeJournal.clear();
-        LOG.warning(Thread.currentThread().getId() + ": rollback(end)");
+        LOG.finest(Thread.currentThread().getId() + ": rollback(end)");
     }
 
     private void recoverIndex(File newIndex, File index, File backupIndex)
@@ -545,7 +545,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
             {
                 JournalEntry journalEntry = new JournalEntry(ACTION_INSERT, path, record, nextJournalEntryId++);
 
-                LOG.warning(Thread.currentThread().getId() + ": ("+journalEntry+")");
+                LOG.finest(Thread.currentThread().getId() + ": ("+journalEntry+")");
                 activeJournal.add(journalEntry);
                 return inMemoryDelegate.insert(path, record);
             }
@@ -559,7 +559,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
             public Record execute()
             {
                 JournalEntry journalEntry = new JournalEntry(ACTION_UPDATE, path, record, nextJournalEntryId++);
-                LOG.warning(Thread.currentThread().getId() + ": ("+journalEntry+")");
+                LOG.finest(Thread.currentThread().getId() + ": ("+journalEntry+")");
                 activeJournal.add(journalEntry);
                 return inMemoryDelegate.update(path, record);
             }
@@ -573,7 +573,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
             public Record execute()
             {
                 JournalEntry journalEntry = new JournalEntry(ACTION_DELETE, path, nextJournalEntryId++);
-                LOG.warning(Thread.currentThread().getId() + ": ("+journalEntry+")");
+                LOG.finest(Thread.currentThread().getId() + ": ("+journalEntry+")");
                 activeJournal.add(journalEntry);
                 return inMemoryDelegate.delete(path);
             }
@@ -656,7 +656,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
 
     public void compactNow() throws IOException
     {
-        LOG.warning(Thread.currentThread().getId() + ": compact(start)");
+        LOG.finest(Thread.currentThread().getId() + ": compact(start)");
 
         long oldSnapshotId = latestSnapshotId;
 
@@ -665,7 +665,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
             // check if compact is required.
             if (lastCommittedJournalEntryId == latestSnapshotId)
             {
-                LOG.warning(Thread.currentThread().getId() + ": compact(not required)");
+                LOG.finest(Thread.currentThread().getId() + ": compact(not required)");
                 return;
             }
 
@@ -745,7 +745,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
             }
 
             cleanupJournalEntries();
-            LOG.warning(Thread.currentThread().getId() + ": compact(end)");
+            LOG.finest(Thread.currentThread().getId() + ": compact(end)");
         }
         catch (IOException e)
         {
