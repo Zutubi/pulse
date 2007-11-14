@@ -3,10 +3,10 @@ package com.zutubi.pulse.core.scm.svn;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.scm.ScmClientUtils;
+import com.zutubi.pulse.core.scm.ScmContext;
 import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.ScmFile;
-import com.zutubi.pulse.core.scm.ScmContext;
-import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.ZipUtils;
@@ -23,9 +23,9 @@ import java.util.List;
  * 
  *
  */
-public class SvnClientTest extends PulseTestCase
+public class SubversionClientTest extends PulseTestCase
 {
-    private SvnClient server;
+    private SubversionClient server;
     private File tmpDir;
     private File gotDir;
     private File expectedDir;
@@ -113,7 +113,7 @@ public class SvnClientTest extends PulseTestCase
 
         waitForServer(3690);
 
-        server = new SvnClient("svn://localhost/test/trunk", "jsankey", "password");
+        server = new SubversionClient("svn://localhost/test/trunk", "jsankey", "password");
     }
 
     protected void tearDown() throws Exception
@@ -157,11 +157,11 @@ public class SvnClientTest extends PulseTestCase
     {
         server.tag(createRevision(1), TAG_PATH, false);
 
-        SvnClient confirmServer = null;
+        SubversionClient confirmServer = null;
 
         try
         {
-            confirmServer = new SvnClient(TAG_PATH, "jsankey", "password");
+            confirmServer = new SubversionClient(TAG_PATH, "jsankey", "password");
             List<ScmFile> files = getSortedListing(confirmServer);
 
             assertEquals(3, files.size());
@@ -193,10 +193,10 @@ public class SvnClientTest extends PulseTestCase
 
     private void assertTaggedRev8() throws ScmException, IOException
     {
-        SvnClient confirmServer = null;
+        SubversionClient confirmServer = null;
         try
         {
-            confirmServer = new SvnClient(TAG_PATH, "jsankey", "password");
+            confirmServer = new SubversionClient(TAG_PATH, "jsankey", "password");
             List<ScmFile> files = getSortedListing(confirmServer);
 
             assertEquals(3, files.size());
@@ -286,10 +286,10 @@ public class SvnClientTest extends PulseTestCase
 
     public void testCheckNonExistantPathHTTP() throws Exception
     {
-        SvnClient server = null;
+        SubversionClient server = null;
         try
         {
-            server = new SvnClient("https://svn.apache.org/repos/asf", "anonymous", "");
+            server = new SubversionClient("https://svn.apache.org/repos/asf", "anonymous", "");
             assertFalse(server.pathExists(createRevision(1), SVNURL.parseURIEncoded("https://svn.apache.org/repos/asf/nosuchpath/")));
         }
         finally
@@ -305,7 +305,7 @@ public class SvnClientTest extends PulseTestCase
         assertDirectoriesEqual(new File(new File(expectedDir, "test"), "trunk"), dir);
     }
 
-    private List<ScmFile> getSortedListing(SvnClient confirmServer)
+    private List<ScmFile> getSortedListing(SubversionClient confirmServer)
             throws ScmException
     {
         List<ScmFile> files = confirmServer.browse("", null);

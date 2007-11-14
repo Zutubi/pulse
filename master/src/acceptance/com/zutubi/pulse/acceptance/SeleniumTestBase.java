@@ -143,7 +143,7 @@ public class SeleniumTestBase extends TestCase
 
         SelectTypeState scmTypeState = new SelectTypeState(selenium);
         scmTypeState.waitFor();
-        scmTypeState.nextFormElements("zutubi.svnConfig");
+        scmTypeState.nextFormElements("zutubi.subversionConfig");
 
         AddProjectWizard.SubversionState subversionState = new AddProjectWizard.SubversionState(selenium);
         subversionState.waitFor();

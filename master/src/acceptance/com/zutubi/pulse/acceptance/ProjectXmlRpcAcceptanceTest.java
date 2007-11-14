@@ -51,7 +51,7 @@ public class ProjectXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         Hashtable<String, Object> createdScm = (Hashtable<String, Object>) createdProject.get("scm");
         assertNotNull(createdScm);
-        assertEquals("zutubi.svnConfig", createdScm.get(SYMBOLIC_NAME_KEY));
+        assertEquals("zutubi.subversionConfig", createdScm.get(SYMBOLIC_NAME_KEY));
         assertEquals("svn://localhost:3088/accept/trunk/triviant", createdScm.get("url"));
         assertEquals("CLEAN_CHECKOUT", createdScm.get("checkoutScheme"));
         assertEquals(false, createdScm.get("monitor"));

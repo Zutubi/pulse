@@ -15,10 +15,7 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeoutException;
-import java.io.ByteArrayOutputStream;
 
 /**
  */
@@ -176,7 +173,7 @@ public class XmlRpcHelper
 
     public String insertSimpleProject(String name, String parent, boolean template) throws Exception
     {
-        Hashtable<String, Object> scm = createEmptyConfig("zutubi.svnConfig");
+        Hashtable<String, Object> scm = createEmptyConfig("zutubi.subversionConfig");
         scm.put("url", "svn://localhost:3088/accept/trunk/triviant");
         scm.put("checkoutScheme", "CLEAN_CHECKOUT");
         scm.put("monitor", false);

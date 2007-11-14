@@ -2,23 +2,22 @@ package com.zutubi.pulse.core.scm.svn.config;
 
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.pulse.core.config.ConfigurationCheckHandlerSupport;
-import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.ScmClientFactory;
-import com.zutubi.pulse.core.scm.svn.config.SvnConfiguration;
-import com.zutubi.pulse.core.scm.svn.SvnClient;
+import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.scm.svn.SubversionClient;
 
 /**
  *
  *
  */
-@SymbolicName("zutubi.svnConfigurationCheckHandler")
-public class SvnConfigurationCheckHandler extends ConfigurationCheckHandlerSupport<SvnConfiguration>
+@SymbolicName("zutubi.subversionConfigurationCheckHandler")
+public class SubversionConfigurationCheckHandler extends ConfigurationCheckHandlerSupport<SubversionConfiguration>
 {
     private ScmClientFactory scmClientFactory;
 
-    public void test(SvnConfiguration configuration) throws ScmException
+    public void test(SubversionConfiguration configuration) throws ScmException
     {
-        SvnClient client = (SvnClient) scmClientFactory.createClient(configuration);
+        SubversionClient client = (SubversionClient) scmClientFactory.createClient(configuration);
         try
         {
             client.testConnection();

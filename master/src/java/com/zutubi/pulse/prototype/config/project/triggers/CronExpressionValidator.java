@@ -1,12 +1,11 @@
-package com.zutubi.pulse.xwork.validator.validators;
+package com.zutubi.pulse.prototype.config.project.triggers;
 
-import com.opensymphony.xwork.validator.ValidationException;
-import com.opensymphony.xwork.validator.validators.FieldValidatorSupport;
+import com.zutubi.validation.ValidationException;
+import com.zutubi.validation.validators.FieldValidatorSupport;
 import org.quartz.CronTrigger;
 import org.quartz.impl.calendar.BaseCalendar;
 
 /**
- * <class-comment/>
  */
 public class CronExpressionValidator extends FieldValidatorSupport
 {
@@ -26,7 +25,7 @@ public class CronExpressionValidator extends FieldValidatorSupport
                 catch (Exception e)
                 {
                     setDefaultMessage(e.getMessage());
-                    addFieldError(getFieldName(), object);
+                    addFieldError(getFieldName());
                 }
             }
         }

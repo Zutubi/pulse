@@ -25,7 +25,7 @@ import java.util.Properties;
 
 /**
  */
-public class SvnWorkingCopyTest extends PulseTestCase
+public class SubversionWorkingCopyTest extends PulseTestCase
 {
     private File tempDir;
     private Process svnProcess;
@@ -35,7 +35,7 @@ public class SvnWorkingCopyTest extends PulseTestCase
     private File otherBase;
     private File branchBase;
 
-    private SvnWorkingCopy wc;
+    private SubversionWorkingCopy wc;
     private SVNWCClient client;
 
     static
@@ -77,10 +77,10 @@ public class SvnWorkingCopyTest extends PulseTestCase
         FileSystemUtils.createFile(conf, "[general]\nanon-access = write\nauth-access = write\n");
 
         // Restore from dump
-        File repoZip = getTestDataFile("core", "repo", "zip");
+        File repoZip = getTestDataFile("bundles/com.zutubi.pulse.core.scm.svn", "repo", "zip");
         ZipUtils.extractZip(repoZip, tempDir);
 
-        File dump = new File(tempDir, "SvnWorkingCopyTest.dump");
+        File dump = new File(tempDir, "SubversionWorkingCopyTest.dump");
         svnProcess = Runtime.getRuntime().exec(new String[] { "svnadmin", "load", "-q", repoDir.getAbsolutePath() });
         FileInputStream is = new FileInputStream(dump);
         IOUtils.joinStreams(is, svnProcess.getOutputStream());
@@ -103,7 +103,7 @@ public class SvnWorkingCopyTest extends PulseTestCase
         updateClient = new SVNUpdateClient(new BasicAuthenticationManager("anonymous", ""), clientManager.getOptions());
         updateClient.doCheckout(SVNURL.parseURIDecoded("svn://localhost/test/trunk"), base, SVNRevision.UNDEFINED, SVNRevision.HEAD, true);
         client = clientManager.getWCClient();
-        wc = new SvnWorkingCopy(base, new PropertiesConfig());
+        wc = new SubversionWorkingCopy(base, new PropertiesConfig());
     }
 
     private void createOtherWC() throws SVNException
@@ -137,21 +137,21 @@ public class SvnWorkingCopyTest extends PulseTestCase
     public void testMatchesRepositoryMatches() throws ScmException
     {
         Properties p = new Properties();
-        p.put(SvnConstants.PROPERTY_URL, "svn://localhost/test/trunk");
+        p.put(SubversionConstants.PROPERTY_URL, "svn://localhost/test/trunk");
         assertTrue(wc.matchesRepository(p));
     }
 
     public void testMatchesRepositoryDoesntMatch() throws ScmException
     {
         Properties p = new Properties();
-        p.put(SvnConstants.PROPERTY_URL, "svn://localhost/test/branches/1.0.x");
+        p.put(SubversionConstants.PROPERTY_URL, "svn://localhost/test/branches/1.0.x");
         assertFalse(wc.matchesRepository(p));
     }
 
     public void testMatchesRepositoryEmbeddedUser() throws ScmException
     {
         Properties p = new Properties();
-        p.put(SvnConstants.PROPERTY_URL, "svn://goober@localhost/test/trunk");
+        p.put(SubversionConstants.PROPERTY_URL, "svn://goober@localhost/test/trunk");
         assertTrue(wc.matchesRepository(p));
     }
 
@@ -216,7 +216,7 @@ public class SvnWorkingCopyTest extends PulseTestCase
     private void getStatusEditedNewlyText(boolean remote)  throws IOException, SVNException, ScmException
     {
         File test = edit("file1");
-        client.doSetProperty(test, SvnConstants.SVN_PROPERTY_EOL_STYLE, "native", true, false, null);
+        client.doSetProperty(test, SubversionConstants.SVN_PROPERTY_EOL_STYLE, "native", true, false, null);
 
         WorkingCopyStatus wcs = assertSimpleStatus("file1", FileStatus.State.MODIFIED, false, remote);
         assertEOL(wcs, "file1", FileStatus.EOLStyle.NATIVE);
@@ -271,7 +271,7 @@ public class SvnWorkingCopyTest extends PulseTestCase
     private void getStatusEditedAddedExecutableProperty(boolean remote) throws IOException, SVNException, ScmException
     {
         File test = edit("file1");
-        client.doSetProperty(test, SvnConstants.SVN_PROPERTY_EXECUTABLE, "yay", true, false, null);
+        client.doSetProperty(test, SubversionConstants.SVN_PROPERTY_EXECUTABLE, "yay", true, false, null);
         WorkingCopyStatus wcs = assertSimpleStatus("file1", FileStatus.State.MODIFIED, false, remote);
         assertExecutable(wcs, "file1", true);
     }
@@ -290,7 +290,7 @@ public class SvnWorkingCopyTest extends PulseTestCase
     {
         File test = new File(base, "bin1");
         FileSystemUtils.createFile(test, "hello");
-        client.doSetProperty(test, SvnConstants.SVN_PROPERTY_EXECUTABLE, null, true, false, null);
+        client.doSetProperty(test, SubversionConstants.SVN_PROPERTY_EXECUTABLE, null, true, false, null);
         WorkingCopyStatus wcs = assertSimpleStatus("bin1", FileStatus.State.MODIFIED, false, remote);
         assertExecutable(wcs, "bin1", false);
     }
@@ -331,7 +331,7 @@ public class SvnWorkingCopyTest extends PulseTestCase
         FileSystemUtils.createFile(test, "hello");
 
         client.doAdd(test, true, false, false, false);
-        client.doSetProperty(test, SvnConstants.SVN_PROPERTY_EOL_STYLE, "native", true, false, null);
+        client.doSetProperty(test, SubversionConstants.SVN_PROPERTY_EOL_STYLE, "native", true, false, null);
         WorkingCopyStatus wcs = assertSimpleStatus("newfile", FileStatus.State.ADDED, false, remote);
         assertEOL(wcs, "newfile", FileStatus.EOLStyle.NATIVE);
     }

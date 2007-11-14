@@ -2,11 +2,10 @@ package com.zutubi.pulse.core.scm.svn;
 
 import com.zutubi.pulse.config.Config;
 import com.zutubi.pulse.config.ConfigSupport;
-import com.zutubi.pulse.core.scm.NumericalRevision;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.personal.PersonalBuildSupport;
 import com.zutubi.pulse.core.scm.*;
-import static com.zutubi.pulse.core.scm.svn.SvnConstants.*;
+import static com.zutubi.pulse.core.scm.svn.SubversionConstants.*;
+import com.zutubi.pulse.personal.PersonalBuildSupport;
 import org.tmatesoft.svn.core.SVNCancelException;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNNodeKind;
@@ -24,7 +23,7 @@ import java.util.Properties;
 
 /**
  */
-public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
+public class SubversionWorkingCopy extends PersonalBuildSupport implements WorkingCopy
 {
     public static final String PROPERTY_ALLOW_EXTERNALS = "svn.allow.externals";
 
@@ -41,7 +40,7 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
         SVNAdminAreaFactory.setUpgradeEnabled(false);
     }
 
-    public SvnWorkingCopy(File path, Config config)
+    public SubversionWorkingCopy(File path, Config config)
     {
         this.base = path;
         ISVNOptions options = SVNWCUtil.createDefaultOptions(true);
@@ -118,7 +117,7 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
     public boolean matchesRepository(Properties repositoryDetails) throws ScmException
     {
         // We just check that the URL matches
-        String url = repositoryDetails.getProperty(SvnConstants.PROPERTY_URL);
+        String url = repositoryDetails.getProperty(SubversionConstants.PROPERTY_URL);
         if (url == null)
         {
             throw new ScmException("Subversion repository details not returned by Pulse server");

@@ -2,20 +2,23 @@ package com.zutubi.pulse.core.scm.svn.config;
 
 import com.zutubi.config.annotations.*;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
-import com.zutubi.pulse.core.scm.svn.SvnClient;
+import com.zutubi.pulse.core.scm.svn.SubversionClient;
+import com.zutubi.validation.annotations.Constraint;
 import com.zutubi.validation.annotations.Required;
 
 import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * Subversion SCM configuration.
  */
 @Form(fieldOrder = { "url", "username", "password", "keyfile", "keyfilePassphrase", "checkoutScheme", "filterPaths", "externalMonitorPaths", "verifyExternals", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod" })
-@ConfigurationCheck("SvnConfigurationCheckHandler")
-@SymbolicName("zutubi.svnConfig")
-public class SvnConfiguration extends ScmConfiguration
+@ConfigurationCheck("SubversionConfigurationCheckHandler")
+@SymbolicName("zutubi.subversionConfig")
+public class SubversionConfiguration extends ScmConfiguration
 {
     @Required
+    @Constraint("SubversionUrlValidator")
     private String url;
     private String username;
     private String password;
@@ -28,11 +31,11 @@ public class SvnConfiguration extends ScmConfiguration
     @Wizard.Ignore
     private boolean verifyExternals;
 
-    public SvnConfiguration()
+    public SubversionConfiguration()
     {
     }
 
-    public SvnConfiguration(String url, String name, String password)
+    public SubversionConfiguration(String url, String name, String password)
     {
         this.url = url;
         this.username = name;
@@ -91,7 +94,7 @@ public class SvnConfiguration extends ScmConfiguration
 
     public String getType()
     {
-        return SvnClient.TYPE;
+        return SubversionClient.TYPE;
     }
 
     public String getPreviousRevision(String revision)

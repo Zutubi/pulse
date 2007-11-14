@@ -4,37 +4,37 @@ import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.pulse.core.scm.ScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmException;
-import com.zutubi.pulse.core.scm.svn.config.SvnConfiguration;
+import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
 
 /**
  *
  *
  */
-public class SvnClientFactory implements ScmClientFactory<SvnConfiguration>
+public class SubversionClientFactory implements ScmClientFactory<SubversionConfiguration>
 {
-    public ScmClient createClient(SvnConfiguration config) throws ScmException
+    public ScmClient createClient(SubversionConfiguration config) throws ScmException
     {
-        SvnClient client;
+        SubversionClient client;
         if (!TextUtils.stringSet(config.getKeyfile()))
         {
             if (TextUtils.stringSet(config.getUsername()))
             {
-                client = new SvnClient(config.getUrl(), config.getUsername(), config.getPassword());
+                client = new SubversionClient(config.getUrl(), config.getUsername(), config.getPassword());
             }
             else
             {
-                client = new SvnClient(config.getUrl());
+                client = new SubversionClient(config.getUrl());
             }
         }
         else
         {
             if (TextUtils.stringSet(config.getKeyfilePassphrase()))
             {
-                client = new SvnClient(config.getUrl(), config.getUsername(), config.getPassword(), config.getKeyfile(), config.getKeyfilePassphrase());
+                client = new SubversionClient(config.getUrl(), config.getUsername(), config.getPassword(), config.getKeyfile(), config.getKeyfilePassphrase());
             }
             else
             {
-                client = new SvnClient(config.getUrl(), config.getUsername(), config.getPassword(), config.getKeyfile());
+                client = new SubversionClient(config.getUrl(), config.getUsername(), config.getPassword(), config.getKeyfile());
             }
         }
 

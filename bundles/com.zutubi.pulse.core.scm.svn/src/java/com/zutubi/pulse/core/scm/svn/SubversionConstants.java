@@ -2,7 +2,7 @@ package com.zutubi.pulse.core.scm.svn;
 
 /**
  */
-public class SvnConstants
+public class SubversionConstants
 {
     public static final String PROPERTY_URL = "svn.url";
     public static final String PROPERTY_USERNAME = "svn.username";

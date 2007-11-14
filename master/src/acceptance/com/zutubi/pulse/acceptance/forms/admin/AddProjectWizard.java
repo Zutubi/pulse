@@ -42,7 +42,7 @@ public class AddProjectWizard
 
         public String getFormName()
         {
-            return "com.zutubi.pulse.core.scm.svn.config.SvnConfiguration";
+            return "com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration";
         }
 
         public String[] getFieldNames()

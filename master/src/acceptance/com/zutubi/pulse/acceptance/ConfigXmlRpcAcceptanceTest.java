@@ -1,8 +1,8 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.util.Sort;
-import com.zutubi.util.RandomUtils;
 import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.util.RandomUtils;
+import com.zutubi.util.Sort;
 
 import java.util.*;
 
@@ -230,13 +230,13 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertEquals(true, call("deleteConfig", scmPath));
 
         Hashtable<String, Object> scm = new Hashtable<String, Object>();
-        scm.put(SYMBOLIC_NAME_KEY, "zutubi.svnConfig");
+        scm.put(SYMBOLIC_NAME_KEY, "zutubi.subversionConfig");
         scm.put("url", "svn://localhost/test/trunk");
         scm.put("monitor", false);
         call("insertConfig", scmPath, scm);
 
         Hashtable<String, Object> loadedScm = call("getConfig", scmPath);
-        assertEquals("zutubi.svnConfig", loadedScm.get(SYMBOLIC_NAME_KEY));
+        assertEquals("zutubi.subversionConfig", loadedScm.get(SYMBOLIC_NAME_KEY));
         assertEquals("svn://localhost/test/trunk", loadedScm.get("url"));
         assertEquals(false, loadedScm.get("monitor"));
     }
@@ -272,13 +272,13 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertEquals(projectName, project.get("name"));
         Hashtable<String, Object> scm = (Hashtable<String, Object>) project.get("scm");
         assertNotNull(scm);
-        assertEquals("zutubi.svnConfig", scm.get(SYMBOLIC_NAME_KEY));
+        assertEquals("zutubi.subversionConfig", scm.get(SYMBOLIC_NAME_KEY));
     }
 
     public void testInsertTemplatedConfigValidates() throws Exception
     {
         Hashtable<String, Object> scm = new Hashtable<String, Object>();
-        scm.put(SYMBOLIC_NAME_KEY, "zutubi.svnConfig");
+        scm.put(SYMBOLIC_NAME_KEY, "zutubi.subversionConfig");
 
         Hashtable<String, Object> project = new Hashtable<String, Object>();
         project.put(SYMBOLIC_NAME_KEY, "zutubi.projectConfig");
@@ -292,7 +292,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testInsertTemplatedConfigValidatesAsTemplate() throws Exception
     {
         Hashtable<String, Object> scm = new Hashtable<String, Object>();
-        scm.put(SYMBOLIC_NAME_KEY, "zutubi.svnConfig");
+        scm.put(SYMBOLIC_NAME_KEY, "zutubi.subversionConfig");
 
         Hashtable<String, Object> project = new Hashtable<String, Object>();
         project.put(SYMBOLIC_NAME_KEY, "zutubi.projectConfig");

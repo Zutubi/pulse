@@ -2,9 +2,9 @@
 <?eclipse version="3.2"?>
 <plugin>
     <extension point="com.zutubi.pulse.core.config">
-        <config class="com.zutubi.pulse.core.scm.svn.config.SvnConfiguration"/>
+        <config class="com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration"/>
     </extension>
     <extension point="com.zutubi.pulse.core.scms">
-        <scm name="svn" factory-class="com.zutubi.pulse.core.scm.svn.SvnClientFactory" working-copy-class="com.zutubi.pulse.core.scm.svn.SvnWorkingCopy"/>
+        <scm name="svn" factory-class="com.zutubi.pulse.core.scm.svn.SubversionClientFactory" working-copy-class="com.zutubi.pulse.core.scm.svn.SubversionWorkingCopy"/>
     </extension>
 </plugin>

@@ -4,9 +4,9 @@ import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.ScmCancelledException;
+import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.ScmEventHandler;
 import com.zutubi.pulse.core.scm.ScmException;
-import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.ZipUtils;
@@ -19,9 +19,9 @@ import java.util.List;
 
 /**
  */
-public class SvnExternalsTest extends PulseTestCase
+public class SubversionExternalsTest extends PulseTestCase
 {
-    private SvnClient server;
+    private SubversionClient server;
     private File tempDir;
     private File checkoutDir;
     private Process svnProcess;
@@ -116,10 +116,10 @@ public class SvnExternalsTest extends PulseTestCase
         FileSystemUtils.createFile(conf, "[general]\nanon-access = write\nauth-access = write\n");
 
         // Restore from dump
-        File repoZip = getTestDataFile("server-core", "repo", "zip");
+        File repoZip = getTestDataFile("bundles/com.zutubi.pulse.core.scm.svn", "repo", "zip");
         ZipUtils.extractZip(repoZip, tempDir);
 
-        File dump = new File(tempDir, "SvnExternalsTest.repo");
+        File dump = new File(tempDir, "SubversionExternalsTest.repo");
         svnProcess = Runtime.getRuntime().exec(new String[] { "svnadmin", "load", "-q", repoDir.getAbsolutePath() });
         FileInputStream is = new FileInputStream(dump);
         IOUtils.joinStreams(is, svnProcess.getOutputStream());
@@ -131,7 +131,7 @@ public class SvnExternalsTest extends PulseTestCase
         svnProcess = Runtime.getRuntime().exec(new String[] { "svnserve", "--foreground", "-dr", "."}, null, repoDir);
         waitForServer(3690);
 
-        server = new SvnClient("svn://localhost/bundle/trunk");
+        server = new SubversionClient("svn://localhost/bundle/trunk");
     }
 
     protected void tearDown() throws Exception
@@ -149,7 +149,7 @@ public class SvnExternalsTest extends PulseTestCase
     public void testGetExternals() throws Exception
     {
         server.addExternalPath(".");
-        List<SvnClient.ExternalDefinition> externals = server.getExternals(createRevision(8));
+        List<SubversionClient.ExternalDefinition> externals = server.getExternals(createRevision(8));
         assertEquals(2, externals.size());
         assertExternal(externals.get(0), "pull1", "svn://localhost/ext1/trunk");
         assertExternal(externals.get(1), "pull2", "svn://localhost/ext2/trunk");
@@ -157,7 +157,7 @@ public class SvnExternalsTest extends PulseTestCase
 
     public void testGetExternalsNoPath() throws Exception
     {
-        List<SvnClient.ExternalDefinition> externals = server.getExternals(createRevision(8));
+        List<SubversionClient.ExternalDefinition> externals = server.getExternals(createRevision(8));
         assertEquals(0, externals.size());
     }
 
@@ -254,7 +254,7 @@ public class SvnExternalsTest extends PulseTestCase
         }
     }
 
-    private void assertExternal(SvnClient.ExternalDefinition external, String path, String url)
+    private void assertExternal(SubversionClient.ExternalDefinition external, String path, String url)
     {
         assertEquals(path, external.path);
         assertEquals(url, external.url.toDecodedString());
@@ -268,10 +268,10 @@ public class SvnExternalsTest extends PulseTestCase
 
     public static void main(String[] argv) throws ScmException
     {
-        SvnClient server = null;
+        SubversionClient server = null;
         try
         {
-            server = new SvnClient("http://svn.nuxeo.org/nuxeo/bundles/ECM-trunk");
+            server = new SubversionClient("http://svn.nuxeo.org/nuxeo/bundles/ECM-trunk");
             server.addExternalPath(".");
             List<Changelist> changelists = server.getChanges(createRevision(6600), createRevision(6603));
             for(Changelist list: changelists)

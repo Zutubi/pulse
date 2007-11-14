@@ -8,14 +8,7 @@ import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.IOUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
-import org.tmatesoft.svn.core.SVNCancelException;
-import org.tmatesoft.svn.core.SVNDirEntry;
-import org.tmatesoft.svn.core.SVNException;
-import org.tmatesoft.svn.core.SVNLogEntry;
-import org.tmatesoft.svn.core.SVNLogEntryPath;
-import org.tmatesoft.svn.core.SVNNodeKind;
-import org.tmatesoft.svn.core.SVNProperty;
-import org.tmatesoft.svn.core.SVNURL;
+import org.tmatesoft.svn.core.*;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
 import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
 import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
@@ -24,20 +17,13 @@ import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 import org.tmatesoft.svn.core.wc.*;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
+import java.io.*;
 import java.util.*;
 
 /**
  * A connection to a subversion server.
  */
-public class SvnClient implements ScmClient
+public class SubversionClient implements ScmClient
 {
     public static final String TYPE = "svn";
 
@@ -161,7 +147,7 @@ public class SvnClient implements ScmClient
      * @param url the url of the SVN repository
      * @throws com.zutubi.pulse.core.scm.ScmException on error
      */
-    public SvnClient(String url) throws ScmException
+    public SubversionClient(String url) throws ScmException
     {
         authenticationManager = SVNWCUtil.createDefaultAuthenticationManager();
         initialiseRepository(url);
@@ -176,7 +162,7 @@ public class SvnClient implements ScmClient
      * @param password password for the given user
      * @throws ScmException if a connection cannot be established
      */
-    public SvnClient(String url, String username, String password) throws ScmException
+    public SubversionClient(String url, String username, String password) throws ScmException
     {
         authenticationManager = SVNWCUtil.createDefaultAuthenticationManager(username, password);
         initialiseRepository(url);
@@ -192,7 +178,7 @@ public class SvnClient implements ScmClient
      * @param privateKeyFile location of the private key to provide on login
      * @throws ScmException if a connection cannot be established
      */
-    public SvnClient(String url, final String username, final String password, final String privateKeyFile) throws ScmException
+    public SubversionClient(String url, final String username, final String password, final String privateKeyFile) throws ScmException
     {
         authenticationManager = SVNWCUtil.createDefaultAuthenticationManager(username, password);
         authenticationManager.setAuthenticationProvider(new SVNSSHAuthenticationProvider(username, privateKeyFile, null));
@@ -210,7 +196,7 @@ public class SvnClient implements ScmClient
      * @param passphrase     passphrase for the given private key file
      * @throws ScmException if a connection cannot be established
      */
-    public SvnClient(String url, final String username, final String password, final String privateKeyFile, final String passphrase) throws ScmException
+    public SubversionClient(String url, final String username, final String password, final String privateKeyFile, final String passphrase) throws ScmException
     {
         authenticationManager = SVNWCUtil.createDefaultAuthenticationManager(username, password);
         authenticationManager.setAuthenticationProvider(new SVNSSHAuthenticationProvider(username, privateKeyFile, passphrase));
@@ -300,6 +286,11 @@ public class SvnClient implements ScmClient
         try
         {
             repository.testConnection();
+            SVNNodeKind kind = repository.checkPath(".", SVNRevision.HEAD.getNumber());
+            if(kind == SVNNodeKind.NONE)
+            {
+                throw new ScmException("Path '" + repository.getLocation().getPath() + "' does not exist in the repository");
+            }
         }
         catch (SVNException e)
         {
@@ -577,28 +568,6 @@ public class SvnClient implements ScmClient
             throw convertException(e);
         }
     }
-
-/*
-    public ScmFile getFile(String path) throws ScmException
-    {
-        try
-        {
-            boolean directory = false;
-
-            SVNNodeKind kind = repository.checkPath(path, -1);
-            if (kind == SVNNodeKind.DIR)
-            {
-                directory = true;
-            }
-
-            return new ScmFile(directory, path);
-        }
-        catch (SVNException e)
-        {
-            throw convertException(e);
-        }
-    }
-*/
 
     public List<ScmFile> browse(String path, Revision revision) throws ScmException
     {

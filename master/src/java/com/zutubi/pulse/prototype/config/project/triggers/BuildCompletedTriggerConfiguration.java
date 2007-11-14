@@ -60,12 +60,9 @@ public class BuildCompletedTriggerConfiguration extends TriggerConfiguration
     public Trigger newTrigger()
     {
         ProjectConfiguration project = configurationProvider.getAncestorOfType(this, ProjectConfiguration.class);
-        String triggerName = "trigger:" + getHandle();
-        String triggerGroup = "project:" + project.getProjectId();
-        
-        EventTrigger trigger = new EventTrigger(BuildCompletedEvent.class, triggerName, triggerGroup, BuildCompletedEventFilter.class);
+        EventTrigger trigger = new EventTrigger(BuildCompletedEvent.class, getTriggerName(), getTriggerGroup(project), BuildCompletedEventFilter.class);
         trigger.setTaskClass(BuildProjectTask.class);
-        trigger.setProject(project.getHandle());
+        trigger.setProject(project.getProjectId());
         
         Map<Serializable, Serializable> dataMap = trigger.getDataMap();
         dataMap.put(BuildCompletedEventFilter.PARAM_PROJECT, this.project.getProjectId());
@@ -80,6 +77,8 @@ public class BuildCompletedTriggerConfiguration extends TriggerConfiguration
 
     public void update(Trigger trigger)
     {
+        super.update(trigger);
+
         Map<Serializable, Serializable> dataMap = trigger.getDataMap();
         dataMap.put(BuildCompletedEventFilter.PARAM_PROJECT, this.project.getProjectId());
 

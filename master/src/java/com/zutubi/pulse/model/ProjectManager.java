@@ -25,7 +25,7 @@ public interface ProjectManager extends EntityManager<Project>
     ProjectConfiguration getProjectConfig(String name, boolean allowInvalid);
 
     @SecureResult
-    ProjectConfiguration getProjectConfig(long handle, boolean allowInvalid);
+    ProjectConfiguration getProjectConfig(long id, boolean allowInvalid);
 
     @SecureResult
     Project getProject(String name, boolean allowInvalid);

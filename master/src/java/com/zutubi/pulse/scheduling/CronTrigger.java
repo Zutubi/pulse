@@ -3,7 +3,7 @@ package com.zutubi.pulse.scheduling;
 import com.zutubi.pulse.model.Project;
 
 /**
- * <class-comment/>
+ * A trigger that fires based on a Cron-like expression.
  */
 public class CronTrigger extends Trigger
 {
