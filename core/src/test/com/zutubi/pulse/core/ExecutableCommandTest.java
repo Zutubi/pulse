@@ -405,6 +405,37 @@ public class ExecutableCommandTest extends PulseTestCase
         }
     }
 
+    public void testStatusMapping()
+    {
+        CommandResult result = statusMappingHelper(1, 1, ResultState.SUCCESS);
+        assertEquals(ResultState.SUCCESS, result.getState());
+    }
+
+    public void testStatusMappingNoMatch()
+    {
+        CommandResult result = statusMappingHelper(2, 1, ResultState.SUCCESS);
+        assertEquals(ResultState.FAILURE, result.getState());
+    }
+
+    public void testStatusMappingError()
+    {
+        CommandResult result = statusMappingHelper(2, 2, ResultState.ERROR);
+        assertEquals(ResultState.ERROR, result.getState());
+    }
+
+    private CommandResult statusMappingHelper(int exitCode, int mappedCode, ResultState mappedStatus)
+    {
+        ExecutableCommand command = new ExecutableCommand();
+        command.setExe("java");
+        command.addArguments("-jar", getTestDataFile("core", "exit", "jar").getAbsolutePath(), Integer.toString(exitCode));
+        StatusMapping mapping = command.createStatusMapping();
+        mapping.setCode(mappedCode);
+        mapping.setStatus(mappedStatus.getPrettyString());
+        CommandResult result = new CommandResult("yay");
+        execute(command, result);
+        return result;
+    }
+
     private String getOutput() throws IOException
     {
         return IOUtils.fileToString(new File(outputDirectory, Command.OUTPUT_ARTIFACT_NAME + "/output.txt"));

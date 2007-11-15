@@ -4,6 +4,7 @@ import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
+import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.jni.ProcessControl;
 import com.zutubi.pulse.util.*;
 import com.zutubi.validation.annotations.Required;
@@ -28,6 +29,7 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
     private String outputFile;
     private List<Environment> env = new LinkedList<Environment>();
     private List<ProcessArtifact> processes = new LinkedList<ProcessArtifact>();
+    private List<StatusMapping> statusMappings = new LinkedList<StatusMapping>();
     private Scope scope;
 
     private Process child;
@@ -159,13 +161,18 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
             
             String commandLine = constructCommandLine(builder);
 
-            if (result == 0)
+            ResultState state = mapExitCode(result);
+            switch(state)
             {
-                cmdResult.success();
-            }
-            else
-            {
-                cmdResult.failure("Command '" + commandLine + "' exited with code '" + result + "'");
+                case SUCCESS:
+                    cmdResult.success();
+                    break;
+                case FAILURE:
+                    cmdResult.failure("Command '" + commandLine + "' exited with code '" + result + "'");
+                    break;
+                default:
+                    cmdResult.error("Command '" + commandLine + "' exited with code '" + result + "'");
+                    break;
             }
 
             cmdResult.getProperties().put("exit code", Integer.toString(result));
@@ -200,6 +207,26 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
             {
                 child.destroy();
             }
+        }
+    }
+
+    private ResultState mapExitCode(int code)
+    {
+        for(StatusMapping mapping: statusMappings)
+        {
+            if(mapping.getCode() == code)
+            {
+                return mapping.getResultState();
+            }
+        }
+
+        if(code == 0)
+        {
+            return ResultState.SUCCESS;
+        }
+        else
+        {
+            return ResultState.FAILURE;
         }
     }
 
@@ -571,6 +598,18 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
         ProcessArtifact p = new ProcessArtifact();
         processes.add(p);
         return p;
+    }
+
+    public List<StatusMapping> getStatusMappings()
+    {
+        return statusMappings;
+    }
+
+    public StatusMapping createStatusMapping()
+    {
+        StatusMapping mapping = new StatusMapping();
+        statusMappings.add(mapping);
+        return mapping;
     }
 
     private String constructCommandLine(ProcessBuilder builder)
