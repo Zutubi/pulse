@@ -1,23 +1,24 @@
-package com.zutubi.pulse.web.project;
+package com.zutubi.pulse.committransformers;
 
-import com.zutubi.pulse.committransformers.CommitMessageBuilder;
-import com.zutubi.pulse.model.CommitMessageTransformer;
 import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.prototype.config.project.commit.CommitMessageTransformerConfiguration;
 import com.zutubi.util.logging.Logger;
 
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
- * <class comment/>
+ * A helper class that applies multiple transforms to a commit comment.
  */
 public class CommitMessageSupport
 {
     private static final Logger LOG = Logger.getLogger(CommitMessageSupport.class);
 
     private Changelist changelist;
-    private List<CommitMessageTransformer> transformers;
+    private Collection<CommitMessageTransformerConfiguration> transformers;
 
-    public CommitMessageSupport(Changelist changelist, List<CommitMessageTransformer> transformers)
+    public CommitMessageSupport(Changelist changelist, Collection<CommitMessageTransformerConfiguration> transformers)
     {
         this.transformers = transformers;
         this.changelist = changelist;
@@ -26,13 +27,23 @@ public class CommitMessageSupport
     protected CommitMessageBuilder applyTransformers()
     {
         CommitMessageBuilder builder = new CommitMessageBuilder(changelist.getComment());
-        for (CommitMessageTransformer transformer : transformers)
+        List<Substitution> substitutions = new LinkedList<Substitution>();
+        for (CommitMessageTransformerConfiguration transformer : transformers)
         {
-            if (transformer.appliesToChangelist(changelist))
+            for(Substitution substitution: transformer.substitutions())
             {
-                builder = transformer.transform(builder);
+                if(!substitutions.contains(substitution))
+                {
+                    substitutions.add(substitution);
+                }
             }
         }
+
+        for(Substitution substitution: substitutions)
+        {
+            builder.replace(substitution);
+        }
+        
         return builder;
     }
 

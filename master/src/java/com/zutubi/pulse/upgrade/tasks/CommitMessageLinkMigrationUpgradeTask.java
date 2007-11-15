@@ -1,9 +1,7 @@
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.pulse.upgrade.UpgradeContext;
 import com.zutubi.pulse.util.JDBCUtils;
 import com.zutubi.pulse.util.PropertiesType;
-import com.zutubi.pulse.committransformers.LinkCommitMessageTransformer;
 
 import java.sql.*;
 import java.io.IOException;
@@ -52,8 +50,8 @@ public class CommitMessageLinkMigrationUpgradeTask extends DatabaseUpgradeTask
                     long id = JDBCUtils.getLong(rs, "id");
 
                     Properties props = new Properties();
-                    props.put(LinkCommitMessageTransformer.EXPRESSION_PROPERTY, JDBCUtils.getString(rs, "expression"));
-                    props.put(LinkCommitMessageTransformer.LINK_PROPERTY, JDBCUtils.getString(rs, "replacement"));
+                    props.put("standard.expression", JDBCUtils.getString(rs, "expression"));
+                    props.put("standard.link", JDBCUtils.getString(rs, "replacement"));
 
                     JDBCUtils.setString(update, 1, propType.toString(props));
                     JDBCUtils.setLong(update, 2, id);

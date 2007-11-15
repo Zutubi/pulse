@@ -12,6 +12,7 @@ import com.zutubi.pulse.prototype.config.project.changeviewer.ChangeViewerConfig
 import com.zutubi.pulse.prototype.config.project.hooks.AutoBuildHookConfiguration;
 import com.zutubi.pulse.prototype.config.project.hooks.BuildHookConfiguration;
 import com.zutubi.pulse.prototype.config.project.types.TypeConfiguration;
+import com.zutubi.pulse.prototype.config.project.commit.CommitMessageTransformerConfiguration;
 import com.zutubi.validation.annotations.Url;
 
 import java.util.*;
@@ -58,6 +59,9 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
 
     @Ordered
     private Map<String, BuildHookConfiguration> buildHooks = new LinkedHashMap<String, BuildHookConfiguration>();
+
+    @Ordered
+    private Map<String, CommitMessageTransformerConfiguration> commitMessageTransformers = new LinkedHashMap<String, CommitMessageTransformerConfiguration>();
 
     private ChangeViewerConfiguration changeViewer;
 
@@ -195,6 +199,16 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
     public void setBuildHooks(Map<String, BuildHookConfiguration> buildHooks)
     {
         this.buildHooks = buildHooks;
+    }
+
+    public Map<String, CommitMessageTransformerConfiguration> getCommitMessageTransformers()
+    {
+        return commitMessageTransformers;
+    }
+
+    public void setCommitMessageTransformers(Map<String, CommitMessageTransformerConfiguration> commitMessageTransformers)
+    {
+        this.commitMessageTransformers = commitMessageTransformers;
     }
 
     public ChangeViewerConfiguration getChangeViewer()

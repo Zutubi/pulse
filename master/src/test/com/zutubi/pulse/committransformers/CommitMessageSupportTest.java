@@ -1,12 +1,11 @@
-package com.zutubi.pulse.web.project;
+package com.zutubi.pulse.committransformers;
 
-import com.zutubi.pulse.committransformers.LinkCommitMessageTransformer;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.model.CommitMessageTransformer;
+import com.zutubi.pulse.prototype.config.project.commit.CommitMessageTransformerConfiguration;
+import com.zutubi.pulse.prototype.config.project.commit.LinkTransformerConfiguration;
 import com.zutubi.pulse.test.PulseTestCase;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,19 +14,16 @@ import java.util.List;
  */
 public class CommitMessageSupportTest extends PulseTestCase
 {
-    private List<CommitMessageTransformer> transformers;
+    private List<CommitMessageTransformerConfiguration> transformers;
 
     protected void setUp() throws Exception
     {
         super.setUp();
 
-        transformers = new LinkedList<CommitMessageTransformer>();
-        transformers.add(new LinkCommitMessageTransformer("foo", "foo+", "http://foo/$0"));
-        transformers.add(new LinkCommitMessageTransformer("bug", "bug ([0-9]+)", "http://bugs/$1"));
-        transformers.add(new LinkCommitMessageTransformer("bad", "bad", "http://$1"));
-        CommitMessageTransformer limited = new LinkCommitMessageTransformer("limited", "limited", "http://lim/");
-        limited.setProjects(Arrays.asList(new Long[] {(long) 1, (long) 3}));
-        transformers.add(limited);
+        transformers = new LinkedList<CommitMessageTransformerConfiguration>();
+        transformers.add(new LinkTransformerConfiguration("foo", "foo+", "http://foo/$0"));
+        transformers.add(new LinkTransformerConfiguration("bug", "bug ([0-9]+)", "http://bugs/$1"));
+        transformers.add(new LinkTransformerConfiguration("bad", "bad", "http://$1"));
     }
 
     public void testBasicReplacement()
@@ -48,12 +44,6 @@ public class CommitMessageSupportTest extends PulseTestCase
     public void testInvalidGroup()
     {
         assertReplacement("bad", "bad");
-    }
-
-    public void testLimitedToProjects()
-    {
-        assertReplacement("limited", "<a href='http://lim/'>limited</a>", 1, 0);
-        assertReplacement("limited", "limited", 2, 0);
     }
 
     public void testEscapesHTML()

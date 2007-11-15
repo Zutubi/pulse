@@ -1,6 +1,5 @@
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.pulse.committransformers.LinkCommitMessageTransformer;
 import com.zutubi.pulse.upgrade.UpgradeException;
 import com.zutubi.pulse.util.JDBCUtils;
 import com.zutubi.pulse.util.PropertiesType;
@@ -74,8 +73,8 @@ public class CommitMessageLinkMigrationUpgradeTaskTest extends BaseUpgradeTaskTe
 
             PropertiesType type = new PropertiesType();
             Properties props = (Properties) type.fromStringValue(rs.getString("PROPERTIES"));
-            assertEquals(expression, props.getProperty(LinkCommitMessageTransformer.EXPRESSION_PROPERTY));
-            assertEquals(link, props.getProperty(LinkCommitMessageTransformer.LINK_PROPERTY));
+            assertEquals(expression, props.getProperty("standard.expression"));
+            assertEquals(link, props.getProperty("standard.link"));
             assertEquals("LINK", rs.getString("TYPE"));
         }
         finally

@@ -14,9 +14,10 @@ import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.project.commit.CommitMessageTransformerConfiguration;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.util.TimeStamps;
-import com.zutubi.pulse.web.project.CommitMessageSupport;
+import com.zutubi.pulse.committransformers.CommitMessageSupport;
 import com.zutubi.pulse.xwork.TextProviderSupport;
 import com.zutubi.pulse.xwork.interceptor.Cancelable;
 import com.zutubi.util.StringUtils;
@@ -25,10 +26,7 @@ import com.zutubi.util.logging.Logger;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.util.*;
 
 /**
  * 
@@ -280,8 +278,17 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
 
     public CommitMessageSupport getCommitMessageSupport(Changelist changelist)
     {
-        // FIXME
-        return new CommitMessageSupport(changelist, Collections.EMPTY_LIST);
+        List<CommitMessageTransformerConfiguration> transformers = new LinkedList<CommitMessageTransformerConfiguration>();
+        for(long projectId: changelist.getProjectIds())
+        {
+            Project project = projectManager.getProject(projectId, false);
+            if(project != null)
+            {
+                transformers.addAll(project.getConfig().getCommitMessageTransformers().values());
+            }
+        }
+
+        return new CommitMessageSupport(changelist, transformers);
     }
 
     public User getLoggedInUser()

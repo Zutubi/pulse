@@ -22,7 +22,7 @@
 </td></tr>
 [#if changelists?exists]
 <tr><td>
-    [@buildChangesHTML changelists=changelists/]
+    [@buildChangesHTML result=result changelists=changelists/]
 </td></tr>
 [/#if]
 

@@ -4,7 +4,7 @@ import com.zutubi.pulse.bootstrap.SystemPaths;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.web.project.CommitMessageSupport;
+import com.zutubi.pulse.committransformers.CommitMessageSupport;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import freemarker.template.Configuration;
@@ -141,23 +141,24 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
         return StringUtils.wrapString(s, 64, prefix);
     }
 
-    public String transformCommentWithoutTrimming(Changelist changelist)
+    public String transformCommentWithoutTrimming(BuildResult buildResult, Changelist changelist)
     {
-        // FIXME
-        CommitMessageSupport support = new CommitMessageSupport(changelist, Collections.EMPTY_LIST);
-        return support.toString();
+        return createCommitMessageSupport(buildResult, changelist).toString();
     }
 
-    public String transformComment(Changelist changelist)
+    public String transformComment(BuildResult buildResult, Changelist changelist)
     {
-        return transformComment(changelist, 60);
+        return transformComment(buildResult, changelist, 60);
     }
     
-    public String transformComment(Changelist changelist, int trimToLength)
+    public String transformComment(BuildResult buildResult, Changelist changelist, int trimToLength)
     {
-        // FIXME
-        CommitMessageSupport support = new CommitMessageSupport(changelist, Collections.EMPTY_LIST);
-        return support.trim(trimToLength);
+        return createCommitMessageSupport(buildResult, changelist).trim(trimToLength);
+    }
+
+    private CommitMessageSupport createCommitMessageSupport(BuildResult buildResult, Changelist changelist)
+    {
+        return new CommitMessageSupport(changelist, buildResult.getProject().getConfig().getCommitMessageTransformers().values());
     }
 
     public void setFreemarkerConfiguration(Configuration freemarkerConfiguration)

@@ -26,6 +26,7 @@ import com.zutubi.pulse.prototype.config.project.hooks.*;
 import com.zutubi.pulse.prototype.config.project.changeviewer.*;
 import com.zutubi.pulse.prototype.config.project.commit.CommitMessageTransformerConfiguration;
 import com.zutubi.pulse.prototype.config.project.commit.CustomTransformerConfiguration;
+import com.zutubi.pulse.prototype.config.project.commit.LinkTransformerConfiguration;
 import com.zutubi.pulse.prototype.config.project.triggers.BuildCompletedTriggerConfiguration;
 import com.zutubi.pulse.prototype.config.project.triggers.CronBuildTriggerConfiguration;
 import com.zutubi.pulse.prototype.config.project.triggers.ScmBuildTriggerConfiguration;
@@ -140,12 +141,8 @@ public class ConfigurationRegistry
             registerConfigurationType(DirectoryArtifactConfiguration.class);
 
             // commit message processors.
-            CompositeType commitConfig = registerConfigurationType(CommitMessageTransformerConfiguration.class);
             registerConfigurationType(CustomTransformerConfiguration.class);
-
-            MapType commitTransformers = new MapType(commitConfig, typeRegistry);
-            commitTransformers.setOrdered(true);
-            projectConfig.addProperty(new ExtensionTypeProperty("commit", commitTransformers));
+            registerConfigurationType(LinkTransformerConfiguration.class);
 
             // hooks
             registerConfigurationType(ManualBuildHookConfiguration.class);

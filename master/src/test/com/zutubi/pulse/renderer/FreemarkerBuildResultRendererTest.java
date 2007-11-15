@@ -1,6 +1,5 @@
 package com.zutubi.pulse.renderer;
 
-import com.zutubi.pulse.committransformers.LinkCommitMessageTransformer;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
@@ -37,18 +36,6 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         freemarkerConfiguration.addAutoInclude("macro.ftl");
         freemarkerConfiguration.setSharedVariable("urls", new Urls(""));
         renderer.setFreemarkerConfiguration(freemarkerConfiguration);
-
-        LinkCommitMessageTransformer tx = new LinkCommitMessageTransformer("Jira");
-        tx.setExpression("(CIB-[0-9]+)");
-        tx.setLink("http://jira.zutubi.com/browse/$0");
-
-        List<CommitMessageTransformer> txs = new ArrayList<CommitMessageTransformer>(1);
-        txs.add(tx);
-
-        // FIXME
-//        Mock commitMessageTransformerManager = new Mock(CommitMessageTransformerManager.class);
-//        renderer.setCommitMessageTransformerManager((CommitMessageTransformerManager) commitMessageTransformerManager.proxy());
-//        commitMessageTransformerManager.matchAndReturn("getCommitMessageTransformers", txs);
     }
 
     protected void tearDown() throws Exception

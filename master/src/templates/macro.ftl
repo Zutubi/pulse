@@ -483,7 +483,7 @@ Shows a summary for each stage in a build.
 <#---------------------------------------------------------------------------
 Shows a table with the given changelists.
 ---------------------------------------------------------------------------->
-[#macro buildChangesHTML changelists trim=true limit=60]
+[#macro buildChangesHTML result changelists trim=true limit=60]
     [@openTable/]
         [@headingRow heading="changes" span=5/]
         <tr>
@@ -500,9 +500,9 @@ Shows a table with the given changelists.
             [@dynamicCell cc=change.user/]
             [@dynamicCell cc=change.prettyTime/]
             [#if trim ]
-            [@contentCell cc=renderer.transformComment(change, limit)/]
+            [@contentCell cc=renderer.transformComment(result, change, limit)/]
             [#else]
-            [@contentCell cc=renderer.transformCommentWithoutTrimming(change)/]
+            [@contentCell cc=renderer.transformCommentWithoutTrimming(result, change)/]
             [/#if]
             [@linkCell cc="view" url="${urls.buildChangelist(result, change.id)}"/]
         </tr>

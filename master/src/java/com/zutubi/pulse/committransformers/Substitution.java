@@ -23,4 +23,27 @@ public class Substitution
     {
         return replacement;
     }
+
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+
+        Substitution that = (Substitution) o;
+        return expression.equals(that.expression) && replacement.equals(that.replacement);
+    }
+
+    public int hashCode()
+    {
+        int result;
+        result = expression.hashCode();
+        result = 31 * result + replacement.hashCode();
+        return result;
+    }
 }
