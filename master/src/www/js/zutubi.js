@@ -1155,6 +1155,10 @@ Ext.override(Ext.View, {
             {
                 this.select(nodeInfo[i], true, true);
             }
+            if (suppressEvent !== true)
+            {
+                this.fireEvent("selectionchange", this, this.selections);
+            }
         }
         else
         {
