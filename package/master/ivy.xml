@@ -20,6 +20,7 @@
         <dependency org="zutubi" name="pulse-master" rev="latest.integration" conf="release->@"/>
 
         <!-- Prepackaged plugins -->
+        <dependency org="zutubi" name="com.zutubi.pulse.master.external.jira" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
         <dependency org="zutubi" name="com.zutubi.pulse.master.hook.email" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
         <dependency org="zutubi" name="com.zutubi.pulse.master.hook.tag" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
     </dependencies>

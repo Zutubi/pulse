@@ -1,4 +1,4 @@
-Bundle-Name: Svn SCM Support
+Bundle-Name: Subversion SCM Support
 Bundle-SymbolicName: com.zutubi.pulse.core.scm.svn; singleton:=true
 Bundle-Description: Support for SVN
 Bundle-Vendor: Zutubi

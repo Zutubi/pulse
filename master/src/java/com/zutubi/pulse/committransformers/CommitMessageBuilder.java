@@ -31,6 +31,11 @@ public class CommitMessageBuilder
         return message;
     }
 
+    public String replace(Substitution substitution)
+    {
+        return replace(substitution.getExpression(), substitution.getReplacement());
+    }
+
     public String replace(String regex, String replacement)
     {
         Pattern pattern = Pattern.compile(regex);
@@ -429,4 +434,5 @@ public class CommitMessageBuilder
         name.insert(0, "</");
         return name.toString();
     }
+
 }

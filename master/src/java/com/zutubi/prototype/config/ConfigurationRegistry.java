@@ -24,9 +24,8 @@ import com.zutubi.pulse.prototype.config.misc.TransientConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.project.hooks.*;
 import com.zutubi.pulse.prototype.config.project.changeviewer.*;
-import com.zutubi.pulse.prototype.config.project.commit.CommitMessageConfiguration;
-import com.zutubi.pulse.prototype.config.project.commit.CustomCommitMessageConfiguration;
-import com.zutubi.pulse.prototype.config.project.commit.JiraCommitMessageConfiguration;
+import com.zutubi.pulse.prototype.config.project.commit.CommitMessageTransformerConfiguration;
+import com.zutubi.pulse.prototype.config.project.commit.CustomTransformerConfiguration;
 import com.zutubi.pulse.prototype.config.project.triggers.BuildCompletedTriggerConfiguration;
 import com.zutubi.pulse.prototype.config.project.triggers.CronBuildTriggerConfiguration;
 import com.zutubi.pulse.prototype.config.project.triggers.ScmBuildTriggerConfiguration;
@@ -34,7 +33,6 @@ import com.zutubi.pulse.prototype.config.project.triggers.TriggerConfiguration;
 import com.zutubi.pulse.prototype.config.project.types.*;
 import com.zutubi.pulse.prototype.config.setup.SetupConfiguration;
 import com.zutubi.pulse.prototype.config.user.*;
-import com.zutubi.pulse.prototype.config.user.contacts.ContactConfiguration;
 import com.zutubi.pulse.prototype.config.user.contacts.EmailContactConfiguration;
 import com.zutubi.pulse.prototype.config.user.contacts.JabberContactConfiguration;
 import com.zutubi.pulse.security.GlobalAuthorityProvider;
@@ -142,9 +140,8 @@ public class ConfigurationRegistry
             registerConfigurationType(DirectoryArtifactConfiguration.class);
 
             // commit message processors.
-            CompositeType commitConfig = registerConfigurationType(CommitMessageConfiguration.class);
-            registerConfigurationType(JiraCommitMessageConfiguration.class);
-            registerConfigurationType(CustomCommitMessageConfiguration.class);
+            CompositeType commitConfig = registerConfigurationType(CommitMessageTransformerConfiguration.class);
+            registerConfigurationType(CustomTransformerConfiguration.class);
 
             MapType commitTransformers = new MapType(commitConfig, typeRegistry);
             commitTransformers.setOrdered(true);
@@ -177,17 +174,14 @@ public class ConfigurationRegistry
             configurationPersistenceManager.register(USERS_SCOPE, userCollection);
 
             // contacts configuration
-            CompositeType contactConfig = typeRegistry.getType(ContactConfiguration.class);
             registerConfigurationType(EmailContactConfiguration.class);
             registerConfigurationType(JabberContactConfiguration.class);
 
             // user subscriptions
-            CompositeType userSubscriptionConfig = typeRegistry.getType(SubscriptionConfiguration.class);
             registerConfigurationType(ProjectSubscriptionConfiguration.class);
             registerConfigurationType(PersonalSubscriptionConfiguration.class);
 
             // user subscription conditions
-            CompositeType userSubscriptionConditionConfig = typeRegistry.getType(SubscriptionConditionConfiguration.class);
             registerConfigurationType(AllBuildsConditionConfiguration.class);
             registerConfigurationType(SelectedBuildsConditionConfiguration.class);
             registerConfigurationType(CustomConditionConfiguration.class);
