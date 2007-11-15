@@ -21,7 +21,6 @@ public class CommandOutputStream extends OutputStream implements Runnable
     private long recipeId;
     private byte[] buffer;
     private int offset;
-    private Thread flusher;
 
     public CommandOutputStream(EventManager eventManager, long recipeId, boolean autoflush)
     {
@@ -32,7 +31,7 @@ public class CommandOutputStream extends OutputStream implements Runnable
 
         if(autoflush)
         {
-            flusher = new Thread(this);
+            Thread flusher = new Thread(this);
             flusher.start();
         }
     }
@@ -118,6 +117,7 @@ public class CommandOutputStream extends OutputStream implements Runnable
             }
             catch (InterruptedException e)
             {
+                // Empty
             }
 
             flush();

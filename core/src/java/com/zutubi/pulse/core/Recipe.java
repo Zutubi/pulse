@@ -14,6 +14,7 @@ public class Recipe implements Reference
 
     private List<Command> commands = new LinkedList<Command>();
     private List<Dependency> dependencies = new LinkedList<Dependency>();
+    private Version version = null;
 
     public String getName()
     {
@@ -61,5 +62,15 @@ public class Recipe implements Reference
     public void addDependency(Dependency dependency)
     {
         dependencies.add(dependency);
+    }
+
+    public Version getVersion()
+    {
+        return version;
+    }
+
+    public void addVersion(Version version)
+    {
+        this.version = version;
     }
 }

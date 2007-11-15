@@ -82,6 +82,18 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         assertOutputFile(1, "greeting", "hello world" + System.getProperty("line.separator"));
     }
 
+    public void testVersion() throws Exception
+    {
+        BuildContext buildContext = new BuildContext();
+        recipeProcessor.build(new RecipeRequest(1, new SimpleBootstrapper(), getPulseFile("basic"), "version"), new SimpleRecipePaths(baseDir, outputDir), resourceRepository, false, buildContext);
+        assertRecipeCommenced(1, "version");
+        assertCommandCommenced(1, "bootstrap");
+        assertCommandCompleted(1, ResultState.SUCCESS);
+        assertRecipeCompleted(1, ResultState.SUCCESS);
+        assertNoMoreEvents();
+        assertEquals("test version", buildContext.getBuildVersion());
+    }
+
     public void testExceptionDuringBootstrap() throws Exception
     {
         ErrorBootstrapper bootstrapper = new ErrorBootstrapper(new BuildException("test exception"));

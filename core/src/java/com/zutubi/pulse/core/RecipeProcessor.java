@@ -216,6 +216,15 @@ public class RecipeProcessor
                 i++;
             }
         }
+
+        if (context != null)
+        {
+            Version version = recipe.getVersion();
+            if(version != null && TextUtils.stringSet(version.getValue()))
+            {
+                context.setBuildVersion(version.getValue());
+            }
+        }
     }
 
     private boolean executeCommand(long recipeId, Scope globalScope, long recipeStartTime, CommandResult result, RecipePaths paths, File commandOutput, TestSuiteResult testResults, Command command, boolean capture, BuildContext context)
