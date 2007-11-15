@@ -204,6 +204,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
             }
         }
 
+        // load the snapshot if it exists.
         MutableRecord latestSnapshot = new MutableRecordImpl();
         if (fileSystem.exists(snapshotDirectory))
         {
@@ -218,71 +219,48 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
 
         // load the journal.
 
-        boolean compactRequired = false;
-
-        List<JournalEntry> journal = new LinkedList<JournalEntry>();
         if (journalIndexFile.isFile())
         {
             LOG.finest(Thread.currentThread().getId() + ": replay journal(start)");
-            LOG.finest(Thread.currentThread().getId() + ":   snapshotid: ("+latestSnapshotId+")");
-            for (JournalEntry journalEntry : readJournal())
+            LOG.finest(Thread.currentThread().getId() + ":   snapshotid: (" + latestSnapshotId + ")");
+
+            List<JournalEntry> journalEntries = readJournal();
+            for (JournalEntry journalEntry : journalEntries)
             {
-                // remove those entries that are already part of the snapshot.
-                if (latestSnapshotId < journalEntry.getId())
+                if (lastCommittedJournalEntryId < journalEntry.getId())
                 {
-                    journalEntry.getRecord(); // preload the record so that it appears in the logging.
-                    LOG.finest(Thread.currentThread().getId() + ":   applying("+journalEntry+")");
-
-
-                    journal.add(journalEntry);
-                    compactRequired = true;
-
-                    // the next journal entry id should be greater than those entries we have
-                    // seen previously.
-                    if (nextJournalEntryId <= journalEntry.getId())
-                    {
-                        nextJournalEntryId = journalEntry.getId() + 1;
-                    }
-                }
-                else
-                {
-                    LOG.finest(Thread.currentThread().getId() + ":   ignoring("+journalEntry+")");
+                    lastCommittedJournalEntryId = journalEntry.getId();
                 }
             }
 
-            for (JournalEntry journalEntry : journal)
+            if (latestSnapshotId < lastCommittedJournalEntryId)
             {
-                if (journalEntry.getAction().equals(ACTION_INSERT))
+                for (JournalEntry journalEntry : journalEntries)
                 {
-                    inMemoryDelegate.insert(journalEntry.getPath(), journalEntry.getRecord());
+                    if (latestSnapshotId < journalEntry.getId())
+                    {
+                        if (journalEntry.getAction().equals(ACTION_INSERT))
+                        {
+                            inMemoryDelegate.insert(journalEntry.getPath(), journalEntry.getRecord());
+                        }
+                        else if (journalEntry.getAction().equals(ACTION_UPDATE))
+                        {
+                            inMemoryDelegate.update(journalEntry.getPath(), journalEntry.getRecord());
+                        }
+                        else if (journalEntry.getAction().equals(ACTION_DELETE))
+                        {
+                            inMemoryDelegate.delete(journalEntry.getPath());
+                        }
+                    }
                 }
-                else if (journalEntry.getAction().equals(ACTION_UPDATE))
-                {
-                    inMemoryDelegate.update(journalEntry.getPath(), journalEntry.getRecord());
-                }
-                else if (journalEntry.getAction().equals(ACTION_DELETE))
-                {
-                    inMemoryDelegate.delete(journalEntry.getPath());
-                }
+                compactNow();
             }
             LOG.finest(Thread.currentThread().getId() + ": replay journal(end)");
         }
 
-        // The last committed journal entry id is at least the latest snapshot id (when there are no journal entries),
-        // or otherwise the highest journal entry. (which just happens to be nextJournalEntryId - 1
-        lastCommittedJournalEntryId = latestSnapshotId;
-        if (latestSnapshotId < nextJournalEntryId)
-        {
-            lastCommittedJournalEntryId = nextJournalEntryId - 1;
-        }
+        // At this stage, we have fully compacted content, so the next journal entry id will be the snapshot + 1.
 
-        // if we loaded any journal entries that were not already part of the snapshot, then compact.
-        if (compactRequired)
-        {
-            compactNow();
-        }
-
-        // start up thread to trigger
+        nextJournalEntryId = latestSnapshotId + 1;
     }
 
     private List<JournalEntry> readJournal() throws IOException
@@ -631,13 +609,6 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
             throw new IOException("Can not write journal entry. File already exists. " + file.getAbsolutePath());
         }
 
-/* should we ever be trying to write a null record?  This generic catch could be rather dangerous in hiding problems.
-        if (record == null)
-        {
-            return true;
-        }
-*/
-
         XmlRecordSerialiser serialiser = new XmlRecordSerialiser();
         serialiser.serialise(file, record);
 
@@ -658,14 +629,12 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
     {
         LOG.finest(Thread.currentThread().getId() + ": compact(start)");
 
-        long oldSnapshotId = latestSnapshotId;
-
         try
         {
             // check if compact is required.
-            if (lastCommittedJournalEntryId == latestSnapshotId)
+            if (lastCommittedJournalEntryId <= latestSnapshotId)
             {
-                LOG.finest(Thread.currentThread().getId() + ": compact(not required)");
+                LOG.finest(Thread.currentThread().getId() + ": compact(end - not required)");
                 return;
             }
 
@@ -736,15 +705,14 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
                 throw new IOException("Failed to commit snapshot to " + snapshotDirectory.getAbsolutePath());
             }
 
-            latestSnapshotId = snapshotJournalId;
-
             if (fileSystem.exists(backupSnapshotDirectory) && !delete(backupSnapshotDirectory))
             {
                 // problem cleaning up backup. non fatal, but needs to be resolved before next commit else it will fail.
                 LOG.severe("Failed to cleanup snapshop backup.");
             }
 
-            cleanupJournalEntries();
+            latestSnapshotId = snapshotJournalId;
+
             LOG.finest(Thread.currentThread().getId() + ": compact(end)");
         }
         catch (IOException e)
@@ -759,10 +727,10 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
                 LOG.severe(e1);
             }
 
-            latestSnapshotId = oldSnapshotId;
-
             throw e;
         }
+
+        cleanupJournalEntries();
     }
 
     private void recoverSnapshot(File newSnapshotDirectory, File snapshotDirectory, File backupSnapshotDirectory) throws IOException

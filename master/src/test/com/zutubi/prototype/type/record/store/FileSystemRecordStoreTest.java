@@ -58,11 +58,12 @@ public class FileSystemRecordStoreTest extends PulseTestCase
 
     public void testInsert()
     {
-        Record sample = createSampleRecord();
+        MutableRecord sample = createSampleRecord();
+        sample.put("nested", createSampleRecord());
         recordStore.insert("sample", sample);
 
         Record stored = (Record) recordStore.select().get("sample");
-        assertEquals(sample.get("a"), stored.get("a"));
+        assertRecordsEquals(sample, stored);
     }
 
     public void testInsertPersistence() throws Exception
@@ -74,6 +75,51 @@ public class FileSystemRecordStoreTest extends PulseTestCase
 
         Record stored = (Record) recordStore.select().get("sample");
         assertRecordsEquals(sample, stored);
+
+        restartRecordStore();
+
+        stored = (Record) recordStore.select().get("sample");
+        assertRecordsEquals(sample, stored);
+    }
+
+    public void testInsertWithCompaction() throws Exception
+    {
+        Record sample = createSampleRecord();
+        recordStore.insert("sample", sample);
+        recordStore.compactNow();
+
+        Record stored = (Record) recordStore.select().get("sample");
+        assertRecordsEquals(sample, stored);
+    }
+
+    public void testInsertWithCompactionAndRestart() throws Exception
+    {
+        Record sample = createSampleRecord();
+        recordStore.insert("sample", sample);
+        recordStore.compactNow();
+
+        restartRecordStore();
+
+        Record stored = (Record) recordStore.select().get("sample");
+        assertRecordsEquals(sample, stored);
+    }
+
+    public void testInsertWithRestartAndCompaction() throws Exception
+    {
+        Record sample = createSampleRecord();
+        recordStore.insert("sample", sample);
+
+        restartRecordStore();
+        recordStore.compactNow();
+
+        Record stored = (Record) recordStore.select().get("sample");
+        assertRecordsEquals(sample, stored);
+
+    }
+
+    public void testInsertWithTheLot()
+    {
+
     }
 
     public void testUpdate()
