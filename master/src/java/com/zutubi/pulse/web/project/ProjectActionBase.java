@@ -104,7 +104,7 @@ public class ProjectActionBase extends ActionSupport
     public CommitMessageSupport getCommitMessageSupport(Changelist changelist)
     {
         // When in the context of a project, only apply its own transformers
-        return new CommitMessageSupport(changelist, getProject().getConfig().getCommitMessageTransformers().values());
+        return new CommitMessageSupport(changelist.getComment(), getProject().getConfig().getCommitMessageTransformers().values());
     }
 
     public void setBuildManager(BuildManager buildManager)

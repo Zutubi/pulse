@@ -1,12 +1,9 @@
 package com.zutubi.pulse.committransformers;
 
-import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.prototype.config.project.commit.CommitMessageTransformerConfiguration;
 import com.zutubi.pulse.prototype.config.project.commit.LinkTransformerConfiguration;
 import com.zutubi.pulse.test.PulseTestCase;
 
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -53,31 +50,37 @@ public class CommitMessageSupportTest extends PulseTestCase
 
     public void testTrim()
     {
-        assertReplacement("some text", "som...", 0, 6);
+        assertReplacement("some text", "som...", 6);
     }
 
     public void testTrimmedLink()
     {
-        assertReplacement("bug 123", "<a href='http://bugs/123'>bug...</a>", 0, 6);
+        assertReplacement("bug 123", "<a href='http://bugs/123'>bug...</a>", 6);
     }
 
     public void testTrimmedLinkJustFits()
     {
-        assertReplacement("bug 123 is really cool", "<a href='http://bugs/123'>bug 123</a>...", 0, 10);
+        assertReplacement("bug 123 is really cool", "<a href='http://bugs/123'>bug 123</a>...", 10);
+    }
+
+    public void testDuplicatesFiltered()
+    {
+        LinkTransformerConfiguration transformer = new LinkTransformerConfiguration("dup", "[A-Z]+", "http://example.com/$0");
+        LinkTransformerConfiguration transformer2 = new LinkTransformerConfiguration("dup", "[A-Z]+", "http://example.com/$0");
+        transformers.add(transformer);
+        transformers.add(transformer);
+        transformers.add(transformer2);
+        assertReplacement("link THIS", "link <a href='http://example.com/THIS'>THIS</a>");
     }
 
     private void assertReplacement(String input, String replacement)
     {
-        assertReplacement(input, replacement, 0, 0);
+        assertReplacement(input, replacement, 0);
     }
 
-    private void assertReplacement(String input, String replacement, long project, int limit)
+    private void assertReplacement(String input, String replacement, int limit)
     {
-        Revision rev = new Revision("author", input, new Date(0));
-        Changelist list = new Changelist("uid", rev);
-        list.addProjectId(project);
-
-        CommitMessageSupport support = new CommitMessageSupport(list, transformers);
+        CommitMessageSupport support = new CommitMessageSupport(input, transformers);
 
         if(limit == 0)
         {

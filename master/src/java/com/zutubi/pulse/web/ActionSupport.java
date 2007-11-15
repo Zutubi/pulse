@@ -288,7 +288,7 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
             }
         }
 
-        return new CommitMessageSupport(changelist, transformers);
+        return new CommitMessageSupport(changelist.getComment(), transformers);
     }
 
     public User getLoggedInUser()

@@ -158,7 +158,7 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
 
     private CommitMessageSupport createCommitMessageSupport(BuildResult buildResult, Changelist changelist)
     {
-        return new CommitMessageSupport(changelist, buildResult.getProject().getConfig().getCommitMessageTransformers().values());
+        return new CommitMessageSupport(changelist.getComment(), buildResult.getProject().getConfig().getCommitMessageTransformers().values());
     }
 
     public void setFreemarkerConfiguration(Configuration freemarkerConfiguration)

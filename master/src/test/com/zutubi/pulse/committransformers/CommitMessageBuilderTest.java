@@ -28,6 +28,16 @@ public class CommitMessageBuilderTest extends TestCase
 //        assertEquals("A &lt;i&gt;very&lt;/i&gt; <b>bold</b> statement.", builder.encode());
     }
 
+    public void testMultipleReplacements()
+    {
+        // Not that nice, but this is reality currently
+        // Higher levels deal with this somewhat.
+        CommitMessageBuilder builder = new CommitMessageBuilder("A JIRA-123 issue");
+        builder.replace("[A-Z]+-[0-9]+", "<a href='foo'>$0</a>");
+        builder.replace("[A-Z]+-[0-9]+", "<a href='bar'>$0</a>");
+        assertEquals("A <a href='foo'><a href='bar'>JIRA-123</a></a> issue", builder.toString());
+    }
+
     public void testTrimUnmodifiedBlock()
     {
         CommitMessageBuilder buffer = new CommitMessageBuilder("This is a String");

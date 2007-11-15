@@ -28,6 +28,22 @@ public class JiraTransformerConfiguration extends CommitMessageTransformerConfig
     @StringList
     private List<String> keys = new LinkedList<String>();
 
+    public JiraTransformerConfiguration()
+    {
+    }
+
+    public JiraTransformerConfiguration(String url)
+    {
+        this.url = url;
+    }
+
+    public JiraTransformerConfiguration(String url, String... keys)
+    {
+        this.url = url;
+        this.matchAnyKey = false;
+        this.keys = Arrays.asList(keys);
+    }
+
     public String getUrl()
     {
         return url;
@@ -87,7 +103,7 @@ public class JiraTransformerConfiguration extends CommitMessageTransformerConfig
     {
         if(matchAnyKey)
         {
-            return Arrays.asList("[A-Z]+");
+            return Arrays.asList("[a-zA-Z]+");
         }
         else
         {

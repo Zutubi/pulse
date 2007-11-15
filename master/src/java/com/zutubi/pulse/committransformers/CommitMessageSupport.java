@@ -1,6 +1,5 @@
 package com.zutubi.pulse.committransformers;
 
-import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.prototype.config.project.commit.CommitMessageTransformerConfiguration;
 import com.zutubi.util.logging.Logger;
 
@@ -15,18 +14,18 @@ public class CommitMessageSupport
 {
     private static final Logger LOG = Logger.getLogger(CommitMessageSupport.class);
 
-    private Changelist changelist;
+    private String comment;
     private Collection<CommitMessageTransformerConfiguration> transformers;
 
-    public CommitMessageSupport(Changelist changelist, Collection<CommitMessageTransformerConfiguration> transformers)
+    public CommitMessageSupport(String comment, Collection<CommitMessageTransformerConfiguration> transformers)
     {
         this.transformers = transformers;
-        this.changelist = changelist;
+        this.comment = comment;
     }
 
     protected CommitMessageBuilder applyTransformers()
     {
-        CommitMessageBuilder builder = new CommitMessageBuilder(changelist.getComment());
+        CommitMessageBuilder builder = new CommitMessageBuilder(comment);
         List<Substitution> substitutions = new LinkedList<Substitution>();
         for (CommitMessageTransformerConfiguration transformer : transformers)
         {
@@ -64,7 +63,7 @@ public class CommitMessageSupport
         catch (Exception e)
         {
             LOG.warning(String.format("Failed to process changelist comment. Cause: %s", e.getMessage()), e);
-            return changelist.getComment();
+            return comment;
         }
     }
 
@@ -80,7 +79,7 @@ public class CommitMessageSupport
         catch (Exception e)
         {
             LOG.warning(String.format("Failed to process changelist comment. Cause: %s", e.getMessage()), e);
-            return changelist.getComment();
+            return comment;
         }
     }
 
@@ -95,7 +94,7 @@ public class CommitMessageSupport
         catch (Exception e)
         {
             LOG.warning(String.format("Failed to process changelist comment. Cause: %s", e.getMessage()), e);
-            return changelist.getComment();
+            return comment;
         }
     }
 }
