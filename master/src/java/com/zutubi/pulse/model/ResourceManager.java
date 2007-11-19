@@ -14,5 +14,5 @@ public interface ResourceManager
 
     void addDiscoveredResources(long handle, List<Resource> resources);
 
-    Map<String, Resource> findAll();
+    Map<String, List<Resource>> findAll();
 }

@@ -482,15 +482,15 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         String random = RandomUtils.randomString(10);
         String parentName = random + "-parent";
         String childName = random + "-child";
-        helper.insertSimpleProject(parentName, true);
-        String childPath = helper.insertSimpleProject(childName, parentName, false);
+        xmlRpcHelper.insertSimpleProject(parentName, true);
+        String childPath = xmlRpcHelper.insertSimpleProject(childName, parentName, false);
 
         String stagesPath = PathUtils.getPath(childPath, "stages");
         String hidePath = PathUtils.getPath(stagesPath, "default");
-        helper.deleteConfig(hidePath);
-        assertEquals(0, helper.getConfigListing(stagesPath).size());
-        helper.restoreConfig(hidePath);
-        Vector<String> listing = helper.getConfigListing(stagesPath);
+        xmlRpcHelper.deleteConfig(hidePath);
+        assertEquals(0, xmlRpcHelper.getConfigListing(stagesPath).size());
+        xmlRpcHelper.restoreConfig(hidePath);
+        Vector<String> listing = xmlRpcHelper.getConfigListing(stagesPath);
         assertEquals(1, listing.size());
         assertEquals("default", listing.get(0));
     }
@@ -498,16 +498,16 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testSetOrder() throws Exception
     {
         String random = RandomUtils.randomString(10);
-        String path = helper.insertSimpleProject(random, true);
+        String path = xmlRpcHelper.insertSimpleProject(random, true);
         String propertiesPath = PathUtils.getPath(path, "properties");
         Hashtable<String, Object> p1 = createProperty("p1", "v1");
         Hashtable<String, Object> p2 = createProperty("p2", "v2");
-        helper.insertConfig(propertiesPath, p1);
-        helper.insertConfig(propertiesPath, p2);
+        xmlRpcHelper.insertConfig(propertiesPath, p1);
+        xmlRpcHelper.insertConfig(propertiesPath, p2);
 
-        assertEquals(Arrays.asList("p1", "p2"), new LinkedList<String>(helper.getConfigListing(propertiesPath)));
-        helper.setConfigOrder(propertiesPath, "p2", "p1");
-        assertEquals(Arrays.asList("p2", "p1"), new LinkedList<String>(helper.getConfigListing(propertiesPath)));
+        assertEquals(Arrays.asList("p1", "p2"), new LinkedList<String>(xmlRpcHelper.getConfigListing(propertiesPath)));
+        xmlRpcHelper.setConfigOrder(propertiesPath, "p2", "p1");
+        assertEquals(Arrays.asList("p2", "p1"), new LinkedList<String>(xmlRpcHelper.getConfigListing(propertiesPath)));
     }
 
     private Hashtable<String, Object> createProperty(String name, String value)

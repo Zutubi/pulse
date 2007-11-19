@@ -136,7 +136,7 @@ function openBrowseWindow(contextPath, selectDir, elementId, extraArgs)
 }
 
 // Function for opening a resource browse window used on several forms.
-//   - resourceId: ID of textbox to to receive the resource name
+//   - resourceId: ID of textbox to receive the resource name
 //   - versionId: ID of textbox to receive the resource version
 function openResourceBrowser(contextPath, resourceId, versionId)
 {

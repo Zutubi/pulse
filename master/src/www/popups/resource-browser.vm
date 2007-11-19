@@ -46,7 +46,7 @@
         #end
             <td class="content">
         #foreach($agent in $versionEntry.value)
-                $!webwork.htmlEncode($agent)
+            $!webwork.htmlEncode($agent)#if($velocityCount < $versionEntry.value.size()),#end
         #end
             </td>
         </tr>

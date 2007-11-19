@@ -12,6 +12,8 @@ import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.wizard.TypeWizardState;
 import com.zutubi.prototype.wizard.webwork.AbstractTypeWizard;
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.bootstrap.freemarker.FreemarkerConfigurationFactoryBean;
 import com.zutubi.pulse.velocity.AbstractDirective;
 import freemarker.core.DelegateBuiltin;
 import freemarker.template.Configuration;
@@ -43,8 +45,7 @@ public class WizardDirective extends AbstractDirective
     private String namespace;
 
     private FormDescriptorFactory formDescriptorFactory;
-
-    private Configuration configuration;
+    private MasterConfigurationManager configurationManager;
     private AbstractTypeWizard wizardInstance;
 
     public WizardDirective()
@@ -121,6 +122,7 @@ public class WizardDirective extends AbstractDirective
 
             // provide wizard specific rendering, that includes details about all of the steps, the current step
             // index, and much much more.
+            Configuration configuration = FreemarkerConfigurationFactoryBean.createConfiguration(wizardInstance.getCurrentState().getType().getClazz(), configurationManager);
             Template template = configuration.getTemplate("prototype/xhtml/wizard.ftl");
             template.process(context, writer);
 
@@ -130,11 +132,6 @@ public class WizardDirective extends AbstractDirective
         {
             throw new ParseErrorException(e.getMessage());
         }
-    }
-
-    public void setFreemarkerConfiguration(Configuration configuration)
-    {
-        this.configuration = configuration;
     }
 
     public void setPath(String path)
@@ -175,5 +172,10 @@ public class WizardDirective extends AbstractDirective
             Messages.addResolver(new WizardContextResolver());
             registrationRequired = false;
         }
+    }
+
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
     }
 }

@@ -2,6 +2,7 @@ package com.zutubi.pulse.model;
 
 import com.opensymphony.util.TextUtils;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.FieldAction;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.validation.annotations.Required;
 
@@ -12,6 +13,7 @@ import com.zutubi.validation.annotations.Required;
 public class ResourceRequirement extends AbstractConfiguration
 {
     @Required
+    @FieldAction(template = "ResourceRequirement.browser")
     private String resource;
     private String version;
 

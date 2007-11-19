@@ -50,28 +50,27 @@
     
     <p id="status" class="status-message" style="display: none"></p>
 
+#if($result.completed())
 #auth("resource=project" "action=write")
     <div id="action-column" style="margin-left: 20px; float: right;">
         <table width="150" class="content">
             <tr>
                 <th class="heading">actions</th>
             </tr>
-    #if($result.completed())
         #set($confirm = $action.getText("build.delete.confirm", [$buildResult.number]))
             <tr>
                 <td class="content">
                     <img alt="delete" src="$base/images/delete.gif"/>
-                    <a href="#" onclick="confirmUrl('$confirm', 'projectName=$u_projectName&amp;buildVID=$buildResult.number')">#wwtext("name=build.delete")</a>
+                    <a href="#" onclick="confirmUrl('$confirm', '$base/deleteBuild.action?projectName=$u_projectName&amp;buildVID=$buildResult.number')">#wwtext("name=build.delete")</a>
                 </td>
             </tr>
-    #end
         </table>
 
+    #if($hooks.size() > 0)
         <table width="150" class="content">
             <tr>
                 <th class="heading">hooks</th>
             </tr>
-    #if($hooks.size() > 0)
         #foreach($hook in $hooks)
             <tr>
                 <td class="content">
@@ -80,11 +79,11 @@
                 </td>
             </tr>
         #end
-    #end
         </table>
+    #end
     </div>
 #end
-
+#end
     <div id="panel">
         #parse("ajax/view-build-panel.vm")
     </div>

@@ -47,19 +47,22 @@ public class BrowseResourcesAction extends ActionSupport
 
     public String execute() throws Exception
     {
-        Map<String, Resource> resources = resourceManager.findAll();
-        for(Map.Entry<String, Resource> entry: resources.entrySet())
+        Map<String, List<Resource>> resources = resourceManager.findAll();
+        for(Map.Entry<String, List<Resource>> entry: resources.entrySet())
         {
-            Resource resource = entry.getValue();
-            Map<String, Set<String>> versions = allResources.get(resource.getName());
-
-            if(versions == null)
+            List<Resource> agentResources = entry.getValue();
+            for (Resource resource: agentResources)
             {
-                versions = new TreeMap<String, Set<String>>();
-                allResources.put(resource.getName(), versions);
-            }
+                Map<String, Set<String>> versions = allResources.get(resource.getName());
 
-            mergeVersions(entry.getKey(), resource, versions);
+                if(versions == null)
+                {
+                    versions = new TreeMap<String, Set<String>>();
+                    allResources.put(resource.getName(), versions);
+                }
+
+                mergeVersions(entry.getKey(), resource, versions);
+            }
         }
 
         return SUCCESS;

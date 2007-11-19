@@ -30,6 +30,11 @@ public class ConfigurationResourceRepository implements ConfigurableResourceRepo
         this.configurationProvider = configurationProvider;
     }
 
+    public AgentConfiguration getAgentConfig()
+    {
+        return agentConfig;
+    }
+
     public boolean hasResource(String name, String version)
     {
         Resource r = getResource(name);

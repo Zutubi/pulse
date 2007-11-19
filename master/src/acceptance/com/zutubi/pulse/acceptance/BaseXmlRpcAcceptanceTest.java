@@ -15,7 +15,7 @@ public class BaseXmlRpcAcceptanceTest extends TestCase
 {
     public static final String SYMBOLIC_NAME_KEY = XmlRpcHelper.SYMBOLIC_NAME_KEY;
 
-    XmlRpcHelper helper;
+    XmlRpcHelper xmlRpcHelper;
 
     public BaseXmlRpcAcceptanceTest()
     {
@@ -38,12 +38,12 @@ public class BaseXmlRpcAcceptanceTest extends TestCase
             port = Integer.parseInt(portProperty);
         }
 
-        helper = new XmlRpcHelper(new URL("http", "localhost", port, "/xmlrpc"));
+        xmlRpcHelper = new XmlRpcHelper(new URL("http", "localhost", port, "/xmlrpc"));
     }
 
     protected void tearDown() throws Exception
     {
-        helper = null;
+        xmlRpcHelper = null;
         super.tearDown();
     }
 
@@ -54,54 +54,54 @@ public class BaseXmlRpcAcceptanceTest extends TestCase
 
     public String login(String login, String password) throws Exception
     {
-        return helper.login(login, password);
+        return xmlRpcHelper.login(login, password);
     }
 
     public String loginAsAdmin() throws Exception
     {
-        return helper.loginAsAdmin();
+        return xmlRpcHelper.loginAsAdmin();
     }
 
     public boolean logout() throws Exception
     {
-        return helper.logout();
+        return xmlRpcHelper.logout();
     }
 
     public Vector<Object> getVector(Object... o)
     {
-        return helper.getVector(o);
+        return xmlRpcHelper.getVector(o);
     }
 
     public <T> T callWithoutToken(String function, Object... args) throws Exception
     {
-        return helper.<T>callWithoutToken(function, args);
+        return xmlRpcHelper.<T>callWithoutToken(function, args);
     }
 
     public <T> T call(String function, Object... args) throws Exception
     {
-        return helper.<T>call(function, args);
+        return xmlRpcHelper.<T>call(function, args);
     }
 
     public String insertSimpleProject(String name) throws Exception
     {
-        return helper.insertSimpleProject(name, false);
+        return xmlRpcHelper.insertSimpleProject(name, false);
     }
 
     public boolean ensureProject(String name) throws Exception
     {
-        return helper.ensureProject(name);
+        return xmlRpcHelper.ensureProject(name);
     }
 
     public String insertSimpleAgent(String name) throws Exception
     {
-        return helper.insertSimpleAgent(name);
+        return xmlRpcHelper.insertSimpleAgent(name);
     }
 
     protected void callAndExpectError(String error, String function, Object... args)
     {
         try
         {
-            helper.call(function, args);
+            xmlRpcHelper.call(function, args);
             fail();
         }
         catch (Exception e)

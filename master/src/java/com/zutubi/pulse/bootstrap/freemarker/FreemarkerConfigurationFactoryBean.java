@@ -7,6 +7,7 @@ import com.zutubi.util.logging.Logger;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;
 import freemarker.cache.TemplateLoader;
+import freemarker.cache.ClassTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.TemplateModelException;
@@ -48,6 +49,16 @@ public class FreemarkerConfigurationFactoryBean implements FactoryBean
         String base = configurationManager.getSystemConfig().getContextPathNormalised();
         configuration.setSharedVariable("base", base);
         configuration.setSharedVariable("urls", new Urls(base));
+        return configuration;
+    }
+
+    public static Configuration createConfiguration(Class clazz, MasterConfigurationManager configurationManager) throws TemplateModelException
+    {
+        Configuration configuration = createConfiguration(configurationManager);
+        TemplateLoader currentLoader = configuration.getTemplateLoader();
+        TemplateLoader classLoader = new ClassTemplateLoader(clazz, "");
+        MultiTemplateLoader loader = new MultiTemplateLoader(new TemplateLoader[]{ classLoader, currentLoader });
+        configuration.setTemplateLoader(loader);
         return configuration;
     }
 

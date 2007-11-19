@@ -144,11 +144,7 @@ public class FormDirective extends PrototypeDirective
 
             // Get our own configuration so that we can mess with the
             // tenplate loader
-            Configuration configuration = FreemarkerConfigurationFactoryBean.createConfiguration(configurationManager);
-            TemplateLoader currentLoader = configuration.getTemplateLoader();
-            TemplateLoader classLoader = new ClassTemplateLoader(ctype.getClazz(), "");
-            MultiTemplateLoader loader = new MultiTemplateLoader(new TemplateLoader[]{ classLoader, currentLoader });
-            configuration.setTemplateLoader(loader);
+            Configuration configuration = FreemarkerConfigurationFactoryBean.createConfiguration(ctype.getClazz(), configurationManager);
             
             try
             {
