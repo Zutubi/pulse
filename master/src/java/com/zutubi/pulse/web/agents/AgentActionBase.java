@@ -1,6 +1,6 @@
 package com.zutubi.pulse.web.agents;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.AgentManager;

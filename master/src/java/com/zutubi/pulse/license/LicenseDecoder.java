@@ -1,6 +1,6 @@
 package com.zutubi.pulse.license;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.util.StringUtils;
 import org.apache.commons.codec.binary.Base64;
 

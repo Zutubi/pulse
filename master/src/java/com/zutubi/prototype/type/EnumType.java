@@ -1,6 +1,6 @@
 package com.zutubi.prototype.type;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 
 /**
  * Type used for enum-valued properties.  They are similar to simple string

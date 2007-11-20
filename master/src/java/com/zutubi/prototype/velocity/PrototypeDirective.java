@@ -1,6 +1,6 @@
 package com.zutubi.prototype.velocity;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.i18n.Messages;

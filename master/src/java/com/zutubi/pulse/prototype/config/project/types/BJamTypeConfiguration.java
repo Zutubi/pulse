@@ -2,7 +2,7 @@ package com.zutubi.pulse.prototype.config.project.types;
 
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Form;
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import org.apache.velocity.VelocityContext;
 
 /**

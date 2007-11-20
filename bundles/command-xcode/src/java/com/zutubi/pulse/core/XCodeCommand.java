@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.util.StringUtils;

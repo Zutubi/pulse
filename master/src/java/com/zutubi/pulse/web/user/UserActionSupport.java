@@ -1,6 +1,6 @@
 package com.zutubi.pulse.web.user;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.web.ActionSupport;

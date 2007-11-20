@@ -1,6 +1,6 @@
 package com.zutubi.pulse.webwork.mapping;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 
 /**
  * A resolver that allows an arbitrary path to be appended to the url.  The

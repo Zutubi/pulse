@@ -1,6 +1,6 @@
 package com.zutubi.pulse.plugins;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 
 /**
  */

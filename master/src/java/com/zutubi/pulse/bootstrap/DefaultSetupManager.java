@@ -1,6 +1,6 @@
 package com.zutubi.pulse.bootstrap;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import com.opensymphony.xwork.spring.SpringObjectFactory;
 import com.zutubi.prototype.config.*;
 import com.zutubi.prototype.type.record.DelegatingHandleAllocator;

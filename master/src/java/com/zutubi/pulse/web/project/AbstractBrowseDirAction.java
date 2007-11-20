@@ -5,7 +5,7 @@ import com.zutubi.pulse.filesystem.File;
 import com.zutubi.pulse.filesystem.FileSystem;
 import com.zutubi.pulse.filesystem.FileSystemException;
 import com.zutubi.pulse.web.DirectoryEntry;
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 
 import java.io.InputStream;
 import java.util.Arrays;

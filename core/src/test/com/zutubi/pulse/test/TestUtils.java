@@ -1,7 +1,7 @@
 package com.zutubi.pulse.test;
 
 import com.zutubi.pulse.Version;
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 
 import java.io.File;
 import java.net.URL;

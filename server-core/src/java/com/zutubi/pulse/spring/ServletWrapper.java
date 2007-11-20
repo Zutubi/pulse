@@ -2,7 +2,7 @@ package com.zutubi.pulse.spring;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.util.bean.ObjectFactory;
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 
 import javax.servlet.*;
 import java.io.IOException;

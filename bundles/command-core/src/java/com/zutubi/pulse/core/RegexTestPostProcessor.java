@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.model.TestCaseResult;
 import com.zutubi.pulse.core.model.TestSuiteResult;
 import com.zutubi.util.IOUtils;
 import com.zutubi.util.logging.Logger;
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 
 import java.io.BufferedReader;
 import java.io.File;

@@ -5,7 +5,7 @@ import org.apache.commons.vfs.FileSystemException;
 
 import java.io.InputStream;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 
 /**
  * <class comment/>

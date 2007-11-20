@@ -1,6 +1,6 @@
 package com.zutubi.pulse.prototype.squeezer.squeezers;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.pulse.prototype.squeezer.SqueezeException;
 import com.zutubi.pulse.prototype.squeezer.TypeSqueezer;
 

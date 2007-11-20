@@ -15,7 +15,7 @@ import com.zutubi.pulse.util.process.ForwardingByteHandler;
 import com.zutubi.pulse.util.process.NullByteHandler;
 import com.zutubi.validation.annotations.Numeric;
 import com.zutubi.validation.annotations.Required;
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 
 import java.util.LinkedList;
 import java.util.List;

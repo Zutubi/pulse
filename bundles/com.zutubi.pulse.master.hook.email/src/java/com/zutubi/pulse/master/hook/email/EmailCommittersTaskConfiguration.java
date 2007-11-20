@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.hook.email;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.Select;
 import com.zutubi.config.annotations.SymbolicName;

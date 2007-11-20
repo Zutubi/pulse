@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.scm.cvs;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.pulse.config.Config;
 import com.zutubi.pulse.config.ConfigSupport;
 import com.zutubi.pulse.core.model.Revision;

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.prototype.config.admin;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.config.annotations.*;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.validation.Validateable;

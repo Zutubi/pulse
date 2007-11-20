@@ -10,7 +10,7 @@ import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.GraphFunction;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.logging.Logger;
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 
 import java.lang.reflect.Modifier;
 import java.util.*;

@@ -2,7 +2,7 @@ package com.zutubi.pulse.prototype.squeezer.squeezers;
 
 import com.zutubi.pulse.prototype.squeezer.TypeSqueezer;
 import com.zutubi.pulse.prototype.squeezer.SqueezeException;
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 
 /**
  * <class-comment/>

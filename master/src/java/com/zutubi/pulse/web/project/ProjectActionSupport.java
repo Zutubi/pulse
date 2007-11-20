@@ -1,6 +1,6 @@
 package com.zutubi.pulse.web.project;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.web.ActionSupport;

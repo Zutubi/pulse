@@ -1,6 +1,6 @@
 package com.zutubi.pulse.prototype.config.project.changeviewer;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.prototype.config.ConfigurationProvider;

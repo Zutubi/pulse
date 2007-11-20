@@ -1,6 +1,6 @@
 package com.zutubi.pulse.model;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 
 import java.util.Arrays;
 import java.util.LinkedList;

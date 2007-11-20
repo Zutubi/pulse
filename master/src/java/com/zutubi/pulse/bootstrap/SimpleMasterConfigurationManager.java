@@ -1,6 +1,6 @@
 package com.zutubi.pulse.bootstrap;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.pulse.bootstrap.conf.EnvConfig;
 import com.zutubi.pulse.bootstrap.conf.VolatileReadOnlyConfig;
 import com.zutubi.pulse.config.Config;

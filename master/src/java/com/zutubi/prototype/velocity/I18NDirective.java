@@ -1,6 +1,6 @@
 package com.zutubi.prototype.velocity;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.i18n.Messages;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;

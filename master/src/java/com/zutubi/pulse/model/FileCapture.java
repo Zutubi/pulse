@@ -1,6 +1,6 @@
 package com.zutubi.pulse.model;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 
 /**
  * A capture for a single file.

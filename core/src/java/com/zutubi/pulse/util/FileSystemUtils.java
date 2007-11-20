@@ -1,6 +1,6 @@
 package com.zutubi.pulse.util;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.util.IOUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;

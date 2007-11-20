@@ -2,7 +2,7 @@ package com.zutubi.pulse.xwork.validator.validators;
 
 import com.opensymphony.xwork.validator.validators.FieldValidatorSupport;
 import com.opensymphony.xwork.validator.ValidationException;
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 
 /**
  *

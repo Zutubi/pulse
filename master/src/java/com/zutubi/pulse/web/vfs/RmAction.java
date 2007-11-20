@@ -2,7 +2,7 @@ package com.zutubi.pulse.web.vfs;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileType;
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 
 /**
  * <class comment/>

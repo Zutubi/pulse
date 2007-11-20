@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import nu.xom.Element;
 
 /**

@@ -1,6 +1,6 @@
 package com.zutubi.prototype.webwork;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.pulse.web.vfs.DirectoryComparator;

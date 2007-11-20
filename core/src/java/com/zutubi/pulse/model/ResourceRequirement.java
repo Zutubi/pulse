@@ -1,6 +1,6 @@
 package com.zutubi.pulse.model;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.FieldAction;
 import com.zutubi.pulse.core.config.AbstractConfiguration;

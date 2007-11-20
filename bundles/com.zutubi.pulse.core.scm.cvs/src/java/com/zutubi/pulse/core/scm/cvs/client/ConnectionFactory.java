@@ -5,7 +5,7 @@
 
 package com.zutubi.pulse.core.scm.cvs.client;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.pulse.core.scm.cvs.client.connection.SshConnection;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.connection.*;

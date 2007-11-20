@@ -1,6 +1,6 @@
 package com.zutubi.pulse.web.admin.plugins;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import com.opensymphony.webwork.ServletActionContext;
 import com.opensymphony.webwork.dispatcher.multipart.MultiPartRequestWrapper;
 import com.zutubi.util.logging.Logger;

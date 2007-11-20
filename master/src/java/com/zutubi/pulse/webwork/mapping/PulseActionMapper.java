@@ -1,6 +1,6 @@
 package com.zutubi.pulse.webwork.mapping;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import com.opensymphony.webwork.dispatcher.mapper.ActionMapper;
 import com.opensymphony.webwork.dispatcher.mapper.ActionMapping;
 import com.opensymphony.webwork.dispatcher.mapper.DefaultActionMapper;

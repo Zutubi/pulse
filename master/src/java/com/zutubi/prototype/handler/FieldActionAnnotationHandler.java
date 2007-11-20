@@ -1,6 +1,6 @@
 package com.zutubi.prototype.handler;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.config.annotations.FieldAction;
 import com.zutubi.prototype.Descriptor;
 import com.zutubi.prototype.FieldDescriptor;

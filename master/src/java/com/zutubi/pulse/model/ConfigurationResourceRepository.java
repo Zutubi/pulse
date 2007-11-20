@@ -1,6 +1,6 @@
 package com.zutubi.pulse.model;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.core.ConfigurableResourceRepository;

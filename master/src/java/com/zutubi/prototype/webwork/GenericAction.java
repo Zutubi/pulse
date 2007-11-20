@@ -1,6 +1,6 @@
 package com.zutubi.prototype.webwork;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.prototype.actions.ActionManager;
 import com.zutubi.prototype.actions.ConfigurationAction;

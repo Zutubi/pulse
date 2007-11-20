@@ -1,6 +1,6 @@
 package com.zutubi.pulse.web.vfs;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.pulse.vfs.CompoundFileFilter;
 import com.zutubi.pulse.vfs.FilePrefixFilter;
 import com.zutubi.util.logging.Logger;

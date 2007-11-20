@@ -1,6 +1,6 @@
 package com.zutubi.prototype.velocity;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.prototype.FormDescriptor;
 import com.zutubi.prototype.FormDescriptorFactory;
 import com.zutubi.prototype.TemplateFormDecorator;

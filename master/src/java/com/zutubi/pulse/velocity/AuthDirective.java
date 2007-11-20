@@ -1,6 +1,6 @@
 package com.zutubi.pulse.velocity;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.prototype.config.ConfigurationSecurityManager;

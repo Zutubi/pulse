@@ -1,6 +1,6 @@
 package com.zutubi.pulse.web.project;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.web.LookupErrorException;

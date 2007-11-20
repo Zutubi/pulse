@@ -1,6 +1,6 @@
 package com.zutubi.pulse.security.ldap;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.prototype.config.ConfigurationEventListener;
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.config.events.ConfigurationEvent;

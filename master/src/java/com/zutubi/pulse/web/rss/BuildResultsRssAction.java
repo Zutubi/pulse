@@ -1,6 +1,6 @@
 package com.zutubi.pulse.web.rss;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import com.sun.syndication.feed.WireFeed;
 import com.sun.syndication.feed.module.content.ContentModule;
 import com.sun.syndication.feed.module.content.ContentModuleImpl;

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.web.project;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.Changelist;

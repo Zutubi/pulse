@@ -1,6 +1,6 @@
 package com.zutubi.pulse.command;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.SystemBootstrapManager;
 import com.zutubi.pulse.bootstrap.DatabaseConfig;

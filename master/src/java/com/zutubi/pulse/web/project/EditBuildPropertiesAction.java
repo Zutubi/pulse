@@ -1,6 +1,6 @@
 package com.zutubi.pulse.web.project;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.model.Field;

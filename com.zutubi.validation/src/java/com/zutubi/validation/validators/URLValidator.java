@@ -1,7 +1,7 @@
 package com.zutubi.validation.validators;
 
 import com.zutubi.validation.ValidationException;
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 
 import java.net.URL;
 import java.net.MalformedURLException;

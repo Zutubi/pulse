@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.scm.cvs.client;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.pulse.core.scm.cvs.CvsRevision;
 import com.zutubi.pulse.core.scm.ScmEventHandler;
 import com.zutubi.pulse.core.scm.ScmException;

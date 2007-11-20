@@ -1,6 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.forms.setup.PulseLicenseForm;

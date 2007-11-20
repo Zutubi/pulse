@@ -4,7 +4,7 @@ import org.apache.commons.vfs.FileObject;
 
 import java.io.File;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 
 /**
  * <class comment/>

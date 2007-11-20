@@ -1,6 +1,6 @@
 package com.zutubi.pulse.web.user;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.prototype.config.user.UserSettingsConfiguration;

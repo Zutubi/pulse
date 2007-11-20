@@ -4,7 +4,7 @@ import com.opensymphony.webwork.dispatcher.WebWorkResultSupport;
 import com.opensymphony.webwork.ServletActionContext;
 import com.opensymphony.xwork.ActionInvocation;
 import com.opensymphony.xwork.util.OgnlValueStack;
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import com.sun.syndication.feed.WireFeed;
 import com.sun.syndication.io.WireFeedOutput;
 import com.zutubi.util.Constants;

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.web.project;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import com.opensymphony.xwork.ValidationAware;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.model.CustomProjectValidationPredicate;

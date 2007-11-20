@@ -2,7 +2,7 @@ package com.zutubi.pulse.upgrade.tasks;
 
 import com.zutubi.pulse.upgrade.UpgradeContext;
 import com.zutubi.pulse.util.JDBCUtils;
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 
 import java.sql.*;
 import java.io.IOException;

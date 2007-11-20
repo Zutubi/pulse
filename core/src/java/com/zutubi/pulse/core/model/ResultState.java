@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.model;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 
 import java.util.*;
 

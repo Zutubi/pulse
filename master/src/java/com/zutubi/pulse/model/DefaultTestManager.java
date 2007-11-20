@@ -1,6 +1,6 @@
 package com.zutubi.pulse.model;
 
-import com.opensymphony.util.TextUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.model.persistence.TestCaseIndexDao;
