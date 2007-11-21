@@ -3,7 +3,10 @@ package com.zutubi.pulse.jetty;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.util.logging.Logger;
+import com.zutubi.pulse.core.PulseRuntimeException;
+import com.opensymphony.util.TextUtils;
 import org.mortbay.http.SocketListener;
+import org.mortbay.http.SslListener;
 import org.mortbay.jetty.Server;
 import org.springframework.beans.factory.FactoryBean;
 
@@ -30,11 +33,44 @@ public class JettyServerFactoryBean implements FactoryBean
                     instance = new Server();
 
                     // configuration of the server depends upon the configmanager.
-                    SocketListener listener = new SocketListener();
                     SystemConfiguration systemConfiguration = configManager.getSystemConfig();
-                    listener.setHost(systemConfiguration.getBindAddress());
-                    listener.setPort(systemConfiguration.getServerPort());
-                    instance.addListener(listener);
+                    if(systemConfiguration.isSslEnabled())
+                    {
+                        SslListener sslListener = new SslListener();
+                        sslListener.setHost(systemConfiguration.getBindAddress());
+                        sslListener.setPort(systemConfiguration.getServerPort());
+                        if(TextUtils.stringSet(systemConfiguration.getSslKeystore()))
+                        {
+                            sslListener.setKeystore(systemConfiguration.getSslKeystore());
+                        }
+
+                        if(TextUtils.stringSet(systemConfiguration.getSslPassword()))
+                        {
+                            sslListener.setPassword(systemConfiguration.getSslPassword());
+                        }
+                        else
+                        {
+                            throw new PulseRuntimeException("SSL enabled but ssl.password not set");
+                        }
+
+                        if(TextUtils.stringSet(systemConfiguration.getSslKeyPassword()))
+                        {
+                            sslListener.setKeyPassword(systemConfiguration.getSslKeyPassword());
+                        }
+                        else
+                        {
+                            throw new PulseRuntimeException("SSL enabled but ssl.keyPassword not set");
+                        }
+
+                        instance.addListener(sslListener);
+                    }
+                    else
+                    {
+                        SocketListener listener = new SocketListener();
+                        listener.setHost(systemConfiguration.getBindAddress());
+                        listener.setPort(systemConfiguration.getServerPort());
+                        instance.addListener(listener);
+                    }
                 }
             }
         }
