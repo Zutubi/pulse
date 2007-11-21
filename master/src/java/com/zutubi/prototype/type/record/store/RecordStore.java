@@ -1,6 +1,5 @@
 package com.zutubi.prototype.type.record.store;
 
-import com.zutubi.prototype.transaction.TransactionResource;
 import com.zutubi.prototype.type.record.Record;
 
 /**

@@ -1,7 +1,7 @@
 package com.zutubi.prototype.transaction;
 
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * The transaction objects allows for operations to be performed against a specific transaction.
