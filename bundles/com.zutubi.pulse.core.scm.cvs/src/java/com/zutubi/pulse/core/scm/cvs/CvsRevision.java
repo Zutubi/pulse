@@ -65,6 +65,7 @@ public class CvsRevision //extends Revision
         try
         {
             setDate(DATE_FORMAT.parse(revStr));
+            setRevisionString(generateRevisionString());
             return;
         }
         catch (ParseException e)
@@ -77,6 +78,7 @@ public class CvsRevision //extends Revision
         try
         {
             setDate(format.parse(revStr));
+            setRevisionString(generateRevisionString());
             return;
         }
         catch (ParseException e)
@@ -113,6 +115,7 @@ public class CvsRevision //extends Revision
         try
         {
             setDate(DATE_FORMAT.parse(date));
+            setRevisionString(generateRevisionString());
             return;
         }
         catch (ParseException e)
@@ -123,6 +126,7 @@ public class CvsRevision //extends Revision
         try
         {
             setDate(format.parse(date));
+            setRevisionString(generateRevisionString());
             return;
         }
         catch (ParseException e)
