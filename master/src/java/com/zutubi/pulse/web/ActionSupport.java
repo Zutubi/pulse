@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import freemarker.template.utility.StringUtil;
+
 /**
  * 
  *
@@ -158,7 +160,7 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
 
     public String jsStringEncode(String s)
     {
-        return TextUtils.htmlEncode(s).replace("'", "\\'");
+        return StringUtil.javaScriptStringEnc(s);
     }
     
     public String urlDecode(String s)

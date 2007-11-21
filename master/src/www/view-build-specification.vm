@@ -181,7 +181,7 @@
                         </table>
                         
         #acl("domainObject=project" "hasPermission=4,1")
-                        <a href="#" id="delete_$!webwork.htmlEncode($node.stage.name)" onclick="confirmUrl('$confirmMessage', 'deleteBuildStage.action?projectId=$project.id&amp;specId=$specification.id&amp;id=$node.id')">
+                        <a href="#" id="delete_$!webwork.htmlEncode($node.stage.name)" onclick="confirmUrl('$action.jsStringEncode($confirmMessage)', 'deleteBuildStage.action?projectId=$project.id&amp;specId=$specification.id&amp;id=$node.id')">
                             <img alt="$action.getText('delete')" src="$base/images/delete.gif"/> #wwtext("name=buildspec.stage.delete")
                         </a>
         #end
