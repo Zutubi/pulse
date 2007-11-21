@@ -13,7 +13,7 @@
         <property name="stamps" type="com.zutubi.pulse.util.TimeStampsType">
             <column name="QUEUE" sql-type="BIGINT"/>
             <column name="START" sql-type="BIGINT"/>
-            <column name="FINISH" sql-type="BIGINT"/>
+            <column name="FINISH" sql-type="BIGINT" index="idx_buildresult_finish"/>
             <column name="ESTIMATED_RUNNING_TIME" sql-type="BIGINT"/>
         </property>
 
