@@ -65,6 +65,11 @@ public class BuildResultExpressions
         return Expression.eq("hasWorkDir", b);
     }
 
+    public static Criterion isPersonalBuild(boolean b)
+    {
+        return (b) ? Expression.isNotNull("user") : Expression.isNull("user");
+    }
+
     public static Order orderByDescEndDate()
     {
         return Order.desc("stamps.endTime");
