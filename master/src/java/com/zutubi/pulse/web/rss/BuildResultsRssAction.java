@@ -178,6 +178,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
         {
             SearchQuery<Long> query = queries.getIds(BuildResult.class);
             query.add(BuildResultExpressions.buildResultCompleted());
+            query.add(BuildResultExpressions.isPersonalBuild(false));
             query.setFirstResult(0);
             query.setMaxResults(10);
             query.add(BuildResultExpressions.orderByDescEndDate());
@@ -243,7 +244,9 @@ public class BuildResultsRssAction extends ProjectActionSupport
             }
 
             SearchQuery<Long> query = queries.getIds(BuildResult.class);
-            query.add(Expression.and(BuildResultExpressions.projectIn(projects), BuildResultExpressions.buildResultCompleted()));
+            query.add(BuildResultExpressions.projectIn(projects));
+            query.add(BuildResultExpressions.buildResultCompleted());
+            query.add(BuildResultExpressions.isPersonalBuild(false));
             query.setFirstResult(0);
             query.setMaxResults(10);
             query.add(BuildResultExpressions.orderByDescEndDate());
@@ -300,9 +303,10 @@ public class BuildResultsRssAction extends ProjectActionSupport
             SearchQuery<Long> query = queries.getIds(BuildResult.class);
             query.add(BuildResultExpressions.projectEq(project));
             query.add(BuildResultExpressions.buildResultCompleted());
+            query.add(BuildResultExpressions.isPersonalBuild(false));
             query.setFirstResult(0);
             query.setMaxResults(10);
-            query.add(Order.desc("stamps.endTime"));
+            query.add(BuildResultExpressions.orderByDescId());
             query.setProjection(Projections.id());
             return query;
         }
@@ -355,7 +359,9 @@ public class BuildResultsRssAction extends ProjectActionSupport
                 return null;
             }
             SearchQuery<Long> query = queries.getIds(BuildResult.class);
-            query.add(Expression.and(BuildResultExpressions.projectIn(projects), BuildResultExpressions.buildResultCompleted()));
+            query.add(BuildResultExpressions.buildResultCompleted());
+            query.add(BuildResultExpressions.projectIn(projects));
+            query.add(BuildResultExpressions.isPersonalBuild(false));
             query.setFirstResult(0);
             query.setMaxResults(10);
             query.add(BuildResultExpressions.orderByDescEndDate());
