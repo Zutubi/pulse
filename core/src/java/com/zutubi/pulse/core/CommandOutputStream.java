@@ -125,6 +125,7 @@ public class CommandOutputStream extends OutputStream implements Runnable
             }
             catch (InterruptedException e)
             {
+                // Empty
             }
 
             flush();

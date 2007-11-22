@@ -107,6 +107,18 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         return context;
     }
 
+    public void testVersion() throws Exception
+    {
+        ExecutionContext context = makeContext(1, "version");
+        recipeProcessor.build(new RecipeRequest(new SimpleBootstrapper(), getPulseFile("basic"), context));
+        assertRecipeCommenced(1, "version");
+        assertCommandCommenced(1, "bootstrap");
+        assertCommandCompleted(1, ResultState.SUCCESS);
+        assertRecipeCompleted(1, ResultState.SUCCESS);
+        assertNoMoreEvents();
+        assertEquals("test version", context.getVersion());
+    }
+
     public void testExceptionDuringBootstrap() throws Exception
     {
         ErrorBootstrapper bootstrapper = new ErrorBootstrapper(new BuildException("test exception"));

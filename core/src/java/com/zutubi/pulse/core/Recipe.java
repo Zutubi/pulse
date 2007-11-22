@@ -34,6 +34,7 @@ public class Recipe extends SelfReference
      * being able to execute this recipe.
      */
     private List<Dependency> dependencies = new LinkedList<Dependency>();
+    private Version version = null;
 
     /**
      * The systems event manager.
@@ -112,6 +113,16 @@ public class Recipe extends SelfReference
         dependencies.add(dependency);
     }
 
+    public Version getVersion()
+    {
+        return version;
+    }
+
+    public void addVersion(Version version)
+    {
+        this.version = version;
+    }
+
     /**
      * Add a command to the front of the command execution list. This command will be executed first
      * unless another command is added via this method.
@@ -145,33 +156,43 @@ public class Recipe extends SelfReference
 
     public void execute(ExecutionContext context)
     {
-        boolean success = true;
-        File outputDir = context.getInternalValue(BuildProperties.PROPERTY_RECIPE_PATHS, RecipePaths.class).getOutputDir();
-        for (int i = 0; i < commands.size(); i++)
+        try
         {
-            Command command = commands.get(i);
-            if (success || command.isForce())
+            boolean success = true;
+            File outputDir = context.getInternalValue(BuildProperties.PROPERTY_RECIPE_PATHS, RecipePaths.class).getOutputDir();
+            for (int i = 0; i < commands.size(); i++)
             {
-                CommandResult result = new CommandResult(command.getName());
-
-                File commandOutput = new File(outputDir, getCommandDirName(i, result));
-                if (!commandOutput.mkdirs())
+                Command command = commands.get(i);
+                if (success || command.isForce())
                 {
-                    throw new BuildException("Could not create command output directory '" + commandOutput.getAbsolutePath() + "'");
-                }
+                    CommandResult result = new CommandResult(command.getName());
 
-                if (!executeCommand(context, commandOutput, result, command))
-                {
-                    // Recipe terminated.
-                    return;
-                }
+                    File commandOutput = new File(outputDir, getCommandDirName(i, result));
+                    if (!commandOutput.mkdirs())
+                    {
+                        throw new BuildException("Could not create command output directory '" + commandOutput.getAbsolutePath() + "'");
+                    }
 
-                switch (result.getState())
-                {
-                    case FAILURE:
-                    case ERROR:
-                        success = false;
+                    if (!executeCommand(context, commandOutput, result, command))
+                    {
+                        // Recipe terminated.
+                        return;
+                    }
+
+                    switch (result.getState())
+                    {
+                        case FAILURE:
+                        case ERROR:
+                            success = false;
+                    }
                 }
+            }
+        }
+        finally
+        {
+            if (version != null)
+            {
+                context.setVersion(version.getValue());
             }
         }
     }

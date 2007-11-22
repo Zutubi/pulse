@@ -6,6 +6,7 @@ import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.CommandOutputEvent;
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.core.model.CommandResult;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -116,6 +117,24 @@ public class CommandOutputStreamTest extends PulseTestCase implements EventListe
         }
 
         assertReceived(totalWritten);
+    }
+
+    public void testAutoFlush() throws InterruptedException, IOException
+    {
+        stream = new CommandOutputStream(eventManager, 1, true);
+        stream.write(getBuffer(1));
+        Thread.sleep(6000);
+        assertReceived(1);
+    }
+
+    public void testAutoFlushAfterFullWrite() throws InterruptedException, IOException
+    {
+        stream = new CommandOutputStream(eventManager, 1, true);
+        stream.write(getBuffer(CommandOutputStream.MINIMUM_SIZE));
+        stream.write(getBuffer(1));
+        Thread.sleep(6000);
+        assertEvent(CommandOutputStream.MINIMUM_SIZE);
+        assertEvent(1);
     }
 
     private byte[] getBuffer(int size)
