@@ -9,7 +9,7 @@ import java.io.IOException;
  */
 public interface MasterConfigurationManager extends ConfigurationManager, DataResolver
 {
-    public static final String CONFIG_DIR = ".pulse";
+    public static final String CONFIG_DIR = ".pulse2";
     
     MasterUserPaths getUserPaths();
 
