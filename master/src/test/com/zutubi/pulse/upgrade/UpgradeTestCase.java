@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 
 import java.util.List;
 import java.util.LinkedList;
+import java.util.Arrays;
 
 /**
  *
@@ -161,4 +162,32 @@ public class UpgradeTestCase extends TestCase
         }
     }
 
+    protected static class UpgradeableComponentSourceAdapter implements UpgradeableComponentSource
+    {
+        private List<UpgradeableComponent> components = new LinkedList<UpgradeableComponent>();
+
+        public UpgradeableComponentSourceAdapter()
+        {
+        }
+
+        public UpgradeableComponentSourceAdapter(List<UpgradeableComponent> components)
+        {
+            this.components = components;
+        }
+
+        public UpgradeableComponentSourceAdapter(UpgradeableComponent component)
+        {
+            this.components = Arrays.asList(component);
+        }
+
+        public boolean isUpgradeRequired()
+        {
+            return components.size() > 0;
+        }
+
+        public List<UpgradeableComponent> getUpgradeableComponents()
+        {
+            return components;
+        }
+    }
 }

@@ -14,6 +14,8 @@ public class DefaultUpgradeManager implements UpgradeManager
 {
     private static final Logger LOG = Logger.getLogger(UpgradeManager.class);
 
+    private List<UpgradeableComponentSource> upgradeableSources = new LinkedList<UpgradeableComponentSource>();
+
     private List<UpgradeableComponent> upgradeableComponents = new LinkedList<UpgradeableComponent>();
 
     private List<UpgradeTaskGroup> groups = new LinkedList<UpgradeTaskGroup>();
@@ -22,6 +24,14 @@ public class DefaultUpgradeManager implements UpgradeManager
 
     public boolean isUpgradeRequired()
     {
+        for (UpgradeableComponentSource source : upgradeableSources)
+        {
+            if (source.isUpgradeRequired())
+            {
+                return true;
+            }
+        }
+
         for (UpgradeableComponent component : upgradeableComponents)
         {
             if (component.isUpgradeRequired())
@@ -32,7 +42,7 @@ public class DefaultUpgradeManager implements UpgradeManager
         return false;
     }
 
-    public void add(UpgradeableComponent component) throws UpgradeException
+    public void add(UpgradeableComponent component)
     {
         upgradeableComponents.add(component);
     }
@@ -47,11 +57,36 @@ public class DefaultUpgradeManager implements UpgradeManager
         this.upgradeableComponents = Arrays.asList(components);
     }
 
+    public void add(UpgradeableComponentSource componentSource) 
+    {
+        upgradeableSources.add(componentSource);
+    }
+
+    public void setUpgradeableComponentSources(List<UpgradeableComponentSource> componentSources)
+    {
+        this.upgradeableSources = componentSources;
+    }
+
+    public void setUpgradeableComponentSources(UpgradeableComponentSource... componentSources)
+    {
+        this.upgradeableSources = Arrays.asList(componentSources);
+    }
+
     public void prepareUpgrade()
     {
         groups = new LinkedList<UpgradeTaskGroup>();
 
-        for (UpgradeableComponent component : upgradeableComponents)
+        List<UpgradeableComponent> components = new LinkedList<UpgradeableComponent>();
+        components.addAll(upgradeableComponents);
+        for (UpgradeableComponentSource source : upgradeableSources)
+        {
+            if (source.isUpgradeRequired())
+            {
+                components.addAll(source.getUpgradeableComponents());
+            }
+        }
+
+        for (UpgradeableComponent component : components)
         {
             if (component.isUpgradeRequired())
             {

@@ -2,6 +2,7 @@ package com.zutubi.pulse.upgrade;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Arrays;
 
 /**
  * <class-comment/>
@@ -131,5 +132,21 @@ public class DefaultUpgradeManagerTest extends UpgradeTestCase
         assertEquals(1, component.completedTasks.size());
         assertEquals(1, component.failedTasks.size());
         assertEquals(0, component.abortedTasks.size());
+    }
+
+    public void testConfigurationViaUpgradeableComponentSource()
+    {
+        List<UpgradeTaskAdapter> tasks = new LinkedList<UpgradeTaskAdapter>();
+        tasks.add(new UpgradeTaskAdapter());
+        UpgradeableComponent component = new UpgradeableComponentAdapter(tasks);
+
+        upgradeManager.add(new UpgradeableComponentSourceAdapter(component));
+        upgradeManager.prepareUpgrade();
+        
+        assertTrue(upgradeManager.isUpgradeRequired());
+
+        List<UpgradeTaskGroup> preview = upgradeManager.previewUpgrade();
+        assertEquals(1, preview.size());
+        assertEquals(1, preview.get(0).getTasks().size());
     }
 }
