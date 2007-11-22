@@ -1,31 +1,29 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
+import static com.zutubi.config.annotations.FieldParameter.ACTIONS;
+import static com.zutubi.config.annotations.FieldParameter.SCRIPTS;
+import com.zutubi.config.annotations.FieldType;
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.model.Field;
 import com.zutubi.prototype.model.Form;
-import com.zutubi.prototype.velocity.PrototypeDirective;
+import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.bootstrap.freemarker.FreemarkerConfigurationFactoryBean;
 import com.zutubi.pulse.core.config.NamedConfigurationComparator;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.pulse.core.scm.ScmClientFactory;
-import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
+import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.model.ManualTriggerBuildReason;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.project.types.TypeConfiguration;
+import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
-import freemarker.cache.ClassTemplateLoader;
-import freemarker.cache.MultiTemplateLoader;
-import freemarker.cache.TemplateLoader;
-import freemarker.template.Configuration;
-import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
 import java.io.IOException;
@@ -42,7 +40,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
     private String revision;
     private List<ResourceProperty> properties;
 
-    private ScmClientFactory scmClientFactory;
+    private ScmClientFactory<ScmConfiguration> scmClientFactory;
     private MasterConfigurationManager configurationManager;
     private ConfigurationProvider configurationProvider;
 
@@ -72,35 +70,23 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         properties = new ArrayList<ResourceProperty>(project.getConfig().getProperties().values());
         Collections.sort(properties, new NamedConfigurationComparator());
 
-        Form form = new Form();
+        Form form = new Form("form", "edit.build.properties", "editBuildProperties.action");
         form.setAjax(false);
-        form.setName("form");
-        form.setId("edit.build.properties");
-        form.setAction("editBuildProperties.action");
 
-        Field field = new Field();
-        field.setType("hidden");
-        field.setId("zfid.projectName");
-        field.setName("projectName");
+        Field field = new Field(FieldType.HIDDEN, "projectName");
         field.setValue(getProjectName());
         form.add(field);
 
-        field = new Field();
-        field.setType("text");
-        field.setId("zfid.revision");
-        field.setName("revision");
+        field = new Field(FieldType.TEXT, "revision");
         field.setLabel("revision");
         field.setValue(revision);
-        field.addParameter("actions", Arrays.asList("getlatest"));
-        field.addParameter("scripts", Arrays.asList("EditBuildPropertiesAction.getlatest"));
+        field.addParameter(ACTIONS, Arrays.asList("getlatest"));
+        field.addParameter(SCRIPTS, Arrays.asList("EditBuildPropertiesAction.getlatest"));
         form.add(field);
 
         for(ResourceProperty property: properties)
         {
-            field = new Field();
-            field.setType("text");
-            field.setId("zfid." + PROPERTY_PREFIX + property.getName());
-            field.setName(PROPERTY_PREFIX + property.getName());
+            field = new Field(FieldType.TEXT, PROPERTY_PREFIX + property.getName());
             field.setLabel(property.getName());
             field.setValue(property.getValue());
             form.add(field);
@@ -109,31 +95,19 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         addSubmit(form, "trigger");
         addSubmit(form, "cancel");
 
-        Map<String, Object> context = PrototypeDirective.initialiseContext(getClass());
-        context.put("form", form);
+        Map<String, Object> context = new HashMap<String, Object>();
         context.put("actionErrors", getActionErrors());
         context.put("fieldErrors", getFieldErrors());
-
-        Configuration configuration = FreemarkerConfigurationFactoryBean.createConfiguration(configurationManager);
-        configuration.setSharedVariable("projectId", project.getId());
-        TemplateLoader currentLoader = configuration.getTemplateLoader();
-        TemplateLoader classLoader = new ClassTemplateLoader(getClass(), "");
-        MultiTemplateLoader loader = new MultiTemplateLoader(new TemplateLoader[]{ classLoader, currentLoader });
-        configuration.setTemplateLoader(loader);
+        context.put("projectId", project.getId());
 
         StringWriter writer = new StringWriter();
-        Template template = configuration.getTemplate("prototype/xhtml/form.ftl");
-        template.process(context, writer);
-
+        PrototypeUtils.renderForm(context, form, getClass(), writer, configurationManager);
         formSource = writer.toString();
     }
 
     private void addSubmit(Form form, String name)
     {
-        Field field;
-        field = new Field();
-        field.setType("submit");
-        field.setName(name);
+        Field field = new Field(FieldType.SUBMIT, name);
         field.setValue(name);
         form.add(field);
     }
@@ -240,7 +214,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         }
     }
 
-    public void setScmClientFactory(ScmClientFactory scmClientFactory)
+    public void setScmClientFactory(ScmClientFactory<ScmConfiguration> scmClientFactory)
     {
         this.scmClientFactory = scmClientFactory;
     }

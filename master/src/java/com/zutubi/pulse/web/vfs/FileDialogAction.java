@@ -1,6 +1,7 @@
 package com.zutubi.pulse.web.vfs;
 
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.util.SystemUtils;
 
 import java.io.File;
 
@@ -54,7 +55,6 @@ public class FileDialogAction extends VFSActionSupport
      * The file systems user home directory.
      */
     protected String userHome;
-
 
     public String getSeparator()
     {
@@ -146,6 +146,11 @@ public class FileDialogAction extends VFSActionSupport
         return userHome;
     }
 
+    public boolean isWindows()
+    {
+        return SystemUtils.IS_WINDOWS;
+    }
+    
     public String execute() throws Exception
     {
         super.execute();
@@ -179,7 +184,7 @@ public class FileDialogAction extends VFSActionSupport
      */
     protected String makeJavascriptFriendly(String str)
     {
-        return str.replace("\\", "\\\\");
+        return str.replace("\\", "/");
     }
 
     /**

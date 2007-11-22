@@ -1,8 +1,10 @@
 package com.zutubi.pulse.prototype.config.project.types;
 
-import com.zutubi.util.TextUtils;
+import com.zutubi.config.annotations.FieldAction;
 import com.zutubi.config.annotations.Form;
+import com.zutubi.config.annotations.Parameter;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.util.TextUtils;
 import org.apache.velocity.VelocityContext;
 
 /**
@@ -13,6 +15,14 @@ import org.apache.velocity.VelocityContext;
 @Form(fieldOrder = {"workigDir", "makefile", "targets", "arguments", "postProcessors"})
 public class MakeTypeConfiguration extends TemplateTypeConfiguration
 {
+    /**
+     * Path relative to work.dir in which to execute the make.
+     */
+    @FieldAction(template = "actions/browse-scm-dir")
+    private String workingDir;
+
+    @FieldAction(template = "actions/browse-scm-file")
+    @Parameter(name = "baseDirField", value = "workingDir")
     private String makefile;
 
     /**
@@ -24,13 +34,6 @@ public class MakeTypeConfiguration extends TemplateTypeConfiguration
      * Extra arguments to pass to make.
      */
     private String arguments;
-    
-    /**
-     * Path relative to work.dir in which to execute the make.
-     */
-    private String workingDir;
-    
-//    private Map<String, String> environment = new TreeMap<String, String>();
 
     public String getMakefile()
     {

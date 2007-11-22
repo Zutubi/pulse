@@ -5,10 +5,11 @@
     <script type="text/javascript">
         function select(resource, version)
         {
-            var field = opener.document.getElementById("$resourceId");
-		    field.value = resource;
-            field = opener.document.getElementById("$versionId");
-	        field.value = version;
+            var field = opener.Ext.getCmp("$resourceId");
+		    field.setValue(resource);
+            field = opener.Ext.getCmp("$versionId");
+	        field.setValue(version);
+	        field.form.updateButtons();
 		    window.close();
         }
     </script>

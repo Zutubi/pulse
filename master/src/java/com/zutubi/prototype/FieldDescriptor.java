@@ -1,5 +1,6 @@
 package com.zutubi.prototype;
 
+import static com.zutubi.config.annotations.FieldParameter.*;
 import com.zutubi.prototype.model.Field;
 import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.prototype.type.record.Record;
@@ -8,40 +9,25 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- *
- *
+ * Describes a form field.
  */
 public class FieldDescriptor extends AbstractParameterised implements Descriptor
 {
     private FormDescriptor form;
-    private Object value;
-    private String parentPath;
-    private String baseName;
-    private TypeProperty property;
-    private String name;
     private String type;
-    private boolean required;
-    private boolean constrained;
-    private boolean submitOnEnter = false;
-    private List<String> actions = new LinkedList<String>();
-    private List<String> scripts = new LinkedList<String>();
+    private String name;
+    private Object value;
+
+    public FieldDescriptor()
+    {
+        addParameter(ACTIONS, new LinkedList<String>());
+        addParameter(SCRIPTS, new LinkedList<String>());
+    }
 
     public Field instantiate(String path, Record instance)
     {
-        Field field = new Field();
-        field.setType(getType());
-        field.setName(getName());
-        field.setId("zfid." + getName());
+        Field field = new Field(getType(), getName());
         field.setLabel(getName() + ".label");
-        
-        field.addParameter("parentPath", getParentPath());
-        field.addParameter("baseName", getBaseName());
-        field.addParameter("required", isRequired());
-        field.addParameter("constrained", isConstrained());
-        field.addParameter("submitOnEnter", submitOnEnter);
-        field.addParameter("property", getProperty());
-        field.addParameter("actions", getActions());
-        field.addParameter("scripts", getScripts());
         field.addAll(getParameters());
 
         // if we do not have a value set, then take the value from the instance.
@@ -67,44 +53,14 @@ public class FieldDescriptor extends AbstractParameterised implements Descriptor
         this.form = form;
     }
 
-    public Object getValue()
+    public String getType()
     {
-        return value;
+        return type;
     }
 
-    public void setValue(Object value)
+    public void setType(String type)
     {
-        this.value = value;
-    }
-
-    public String getParentPath()
-    {
-        return parentPath;
-    }
-
-    public void setParentPath(String parentPath)
-    {
-        this.parentPath = parentPath;
-    }
-
-    public String getBaseName()
-    {
-        return baseName;
-    }
-
-    public void setBaseName(String baseName)
-    {
-        this.baseName = baseName;
-    }
-
-    public TypeProperty getProperty()
-    {
-        return property;
-    }
-
-    public void setProperty(TypeProperty property)
-    {
-        this.property = property;
+        this.type = type;
     }
 
     public String getName()
@@ -117,63 +73,93 @@ public class FieldDescriptor extends AbstractParameterised implements Descriptor
         this.name = name;
     }
 
-    public String getType()
+    public Object getValue()
     {
-        return type;
+        return value;
     }
 
-    public void setType(String type)
+    public void setValue(Object value)
     {
-        this.type = type;
+        this.value = value;
+    }
+
+    public String getParentPath()
+    {
+        return (String) getParameter(PARENT_PATH);
+    }
+
+    public void setParentPath(String parentPath)
+    {
+        addParameter(PARENT_PATH, parentPath);
+    }
+
+    public String getBaseName()
+    {
+        return (String) getParameter(BASE_NAME);
+    }
+
+    public void setBaseName(String baseName)
+    {
+        addParameter(BASE_NAME, baseName);
+    }
+
+    public TypeProperty getProperty()
+    {
+        return (TypeProperty) getParameter(PROPERTY);
+    }
+
+    public void setProperty(TypeProperty property)
+    {
+        addParameter(PROPERTY, property);
     }
 
     public boolean isRequired()
     {
-        return required;
+        return getParameter(REQUIRED, false);
     }
 
     public void setRequired(boolean required)
     {
-        this.required = required;
+        addParameter(REQUIRED, required);
     }
 
     public boolean isConstrained()
     {
-        return constrained;
+        return getParameter(CONSTRAINED, false);
     }
 
     public void setConstrained(boolean constrained)
     {
-        this.constrained = constrained;
+        addParameter(CONSTRAINED, constrained);
     }
 
     public boolean getSubmitOnEnter()
     {
-        return submitOnEnter;
+        return getParameter(SUBMIT_ON_ENTER, false);
     }
 
     public void setSubmitOnEnter(boolean submitOnEnter)
     {
-        this.submitOnEnter = submitOnEnter;
+        addParameter(SUBMIT_ON_ENTER, submitOnEnter);
     }
 
     public void addAction(String template)
     {
-        actions.add(template);
+        getActions().add(template);
     }
 
     public List<String> getActions()
     {
-        return actions;
+        return (List<String>) getParameter(ACTIONS);
     }
 
     public void addScript(String template)
     {
-        scripts.add(template);
+        getScripts().add(template);
     }
 
     public List<String> getScripts()
     {
-        return scripts;
+        return (List<String>) getParameter(SCRIPTS);
     }
 }

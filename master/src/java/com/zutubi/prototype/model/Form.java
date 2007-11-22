@@ -1,5 +1,6 @@
 package com.zutubi.prototype.model;
 
+import com.zutubi.config.annotations.FieldType;
 import com.zutubi.prototype.AbstractParameterised;
 
 import java.util.Collections;
@@ -18,6 +19,7 @@ public class Form extends AbstractParameterised
     private static final String PARAMETER_DISPLAY_MODE = "displayMode";
     private static final String PARAMETER_READ_ONLY = "readOnly";
     private static final String PARAMETER_AJAX = "ajax";
+    private static final String PARAMETER_FILE_UPLOAD = "fileUpload";
 
     /**
      * Ordered list of fields that make up this form.
@@ -28,76 +30,86 @@ public class Form extends AbstractParameterised
      */
     private List<Field> submitFields = new LinkedList<Field>();
 
-    public Form()
+    public Form(String name, String id, String action)
     {
-        parameters.put(PARAMETER_AJAX, true);
-        parameters.put(PARAMETER_DISPLAY_MODE, false);
-        parameters.put(PARAMETER_READ_ONLY, false);
+        setName(name);
+        setId(id);
+        setAction(action);
     }
 
     public String getName()
     {
-        return (String) parameters.get(PARAMETER_NAME);
+        return (String) getParameter(PARAMETER_NAME);
     }
 
-    public void setName(String name)
+    private void setName(String name)
     {
-        parameters.put(PARAMETER_NAME, name);
+        addParameter(PARAMETER_NAME, name);
     }
 
     public String getId()
     {
-        return (String) parameters.get(PARAMETER_ID);
+        return (String) getParameter(PARAMETER_ID);
     }
 
-    public void setId(String id)
+    private void setId(String id)
     {
-        parameters.put(PARAMETER_ID, id);
+        addParameter(PARAMETER_ID, id);
     }
 
     public String getAction()
     {
-        return (String) parameters.get(PARAMETER_ACTION);
+        return (String) getParameter(PARAMETER_ACTION);
     }
 
     public void setAction(String action)
     {
-        parameters.put(PARAMETER_ACTION, action);
+        addParameter(PARAMETER_ACTION, action);
     }
 
-    public boolean getDisplayMode()
+    public boolean isDisplayMode()
     {
-        return (Boolean) parameters.get(PARAMETER_DISPLAY_MODE);
+        return getParameter(PARAMETER_DISPLAY_MODE, false);
     }
 
     public void setDisplayMode(boolean displayMode)
     {
-        parameters.put(PARAMETER_DISPLAY_MODE, displayMode);
+        addParameter(PARAMETER_DISPLAY_MODE, displayMode);
     }
 
-    public boolean getReadOnly()
+    public boolean isReadOnly()
     {
-        return (Boolean) parameters.get(PARAMETER_READ_ONLY);
+        return getParameter(PARAMETER_READ_ONLY, false);
     }
 
     public void setReadOnly(boolean readOnly)
     {
-        parameters.put(PARAMETER_READ_ONLY, readOnly);
+        addParameter(PARAMETER_READ_ONLY, readOnly);
     }
 
-    public boolean getAjax()
+    public boolean isAjax()
     {
-        return (Boolean) parameters.get(PARAMETER_AJAX);
+        return getParameter(PARAMETER_AJAX, true);
     }
 
     public void setAjax(boolean ajax)
     {
-        parameters.put(PARAMETER_AJAX, ajax);
+        addParameter(PARAMETER_AJAX, ajax);
+    }
+
+    public boolean isFileUpload()
+    {
+        return getParameter(PARAMETER_FILE_UPLOAD, false);
+    }
+
+    public void setFileUpload(boolean fileUpload)
+    {
+        addParameter(PARAMETER_FILE_UPLOAD, fileUpload);
     }
 
     public void add(Field field)
     {
-        if ("submit".equals(field.getType()))
+        if (FieldType.SUBMIT.equals(field.getType()))
         {
             this.submitFields.add(field);
         }
@@ -110,17 +122,6 @@ public class Form extends AbstractParameterised
     public List<Field> getFields()
     {
         return Collections.unmodifiableList(fields);
-    }
-
-    public void setFields(List<Field> fields)
-    {
-        this.fields.clear();
-        this.submitFields.clear();
-
-        for (Field field : fields)
-        {
-            add(field);
-        }
     }
 
     public List<Field> getSubmitFields()

@@ -585,6 +585,10 @@
         <action name="pluginFileDialog" class="com.zutubi.pulse.web.admin.plugins.PluginFileDialogAction">
             <result name="success" type="velocity">tree/filedialog.vm</result>
         </action>
+
+        <action name="scmFileDialog" class="com.zutubi.pulse.web.admin.ScmFileDialogAction">
+            <result name="success" type="velocity">tree/filedialog.vm</result>
+        </action>
     </package>
 
 </xwork>

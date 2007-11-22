@@ -1,21 +1,34 @@
 package com.zutubi.prototype.webwork;
 
-import com.zutubi.util.TextUtils;
+import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.xwork.ValidationAware;
+import com.opensymphony.xwork.util.OgnlValueStack;
+import com.zutubi.config.annotations.Classification;
 import com.zutubi.i18n.Messages;
 import com.zutubi.prototype.config.ConfigurationSecurityManager;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
+import com.zutubi.prototype.freemarker.BaseNameMethod;
+import com.zutubi.prototype.freemarker.GetTextMethod;
+import com.zutubi.prototype.freemarker.ValidIdMethod;
+import com.zutubi.prototype.model.Form;
 import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.bootstrap.freemarker.FreemarkerConfigurationFactoryBean;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.webwork.mapping.PulseActionMapper;
 import com.zutubi.util.StringUtils;
-import com.zutubi.config.annotations.Classification;
+import com.zutubi.util.TextUtils;
+import freemarker.core.DelegateBuiltin;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.*;
 
 /**
@@ -342,5 +355,38 @@ public class PrototypeUtils
     public static String getIconCls(ComplexType type)
     {
         return "config-" + getClassification(type) + "-icon";
+    }
+
+    public static Map<String, Object> initialiseContext(Class clazz)
+    {
+        Map<String, Object> context = new HashMap<String, Object>();
+        return populateContext(clazz, context);
+    }
+
+    public static Map<String, Object> populateContext(Class clazz, Map<String, Object> context)
+    {
+        Messages messages = Messages.getInstance(clazz);
+        context.put("i18nText", new GetTextMethod(messages));
+        context.put("baseName", new BaseNameMethod());
+        context.put("validId", new ValidIdMethod());
+
+        // validation support:
+        OgnlValueStack stack = ActionContext.getContext().getValueStack();
+        context.put("fieldErrors", stack.findValue("fieldErrors"));
+
+        // provide some syntactic sweetener by linking the i18n text method to the ?i18n builtin function.
+        DelegateBuiltin.conditionalRegistration("i18n", "i18nText");
+        DelegateBuiltin.conditionalRegistration("baseName", "baseName");
+        DelegateBuiltin.conditionalRegistration("id", "validId");
+        return context;
+    }
+
+    public static void renderForm(Map<String, Object> context, Form form, Class i18nClazz, Writer writer, MasterConfigurationManager configurationManager) throws TemplateException, IOException
+    {
+        populateContext(i18nClazz, context);
+        context.put("form", form);
+        freemarker.template.Configuration configuration = FreemarkerConfigurationFactoryBean.createConfiguration(i18nClazz, configurationManager);
+        Template template = configuration.getTemplate("prototype/xhtml/form.ftl");
+        template.process(context, writer);
     }
 }

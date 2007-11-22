@@ -7,7 +7,7 @@ import com.zutubi.pulse.acceptance.SeleniumUtils;
  */
 public class InstallPluginForm
 {
-    private static final String FORM_ID = "plugin.local";
+    private static final String PATH_FIELD_ID = "zfid.pluginPath";
 
     private Selenium selenium;
 
@@ -18,18 +18,18 @@ public class InstallPluginForm
 
     public boolean isFormPresent()
     {
-        return selenium.isElementPresent(FORM_ID);
+        return selenium.isElementPresent(PATH_FIELD_ID);
     }
 
     public void waitFor()
     {
-        SeleniumUtils.waitForElementId(selenium, FORM_ID);
+        SeleniumUtils.waitForElementId(selenium, PATH_FIELD_ID);
     }
 
     public void continueFormElements(String path)
     {
-        selenium.type("local.path", path);
-        selenium.click("continue");
+        selenium.type(PATH_FIELD_ID, path);
+        selenium.click("zfid.continue");
         selenium.waitForPageToLoad("30000");
     }
 }

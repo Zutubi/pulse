@@ -7,6 +7,7 @@ import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.i18n.Messages;
 import com.zutubi.prototype.config.ConfigurationSecurityManager;
 import com.zutubi.prototype.security.AccessManager;
+import com.zutubi.pulse.committransformers.CommitMessageSupport;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.model.Project;
@@ -17,7 +18,6 @@ import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.project.commit.CommitMessageTransformerConfiguration;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.util.TimeStamps;
-import com.zutubi.pulse.committransformers.CommitMessageSupport;
 import com.zutubi.pulse.xwork.TextProviderSupport;
 import com.zutubi.pulse.xwork.interceptor.Cancelable;
 import com.zutubi.util.StringUtils;
@@ -26,7 +26,10 @@ import com.zutubi.util.logging.Logger;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * 
@@ -58,7 +61,7 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
 
     public boolean isCancelled()
     {
-        return cancel != null;
+        return cancel != null && !cancel.equalsIgnoreCase("false");
     }
 
     public void setCancel(String name)

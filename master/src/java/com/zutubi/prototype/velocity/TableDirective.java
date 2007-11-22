@@ -83,7 +83,7 @@ public class TableDirective extends PrototypeDirective
             Table table = tableDescriptor.instantiate(path, data);
 
             // handle rendering of the freemarker template.
-            Map<String, Object> context = initialiseContext(collectionType.getCollectionType().getClazz());
+            Map<String, Object> context = PrototypeUtils.initialiseContext(collectionType.getCollectionType().getClazz());
             context.put("table", table);
             context.put("path", path);
             context.put("embedded", PrototypeUtils.isEmbeddedCollection(collectionType));

@@ -14,13 +14,22 @@ width of its contents.  Floating it works, but hurts other things.
     var ${form.name} = function()
     {
         var form = new ZUTUBI.Form({
-            method: 'post',
-            waitMsgTarget: 'center'
+            method: 'post'
+            , waitMsgTarget: 'center'
+<#if form.fileUpload>
+            , fileUpload: true
+            , autoCreate: {tag: 'form', method: 'post', id: Ext.id(), enctype: 'multipart/form-data' }
+</#if>
         });
 
         function submitForm(value)
         {
-            Ext.get('submitField').dom.value = value;
+            Ext.get('${form.name?js_string}.submitField').dom.value = value;
+            if(value == 'cancel')
+            {
+                Ext.DomHelper.append(form.el, {tag: 'input', type: 'hidden', name: 'cancel', value: 'true'});
+            }
+
     <#if form.ajax>
             window.formSubmitting = true;
             form.submit({

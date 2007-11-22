@@ -13,6 +13,7 @@ import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.annotations.Constraint;
+import com.zutubi.validation.annotations.Numeric;
 import com.zutubi.validation.validators.RequiredValidator;
 
 import java.lang.annotation.Annotation;
@@ -114,6 +115,7 @@ public class FormDescriptorFactory
                 {
                     ((OptionFieldDescriptor)fd).setMultiple(true);                    
                 }
+
                 fd.setForm(form);
                 fd.setParentPath(parentPath);
                 fd.setBaseName(baseName);
@@ -191,7 +193,16 @@ public class FormDescriptorFactory
     private void addFieldParameters(CompositeType type, String parentPath, String baseName, TypeProperty property, FieldDescriptor fd)
     {
         handleAnnotations(type, fd, property.getAnnotations());
-        if(fd instanceof SelectFieldDescriptor)
+
+        if (fd instanceof TextFieldDescriptor)
+        {
+            Numeric numeric = AnnotationUtils.findAnnotation(property.getAnnotations(), Numeric.class);
+            if(numeric != null)
+            {
+                fd.addParameter("size", 100);
+            }
+        }
+        else if(fd instanceof SelectFieldDescriptor)
         {
             SelectFieldDescriptor select = (SelectFieldDescriptor) fd;
             if (select.getList() == null)

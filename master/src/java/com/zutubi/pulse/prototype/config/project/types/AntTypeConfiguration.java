@@ -1,8 +1,10 @@
 package com.zutubi.pulse.prototype.config.project.types;
 
-import com.zutubi.util.TextUtils;
+import com.zutubi.config.annotations.FieldAction;
 import com.zutubi.config.annotations.Form;
+import com.zutubi.config.annotations.Parameter;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.util.TextUtils;
 import org.apache.velocity.VelocityContext;
 
 /**
@@ -13,7 +15,10 @@ import org.apache.velocity.VelocityContext;
 @Form(fieldOrder = {"work", "file", "target", "args", "postProcessors"})
 public class AntTypeConfiguration extends TemplateTypeConfiguration
 {
+    @FieldAction(template = "actions/browse-scm-dir")
     private String work;
+    @FieldAction(template = "actions/browse-scm-file")
+    @Parameter(name = "baseDirField", value = "work")
     private String file;
     private String target;
     private String args;

@@ -8,58 +8,65 @@ import com.zutubi.prototype.AbstractParameterised;
  */
 public class Field extends AbstractParameterised
 {
-    public String getName()
+    public Field(String type, String name)
     {
-        return (String) parameters.get("name");
+        setType(type);
+        setName(name);
+        setId("zfid." + name);
     }
 
-    public Field setName(String name)
+    public String getName()
     {
-        parameters.put("name", name);
+        return (String) getParameter("name");
+    }
+
+    private Field setName(String name)
+    {
+        addParameter("name", name);
         return this;
     }
 
     public String getType()
     {
-        return (String) parameters.get("type");
+        return (String) getParameter("type");
     }
 
-    public Field setType(String type)
+    private Field setType(String type)
     {
-        parameters.put("type", type);
+        addParameter("type", type);
         return this;
     }
 
     public String getLabel()
     {
-        return (String)parameters.get("label");
+        return (String) getParameter("label");
     }
 
     public Field setLabel(String label)
     {
-        parameters.put("label", label);
+        addParameter("label", label);
         return this;
     }
 
     public Object getValue()
     {
-        return parameters.get("value");
+        return getParameter("value");
     }
 
     public Field setValue(Object value)
     {
-        parameters.put("value", value);
+        addParameter("value", value);
         return this;
     }
 
     public String getId()
     {
-        return (String) parameters.get("id");
+        return (String) getParameter("id");
     }
 
-    public Field setId(String id)
+    private Field setId(String id)
     {
-        parameters.put("id", id);
+        addParameter("id", id);
         return this;
     }
 }

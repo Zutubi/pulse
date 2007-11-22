@@ -3,7 +3,6 @@ package com.zutubi.prototype;
 import com.zutubi.prototype.model.Field;
 import com.zutubi.prototype.model.Form;
 import com.zutubi.prototype.model.SubmitFieldDescriptor;
-import com.zutubi.prototype.model.HiddenFieldDescriptor;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.pulse.webwork.mapping.PulseActionMapper;
@@ -109,10 +108,7 @@ public class FormDescriptor extends AbstractParameterised implements Descriptor
 
     public Form instantiate(String path, Record record)
     {
-        Form form = new Form();
-        form.setName(name);
-        form.setId(id);
-        form.setAction(PrototypeUtils.getConfigURL(path, action, null, namespace));
+        Form form = new Form(name, id, PrototypeUtils.getConfigURL(path, action, null, namespace));
         form.setReadOnly(readOnly);
         form.setDisplayMode(displayMode);
         form.setAjax(ajax);
@@ -166,9 +162,9 @@ public class FormDescriptor extends AbstractParameterised implements Descriptor
     {
         // If a field order is defined, lets us it as the starting point.
         LinkedList<String> ordered = new LinkedList<String>();
-        if (parameters.containsKey("fieldOrder"))
+        if (hasParameter("fieldOrder"))
         {
-            ordered.addAll(Arrays.asList((String[])parameters.get("fieldOrder")));
+            ordered.addAll(Arrays.asList((String[])getParameter("fieldOrder")));
         }
 
         // are we done?

@@ -63,7 +63,7 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
     {
         int width = columns.size() + (getParameter(PARAM_ORDER_ALLOWED, false) ? 3 : 2);
         Table table = new Table(width);
-        table.addAll(parameters);
+        table.addAll(getParameters());
 
         Messages messages = Messages.getInstance(type.getClazz());
 

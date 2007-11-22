@@ -37,25 +37,6 @@ public class ScmRootFileObject extends AbstractPulseFileObject implements ScmPro
     public ScmConfiguration getScm() throws FileSystemException
     {
         ProjectProvider projectProvider = getAncestor(ProjectProvider.class);
-        if(projectProvider.getProjectId() == 0)
-        {
-            // FIXME
-/*
-            // Assume project setup
-            Map session = ActionContext.getContext().getSession();
-            if (!session.containsKey(AddProjectWizard.class.getName()))
-            {
-                throw new FileSystemException("Unable to locate SCM configuration from previous wizard step");
-            }
-
-            AddProjectWizard wizard = (AddProjectWizard) session.get(AddProjectWizard.class.getName());
-            return wizard.getScm();            
-*/
-            return null;
-        }
-        else
-        {
-            return projectProvider.getProjectConfig().getScm();
-        }
+        return projectProvider.getProjectConfig().getScm();
     }
 }

@@ -23,6 +23,7 @@ public class SubversionConfiguration extends ScmConfiguration
     private String username;
     private String password;
     private String keyfile;
+    @Password
     private String keyfilePassphrase;
 
     @Wizard.Ignore

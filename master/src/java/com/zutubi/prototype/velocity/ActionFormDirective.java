@@ -6,6 +6,7 @@ import com.zutubi.prototype.model.Form;
 import com.zutubi.prototype.model.HiddenFieldDescriptor;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.freemarker.FreemarkerConfigurationFactoryBean;
 import com.zutubi.util.logging.Logger;
@@ -90,7 +91,7 @@ public class ActionFormDirective extends PrototypeDirective
             formDescriptor.add(hiddenFieldDescriptor);
 
             // Create the context object used to define the freemarker rendering context
-            Map<String, Object> context = initialiseContext(argumentType.getClazz());
+            Map<String, Object> context = PrototypeUtils.initialiseContext(argumentType.getClazz());
 
             Form form = formDescriptor.instantiate(lookupPath(), lookupRecord());
             context.put("form", form);

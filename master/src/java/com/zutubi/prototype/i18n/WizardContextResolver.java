@@ -30,7 +30,7 @@ public class WizardContextResolver implements ContextResolver<WizardContext>
         resolvedNames.add(wizardTypeResourceName);
 
         resolveUsingDelegateResolver(new ClassContext(wizard.getClass()), resolvedNames);
-        resolveUsingDelegateResolver(new ClassContext(currentState.getType().getClazz()), resolvedNames);
+        resolveUsingDelegateResolver(new ExtendedClassContext(currentState.getType().getClazz()), resolvedNames);
         resolveUsingDelegateResolver(new ExtendedClassContext(wizard.getType().getClazz()), resolvedNames);
 
         return resolvedNames.toArray(new String[resolvedNames.size()]);

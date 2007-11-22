@@ -4,6 +4,6 @@ import com.zutubi.pulse.web.vfs.FileDialogAction;
 
 /**
  */
-public class AddResourceFileDialogAction extends FileDialogAction
+public class ScmFileDialogAction extends FileDialogAction
 {
 }

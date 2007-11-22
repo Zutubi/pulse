@@ -7,12 +7,12 @@ form.on('actionfailed', function() { window.formSubmitting = false; });
 var fieldConfig;
 var hiddenFields = [];
 
-hiddenFields.push({id: 'submitField', name: 'submitField', value: ''});
+hiddenFields.push({id: '${form.name?js_string}.submitField', name: 'submitField', value: ''});
 
 <#list form.fields as field>
     <#assign parameters=field.parameters>
     fieldConfig = {
-        width: 200
+        width: 360
       , validateOnBlur: false
     <#if form.readOnly>
       , disabled: true
@@ -50,6 +50,8 @@ Ext.onReady(function()
 
     form.render('${form.id}');
     form.el.dom.action = '${base}/${form.action}';
+    form.url = '${base}/${form.action}';
+
     for(var i = 0; i < hiddenFields.length; i++)
     {
         var config = hiddenFields[i];

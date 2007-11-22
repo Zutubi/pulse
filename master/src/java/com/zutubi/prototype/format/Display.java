@@ -1,19 +1,18 @@
 package com.zutubi.prototype.format;
 
-import com.zutubi.util.bean.ObjectFactory;
-import com.zutubi.util.ReflectionUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
+import com.zutubi.util.ReflectionUtils;
+import com.zutubi.util.bean.ObjectFactory;
 
-import java.util.List;
-import java.util.LinkedList;
 import java.lang.reflect.Method;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
  *
  */
-//FIXME: Need a better name for this.
 public class Display
 {
     private ObjectFactory objectFactory;

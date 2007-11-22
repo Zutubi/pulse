@@ -1,6 +1,5 @@
 package com.zutubi.prototype.velocity;
 
-import com.zutubi.util.TextUtils;
 import com.zutubi.prototype.FormDescriptor;
 import com.zutubi.prototype.FormDescriptorFactory;
 import com.zutubi.prototype.TemplateFormDecorator;
@@ -12,15 +11,10 @@ import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.TemplateRecord;
+import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.bootstrap.freemarker.FreemarkerConfigurationFactoryBean;
+import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
-import freemarker.cache.ClassTemplateLoader;
-import freemarker.cache.MultiTemplateLoader;
-import freemarker.cache.TemplateLoader;
-import freemarker.template.Configuration;
-import freemarker.template.Template;
-import freemarker.template.TemplateException;
 import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
@@ -28,6 +22,7 @@ import org.apache.velocity.runtime.parser.node.Node;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -44,7 +39,7 @@ public class FormDirective extends PrototypeDirective
     private boolean displayMode = false;
     private boolean ajax = false;
     private String namespace;
-    
+
     private MasterConfigurationManager configurationManager;
     private ConfigurationSecurityManager configurationSecurityManager;
 
@@ -113,7 +108,7 @@ public class FormDirective extends PrototypeDirective
             formDescriptor.setNamespace(namespace);
 
             // These decorations should be genericised
-            if(displayMode)
+            if (displayMode)
             {
                 formDescriptor.setActions("apply", "reset");
             }
@@ -132,30 +127,14 @@ public class FormDirective extends PrototypeDirective
             formDescriptor.add(hiddenFieldDescriptor);
 
             // Create the context object used to define the freemarker rendering context
-            Map<String, Object> context = initialiseContext(ctype.getClazz());
-
+            Class clazz = ctype.getClazz();
             Form form = formDescriptor.instantiate(lookupPath(), data);
-            if(TextUtils.stringSet(action))
+            if (TextUtils.stringSet(action))
             {
                 form.setAction(action);
             }
 
-            context.put("form", form);
-
-            // Get our own configuration so that we can mess with the
-            // tenplate loader
-            Configuration configuration = FreemarkerConfigurationFactoryBean.createConfiguration(ctype.getClazz(), configurationManager);
-            
-            try
-            {
-                Template template = configuration.getTemplate("prototype/xhtml/form.ftl");
-                template.process(context, writer);
-            }
-            catch (TemplateException e)
-            {
-                LOG.warning(e);
-                throw new ParseErrorException(e.getMessage());
-            }
+            PrototypeUtils.renderForm(new HashMap<String, Object>(), form, clazz, writer, configurationManager);
 
             return true;
         }

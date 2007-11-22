@@ -1,8 +1,9 @@
 package com.zutubi.pulse.prototype.config.project.types;
 
-import com.zutubi.util.TextUtils;
+import com.zutubi.config.annotations.FieldAction;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.util.TextUtils;
 import org.apache.velocity.VelocityContext;
 
 /**
@@ -14,7 +15,7 @@ import org.apache.velocity.VelocityContext;
 public class MavenTypeConfiguration extends TemplateTypeConfiguration
 {
     private String targets;
-
+    @FieldAction(template = "actions/browse-scm-dir")
     private String workingDir;
     
     private String arguments;

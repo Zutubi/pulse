@@ -10,6 +10,7 @@ import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.util.logging.Logger;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -106,7 +107,7 @@ public class CheckDirective extends PrototypeDirective
             formDescriptor.setNamespace(namespace);
             formDescriptor.setAjax(true);
 
-            Map<String, Object> context = initialiseContext(checkType.getClazz());
+            Map<String, Object> context = PrototypeUtils.initialiseContext(checkType.getClazz());
             OgnlValueStack stack = ActionContext.getContext().getValueStack();
             Record data = (Record) stack.findValue("checkRecord");
 

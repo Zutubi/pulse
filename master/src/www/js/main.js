@@ -172,7 +172,7 @@ function openResourceDialog(base, agent, formname, fieldname)
     openFileDialog(base + '/popups/fileDialog.action', formname, fieldname, root, '', false, false, false);
 }
 
-function openSCMSelectDialog(base, showFiles, formName, fieldName, projectId, path, prefix)
+function openSCMSelectDialog(base, showFiles, formName, fieldName, projectPath, path, prefix)
 {
     if(path)
     {
@@ -199,7 +199,7 @@ function openSCMSelectDialog(base, showFiles, formName, fieldName, projectId, pa
         }
     }
 
-    openFileDialog(base + '/popups/fileDialog.action', formName, fieldName, 'pulse:///projects/' + projectId + '/scm/' + path, prefix, showFiles, false, false);
+    openFileDialog(base + '/popups/scmFileDialog.action', formName, fieldName, 'pulse:///' + projectPath + '/scm/' + path, prefix, showFiles, false, false);
 }
 
 

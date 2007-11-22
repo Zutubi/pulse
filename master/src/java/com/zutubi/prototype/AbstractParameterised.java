@@ -9,7 +9,7 @@ import java.util.Map;
  */
 public abstract class AbstractParameterised implements Parameterised
 {
-    protected Map<String, Object> parameters = new HashMap<String, Object>();
+    private Map<String, Object> parameters = new HashMap<String, Object>();
 
     public void addParameter(String key, Object value)
     {

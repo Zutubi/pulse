@@ -27,24 +27,23 @@
             window.onload = onInit;
             window.onresize = onResize;
 
-            function getFormValue()
+            function getField()
             {
                 var params = qs();
-                var formname = params['formname'];
                 var fieldname = params['fieldname'];
+                return opener.Ext.getCmp('zfid.' + fieldname);
+            }
 
-                var formFieldObject = opener.document.forms[formname].elements[fieldname];
-                return formFieldObject.value;
+            function getFormValue()
+            {
+                return getField().getValue();
             }
 
             function setFormValue(newValue)
             {
-                var params = qs();
-                var formname = params['formname'];
-                var fieldname = params['fieldname'];
-
-                var formFieldObject = opener.document.forms[formname].elements[fieldname];
-                formFieldObject.value = newValue;
+                var field = getField();
+                field.setValue(newValue);
+                field.form.updateButtons();
             }
 
             function copySelectedToParentForm()
@@ -53,7 +52,7 @@
                 if (tree.selected)
                 {
                     var path = tree.selected.getIdPath();
-                    if ('$separator' == '/' && path.charAt(0) != '/')
+                    if (!'$prefix' && !$windows && path.charAt(0) != '/')
                     {
                         path = '/' + path;
                     }
@@ -63,7 +62,7 @@
                         // strip a leading separator after we remove the
                         // prefix.
                         path = path.substring('$prefix'.length);
-                        if(path.length > 0 && path[0] == '$separator')
+                        if(path.length > 0 && path.charAt(0) == '$separator')
                         {
                             path = path.substring(1);
                         }
@@ -228,17 +227,21 @@
              */
             function onResize(event)
             {
-                var vElem = document.getElementById("view");
+                var toolbarHeight = 0;
 
+#if($showToolbar)
                 var tElem = document.getElementById("toolbar");
-
                 var tDim = Element.getDimensions(tElem);
+                toolbarHeight = tDim.height;
+#end
+
+                var vElem = document.getElementById("view");
                 var wDim = windowSize();
 
                 // work out the fudge factor - ie: the margin values.
                 var fudgeFactor = 160;
 
-                var viewHeight = wDim.height - tDim.height - fudgeFactor;
+                var viewHeight = wDim.height - toolbarHeight - fudgeFactor;
                 Element.setStyle(vElem, {"height":viewHeight + "px"});
             }
 
@@ -479,7 +482,9 @@
     </div>
 
     <!--toolbar-->
+#if($showToolbar)
     <div id="toolbar"></div>
+#end
 
     <!--directory view-->
     <div class="viewport" id="view">

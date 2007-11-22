@@ -4,13 +4,6 @@
 <html>
 <head>
     <title>#wwtext("name=add.plugin")</title>
-    <script type="text/javascript">
-    	function openBrowseFileDialog()
-    	{
-    	    openFileDialog('$base/popups/pluginFileDialog.action', 'plugin.local', 'pluginPath', 'local:///', '', true, true, true);
-    	    return false;
-    	}
-    </script>
 </head>
 <body>
     #adminTabs("plugins")
@@ -19,14 +12,26 @@
 
     #parse("/template/includes/actionerrors.vm")
 
-    #wwcform("action=$base/admin/plugins?install=upload" "id=plugin.upload" "name=plugin.upload" "heading=%{getText('plugin.upload')}" "method=post" "enctype=multipart/form-data")
-        #wwfile("name=plugin" "label=path" "required=true" "size=60" "id=upload.path" "tabindex=1")
-        #upload(2)
-    #end
+    <table class="config-panel">
+        <tr>
+            <td>
+                <h3 class="config-header">#wwtext("name=plugin.upload")</h3>
+                <div class="config-form-container">
+               $uploadFormSource
+                </div>
+            </td>
+        </tr>
+    </table>
 
-    #wwcform("action=$base/admin/plugins?install=local" "id=plugin.local" "name=plugin.local" "heading=%{getText('plugin.local')}" "method=post" "enctype=multipart/form-data")
-        #wwtextfield("name=pluginPath" "label=path" "required=true" "size=60" "id=local.path" "tabindex=4" "after= <a href='#' onclick='return openBrowseFileDialog();'>browse</a>")
-        #continueCancel(5)
-    #end
+    <table class="config-panel">
+        <tr>
+            <td>
+                <h3 class="config-header">#wwtext("name=plugin.local")</h3>
+                <div class="config-form-container">
+                    $localFormSource
+                </div>
+            </td>
+        </tr>
+    </table>
 </body>
 </html>

@@ -12,7 +12,6 @@ import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.prototype.wizard.Wizard;
 import com.zutubi.prototype.wizard.WizardState;
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.*;
 import com.zutubi.validation.i18n.MessagesTextProvider;
@@ -23,7 +22,7 @@ import java.util.Map;
  *
  *
  */
-public class ConfigurationWizardAction extends ActionSupport
+public class ConfigurationWizardAction extends com.opensymphony.xwork.ActionSupport
 {
     private static final Logger LOG = Logger.getLogger(ConfigurationWizardAction.class);
 
@@ -263,7 +262,7 @@ public class ConfigurationWizardAction extends ActionSupport
         try
         {
             // normalise the path by stripping leading and trailing '/' chars
-            String sessionKey = PathUtils.normalizePath(this.path);
+            String sessionKey = getSessionKey(this.path);
 
             Map<String, Object> session = ActionContext.getContext().getSession();
             if (!session.containsKey(sessionKey))
@@ -278,6 +277,11 @@ public class ConfigurationWizardAction extends ActionSupport
             LOG.warning(e);
             return null;
         }
+    }
+
+    public static String getSessionKey(String path)
+    {
+        return PathUtils.normalizePath(path);
     }
 
     @SuppressWarnings({ "unchecked" })
