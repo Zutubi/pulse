@@ -55,9 +55,7 @@ public class DefaultUpgradeManager implements UpgradeManager
         {
             if (component.isUpgradeRequired())
             {
-                component.prepareUpgrade();
-
-                // task group takes details from teh upgradeable component.
+                // task group takes details from the upgradeable component.
                 UpgradeTaskGroup taskGroup = new UpgradeTaskGroup();
                 taskGroup.setSource(component);
                 taskGroup.setTasks(component.getUpgradeTasks());
@@ -66,6 +64,7 @@ public class DefaultUpgradeManager implements UpgradeManager
         }
 
         monitor = new UpgradeProgressMonitor();
+        monitor.setTaskGroups(groups);
     }
 
     public List<UpgradeTaskGroup> previewUpgrade()
@@ -85,17 +84,20 @@ public class DefaultUpgradeManager implements UpgradeManager
         }
 
         monitor.start();
-        monitor.setTaskGroups(groups);
 
         for (UpgradeTaskGroup group : groups)
         {
             monitor.started(group);
 
-            UpgradeListener listener = null;
-            if (group.getSource() instanceof UpgradeListener)
+            UpgradeableComponent source = group.getSource();
+
+            UpgradeListener listener = new DelegateUpgradeListener();
+            if (source instanceof UpgradeListener)
             {
-                listener = (UpgradeListener) group.getSource();
+                listener = new DelegateUpgradeListener((UpgradeListener) group.getSource());
             }
+
+            source.upgradeStarted();
 
             List<UpgradeTask> tasksToExecute = group.getTasks();
 
@@ -124,24 +126,31 @@ public class DefaultUpgradeManager implements UpgradeManager
                         if (task.hasFailed())
                         {
                             // use an exception to break out to the task failure handling.
-                            throw new UpgradeException("Task "+task.getName()+" is marked as failed.");
+                            StringBuffer errors = new StringBuffer();
+                            String sep = "\n";
+                            for (String error : task.getErrors())
+                            {
+                                errors.append(sep);
+                                errors.append(error);
+                            }
+
+                            throw new UpgradeException("UpgradeTask '" + task.getName() + "' is marked as failed. " +
+                                    "The following errors were recorded:" + errors.toString());
                         }
 
                         monitor.completed(task);
-                        if (listener != null) // maybe we can link the listener into the monitor
-                        // since the monitor knows what is happening. 
-                        {
-                            listener.taskComplete(task);
-                        }
+                        listener.taskCompleted(task);
                     }
                     else
                     {
                         monitor.aborted(task);
+                        listener.taskAborted(task);
                     }
                 }
                 catch (UpgradeException e)
                 {
                     monitor.failed(task);
+                    listener.taskFailed(task);
                     if (task.haltOnFailure())
                     {
                         abort = true;
@@ -153,11 +162,12 @@ public class DefaultUpgradeManager implements UpgradeManager
             if (abort)
             {
                 monitor.aborted(group);
+                source.upgradeAborted();
             }
             else
             {
                 monitor.completed(group);
-                group.getSource().completeUpgrade();
+                source.upgradeCompleted();
             }
         }
 
@@ -167,5 +177,43 @@ public class DefaultUpgradeManager implements UpgradeManager
     public UpgradeProgressMonitor getUpgradeMonitor()
     {
         return monitor;
+    }
+
+    private class DelegateUpgradeListener implements UpgradeListener
+    {
+        private UpgradeListener delegate;
+
+        public DelegateUpgradeListener()
+        {
+        }
+
+        public DelegateUpgradeListener(UpgradeListener delegate)
+        {
+            this.delegate = delegate;
+        }
+
+        public void taskCompleted(UpgradeTask task)
+        {
+            if (delegate != null)
+            {
+                delegate.taskCompleted(task);
+            }
+        }
+
+        public void taskFailed(UpgradeTask task)
+        {
+            if (delegate != null)
+            {
+                delegate.taskFailed(task);
+            }
+        }
+
+        public void taskAborted(UpgradeTask task)
+        {
+            if (delegate != null)
+            {
+                delegate.taskAborted(task);
+            }
+        }
     }
 }

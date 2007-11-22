@@ -63,8 +63,9 @@ public class DefaultUpgradeManagerTest extends UpgradeTestCase
     {
         List<UpgradeTaskAdapter> tasks = new LinkedList<UpgradeTaskAdapter>();
         tasks.add(new UpgradeTaskAdapter());
+        UpgradeableComponentAdapter component = new UpgradeableComponentAdapter(tasks);
 
-        upgradeManager.add(new UpgradeableComponentAdapter(tasks));
+        upgradeManager.add(component);
 
         upgradeManager.prepareUpgrade();
         upgradeManager.executeUpgrade();
@@ -74,6 +75,14 @@ public class DefaultUpgradeManagerTest extends UpgradeTestCase
             UpgradeTaskAdapter adapter = (UpgradeTaskAdapter) task;
             assertTrue(adapter.isExecuted());
         }
+
+        assertTrue(component.wasStarted());
+        assertTrue(component.wasCompleted());
+        assertFalse(component.wasAborted());
+
+        assertEquals(1, component.completedTasks.size());
+        assertEquals(0, component.failedTasks.size());
+        assertEquals(0, component.abortedTasks.size());
     }
 
     public void testAbortOnFailure() throws UpgradeException
@@ -81,14 +90,23 @@ public class DefaultUpgradeManagerTest extends UpgradeTestCase
         List<UpgradeTaskAdapter> tasks = new LinkedList<UpgradeTaskAdapter>();
         tasks.add(new UpgradeTaskAdapter(true, true));
         tasks.add(new UpgradeTaskAdapter());
+        UpgradeableComponentAdapter component = new UpgradeableComponentAdapter(tasks);
 
-        upgradeManager.add(new UpgradeableComponentAdapter(tasks));
+        upgradeManager.add(component);
 
         upgradeManager.prepareUpgrade();
         upgradeManager.executeUpgrade();
 
         assertTrue(tasks.get(0).isExecuted());
         assertFalse(tasks.get(1).isExecuted());
+
+        assertTrue(component.wasStarted());
+        assertFalse(component.wasCompleted());
+        assertTrue(component.wasAborted());
+
+        assertEquals(0, component.completedTasks.size());
+        assertEquals(1, component.failedTasks.size());
+        assertEquals(1, component.abortedTasks.size());
     }
 
     public void testNoAbortOnFailure() throws UpgradeException
@@ -96,13 +114,22 @@ public class DefaultUpgradeManagerTest extends UpgradeTestCase
         List<UpgradeTaskAdapter> tasks = new LinkedList<UpgradeTaskAdapter>();
         tasks.add(new UpgradeTaskAdapter(false, true));
         tasks.add(new UpgradeTaskAdapter());
+        UpgradeableComponentAdapter component = new UpgradeableComponentAdapter(tasks);
 
-        upgradeManager.add(new UpgradeableComponentAdapter(tasks));
+        upgradeManager.add(component);
 
         upgradeManager.prepareUpgrade();
         upgradeManager.executeUpgrade();
 
         assertTrue(tasks.get(0).isExecuted());
         assertTrue(tasks.get(1).isExecuted());
+
+        assertTrue(component.wasStarted());
+        assertTrue(component.wasCompleted());
+        assertFalse(component.wasAborted());
+
+        assertEquals(1, component.completedTasks.size());
+        assertEquals(1, component.failedTasks.size());
+        assertEquals(0, component.abortedTasks.size());
     }
 }

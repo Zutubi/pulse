@@ -27,6 +27,7 @@ public class PulseUpgradeableComponent implements UpgradeableComponent, UpgradeL
     private List<PulseUpgradeTask> systemTasks = new LinkedList<PulseUpgradeTask>();
 
     private MasterConfigurationManager configurationManager;
+    
     private Data upgradeTarget;
 
     /**
@@ -155,18 +156,25 @@ public class PulseUpgradeableComponent implements UpgradeableComponent, UpgradeL
         return new LinkedList<UpgradeTask>(tasks);
     }
 
-    public void prepareUpgrade()
+    public void upgradeStarted()
     {
         upgradeTarget = configurationManager.getData();
     }
 
-    public void completeUpgrade()
+    public void upgradeCompleted()
     {
         // assumes a successful upgrade.
         upgradeTarget.updateVersion(Version.getVersion());
     }
 
-    public void taskComplete(UpgradeTask task)
+    public void upgradeAborted()
+    {
+
+    }
+
+    //--- UpgradeListener implementation --- 
+
+    public void taskCompleted(UpgradeTask task)
     {
         // record task completion, to ensure that it is not run a second time. Any task with a build
         // number less than zero are run during each upgrade and do not impact the target build number.
@@ -177,6 +185,16 @@ public class PulseUpgradeableComponent implements UpgradeableComponent, UpgradeL
         {
             upgradeTarget.setBuildNumber(pulseTask.getBuildNumber());
         }
+    }
+
+    public void taskFailed(UpgradeTask task)
+    {
+        // noop
+    }
+
+    public void taskAborted(UpgradeTask task)
+    {
+        // noop
     }
 
     public void setConfigurationManager(MasterConfigurationManager configurationManager)

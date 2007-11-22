@@ -86,13 +86,22 @@ public class UpgradeProgressMonitor
         return groupProgressLookupMap.get(group);
     }
 
+    /**
+     * Notify the monitor that the specified upgrade task has started / is starting processing.
+     *
+     * @param task in question
+     */
     public void started(UpgradeTask task)
     {
         TaskUpgradeProgress taskProgress = getProgress(task);
         taskProgress.setStatus(UpgradeStatus.IN_PROGRESS);
-
     }
 
+    /**
+     * Notify the monitor that the specified upgrade task has been aborted.
+     *
+     * @param task
+     */
     public void aborted(UpgradeTask task)
     {
         TaskUpgradeProgress taskProgress = getProgress(task);
@@ -101,6 +110,11 @@ public class UpgradeProgressMonitor
         tasksFinishedCount++;
     }
 
+    /**
+     * Notify the monitor that the specified upgrade task has failed.
+     *
+     * @param task
+     */
     public void failed(UpgradeTask task)
     {
         TaskUpgradeProgress taskProgress = getProgress(task);
@@ -110,6 +124,11 @@ public class UpgradeProgressMonitor
         error = true;
     }
 
+    /**
+     * Notify the monitor that the specified upgrade task has completed successfully.
+     *
+     * @param task
+     */
     public void completed(UpgradeTask task)
     {
         TaskUpgradeProgress taskProgress = getProgress(task);
@@ -170,28 +189,24 @@ public class UpgradeProgressMonitor
     {
         TaskGroupUpgradeProgress groupProgress = getProgress(group);
         groupProgress.setStatus(UpgradeStatus.IN_PROGRESS);
-
     }
 
     public void completed(UpgradeTaskGroup group)
     {
         TaskGroupUpgradeProgress groupProgress = getProgress(group);
         groupProgress.setStatus(UpgradeStatus.COMPLETED);
-
     }
 
     public void aborted(UpgradeTaskGroup group)
     {
         TaskGroupUpgradeProgress groupProgress = getProgress(group);
         groupProgress.setStatus(UpgradeStatus.ABORTED);
-
     }
 
     public boolean isStarted()
     {
         return startTimestamp != 0;
     }
-
 
     private boolean error = false;
 

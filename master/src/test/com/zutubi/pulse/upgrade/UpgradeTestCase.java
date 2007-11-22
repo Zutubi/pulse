@@ -16,10 +16,18 @@ public class UpgradeTestCase extends TestCase
         // help idea so that it does not report a test case with not tests as bad.    
     }
 
-    protected static class UpgradeableComponentAdapter implements UpgradeableComponent
+    protected static class UpgradeableComponentAdapter implements UpgradeableComponent, UpgradeListener
     {
         private boolean upgradeRequired = false;
         private List<UpgradeTaskAdapter> tasks = new LinkedList<UpgradeTaskAdapter>();
+
+        protected List<UpgradeTask> failedTasks = new LinkedList<UpgradeTask>();
+        protected List<UpgradeTask> abortedTasks = new LinkedList<UpgradeTask>();
+        protected List<UpgradeTask> completedTasks = new LinkedList<UpgradeTask>();
+
+        private boolean wasStarted;
+        private boolean wasCompleted;
+        private boolean wasAborted;
 
         public UpgradeableComponentAdapter()
         {
@@ -42,14 +50,49 @@ public class UpgradeTestCase extends TestCase
             return new LinkedList<UpgradeTask>(tasks);
         }
 
-        public void prepareUpgrade()
+        public void upgradeStarted()
         {
-
+            this.wasStarted = true;
         }
 
-        public void completeUpgrade()
+        public void upgradeCompleted()
         {
+            this.wasCompleted = true;
+        }
 
+        public void upgradeAborted()
+        {
+            this.wasAborted = true;
+        }
+
+        public boolean wasStarted()
+        {
+            return wasStarted;
+        }
+
+        public boolean wasCompleted()
+        {
+            return wasCompleted;
+        }
+
+        public boolean wasAborted()
+        {
+            return wasAborted;
+        }
+
+        public void taskCompleted(UpgradeTask task)
+        {
+            completedTasks.add(task);
+        }
+
+        public void taskFailed(UpgradeTask task)
+        {
+            failedTasks.add(task);
+        }
+
+        public void taskAborted(UpgradeTask task)
+        {
+            abortedTasks.add(task);
         }
     }
 
