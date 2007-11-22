@@ -18,10 +18,12 @@
     </bean>
 
     <bean id="schemaUpgradeableComponent" class="com.zutubi.pulse.upgrade.tasks.PulseUpgradeableComponent" autowire="byName">
+<!--
         <property name="tasks">
             <list>
             </list>
         </property>
+-->
         <property name="systemTasks">
             <list>
                 <ref local="backup"/>
