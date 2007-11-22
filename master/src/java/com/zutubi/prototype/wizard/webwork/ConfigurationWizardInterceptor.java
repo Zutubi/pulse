@@ -5,6 +5,7 @@ import com.opensymphony.xwork.ActionInvocation;
 import com.opensymphony.xwork.interceptor.Interceptor;
 import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.prototype.wizard.Wizard;
+import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.TextUtils;
 
 import java.util.Map;
@@ -16,6 +17,8 @@ import java.util.Map;
 public class ConfigurationWizardInterceptor implements Interceptor
 {
     public static final String STATE_ID_PARAMETER = "stateId";
+    public static final String SUBMIT_PARAMETER = "submitField";
+    private static final String[] SUBMIT_VALUES = {"cancel", "finish", "previous", "next"};
 
     public void destroy()
     {
@@ -55,7 +58,8 @@ public class ConfigurationWizardInterceptor implements Interceptor
             // NOTE: we need to go directly to the parameters here since the wizard will not have been through
             //       the params interceptor.
             final Map parameters = ActionContext.getContext().getParameters();
-            boolean actionRequested = parameterSet(parameters, "submitField") || parameterSet(parameters, "cancel");
+            boolean actionRequested = parameterSet(parameters, SUBMIT_PARAMETER) && CollectionUtils.contains(SUBMIT_VALUES, parameters.get(SUBMIT_PARAMETER)) ||
+                                      parameterSet(parameters, "cancel");
 
             if (actionRequested)
             {
