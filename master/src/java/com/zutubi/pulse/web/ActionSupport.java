@@ -22,6 +22,7 @@ import com.zutubi.pulse.xwork.TextProviderSupport;
 import com.zutubi.pulse.xwork.interceptor.Cancelable;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
+import freemarker.template.utility.StringUtil;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -168,7 +169,7 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
 
     public String jsStringEncode(String s)
     {
-        return TextUtils.htmlEncode(s).replace("'", "\\'");
+        return StringUtil.javaScriptStringEnc(s);
     }
 
     public String uriComponentEncode(String s)
