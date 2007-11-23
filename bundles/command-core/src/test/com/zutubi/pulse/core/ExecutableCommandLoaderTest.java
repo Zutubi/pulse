@@ -1,5 +1,7 @@
 package com.zutubi.pulse.core;
 
+import com.zutubi.pulse.core.model.ResultState;
+
 import java.util.List;
 
 /**
@@ -78,5 +80,19 @@ public class ExecutableCommandLoaderTest extends FileLoaderTestBase
         assertEquals(2, args.size());
         assertEquals("bar", args.get(0).getText());
         assertEquals("ref in text bar", args.get(1).getText());
+    }
+
+    public void testExecutableStatusMapping() throws PulseException
+    {
+        PulseFile pf = new PulseFile();
+        loader.load(getInput(getName()), pf);
+
+        Recipe recipe = pf.getRecipe("wow");
+        ExecutableCommand command = (ExecutableCommand) recipe.getCommand("test");
+        List<StatusMapping> statusMappings = command.getStatusMappings();
+        assertEquals(1, statusMappings.size());
+        StatusMapping mapping = statusMappings.get(0);
+        assertEquals(2, mapping.getCode());
+        assertEquals(ResultState.ERROR, mapping.getResultState());
     }
 }

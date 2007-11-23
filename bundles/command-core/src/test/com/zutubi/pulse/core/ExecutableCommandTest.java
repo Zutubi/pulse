@@ -378,6 +378,35 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
         }
     }
 
+    public void testStatusMapping() throws Exception
+    {
+        CommandResult result = statusMappingHelper(1, 1, ResultState.SUCCESS);
+        assertEquals(ResultState.SUCCESS, result.getState());
+    }
+
+    public void testStatusMappingNoMatch() throws Exception
+    {
+        CommandResult result = statusMappingHelper(2, 1, ResultState.SUCCESS);
+        assertEquals(ResultState.FAILURE, result.getState());
+    }
+
+    public void testStatusMappingError() throws Exception
+    {
+        CommandResult result = statusMappingHelper(2, 2, ResultState.ERROR);
+        assertEquals(ResultState.ERROR, result.getState());
+    }
+
+    private CommandResult statusMappingHelper(int exitCode, int mappedCode, ResultState mappedStatus) throws Exception
+    {
+        ExecutableCommand command = new ExecutableCommand();
+        command.setExe("java");
+        command.addArguments("-jar", getTestDataFile("bundles/command-core", "exit", "jar").getAbsolutePath(), Integer.toString(exitCode));
+        StatusMapping mapping = command.createStatusMapping();
+        mapping.setCode(mappedCode);
+        mapping.setStatus(mappedStatus.getPrettyString());
+        return runCommand(command);
+    }
+
     private CommandResult runCommand(ExecutableCommand command, long buildNumber)
     {
         ExecutionContext context = new ExecutionContext();
@@ -386,7 +415,6 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
         command.setScope(scope);
         return super.runCommand(command, context);
     }
-
 
     protected String getBuildFileName()
     {
