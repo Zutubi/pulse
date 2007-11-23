@@ -135,6 +135,23 @@ The beans defined within the security subsystem need not be accessed by other co
         <property name="forceHttps">
             <value>false</value>
         </property>
+        <property name="portResolver">
+            <ref local="portResolver"/>
+        </property>
+    </bean>
+
+    <bean id="portResolver" class="org.acegisecurity.util.PortResolverImpl">
+        <property name="portMapper">
+            <ref local="portMapper"/>
+        </property>
+    </bean>
+
+    <bean id="portMapper" class="org.acegisecurity.util.PortMapperImpl">
+        <property name="portMappings">
+            <map>
+                <entry key="80"><value>80</value></entry>
+            </map>
+        </property>
     </bean>
 
     <bean id="ajaxEntryPoint" class="com.zutubi.pulse.security.AjaxAuthenticationEntryPoint"/>
@@ -232,6 +249,9 @@ The beans defined within the security subsystem need not be accessed by other co
     <bean id="exceptionTranslationFilter" class="org.acegisecurity.ui.ExceptionTranslationFilter">
         <property name="authenticationEntryPoint">
             <ref local="authenticationProcessingFilterEntryPoint"/>
+        </property>
+        <property name="portResolver">
+            <ref local="portResolver"/>
         </property>
     </bean>
 

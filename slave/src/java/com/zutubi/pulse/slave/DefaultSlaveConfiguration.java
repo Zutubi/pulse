@@ -113,6 +113,31 @@ public class DefaultSlaveConfiguration implements SlaveConfiguration, SystemConf
         return config.getProperty(PULSE_DATA, defaultData);
     }
 
+    public boolean isSslEnabled()
+    {
+        return config.getBooleanProperty(SSL_ENABLED, false);
+    }
+
+    public String getSslKeystore()
+    {
+        return config.getProperty(SSL_KEYSTORE);
+    }
+
+    public String getSslPassword()
+    {
+        return config.getProperty(SSL_PASSWORD);
+    }
+
+    public String getSslKeyPassword()
+    {
+        return config.getProperty(SSL_KEY_PASSWORD);
+    }
+
+    public void setLoggingLevel(String c)
+    {
+        config.setProperty(LOGGING_CONFIG, c);
+    }
+
     public boolean isEventLoggingEnabled()
     {
         return config.getBooleanProperty(LOG_EVENTS, false);

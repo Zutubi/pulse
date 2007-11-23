@@ -88,4 +88,24 @@ public class SystemConfigurationSupport extends ConfigSupport implements SystemC
         }
         return hostUrl + getContextPath();
     }
+
+    public boolean isSslEnabled()
+    {
+        return getBooleanProperty(SSL_ENABLED, false);
+    }
+
+    public String getSslKeystore()
+    {
+        return getProperty(SSL_KEYSTORE);
+    }
+
+    public String getSslPassword()
+    {
+        return getProperty(SSL_PASSWORD);
+    }
+
+    public String getSslKeyPassword()
+    {
+        return getProperty(SSL_KEY_PASSWORD);
+    }
 }

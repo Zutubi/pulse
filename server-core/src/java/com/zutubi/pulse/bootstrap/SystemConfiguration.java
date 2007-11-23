@@ -21,6 +21,11 @@ public interface SystemConfiguration
      */
     public static final String PULSE_DATA = "pulse.data";
 
+    public static final String SSL_ENABLED      = "ssl.enabled";
+    public static final String SSL_KEYSTORE     = "ssl.keystore";
+    public static final String SSL_PASSWORD     = "ssl.password";
+    public static final String SSL_KEY_PASSWORD = "ssl.keyPassword";
+
     /**
      * @return the address that we should bind the http server to.
      */
@@ -44,4 +49,10 @@ public interface SystemConfiguration
     void setDataPath(String path);
 
     String getDataPath();
+
+    boolean isSslEnabled();
+    String getSslKeystore();
+    String getSslPassword();
+    String getSslKeyPassword();
+
 }
