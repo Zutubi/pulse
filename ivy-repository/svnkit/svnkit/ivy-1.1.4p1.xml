@@ -11,4 +11,8 @@
         <artifact name="svnkit" type="jar" conf="default"/>
         <artifact name="svnkit-ganymed" type="jar" conf="default"/>
     </publications>
+
+    <dependencies>
+        <dependency org="jna" name="jna" rev="20070509"/>
+    </dependencies>
 </ivy-module>
