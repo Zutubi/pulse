@@ -62,9 +62,9 @@ public class RecipeControllerTest extends PulseTestCase
         childNode.setId(103);
         rootNode.addChild(childNode);
 
-        RecipeRequest recipeRequest = new RecipeRequest(null, makeContext("project", rootResult.getId(), rootResult.getRecipeName()));
+        RecipeRequest recipeRequest = new RecipeRequest(makeContext("project", rootResult.getId(), rootResult.getRecipeName()));
         BuildResult build = new BuildResult(new ManualTriggerBuildReason("user"), new Project(), 1, false);
-        dispatchRequest = new RecipeDispatchRequest(new Project(), new AnyCapableAgentRequirements(), new BuildRevision(), recipeRequest, null);
+        dispatchRequest = new RecipeDispatchRequest(new Project(), new AnyCapableAgentRequirements(), null, new BuildRevision(), recipeRequest, null);
         MasterConfigurationManager configurationManager = new SimpleMasterConfigurationManager()
         {
             public File getDataDirectory()
@@ -77,7 +77,7 @@ public class RecipeControllerTest extends PulseTestCase
                 return new Data(getDataDirectory());
             }
         };
-        recipeController = new RecipeController(build, rootNode, dispatchRequest, new ExecutionContext(), null, logger, resultCollector, configurationManager);
+        recipeController = new RecipeController(build, rootNode, dispatchRequest, new ExecutionContext(), null, logger, resultCollector, configurationManager, new DefaultResourceManager());
         recipeController.setRecipeQueue(recipeQueue);
         recipeController.setBuildManager(buildManager);
         recipeController.setEventManager(new DefaultEventManager());
@@ -112,7 +112,7 @@ public class RecipeControllerTest extends PulseTestCase
 
         // After dispatching, the controller should handle a dispatched event
         // by recording the build service on the result node.
-        RecipeDispatchedEvent event = new RecipeDispatchedEvent(this, new RecipeRequest(null, makeContext("project", rootResult.getId(), "test")), new MockAgent(buildService));
+        RecipeDispatchedEvent event = new RecipeDispatchedEvent(this, new RecipeRequest(makeContext("project", rootResult.getId(), "test")), new MockAgent(buildService));
         assertTrue(recipeController.handleRecipeEvent(event));
         assertEquals(buildService.getHostName(), rootNode.getHost());
 
@@ -457,7 +457,7 @@ public class RecipeControllerTest extends PulseTestCase
 
         public AgentConfiguration getConfig()
         {
-            throw new RuntimeException("Method not yet implemented.");
+            return new AgentConfiguration();
         }
 
         public AgentState getState()

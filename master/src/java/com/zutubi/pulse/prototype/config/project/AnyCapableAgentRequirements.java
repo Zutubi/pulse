@@ -2,7 +2,6 @@ package com.zutubi.pulse.prototype.config.project;
 
 import com.zutubi.pulse.AgentService;
 import com.zutubi.pulse.RecipeDispatchRequest;
-import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.PulseFileLoader;
 import com.zutubi.pulse.core.PulseFileLoaderFactory;
@@ -23,24 +22,17 @@ public class AnyCapableAgentRequirements implements AgentRequirements
 
     public AnyCapableAgentRequirements()
     {
-        ComponentContext.autowire(this);
     }
 
     public boolean fulfilledBy(RecipeDispatchRequest request, AgentService service)
     {
-        List<ResourceRequirement> requirements = request.getRequest().getResourceRequirements();
+        List<ResourceRequirement> requirements = request.getResourceRequirements();
         for(ResourceRequirement requirement: requirements)
         {
             if(!service.hasResource(requirement.getResource(), requirement.getVersion()))
             {
                 return false;
             }
-        }
-
-        if (fileLoaderFactory == null)
-        {
-            // FIXME: timing problems with wiring this instance..
-            ComponentContext.autowire(this);
         }
 
         PulseFileLoader fileLoader = fileLoaderFactory.createLoader();

@@ -1,10 +1,8 @@
 package com.zutubi.pulse;
 
+import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.core.Bootstrapper;
-import com.zutubi.pulse.core.BuildException;
-import com.zutubi.pulse.core.BuildProperties;
-import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.FeaturePersister;
 import com.zutubi.pulse.core.model.RecipeResult;
@@ -13,6 +11,7 @@ import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.RecipeResultNode;
+import com.zutubi.pulse.model.ResourceManager;
 import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.util.logging.Logger;
 
@@ -41,8 +40,9 @@ public class RecipeController
     private AgentService agentService;
     private EventManager eventManager;
     private MasterConfigurationManager configurationManager;
+    private ResourceManager resourceManager;
 
-    public RecipeController(BuildResult buildResult, RecipeResultNode recipeResultNode, RecipeDispatchRequest dispatchRequest, ExecutionContext recipeContext, RecipeResultNode previousSuccessful, RecipeLogger logger, RecipeResultCollector collector, MasterConfigurationManager configurationManager)
+    public RecipeController(BuildResult buildResult, RecipeResultNode recipeResultNode, RecipeDispatchRequest dispatchRequest, ExecutionContext recipeContext, RecipeResultNode previousSuccessful, RecipeLogger logger, RecipeResultCollector collector, MasterConfigurationManager configurationManager, ResourceManager resourceManager)
     {
         this.buildResult = buildResult;
         this.recipeResultNode = recipeResultNode;
@@ -53,6 +53,7 @@ public class RecipeController
         this.logger = logger;
         this.collector = collector;
         this.configurationManager = configurationManager;
+        this.resourceManager = resourceManager;
     }
 
     public void prepare(BuildResult buildResult)
@@ -139,9 +140,17 @@ public class RecipeController
     private void handleRecipeDispatch(RecipeDispatchedEvent event)
     {
         logger.log(event);
-        agentService = event.getAgent().getService();
+        Agent agent = event.getAgent();
+        agentService = agent.getService();
         recipeResultNode.setHost(agentService.getHostName());
         buildManager.save(recipeResultNode);
+
+        ResourceRepository resourceRepository = resourceManager.getAgentRepository(agent.getConfig().getHandle());
+        if (resourceRepository != null)
+        {
+            MasterBuildProperties.addResourceProperties(recipeContext, dispatchRequest.getResourceRequirements(), resourceRepository);
+            MasterBuildProperties.addProjectProperties(recipeContext, dispatchRequest.getProject().getConfig());
+        }
     }
 
     private void handleRecipeCommenced(RecipeCommencedEvent event)

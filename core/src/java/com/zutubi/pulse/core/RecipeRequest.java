@@ -1,9 +1,5 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.model.ResourceRequirement;
-
-import java.util.List;
-
 /**
  * A request to execute a specific recipe.  Includes details about how to
  * bootstrap this step of the build (e.g. by SCM checkout, or by using a
@@ -21,30 +17,19 @@ public class RecipeRequest
      */
     private String pulseFileSource;
     /**
-     * Required resources for the build.  If the pulse file is set lazily,
-     * some requirements may be added at that time.
-     */
-    private List<ResourceRequirement> resourceRequirements;
-    /**
      * Context for the recipe.
      */
     private ExecutionContext context;
 
-    public RecipeRequest(List<ResourceRequirement> resourceRequirements, ExecutionContext context)
+    public RecipeRequest(ExecutionContext context)
     {
-        this(null, null, resourceRequirements, context);
+        this(null, null, context);
     }
 
     public RecipeRequest(Bootstrapper bootstrapper, String pulseFileSource, ExecutionContext context)
     {
-        this(bootstrapper, pulseFileSource, null, context);
-    }
-
-    public RecipeRequest(Bootstrapper bootstrapper, String pulseFileSource, List<ResourceRequirement> resourceRequirements, ExecutionContext context)
-    {
         this.bootstrapper = bootstrapper;
         this.pulseFileSource = pulseFileSource;
-        this.resourceRequirements = resourceRequirements;
         this.context = context;
     }
 
@@ -94,16 +79,6 @@ public class RecipeRequest
     public void setPulseFileSource(String pulseFileSource)
     {
         this.pulseFileSource = pulseFileSource;
-    }
-
-    public List<ResourceRequirement> getResourceRequirements()
-    {
-        return resourceRequirements;
-    }
-
-    public void setResourceRequirements(List<ResourceRequirement> resourceRequirements)
-    {
-        this.resourceRequirements = resourceRequirements;
     }
 
     public ExecutionContext getContext()

@@ -8,6 +8,7 @@ import com.zutubi.pulse.acceptance.pages.browse.BuildDetailedViewPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectsPage;
 import com.zutubi.pulse.agent.AgentManager;
+import com.zutubi.pulse.core.config.ResourceProperty;
 
 import java.util.Hashtable;
 
@@ -97,8 +98,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
             loginAsAdmin();
             ensureProject(random);
 
-            Hashtable<String, Object> property = new Hashtable<String, Object>();
-            property.put(BaseXmlRpcAcceptanceTest.SYMBOLIC_NAME_KEY, "zutubi.resourceProperty");
+            Hashtable<String, Object> property = xmlRpcHelper.createDefaultConfig(ResourceProperty.class);
             property.put("name", "pname");
             property.put("value", "pvalue");
             property.put("addToEnvironment", true);

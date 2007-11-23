@@ -24,10 +24,7 @@ import com.zutubi.pulse.events.build.RecipeCompletedEvent;
 import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.logging.CustomLogRecord;
-import com.zutubi.pulse.model.AgentState;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.UnknownBuildReason;
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
@@ -40,10 +37,7 @@ import com.zutubi.pulse.services.UpgradeStatus;
 import junit.framework.TestCase;
 
 import java.io.File;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -108,6 +102,22 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             }
         });
         queue.setThreadFactory(Executors.defaultThreadFactory());
+        queue.setResourceManager(new ResourceManager()
+        {
+            public ResourceRepository getAgentRepository(long handle)
+            {
+                return new FileResourceRepository();
+            }
+
+            public void addDiscoveredResources(long handle, List<Resource> resources)
+            {
+            }
+
+            public Map<String, List<Resource>> findAll()
+            {
+                return Collections.EMPTY_MAP;
+            }
+        });
         queue.init();
 
         recipeErrors = new LinkedList<RecipeErrorEvent>();
@@ -746,9 +756,9 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         ExecutionContext context = new ExecutionContext();
         context.addInternalString(BuildProperties.PROPERTY_PROJECT, "project");
         context.addInternalString(BuildProperties.PROPERTY_RECIPE_ID, Long.toString(id));
-        RecipeRequest request = new RecipeRequest(null, null, context);
+        RecipeRequest request = new RecipeRequest(context);
         request.setBootstrapper(new ChainBootstrapper());
-        return new RecipeDispatchRequest(project, requirements, new BuildRevision(), request, result);
+        return new RecipeDispatchRequest(project, requirements, null, new BuildRevision(), request, result);
     }
 
     private RecipeDispatchRequest createDispatchRequest(int type)

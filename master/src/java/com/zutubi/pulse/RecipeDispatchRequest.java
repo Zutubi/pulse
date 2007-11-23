@@ -4,8 +4,11 @@ import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.ResourceRequirement;
 import com.zutubi.pulse.prototype.config.project.AgentRequirements;
 import com.zutubi.pulse.util.TimeStamps;
+
+import java.util.List;
 
 /**
  * A request to dispatch a recipe to some build hostRequirements, which may be restricted.
@@ -14,6 +17,7 @@ public class RecipeDispatchRequest
 {
     private Project project;
     private AgentRequirements hostRequirements;
+    private List<ResourceRequirement> resourceRequirements;
     private BuildRevision revision;
     private RecipeRequest request;
     private BuildResult build;
@@ -24,10 +28,11 @@ public class RecipeDispatchRequest
      */
     private long timeout = -1;
 
-    public RecipeDispatchRequest(Project project, AgentRequirements hostRequirements, BuildRevision revision, RecipeRequest request, BuildResult build)
+    public RecipeDispatchRequest(Project project, AgentRequirements hostRequirements, List<ResourceRequirement> resourceRequirements, BuildRevision revision, RecipeRequest request, BuildResult build)
     {
         this.project = project;
         this.hostRequirements = hostRequirements;
+        this.resourceRequirements = resourceRequirements;
         this.revision = revision;
         this.request = request;
         this.build = build;
@@ -41,6 +46,11 @@ public class RecipeDispatchRequest
     public AgentRequirements getHostRequirements()
     {
         return hostRequirements;
+    }
+
+    public List<ResourceRequirement> getResourceRequirements()
+    {
+        return resourceRequirements;
     }
 
     public RecipeRequest getRequest()

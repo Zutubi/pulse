@@ -9,10 +9,9 @@ import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.model.ResourceRequirement;
 import com.zutubi.pulse.prototype.config.LabelConfiguration;
 import com.zutubi.pulse.prototype.config.project.changeviewer.ChangeViewerConfiguration;
-import com.zutubi.pulse.prototype.config.project.hooks.AutoBuildHookConfiguration;
+import com.zutubi.pulse.prototype.config.project.commit.CommitMessageTransformerConfiguration;
 import com.zutubi.pulse.prototype.config.project.hooks.BuildHookConfiguration;
 import com.zutubi.pulse.prototype.config.project.types.TypeConfiguration;
-import com.zutubi.pulse.prototype.config.project.commit.CommitMessageTransformerConfiguration;
 import com.zutubi.validation.annotations.Url;
 
 import java.util.*;
@@ -41,14 +40,14 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
     private TypeConfiguration type;
 
     @Ordered
-    private Map<String, ResourceProperty> properties;
+    private Map<String, ResourceProperty> properties = new LinkedHashMap<String, ResourceProperty>();
 
     private BuildOptionsConfiguration options;
 
     @Ordered
-    private Map<String, BuildStageConfiguration> stages;
+    private Map<String, BuildStageConfiguration> stages = new LinkedHashMap<String, BuildStageConfiguration>();
 
-    private List<ResourceRequirement> requirements;
+    private List<ResourceRequirement> requirements = new LinkedList<ResourceRequirement>();
 
     private List<LabelConfiguration> labels = new LinkedList<LabelConfiguration>();
 

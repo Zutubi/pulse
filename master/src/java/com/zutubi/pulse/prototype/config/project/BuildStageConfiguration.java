@@ -1,10 +1,14 @@
 package com.zutubi.pulse.prototype.config.project;
 
 import com.zutubi.config.annotations.*;
+import com.zutubi.pulse.AgentService;
+import com.zutubi.pulse.RecipeDispatchRequest;
 import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.model.ResourceRequirement;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
+import com.zutubi.util.bean.ObjectFactory;
+import com.zutubi.util.logging.Logger;
 
 import java.util.List;
 import java.util.Map;
@@ -19,12 +23,17 @@ import java.util.Map;
 @Form(fieldOrder = {"name", "recipe", "agent"})
 public class BuildStageConfiguration extends AbstractNamedConfiguration
 {
+    private static final Logger LOG = Logger.getLogger(BuildStageConfiguration.class);
+
     @Reference(optionProvider = "BuildStageAgentOptionProvider")
     private AgentConfiguration agent;
     private String recipe;
     @Ordered
     private Map<String, ResourceProperty> properties;
     private List<ResourceRequirement> requirements;
+
+    @Transient
+    private ObjectFactory objectFactory;
 
     public AgentConfiguration getAgent()
     {
@@ -74,13 +83,32 @@ public class BuildStageConfiguration extends AbstractNamedConfiguration
     @Transient
     public AgentRequirements getAgentRequirements()
     {
-        if(agent == null)
+        try
         {
-            return new AnyCapableAgentRequirements();
+            if(agent == null)
+            {
+                return objectFactory.buildBean(AnyCapableAgentRequirements.class);
+            }
+            else
+            {
+                return objectFactory.buildBean(SpecificAgentRequirements.class, new Class[]{ AgentConfiguration.class }, new Object[]{ agent });
+            }
         }
-        else
+        catch (Exception e)
         {
-            return new SpecificAgentRequirements(agent);
+            LOG.severe(e);
+            return new AgentRequirements()
+            {
+                public boolean fulfilledBy(RecipeDispatchRequest request, AgentService service)
+                {
+                    return false;
+                }
+            };
         }
+    }
+
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
     }
 }

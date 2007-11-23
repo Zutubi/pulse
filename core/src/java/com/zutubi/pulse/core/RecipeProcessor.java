@@ -1,10 +1,6 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.util.TextUtils;
 import static com.zutubi.pulse.core.BuildProperties.*;
-import com.zutubi.pulse.core.config.Resource;
-import com.zutubi.pulse.core.config.ResourceProperty;
-import com.zutubi.pulse.core.config.ResourceVersion;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.TestSuitePersister;
 import com.zutubi.pulse.core.model.TestSuiteResult;
@@ -12,10 +8,10 @@ import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.RecipeCommencedEvent;
 import com.zutubi.pulse.events.build.RecipeCompletedEvent;
 import com.zutubi.pulse.events.build.RecipeStatusEvent;
-import com.zutubi.pulse.model.ResourceRequirement;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.ZipUtils;
 import com.zutubi.util.IOUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.ByteArrayInputStream;
@@ -23,7 +19,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -68,15 +63,14 @@ public class RecipeProcessor
 
         ExecutionContext context = request.getContext();
         long recipeStartTime = recipeResult.getStartTime();
-        ResourceRepository resourceRepository = context.getInternalValue(PROPERTY_RESOURCE_REPOSITORY, ResourceRepository.class);
-        pushRecipeContext(context, resourceRepository, testResults, recipeStartTime, request);
+        pushRecipeContext(context, testResults, recipeStartTime);
         try
         {
             // Wrap bootstrapper in a command and run it.
             BootstrapCommand bootstrapCommand = new BootstrapCommand(request.getBootstrapper());
 
             // Now we can load the recipe from the pulse file
-            PulseFile pulseFile = loadPulseFile(request, context, resourceRepository);
+            PulseFile pulseFile = loadPulseFile(request, context);
 
             String recipeName = request.getRecipeName();
             if (!TextUtils.stringSet(recipeName))
@@ -195,7 +189,7 @@ public class RecipeProcessor
         }
     }
 
-    private void pushRecipeContext(ExecutionContext context, ResourceRepository resourceRepository, TestSuiteResult testResults, long recipeStartTime, RecipeRequest request)
+    private void pushRecipeContext(ExecutionContext context, TestSuiteResult testResults, long recipeStartTime)
     {
         context.pushInternalScope();
         context.addInternalString(PROPERTY_BASE_DIR, context.getWorkingDir().getAbsolutePath());
@@ -204,14 +198,13 @@ public class RecipeProcessor
         context.addInternalValue(PROPERTY_TEST_RESULTS, testResults);
 
         context.pushScope();
-        importResources(resourceRepository, request.getResourceRequirements(), context);
         if(context.getInternalString(PROPERTY_RECIPE) == null)
         {
             context.addString(PROPERTY_RECIPE, "[default]");
         }
     }
 
-    private PulseFile loadPulseFile(RecipeRequest request, ExecutionContext context, ResourceRepository resourceRepository) throws BuildException
+    private PulseFile loadPulseFile(RecipeRequest request, ExecutionContext context) throws BuildException
     {
         Scope globalScope = new Scope(context.asScope());
         Map<String, String> env = System.getenv();
@@ -233,6 +226,8 @@ public class RecipeProcessor
         try
         {
             stream = new ByteArrayInputStream(pulseFileSource.getBytes());
+
+            ResourceRepository resourceRepository = context.getInternalValue(PROPERTY_RESOURCE_REPOSITORY, ResourceRepository.class);
             PulseFile result = new PulseFile();
             PulseFileLoader fileLoader = fileLoaderFactory.createLoader();
             fileLoader.load(stream, result, globalScope, resourceRepository, new RecipeLoadPredicate(result, request.getRecipeName()));
@@ -245,46 +240,6 @@ public class RecipeProcessor
         finally
         {
             IOUtils.close(stream);
-        }
-    }
-
-    private void importResources(ResourceRepository resourceRepository, List<ResourceRequirement> resourceRequirements, ExecutionContext context)
-    {
-        if (resourceRequirements != null)
-        {
-            for(ResourceRequirement requirement: resourceRequirements)
-            {
-                Resource resource = resourceRepository.getResource(requirement.getResource());
-                if(resource == null)
-                {
-                    throw new BuildException("Unable to import required resource '" + requirement.getResource() + "'");
-                }
-
-                for(ResourceProperty property: resource.getProperties().values())
-                {
-                    context.add(property);
-                }
-
-                String importVersion = requirement.getVersion();
-                if(importVersion == null)
-                {
-                    importVersion = resource.getDefaultVersion();
-                }
-
-                if(TextUtils.stringSet(importVersion))
-                {
-                    ResourceVersion version = resource.getVersion(importVersion);
-                    if(version == null)
-                    {
-                        throw new BuildException("Reference to non-existant version '" + importVersion + "' of resource '" + requirement.getResource() + "'");
-                    }
-
-                    for(ResourceProperty property: version.getProperties().values())
-                    {
-                        context.add(property);
-                    }
-                }
-            }
         }
     }
 

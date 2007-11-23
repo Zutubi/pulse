@@ -4,8 +4,7 @@ import com.zutubi.prototype.config.ConfigurationEventListener;
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.config.events.ConfigurationEvent;
 import com.zutubi.prototype.config.events.PostSaveEvent;
-import static com.zutubi.pulse.MasterBuildProperties.PROPERTY_CLEAN_BUILD;
-import static com.zutubi.pulse.MasterBuildProperties.addRevisionProperties;
+import static com.zutubi.pulse.MasterBuildProperties.*;
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.core.*;
@@ -17,6 +16,7 @@ import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.events.*;
 import com.zutubi.pulse.events.build.*;
+import com.zutubi.pulse.model.ResourceManager;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.project.types.TypeConfiguration;
@@ -91,6 +91,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     
     private AgentManager agentManager;
     private EventManager eventManager;
+    private ResourceManager resourceManager;
     private GeneralAdminConfiguration adminConfiguration;
     private ScmClientFactory scmClientFactory;
     private ThreadFactory threadFactory;
@@ -533,6 +534,9 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
         ExecutionContext context = recipeRequest.getContext();
         addRevisionProperties(context, buildRevision);
+        addResourceProperties(context, request.getResourceRequirements(), resourceManager.getAgentRepository(agent.getConfig().getHandle()));
+        addProjectProperties(context, request.getProject().getConfig());
+        
         context.addInternalString(PROPERTY_CLEAN_BUILD, Boolean.toString(request.getProject().isForceCleanForAgent(agent.getId())));
 
         dispatchedQueue.offer(new DispatchedRequest(recipeRequest, agent));
@@ -802,6 +806,11 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     public void setThreadFactory(ThreadFactory threadFactory)
     {
         this.threadFactory = threadFactory;
+    }
+
+    public void setResourceManager(ResourceManager resourceManager)
+    {
+        this.resourceManager = resourceManager;
     }
 
     private static class DispatchedRequest

@@ -67,6 +67,7 @@ public class FatController implements EventListener, Stoppable
     private ThreadFactory threadFactory;
     private AccessManager accessManager;
     private ConfigurationProvider configurationProvider;
+    private ResourceManager resourceManager;
 
     /**
      * When the fat controller is enabled, it will handle incoming build requests.
@@ -264,6 +265,7 @@ public class FatController implements EventListener, Stoppable
                 controller.setConfigurationManager(configManager);
                 controller.setConfigurationProvider(configurationProvider);
                 controller.setThreadFactory(threadFactory);
+                controller.setResourceManager(resourceManager);
                 controller.init();
                 controller.run();
                 runningBuilds.add(controller);
@@ -420,5 +422,10 @@ public class FatController implements EventListener, Stoppable
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)
     {
         this.configurationProvider = configurationProvider;
+    }
+
+    public void setResourceManager(ResourceManager resourceManager)
+    {
+        this.resourceManager = resourceManager;
     }
 }

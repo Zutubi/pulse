@@ -74,8 +74,9 @@ public class BuildController implements EventListener
     private BuildResult previousSuccessful;
     private ExecutionContext buildContext;
 
-    private ScmClientFactory scmClientFactory;
+    private ScmClientFactory<ScmConfiguration> scmClientFactory;
     private ThreadFactory threadFactory;
+    private ResourceManager resourceManager;
 
     public BuildController(AbstractBuildRequestEvent event)
     {
@@ -163,11 +164,11 @@ public class BuildController implements EventListener
             recipeContext.addInternalString(PROPERTY_RECIPE_ID, Long.toString(recipeResult.getId()));
             recipeContext.addInternalString(PROPERTY_RECIPE, stage.getRecipe());
 
-            RecipeRequest recipeRequest = new RecipeRequest(getResourceRequirements(stage), new ExecutionContext(recipeContext));
-            RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(project, stage.getAgentRequirements(), request.getRevision(), recipeRequest, buildResult);
+            RecipeRequest recipeRequest = new RecipeRequest(new ExecutionContext(recipeContext));
+            RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(project, stage.getAgentRequirements(), getResourceRequirements(stage), request.getRevision(), recipeRequest, buildResult);
             DefaultRecipeLogger logger = new DefaultRecipeLogger(new File(paths.getRecipeDir(buildResult, recipeResult.getId()), RecipeResult.RECIPE_LOG));
             RecipeResultNode previousRecipe = previousSuccessful == null ? null : previousSuccessful.findResultNodeByHandle(stage.getHandle());
-            RecipeController rc = new RecipeController(buildResult, childResultNode, dispatchRequest, recipeContext, previousRecipe, logger, collector, configurationManager);
+            RecipeController rc = new RecipeController(buildResult, childResultNode, dispatchRequest, recipeContext, previousRecipe, logger, collector, configurationManager, resourceManager);
             rc.setRecipeQueue(queue);
             rc.setBuildManager(buildManager);
             rc.setServiceTokenManager(serviceTokenManager);
@@ -745,7 +746,7 @@ public class BuildController implements EventListener
         this.serviceTokenManager = serviceTokenManager;
     }
 
-    public void setScmClientFactory(ScmClientFactory scmClientFactory)
+    public void setScmClientFactory(ScmClientFactory<ScmConfiguration> scmClientFactory)
     {
         this.scmClientFactory = scmClientFactory;
     }
@@ -753,5 +754,10 @@ public class BuildController implements EventListener
     public void setThreadFactory(ThreadFactory threadFactory)
     {
         this.threadFactory = threadFactory;
+    }
+
+    public void setResourceManager(ResourceManager resourceManager)
+    {
+        this.resourceManager = resourceManager;
     }
 }
