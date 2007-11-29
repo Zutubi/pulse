@@ -4,12 +4,12 @@ import com.zutubi.pulse.upgrade.UpgradeContext;
 import com.zutubi.pulse.util.JDBCUtils;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.CallableStatement;
 
 /**
- *
- *
+ * Adds an index to the end time (finish) column for build results for faster
+ * RSS queries.
  */
 public class IndexBuildResultEndTimeUpgradeTask extends DatabaseUpgradeTask
 {
@@ -25,10 +25,10 @@ public class IndexBuildResultEndTimeUpgradeTask extends DatabaseUpgradeTask
 
     public void execute(UpgradeContext context, Connection con) throws SQLException
     {
-        CallableStatement stmt = null;
+        PreparedStatement stmt = null;
         try
         {
-            stmt = con.prepareCall("create index idx_buildresult_finish on BUILD_RESULT (FINISH)");
+            stmt = con.prepareStatement("create index idx_buildresult_finish on BUILD_RESULT (FINISH)");
             stmt.executeUpdate();
         }
         finally
