@@ -9,6 +9,7 @@ import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.model.persistence.ChangelistDao;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.util.StringUtils;
 import com.zutubi.pulse.util.TimeStamps;
@@ -50,6 +51,7 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
     protected ProjectManager projectManager;
     protected String changeUrl;
     protected CommitMessageTransformerManager commitMessageTransformerManager;
+    protected ChangelistDao changelistDao;
 
     public boolean isCancelled()
     {
@@ -231,7 +233,7 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
                 Revision revision = changelist.getRevision();
                 if (revision != null)
                 {
-                    for(long id: changelist.getProjectIds())
+                    for(long id: changelistDao.getAllAffectedProjectIds(changelist))
                     {
                         Project p = getProjectManager().getProject(id);
                         if(p != null && p.getChangeViewer() != null)
@@ -261,6 +263,11 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
 
     public CommitMessageSupport getCommitMessageSupport(Changelist changelist)
     {
-        return new CommitMessageSupport(changelist, commitMessageTransformerManager.getCommitMessageTransformers());
+        return new CommitMessageSupport(changelist, commitMessageTransformerManager.getCommitMessageTransformers(), changelistDao);
+    }
+
+    public void setChangelistDao(ChangelistDao changelistDao)
+    {
+        this.changelistDao = changelistDao;
     }
 }

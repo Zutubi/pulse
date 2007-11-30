@@ -4,12 +4,9 @@ import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.FileRevision;
 import com.zutubi.pulse.model.*;
-import com.zutubi.pulse.model.persistence.ChangelistDao;
 import com.zutubi.pulse.web.ActionSupport;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  */
@@ -17,7 +14,6 @@ public class ViewChangelistAction extends ActionSupport
 {
     private long id;
     private Changelist changelist;
-    private ChangelistDao changelistDao;
     private BuildManager buildManager;
 
     /** If we drilled down from the project, this is the project ID */
@@ -103,7 +99,7 @@ public class ViewChangelistAction extends ActionSupport
             }
             else
             {
-                for(long id: changelist.getProjectIds())
+                for(long id: changelistDao.getAllAffectedProjectIds(changelist))
                 {
                     p = projectManager.getProject(id);
                     if(p != null && p.getChangeViewer() != null)
@@ -243,7 +239,13 @@ public class ViewChangelistAction extends ActionSupport
             buildResult = buildManager.getBuildResult(buildId);
         }
 
-        buildResults = ChangelistUtils.getBuilds(buildManager, changelist);
+        Set<Long> buildIds = changelistDao.getAllAffectedResultIds(changelist);
+        buildResults = new LinkedList<BuildResult>();
+        for(Long id: buildIds)
+        {
+            buildResults.add(buildManager.getBuildResult(id));
+        }
+        
         Collections.sort(buildResults, new Comparator<BuildResult>()
         {
             public int compare(BuildResult b1, BuildResult b2)
@@ -259,11 +261,6 @@ public class ViewChangelistAction extends ActionSupport
             }
         });
         return SUCCESS;
-    }
-
-    public void setChangelistDao(ChangelistDao changelistDao)
-    {
-        this.changelistDao = changelistDao;
     }
 
     public void setBuildManager(BuildManager buildManager)

@@ -2,6 +2,7 @@ package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.committransformers.CommitMessageBuilder;
 import com.zutubi.pulse.model.CommitMessageTransformer;
+import com.zutubi.pulse.model.persistence.ChangelistDao;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.util.logging.Logger;
 
@@ -16,11 +17,13 @@ public class CommitMessageSupport
 
     private Changelist changelist;
     private List<CommitMessageTransformer> transformers;
+    private ChangelistDao changelistDao;
 
-    public CommitMessageSupport(Changelist changelist, List<CommitMessageTransformer> transformers)
+    public CommitMessageSupport(Changelist changelist, List<CommitMessageTransformer> transformers, ChangelistDao changelistDao)
     {
         this.transformers = transformers;
         this.changelist = changelist;
+        this.changelistDao = changelistDao;
     }
 
     protected CommitMessageBuilder applyTransformers()
@@ -28,7 +31,7 @@ public class CommitMessageSupport
         CommitMessageBuilder builder = new CommitMessageBuilder(changelist.getComment());
         for (CommitMessageTransformer transformer : transformers)
         {
-            if (transformer.appliesToChangelist(changelist))
+            if (transformer.appliesToChangelist(changelistDao.getAllAffectedProjectIds(changelist)))
             {
                 builder = transformer.transform(builder);
             }

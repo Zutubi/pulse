@@ -6,10 +6,6 @@
             <generator class="hilo"/>
         </id>
 
-        <property name="serverUid" type="string" length="255">
-            <column name="SERVER_UID" index="idx_changelist_uid_rev"/>
-        </property>
-
         <component name="revision" class="com.zutubi.pulse.core.model.Revision">
             <property name="author" type="string" length="255">
                 <column name="REVISION_AUTHOR" index="idx_changelist_revision_author"/>
@@ -23,6 +19,10 @@
                 <column name="REVISION_STRING" index="idx_changelist_uid_rev"/>
             </property>
         </component>
+
+        <property name="serverUid" type="string" length="255">
+            <column name="SERVER_UID" index="idx_changelist_uid_rev"/>
+        </property>
 
         <list name="changes" cascade="all,delete-orphan" lazy="true">
             <key column="CHANGELIST_ID"/>

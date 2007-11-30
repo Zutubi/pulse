@@ -10,10 +10,7 @@ import com.zutubi.pulse.util.logging.Logger;
 
 import javax.sql.DataSource;
 import java.io.*;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
 import java.io.IOException;
@@ -150,5 +147,64 @@ public abstract class DatabaseUpgradeTask implements UpgradeTask, DataSourceAwar
             IOUtils.close(oos);
         }
         return data;
+    }
+
+    protected void addIndex(Connection con, String table, String indexName, String... columns) throws SQLException
+    {
+        String sql = "CREATE INDEX " + indexName + " ON " + table + " (";
+        boolean first = true;
+        for(String column: columns)
+        {
+            if(first)
+            {
+                first = false;
+            }
+            else
+            {
+                sql += ",";
+            }
+
+            sql += column;
+        }
+        
+        sql += ")";
+
+        runUpdate(con, sql);
+    }
+
+    protected void runUpdate(Connection con, String sql) throws SQLException
+    {
+        PreparedStatement stmt = null;
+        try
+        {
+            stmt = con.prepareStatement(sql);
+            stmt.executeUpdate();
+        }
+        finally
+        {
+            JDBCUtils.close(stmt);
+        }
+    }
+
+    protected Long runQueryForLong(Connection con, String sql) throws SQLException
+    {
+        PreparedStatement query = null;
+        ResultSet rs = null;
+        try
+        {
+            query = con.prepareStatement(sql);
+            rs = query.executeQuery();
+            if(rs.next())
+            {
+                return rs.getLong(1);
+            }
+        }
+        finally
+        {
+            JDBCUtils.close(rs);
+            JDBCUtils.close(query);
+        }
+
+        return null;
     }
 }

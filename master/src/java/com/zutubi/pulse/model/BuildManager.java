@@ -133,8 +133,6 @@ public interface BuildManager
 
     void deleteAllBuilds(User user);
 
-    Changelist getChangelistByRevision(String serverUid, Revision revision);
-
     void delete(BuildResult result);
 
     List<BuildResult> abortUnfinishedBuilds(Project project, String message);

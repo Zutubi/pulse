@@ -4,6 +4,7 @@ import com.zutubi.pulse.bootstrap.SystemPaths;
 import com.zutubi.pulse.committransformers.CommitMessageTransformerManager;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.persistence.ChangelistDao;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.StringUtils;
 import com.zutubi.pulse.util.logging.Logger;
@@ -26,6 +27,7 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
     private Configuration freemarkerConfiguration;
     private SystemPaths systemPaths;
     private CommitMessageTransformerManager commitMessageTransformerManager;
+    private ChangelistDao changelistDao;
 
     public void render(BuildResult result, Map<String, Object> dataMap, String templateName, Writer writer)
     {
@@ -148,7 +150,7 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
 
     public String transformCommentWithoutTrimming(Changelist changelist)
     {
-        CommitMessageSupport support = new CommitMessageSupport(changelist, commitMessageTransformerManager.getCommitMessageTransformers());
+        CommitMessageSupport support = new CommitMessageSupport(changelist, commitMessageTransformerManager.getCommitMessageTransformers(), changelistDao);
         return support.toString();
     }
 
@@ -159,7 +161,7 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
 
     public String transformComment(Changelist changelist, int trimToLength)
     {
-        CommitMessageSupport support = new CommitMessageSupport(changelist, commitMessageTransformerManager.getCommitMessageTransformers());
+        CommitMessageSupport support = new CommitMessageSupport(changelist, commitMessageTransformerManager.getCommitMessageTransformers(), changelistDao);
         return support.trim(trimToLength);
     }
 
@@ -176,5 +178,10 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
     public void setSystemPaths(SystemPaths systemPaths)
     {
         this.systemPaths = systemPaths;
+    }
+
+    public void setChangelistDao(ChangelistDao changelistDao)
+    {
+        this.changelistDao = changelistDao;
     }
 }

@@ -34,7 +34,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         freemarkerConfiguration.setObjectWrapper(new DefaultObjectWrapper());
         freemarkerConfiguration.addAutoInclude("macro.ftl");
         renderer.setFreemarkerConfiguration(freemarkerConfiguration);
-
+        renderer.setChangelistDao(new MockChangelistDao());
         LinkCommitMessageTransformer tx = new LinkCommitMessageTransformer("Jira");
         tx.setExpression("(CIB-[0-9]+)");
         tx.setLink("http://jira.zutubi.com/browse/$0");
@@ -348,7 +348,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
 
         for(Changelist change: changes)
         {
-            change.addResultId(result.getId());
+            change.setResultId(result.getId());
         }
 
         return result;

@@ -6,10 +6,7 @@ import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.web.ActionSupport;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Action to view the user's dashboard: their own Pulse "homepage".
@@ -71,6 +68,33 @@ public class DashboardAction extends ActionSupport
     public List<Changelist> getProjectChangelists()
     {
         return projectChangelists;
+    }
+
+    public List<BuildResult> getChangelistResults(Changelist changelist)
+    {
+        Set<Long> ids = changelistDao.getAllAffectedResultIds(changelist);
+        List<BuildResult> buildResults = new LinkedList<BuildResult>();
+        for(Long id: ids)
+        {
+            buildResults.add(buildManager.getBuildResult(id));
+        }
+
+        Collections.sort(buildResults, new Comparator<BuildResult>()
+        {
+            public int compare(BuildResult b1, BuildResult b2)
+            {
+                NamedEntityComparator comparator = new NamedEntityComparator();
+                int result = comparator.compare(b1.getProject(), b2.getProject());
+                if(result == 0)
+                {
+                    result = (int)(b1.getNumber() - b2.getNumber());
+                }
+
+                return result;
+            }
+        });
+
+        return buildResults;
     }
 
     public boolean isContactError()

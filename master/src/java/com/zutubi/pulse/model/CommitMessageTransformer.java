@@ -1,12 +1,12 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.committransformers.CommitMessageBuilder;
+import com.zutubi.pulse.core.model.Entity;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * A CommitMessageTransformer is used to search for a pattern in SCM commit
@@ -72,7 +72,7 @@ public abstract class CommitMessageTransformer extends Entity implements NamedEn
         this.properties = properties;
     }
 
-    public boolean appliesToChangelist(Changelist changelist)
+    public boolean appliesToChangelist(Set<Long> changelistProjects)
     {
         if(projects == null || projects.size() == 0)
         {
@@ -81,7 +81,7 @@ public abstract class CommitMessageTransformer extends Entity implements NamedEn
 
         for(Long id: projects)
         {
-            if(changelist.getProjectIds().contains(id))
+            if(changelistProjects.contains(id))
             {
                 return true;
             }

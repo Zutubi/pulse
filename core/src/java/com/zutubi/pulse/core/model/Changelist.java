@@ -18,14 +18,9 @@ public class Changelist extends Entity
     private String serverUid;
     private Revision revision;
     private List<Change> changes;
-    // Used to facilitate recent changes for project lookup
-    private List<Long> projectIds = new LinkedList<Long>();
-    /**
-     * Id of the build results affected by this change: the BuildResult class
-     * is up in master so we can't map them directly.  In any case, this
-     * forces lazy loading of the results which is a Good Thing.
-     */
-    private List<Long> resultIds = new LinkedList<Long>();
+
+    private long projectId;
+    private long resultId;
 
     protected Changelist()
     {
@@ -99,55 +94,24 @@ public class Changelist extends Entity
         this.revision = revision;
     }
 
-    public List<Long> getProjectIds()
+    public long getProjectId()
     {
-        return projectIds;
+        return projectId;
     }
 
-    public void setProjectIds(List<Long> projectIds)
+    public void setProjectId(long projectId)
     {
-        this.projectIds = projectIds;
+        this.projectId = projectId;
     }
 
-    public List<Long> getResultIds()
+    public long getResultId()
     {
-        return resultIds;
+        return resultId;
     }
 
-    public void setResultIds(List<Long> resultIds)
+    public void setResultId(long resultId)
     {
-        this.resultIds = resultIds;
-    }
-
-    public void addProjectId(long id)
-    {
-        if(!projectIds.contains(id))
-        {
-            projectIds.add(id);
-        }
-    }
-
-    public void addResultId(long id)
-    {
-        resultIds.add(id);
-    }
-
-    public void removeResultId(long id)
-    {
-        int i;
-
-        for(i = 0; i < resultIds.size(); i++)
-        {
-            if(resultIds.get(i) == id)
-            {
-                break;
-            }
-        }
-
-        if(i < resultIds.size())
-        {
-            resultIds.remove(i);
-        }
+        this.resultId = resultId;
     }
 
     public String toString()

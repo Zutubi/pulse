@@ -3,6 +3,7 @@ package com.zutubi.pulse.web.project;
 import com.zutubi.pulse.committransformers.CommitMessageBuilder;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.model.CommitMessageTransformer;
+import com.zutubi.pulse.model.persistence.ChangelistDao;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.util.List;
@@ -14,10 +15,12 @@ public class CommitMessageHelper
     private static final Logger LOG = Logger.getLogger(CommitMessageHelper.class);
     
     private List<CommitMessageTransformer> transformers;
+    private ChangelistDao changelistDao;
 
-    public CommitMessageHelper(List<CommitMessageTransformer> transformers)
+    public CommitMessageHelper(List<CommitMessageTransformer> transformers, ChangelistDao changelistDao)
     {
         this.transformers = transformers;
+        this.changelistDao = changelistDao;
     }
 
     public String applyTransforms(Changelist changelist)
@@ -34,7 +37,7 @@ public class CommitMessageHelper
 
             for(CommitMessageTransformer transformer: transformers)
             {
-                if(transformer.appliesToChangelist(changelist))
+                if(transformer.appliesToChangelist(changelistDao.getAllAffectedProjectIds(changelist)))
                 {
                     builder = transformer.transform(builder);
                 }

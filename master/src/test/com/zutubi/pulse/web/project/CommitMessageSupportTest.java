@@ -4,18 +4,18 @@ import com.zutubi.pulse.committransformers.LinkCommitMessageTransformer;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.model.CommitMessageTransformer;
+import com.zutubi.pulse.model.MockChangelistDao;
+import com.zutubi.pulse.model.persistence.ChangelistDao;
 import com.zutubi.pulse.test.PulseTestCase;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  */
 public class CommitMessageSupportTest extends PulseTestCase
 {
     private List<CommitMessageTransformer> transformers;
+    private ChangelistDao changelistDao;
 
     protected void setUp() throws Exception
     {
@@ -26,8 +26,9 @@ public class CommitMessageSupportTest extends PulseTestCase
         transformers.add(new LinkCommitMessageTransformer("bug", "bug ([0-9]+)", "http://bugs/$1"));
         transformers.add(new LinkCommitMessageTransformer("bad", "bad", "http://$1"));
         CommitMessageTransformer limited = new LinkCommitMessageTransformer("limited", "limited", "http://lim/");
-        limited.setProjects(Arrays.asList(new Long[] {(long) 1, (long) 3}));
+        limited.setProjects(Arrays.asList((long) 1, (long) 3));
         transformers.add(limited);
+        changelistDao = new MockChangelistDao();
     }
 
     public void testBasicReplacement()
@@ -85,9 +86,9 @@ public class CommitMessageSupportTest extends PulseTestCase
     {
         Revision rev = new Revision("author", input, new Date(0));
         Changelist list = new Changelist("uid", rev);
-        list.addProjectId(project);
+        list.setProjectId(project);
 
-        CommitMessageSupport support = new CommitMessageSupport(list, transformers);
+        CommitMessageSupport support = new CommitMessageSupport(list, transformers, changelistDao);
 
         if(limit == 0)
         {
@@ -98,4 +99,5 @@ public class CommitMessageSupportTest extends PulseTestCase
             assertEquals(replacement, support.trim(limit));
         }
     }
+
 }

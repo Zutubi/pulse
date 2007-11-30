@@ -55,7 +55,7 @@ public class ChangedByMeNotificationConditionTest extends PulseTestCase
         BuildResult result = new BuildResult();
         for(Changelist list: changes)
         {
-            list.addResultId(result.getId());
+            list.setResultId(result.getId());
             buildManager.save(list);
         }
         BuildScmDetails details = new BuildScmDetails(new NumericalRevision(1));
