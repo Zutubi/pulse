@@ -10,15 +10,14 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
+import org.springframework.orm.hibernate3.HibernateTemplate;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Hibernate implementation of ChangelistDao.
  */
+@SuppressWarnings({"unchecked"})
 public class HibernateChangelistDao extends HibernateEntityDao<Changelist> implements ChangelistDao
 {
     public Class persistentClass()
@@ -26,42 +25,58 @@ public class HibernateChangelistDao extends HibernateEntityDao<Changelist> imple
         return Changelist.class;
     }
 
-    @SuppressWarnings({ "unchecked" })
+    public Set<Long> getAllAffectedProjectIds(Changelist changelist)
+    {
+        List<Changelist> all = findByRevision(changelist.getServerUid(), changelist.getRevision());
+        Set<Long> ids = new HashSet<Long>();
+        for(Changelist cl: all)
+        {
+            ids.add(cl.getProjectId());
+        }
+
+        return ids;
+    }
+
+    public Set<Long> getAllAffectedResultIds(Changelist changelist)
+    {
+        List<Changelist> all = findByRevision(changelist.getServerUid(), changelist.getRevision());
+        Set<Long> ids = new HashSet<Long>();
+        for(Changelist cl: all)
+        {
+            ids.add(cl.getResultId());
+        }
+
+        return ids;
+    }
+
     public List<Changelist> findLatestByUser(final User user, final int max)
     {
-        return (List<Changelist>) getHibernateTemplate().execute(new HibernateCallback()
+        final List<String> allLogins = new LinkedList<String>();
+        allLogins.add(user.getConfig().getLogin());
+        allLogins.addAll(user.getPreferences().getSettings().getAliases());
+
+        return findUnique(new ChangelistQuery()
         {
-            public Object doInHibernate(Session session) throws HibernateException
+            public Query createQuery(Session session)
             {
                 Query queryObject = session.createQuery("from Changelist model where model.revision.author in (:logins) order by model.revision.time desc");
-                List<String> allLogins = new LinkedList<String>();
-                allLogins.add(user.getConfig().getLogin());
-                allLogins.addAll(user.getConfig().getPreferences().getSettings().getAliases());
                 queryObject.setParameterList("logins", allLogins);
-                queryObject.setMaxResults(max);
-
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
-
-                return queryObject.list();
+                return queryObject;
             }
-        });
+        }, max);
     }
 
     public List<Changelist> findLatestByProject(final Project project, final int max)
     {
-        return (List<Changelist>) getHibernateTemplate().execute(new HibernateCallback()
+        return findUnique(new ChangelistQuery()
         {
-            public Object doInHibernate(Session session) throws HibernateException
+            public Query createQuery(Session session)
             {
-                Query queryObject = session.createQuery("from Changelist model where :projectId in elements(model.projectIds) order by model.revision.time desc");
+                Query queryObject = session.createQuery("from Changelist model where model.projectId = :projectId order by model.revision.time desc");
                 queryObject.setParameter("projectId", project.getId());
-                queryObject.setMaxResults(max);
-
-                SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
-
-                return queryObject.list();
+                return queryObject;
             }
-        });
+        }, max);
     }
 
     public List<Changelist> findLatestByProjects(Project[] projects, final int max)
@@ -72,49 +87,20 @@ public class HibernateChangelistDao extends HibernateEntityDao<Changelist> imple
             projectIds[i] = projects[i].getId();
         }
 
-        LinkedHashSet<Changelist> results = new LinkedHashSet<Changelist>();
-        final int[] offset = { 0 };
-
-        while(results.size() < max)
+        return findUnique(new ChangelistQuery()
         {
-            List<Changelist> changelists = (List<Changelist>) getHibernateTemplate().execute(new HibernateCallback()
+            public Query createQuery(Session session)
             {
-                public Object doInHibernate(Session session) throws HibernateException
-                {
-                    Query queryObject = session.createQuery("from Changelist model join model.projectIds project where project in (:projectIds) order by model.revision.time desc");
-                    queryObject.setParameterList("projectIds", projectIds);
-                    queryObject.setFirstResult(offset[0]);
-                    queryObject.setMaxResults(max);
-
-                    SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
-
-                    return queryObject.list();
-                }
-            });
-
-            if(changelists.size() == 0)
-            {
-                break;
+                Query queryObject = session.createQuery("from Changelist model where model.projectId in (:projectIds) order by model.revision.time desc");
+                queryObject.setParameterList("projectIds", projectIds);
+                return queryObject;
             }
-
-            results.addAll(changelists);
-            offset[0] = offset[0] + max;
-        }
-
-        // We can actually get up to max - 1 extra entries if multiple queries
-        // were run, so discard any after max (better than shrinking query max
-        // as we go as then we may execute many queries).
-        ArrayList<Changelist> changes = new ArrayList<Changelist>(results);
-        while(changes.size() > max)
-        {
-            changes.remove(changes.size() - 1);
-        }
-        return changes;
+        }, max);
     }
 
-    public Changelist findByRevision(final String serverUid, final Revision revision)
+    public List<Changelist> findByRevision(final String serverUid, final Revision revision)
     {
-        return (Changelist) getHibernateTemplate().execute(new HibernateCallback()
+        return (List<Changelist>) getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
@@ -124,18 +110,18 @@ public class HibernateChangelistDao extends HibernateEntityDao<Changelist> imple
 
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
 
-                return queryObject.uniqueResult();
+                return queryObject.list();
             }
         });
     }
 
     public List<Changelist> findByResult(final long id)
     {
-        List<Changelist> all = (List<Changelist>) getHibernateTemplate().execute(new HibernateCallback()
+        return  (List<Changelist>) getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery("from Changelist model where :resultId in elements(model.resultIds) order by model.revision.time desc");
+                Query queryObject = session.createQuery("from Changelist model where model.resultId = :resultId order by model.revision.time desc");
                 queryObject.setParameter("resultId", id);
 
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
@@ -143,15 +129,69 @@ public class HibernateChangelistDao extends HibernateEntityDao<Changelist> imple
                 return queryObject.list();
             }
         });
+    }
 
-        // Using the fetch join means we no longer get distinct results!
-        LinkedHashSet<Changelist> set = new LinkedHashSet<Changelist>(all);
-        for (Changelist changelist : all)
+    private static interface ChangelistQuery
+    {
+        Query createQuery(Session session);
+    }
+
+    private List<Changelist> findUnique(final ChangelistQuery changelistQuery, final int max)
+    {
+        List<Changelist> results = new ArrayList<Changelist>(max);
+        final int[] offset = { 0 };
+
+        while(results.size() < max)
         {
-            changelist.getChanges().size();
-            set.add(changelist);
+            List<Changelist> changelists = (List<Changelist>) getHibernateTemplate().execute(new HibernateCallback()
+            {
+                public Object doInHibernate(Session session) throws HibernateException
+                {
+                    Query queryObject = changelistQuery.createQuery(session);
+                    queryObject.setFirstResult(offset[0]);
+                    queryObject.setMaxResults(max);
+                    SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
+                    return queryObject.list();
+                }
+            });
+
+            if(changelists.size() == 0)
+            {
+                break;
+            }
+
+            addUnique(results, changelists);
+            offset[0] = offset[0] + max;
         }
 
-        return new LinkedList<Changelist>(set);
+        // We can actually get up to max - 1 extra entries if multiple queries
+        // were run, so discard any after max (better than shrinking query max
+        // as we go as then we may execute many queries).
+        while(results.size() > max)
+        {
+            results.remove(results.size() - 1);
+        }
+        return results;
+    }
+
+    private void addUnique(Collection<Changelist> lists, Collection<Changelist> toAdd)
+    {
+        for(Changelist candidate: toAdd)
+        {
+            boolean found = false;
+            for(Changelist existing: lists)
+            {
+                if(candidate.getServerUid().equals(existing.getServerUid()) && candidate.getRevision().getRevisionString().equals(existing.getRevision().getRevisionString()))
+                {
+                    found = true;
+                    break;
+                }
+            }
+
+            if(!found)
+            {
+                lists.add(candidate);
+            }
+        }
     }
 }

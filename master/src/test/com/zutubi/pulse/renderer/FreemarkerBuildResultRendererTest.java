@@ -361,7 +361,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
 
         for(Changelist change: changes)
         {
-            change.addResultId(result.getId());
+            change.setResultId(result.getId());
         }
 
         return result;

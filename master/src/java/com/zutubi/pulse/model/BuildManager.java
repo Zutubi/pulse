@@ -158,8 +158,6 @@ public interface BuildManager
     @SecureParameter(action = AccessManager.ACTION_WRITE)
     void deleteAllBuilds(User user);
 
-    Changelist getChangelistByRevision(String serverUid, Revision revision);
-
     @SecureParameter(action = AccessManager.ACTION_WRITE)
     void delete(BuildResult result);
 

@@ -11,8 +11,6 @@ import com.zutubi.util.Constants;
 
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 
@@ -20,7 +18,6 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
 {
-
     private ChangelistDao changelistDao;
 
     public void setUp() throws Exception
@@ -39,6 +36,7 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
     {
         Date date = new Date(System.currentTimeMillis() - Constants.YEAR);
         Revision revision = new Revision("pulse", "test changelist", date);
+        revision.setRevisionString("wow");
         Changelist list = new Changelist("scm", revision);
         Change change = new Change("some/random/file", "23", Change.Action.EDIT);
 
@@ -103,9 +101,8 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
 
     public void testLatestForProjectsOverlapping()
     {
-        Changelist change = createChangelist(1, 1, "login1");
-        change.addProjectId(3);
-        changelistDao.save(change);
+        changelistDao.save(createChangelist(1, 1, "login1"));
+        changelistDao.save(createChangelist(3, 1, "login1"));
         commitAndRefreshTransaction();
 
         Project p1 = new Project();
@@ -120,9 +117,8 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
 
     public void testLatestForProjectsOverlappingStillGetMax()
     {
-        Changelist change = createChangelist(1, 1, "login1");
-        change.addProjectId(3);
-        changelistDao.save(change);
+        changelistDao.save(createChangelist(1, 1, "login1"));
+        changelistDao.save(createChangelist(3, 1, "login1"));
         changelistDao.save(createChangelist(1, 2, "login1"));
         commitAndRefreshTransaction();
 
@@ -191,9 +187,10 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        Changelist changelist = changelistDao.findByRevision("scm", createRevision(12));
-        assertNotNull(changelist);
-        assertEquals("jason", changelist.getRevision().getAuthor());
+        List<Changelist> changelists = changelistDao.findByRevision("scm", createRevision(12));
+        assertNotNull(changelists);
+        assertEquals(1, changelists.size());
+        assertEquals("jason", changelists.get(0).getRevision().getAuthor());
     }
 
     public void testLookupByCvsRevision()
@@ -205,15 +202,16 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
 
         commitAndRefreshTransaction();
 
-        Changelist otherList = changelistDao.findByRevision("scm", r);
+        List<Changelist> otherList = changelistDao.findByRevision("scm", r);
         assertNotNull(otherList);
-        assertPropertyEquals(list, otherList);
+        assertEquals(1, otherList.size());
+        assertPropertyEquals(list, otherList.get(0));
     }
 
     public void testFindByResult()
     {
         Changelist list = new Changelist("uid", createRevision(1));
-        list.addResultId(12);
+        list.setResultId(12);
         changelistDao.save(list);
         commitAndRefreshTransaction();
 
@@ -228,25 +226,15 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
     {
         Revision r1 = createRevision(1);
         r1.setDate(new Date(System.currentTimeMillis() - 1000));
-        Changelist l1 = new Changelist("uid", r1);
-        l1.addResultId(12);
-        l1.addResultId(13);
-        l1.addResultId(14);
-        l1.addChange(new Change("file1", "1", Change.Action.ADD));
-        l1.addChange(new Change("file2", "23", Change.Action.ADD));
-        l1.addChange(new Change("file3", "4", Change.Action.ADD));
-        changelistDao.save(l1);
+        createChangelistForResult(r1, 12);
+        Changelist l1 = createChangelistForResult(r1, 13);
+        createChangelistForResult(r1, 14);
 
         Revision r2 = createRevision(100);
         r2.setDate(new Date(System.currentTimeMillis()));
-        Changelist l2 = new Changelist("uid", r2);
-        l2.addResultId(13);
-        l2.addResultId(14);
-        l2.addResultId(15);
-        l2.addChange(new Change("file1", "2", Change.Action.ADD));
-        l2.addChange(new Change("file2", "1", Change.Action.ADD));
-        l2.addChange(new Change("file3", "1.1.2.3", Change.Action.ADD));
-        changelistDao.save(l2);
+        Changelist l2 = createChangelistForResult(r2, 13);
+        createChangelistForResult(r2, 14);
+        createChangelistForResult(r2, 15);
         commitAndRefreshTransaction();
 
         List<Changelist> found = changelistDao.findByResult(13);
@@ -255,48 +243,15 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
         assertEquals(l1, found.get(1));
     }
 
-    public void testRaceToSave() throws Exception
+    private Changelist createChangelistForResult(Revision r1, int resultId)
     {
-        Lock lock = new ReentrantLock();
-        ChangelistNutter[] nutters = new ChangelistNutter[5];
-        Thread[] threads = new Thread[5];
-
-        for(int i = 0; i < nutters.length; i++)
-        {
-            nutters[i] = new ChangelistNutter(i, lock);
-        }
-
-        for(int i = 0; i < threads.length; i++)
-        {
-            threads[i] = new Thread(nutters[i]);
-        }
-
-        for (Thread thread : threads)
-        {
-            thread.start();
-        }
-
-        System.out.println("sleeping");
-        Thread.sleep(5000);
-        System.out.println("awake");
-
-        for (ChangelistNutter nutter : nutters)
-        {
-            nutter.done = true;
-        }
-
-        for (Thread thread1 : threads)
-        {
-            thread1.join();
-        }
-
-        for (ChangelistNutter nutter1 : nutters)
-        {
-            if (nutter1.e != null)
-            {
-                fail(nutter1.e.getMessage());
-            }
-        }
+        Changelist l1 = new Changelist("uid", r1);
+        l1.setResultId(resultId);
+        l1.addChange(new Change("file1", "1", Change.Action.ADD));
+        l1.addChange(new Change("file2", "23", Change.Action.ADD));
+        l1.addChange(new Change("file3", "4", Change.Action.ADD));
+        changelistDao.save(l1);
+        return l1;
     }
 
     private Changelist createChangelist(long project, long number, String login)
@@ -309,7 +264,7 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
 
         if(project != 0)
         {
-            changelist.addProjectId(project);
+            changelist.setProjectId(project);
         }
 
         return changelist;
@@ -318,54 +273,6 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
     private Changelist createChangelist(long number, String login)
     {
         return createChangelist(0, number, login);
-    }
-
-    private class ChangelistNutter implements Runnable
-    {
-        int n;
-        Exception e;
-        boolean done = false;
-        Lock lock;
-
-        public ChangelistNutter(int i, Lock lock)
-        {
-            this.n = i;
-            this.lock = lock;
-        }
-
-        public void run()
-        {
-            long i = 0;
-            try
-            {
-                System.out.println("nutter " + n + " starting");
-                while(!done)
-                {
-                    Changelist newList = new Changelist("scm", createRevision(i));
-                    lock.lock();
-                    try
-                    {
-                        Changelist list = changelistDao.findByRevision("scm", createRevision(i++));
-                        if(list == null)
-                        {
-                            changelistDao.save(newList);
-                        }
-                    }
-                    finally
-                    {
-                        lock.unlock();
-                    }
-                }
-
-                System.out.println("nutter " + n + " finishing, i = " + i);
-            }
-            catch(Exception e)
-            {
-                System.out.println("i = " + i);
-                e.printStackTrace();
-                this.e = e;
-            }
-        }
     }
 
     private Revision createRevision(long rev)

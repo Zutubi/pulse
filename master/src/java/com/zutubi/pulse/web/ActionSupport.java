@@ -14,6 +14,7 @@ import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.UserManager;
+import com.zutubi.pulse.model.persistence.ChangelistDao;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.project.commit.CommitMessageTransformerConfiguration;
 import com.zutubi.pulse.security.AcegiUtils;
@@ -57,6 +58,7 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
     protected ProjectManager projectManager;
     protected UserManager userManager;
     protected ConfigurationSecurityManager configurationSecurityManager;
+    protected ChangelistDao changelistDao;
     protected String changeUrl;
     private User loggedInUser = null;
 
@@ -247,7 +249,7 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
                 Revision revision = changelist.getRevision();
                 if (revision != null)
                 {
-                    for(long id: changelist.getProjectIds())
+                    for(long id: changelistDao.getAllAffectedProjectIds(changelist))
                     {
                         ProjectConfiguration p = getProjectManager().getProjectConfig(id, false);
                         if(p != null && p.getChangeViewer() != null)
@@ -283,7 +285,7 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
     public CommitMessageSupport getCommitMessageSupport(Changelist changelist)
     {
         List<CommitMessageTransformerConfiguration> transformers = new LinkedList<CommitMessageTransformerConfiguration>();
-        for(long projectId: changelist.getProjectIds())
+        for(long projectId: changelistDao.getAllAffectedProjectIds(changelist))
         {
             Project project = projectManager.getProject(projectId, false);
             if(project != null)
@@ -327,5 +329,10 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
     public final void setConfigurationSecurityManager(ConfigurationSecurityManager configurationSecurityManager)
     {
         this.configurationSecurityManager = configurationSecurityManager;
+    }
+
+    public void setChangelistDao(ChangelistDao changelistDao)
+    {
+        this.changelistDao = changelistDao;
     }
 }

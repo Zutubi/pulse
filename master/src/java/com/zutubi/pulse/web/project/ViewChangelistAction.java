@@ -1,22 +1,18 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.util.TextUtils;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.ChangelistUtils;
 import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.persistence.ChangelistDao;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.project.changeviewer.ChangeViewerConfiguration;
 import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.util.Sort;
+import com.zutubi.util.TextUtils;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  */
@@ -24,7 +20,6 @@ public class ViewChangelistAction extends ActionSupport
 {
     private long id;
     private Changelist changelist;
-    private ChangelistDao changelistDao;
     private BuildManager buildManager;
 
     /**
@@ -121,7 +116,7 @@ public class ViewChangelistAction extends ActionSupport
 
             if (!getViewerFromProject(p))
             {
-                for (long id : changelist.getProjectIds())
+                for (long id : changelistDao.getAllAffectedProjectIds(changelist))
                 {
                     p = projectManager.getProject(id, false);
                     if (getViewerFromProject(p))
@@ -271,7 +266,13 @@ public class ViewChangelistAction extends ActionSupport
             buildResult = buildManager.getByProjectAndVirtualId(project, buildVID);
         }
 
-        buildResults = ChangelistUtils.getBuilds(buildManager, changelist);
+        Set<Long> buildIds = changelistDao.getAllAffectedResultIds(changelist);
+        buildResults = new LinkedList<BuildResult>();
+        for(Long id: buildIds)
+        {
+            buildResults.add(buildManager.getBuildResult(id));
+        }
+
         Collections.sort(buildResults, new Comparator<BuildResult>()
         {
             public int compare(BuildResult b1, BuildResult b2)
@@ -288,11 +289,6 @@ public class ViewChangelistAction extends ActionSupport
         });
 
         return SUCCESS;
-    }
-
-    public void setChangelistDao(ChangelistDao changelistDao)
-    {
-        this.changelistDao = changelistDao;
     }
 
     public void setBuildManager(BuildManager buildManager)

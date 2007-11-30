@@ -48,8 +48,6 @@ public class BuildController implements EventListener
 
     private static final String TIMEOUT_TRIGGER_GROUP = "timeout";
 
-    private static final Lock CHANGE_LOCK = new ReentrantLock();
-
     private AbstractBuildRequestEvent request;
     private Project project;
     private ProjectConfiguration projectConfig;
@@ -551,31 +549,12 @@ public class BuildController implements EventListener
         List<Changelist> result = new LinkedList<Changelist>();
         List<Changelist> scmChanges = client.getChanges(previousRevision, revision);
 
-        // Get the uid after the changes as Svn requires a connection to be
-        // made first
-        String uid = client.getUid();
-
-        CHANGE_LOCK.lock();
-        try
+        for (Changelist change : scmChanges)
         {
-            for (Changelist change : scmChanges)
-            {
-                // Have we already got this revision?
-                Changelist alreadySaved = buildManager.getChangelistByRevision(uid, change.getRevision());
-                if (alreadySaved != null)
-                {
-                    change = alreadySaved;
-                }
-
-                change.addProjectId(buildResult.getProject().getId());
-                change.addResultId(buildResult.getId());
-                buildManager.save(change);
-                result.add(change);
-            }
-        }
-        finally
-        {
-            CHANGE_LOCK.unlock();
+            change.setProjectId(buildResult.getProject().getId());
+            change.setResultId(buildResult.getId());
+            buildManager.save(change);
+            result.add(change);
         }
 
         return result;

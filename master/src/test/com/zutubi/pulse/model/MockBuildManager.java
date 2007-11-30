@@ -233,7 +233,7 @@ public class MockBuildManager implements BuildManager
         List<Changelist> lists = new LinkedList<Changelist>();
         for(Changelist c: changelists.values())
         {
-            if(c.getResultIds().contains(result.getId()))
+            if(c.getResultId() == result.getId())
             {
                 lists.add(c);
             }

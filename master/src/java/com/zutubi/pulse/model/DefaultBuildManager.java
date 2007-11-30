@@ -361,11 +361,6 @@ public class DefaultBuildManager implements BuildManager
         }
     }
 
-    public Changelist getChangelistByRevision(String serverUid, Revision revision)
-    {
-        return changelistDao.findByRevision(serverUid, revision);
-    }
-
     public void delete(BuildResult result)
     {
         cleanupResult(result, true);
@@ -491,8 +486,7 @@ public class DefaultBuildManager implements BuildManager
                 List<Changelist> changelists = changelistDao.findByResult(build.getId());
                 for(Changelist change: changelists)
                 {
-                    change.removeResultId(build.getId());
-                    changelistDao.save(change);
+                    changelistDao.delete(change);
                 }
             }
         }

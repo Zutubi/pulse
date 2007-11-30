@@ -6,12 +6,16 @@ import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.User;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * DAO for accessing Changelist objects.
  */
 public interface ChangelistDao extends EntityDao<Changelist>
 {
+    Set<Long> getAllAffectedProjectIds(Changelist changelist);
+    Set<Long> getAllAffectedResultIds(Changelist changelist);
+
     /**
      * Returns a list of up to max changelists submitted by the given user.
      *
@@ -32,8 +36,7 @@ public interface ChangelistDao extends EntityDao<Changelist>
 
     List<Changelist> findLatestByProjects(Project[] projects, int max);
 
-    Changelist findByRevision(String serverUid, Revision revision);
-
     List<Changelist> findByResult(long id);
 
+    List<Changelist> findByRevision(String serverUid, Revision revision);
 }

@@ -1,17 +1,20 @@
 package com.zutubi.pulse.renderer;
 
 import com.zutubi.pulse.bootstrap.SystemPaths;
+import com.zutubi.pulse.committransformers.CommitMessageSupport;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.committransformers.CommitMessageSupport;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  */

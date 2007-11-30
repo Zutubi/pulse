@@ -1,17 +1,28 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
 <hibernate-mapping>
-
-    <class name="com.zutubi.pulse.core.model.Changelist" table="CHANGELIST" lazy="false">
-
+    <class name="com.zutubi.pulse.core.model.Changelist" table="BUILD_CHANGELIST" lazy="false">
         <id name="id" type="long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>
 
-        <property name="serverUid" column="SERVER_UID" type="string" length="255"/>
+        <property name="serverUid" type="string" length="255">
+            <column name="SERVER_UID" index="idx_changelist_uid_rev"/>
+        </property>
 
-        <!-- the local side of a one-one...  -->
-        <many-to-one name="revision" class="com.zutubi.pulse.core.model.Revision" column="REVISION_ID" cascade="all" unique="true"/>
+        <component name="revision" class="com.zutubi.pulse.core.model.Revision">
+            <property name="author" type="string" length="255">
+                <column name="REVISION_AUTHOR" index="idx_changelist_revision_author"/>
+            </property>
+            <property name="comment" column="REVISION_COMMENT" type="string" length="4096"/>
+            <property name="time" type="long">
+                <column name="REVISION_DATE" index="idx_changelist_revision_date"/>
+            </property>
+            <property name="branch" column="REVISION_BRANCH" type="string" length="255"/>
+            <property name="revisionString" type="string" length="255">
+                <column name="REVISION_STRING" index="idx_changelist_uid_rev"/>
+            </property>
+        </component>
 
         <list name="changes" cascade="all,delete-orphan" lazy="true">
             <key column="CHANGELIST_ID"/>
@@ -19,18 +30,16 @@
             <one-to-many class="com.zutubi.pulse.core.model.Change"/>
         </list>
 
-        <bag name="projectIds" table="CHANGELIST_PROJECTS" lazy="false">
-            <key column="CHANGELIST_ID"/>
-            <element type="long" column="PROJECT_ID" not-null="true"/>
-        </bag>
+        <property name="projectId" type="long">
+            <column name="PROJECT_ID" index="idx_changelist_project_id"/>
+        </property>
 
-        <bag name="resultIds" table="CHANGELIST_RESULTS" lazy="false">
-            <key column="CHANGELIST_ID"/>
-            <element type="long" column="RESULT_ID" not-null="true"/>
-        </bag>
+        <property name="resultId" type="long">
+            <column name="RESULT_ID" index="idx_changelist_result_id"/>
+        </property>
     </class>
 
-    <class name="com.zutubi.pulse.core.model.Change" table="FILE_CHANGE" lazy="false">
+    <class name="com.zutubi.pulse.core.model.Change" table="BUILD_FILE_CHANGE" lazy="false">
         <id name="id" type="long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>
@@ -46,7 +55,7 @@
     </class>
 
 <!--
-    <class name="com.zutubi.pulse.core.model.FileRevision" table="FILE_REVISION" lazy="false">
+    <class name="com.zutubi.pulse.core.model.FileRevision" table="BUILD_FILE_REVISION" lazy="false">
         <id name="id" type="long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>

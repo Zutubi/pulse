@@ -814,8 +814,8 @@
 
 #macro(aggregateResultCell $changelist $myProjects)
     #set ($selectedResult = "n")
-    #foreach($id in $changelist.resultIds)
-        #set($result = $action.getResult($id))
+    #set ($changelistResults = $action.getChangelistResults($changelist))
+    #foreach($result in $changelistResults)
         #if ($selectedResult == "n")
             #set($selectedResult = $result)
         #end
@@ -864,7 +864,7 @@
                     #contentHeading("build id" 1)
                     #contentHeading("status" 2)
                 </tr>
-            #foreach($id in $changelist.resultIds)
+            #foreach($result in $changelistResults)
                 <tr>
                 #set($result = $action.getResult($id))
                     <td class="content"><a href="$urls.projectHome($result.project)">$!webwork.htmlEncode($result.project.name)</a></td>
