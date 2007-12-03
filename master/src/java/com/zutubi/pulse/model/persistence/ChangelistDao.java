@@ -1,8 +1,6 @@
 package com.zutubi.pulse.model.persistence;
 
 import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.model.NumericalRevision;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.User;
 
@@ -39,5 +37,5 @@ public interface ChangelistDao extends EntityDao<Changelist>
 
     List<Changelist> findByResult(long id);
 
-    List<Changelist> findByRevision(String serverUid, Revision revision);
+    List<Changelist> findAllEquivalent(Changelist changelist);
 }

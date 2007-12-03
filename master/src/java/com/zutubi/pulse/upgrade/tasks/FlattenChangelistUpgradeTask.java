@@ -61,7 +61,6 @@ public class FlattenChangelistUpgradeTask extends DatabaseUpgradeTask
     {
         addIndex(con, "BUILD_CHANGELIST", "idx_changelist_revision_author", "REVISION_AUTHOR");
         addIndex(con, "BUILD_CHANGELIST", "idx_changelist_revision_date", "REVISION_DATE");
-        addIndex(con, "BUILD_CHANGELIST", "idx_changelist_uid_rev", "REVISION_STRING", "SERVER_UID");
         addIndex(con, "BUILD_CHANGELIST", "idx_changelist_project_id", "PROJECT_ID");
         addIndex(con, "BUILD_CHANGELIST", "idx_changelist_result_id", "RESULT_ID");
     }

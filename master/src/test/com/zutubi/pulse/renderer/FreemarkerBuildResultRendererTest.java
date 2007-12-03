@@ -357,9 +357,9 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
     private List<Changelist> getChanges()
     {
         List<Changelist> changes = new LinkedList<Changelist>();
-        Changelist list = new Changelist("scm", new NumericalRevision("test author", "CIB-1: short comment", new Date(324252), 655));
+        Changelist list = new Changelist(new NumericalRevision("test author", "CIB-1: short comment", new Date(324252), 655));
         changes.add(list);
-        list = new Changelist("scm", new NumericalRevision("author2", "this time we will use a longer comment to make sure that the renderer is applying some sort of trimming to the resulting output dadada da dadad ad ad adadad ad ad ada d adada dad ad ad d ad ada da d", new Date(310000), 656));
+        list = new Changelist(new NumericalRevision("author2", "this time we will use a longer comment to make sure that the renderer is applying some sort of trimming to the resulting output dadada da dadad ad ad adadad ad ad ada d adada dad ad ad d ad ada da d", new Date(310000), 656));
         changes.add(list);
         return changes;
     }

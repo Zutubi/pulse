@@ -1,15 +1,12 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.model.persistence.ChangelistDao;
-import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.model.persistence.ChangelistDao;
 
-import java.util.Set;
-import java.util.HashSet;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  */
@@ -45,7 +42,7 @@ public class MockChangelistDao implements ChangelistDao
         throw new RuntimeException("Method not yet implemented");
     }
 
-    public List<Changelist> findByRevision(String serverUid, Revision revision)
+    public List<Changelist> findAllEquivalent(Changelist changelist)
     {
         throw new RuntimeException("Method not yet implemented");
     }

@@ -470,7 +470,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         result.setScmDetails(new BuildScmDetails(new NumericalRevision(10)));
         buildResultDao.save(result);
 
-        Changelist list = new Changelist("uid", new NumericalRevision(10));
+        Changelist list = new Changelist(new NumericalRevision(10));
         list.setProjectId(p.getId());
         list.setResultId(result.getId());
         changelistDao.save(list);

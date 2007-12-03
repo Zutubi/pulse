@@ -8,7 +8,10 @@ import com.zutubi.pulse.model.MockChangelistDao;
 import com.zutubi.pulse.model.persistence.ChangelistDao;
 import com.zutubi.pulse.test.PulseTestCase;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  */
@@ -85,7 +88,7 @@ public class CommitMessageSupportTest extends PulseTestCase
     private void assertReplacement(String input, String replacement, long project, int limit)
     {
         Revision rev = new Revision("author", input, new Date(0));
-        Changelist list = new Changelist("uid", rev);
+        Changelist list = new Changelist(rev);
         list.setProjectId(project);
 
         CommitMessageSupport support = new CommitMessageSupport(list, transformers, changelistDao);

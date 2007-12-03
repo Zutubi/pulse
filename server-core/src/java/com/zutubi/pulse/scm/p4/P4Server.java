@@ -346,7 +346,7 @@ public class P4Server extends CachingSCMServer
 
         NumericalRevision revision = new NumericalRevision(user, comment, date, number);
         ScmFilepathFilter filter = new ScmFilepathFilter(excludedPaths);
-        Changelist changelist = new Changelist(getUid(), revision);
+        Changelist changelist = new Changelist(revision);
 
         for (int i = affectedFilesIndex + 2; i < lines.length; i++)
         {

@@ -95,6 +95,9 @@
                 <ref local="schemaUpgrade0102039001"/>
                 <ref local="flattenChangelists"/>
                 <ref local="flattenChangelistsSchemaRefactor"/>
+                <ref local="schemaUpgrade0102040001"/>
+                <ref local="changelistHash"/>
+                <ref local="changelistHashSchemaRefactor"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -671,6 +674,28 @@
             <list>
                 <value>com/zutubi/pulse/upgrade/schema/build_0102039003/Changelist.hbm.xml</value>
                 <value>com/zutubi/pulse/upgrade/schema/build_0102039003/Revision.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="schemaUpgrade0102040001" class="com.zutubi.pulse.upgrade.tasks.MigrateSchemaUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="102040001"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/upgrade/schema/build_0102040001/Changelist.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="changelistHash" class="com.zutubi.pulse.upgrade.tasks.ChangelistHashUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="102040002"/>
+    </bean>
+
+    <bean id="changelistHashSchemaRefactor" class="com.zutubi.pulse.upgrade.tasks.ChangelistHashSchemaRefactorUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="102040003"/>
+        <property name="mappings">
+            <list>
+                <value>com/zutubi/pulse/upgrade/schema/build_0102040003/Changelist.hbm.xml</value>
             </list>
         </property>
     </bean>

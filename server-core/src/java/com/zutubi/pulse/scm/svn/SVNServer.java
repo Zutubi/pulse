@@ -396,7 +396,7 @@ public class SVNServer implements SCMServer
         {
             NumericalRevision revision = new NumericalRevision(entry.getAuthor(), entry.getMessage(), entry.getDate(), entry.getRevision());
 
-            Changelist list = new Changelist(getUid(), revision);
+            Changelist list = new Changelist(revision);
             handler.handle(list);
 
             FileRevision fileRevision = new NumericalFileRevision(((NumericalRevision) list.getRevision()).getRevisionNumber());
