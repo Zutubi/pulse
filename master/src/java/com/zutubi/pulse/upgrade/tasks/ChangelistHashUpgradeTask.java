@@ -67,7 +67,7 @@ public class ChangelistHashUpgradeTask extends DatabaseUpgradeTask
 
     private void prepareStatements(Connection con) throws SQLException
     {
-        selectChangelists = con.prepareStatement("SELECT ID, REVISION_AUTHOR, REVISION_COMMENT, REVISION_DATE, REVISION_BRANCH, REVISION_STRING FROM BUILD_CHANGELIST WHERE TRUE LIMIT 200 OFFSET ?");
+        selectChangelists = con.prepareStatement("SELECT ID, REVISION_AUTHOR, REVISION_COMMENT, REVISION_DATE, REVISION_BRANCH, REVISION_STRING FROM BUILD_CHANGELIST ORDER BY ID LIMIT 200 OFFSET ?");
         setHash = con.prepareStatement("UPDATE BUILD_CHANGELIST SET HASH = ? WHERE ID = ?");
     }
 
@@ -123,7 +123,8 @@ public class ChangelistHashUpgradeTask extends DatabaseUpgradeTask
         String hash = getHash(author, comment, date, branch, revisionString);
         setHash.setString(1, hash);
         setHash.setLong(2, id);
-        setHash.executeUpdate();
+        int i = setHash.executeUpdate();
+        System.out.println("i = " + i);
     }
 
     public String getHash(String author, String comment, Long date, String branch, String revisionString)
