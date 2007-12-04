@@ -502,6 +502,11 @@ public class DefaultBuildManager implements BuildManager
         cleanupWorkForNodes(paths, build, build.getRoot().getChildren());
     }
 
+    public void executeInTransation(Runnable runnable)
+    {
+        runnable.run();
+    }
+
     private void cleanupWorkForNodes(MasterBuildPaths paths, BuildResult build, List<RecipeResultNode> nodes)
     {
         for (RecipeResultNode node : nodes)

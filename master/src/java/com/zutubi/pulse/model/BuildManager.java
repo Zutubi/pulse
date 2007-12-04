@@ -184,4 +184,6 @@ public interface BuildManager
 
     @SecureParameter(parameterType = BuildResult.class, action = AccessManager.ACTION_WRITE)
     void cleanupWork(BuildResult build);
+
+    void executeInTransation(Runnable runnable);
 }
