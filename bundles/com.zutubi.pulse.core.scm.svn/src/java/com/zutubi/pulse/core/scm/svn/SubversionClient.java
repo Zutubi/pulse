@@ -417,7 +417,7 @@ public class SubversionClient implements ScmClient
         for (SVNLogEntry entry : logs)
         {
             NumericalRevision revision = new NumericalRevision(entry.getAuthor(), entry.getMessage(), entry.getDate(), entry.getRevision());
-            Changelist list = new Changelist(getUid(), convertRevision(revision));
+            Changelist list = new Changelist(convertRevision(revision));
             handler.handle(list);
 
             Map files = entry.getChangedPaths();

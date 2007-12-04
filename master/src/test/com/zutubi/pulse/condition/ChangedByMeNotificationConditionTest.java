@@ -65,7 +65,7 @@ public class ChangedByMeNotificationConditionTest extends PulseTestCase
 
     private Changelist getChangelistBy(String author)
     {
-        Changelist change = new Changelist("uid", new Revision(author, "comment", new Date(0)));
+        Changelist change = new Changelist(new Revision(author, "comment", new Date(0)));
         change.addChange(new Change("file", "1", Change.Action.EDIT));
         return change;
     }

@@ -176,7 +176,7 @@ public class LogInformationAnalyser
             // is common to all the changes.
             Revision lastChange = localChanges.get(localChanges.size() - 1);
             CvsRevision rev = new CvsRevision(lastChange.getAuthor(), lastChange.getTag(), lastChange.getMessage(), lastChange.getDate());
-            Changelist changelist = new Changelist(uid, CvsClient.convertRevision(rev));
+            Changelist changelist = new Changelist(CvsClient.convertRevision(rev));
             for (Revision change : localChanges)
             {
                 changelist.addChange(new Change(change.getFilename(), change.getRevision(), change.getAction()));

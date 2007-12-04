@@ -43,7 +43,7 @@ public class MockChangelistDao implements ChangelistDao
         throw new RuntimeException("Method not yet implemented");
     }
 
-    public List<Changelist> findByRevision(String serverUid, Revision revision)
+    public List<Changelist> findAllEquivalent(Changelist changelist)
     {
         throw new RuntimeException("Method not yet implemented");
     }

@@ -1,7 +1,6 @@
 package com.zutubi.pulse.model.persistence.hibernate;
 
 import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.persistence.ChangelistDao;
@@ -10,7 +9,6 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
-import org.springframework.orm.hibernate3.HibernateTemplate;
 
 import java.util.*;
 
@@ -27,7 +25,7 @@ public class HibernateChangelistDao extends HibernateEntityDao<Changelist> imple
 
     public Set<Long> getAllAffectedProjectIds(Changelist changelist)
     {
-        List<Changelist> all = findByRevision(changelist.getServerUid(), changelist.getRevision());
+        List<Changelist> all = findAllEquivalent(changelist);
         Set<Long> ids = new HashSet<Long>();
         for(Changelist cl: all)
         {
@@ -39,7 +37,7 @@ public class HibernateChangelistDao extends HibernateEntityDao<Changelist> imple
 
     public Set<Long> getAllAffectedResultIds(Changelist changelist)
     {
-        List<Changelist> all = findByRevision(changelist.getServerUid(), changelist.getRevision());
+        List<Changelist> all = findAllEquivalent(changelist);
         Set<Long> ids = new HashSet<Long>();
         for(Changelist cl: all)
         {
@@ -98,21 +96,31 @@ public class HibernateChangelistDao extends HibernateEntityDao<Changelist> imple
         }, max);
     }
 
-    public List<Changelist> findByRevision(final String serverUid, final Revision revision)
+    public List<Changelist> findAllEquivalent(final Changelist changelist)
     {
-        return (List<Changelist>) getHibernateTemplate().execute(new HibernateCallback()
+        List<Changelist> result = (List<Changelist>) getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery("from Changelist model where model.serverUid = :serverUid and model.revision.revisionString = :revisionString");
-                queryObject.setParameter("serverUid", serverUid);
-                queryObject.setParameter("revisionString", revision.getRevisionString());
+                Query queryObject = session.createQuery("from Changelist model where model.hash = :hash");
+                queryObject.setParameter("hash", changelist.getHash());
 
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
 
                 return queryObject.list();
             }
         });
+
+        Iterator<Changelist> it = result.iterator();
+        while(it.hasNext())
+        {
+            if(!it.next().isEquivalent(changelist))
+            {
+                it.remove();
+            }
+        }
+
+        return result;
     }
 
     public List<Changelist> findByResult(final long id)
@@ -181,7 +189,7 @@ public class HibernateChangelistDao extends HibernateEntityDao<Changelist> imple
             boolean found = false;
             for(Changelist existing: lists)
             {
-                if(candidate.getServerUid().equals(existing.getServerUid()) && candidate.getRevision().getRevisionString().equals(existing.getRevision().getRevisionString()))
+                if(existing.isEquivalent(candidate))
                 {
                     found = true;
                     break;

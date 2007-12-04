@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.model;
 
 import com.zutubi.pulse.util.TimeStamps;
+import org.apache.commons.codec.digest.DigestUtils;
 
 import java.util.Date;
 import java.util.LinkedList;
@@ -14,9 +15,13 @@ import java.util.Locale;
  */
 public class Changelist extends Entity
 {
-    /* Unique ID for the server this revision is stored on. */
-    private String serverUid;
     private Revision revision;
+    /**
+     * A collection of details from the revision that can be used to identify
+     * duplicate changelists hashed using MD5.
+     */
+    private String hash;
+
     private List<Change> changes;
 
     private long projectId;
@@ -27,26 +32,68 @@ public class Changelist extends Entity
 
     }
 
-    public Changelist(String serverUid, Revision revision)
+    public Changelist(Revision revision)
     {
-        this.serverUid = serverUid;
         this.revision = revision;
         this.changes = new LinkedList<Change>();
+    }
+
+    public boolean isEquivalent(Changelist other)
+    {
+        return other != null &&
+                safeTime(getDate()) == safeTime(other.getDate()) &&
+                safeString(revision.getAuthor()).equals(safeString(other.revision.getAuthor())) &&
+                safeString(revision.getBranch()).equals(safeString(other.revision.getBranch())) &&
+                safeString(revision.getComment()).equals(safeString(other.revision.getComment())) &&
+                safeString(revision.getRevisionString()).equals(safeString(other.revision.getRevisionString()));
+
+    }
+
+    public String getHash()
+    {
+        if(hash == null)
+        {
+            // Calculate on demand.
+            String input;
+            if(revision == null)
+            {
+                input = "////";
+            }
+            else
+            {
+                input = safeString(Long.toString(safeTime(revision.getDate())) + "/" + revision.getAuthor() + "/" + safeString(revision.getBranch()) + "/" + safeString(revision.getComment()) + "/" + safeString(revision.getRevisionString()));
+            }
+
+            hash = DigestUtils.md5Hex(input);
+        }
+        return hash;
+    }
+
+    private long safeTime(Date date)
+    {
+        return date == null ? 0 : date.getTime();
+    }
+
+    private String safeString(String in)
+    {
+        if(in == null)
+        {
+            return "";
+        }
+        else
+        {
+            return in;
+        }
+    }
+
+    public void setHash(String hash)
+    {
+        this.hash = hash;
     }
 
     public void addChange(Change change)
     {
         changes.add(change);
-    }
-
-    public String getServerUid()
-    {
-        return serverUid;
-    }
-
-    private void setServerUid(String serverUid)
-    {
-        this.serverUid = serverUid;
     }
 
     public Revision getRevision()
@@ -116,6 +163,6 @@ public class Changelist extends Entity
 
     public String toString()
     {
-        return "{ uid: " + serverUid + ", rev: " + ((revision != null) ? revision.toString() : "null") + ", changes: " + changes.size() + " }";
+        return "{ rev: " + ((revision != null) ? revision.toString() : "null") + ", changes: " + changes.toString() + " }";
     }
 }

@@ -5,7 +5,6 @@ import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.util.SystemUtils;
 import com.zutubi.pulse.webwork.mapping.Urls;
 import com.zutubi.util.Constants;
 import com.zutubi.util.IOUtils;
@@ -370,9 +369,9 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
     private List<Changelist> getChanges()
     {
         List<Changelist> changes = new LinkedList<Changelist>();
-        Changelist list = new Changelist("scm", new Revision("test author", "CIB-1: short comment", new Date(324252), "655"));
+        Changelist list = new Changelist(new Revision("test author", "CIB-1: short comment", new Date(324252), "655"));
         changes.add(list);
-        list = new Changelist("scm", new Revision("author2", "this time we will use a longer comment to make sure that the renderer is applying some sort of trimming to the resulting output dadada da dadad ad ad adadad ad ad ada d adada dad ad ad d ad ada da d", new Date(310000), "656"));
+        list = new Changelist(new Revision("author2", "this time we will use a longer comment to make sure that the renderer is applying some sort of trimming to the resulting output dadada da dadad ad ad adadad ad ad ada d adada dad ad ad d ad ada da d", new Date(310000), "656"));
         changes.add(list);
         return changes;
     }
@@ -496,11 +495,6 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         return s.replace("\r", "");
     }
 
-    private Map<String, Object> getDataMap(String baseUrl, BuildResult result, List<Changelist> changelists)
-    {
-        return getDataMap(baseUrl, result, changelists, null, 0, 0);
-    }
-
     private Map<String, Object> getDataMap(String baseUrl, BuildResult result, List<Changelist> changelists, BuildResult lastSuccess, int unsuccessfulBuilds, int unsuccessfulDays)
     {
 
@@ -528,10 +522,5 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
     private String replaceTimestamps(String str)
     {
         return str.replaceAll("\n.*ago<", "@@@@").replaceAll("\n[0-9]+ ms", "@@@@").replaceAll("\n.*70.*<", "@@@@");
-    }
-
-    private String normaliseLineSeparators(String str)
-    {
-        return str.replaceAll(SystemUtils.LINE_SEPARATOR, "\n");
     }
 }

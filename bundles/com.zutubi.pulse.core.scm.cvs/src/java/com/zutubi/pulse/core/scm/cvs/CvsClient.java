@@ -347,7 +347,7 @@ public class CvsClient implements ScmClient, DataCacheAware
         List<Changelist> fixedChangelists = new LinkedList<Changelist>();
         for (Changelist changelist : changes)
         {
-            Changelist fixedChangelist = new Changelist(changelist.getServerUid(), changelist.getRevision());
+            Changelist fixedChangelist = new Changelist(changelist.getRevision());
             for (Change change : changelist.getChanges())
             {
                 // a) strip off the leading /.

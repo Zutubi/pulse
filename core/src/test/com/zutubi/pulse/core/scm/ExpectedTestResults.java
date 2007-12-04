@@ -68,11 +68,11 @@ public class ExpectedTestResults
     private void setupResults()
     {
         changelists = new LinkedList<Changelist>();
-        changelists.add(new Changelist("uid", revisions.get(0)));
-        changelists.add(new Changelist("uid", revisions.get(1)));
-        changelists.add(new Changelist("uid", revisions.get(2)));
-        changelists.add(new Changelist("uid", revisions.get(3)));
-        changelists.add(new Changelist("uid", revisions.get(4)));
+        changelists.add(new Changelist(revisions.get(0)));
+        changelists.add(new Changelist(revisions.get(1)));
+        changelists.add(new Changelist(revisions.get(2)));
+        changelists.add(new Changelist(revisions.get(3)));
+        changelists.add(new Changelist(revisions.get(4)));
 
 
         Changelist cl1 = changelists.get(0);
@@ -282,7 +282,7 @@ public class ExpectedTestResults
             }
         }
 
-        Changelist result = new Changelist("uid", null);
+        Changelist result = new Changelist(null);
         for (Change change : latestChanges.values())
         {
             result.addChange(change);

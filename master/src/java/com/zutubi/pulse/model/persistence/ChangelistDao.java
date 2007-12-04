@@ -38,5 +38,5 @@ public interface ChangelistDao extends EntityDao<Changelist>
 
     List<Changelist> findByResult(long id);
 
-    List<Changelist> findByRevision(String serverUid, Revision revision);
+    List<Changelist> findAllEquivalent(Changelist changelist);
 }

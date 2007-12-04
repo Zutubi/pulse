@@ -173,6 +173,26 @@ public abstract class DatabaseUpgradeTask implements PulseUpgradeTask, DataSourc
         runUpdate(con, sql);
     }
 
+    protected void dropIndex(Connection con, String table, String indexName) throws SQLException
+    {
+        String sql;
+        String databaseProductName = con.getMetaData().getDatabaseProductName().toLowerCase();
+        if(databaseProductName.contains("postgres"))
+        {
+            sql = "DROP INDEX IF EXISTS " + indexName;
+        }
+        else if(databaseProductName.contains("mysql"))
+        {
+            sql = "DROP INDEX " + indexName + " ON " + table;
+        }
+        else
+        {
+            sql = "DROP INDEX " + indexName + " IF EXISTS";
+        }
+
+        runUpdate(con, sql);
+    }
+
     protected void runUpdate(Connection con, String sql) throws SQLException
     {
         PreparedStatement stmt = null;

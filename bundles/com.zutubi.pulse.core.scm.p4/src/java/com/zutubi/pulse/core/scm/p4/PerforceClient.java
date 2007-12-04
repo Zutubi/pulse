@@ -353,7 +353,7 @@ public class PerforceClient extends CachingScmClient
 
         Revision revision = new Revision(user, comment, date, Long.toString(number));
         ScmFilepathFilter filter = new ScmFilepathFilter(excludedPaths);
-        Changelist changelist = new Changelist(getUid(), revision);
+        Changelist changelist = new Changelist(revision);
 
         for (int i = affectedFilesIndex + 2; i < lines.length; i++)
         {
