@@ -1,5 +1,7 @@
 package com.zutubi.prototype.wizard;
 
+import com.zutubi.prototype.type.TypeException;
+
 import java.util.List;
 
 /**

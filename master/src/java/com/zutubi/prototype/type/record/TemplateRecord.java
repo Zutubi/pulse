@@ -1,6 +1,7 @@
 package com.zutubi.prototype.type.record;
 
 import com.zutubi.config.annotations.NoInherit;
+import com.zutubi.config.annotations.Internal;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.type.ComplexType;
 import com.zutubi.prototype.type.CompositeType;
@@ -11,6 +12,7 @@ import com.zutubi.util.StringUtils;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.lang.annotation.Annotation;
 
 /**
  */
@@ -115,15 +117,10 @@ public class TemplateRecord extends AbstractRecord
     private boolean canInherit(String key)
     {
         // No parent, nothing to inherit.
-        if (parent == null)
-        {
-            return false;
-        }
-
-        return !markedNoInherit(key);
+        return parent != null && !isPropertyAnnotated(key, NoInherit.class);
     }
 
-    private boolean markedNoInherit(String key)
+    private boolean isPropertyAnnotated(String key, Class<? extends Annotation> annotationClass)
     {
         // Composite properties explicitly marked NoInherit cannot be
         // inherited.
@@ -131,7 +128,7 @@ public class TemplateRecord extends AbstractRecord
         {
             CompositeType ctype = (CompositeType) type;
             TypeProperty property = ctype.getProperty(key);
-            if (property != null && property.getAnnotation(NoInherit.class) != null)
+            if (property != null && property.getAnnotation(annotationClass) != null)
             {
                 return true;
             }
@@ -139,15 +136,20 @@ public class TemplateRecord extends AbstractRecord
         return false;
     }
 
+    private boolean isInternalProperty(String key)
+    {
+        if (type instanceof CompositeType)
+        {
+            CompositeType ctype = (CompositeType) type;
+            return ctype.hasInternalProperty(key);
+        }
+        return false;
+    }
+
     private boolean canInheritMeta(String key)
     {
         // No parent, nothing to inherit.
-        if (parent == null)
-        {
-            return false;
-        }
-
-        return !CollectionUtils.contains(NO_INHERIT_META_KEYS, key);
+        return parent != null && !CollectionUtils.contains(NO_INHERIT_META_KEYS, key);
     }
 
     public Set<String> keySet()
@@ -284,9 +286,12 @@ public class TemplateRecord extends AbstractRecord
             }
         }
 
-        if(moi.simpleKeySet().size() > 0)
+        for(String simpleKey: moi.simpleKeySet())
         {
-            return false;
+            if(!isInternalProperty(simpleKey))
+            {
+                return false;
+            }
         }
 
         if(getHiddenKeys().size() > 0)

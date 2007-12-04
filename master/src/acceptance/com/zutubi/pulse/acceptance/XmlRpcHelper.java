@@ -7,6 +7,7 @@ import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.prototype.config.group.GroupConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectAclConfiguration;
+import com.zutubi.pulse.prototype.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 import org.apache.xmlrpc.XmlRpcClient;
 
@@ -181,10 +182,16 @@ public class XmlRpcHelper
         Hashtable<String, Object> type = createEmptyConfig("zutubi.antTypeConfig");
         type.put("file", "build.xml");
 
+        Hashtable<String, Object> stage = createEmptyConfig(BuildStageConfiguration.class);
+        stage.put("name", "default");
+        Hashtable<String, Object> stages = new Hashtable<String, Object>();
+        stages.put("default", stage);
+
         Hashtable<String, Object> project = createEmptyConfig("zutubi.projectConfig");
         project.put("name", name);
         project.put("scm", scm);
         project.put("type", type);
+        project.put("stages", stages);
 
         return call("insertTemplatedConfig", "projects/" + parent, project, template);
     }

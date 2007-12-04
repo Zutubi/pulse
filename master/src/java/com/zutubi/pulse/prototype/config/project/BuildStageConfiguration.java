@@ -21,7 +21,8 @@ import java.util.Map;
  */
 @SymbolicName("zutubi.stageConfig")
 @Form(fieldOrder = {"name", "recipe", "agent"})
-public class BuildStageConfiguration extends AbstractNamedConfiguration
+public class
+        BuildStageConfiguration extends AbstractNamedConfiguration
 {
     private static final Logger LOG = Logger.getLogger(BuildStageConfiguration.class);
 
@@ -34,6 +35,15 @@ public class BuildStageConfiguration extends AbstractNamedConfiguration
 
     @Transient
     private ObjectFactory objectFactory;
+
+    public BuildStageConfiguration()
+    {
+    }
+
+    public BuildStageConfiguration(String name)
+    {
+        super(name);
+    }
 
     public AgentConfiguration getAgent()
     {

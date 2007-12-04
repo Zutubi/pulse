@@ -51,6 +51,10 @@ public abstract class AbstractTypeWizard implements Wizard
      */
     protected String successPath;
     /**
+     * The path to our template parent, if we have one.
+     */
+    protected String templateParentPath;
+    /**
      * Template parent record, if we have a template parent.
      */
     protected TemplateRecord templateParentRecord;
@@ -164,10 +168,11 @@ public abstract class AbstractTypeWizard implements Wizard
         return template;
     }
 
-    public void setParameters(String parentPath, String insertPath, TemplateRecord templateParentRecord, boolean template)
+    public void setParameters(String parentPath, String insertPath, String templateParentPath, TemplateRecord templateParentRecord, boolean template)
     {
         this.parentPath = parentPath;
         this.insertPath = insertPath;
+        this.templateParentPath = templateParentPath;
         this.templateParentRecord = templateParentRecord;
         this.template = template;
     }

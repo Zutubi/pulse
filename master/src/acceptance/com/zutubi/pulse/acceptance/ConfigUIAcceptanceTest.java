@@ -1,6 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.prototype.config.ConfigurationRegistry;
 import com.zutubi.pulse.acceptance.forms.admin.*;
 import com.zutubi.pulse.acceptance.pages.admin.*;
 import com.zutubi.pulse.core.config.ResourceProperty;
@@ -39,7 +40,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         // single select should have an empty option added.
         loginAsAdmin();
         goTo(urls.adminProjects());
-        addProject(random, true, ProjectManager.GLOBAL_PROJECT_NAME, true);
+        addProject(random, true, ProjectManager.GLOBAL_PROJECT_NAME);
         goTo(urls.adminProject(random) + "scm/");
         SubversionForm form = new SubversionForm(selenium);
         form.waitFor();
@@ -462,6 +463,21 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.insertSimpleProject(parentName, true);
 
         loginAsAdmin();
+        addInheritingProject(parentName, childName);
+
+        ProjectHierarchyPage childHierarchyPage = new ProjectHierarchyPage(selenium, urls, childName, false);
+        childHierarchyPage.waitFor();
+        ProjectConfigPage configPage = childHierarchyPage.clickConfigure();
+        configPage.waitFor();
+        CompositePage scmPage = configPage.clickComposite("scm", "scm");
+        scmPage.waitFor();
+        SubversionForm subversionForm = new SubversionForm(selenium);
+        subversionForm.waitFor();
+        subversionForm.assertFormElements("svn://localhost:3088/accept/trunk/triviant", null, null, null, null, null, null, null, null, null, null, null, null);
+    }
+
+    private void addInheritingProject(String parentName, String childName)
+    {
         ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, parentName, true);
         hierarchyPage.goTo();
         hierarchyPage.clickAdd();
@@ -474,16 +490,6 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         AddProjectWizard.AntState antState = new AddProjectWizard.AntState(selenium);
         antState.waitFor();
         antState.finishFormElements(null, null, null, null);
-
-        ProjectHierarchyPage childHierarchyPage = new ProjectHierarchyPage(selenium, urls, childName, false);
-        childHierarchyPage.waitFor();
-        ProjectConfigPage configPage = childHierarchyPage.clickConfigure();
-        configPage.waitFor();
-        CompositePage scmPage = configPage.clickComposite("scm", "scm");
-        scmPage.waitFor();
-        SubversionForm subversionForm = new SubversionForm(selenium);
-        subversionForm.waitFor();
-        subversionForm.assertFormElements("svn://localhost:3088/accept/trunk/triviant", null, null, null, null, null, null, null, null, null, null, null, null);
     }
 
     public void testWizardOverridingScrubRequired() throws Exception
@@ -504,6 +510,40 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         subversionState.nextFormElements("", null, null, null, null, null);
         subversionState.assertFormPresent();
         assertTextPresent("url requires a value");
+    }
+
+    public void testDefaultProjectConfigCreated()
+    {
+        loginAsAdmin();
+        goTo(urls.adminProjects());
+        addProject(random);
+
+        ListPage listPage = new ListPage(selenium, urls, PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, random, "stages"));
+        listPage.goTo();
+        listPage.assertItemPresent("default", null, "view", "delete");
+
+        listPage = new ListPage(selenium, urls, PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, random, "triggers"));
+        listPage.goTo();
+        listPage.assertItemPresent("scm trigger", null, "view", "delete", "pause");
+    }
+
+    public void testDefaultProjectConfigNotCreatedWhenAlreadyInherited()
+    {
+        String parentName = random + "-parent";
+        String childName = random + "-child";
+
+        loginAsAdmin();
+        goTo(urls.adminProjects());
+        addProject(parentName, true, ProjectManager.GLOBAL_PROJECT_NAME);
+        addInheritingProject(parentName, childName);
+
+        ListPage listPage = new ListPage(selenium, urls, PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, childName, "stages"));
+        listPage.goTo();
+        listPage.assertItemPresent("default", ListPage.ANNOTATION_INHERITED, "view", "delete");
+
+        listPage = new ListPage(selenium, urls, PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, childName, "triggers"));
+        listPage.goTo();
+        listPage.assertItemPresent("scm trigger", ListPage.ANNOTATION_INHERITED, "view", "delete", "pause");
     }
 
     private void insertProperty(String projectPath) throws Exception

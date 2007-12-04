@@ -42,7 +42,7 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
     @Ordered
     private Map<String, ResourceProperty> properties = new LinkedHashMap<String, ResourceProperty>();
 
-    private BuildOptionsConfiguration options;
+    private BuildOptionsConfiguration options = new BuildOptionsConfiguration();
 
     @Ordered
     private Map<String, BuildStageConfiguration> stages = new LinkedHashMap<String, BuildStageConfiguration>();
@@ -63,17 +63,6 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
     private Map<String, CommitMessageTransformerConfiguration> commitMessageTransformers = new LinkedHashMap<String, CommitMessageTransformerConfiguration>();
 
     private ChangeViewerConfiguration changeViewer;
-
-    public ProjectConfiguration()
-    {
-        // setup defaults
-        options = new BuildOptionsConfiguration();
-
-        BuildStageConfiguration defaultStage = new BuildStageConfiguration();
-        defaultStage.setName("default");
-        stages = new HashMap<String, BuildStageConfiguration>();
-        stages.put("default", defaultStage);
-    }
 
     public long getProjectId()
     {

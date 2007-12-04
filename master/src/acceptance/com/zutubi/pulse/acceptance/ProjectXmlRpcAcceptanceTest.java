@@ -33,7 +33,7 @@ public class ProjectXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         Hashtable<String, Object> globalProject = call("getConfig", "projects/global project template");
         assertProject(globalProject, "global project template");
-        assertDefaultStages(globalProject);
+        assertDefaultCleanups(globalProject);
         assertDefaultOptions(globalProject);
     }
 
@@ -46,7 +46,7 @@ public class ProjectXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         Hashtable<String, Object> createdProject = call("getConfig", path);
         assertProject(createdProject, projectName);
-        assertDefaultStages(createdProject);
+        assertDefaultCleanups(createdProject);
         assertDefaultOptions(createdProject);
 
         Hashtable<String, Object> createdScm = (Hashtable<String, Object>) createdProject.get("scm");
@@ -93,7 +93,7 @@ public class ProjectXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         Hashtable<String, Object> editedProject = call("getConfig", editedPath);
         assertProject(editedProject, editedName);
-        assertDefaultStages(editedProject);
+        assertDefaultCleanups(editedProject);
         assertDefaultOptions(editedProject);
 
         Hashtable<String, Object> editedScm = (Hashtable<String, Object>) editedProject.get("scm");
@@ -120,21 +120,20 @@ public class ProjectXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertEquals(name, struct.get("name"));
     }
 
-    private void assertDefaultStages(Hashtable<String, Object> project)
+    private void assertDefaultCleanups(Hashtable<String, Object> project)
     {
-        Hashtable<String, Object> stages = (Hashtable<String, Object>) project.get("stages");
-        assertNotNull(stages);
-        assertDefaultStage(stages);
+        Hashtable<String, Object> cleanups = (Hashtable<String, Object>) project.get("cleanup");
+        assertNotNull(cleanups);
+        assertDefaultCleanup(cleanups);
     }
 
-    private void assertDefaultStage(Hashtable<String, Object> stages)
+    private void assertDefaultCleanup(Hashtable<String, Object> cleanups)
     {
-        Hashtable<String, Object> defaultStage = (Hashtable<String, Object>) stages.get("default");
-        assertNotNull(defaultStage);
-        assertEquals("zutubi.stageConfig", defaultStage.get(SYMBOLIC_NAME_KEY));
-        assertEquals("default", defaultStage.get("name"));
-        assertEquals(0, ((Hashtable)defaultStage.get("properties")).size());
-        assertEquals(0, ((Vector)defaultStage.get("requirements")).size());
+        Hashtable<String, Object> defaultCleanup = (Hashtable<String, Object>) cleanups.get("default");
+        assertNotNull(defaultCleanup);
+        assertEquals("zutubi.cleanupConfig", defaultCleanup.get(SYMBOLIC_NAME_KEY));
+        assertEquals("default", defaultCleanup.get("name"));
+        assertEquals(10, defaultCleanup.get("retain"));
     }
 
     private void assertDefaultOptions(Hashtable<String, Object> project)

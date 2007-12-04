@@ -121,12 +121,12 @@ public class SeleniumTestBase extends TestCase
 
     protected void addProject(String name)
     {
-        addProject(name, false, "global project template", true);
+        addProject(name, false, "global project template");
     }
 
-    protected void addProject(String name, boolean template, String parentName, boolean parentIsTemplate)
+    protected void addProject(String name, boolean template, String parentName)
     {
-        ProjectHierarchyPage globalPage = new ProjectHierarchyPage(selenium, urls, parentName, parentIsTemplate);
+        ProjectHierarchyPage globalPage = new ProjectHierarchyPage(selenium, urls, parentName, true);
         globalPage.waitFor();
         if (template)
         {

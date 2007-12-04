@@ -185,6 +185,11 @@ public class CompositeType extends AbstractType implements ComplexType
         return internalProperties.size() > 0;
     }
     
+    public boolean hasInternalProperty(String propertyName)
+    {
+        return internalProperties.containsKey(propertyName);
+    }
+
     public List<String> getInternalPropertyNames()
     {
         return Collections.unmodifiableList(new LinkedList<String>(internalProperties.keySet()));

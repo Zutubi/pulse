@@ -293,6 +293,7 @@ public class ConfigurationWizardAction extends com.opensymphony.xwork.ActionSupp
         Type type;
         String insertPath;
         boolean template;
+        String templateParentPath = null;
         TemplateRecord templateParentRecord = null;
 
         // The incoming path for a templated scope should hold the template
@@ -300,7 +301,8 @@ public class ConfigurationWizardAction extends com.opensymphony.xwork.ActionSupp
         if(parentPath != null && configurationTemplateManager.isTemplatedCollection(parentPath))
         {
             type = configurationTemplateManager.getType(parentPath).getTargetType();
-            templateParentRecord = (TemplateRecord) configurationTemplateManager.getRecord(path);
+            templateParentPath = path;
+            templateParentRecord = (TemplateRecord) configurationTemplateManager.getRecord(templateParentPath);
             if (templateParentRecord == null)
             {
                 throw new IllegalArgumentException("Invalid wizard path '" + path + "': template parent does not exist");
@@ -343,7 +345,7 @@ public class ConfigurationWizardAction extends com.opensymphony.xwork.ActionSupp
             ComponentContext.autowire(wizardInstance);
         }
 
-        wizardInstance.setParameters(parentPath, insertPath, templateParentRecord, template);
+        wizardInstance.setParameters(parentPath, insertPath, templateParentPath, templateParentRecord, template);
 
         wizardRequiresLazyInitialisation = true;
         return wizardInstance;

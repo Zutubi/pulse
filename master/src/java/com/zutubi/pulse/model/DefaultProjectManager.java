@@ -10,6 +10,9 @@ import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.DefaultSetupManager;
+import com.zutubi.pulse.cleanup.config.CleanupConfiguration;
+import com.zutubi.pulse.cleanup.config.CleanupUnit;
+import com.zutubi.pulse.cleanup.config.CleanupWhat;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.RecipeRequest;
@@ -26,9 +29,9 @@ import com.zutubi.pulse.events.build.PersonalBuildRequestEvent;
 import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
 import com.zutubi.pulse.license.LicenseManager;
 import com.zutubi.pulse.license.authorisation.AddProjectAuthorisation;
+import com.zutubi.pulse.model.persistence.AgentStateDao;
 import com.zutubi.pulse.model.persistence.ProjectDao;
 import com.zutubi.pulse.model.persistence.TestCaseIndexDao;
-import com.zutubi.pulse.model.persistence.AgentStateDao;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.prototype.config.LabelConfiguration;
 import com.zutubi.pulse.prototype.config.group.AbstractGroupConfiguration;
@@ -146,6 +149,16 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
                 // Project admins can do just that
                 group = configurationProvider.get(PathUtils.getPath(ConfigurationRegistry.GROUPS_SCOPE, UserManager.PROJECT_ADMINS_GROUP_NAME), AbstractGroupConfiguration.class);
                 globalProject.addPermission(new ProjectAclConfiguration(group, AccessManager.ACTION_ADMINISTER));
+
+                // Default cleanup rule to blow away working copy snapshots
+                CleanupConfiguration cleanupConfiguration = new CleanupConfiguration();
+                cleanupConfiguration.setName("default");
+                cleanupConfiguration.setWhat(CleanupWhat.WORKING_DIRECTORIES_ONLY);
+                cleanupConfiguration.setRetain(10);
+                cleanupConfiguration.setUnit(CleanupUnit.BUILDS);
+                Map<String, CleanupConfiguration> cleanupMap = new HashMap<String, CleanupConfiguration>();
+                cleanupMap.put("default", cleanupConfiguration);
+                globalProject.getExtensions().put("cleanup", cleanupMap);               
 
                 CompositeType projectType = typeRegistry.getType(ProjectConfiguration.class);
                 MutableRecord globalTemplate = projectType.unstantiate(globalProject);

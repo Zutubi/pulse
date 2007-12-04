@@ -261,24 +261,24 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         String projectPath = xmlRpcHelper.insertSimpleProject(random, false);
 
         loginAsAdmin();
-        String stagesPath = PathUtils.getPath(projectPath, "stages");
-        String stagePath = PathUtils.getPath(stagesPath, "default");
+        String cleanupsPath = PathUtils.getPath(projectPath, "cleanup");
+        String cleanupPath = PathUtils.getPath(cleanupsPath, "default");
 
-        ListPage stagesPage = new ListPage(selenium, urls, stagesPath);
-        stagesPage.goTo();
-        stagesPage.expandTreeNode(stagesPath);
-        stagesPage.assertItemPresent("default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_DELETE);
-        stagesPage.assertTreeLinkPresent("default");
+        ListPage cleanupsPage = new ListPage(selenium, urls, cleanupsPath);
+        cleanupsPage.goTo();
+        cleanupsPage.expandTreeNode(cleanupsPath);
+        cleanupsPage.assertItemPresent("default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_DELETE);
+        cleanupsPage.assertTreeLinkPresent("default");
 
-        DeleteConfirmPage confirmPage = stagesPage.clickDelete("default");
+        DeleteConfirmPage confirmPage = cleanupsPage.clickDelete("default");
         confirmPage.waitFor();
         assertTextPresent("Are you sure you wish to hide this record?");
-        confirmPage.assertTasks(stagePath, ACTION_HIDE_RECORD);
+        confirmPage.assertTasks(cleanupPath, ACTION_HIDE_RECORD);
         confirmPage.clickDelete();
 
-        stagesPage.waitFor();
-        stagesPage.assertItemPresent("default", ListPage.ANNOTATION_HIDDEN, ACTION_RESTORE);
-        stagesPage.assertTreeLinkNotPresent("default");
+        cleanupsPage.waitFor();
+        cleanupsPage.assertItemPresent("default", ListPage.ANNOTATION_HIDDEN, ACTION_RESTORE);
+        cleanupsPage.assertTreeLinkNotPresent("default");
     }
 
     public void testCancelHide() throws Exception
@@ -286,18 +286,18 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         String projectPath = xmlRpcHelper.insertSimpleProject(random, false);
 
         loginAsAdmin();
-        String stagesPath = PathUtils.getPath(projectPath, "stages");
+        String cleanupssPath = PathUtils.getPath(projectPath, "cleanup");
 
-        ListPage stagesPage = new ListPage(selenium, urls, stagesPath);
-        stagesPage.goTo();
-        stagesPage.assertItemPresent("default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_DELETE);
+        ListPage cleanupsPage = new ListPage(selenium, urls, cleanupssPath);
+        cleanupsPage.goTo();
+        cleanupsPage.assertItemPresent("default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_DELETE);
 
-        DeleteConfirmPage confirmPage = stagesPage.clickDelete("default");
+        DeleteConfirmPage confirmPage = cleanupsPage.clickDelete("default");
         confirmPage.waitFor();
         confirmPage.clickCancel();
 
-        stagesPage.waitFor();
-        stagesPage.assertItemPresent("default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_DELETE);
+        cleanupsPage.waitFor();
+        cleanupsPage.assertItemPresent("default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_DELETE);
     }
 
     public void testHideMapItemWithSkeletonDescendent() throws Exception
@@ -306,26 +306,26 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         String childName = random + "-child";
 
         String parentPath = xmlRpcHelper.insertSimpleProject(parentName, true);
-        String parentStagesPath = PathUtils.getPath(parentPath, "stages");
-        String parentStagePath = PathUtils.getPath(parentStagesPath, "default");
+        String parentCleanupsPath = PathUtils.getPath(parentPath, "cleanup");
+        String parentCleanupPath = PathUtils.getPath(parentCleanupsPath, "default");
         String childPath = xmlRpcHelper.insertSimpleProject(childName, parentName, false);
-        String childStagePath = PathUtils.getPath(childPath, "stages", "default");
+        String childCleanupPath = PathUtils.getPath(childPath, "cleanup", "default");
 
         loginAsAdmin();
 
-        ListPage stagesPage = new ListPage(selenium, urls, parentStagesPath);
-        stagesPage.goTo();
-        stagesPage.assertItemPresent("default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_DELETE);
+        ListPage cleanupsPage = new ListPage(selenium, urls, parentCleanupsPath);
+        cleanupsPage.goTo();
+        cleanupsPage.assertItemPresent("default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_DELETE);
 
-        DeleteConfirmPage confirmPage = stagesPage.clickDelete("default");
+        DeleteConfirmPage confirmPage = cleanupsPage.clickDelete("default");
         confirmPage.waitFor();
         assertTextPresent("Are you sure you wish to hide this record?");
-        confirmPage.assertTasks(parentStagePath, ACTION_HIDE_RECORD);
+        confirmPage.assertTasks(parentCleanupPath, ACTION_HIDE_RECORD);
         confirmPage.clickDelete();
 
-        stagesPage.waitFor();
-        stagesPage.assertItemPresent("default", ListPage.ANNOTATION_HIDDEN, ACTION_RESTORE);
-        assertFalse(xmlRpcHelper.configPathExists(childStagePath));
+        cleanupsPage.waitFor();
+        cleanupsPage.assertItemPresent("default", ListPage.ANNOTATION_HIDDEN, ACTION_RESTORE);
+        assertFalse(xmlRpcHelper.configPathExists(childCleanupPath));
     }
 
     public void testHideMapItemWithDescendentOverride() throws Exception
@@ -334,51 +334,51 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         String childName = random + "-child";
 
         String parentPath = xmlRpcHelper.insertSimpleProject(parentName, true);
-        String parentStagesPath = PathUtils.getPath(parentPath, "stages");
-        String parentStagePath = PathUtils.getPath(parentStagesPath, "default");
+        String parentCleanupsPath = PathUtils.getPath(parentPath, "cleanup");
+        String parentCleanupPath = PathUtils.getPath(parentCleanupsPath, "default");
         String childPath = xmlRpcHelper.insertSimpleProject(childName, parentName, false);
-        String childStagePath = PathUtils.getPath(childPath, "stages", "default");
-        Hashtable<String, Object> childStage = xmlRpcHelper.getConfig(childStagePath);
-        childStage.put("recipe", "edited");
-        xmlRpcHelper.saveConfig(childStagePath, childStage, false);
+        String childCleanupPath = PathUtils.getPath(childPath, "cleanup", "default");
+        Hashtable<String, Object> childCleanup = xmlRpcHelper.getConfig(childCleanupPath);
+        childCleanup.put("retain", 928);
+        xmlRpcHelper.saveConfig(childCleanupPath, childCleanup, false);
 
         loginAsAdmin();
 
-        ListPage stagesPage = new ListPage(selenium, urls, parentStagesPath);
-        stagesPage.goTo();
-        stagesPage.assertItemPresent("default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_DELETE);
+        ListPage cleanupsPage = new ListPage(selenium, urls, parentCleanupsPath);
+        cleanupsPage.goTo();
+        cleanupsPage.assertItemPresent("default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_DELETE);
 
-        DeleteConfirmPage confirmPage = stagesPage.clickDelete("default");
+        DeleteConfirmPage confirmPage = cleanupsPage.clickDelete("default");
         confirmPage.waitFor();
         assertTextPresent("Are you sure you wish to hide this record?");
-        confirmPage.assertTasks(parentStagePath, ACTION_HIDE_RECORD, childStagePath, ACTION_DELETE_RECORD);
+        confirmPage.assertTasks(parentCleanupPath, ACTION_HIDE_RECORD, childCleanupPath, ACTION_DELETE_RECORD);
         confirmPage.clickDelete();
 
-        stagesPage.waitFor();
-        stagesPage.assertItemPresent("default", ListPage.ANNOTATION_HIDDEN, ACTION_RESTORE);
-        assertFalse(xmlRpcHelper.configPathExists(childStagePath));
+        cleanupsPage.waitFor();
+        cleanupsPage.assertItemPresent("default", ListPage.ANNOTATION_HIDDEN, ACTION_RESTORE);
+        assertFalse(xmlRpcHelper.configPathExists(childCleanupPath));
     }
 
     public void testRestoreMapItem() throws Exception
     {
         String projectPath = xmlRpcHelper.insertSimpleProject(random, false);
-        String stagesPath = PathUtils.getPath(projectPath, "stages");
-        String stagePath = PathUtils.getPath(stagesPath, "default");
-        xmlRpcHelper.deleteConfig(stagePath);
+        String cleanupsPath = PathUtils.getPath(projectPath, "cleanup");
+        String cleanupPath = PathUtils.getPath(cleanupsPath, "default");
+        xmlRpcHelper.deleteConfig(cleanupPath);
 
         loginAsAdmin();
 
-        ListPage stagesPage = new ListPage(selenium, urls, stagesPath);
-        stagesPage.goTo();
-        stagesPage.assertItemPresent("default", ListPage.ANNOTATION_HIDDEN, ACTION_RESTORE);
-        stagesPage.expandTreeNode(stagesPath);
-        stagesPage.assertTreeLinkNotPresent("default");
+        ListPage cleanupsPage = new ListPage(selenium, urls, cleanupsPath);
+        cleanupsPage.goTo();
+        cleanupsPage.assertItemPresent("default", ListPage.ANNOTATION_HIDDEN, ACTION_RESTORE);
+        cleanupsPage.expandTreeNode(cleanupsPath);
+        cleanupsPage.assertTreeLinkNotPresent("default");
 
-        stagesPage.clickRestore("default");
-        stagesPage.waitFor();
-        stagesPage.assertItemPresent("default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_DELETE);
-        stagesPage.expandTreeNode(stagesPath);
-        stagesPage.assertTreeLinkPresent("default");
+        cleanupsPage.clickRestore("default");
+        cleanupsPage.waitFor();
+        cleanupsPage.assertItemPresent("default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_DELETE);
+        cleanupsPage.expandTreeNode(cleanupsPath);
+        cleanupsPage.assertTreeLinkPresent("default");
     }
 
     public void testHideListItem() throws Exception
