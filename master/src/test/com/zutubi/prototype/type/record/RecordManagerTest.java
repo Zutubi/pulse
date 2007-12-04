@@ -344,6 +344,14 @@ public class RecordManagerTest extends PulseTestCase
         }
     }
 
+    public void testCopyDoesNotDuplicateHandles()
+    {
+        recordManager.insert("r1", new MutableRecordImpl());
+        recordManager.copy("r1", "r2");
+
+        assertTrue(recordManager.select("r1").getHandle() != recordManager.select("r2").getHandle());
+    }
+
     public void testHandleMap()
     {
         recordManager.insert("r1", new MutableRecordImpl());
