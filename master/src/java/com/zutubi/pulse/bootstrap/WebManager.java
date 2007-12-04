@@ -5,18 +5,10 @@ import com.opensymphony.xwork.config.ConfigurationManager;
 import com.opensymphony.xwork.config.providers.XmlConfigurationProvider;
 
 /**
- * <class-comment/>
  */
 public class WebManager
 {
     private JettyManager jettyManager;
-
-    public void deployStartup()
-    {
-        ensureJettyStarted();
-
-        loadXworkConfiguration("xwork-startup.xml");
-    }
 
     public void deployShutdown()
     {
