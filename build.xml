@@ -101,6 +101,7 @@
         <!-- clean out the user.home/.pulse/* directory -->
         <delete dir="${user.home}/.pulse"/>        
         <delete dir="${user.home}/.pulse2"/>        
+        <delete dir="${user.home}/.pulse-agent"/>
     </target>
 
     <!--
@@ -552,7 +553,13 @@
         <property file="ivy.properties"/>
         <ivy:configure/>
         
-        <retrieve-dependencies ivyfile="package/core/ivy.xml" conf="equinox-bundles" dest="plugins/internal"/>        
+        <retrieve-dependencies ivyfile="package/core/ivy.xml" conf="equinox-bundles" dest="plugins/internal"/>
+
+        <echo message=""/>
+        <echo message="====================================================================="/>
+        <echo message="IMPORTANT:"/>
+        <echo message="   Now run the bundles/build.xml idea.prepare.prepackaged ant target"/>
+
     </target>
 
     <macrodef name="build-package-deps">
