@@ -55,7 +55,7 @@
 
     #parse("/template/includes/actionerrors.vm")
 
-#wwcform("action=setupLicense.action" "heading=%{getText('license.setup')}" "name=setup.license" "method=post")
+#wwcform("action=setupLicense" "heading=%{getText('license.setup')}" "name=setup.license" "method=post")
 
     #wwtextarea("name=license" "labelCssClass=textarea" "label=%{getText('license.key.field')}" "required=true" "rows=10" "cols=65" "tabindex=1")
     #inlineHelp("license.help")

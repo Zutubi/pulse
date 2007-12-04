@@ -31,7 +31,7 @@
                         #end
                     #end
                     <tr>
-                        <form action="addExcludedPath.action" id="scm.filter.excluded.add" method="post">
+                        <form action="addExcludedPath" id="scm.filter.excluded.add" method="post">
                             #wwhidden("name=id")
                             #wwhidden("name=projectId")
                         <td  class="content">

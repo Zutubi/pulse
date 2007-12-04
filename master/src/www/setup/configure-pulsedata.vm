@@ -18,7 +18,7 @@
 <p>&nbsp;</p>
     #parse("/template/includes/actionerrors.vm")
 
-#wwcform("action=setupData.action" "heading=%{getText('data.setup')}" "name=setup.data" "method=post")
+#wwcform("action=setupData" "heading=%{getText('data.setup')}" "name=setup.data" "method=post")
     #wwtextfield("name=data" "required=true" "label=%{getText('data.field')}" "size=60" "tabindex=1"  "after= <a href='#' onclick='return openBrowseFileDialog();'>browse</a>"  "onkeypress=return submitenter(this,event);")
     #inlineHelp("data.help")
     #next(2)

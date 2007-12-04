@@ -8,7 +8,7 @@
 
     #parse("/template/includes/actionerrors.vm")
 
-#wwcform("action=setupWizard.action" "heading=%{getText('admin.create')}" "name=admin.create" "method=post")
+#wwcform("action=setupWizard" "heading=%{getText('admin.create')}" "name=admin.create" "method=post")
     #wwhidden("name=state")
     #wwhidden("name=submit")
 
