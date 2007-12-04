@@ -11,29 +11,51 @@ import java.util.List;
  */
 public interface Plugin
 {
+    /**
+     * The state of the plugin within its lifecycle. 
+     */
     public enum State
     {
+        /**
+         * An installed plugin has been registered with the plugin registry and is available
+         * for startup.  All plugins must be installed before they can be enabled.
+         *
+         * The installed state differs from the Equinox installed state in that an installed
+         * plugin is not necessarily known to equinox. 
+         */
         INSTALLED,
+
         /**
          * The plugin is loaded and available for use.
          */
         ENABLED,
+
         /**
-         * The plugin is currently disabled: it is not loaded or available
-         * for use, but remains on disk.
+         * The plugin is currently disabled: it is not loaded or available for use, but
+         * remains on disk.
          */
         DISABLED,
+
+        /**
+         * The plugin has been uninstalled, and is no longer available for use.
+         *
+         * The primary purpose of this state is to remember which plugins have been
+         * uninstalled in the past
+         */
         UNINSTALLED,
+
         VERSION_CHANGE,
         
         /**
          * The plugin will be uninstalled on restart, and is no longer valid.
          */
         UNINSTALLING,
+
         /**
          * The plugin will be disabled on restart, and is no longer valid.
          */
         DISABLING,
+
         /**
          * A new version of the plugin is ready to install, the current
          * version should be removed.
