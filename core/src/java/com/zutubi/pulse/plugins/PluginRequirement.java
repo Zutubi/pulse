@@ -1,5 +1,7 @@
 package com.zutubi.pulse.plugins;
 
+import com.zutubi.pulse.plugins.VersionRange;
+
 /**
  * Stores information about a dependency requirement of a plugin on another
  * plugin.

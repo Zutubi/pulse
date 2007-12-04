@@ -3,53 +3,128 @@ package com.zutubi.pulse.plugins;
 import java.io.File;
 
 /**
- * An implementation of PluginPaths that is fully configurable: used to set
- * up paths for within a development environment.
+ *
+ *
  */
 public class ConfigurablePluginPaths implements PluginPaths
 {
-    private File pluginConfigurationRoot;
-    private File internalPluginRoot;
-    private File prepackagedPluginRoot;
-    private File userPluginRoot;
+    private File internalPluginStorageDir;
+    private File pluginStorageDir;
+    private File pluginWorkDir;
+    private File pluginRegistryDir;
+    private File osgiConfigurationDir;
+    private File prepackagedPluginStorageDir;
 
-    public File getPluginConfigurationRoot()
+    /**
+     * The internal plugin storage directory is the location of pulses' internal plugins, those that come
+     * bundled with pulse. 
+     *
+     * @return
+     */
+    public File getInternalPluginStorageDir()
     {
-        return pluginConfigurationRoot;
+        return internalPluginStorageDir;
     }
 
-    public void setPluginConfigurationRootString(String pluginConfigurationRoot)
+    public void setInternalPluginStorageString(String internalPluginStorageDir)
     {
-        this.pluginConfigurationRoot = new File(pluginConfigurationRoot);
+        this.internalPluginStorageDir = new File(internalPluginStorageDir);
     }
 
-    public File getInternalPluginRoot()
+    public void setInternalPluginStorageDir(File internalPluginStorageDir)
     {
-        return internalPluginRoot;
+        this.internalPluginStorageDir = internalPluginStorageDir;
     }
 
-    public void setInternalPluginRootString(String internalPluginRoot)
+    /**
+     * The plugin storage directory is the directory in which all but the internal plugins are stored.  This
+     * includes pre-packaged plugins and manually installed plugins.
+     *
+     * @return
+     */
+    public File getPluginStorageDir()
     {
-        this.internalPluginRoot = new File(internalPluginRoot);
+        return pluginStorageDir;
     }
 
-    public File getPrepackagedPluginRoot()
+    public void setPluginStorageString(String pluginStorageDir)
     {
-        return prepackagedPluginRoot;
+        this.pluginStorageDir = new File(pluginStorageDir);
     }
 
-    public void setPrepackagedPluginRootString(String prepackagedPluginRoot)
+    public void setPluginStorageDir(File pluginStorageDir)
     {
-        this.prepackagedPluginRoot = new File(prepackagedPluginRoot);
+        this.pluginStorageDir = pluginStorageDir;
     }
 
-    public File getUserPluginRoot()
+    /**
+     * The plugin work directory is a scratch directory into which temporary files can be written.  For example,
+     * when a plugin is upgraded, the upgrade will be downloaded into the working directory, and installed on restart.
+     *
+     * @return
+     */
+    public File getPluginWorkDir()
     {
-        return userPluginRoot;
+        return pluginWorkDir;
     }
 
-    public void setUserPluginRootString(String userPluginRoot)
+    public void setPluginWorkString(String pluginWorkDir)
     {
-        this.userPluginRoot = new File(userPluginRoot);
+        this.pluginWorkDir = new File(pluginWorkDir);
+    }
+
+    public void setPluginWorkDir(File pluginWorkDir)
+    {
+        this.pluginWorkDir = pluginWorkDir;
+    }
+
+    /**
+     * The plugin registry directory is the directory in which the plugin registry is stored.
+     *
+     * @return
+     */
+    public File getPluginRegistryDir()
+    {
+        return pluginRegistryDir;
+    }
+
+    public void setPluginRegistryString(String pluginRegistryDir)
+    {
+        this.pluginRegistryDir = new File(pluginRegistryDir);
+    }
+
+    public void setPluginRegistryDir(File pluginRegistryDir)
+    {
+        this.pluginRegistryDir = pluginRegistryDir;
+    }
+
+    public File getOsgiConfigurationDir()
+    {
+        return osgiConfigurationDir;
+    }
+
+    public void setOsgiConfigurationString(String osgiConfigurationDir)
+    {
+        this.osgiConfigurationDir = new File(osgiConfigurationDir);
+    }
+
+    public void setOsgiConfigurationDir(File osgiConfigurationDir)
+    {
+        this.osgiConfigurationDir = osgiConfigurationDir;
+    }
+
+    public File getPrepackagedPluginStorageDir()
+    {
+        return prepackagedPluginStorageDir;
+    }
+
+    public void setPrepackagedPluginStorageString(String prepackagedPluginStorageDir)
+    {
+        this.prepackagedPluginStorageDir = new File(prepackagedPluginStorageDir);
+    }
+
+    public void setPrepackagedPluginStorageDir(File prepackagedPluginStorageDir)
+    {
+        this.prepackagedPluginStorageDir = prepackagedPluginStorageDir;
     }
 }

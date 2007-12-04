@@ -19,7 +19,7 @@ public class UnInstallPluginAction extends PluginActionSupport
         Plugin plugin = pluginManager.getPlugin(id);
         if (plugin != null)
         {
-            pluginManager.uninstallPlugin(plugin);
+            plugin.uninstall();
         }
 
         return SUCCESS;

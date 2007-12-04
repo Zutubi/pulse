@@ -20,7 +20,11 @@
 
     <bean id="configurationManager" class="com.zutubi.pulse.slave.SlaveConfigurationManager" init-method="init"/>
 
-    <bean id="pluginPaths" class="com.zutubi.pulse.bootstrap.ServerPluginPaths" autowire="byName"/>
+    <bean id="pluginPaths" class="com.zutubi.pulse.bootstrap.ServerPluginPaths" autowire="byName">
+        <property name="configurationManager">
+            <ref local="configurationManager"/>
+        </property>
+    </bean>
     
     <bean id="objectFactory" class="com.zutubi.pulse.spring.SpringObjectFactory"/>
 

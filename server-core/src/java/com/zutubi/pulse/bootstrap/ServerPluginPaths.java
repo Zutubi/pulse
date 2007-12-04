@@ -16,6 +16,10 @@ public class ServerPluginPaths implements PluginPaths
     private File prepackagedPluginRoot;
     private File userPluginRoot;
 
+    public void init()
+    {
+    }
+
     private File getSystemPluginRoot()
     {
         if(systemPluginRoot == null)
@@ -25,7 +29,8 @@ public class ServerPluginPaths implements PluginPaths
         return systemPluginRoot;
     }
 
-    public File getPluginConfigurationRoot()
+
+    public File getOsgiConfigurationDir()
     {
         if(pluginConfigurationRoot == null)
         {
@@ -34,7 +39,7 @@ public class ServerPluginPaths implements PluginPaths
         return pluginConfigurationRoot;
     }
 
-    public File getInternalPluginRoot()
+    public File getInternalPluginStorageDir()
     {
         if(internalPluginRoot == null)
         {
@@ -43,7 +48,7 @@ public class ServerPluginPaths implements PluginPaths
         return internalPluginRoot;
     }
 
-    public File getPrepackagedPluginRoot()
+    public File getPrepackagedPluginStorageDir()
     {
         if(prepackagedPluginRoot == null)
         {
@@ -52,17 +57,31 @@ public class ServerPluginPaths implements PluginPaths
         return prepackagedPluginRoot;
     }
 
-    public File getUserPluginRoot()
+    public File getPluginStorageDir()
     {
         if(userPluginRoot == null)
         {
-            File dataDir = configurationManager.getUserPaths().getData();
-            if (dataDir != null)
+            UserPaths userPaths = configurationManager.getUserPaths();
+            if (userPaths != null)
             {
-                userPluginRoot = new File(dataDir, "plugins");
+                File dataDir = userPaths.getData();
+                if (dataDir != null)
+                {
+                    userPluginRoot = new File(dataDir, "plugins");
+                }
             }
         }
         return userPluginRoot;
+    }
+
+    public File getPluginRegistryDir()
+    {
+        return getPluginStorageDir();
+    }
+
+    public File getPluginWorkDir()
+    {
+        return configurationManager.getSystemPaths().getTmpRoot();
     }
 
     public void setConfigurationManager(ConfigurationManager configurationManager)

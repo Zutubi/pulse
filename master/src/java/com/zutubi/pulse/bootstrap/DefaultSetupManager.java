@@ -6,6 +6,7 @@ import com.zutubi.prototype.config.*;
 import com.zutubi.prototype.type.record.DelegatingHandleAllocator;
 import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.pulse.Version;
+import com.zutubi.pulse.plugins.PluginManager;
 import com.zutubi.pulse.bootstrap.conf.EnvConfig;
 import com.zutubi.pulse.config.PropertiesWriter;
 import com.zutubi.pulse.events.DataDirectoryLocatedEvent;
@@ -307,6 +308,7 @@ public class DefaultSetupManager implements SetupManager
     private void initialiseConfigurationPersistence()
     {
         RecordManager recordManager = ComponentContext.getBean("recordManager");
+        PluginManager pluginManager = ComponentContext.getBean("pluginManager");
         DelegatingHandleAllocator handleAllocator = ComponentContext.getBean("handleAllocator");
         ConfigurationPersistenceManager configurationPersistenceManager = ComponentContext.getBean("configurationPersistenceManager");
         ConfigurationReferenceManager configurationReferenceManager = ComponentContext.getBean("configurationReferenceManager");
@@ -316,12 +318,16 @@ public class DefaultSetupManager implements SetupManager
         DefaultConfigurationProvider configurationProvider = ComponentContext.getBean("configurationProvider");
 
         recordManager.init();
+
         handleAllocator.setDelegate(recordManager);
         configurationPersistenceManager.setRecordManager(recordManager);
         configurationReferenceManager.setRecordManager(recordManager);
         configurationTemplateManager.setRecordManager(recordManager);
         configurationRegistry.init();
+
+        configurationExtensionManager.setPluginManager(pluginManager);
         configurationExtensionManager.init();
+
         configurationTemplateManager.init();
         configurationProvider.init();
         this.configurationProvider = configurationProvider;

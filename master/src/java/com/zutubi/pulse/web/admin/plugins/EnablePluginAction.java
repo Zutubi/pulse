@@ -19,7 +19,7 @@ public class EnablePluginAction extends PluginActionSupport
         Plugin plugin = pluginManager.getPlugin(id);
         if (plugin != null)
         {
-            pluginManager.enablePlugin(plugin);
+            plugin.enable();
         }
 
         return SUCCESS;

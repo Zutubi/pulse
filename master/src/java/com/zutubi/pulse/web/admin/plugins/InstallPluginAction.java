@@ -164,7 +164,11 @@ public class InstallPluginAction extends PluginActionSupport
 
         try
         {
-            pluginManager.installPlugin(fileNames[0], files[0].toURI().toURL());
+//<<<<<<< .mine
+            pluginManager.install(files[0].toURI(), fileNames[0], true);
+//=======
+//            pluginManager.installPlugin(fileNames[0], files[0].toURI().toURL());
+//>>>>>>> .r3997
         }
         catch (Exception e)
         {
@@ -200,7 +204,11 @@ public class InstallPluginAction extends PluginActionSupport
 
         try
         {
-            pluginManager.installPlugin(pluginFile.toURI().toURL());
+//<<<<<<< .mine
+            pluginManager.install(pluginFile.toURI());
+//=======
+//            pluginManager.installPlugin(pluginFile.toURI().toURL());
+//>>>>>>> .r3997
         }
         catch (Exception e)
         {

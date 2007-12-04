@@ -5,7 +5,6 @@
     <bean id="setupManager" class="com.zutubi.pulse.bootstrap.DefaultSetupManager" autowire="byName">
         <property name="configContexts">
             <list>
-                <value>classpath:/com/zutubi/pulse/bootstrap/context/pluginContext.xml</value>
                 <value>classpath:/com/zutubi/pulse/bootstrap/context/configContext.xml</value>
             </list>
         </property>
@@ -15,10 +14,13 @@
                 <value>classpath:/com/zutubi/pulse/bootstrap/context/databaseContext.xml</value>
                 <value>classpath:/com/zutubi/pulse/bootstrap/context/hibernateContext.xml</value>
                 <value>classpath:/com/zutubi/pulse/bootstrap/context/cacheContext.xml</value>
+                <value>classpath:/com/zutubi/pulse/bootstrap/context/pluginContext.xml</value>
             </list>
         </property>
         <property name="licenseContexts">
-            <value>classpath:/com/zutubi/pulse/bootstrap/context/licenseContext.xml</value>
+            <list>
+                <value>classpath:/com/zutubi/pulse/bootstrap/context/licenseContext.xml</value>
+            </list>
         </property>
         <property name="upgradeContexts">
             <list>

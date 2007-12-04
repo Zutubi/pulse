@@ -72,6 +72,12 @@ public class ScmExtensionManager extends AbstractExtensionManager
             catch (Exception e)
             {
                 LOG.severe(e);
+                handleExtensionError(extension, e);
+            }
+            catch (NoClassDefFoundError e)
+            {
+                LOG.severe(e);
+                handleExtensionError(extension, e);
             }
         }
     }
@@ -79,6 +85,7 @@ public class ScmExtensionManager extends AbstractExtensionManager
     public void removeExtension(IExtension extension, Object[] objects)
     {
         // Uninstall not currently supported
+        System.out.println("extension removed: " + extension.getContributor().getName());
     }
 
     public void setScmClientFactory(DelegateScmClientFactory clientFactory)

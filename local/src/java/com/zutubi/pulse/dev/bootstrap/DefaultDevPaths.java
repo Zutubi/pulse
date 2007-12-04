@@ -54,7 +54,7 @@ public class DefaultDevPaths implements DevPaths
         return systemPluginRoot;
     }
 
-    public File getPluginConfigurationRoot()
+    public File getOsgiConfigurationDir()
     {
         if(pluginConfigurationRoot == null)
         {
@@ -63,7 +63,7 @@ public class DefaultDevPaths implements DevPaths
         return pluginConfigurationRoot;
     }
 
-    public File getInternalPluginRoot()
+    public File getInternalPluginStorageDir()
     {
         if(internalPluginRoot == null)
         {
@@ -72,7 +72,7 @@ public class DefaultDevPaths implements DevPaths
         return internalPluginRoot;
     }
 
-    public File getPrepackagedPluginRoot()
+    public File getPrepackagedPluginStorageDir()
     {
         if(prepackagedPluginRoot == null)
         {
@@ -81,12 +81,23 @@ public class DefaultDevPaths implements DevPaths
         return prepackagedPluginRoot;
     }
 
-    public File getUserPluginRoot()
+    public File getPluginStorageDir()
     {
         if(userPluginRoot == null)
         {
             userPluginRoot = new File(getUserRoot(), "plugins");
         }
         return userPluginRoot;
+    }
+
+    public File getPluginRegistryDir()
+    {
+        return getPluginStorageDir();
+    }
+
+    public File getPluginWorkDir()
+    {
+        // not sure where this should point? just need some scratch space. Any temp directory would suit.
+        return null;
     }
 }

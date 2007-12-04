@@ -8,4 +8,13 @@
         <property name="userPluginRootString" value="user/plugins"/>
         <property name="userRootString" value="user"/>
     </bean>
+
+    <bean id="pluginPaths" class="com.zutubi.pulse.plugins.ConfigurablePluginPaths">
+        <property name="internalPluginStorageString" value="plugins/internal"/>
+        <property name="osgiConfigurationString" value="master/etc/osgi"/>
+        <property name="pluginRegistryString" value="plugins"/>
+        <property name="pluginStorageString" value="plugins/prepackaged"/>
+        <property name="pluginWorkString" value="plugins/work"/>
+    </bean>
+
 </beans>

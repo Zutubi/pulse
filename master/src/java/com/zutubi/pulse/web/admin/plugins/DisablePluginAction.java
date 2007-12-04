@@ -19,7 +19,7 @@ public class DisablePluginAction extends PluginActionSupport
         Plugin plugin = pluginManager.getPlugin(id);
         if (plugin != null)
         {
-            pluginManager.disablePlugin(plugin);
+            plugin.disable();
         }
 
         return SUCCESS;

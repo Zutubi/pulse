@@ -9,6 +9,10 @@ import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 import org.eclipse.core.runtime.dynamichelpers.IFilter;
 import org.osgi.framework.Bundle;
 
+import com.zutubi.pulse.plugins.PluginManager;
+import com.zutubi.pulse.plugins.Plugin;
+import com.zutubi.pulse.plugins.LocalPlugin;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -30,12 +34,15 @@ public abstract class AbstractExtensionManager implements IExtensionChangeHandle
 
     public void initialiseExtensions()
     {
-        IExtensionRegistry registry = pluginManager.getExtenstionRegistry();
-        IExtensionTracker tracker = pluginManager.getExtenstionTracker();
+        IExtensionRegistry registry = pluginManager.getExtensionRegistry();
+        IExtensionTracker tracker = pluginManager.getExtensionTracker();
 
         IExtensionPoint extensionPoint = registry.getExtensionPoint(getExtensionPointId());
         if(extensionPoint == null)
         {
+            // check that the MANIFEST.MF files are being copied into the classpath. ie:
+            // ensure that IDEA treating *.mf files are resources that need to be copied into the
+            // classes directory.
             LOG.severe("Extension point '" + getExtensionPointId() + "' not found.");
             return;
         }
@@ -100,8 +107,11 @@ public abstract class AbstractExtensionManager implements IExtensionChangeHandle
         try
         {
             // Record the error for the UI.
-            Plugin plugin = pluginManager.getPlugin(extension);
-            pluginManager.disablePlugin(plugin, message);
+            Plugin plugin = getPlugin(extension);
+            if (plugin != null)
+            {
+                plugin.disable(message);
+            }
         }
         catch (Throwable e)
         {
@@ -123,7 +133,7 @@ public abstract class AbstractExtensionManager implements IExtensionChangeHandle
     protected List<IConfigurationElement> getConfigElements(IExtension extension)
     {
         List<IConfigurationElement> configElements = new LinkedList<IConfigurationElement>();
-        IExtensionRegistry registry = pluginManager.getExtenstionRegistry();
+        IExtensionRegistry registry = pluginManager.getExtensionRegistry();
         IExtension[] bundleExtensions = registry.getExtensions(extension.getNamespaceIdentifier());
         for (IExtension candidate : bundleExtensions)
         {
@@ -137,6 +147,26 @@ public abstract class AbstractExtensionManager implements IExtensionChangeHandle
         }
 
         return configElements;
+    }
+
+    private Plugin getPlugin(IExtension extension)
+    {
+        if (!extension.isValid())
+        {
+            return null;
+        }
+        Bundle bundle = OSGIUtils.getDefault().getBundle(extension.getNamespaceIdentifier());
+        long requiredBundleId = bundle.getBundleId();
+
+        for (Plugin plugin : pluginManager.getPlugins())
+        {
+            LocalPlugin localPlugin = (LocalPlugin) plugin;
+            if (localPlugin.bundle.getBundleId() == requiredBundleId)
+            {
+                return plugin;
+            }
+        }
+        return null;
     }
 
     public void setPluginManager(PluginManager pluginManager)

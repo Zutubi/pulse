@@ -1,9 +1,9 @@
 package com.zutubi.pulse.web.admin.plugins;
 
-import com.zutubi.pulse.web.ActionSupport;
-import com.zutubi.pulse.web.LookupErrorException;
 import com.zutubi.pulse.plugins.Plugin;
 import com.zutubi.pulse.plugins.PluginRequirement;
+import com.zutubi.pulse.plugins.LocalPlugin;
+import com.zutubi.pulse.web.LookupErrorException;
 
 import java.util.List;
 
@@ -31,22 +31,26 @@ public class ViewPluginAction extends PluginActionSupport
 
     public List<PluginRequirement> getRequiredPlugins()
     {
-        return pluginManager.getRequiredPlugins(plugin);
+        // this only works for installed plugins.
+        LocalPlugin installedPlugin = (LocalPlugin) plugin;
+        return installedPlugin.getRequiredPlugins();
     }
 
     public List<Plugin> getDependentPlugins()
     {
-        return pluginManager.getDependentPlugins(plugin);
+        // this only works for installed plugins.
+        LocalPlugin installedPlugin = (LocalPlugin) plugin;
+        return installedPlugin.getDependentPlugins();
     }
 
     public String execute() throws Exception
     {
         plugin = pluginManager.getPlugin(id);
-        if(plugin == null)
+        if (plugin == null)
         {
             throw new LookupErrorException("Unknown plugin [" + id + "]");
         }
-        
+
         return SUCCESS;
     }
 }

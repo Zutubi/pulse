@@ -4,7 +4,7 @@
     <import resource="classpath:/com/zutubi/pulse/bootstrap/context/eventContext.xml"/>
     <import resource="classpath:/com/zutubi/pulse/bootstrap/context/pluginContext.xml"/>
 
-    <alias name="devPaths" alias="pluginPaths"/>
+    <!--<alias name="devPaths" alias="pluginPaths"/>-->
 
     <bean id="recipeProcessor" class="com.zutubi.pulse.core.RecipeProcessor" autowire="byName" init-method="init"/>
 

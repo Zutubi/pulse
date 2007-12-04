@@ -114,15 +114,14 @@ public class DefaultFeatureManager implements FeatureManager
         else
         {
             Plugin p = pluginManager.getPlugin(requirement.getId());
-            String versionString = p.getVersion();
+            Version v = p.getVersion();
             try
             {
-                Version v = new Version(versionString);
                 return p != null && requirement.satisfied(v);
             }
             catch(IllegalArgumentException e)
             {
-                LOG.warning("Unable to parse version '" + versionString + "' for plugin '" + p.getName() + "': " + e.getMessage());
+                LOG.warning("Unable to parse version '" + v.toString() + "' for plugin '" + p.getName() + "': " + e.getMessage());
                 return false;
             }
         }
