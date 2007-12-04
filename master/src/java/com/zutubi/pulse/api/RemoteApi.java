@@ -23,9 +23,9 @@ import com.zutubi.pulse.scm.SCMException;
 import com.zutubi.pulse.scm.SCMServer;
 import com.zutubi.pulse.scm.SCMServerUtils;
 import com.zutubi.pulse.util.OgnlUtils;
+import com.zutubi.pulse.util.StringUtils;
 import com.zutubi.pulse.util.TimeStamps;
 import com.zutubi.pulse.util.UnaryFunction;
-import com.zutubi.pulse.util.StringUtils;
 import com.zutubi.pulse.validation.PulseValidationContext;
 import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.ValidationException;
@@ -501,15 +501,22 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
     public Vector<Hashtable<String, Object>> getChangesInBuild(String token, String projectName, int id) throws AuthenticationException
     {
         tokenManager.verifyUser(token);
-        Project project = internalGetProject(projectName);
-        BuildResult build = internalGetBuild(project, id);
 
-        List<Changelist> changelists = buildManager.getChangesForBuild(build);
-        Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(changelists.size());
-        for(Changelist change: changelists)
+        Project project = internalGetProject(projectName);
+        final BuildResult build = internalGetBuild(project, id);
+        final Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>();
+
+        buildManager.executeInTransaction(new Runnable()
         {
-            result.add(convertChangelist(change));
-        }
+            public void run()
+            {
+                List<Changelist> changelists = buildManager.getChangesForBuild(build);
+                for(Changelist change: changelists)
+                {
+                    result.add(convertChangelist(change));
+                }
+            }
+        });
 
         return result;
     }
