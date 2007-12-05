@@ -29,17 +29,13 @@ public abstract class TransactionalWrapper<T> implements TransactionResource
     {
         // ensure that we are part of the transaction.
         boolean activeTransaction = transactionManager.getTransaction() != null;
-        if (activeTransaction)
-        {
-            // join existing transaction.
-            transactionManager.getTransaction().enlistResource(this);
-        }
-        else
+        if (!activeTransaction)
         {
             // execute a manual transaction.
             transactionManager.begin();
-            transactionManager.getTransaction().enlistResource(this);
         }
+
+        transactionManager.getTransaction().enlistResource(this);
 
         T writeableState = threadlocal.get();
         if (writeableState == null)
@@ -48,13 +44,45 @@ public abstract class TransactionalWrapper<T> implements TransactionResource
             threadlocal.set(writeableState);
         }
 
-        Object result = action.execute(writeableState);
         if (!activeTransaction)
         {
-            // execute a manual transaction.
-            transactionManager.commit();
+            try
+            {
+                Object result = action.execute(writeableState);
+
+                // execute a manual transaction.
+                transactionManager.commit();
+
+                return result;
+            }
+            catch (RuntimeException e)
+            {
+                transactionManager.rollback();
+                throw e;
+            }
+            catch (Throwable t)
+            {
+                transactionManager.rollback();
+                throw new RuntimeException(t);
+            }
         }
-        return result;
+        else
+        {
+            try
+            {
+                return action.execute(writeableState);
+            }
+            catch (RuntimeException e)
+            {
+                transactionManager.setRollbackOnly();
+                throw e;
+            }
+            catch (Throwable t)
+            {
+                transactionManager.setRollbackOnly();
+                throw new RuntimeException(t);
+            }
+        }
     }
 
     //---( transactional resource implementation )---

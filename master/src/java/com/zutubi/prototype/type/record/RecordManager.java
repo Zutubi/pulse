@@ -326,10 +326,11 @@ public class RecordManager implements HandleAllocator
      */
     public synchronized Record move(String sourcePath, String destinationPath)
     {
+        checkPath(destinationPath);
+
         Record record = delete(sourcePath);
         if (record != null)
         {
-            checkPath(destinationPath);
             record = insert(destinationPath, record);
         }
         return record;
