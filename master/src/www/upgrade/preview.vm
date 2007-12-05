@@ -49,7 +49,7 @@
     Please be aware that pulse can not continue without running these upgrade tasks.  If you do not wish to continue with
     this upgrade, shutdown this installation of pulse.  Otherwise, please click continue to run the upgrade.
 </p>
-#wwform("action=execute.action" "method=post")
+#wwform("action=execute" "method=post")
 #continue(1)
 #end
 
