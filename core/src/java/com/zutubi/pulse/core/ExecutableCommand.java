@@ -2,9 +2,9 @@ package com.zutubi.pulse.core;
 
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
-import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.jni.ProcessControl;
 import com.zutubi.pulse.util.*;
 import com.zutubi.validation.annotations.Required;
@@ -44,7 +44,7 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
         File workingDir = getWorkingDir(context.getPaths());
         ProcessBuilder builder = new ProcessBuilder(constructCommand(workingDir));
         builder.directory(workingDir);
-        updateChildEnvironment(builder, context);
+        updateChildEnvironment(builder);
 
         builder.redirectErrorStream(true);
 
@@ -317,14 +317,10 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
         Map<String, String> env = new TreeMap<String, String>(builder.environment());
         for (String key : env.keySet())
         {
-            String value;
+            String value = env.get(key);
             if(suppressedEnvironment.contains(key.toUpperCase()))
             {
                 value = SUPPRESSED_VALUE;
-            }
-            else
-            {
-                value = env.get(key);
             }
             buffer.append(key).append("=").append(value).append(separator);
         }
@@ -336,7 +332,12 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
         {
             for (Map.Entry<String, String> setting : scope.getEnvironment().entrySet())
             {
-                buffer.append(setting.getKey()).append("=").append(setting.getValue()).append(separator);
+                String value = setting.getValue();
+                if (suppressedEnvironment.contains(setting.getKey().toUpperCase()))
+                {
+                    value = SUPPRESSED_VALUE;
+                }
+                buffer.append(setting.getKey()).append("=").append(value).append(separator);
             }
         }
         else
@@ -435,7 +436,7 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
         }
     }
 
-    private void updateChildEnvironment(ProcessBuilder builder, CommandContext context)
+    private void updateChildEnvironment(ProcessBuilder builder)
     {
         Map<String, String> childEnvironment = builder.environment();
 
@@ -491,6 +492,11 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
             return false;
         }
 
+        if(suppressedEnvironment.contains(name))
+        {
+            return false;
+        }
+        
         if (SystemUtils.IS_WINDOWS)
         {
             return name.matches("[-a-zA-Z._0-9<>|&^% ]+");

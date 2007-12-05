@@ -35,8 +35,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  *
@@ -246,26 +244,30 @@ public class BuildController implements EventListener
             throw new BuildException("Insufficient database space to run build.  Consider adding more cleanup rules to remove old build information");
         }
 
-        // check project configuration to determine which bootstrap configuration should be used.
-        Bootstrapper initialBootstrapper;
-        boolean checkoutOnly = request.isPersonal() || specification.getCheckoutScheme() == BuildSpecification.CheckoutScheme.CLEAN_CHECKOUT;
-        if (checkoutOnly)
-        {
-            initialBootstrapper = new CheckoutBootstrapper(project.getName(), specification.getName(), project.getScm(), request.getRevision(), false);
-            if (request.isPersonal())
-            {
-                initialBootstrapper = createPersonalBuildBootstrapper(initialBootstrapper);
-            }
-        }
-        else
-        {
-            initialBootstrapper = new ProjectRepoBootstrapper(project.getName(), specification.getName(), project.getScm(), request.getRevision());
-        }
-
         tree.prepare(buildResult);
 
         // execute the first level of recipe controllers...
-        initialiseNodes(initialBootstrapper, tree.getRoot().getChildren());
+        initialiseNodes(new BootstrapperCreator()
+        {
+            public Bootstrapper create()
+            {
+                Bootstrapper initialBootstrapper;
+                boolean checkoutOnly = request.isPersonal() || specification.getCheckoutScheme() == BuildSpecification.CheckoutScheme.CLEAN_CHECKOUT;
+                if (checkoutOnly)
+                {
+                    initialBootstrapper = new CheckoutBootstrapper(project.getName(), specification.getName(), project.getScm(), request.getRevision(), false);
+                    if (request.isPersonal())
+                    {
+                        initialBootstrapper = createPersonalBuildBootstrapper(initialBootstrapper);
+                    }
+                }
+                else
+                {
+                    initialBootstrapper = new ProjectRepoBootstrapper(project.getName(), specification.getName(), project.getScm(), request.getRevision());
+                }
+                return initialBootstrapper;
+            }
+        }, tree.getRoot().getChildren());
     }
 
     private Bootstrapper createPersonalBuildBootstrapper(Bootstrapper initialBootstrapper)
@@ -357,7 +359,7 @@ public class BuildController implements EventListener
         }
     }
 
-    private void initialiseNodes(Bootstrapper bootstrapper, List<TreeNode<RecipeController>> nodes)
+    private void initialiseNodes(BootstrapperCreator creator, List<TreeNode<RecipeController>> nodes)
     {
         // Important to add them all first as a failure during initialisation
         // will test if there are other executing controllers (if not the
@@ -369,7 +371,7 @@ public class BuildController implements EventListener
 
         for (TreeNode<RecipeController> node : nodes)
         {
-            node.getData().initialise(bootstrapper);
+            node.getData().initialise(creator.create());
             checkNodeStatus(node);
         }
     }
@@ -574,7 +576,7 @@ public class BuildController implements EventListener
 
     private void checkNodeStatus(TreeNode<RecipeController> node)
     {
-        RecipeController controller = node.getData();
+        final RecipeController controller = node.getData();
 
         if (controller.isFinished())
         {
@@ -584,7 +586,13 @@ public class BuildController implements EventListener
             RecipeResult result = controller.getResult();
             if (result.succeeded())
             {
-                initialiseNodes(controller.getChildBootstrapper(), node.getChildren());
+                initialiseNodes(new BootstrapperCreator()
+                {
+                    public Bootstrapper create()
+                    {
+                        return controller.getChildBootstrapper();
+                    }
+                }, node.getChildren());
             }
             else if (result.failed())
             {
@@ -665,5 +673,10 @@ public class BuildController implements EventListener
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
+    }
+
+    private static interface BootstrapperCreator
+    {
+        Bootstrapper create();
     }
 }
