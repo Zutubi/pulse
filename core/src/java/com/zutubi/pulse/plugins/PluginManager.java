@@ -33,9 +33,6 @@ import java.util.Map;
  *
  *
  */
-// Is there a better name available? Although this is the central manager for the plugin system
-// I do not want to call it the Manager since everything is a manager these days. That name is overused
-// and so has no meaning.
 public class PluginManager
 {
     public static final String CONFIG_EXTENSION_POINT = "com.zutubi.pulse.core.config";

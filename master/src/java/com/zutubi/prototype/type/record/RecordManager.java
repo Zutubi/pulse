@@ -177,10 +177,14 @@ public class RecordManager implements HandleAllocator
 
     private void allocateHandles(MutableRecord record)
     {
+/*
         if (record.getHandle() == UNDEFINED)
         {
+*/
             record.setHandle(allocateHandle());
+/*
         }
+*/
         for (Object child : record.values())
         {
             if (child instanceof MutableRecord)
@@ -237,29 +241,28 @@ public class RecordManager implements HandleAllocator
      * that path, but the parent must exist.
      *
      * @param path      path to store the new record at
-     * @param newRecord the record value to store
+     * @param record the record value to store
      * @return the newly-inserted record
      */
-    public synchronized Record insert(final String path, final Record newRecord)
-    {
-        if (newRecord.getHandle() != UNDEFINED)
-        {
-            throw new IllegalArgumentException("Attempting to insert a record with a pre-allocated handle.");
-        }
-        return internalInsert(path, newRecord);
-    }
-
-    private Record internalInsert(final String path, final Record newRecord)
+    public synchronized Record insert(final String path, final Record record)
     {
         checkPath(path);
-        
+
+        if (record == null)
+        {
+            throw new IllegalArgumentException("Attempt to insert null record.");
+        }
+
+        // we copy first because we do not want to modify the argument.
+        final Record copy = record.copy(true);
+
         return (Record) stateWrapper.execute(new TransactionalWrapper.Action<RecordManagerState>()
         {
             public Object execute(RecordManagerState state)
             {
-                allocateHandles((MutableRecord) newRecord);
-                state.addToHandleMap(path, newRecord);
-                return recordStore.insert(path, newRecord);
+                allocateHandles((MutableRecord) copy);
+                state.addToHandleMap(path, copy);
+                return recordStore.insert(path, copy);
             }
         });
     }
@@ -346,17 +349,24 @@ public class RecordManager implements HandleAllocator
      * @return the moved record, or null if the source path does not refer to
      *         an existing record
      */
-    public synchronized Record move(String sourcePath, String destinationPath)
+    public synchronized Record move(String sourcePath, final String destinationPath)
     {
         checkPath(destinationPath);
         checkDoesNotExist(destinationPath, "Failed to move to destination path: '" + destinationPath + "'. An entry already exists at this path.");
 
-        Record record = delete(sourcePath);
+        final Record record = delete(sourcePath);
         if (record != null)
         {
-            record = internalInsert(destinationPath, record);
+            return (Record) stateWrapper.execute(new TransactionalWrapper.Action<RecordManagerState>()
+            {
+                public Object execute(RecordManagerState state)
+                {
+                    state.addToHandleMap(destinationPath, record);
+                    return recordStore.insert(destinationPath, record);
+                }
+            });
         }
-        return record;
+        return null;
     }
 
     private void checkDoesNotExist(String destinationPath, String message)
