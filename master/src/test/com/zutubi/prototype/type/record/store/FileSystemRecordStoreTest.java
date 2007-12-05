@@ -500,7 +500,7 @@ public class FileSystemRecordStoreTest extends PulseTestCase
         MutableRecord sample = createRandomSampleRecord();
         recordStore.insert("sample", sample);
 
-        recordStore.setFileSystem(new DefaultFS()
+        recordStore.setFileSystem(new NativeFS()
         {
             public boolean mkdirs(File file)
             {
@@ -526,14 +526,14 @@ public class FileSystemRecordStoreTest extends PulseTestCase
         assertRecordsEquals(sample, recordStore.select().get("sample"));
 
         // ensure that a subsequent compact is successful.
-        recordStore.setFileSystem(new DefaultFS());
+        recordStore.setFileSystem(new NativeFS());
         recordStore.compactNow();
     }
 
     public void testFailureToWriteNewIndexDuringTransaction()
     {
         MutableRecord sample = createRandomSampleRecord();
-        recordStore.setFileSystem(new DefaultFS()
+        recordStore.setFileSystem(new NativeFS()
         {
             public boolean createNewFile(File file) throws IOException
             {
@@ -561,7 +561,7 @@ public class FileSystemRecordStoreTest extends PulseTestCase
     public void testFailureToWriteNewJournalEntryDuringTransaction()
     {
         MutableRecord sample = createRandomSampleRecord();
-        recordStore.setFileSystem(new DefaultFS()
+        recordStore.setFileSystem(new NativeFS()
         {
             public boolean exists(File file)
             {

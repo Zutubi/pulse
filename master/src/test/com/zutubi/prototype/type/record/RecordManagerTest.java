@@ -325,13 +325,12 @@ public class RecordManagerTest extends PulseTestCase
 
     public void testHandlesAreUniqueAcrossRuns() throws Exception
     {
-        // close the default transaction.
-        userTransaction.commit();
-
         long handle = 0;
         for (int i = 0; i < 10; i++)
         {
             newRecordManager();
+            
+            userTransaction.begin();
             for (int j = 0; j < i; j++)
             {
                 String path = "i" + i + "j" + j;
@@ -380,9 +379,9 @@ public class RecordManagerTest extends PulseTestCase
         recordManager.insert("r2", new MutableRecordImpl());
         assertHandleToPath("r1");
         assertHandleToPath("r2");
-        userTransaction.commit();
-        
+
         newRecordManager();
+
         assertHandleToPath("r1");
         assertHandleToPath("r2");
     }
@@ -496,7 +495,7 @@ public class RecordManagerTest extends PulseTestCase
 
         recordManager.insert("path", record);
 
-        record = new MutableRecordImpl();
+        record.remove("foo");
         recordManager.update("path", record);
 
         Record loaded = recordManager.select("path");
@@ -511,7 +510,8 @@ public class RecordManagerTest extends PulseTestCase
 
         recordManager.insert("path", record);
 
-        record = new MutableRecordImpl();
+        record.remove("foo");
+        record.remove("quux");
         recordManager.update("path", record);
 
         Record loaded = recordManager.select("path");
@@ -519,10 +519,33 @@ public class RecordManagerTest extends PulseTestCase
         assertNotNull(loaded.get("quux"));
     }
 
+    public void testUpdateExistingPathUsingExistingRecordFails()
+    {
+        MutableRecord x = new MutableRecordImpl();
+        x.put("foo", "bar");
+
+        MutableRecord y = new MutableRecordImpl();
+        y.put("a", "b");
+
+        recordManager.insert("x", x);
+        recordManager.insert("y", y);
+        try
+        {
+            recordManager.update("x", y);
+            fail();
+        }
+        catch (RuntimeException e)
+        {
+            assertEquals("Failed to update 'x'. New handle differs from existing handle.", e.getMessage());
+        }
+    }
+
     //---( transactional tests: focus on record handles )---
 
     public void testCommit()
     {
+        userTransaction.begin();
+
         MutableRecord record = new MutableRecordImpl();
         record.put("foo", "bar");
 
@@ -553,6 +576,8 @@ public class RecordManagerTest extends PulseTestCase
 
     public void testRollback()
     {
+        userTransaction.begin();
+
         MutableRecord record = new MutableRecordImpl();
         record.put("foo", "bar");
 
@@ -577,9 +602,6 @@ public class RecordManagerTest extends PulseTestCase
 
     public void testNoSurroundingTransaction()
     {
-        // close the existing transaction.
-        userTransaction.commit();
-
         MutableRecord record = new MutableRecordImpl();
         record.put("foo", "bar");
         final Record insertedRecord = recordManager.insert("path", record);
@@ -615,6 +637,5 @@ public class RecordManagerTest extends PulseTestCase
         recordManager.setRecordStore(recordStore);
         recordManager.init();
 
-        userTransaction.begin();
     }
 }

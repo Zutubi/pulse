@@ -68,7 +68,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
 
     private long latestSnapshotId = 0;
 
-    private FS fileSystem = new DefaultFS();
+    private FS fileSystem = new NativeFS();
 
     private File snapshotDirectory;
     private File backupSnapshotDirectory;

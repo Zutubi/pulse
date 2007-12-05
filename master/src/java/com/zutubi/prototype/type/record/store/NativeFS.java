@@ -7,7 +7,7 @@ import java.io.IOException;
  *
  *
  */
-public class DefaultFS implements FS
+public class NativeFS implements FS
 {
     public boolean exists(File file)
     {

@@ -65,7 +65,7 @@ public class InMemoryRecordStore implements RecordStore
 
     public void setTransactionManager(TransactionManager transactionManager)
     {
-        this.wrapper.setTransactionManager(transactionManager);
+        wrapper.setTransactionManager(transactionManager);
     }
 
     private Record insert(MutableRecord base, String path, Record newRecord)
@@ -81,7 +81,6 @@ public class InMemoryRecordStore implements RecordStore
             throw new IllegalArgumentException("No parent record for path '" + path + "'");
         }
 
-        // Save first before hooking up in memory
         parent.put(basePath, record);
 
         return record;

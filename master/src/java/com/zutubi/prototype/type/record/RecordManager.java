@@ -211,7 +211,18 @@ public class RecordManager implements HandleAllocator
     public synchronized Record update(final String path, final Record values)
     {
         checkPath(path);
-        
+
+        // sanity check - we expect the states handle/path to match that of the
+        // record we are updating.  If not we fail early.
+        Record originalRecord = select(path);
+        if (originalRecord != null) // out aim is to check the handle, not if a record exists.
+        {
+            if (values.getHandle() != originalRecord.getHandle())
+            {
+                throw new IllegalArgumentException("Failed to update '" + path + "'. New handle differs from existing handle.");
+            }
+        }
+
         return (Record) stateWrapper.execute(new TransactionalWrapper.Action<RecordManagerState>()
         {
             public Object execute(RecordManagerState state)
@@ -231,8 +242,17 @@ public class RecordManager implements HandleAllocator
      */
     public synchronized Record insert(final String path, final Record newRecord)
     {
-        checkPath(path);
+        if (newRecord.getHandle() != UNDEFINED)
+        {
+            throw new IllegalArgumentException("Attempting to insert a record with a pre-allocated handle.");
+        }
+        return internalInsert(path, newRecord);
+    }
 
+    private Record internalInsert(final String path, final Record newRecord)
+    {
+        checkPath(path);
+        
         return (Record) stateWrapper.execute(new TransactionalWrapper.Action<RecordManagerState>()
         {
             public Object execute(RecordManagerState state)
@@ -242,7 +262,6 @@ public class RecordManager implements HandleAllocator
                 return recordStore.insert(path, newRecord);
             }
         });
-
     }
 
     /**
@@ -302,6 +321,9 @@ public class RecordManager implements HandleAllocator
      */
     public synchronized Record copy(String sourcePath, String destinationPath)
     {
+        checkPath(sourcePath);
+        checkDoesNotExist(destinationPath, "Failed to copy to destination path: '" + destinationPath + "'. An entry already exists at this path.");
+
         MutableRecord record = (MutableRecord) select(sourcePath);
         if (record != null)
         {
@@ -327,13 +349,22 @@ public class RecordManager implements HandleAllocator
     public synchronized Record move(String sourcePath, String destinationPath)
     {
         checkPath(destinationPath);
+        checkDoesNotExist(destinationPath, "Failed to move to destination path: '" + destinationPath + "'. An entry already exists at this path.");
 
         Record record = delete(sourcePath);
         if (record != null)
         {
-            record = insert(destinationPath, record);
+            record = internalInsert(destinationPath, record);
         }
         return record;
+    }
+
+    private void checkDoesNotExist(String destinationPath, String message)
+    {
+        if (containsRecord(destinationPath))
+        {
+            throw new IllegalArgumentException(message);
+        }
     }
 
     public void setRecordStore(RecordStore recordStore)
@@ -351,6 +382,10 @@ public class RecordManager implements HandleAllocator
      */
     private class RecordManagerState
     {
+        /**
+         * Record handle to path map.  Handles uniquely identify paths, so there should
+         * never be any duplication.  This object aggressively enforces this.
+         */
         Map<Long, String> handleToPathMap;
 
         public RecordManagerState()
@@ -375,6 +410,18 @@ public class RecordManager implements HandleAllocator
 
         private void addToHandleMap(String path, Record record)
         {
+            // aggressively ensure that we reject duplicates handles.
+            if (handleToPathMap.containsKey(record.getHandle()))
+            {
+                // only time we will allow this is when the path is the same.
+                String mappedPath = handleToPathMap.get(record.getHandle());
+                if (!path.equals(mappedPath))
+                {
+                    throw new RuntimeException("Attempting to add a duplicate record handle.  " +
+                            "Existing path is: '" + mappedPath + "', duplicate path is: '" + path + "'");
+                }
+            }
+            
             handleToPathMap.put(record.getHandle(), path);
             for (String key : record.nestedKeySet())
             {
