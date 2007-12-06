@@ -15,6 +15,11 @@
                 <ref local="schemaUpgradeableComponent"/>
             </list>
         </property>
+        <property name="upgradeableComponentSources">
+            <list>
+                <ref bean="pluginManager"/>
+            </list>
+        </property>
     </bean>
 
     <bean id="schemaUpgradeableComponent" class="com.zutubi.pulse.upgrade.tasks.PulseUpgradeableComponent" autowire="byName">

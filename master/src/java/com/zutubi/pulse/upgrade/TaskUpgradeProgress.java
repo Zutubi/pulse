@@ -13,8 +13,6 @@ public class TaskUpgradeProgress
      */
     private UpgradeStatus status = UpgradeStatus.PENDING;
 
-    private String message;
-
     public TaskUpgradeProgress(UpgradeTask task)
     {
         this.task = task;
@@ -28,5 +26,15 @@ public class TaskUpgradeProgress
     public void setStatus(UpgradeStatus status)
     {
         this.status = status;
+    }
+
+    public String getName()
+    {
+        return task.getName();
+    }
+
+    public String getMessage()
+    {
+        return task.getErrors().get(0);
     }
 }

@@ -27,38 +27,39 @@
         </tr>
     </table>
 </p>
-<!--
-#if($upgradePreview.size() > 0)
+
+#if($upgradeGroupPreview.size() > 0)
 <p>
     Before pulse can use this data directory, it will need to run the following upgrade tasks.
+    #foreach($upgradePreview in $upgradeGroupPreview)
     <table class="columns" width="40%">
         <tr>
             <td class="columns" width="90%">
                 <table id="upgrade.task.details" class="fill-content">
-                    #foreach($upgradeTask in $upgradePreview)
+                    #foreach($upgradeTask in $upgradePreview.tasks)
                     #dynamicRow($upgradeTask.name $upgradeTask.description)
                     #end
                 </table>
             </td>
         </tr>
     </table>
+    #end
 </p>
 #end
 <p style="width:50%">
     Please be aware that pulse can not continue without running these upgrade tasks.  If you do not wish to continue with
     this upgrade, shutdown this installation of pulse.  Otherwise, please click continue to run the upgrade.
 </p>
-#wwform("action=execute.action" "method=post")
+#wwform("action=execute" "method=post")
 #continue(1)
 #end
--->
-
+<!--
 <p style="width:50%; color: red; font-size: 125%">
    This is an experimental release of Pulse 2.0 that <strong>does not</strong> support
    an upgrade path.  Please modify your config.properties file to use a fresh
    data path.  <strong>DO NOT</strong> attempt to use this version of Pulse with
    production data.
 </p>
-
+-->
 </body>
 </html>

@@ -35,7 +35,7 @@ public class UpgradeProgressMonitor
      * Use a list here to ensure that the order of the task progress entries
      * remain in the same order as was passed to this monitor.
      */
-    private List<TaskUpgradeProgress> orderedProgressDetails = new LinkedList<TaskUpgradeProgress>();
+    private List<TaskGroupUpgradeProgress> orderedTaskGroups = new LinkedList<TaskGroupUpgradeProgress>();
 
     private Map<UpgradeTask, TaskUpgradeProgress> taskProgressLookupMap = new HashMap<UpgradeTask, TaskUpgradeProgress>();
     private Map<UpgradeTaskGroup, TaskGroupUpgradeProgress> groupProgressLookupMap = new HashMap<UpgradeTaskGroup, TaskGroupUpgradeProgress>();
@@ -173,16 +173,22 @@ public class UpgradeProgressMonitor
         {
             TaskGroupUpgradeProgress groupProgress = new TaskGroupUpgradeProgress(group);
             groupProgressLookupMap.put(group, groupProgress);
+            orderedTaskGroups.add(groupProgress);
 
             List<UpgradeTask> monitoredTasks = group.getTasks();
             for (UpgradeTask task : monitoredTasks)
             {
                 TaskUpgradeProgress taskProgress = new TaskUpgradeProgress(task);
                 taskProgressLookupMap.put(task, taskProgress);
-                orderedProgressDetails.add(taskProgress);
+                groupProgress.add(taskProgress);
             }
             taskCount = taskCount + monitoredTasks.size();
         }
+    }
+
+    public List<TaskGroupUpgradeProgress> getOrderedTaskGroups()
+    {
+        return orderedTaskGroups;
     }
 
     public void started(UpgradeTaskGroup group)

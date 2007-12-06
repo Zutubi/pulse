@@ -36,20 +36,22 @@
 
 </p>
 
-#if($monitor.taskProgress.size() > 0)
+#if($monitor.orderedTaskGroups.size() > 0)
 <p>
     To use this directory we will need to execute the following upgrade tasks.
+    #foreach($groupProgress in $monitor.orderedTaskGroups)
     <table class="columns" width="40%">
         <tr>
             <td class="columns" width="90%">
                 <table id="upgrade.task.details" class="fill-content">
-                    #foreach($task in $monitor.taskProgress)
+                    #foreach($task in $groupProgress.tasks)
                     #dynamicRow($task.name $task.status)
                     #end
                 </table>
             </td>
         </tr>
     </table>
+    #end
 </p>
 #end
 

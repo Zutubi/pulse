@@ -38,11 +38,13 @@ public class UpgradePreviewAction extends UpgradeActionSupport
         this.configurationManager = configurationManager;
     }
 
+/*
     public List<UpgradeTask> getUpgradePreview()
     {
         return upgradePreview;
     }
 
+*/
     public List<UpgradeTaskGroup> getUpgradeGroupPreview()
     {
         return upgradeGroupPreview;
@@ -75,7 +77,7 @@ public class UpgradePreviewAction extends UpgradeActionSupport
 
         upgradeGroupPreview = upgradeManager.previewUpgrade();
 
-        upgradePreview = upgradeGroupPreview.get(0).getTasks();
+//        upgradePreview = upgradeGroupPreview.get(0).getTasks();
 
         return SUCCESS;
     }
