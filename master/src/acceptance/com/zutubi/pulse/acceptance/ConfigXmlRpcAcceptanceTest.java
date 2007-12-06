@@ -477,6 +477,29 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertEquals(0, loadedProperties.size());
     }
 
+    public void testDeleteAllHitsInherited() throws Exception
+    {
+        String random = randomName();
+        String parent = random + "-parent";
+        String child = random + "-child";
+
+        String parentPath = xmlRpcHelper.insertSimpleProject(parent, true);
+        String childPath = xmlRpcHelper.insertSimpleProject(child, parent, false);
+
+        Hashtable<String, Object> project = call("getConfig", parentPath);
+        Hashtable<String, Object> properties = (Hashtable<String, Object>) project.get("properties");
+        properties.put("p1", createProperty("p1", "v1"));
+        call("saveConfig", parentPath, project, true);
+
+        assertEquals(1, call("deleteAllConfigs", childPath+ "/properties/*"));
+        Hashtable<String, Object> loadedProperties = call("getConfig", childPath + "/properties");
+        assertEquals(0, loadedProperties.size());
+
+        call("restoreConfig", childPath + "/properties/p1");
+        loadedProperties = call("getConfig", childPath + "/properties");
+        assertEquals(1, loadedProperties.size());
+    }
+
     public void testRestore() throws Exception
     {
         String random = RandomUtils.randomString(10);
