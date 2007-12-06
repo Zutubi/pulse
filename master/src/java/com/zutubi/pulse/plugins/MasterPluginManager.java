@@ -13,7 +13,7 @@ public class MasterPluginManager extends PluginManager implements UpgradeableCom
 {
     public boolean isUpgradeRequired()
     {
-        return true;
+        return false;
     }
 
     public List<UpgradeableComponent> getUpgradeableComponents()
