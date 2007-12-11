@@ -59,7 +59,7 @@ public class ProjectRepoBootstrapper implements Bootstrapper
             }
         };
 
-        context.pushInternalScope();
+        context.push();
         try
         {
             context.addInternalValue(BuildProperties.PROPERTY_RECIPE_PATHS, mungedPaths);
@@ -69,7 +69,7 @@ public class ProjectRepoBootstrapper implements Bootstrapper
         finally
         {
             context.setWorkingDir(paths.getBaseDir());
-            context.popInternalScope();
+            context.pop();
         }
 
         // If the checkout and base differ, then we need to copy over to the base.

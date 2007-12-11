@@ -235,7 +235,7 @@ public class VariableHelper
         return false;
     }
 
-    public static Object replaceVariable(String input, Scope properties) throws FileLoadException
+    public static Object replaceVariable(String input, ReferenceMap properties) throws FileLoadException
     {
         List<Token> tokens = tokenise(input, false);
         if (tokens.size() != 1 || tokens.get(0).type != TokenType.VARIABLE_REFERENCE)
@@ -251,12 +251,12 @@ public class VariableHelper
         throw new FileLoadException("Unknown variable reference '" + token.value + "'");
     }
 
-    public static String replaceVariables(String input, Scope properties) throws FileLoadException
+    public static String replaceVariables(String input, ReferenceMap properties) throws FileLoadException
     {
         return replaceVariables(input, properties, false);
     }
 
-    public static String replaceVariables(String input, Scope properties, boolean allowUnresolved) throws FileLoadException
+    public static String replaceVariables(String input, ReferenceMap properties, boolean allowUnresolved) throws FileLoadException
     {
         StringBuilder result = new StringBuilder();
 
@@ -281,7 +281,7 @@ public class VariableHelper
         return result.toString();
     }
 
-    public static List<String> splitAndReplaceVariables(String input, Scope properties, boolean allowUnresolved) throws FileLoadException
+    public static List<String> splitAndReplaceVariables(String input, ReferenceMap properties, boolean allowUnresolved) throws FileLoadException
     {
         List<String> result = new LinkedList<String>();
         StringBuilder current = new StringBuilder();
@@ -330,7 +330,7 @@ public class VariableHelper
         return result;
     }
 
-    private static String resolveReference(Scope properties, Token token, boolean allowUnresolved) throws FileLoadException
+    private static String resolveReference(ReferenceMap properties, Token token, boolean allowUnresolved) throws FileLoadException
     {
         Reference reference = properties.getReference(token.value);
         if (reference != null && reference.getValue() != null)

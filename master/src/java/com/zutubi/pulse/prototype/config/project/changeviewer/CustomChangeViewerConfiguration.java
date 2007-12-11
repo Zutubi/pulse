@@ -6,7 +6,7 @@ import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.core.Property;
-import com.zutubi.pulse.core.Scope;
+import com.zutubi.pulse.core.PulseScope;
 import com.zutubi.pulse.core.VariableHelper;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
@@ -156,7 +156,7 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
     {
         if(TextUtils.stringSet(url))
         {
-            Scope scope = new Scope();
+            PulseScope scope = new PulseScope();
             scope.add(new Property(PROPERTY_REVISION, revision.getRevisionString()));
             scope.add(new Property(PROPERTY_AUTHOR, revision.getAuthor()));
             scope.add(new Property(PROPERTY_BRANCH, revision.getBranch()));
@@ -185,7 +185,7 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
     {
         if(TextUtils.stringSet(url))
         {
-            Scope scope = new Scope();
+            PulseScope scope = new PulseScope();
             scope.add(new Property(PROPERTY_PATH, StringUtils.urlEncodePath(path)));
             scope.add(new Property(PROPERTY_PATH_RAW, path));
             scope.add(new Property(PROPERTY_PATH_FORM, StringUtils.formUrlEncode(path)));
@@ -213,7 +213,7 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
 
     public static void validateChangesetURL(String url)
     {
-        Scope scope = new Scope();
+        PulseScope scope = new PulseScope();
         scope.add(new Property(PROPERTY_REVISION, ""));
         scope.add(new Property(PROPERTY_AUTHOR, ""));
         scope.add(new Property(PROPERTY_BRANCH, ""));
@@ -232,7 +232,7 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
 
     public static void validateFileURL(String url)
     {
-        Scope scope = new Scope();
+        PulseScope scope = new PulseScope();
         scope.add(new Property(PROPERTY_PATH, ""));
         scope.add(new Property(PROPERTY_REVISION, ""));
         scope.add(new Property(PROPERTY_PREVIOUS_REVISION, ""));

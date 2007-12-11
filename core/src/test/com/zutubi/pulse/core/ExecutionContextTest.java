@@ -166,7 +166,7 @@ public class ExecutionContextTest extends PulseTestCase
     {
         ExecutionContext context = makeNonTrivialContext();
         
-        Scope scope = context.asScope();
+        PulseScope scope = context.asScope();
         assertEquals("ip", scope.getReferenceValue("iparent", String.class));
         assertEquals("ic", scope.getReferenceValue("ichild", String.class));
         assertEquals("p", scope.getReferenceValue("parent", String.class));

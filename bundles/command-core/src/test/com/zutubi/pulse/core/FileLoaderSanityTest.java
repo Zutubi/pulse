@@ -23,7 +23,7 @@ public class FileLoaderSanityTest extends FileLoaderTestBase
     public void testSampleProject() throws Exception
     {
         PulseFile bf = new PulseFile();
-        Scope scope = new Scope();
+        PulseScope scope = new PulseScope();
         Property property = new Property("base.dir", "/whatever");
         scope.add(property);
 

@@ -19,8 +19,8 @@ public class ResourceReferenceTest extends PulseTestCase
 
     public void testResourceReference() throws Exception
     {
-        Scope parent = new Scope();
-        Scope scope = new Scope(parent);
+        PulseScope parent = new PulseScope();
+        PulseScope scope = new PulseScope(parent);
         FileResourceRepository repo = ResourceFileLoader.load(getInput("testResourceReference"));
         ResourceReference ref = new ResourceReference();
         ref.setResourceRepository(repo);

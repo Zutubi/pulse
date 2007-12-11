@@ -158,7 +158,7 @@ public class BuildController implements EventListener
             recipeResult.setAbsoluteOutputDir(configurationManager.getDataDirectory(), recipeOutputDir);
 
             ExecutionContext recipeContext = new ExecutionContext(buildContext);
-            recipeContext.pushInternalScope();
+            recipeContext.push();
             recipeContext.addInternalString(PROPERTY_RECIPE_ID, Long.toString(recipeResult.getId()));
             recipeContext.addInternalString(PROPERTY_RECIPE, stage.getRecipe());
 

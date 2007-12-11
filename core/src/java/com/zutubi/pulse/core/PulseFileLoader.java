@@ -27,7 +27,7 @@ public class PulseFileLoader extends FileLoader
 
         PulseFile file = new PulseFile();
         ResourceRequirementsPredicate predicate = new ResourceRequirementsPredicate(file, recipe);
-        load(new ByteArrayInputStream(pulseFile.getBytes()), file, new Scope(), new FileResourceRepository(), predicate);
+        load(new ByteArrayInputStream(pulseFile.getBytes()), file, new PulseScope(), new FileResourceRepository(), predicate);
 
         for(ResourceReference reference: predicate.getReferences())
         {

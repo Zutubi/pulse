@@ -16,8 +16,8 @@ import java.io.OutputStream;
 public class ExecutionContext
 {
     // If you add a field, remember to update the copy constructor
-    private Scope internalScope;
-    private Scope userScope;
+    private PulseScope internalScope;
+    private PulseScope userScope;
     private File workingDir = null;
     private OutputStream outputStream = null;
     // TODO: replace this with more generic support for extracting properties
@@ -26,8 +26,8 @@ public class ExecutionContext
 
     public ExecutionContext()
     {
-        internalScope = new Scope();
-        userScope = new Scope();
+        internalScope = new PulseScope();
+        userScope = new PulseScope();
     }
 
     public ExecutionContext(ExecutionContext other)
@@ -167,10 +167,10 @@ public class ExecutionContext
         return value;
     }
 
-    public Scope asScope()
+    public PulseScope asScope()
     {
-        Scope parent = internalScope.copy();
-        Scope leaf = userScope.copy();
+        PulseScope parent = internalScope.copy();
+        PulseScope leaf = userScope.copy();
         leaf.getRoot().setParent(parent);
         return leaf;
     }
@@ -215,14 +215,14 @@ public class ExecutionContext
         userScope.add(new GenericReference<Object>(name, value));
     }
 
-    public void pushInternalScope()
+    void pushInternalScope()
     {
-        internalScope = new Scope(internalScope);
+        internalScope = new PulseScope(internalScope);
     }
 
-    public void pushScope()
+    void pushScope()
     {
-        userScope = new Scope(userScope);
+        userScope = new PulseScope(userScope);
     }
 
     public void push()
@@ -231,12 +231,12 @@ public class ExecutionContext
         pushScope();
     }
 
-    public void popInternalScope()
+    void popInternalScope()
     {
         this.internalScope = this.internalScope.getParent();
     }
 
-    public void popScope()
+    void popScope()
     {
         this.userScope = this.userScope.getParent();
     }

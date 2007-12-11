@@ -2,7 +2,7 @@ package com.zutubi.pulse.core.scm.p4;
 
 import com.zutubi.util.TextUtils;
 import com.zutubi.pulse.core.Property;
-import com.zutubi.pulse.core.Scope;
+import com.zutubi.pulse.core.PulseScope;
 import com.zutubi.pulse.core.VariableHelper;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
@@ -58,7 +58,7 @@ public class PerforceClient extends CachingScmClient
             {
                 String commandLine = templateClient.substring(1);
 
-                Scope scope = new Scope();
+                PulseScope scope = new PulseScope();
                 String revisionSpec;
                 if(revision == null)
                 {

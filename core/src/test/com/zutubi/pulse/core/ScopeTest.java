@@ -7,18 +7,19 @@ import com.zutubi.pulse.util.FileSystemUtils;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.Collection;
 
 /**
  */
 public class ScopeTest extends PulseTestCase
 {
-    private Scope scope;
+    private PulseScope scope;
 
     protected void setUp() throws Exception
     {
         super.setUp();
-        Scope parent = new Scope();
-        scope = new Scope(parent);
+        PulseScope parent = new PulseScope();
+        scope = new PulseScope(parent);
         parent.add(new Property("parent only", "parent"));
         parent.add(new Property("parent and child", "parent"));
         parent.add(new ResourceProperty("parent only resource", "parent resource", true, true, false));
@@ -75,7 +76,7 @@ public class ScopeTest extends PulseTestCase
 
     public void testReferToEarlierProperty()
     {
-        Scope s = new Scope();
+        PulseScope s = new PulseScope();
         s.add(new ResourceProperty("test", "value", false, false, false));
         s.add(new ResourceProperty("test2", "${test}2", false, false, true));
         assertEquals("value2", s.getReference("test2").getValue());
@@ -83,7 +84,7 @@ public class ScopeTest extends PulseTestCase
 
     public void testDontResolve()
     {
-        Scope s = new Scope();
+        PulseScope s = new PulseScope();
         s.add(new ResourceProperty("test", "value", false, false, false));
         s.add(new ResourceProperty("test2", "${test}2", false, false, false));
         assertEquals("${test}2", s.getReference("test2").getValue());
@@ -91,15 +92,15 @@ public class ScopeTest extends PulseTestCase
 
     public void testSelfReference()
     {
-        Scope s = new Scope();
+        PulseScope s = new PulseScope();
         s.add(new ResourceProperty("testvar", "${testvar}", false, false, true));
         assertEquals("${testvar}", s.getReference("testvar").getValue());
     }
 
     public void testReferToParentProperty()
     {
-        Scope p = new Scope();
-        Scope c = new Scope(p);
+        PulseScope p = new PulseScope();
+        PulseScope c = new PulseScope(p);
         p.add(new ResourceProperty("test", "value", false, false, false));
         c.add(new ResourceProperty("test2", "${test}2", false, false, true));
         assertEquals("value2", c.getReference("test2").getValue());
@@ -107,7 +108,7 @@ public class ScopeTest extends PulseTestCase
 
     public void testAddToPathPreservesOrder()
     {
-        Scope s = new Scope();
+        PulseScope s = new PulseScope();
         s.add(new ResourceProperty("j", "jv", false, true, false));
         s.add(new ResourceProperty("z", "zv", false, true, false));
         s.add(new ResourceProperty("a", "av", false, true, false));
@@ -116,8 +117,8 @@ public class ScopeTest extends PulseTestCase
 
     public void testChildHidesParentAddToPath()
     {
-        Scope p = new Scope();
-        Scope c = new Scope(p);
+        PulseScope p = new PulseScope();
+        PulseScope c = new PulseScope(p);
         p.add(new ResourceProperty("testvar", "parent", false, true, false));
         c.add(new ResourceProperty("testvar", "child", false, false, false));
         assertEquals("parent" + File.pathSeparator, p.getPathPrefix());
@@ -126,8 +127,8 @@ public class ScopeTest extends PulseTestCase
 
     public void testChildHidesParentAddToEnv()
     {
-        Scope p = new Scope();
-        Scope c = new Scope(p);
+        PulseScope p = new PulseScope();
+        PulseScope c = new PulseScope(p);
         p.add(new ResourceProperty("priceless", "parent", true, false, false));
         c.add(new ResourceProperty("priceless", "child", false, false, false));
         assertFalse(c.containsReference("env.PRICELESS"));
@@ -135,22 +136,22 @@ public class ScopeTest extends PulseTestCase
 
     public void testAddToEnvironmentAddsEnvVar()
     {
-        Scope s = new Scope();
+        PulseScope s = new PulseScope();
         s.add(new ResourceProperty("testvar", "value", true, false, false));
         assertEquals("value", s.getReference("env.testvar").getValue());
     }
 
     public void testAddToParentEnvAddsEnvVar()
     {
-        Scope p = new Scope();
-        Scope c = new Scope(p);
+        PulseScope p = new PulseScope();
+        PulseScope c = new PulseScope(p);
         p.add(new ResourceProperty("testvar", "value", true, false, false));
         assertEquals("value", c.getReference("env.testvar").getValue());
     }
 
     public void testAddToEnvReferenceEnvVar()
     {
-        Scope s = new Scope();
+        PulseScope s = new PulseScope();
         s.add(new ResourceProperty("testvar", "value", true, false, false));
         s.add(new ResourceProperty("testvar2", "${env.testvar}2", true, false, true));
         assertEquals("value2", s.getReference("testvar2").getValue());
@@ -158,8 +159,8 @@ public class ScopeTest extends PulseTestCase
 
     public void testAddToParentEnvReferenceEnvVar()
     {
-        Scope p = new Scope();
-        Scope c = new Scope(p);
+        PulseScope p = new PulseScope();
+        PulseScope c = new PulseScope(p);
         p.add(new ResourceProperty("testvar", "value", true, false, false));
         c.add(new ResourceProperty("testvar2", "${env.testvar}2", true, false, true));
         assertEquals("value2", c.getReference("testvar2").getValue());
@@ -167,7 +168,7 @@ public class ScopeTest extends PulseTestCase
 
     public void testReferenceEnvPath()
     {
-        Scope s = new Scope();
+        PulseScope s = new PulseScope();
         s.addEnvironmentProperty("PATH", "dummypath");
         s.add(new ResourceProperty("somevar", "someval", false, true, false));
         s.add(new ResourceProperty("refvar", "${env.PATH}?", false, false, true));
@@ -176,14 +177,14 @@ public class ScopeTest extends PulseTestCase
 
     public void testSelfReferenceEnvVar()
     {
-        Scope s = new Scope();
+        PulseScope s = new PulseScope();
         s.add(new ResourceProperty("refvar", "${env.refvar}?", true, false, true));
         assertEquals("${env.refvar}?", s.getReference("refvar").getValue());
     }
 
     public void testSelfReferenceEnvPath()
     {
-        Scope s = new Scope();
+        PulseScope s = new PulseScope();
         s.addEnvironmentProperty("PATH", "dummypath");
         s.add(new ResourceProperty("refvar", "${env.PATH}?", false, true, true));
         assertEquals("dummypath?", s.getReference("refvar").getValue());
@@ -191,37 +192,38 @@ public class ScopeTest extends PulseTestCase
 
     public void testBackslash()
     {
-        Scope s = new Scope();
+        PulseScope s = new PulseScope();
         s.add(new ResourceProperty("myvar", "\\", false, true, true));
         assertEquals("\\", s.getReference("myvar").getValue());
     }
 
     public void testBadSyntax()
     {
-        Scope s = new Scope();
+        PulseScope s = new PulseScope();
         s.add(new ResourceProperty("myvar", "this ${ is invalid", false, true, true));
         assertEquals("this ${ is invalid", s.getReference("myvar").getValue());        
     }
 
     public void testGetReferencesIncludesParents()
     {
-        Scope parent = new Scope();
-        Scope child = new Scope(parent);
+        PulseScope parent = new PulseScope();
+        PulseScope child = new PulseScope(parent);
 
         parent.add(new ResourceProperty("name", "value"));
 
-        List<Reference> references = child.getReferences();
+        Collection<Reference> references = child.getReferences();
         assertEquals(1, references.size());
-        assertEquals("name", references.get(0).getName());
-        assertEquals("value", references.get(0).getValue());
+        Reference reference = references.iterator().next();
+        assertEquals("name", reference.getName());
+        assertEquals("value", reference.getValue());
     }
 
     public void testCopy()
     {
-        Scope original = new Scope();
+        PulseScope original = new PulseScope();
         original.add(new Property("foo", "bar"));
 
-        Scope copy = original.copy();
+        PulseScope copy = original.copy();
         assertEquals("bar", original.getReferenceValue("foo", String.class));
         assertEquals("bar", copy.getReferenceValue("foo", String.class));
         
@@ -232,11 +234,11 @@ public class ScopeTest extends PulseTestCase
 
     public void testCopyWithParent()
     {
-        Scope parent = new Scope();
+        PulseScope parent = new PulseScope();
         parent.add(new Property("foo", "bar"));
-        Scope original = new Scope(parent);
+        PulseScope original = new PulseScope(parent);
 
-        Scope copy = original.copy();
+        PulseScope copy = original.copy();
         assertEquals("bar", parent.getReferenceValue("foo", String.class));
         assertEquals("bar", original.getReferenceValue("foo", String.class));
         assertEquals("bar", copy.getReferenceValue("foo", String.class));

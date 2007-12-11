@@ -31,7 +31,7 @@ public class ResourceReference implements ResourceAware, ScopeAware, InitCompone
     private ResourceRepository repository;
     private Scope scope;
 
-    public void setScope(Scope scope)
+    public void setScope(PulseScope scope)
     {
         this.scope = scope;
     }
@@ -54,7 +54,8 @@ public class ResourceReference implements ResourceAware, ScopeAware, InitCompone
             return;
         }
 
-        scope.getParent().add(resource.getProperties().values());
+        // FIXME scope
+        ((PulseScope)scope).getParent().add(resource.getProperties().values());
         String importVersion = version;
         if(importVersion == null)
         {
@@ -74,7 +75,8 @@ public class ResourceReference implements ResourceAware, ScopeAware, InitCompone
                 return;
             }
 
-            scope.getParent().add(resourceVersion.getProperties().values());
+            // FIXME scope
+            ((PulseScope)scope).getParent().add(resourceVersion.getProperties().values());
         }
     }
 

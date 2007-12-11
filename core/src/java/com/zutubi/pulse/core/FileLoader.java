@@ -89,7 +89,7 @@ public class FileLoader
 
             if (globalScope == null)
             {
-                globalScope = new Scope();
+                globalScope = new PulseScope();
             }
 
             // brief bootstraping of the loading process
@@ -97,7 +97,7 @@ public class FileLoader
 
             if (ScopeAware.class.isAssignableFrom(root.getClass()))
             {
-                ((ScopeAware) root).setScope(globalScope.copy());
+                ((ScopeAware) root).setScope((PulseScope) globalScope.copy());
             }
 
             mapAttributesToProperties(rootElement, root, predicate, globalScope);
@@ -161,18 +161,18 @@ public class FileLoader
                 String referenceName = ((Reference) type).getName();
                 if (referenceName != null && referenceName.length() > 0)
                 {
-                    scope.setReference((Reference) type);
+                    scope.addUnique((Reference) type);
                 }
             }
 
             boolean loadType = predicate.loadType(type, e);
             if(loadType)
             {
-                scope = new Scope(scope);
+                scope = scope.createChild();
 
                 if (ScopeAware.class.isAssignableFrom(type.getClass()))
                 {
-                    ((ScopeAware) type).setScope(scope.copy());
+                    ((ScopeAware) type).setScope((PulseScope) scope.copy());
                 }
 
                 if (ResourceAware.class.isAssignableFrom(type.getClass()))
@@ -303,7 +303,7 @@ public class FileLoader
                 Attribute attribute = element.getAttribute(i);
                 if(attribute.getLocalName().equals("name"))
                 {
-                    scope.setReference(new Macro(attribute.getValue(), element));
+                    scope.addUnique(new Macro(attribute.getValue(), element));
                     found = true;
                 }
                 else
@@ -365,7 +365,7 @@ public class FileLoader
         else if(localName.equals("scope"))
         {
             // Just load children in new scope and redirect to parent
-            loadSubElements(element, type, new Scope(scope), typeHelper, depth, resourceRepository, predicate);
+            loadSubElements(element, type, scope.createChild(), typeHelper, depth, resourceRepository, predicate);
             return true;
         }
 

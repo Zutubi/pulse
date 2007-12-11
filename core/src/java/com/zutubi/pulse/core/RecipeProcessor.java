@@ -123,8 +123,7 @@ public class RecipeProcessor
 
             eventManager.publish(completedEvent);
 
-            context.popInternalScope();
-            context.popScope();
+            context.pop();
 
             runningLock.lock();
             runningRecipe = 0;
@@ -206,7 +205,7 @@ public class RecipeProcessor
 
     private PulseFile loadPulseFile(RecipeRequest request, ExecutionContext context) throws BuildException
     {
-        Scope globalScope = new Scope(context.asScope());
+        PulseScope globalScope = new PulseScope(context.asScope());
         Map<String, String> env = System.getenv();
         for(Map.Entry<String, String> var: env.entrySet())
         {

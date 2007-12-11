@@ -39,7 +39,7 @@ public class MasterRecipeRunner implements Runnable
         ServerRecipePaths recipePaths = new ServerRecipePaths(request.getProject(), request.getId(), configurationManager.getUserPaths().getData(), context.getInternalBoolean(BuildProperties.PROPERTY_INCREMENTAL_BUILD, false));
 
         CommandOutputStream outputStream = null;
-        context.pushInternalScope();
+        context.push();
         try
         {
             context.addInternalValue(BuildProperties.PROPERTY_RECIPE_PATHS, recipePaths);
@@ -63,7 +63,7 @@ public class MasterRecipeRunner implements Runnable
         finally
         {
             IOUtils.close(outputStream);
-            context.popInternalScope();
+            context.pop();
         }
     }
 

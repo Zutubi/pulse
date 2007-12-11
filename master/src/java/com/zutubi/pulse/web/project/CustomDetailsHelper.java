@@ -51,7 +51,7 @@ public class CustomDetailsHelper
             PulseFileLoader loader = fileLoaderFactory.createLoader();
             loader.setObjectFactory(new DefaultObjectFactory());
             
-            loader.load(new ByteArrayInputStream(pulseFile.getBytes()), new PulseFile(), new Scope(), resourceRepository, new CustomProjectValidationPredicate());
+            loader.load(new ByteArrayInputStream(pulseFile.getBytes()), new PulseFile(), new PulseScope(), resourceRepository, new CustomProjectValidationPredicate());
         }
         catch(ParseException pe)
         {

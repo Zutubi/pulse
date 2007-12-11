@@ -68,7 +68,7 @@ public class SlaveRecipeProcessor
             Bootstrapper requestBootstrapper = request.getBootstrapper();
             request.setBootstrapper(new ChainBootstrapper(new ServerBootstrapper(), requestBootstrapper));
 
-            context.pushInternalScope();
+            context.push();
             CommandOutputStream outputStream = null;
             try
             {
@@ -95,7 +95,7 @@ public class SlaveRecipeProcessor
             finally
             {
                 IOUtils.close(outputStream);
-                context.popInternalScope();
+                context.pop();
                 eventManager.unregister(listener);
             }
         }

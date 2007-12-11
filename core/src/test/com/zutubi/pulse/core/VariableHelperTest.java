@@ -16,11 +16,11 @@ public class VariableHelperTest extends TestCase
 
     public void setUp() throws FileLoadException
     {
-        scope = new Scope();
-        scope.setReference(new Property("foo", "foo"));
-        scope.setReference(new Property("bar", "baz"));
-        scope.setReference(new Property("a\\b", "slashed"));
-        scope.setReference(new Property("empty", ""));
+        scope = new PulseScope();
+        scope.addUnique(new Property("foo", "foo"));
+        scope.addUnique(new Property("bar", "baz"));
+        scope.addUnique(new Property("a\\b", "slashed"));
+        scope.addUnique(new Property("empty", ""));
     }
 
     private void errorTest(String input, String expectedError)
@@ -151,7 +151,7 @@ public class VariableHelperTest extends TestCase
 
     public void testNestedVariable() throws Exception
     {
-        scope.setReference(new Property("a", "${foo}"));
+        scope.addUnique(new Property("a", "${foo}"));
         successTest("${a}", "${foo}");
     }
 
@@ -247,13 +247,13 @@ public class VariableHelperTest extends TestCase
 
     public void testSplitQuotesInVariableReference() throws Exception
     {
-        scope.setReference(new Property("a\"b", "val"));
+        scope.addUnique(new Property("a\"b", "val"));
         successSplitTest("odd ${a\"b} variable", "odd", "val", "variable");        
     }
 
     public void testSplitSpaceInVariableReference() throws Exception
     {
-        scope.setReference(new Property("space invader", "val"));
+        scope.addUnique(new Property("space invader", "val"));
         successSplitTest("odd ${space invader} variable", "odd", "val", "variable");
     }
 

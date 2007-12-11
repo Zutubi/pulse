@@ -53,7 +53,7 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
     private List<ProcessArtifact> processes = new LinkedList<ProcessArtifact>();
     private List<String> suppressedEnvironment = Arrays.asList(System.getProperty("pulse.suppressed.environment.variables", "P4PASSWD").split(" +"));
     private List<StatusMapping> statusMappings = new LinkedList<StatusMapping>();
-    private Scope scope;
+    private PulseScope scope;
 
     /**
      * Required no arg constructor.
@@ -767,7 +767,7 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
         }
     }
 
-    public void setScope(Scope scope)
+    public void setScope(PulseScope scope)
     {
         this.scope = scope;
     }
