@@ -122,31 +122,56 @@ public class IntrospectionHelper
                 continue;
             }
 
-            if (name.startsWith("add") &&
-                    paramTypes.length == 1 &&
-                    Void.TYPE.equals(returnType))
+            if (name.startsWith("add") && Void.TYPE.equals(returnType))
             {
-                if (name.equals("add"))
+                if(paramTypes.length == 1)
                 {
-                    // type adder.
-                    NestedAdder adder = new NestedAdder() {
-                        public void add(Object parent, Object arg) throws InvocationTargetException, IllegalAccessException
-                        {
-                            method.invoke(parent, arg);
-                        }
-                    };
-                    nestedTypeAdders.put(paramTypes[0], adder);
+                    if (name.equals("add"))
+                    {
+                        // type adder.
+                        NestedAdder adder = new NestedAdder() {
+                            public void add(Object parent, Object arg, Scope scope) throws InvocationTargetException, IllegalAccessException
+                            {
+                                method.invoke(parent, arg);
+                            }
+                        };
+                        nestedTypeAdders.put(paramTypes[0], adder);
+                    }
+                    else
+                    {
+                        String attributeName = getPropertyName(name, "add");
+                        nestedAdders.put(attributeName, new NestedAdder(){
+                            public void add(Object parent, Object arg, Scope scope) throws InvocationTargetException, IllegalAccessException
+                            {
+                                method.invoke(parent, arg);
+                            }
+                        });
+                    }
                 }
-                else
+                else if(paramTypes.length == 2 && paramTypes[1].isAssignableFrom(Scope.class))
                 {
-                    String attributeName = getPropertyName(name, "add");
-                    nestedAdders.put(attributeName, new NestedAdder(){
-                        public void add(Object parent, Object arg) throws InvocationTargetException, IllegalAccessException
-                        {
-                            method.invoke(parent, arg);
-                        }
+                    if (name.equals("add"))
+                    {
+                        // type adder.
+                        NestedAdder adder = new NestedAdder() {
+                            public void add(Object parent, Object arg, Scope scope) throws InvocationTargetException, IllegalAccessException
+                            {
+                                method.invoke(parent, arg, scope);
+                            }
+                        };
+                        nestedTypeAdders.put(paramTypes[0], adder);
+                    }
+                    else
+                    {
+                        String attributeName = getPropertyName(name, "add");
+                        nestedAdders.put(attributeName, new NestedAdder(){
+                            public void add(Object parent, Object arg, Scope scope) throws InvocationTargetException, IllegalAccessException
+                            {
+                                method.invoke(parent, arg, scope);
+                            }
 
-                    });
+                        });
+                    }
                 }
             }
         }
@@ -179,7 +204,7 @@ public class IntrospectionHelper
      */
     private interface NestedAdder
     {
-        public void add(Object parent, Object arg) throws InvocationTargetException, IllegalAccessException;
+        public void add(Object parent, Object arg, Scope scope) throws InvocationTargetException, IllegalAccessException;
     }
 
     /**
@@ -408,17 +433,17 @@ public class IntrospectionHelper
         attributeSetters.get(name).set(parent, value, resolveReferences, allowUnresolved, referenceMap);
     }
     
-    public void add(String name, Object parent, Object arg) throws IllegalAccessException, InvocationTargetException
+    public void add(String name, Object parent, Object arg, Scope scope) throws IllegalAccessException, InvocationTargetException
     {
-        nestedAdders.get(name).add(parent, arg);
+        nestedAdders.get(name).add(parent, arg, scope);
     }
     
-    public void add(Object parent, Object arg) throws IllegalAccessException, InvocationTargetException
+    public void add(Object parent, Object arg, Scope scope) throws IllegalAccessException, InvocationTargetException
     {
         List<NestedAdder> adders = getTypeAdders(arg.getClass());
         for (NestedAdder adder: adders)
         {
-            adder.add(parent, arg);            
+            adder.add(parent, arg, scope);
         }
     }
     

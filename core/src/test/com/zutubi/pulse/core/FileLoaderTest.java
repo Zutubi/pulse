@@ -160,6 +160,23 @@ public class FileLoaderTest extends FileLoaderTestBase
         }
     }
 
+    public void testAdderTypeScope() throws PulseException
+    {
+        ScopeAcceptingRoot root = new ScopeAcceptingRoot();
+        loader.load(getInput(getName()), root);
+        assertNotNull(root.getReference("a"));
+        assertNotNull(root.getScope("a"));
+    }
+
+    public void testAdderScope() throws PulseException
+    {
+        loader.register("ref", SimpleReference.class);
+        ScopeAcceptingRoot root = new ScopeAcceptingRoot();
+        loader.load(getInput(getName()), root);
+        assertNotNull(root.getReference("a"));
+        assertNotNull(root.getScope("a"));
+    }
+
     public void testSpecificRecipeError() throws PulseException
     {
         try

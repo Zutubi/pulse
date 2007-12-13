@@ -197,11 +197,11 @@ public class FileLoader
             // add to container.
             if (parentHelper.hasAdd(propertyName))
             {
-                parentHelper.add(propertyName, parent, type);
+                parentHelper.add(propertyName, parent, type, scope);
             }
             else if (parentHelper.canAdd(type.getClass()))
             {
-                parentHelper.add(parent, type);
+                parentHelper.add(parent, type, scope);
             }
 
             if(loadType)
