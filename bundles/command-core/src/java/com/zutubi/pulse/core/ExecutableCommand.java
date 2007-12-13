@@ -51,7 +51,7 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
     private PrecapturedArtifact envArtifact;
 
     private List<ProcessArtifact> processes = new LinkedList<ProcessArtifact>();
-    private List<String> suppressedEnvironment = Arrays.asList(System.getProperty("pulse.suppressed.environment.variables", "P4PASSWD").split(" +"));
+    private List<String> suppressedEnvironment = Arrays.asList(System.getProperty("pulse.suppressed.environment.variables", "P4PASSWD PULSE_TEST_SUPPRESSED").split(" +"));
     private List<StatusMapping> statusMappings = new LinkedList<StatusMapping>();
     private PulseScope scope;
 
@@ -376,16 +376,8 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
         Map<String, String> env = new TreeMap<String, String>(builder.environment());
         for (String key : env.keySet())
         {
-            String value;
-            if(suppressedEnvironment.contains(key.toUpperCase()))
-            {
-                value = SUPPRESSED_VALUE;
-            }
-            else
-            {
-                value = env.get(key);
-            }
-            buffer.append(key).append("=").append(value).append(separator);
+            String value = env.get(key);
+            appendProperty(key, value, buffer, separator);
         }
 
         buffer.append(separator);
@@ -396,7 +388,7 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
         {
             for (Map.Entry<String, String> setting : scope.getEnvironment().entrySet())
             {
-                buffer.append(setting.getKey()).append("=").append(setting.getValue()).append(separator);
+                appendProperty(setting.getKey(), setting.getValue(), buffer, separator);
             }
         }
         else
@@ -411,7 +403,7 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
         {
             for (Environment setting : this.env)
             {
-                buffer.append(setting.getName()).append("=").append(setting.getValue()).append(separator);
+                appendProperty(setting.getName(), setting.getValue(), buffer, separator);
             }
         }
         else
@@ -431,6 +423,15 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
         {
             IOUtils.close(writer);
         }
+    }
+
+    private void appendProperty(String key, String value, StringBuffer buffer, String separator)
+    {
+        if (suppressedEnvironment.contains(key.toUpperCase()))
+        {
+            value = SUPPRESSED_VALUE;
+        }
+        buffer.append(key).append("=").append(value).append(separator);
     }
 
     private void initialiseEnvironmentArtifact()
@@ -571,6 +572,11 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
             return false;
         }
 
+        if(suppressedEnvironment.contains(name.toUpperCase()))
+        {
+            return false;
+        }
+        
         if (SystemUtils.IS_WINDOWS)
         {
             return name.matches("[-a-zA-Z._0-9<>|&^% ]+");

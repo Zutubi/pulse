@@ -183,17 +183,41 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         assertEnvironment(projectName, 1, "rp=ref " + AgentManager.MASTER_AGENT_NAME);
     }
 
+    public void testSuppressedProperty() throws Exception
+    {
+        String projectName = random + "-project";
+        ensureProject(projectName);
+        String stagePath = PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, projectName, "stages", "default");
+        Hashtable<String, Object> defaultStage = xmlRpcHelper.getConfig(stagePath);
+        defaultStage.put("agent", PathUtils.getPath(ConfigurationRegistry.AGENTS_SCOPE, AgentManager.MASTER_AGENT_NAME));
+        xmlRpcHelper.saveConfig(stagePath, defaultStage, false);
+        String suppressedName = "PULSE_TEST_SUPPRESSED";
+        String suppressedValue = random + "-suppress";
+        xmlRpcHelper.insertConfig(PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, projectName, "properties"), createProperty(suppressedName, suppressedValue, false, true, false));
+
+        loginAsAdmin();
+        triggerSuccessfulBuild(projectName, AgentManager.MASTER_AGENT_NAME);
+        goToEnv(projectName, 1);
+        assertTextPresent(suppressedName);
+        assertTextNotPresent(suppressedValue);
+    }
+
     private void assertEnvironment(String projectName, int buildId, String... envs)
+    {
+        goToEnv(projectName, buildId);
+        for(String env: envs)
+        {
+            assertTextPresent(env);
+        }
+    }
+
+    private void goToEnv(String projectName, int buildId)
     {
         BuildDetailedViewPage detailedViewPage = new BuildDetailedViewPage(selenium, urls, projectName, buildId);
         detailedViewPage.goTo();
         detailedViewPage.clickCommand("default", "build");
         selenium.click("link=env.txt");
         selenium.waitForPageToLoad("10000");
-        for(String env: envs)
-        {
-            assertTextPresent(env);
-        }
     }
 
     private String addResource(String agent, String name) throws Exception
