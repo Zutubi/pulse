@@ -4,8 +4,8 @@ import com.zutubi.config.annotations.ControllingCheckbox;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.pulse.core.ExecutionContext;
-import com.zutubi.pulse.core.VariableHelper;
 import com.zutubi.pulse.core.Scope;
+import com.zutubi.pulse.core.VariableHelper;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.RecipeResultNode;
@@ -13,14 +13,14 @@ import com.zutubi.pulse.util.process.AsyncProcess;
 import com.zutubi.pulse.util.process.ByteHandler;
 import com.zutubi.pulse.util.process.ForwardingByteHandler;
 import com.zutubi.pulse.util.process.NullByteHandler;
+import com.zutubi.util.TextUtils;
 import com.zutubi.validation.annotations.Numeric;
 import com.zutubi.validation.annotations.Required;
-import com.zutubi.util.TextUtils;
 
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.io.File;
 
 /**
  * Run executable tasks are used to execute an arbitrary command in a hook.
@@ -93,7 +93,7 @@ public class RunExecutableTaskConfiguration extends AbstractConfiguration implem
         AsyncProcess asyncProcess = null;
         try
         {
-            Scope scope = context.asScope();
+            Scope scope = context.getScope();
             List<String> resolvedArguments = VariableHelper.splitAndReplaceVariables(arguments, scope, true);
             List<String> commandLine = new LinkedList<String>();
             commandLine.add(command);

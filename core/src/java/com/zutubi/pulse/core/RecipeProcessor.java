@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core;
 
 import static com.zutubi.pulse.core.BuildProperties.*;
+import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.TestSuitePersister;
 import com.zutubi.pulse.core.model.TestSuiteResult;
@@ -63,7 +64,7 @@ public class RecipeProcessor
 
         ExecutionContext context = request.getContext();
         long recipeStartTime = recipeResult.getStartTime();
-        pushRecipeContext(context, testResults, recipeStartTime);
+        pushRecipeContext(context, request, testResults, recipeStartTime);
         try
         {
             // Wrap bootstrapper in a command and run it.
@@ -188,31 +189,37 @@ public class RecipeProcessor
         }
     }
 
-    private void pushRecipeContext(ExecutionContext context, TestSuiteResult testResults, long recipeStartTime)
+    private void pushRecipeContext(ExecutionContext context, RecipeRequest request, TestSuiteResult testResults, long recipeStartTime)
     {
-        context.pushInternalScope();
+        context.push();
         context.addInternalString(PROPERTY_BASE_DIR, context.getWorkingDir().getAbsolutePath());
         context.addInternalString(PROPERTY_RECIPE_TIMESTAMP, BuildProperties.TIMESTAMP_FORMAT.format(new Date(recipeStartTime)));
         context.addInternalString(PROPERTY_RECIPE_TIMESTAMP_MILLIS, Long.toString(recipeStartTime));
         context.addInternalValue(PROPERTY_TEST_RESULTS, testResults);
 
-        context.pushScope();
         if(context.getInternalString(PROPERTY_RECIPE) == null)
         {
             context.addString(PROPERTY_RECIPE, "[default]");
+        }
+
+        PulseScope scope = context.getScope();
+        Map<String, String> env = System.getenv();
+        for(Map.Entry<String, String> var: env.entrySet())
+        {
+            scope.addEnvironmentProperty(var.getKey(), var.getValue());
+        }
+
+        addResourceProperties(context, request.getResourceRequirements(), context.getValue(PROPERTY_RESOURCE_REPOSITORY, ResourceRepository.class));
+        for(ResourceProperty property: request.getProperties())
+        {
+            context.add(property);
         }
     }
 
     private PulseFile loadPulseFile(RecipeRequest request, ExecutionContext context) throws BuildException
     {
-        PulseScope globalScope = new PulseScope(context.asScope());
-        Map<String, String> env = System.getenv();
-        for(Map.Entry<String, String> var: env.entrySet())
-        {
-            globalScope.addEnvironmentProperty(var.getKey(), var.getValue());
-        }
+        PulseScope globalScope = new PulseScope(context.getScope());
 
-        // import the required resources into the pulse files scope.
         // CIB-286: special case empty file for better reporting
         String pulseFileSource = request.getPulseFileSource();
         if(!TextUtils.stringSet(pulseFileSource))

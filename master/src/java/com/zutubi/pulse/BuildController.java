@@ -36,8 +36,6 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  *
@@ -163,7 +161,11 @@ public class BuildController implements EventListener
             recipeContext.addInternalString(PROPERTY_RECIPE, stage.getRecipe());
 
             RecipeRequest recipeRequest = new RecipeRequest(new ExecutionContext(recipeContext));
-            RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(project, stage.getAgentRequirements(), getResourceRequirements(stage), request.getRevision(), recipeRequest, buildResult);
+            List<ResourceRequirement> resourceRequirements = getResourceRequirements(stage);
+            recipeRequest.addAllResourceRequirements(resourceRequirements);
+            recipeRequest.addAllProperties(projectConfig.getProperties().values());
+
+            RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(project, stage.getAgentRequirements(), resourceRequirements, request.getRevision(), recipeRequest, buildResult);
             DefaultRecipeLogger logger = new DefaultRecipeLogger(new File(paths.getRecipeDir(buildResult, recipeResult.getId()), RecipeResult.RECIPE_LOG));
             RecipeResultNode previousRecipe = previousSuccessful == null ? null : previousSuccessful.findResultNodeByHandle(stage.getHandle());
             RecipeController rc = new RecipeController(buildResult, childResultNode, dispatchRequest, recipeContext, previousRecipe, logger, collector, configurationManager, resourceManager);

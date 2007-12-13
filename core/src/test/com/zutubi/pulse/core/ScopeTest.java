@@ -5,9 +5,9 @@ import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Collection;
 
 /**
  */
@@ -211,7 +211,7 @@ public class ScopeTest extends PulseTestCase
 
         parent.add(new ResourceProperty("name", "value"));
 
-        Collection<Reference> references = child.getReferences();
+        Collection<Reference> references = child.getOldrefs();
         assertEquals(1, references.size());
         Reference reference = references.iterator().next();
         assertEquals("name", reference.getName());

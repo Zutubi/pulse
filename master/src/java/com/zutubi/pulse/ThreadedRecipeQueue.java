@@ -4,7 +4,8 @@ import com.zutubi.prototype.config.ConfigurationEventListener;
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.config.events.ConfigurationEvent;
 import com.zutubi.prototype.config.events.PostSaveEvent;
-import static com.zutubi.pulse.MasterBuildProperties.*;
+import static com.zutubi.pulse.MasterBuildProperties.PROPERTY_CLEAN_BUILD;
+import static com.zutubi.pulse.MasterBuildProperties.addRevisionProperties;
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.core.*;
@@ -534,8 +535,6 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
         ExecutionContext context = recipeRequest.getContext();
         addRevisionProperties(context, buildRevision);
-        addResourceProperties(context, request.getResourceRequirements(), resourceManager.getAgentRepository(agent.getConfig().getHandle()));
-        addProjectProperties(context, request.getProject().getConfig());
         
         context.addInternalString(PROPERTY_CLEAN_BUILD, Boolean.toString(request.getProject().isForceCleanForAgent(agent.getId())));
 

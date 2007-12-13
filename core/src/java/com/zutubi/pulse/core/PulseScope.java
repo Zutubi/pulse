@@ -16,7 +16,8 @@ public class PulseScope implements Scope
 
     // If you add a field, update copy()
     private PulseScope parent;
-    private List<ReferenceInfo> references = new LinkedList<ReferenceInfo>();
+    private Map<String, Reference> references = new LinkedHashMap<String, Reference>();
+    private List<ReferenceInfo> oldrefs = new LinkedList<ReferenceInfo>();
 
     public PulseScope()
     {
@@ -53,16 +54,16 @@ public class PulseScope implements Scope
         return parent.getRoot();
     }
     
-    public Collection<Reference> getReferences()
+    public Collection<Reference> getOldrefs()
     {
-        List<Reference> result = new ArrayList<Reference>(references.size());
+        List<Reference> result = new ArrayList<Reference>(oldrefs.size());
 
         if (parent != null)
         {
-            result.addAll(parent.getReferences());
+            result.addAll(parent.getOldrefs());
         }
 
-        for (ReferenceInfo info : references)
+        for (ReferenceInfo info : oldrefs)
         {
             result.add(info.reference);
         }
@@ -72,14 +73,14 @@ public class PulseScope implements Scope
 
     public List<Reference> getReferences(Class type)
     {
-        List<Reference> result = new ArrayList<Reference>(references.size());
+        List<Reference> result = new ArrayList<Reference>(oldrefs.size());
 
         if (parent != null)
         {
             result.addAll(parent.getReferences(type));
         }
 
-        for (ReferenceInfo info : references)
+        for (ReferenceInfo info : oldrefs)
         {
             if (type.isInstance(info.reference.getValue()))
             {
@@ -109,7 +110,7 @@ public class PulseScope implements Scope
             }
         }
 
-        ReferenceInfo info = directLookup(name, references);
+        ReferenceInfo info = directLookup(name, oldrefs);
         if (info != null)
         {
             return info.reference;
@@ -181,7 +182,7 @@ public class PulseScope implements Scope
 
     public void addUnique(Reference reference) throws IllegalArgumentException
     {
-        if (directLookup(reference.getName(), references) != null)
+        if (directLookup(reference.getName(), oldrefs) != null)
         {
             throw new IllegalArgumentException("'" + reference.getName() + "' is already defined in this scope.");
         }
@@ -196,7 +197,7 @@ public class PulseScope implements Scope
 
     private void add(ReferenceInfo info)
     {
-        references.add(0, info);
+        oldrefs.add(0, info);
     }
 
     public void addAll(Collection<? extends Reference> references)
@@ -337,7 +338,7 @@ public class PulseScope implements Scope
 
     private void merge(List<ReferenceInfo> merged)
     {
-        for (ReferenceInfo i : references)
+        for (ReferenceInfo i : oldrefs)
         {
             if (directLookup(i.reference.getName(), merged) == null)
             {
@@ -360,7 +361,7 @@ public class PulseScope implements Scope
         }
 
         PulseScope copy = new PulseScope(parentCopy);
-        copy.references = new LinkedList<ReferenceInfo>(references);
+        copy.oldrefs = new LinkedList<ReferenceInfo>(oldrefs);
         return copy;
     }
 
@@ -368,7 +369,7 @@ public class PulseScope implements Scope
     {
         PulseScope copy = new PulseScope(parent == null ? null : parent.copy());
         // Assumes reference infos are not mutated in some odd way
-        copy.references = new LinkedList<ReferenceInfo>(references);
+        copy.oldrefs = new LinkedList<ReferenceInfo>(oldrefs);
         return copy;
     }
 

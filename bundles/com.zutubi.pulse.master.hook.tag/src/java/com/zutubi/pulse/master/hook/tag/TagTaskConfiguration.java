@@ -61,7 +61,7 @@ public class TagTaskConfiguration extends AbstractConfiguration implements Build
         ScmClient client = null;
         try
         {
-            String tagName = VariableHelper.replaceVariables(tag, context.asScope(), false);
+            String tagName = VariableHelper.replaceVariables(tag, context.getScope(), false);
             client = scmClientFactory.createClient(buildResult.getProject().getConfig().getScm());
             client.tag(revision, tagName, moveExisting);
         }

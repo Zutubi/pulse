@@ -255,7 +255,7 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
     {
         ExecutionContext context = new ExecutionContext();
         ExecutableCommand command = new ExecutableCommand();
-        PulseScope scope = new PulseScope(context.asScope());
+        PulseScope scope = new PulseScope(context.getScope());
         scope.add(new ResourceProperty("java.bin.dir", "somedir", false, true, false));
         command.setScope(scope);
         command.setExe("echo");
@@ -369,7 +369,7 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
         {
             ExecutionContext context = new ExecutionContext();
             ExecutableCommand command = new ExecutableCommand();
-            PulseScope scope = new PulseScope(context.asScope());
+            PulseScope scope = new PulseScope(context.getScope());
             scope.add(new ResourceProperty("a<>", "b", true, false, false));
             command.setScope(scope);
             command.setExe("dir");
@@ -411,7 +411,7 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
     {
         ExecutionContext context = new ExecutionContext();
         context.addInternalString(BuildProperties.PROPERTY_BUILD_NUMBER, Long.toString(buildNumber));
-        PulseScope scope = new PulseScope(context.asScope());
+        PulseScope scope = new PulseScope(context.getScope());
         command.setScope(scope);
         return super.runCommand(command, context);
     }

@@ -4,10 +4,6 @@ import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.BuildProperties;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.ExecutionContext;
-import com.zutubi.pulse.core.ResourceRepository;
-import com.zutubi.pulse.core.config.Resource;
-import com.zutubi.pulse.core.config.ResourceProperty;
-import com.zutubi.pulse.core.config.ResourceVersion;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.TestResultSummary;
@@ -15,11 +11,9 @@ import com.zutubi.pulse.core.scm.CheckoutScheme;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
-import com.zutubi.util.TextUtils;
 
 import java.io.File;
 import java.util.Date;
-import java.util.List;
 
 /**
  * A utility extension of the build properties class with static members for
@@ -28,14 +22,6 @@ import java.util.List;
  */
 public class MasterBuildProperties extends BuildProperties
 {
-    public static void addProjectProperties(ExecutionContext context, ProjectConfiguration projectConfig)
-    {
-        for(ResourceProperty property: projectConfig.getProperties().values())
-        {
-            context.add(property);
-        }
-    }
-
     public static void addAllBuildProperties(ExecutionContext context, BuildResult result, GeneralAdminConfiguration adminConfiguration, MasterConfigurationManager configurationManager)
     {
         String masterUrl = MasterAgentService.constructMasterUrl(adminConfiguration, configurationManager.getSystemConfig());
@@ -72,8 +58,6 @@ public class MasterBuildProperties extends BuildProperties
 
         context.addInternalString(PROPERTY_COMPRESS_ARTIFACTS, "true");
         context.addInternalString(PROPERTY_COMPRESS_WORKING_DIR, Boolean.toString(projectConfig.getOptions().getRetainWorkingCopy()));
-
-        addProjectProperties(context, projectConfig);
     }
 
     public static void addRevisionProperties(ExecutionContext context, BuildRevision buildRevision)
@@ -81,46 +65,6 @@ public class MasterBuildProperties extends BuildProperties
         context.addInternalString(PROPERTY_BUILD_REVISION, buildRevision.getRevision().getRevisionString());
         context.addInternalString(PROPERTY_BUILD_TIMESTAMP, TIMESTAMP_FORMAT.format(new Date(buildRevision.getTimestamp())));
         context.addInternalString(PROPERTY_BUILD_TIMESTAMP_MILLIS, Long.toString(buildRevision.getTimestamp()));
-    }
-
-    public static void addResourceProperties(ExecutionContext context, List<ResourceRequirement> resourceRequirements, ResourceRepository resourceRepository)
-    {
-        if (resourceRequirements != null)
-        {
-            for(ResourceRequirement requirement: resourceRequirements)
-            {
-                Resource resource = resourceRepository.getResource(requirement.getResource());
-                if(resource == null)
-                {
-                    return;
-                }
-
-                for(ResourceProperty property: resource.getProperties().values())
-                {
-                    context.add(property);
-                }
-
-                String importVersion = requirement.getVersion();
-                if(importVersion == null)
-                {
-                    importVersion = resource.getDefaultVersion();
-                }
-
-                if(TextUtils.stringSet(importVersion))
-                {
-                    ResourceVersion version = resource.getVersion(importVersion);
-                    if(version == null)
-                    {
-                        return;
-                    }
-
-                    for(ResourceProperty property: version.getProperties().values())
-                    {
-                        context.add(property);
-                    }
-                }
-            }
-        }
     }
 
     public static void addCompletedBuildProperties(ExecutionContext context, BuildResult result, MasterConfigurationManager configurationManager)

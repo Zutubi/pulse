@@ -18,6 +18,7 @@ public class ExecutionContext
     // If you add a field, remember to update the copy constructor
     private PulseScope internalScope;
     private PulseScope userScope;
+    private PulseScope rootUserScope;
     private File workingDir = null;
     private OutputStream outputStream = null;
     // TODO: replace this with more generic support for extracting properties
@@ -27,13 +28,16 @@ public class ExecutionContext
     public ExecutionContext()
     {
         internalScope = new PulseScope();
-        userScope = new PulseScope();
+        rootUserScope = userScope = new PulseScope(internalScope);
     }
 
     public ExecutionContext(ExecutionContext other)
     {
         this.internalScope = other.internalScope.copy();
-        this.userScope = other.userScope.copy();
+        this.userScope = other.userScope.copyTo(other.rootUserScope.getParent());
+        this.rootUserScope = userScope.getRoot();
+        this.rootUserScope.setParent(internalScope);
+
         this.workingDir = other.workingDir;
         this.outputStream = other.outputStream;
         this.version = other.version;
@@ -159,20 +163,12 @@ public class ExecutionContext
 
     public <T> T getValue(String name, Class<T> type)
     {
-        T value = userScope.getReferenceValue(name, type);
-        if (value == null)
-        {
-            value = internalScope.getReferenceValue(name, type);
-        }
-        return value;
+        return userScope.getReferenceValue(name, type);
     }
 
-    public PulseScope asScope()
+    public PulseScope getScope()
     {
-        PulseScope parent = internalScope.copy();
-        PulseScope leaf = userScope.copy();
-        leaf.getRoot().setParent(parent);
-        return leaf;
+        return userScope;
     }
 
     public void addInternal(Reference reference)
@@ -218,6 +214,7 @@ public class ExecutionContext
     void pushInternalScope()
     {
         internalScope = new PulseScope(internalScope);
+        rootUserScope.setParent(internalScope);
     }
 
     void pushScope()
@@ -233,12 +230,13 @@ public class ExecutionContext
 
     void popInternalScope()
     {
-        this.internalScope = this.internalScope.getParent();
+        internalScope = internalScope.getParent();
+        rootUserScope.setParent(internalScope);
     }
 
     void popScope()
     {
-        this.userScope = this.userScope.getParent();
+        userScope = userScope.getParent();
     }
 
     public void pop()
