@@ -148,10 +148,10 @@ public class RecipeController
         ResourceRepository resourceRepository = resourceManager.getAgentRepository(agent.getConfig().getHandle());
         if (resourceRepository != null)
         {
-            // FIXME scope
-//            MasterBuildProperties.addResourceProperties(recipeContext, dispatchRequest.getResourceRequirements(), resourceRepository);
-//            MasterBuildProperties.addProjectProperties(recipeContext, dispatchRequest.getProject().getConfig());
+            BuildProperties.addResourceProperties(recipeContext, dispatchRequest.getResourceRequirements(), resourceRepository);
         }
+
+        MasterBuildProperties.addProjectProperties(recipeContext, dispatchRequest.getProject().getConfig());
     }
 
     private void handleRecipeCommenced(RecipeCommencedEvent event)

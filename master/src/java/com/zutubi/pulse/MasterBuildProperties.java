@@ -4,6 +4,7 @@ import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.BuildProperties;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.TestResultSummary;
@@ -22,6 +23,14 @@ import java.util.Date;
  */
 public class MasterBuildProperties extends BuildProperties
 {
+    public static void addProjectProperties(ExecutionContext context, ProjectConfiguration projectConfiguration)
+    {
+        for(ResourceProperty property: projectConfiguration.getProperties().values())
+        {
+            context.add(property);
+        }
+    }
+
     public static void addAllBuildProperties(ExecutionContext context, BuildResult result, GeneralAdminConfiguration adminConfiguration, MasterConfigurationManager configurationManager)
     {
         String masterUrl = MasterAgentService.constructMasterUrl(adminConfiguration, configurationManager.getSystemConfig());
@@ -32,6 +41,7 @@ public class MasterBuildProperties extends BuildProperties
         }
         context.addInternalString(PROPERTY_BUILD_TIMESTAMP, TIMESTAMP_FORMAT.format(result.getStamps().getStartTime()));
         context.addInternalString(PROPERTY_BUILD_TIMESTAMP_MILLIS, Long.toString(result.getStamps().getStartTime()));
+        addProjectProperties(context, result.getProject().getConfig());
         addCompletedBuildProperties(context, result, configurationManager);
     }
 
