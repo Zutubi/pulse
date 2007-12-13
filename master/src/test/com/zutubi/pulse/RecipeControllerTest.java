@@ -18,6 +18,7 @@ import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.prototype.config.project.AnyCapableAgentRequirements;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.services.UpgradeState;
 import com.zutubi.pulse.test.PulseTestCase;
@@ -63,8 +64,10 @@ public class RecipeControllerTest extends PulseTestCase
         rootNode.addChild(childNode);
 
         RecipeRequest recipeRequest = new RecipeRequest(makeContext("project", rootResult.getId(), rootResult.getRecipeName()));
-        BuildResult build = new BuildResult(new ManualTriggerBuildReason("user"), new Project(), 1, false);
-        dispatchRequest = new RecipeDispatchRequest(new Project(), new AnyCapableAgentRequirements(), null, new BuildRevision(), recipeRequest, null);
+        Project project = new Project();
+        project.setConfig(new ProjectConfiguration());
+        BuildResult build = new BuildResult(new ManualTriggerBuildReason("user"), project, 1, false);
+        dispatchRequest = new RecipeDispatchRequest(project, new AnyCapableAgentRequirements(), null, new BuildRevision(), recipeRequest, null);
         MasterConfigurationManager configurationManager = new SimpleMasterConfigurationManager()
         {
             public File getDataDirectory()
