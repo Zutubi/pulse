@@ -286,7 +286,7 @@ public class PulseScope implements Scope
 
     public void add(ResourceProperty resourceProperty)
     {
-        add(new ReferenceInfo(resourceProperty));
+        add(new ReferenceInfo(resourceProperty, this));
     }
 
     /**
@@ -373,7 +373,7 @@ public class PulseScope implements Scope
         return copy;
     }
 
-    private class ReferenceInfo
+    private static class ReferenceInfo
     {
         private Reference reference;
         private boolean addToPath;
@@ -391,14 +391,14 @@ public class PulseScope implements Scope
             addToEnvironment = false;
         }
 
-        public ReferenceInfo(ResourceProperty p)
+        public ReferenceInfo(ResourceProperty p, ReferenceMap map)
         {
             String value = p.getValue();
             if (p.getResolveVariables())
             {
                 try
                 {
-                    value = VariableHelper.replaceVariables(p.getValue(), PulseScope.this, true);
+                    value = VariableHelper.replaceVariables(p.getValue(), map, true);
                 }
                 catch (FileLoadException e)
                 {

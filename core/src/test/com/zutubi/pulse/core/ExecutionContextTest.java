@@ -162,10 +162,23 @@ public class ExecutionContextTest extends PulseTestCase
         assertEquals(new File("foo"), copy.getWorkingDir());
     }
 
-    public void testAsScope()
+    public void testCopyProducesUniqueScopes()
     {
         ExecutionContext context = makeNonTrivialContext();
-        
+        ExecutionContext copy = new ExecutionContext(context);
+        for(Scope scopeCopy = copy.getScope(); scopeCopy != null; scopeCopy = scopeCopy.getParent())
+        {
+            for(Scope scope = context.getScope(); scope != null; scope = scope.getParent())
+            {
+                assertNotSame(scopeCopy, scope);
+            }
+        }
+    }
+
+    public void testGetScope()
+    {
+        ExecutionContext context = makeNonTrivialContext();
+
         PulseScope scope = context.getScope();
         assertEquals("ip", scope.getReferenceValue("iparent", String.class));
         assertEquals("ic", scope.getReferenceValue("ichild", String.class));
