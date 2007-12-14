@@ -1,94 +1,40 @@
 package com.zutubi.pulse.plugins;
 
-import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 
 import java.io.File;
-import java.io.FileFilter;
+import java.io.IOException;
 import java.util.List;
 
 /**
  *
  *
  */
-public class PluginManagerTest extends PulseTestCase
+public class PluginManagerTest extends BasePluginSystemTestCase
 {
     private static final String PRODUCER_ID = "com.zutubi.bundles.producer";
     private static final String CONSUMER_ID = "com.zutubi.bundles.consumer";
 
-    private PluginManager manager;
-    private PluginPaths paths;
-
-    private File tempDir;
     private File producer1;
     private File producer11;
     private File producer2;
+    private File producer3;
     private File consumer1;
 
     protected void setUp() throws Exception
     {
         super.setUp();
 
-        paths = setUpPaths();
-
-        startupPluginCore();
-    }
-
-    protected PluginPaths setUpPaths() throws Exception
-    {
-        // base directory will be cleaned up at the end of the test.
-        tempDir = FileSystemUtils.createTempDir(PluginManagerTest.class.getName(), "");
-
-        File internalDir = new File(tempDir, "internal");
-        assertTrue(internalDir.mkdirs());
-        File prepackagedDir = new File(tempDir, "prepackaged");
-        assertTrue(prepackagedDir.mkdirs());
-
-        File storageDir = new File(tempDir, "storage");
-        assertTrue(storageDir.mkdirs());
-        File configDir = new File(tempDir, "config");
-        assertTrue(configDir.mkdirs());
-        File workDir = new File(tempDir, "work");
-        assertTrue(workDir.mkdirs());
-
-        File osgiDir = new File(tempDir, "osgi");
-        assertTrue(osgiDir.mkdirs());
-
-        ConfigurablePluginPaths paths = new ConfigurablePluginPaths();
-        paths.setPrepackagedPluginStorageDir(prepackagedDir);
-        paths.setInternalPluginStorageDir(internalDir);
-        paths.setOsgiConfigurationDir(osgiDir);
-        paths.setPluginRegistryDir(configDir);
-        paths.setPluginStorageDir(storageDir);
-        paths.setPluginWorkDir(workDir);
-
-        // copy contents from etc osgi into temp osgi dir.
-        FileSystemUtils.copy(osgiDir, new File(getPulseRoot(), "master/etc/osgi").listFiles(new FileFilter()
-        {
-            public boolean accept(File file)
-            {
-                return !file.isDirectory();
-            }
-        }));
-
         File bundleDir = getTestDataDir("core", "test-bundles");
         producer1 = new File(bundleDir, "com.zutubi.bundles.producer_1.0.0.jar");
         producer11 = new File(bundleDir, "com.zutubi.bundles.producer_1.1.0.jar");
         producer2 = new File(bundleDir, "com.zutubi.bundles.producer_2.0.0.jar");
+        producer3 = new File(bundleDir, "com.zutubi.bundles.producer_3.0.0.jar");
         consumer1 = new File(bundleDir, "com.zutubi.bundles.consumer_1.0.0.jar");
-
-        return paths;
     }
 
     protected void tearDown() throws Exception
     {
-        shutdownPluginCore();
-
-        manager = null;
-        paths = null;
-
-        removeDirectory(tempDir);
-
         super.tearDown();
     }
 
@@ -96,6 +42,8 @@ public class PluginManagerTest extends PulseTestCase
 
     public void testInstallPlugin() throws Exception
     {
+        startupPluginCore();
+
         File installedPluginFile = new File(paths.getPluginStorageDir(), "com.zutubi.bundles.producer_1.0.0.jar");
         assertFalse(installedPluginFile.isFile());
 
@@ -114,6 +62,8 @@ public class PluginManagerTest extends PulseTestCase
 
     public void testInstallWithAutostartDisabled() throws Exception
     {
+        startupPluginCore();
+
         Plugin installedPlugin = manager.install(producer1.toURI(), false);
         assertPlugin(installedPlugin, PRODUCER_ID, "1.0.0", Plugin.State.DISABLED);
         assertEquals(null, installedPlugin.getErrorMessage());
@@ -123,6 +73,8 @@ public class PluginManagerTest extends PulseTestCase
 
     public void testInstallWithAutostartEnabled() throws Exception
     {
+        startupPluginCore();
+
         Plugin installedPlugin = manager.install(producer1.toURI(), true);
         assertPlugin(installedPlugin, PRODUCER_ID, "1.0.0", Plugin.State.ENABLED);
         assertEquals(null, installedPlugin.getErrorMessage());
@@ -132,6 +84,8 @@ public class PluginManagerTest extends PulseTestCase
 
     public void testInstallWithMissingDependency() throws Exception
     {
+        startupPluginCore();
+
         // install the consumer before we install the producer.
         Plugin installedConsumer = manager.install(consumer1.toURI());
         assertPlugin(installedConsumer, CONSUMER_ID, "1.0.0", Plugin.State.DISABLED);
@@ -144,6 +98,8 @@ public class PluginManagerTest extends PulseTestCase
 
     public void testInstallingAPluginBeforeInstallingItsDependency() throws PluginException
     {
+        startupPluginCore();
+
         // install the consumer before we install the producer.
         Plugin installedConsumer = manager.install(consumer1.toURI());
         assertPlugin(installedConsumer, CONSUMER_ID, "1.0.0", Plugin.State.DISABLED);
@@ -168,6 +124,8 @@ public class PluginManagerTest extends PulseTestCase
 
     public void testEnablePlugin() throws Exception
     {
+        startupPluginCore();
+
         Plugin plugin = manager.install(producer1.toURI(), false);
         assertPlugin(plugin, PRODUCER_ID, "1.0.0", Plugin.State.DISABLED);
         assertEquals(0, manager.equinox.getBundleCount(PRODUCER_ID));
@@ -179,6 +137,8 @@ public class PluginManagerTest extends PulseTestCase
 
     public void testDisablePlugin() throws Exception
     {
+        startupPluginCore();
+
         Plugin plugin = manager.install(producer1.toURI());
         assertPlugin(plugin, PRODUCER_ID, "1.0.0", Plugin.State.ENABLED);
 
@@ -195,6 +155,8 @@ public class PluginManagerTest extends PulseTestCase
 
     public void testEnableDisableCorrectlyPersistsAcrossRestarts() throws Exception
     {
+        startupPluginCore();
+
         Plugin plugin = manager.install(producer1.toURI(), false);
         assertPlugin(plugin, PRODUCER_ID, "1.0.0", Plugin.State.DISABLED);
         assertEquals(0, manager.equinox.getBundleCount(PRODUCER_ID));
@@ -216,6 +178,8 @@ public class PluginManagerTest extends PulseTestCase
 
     public void testDisablingRequiredPluginAlsoDisablesDependent() throws Exception
     {
+        startupPluginCore();
+
         Plugin producer = manager.install(producer1.toURI());
         assertPlugin(producer, PRODUCER_ID, "1.0.0", Plugin.State.ENABLED);
         Plugin consumer = manager.install(consumer1.toURI());
@@ -245,6 +209,8 @@ public class PluginManagerTest extends PulseTestCase
 
     public void testUpgradeDisabledPlugin() throws Exception
     {
+        startupPluginCore();
+
         Plugin plugin = manager.install(producer1.toURI(), false);
         assertPlugin(plugin, PRODUCER_ID, "1.0.0", Plugin.State.DISABLED);
         assertEquals(1, manager.getPlugins().size());
@@ -272,6 +238,8 @@ public class PluginManagerTest extends PulseTestCase
 
     public void testUpgradeEnabledPlugin() throws Exception
     {
+        startupPluginCore();
+
         Plugin plugin = manager.install(producer1.toURI());
         assertPlugin(plugin, PRODUCER_ID, "1.0.0", Plugin.State.ENABLED);
 
@@ -294,6 +262,8 @@ public class PluginManagerTest extends PulseTestCase
 
     public void testMultiplePluginUpgrades() throws Exception
     {
+        startupPluginCore();
+
         Plugin plugin = manager.install(producer1.toURI());
         assertPlugin(plugin, PRODUCER_ID, "1.0.0", Plugin.State.ENABLED);
         assertEquals(0, paths.getPluginWorkDir().list().length);
@@ -324,6 +294,8 @@ public class PluginManagerTest extends PulseTestCase
 
     public void testManualUpgradeOfEnabledPlugin() throws Exception
     {
+        startupPluginCore();
+
         Plugin plugin = manager.install(producer1.toURI());
         assertPlugin(plugin, PRODUCER_ID, "1.0.0", Plugin.State.ENABLED);
 
@@ -346,20 +318,16 @@ public class PluginManagerTest extends PulseTestCase
 
     public void testLoadInternalPlugins() throws Exception
     {
-        shutdownPluginCore();
-
         FileSystemUtils.copy(paths.getInternalPluginStorageDir(), producer1);
 
         startupPluginCore();
 
-        Plugin plugin = manager.getPlugin(PRODUCER_ID);
+        Plugin plugin = manager.getInternalPlugin(PRODUCER_ID);
         assertPlugin(plugin, PRODUCER_ID, "1.0.0", Plugin.State.ENABLED);
     }
 
     public void testLoadPrepackagedPlugins() throws Exception
     {
-        shutdownPluginCore();
-
         FileSystemUtils.copy(paths.getPrepackagedPluginStorageDir(), producer1);
 
         startupPluginCore();
@@ -370,8 +338,6 @@ public class PluginManagerTest extends PulseTestCase
 
     public void testUpgradePrepackagedPlugins() throws Exception
     {
-        shutdownPluginCore();
-
         FileSystemUtils.copy(paths.getPrepackagedPluginStorageDir(), producer1);
 
         startupPluginCore();
@@ -396,6 +362,8 @@ public class PluginManagerTest extends PulseTestCase
 
     public void testDoNotUpgradeUninstalledPrepackagedPlugins() throws Exception
     {
+        startupPluginCore();
+
         Plugin plugin = manager.install(producer1.toURI(), false);
         plugin.uninstall();
         assertEquals(Plugin.State.UNINSTALLED, plugin.getState());
@@ -413,13 +381,13 @@ public class PluginManagerTest extends PulseTestCase
 
     public void testUpgradeInternalPlugin() throws Exception
     {
-        shutdownPluginCore();
-
+        // internal plugins 'just upgrade'.  None of the standard processing applies.
+        
         FileSystemUtils.copy(paths.getInternalPluginStorageDir(), producer1);
 
         startupPluginCore();
 
-        Plugin plugin = manager.getPlugin(PRODUCER_ID);
+        Plugin plugin = manager.getInternalPlugin(PRODUCER_ID);
         assertNotNull(plugin);
         assertEquals(Plugin.State.ENABLED, plugin.getState());
 
@@ -431,16 +399,15 @@ public class PluginManagerTest extends PulseTestCase
 
         startupPluginCore();
 
-        plugin = manager.getPlugin(PRODUCER_ID);
+        plugin = manager.getInternalPlugin(PRODUCER_ID);
         assertNotNull(plugin);
-        assertEquals(Plugin.State.VERSION_CHANGE, plugin.getState());
-
-        plugin.resolve();
         assertEquals(Plugin.State.ENABLED, plugin.getState());
     }
 
     public void testUninstallPlugin() throws Exception
     {
+        startupPluginCore();
+
         Plugin plugin = manager.install(producer1.toURI());
         assertEquals(Plugin.State.ENABLED, plugin.getState());
         assertEquals("1.0.0", plugin.getVersion().toString());
@@ -456,6 +423,8 @@ public class PluginManagerTest extends PulseTestCase
 
     public void testUninstallDisabledPlugin() throws Exception
     {
+        startupPluginCore();
+
         Plugin plugin = manager.install(producer1.toURI(), false);
         assertEquals(Plugin.State.DISABLED, plugin.getState());
 
@@ -470,6 +439,8 @@ public class PluginManagerTest extends PulseTestCase
 
     public void testReinstallAfterUninstall() throws Exception
     {
+        startupPluginCore();
+
         Plugin plugin = manager.install(producer1.toURI());
         assertEquals(Plugin.State.ENABLED, plugin.getState());
 
@@ -485,6 +456,8 @@ public class PluginManagerTest extends PulseTestCase
 
     public void testManualUninstall() throws Exception
     {
+        startupPluginCore();
+
         Plugin plugin = manager.install(producer1.toURI());
         assertEquals(Plugin.State.ENABLED, plugin.getState());
 
@@ -500,14 +473,11 @@ public class PluginManagerTest extends PulseTestCase
 
     public void testCanNotUninstallInternalPlugin() throws Exception
     {
-        // broken...
-        shutdownPluginCore();
-
         FileSystemUtils.copy(paths.getInternalPluginStorageDir(), producer1);
 
         startupPluginCore();
 
-        Plugin plugin = manager.getPlugin(PRODUCER_ID);
+        Plugin plugin = manager.getInternalPlugin(PRODUCER_ID);
         assertNotNull(plugin);
         try
         {
@@ -522,6 +492,8 @@ public class PluginManagerTest extends PulseTestCase
 
     public void testDependentPlugins() throws PluginException
     {
+        startupPluginCore();
+
         Plugin producer = manager.install(producer1.toURI());
         List<Plugin> dependentPlugins = producer.getDependentPlugins();
         assertEquals(0, dependentPlugins.size());
@@ -534,6 +506,8 @@ public class PluginManagerTest extends PulseTestCase
 
     public void testPluginDependenciesForInstalledPlugins() throws Exception
     {
+        startupPluginCore();
+
         // this differs from the previous in that we install and then restart the plugin manager.  This
         // better tests the init processing.
         Plugin producer = manager.install(producer1.toURI());
@@ -548,6 +522,8 @@ public class PluginManagerTest extends PulseTestCase
 
     public void testGetRequiredPlugins() throws PluginException
     {
+        startupPluginCore();
+
         Plugin producer = manager.install(producer1.toURI());
         Plugin consumer = manager.install(consumer1.toURI());
 
@@ -558,13 +534,30 @@ public class PluginManagerTest extends PulseTestCase
         assertEquals(producer, pluginRequirements.get(0).getSupplier());
     }
 
+    public void testInternalPluginsAreNotRegistered() throws IOException, PluginException
+    {
+        FileSystemUtils.copy(paths.getInternalPluginStorageDir(), producer1);
+        startupPluginCore();
+
+        PluginRegistry registry = manager.getPluginRegistry();
+        assertEquals(0, registry.getRegistrations().size());
+        assertFalse(registry.isRegistered("com.zutubi.bundles.producer"));
+    }
+
+    public void testNonInternalPluginsAreRegistered() throws PluginException, IOException
+    {
+        FileSystemUtils.copy(paths.getPluginStorageDir(), producer1);
+        startupPluginCore();
+
+        PluginRegistry registry = manager.getPluginRegistry();
+        assertEquals(1, registry.getRegistrations().size());
+        assertTrue(registry.isRegistered("com.zutubi.bundles.producer"));
+    }
+
 
     public void testConcurrentUpgrades()
     {
-/*
         // upgrade 2 different plugins,
-        fail("nyi");
-*/
     }
 
     public void testUpgradingToPluginWhereFileWasDeletedBeforeRestart()
@@ -573,54 +566,43 @@ public class PluginManagerTest extends PulseTestCase
         // working directory is cleared out (is scratch space after all)
         // restart
         // plugin upgrade fails, but old plugin should be activated - appropriate message should be available somewhere.
-
-/*
-        fail("nyi");
-*/
     }
 
-    //---( test extensions )---
-    public void testCoreExtension() throws Exception
+    public void testUpgradingDisabledPluginTriggersUpgrade()
     {
-/*
-        shutdownPluginCore();
+        // install producer 1.0.0,
+        // disable producer
+        // upgrade to producer 3.0.0
+        // ensure that upgrade is required.
+    }
 
-        // copy in the bundle.
-        File coreBundleBase = new File(getPulseRoot(), FileSystemUtils.composeFilename("bundles", "core-bundle", "resources"));
-        File coreBundleInstallDir = new File(paths.getInternalPluginStorageDir(), "com.zutubi.pulse.core");
-        assertTrue(coreBundleInstallDir.mkdirs());
-        FileSystemUtils.copy(coreBundleInstallDir, coreBundleBase);
+    public void testDependencyCheckMessages()
+    {
+        // install the plugin with the missing dependency,
+        // check that the missing dependency is correctly identified
+        // check that error message when
+        //      a) installing into a running system
+        //      b) starting up the system
+    }
+
+    public void testPluginThatFailsOnStartupWillRetryStartupOnNextSystemStartup()
+    {
+        // failures on startup should not force a manual 're-enable' of the plugin by the user.
+    }
+
+    public void testRegistry() throws Exception
+    {
+        // install the equinox registry plugins to enable all of the registry goodness.
+        installPulseInternalBundles();
+
+        FileSystemUtils.copy(paths.getPluginStorageDir(), producer3);
 
         startupPluginCore();
 
-        // load all of the relevant internal extension point managers.
-        CommandExtensionManager extensionManager = new CommandExtensionManager();
-        extensionManager.setPluginManager(manager);
-        extensionManager.init();
-
-        // initialise the extension system
-        manager.initialiseExtensions();
-
-*/
+        assertNotNull(manager.getExtensionRegistry());
+        assertNotNull(manager.getExtensionTracker());
     }
 
-    private void restartPluginCore() throws Exception
-    {
-        shutdownPluginCore();
-        startupPluginCore();
-    }
-
-    private void startupPluginCore() throws Exception
-    {
-        manager = new PluginManager();
-        manager.setPluginPaths(paths);
-        manager.init();
-    }
-
-    private void shutdownPluginCore() throws Exception
-    {
-        manager.destroy();
-    }
 
     private void assertPlugin(Plugin plugin, String expectedId, String expectedVersion, Plugin.State expectedState)
     {

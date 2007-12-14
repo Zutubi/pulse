@@ -24,7 +24,7 @@
     </publications>
 
     <dependencies>
-        <dependency org="zutubi" name="com.zutubi.pulse.core" rev="latest.integration" conf="*->@"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core" rev="latest.integration" conf="build,source,external,builded_3rd_party->@"/>
 
         <dependency org="zutubi" name="pulse-master" rev="latest.integration" conf="build->@"/>
     </dependencies>

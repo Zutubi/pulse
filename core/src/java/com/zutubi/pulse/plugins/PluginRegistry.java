@@ -34,6 +34,8 @@ public class PluginRegistry
     private static final String ELEMENT_PLUGIN = "plugin";
     private static final String ATTRIBUTE_ID = "id";
 
+    private static final String REGISTRY_FILE_NAME = "plugin-registry.xml";
+
     /**
      * The file in which all of the registry details are persisted.
      */
@@ -49,7 +51,7 @@ public class PluginRegistry
      */
     public PluginRegistry(File dir) throws IOException
     {
-        this.registry = new File(dir, "plugin-registry.xml");
+        this.registry = new File(dir, REGISTRY_FILE_NAME);
 
         load();
     }
@@ -102,11 +104,6 @@ public class PluginRegistry
     public Map<String, String> getEntry(String id)
     {
         return entries.get(id);
-    }
-
-    public Map<String, String> getEntry()
-    {
-        return baseEntry;
     }
 
     /**

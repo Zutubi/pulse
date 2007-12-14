@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<schema targetNamespace="com.zutubi.pulse.core">
+    <annotation>
+        <appInfo>
+            <meta.schema plugin="com.zutubi.pulse.core" id="upgrade" name="Upgrade"/>
+        </appInfo>
+        <documentation>
+        </documentation>
+    </annotation>
+
+    <element name="extension">
+        <complexType>
+            <sequence>
+                <element ref="upgrade" minOccurs="1" maxOccurs="unbounded"/>
+            </sequence>
+            <attribute name="point" type="string" use="required">
+                <annotation>
+                    <documentation>
+                        The extension-point of this extension.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="id" type="string">
+                <annotation>
+                    <documentation>
+                        Extension identifier.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="name" type="string">
+                <annotation>
+                    <documentation>
+                        Name of this extension.
+                    </documentation>
+                </annotation>
+            </attribute>
+        </complexType>
+    </element>
+
+    <element name="upgrade">
+        <complexType>
+            <attribute name="version" type="string">
+                <annotation>
+                    <documentation>
+                        The version that triggers the upgrade.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="class" type="string">
+                <annotation>
+                    <documentation>
+                        The specific class implementing the upgrade.
+                    </documentation>
+                </annotation>
+            </attribute>
+        </complexType>
+    </element>
+</schema>

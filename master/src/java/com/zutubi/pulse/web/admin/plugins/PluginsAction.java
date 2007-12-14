@@ -32,7 +32,7 @@ public class PluginsAction extends PluginActionSupport
 
     public String execute() throws Exception
     {
-        plugins = pluginManager.getNonInternalPlugins();
+        plugins = pluginManager.getPlugins();
         return SUCCESS;
     }
 }

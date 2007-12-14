@@ -18,7 +18,7 @@
 <!--
         <property name="upgradeableComponentSources">
             <list>
-                <ref bean="pluginManager"/>
+                <ref bean="pluginUpgradeManager"/>
             </list>
         </property>
 -->

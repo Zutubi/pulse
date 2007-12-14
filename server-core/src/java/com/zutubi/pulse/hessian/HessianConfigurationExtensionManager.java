@@ -9,7 +9,8 @@ import java.util.Map;
 import java.util.HashMap;
 
 /**
- *
+ * TODO: This may be used by hessian, but the functionality is something that can easily be supported by the
+ * TODO: configuration extension manager.
  *
  */
 public class HessianConfigurationExtensionManager extends AbstractExtensionManager

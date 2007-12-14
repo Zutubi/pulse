@@ -46,7 +46,7 @@ public class PluginsFileObject extends AbstractPulseFileObject
 
     protected String[] doListChildren() throws Exception
     {
-        List<Plugin> allPlugins = pluginManager.getNonInternalPlugins();
+        List<Plugin> allPlugins = pluginManager.getPlugins();
         return CollectionUtils.mapToArray(allPlugins, new Mapping<Plugin, String>()
         {
             public String map(Plugin plugin)

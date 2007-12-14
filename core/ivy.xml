@@ -32,8 +32,6 @@
         <dependency org="apache" name="commons-cli" rev="1.0" conf="external,build,release->default"/>
         <dependency org="apache" name="xmlrpc" rev="2.0.1" conf="external,build,release->default"/>
 
-        <dependency org="eclipse" name="equinox-bundles" rev="3.3" conf="build->default"/>
-
         <dependency org="jssh" name="jssh" rev="0.2.7" conf="external,build,release->default"/>
 
         <dependency org="junit" name="junit" rev="3.8.1" conf="external,build->default"/>
@@ -48,6 +46,11 @@
         <dependency org="xstream" name="xstream" rev="1.2" conf="external,build,release->default"/>
 
         <dependency org="eclipse" name="equinox" rev="3.3" conf="external,build,release->default"/>
+        <dependency org="eclipse" name="equinox-bundles" rev="3.3" conf="build->default">
+            <artifact name="org.eclipse.equinox.common_3.3.0.v20070426" type="jar"/>
+            <artifact name="org.eclipse.equinox.registry_3.3.0.v20070522" type="jar"/>
+            <!--<artifact name="org.eclipse.core.jobs_3.3.0.v20070423" type="jar"/>-->
+        </dependency>
 
         <dependency org="springframework" name="spring" rev="2.0" conf="external,build,release->spring-beans,spring-context,spring-core"/>
     </dependencies>

@@ -47,15 +47,18 @@ public class PluginManager
 
     private List<LocalPlugin> plugins = new LinkedList<LocalPlugin>();
 
+    // special plugins that are loaded ahead of all others.  Upgrade handling does not apply to these plugins.
+    private List<LocalPlugin> internalPlugins = new LinkedList<LocalPlugin>();
+
     private IExtensionRegistry extensionRegistry;
     private IExtensionTracker extensionTracker;
 
     //-- plugin registry keys. --
-    
+
     private static final String PLUGIN_STATE_KEY = "plugin.state";
     private static final String PLUGIN_TYPE_KEY = "plugin.type";
-    private static final String PLUGIN_VERSION_KEY = "plugin.version";
-    private static final String PLUGIN_SOURCE_KEY = "plugin.uri";
+    public static final String PLUGIN_VERSION_KEY = "plugin.version";
+    public static final String PLUGIN_SOURCE_KEY = "plugin.uri";
     private static final String PLUGIN_PENDING_KEY = "plugin.pending.action";
     private static final String UPGRADE_SOURCE_KEY = "plugin.upgrade.source";
 
@@ -69,6 +72,8 @@ public class PluginManager
 
     private List<ExtensionManager> extensionManagers = new LinkedList<ExtensionManager>();
 
+    private boolean versionChangeDetected = false;
+
     private enum State
     {
         ENABLED, DISABLED, UNINSTALLED
@@ -80,27 +85,47 @@ public class PluginManager
 
     public void init() throws Exception
     {
+        // Step 1: process any pending actions.
+        //  - these need to be executed BEFORE we start working with the underlying equinox system, in particular,
+        //    before we start wiring things together.
+        registry = new PluginRegistry(paths.getPluginRegistryDir());
+
+        processPendingActions();
+
+        // Step 2: start the embedded plugin container
+        //  - configure start equinox
+        //  - install and startup the internal plugins.
         equinox = new Equinox();
 
         // setup the configuration.
         equinox.setProperty(OSGiFramework.OSGI_CONFIGURATION_AREA, paths.getOsgiConfigurationDir().getAbsolutePath());
         equinox.start();
 
-        registry = new PluginRegistry(paths.getPluginRegistryDir());
+        startupInternalPlugins();
 
-        // we have complete details for the pending actions, so process them first.
-        processPendingActions();
+        // extension registry is not available until the internal plugins containing the eclipse registry have been loaded.
+        extensionRegistry = RegistryFactory.getRegistry();
+        extensionTracker = new ExtensionTracker(extensionRegistry);
+
+        // Step 3: scan the various directories and update the registry accordingly.
+        //  - install the pre-packaged plugins, unless they have been explicitly marked as uninstalled.
+        //  - register new plugins, mark uninstalls as uninstalled.
 
         // run scans over the directories before checking for manual uninstalls so that manual upgrades are not
         // miss interpreted.
-        scanInternalPlugins();
         scanPrepackagedPlugins();
         scanUserPlugins();
-
         scanForManualUninstalls();
+
+        // Step 4: plugin startup
+        //  - install and resolve the plugins. (deal with unresolved plugins - provide as much feedback as possible).
+        //  - check for version changes.  Those plugins with version changes may require upgrades - leave that to
+        //    the plugin upgrade process
+        //  - start the plugins that we can start.
 
         List<LocalPlugin> installedPlugins = new LinkedList<LocalPlugin>();
 
+        //TODO: create handles for all plugins - enabled and disabled.
         for (String id : registry.getRegistrations())
         {
             Map<String, String> entry = registry.getEntry(id);
@@ -128,7 +153,7 @@ public class PluginManager
 
         // enable all of the installed plugins - enable in batch.
         // - this processing is exactly the same as that done during the enable, except on a bulk
-        boolean versionChangeDetected = false;
+        versionChangeDetected = false;
         for (LocalPlugin plugin : installedPlugins)
         {
             Map<String, String> entry = registry.getEntry(plugin.getId());
@@ -145,6 +170,8 @@ public class PluginManager
             plugin.bundle = equinox.install(plugin.getSource());
             plugin.bundleDescription = equinox.getBundleDescription(plugin.getId(), plugin.getVersion().toString());
         }
+
+        //NOTE: the extension works with resolved plugins, so we need to get a plugin to resolved before it can be upgrades. 
 
         // resolve them all.
         equinox.resolveBundles();
@@ -212,11 +239,36 @@ public class PluginManager
                 }
             }
 
-            // extension registry is not available until the internal plugins containing the eclipse registry have
-            // been loaded.
-            extensionRegistry = RegistryFactory.getRegistry();
-            extensionTracker = new ExtensionTracker(extensionRegistry);
         }
+    }
+
+    private void startupInternalPlugins()
+            throws PluginException, BundleException
+    {
+        for(File file : paths.getInternalPluginStorageDir().listFiles())
+        {
+            LocalPlugin internalPlugin = createPluginHandle(file.toURI(), Plugin.Type.INTERNAL);
+            internalPlugin.bundle = equinox.install(internalPlugin.getSource());
+            internalPlugin.bundleDescription = equinox.getBundleDescription(internalPlugin.getId(), internalPlugin.getVersion().toString());
+            internalPlugins.add(internalPlugin);
+        }
+        equinox.resolveBundles();
+        internalPlugins = sortPlugins(internalPlugins);
+        for (LocalPlugin plugin : internalPlugins)
+        {
+            plugin.bundle.start(Bundle.START_TRANSIENT);
+            plugin.setState(Plugin.State.ENABLED);
+        }
+    }
+
+    public boolean isVersionChangeDetected()
+    {
+        return versionChangeDetected;
+    }
+
+    protected void completeStartup()
+    {
+
     }
 
     private void scanForManualUninstalls() throws PluginException
@@ -270,15 +322,7 @@ public class PluginManager
                             {
                                 String source = entry.get(PLUGIN_SOURCE_KEY);
                                 File plugin = new File(new URI(source));
-                                if (plugin.isDirectory())
-                                {
-                                    FileSystemUtils.rmdir(plugin);
-                                }
-                                else if (plugin.isFile())
-                                {
-                                    FileSystemUtils.delete(plugin);
-                                }
-
+                                FileSystemUtils.delete(plugin);
                                 entry.remove(PLUGIN_SOURCE_KEY);
                             }
                             entry.put(PLUGIN_STATE_KEY, State.UNINSTALLED.toString());
@@ -290,14 +334,7 @@ public class PluginManager
 
                             // cleanup the temporary file.
                             File tmpPluginFile = new File(newSource);
-                            if (tmpPluginFile.isDirectory())
-                            {
-                                FileSystemUtils.rmdir(tmpPluginFile);
-                            }
-                            else if (tmpPluginFile.isFile())
-                            {
-                                FileSystemUtils.delete(tmpPluginFile);
-                            }
+                            FileSystemUtils.delete(tmpPluginFile);
                         }
                         entry.remove(PLUGIN_PENDING_KEY);
                         saveRegistry(); // this may be overly aggressive flushing.
@@ -339,17 +376,6 @@ public class PluginManager
         saveRegistry();
     }
 
-    /**
-     * Scan the internal plugins directory, picking up and installing any new plugins, and detecting any plugins
-     * that require an upgrade.
-     *
-     * @throws PluginException if there is an error scanning the internal plugins directory.
-     */
-    private void scanInternalPlugins() throws PluginException
-    {
-        scanInplacePluginDirectory(paths.getInternalPluginStorageDir(), Plugin.Type.INTERNAL);
-    }
-
     private void scanUserPlugins() throws PluginException
     {
         scanInplacePluginDirectory(paths.getPluginStorageDir(), Plugin.Type.USER);
@@ -359,7 +385,7 @@ public class PluginManager
     {
         if (paths.getPrepackagedPluginStorageDir() == null)
         {
-            // During dev, the prepackaged plugins are compiled directly into the storage directory.  
+            // During dev, the prepackaged plugins are compiled directly into the storage directory.
             // Lets just work with this for now.
             return;
         }
@@ -370,7 +396,6 @@ public class PluginManager
             LocalPlugin plugin = createPluginHandle(file.toURI(), Plugin.Type.USER);
             try
             {
-
                 if (!registry.isRegistered(plugin))
                 {
                     // download and register - may want to make the default 'discovery' behaviour configurable?
@@ -392,10 +417,10 @@ public class PluginManager
                     // version check. if new version available, mark it for pending upgrade.
                     LocalPlugin registeredPlugin = createPluginHandle(new URI(entry.get(PLUGIN_SOURCE_KEY)), Plugin.Type.valueOf(entry.get(PLUGIN_TYPE_KEY)));
 
-                    // this comparison is a little odd - opposite to the standard comparison...
+                    //TODO: provide the user with the opportunity to not upgrade to the new version. They may have an old version for a specific reason.
+
                     if (plugin.getVersion().compareTo(registeredPlugin.getVersion()) > 0)
                     {
-                        // upgrade - configure pending upgrade
                         try
                         {
                             upgradePluginSource(plugin.getId(), file.toURI());
@@ -812,30 +837,9 @@ public class PluginManager
         return new LinkedList<Plugin>(plugins);
     }
 
-    public List<Plugin> getNonInternalPlugins()
-    {
-        List<Plugin> result = new LinkedList<Plugin>();
-        for (LocalPlugin plugin : plugins)
-        {
-            if (plugin.getType() != Plugin.Type.INTERNAL)
-            {
-                result.add(plugin);
-            }
-        }
-        return result;
-    }
-
     public List<Plugin> getDependentPlugins(LocalPlugin plugin)
     {
-        List<LocalPlugin> nonInternalPlugins = new LinkedList<LocalPlugin>();
-        for (LocalPlugin p : plugins)
-        {
-            if (p.getType() != Plugin.Type.INTERNAL)
-            {
-                nonInternalPlugins.add(p);
-            }
-        }
-        return new LinkedList<Plugin>(getDependentPlugins(plugin, nonInternalPlugins, false));
+        return new LinkedList<Plugin>(getDependentPlugins(plugin, plugins, false));
     }
 
     public List<PluginRequirement> getRequiredPlugins(LocalPlugin plugin)
@@ -848,7 +852,7 @@ public class PluginManager
             // but to get at them, we would need to read the raw bundle description outselves.
             return new LinkedList<PluginRequirement>();
         }
-        
+
         BundleSpecification[] requiredBundles = description.getRequiredBundles();
         return CollectionUtils.map(requiredBundles, new Mapping<BundleSpecification, PluginRequirement>()
         {
@@ -907,6 +911,12 @@ public class PluginManager
             is = source.toURL().openStream();
 
             tmpFile = new File(downloadedFile.getAbsolutePath() + ".tmp");
+
+            if (!tmpFile.getParentFile().exists() && !tmpFile.getParentFile().mkdirs())
+            {
+                throw new IOException("Failed to download plugin. Unable to create new directory: " + tmpFile.getParentFile().getAbsolutePath());
+            }
+            
             os = new FileOutputStream(tmpFile);
 
             IOUtils.joinStreams(is, os);
@@ -944,6 +954,11 @@ public class PluginManager
     public Plugin getPlugin(String id)
     {
         return findPlugin(id, plugins);
+    }
+
+    public Plugin getInternalPlugin(String id)
+    {
+        return findPlugin(id, internalPlugins);
     }
 
     private LocalPlugin findPlugin(final String id, List<LocalPlugin> plugins)
@@ -1015,6 +1030,11 @@ public class PluginManager
         }
     }
 
+    public PluginRegistry getPluginRegistry()
+    {
+        return registry;
+    }
+
     public IExtensionRegistry getExtensionRegistry()
     {
         return extensionRegistry;
@@ -1032,7 +1052,7 @@ public class PluginManager
 
     public void initialiseExtensions()
     {
-        for(ExtensionManager extensionManager: extensionManagers)
+        for (ExtensionManager extensionManager : extensionManagers)
         {
             ComponentContext.autowire(extensionManager);
             extensionManager.initialiseExtensions();
