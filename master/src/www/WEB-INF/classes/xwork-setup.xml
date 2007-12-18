@@ -25,6 +25,7 @@
             <result name="data" type="redirect">/setup/setupData!input.action</result>
             <result name="setup" type="redirect">/setupwizard/init/?wizard</result>
             <result name="license" type="redirect">/setup/setupLicense!input.action</result>
+            <result name="restore" type="redirect">/restore/preview.action</result>
             <result name="upgrade" type="redirect">/upgrade/preview.action</result>
             <result name="starting" type="redirect">/startup/starting.action</result>
             <result name="success" type="redirect">/</result>
@@ -80,6 +81,30 @@
         <action name="continue" class="com.zutubi.pulse.web.upgrade.PostUpgradeAction">
             <result name="success" type="redirect">/</result>
         </action>
+    </package>
+
+    <package name="restore" namespace="/restore" extends="webwork-default-package">
+        <default-interceptor-ref name="completeStack"/>
+
+        <action name="preview" class="com.zutubi.pulse.web.restore.RestorePreviewAction">
+            <result name="success" type="velocity">preview.vm</result>
+        </action>
+
+        <action name="execute" class="com.zutubi.pulse.web.restore.RestoreExecuteAction">
+            <interceptor-ref name="executeAndWaitStack"/>
+            <result name="wait" type="velocity">status.vm</result>
+            <result name="success" type="velocity">complete.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="continue" class="com.zutubi.pulse.web.restore.PostRestoreAction">
+            <result name="success" type="redirect">/</result>
+        </action>
+
+        <action name="skip" class="com.zutubi.pulse.web.restore.SkipRestoreAction">
+            <result name="success" type="redirect">/</result>
+        </action>
+
     </package>
 
     <package name="startup" extends="webwork-default-package">

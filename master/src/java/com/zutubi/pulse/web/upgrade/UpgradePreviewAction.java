@@ -77,8 +77,6 @@ public class UpgradePreviewAction extends UpgradeActionSupport
 
         upgradeGroupPreview = upgradeManager.previewUpgrade();
 
-//        upgradePreview = upgradeGroupPreview.get(0).getTasks();
-
         return SUCCESS;
     }
 

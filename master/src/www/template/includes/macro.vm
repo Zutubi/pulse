@@ -1137,6 +1137,23 @@
 #end
 
 ##
+## Shows a standard Continue Skip submit row, given the first tab index.
+##
+    #macro(continueSkip $tabIndex)
+        #openSubmit()
+            #wwsubmit("name=continue" "value=%{getText('continue.name')}" "tabindex=$tabIndex")
+            #set($tabIndex = $tabIndex + 1)
+            #wwsubmit("name=skip" "value=%{getText('skip.name')}" "tabindex=$tabIndex")
+        #closeSubmit()
+    #end
+
+#macro(skip $tabIndex)
+    #openSubmit()
+        #wwsubmit("name=skip" "value=%{getText('skip.name')}" "tabindex=$tabIndex")
+    #closeSubmit()
+#end
+
+##
 ## Shows a standard Upload submit row, given the first tab index.
 ##
 #macro(upload $tabIndex)

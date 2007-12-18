@@ -1,0 +1,29 @@
+<html>
+<head></head>
+
+<body>
+<h1 id="restore.preview">Restore Preview</h1>
+
+<p>
+    blurb about restore, including details of the data to be restored.
+    <ul>
+        <li>Date: </li>$info.date
+        <li>Version: </li>$info.version
+        <li>File: </li>$info.source
+    </ul>
+</p>
+
+<p style="width:50%">
+    Please be aware that this restore will overwrite all of your existing configuration and settings.
+</p>
+
+#wwform("action=execute" "method=post")
+#continue(1)
+#end
+
+#wwform("action=skip" "method=post")
+#skip(1)
+#end
+
+</body>
+</html>

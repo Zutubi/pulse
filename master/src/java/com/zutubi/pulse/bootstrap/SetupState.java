@@ -10,4 +10,5 @@ public enum SetupState
     LICENSE,
     UPGRADE,
     SETUP,
+    RESTORE,
 }

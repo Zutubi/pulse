@@ -1,0 +1,39 @@
+<html>
+<head>
+
+</head>
+
+<body>
+
+<h1 id="restore.complete">Restore#if ($monitor.isSuccessful()) Complete #else Failed #end</h1>
+
+<p>
+    The restore has been#if ($monitor.isSuccessful()) successful.#else unsuccessful#end
+</p>
+
+<p>
+    <table width=500>
+        <tr width="40%">
+            #if ($monitor.isSuccessful())
+                #set($styleClass = "okaybar")
+            #elseif($monitor.isError())
+                #set($styleClass = "errorbar")
+            #else
+                #set($styleClass = "clearbar")
+            #end
+            <td width="100%" class="$styleClass">&nbsp;</td>
+        </tr>
+    </table>
+</p>
+
+<p>
+#if ($monitor.isSuccessful())
+    The restore has completed. <a id="continue" href="continue.action">continue</a>.
+#else
+    The upgrade has failed. Please report this failure to <a href="mailto:support@zutubi.com">zutubi support</a>,
+    including a screenshot of this page and your server log files.
+#end
+</p>
+
+</body>
+</html>

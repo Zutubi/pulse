@@ -6,6 +6,7 @@
         <property name="configContexts">
             <list>
                 <value>classpath:/com/zutubi/pulse/bootstrap/context/configContext.xml</value>
+                <value>classpath:/com/zutubi/pulse/bootstrap/context/restoreContext.xml</value>
             </list>
         </property>
         <property name="daoContexts">

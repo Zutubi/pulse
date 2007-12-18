@@ -28,6 +28,7 @@
         <pattern>/setup/*</pattern>
         <pattern>/setupwizard/*</pattern>
         <pattern>/upgrade/*</pattern>
+        <pattern>/restore/*</pattern>
         <pattern>/startup/*</pattern>
         <pattern>/shutdown/*</pattern>
     </decorator>

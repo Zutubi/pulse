@@ -209,6 +209,24 @@ public class DefaultSetupManager implements SetupManager
         eventManager.publish(new DataDirectoryLocatedEvent(this));
 
         loadSystemProperties();
+
+        if (isRestoreRequested())
+        {
+            state = SetupState.RESTORE;
+            showPrompt();
+            return;
+        }
+
+        requestRestoreComplete(false);
+    }
+
+    public boolean isRestoreRequested()
+    {
+        return false;
+    }
+
+    public void requestRestoreComplete(boolean changed)
+    {
         linkUserTemplates();
 
         // load db contexts...
@@ -221,7 +239,7 @@ public class DefaultSetupManager implements SetupManager
         if (isLicenseRequired())
         {
             //TODO: we need to provide some feedback to the user about what / why their current license
-            //TODO: if one exists is not sufficient.
+            //TODO: (if one exists) is not sufficient.
             state = SetupState.LICENSE;
             showPrompt();
             return;

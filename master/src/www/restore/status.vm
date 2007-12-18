@@ -1,0 +1,40 @@
+<html>
+<head>
+    <meta http-equiv="refresh" content='5;url=#wwurl("includeParams=all")'/>
+</head>
+
+<body>
+
+<h1 id="restore.progress">Restore Progress</h1>
+
+<p>
+    The restore is currently in progress.
+</p>
+
+<table width=500>
+    <tr>
+        <td colspan="2" nowrap>Percentage complete: $monitor.getPercentageComplete()%</td>
+    </tr>
+    <tr width="40%">
+        #if ($monitor.isSuccessful())
+            #set($styleClass = "okaybar")
+        #elseif($monitor.isError())
+            #set($styleClass = "errorbar")
+        #else
+            #set($styleClass = "clearbar")
+        #end
+        #if ($monitor.getPercentageComplete() == 0)
+            <td colspan="2" class="clearbar">&nbsp;</td>
+        #else
+            <td width="$monitor.getPercentageComplete()%" class="$styleClass"/>
+            <td class="clearbar">&nbsp;</td>
+        #end
+    </tr>
+</table>
+
+<p>
+    Elapsed time: $monitor.getElaspedTime()
+</p>
+
+</body>
+</html>

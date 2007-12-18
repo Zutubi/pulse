@@ -22,4 +22,6 @@ public interface SetupManager
     void requestSetupComplete();
 
     void startSetupWorkflow(ProcessSetupStartupTask processSetupStartupTask);
+
+    void requestRestoreComplete(boolean changed);
 }
