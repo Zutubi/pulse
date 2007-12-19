@@ -56,6 +56,19 @@ public class MultiScopeStackTest extends PulseTestCase
         assertTrue(scope.containsReference("1 2 3"));
     }
 
+    public void testGetNamedScopeNoSuchScope()
+    {
+        try
+        {
+            stack.getScope("blah");
+            fail();
+        }
+        catch(IllegalArgumentException e)
+        {
+            assertEquals("No such scope 'blah'", e.getMessage());
+        }
+    }
+
     public void testPushPopProperties()
     {
         pushAndAddProperties();
@@ -81,6 +94,58 @@ public class MultiScopeStackTest extends PulseTestCase
         assertScopeChain(stack.getScope(NS3), scope3, stack.getScope(NS2), scope2, stack.getScope(NS1), scope1);
         stack.pop();
         assertScopeChain(scope3, scope2, scope1);
+    }
+
+    public void testPopEmpty()
+    {
+        try
+        {
+            stack.pop();
+            fail();
+        }
+        catch(IllegalStateException e)
+        {
+            assertEquals("Attempt to pop an empty stack", e.getMessage());
+        }
+    }
+
+    public void testPopTo(String label)
+    {
+        stack.setLabel("foo");
+        stack.push();
+        stack.add(new Property("a", "av"));
+        stack.push();
+        stack.add(new Property("b", "bv"));
+        stack.popTo("foo");
+
+        assertFalse(stack.containsReference("a"));
+        assertFalse(stack.containsReference("b"));
+        assertOriginalProperties(stack);
+    }
+
+    public void testPopToSame(String label)
+    {
+        stack.push();
+        stack.add(new Property("a", "av"));
+        stack.setLabel("foo");
+        stack.popTo("foo");
+
+        assertTrue(stack.containsReference("a"));
+        assertOriginalProperties(stack);
+    }
+
+    public void testPopToNonExistantLabel(String label)
+    {
+        stack.setLabel("foo");
+        stack.push();
+        stack.add(new Property("a", "av"));
+        stack.push();
+        stack.add(new Property("b", "bv"));
+        stack.popTo("non");
+
+        assertTrue(stack.containsReference("a"));
+        assertTrue(stack.containsReference("b"));
+        assertOriginalProperties(stack);
     }
 
     public void testCopy()

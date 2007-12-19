@@ -1,9 +1,9 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.util.TextUtils;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.TextUtils;
 
 import java.util.List;
 
@@ -20,13 +20,11 @@ public class XCodeCommand extends ExecutableCommand
 
     public XCodeCommand()
     {
-        super("xcodebuild");
+        super("xcode.bin", "xcodebuild");
     }
 
     public void execute(ExecutionContext context, CommandResult cmdResult)
     {
-        setExeFromProperty("xcode.bin");
-
         if (TextUtils.stringSet(project))
         {
             addArguments("-project", project);

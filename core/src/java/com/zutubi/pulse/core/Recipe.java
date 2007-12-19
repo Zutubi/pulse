@@ -23,6 +23,8 @@ public class Recipe extends SelfReference
 {
     private static final Logger LOG = Logger.getLogger(Recipe.class);
 
+    private static final String LABEL_EXECUTE = "execute";
+
     /**
      * The ordered list of commands that are executed by this recipe.
      */
@@ -167,6 +169,7 @@ public class Recipe extends SelfReference
 
     public void execute(ExecutionContext context)
     {
+        context.setLabel(LABEL_EXECUTE);
         try
         {
             boolean success = true;
@@ -187,7 +190,7 @@ public class Recipe extends SelfReference
 
                     pushCommandContext(context, pair.second, commandOutput);
                     boolean recipeTerminated = !executeCommand(context, commandOutput, result, command);
-                    context.pop();
+                    context.popTo(LABEL_EXECUTE);
 
                     if(recipeTerminated)
                     {

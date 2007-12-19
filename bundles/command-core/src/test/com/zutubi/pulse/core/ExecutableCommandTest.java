@@ -256,10 +256,8 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
     public void testResourcePathsAddedToEnvironment() throws IOException
     {
         ExecutionContext context = new ExecutionContext();
+        context.add(new ResourceProperty("java.bin.dir", "somedir", false, true, false));
         ExecutableCommand command = new ExecutableCommand();
-        PulseScope scope = new PulseScope(context.getScope());
-        scope.add(new ResourceProperty("java.bin.dir", "somedir", false, true, false));
-        command.setScope(scope);
         command.setExe("echo");
 
         CommandResult result = runCommand(command, context);
@@ -370,10 +368,8 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
         if (SystemUtils.IS_WINDOWS)
         {
             ExecutionContext context = new ExecutionContext();
+            context.add(new ResourceProperty("a<>", "b", true, false, false));
             ExecutableCommand command = new ExecutableCommand();
-            PulseScope scope = new PulseScope(context.getScope());
-            scope.add(new ResourceProperty("a<>", "b", true, false, false));
-            command.setScope(scope);
             command.setExe("dir");
 
             runCommand(command, context);
@@ -413,8 +409,6 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
     {
         ExecutionContext context = new ExecutionContext();
         context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_NUMBER, Long.toString(buildNumber));
-        PulseScope scope = new PulseScope(context.getScope());
-        command.setScope(scope);
         return super.runCommand(command, context);
     }
 

@@ -10,7 +10,8 @@ import com.zutubi.util.Constants;
 import com.zutubi.util.ForkOutputStream;
 import com.zutubi.util.IOUtils;
 import com.zutubi.util.TextUtils;
-import com.zutubi.validation.annotations.Required;
+import com.zutubi.validation.Validateable;
+import com.zutubi.validation.ValidationContext;
 
 import java.io.*;
 import java.util.*;
@@ -21,7 +22,7 @@ import java.util.*;
  * It exposes two built in artifacts. The command's output and its execution
  * environment.
  */
-public class ExecutableCommand extends CommandSupport implements ScopeAware
+public class ExecutableCommand extends CommandSupport implements Validateable
 {
     private static final String SUPPRESSED_VALUE = "[value suppressed for security reasons]";
 
@@ -34,9 +35,9 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
     static final String OUTPUT_ARTIFACT_NAME = "command output";
     static final String OUTPUT_FILENAME = "output.txt";
 
-    @Required
     private String exe;
-    private boolean explicitExe = false;
+    private String exeProperty;
+    private String defaultExe;
     private List<Arg> args = new LinkedList<Arg>();
     private File workingDir;
     private String inputFile;
@@ -54,7 +55,6 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
     private List<ProcessArtifact> processes = new LinkedList<ProcessArtifact>();
     private List<String> suppressedEnvironment = Arrays.asList(System.getProperty("pulse.suppressed.environment.variables", "P4PASSWD PULSE_TEST_SUPPRESSED").split(" +"));
     private List<StatusMapping> statusMappings = new LinkedList<StatusMapping>();
-    private PulseScope scope;
 
     /**
      * Required no arg constructor.
@@ -64,17 +64,18 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
 
     }
 
-    protected ExecutableCommand(String defaultExe)
+    protected ExecutableCommand(String exeProperty, String defaultExe)
     {
-        exe = defaultExe;
+        this.exeProperty = exeProperty;
+        this.defaultExe = defaultExe;
     }
 
     public void execute(ExecutionContext context, CommandResult cmdResult)
     {
         File workingDir = getWorkingDir(context.getWorkingDir());
-        ProcessBuilder builder = new ProcessBuilder(constructCommand(workingDir));
+        ProcessBuilder builder = new ProcessBuilder(constructCommand(context, workingDir));
         builder.directory(workingDir);
-        updateChildEnvironment(builder);
+        updateChildEnvironment(context, builder);
 
         builder.redirectErrorStream(true);
 
@@ -82,7 +83,7 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
         File outputDir = context.getFile(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR);
         try
         {
-            captureExecutionEnvironmentArtifact(builder, outputDir);
+            captureExecutionEnvironmentArtifact(context, builder, outputDir);
         }
         catch (IOException e)
         {
@@ -343,12 +344,13 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
     /**
      * This method records the execution environment and adds it as an artifact to the command result.
      *
+     * @param context context we are executing in
      * @param builder is the configured builder used to execute the command.
      * @param outputDir is the artifact output directory.
      *
      * @throws IOException if there are problems recording the execution environment.
      */
-    private void captureExecutionEnvironmentArtifact(ProcessBuilder builder, File outputDir) throws IOException
+    private void captureExecutionEnvironmentArtifact(ExecutionContext context, ProcessBuilder builder, File outputDir) throws IOException
     {
         initialiseEnvironmentArtifact();
 
@@ -385,7 +387,8 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
         buffer.append("Resources: (via scope)").append(separator);
         buffer.append("----------------------").append(separator);
 
-        if (scope != null && scope.getEnvironment().size() > 0)
+        PulseScope scope = context.getScope();
+        if (scope.getEnvironment().size() > 0)
         {
             for (Map.Entry<String, String> setting : scope.getEnvironment().entrySet())
             {
@@ -443,8 +446,9 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
         envArtifact.setType("text/plain");
     }
 
-    private List<String> constructCommand(File workingDir)
+    private List<String> constructCommand(ExecutionContext context, File workingDir)
     {
+        determineExe(context);
         String binary = exe;
 
         File exeFile = new File(exe);
@@ -459,7 +463,7 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
             }
             else
             {
-                exeFile = scope == null ? null : SystemUtils.findInPath(exe, scope.getPathDirectories());
+                exeFile = SystemUtils.findInPath(exe, context.getScope().getPathDirectories());
                 if (exeFile != null)
                 {
                     binary = exeFile.getAbsolutePath();
@@ -478,6 +482,22 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
             }
         }
         return command;
+    }
+
+    private void determineExe(ExecutionContext context)
+    {
+        if(!TextUtils.stringSet(exe))
+        {
+            if(TextUtils.stringSet(exeProperty))
+            {
+                exe = context.getString(exeProperty);
+            }
+
+            if(!TextUtils.stringSet(exe))
+            {
+                exe = defaultExe;
+            }
+        }
     }
 
     /**
@@ -510,24 +530,21 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
         }
     }
 
-    private void updateChildEnvironment(ProcessBuilder builder)
+    private void updateChildEnvironment(ExecutionContext context, ProcessBuilder builder)
     {
         Map<String, String> childEnvironment = builder.environment();
-        if (scope != null)
+        // Implicit PULSE_* varialbes come first: anything explicit
+        // should override them.
+        for(Reference reference: context.getScope().getReferences(String.class))
         {
-            // Implicit PULSE_* varialbes come first: anything explicit
-            // should override them.
-            for(Reference reference: scope.getReferences(String.class))
+            if(acceptableName(reference.getName()))
             {
-                if(acceptableName(reference.getName()))
-                {
-                    childEnvironment.put(convertName(reference.getName()), (String) reference.getValue());
-                }
+                childEnvironment.put(convertName(reference.getName()), (String) reference.getValue());
             }
-
-            // Now things defined on the scope.
-            scope.applyEnvironment(childEnvironment);
         }
+
+        // Now things defined on the scope.
+        context.getScope().applyEnvironment(childEnvironment);
 
         // Finally things defined on the command
         for (Environment setting : env)
@@ -586,7 +603,6 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
     public void setExe(String exe)
     {
         this.exe = exe;
-        this.explicitExe = true;
     }
 
     /**
@@ -719,21 +735,12 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
         return args;
     }
 
-    protected void setExeFromProperty(String property)
+    public void validate(ValidationContext context)
     {
-        if (!explicitExe && scope != null)
+        if(!TextUtils.stringSet(exe) && !TextUtils.stringSet(defaultExe))
         {
-            String value = scope.getReferenceValue(property, String.class);
-            if (value != null)
-            {
-                setExe(value);
-            }
+            context.addFieldError("exe", "exe is required");
         }
-    }
-
-    public void setScope(PulseScope scope)
-    {
-        this.scope = scope;
     }
 
     /**

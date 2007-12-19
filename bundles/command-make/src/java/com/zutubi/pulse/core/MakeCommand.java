@@ -11,12 +11,11 @@ public class MakeCommand extends ExecutableCommand
 
     public MakeCommand()
     {
-        super("make");
+        super("make.bin", "make");
     }
 
     public void execute(ExecutionContext context, CommandResult cmdResult)
     {
-        setExeFromProperty("make.bin");
 
         if (makefile != null)
         {

@@ -12,13 +12,11 @@ public class AntCommand extends ExecutableCommand
 
     public AntCommand()
     {
-        super(SystemUtils.IS_WINDOWS ? "ant.bat" : "ant");
+        super("ant.bin", SystemUtils.IS_WINDOWS ? "ant.bat" : "ant");
     }
 
     public void execute(ExecutionContext context, CommandResult cmdResult)
     {
-        setExeFromProperty("ant.bin");
-
         if (buildFile != null)
         {
             addArguments("-f", buildFile);

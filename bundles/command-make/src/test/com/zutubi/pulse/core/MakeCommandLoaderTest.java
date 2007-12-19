@@ -29,13 +29,6 @@ public class MakeCommandLoaderTest extends FileLoaderTestBase
         return (MakeCommand) commands.get(commandIndex);
     }
 
-    public void testMakeCommandDefaults() throws Exception
-    {
-        MakeCommand command = makeCommandHelper(0);
-        assertEquals("make", command.getExe());
-        assertNull(command.getTargets());
-    }
-
     public void testMakeCommandCustomExe() throws Exception
     {
         MakeCommand command = makeCommandHelper(1);

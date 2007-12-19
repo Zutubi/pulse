@@ -12,13 +12,11 @@ public class BJamCommand extends ExecutableCommand
 
     public BJamCommand()
     {
-        super("bjam");
+        super("bjam.bin", "bjam");
     }
 
     public void execute(ExecutionContext context, CommandResult cmdResult)
     {
-        setExeFromProperty("bjam.bin");
-
         if (jamfile != null)
         {
             addArguments("-f", jamfile);

@@ -210,6 +210,16 @@ public class ExecutionContext
     {
         scopeStack.pop();
     }
+
+    public void popTo(String label)
+    {
+        scopeStack.popTo(label);
+    }
+
+    public void setLabel(String label)
+    {
+        scopeStack.setLabel(label);
+    }
     
     public File getWorkingDir()
     {

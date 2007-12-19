@@ -15,13 +15,11 @@ public class Maven2Command extends ExecutableCommand
 
     public Maven2Command()
     {
-        super(SystemUtils.IS_WINDOWS ? "mvn.bat" : "mvn");
+        super("maven2.bin", SystemUtils.IS_WINDOWS ? "mvn.bat" : "mvn");
     }
 
     public void execute(ExecutionContext context, CommandResult cmdResult)
     {
-        setExeFromProperty("maven2.bin");
-
         if (goals != null)
         {
             addArguments(goals.trim().split(" +"));

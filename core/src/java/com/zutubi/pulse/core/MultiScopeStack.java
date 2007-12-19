@@ -90,7 +90,7 @@ public class MultiScopeStack implements ReferenceMap
 
     public void pop()
     {
-        if(leaf.getParent() == null)
+        if(leaves[0].getParent() == null)
         {
             throw new IllegalStateException("Attempt to pop an empty stack");
         }
@@ -105,6 +105,14 @@ public class MultiScopeStack implements ReferenceMap
         }
 
         leaf = leaves[leaves.length - 1];
+    }
+
+    public void popTo(String label)
+    {
+        while(!label.equals(getLabel()) & leaf.getParent() != null)
+        {
+            pop();
+        }
     }
 
     public PulseScope getScope()
@@ -122,7 +130,7 @@ public class MultiScopeStack implements ReferenceMap
             }
         }
 
-        return null;
+        throw new IllegalArgumentException("No such scope '" + name + "'");
     }
 
     public boolean containsReference(String name)
