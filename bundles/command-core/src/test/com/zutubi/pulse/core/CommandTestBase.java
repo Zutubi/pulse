@@ -76,7 +76,7 @@ public abstract class CommandTestBase extends PulseTestCase implements EventList
 
         Recipe recipe = new Recipe();
         recipe.setEventManager(eventManager);
-        recipe.add(command);
+        recipe.add(command, null);
         recipe.execute(context);
 
         assertCommandCommenced(command.getName());

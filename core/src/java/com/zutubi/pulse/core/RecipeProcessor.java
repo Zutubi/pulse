@@ -219,6 +219,7 @@ public class RecipeProcessor
     private PulseFile loadPulseFile(RecipeRequest request, ExecutionContext context) throws BuildException
     {
         PulseScope globalScope = new PulseScope(context.getScope());
+        globalScope.setLabel(SCOPE_RECIPE);
 
         // CIB-286: special case empty file for better reporting
         String pulseFileSource = request.getPulseFileSource();

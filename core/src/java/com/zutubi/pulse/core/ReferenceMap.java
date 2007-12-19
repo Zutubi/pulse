@@ -11,7 +11,7 @@ public interface ReferenceMap
 
     Reference getReference(String name);
 
-    Collection<Reference> getOldrefs();
+    Collection<Reference> getReferences();
 
     void add(Reference reference);
 

@@ -4,6 +4,9 @@ import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.CommandCommencedEvent;
 import com.zutubi.pulse.events.build.CommandCompletedEvent;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
+import com.zutubi.util.Pair;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
@@ -20,14 +23,9 @@ public class Recipe extends SelfReference
     private static final Logger LOG = Logger.getLogger(Recipe.class);
 
     /**
-     * The name uniquely identifying this recipe.
-     */
-    private String name;
-
-    /**
      * The ordered list of commands that are executed by this recipe.
      */
-    private LinkedList<Command> commands = new LinkedList<Command>();
+    private LinkedList<Pair<Command, Scope>> commands = new LinkedList<Pair<Command, Scope>>();
 
     /**
      * The list of resource dependencies that need to be resolved prior to
@@ -69,10 +67,16 @@ public class Recipe extends SelfReference
      * Add a new command instance to this recipe.
      *
      * @param command instance
+     * @param scope   scope at the point where the command is loaded
      */
-    public void add(Command command)
+    public void add(Command command, Scope scope)
     {
-        commands.add(command);
+        if(scope != null)
+        {
+            scope = scope.copyTo(scope.getAncestor(BuildProperties.SCOPE_RECIPE));
+        }
+
+        commands.add(new Pair<Command, Scope>(command, scope));
     }
 
     /**
@@ -83,11 +87,11 @@ public class Recipe extends SelfReference
      */
     public Command getCommand(String name)
     {
-        for (Command c : commands)
+        for (Pair<Command, Scope> c : commands)
         {
-            if (c.getName().equals(name))
+            if (c.first.getName().equals(name))
             {
-                return c;
+                return c.first;
             }
         }
         return null;
@@ -100,7 +104,13 @@ public class Recipe extends SelfReference
      */
     public List<Command> getCommands()
     {
-        return Collections.unmodifiableList(commands);
+        return CollectionUtils.map(commands, new Mapping<Pair<Command, Scope>, Command>()
+        {
+            public Command map(Pair<Command, Scope> pair)
+            {
+                return pair.first;
+            }
+        });
     }
 
     public List<Dependency> getDependencies()
@@ -131,7 +141,7 @@ public class Recipe extends SelfReference
      */
     public void addFirstCommand(Command command)
     {
-        commands.addFirst(command);
+        commands.addFirst(new Pair<Command, Scope>(command, null));
     }
 
     /**
@@ -162,7 +172,8 @@ public class Recipe extends SelfReference
             File outputDir = context.getInternalValue(BuildProperties.PROPERTY_RECIPE_PATHS, RecipePaths.class).getOutputDir();
             for (int i = 0; i < commands.size(); i++)
             {
-                Command command = commands.get(i);
+                Pair<Command, Scope> pair = commands.get(i);
+                Command command = pair.first;
                 if (success || command.isForce())
                 {
                     CommandResult result = new CommandResult(command.getName());
@@ -173,7 +184,7 @@ public class Recipe extends SelfReference
                         throw new BuildException("Could not create command output directory '" + commandOutput.getAbsolutePath() + "'");
                     }
 
-                    if (!executeCommand(context, commandOutput, result, command))
+                    if (!executeCommand(context, commandOutput, result, command, pair.second))
                     {
                         // Recipe terminated.
                         return;
@@ -205,9 +216,9 @@ public class Recipe extends SelfReference
         return String.format("%08d-%s", i, result.getCommandName());
     }
 
-    private boolean executeCommand(ExecutionContext context, File commandOutput, CommandResult commandResult, Command command)
+    private boolean executeCommand(ExecutionContext context, File commandOutput, CommandResult commandResult, Command command, Scope scope)
     {
-        pushCommandContext(context, commandOutput);
+        pushCommandContext(context, scope, commandOutput);
         try
         {
             runningLock.lock();
@@ -259,36 +270,32 @@ public class Recipe extends SelfReference
         }
         finally
         {
-            context.popInternalScope();
+            context.pop();
         }
     }
 
-    private void pushCommandContext(ExecutionContext context, File commandOutput)
+    private void pushCommandContext(ExecutionContext context, Scope scope, File commandOutput)
     {
-        context.pushInternalScope();
+        context.push();
         context.addInternalString(BuildProperties.PROPERTY_OUTPUT_DIR, commandOutput.getAbsolutePath());
+
+        if (scope != null)
+        {
+            for(Reference reference: scope.getReferences())
+            {
+                context.add(reference);
+            }
+        }
     }
 
     private void processArtifacts(Command command, ExecutionContext context, CommandResult result)
     {
         for (Artifact artifact : command.getArtifacts())
         {
-            try
-            {
-                artifact.capture(result, context);
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
+            artifact.capture(result, context);
         }
     }
 
-    /**
-     * Required resource.
-     *
-     * @param eventManager instance.
-     */
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;

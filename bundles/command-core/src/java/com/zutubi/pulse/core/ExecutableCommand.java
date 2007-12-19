@@ -21,7 +21,6 @@ import java.util.*;
  */
 public class ExecutableCommand extends CommandSupport implements ScopeAware
 {
-    private static final String ENV_PATH = "PATH";
     private static final String SUPPRESSED_VALUE = "[value suppressed for security reasons]";
 
     /**
@@ -416,7 +415,7 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
         try
         {
             writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));
-            writer.append(buffer.toString());
+            writer.append(buffer);
             writer.flush();
         }
         finally
@@ -512,40 +511,10 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
     private void updateChildEnvironment(ProcessBuilder builder)
     {
         Map<String, String> childEnvironment = builder.environment();
-
         if (scope != null)
         {
-            for (Map.Entry<String, String> setting : scope.getEnvironment().entrySet())
-            {
-                childEnvironment.put(setting.getKey(), setting.getValue());
-            }
-
-            /**
-             * Here, we are using a custom get property method that runs a case insensitive lookup of the ENV_PATH
-             * property. This is required because on Windows, the PATH variable is actually in the map as Path, and
-             * so is not matched.
-             */
-            String pathKey = ENV_PATH;
-            String pathValue = scope.getPathPrefix();
-
-            String translatedKey = locateCaseInsensitiveMatch(ENV_PATH, childEnvironment);
-            if (translatedKey != null)
-            {
-                String path = childEnvironment.get(translatedKey);
-                pathKey = translatedKey;
-                pathValue = pathValue + path;
-            }
-
-            childEnvironment.put(pathKey, pathValue);
-        }
-
-        for (Environment setting : env)
-        {
-            childEnvironment.put(setting.getName(), setting.getValue());
-        }
-
-        if (scope != null)
-        {
+            // Implicit PULSE_* varialbes come first: anything explicit
+            // should override them.
             for(Reference reference: scope.getReferences(String.class))
             {
                 if(acceptableName(reference.getName()))
@@ -553,6 +522,15 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
                     childEnvironment.put(convertName(reference.getName()), (String) reference.getValue());
                 }
             }
+
+            // Now things defined on the scope.
+            scope.applyEnvironment(childEnvironment);
+        }
+
+        // Finally things defined on the command
+        for (Environment setting : env)
+        {
+            childEnvironment.put(setting.getName(), setting.getValue());
         }
     }
 
@@ -591,28 +569,6 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
         name = name.replaceAll("\\.", "_");
 
         return "PULSE_" + name;
-    }
-
-    /*
-     * Take the specified key, and find a case insensitive match in the maps key set. Return this match,
-     * or null if no match is found.
-     *
-     * This is important when we are looking for environment variables (such as PATH) that may be
-     * specified in lowercase, as so happens when we use the environment variables from the process
-     * builder.
-     */
-    private String locateCaseInsensitiveMatch(String propertyName, Map<String, String> map)
-    {
-        // case insensitive lookup.
-        propertyName = propertyName.toLowerCase();
-        for (String key : map.keySet())
-        {
-            if (key.toLowerCase().equals(propertyName))
-            {
-                return key;
-            }
-        }
-        return null;
     }
 
     public List<String> getArtifactNames()

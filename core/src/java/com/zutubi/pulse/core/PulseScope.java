@@ -1,6 +1,10 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.config.ResourceProperty;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
+import com.zutubi.util.Predicate;
+import com.zutubi.util.TextUtils;
 
 import java.io.File;
 import java.util.*;
@@ -12,12 +16,15 @@ import java.util.*;
  */
 public class PulseScope implements Scope
 {
+    private static final String ENV_PATH = "PATH";
+
     private static final boolean RETAIN_ENVIRONMENT_CASE = System.getProperty("pulse.retain.environment.case") != null;
 
-    // If you add a field, update copy()
+    // If you add a field, update copyTo()
     private PulseScope parent;
-    private Map<String, Reference> references = new LinkedHashMap<String, Reference>();
-    private List<ReferenceInfo> oldrefs = new LinkedList<ReferenceInfo>();
+    // Optional label that can be used to marking and finding specific scopes
+    private String label;
+    private Map<String, ReferenceInfo> references = new LinkedHashMap<String, ReferenceInfo>();
 
     public PulseScope()
     {
@@ -44,6 +51,16 @@ public class PulseScope implements Scope
         this.parent = parent;
     }
 
+    public String getLabel()
+    {
+        return label;
+    }
+
+    public void setLabel(String label)
+    {
+        this.label = label;
+    }
+
     public PulseScope getRoot()
     {
         if(parent == null)
@@ -53,42 +70,78 @@ public class PulseScope implements Scope
 
         return parent.getRoot();
     }
-    
-    public Collection<Reference> getOldrefs()
+
+    public PulseScope getAncestor(String label)
     {
-        List<Reference> result = new ArrayList<Reference>(oldrefs.size());
-
-        if (parent != null)
+        if(label.equals(this.label))
         {
-            result.addAll(parent.getOldrefs());
+            return this;
         }
 
-        for (ReferenceInfo info : oldrefs)
+        if(parent != null)
         {
-            result.add(info.reference);
+            return parent.getAncestor(label);
         }
 
-        return result;
+        return null;
     }
 
-    public List<Reference> getReferences(Class type)
+    private Map<String, ReferenceInfo> merge()
     {
-        List<Reference> result = new ArrayList<Reference>(oldrefs.size());
-
-        if (parent != null)
+        Map<String, ReferenceInfo> merged = new LinkedHashMap<String, ReferenceInfo>();
+        if(parent != null)
         {
-            result.addAll(parent.getReferences(type));
+            merged.putAll(parent.merge());
         }
 
-        for (ReferenceInfo info : oldrefs)
+        // We do not use putAll here as the LinkedHashMap does not preserve
+        // ordering for re-entries (i.e. putting on top of an existing key)
+        // whereas we want to preserve ordering.  Hence re-entries are
+        // avoided by removing existing keys.
+        for(Map.Entry<String, ReferenceInfo> entry: references.entrySet())
         {
-            if (type.isInstance(info.reference.getValue()))
+            if(merged.containsKey(entry.getKey()))
             {
-                result.add(info.reference);
+                merged.remove(entry.getKey());
             }
+
+            merged.put(entry.getKey(), entry.getValue());
         }
 
-        return result;
+        return merged;
+    }
+    
+    public Collection<Reference> getReferences()
+    {
+        return CollectionUtils.map(merge().values(), new Mapping<ReferenceInfo, Reference>()
+        {
+            public Reference map(ReferenceInfo referenceInfo)
+            {
+                return referenceInfo.reference;
+            }
+        });
+    }
+
+    private List<Reference> getReferencesSatisfyingPredicate(Predicate<ReferenceInfo> p)
+    {
+        return CollectionUtils.map(CollectionUtils.filter(merge().values(), p), new Mapping<ReferenceInfo, Reference>()
+        {
+            public Reference map(ReferenceInfo referenceInfo)
+            {
+                return referenceInfo.reference;
+            }
+        });
+    }
+
+    public List<Reference> getReferences(final Class type)
+    {
+        return getReferencesSatisfyingPredicate(new Predicate<ReferenceInfo>()
+        {
+            public boolean satisfied(ReferenceInfo referenceInfo)
+            {
+                return type.isInstance(referenceInfo.reference.getValue());
+            }
+        });
     }
 
     public boolean containsReference(String name)
@@ -98,31 +151,46 @@ public class PulseScope implements Scope
 
     public Reference getReference(String name)
     {
-        if (name.startsWith("env."))
+        ReferenceInfo info = merge().get(name);
+        Reference result = info == null ? null : info.reference;
+
+        if(name.startsWith("env."))
         {
-            if (name.equalsIgnoreCase("env.path"))
+            // If we didn't find it via direct-lookup, try dynamic env.*
+            // lookup on the environment.
+            String envName = name.substring(4);
+            if (result == null)
             {
-                return lookupPath(name);
+                Map<String, String> environment = getEnvironment();
+                String value = environment.get(envName);
+                if(value != null)
+                {
+                    result = new Property(name, value);
+                }
             }
-            else
+
+            // Special case PATH to add the prefix
+            if(envName.toUpperCase(Locale.US).equals(ENV_PATH))
             {
-                return lookupEnvironment(name);
+                String pathPrefix = getPathPrefix();
+                if(TextUtils.stringSet(pathPrefix))
+                {
+                    if(result == null)
+                    {
+                        result = new Property(name, pathPrefix.substring(0, pathPrefix.length() - 1));
+                    }
+                    else if((result.getValue() instanceof String))
+                    {
+                        result = new Property(name, pathPrefix + result.getValue());
+                    }
+                }
             }
         }
 
-        ReferenceInfo info = directLookup(name, oldrefs);
-        if (info != null)
-        {
-            return info.reference;
-        }
-        else if (parent != null)
-        {
-            return parent.getReference(name);
-        }
-
-        return null;
+        return result;
     }
 
+    @SuppressWarnings({"unchecked"})
     public <T> T getReferenceValue(String name, Class<T> type)
     {
         Reference r = getReference(name);
@@ -134,55 +202,9 @@ public class PulseScope implements Scope
         return (T) r.getValue();
     }
 
-    private Reference lookupPath(String name)
-    {
-        List<ReferenceInfo> merged = new LinkedList<ReferenceInfo>();
-        merge(merged);
-
-        ReferenceInfo info = directLookup(name, merged, false);
-        String value;
-        if (info == null || !(info.reference.getValue() instanceof String))
-        {
-            value = "";
-        }
-        else
-        {
-            value = (String) info.reference.getValue();
-        }
-
-        return new Property(name, getPathPrefix() + value);
-    }
-
-    private Reference lookupEnvironment(String name)
-    {
-        List<ReferenceInfo> merged = new LinkedList<ReferenceInfo>();
-        merge(merged);
-
-        Map<String, String> env = getEnvironment(merged);
-        String var = name.substring(4);
-        String value = env.get(var);
-
-        if (value == null)
-        {
-            ReferenceInfo info = directLookup(name, merged);
-            if (info == null)
-            {
-                return null;
-            }
-            else
-            {
-                return info.reference;
-            }
-        }
-        else
-        {
-            return new Property(name, value);
-        }
-    }
-
     public void addUnique(Reference reference) throws IllegalArgumentException
     {
-        if (directLookup(reference.getName(), oldrefs) != null)
+        if (references.containsKey(reference.getName()))
         {
             throw new IllegalArgumentException("'" + reference.getName() + "' is already defined in this scope.");
         }
@@ -192,12 +214,7 @@ public class PulseScope implements Scope
 
     public void add(Reference reference)
     {
-        add(new ReferenceInfo(reference));
-    }
-
-    private void add(ReferenceInfo info)
-    {
-        oldrefs.add(0, info);
+        references.put(reference.getName(), new ReferenceInfo(reference));
     }
 
     public void addAll(Collection<? extends Reference> references)
@@ -216,51 +233,92 @@ public class PulseScope implements Scope
         }
     }
 
-    public <V extends Reference> void add(Map<String, V> references) throws FileLoadException
-    {
-        for (Reference v : references.values())
-        {
-            addUnique(v);
-        }
-    }
-
+    /**
+     * Returns an environment map that includes all properties marked add to
+     * environment.  Note that changes to the PATH from add to path
+     * properties are not taken into account.
+     *
+     * @see #applyEnvironment(java.util.Map)
+     *
+     * @return the environment defined by add to environment properties in
+     *         this scope
+     */
     public Map<String, String> getEnvironment()
     {
-        List<ReferenceInfo> merged = new LinkedList<ReferenceInfo>();
-        merge(merged);
-
-        return getEnvironment(merged);
-    }
-
-    private Map<String, String> getEnvironment(List<ReferenceInfo> merged)
-    {
-        Map<String, String> env = new TreeMap<String, String>();
-        for (ReferenceInfo i : merged)
+        Collection<Reference> references = getReferencesSatisfyingPredicate(new Predicate<ReferenceInfo>()
         {
-            if (i.addToEnvironment && i.reference.getValue() != null)
+            public boolean satisfied(ReferenceInfo referenceInfo)
             {
-                env.put(i.reference.getName(), (String) i.reference.getValue());
+                return referenceInfo.addToEnvironment && (referenceInfo.reference.getValue() instanceof String);
             }
+        });
+
+        Map<String, String> result = new HashMap<String, String>(references.size());
+        for(Reference r: references)
+        {
+            result.put(r.getName(), (String) r.getValue());
         }
 
-        return env;
+        return result;
+    }
+
+    /**
+     * Applies the environment defined within this scope to an existing
+     * environment.  Properties marked as add to environment are added, and
+     * the prefix defined by add to path properties is added to the PATH.
+     *
+     * @param existingEnvironment existing environment to add to
+     */
+    public void applyEnvironment(Map<String, String> existingEnvironment)
+    {
+        existingEnvironment.putAll(getEnvironment());
+
+        String pathPrefix = getPathPrefix();
+        if(TextUtils.stringSet(pathPrefix))
+        {
+            String pathKey = null;
+            for(String key: existingEnvironment.keySet())
+            {
+                if(key.toUpperCase(Locale.US).equals(ENV_PATH))
+                {
+                    pathKey = key;
+                    break;
+                }
+            }
+
+            if(pathKey == null)
+            {
+                existingEnvironment.put(ENV_PATH, pathPrefix.substring(0, pathPrefix.length() - 1));
+            }
+            else
+            {
+                existingEnvironment.put(pathKey, pathPrefix + existingEnvironment.get(pathKey));
+            }
+        }
     }
 
     public List<String> getPathDirectories()
     {
-        List<ReferenceInfo> merged = new LinkedList<ReferenceInfo>();
-        merge(merged);
-
-        List<String> dirs = new LinkedList<String>();
-        for (ReferenceInfo i : merged)
+        Collection<Reference> references = getReferencesSatisfyingPredicate(new Predicate<ReferenceInfo>()
         {
-            if (i.addToPath)
+            public boolean satisfied(ReferenceInfo referenceInfo)
             {
-                dirs.add((String) i.reference.getValue());
+                return referenceInfo.addToPath && referenceInfo.reference.getValue() instanceof String;
             }
-        }
+        });
+        
+        List<String> result = CollectionUtils.map(references, new Mapping<Reference, String>()
+        {
+            public String map(Reference reference)
+            {
+                return (String) reference.getValue();
+            }
+        });
 
-        return dirs;
+        // Reverse so the most local and recently added values end up earlier
+        // in the path.
+        Collections.reverse(result);
+        return result;
     }
 
     public String getPathPrefix()
@@ -276,7 +334,7 @@ public class PulseScope implements Scope
         return result;
     }
 
-    public void add(Collection<ResourceProperty> properties)
+    public void add(Collection<? extends ResourceProperty> properties)
     {
         for (ResourceProperty resourceProperty : properties)
         {
@@ -286,7 +344,21 @@ public class PulseScope implements Scope
 
     public void add(ResourceProperty resourceProperty)
     {
-        add(new ReferenceInfo(resourceProperty, this));
+        String value = resourceProperty.getValue();
+        if(resourceProperty.getResolveVariables())
+        {
+            try
+            {
+                value = VariableHelper.replaceVariables(value, this, true);
+            }
+            catch (FileLoadException e)
+            {
+                // Just use unresolved value.
+            }
+        }
+
+        String name = resourceProperty.getName();
+        references.put(name, new ReferenceInfo(new Property(name, value), resourceProperty.getAddToEnvironment(), resourceProperty.getAddToPath()));
     }
 
     /**
@@ -307,51 +379,6 @@ public class PulseScope implements Scope
         add(new Property("env." + name, value));
     }
 
-    private ReferenceInfo directLookup(String name, List<ReferenceInfo> references)
-    {
-        return directLookup(name, references, true);
-    }
-
-    private ReferenceInfo directLookup(String name, List<ReferenceInfo> references, boolean caseSensitive)
-    {
-        if (!caseSensitive)
-        {
-            name = name.toLowerCase();
-        }
-
-        for (ReferenceInfo i : references)
-        {
-            String referenceName = i.reference.getName();
-            if (!caseSensitive)
-            {
-                referenceName = referenceName.toLowerCase();
-            }
-
-            if (referenceName.equals(name))
-            {
-                return i;
-            }
-        }
-
-        return null;
-    }
-
-    private void merge(List<ReferenceInfo> merged)
-    {
-        for (ReferenceInfo i : oldrefs)
-        {
-            if (directLookup(i.reference.getName(), merged) == null)
-            {
-                merged.add(i);
-            }
-        }
-
-        if (parent != null)
-        {
-            parent.merge(merged);
-        }
-    }
-
     public PulseScope copyTo(Scope scope)
     {
         PulseScope parentCopy = null;
@@ -361,59 +388,32 @@ public class PulseScope implements Scope
         }
 
         PulseScope copy = new PulseScope(parentCopy);
-        copy.oldrefs = new LinkedList<ReferenceInfo>(oldrefs);
+        copy.label = label;
+        copy.references = new LinkedHashMap<String, ReferenceInfo>(references);
         return copy;
     }
 
     public PulseScope copy()
     {
-        PulseScope copy = new PulseScope(parent == null ? null : parent.copy());
-        // Assumes reference infos are not mutated in some odd way
-        copy.oldrefs = new LinkedList<ReferenceInfo>(oldrefs);
-        return copy;
+        return copyTo(null);
     }
 
     private static class ReferenceInfo
     {
         private Reference reference;
-        private boolean addToPath;
-        private boolean addToEnvironment;
-
-        public ReferenceInfo()
-        {
-            // This constructor is to make hessian happy.
-        }
+        private boolean addToEnvironment = false;
+        private boolean addToPath = false;
 
         public ReferenceInfo(Reference reference)
         {
             this.reference = reference;
-            addToPath = false;
-            addToEnvironment = false;
         }
 
-        public ReferenceInfo(ResourceProperty p, ReferenceMap map)
+        public ReferenceInfo(Reference reference, boolean addToEnvironment, boolean addToPath)
         {
-            String value = p.getValue();
-            if (p.getResolveVariables())
-            {
-                try
-                {
-                    value = VariableHelper.replaceVariables(p.getValue(), map, true);
-                }
-                catch (FileLoadException e)
-                {
-                    // Just use the unresolved value
-                }
-            }
-
-            this.reference = new Property(p.getName(), value);
-            this.addToPath = p.getAddToPath();
-            this.addToEnvironment = p.getAddToEnvironment();
-        }
-
-        public String toString()
-        {
-            return reference.getName() + " -> " + reference.getValue() + " [path: " + addToPath + ", env: " + addToEnvironment + "]";
+            this.reference = reference;
+            this.addToEnvironment = addToEnvironment;
+            this.addToPath = addToPath;
         }
     }
 }

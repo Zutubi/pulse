@@ -14,6 +14,9 @@ import java.util.List;
  */
 public class BuildProperties
 {
+    // Scope labels
+    public static final String SCOPE_RECIPE = "recipe";
+    
     // Shared
     public static final String PROPERTY_DIRECTORY               = "dir";
     public static final String PROPERTY_STATUS                  = "status";
@@ -55,7 +58,7 @@ public class BuildProperties
     // Other constants
     public static final SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
-    
+
     public static void addResourceProperties(ExecutionContext context, List<ResourceRequirement> resourceRequirements, ResourceRepository resourceRepository)
     {
         if (resourceRequirements != null)

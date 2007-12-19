@@ -55,7 +55,7 @@ public class RecipeTest extends PulseTestCase
 
     public void testExecuteRecipe()
     {
-        recipe.add(new NoopCommand());
+        recipe.add(new NoopCommand(), null);
         recipe.execute(context);
 
         for (Command command : recipe.getCommands())
