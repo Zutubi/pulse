@@ -1,5 +1,7 @@
 package com.zutubi.pulse.core;
 
+import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_INTERNAL;
+import static com.zutubi.pulse.core.BuildProperties.PROPERTY_OUTPUT_DIR;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.util.IOUtils;
@@ -290,7 +292,7 @@ public class RegexPostProcessorTest extends PulseTestCase
 
         CommandResult result = new CommandResult("test");
         ExecutionContext context = new ExecutionContext();
-        context.addInternalString(BuildProperties.PROPERTY_OUTPUT_DIR, tempDir.getAbsolutePath());
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, tempDir.getAbsolutePath());
         pp.process(artifact, result, context);
         List<Feature> features = artifact.getFeatures();
         assertEquals(2, features.size());
@@ -356,7 +358,7 @@ public class RegexPostProcessorTest extends PulseTestCase
     {
         CommandResult result = new CommandResult("test");
         ExecutionContext context = new ExecutionContext();
-        context.addInternalString(BuildProperties.PROPERTY_OUTPUT_DIR, tempDir.getAbsolutePath());
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, tempDir.getAbsolutePath());
         pp.process(artifact, result, context);
         List<Feature> features = artifact.getFeatures();
 

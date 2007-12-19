@@ -108,12 +108,12 @@ public class RecipeProcessor
         {
             eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Storing test results..."));
 
-            RecipePaths paths = context.getInternalValue(PROPERTY_RECIPE_PATHS, RecipePaths.class);
+            RecipePaths paths = context.getValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, RecipePaths.class);
             writeTestResults(paths, testResults);
             recipeResult.setTestSummary(testResults.getSummary());
             eventManager.publish(new RecipeStatusEvent(this, runningRecipe, "Test results stored."));
 
-            compressResults(paths, context.getInternalBoolean(PROPERTY_COMPRESS_ARTIFACTS, false), context.getInternalBoolean(PROPERTY_COMPRESS_WORKING_DIR, false));
+            compressResults(paths, context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_COMPRESS_ARTIFACTS, false), context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_COMPRESS_WORKING_DIR, false));
 
             recipeResult.complete();
             RecipeCompletedEvent completedEvent = new RecipeCompletedEvent(this, recipeResult);
@@ -192,12 +192,12 @@ public class RecipeProcessor
     private void pushRecipeContext(ExecutionContext context, RecipeRequest request, TestSuiteResult testResults, long recipeStartTime)
     {
         context.push();
-        context.addInternalString(PROPERTY_BASE_DIR, context.getWorkingDir().getAbsolutePath());
-        context.addInternalString(PROPERTY_RECIPE_TIMESTAMP, BuildProperties.TIMESTAMP_FORMAT.format(new Date(recipeStartTime)));
-        context.addInternalString(PROPERTY_RECIPE_TIMESTAMP_MILLIS, Long.toString(recipeStartTime));
-        context.addInternalValue(PROPERTY_TEST_RESULTS, testResults);
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_BASE_DIR, context.getWorkingDir().getAbsolutePath());
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE_TIMESTAMP, BuildProperties.TIMESTAMP_FORMAT.format(new Date(recipeStartTime)));
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE_TIMESTAMP_MILLIS, Long.toString(recipeStartTime));
+        context.addValue(NAMESPACE_INTERNAL, PROPERTY_TEST_RESULTS, testResults);
 
-        if(context.getInternalString(PROPERTY_RECIPE) == null)
+        if(context.getString(NAMESPACE_INTERNAL, PROPERTY_RECIPE) == null)
         {
             context.addString(PROPERTY_RECIPE, "[default]");
         }
@@ -218,8 +218,8 @@ public class RecipeProcessor
 
     private PulseFile loadPulseFile(RecipeRequest request, ExecutionContext context) throws BuildException
     {
+        context.getScope().setLabel(SCOPE_RECIPE);
         PulseScope globalScope = new PulseScope(context.getScope());
-        globalScope.setLabel(SCOPE_RECIPE);
 
         // CIB-286: special case empty file for better reporting
         String pulseFileSource = request.getPulseFileSource();
@@ -234,7 +234,7 @@ public class RecipeProcessor
         {
             stream = new ByteArrayInputStream(pulseFileSource.getBytes());
 
-            ResourceRepository resourceRepository = context.getInternalValue(PROPERTY_RESOURCE_REPOSITORY, ResourceRepository.class);
+            ResourceRepository resourceRepository = context.getValue(NAMESPACE_INTERNAL, PROPERTY_RESOURCE_REPOSITORY, ResourceRepository.class);
             PulseFile result = new PulseFile();
             PulseFileLoader fileLoader = fileLoaderFactory.createLoader();
             fileLoader.load(stream, result, globalScope, resourceRepository, new RecipeLoadPredicate(result, request.getRecipeName()));

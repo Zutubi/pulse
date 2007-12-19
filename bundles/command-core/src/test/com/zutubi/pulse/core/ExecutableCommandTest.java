@@ -1,5 +1,7 @@
 package com.zutubi.pulse.core;
 
+import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_INTERNAL;
+import static com.zutubi.pulse.core.BuildProperties.PROPERTY_BUILD_NUMBER;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.util.FileSystemUtils;
@@ -410,7 +412,7 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
     private CommandResult runCommand(ExecutableCommand command, long buildNumber)
     {
         ExecutionContext context = new ExecutionContext();
-        context.addInternalString(BuildProperties.PROPERTY_BUILD_NUMBER, Long.toString(buildNumber));
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_NUMBER, Long.toString(buildNumber));
         PulseScope scope = new PulseScope(context.getScope());
         command.setScope(scope);
         return super.runCommand(command, context);

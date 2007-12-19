@@ -1,5 +1,7 @@
 package com.zutubi.pulse.core;
 
+import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_INTERNAL;
+import static com.zutubi.pulse.core.BuildProperties.PROPERTY_OUTPUT_DIR;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
@@ -24,7 +26,7 @@ public class PrecapturedArtifact extends ArtifactSupport
 
     public void capture(CommandResult result, ExecutionContext context)
     {
-        File dir = new File(context.getInternalFile(BuildProperties.PROPERTY_OUTPUT_DIR), getName());
+        File dir = new File(context.getFile(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR), getName());
         
         StoredArtifact storedArtifact = new StoredArtifact(getName());
 

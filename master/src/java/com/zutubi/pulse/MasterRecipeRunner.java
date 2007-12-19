@@ -2,6 +2,7 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.*;
+import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.repository.MasterFileRepository;
@@ -36,15 +37,15 @@ public class MasterRecipeRunner implements Runnable
         request.setBootstrapper(new ChainBootstrapper(new ServerBootstrapper(), requestBootstrapper));
 
         ExecutionContext context = request.getContext();
-        ServerRecipePaths recipePaths = new ServerRecipePaths(request.getProject(), request.getId(), configurationManager.getUserPaths().getData(), context.getInternalBoolean(BuildProperties.PROPERTY_INCREMENTAL_BUILD, false));
+        ServerRecipePaths recipePaths = new ServerRecipePaths(request.getProject(), request.getId(), configurationManager.getUserPaths().getData(), context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BUILD, false));
 
         CommandOutputStream outputStream = null;
         context.push();
         try
         {
-            context.addInternalValue(BuildProperties.PROPERTY_RECIPE_PATHS, recipePaths);
-            context.addInternalValue(BuildProperties.PROPERTY_RESOURCE_REPOSITORY, resourceRepository);
-            context.addInternalValue(BuildProperties.PROPERTY_FILE_REPOSITORY, new MasterFileRepository(configurationManager));
+            context.addValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, recipePaths);
+            context.addValue(NAMESPACE_INTERNAL, PROPERTY_RESOURCE_REPOSITORY, resourceRepository);
+            context.addValue(NAMESPACE_INTERNAL, PROPERTY_FILE_REPOSITORY, new MasterFileRepository(configurationManager));
             outputStream = new CommandOutputStream(eventManager, request.getId(), true);
             context.setOutputStream(outputStream);
             context.setWorkingDir(recipePaths.getBaseDir());

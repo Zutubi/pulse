@@ -1,5 +1,7 @@
 package com.zutubi.pulse.core;
 
+import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_INTERNAL;
+import static com.zutubi.pulse.core.BuildProperties.PROPERTY_RECIPE_PATHS;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
@@ -71,7 +73,7 @@ public abstract class CommandTestBase extends PulseTestCase implements EventList
      */
     protected CommandResult runCommand(Command command, ExecutionContext context)
     {
-        context.addInternalValue(BuildProperties.PROPERTY_RECIPE_PATHS, new SimpleRecipePaths(baseDir, outputDir));
+        context.addValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, new SimpleRecipePaths(baseDir, outputDir));
         context.setWorkingDir(baseDir);
 
         Recipe recipe = new Recipe();

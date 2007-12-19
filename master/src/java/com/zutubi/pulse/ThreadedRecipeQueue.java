@@ -9,6 +9,7 @@ import static com.zutubi.pulse.MasterBuildProperties.addRevisionProperties;
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.core.*;
+import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_INTERNAL;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.pulse.core.scm.ScmClientFactory;
@@ -536,7 +537,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         ExecutionContext context = recipeRequest.getContext();
         addRevisionProperties(context, buildRevision);
         
-        context.addInternalString(PROPERTY_CLEAN_BUILD, Boolean.toString(request.getProject().isForceCleanForAgent(agent.getId())));
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_CLEAN_BUILD, Boolean.toString(request.getProject().isForceCleanForAgent(agent.getId())));
 
         dispatchedQueue.offer(new DispatchedRequest(recipeRequest, agent));
 

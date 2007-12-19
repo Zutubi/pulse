@@ -1,5 +1,7 @@
 package com.zutubi.pulse.core;
 
+import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_INTERNAL;
+import static com.zutubi.pulse.core.BuildProperties.PROPERTY_OUTPUT_DIR;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.jni.ProcessControl;
@@ -77,7 +79,7 @@ public class ExecutableCommand extends CommandSupport implements ScopeAware
         builder.redirectErrorStream(true);
 
         // record the commands execution environment as an artifact.
-        File outputDir = context.getInternalFile(BuildProperties.PROPERTY_OUTPUT_DIR);
+        File outputDir = context.getFile(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR);
         try
         {
             captureExecutionEnvironmentArtifact(builder, outputDir);

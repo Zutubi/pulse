@@ -2,6 +2,8 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.*;
+import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_INTERNAL;
+import static com.zutubi.pulse.core.BuildProperties.PROPERTY_OUTPUT_DIR;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.scm.*;
@@ -42,7 +44,7 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmEventHandler
     public void bootstrap(ExecutionContext context)
     {
         File workDir = context.getWorkingDir();
-        File outDir = new File(context.getInternalFile(BuildProperties.PROPERTY_OUTPUT_DIR), BootstrapCommand.OUTPUT_NAME);
+        File outDir = new File(context.getFile(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR), BootstrapCommand.OUTPUT_NAME);
         outDir.mkdirs();
 
         OutputStream out;
@@ -144,7 +146,7 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmEventHandler
 
     protected ScmClient createScmClient() throws ScmException
     {
-        ScmClientFactory factory = ComponentContext.getBean("scmClientFactory");
+        ScmClientFactory<ScmConfiguration> factory = ComponentContext.getBean("scmClientFactory");
         return factory.createClient(scmConfig);
     }
 

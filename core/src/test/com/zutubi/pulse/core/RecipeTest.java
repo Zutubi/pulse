@@ -1,5 +1,7 @@
 package com.zutubi.pulse.core;
 
+import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_INTERNAL;
+import static com.zutubi.pulse.core.BuildProperties.PROPERTY_RECIPE_PATHS;
 import com.zutubi.pulse.events.DefaultEventManager;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
@@ -40,7 +42,7 @@ public class RecipeTest extends PulseTestCase
 
         context = new ExecutionContext();
         context.setWorkingDir(paths.getBaseDir());
-        context.addInternalValue(BuildProperties.PROPERTY_RECIPE_PATHS, paths);
+        context.addValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, paths);
     }
 
     protected void tearDown() throws Exception

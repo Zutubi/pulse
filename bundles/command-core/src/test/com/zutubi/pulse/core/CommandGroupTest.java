@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core;
 
+import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.core.model.StoredArtifact;
@@ -219,8 +220,8 @@ public class CommandGroupTest extends CommandTestBase
     private void execute(CommandGroup group, CommandResult result)
     {
         ExecutionContext context = new ExecutionContext();
-        context.addInternalValue(BuildProperties.PROPERTY_RECIPE_PATHS, new SimpleRecipePaths(baseDir, null));
-        context.addInternalString(BuildProperties.PROPERTY_OUTPUT_DIR, outputDir.getAbsolutePath());
+        context.addValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, new SimpleRecipePaths(baseDir, null));
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, outputDir.getAbsolutePath());
         context.setWorkingDir(baseDir);
 
         group.execute(context, result);

@@ -2,7 +2,8 @@ package com.zutubi.pulse.local;
 
 import com.zutubi.pulse.core.BootstrapperSupport;
 import com.zutubi.pulse.core.BuildException;
-import com.zutubi.pulse.core.BuildProperties;
+import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_INTERNAL;
+import static com.zutubi.pulse.core.BuildProperties.PROPERTY_OUTPUT_DIR;
 import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.util.FileSystemUtils;
 
@@ -16,7 +17,7 @@ public class LocalBootstrapper extends BootstrapperSupport
     {
         try
         {
-            FileSystemUtils.cleanOutputDir(context.getInternalFile(BuildProperties.PROPERTY_OUTPUT_DIR));
+            FileSystemUtils.cleanOutputDir(context.getFile(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR));
         }
         catch (IOException e)
         {

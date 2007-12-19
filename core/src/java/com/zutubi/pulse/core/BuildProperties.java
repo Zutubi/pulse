@@ -14,14 +14,18 @@ import java.util.List;
  */
 public class BuildProperties
 {
+    // Namespaces
+    public static final String NAMESPACE_INTERNAL = "internal";
+    public static final String NAMESPACE_USER     = "user";
+
     // Scope labels
     public static final String SCOPE_RECIPE = "recipe";
     
-    // Shared
+    // Shared properties
     public static final String PROPERTY_DIRECTORY               = "dir";
     public static final String PROPERTY_STATUS                  = "status";
 
-    // Build
+    // Build level properties
     public static final String PROPERTY_BUILD_COUNT             = "build.count";
     public static final String PROPERTY_BUILD_DIRECTORY         = "build.dir";
     public static final String PROPERTY_BUILD_NUMBER            = "build.number";
@@ -39,7 +43,7 @@ public class BuildProperties
     public static final String PROPERTY_SUCCESS_COUNT           = "success.count";
     public static final String PROPERTY_TEST_SUMMARY            = "test.summary";
 
-    // Stage/Recipe
+    // Stage/Recipe level properties
     public static final String PROPERTY_AGENT                   = "agent";
     public static final String PROPERTY_BASE_DIR                = "base.dir";
     public static final String PROPERTY_FILE_REPOSITORY         = "file.repository";
@@ -52,7 +56,7 @@ public class BuildProperties
     public static final String PROPERTY_STAGE                   = "stage";
     public static final String PROPERTY_TEST_RESULTS            = "test.results";
 
-    // Command
+    // Command level properties
     public static final String PROPERTY_OUTPUT_DIR             = "output.dir";
 
     // Other constants

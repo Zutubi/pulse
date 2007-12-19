@@ -1,6 +1,10 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.core.*;
+import com.zutubi.pulse.core.Bootstrapper;
+import com.zutubi.pulse.core.BuildException;
+import static com.zutubi.pulse.core.BuildProperties.*;
+import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.scm.FileStatus;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.repository.FileRepository;
@@ -36,7 +40,7 @@ public class PatchBootstrapper implements Bootstrapper
         try
         {
             // apply a patch prefix to the if one is specified. Used to work around a cvs issue.
-            FileRepository fileRepository = context.getInternalValue(BuildProperties.PROPERTY_FILE_REPOSITORY, FileRepository.class);
+            FileRepository fileRepository = context.getValue(NAMESPACE_INTERNAL, PROPERTY_FILE_REPOSITORY, FileRepository.class);
             PatchArchive patch = new PatchArchive(fileRepository.getPatchFile(userId, number));
             patch.apply(getBaseBuildDir(context), localEOL);
         }
@@ -63,7 +67,7 @@ public class PatchBootstrapper implements Bootstrapper
         String defaultPrefix = System.getProperty(DEFAULT_PATCH_BOOSTRAP_PREFIX);
 
         String projectPrefix = null;
-        String projectName = context.getInternalString(BuildProperties.PROPERTY_PROJECT);
+        String projectName = context.getString(NAMESPACE_INTERNAL, PROPERTY_PROJECT);
         if (projectName != null)
         {
             projectPrefix = System.getProperty(PATCH_BOOSTRAP_PREFIX + "." + projectName);

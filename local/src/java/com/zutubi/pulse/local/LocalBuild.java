@@ -2,6 +2,7 @@ package com.zutubi.pulse.local;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.*;
+import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.dev.bootstrap.DevBootstrapManager;
 import com.zutubi.pulse.events.EventManager;
@@ -125,7 +126,7 @@ public class LocalBuild
      *                      resources are to be loaded
      * @param outputDir     the name of the output directory to capture output
      *                      and save results to
-     * @throws PulseException
+     * @throws PulseException if a build error occurs
      */
     public void runBuild(File baseDir, String pulseFileName, String recipe, String resourcesFile, String outputDir) throws PulseException
     {
@@ -152,9 +153,9 @@ public class LocalBuild
 
             ExecutionContext context = new ExecutionContext();
             context.setWorkingDir(baseDir);
-            context.addInternalValue(BuildProperties.PROPERTY_RECIPE_PATHS, paths);
-            context.addInternalValue(BuildProperties.PROPERTY_RESOURCE_REPOSITORY, repository);
-            context.addInternalString(BuildProperties.PROPERTY_RECIPE, recipe);
+            context.addValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, paths);
+            context.addValue(NAMESPACE_INTERNAL, PROPERTY_RESOURCE_REPOSITORY, repository);
+            context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE, recipe);
             Bootstrapper bootstrapper = new LocalBootstrapper();
             RecipeRequest request = new RecipeRequest(bootstrapper, loadPulseFile(baseDir, pulseFileName), context);
             recipeProcessor.build(request);

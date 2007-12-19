@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core;
 
+import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.core.model.TestSuiteResult;
@@ -30,8 +31,8 @@ public abstract class TestReportPostProcessor extends SelfReference implements P
 
     public void process(StoredFileArtifact artifact, CommandResult result, ExecutionContext context)
     {
-        TestSuiteResult testResults = context.getInternalValue(BuildProperties.PROPERTY_TEST_RESULTS, TestSuiteResult.class);
-        File outputDir = context.getInternalFile(BuildProperties.PROPERTY_OUTPUT_DIR);
+        TestSuiteResult testResults = context.getValue(NAMESPACE_INTERNAL, PROPERTY_TEST_RESULTS, TestSuiteResult.class);
+        File outputDir = context.getFile(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR);
         int brokenBefore = testResults.getSummary().getBroken();
 
         File file = new File(outputDir, artifact.getPath());

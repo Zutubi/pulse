@@ -6,7 +6,11 @@ import com.zutubi.pulse.bootstrap.Data;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.MasterUserPaths;
 import com.zutubi.pulse.bootstrap.SimpleMasterConfigurationManager;
-import com.zutubi.pulse.core.*;
+import com.zutubi.pulse.core.Bootstrapper;
+import static com.zutubi.pulse.core.BuildProperties.*;
+import com.zutubi.pulse.core.BuildRevision;
+import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.Feature;
@@ -266,9 +270,9 @@ public class RecipeControllerTest extends PulseTestCase
     private ExecutionContext makeContext(String project, long id, String recipeName)
     {
         ExecutionContext context = new ExecutionContext();
-        context.addInternalString(BuildProperties.PROPERTY_PROJECT, project);
-        context.addInternalString(BuildProperties.PROPERTY_RECIPE_ID, Long.toString(id));
-        context.addInternalString(BuildProperties.PROPERTY_RECIPE, recipeName);
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_PROJECT, project);
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE_ID, Long.toString(id));
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE, recipeName);
         return context;
     }
 

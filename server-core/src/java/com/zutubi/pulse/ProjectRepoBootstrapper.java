@@ -1,6 +1,7 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.core.*;
+import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.util.FileSystemUtils;
 
@@ -30,14 +31,14 @@ public class ProjectRepoBootstrapper implements Bootstrapper
 
     public void bootstrap(final ExecutionContext context) throws BuildException
     {
-        final RecipePaths paths = context.getInternalValue(BuildProperties.PROPERTY_RECIPE_PATHS, RecipePaths.class);
+        final RecipePaths paths = context.getValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, RecipePaths.class);
         if (paths.getPersistentWorkDir() == null)
         {
             throw new BuildException("Attempt to use update bootstrapping when no persistent working directory is available.");
         }
 
         // run the scm bootstrapper on the local directory,
-        boolean cleanBuild = context.getInternalBoolean(BuildProperties.PROPERTY_CLEAN_BUILD, false);
+        boolean cleanBuild = context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_CLEAN_BUILD, false);
         childBootstrapper = selectBootstrapper(cleanBuild, paths.getPersistentWorkDir());
         childBootstrapper.prepare(agent);
 
@@ -62,7 +63,7 @@ public class ProjectRepoBootstrapper implements Bootstrapper
         context.push();
         try
         {
-            context.addInternalValue(BuildProperties.PROPERTY_RECIPE_PATHS, mungedPaths);
+            context.addValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, mungedPaths);
             context.setWorkingDir(mungedPaths.getBaseDir());
             childBootstrapper.bootstrap(context);
         }

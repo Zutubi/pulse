@@ -37,10 +37,10 @@ public class MasterBuildProperties extends BuildProperties
         addBuildProperties(context, result, result.getProject(), result.getAbsoluteOutputDir(configurationManager.getDataDirectory()), masterUrl);
         if(result.getRevision() != null)
         {
-            context.addInternalString(PROPERTY_BUILD_REVISION, result.getRevision().getRevisionString());
+            context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_REVISION, result.getRevision().getRevisionString());
         }
-        context.addInternalString(PROPERTY_BUILD_TIMESTAMP, TIMESTAMP_FORMAT.format(result.getStamps().getStartTime()));
-        context.addInternalString(PROPERTY_BUILD_TIMESTAMP_MILLIS, Long.toString(result.getStamps().getStartTime()));
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_TIMESTAMP, TIMESTAMP_FORMAT.format(result.getStamps().getStartTime()));
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_TIMESTAMP_MILLIS, Long.toString(result.getStamps().getStartTime()));
         addProjectProperties(context, result.getProject().getConfig());
         addCompletedBuildProperties(context, result, configurationManager);
     }
@@ -48,38 +48,38 @@ public class MasterBuildProperties extends BuildProperties
     public static void addBuildProperties(ExecutionContext context, BuildResult buildResult, Project project, File buildDir, String masterUrl)
     {
         ProjectConfiguration projectConfig = project.getConfig();
-        context.addInternalString(PROPERTY_BUILD_NUMBER, Long.toString(buildResult.getNumber()));
-        context.addInternalString(PROPERTY_PROJECT, projectConfig.getName());
-        context.addInternalString(PROPERTY_BUILD_DIRECTORY, buildDir.getAbsolutePath());
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_NUMBER, Long.toString(buildResult.getNumber()));
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_PROJECT, projectConfig.getName());
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_DIRECTORY, buildDir.getAbsolutePath());
 
         BuildReason buildReason = buildResult.getReason();
-        context.addInternalString(PROPERTY_BUILD_REASON, buildReason.getSummary());
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_REASON, buildReason.getSummary());
         if(buildReason instanceof TriggerBuildReason)
         {
-            context.addInternalString(PROPERTY_BUILD_TRIGGER, ((TriggerBuildReason)buildReason).getTriggerName());
+            context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_TRIGGER, ((TriggerBuildReason)buildReason).getTriggerName());
         }
 
-        context.addInternalString(PROPERTY_MASTER_URL, masterUrl);
-        context.addInternalString(PROPERTY_BUILD_COUNT, Integer.toString(project.getBuildCount()));
-        context.addInternalString(PROPERTY_SUCCESS_COUNT, Integer.toString(project.getSuccessCount()));
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_MASTER_URL, masterUrl);
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_COUNT, Integer.toString(project.getBuildCount()));
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_SUCCESS_COUNT, Integer.toString(project.getSuccessCount()));
 
         CheckoutScheme checkoutScheme = projectConfig.getScm().getCheckoutScheme();
-        context.addInternalString(PROPERTY_INCREMENTAL_BUILD, Boolean.toString(!buildResult.isPersonal() && checkoutScheme == CheckoutScheme.INCREMENTAL_UPDATE));
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BUILD, Boolean.toString(!buildResult.isPersonal() && checkoutScheme == CheckoutScheme.INCREMENTAL_UPDATE));
 
-        context.addInternalString(PROPERTY_COMPRESS_ARTIFACTS, "true");
-        context.addInternalString(PROPERTY_COMPRESS_WORKING_DIR, Boolean.toString(projectConfig.getOptions().getRetainWorkingCopy()));
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_COMPRESS_ARTIFACTS, "true");
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_COMPRESS_WORKING_DIR, Boolean.toString(projectConfig.getOptions().getRetainWorkingCopy()));
     }
 
     public static void addRevisionProperties(ExecutionContext context, BuildRevision buildRevision)
     {
-        context.addInternalString(PROPERTY_BUILD_REVISION, buildRevision.getRevision().getRevisionString());
-        context.addInternalString(PROPERTY_BUILD_TIMESTAMP, TIMESTAMP_FORMAT.format(new Date(buildRevision.getTimestamp())));
-        context.addInternalString(PROPERTY_BUILD_TIMESTAMP_MILLIS, Long.toString(buildRevision.getTimestamp()));
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_REVISION, buildRevision.getRevision().getRevisionString());
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_TIMESTAMP, TIMESTAMP_FORMAT.format(new Date(buildRevision.getTimestamp())));
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_TIMESTAMP_MILLIS, Long.toString(buildRevision.getTimestamp()));
     }
 
     public static void addCompletedBuildProperties(ExecutionContext context, BuildResult result, MasterConfigurationManager configurationManager)
     {
-        context.addInternalString(PROPERTY_STATUS, result.getState().getString());
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_STATUS, result.getState().getString());
 
         TestResultSummary tests = result.getTestSummary();
         String testSummary;
@@ -99,7 +99,7 @@ public class MasterBuildProperties extends BuildProperties
             testSummary = "no tests";
         }
 
-        context.addInternalString(PROPERTY_TEST_SUMMARY, testSummary);
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_TEST_SUMMARY, testSummary);
         for(RecipeResultNode node: result.getRoot().getChildren())
         {
             addStageProperties(context, result, node, configurationManager, true);
@@ -120,17 +120,17 @@ public class MasterBuildProperties extends BuildProperties
         }
         else
         {
-            context.addInternalString(PROPERTY_RECIPE, recipeResult.getRecipeNameSafe());
-            context.addInternalString(PROPERTY_STAGE, node.getStageName());
-            context.addInternalString(PROPERTY_STATUS, recipeResult.getState().getString());
+            context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE, recipeResult.getRecipeNameSafe());
+            context.addString(NAMESPACE_INTERNAL, PROPERTY_STAGE, node.getStageName());
+            context.addString(NAMESPACE_INTERNAL, PROPERTY_STATUS, recipeResult.getState().getString());
         }
 
-        context.addInternalString(prefix + PROPERTY_AGENT, node.getHostSafe());
+        context.addString(NAMESPACE_INTERNAL, prefix + PROPERTY_AGENT, node.getHostSafe());
         if(result != null)
         {
-            context.addInternalString(prefix + PROPERTY_RECIPE, recipeResult.getRecipeNameSafe());
-            context.addInternalString(prefix + PROPERTY_STATUS, recipeResult.getState().getString());
-            context.addInternalString(prefix + PROPERTY_DIRECTORY, paths.getRecipeDir(result, recipeResult.getId()).getAbsolutePath());
+            context.addString(NAMESPACE_INTERNAL, prefix + PROPERTY_RECIPE, recipeResult.getRecipeNameSafe());
+            context.addString(NAMESPACE_INTERNAL, prefix + PROPERTY_STATUS, recipeResult.getState().getString());
+            context.addString(NAMESPACE_INTERNAL, prefix + PROPERTY_DIRECTORY, paths.getRecipeDir(result, recipeResult.getId()).getAbsolutePath());
 
             for(CommandResult command: recipeResult.getCommandResults())
             {
@@ -152,7 +152,7 @@ public class MasterBuildProperties extends BuildProperties
 
         prefix += "command." + commandName + ".";
 
-        context.addInternalString(prefix + PROPERTY_STATUS, commandResult.getState().getString());
-        context.addInternalString(prefix + PROPERTY_DIRECTORY, commandResult.getAbsoluteOutputDir(configurationManager.getDataDirectory()).getAbsolutePath());
+        context.addString(NAMESPACE_INTERNAL, prefix + PROPERTY_STATUS, commandResult.getState().getString());
+        context.addString(NAMESPACE_INTERNAL, prefix + PROPERTY_DIRECTORY, commandResult.getAbsoluteOutputDir(configurationManager.getDataDirectory()).getAbsolutePath());
     }
 }

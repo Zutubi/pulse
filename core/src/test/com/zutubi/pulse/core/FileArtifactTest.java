@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core;
 
+import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
@@ -210,13 +211,13 @@ public class FileArtifactTest extends PulseTestCase
         RecipePaths paths = new SimpleRecipePaths(tmpSourceDir, null);
         ExecutionContext context = new ExecutionContext();
         context.setWorkingDir(paths.getBaseDir());
-        context.addInternalValue(BuildProperties.PROPERTY_RECIPE_PATHS, paths);
+        context.addValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, paths);
         if(recipeStartTime > 0)
         {
-            context.addInternalString(BuildProperties.PROPERTY_RECIPE_TIMESTAMP_MILLIS, Long.toString(recipeStartTime));
+            context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE_TIMESTAMP_MILLIS, Long.toString(recipeStartTime));
         }
 
-        context.addInternalString(BuildProperties.PROPERTY_OUTPUT_DIR, tmpOutputDir.getAbsolutePath());
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, tmpOutputDir.getAbsolutePath());
 
         fileArtifactObject.capture(result, context);
     }

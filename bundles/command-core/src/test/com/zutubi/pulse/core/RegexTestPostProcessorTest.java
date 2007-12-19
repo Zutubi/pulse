@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core;
 
+import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.core.model.TestCaseResult;
@@ -144,8 +145,8 @@ public class RegexTestPostProcessorTest extends PulseTestCase
 
         TestSuiteResult testResults = new TestSuiteResult();
         ExecutionContext context = new ExecutionContext();
-        context.addInternalValue(BuildProperties.PROPERTY_TEST_RESULTS, testResults);
-        context.addInternalString(BuildProperties.PROPERTY_OUTPUT_DIR, tmpDir.getAbsolutePath());
+        context.addValue(NAMESPACE_INTERNAL, PROPERTY_TEST_RESULTS, testResults);
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, tmpDir.getAbsolutePath());
 
         pp.process(artifact, result, context);
         return testResults;

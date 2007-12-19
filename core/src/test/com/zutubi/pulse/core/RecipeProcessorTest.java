@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core;
 
+import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.events.DefaultEventManager;
@@ -100,10 +101,10 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
     {
         ExecutionContext context = new ExecutionContext();
         context.setWorkingDir(paths.getBaseDir());
-        context.addInternalValue(BuildProperties.PROPERTY_RECIPE_PATHS, paths);
-        context.addInternalValue(BuildProperties.PROPERTY_RESOURCE_REPOSITORY, resourceRepository);
-        context.addInternalString(BuildProperties.PROPERTY_RECIPE_ID, Long.toString(id));
-        context.addInternalString(BuildProperties.PROPERTY_RECIPE, recipeName);
+        context.addValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, paths);
+        context.addValue(NAMESPACE_INTERNAL, PROPERTY_RESOURCE_REPOSITORY, resourceRepository);
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE_ID, Long.toString(id));
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE, recipeName);
         return context;
     }
 

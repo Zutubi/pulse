@@ -1,5 +1,7 @@
 package com.zutubi.pulse.core;
 
+import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_INTERNAL;
+import static com.zutubi.pulse.core.BuildProperties.PROPERTY_OUTPUT_DIR;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.util.IOUtils;
 
@@ -38,7 +40,7 @@ public class PrintCommand extends CommandSupport
             return;
         }
 
-        File outputFileDir = new File(context.getInternalFile(BuildProperties.PROPERTY_OUTPUT_DIR), "command output");
+        File outputFileDir = new File(context.getFile(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR), "command output");
         if (!outputFileDir.mkdir())
         {
             throw new BuildException("Unable to create directory for output artifact '" + outputFileDir.getAbsolutePath() + "'");

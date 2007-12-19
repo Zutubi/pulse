@@ -1,5 +1,7 @@
 package com.zutubi.pulse.core;
 
+import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_INTERNAL;
+import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_USER;
 import com.zutubi.pulse.core.config.ResourceProperty;
 
 import java.io.File;
@@ -16,9 +18,7 @@ import java.io.OutputStream;
 public class ExecutionContext
 {
     // If you add a field, remember to update the copy constructor
-    private PulseScope internalScope;
-    private PulseScope userScope;
-    private PulseScope rootUserScope;
+    private MultiScopeStack scopeStack;
     private File workingDir = null;
     private OutputStream outputStream = null;
     // TODO: replace this with more generic support for extracting properties
@@ -27,40 +27,30 @@ public class ExecutionContext
 
     public ExecutionContext()
     {
-        internalScope = new PulseScope();
-        rootUserScope = userScope = new PulseScope(internalScope);
+        scopeStack = new MultiScopeStack(NAMESPACE_INTERNAL, NAMESPACE_USER);
     }
 
     public ExecutionContext(ExecutionContext other)
     {
-        this.internalScope = other.internalScope.copy();
-        this.userScope = other.userScope.copyTo(other.rootUserScope.getParent());
-        this.rootUserScope = userScope.getRoot();
-        this.rootUserScope.setParent(internalScope);
-
+        this.scopeStack = new MultiScopeStack(other.scopeStack);
         this.workingDir = other.workingDir;
         this.outputStream = other.outputStream;
         this.version = other.version;
     }
 
-    public Reference getInternalReference(String name)
+    public Reference getReference(String namespace, String name)
     {
-        return internalScope.getReference(name);
+        return scopeStack.getScope(namespace).getReference(name);
     }
 
     public Reference getReference(String name)
     {
-        Reference ref = userScope.getReference(name);
-        if (ref == null)
-        {
-            ref = internalScope.getReference(name);
-        }
-        return ref;
+        return scopeStack.getScope().getReference(name);
     }
 
-    public String getInternalString(String name)
+    public String getString(String namespace, String name)
     {
-        return getInternalValue(name, String.class);
+        return getValue(namespace, name, String.class);
     }
 
     public String getString(String name)
@@ -68,9 +58,9 @@ public class ExecutionContext
         return getValue(name, String.class);
     }
 
-    public boolean getInternalBoolean(String name, boolean defaultValue)
+    public boolean getBoolean(String namespace, String name, boolean defaultValue)
     {
-        return asBoolean(getInternalValue(name, Object.class), defaultValue);
+        return asBoolean(getValue(namespace, name, Object.class), defaultValue);
     }
 
     public boolean getBoolean(String name, boolean defaultValue)
@@ -95,9 +85,9 @@ public class ExecutionContext
         return defaultValue;
     }
 
-    public long getInternalLong(String name)
+    public long getLong(String namespace, String name)
     {
-        return asLong(getInternalValue(name, Object.class));
+        return asLong(getValue(namespace, name, Object.class));
     }
 
     public long getLong(String name)
@@ -129,9 +119,9 @@ public class ExecutionContext
         return 0;
     }
 
-    public File getInternalFile(String name)
+    public File getFile(String namespace, String name)
     {
-        return asFile(getInternalValue(name, Object.class));
+        return asFile(getValue(namespace, name, Object.class));
     }
 
     public File getFile(String name)
@@ -156,93 +146,69 @@ public class ExecutionContext
         return null;
     }
 
-    public <T> T getInternalValue(String name, Class<T> type)
+    public <T> T getValue(String namespace, String name, Class<T> type)
     {
-        return internalScope.getReferenceValue(name, type);
+        return scopeStack.getScope(namespace).getReferenceValue(name, type);
     }
 
     public <T> T getValue(String name, Class<T> type)
     {
-        return userScope.getReferenceValue(name, type);
+        return scopeStack.getScope().getReferenceValue(name, type);
     }
 
     public PulseScope getScope()
     {
-        return userScope;
+        return scopeStack.getScope();
     }
 
-    public void addInternal(Reference reference)
+    public void add(String namespace, Reference reference)
     {
-        internalScope.add(reference);
+        scopeStack.getScope(namespace).add(reference);
     }
 
     public void add(Reference reference)
     {
-        userScope.add(reference);
+        scopeStack.getScope().add(reference);
     }
 
-    public void addInternal(ResourceProperty resourceProperty)
+    public void add(String namespace, ResourceProperty resourceProperty)
     {
-        internalScope.add(resourceProperty);
+        scopeStack.getScope(namespace).add(resourceProperty);
     }
 
     public void add(ResourceProperty resourceProperty)
     {
-        userScope.add(resourceProperty);
+        scopeStack.getScope().add(resourceProperty);
     }
 
-    public void addInternalString(String name, String value)
+    public void addString(String namespace, String name, String value)
     {
-        internalScope.add(new Property(name, value));
+        scopeStack.getScope(namespace).add(new Property(name, value));
     }
 
     public void addString(String name, String value)
     {
-        userScope.add(new Property(name, value));
+        scopeStack.getScope().add(new Property(name, value));
     }
 
-    public void addInternalValue(String name, Object value)
+    public void addValue(String namespace, String name, Object value)
     {
-        internalScope.add(new GenericReference<Object>(name, value));
+        scopeStack.getScope(namespace).add(new GenericReference<Object>(name, value));
     }
 
     public void addValue(String name, Object value)
     {
-        userScope.add(new GenericReference<Object>(name, value));
-    }
-
-    void pushInternalScope()
-    {
-        internalScope = new PulseScope(internalScope);
-        rootUserScope.setParent(internalScope);
-    }
-
-    void pushScope()
-    {
-        userScope = new PulseScope(userScope);
+        scopeStack.getScope().add(new GenericReference<Object>(name, value));
     }
 
     public void push()
     {
-        pushInternalScope();
-        pushScope();
-    }
-
-    void popInternalScope()
-    {
-        internalScope = internalScope.getParent();
-        rootUserScope.setParent(internalScope);
-    }
-
-    void popScope()
-    {
-        userScope = userScope.getParent();
+        scopeStack.push();
     }
 
     public void pop()
     {
-        popInternalScope();
-        popScope();
+        scopeStack.pop();
     }
     
     public File getWorkingDir()

@@ -3,6 +3,8 @@ package com.zutubi.pulse;
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.*;
+import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_INTERNAL;
+import static com.zutubi.pulse.core.BuildProperties.PROPERTY_INCREMENTAL_BUILD;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.FeaturePersister;
 import com.zutubi.pulse.core.model.RecipeResult;
@@ -261,7 +263,7 @@ public class RecipeController
         try
         {
             logger.collecting(recipeResult, collectWorkingCopy);
-            collector.collect(buildResult, recipeResult.getId(), collectWorkingCopy, recipeContext.getInternalBoolean(BuildProperties.PROPERTY_INCREMENTAL_BUILD, false), agentService);
+            collector.collect(buildResult, recipeResult.getId(), collectWorkingCopy, recipeContext.getBoolean(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BUILD, false), agentService);
         }
         catch (BuildException e)
         {
@@ -281,7 +283,7 @@ public class RecipeController
     {
         try
         {
-            collector.cleanup(buildResult, recipeResult.getId(), recipeContext.getInternalBoolean(BuildProperties.PROPERTY_INCREMENTAL_BUILD, false), agentService);
+            collector.cleanup(buildResult, recipeResult.getId(), recipeContext.getBoolean(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BUILD, false), agentService);
         }
         catch (Exception e)
         {

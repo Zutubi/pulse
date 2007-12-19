@@ -8,6 +8,7 @@ import com.zutubi.pulse.agent.Status;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.SimpleMasterConfigurationManager;
 import com.zutubi.pulse.core.*;
+import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.Revision;
@@ -754,8 +755,8 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         BuildResult result = new BuildResult(new UnknownBuildReason(), project, 100, false);
         AgentRequirements requirements = new MockAgentRequirements(type);
         ExecutionContext context = new ExecutionContext();
-        context.addInternalString(BuildProperties.PROPERTY_PROJECT, "project");
-        context.addInternalString(BuildProperties.PROPERTY_RECIPE_ID, Long.toString(id));
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_PROJECT, "project");
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE_ID, Long.toString(id));
         RecipeRequest request = new RecipeRequest(context);
         request.setBootstrapper(new ChainBootstrapper());
         return new RecipeDispatchRequest(project, requirements, null, new BuildRevision(), request, result);

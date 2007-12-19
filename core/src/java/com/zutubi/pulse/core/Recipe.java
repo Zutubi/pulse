@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core;
 
+import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.CommandCommencedEvent;
@@ -71,7 +72,7 @@ public class Recipe extends SelfReference
      */
     public void add(Command command, Scope scope)
     {
-        if(scope != null)
+        if (scope != null)
         {
             scope = scope.copyTo(scope.getAncestor(BuildProperties.SCOPE_RECIPE));
         }
@@ -169,7 +170,7 @@ public class Recipe extends SelfReference
         try
         {
             boolean success = true;
-            File outputDir = context.getInternalValue(BuildProperties.PROPERTY_RECIPE_PATHS, RecipePaths.class).getOutputDir();
+            File outputDir = context.getValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, RecipePaths.class).getOutputDir();
             for (int i = 0; i < commands.size(); i++)
             {
                 Pair<Command, Scope> pair = commands.get(i);
@@ -184,9 +185,12 @@ public class Recipe extends SelfReference
                         throw new BuildException("Could not create command output directory '" + commandOutput.getAbsolutePath() + "'");
                     }
 
-                    if (!executeCommand(context, commandOutput, result, command, pair.second))
+                    pushCommandContext(context, pair.second, commandOutput);
+                    boolean recipeTerminated = !executeCommand(context, commandOutput, result, command);
+                    context.pop();
+
+                    if(recipeTerminated)
                     {
-                        // Recipe terminated.
                         return;
                     }
 
@@ -216,72 +220,70 @@ public class Recipe extends SelfReference
         return String.format("%08d-%s", i, result.getCommandName());
     }
 
-    private boolean executeCommand(ExecutionContext context, File commandOutput, CommandResult commandResult, Command command, Scope scope)
+    private boolean executeCommand(ExecutionContext context, File commandOutput, CommandResult commandResult, Command command)
     {
-        pushCommandContext(context, scope, commandOutput);
+        runningLock.lock();
+        if (terminating)
+        {
+            runningLock.unlock();
+            return false;
+        }
+
+        runningCommand = command;
+        runningLock.unlock();
+
+        commandResult.commence();
+        commandResult.setOutputDir(commandOutput.getPath());
+        long recipeId = context.getLong(NAMESPACE_INTERNAL, PROPERTY_RECIPE_ID);
+        eventManager.publish(new CommandCommencedEvent(this, recipeId, commandResult.getCommandName(), commandResult.getStartTime()));
+
         try
         {
-            runningLock.lock();
-            if (terminating)
-            {
-                runningLock.unlock();
-                return false;
-            }
-
-            runningCommand = command;
-            runningLock.unlock();
-
-            commandResult.commence();
-            commandResult.setOutputDir(commandOutput.getPath());
-            long recipeId = context.getInternalLong(BuildProperties.PROPERTY_RECIPE_ID);
-            eventManager.publish(new CommandCommencedEvent(this, recipeId, commandResult.getCommandName(), commandResult.getStartTime()));
-
-            try
-            {
-                try
-                {
-                    command.execute(context, commandResult);
-                }
-                finally
-                {
-                    // still need to process any available artifacts, even in the event of an error.
-                    processArtifacts(command, context, commandResult);
-                }
-            }
-            catch (BuildException e)
-            {
-                commandResult.error(e);
-            }
-            catch (Exception e)
-            {
-                LOG.severe(e);
-                commandResult.error(new BuildException("Unexpected error: " + e.getMessage(), e));
-            }
-            finally
-            {
-                runningLock.lock();
-                runningCommand = null;
-                runningLock.unlock();
-
-                commandResult.complete();
-                eventManager.publish(new CommandCompletedEvent(this, recipeId, commandResult));
-            }
-            return true;
+            executeAndProcess(context, commandResult, command);
+        }
+        catch (BuildException e)
+        {
+            commandResult.error(e);
+        }
+        catch (Exception e)
+        {
+            LOG.severe(e);
+            commandResult.error(new BuildException("Unexpected error: " + e.getMessage(), e));
         }
         finally
         {
-            context.pop();
+            runningLock.lock();
+            runningCommand = null;
+            runningLock.unlock();
+
+            commandResult.complete();
+            eventManager.publish(new CommandCompletedEvent(this, recipeId, commandResult));
+        }
+
+        return true;
+    }
+
+    private void executeAndProcess(ExecutionContext context, CommandResult commandResult, Command command)
+    {
+        try
+        {
+            command.execute(context, commandResult);
+        }
+        finally
+        {
+            // still need to process any available artifacts, even in the event of an error.
+            processArtifacts(command, context, commandResult);
         }
     }
 
     private void pushCommandContext(ExecutionContext context, Scope scope, File commandOutput)
     {
         context.push();
-        context.addInternalString(BuildProperties.PROPERTY_OUTPUT_DIR, commandOutput.getAbsolutePath());
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, commandOutput.getAbsolutePath());
 
         if (scope != null)
         {
-            for(Reference reference: scope.getReferences())
+            for (Reference reference : scope.getReferences())
             {
                 context.add(reference);
             }

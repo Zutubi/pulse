@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core;
 
+import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.model.ResourceRequirement;
 
@@ -46,12 +47,12 @@ public class RecipeRequest
 
     public String getProject()
     {
-        return context.getInternalString(BuildProperties.PROPERTY_PROJECT);
+        return context.getString(NAMESPACE_INTERNAL, PROPERTY_PROJECT);
     }
 
     public long getId()
     {
-        return context.getInternalLong(BuildProperties.PROPERTY_RECIPE_ID);
+        return context.getLong(NAMESPACE_INTERNAL, PROPERTY_RECIPE_ID);
     }
 
     public Bootstrapper getBootstrapper()
@@ -66,7 +67,7 @@ public class RecipeRequest
 
     public String getRecipeName()
     {
-        return context.getInternalString(BuildProperties.PROPERTY_RECIPE);
+        return context.getString(NAMESPACE_INTERNAL, PROPERTY_RECIPE);
     }
 
     public String getRecipeNameSafe()
@@ -120,6 +121,6 @@ public class RecipeRequest
     public void prepare(String agent)
     {
         bootstrapper.prepare(agent);
-        context.addInternalString(BuildProperties.PROPERTY_AGENT, agent);
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_AGENT, agent);
     }
 }

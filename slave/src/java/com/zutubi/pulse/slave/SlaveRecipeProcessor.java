@@ -4,6 +4,7 @@ import com.zutubi.pulse.ChainBootstrapper;
 import com.zutubi.pulse.ServerBootstrapper;
 import com.zutubi.pulse.ServerRecipePaths;
 import com.zutubi.pulse.core.*;
+import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
@@ -63,7 +64,7 @@ public class SlaveRecipeProcessor
             ExecutionContext context = request.getContext();
             EventListener listener = registerMasterListener(master, masterProxy, request.getId());
             ResourceRepository repo = new RemoteResourceRepository(handle, masterProxy, serviceTokenManager);
-            ServerRecipePaths processorPaths = new ServerRecipePaths(request.getProject(), request.getId(), configurationManager.getUserPaths().getData(), context.getInternalBoolean(BuildProperties.PROPERTY_INCREMENTAL_BUILD, false));
+            ServerRecipePaths processorPaths = new ServerRecipePaths(request.getProject(), request.getId(), configurationManager.getUserPaths().getData(), context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BUILD, false));
 
             Bootstrapper requestBootstrapper = request.getBootstrapper();
             request.setBootstrapper(new ChainBootstrapper(new ServerBootstrapper(), requestBootstrapper));
@@ -72,9 +73,9 @@ public class SlaveRecipeProcessor
             CommandOutputStream outputStream = null;
             try
             {
-                context.addInternalValue(BuildProperties.PROPERTY_RECIPE_PATHS, processorPaths);
-                context.addInternalValue(BuildProperties.PROPERTY_RESOURCE_REPOSITORY, repo);
-                context.addInternalValue(BuildProperties.PROPERTY_FILE_REPOSITORY, new SlaveFileRepository(processorPaths.getRecipeRoot(), master, serviceTokenManager));
+                context.addValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, processorPaths);
+                context.addValue(NAMESPACE_INTERNAL, PROPERTY_RESOURCE_REPOSITORY, repo);
+                context.addValue(NAMESPACE_INTERNAL, PROPERTY_FILE_REPOSITORY, new SlaveFileRepository(processorPaths.getRecipeRoot(), master, serviceTokenManager));
                 outputStream = new CommandOutputStream(eventManager, request.getId(), true);
                 context.setOutputStream(outputStream);
                 context.setWorkingDir(processorPaths.getBaseDir());

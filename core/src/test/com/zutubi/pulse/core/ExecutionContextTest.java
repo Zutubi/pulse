@@ -1,5 +1,6 @@
 package com.zutubi.pulse.core;
 
+import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_INTERNAL;
 import com.zutubi.pulse.test.PulseTestCase;
 
 import java.io.ByteArrayOutputStream;
@@ -12,8 +13,8 @@ public class ExecutionContextTest extends PulseTestCase
     public void testInternalProperty()
     {
         ExecutionContext context = new ExecutionContext();
-        context.addInternalString("foo", "bar");
-        assertEquals("bar", context.getInternalString("foo"));
+        context.addString(NAMESPACE_INTERNAL, "foo", "bar");
+        assertEquals("bar", context.getString(NAMESPACE_INTERNAL, "foo"));
         assertEquals("bar", context.getString("foo"));
     }
 
@@ -21,38 +22,8 @@ public class ExecutionContextTest extends PulseTestCase
     {
         ExecutionContext context = new ExecutionContext();
         context.addString("foo", "bar");
-        assertNull(context.getInternalString("foo"));
+        assertNull(context.getString(NAMESPACE_INTERNAL, "foo"));
         assertEquals("bar", context.getString("foo"));
-    }
-
-    public void testPushPopInternalScope()
-    {
-        ExecutionContext context = new ExecutionContext();
-        context.addInternalString("parent", "pv");
-        context.pushInternalScope();
-        context.addInternalString("child", "cv");
-        assertEquals("pv", context.getInternalString("parent"));
-        assertEquals("pv", context.getString("parent"));
-        assertEquals("cv", context.getInternalString("child"));
-        assertEquals("cv", context.getString("child"));
-        context.popInternalScope();
-        assertEquals("pv", context.getInternalString("parent"));
-        assertEquals("pv", context.getString("parent"));
-        assertNull(context.getInternalString("child"));
-        assertNull(context.getString("child"));
-    }
-
-    public void testPushPopUserScope()
-    {
-        ExecutionContext context = new ExecutionContext();
-        context.addString("parent", "pv");
-        context.pushScope();
-        context.addString("child", "cv");
-        assertEquals("pv", context.getString("parent"));
-        assertEquals("cv", context.getString("child"));
-        context.popScope();
-        assertEquals("pv", context.getString("parent"));
-        assertNull(context.getString("child"));
     }
 
     public void testGetBooleanNotSet()
@@ -153,8 +124,8 @@ public class ExecutionContextTest extends PulseTestCase
         context.setWorkingDir(new File("foo"));
 
         ExecutionContext copy = new ExecutionContext(context);
-        assertEquals("ip", copy.getInternalString("iparent"));
-        assertEquals("ic", copy.getInternalString("ichild"));
+        assertEquals("ip", copy.getString(NAMESPACE_INTERNAL, "iparent"));
+        assertEquals("ic", copy.getString(NAMESPACE_INTERNAL, "ichild"));
         assertEquals("p", copy.getString("parent"));
         assertEquals("c", copy.getString("child"));
         assertSame(outputStream, context.getOutputStream());
@@ -189,11 +160,10 @@ public class ExecutionContextTest extends PulseTestCase
     private ExecutionContext makeNonTrivialContext()
     {
         ExecutionContext context = new ExecutionContext();
-        context.addInternalString("iparent", "ip");
-        context.pushInternalScope();
-        context.addInternalString("ichild", "ic");
+        context.addString(NAMESPACE_INTERNAL, "iparent", "ip");
         context.addString("parent", "p");
-        context.pushScope();
+        context.push();
+        context.addString(NAMESPACE_INTERNAL, "ichild", "ic");
         context.addString("child", "c");
         return context;
     }

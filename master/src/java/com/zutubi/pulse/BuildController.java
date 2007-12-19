@@ -157,8 +157,8 @@ public class BuildController implements EventListener
 
             ExecutionContext recipeContext = new ExecutionContext(buildContext);
             recipeContext.push();
-            recipeContext.addInternalString(PROPERTY_RECIPE_ID, Long.toString(recipeResult.getId()));
-            recipeContext.addInternalString(PROPERTY_RECIPE, stage.getRecipe());
+            recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE_ID, Long.toString(recipeResult.getId()));
+            recipeContext.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE, stage.getRecipe());
 
             RecipeRequest recipeRequest = new RecipeRequest(new ExecutionContext(recipeContext));
             List<ResourceRequirement> resourceRequirements = getResourceRequirements(stage);
