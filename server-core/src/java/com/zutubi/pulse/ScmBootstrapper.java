@@ -53,7 +53,7 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmEventHandler
 
         ScmContext scmContext = new ScmContext();
         scmContext.setDir(workDir);
-        
+
         try
         {
             fout = new FileOutputStream(new File(outDir, BootstrapCommand.FILES_FILE));
@@ -88,9 +88,10 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmEventHandler
                 client.storeConnectionDetails(outDir);
 
                 List<ScmContext.Property> properties = scmContext.getProperties();
+                PulseScope recipeScope = context.getScope().getAncestor(BuildProperties.SCOPE_RECIPE);
                 for (ScmContext.Property prop : properties)
                 {
-                    context.add(new ResourceProperty(
+                    recipeScope.add(new ResourceProperty(
                             prop.getName(),
                             prop.getValue(),
                             prop.isAddToEnvironment(),

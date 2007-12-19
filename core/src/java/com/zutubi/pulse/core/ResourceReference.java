@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.util.TextUtils;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceVersion;
+import com.zutubi.util.TextUtils;
 
 /**
  * A resource references adds the named resource to the current scope.
@@ -29,11 +29,11 @@ public class ResourceReference implements ResourceAware, ScopeAware, InitCompone
     private boolean required = true;
 
     private ResourceRepository repository;
-    private Scope scope;
+    private PulseScope scope;
 
-    public void setScope(PulseScope scope)
+    public void setScope(Scope scope)
     {
-        this.scope = scope;
+        this.scope = (PulseScope) scope;
     }
 
     public void initBeforeChildren() throws FileLoadException
@@ -54,8 +54,7 @@ public class ResourceReference implements ResourceAware, ScopeAware, InitCompone
             return;
         }
 
-        // FIXME scope
-        ((PulseScope)scope).getParent().add(resource.getProperties().values());
+        scope.getParent().add(resource.getProperties().values());
         String importVersion = version;
         if(importVersion == null)
         {
@@ -75,8 +74,7 @@ public class ResourceReference implements ResourceAware, ScopeAware, InitCompone
                 return;
             }
 
-            // FIXME scope
-            ((PulseScope)scope).getParent().add(resourceVersion.getProperties().values());
+            scope.getParent().add(resourceVersion.getProperties().values());
         }
     }
 
@@ -96,11 +94,8 @@ public class ResourceReference implements ResourceAware, ScopeAware, InitCompone
     }
 
     /**
-     * The name of the resource being referenced.
-     *
-     * This parameter is required.
-     *
-     * @param name
+     * @param name name of the resource being referenced. This parameter is
+     *             required.
      */
     public void setName(String name)
     {
@@ -113,11 +108,8 @@ public class ResourceReference implements ResourceAware, ScopeAware, InitCompone
     }
 
     /**
-     * The version of the resource being referenced.
-     *
-     * This parameter is optional
-     *
-     * @param version
+     * @param version the version of the resource being referenced. This
+     *                parameter is optional
      */
     public void setVersion(String version)
     {
@@ -135,7 +127,7 @@ public class ResourceReference implements ResourceAware, ScopeAware, InitCompone
      *
      * This parameter is optional, defaults to false.
      *
-     * @param required
+     * @param required true if the referenced resource (version) must exist
      */
     public void setRequired(boolean required)
     {

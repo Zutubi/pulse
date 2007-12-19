@@ -20,8 +20,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 
- *
  */
 public class FileLoader
 {
@@ -97,7 +95,7 @@ public class FileLoader
 
             if (ScopeAware.class.isAssignableFrom(root.getClass()))
             {
-                ((ScopeAware) root).setScope((PulseScope) globalScope.copy());
+                ((ScopeAware) root).setScope(globalScope.copy());
             }
 
             mapAttributesToProperties(rootElement, root, predicate, globalScope);
@@ -172,7 +170,7 @@ public class FileLoader
 
                 if (ScopeAware.class.isAssignableFrom(type.getClass()))
                 {
-                    ((ScopeAware) type).setScope((PulseScope) scope.copy());
+                    ((ScopeAware) type).setScope(scope.copy());
                 }
 
                 if (ResourceAware.class.isAssignableFrom(type.getClass()))
@@ -420,7 +418,8 @@ public class FileLoader
      * Simple helper that converts some-name to someName. ie: remove the '-' and
      * upper case the following letter.
      *
-     * @param name
+     * @param name name to be converted
+     * @return converted name
      */
     private String convertLocalNameToPropertyName(String name)
     {

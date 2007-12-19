@@ -5,5 +5,5 @@ package com.zutubi.pulse.core;
  */
 public interface ScopeAware
 {
-    public void setScope(PulseScope scope);
+    public void setScope(Scope scope);
 }
