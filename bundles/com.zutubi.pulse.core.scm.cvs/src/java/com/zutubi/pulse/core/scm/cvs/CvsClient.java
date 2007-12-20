@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core.scm.cvs;
 
-import com.zutubi.util.TextUtils;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
@@ -11,16 +10,12 @@ import com.zutubi.pulse.core.scm.cvs.client.commands.RlsInfo;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.CleanupInputStream;
 import com.zutubi.util.IOUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -103,9 +98,9 @@ public class CvsClient implements ScmClient, DataCacheAware
 
     public String getLocation()
     {
-        StringBuffer buffer = new StringBuffer();
-        buffer.append(getRoot()).append("[").append(getModule()).append("]");
-        return buffer.toString();
+        StringBuilder builder = new StringBuilder();
+        builder.append(getRoot()).append("[").append(getModule()).append("]");
+        return builder.toString();
     }
 
     /**

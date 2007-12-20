@@ -1,6 +1,10 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.pulse.prototype.config.agent.AgentConfigurationActions;
+import com.zutubi.pulse.prototype.config.user.SetPasswordConfiguration;
+import com.zutubi.pulse.prototype.config.user.UserConfiguration;
+import com.zutubi.pulse.prototype.config.user.UserConfigurationActions;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.Sort;
 
@@ -531,6 +535,104 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertEquals(Arrays.asList("p1", "p2"), new LinkedList<String>(xmlRpcHelper.getConfigListing(propertiesPath)));
         xmlRpcHelper.setConfigOrder(propertiesPath, "p2", "p1");
         assertEquals(Arrays.asList("p2", "p1"), new LinkedList<String>(xmlRpcHelper.getConfigListing(propertiesPath)));
+    }
+
+    public void testGetConfigActions() throws Exception
+    {
+        String agentName = "getConfigActions-" + RandomUtils.randomString(10);
+        String path = xmlRpcHelper.insertSimpleAgent(agentName);
+        try
+        {
+            Vector<String> actions = xmlRpcHelper.getConfigActions(path);
+            assertEquals(Arrays.asList(AgentConfigurationActions.ACTION_DISABLE, AgentConfigurationActions.ACTION_PING, AgentConfigurationActions.ACTION_GC),
+                         new LinkedList<String>(actions));
+        }
+        finally
+        {
+            xmlRpcHelper.deleteConfig(path);
+        }
+    }
+
+    public void testDoConfigAction() throws Exception
+    {
+        String agentName = "doConfigAction-" + RandomUtils.randomString(10);
+        String path = xmlRpcHelper.insertSimpleAgent(agentName);
+        try
+        {
+            xmlRpcHelper.doConfigAction(path, AgentConfigurationActions.ACTION_DISABLE);
+            Vector<String> actions = xmlRpcHelper.getConfigActions(path);
+            assertEquals(Arrays.asList(AgentConfigurationActions.ACTION_ENABLE),
+                     new LinkedList<String>(actions));
+        }
+        finally
+        {
+            xmlRpcHelper.deleteConfig(path);
+        }
+    }
+
+    public void testDoConfigActionWithArgument() throws Exception
+    {
+        String userName = "doConfigActionWithArgument-" + RandomUtils.randomString(10);
+        String path = xmlRpcHelper.insertTrivialUser(userName);
+        try
+        {
+            Hashtable<String, Object> password = xmlRpcHelper.createDefaultConfig(SetPasswordConfiguration.class);
+            password.put("password", "foo");
+            password.put("confirmPassword", "foo");
+            xmlRpcHelper.doConfigActionWithArgument(path, UserConfigurationActions.ACTION_SET_PASSWORD, password);
+            xmlRpcHelper.logout();
+            xmlRpcHelper.login(userName, "foo");
+        }
+        finally
+        {
+            xmlRpcHelper.deleteConfig(path);
+        }
+    }
+
+    public void testDoConfigActionWithInvalidArgument() throws Exception
+    {
+        String userName = "doConfigActionWitInvalidArgument-" + RandomUtils.randomString(10);
+        String path = xmlRpcHelper.insertTrivialUser(userName);
+        try
+        {
+            Hashtable<String, Object> password = xmlRpcHelper.createDefaultConfig(SetPasswordConfiguration.class);
+            password.put("password", "foo");
+            password.put("confirmPassword", "bar");
+            xmlRpcHelper.doConfigActionWithArgument(path, UserConfigurationActions.ACTION_SET_PASSWORD, password);
+            fail();
+        }
+        catch(Exception e)
+        {
+            assertEquals("java.lang.Exception: com.zutubi.pulse.api.ValidationException: password: passwords do not match", e.getMessage());
+        }
+        finally
+        {
+            xmlRpcHelper.deleteConfig(path);
+        }
+    }
+
+    public void testDoConfigActionWithIncorrectArgument() throws Exception
+    {
+        String userName = "doConfigActionWitIncorrectArgument-" + RandomUtils.randomString(10);
+        String path = xmlRpcHelper.insertTrivialUser(userName);
+        try
+        {
+            // Deliberately pass wrong type as argument
+            Hashtable<String, Object> password = xmlRpcHelper.createDefaultConfig(UserConfiguration.class);
+            password.put("login", randomName());
+            password.put("name", randomName());
+            xmlRpcHelper.doConfigActionWithArgument(path, UserConfigurationActions.ACTION_SET_PASSWORD, password);
+            fail();
+        }
+        catch(Exception e)
+        {
+            assertEquals("java.lang.Exception: java.lang.RuntimeException: java.lang.IllegalArgumentException: Invoking action 'setPassword' of type 'com.zutubi.pulse.prototype.config.user.UserConfiguration': argument instance is of wrong type: expecting 'com.zutubi.pulse.prototype.config.user.SetPasswordConfiguration', got 'com.zutubi.pulse.prototype.config.user.UserConfiguration'",
+                         e.getMessage());
+        }
+        finally
+        {
+            xmlRpcHelper.deleteConfig(path);
+        }
     }
 
     private Hashtable<String, Object> createProperty(String name, String value)

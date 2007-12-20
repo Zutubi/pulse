@@ -3,13 +3,11 @@ package com.zutubi.pulse.core.scm;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.personal.PersonalBuildWorker;
 
-import java.util.Properties;
-
 /**
  */
 public interface WorkingCopy extends PersonalBuildWorker
 {
-    boolean matchesRepository(Properties repositoryDetails) throws ScmException;
+    boolean matchesLocation(String location) throws ScmException;
 
     WorkingCopyStatus getLocalStatus(String... spec) throws ScmException;
 

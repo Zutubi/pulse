@@ -1,18 +1,14 @@
 package com.zutubi.pulse.core.scm.cvs;
 
-import com.zutubi.util.TextUtils;
 import com.zutubi.pulse.config.Config;
 import com.zutubi.pulse.config.ConfigSupport;
 import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.scm.*;
+import com.zutubi.pulse.core.scm.cvs.client.CvsCore;
 import com.zutubi.pulse.personal.PersonalBuildException;
 import com.zutubi.pulse.personal.PersonalBuildSupport;
-import com.zutubi.pulse.core.scm.FileStatus;
-import com.zutubi.pulse.core.scm.ScmException;
-import com.zutubi.pulse.core.scm.ScmUtils;
-import com.zutubi.pulse.core.scm.WorkingCopy;
-import com.zutubi.pulse.core.scm.WorkingCopyStatus;
-import com.zutubi.pulse.core.scm.cvs.client.CvsCore;
 import com.zutubi.util.IOUtils;
+import com.zutubi.util.TextUtils;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.DefaultFileInfoContainer;
 import org.netbeans.lib.cvsclient.command.status.StatusInformation;
@@ -23,10 +19,8 @@ import static org.netbeans.lib.cvsclient.file.FileStatus.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
-import java.util.Properties;
 
 /**
- * <class comment/>
  */
 public class CvsWorkingCopy extends PersonalBuildSupport implements WorkingCopy
 {
@@ -84,22 +78,21 @@ public class CvsWorkingCopy extends PersonalBuildSupport implements WorkingCopy
         }
     }
 
-    public boolean matchesRepository(Properties repositoryDetails) throws ScmException
+    public boolean matchesLocation(String location) throws ScmException
     {
+        // Location is <root>[<module>]
+        String[] pieces = location.split("\\[");
+        pieces[1] = pieces[1].substring(0, pieces[1].length() - 1);
+
         CVSRoot localCvsRoot = CVSRoot.parse(localWorkingRoot);
-
-        String projectRoot = repositoryDetails.getProperty(CvsConstants.ROOT);
-        CVSRoot projectCvsRoot = CVSRoot.parse(projectRoot);
-
+        CVSRoot projectCvsRoot = CVSRoot.parse(pieces[0]);
         if (localCvsRoot.getCompatibilityLevel(projectCvsRoot) == -1)
         {
             return false;
         }
 
         // now check that the modules match.
-        String projectModule = repositoryDetails.getProperty(CvsConstants.MODULE);
-
-        return localWorkingModule.equals(projectModule);
+        return localWorkingModule.equals(pieces[1]);
     }
 
     private String loadLocalWorkingModule() throws IOException

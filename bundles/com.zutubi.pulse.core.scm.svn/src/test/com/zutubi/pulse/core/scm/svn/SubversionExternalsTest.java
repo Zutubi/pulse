@@ -3,10 +3,7 @@ package com.zutubi.pulse.core.scm.svn;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.scm.ScmCancelledException;
-import com.zutubi.pulse.core.scm.ScmClientUtils;
-import com.zutubi.pulse.core.scm.ScmEventHandler;
-import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.scm.*;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.ZipUtils;
@@ -15,6 +12,8 @@ import com.zutubi.util.IOUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -190,7 +189,7 @@ public class SubversionExternalsTest extends PulseTestCase
         server.addExternalPath(".");
         List<Changelist> changes = server.getChanges(createRevision(7), createRevision(8));
         assertEquals(1, changes.size());
-        assertChange(changes.get(0), "8", "/bundle/trunk/file2", "/ext1/trunk/file2", "/meta/trunk/file2", "/ext2/trunk/file2");
+        assertChange(changes.get(0), "8", "/bundle/trunk/file2", "/ext1/trunk/file2", "/ext2/trunk/file2", "/meta/trunk/file2");
     }
 
     public void testCheckoutRevision() throws Exception
@@ -215,7 +214,10 @@ public class SubversionExternalsTest extends PulseTestCase
     public void testUpdate() throws Exception
     {
         doCheckout(2);
-        server.update(null, null);
+        ScmContext context = new ScmContext();
+        context.setRevision(new Revision("5"));
+        context.setDir(checkoutDir);
+        server.update(context, null);
 
         assertFile("file1", "edited bundle file1\n");
         assertFile("pull1/file1", "");
@@ -225,8 +227,12 @@ public class SubversionExternalsTest extends PulseTestCase
 
     private void doCheckout(int rev) throws ScmException
     {
+        ScmContext context = new ScmContext();
+        Revision revision = new Revision(Integer.toString(rev));
+        context.setRevision(revision);
+        context.setDir(checkoutDir);
         server.addExternalPath(".");
-        server.checkout(null, new ScmEventHandler()
+        server.checkout(context, new ScmEventHandler()
         {
             public void status(String message)
             {
@@ -247,9 +253,18 @@ public class SubversionExternalsTest extends PulseTestCase
     private void assertChange(Changelist changelist, String revision, String... paths)
     {
         assertEquals(revision, changelist.getRevision().getRevisionString());
+        List<Change> changes = changelist.getChanges();
+        Collections.sort(changes, new Comparator<Change>()
+        {
+            public int compare(Change o1, Change o2)
+            {
+                return o1.getFilename().compareTo(o2.getFilename());
+            }
+        });
+        
         for(int i = 0; i < paths.length; i++)
         {
-            Change change = changelist.getChanges().get(i);
+            Change change = changes.get(i);
             assertEquals(paths[i], change.getFilename());
         }
     }

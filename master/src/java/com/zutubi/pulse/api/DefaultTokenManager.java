@@ -127,11 +127,12 @@ public class DefaultTokenManager implements TokenManager
         return adminTokenManager != null && adminTokenManager.checkAdminToken(token);
     }
 
-    public void loginUser(String token) throws AuthenticationException
+    public User loginUser(String token) throws AuthenticationException
     {
         User user = verifyToken(token);
         AcegiUser principle = userManager.getPrinciple(user);
         AcegiUtils.loginAs(principle);
+        return user;
     }
 
     public void logoutUser()

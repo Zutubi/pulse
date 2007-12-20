@@ -23,6 +23,11 @@ public class Revision extends Entity implements Comparable<Revision>
     {
     }
 
+    public Revision(String revisionString)
+    {
+        this(null, null, null, revisionString);
+    }
+
     public Revision(String author, String comment, Date date)
     {
         this(author, comment, date, "");

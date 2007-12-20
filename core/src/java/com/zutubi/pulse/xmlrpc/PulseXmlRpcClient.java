@@ -1,11 +1,10 @@
 package com.zutubi.pulse.xmlrpc;
 
-import com.zutubi.pulse.core.scm.ScmConfiguration;
+import com.zutubi.pulse.core.scm.ScmLocation;
 import org.apache.xmlrpc.XmlRpcClient;
 
 import java.net.MalformedURLException;
 import java.util.Hashtable;
-import java.util.Map;
 import java.util.Vector;
 
 /**
@@ -56,24 +55,14 @@ public class PulseXmlRpcClient
         }
     }
 
-    public ScmConfiguration preparePersonalBuild(String token, String projectName)
+    public ScmLocation preparePersonalBuild(String token, String projectName)
     {
-        Hashtable<String, String> result = (Hashtable<String, String>) execute("RemoteApi.preparePersonalBuild", token, projectName);
-
-        ScmConfiguration config = new ScmConfiguration(result.get(ScmConfiguration.PROPERTY_TYPE));
-        for(Map.Entry<String, String> entry: result.entrySet())
-        {
-            String key = entry.getKey();
-            if(!key.equals(ScmConfiguration.PROPERTY_TYPE))
-            {
-                config.addProperty(key, entry.getValue());
-            }
-        }
-
-        return config;
+        Hashtable<String, String> result = execute("RemoteApi.preparePersonalBuild", token, projectName);
+        return new ScmLocation(result.get(ScmLocation.TYPE), result.get(ScmLocation.LOCATION));
     }
 
-    private Object execute(String method, String... args)
+    @SuppressWarnings({"unchecked"})
+    private <T> T execute(String method, String... args)
     {
         Vector v = new Vector(args.length);
         for(String arg: args)
@@ -83,7 +72,7 @@ public class PulseXmlRpcClient
 
         try
         {
-            return client.execute(method, v);
+            return (T) client.execute(method, v);
         }
         catch (Exception e)
         {

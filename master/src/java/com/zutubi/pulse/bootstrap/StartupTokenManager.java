@@ -46,7 +46,7 @@ public class StartupTokenManager implements TokenManager
         throw new AuthenticationException("System startup in progress");
     }
 
-    public void loginUser(String token) throws AuthenticationException
+    public User loginUser(String token) throws AuthenticationException
     {
         throw new AuthenticationException("System startup in progress");
     }

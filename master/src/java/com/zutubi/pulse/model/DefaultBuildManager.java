@@ -1,9 +1,9 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.MasterBuildPaths;
-import com.zutubi.pulse.database.DatabaseConsole;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.database.DatabaseConsole;
 import com.zutubi.pulse.model.persistence.ArtifactDao;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
 import com.zutubi.pulse.model.persistence.ChangelistDao;
@@ -502,7 +502,7 @@ public class DefaultBuildManager implements BuildManager
         cleanupWorkForNodes(paths, build, build.getRoot().getChildren());
     }
 
-    public void executeInTransation(Runnable runnable)
+    public void executeInTransaction(Runnable runnable)
     {
         runnable.run();
     }

@@ -6,8 +6,8 @@ import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.prototype.config.group.GroupConfiguration;
-import com.zutubi.pulse.prototype.config.project.ProjectAclConfiguration;
 import com.zutubi.pulse.prototype.config.project.BuildStageConfiguration;
+import com.zutubi.pulse.prototype.config.project.ProjectAclConfiguration;
 import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 import org.apache.xmlrpc.XmlRpcClient;
 
@@ -166,7 +166,22 @@ public class XmlRpcHelper
     {
         call("setConfigOrder", path, new Vector<String>(Arrays.asList(order)));
     }
-    
+
+    public Vector<String> getConfigActions(String path) throws Exception
+    {
+        return call("getConfigActions", path);
+    }
+
+    public void doConfigAction(String path, String action) throws Exception
+    {
+        call("doConfigAction", path, action);
+    }
+
+    public void doConfigActionWithArgument(String path, String action, Hashtable<String, Object> argument) throws Exception
+    {
+        call("doConfigActionWithArgument", path, action, argument);
+    }
+
     public String insertSimpleProject(String name, boolean template) throws Exception
     {
         return insertSimpleProject(name, ProjectManager.GLOBAL_PROJECT_NAME, template);

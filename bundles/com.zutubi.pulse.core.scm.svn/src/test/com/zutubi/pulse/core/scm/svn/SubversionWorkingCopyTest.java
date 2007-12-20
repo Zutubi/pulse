@@ -4,6 +4,7 @@ import com.zutubi.pulse.config.PropertiesConfig;
 import com.zutubi.pulse.core.scm.FileStatus;
 import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.WorkingCopyStatus;
+import com.zutubi.pulse.jni.ProcessControl;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.ZipUtils;
@@ -21,7 +22,6 @@ import org.tmatesoft.svn.core.wc.SVNWCClient;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Properties;
 
 /**
  */
@@ -122,7 +122,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
 
     protected void tearDown() throws Exception
     {
-        svnProcess.destroy();
+        ProcessControl.destroyProcess(svnProcess);
         svnProcess.waitFor();
         svnProcess = null;
         Thread.sleep(100);
@@ -134,25 +134,19 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         wc = null;
     }
 
-    public void testMatchesRepositoryMatches() throws ScmException
+    public void testMatchesLocationMatches() throws ScmException
     {
-        Properties p = new Properties();
-        p.put(SubversionConstants.PROPERTY_URL, "svn://localhost/test/trunk");
-        assertTrue(wc.matchesRepository(p));
+        assertTrue(wc.matchesLocation("svn://localhost/test/trunk"));
     }
 
-    public void testMatchesRepositoryDoesntMatch() throws ScmException
+    public void testMatchesLocationDoesntMatch() throws ScmException
     {
-        Properties p = new Properties();
-        p.put(SubversionConstants.PROPERTY_URL, "svn://localhost/test/branches/1.0.x");
-        assertFalse(wc.matchesRepository(p));
+        assertFalse(wc.matchesLocation("svn://localhost/test/branches/1.0.x"));
     }
 
-    public void testMatchesRepositoryEmbeddedUser() throws ScmException
+    public void testMatchesLocationEmbeddedUser() throws ScmException
     {
-        Properties p = new Properties();
-        p.put(SubversionConstants.PROPERTY_URL, "svn://goober@localhost/test/trunk");
-        assertTrue(wc.matchesRepository(p));
+        assertTrue(wc.matchesLocation("svn://goober@localhost/test/trunk"));
     }
 
     public void testGetStatusNoChanges() throws Exception
@@ -562,7 +556,12 @@ public class SubversionWorkingCopyTest extends PulseTestCase
     {
         otherDelete("file1");
         edit("file1");
-        WorkingCopyStatus wcs = assertSimpleStatus("file1", FileStatus.State.MODIFIED, true);
+        WorkingCopyStatus wcs = wc.getStatus();
+        assertEquals(2, wcs.getChanges().size());
+        assertEquals("file1", wcs.getChanges().get(0).getPath());
+        assertEquals(FileStatus.State.MODIFIED, wcs.getChanges().get(0).getState());
+        assertEquals("", wcs.getChanges().get(1).getPath());
+        assertEquals(FileStatus.State.UNCHANGED, wcs.getChanges().get(1).getState());
         assertNoProperties(wcs, "file1");
     }
 

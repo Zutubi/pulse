@@ -103,4 +103,24 @@ public class NumericalRevision
     {
         this.date = date;
     }
+
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+
+        NumericalRevision that = (NumericalRevision) o;
+        return !(revisionString != null ? !revisionString.equals(that.revisionString) : that.revisionString != null);
+    }
+
+    public int hashCode()
+    {
+        return (revisionString != null ? revisionString.hashCode() : 0);
+    }
 }

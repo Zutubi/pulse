@@ -9,7 +9,10 @@ import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Provides support for executing actions on configuration instances.  For
@@ -88,6 +91,7 @@ public class ActionManager
             catch (Exception e)
             {
                 LOG.severe(e);
+                throw new RuntimeException(e);
             }
         }
         else

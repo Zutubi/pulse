@@ -1,11 +1,11 @@
 package com.zutubi.pulse.core.scm.p4;
 
 import com.zutubi.pulse.config.PropertiesConfig;
-import com.zutubi.pulse.personal.PersonalBuildUI;
 import com.zutubi.pulse.core.scm.FileStatus;
 import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.WorkingCopyStatus;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
+import com.zutubi.pulse.personal.PersonalBuildUI;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.ZipUtils;
@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Properties;
 
 /**
  */
@@ -31,7 +30,6 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     private File otherClientRoot;
     private PerforceCore otherCore;
 
-    private List<String> debugs = new LinkedList<String>();
     private List<String> statuses = new LinkedList<String>();
     private List<String> errors = new LinkedList<String>();
     private List<String> warnings = new LinkedList<String>();
@@ -45,7 +43,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
         File repoDir = new File(tempDir, "repo");
         repoDir.mkdir();
 
-        File repoZip = getTestDataFile("core", "repo", "zip");
+        File repoZip = getTestDataFile("bundles/com.zutubi.pulse.core.scm.p4", "repo", "zip");
         ZipUtils.extractZip(repoZip, repoDir);
 
         // Restore from checkpoint
@@ -108,18 +106,14 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
         warnings = null;
     }
 
-    public void testRepositoryMatches() throws ScmException
+    public void testLocationMatches() throws ScmException
     {
-        Properties properties = new Properties();
-        properties.put(PROPERTY_PORT, ":1666");
-        assertTrue(wc.matchesRepository(properties));
+        assertTrue(wc.matchesLocation("foo@:1666"));
     }
 
-    public void testRepositoryDoesntMatch() throws ScmException
+    public void testLocationDoesntMatch() throws ScmException
     {
-        Properties properties = new Properties();
-        properties.put(PROPERTY_PORT, "anotherhost:1666");
-        assertFalse(wc.matchesRepository(properties));
+        assertFalse(wc.matchesLocation("foo@anotherhost:1666"));
         assertWarning("P4PORT setting ':1666' does not match Pulse project's P4PORT 'anotherhost:1666'");
     }
 
@@ -732,7 +726,6 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
 
     public void debug(String message)
     {
-        debugs.add(message);
     }
 
     public void status(String message)

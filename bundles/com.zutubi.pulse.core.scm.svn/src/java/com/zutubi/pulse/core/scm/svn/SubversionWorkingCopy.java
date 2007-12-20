@@ -19,7 +19,6 @@ import org.tmatesoft.svn.core.wc.*;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Properties;
 
 /**
  */
@@ -114,20 +113,14 @@ public class SubversionWorkingCopy extends PersonalBuildSupport implements Worki
         return password;
     }
 
-    public boolean matchesRepository(Properties repositoryDetails) throws ScmException
+    public boolean matchesLocation(String location) throws ScmException
     {
         // We just check that the URL matches
-        String url = repositoryDetails.getProperty(SubversionConstants.PROPERTY_URL);
-        if (url == null)
-        {
-            throw new ScmException("Subversion repository details not returned by Pulse server");
-        }
-
         SVNURL serverURL;
 
         try
         {
-            serverURL = SVNURL.parseURIEncoded(url);
+            serverURL = SVNURL.parseURIEncoded(location);
         }
         catch (SVNException e)
         {
@@ -152,7 +145,7 @@ public class SubversionWorkingCopy extends PersonalBuildSupport implements Worki
             }
             else
             {
-                warning("Working copy's repository URL '" + wcUrl + "' does not match Pulse project's repository URL '" + url + "'");
+                warning("Working copy's repository URL '" + wcUrl + "' does not match Pulse project's repository URL '" + location + "'");
                 return false;
             }
         }

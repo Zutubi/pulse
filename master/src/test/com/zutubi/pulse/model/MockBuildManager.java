@@ -311,7 +311,7 @@ public class MockBuildManager implements BuildManager
         throw new RuntimeException("Method not implemented.");
     }
 
-    public void executeInTransation(Runnable runnable)
+    public void executeInTransaction(Runnable runnable)
     {
     }
 }

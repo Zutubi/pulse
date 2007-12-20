@@ -174,9 +174,9 @@ public class PersonalBuildClient extends PersonalBuildSupport
         try
         {
             debug("Checking configuration and obtaining project SCM details...");
-            ScmConfiguration scmConfiguration = rpc.preparePersonalBuild(token, config.getProject());
+            ScmLocation scmLocation = rpc.preparePersonalBuild(token, config.getProject());
             debug("Configuration accepted.");
-            String scmType = scmConfiguration.getType();
+            String scmType = scmLocation.getType();
             debug("SCM type: " + scmType);
 
             WorkingCopy wc = WorkingCopyFactory.create(scmType, config.getBase(), config);
@@ -189,7 +189,7 @@ public class PersonalBuildClient extends PersonalBuildSupport
             if (config.getCheckRepository())
             {
                 debug("Checking working copy matches project SCM configuration");
-                if (!wc.matchesRepository(scmConfiguration.getRepositoryDetails()))
+                if (!wc.matchesLocation(scmLocation.getLocation()))
                 {
                     PersonalBuildUI.Response response = ynaPrompt("This working copy may not match project '" + config.getProject() + "'.  Continue anyway?", PersonalBuildUI.Response.NO);
                     if (response.isPersistent())

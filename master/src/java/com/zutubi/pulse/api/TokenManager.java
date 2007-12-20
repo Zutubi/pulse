@@ -18,7 +18,7 @@ public interface TokenManager
 
     User verifyRoleIn(String token, String... allowedAuthorities) throws AuthenticationException;
 
-    void loginUser(String token) throws AuthenticationException;
+    User loginUser(String token) throws AuthenticationException;
 
     void logoutUser();
 }

@@ -1,8 +1,8 @@
 package com.zutubi.pulse.util;
 
-import com.zutubi.util.TextUtils;
 import com.zutubi.util.IOUtils;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.*;
@@ -20,6 +20,8 @@ import java.util.List;
 public class FileSystemUtils
 {
     private static final Logger LOG = Logger.getLogger(FileSystemUtils.class);
+
+    private static final int DELETE_RETRIES = 3;
 
     // Unix-style file mode values
     
@@ -128,7 +130,7 @@ public class FileSystemUtils
                 }
                 else
                 {
-                    if (!file.delete())
+                    if (!robustDelete(file))
                     {
                         return false;
                     }
@@ -136,7 +138,34 @@ public class FileSystemUtils
             }
         }
 
-        return dir.delete();
+        return robustDelete(dir);
+    }
+
+    public static boolean robustDelete(File f)
+    {
+        boolean deleted = false;
+        for(int i = 0; i < DELETE_RETRIES; i++)
+        {
+            deleted = f.delete();
+            if(deleted)
+            {
+                break;
+            }
+            else
+            {
+                System.gc();
+                try
+                {
+                    Thread.sleep(100);
+                }
+                catch (InterruptedException e)
+                {
+                    // Ignore
+                }
+            }
+        }
+
+        return deleted;
     }
 
     public static void cleanOutputDir(File output) throws IOException
@@ -447,7 +476,7 @@ public class FileSystemUtils
             }
             else
             {
-                dest.delete();
+                robustDelete(dest);
             }
         }
 

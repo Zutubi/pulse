@@ -1,13 +1,9 @@
 package com.zutubi.pulse.core.scm.cvs.config;
 
-import com.zutubi.config.annotations.ConfigurationCheck;
-import com.zutubi.config.annotations.Form;
-import com.zutubi.config.annotations.Password;
-import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.Text;
+import com.zutubi.config.annotations.*;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
-import com.zutubi.pulse.core.scm.cvs.validation.annotation.CvsRoot;
 import com.zutubi.pulse.core.scm.cvs.CvsClient;
+import com.zutubi.pulse.core.scm.cvs.validation.annotation.CvsRoot;
 import com.zutubi.validation.annotations.Required;
 
 /**
@@ -22,7 +18,7 @@ public class CvsConfiguration extends ScmConfiguration
     @Required @CvsRoot
     @Text
     private String root;
-
+    @Required
     private String module;
     
     @Password

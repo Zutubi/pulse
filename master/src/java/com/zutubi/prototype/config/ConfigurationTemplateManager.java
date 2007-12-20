@@ -766,7 +766,7 @@ public class ConfigurationTemplateManager implements Synchronization
      * @param subject    record to validate
      * @param deep       if true, child records will also be validated
      *                   recursively (otherwise they are ignored)
-     * @return the instance if valid, null otherwise
+     * @return the instance, which will be marked up with any validation errors
      * @throws com.zutubi.prototype.type.TypeException
      *          if an error prevents
      *          creation of the instance: this is motre fatal than a normal
