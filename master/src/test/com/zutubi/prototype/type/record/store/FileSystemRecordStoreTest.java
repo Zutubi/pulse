@@ -638,6 +638,29 @@ public class FileSystemRecordStoreTest extends PulseTestCase
         }
     }
 
+    public void testImport() throws Exception
+    {
+        MutableRecord sample = createRandomSampleRecord();
+        recordStore.insert("a", sample);
+        
+        assertNotNull(recordStore.select().get("a"));
+
+        MutableRecord sampleImport = createRandomSampleRecord();
+        sampleImport.put("nested", createRandomSampleRecord());
+        recordStore.importRecords(sampleImport);
+
+        assertNull(recordStore.select().get("a"));
+        assertNotNull(recordStore.select().get("nested"));
+        assertEquals(sampleImport, recordStore.select());
+
+        // quick check that all is as expected after a restart.
+        restartRecordStore();
+
+        assertNull(recordStore.select().get("a"));
+        assertNotNull(recordStore.select().get("nested"));
+        assertEquals(sampleImport, recordStore.select());
+    }
+
     //---( helper methods. )---
 
     private MutableRecord createSampleRecord()
