@@ -38,6 +38,7 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
     private static final String ACTION_INSERT = "insert";
     private static final String ACTION_UPDATE = "update";
     private static final String ACTION_DELETE = "delete";
+    private static final String ACTION_IMPORT = "import";
 
     /**
      * The in memory record store that will be used to hold an in memory version of the data this
@@ -250,6 +251,10 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
                         else if (journalEntry.getAction().equals(ACTION_DELETE))
                         {
                             inMemoryDelegate.delete(journalEntry.getPath());
+                        }
+                        else if (journalEntry.getAction().equals(ACTION_IMPORT))
+                        {
+                            inMemoryDelegate.importRecords(journalEntry.getRecord());
                         }
                     }
                 }
@@ -561,6 +566,24 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
     public Record select()
     {
         return inMemoryDelegate.select();
+    }
+
+    public Record exportRecords()
+    {
+        return inMemoryDelegate.exportRecords();
+    }
+
+    public void importRecords(final Record record)
+    {
+        execute(new Executable()
+        {
+            public Record execute()
+            {
+                activeJournal.add(new JournalEntry(ACTION_IMPORT, "", record, nextJournalEntryId++));
+                inMemoryDelegate.importRecords(record);
+                return null;
+            }
+        });
     }
 
     public void setPersistenceDirectory(File persistentDir)

@@ -28,6 +28,16 @@ public class ScmRecordStore implements RecordStore
         return null;
     }
 
+    public Record exportRecords()
+    {
+        return null;
+    }
+
+    public void importRecords(Record r)
+    {
+
+    }
+
     public boolean prepare()
     {
         return false;

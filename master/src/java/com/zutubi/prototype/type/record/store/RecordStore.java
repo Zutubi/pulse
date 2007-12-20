@@ -15,4 +15,8 @@ public interface RecordStore
     Record delete(String path);
 
     Record select();
+
+    Record exportRecords();
+
+    void importRecords(Record r);
 }

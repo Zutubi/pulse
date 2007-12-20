@@ -63,6 +63,32 @@ public class InMemoryRecordStore implements RecordStore
         });
     }
 
+    public Record exportRecords()
+    {
+        return select();
+    }
+
+    public void importRecords(final Record r)
+    {
+        wrapper.execute(new TransactionalWrapper.Action<MutableRecord>()
+        {
+            public Object execute(MutableRecord base)
+            {
+                // update the base to contain the contents of r.
+                base.clear();
+                for (String key : r.keySet())
+                {
+                    base.put(key, r.get(key));
+                }
+                for (String key : r.metaKeySet())
+                {
+                    base.put(key, r.getMeta(key));
+                }
+                return null;
+            }
+        });
+    }
+
     public void setTransactionManager(TransactionManager transactionManager)
     {
         wrapper.setTransactionManager(transactionManager);
@@ -142,7 +168,7 @@ public class InMemoryRecordStore implements RecordStore
     {
         String[] parentPath = PathUtils.getParentPathElements(path);
         String basePath = PathUtils.getBaseName(path);
-        
+
         MutableRecord parentRecord = getRecord(base, parentPath);
         if (parentRecord == null)
         {
