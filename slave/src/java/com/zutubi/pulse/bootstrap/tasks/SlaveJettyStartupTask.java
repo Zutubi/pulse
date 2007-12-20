@@ -1,6 +1,7 @@
-package com.zutubi.pulse.bootstrap;
+package com.zutubi.pulse.bootstrap.tasks;
 
 import com.zutubi.pulse.jetty.JettyManager;
+import com.zutubi.pulse.bootstrap.StartupTask;
 
 /**
  */

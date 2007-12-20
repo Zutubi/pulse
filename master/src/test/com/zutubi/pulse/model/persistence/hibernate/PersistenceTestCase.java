@@ -1,7 +1,7 @@
 package com.zutubi.pulse.model.persistence.hibernate;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.bootstrap.DatabaseConsole;
+import com.zutubi.pulse.database.DatabaseConsole;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.pulse.util.JDBCUtils;

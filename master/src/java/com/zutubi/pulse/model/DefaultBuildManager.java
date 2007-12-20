@@ -1,7 +1,7 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.MasterBuildPaths;
-import com.zutubi.pulse.bootstrap.DatabaseConsole;
+import com.zutubi.pulse.database.DatabaseConsole;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.model.persistence.ArtifactDao;

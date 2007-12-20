@@ -15,8 +15,10 @@ This context exports:
 This context requires:
 
     configurationManager:
+
+    eventManager:
 -->
-<beans>
+<beans default-autowire="byName">
 
     <!--
     ideally, we want to initialise the log configuration manager as soon as possible. the problem

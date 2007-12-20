@@ -1,5 +1,7 @@
 package com.zutubi.pulse.bootstrap;
 
+import com.zutubi.pulse.database.DatabaseConfig;
+
 import java.io.File;
 import java.io.IOException;
 

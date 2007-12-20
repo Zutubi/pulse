@@ -1,4 +1,4 @@
-package com.zutubi.pulse.bootstrap;
+package com.zutubi.pulse.database;
 
 import com.zutubi.util.IOUtils;
 import com.zutubi.pulse.util.JDBCUtils;

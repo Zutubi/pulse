@@ -28,6 +28,10 @@ This context requires:
         </property>
     </bean>
 
+    <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+        <property name="threadFactory" ref="threadFactory"/>
+    </bean>
+
     <bean id="quartzJobFactory" class="com.zutubi.pulse.bootstrap.quartz.SpringJobFactory" init-method="init">
         <property name="scheduler">
             <ref local="quartzScheduler"/>

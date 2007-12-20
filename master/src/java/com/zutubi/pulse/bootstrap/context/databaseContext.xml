@@ -11,7 +11,7 @@ This context exports:
 -->
 <beans>
 
-    <bean id="dataSource" class="com.zutubi.pulse.bootstrap.DataSourceBeanFactory" destroy-method="close" autowire="byName"/>
+    <bean id="dataSource" class="com.zutubi.pulse.database.DataSourceBeanFactory" destroy-method="close" autowire="byName"/>
 
     <bean id="databaseConfig" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
         <property name="targetBeanName">

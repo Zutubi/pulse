@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans default-autowire="byName">
+
     <bean id="recordRoot" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
         <property name="targetBeanName">
             <value>configurationManager</value>
@@ -18,7 +19,7 @@
     
     <bean id="recordManager" class="com.zutubi.prototype.type.record.RecordManager">
         <property name="transactionManager">
-            <ref bean="recordTransactionManager"/>
+            <ref bean="pulseTransactionManager"/>
         </property>
     </bean>
 
@@ -27,10 +28,11 @@
             <ref local="recordRoot"/>
         </property>
         <property name="transactionManager">
-            <ref bean="recordTransactionManager"/>
+            <ref bean="pulseTransactionManager"/>
         </property>
     </bean>
 
     <bean id="configurationProvider" class="com.zutubi.prototype.config.DefaultConfigurationProvider" autowire="byName"/>
+    
 </beans>
         

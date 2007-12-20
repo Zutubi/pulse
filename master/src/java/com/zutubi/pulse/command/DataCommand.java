@@ -3,7 +3,7 @@ package com.zutubi.pulse.command;
 import com.zutubi.util.TextUtils;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.SystemBootstrapManager;
-import com.zutubi.pulse.bootstrap.DatabaseConfig;
+import com.zutubi.pulse.database.DatabaseConfig;
 import com.zutubi.pulse.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.bootstrap.conf.EnvConfig;
 import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;

@@ -5,15 +5,15 @@
     <bean id="startupManager" class="com.zutubi.pulse.bootstrap.DefaultStartupManager" autowire="byName">
         <property name="startupTasks">
             <list>
-                <value>com.zutubi.pulse.bootstrap.SlaveContextStartupTask</value>
-                <value>com.zutubi.pulse.bootstrap.SlaveSystemPropertiesStartupTask</value>
-                <value>com.zutubi.pulse.bootstrap.SlaveJettyStartupTask</value>
+                <value>com.zutubi.pulse.bootstrap.tasks.SlaveContextStartupTask</value>
+                <value>com.zutubi.pulse.bootstrap.tasks.SlaveSystemPropertiesStartupTask</value>
+                <value>com.zutubi.pulse.bootstrap.tasks.SlaveJettyStartupTask</value>
             </list>
         </property>
         <property name="postStartupTasks">
             <list>
-                <value>com.zutubi.pulse.bootstrap.InitialiseExtensionsStartupTask</value>
-                <value>com.zutubi.pulse.bootstrap.SlaveStartedMessageStartupTask</value>
+                <value>com.zutubi.pulse.bootstrap.tasks.InitialiseExtensionsStartupTask</value>
+                <value>com.zutubi.pulse.bootstrap.tasks.SlaveStartedMessageStartupTask</value>
             </list>
         </property>
     </bean>

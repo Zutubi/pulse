@@ -1,7 +1,6 @@
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.pulse.bootstrap.DatabaseConsole;
-import com.zutubi.pulse.upgrade.UpgradeContext;
+import com.zutubi.pulse.database.DatabaseConsole;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;

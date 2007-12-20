@@ -33,7 +33,7 @@
     <bean id="configurationCleanupManager" class="com.zutubi.prototype.config.cleanup.ConfigurationCleanupManager" autowire="byName" init-method="init"/>
     <bean id="configurationTemplateManager" class="com.zutubi.prototype.config.ConfigurationTemplateManager" autowire="byName">
         <property name="transactionManager">
-            <ref bean="recordTransactionManager"/>
+            <ref bean="pulseTransactionManager"/>
         </property>
     </bean>
     <bean id="actionManager" class="com.zutubi.prototype.actions.ActionManager" autowire="byName"/>

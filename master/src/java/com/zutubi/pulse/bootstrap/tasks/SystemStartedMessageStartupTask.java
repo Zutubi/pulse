@@ -1,7 +1,10 @@
-package com.zutubi.pulse.bootstrap;
+package com.zutubi.pulse.bootstrap.tasks;
 
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
+import com.zutubi.pulse.bootstrap.StartupTask;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.bootstrap.SystemConfiguration;
 
 /**
  */

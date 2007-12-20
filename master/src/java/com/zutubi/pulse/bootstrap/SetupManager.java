@@ -1,5 +1,7 @@
 package com.zutubi.pulse.bootstrap;
 
+import com.zutubi.pulse.bootstrap.tasks.ProcessSetupStartupTask;
+
 import java.io.IOException;
 
 /**
@@ -13,6 +15,8 @@ public interface SetupManager
 {
     SetupState getCurrentState();
 
+    void startSetupWorkflow(ProcessSetupStartupTask processSetupStartupTask);
+
     void requestDataComplete() throws IOException;
 
     void requestLicenseComplete();
@@ -20,8 +24,6 @@ public interface SetupManager
     void requestUpgradeComplete(boolean changes);
 
     void requestSetupComplete();
-
-    void startSetupWorkflow(ProcessSetupStartupTask processSetupStartupTask);
 
     void requestRestoreComplete(boolean changed);
 }

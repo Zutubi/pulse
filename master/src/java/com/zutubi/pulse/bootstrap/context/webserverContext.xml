@@ -36,7 +36,24 @@ This context exports:
 
     <bean id="tokenManager" class="com.zutubi.pulse.bootstrap.StartupTokenManager">
         <property name="adminTokenManager">
-            <ref bean="adminTokenManager"/>
+            <ref local="adminTokenManager"/>
         </property>
     </bean>
+
+    <!-- Token manager required for scripted access to the remote api. -->
+    <bean id="adminTokenManager" class="com.zutubi.pulse.api.AdminTokenManager" autowire="byName" init-method="init">
+        <property name="configRoot">
+            <bean id="configRoot" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+                <property name="targetBeanName">
+                    <value>configurationManager</value>
+                </property>
+                <property name="propertyPath">
+                    <value>systemPaths.configRoot</value>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="xworkObjectFactory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>
+    
 </beans>

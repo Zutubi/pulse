@@ -1,4 +1,4 @@
-package com.zutubi.pulse.bootstrap;
+package com.zutubi.pulse.database;
 
 import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
 import com.zutubi.pulse.upgrade.tasks.SchemaRefactor;

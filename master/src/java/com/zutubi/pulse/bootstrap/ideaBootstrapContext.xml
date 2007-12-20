@@ -8,18 +8,20 @@
     <bean id="startupManager" class="com.zutubi.pulse.bootstrap.DefaultStartupManager" autowire="byName">
         <property name="startupTasks">
             <list>
-                <value>com.zutubi.pulse.bootstrap.LoginAsSystemStartupTask</value>
-                <value>com.zutubi.pulse.bootstrap.FreemarkerLoggingStartupTask</value>
-                <value>com.zutubi.pulse.bootstrap.ProcessSetupStartupTask</value>
-                <value>com.zutubi.pulse.BuildAborterStartupTask</value>
-                <value>com.zutubi.pulse.NextBuildNumberAdjusterStartupTask</value>
-                <value>com.zutubi.pulse.bootstrap.InitialiseExtensionsStartupTask</value>
+                <value>com.zutubi.pulse.bootstrap.tasks.LoginAsSystemStartupTask</value>
+                <value>com.zutubi.pulse.bootstrap.tasks.FreemarkerLoggingStartupTask</value>
+                <value>com.zutubi.pulse.bootstrap.tasks.CoreSystemStartupTask</value>
+                <value>com.zutubi.pulse.bootstrap.tasks.WebserverStartupTask</value>
+                <value>com.zutubi.pulse.bootstrap.tasks.ProcessSetupStartupTask</value>
+                <value>com.zutubi.pulse.bootstrap.tasks.BuildAborterStartupTask</value>
+                <value>com.zutubi.pulse.bootstrap.tasks.NextBuildNumberAdjusterStartupTask</value>
+                <value>com.zutubi.pulse.bootstrap.tasks.InitialiseExtensionsStartupTask</value>
             </list>
         </property>
         <property name="postStartupTasks">
             <list>
-                <value>com.zutubi.pulse.bootstrap.DeployMainWebappStartupTask</value>
-                <value>com.zutubi.pulse.bootstrap.SystemStartedMessageStartupTask</value>
+                <value>com.zutubi.pulse.bootstrap.tasks.DeployMainWebappStartupTask</value>
+                <value>com.zutubi.pulse.bootstrap.tasks.SystemStartedMessageStartupTask</value>
             </list>
         </property>
     </bean>
@@ -51,15 +53,6 @@
             </bean>
         </property>
     </bean>
-
-<!--
-    <bean id="pluginPaths" class="com.zutubi.pulse.plugins.ConfigurablePluginPaths">
-        <property name="pluginConfigurationRootString" value="master/etc/osgi"/>
-        <property name="internalPluginRootString" value="plugins/internal"/>
-        <property name="prepackagedPluginRootString" value="plugins/prepackaged"/>
-        <property name="userPluginRootString" value="user/plugins"/>
-    </bean>
--->
 
     <bean id="pluginPaths" class="com.zutubi.pulse.plugins.ConfigurablePluginPaths">
         <property name="internalPluginStorageString" value="plugins/internal"/>

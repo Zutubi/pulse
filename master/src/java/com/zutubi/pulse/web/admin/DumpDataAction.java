@@ -1,6 +1,6 @@
 package com.zutubi.pulse.web.admin;
 
-import com.zutubi.pulse.bootstrap.DatabaseConfig;
+import com.zutubi.pulse.database.DatabaseConfig;
 import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
 import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.pulse.transfer.TransferAPI;

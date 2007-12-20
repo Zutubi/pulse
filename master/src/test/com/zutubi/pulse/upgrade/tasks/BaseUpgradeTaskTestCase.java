@@ -1,10 +1,10 @@
 package com.zutubi.pulse.upgrade.tasks;
 
 import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.bootstrap.DatabaseConsole;
+import com.zutubi.pulse.database.DatabaseConsole;
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.bootstrap.DatabaseConsoleBeanFactory;
-import com.zutubi.pulse.bootstrap.DatabaseConfig;
+import com.zutubi.pulse.database.DatabaseConsoleBeanFactory;
+import com.zutubi.pulse.database.DatabaseConfig;
 
 import java.io.File;
 import java.io.FilenameFilter;

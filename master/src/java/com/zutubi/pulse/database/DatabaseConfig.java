@@ -1,4 +1,6 @@
-package com.zutubi.pulse.bootstrap;
+package com.zutubi.pulse.database;
+
+import com.zutubi.pulse.bootstrap.MasterUserPaths;
 
 import java.util.Properties;
 
@@ -95,7 +97,7 @@ public class DatabaseConfig
             String propertyName = (String) o;
             if (propertyName.startsWith(JDBC_PROPERTY_PREFIX))
             {
-                String key = propertyName.substring(14);
+                String key = propertyName.substring(JDBC_PROPERTY_PREFIX.length());
                 String value = properties.getProperty(propertyName);
                 props.put(key, value);
             }

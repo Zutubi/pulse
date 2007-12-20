@@ -5,16 +5,16 @@
     <bean id="startupManager" class="com.zutubi.pulse.bootstrap.DefaultStartupManager" autowire="byName">
         <property name="startupTasks">
             <list>
-                <value>com.zutubi.pulse.bootstrap.FreemarkerLoggingStartupTask</value>
-                <value>com.zutubi.pulse.bootstrap.ProcessSetupStartupTask</value>
-                <value>com.zutubi.pulse.bootstrap.DeployMainWebappStartupTask</value>
+                <value>com.zutubi.pulse.bootstrap.tasks.FreemarkerLoggingStartupTask</value>
+                <value>com.zutubi.pulse.bootstrap.tasks.ProcessSetupStartupTask</value>
+                <value>com.zutubi.pulse.bootstrap.tasks.DeployMainWebappStartupTask</value>
                 <value>com.zutubi.pulse.test.SetupFeatureTour</value>
             </list>
         </property>
         <property name="postStartupTasks">
             <list>
-                <value>com.zutubi.pulse.bootstrap.InitialiseExtensionsStartupTask</value>
-                <value>com.zutubi.pulse.bootstrap.SystemStartedMessageStartupTask</value>
+                <value>com.zutubi.pulse.bootstrap.tasks.InitialiseExtensionsStartupTask</value>
+                <value>com.zutubi.pulse.bootstrap.tasks.SystemStartedMessageStartupTask</value>
             </list>
         </property>
     </bean>

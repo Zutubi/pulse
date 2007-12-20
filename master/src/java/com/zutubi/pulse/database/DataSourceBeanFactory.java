@@ -1,4 +1,4 @@
-package com.zutubi.pulse.bootstrap;
+package com.zutubi.pulse.database;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.springframework.beans.factory.FactoryBean;

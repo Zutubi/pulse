@@ -6,8 +6,10 @@ import com.zutubi.prototype.config.*;
 import com.zutubi.prototype.type.record.DelegatingHandleAllocator;
 import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.pulse.Version;
+import com.zutubi.pulse.database.DatabaseConsole;
 import com.zutubi.pulse.plugins.PluginManager;
 import com.zutubi.pulse.bootstrap.conf.EnvConfig;
+import com.zutubi.pulse.bootstrap.tasks.ProcessSetupStartupTask;
 import com.zutubi.pulse.config.PropertiesWriter;
 import com.zutubi.pulse.events.DataDirectoryLocatedEvent;
 import com.zutubi.pulse.events.EventManager;
@@ -129,6 +131,7 @@ public class DefaultSetupManager implements SetupManager
 
         try
         {
+            // record the startup configuration so that it can be reused next time.
             createExternalConfigFileIfRequired();
         }
         catch (IOException e)
@@ -148,6 +151,7 @@ public class DefaultSetupManager implements SetupManager
         requestDataComplete();
     }
 
+    // part of the data directory initialisation process.
     private void createExternalConfigFileIfRequired() throws IOException
     {
         // If the user configuration file does not exist, create it now.
@@ -157,6 +161,7 @@ public class DefaultSetupManager implements SetupManager
         String externalConfig = envConfig.getPulseConfig();
         if (!TextUtils.stringSet(externalConfig))
         {
+            // default is something like ~/.pulse2/config.properties
             externalConfig = envConfig.getDefaultPulseConfig(MasterConfigurationManager.CONFIG_DIR);
         }
         File configFile = new File(externalConfig);
@@ -208,6 +213,9 @@ public class DefaultSetupManager implements SetupManager
 
         eventManager.publish(new DataDirectoryLocatedEvent(this));
 
+        //TODO: replace this with a configuration listener that monitors for the DataDirectoryLocatedEvent, and
+        //TODO: loads the system.properties file accordingly.  Why? To keep all of the config work in one place.
+        //TODO: At the moment, it is split up into little bits in lots of places which makes it awkward.
         loadSystemProperties();
 
         if (isRestoreRequested())

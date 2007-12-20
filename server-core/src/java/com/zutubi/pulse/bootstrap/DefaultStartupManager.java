@@ -97,14 +97,6 @@ public class DefaultStartupManager implements StartupManager
         {
             starting = true;
 
-            // record the startup config to the config directory.
-            SystemConfiguration config = configurationManager.getSystemConfig();
-            File configRoot = configurationManager.getSystemPaths().getConfigRoot();
-            File startupConfigFile = new File(configRoot, "runtime.properties");
-            ConfigSupport startupConfig = new ConfigSupport(new FileConfig(startupConfigFile));
-            startupConfig.setProperty(SystemConfiguration.CONTEXT_PATH, config.getContextPath());
-            startupConfig.setInteger(SystemConfiguration.WEBAPP_PORT, config.getServerPort());
-
             Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler()
             {
                 public void uncaughtException(Thread t, Throwable e)
@@ -112,6 +104,9 @@ public class DefaultStartupManager implements StartupManager
                     java.util.logging.Logger.getLogger("").log(Level.SEVERE, "Uncaught exception: " + e.getMessage(), e);
                 }
             });
+
+            // record the startup config to the config directory.
+            writeSystemRuntimePropertiesToFile();
 
             // application contexts have finished loading
             // i) run startup tasks
@@ -130,6 +125,16 @@ public class DefaultStartupManager implements StartupManager
         {
             throw new StartupException(e);
         }
+    }
+
+    private void writeSystemRuntimePropertiesToFile()
+    {
+        SystemConfiguration config = configurationManager.getSystemConfig();
+        File configRoot = configurationManager.getSystemPaths().getConfigRoot();
+        File startupConfigFile = new File(configRoot, "runtime.properties");
+        ConfigSupport startupConfig = new ConfigSupport(new FileConfig(startupConfigFile));
+        startupConfig.setProperty(SystemConfiguration.CONTEXT_PATH, config.getContextPath());
+        startupConfig.setInteger(SystemConfiguration.WEBAPP_PORT, config.getServerPort());
     }
 
     private void runStartupTasks(List<String> startupRunnables)

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.pulse.bootstrap.DatabaseConfig;
+import com.zutubi.pulse.database.DatabaseConfig;
 import com.zutubi.pulse.upgrade.DataSourceAware;
 import com.zutubi.pulse.upgrade.UpgradeException;
 import org.springframework.core.io.ClassPathResource;
