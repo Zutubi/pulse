@@ -58,4 +58,10 @@ public class RestoreProgressMonitor
     {
         return successful;
     }
+
+    public void fail()
+    {
+        finishTimestamp = System.currentTimeMillis();
+        successful = false;
+    }
 }

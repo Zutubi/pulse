@@ -44,7 +44,7 @@ public class DefaultSetupManager implements SetupManager
      * Set to true during startup if the setup manager is run.
      */
     public static boolean initialInstallation = false;
-    
+
     private MasterConfigurationManager configurationManager;
     private UserManager userManager;
     private UpgradeManager upgradeManager;
@@ -54,6 +54,8 @@ public class DefaultSetupManager implements SetupManager
      * Contexts for Stage A: the config subsystem.
      */
     private List<String> configContexts = new LinkedList<String>();
+
+    private List<String> restoreContexts = new LinkedList<String>();
 
     /**
      * Contexts for Stage B: the database.
@@ -97,47 +99,14 @@ public class DefaultSetupManager implements SetupManager
         return state;
     }
 
-    private void showPrompt()
-    {
-        if (!promptShown)
-        {
-            String baseUrl = null;
-            if(configurationProvider != null)
-            {
-                GeneralAdminConfiguration config = configurationProvider.get(GeneralAdminConfiguration.class);
-                if (config != null)
-                {
-                    baseUrl = config.getBaseUrl();
-                }
-            }
-
-            if(!TextUtils.stringSet(baseUrl))
-            {
-                SystemConfigurationSupport systemConfig = (SystemConfigurationSupport) configurationManager.getSystemConfig();
-                baseUrl = systemConfig.getHostUrl();
-            }
-            
-            // let the user know that they should continue / complete the setup process via the Web UI.
-            System.err.println("Now go to " + baseUrl + " and follow the prompts.");
-            promptShown = true;
-        }
-    }
-
     public void startSetupWorkflow(ProcessSetupStartupTask processSetupStartupTask)
     {
         this.setupCallback = processSetupStartupTask;
 
         state = SetupState.STARTING;
 
-        try
-        {
-            // record the startup configuration so that it can be reused next time.
-            createExternalConfigFileIfRequired();
-        }
-        catch (IOException e)
-        {
-            System.err.println("WARNING: " + e.getMessage());
-        }
+        // record the startup configuration so that it can be reused next time.
+        createExternalConfigFileIfRequired();
 
         initialiseConfigurationSystem();
 
@@ -151,41 +120,50 @@ public class DefaultSetupManager implements SetupManager
         requestDataComplete();
     }
 
-    // part of the data directory initialisation process.
-    private void createExternalConfigFileIfRequired() throws IOException
+    //TODO: move this into the configuration managers.  It is specific to them, and should not be here.
+    // Part of the configuration system initialisation.  This is picked up by the configuration manager next time
+    // round.
+    private void createExternalConfigFileIfRequired()
     {
-        // If the user configuration file does not exist, create it now.
-        EnvConfig envConfig = configurationManager.getEnvConfig();
-        SystemConfiguration sysConfig = configurationManager.getSystemConfig();
-
-        String externalConfig = envConfig.getPulseConfig();
-        if (!TextUtils.stringSet(externalConfig))
+        try
         {
-            // default is something like ~/.pulse2/config.properties
-            externalConfig = envConfig.getDefaultPulseConfig(MasterConfigurationManager.CONFIG_DIR);
+            // If the user configuration file does not exist, create it now.
+            EnvConfig envConfig = configurationManager.getEnvConfig();
+            SystemConfiguration sysConfig = configurationManager.getSystemConfig();
+
+            String externalConfig = envConfig.getPulseConfig();
+            if (!TextUtils.stringSet(externalConfig))
+            {
+                // default is something like ~/.pulse2/config.properties
+                externalConfig = envConfig.getDefaultPulseConfig(MasterConfigurationManager.CONFIG_DIR);
+            }
+            File configFile = new File(externalConfig);
+            if (!configFile.isAbsolute())
+            {
+                configFile = configFile.getCanonicalFile();
+            }
+            if (!configFile.isFile())
+            {
+                // copy the template file into the config location.
+                SystemPaths paths = configurationManager.getSystemPaths();
+                File configTemplate = new File(paths.getConfigRoot(), "config.properties.template");
+                IOUtils.copyTemplate(configTemplate, configFile);
+
+                // write the default configuration to this template file.
+                // There needs to be a way to do this without duplicating the default configuration data.
+                // Unfortunately, the defaults are currently hidden by any system properties that over ride them...
+                Properties props = new Properties();
+                props.setProperty(SystemConfiguration.CONTEXT_PATH, "/");
+                props.setProperty(SystemConfiguration.WEBAPP_PORT, "8080");
+                props.setProperty(SystemConfiguration.PULSE_DATA, (sysConfig.getDataPath() != null ? sysConfig.getDataPath() : ""));
+
+                PropertiesWriter writer = new PropertiesWriter();
+                writer.write(configFile, props);
+            }
         }
-        File configFile = new File(externalConfig);
-        if (!configFile.isAbsolute())
+        catch (IOException e)
         {
-            configFile = configFile.getCanonicalFile();
-        }
-        if (!configFile.isFile())
-        {
-            // copy the template file into the config location.
-            SystemPaths paths = configurationManager.getSystemPaths();
-            File configTemplate = new File(paths.getConfigRoot(), "config.properties.template");
-            IOUtils.copyTemplate(configTemplate, configFile);
-
-            // write the default configuration to this template file.
-            // There needs to be a way to do this without duplicating the default configuration data.
-            // Unfortunately, the defaults are currently hidden by any system properties that over ride them...
-            Properties props = new Properties();
-            props.setProperty(SystemConfiguration.CONTEXT_PATH, "/");
-            props.setProperty(SystemConfiguration.WEBAPP_PORT, "8080");
-            props.setProperty(SystemConfiguration.PULSE_DATA, (sysConfig.getDataPath() != null ? sysConfig.getDataPath() : ""));
-
-            PropertiesWriter writer = new PropertiesWriter();
-            writer.write(configFile, props);
+            System.err.println("WARNING: " + e.getMessage());
         }
     }
 
@@ -213,10 +191,9 @@ public class DefaultSetupManager implements SetupManager
 
         eventManager.publish(new DataDirectoryLocatedEvent(this));
 
-        //TODO: replace this with a configuration listener that monitors for the DataDirectoryLocatedEvent, and
-        //TODO: loads the system.properties file accordingly.  Why? To keep all of the config work in one place.
-        //TODO: At the moment, it is split up into little bits in lots of places which makes it awkward.
         loadSystemProperties();
+
+        loadContexts(restoreContexts);
 
         if (isRestoreRequested())
         {
@@ -230,6 +207,7 @@ public class DefaultSetupManager implements SetupManager
 
     public boolean isRestoreRequested()
     {
+        
         return false;
     }
 
@@ -240,7 +218,7 @@ public class DefaultSetupManager implements SetupManager
         // load db contexts...
         loadContexts(daoContexts);
         initialiseConfigurationPersistence();
-        
+
         loadContexts(licenseContexts);
 
         state = SetupState.STARTING;
@@ -255,10 +233,13 @@ public class DefaultSetupManager implements SetupManager
         requestLicenseComplete();
     }
 
+    //TODO: replace this with a configuration listener that monitors for the DataDirectoryLocatedEvent, and
+    //TODO: loads the system.properties file accordingly.  Why? To keep all of the config work in one place.
+    //TODO: At the moment, it is split up into little bits in lots of places which makes it awkward.
     private void loadSystemProperties()
     {
         File propFile = new File(configurationManager.getUserPaths().getUserConfigRoot(), "system.properties");
-        if(propFile.exists())
+        if (propFile.exists())
         {
             FileInputStream is = null;
             try
@@ -280,7 +261,7 @@ public class DefaultSetupManager implements SetupManager
     private void linkUserTemplates()
     {
         File userTemplateRoot = configurationManager.getUserPaths().getUserTemplateRoot();
-        if(userTemplateRoot.isDirectory())
+        if (userTemplateRoot.isDirectory())
         {
             Configuration freemarkerConfiguration = ComponentContext.getBean("freemarkerConfiguration");
             TemplateLoader existingLoader = freemarkerConfiguration.getTemplateLoader();
@@ -368,7 +349,7 @@ public class DefaultSetupManager implements SetupManager
         // Remove the upgrade context from the ComponentContext stack / namespace.
         // They are no longer required.
         ComponentContext.pop();
-        
+
         loadContexts(setupContexts);
 
         if (isSetupRequired())
@@ -438,6 +419,45 @@ public class DefaultSetupManager implements SetupManager
         }
     }
 
+    /**
+     * Prompt the user via the command line to go to the Web UI to continue the setup process.
+     */
+    private void showPrompt()
+    {
+        // We ensure that we only ever prompt the user once.
+        if (!promptShown)
+        {
+            String baseUrl = null;
+
+            // depending on whether or not we are prompting from an existing installation or a new installation will
+            // determine whether or not the baseUrl has been configured via the configuration system (and whether or
+            // not the configurationProvider is available).  ie: the ConfigurationProvider is available during the
+            // upgrade process - which only happens when we are working with an existing installation.
+            if (configurationProvider != null)
+            {
+                GeneralAdminConfiguration config = configurationProvider.get(GeneralAdminConfiguration.class);
+                if (config != null)
+                {
+                    baseUrl = config.getBaseUrl();
+                }
+            }
+
+            if (!TextUtils.stringSet(baseUrl))
+            {
+                // fall back to the default host url.
+                SystemConfigurationSupport systemConfig = (SystemConfigurationSupport) configurationManager.getSystemConfig();
+                baseUrl = systemConfig.getHostUrl();
+            }
+
+            // WARNING: sometimes calculating the host url and sometimes using a configured setting (from a previous
+            //          installation or possibly a restore) results in possibly inconsistent behaviour.  It may be
+            //          worth while always using the calculated host url since this is being printed on the local host.
+
+            System.err.println("Now go to " + baseUrl + " and follow the prompts.");
+            promptShown = true;
+        }
+    }
+
     public void setUserManager(UserManager userManager)
     {
         this.userManager = userManager;
@@ -466,6 +486,11 @@ public class DefaultSetupManager implements SetupManager
     public void setLicenseContexts(List<String> licenseContexts)
     {
         this.licenseContexts = licenseContexts;
+    }
+
+    public void setRestoreContexts(List<String> restoreContexts)
+    {
+        this.restoreContexts = restoreContexts;
     }
 
     public void setSetupContexts(List<String> setupContexts)

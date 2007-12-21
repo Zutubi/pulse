@@ -20,9 +20,6 @@ public class WebserverStartupTask implements StartupTask
 
         JettyManager jettyManager = ComponentContext.getBean("jettyManager");
         shutdownManager.addStoppable(jettyManager);
-
-        WebManager webManager = (WebManager) ComponentContext.getBean("webManager");
-//        webManager.deployMain(); deploy some form of welcome / holding page.
     }
 
     public boolean haltOnFailure()

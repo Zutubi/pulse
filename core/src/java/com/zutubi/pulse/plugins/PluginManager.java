@@ -242,8 +242,7 @@ public class PluginManager
         }
     }
 
-    private void startupInternalPlugins()
-            throws PluginException, BundleException
+    private void startupInternalPlugins() throws PluginException, BundleException
     {
         for(File file : paths.getInternalPluginStorageDir().listFiles())
         {
