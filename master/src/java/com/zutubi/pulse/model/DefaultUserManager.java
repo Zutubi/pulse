@@ -182,6 +182,11 @@ public class DefaultUserManager implements UserManager
     {
         // We need to remove all ACLs with this group as a recipient
         projectManager.removeAcls(group.getDefaultAuthority());
+        for(User u: group.getUsers())
+        {
+            u.getGroups().remove(group);
+            userDao.save(u);
+        }
         groupDao.delete(group);
     }
 
