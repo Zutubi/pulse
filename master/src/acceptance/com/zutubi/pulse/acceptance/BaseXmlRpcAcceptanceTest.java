@@ -49,7 +49,7 @@ public class BaseXmlRpcAcceptanceTest extends TestCase
 
     protected String randomName()
     {
-        return RandomUtils.randomString(10);
+        return getName() + "-" + RandomUtils.randomString(10);
     }
 
     public String login(String login, String password) throws Exception

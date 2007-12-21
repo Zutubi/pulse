@@ -535,6 +535,25 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         }
     }
 
+    public Vector<String> getMyProjectNames(String token) throws AuthenticationException
+    {
+        User user = tokenManager.loginUser(token);
+        try
+        {
+            List<Project> projects = new LinkedList<Project>();
+            if (user != null)
+            {
+                projects.addAll(userManager.getUserProjects(user, projectManager));
+            }
+
+            return getNames(projects);
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
     public Vector<String> getAllProjectGroups(String token) throws AuthenticationException
     {
         tokenManager.loginUser(token);
@@ -577,25 +596,6 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         }
     }
 
-    public Vector<String> getMyProjectNames(String token) throws AuthenticationException
-    {
-        User user = tokenManager.loginUser(token);
-        try
-        {
-            List<Project> projects = new LinkedList<Project>();
-            if (user != null)
-            {
-                projects.addAll(userManager.getUserProjects(user, projectManager));
-            }
-
-            return getNames(projects);
-        }
-        finally
-        {
-            tokenManager.logoutUser();
-        }
-    }
-
     private Vector<String> getNames(Collection<Project> projects)
     {
         Vector<String> result = new Vector<String>(projects.size());
@@ -608,6 +608,29 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         }, result);
 
         return result;
+    }
+
+    public Vector<String> getAllAgentNames(String token) throws AuthenticationException
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            List<Agent> agents = agentManager.getAllAgents();
+            Vector<String> result = new Vector<String>(agents.size());
+            CollectionUtils.map(agents, new Mapping<Agent, String>()
+            {
+                public String map(Agent agent)
+                {
+                    return agent.getConfig().getName();
+                }
+            }, result);
+
+            return result;
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
     }
 
     public Vector<Hashtable<String, Object>> getBuild(String token, String projectName, int id) throws AuthenticationException

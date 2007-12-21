@@ -19,6 +19,7 @@ public class AcceptanceTestSuite
         //---( xml rpc acceptance tests )---
         suite.addTestSuite(ConfigXmlRpcAcceptanceTest.class);
         suite.addTestSuite(ProjectXmlRpcAcceptanceTest.class);
+        suite.addTestSuite(ReportingXmlRpcAcceptanceTest.class);
         suite.addTestSuite(ResourceAcceptanceTest.class);
 
         //---( web ui acceptance tests )---

@@ -5,7 +5,6 @@ import com.zutubi.pulse.prototype.config.agent.AgentConfigurationActions;
 import com.zutubi.pulse.prototype.config.user.SetPasswordConfiguration;
 import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 import com.zutubi.pulse.prototype.config.user.UserConfigurationActions;
-import com.zutubi.util.RandomUtils;
 import com.zutubi.util.Sort;
 
 import java.util.*;
@@ -506,7 +505,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testRestore() throws Exception
     {
-        String random = RandomUtils.randomString(10);
+        String random = randomName();
         String parentName = random + "-parent";
         String childName = random + "-child";
         xmlRpcHelper.insertSimpleProject(parentName, true);
@@ -524,7 +523,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testSetOrder() throws Exception
     {
-        String random = RandomUtils.randomString(10);
+        String random = randomName();
         String path = xmlRpcHelper.insertSimpleProject(random, true);
         String propertiesPath = PathUtils.getPath(path, "properties");
         Hashtable<String, Object> p1 = createProperty("p1", "v1");
@@ -539,7 +538,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testGetConfigActions() throws Exception
     {
-        String agentName = "getConfigActions-" + RandomUtils.randomString(10);
+        String agentName = randomName();
         String path = xmlRpcHelper.insertSimpleAgent(agentName);
         try
         {
@@ -555,7 +554,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testDoConfigAction() throws Exception
     {
-        String agentName = "doConfigAction-" + RandomUtils.randomString(10);
+        String agentName = randomName();
         String path = xmlRpcHelper.insertSimpleAgent(agentName);
         try
         {
@@ -572,7 +571,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testDoConfigActionWithArgument() throws Exception
     {
-        String userName = "doConfigActionWithArgument-" + RandomUtils.randomString(10);
+        String userName = randomName();
         String path = xmlRpcHelper.insertTrivialUser(userName);
         try
         {
@@ -591,7 +590,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testDoConfigActionWithInvalidArgument() throws Exception
     {
-        String userName = "doConfigActionWitInvalidArgument-" + RandomUtils.randomString(10);
+        String userName = randomName();
         String path = xmlRpcHelper.insertTrivialUser(userName);
         try
         {
@@ -613,7 +612,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testDoConfigActionWithIncorrectArgument() throws Exception
     {
-        String userName = "doConfigActionWitIncorrectArgument-" + RandomUtils.randomString(10);
+        String userName = randomName();
         String path = xmlRpcHelper.insertTrivialUser(userName);
         try
         {

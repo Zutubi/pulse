@@ -182,6 +182,36 @@ public class XmlRpcHelper
         call("doConfigActionWithArgument", path, action, argument);
     }
 
+    public Vector<String> getAllUserLogins() throws Exception
+    {
+        return call("getAllUserLogins");
+    }
+
+    public Vector<String> getAllProjectNames() throws Exception
+    {
+        return call("getAllProjectNames");
+    }
+
+    public Vector<String> getMyProjectNames() throws Exception
+    {
+        return call("getMyProjectNames");
+    }
+
+    public Vector<String> getAllProjectGroups() throws Exception
+    {
+        return call("getAllProjectGroups");
+    }
+
+    public Hashtable<String, Object> getProjectGroup(String name) throws Exception
+    {
+        return call("getProjectGroup", name);
+    }
+
+    public Vector<String> getAllAgentNames() throws Exception
+    {
+        return call("getAllAgentNames");
+    }
+
     public String insertSimpleProject(String name, boolean template) throws Exception
     {
         return insertSimpleProject(name, ProjectManager.GLOBAL_PROJECT_NAME, template);
@@ -312,6 +342,11 @@ public class XmlRpcHelper
         {
             return build.get(0);
         }
+    }
+
+    public boolean deleteBuild(String projectName, int number) throws Exception
+    {
+        return (Boolean)call("deleteBuild", projectName, number);
     }
 
     public int runBuild(String projectName, long timeout) throws Exception
