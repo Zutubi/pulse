@@ -336,12 +336,6 @@
         <ivy:publish resolver="build" artifactspattern="${current.dir}/build/[artifact].[ext]"/>
     </target>
 
-    <!-- refresh this modules dependencies lib. -->
-    <target name="refresh.lib">
-        <!-- resolve the dependencies into the lib directory. -->
-        <retrieve-dependencies dest="lib"/>
-    </target>
-
     <macrodef name="package-src">
         <attribute name="pathref"/>
         <attribute name="name"/>

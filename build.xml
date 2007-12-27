@@ -102,6 +102,14 @@
         <delete dir="${user.home}/.pulse"/>        
         <delete dir="${user.home}/.pulse2"/>        
         <delete dir="${user.home}/.pulse-agent"/>
+
+        <delete file="plugins/plugins-registry.xml"/>
+
+        <delete dir="package/core/build"/>
+        <delete dir="package/local/build"/>
+        <delete dir="package/server-core/build"/>
+        <delete dir="package/slave/build"/>
+        <delete dir="package/master/build"/>
     </target>
 
     <!--
