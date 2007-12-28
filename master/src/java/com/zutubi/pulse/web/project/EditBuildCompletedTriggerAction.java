@@ -69,6 +69,12 @@ public class EditBuildCompletedTriggerAction extends AbstractEditTriggerAction
 
         trigger = (EventTrigger) t;
 
+        // Must set trigger before calling super
+        super.prepare();
+    }
+
+    public String doInput()
+    {
         Map<Serializable, Serializable> dataMap = trigger.getDataMap();
         filterProject = (Long) dataMap.get(BuildCompletedEventFilter.PARAM_PROJECT);
         filterSpecification = (String) dataMap.get(BuildCompletedEventFilter.PARAM_SPECIFICATION);
@@ -78,9 +84,8 @@ public class EditBuildCompletedTriggerAction extends AbstractEditTriggerAction
         {
             filterStateNames.add(r.toString());
         }
-        
-        // Must set trigger before calling super
-        super.prepare();
+
+        return super.doInput();
     }
 
     public Map<Long, String> getFilterProjects()

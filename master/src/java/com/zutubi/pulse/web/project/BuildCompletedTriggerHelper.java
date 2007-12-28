@@ -48,11 +48,13 @@ public class BuildCompletedTriggerHelper
         Map<Serializable, Serializable> dataMap = trigger.getDataMap();
         dataMap.put(BuildCompletedEventFilter.PARAM_PROJECT, filterProject);
 
+        dataMap.remove(BuildCompletedEventFilter.PARAM_SPECIFICATION);
         if(TextUtils.stringSet(filterSpecification))
         {
             dataMap.put(BuildCompletedEventFilter.PARAM_SPECIFICATION, filterSpecification);
         }
 
+        dataMap.remove(BuildCompletedEventFilter.PARAM_STATES);
         if(filterStateNames != null && filterStateNames.size() > 0)
         {
             dataMap.put(BuildCompletedEventFilter.PARAM_STATES, ResultState.getStateNamesString(filterStateNames));
