@@ -286,7 +286,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         }
     }
 
-    public Vector<Hashtable<String, Object>> queryBuildsForProject(String token, String projectName, String[] resultStates, String[] buildSpecifications, int firstResult, int maxResults, boolean mostRecentFirst) throws AuthenticationException
+    public Vector<Hashtable<String, Object>> queryBuildsForProject(String token, String projectName, Vector<String> resultStates, Vector<String> buildSpecifications, int firstResult, int maxResults, boolean mostRecentFirst) throws AuthenticationException
     {
         tokenManager.verifyUser(token);
         Project project = internalGetProject(projectName);
@@ -334,14 +334,14 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         return result;
     }
 
-    private PersistentName[] mapSpecs(String[] buildSpecifications, Project project)
+    private PersistentName[] mapSpecs(Vector<String> buildSpecifications, Project project)
     {
-        if (buildSpecifications.length > 0)
+        if (buildSpecifications.size() > 0)
         {
-            PersistentName[] specs = new PersistentName[buildSpecifications.length];
-            for(int i = 0; i < buildSpecifications.length; i++)
+            PersistentName[] specs = new PersistentName[buildSpecifications.size()];
+            for(int i = 0; i < buildSpecifications.size(); i++)
             {
-                specs[i] = getBuildSpecification(project, buildSpecifications[i]).getPname();
+                specs[i] = getBuildSpecification(project, buildSpecifications.get(i)).getPname();
             }
 
             return specs;
@@ -352,14 +352,14 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         }
     }
 
-    private ResultState[] mapStates(String[] stateNames)
+    private ResultState[] mapStates(Vector<String> stateNames)
     {
-        if(stateNames.length > 0)
+        if(stateNames.size() > 0)
         {
-            ResultState[] states = new ResultState[stateNames.length];
-            for(int i = 0; i < stateNames.length; i++)
+            ResultState[] states = new ResultState[stateNames.size()];
+            for(int i = 0; i < stateNames.size(); i++)
             {
-                states[i] = ResultState.fromPrettyString(stateNames[i]);
+                states[i] = ResultState.fromPrettyString(stateNames.get(i));
             }
 
             return states;
