@@ -30,6 +30,16 @@ public class Urls
         return baseUrl + "/login.action";
     }
     
+    public String dashboard()
+    {
+        return base() + "dashboard/";
+    }
+
+    public String dashboardMyBuilds()
+    {
+        return dashboard() + "my builds/";
+    }
+
     public String browse()
     {
         return baseUrl + "/browse/";

@@ -29,7 +29,7 @@
 
     #buildColumnsPopup("my" "popup")
     
-    <h2 class="section">#wwtext("name=personal.builds")</h2>
+    <h2 id="personal-builds" class="section">#wwtext("name=personal.builds")</h2>
     <table class="columns" width="98%">
         <tr>
             <td class="columns">
@@ -53,7 +53,5 @@
             </td>
         </tr>
     </table>
-
-
 </body>
 </html>

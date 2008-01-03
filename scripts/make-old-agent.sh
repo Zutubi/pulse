@@ -7,5 +7,5 @@ top="$base/.."
 
 cd "$top"
 ant -Dpulse.version=1.1.999 -Dpulse.build=0101999000 -Dskip.tests=true package.slave
-cp build/pulse-agent-1.1.999.tar.gz master/src/acceptance/data
+cp build/pulse-agent-1.1.999.tar.gz acceptance/src/test/data
 exit 0

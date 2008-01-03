@@ -28,7 +28,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
     private static final String PROJECT_PATH = PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, "hook-test-project");
     private static final String HOOKS_PATH   = PathUtils.getPath(PROJECT_PATH, "buildHooks");
 
-    private static final File DUMPENV_JAR = new File(TestUtils.getPulseRoot(), FileSystemUtils.composeFilename("master", "src", "acceptance", "misc", "dumpenv.jar"));
+    private static final File DUMPENV_JAR = new File(TestUtils.getPulseRoot(), FileSystemUtils.composeFilename("acceptance", "src", "test", "misc", "dumpenv.jar"));
 
     private File tempDir;
 

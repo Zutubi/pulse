@@ -147,7 +147,7 @@ public class PluginUIAcceptanceTest extends SeleniumTestBase
 
     private File makeTestPlugin(String id, String name) throws IOException
     {
-        File testPlugin = new File(TestUtils.getPulseRoot(), FileSystemUtils.composeFilename("master", "src", "acceptance", "misc", ID_TEST + ".jar"));
+        File testPlugin = new File(TestUtils.getPulseRoot(), FileSystemUtils.composeFilename("acceptance", "src", "test", "misc", ID_TEST + ".jar"));
         tmpDir = FileSystemUtils.createTempDir(getName(), "");
         File unzipDir = new File(tmpDir, "unzip");
         ZipUtils.extractZip(testPlugin, unzipDir);

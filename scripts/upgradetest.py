@@ -105,7 +105,7 @@ def upgradeTest(version, build, service):
     if not os.path.isfile(masterPackageFile):
         raise Exception('Master package file "' + masterPackageFile + '" does not exist')
 
-    oldAgentPackageFile = os.path.join('master', 'src', 'acceptance', 'data', 'pulse-agent-1.1.999.tar.gz')
+    oldAgentPackageFile = os.path.join('acceptance', 'src', 'test', 'data', 'pulse-agent-1.1.999.tar.gz')
     if not os.path.isfile(oldAgentPackageFile):
         raise Exception('Old agent package "' + oldAgentPackageFile + '" does not exist')
 

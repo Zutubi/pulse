@@ -6,7 +6,7 @@ set -e
 
 if ! netstat -an | grep $port > /dev/null
 then
-    java -jar "$top/master/src/acceptance/misc/"selenium-server-*.jar -port $port > "$working/selenium-stdout.txt" 2> "$working/selenium-stderr.txt" &
+    java -jar "$top/acceptance/src/test/misc/"selenium-server-*.jar -port $port > "$working/selenium-stdout.txt" 2> "$working/selenium-stderr.txt" &
     echo $! > "$pidfile"
 fi
 

@@ -41,7 +41,6 @@
         <property name="build.lib.dir" value="${build.dir}/lib"/>
         <property name="classes.dir" value="${build.dir}/classes"/>
         <property name="test.classes.dir" value="${build.dir}/test.classes"/>
-        <property name="accept.classes.dir" value="${build.dir}/acceptance.classes"/>
         <property name="report.dir" value="${build.dir}/reports"/>
         <property name="process.src.dir" value="${build.dir}/src"/>
 
@@ -52,15 +51,9 @@
                 <available file="src/test"/>
             </not>
         </condition>
-        <condition property="no.accept">
-            <not>
-                <available file="src/acceptance"/>
-            </not>
-        </condition>
         <condition property="skip.tests">
             <and>
                 <isset property="no.tests"/>
-                <isset property="no.accept"/>
             </and>
         </condition>
 
@@ -117,28 +110,6 @@
             </fileset>
         </path>
 
-        <path id="accept.paths">
-            <pathelement path="src/acceptance"/>
-        </path>
-
-        <path id="accept.resources">
-            <fileset dir="src/acceptance">
-                <exclude name="**/*.java"/>
-            </fileset>
-        </path>
-
-        <path id="accept.export.selection">
-            <fileset dir="src/acceptance">
-                <include name="**/*"/>
-            </fileset>
-        </path>
-
-        <path id="accept.run.selection">
-            <fileset dir="src/acceptance">
-                <include name="**/*Test.java"/>
-            </fileset>
-        </path>
-
         <!-- ivy configuration -->
         <property file="${project.root.dir}/ivy.properties"/>
         <ivy:configure file="${project.root.dir}/ivyconf.xml"/>
@@ -183,7 +154,6 @@
         <mkdir dir="${classes.dir}"/>
         <mkdir dir="${build.lib.dir}"/>
         <mkdir dir="${test.classes.dir}"/>
-        <mkdir dir="${accept.classes.dir}"/>
         <mkdir dir="${report.dir}/junit/xml"/>
         <mkdir dir="${report.dir}/junit/html"/>
 
@@ -238,21 +208,6 @@
         	
                 <copy todir="${test.classes.dir}" overwrite="true">
                     <path refid="test.resources"/>
-                </copy>
-            </then>
-        </if>
-        <if>
-            <not><isset property="no.accept"/></not>        	
-            <then>
-                <javac target="5" destdir="${accept.classes.dir}" debug="true">
-                    <classpath refid="lib.path"/>
-                    <classpath location="${classes.dir}"/>
-                    <classpath location="${test.classes.dir}"/>
-                    <src refid="accept.paths"/>
-                </javac>
-        	
-                <copy todir="${accept.classes.dir}" overwrite="true">
-                    <path refid="accept.resources"/>
                 </copy>
             </then>
         </if>

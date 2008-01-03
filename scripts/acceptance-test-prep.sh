@@ -80,7 +80,7 @@ hibernate.jdbc.batch_size=0
 hibernate.jdbc.use_scrollable_resultsets=false
 EOF
 
-cp "$top/master/src/acceptance/drivers/"* "$acceptDir/$packageName"/versions/*/lib
+cp "$top/acceptance/src/test/drivers/"* "$acceptDir/$packageName"/versions/*/lib
 
 pushd "$acceptDir"
 export PULSE_HOME=

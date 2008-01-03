@@ -2,4 +2,4 @@
 
 repodir="$working/repo"
 pidfile="$working/svnserve.pid"
-dumpfile="$top/master/src/acceptance/data/svn-repo.dump.gz"
+dumpfile="$top/acceptance/src/test/data/svn-repo.dump.gz"

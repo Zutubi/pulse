@@ -455,13 +455,20 @@
 
     <target name="accept.master" depends="package.master, run.accept.master"/>
 
-    <target name="run.accept.master" depends="init">
-        <property name="build.dir" value="master/build"/>
+    <target name="build.acceptance">
+        <subant inheritall="false" target="build.module">
+            <property name="skip.dependencies" value="true"/>
+            <fileset dir="acceptance" includes="build.xml"/>
+        </subant>
+    </target>
+
+    <target name="run.accept.master" depends="build.acceptance, init">
+        <property name="build.dir" value="acceptance/build"/>
         <property name="report.dir" value="build/reports/junit"/>
         <mkdir dir="${report.dir}/xml"/>
         <mkdir dir="${report.dir}/html"/>
 
-        <javac target="5" srcdir="server-core/src/java" destdir="${build.dir}/classes" includes="**/LicenseEncoder*" debug="true">
+        <javac target="5" srcdir="master/src/java" destdir="${build.dir}/classes" includes="**/LicenseEncoder*" debug="true">
             <classpath>
                 <fileset dir="${build.dir}/lib">
                     <include name="**/*.jar"/>
@@ -489,14 +496,13 @@
             <classpath>
                 <pathelement location="${build.dir}/classes"/>
                 <pathelement location="${build.dir}/test.classes"/>
-                <pathelement location="${build.dir}/acceptance.classes"/>
                 <fileset dir="${build.dir}/lib">
                     <include name="**/*.jar"/>
                 </fileset>
             </classpath>
             <formatter type="xml"/>
             <batchtest todir="${report.dir}/xml">
-                <fileset dir="master/src/acceptance">
+                <fileset dir="acceptance/src/test">
                     <include name="**/AcceptanceTestSuite.java"/>
                 </fileset>
             </batchtest>
@@ -524,20 +530,19 @@
     </target>
     
     <target name="setup.master" depends="init">
-        <property name="build.dir" value="master/build"/>
+        <property name="build.dir" value="acceptance/build"/>
         <junit>
             <sysproperty key="pulse.port" value="${master.port}"/>
             <sysproperty key="bootstrap" value="com/zutubi/pulse/bootstrap/bootstrapContext.xml"/>
             <classpath>
                 <pathelement location="${build.dir}/classes"/>
                 <pathelement location="${build.dir}/test.classes"/>
-                <pathelement location="${build.dir}/acceptance.classes"/>
                 <fileset dir="${build.dir}/lib">
                     <include name="**/*.jar"/>
                 </fileset>
             </classpath>
             <batchtest todir="fubar">
-                <fileset dir="master/src/acceptance">
+                <fileset dir="acceptance/src/test">
                     <include name="**/SetupAcceptanceTest.java"/>
                 </fileset>
             </batchtest>

@@ -33,7 +33,7 @@ import java.util.Properties;
  */
 public class UpgradeAcceptanceTest extends SeleniumTestBase
 {
-    File dataArea = new File(TestUtils.getPulseRoot(), FileSystemUtils.composeFilename("master", "src", "acceptance", "data"));
+    File dataArea = new File(TestUtils.getPulseRoot(), FileSystemUtils.composeFilename("acceptance", "src", "test", "data"));
     private File tmpDir = null;
     private DriverManagerDataSource dataSource = new DriverManagerDataSource();
     private String dialect = "org.hibernate.dialect.HSQLDialect";
