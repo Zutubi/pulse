@@ -14,7 +14,7 @@
             </chain>
             <chain name="artifact">
                 <url name="artifact-repository">
-                    <artifact pattern="http://www.cinnamonbob.com/repository/[organisation]/[module]/[type]s/[artifact]-[revision].[type]"/>
+                    <artifact pattern="http://ivy.zutubi.com/[organisation]/[module]/[type]s/[artifact]-[revision].[type]"/>
                 </url>
             </chain>
         </dual>
