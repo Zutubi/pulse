@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceVersion;
 import com.zutubi.pulse.util.SystemUtils;
+import com.zutubi.pulse.util.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -67,25 +68,25 @@ public class StandardTemplateResourceConstructor implements ResourceConstructor
             resource.add(version);
             resource.setDefaultVersion(version.getValue());
 
-            version.addProperty(new ResourceProperty((resourceName + "_HOME").toUpperCase(), home.getCanonicalPath(), true, false, false));
+            version.addProperty(new ResourceProperty((resourceName + "_HOME").toUpperCase(), FileSystemUtils.normaliseSeparators(home.getCanonicalPath()), true, false, false));
 
             // configure the binary directory for this version.
             File binDir = new File(home, "bin");
-            version.addProperty(new ResourceProperty(resourceName + ".bin.dir", binDir.getAbsolutePath(), false, true, false));
+            version.addProperty(new ResourceProperty(resourceName + ".bin.dir", FileSystemUtils.normaliseSeparators(binDir.getAbsolutePath()), false, true, false));
 
             if (SystemUtils.IS_WINDOWS)
             {
-                version.addProperty(new ResourceProperty(resourceName + ".bin", new File(binDir, scriptName + ".bat").getCanonicalPath(), false, false, false));
+                version.addProperty(new ResourceProperty(resourceName + ".bin", FileSystemUtils.normaliseSeparators(new File(binDir, scriptName + ".bat").getCanonicalPath()), false, false, false));
             }
             else
             {
-                version.addProperty(new ResourceProperty(resourceName + ".bin", new File(binDir, scriptName).getCanonicalPath(), false, false, false));
+                version.addProperty(new ResourceProperty(resourceName + ".bin", FileSystemUtils.normaliseSeparators(new File(binDir, scriptName).getCanonicalPath()), false, false, false));
             }
 
             File lib = new File(home, "lib");
             if (lib.isDirectory())
             {
-                version.addProperty(new ResourceProperty(resourceName + ".lib.dir", lib.getAbsolutePath(), false, false, false));
+                version.addProperty(new ResourceProperty(resourceName + ".lib.dir", FileSystemUtils.normaliseSeparators(lib.getAbsolutePath()), false, false, false));
             }
             return resource;
         }
