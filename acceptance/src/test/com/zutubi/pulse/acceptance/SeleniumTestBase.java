@@ -38,7 +38,7 @@ public class SeleniumTestBase extends TestCase
     {
         super.setUp();
 
-        port = System.getProperty("pulse.port", "8889");
+        port = System.getProperty("pulse.port", "8080");
         xmlRpcHelper = new XmlRpcHelper(new URL("http", "localhost", Integer.parseInt(port), "/xmlrpc"));
         baseUrl = "http://localhost:" + port + "/";
         urls = new Urls("");
