@@ -102,6 +102,8 @@
             <fileset dir="src/test">
                 <include name="**/*Test.java"/>
                 <exclude name="**/Cvs*"/>
+                <exclude name="**/RlsCommandTest*"/>
+                <exclude name="**/VersionCommandTest*"/>
                 <exclude name="**/LogInformationAnalyserTest*"/>
                 <exclude name="**/*Subversion*Test*"/>
                 <exclude name="**/*WorkingCopyTest*"/>
