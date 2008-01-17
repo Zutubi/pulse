@@ -62,6 +62,17 @@ public class Maven2CommandTest extends ExecutableCommandTestBase
         failedRun(command, "BUILD ERROR", "Cannot execute mojo: resources", "It requires a project with an existing pom.xml");
     }
 
+    public void testNonDefaultPOM() throws Exception
+    {
+        prepareBaseDir("nondefaultpom");
+
+        Maven2Command command = new Maven2Command();
+        command.setGoals("compile");
+        command.addArguments("-f");
+        command.addArguments("blah/pom.xml");
+        successRun(command, "[compiler:compile]", "BUILD SUCCESSFUL");
+    }
+
     public void testCompilerError() throws Exception
     {
         prepareBaseDir("compilererror");
