@@ -68,6 +68,15 @@ public class Maven2CommandTest extends PulseTestCase
         failedRun("nopom", command, "BUILD ERROR", "Cannot execute mojo: resources", "It requires a project with an existing pom.xml");
     }
 
+    public void testNonDefaultPOM() throws Exception
+    {
+        Maven2Command command = new Maven2Command();
+        command.setGoals("compile");
+        command.addArguments("-f");
+        command.addArguments("blah/pom.xml");
+        successRun("nondefaultpom", command, "[compiler:compile]", "BUILD SUCCESSFUL");
+    }
+
     public void testCompilerError() throws Exception
     {
         Maven2Command command = new Maven2Command();
@@ -99,7 +108,21 @@ public class Maven2CommandTest extends PulseTestCase
     private CommandResult successRun(String inName, Maven2Command command, String ...contents) throws Exception
     {
         CommandResult result = runMaven(inName, command, null);
-        assertTrue(result.succeeded());
+        if (!result.succeeded())
+        {
+            // dump the output.
+            InputStream is = null;
+            try
+            {
+                is = new FileInputStream(cleanOutput());
+                System.out.println(IOUtils.inputStreamToString(is));
+            }
+            finally
+            {
+                IOUtils.close(is);
+            }
+            fail();
+        }
         checkOutput(contents);
         return result;
     }
