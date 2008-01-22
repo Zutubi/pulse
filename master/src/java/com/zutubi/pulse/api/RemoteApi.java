@@ -1040,6 +1040,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
     private Hashtable<String, Object> convertArtifact(StoredArtifact artifact, String project, BuildResult build, String stage, String command)
     {
         Hashtable<String, Object> result = new Hashtable<String, Object>();
+        result.put("id", Long.toString(artifact.getId()));
         result.put("stage", stage);
         result.put("command", command);
         result.put("name", artifact.getName());

@@ -70,8 +70,11 @@ public class ZipAction extends VFSActionSupport
 
         AbstractPulseFileObject pfo = (AbstractPulseFileObject) fo;
         File base = pfo.toFile();
-
-        // what if base is null or does not exist?....
+        if (base == null || !base.exists())
+        {
+            addActionError("The requested file does not exist: " + path);
+            return ERROR;
+        }
 
         File tmpRoot = configurationManager.getSystemPaths().getTmpRoot();
         if (!tmpRoot.exists() && !tmpRoot.mkdirs())

@@ -52,8 +52,11 @@ public class ArtifactFileObject extends AbstractPulseFileObject implements Artif
     protected void doAttach() throws Exception
     {
         StoredArtifact artifact = getArtifact();
-        isHtmlArtifact = artifact.hasIndexFile() && !getArtifact().isSingleFile();
-        isLinkArtifact = artifact.isLink();
+        if (artifact != null)
+        {
+            isHtmlArtifact = artifact.hasIndexFile() && !artifact.isSingleFile();
+            isLinkArtifact = artifact.isLink();
+        }
     }
 
     private File getArtifactBase()
@@ -62,6 +65,12 @@ public class ArtifactFileObject extends AbstractPulseFileObject implements Artif
         {
             CommandResult result = getCommandResult();
             StoredArtifact artifact = getArtifact();
+            if (result == null || artifact == null)
+            {
+                // this artifact does not exist, we should not be talking to this object.  However, since we
+                // are, we should ensure that we behave in a sensible maner.
+                return null;
+            }
 
             File outputDir = result.getAbsoluteOutputDir(pfs.getConfigurationManager().getDataDirectory());
             artifactBase = new File(outputDir, artifact.getName());
@@ -100,6 +109,10 @@ public class ArtifactFileObject extends AbstractPulseFileObject implements Artif
         if(isLinkArtifact)
         {
             return FileTypeConstants.LINK;
+        }
+        else if (getArtifactBase() == null)
+        {
+            return FileTypeConstants.UNKNOWN;
         }
         else if(!getArtifactBase().isDirectory())
         {
