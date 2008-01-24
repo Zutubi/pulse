@@ -22,7 +22,7 @@ public class ChangedByMeNotifyCondition implements NotifyCondition
     {
     }
 
-    public boolean satisfied(BuildResult result, UserConfiguration user)
+    public boolean satisfied(final BuildResult result, final UserConfiguration user)
     {
         if(result == null)
         {
@@ -30,16 +30,25 @@ public class ChangedByMeNotifyCondition implements NotifyCondition
         }
 
         // look for a change.
-        List<Changelist> changelists = buildManager.getChangesForBuild(result);
-        for (Changelist changelist : changelists)
+        final boolean[] response = new boolean[1];
+        buildManager.executeInTransaction(new Runnable()
         {
-            if (byMe(changelist, user) && changelist.getChanges() != null && changelist.getChanges().size() > 0)
+            public void run()
             {
-                return true;
+                List<Changelist> changelists = buildManager.getChangesForBuild(result);
+                for (Changelist changelist : changelists)
+                {
+                    if (byMe(changelist, user) && changelist.getChanges() != null && changelist.getChanges().size() > 0)
+                    {
+                        response[0] = true;
+                        return;
+                    }
+                }
+                response[0] = false;
             }
-        }
+        });
 
-        return false;
+        return response[0];
     }
 
     private boolean byMe(Changelist changelist, UserConfiguration user)
