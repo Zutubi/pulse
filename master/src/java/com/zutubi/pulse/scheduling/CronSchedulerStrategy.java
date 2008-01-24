@@ -22,7 +22,9 @@ public class CronSchedulerStrategy extends QuartzSchedulerStrategy
         CronTrigger cronTrigger = (CronTrigger) trigger;
         try
         {
-            return new org.quartz.CronTrigger(Long.toString(cronTrigger.getId()), QUARTZ_GROUP, cronTrigger.getCron());
+            org.quartz.CronTrigger quartzTrigger = new org.quartz.CronTrigger(Long.toString(cronTrigger.getId()), QUARTZ_GROUP, cronTrigger.getCron());
+            quartzTrigger.setMisfireInstruction(org.quartz.CronTrigger.MISFIRE_INSTRUCTION_DO_NOTHING);
+            return quartzTrigger;
         }
         catch (ParseException e)
         {
