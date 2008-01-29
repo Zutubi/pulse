@@ -1,13 +1,12 @@
 package com.zutubi.pulse.model;
 
+import com.zutubi.prototype.config.MockConfigurationProvider;
+import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
-import com.zutubi.pulse.core.config.Configuration;
-import com.zutubi.pulse.prototype.config.project.changeviewer.CustomChangeViewerConfiguration;
-import com.zutubi.pulse.prototype.config.project.changeviewer.ViewVCChangeViewer;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.project.changeviewer.CustomChangeViewerConfiguration;
 import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.prototype.config.MockConfigurationProvider;
 
 import java.util.Date;
 
@@ -59,7 +58,7 @@ public class CustomChangeViewerTest extends PulseTestCase
         viewer.setChangesetURL("${revision} ${author} ${branch} ${time.pulse} ${time.fisheye} ${unknown}");
         Revision rev = new Revision("author", "comment", new Date(1000), "author:branch:19700101-10:00:01");
         rev.setBranch("branch");
-        assertEquals("author:branch:19700101-10:00:01 author branch 19700101-00:00:01 19700101000001 ${unknown}", viewer.getChangesetURL(rev));
+        assertEquals("author:branch:19700101-10:00:01 author branch 19700101-10:00:01 19700101000001 ${unknown}", viewer.getChangesetURL(rev));
     }
 
     public void testGetFileViewURL()
