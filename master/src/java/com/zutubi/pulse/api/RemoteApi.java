@@ -57,28 +57,77 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         ComponentContext.autowire(this);
     }
 
+    /**
+     * @return the version of this Pulse installation as a build number.  The
+     *         number is of the form:
+     *         &lt;major&gt;&lt;minor&gt;&lt;build&gt;&lt;patch&gt;
+     *         where &lt;major&gt; and &lt;minor&gt; are two digits and
+     *         &lt;build&gt; and &lt;patch&gt; are three digits.  The value
+     *         of &lt;patch&gt; will always be 000 in regular builds.  For
+     *         example, version 2.0.12 would have build number 0200012000, so
+     *         this method would return 200012000.
+     */
     public int getVersion()
     {
         Version v = Version.getVersion();
         return v.getBuildNumberAsInt();
     }
 
+    /**
+     * Authenticates as the given user and returns a token that can be used
+     * as credentials for other method calls.  The returned token is valid
+     * for 30 minutes or until explicitly invalidated by a call to
+     * {@link #logout(String)}.
+     *
+     * @see #logout(String)
+     *
+     * @param username login of the user to authenticate as
+     * @param password password of the user
+     * @return an authentication token that can be used as credentials for
+     *         other method calls
+     * @throws AuthenticationException if the user does not exist or the
+     *         password does not match
+     */
     public String login(String username, String password) throws AuthenticationException
     {
         return tokenManager.login(username, password);
     }
 
+    /**
+     * Explicitly invalidates the given authentication token, such that it
+     * cannot be used for further method calls.
+     *
+     * @see #login(String, String)
+     * 
+     * @param token the token to invalidate
+     * @return true if the given token was valid before this call
+     */
     public boolean logout(String token)
     {
         return tokenManager.logout(token);
     }
 
+    /**
+     * A trivial ping method that can be useful for testing connectivity.
+     *
+     * @return the value "pong"
+     */
     public String ping()
     {
         return "pong";
     }
 
-    public Boolean configPathExists(String token, String path) throws AuthenticationException
+    /**
+     * Tests whether the given configuration path exists and is visible to
+     * the logged in user.
+     *
+     * @param token authentication token (see {@link #login})
+     * @param path the path to test, e.g. "projects/my project"
+     * @return true iff the given configuration path exists and is visible to
+     *         the logged in user
+     * @throws AuthenticationException if the given token is invalid
+     */
+    public boolean configPathExists(String token, String path) throws AuthenticationException
     {
         tokenManager.loginUser(token);
         try
@@ -91,7 +140,20 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         }
     }
 
-    public Vector<String> getConfigListing(String token, String path) throws AuthenticationException, TypeException
+    /**
+     * Returns a list of sub paths that are nested under the given
+     * configuration path.  For example, if the path "projects" is given, a
+     * list of all project names will be returned. Paths not visible to the
+     * logged in user are filtered out.
+     *
+     * @param token authentication token (see {@link #login})
+     * @param path the path to list the sub paths of
+     * @return all sub paths of the given path that are visible to the logged
+     *         in user
+     * @throws AuthenticationException if the given token in invalid
+     * @throws IllegalArgumentException if the given path is invalid
+     */
+    public Vector<String> getConfigListing(String token, String path) throws AuthenticationException
     {
         tokenManager.loginUser(token);
         try
@@ -134,6 +196,18 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         }
     }
 
+    /**
+     * Creates a default configuration object of the given type.  This object
+     * will not necessarily be valid - some fields may be incomplete.
+     *
+     * @param token        authentication token (see {@link #login})
+     * @param symbolicName symbolic name of the configuration type to create
+     *                     an instance of, e.g. "zutubi.projectConfig"
+     * @return a default configuration object of the given type
+     * @throws AuthenticationException if the given token is invalid
+     * @throws IllegalArgumentException if the given symbolic name is invalid
+     * @throws TypeException if there is an error constructing the object
+     */
     public Hashtable<String, Object> createDefaultConfig(String token, String symbolicName) throws AuthenticationException, TypeException
     {
         tokenManager.verifyUser(token);
