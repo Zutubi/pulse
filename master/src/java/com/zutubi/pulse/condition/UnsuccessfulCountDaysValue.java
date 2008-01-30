@@ -21,7 +21,7 @@ public class UnsuccessfulCountDaysValue implements NotifyIntegerValue
 {
     private BuildManager buildManager;
 
-    public int getValue(BuildResult result, UserConfiguration user)
+    public Comparable getValue(BuildResult result, UserConfiguration user)
     {
         return getValueForBuild(result, buildManager);
     }

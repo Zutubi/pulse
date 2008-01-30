@@ -4,9 +4,12 @@ import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 
 /**
+ *
+ *
  */
 public class ComparisonNotifyCondition implements NotifyCondition
 {
+
     public enum Op
     {
         EQUAL
@@ -16,9 +19,18 @@ public class ComparisonNotifyCondition implements NotifyCondition
                 return "==";
             }
 
-            public boolean evaluate(int left, int right)
+            public boolean evaluate(Comparable left, Comparable right)
             {
-                return left == right;
+                if (left == null)
+                {
+                    return right == null;
+                }
+                if (right == null)
+                {
+                    return false;
+                }
+                checkMatchingType(left, right);
+                return left.compareTo(right) == 0;
             }
         },
         NOT_EQUAL
@@ -28,9 +40,9 @@ public class ComparisonNotifyCondition implements NotifyCondition
                 return "!=";
             }
 
-            public boolean evaluate(int left, int right)
+            public boolean evaluate(Comparable left, Comparable right)
             {
-                return left != right;
+                return !EQUAL.evaluate(left, right);
             }
         },
         LESS_THAN
@@ -40,9 +52,10 @@ public class ComparisonNotifyCondition implements NotifyCondition
                 return "<";
             }
 
-            public boolean evaluate(int left, int right)
+            public boolean evaluate(Comparable left, Comparable right)
             {
-                return left < right;
+                checkMatchingType(left, right);
+                return left.compareTo(right) < 0;
             }
         },
         LESS_THAN_OR_EQUAL
@@ -52,9 +65,10 @@ public class ComparisonNotifyCondition implements NotifyCondition
                 return "<=";
             }
 
-            public boolean evaluate(int left, int right)
+            public boolean evaluate(Comparable left, Comparable right)
             {
-                return left <= right;
+                checkMatchingType(left, right);
+                return left.compareTo(right) <= 0;
             }
         },
         GREATER_THAN
@@ -64,9 +78,10 @@ public class ComparisonNotifyCondition implements NotifyCondition
                 return ">";
             }
 
-            public boolean evaluate(int left, int right)
+            public boolean evaluate(Comparable left, Comparable right)
             {
-                return left > right;
+                checkMatchingType(left, right);
+                return left.compareTo(right) > 0;
             }
         },
         GREATER_THAN_OR_EQUAL
@@ -76,14 +91,15 @@ public class ComparisonNotifyCondition implements NotifyCondition
                 return ">=";
             }
 
-            public boolean evaluate(int left, int right)
+            public boolean evaluate(Comparable left, Comparable right)
             {
-                return left >= right;
+                checkMatchingType(left, right);
+                return left.compareTo(right) >= 0;
             }
         };
 
         public abstract String toToken();
-        public abstract boolean evaluate(int left, int right);
+        public abstract boolean evaluate(Comparable left, Comparable right);
 
         public static Op fromToken(String token)
         {
@@ -97,13 +113,25 @@ public class ComparisonNotifyCondition implements NotifyCondition
 
             throw new IllegalArgumentException("Unrecognised token '" + token + "'");
         }
+
+        private static void checkMatchingType(Comparable left, Comparable right)
+        {
+            if (left == null || right == null)
+            {
+                throw new IllegalArgumentException("Unable to compare values '"+left+"' and '"+right+"'.  One of them is null.");
+            }
+            if (left.getClass() != right.getClass())
+            {
+                throw new IllegalArgumentException("Unable to compare values '"+left+"' and '"+right+"'.  Types do not match.");
+            }
+        }
     }
 
-    private NotifyIntegerValue left;
-    private NotifyIntegerValue right;
+    private NotifyValue left;
+    private NotifyValue right;
     private Op op;
 
-    public ComparisonNotifyCondition(NotifyIntegerValue left, NotifyIntegerValue right, Op op)
+    public ComparisonNotifyCondition(NotifyValue left, NotifyValue right, Op op)
     {
         this.left = left;
         this.right = right;
@@ -112,15 +140,18 @@ public class ComparisonNotifyCondition implements NotifyCondition
 
     public boolean satisfied(BuildResult result, UserConfiguration user)
     {
-        return op.evaluate(left.getValue(result, user), right.getValue(result, user));
+        Comparable leftValue = left.getValue(result, user);
+        Comparable rightValue = right.getValue(result, user);
+
+        return op.evaluate(leftValue, rightValue);
     }
 
-    public NotifyIntegerValue getLeft()
+    public NotifyValue getLeft()
     {
         return left;
     }
 
-    public NotifyIntegerValue getRight()
+    public NotifyValue getRight()
     {
         return right;
     }
@@ -130,3 +161,4 @@ public class ComparisonNotifyCondition implements NotifyCondition
         return op;
     }
 }
+

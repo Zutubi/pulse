@@ -14,7 +14,7 @@ public class LiteralNotifyIntegerValue implements NotifyIntegerValue
         this.value = value;
     }
 
-    public int getValue(BuildResult result, UserConfiguration user)
+    public Comparable getValue(BuildResult result, UserConfiguration user)
     {
         return value;
     }

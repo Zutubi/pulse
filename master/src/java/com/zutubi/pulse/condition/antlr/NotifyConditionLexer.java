@@ -2,11 +2,29 @@
 
     package com.zutubi.pulse.condition.antlr;
 
-import antlr.*;
-
 import java.io.InputStream;
+import antlr.TokenStreamException;
+import antlr.TokenStreamIOException;
+import antlr.TokenStreamRecognitionException;
+import antlr.CharStreamException;
+import antlr.CharStreamIOException;
+import antlr.ANTLRException;
 import java.io.Reader;
 import java.util.Hashtable;
+import antlr.CharScanner;
+import antlr.InputBuffer;
+import antlr.ByteBuffer;
+import antlr.CharBuffer;
+import antlr.Token;
+import antlr.CommonToken;
+import antlr.RecognitionException;
+import antlr.NoViableAltForCharException;
+import antlr.MismatchedCharException;
+import antlr.TokenStream;
+import antlr.ANTLRHashString;
+import antlr.LexerSharedInputState;
+import antlr.collections.impl.BitSet;
+import antlr.SemanticException;
 
 public class NotifyConditionLexer extends antlr.CharScanner implements NotifyConditionTreeParserTokenTypes, TokenStream
  {
@@ -24,20 +42,20 @@ public NotifyConditionLexer(LexerSharedInputState state) {
 	caseSensitiveLiterals = true;
 	setCaseSensitive(true);
 	literals = new Hashtable();
-	literals.put(new ANTLRHashString("changed.by.me", this), new Integer(21));
-	literals.put(new ANTLRHashString("state.change", this), new Integer(22));
-	literals.put(new ANTLRHashString("true", this), new Integer(15));
-	literals.put(new ANTLRHashString("changed", this), new Integer(20));
-	literals.put(new ANTLRHashString("unsuccessful.count.days", this), new Integer(24));
-	literals.put(new ANTLRHashString("false", this), new Integer(16));
-	literals.put(new ANTLRHashString("success", this), new Integer(17));
+	literals.put(new ANTLRHashString("changed.by.me", this), new Integer(22));
+	literals.put(new ANTLRHashString("state.change", this), new Integer(23));
+	literals.put(new ANTLRHashString("true", this), new Integer(16));
+	literals.put(new ANTLRHashString("changed", this), new Integer(21));
+	literals.put(new ANTLRHashString("unsuccessful.count.days", this), new Integer(25));
+	literals.put(new ANTLRHashString("false", this), new Integer(17));
+	literals.put(new ANTLRHashString("success", this), new Integer(18));
 	literals.put(new ANTLRHashString("not", this), new Integer(6));
 	literals.put(new ANTLRHashString("or", this), new Integer(5));
 	literals.put(new ANTLRHashString("and", this), new Integer(4));
 	literals.put(new ANTLRHashString("previous", this), new Integer(13));
-	literals.put(new ANTLRHashString("failure", this), new Integer(18));
-	literals.put(new ANTLRHashString("error", this), new Integer(19));
-	literals.put(new ANTLRHashString("unsuccessful.count.builds", this), new Integer(23));
+	literals.put(new ANTLRHashString("failure", this), new Integer(19));
+	literals.put(new ANTLRHashString("error", this), new Integer(20));
+	literals.put(new ANTLRHashString("unsuccessful.count.builds", this), new Integer(24));
 }
 
 public Token nextToken() throws TokenStreamException {
@@ -156,8 +174,8 @@ tryAgain:
 		int _saveIndex;
 		
 		{
-		int _cnt38=0;
-		_loop38:
+		int _cnt39=0;
+		_loop39:
 		do {
 			switch ( LA(1)) {
 			case 'a':  case 'b':  case 'c':  case 'd':
@@ -189,10 +207,10 @@ tryAgain:
 			}
 			default:
 			{
-				if ( _cnt38>=1 ) { break _loop38; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
+				if ( _cnt39>=1 ) { break _loop39; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
 			}
 			}
-			_cnt38++;
+			_cnt39++;
 		} while (true);
 		}
 		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
@@ -208,17 +226,17 @@ tryAgain:
 		int _saveIndex;
 		
 		{
-		int _cnt41=0;
-		_loop41:
+		int _cnt42=0;
+		_loop42:
 		do {
 			if (((LA(1) >= '0' && LA(1) <= '9'))) {
 				matchRange('0','9');
 			}
 			else {
-				if ( _cnt41>=1 ) { break _loop41; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
+				if ( _cnt42>=1 ) { break _loop42; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
 			}
 			
-			_cnt41++;
+			_cnt42++;
 		} while (true);
 		}
 		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {

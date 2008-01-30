@@ -2,8 +2,24 @@
 
     package com.zutubi.pulse.condition.antlr;
 
-import antlr.*;
+import antlr.TokenBuffer;
+import antlr.TokenStreamException;
+import antlr.TokenStreamIOException;
+import antlr.ANTLRException;
+import antlr.LLkParser;
+import antlr.Token;
+import antlr.TokenStream;
+import antlr.RecognitionException;
+import antlr.NoViableAltException;
+import antlr.MismatchedTokenException;
+import antlr.SemanticException;
+import antlr.ParserSharedInputState;
+import antlr.collections.impl.BitSet;
 import antlr.collections.AST;
+import java.util.Hashtable;
+import antlr.ASTFactory;
+import antlr.ASTPair;
+import antlr.collections.impl.ASTArray;
 
 public class NotifyConditionParser extends antlr.LLkParser       implements NotifyConditionTreeParserTokenTypes
  {
@@ -62,7 +78,7 @@ public NotifyConditionParser(ParserSharedInputState state) {
 		andexpression();
 		astFactory.addASTChild(currentAST, returnAST);
 		{
-		_loop22:
+		_loop23:
 		do {
 			if ((LA(1)==LITERAL_or)) {
 				AST tmp2_AST = null;
@@ -73,7 +89,7 @@ public NotifyConditionParser(ParserSharedInputState state) {
 				astFactory.addASTChild(currentAST, returnAST);
 			}
 			else {
-				break _loop22;
+				break _loop23;
 			}
 			
 		} while (true);
@@ -91,7 +107,7 @@ public NotifyConditionParser(ParserSharedInputState state) {
 		notexpression();
 		astFactory.addASTChild(currentAST, returnAST);
 		{
-		_loop25:
+		_loop26:
 		do {
 			if ((LA(1)==LITERAL_and)) {
 				AST tmp3_AST = null;
@@ -102,7 +118,7 @@ public NotifyConditionParser(ParserSharedInputState state) {
 				astFactory.addASTChild(currentAST, returnAST);
 			}
 			else {
-				break _loop25;
+				break _loop26;
 			}
 			
 		} while (true);
@@ -127,6 +143,7 @@ public NotifyConditionParser(ParserSharedInputState state) {
 			match(LITERAL_not);
 			break;
 		}
+		case WORD:
 		case INTEGER:
 		case LITERAL_true:
 		case LITERAL_false:
@@ -134,10 +151,10 @@ public NotifyConditionParser(ParserSharedInputState state) {
 		case LITERAL_failure:
 		case LITERAL_error:
 		case LITERAL_changed:
-		case 21:
 		case 22:
 		case 23:
 		case 24:
+		case 25:
 		case LEFT_PAREN:
 		{
 			break;
@@ -167,8 +184,8 @@ public NotifyConditionParser(ParserSharedInputState state) {
 		case LITERAL_failure:
 		case LITERAL_error:
 		case LITERAL_changed:
-		case 21:
 		case 22:
+		case 23:
 		{
 			boolsymbol();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -209,9 +226,10 @@ public NotifyConditionParser(ParserSharedInputState state) {
 			boolexpression_AST = (AST)currentAST.root;
 			break;
 		}
+		case WORD:
 		case INTEGER:
-		case 23:
 		case 24:
+		case 25:
 		{
 			compareexpression();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -287,21 +305,21 @@ public NotifyConditionParser(ParserSharedInputState state) {
 			boolsymbol_AST = (AST)currentAST.root;
 			break;
 		}
-		case 21:
+		case 22:
 		{
 			AST tmp16_AST = null;
 			tmp16_AST = astFactory.create(LT(1));
 			astFactory.addASTChild(currentAST, tmp16_AST);
-			match(21);
+			match(22);
 			boolsymbol_AST = (AST)currentAST.root;
 			break;
 		}
-		case 22:
+		case 23:
 		{
 			AST tmp17_AST = null;
 			tmp17_AST = astFactory.create(LT(1));
 			astFactory.addASTChild(currentAST, tmp17_AST);
-			match(22);
+			match(23);
 			boolsymbol_AST = (AST)currentAST.root;
 			break;
 		}
@@ -319,7 +337,7 @@ public NotifyConditionParser(ParserSharedInputState state) {
 		ASTPair currentAST = new ASTPair();
 		AST compareexpression_AST = null;
 		
-		integer();
+		value();
 		astFactory.addASTChild(currentAST, returnAST);
 		{
 		switch ( LA(1)) {
@@ -377,17 +395,17 @@ public NotifyConditionParser(ParserSharedInputState state) {
 		}
 		}
 		}
-		integer();
+		value();
 		astFactory.addASTChild(currentAST, returnAST);
 		compareexpression_AST = (AST)currentAST.root;
 		returnAST = compareexpression_AST;
 	}
 	
-	public final void integer() throws RecognitionException, TokenStreamException {
+	public final void value() throws RecognitionException, TokenStreamException {
 		
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
-		AST integer_AST = null;
+		AST value_AST = null;
 		
 		switch ( LA(1)) {
 		case INTEGER:
@@ -396,11 +414,11 @@ public NotifyConditionParser(ParserSharedInputState state) {
 			tmp24_AST = astFactory.create(LT(1));
 			astFactory.addASTChild(currentAST, tmp24_AST);
 			match(INTEGER);
-			integer_AST = (AST)currentAST.root;
+			value_AST = (AST)currentAST.root;
 			break;
 		}
-		case 23:
 		case 24:
+		case 25:
 		{
 			intsymbol();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -435,7 +453,16 @@ public NotifyConditionParser(ParserSharedInputState state) {
 			}
 			}
 			}
-			integer_AST = (AST)currentAST.root;
+			value_AST = (AST)currentAST.root;
+			break;
+		}
+		case WORD:
+		{
+			AST tmp28_AST = null;
+			tmp28_AST = astFactory.create(LT(1));
+			astFactory.addASTChild(currentAST, tmp28_AST);
+			match(WORD);
+			value_AST = (AST)currentAST.root;
 			break;
 		}
 		default:
@@ -443,7 +470,7 @@ public NotifyConditionParser(ParserSharedInputState state) {
 			throw new NoViableAltException(LT(1), getFilename());
 		}
 		}
-		returnAST = integer_AST;
+		returnAST = value_AST;
 	}
 	
 	public final void intsymbol() throws RecognitionException, TokenStreamException {
@@ -453,21 +480,21 @@ public NotifyConditionParser(ParserSharedInputState state) {
 		AST intsymbol_AST = null;
 		
 		switch ( LA(1)) {
-		case 23:
-		{
-			AST tmp28_AST = null;
-			tmp28_AST = astFactory.create(LT(1));
-			astFactory.addASTChild(currentAST, tmp28_AST);
-			match(23);
-			intsymbol_AST = (AST)currentAST.root;
-			break;
-		}
 		case 24:
 		{
 			AST tmp29_AST = null;
 			tmp29_AST = astFactory.create(LT(1));
 			astFactory.addASTChild(currentAST, tmp29_AST);
 			match(24);
+			intsymbol_AST = (AST)currentAST.root;
+			break;
+		}
+		case 25:
+		{
+			AST tmp30_AST = null;
+			tmp30_AST = astFactory.create(LT(1));
+			astFactory.addASTChild(currentAST, tmp30_AST);
+			match(25);
 			intsymbol_AST = (AST)currentAST.root;
 			break;
 		}
@@ -495,6 +522,7 @@ public NotifyConditionParser(ParserSharedInputState state) {
 		"GREATER_THAN",
 		"GREATER_THAN_OR_EQUAL",
 		"\"previous\"",
+		"a word",
 		"an integer",
 		"\"true\"",
 		"\"false\"",
@@ -508,7 +536,6 @@ public NotifyConditionParser(ParserSharedInputState state) {
 		"\"unsuccessful.count.days\"",
 		"an opening parenthesis '('",
 		"a closing parenthesis ')'",
-		"a word",
 		"WHITESPACE"
 	};
 	
