@@ -58,6 +58,14 @@
     </tr>
 </table>
 <table class="fill-content">
+    #headingRow("conditions.string.values" 2)
+    <tr>
+        #contentRowHeading("[a-zA-Z]+")
+        #staticWrapCell("conditions.string.literals")
+    </tr>
+    #condition("build.specification.name")
+</table>
+<table class="fill-content">
     #headingRow("conditions.integer.operators" 6)
     <tr>
         <td class="content-centre">&lt;</td>
