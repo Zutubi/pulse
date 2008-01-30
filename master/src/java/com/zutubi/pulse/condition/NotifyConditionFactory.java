@@ -26,6 +26,9 @@ public class NotifyConditionFactory
     public static final String UNSUCCESSFUL_COUNT_BUILDS = "unsuccessful.count.builds";
     public static final String UNSUCCESSFUL_COUNT_DAYS = "unsuccessful.count.days";
 
+    // String values
+    public static final String BUILD_SPECIFICATION_NAME = "build.specification.name";
+
     private final static Map<String, Class> typeMap = new HashMap<String, Class>();
 
     private ObjectFactory objectFactory;
@@ -44,6 +47,8 @@ public class NotifyConditionFactory
 
         typeMap.put(UNSUCCESSFUL_COUNT_BUILDS, UnsuccessfulCountBuildsValue.class);
         typeMap.put(UNSUCCESSFUL_COUNT_DAYS, UnsuccessfulCountDaysValue.class);
+        
+        typeMap.put(BUILD_SPECIFICATION_NAME, BuildSpecificationNameValue.class);
     }
 
     public List<String> getAvailableConditions()
@@ -72,11 +77,16 @@ public class NotifyConditionFactory
         return create(value, NotifyIntegerValue.class);
     }
 
+    public NotifyStringValue createStringValue(String value)
+    {
+        return create(value, NotifyStringValue.class);
+    }
+
     private <T> T create(String token, Class<T> clazz)
     {
         if (!isValid(token, clazz))
         {
-            throw new IllegalArgumentException("invalid token '" + token + "' specified.");
+            throw new IllegalArgumentException("Invalid token '" + token + "' specified.");
         }
         Class definition = typeMap.get(token);
 

@@ -5,6 +5,7 @@ import com.zutubi.pulse.model.User;
 
 /**
  */
-public interface NotifyIntegerValue extends NotifyValue
+public abstract interface NotifyStringValue extends NotifyValue
 {
+
 }

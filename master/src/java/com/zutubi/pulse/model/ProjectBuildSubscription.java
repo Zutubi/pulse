@@ -91,7 +91,15 @@ public class ProjectBuildSubscription extends Subscription
 
     public boolean conditionSatisfied(BuildResult result)
     {
-        return !result.isPersonal() && getNotifyCondition().satisfied(result, getContactPoint().getUser());
+        try
+        {
+            return !result.isPersonal() && getNotifyCondition().satisfied(result, getContactPoint().getUser());
+        }
+        catch (Exception e)
+        {
+            LOG.severe("Failed to evaluate subscription condition '" + condition + "'", e);
+            return false;
+        }
     }
 
     public NotifyCondition getNotifyCondition()

@@ -33,15 +33,15 @@ cond returns [NotifyCondition r]
 
 comp returns [NotifyCondition r]
 {
-    NotifyIntegerValue x, y;
+    NotifyValue x, y;
     r = null;
 }
-    : #(EQUAL x=integer y=integer) { r = new ComparisonNotifyCondition(x, y, ComparisonNotifyCondition.Op.EQUAL); }
-    | #(NOT_EQUAL x=integer y=integer) { r = new ComparisonNotifyCondition(x, y, ComparisonNotifyCondition.Op.NOT_EQUAL); }
-    | #(LESS_THAN x=integer y=integer) { r = new ComparisonNotifyCondition(x, y, ComparisonNotifyCondition.Op.LESS_THAN); }
-    | #(LESS_THAN_OR_EQUAL x=integer y=integer) { r = new ComparisonNotifyCondition(x, y, ComparisonNotifyCondition.Op.LESS_THAN_OR_EQUAL); }
-    | #(GREATER_THAN x=integer y=integer) { r = new ComparisonNotifyCondition(x, y, ComparisonNotifyCondition.Op.GREATER_THAN); }
-    | #(GREATER_THAN_OR_EQUAL x=integer y=integer) { r = new ComparisonNotifyCondition(x, y, ComparisonNotifyCondition.Op.GREATER_THAN_OR_EQUAL); }
+    : #(EQUAL x=value y=value) { r = new ComparisonNotifyCondition(x, y, ComparisonNotifyCondition.Op.EQUAL); }
+    | #(NOT_EQUAL x=value y=value) { r = new ComparisonNotifyCondition(x, y, ComparisonNotifyCondition.Op.NOT_EQUAL); }
+    | #(LESS_THAN x=value y=value) { r = new ComparisonNotifyCondition(x, y, ComparisonNotifyCondition.Op.LESS_THAN); }
+    | #(LESS_THAN_OR_EQUAL x=value y=value) { r = new ComparisonNotifyCondition(x, y, ComparisonNotifyCondition.Op.LESS_THAN_OR_EQUAL); }
+    | #(GREATER_THAN x=value y=value) { r = new ComparisonNotifyCondition(x, y, ComparisonNotifyCondition.Op.GREATER_THAN); }
+    | #(GREATER_THAN_OR_EQUAL x=value y=value) { r = new ComparisonNotifyCondition(x, y, ComparisonNotifyCondition.Op.GREATER_THAN_OR_EQUAL); }
     ;
 
 prev returns [NotifyCondition r]
@@ -51,7 +51,16 @@ prev returns [NotifyCondition r]
     : #("previous" r=cond) { r = factory.build(PreviousNotifyCondition.class, new Class[]{ NotifyCondition.class }, new Object[]{ r }); }
     ;
 
-integer returns [NotifyIntegerValue r]
+value returns [NotifyValue r]
+{
+    r = null;
+}
+    : r=integer
+    | k:strsymbol { r = factory.createStringValue(k.getText()); }
+    | l:WORD { r = new LiteralNotifyStringValue(l.getText()); }
+    ;
+
+integer returns [NotifyValue r]
 {
     r = null;
 }
@@ -60,7 +69,7 @@ integer returns [NotifyIntegerValue r]
     | j:intsymbol { r = factory.createIntegerValue(j.getText()); }
     ;
 
-previnteger returns [NotifyIntegerValue r]
+previnteger returns [NotifyValue r]
 {
     r = null;
 }
@@ -81,6 +90,10 @@ boolsymbol
 intsymbol
     : "unsuccessful.count.builds"
     | "unsuccessful.count.days"
+    ;
+
+strsymbol
+    : "build.specification.name"
     ;
 
 class NotifyConditionParser extends Parser;
@@ -119,6 +132,8 @@ compareexpression
 integer
     : INTEGER
     | intsymbol (LEFT_PAREN! "previous"^ RIGHT_PAREN!)?
+    | strsymbol
+    | WORD
     ;
 
 boolsymbol
@@ -137,6 +152,10 @@ intsymbol
     | "unsuccessful.count.days"
     ;
     
+strsymbol
+    : "build.specification.name"
+    ;
+
 class NotifyConditionLexer extends Lexer;
 
 options {

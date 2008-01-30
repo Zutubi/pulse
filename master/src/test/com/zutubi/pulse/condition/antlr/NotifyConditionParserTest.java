@@ -6,10 +6,14 @@ import com.opensymphony.xwork.ValidationAwareSupport;
 import com.zutubi.pulse.condition.*;
 import com.zutubi.pulse.core.ObjectFactory;
 import com.zutubi.pulse.core.PulseRuntimeException;
+import com.zutubi.pulse.core.model.PersistentName;
+import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.util.ObjectUtils;
 import com.zutubi.pulse.web.user.SubscriptionHelper;
 
 import java.io.StringReader;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 /**
@@ -334,6 +338,37 @@ public class NotifyConditionParserTest extends PulseTestCase
     public void testMisplacedParameters()
     {
         failureHelper("true or (previous)", "line 1:10: unexpected token: previous");
+    }
+
+    public void testBuildSpecificationName() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException
+    {
+        NotifyCondition condition = parseExpression("build.specification.name == myName");
+        assertTrue(condition instanceof ComparisonNotifyCondition);
+        ComparisonNotifyCondition comp = (ComparisonNotifyCondition) condition;
+        assertTrue(comp.getLeft() instanceof BuildSpecificationNameValue);
+        assertTrue(comp.getRight() instanceof LiteralNotifyStringValue);
+        assertEquals("myName", comp.getRight().getValue(null, null));
+
+        BuildResult result = new BuildResult();
+        ObjectUtils.setProperty("setSpecName", new PersistentName("myName"), result);
+
+        assertTrue(condition.satisfied(result, null));
+
+        ObjectUtils.setProperty("setSpecName", new PersistentName("anotherName"), result);
+        assertFalse(condition.satisfied(result, null));
+    }
+
+    public void testMismatchedValueComparison()
+    {
+        try
+        {
+            NotifyCondition condition = parseExpression("blah == 3");
+            condition.satisfied(null, null);
+        }
+        catch (IllegalArgumentException e)
+        {
+            assertTrue(e.getMessage().contains("Unable to compare values 'blah' and '3'.  Types do not match."));
+        }
     }
 
     private void failureHelper(String expression, String error)

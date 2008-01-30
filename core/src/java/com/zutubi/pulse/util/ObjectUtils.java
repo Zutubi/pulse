@@ -2,6 +2,8 @@ package com.zutubi.pulse.util;
 
 import java.util.List;
 import java.util.LinkedList;
+import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * <class-comment/>
@@ -32,5 +34,12 @@ public class ObjectUtils
             l.add(obj);
         }
         return l;
+    }
+
+    public static void setProperty(String name, Object value, Object target) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException
+    {
+        Method m = target.getClass().getDeclaredMethod(name, value.getClass());
+        m.setAccessible(true);
+        m.invoke(target, value);
     }
 }

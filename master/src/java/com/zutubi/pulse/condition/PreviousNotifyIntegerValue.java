@@ -16,7 +16,7 @@ public class PreviousNotifyIntegerValue implements NotifyIntegerValue
         this.delegate = delegate;
     }
 
-    public int getValue(BuildResult result, User user)
+    public Comparable getValue(BuildResult result, User user)
     {
         BuildResult previous = buildManager.getPreviousBuildResult(result);
         return delegate.getValue(previous, user);

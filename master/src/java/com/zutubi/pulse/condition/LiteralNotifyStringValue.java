@@ -4,17 +4,19 @@ import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.User;
 
 /**
+ *
+ *
  */
-public class LiteralNotifyIntegerValue implements NotifyIntegerValue
+public class LiteralNotifyStringValue implements NotifyStringValue
 {
-    private int value;
+    private String value;
 
-    public LiteralNotifyIntegerValue(int value)
+    public LiteralNotifyStringValue(String value)
     {
         this.value = value;
     }
 
-    public Comparable getValue(BuildResult result, User user)
+    public String getValue(BuildResult result, User user)
     {
         return value;
     }

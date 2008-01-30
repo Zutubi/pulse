@@ -4,7 +4,10 @@ import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.User;
 
 /**
+ *
+ *
  */
-public interface NotifyIntegerValue extends NotifyValue
+public interface NotifyValue
 {
+    Comparable getValue(BuildResult result, User user);
 }
