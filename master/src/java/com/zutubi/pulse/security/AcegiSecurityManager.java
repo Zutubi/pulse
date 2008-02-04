@@ -22,7 +22,7 @@ public class AcegiSecurityManager implements SecurityManager
     private ProviderManager authenticationManager;
     private JettyManager jettyManager;
 
-    public void init()
+    public void secure()
     {
         deploySecurityFilter();
         enableWebUISecurity();

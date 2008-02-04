@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web.restore;
 
 import com.zutubi.pulse.web.ActionSupport;
-import com.zutubi.pulse.restore.RestoreManager;
+import com.zutubi.pulse.restore.ArchiveManager;
 
 /**
  *
@@ -9,10 +9,10 @@ import com.zutubi.pulse.restore.RestoreManager;
  */
 public class RestoreActionSupport extends ActionSupport
 {
-    protected RestoreManager restoreManager;
+    protected ArchiveManager archiveManager;
 
-    public void setRestoreManager(RestoreManager restoreManager)
+    public void setArchiveManager(ArchiveManager archiveManager)
     {
-        this.restoreManager = restoreManager;
+        this.archiveManager = archiveManager;
     }
 }

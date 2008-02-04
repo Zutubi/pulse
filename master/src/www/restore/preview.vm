@@ -7,9 +7,9 @@
 <p>
     blurb about restore, including details of the data to be restored.
     <ul>
-        <li>Date: </li>$info.date
-        <li>Version: </li>$info.version
-        <li>File: </li>$info.source
+        <li>Date: $info.date</li>
+        <li>Version: $info.version</li>
+        <li>File: $info.source</li>
     </ul>
 </p>
 
@@ -17,13 +17,19 @@
     Please be aware that this restore will overwrite all of your existing configuration and settings.
 </p>
 
-#wwform("action=execute" "method=post")
-#continue(1)
-#end
 
-#wwform("action=skip" "method=post")
-#skip(1)
-#end
+<table class="form">
+    <tr width="2">
+        <form id="execute" name="execute" action="$base/restore/execute.action" method="post">
+            <td class="submit" colspan="1"><input type="submit" name="continue" value="continue" class="submit"tabindex="1"/></td>
+        </form>
+
+        <form id="abort" name="abort" action="$base/restore/abort.action" method="post">
+            <td class="submit" colspan="1"><input type="submit" name="abort" value="cancel" class="submit" tabindex="2"/>
+            </td>
+        </form>
+    </tr>
+</table>
 
 </body>
 </html>

@@ -5,5 +5,5 @@ package com.zutubi.pulse.security;
  */
 public interface SecurityManager
 {
-    void init();
+    void secure();
 }

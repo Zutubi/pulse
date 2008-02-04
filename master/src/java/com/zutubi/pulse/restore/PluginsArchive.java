@@ -10,7 +10,7 @@ import java.io.IOException;
  *
  *
  */
-public class RestorablePlugins implements Restorable
+public class PluginsArchive implements Archiveable
 {
     private PluginPaths pluginPaths;
 
@@ -19,7 +19,18 @@ public class RestorablePlugins implements Restorable
         return "plugins";
     }
 
-    public void backup(File base) throws RestoreException
+
+    public void backup(Archive archive) throws ArchiveException
+    {
+
+    }
+
+    public void restore(Archive archive) throws ArchiveException
+    {
+
+    }
+
+    public void backup(File base) throws ArchiveException
     {
         try
         {
@@ -28,11 +39,11 @@ public class RestorablePlugins implements Restorable
         }
         catch (IOException e)
         {
-            throw new RestoreException(e);
+            throw new ArchiveException(e);
         }
     }
 
-    public void restore(File base) throws RestoreException
+    public void restore(File base) throws ArchiveException
     {
         try
         {
@@ -46,7 +57,7 @@ public class RestorablePlugins implements Restorable
         }
         catch (IOException e)
         {
-            throw new RestoreException(e);
+            throw new ArchiveException(e);
         }
     }
 

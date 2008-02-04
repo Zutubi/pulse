@@ -6,23 +6,23 @@ import com.zutubi.pulse.core.PulseException;
  *
  *
  */
-public class RestoreException extends PulseException
+public class ArchiveException extends PulseException
 {
-    public RestoreException(String errorMessage)
+    public ArchiveException(String errorMessage)
     {
         super(errorMessage);
     }
 
-    public RestoreException()
+    public ArchiveException()
     {
     }
 
-    public RestoreException(Throwable cause)
+    public ArchiveException(Throwable cause)
     {
         super(cause);
     }
 
-    public RestoreException(String errorMessage, Throwable cause)
+    public ArchiveException(String errorMessage, Throwable cause)
     {
         super(errorMessage, cause);
     }

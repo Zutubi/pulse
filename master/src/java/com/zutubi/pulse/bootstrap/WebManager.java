@@ -3,6 +3,7 @@ package com.zutubi.pulse.bootstrap;
 import com.zutubi.pulse.jetty.JettyManager;
 import com.opensymphony.xwork.config.ConfigurationManager;
 import com.opensymphony.xwork.config.providers.XmlConfigurationProvider;
+import com.zutubi.pulse.security.SecurityManager;
 
 /**
  */
@@ -29,6 +30,10 @@ public class WebManager
         ensureJettyStarted();
 
         loadXworkConfiguration("xwork.xml");
+
+        // enable security only when the standard xwork file is loaded.
+        SecurityManager securityManager = ComponentContext.getBean("securityManager");
+        securityManager.secure();
     }
 
     private void loadXworkConfiguration(String name)
@@ -45,7 +50,6 @@ public class WebManager
             jettyManager.start();
         }
     }
-
 
     /**
      * Required resource.

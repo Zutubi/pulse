@@ -86,11 +86,11 @@
     <package name="restore" namespace="/restore" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
-        <action name="preview" class="com.zutubi.pulse.web.restore.RestorePreviewAction">
+        <action name="preview" class="com.zutubi.pulse.web.restore.PreviewRestoreAction">
             <result name="success" type="velocity">preview.vm</result>
         </action>
 
-        <action name="execute" class="com.zutubi.pulse.web.restore.RestoreExecuteAction">
+        <action name="execute" class="com.zutubi.pulse.web.restore.ExecuteRestoreAction">
             <interceptor-ref name="executeAndWaitStack"/>
             <result name="wait" type="velocity">status.vm</result>
             <result name="success" type="velocity">complete.vm</result>
@@ -101,7 +101,7 @@
             <result name="success" type="redirect">/</result>
         </action>
 
-        <action name="skip" class="com.zutubi.pulse.web.restore.SkipRestoreAction">
+        <action name="abort" class="com.zutubi.pulse.web.restore.AbortRestoreAction">
             <result name="success" type="redirect">/</result>
         </action>
 

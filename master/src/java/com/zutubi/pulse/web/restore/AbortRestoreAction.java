@@ -1,18 +1,19 @@
 package com.zutubi.pulse.web.restore;
 
 import com.zutubi.pulse.bootstrap.SetupManager;
+import com.zutubi.pulse.bootstrap.DefaultSetupManager;
 
 /**
  *
  *
  */
-public class SkipRestoreAction extends RestoreActionSupport
+public class AbortRestoreAction extends RestoreActionSupport
 {
     private SetupManager setupManager;
 
     public String execute() throws Exception
     {
-        setupManager.requestRestoreComplete(false);
+        ((DefaultSetupManager)setupManager).doCancelRestorationRequest();
         return SUCCESS;
     }
 
@@ -20,5 +21,4 @@ public class SkipRestoreAction extends RestoreActionSupport
     {
         this.setupManager = setupManager;
     }
-
 }

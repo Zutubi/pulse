@@ -25,5 +25,5 @@ public interface SetupManager
 
     void requestSetupComplete();
 
-    void requestRestoreComplete(boolean changed);
+    void requestRestoreComplete();
 }

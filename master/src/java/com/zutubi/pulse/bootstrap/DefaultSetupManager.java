@@ -1,24 +1,33 @@
 package com.zutubi.pulse.bootstrap;
 
-import com.zutubi.util.TextUtils;
 import com.opensymphony.xwork.spring.SpringObjectFactory;
-import com.zutubi.prototype.config.*;
+import com.zutubi.prototype.config.ConfigurationExtensionManager;
+import com.zutubi.prototype.config.ConfigurationPersistenceManager;
+import com.zutubi.prototype.config.ConfigurationProvider;
+import com.zutubi.prototype.config.ConfigurationReferenceManager;
+import com.zutubi.prototype.config.ConfigurationRegistry;
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
+import com.zutubi.prototype.config.DefaultConfigurationProvider;
 import com.zutubi.prototype.type.record.DelegatingHandleAllocator;
 import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.database.DatabaseConsole;
-import com.zutubi.pulse.plugins.PluginManager;
 import com.zutubi.pulse.bootstrap.conf.EnvConfig;
 import com.zutubi.pulse.bootstrap.tasks.ProcessSetupStartupTask;
 import com.zutubi.pulse.config.PropertiesWriter;
+import com.zutubi.pulse.database.DatabaseConsole;
 import com.zutubi.pulse.events.DataDirectoryLocatedEvent;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.logging.LogConfigurationManager;
 import com.zutubi.pulse.model.UserManager;
+import com.zutubi.pulse.plugins.PluginManager;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
+import com.zutubi.pulse.restore.ArchiveManager;
+import com.zutubi.pulse.restore.ProgressMonitor;
 import com.zutubi.pulse.upgrade.UpgradeManager;
+import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.IOUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;
@@ -193,25 +202,10 @@ public class DefaultSetupManager implements SetupManager
 
         loadSystemProperties();
 
-        loadContexts(restoreContexts);
-
-        if (isRestoreRequested())
-        {
-            state = SetupState.RESTORE;
-            showPrompt();
-            return;
-        }
-
-        requestRestoreComplete(false);
+        handleRestorationProcess();
     }
 
-    public boolean isRestoreRequested()
-    {
-        
-        return false;
-    }
-
-    public void requestRestoreComplete(boolean changed)
+    public void requestRestoreComplete()
     {
         linkUserTemplates();
 
@@ -458,6 +452,82 @@ public class DefaultSetupManager implements SetupManager
         }
     }
 
+    //---( workflow for the restoration process.  Should probably shift this out of the manager...,
+    // all this manager is interested in are co-ordinating the various steps, not the workflow of each step.  )---
+
+    private ArchiveManager archiveManager;
+
+    private boolean isRestoreRequested()
+    {
+        // check for the existance of a PULSE_DATA/restore/archive.zip
+        return getArchiveFile() != null;
+    }
+
+    private File getArchiveFile()
+    {
+        UserPaths paths = configurationManager.getUserPaths();
+        if (paths != null)
+        {
+            File archive = new File(paths.getData(), "restore/archive.zip");
+            if (archive.exists())
+            {
+                return archive;
+            }
+        }
+
+        return null;
+    }
+
+    public void handleRestorationProcess()
+    {
+        //TODO: only need to load restoreContexts if restore is requested? maybe load these statically...
+        loadContexts(restoreContexts);
+
+        if (isRestoreRequested())
+        {
+
+            archiveManager.prepareRestore(getArchiveFile());
+
+            // show restoration preview page.
+            state = SetupState.RESTORE;
+            showPrompt();
+            return;
+        }
+
+        requestRestoreComplete();
+    }
+
+    // continue selected on the restoration preview page.
+    public void doExecuteRestorationRequest()
+    {
+        File archive = getArchiveFile();
+        ProgressMonitor monitor = archiveManager.getMonitor();
+        if (!monitor.isStarted())
+        {
+            archiveManager.prepareRestore(archive);
+            archiveManager.restoreArchive();
+//            archiveManager.restoreArchive(new Archive(archive));
+        }
+    }
+
+    public void doCancelRestorationRequest() throws IOException
+    {
+        // delete the PULSE_DATA/restore/archive.zip
+        FileSystemUtils.delete(getArchiveFile());
+
+        requestRestoreComplete();
+    }
+
+    public void doCompleteRestoration() throws IOException
+    {
+        // remove the archive since the restoration is complete.
+        FileSystemUtils.delete(getArchiveFile());
+
+        requestRestoreComplete();
+    }
+
+    //---( end )
+
     public void setUserManager(UserManager userManager)
     {
         this.userManager = userManager;
@@ -516,5 +586,10 @@ public class DefaultSetupManager implements SetupManager
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
+    }
+
+    public void setArchiveManager(ArchiveManager archiveManager)
+    {
+        this.archiveManager = archiveManager;
     }
 }

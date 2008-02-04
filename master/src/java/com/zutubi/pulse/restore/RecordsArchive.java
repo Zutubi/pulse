@@ -12,13 +12,23 @@ import java.io.File;
  *
  *
  */
-public class RestorableRecords implements Restorable
+public class RecordsArchive implements Archiveable
 {
     private RecordStore recordStore;
 
     public String getName()
     {
         return "records";
+    }
+
+    public void backup(Archive archive) throws ArchiveException
+    {
+
+    }
+
+    public void restore(Archive archive) throws ArchiveException
+    {
+
     }
 
     public void backup(File base)

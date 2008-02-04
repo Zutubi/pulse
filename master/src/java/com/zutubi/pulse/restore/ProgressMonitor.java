@@ -6,7 +6,7 @@ import com.zutubi.pulse.util.TimeStamps;
  *
  *
  */
-public class RestoreProgressMonitor
+public class ProgressMonitor
 {
     private long startTimestamp;
     private long finishTimestamp;

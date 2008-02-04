@@ -19,7 +19,7 @@ import javax.sql.DataSource;
  *
  *
  */
-public class RestorableDatabase implements Restorable
+public class DatabaseArchive implements Archiveable
 {
     private List<String> mappings = new LinkedList<String>();
     private DatabaseConfig databaseConfig = null;
@@ -30,12 +30,23 @@ public class RestorableDatabase implements Restorable
         return "database";
     }
 
-    public void backup(File base)
+
+    public void backup(Archive archive) throws ArchiveException
     {
 
     }
 
-    public void restore(File base) throws RestoreException
+    public void restore(Archive archive) throws ArchiveException
+    {
+
+    }
+
+    public void backup(File base)
+    {
+        throw new RuntimeException("not yet supported");
+    }
+
+    public void restore(File base) throws ArchiveException
     {
         try
         {
@@ -57,11 +68,11 @@ public class RestorableDatabase implements Restorable
         }
         catch (IOException e)
         {
-            throw new RestoreException(e);
+            throw new ArchiveException(e);
         }
         catch (TransferException e)
         {
-            throw new RestoreException(e);
+            throw new ArchiveException(e);
         }
     }
 

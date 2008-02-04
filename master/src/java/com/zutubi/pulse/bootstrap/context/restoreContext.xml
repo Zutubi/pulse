@@ -5,7 +5,7 @@
 -->
 <beans>
 
-    <bean id="restoreManager" class="com.zutubi.pulse.restore.DefaultRestoreManager" autowire="byName">
+    <bean id="archiveManager" class="com.zutubi.pulse.restore.DefaultArchiveManager" autowire="byName">
     </bean>
 
 </beans>

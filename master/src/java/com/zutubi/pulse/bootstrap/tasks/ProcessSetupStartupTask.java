@@ -46,8 +46,8 @@ public class ProcessSetupStartupTask implements Runnable, StartupTask
         }
 
         // handle the initialisation of the security manager, since this can not be done within the spring context file.
-        AcegiSecurityManager securityManager = (AcegiSecurityManager) ComponentContext.getBean("securityManager");
-        securityManager.init();
+//        AcegiSecurityManager securityManager = (AcegiSecurityManager) ComponentContext.getBean("securityManager");
+//        securityManager.secure();
     }
 
     public boolean haltOnFailure()

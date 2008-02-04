@@ -311,6 +311,11 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
         return loggedInUser;
     }
 
+    public String execute() throws Exception
+    {
+        return super.execute();
+    }
+
     public final void setProjectManager(ProjectManager projectManager)
     {
         this.projectManager = projectManager;

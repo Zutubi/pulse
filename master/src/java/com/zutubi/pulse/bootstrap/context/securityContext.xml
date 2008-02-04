@@ -281,9 +281,10 @@ The beans defined within the security subsystem need not be accessed by other co
             <value>
                 CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
                 PATTERN_TYPE_APACHE_ANT
+<!--
                 /switchuser.vm=ROLE_ADMINISTRATOR
                 /j_acegi_switch_user=ROLE_ADMINISTRATOR
-                /signup*.action*=ROLE_ANONYMOUS
+-->
                 /login.action*=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER
                 /logout.action=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER
                 /js/**=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER

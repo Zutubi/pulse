@@ -1,6 +1,7 @@
 package com.zutubi.pulse.web.restore;
 
 import com.zutubi.pulse.bootstrap.SetupManager;
+import com.zutubi.pulse.bootstrap.DefaultSetupManager;
 
 /**
  *
@@ -12,7 +13,7 @@ public class PostRestoreAction extends RestoreActionSupport
 
     public String execute() throws Exception
     {
-        setupManager.requestRestoreComplete(true);
+        ((DefaultSetupManager)setupManager).doCompleteRestoration();
         return SUCCESS;
     }
 
