@@ -174,7 +174,13 @@ public class SubscriptionHelper
                 action.addFieldError("repeatedX", "value must be a positive integer");
             }
         }
-
+        else if (type.equals("simple"))
+        {
+            if (simpleConditions == null || simpleConditions.size() == 0)
+            {
+                action.addFieldError("selectedConditions", "please select at least one condition");
+            }
+        }
     }
 
     public static NotifyCondition validateCondition(String condition, ValidationAware action, NotifyConditionFactory notifyConditionFactory)

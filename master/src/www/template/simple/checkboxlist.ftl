@@ -5,9 +5,9 @@
         <#if parameters.multirow?exists && itemCount &gt; 1>
             </td></tr><tr>
             <#if parameters.labelposition?default("") != 'top'>
-                <th class="label">&nbsp;</th>
+    <td <#if hasFieldErrors> class="error-field"<#t/> <#else> class="field"<#t/></#if>><#t/>&nbsp;</td>
             </#if>
-            <td class="field">
+    <td <#if hasFieldErrors> class="error-field"<#t/> <#else> class="field"<#t/></#if>><#t/>
         </#if>
         <#if parameters.listKey?exists>
             <#assign itemKey = stack.findValue(parameters.listKey)/>
