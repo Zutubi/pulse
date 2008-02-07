@@ -10,7 +10,7 @@ public interface ArchiveManager
 {
     ProgressMonitor getMonitor();
 
-    Archive prepareRestore(File backup);
+    Archive prepareRestore(File backup) throws ArchiveException;
 
     Archive previewRestore();
 

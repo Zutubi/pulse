@@ -6,10 +6,30 @@
 
 <p>
     blurb about restore, including details of the data to be restored.
+    <table border="1">
+        <tr>
+            <td>Date</td>
+            <td>$info.created</td>
+        </tr>
+        <tr>
+            <td>Author</td>
+            <td>$info.author</td>
+        </tr>
+        <tr>
+            <td>Version</td>
+            <td>$info.version</td>
+        </tr>
+        <tr>
+            <td>Source</td>
+            <td>$info.file.absolutePath</td>
+        </tr>
+    </table>
+    <p>&nbsp;</p>
     <ul>
-        <li>Date: $info.date</li>
+        <li>Date: $info.created</li>
+        <li>Author: $info.author</li>
         <li>Version: $info.version</li>
-        <li>File: $info.source</li>
+        <li>Source: $info.file.absolutePath</li>
     </ul>
 </p>
 

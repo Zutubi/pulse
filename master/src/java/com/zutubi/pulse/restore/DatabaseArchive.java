@@ -19,7 +19,7 @@ import javax.sql.DataSource;
  *
  *
  */
-public class DatabaseArchive implements Archiveable
+public class DatabaseArchive implements ArchiveableComponent
 {
     private List<String> mappings = new LinkedList<String>();
     private DatabaseConfig databaseConfig = null;

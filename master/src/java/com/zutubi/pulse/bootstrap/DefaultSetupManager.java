@@ -24,6 +24,7 @@ import com.zutubi.pulse.plugins.PluginManager;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.pulse.restore.ArchiveManager;
 import com.zutubi.pulse.restore.ProgressMonitor;
+import com.zutubi.pulse.restore.ArchiveException;
 import com.zutubi.pulse.upgrade.UpgradeManager;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.IOUtils;
@@ -486,7 +487,14 @@ public class DefaultSetupManager implements SetupManager
         if (isRestoreRequested())
         {
 
-            archiveManager.prepareRestore(getArchiveFile());
+            try
+            {
+                archiveManager.prepareRestore(getArchiveFile());
+            }
+            catch (ArchiveException e)
+            {
+                e.printStackTrace();
+            }
 
             // show restoration preview page.
             state = SetupState.RESTORE;
@@ -500,13 +508,10 @@ public class DefaultSetupManager implements SetupManager
     // continue selected on the restoration preview page.
     public void doExecuteRestorationRequest()
     {
-        File archive = getArchiveFile();
         ProgressMonitor monitor = archiveManager.getMonitor();
         if (!monitor.isStarted())
         {
-            archiveManager.prepareRestore(archive);
             archiveManager.restoreArchive();
-//            archiveManager.restoreArchive(new Archive(archive));
         }
     }
 

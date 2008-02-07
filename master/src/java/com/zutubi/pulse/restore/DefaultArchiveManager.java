@@ -10,21 +10,22 @@ import java.util.List;
  */
 public class DefaultArchiveManager implements ArchiveManager
 {
-
     private ProgressMonitor monitor = new ProgressMonitor();
 
     private Archive archive;
 
-    private List<Archiveable> archiveableComponents = new LinkedList<Archiveable>();
+    private File tmpDirectory;
 
-    public void add(Archiveable component)
+    private List<ArchiveableComponent> archiveableComponents = new LinkedList<ArchiveableComponent>();
+
+    public void add(ArchiveableComponent component)
     {
         archiveableComponents.add(component);
     }
 
-    public void setRestorableComponents(List<Archiveable> components)
+    public void setRestorableComponents(List<ArchiveableComponent> components)
     {
-        archiveableComponents = new LinkedList<Archiveable>(components);
+        archiveableComponents = new LinkedList<ArchiveableComponent>(components);
     }
 
     public ProgressMonitor getMonitor()
@@ -32,11 +33,13 @@ public class DefaultArchiveManager implements ArchiveManager
         return monitor;
     }
 
-    public Archive prepareRestore(File source)
+    public Archive prepareRestore(File source) throws ArchiveException
     {
-        // check the backup file, load the backup info.
-        archive = new Archive(source);
+        ArchiveFactory factory = new ArchiveFactory();
+        factory.setTmpDirectory(tmpDirectory);
 
+        archive = factory.openArchive(source);
+        
         return archive;
     }
 
@@ -61,7 +64,7 @@ public class DefaultArchiveManager implements ArchiveManager
             // -- we should know which restorable components we are dealing with at this stage, so should
             //    not need to run the componentBase.isDirectory check.
 
-            for (Archiveable component : archiveableComponents)
+            for (ArchiveableComponent component : archiveableComponents)
             {
                 // starting component.getName();
                 component.restore(archive);
@@ -105,5 +108,10 @@ public class DefaultArchiveManager implements ArchiveManager
     public Archive getArchiveToBeRestoredOnRestart()
     {
         return null;
+    }
+
+    public void setTmpDirectory(File tmpDirectory)
+    {
+        this.tmpDirectory = tmpDirectory;
     }
 }

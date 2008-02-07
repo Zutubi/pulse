@@ -12,7 +12,7 @@ import java.io.File;
  *
  *
  */
-public class RecordsArchive implements Archiveable
+public class RecordsArchive implements ArchiveableComponent
 {
     private RecordStore recordStore;
 

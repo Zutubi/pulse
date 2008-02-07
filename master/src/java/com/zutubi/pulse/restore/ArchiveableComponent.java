@@ -4,7 +4,7 @@ package com.zutubi.pulse.restore;
  *
  *
  */
-public interface Archiveable
+public interface ArchiveableComponent
 {
     /**
      * Unique identifier for this restorable component.

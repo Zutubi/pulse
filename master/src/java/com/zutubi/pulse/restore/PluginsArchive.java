@@ -10,7 +10,7 @@ import java.io.IOException;
  *
  *
  */
-public class PluginsArchive implements Archiveable
+public class PluginsArchive implements ArchiveableComponent
 {
     private PluginPaths pluginPaths;
 
