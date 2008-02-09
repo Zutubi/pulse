@@ -1,6 +1,5 @@
 package com.zutubi.pulse.prototype.config.project.changeviewer;
 
-import com.zutubi.util.TextUtils;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.prototype.config.ConfigurationProvider;
@@ -12,6 +11,7 @@ import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.TextUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
@@ -34,7 +34,7 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
     private static final String PROPERTY_TIMESTAMP_PULSE = "time.pulse";
     private static final String PROPERTY_TIMESTAMP_FISHEYE = "time.fisheye";
 
-    private static final SimpleDateFormat PULSE_DATE_FORMAT = new SimpleDateFormat("yyyyMMdd-HH:mm:ss");
+    public static final SimpleDateFormat PULSE_DATE_FORMAT = new SimpleDateFormat("yyyyMMdd-HH:mm:ss");
     public static final SimpleDateFormat FISHEYE_DATE_FORMAT = new SimpleDateFormat("yyyyMMddHHmmss");
 
     private String changesetURL;

@@ -2,20 +2,10 @@
 
     package com.zutubi.pulse.condition.antlr;
 
-import antlr.TreeParser;
-import antlr.Token;
-import antlr.collections.AST;
-import antlr.RecognitionException;
-import antlr.ANTLRException;
 import antlr.NoViableAltException;
-import antlr.MismatchedTokenException;
-import antlr.SemanticException;
-import antlr.collections.impl.BitSet;
-import antlr.ASTPair;
-import antlr.collections.impl.ASTArray;
-
-    import com.zutubi.pulse.bootstrap.ComponentContext;
-    import com.zutubi.pulse.condition.*;
+import antlr.RecognitionException;
+import antlr.collections.AST;
+import com.zutubi.pulse.condition.*;
 
 
 public class NotifyConditionTreeParser extends antlr.TreeParser       implements NotifyConditionTreeParserTokenTypes
@@ -47,7 +37,7 @@ public NotifyConditionTreeParser() {
 			case LITERAL_and:
 			{
 				AST __t2 = _t;
-				AST tmp31_AST_in = (AST)_t;
+				AST tmp30_AST_in = (AST)_t;
 				match(_t,LITERAL_and);
 				_t = _t.getFirstChild();
 				a=cond(_t);
@@ -62,7 +52,7 @@ public NotifyConditionTreeParser() {
 			case LITERAL_or:
 			{
 				AST __t3 = _t;
-				AST tmp32_AST_in = (AST)_t;
+				AST tmp31_AST_in = (AST)_t;
 				match(_t,LITERAL_or);
 				_t = _t.getFirstChild();
 				a=cond(_t);
@@ -77,7 +67,7 @@ public NotifyConditionTreeParser() {
 			case LITERAL_not:
 			{
 				AST __t4 = _t;
-				AST tmp33_AST_in = (AST)_t;
+				AST tmp32_AST_in = (AST)_t;
 				match(_t,LITERAL_not);
 				_t = _t.getFirstChild();
 				a=cond(_t);
@@ -110,8 +100,8 @@ public NotifyConditionTreeParser() {
 			case LITERAL_failure:
 			case LITERAL_error:
 			case LITERAL_changed:
+			case 21:
 			case 22:
-			case 23:
 			{
 				c = _t==ASTNULL ? null : (AST)_t;
 				boolsymbol(_t);
@@ -148,12 +138,12 @@ public NotifyConditionTreeParser() {
 			case EQUAL:
 			{
 				AST __t6 = _t;
-				AST tmp34_AST_in = (AST)_t;
+				AST tmp33_AST_in = (AST)_t;
 				match(_t,EQUAL);
 				_t = _t.getFirstChild();
-				x=value(_t);
+				x=integer(_t);
 				_t = _retTree;
-				y=value(_t);
+				y=integer(_t);
 				_t = _retTree;
 				_t = __t6;
 				_t = _t.getNextSibling();
@@ -163,12 +153,12 @@ public NotifyConditionTreeParser() {
 			case NOT_EQUAL:
 			{
 				AST __t7 = _t;
-				AST tmp35_AST_in = (AST)_t;
+				AST tmp34_AST_in = (AST)_t;
 				match(_t,NOT_EQUAL);
 				_t = _t.getFirstChild();
-				x=value(_t);
+				x=integer(_t);
 				_t = _retTree;
-				y=value(_t);
+				y=integer(_t);
 				_t = _retTree;
 				_t = __t7;
 				_t = _t.getNextSibling();
@@ -178,12 +168,12 @@ public NotifyConditionTreeParser() {
 			case LESS_THAN:
 			{
 				AST __t8 = _t;
-				AST tmp36_AST_in = (AST)_t;
+				AST tmp35_AST_in = (AST)_t;
 				match(_t,LESS_THAN);
 				_t = _t.getFirstChild();
-				x=value(_t);
+				x=integer(_t);
 				_t = _retTree;
-				y=value(_t);
+				y=integer(_t);
 				_t = _retTree;
 				_t = __t8;
 				_t = _t.getNextSibling();
@@ -193,12 +183,12 @@ public NotifyConditionTreeParser() {
 			case LESS_THAN_OR_EQUAL:
 			{
 				AST __t9 = _t;
-				AST tmp37_AST_in = (AST)_t;
+				AST tmp36_AST_in = (AST)_t;
 				match(_t,LESS_THAN_OR_EQUAL);
 				_t = _t.getFirstChild();
-				x=value(_t);
+				x=integer(_t);
 				_t = _retTree;
-				y=value(_t);
+				y=integer(_t);
 				_t = _retTree;
 				_t = __t9;
 				_t = _t.getNextSibling();
@@ -208,12 +198,12 @@ public NotifyConditionTreeParser() {
 			case GREATER_THAN:
 			{
 				AST __t10 = _t;
-				AST tmp38_AST_in = (AST)_t;
+				AST tmp37_AST_in = (AST)_t;
 				match(_t,GREATER_THAN);
 				_t = _t.getFirstChild();
-				x=value(_t);
+				x=integer(_t);
 				_t = _retTree;
-				y=value(_t);
+				y=integer(_t);
 				_t = _retTree;
 				_t = __t10;
 				_t = _t.getNextSibling();
@@ -223,12 +213,12 @@ public NotifyConditionTreeParser() {
 			case GREATER_THAN_OR_EQUAL:
 			{
 				AST __t11 = _t;
-				AST tmp39_AST_in = (AST)_t;
+				AST tmp38_AST_in = (AST)_t;
 				match(_t,GREATER_THAN_OR_EQUAL);
 				_t = _t.getFirstChild();
-				x=value(_t);
+				x=integer(_t);
 				_t = _retTree;
-				y=value(_t);
+				y=integer(_t);
 				_t = _retTree;
 				_t = __t11;
 				_t = _t.getNextSibling();
@@ -259,7 +249,7 @@ public NotifyConditionTreeParser() {
 		
 		try {      // for error handling
 			AST __t13 = _t;
-			AST tmp40_AST_in = (AST)_t;
+			AST tmp39_AST_in = (AST)_t;
 			match(_t,LITERAL_previous);
 			_t = _t.getFirstChild();
 			r=cond(_t);
@@ -285,43 +275,50 @@ public NotifyConditionTreeParser() {
 			switch ( _t.getType()) {
 			case LITERAL_true:
 			{
-				AST tmp41_AST_in = (AST)_t;
+				AST tmp40_AST_in = (AST)_t;
 				match(_t,LITERAL_true);
 				_t = _t.getNextSibling();
 				break;
 			}
 			case LITERAL_false:
 			{
-				AST tmp42_AST_in = (AST)_t;
+				AST tmp41_AST_in = (AST)_t;
 				match(_t,LITERAL_false);
 				_t = _t.getNextSibling();
 				break;
 			}
 			case LITERAL_success:
 			{
-				AST tmp43_AST_in = (AST)_t;
+				AST tmp42_AST_in = (AST)_t;
 				match(_t,LITERAL_success);
 				_t = _t.getNextSibling();
 				break;
 			}
 			case LITERAL_failure:
 			{
-				AST tmp44_AST_in = (AST)_t;
+				AST tmp43_AST_in = (AST)_t;
 				match(_t,LITERAL_failure);
 				_t = _t.getNextSibling();
 				break;
 			}
 			case LITERAL_error:
 			{
-				AST tmp45_AST_in = (AST)_t;
+				AST tmp44_AST_in = (AST)_t;
 				match(_t,LITERAL_error);
 				_t = _t.getNextSibling();
 				break;
 			}
 			case LITERAL_changed:
 			{
-				AST tmp46_AST_in = (AST)_t;
+				AST tmp45_AST_in = (AST)_t;
 				match(_t,LITERAL_changed);
+				_t = _t.getNextSibling();
+				break;
+			}
+			case 21:
+			{
+				AST tmp46_AST_in = (AST)_t;
+				match(_t,21);
 				_t = _t.getNextSibling();
 				break;
 			}
@@ -332,13 +329,6 @@ public NotifyConditionTreeParser() {
 				_t = _t.getNextSibling();
 				break;
 			}
-			case 23:
-			{
-				AST tmp48_AST_in = (AST)_t;
-				match(_t,23);
-				_t = _t.getNextSibling();
-				break;
-			}
 			default:
 			{
 				throw new NoViableAltException(_t);
@@ -350,49 +340,6 @@ public NotifyConditionTreeParser() {
 			if (_t!=null) {_t = _t.getNextSibling();}
 		}
 		_retTree = _t;
-	}
-	
-	public final NotifyValue  value(AST _t) throws RecognitionException {
-		NotifyValue r;
-		
-		AST value_AST_in = (_t == ASTNULL) ? null : (AST)_t;
-		AST l = null;
-		
-		r = null;
-		
-		
-		try {      // for error handling
-			if (_t==null) _t=ASTNULL;
-			switch ( _t.getType()) {
-			case LITERAL_previous:
-			case INTEGER:
-			case 24:
-			case 25:
-			{
-				r=integer(_t);
-				_t = _retTree;
-				break;
-			}
-			case WORD:
-			{
-				l = (AST)_t;
-				match(_t,WORD);
-				_t = _t.getNextSibling();
-				r = new LiteralNotifyStringValue(l.getText());
-				break;
-			}
-			default:
-			{
-				throw new NoViableAltException(_t);
-			}
-			}
-		}
-		catch (RecognitionException ex) {
-			reportError(ex);
-			if (_t!=null) {_t = _t.getNextSibling();}
-		}
-		_retTree = _t;
-		return r;
 	}
 	
 	public final NotifyValue  integer(AST _t) throws RecognitionException {
@@ -422,8 +369,8 @@ public NotifyConditionTreeParser() {
 				_t = _retTree;
 				break;
 			}
+			case 23:
 			case 24:
-			case 25:
 			{
 				j = _t==ASTNULL ? null : (AST)_t;
 				intsymbol(_t);
@@ -454,13 +401,13 @@ public NotifyConditionTreeParser() {
 		
 		
 		try {      // for error handling
-			AST __t17 = _t;
-			AST tmp49_AST_in = (AST)_t;
+			AST __t16 = _t;
+			AST tmp48_AST_in = (AST)_t;
 			match(_t,LITERAL_previous);
 			_t = _t.getFirstChild();
 			r=integer(_t);
 			_t = _retTree;
-			_t = __t17;
+			_t = __t16;
 			_t = _t.getNextSibling();
 			r = factory.build(PreviousNotifyIntegerValue.class, new Class[]{ NotifyIntegerValue.class }, new Object[]{ r });
 		}
@@ -479,17 +426,17 @@ public NotifyConditionTreeParser() {
 		try {      // for error handling
 			if (_t==null) _t=ASTNULL;
 			switch ( _t.getType()) {
+			case 23:
+			{
+				AST tmp49_AST_in = (AST)_t;
+				match(_t,23);
+				_t = _t.getNextSibling();
+				break;
+			}
 			case 24:
 			{
 				AST tmp50_AST_in = (AST)_t;
 				match(_t,24);
-				_t = _t.getNextSibling();
-				break;
-			}
-			case 25:
-			{
-				AST tmp51_AST_in = (AST)_t;
-				match(_t,25);
 				_t = _t.getNextSibling();
 				break;
 			}
@@ -522,7 +469,6 @@ public NotifyConditionTreeParser() {
 		"GREATER_THAN",
 		"GREATER_THAN_OR_EQUAL",
 		"\"previous\"",
-		"a word",
 		"an integer",
 		"\"true\"",
 		"\"false\"",
@@ -536,6 +482,7 @@ public NotifyConditionTreeParser() {
 		"\"unsuccessful.count.days\"",
 		"an opening parenthesis '('",
 		"a closing parenthesis ')'",
+		"a word",
 		"WHITESPACE"
 	};
 	

@@ -76,11 +76,6 @@ public class NotifyConditionFactory
         return create(value, NotifyIntegerValue.class);
     }
 
-    public NotifyStringValue createStringValue(String value)
-    {
-        return create(value, NotifyStringValue.class);
-    }
-
     private <T> T create(String token, Class<T> clazz)
     {
         if (!isValid(token, clazz))
