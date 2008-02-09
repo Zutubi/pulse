@@ -110,7 +110,7 @@ public class ProjectHomeAction extends ProjectActionBase
     {
         Project project = getRequiredProject();
 
-        totalBuilds = buildManager.getBuildCount(project, new ResultState[]{ResultState.SUCCESS, ResultState.ERROR, ResultState.FAILURE});
+        totalBuilds = buildManager.getBuildCount(project, ResultState.getCompletedStates());
         successfulBuilds = buildManager.getBuildCount(project, new ResultState[]{ResultState.SUCCESS});
         failedBuilds = buildManager.getBuildCount(project, new ResultState[]{ResultState.FAILURE});
         currentBuild = buildManager.getLatestBuildResult(project);

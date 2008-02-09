@@ -76,11 +76,6 @@ public class AcegiUser implements Actor, UserDetails
         return authorities;
     }
 
-    public synchronized boolean hasAuthority(String authority)
-    {
-        return authoritySet.contains(authority);
-    }
-
     public String getPassword()
     {
         return password;

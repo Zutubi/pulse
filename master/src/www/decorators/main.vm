@@ -134,16 +134,21 @@
             <tr>
               <td class="logo">
                   :: <a href="$base/default.action">pulse 2 [ M5 ]</a> ::
-#if($u_projectName)
-                  <a href="$urls.projectHome($u_projectName)">$h_projectName</a>
-#end
 #if($personalBuild)
-                 <a href="$base/myBuilds.action">my builds</a>
-#end
-#if($buildNumber && $buildNumber != "0")
+                  <a href="$urls.dashboardMyBuilds()">my builds</a>
+    #if($buildNumber && $buildNumber != "0")
+                  :: <a href="$urls.dashboardMyBuild($buildNumber)">build $buildNumber</a>
+        #if($u_stageName)
+                  :: <a href="$urls.dashboardMyBuildStageDetails($buildNumber, $u_stageName)">stage $h_stageName</a>
+        #end
+    #end
+#elseif($u_projectName)
+                  <a href="$urls.projectHome($u_projectName)">$h_projectName</a>
+    #if($buildNumber && $buildNumber != "0")
                   :: <a href="$urls.build($u_projectName, $buildNumber)">build $buildNumber</a>
-    #if($u_stageName)
+        #if($u_stageName)
                   :: <a href="$urls.stageDetails($u_projectName, $buildNumber, $u_stageName)">stage $h_stageName</a>
+        #end
     #end
 #end
 #if($u_agentName)

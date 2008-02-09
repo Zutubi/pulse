@@ -181,11 +181,6 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         createAndVerify("failedsuccess", "html-project-overview", "http://test.url:8080", result, new LinkedList<Changelist>(), previous, 33, 10);
     }
 
-    public void test()
-    {
-
-    }
-
     private void errorsHelper(String type) throws Exception
     {
         List<Changelist> changes = getChanges();

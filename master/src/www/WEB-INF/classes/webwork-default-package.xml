@@ -17,6 +17,7 @@
             <result-type name="json" class="com.zutubi.pulse.xwork.dispatcher.JsonResult"/>
             <result-type name="flexjson" class="com.zutubi.pulse.xwork.dispatcher.FlexJsonResult"/>
             <result-type name="rss" class="com.zutubi.pulse.xwork.results.JITFeedResult"/>
+            <result-type name="up" class="com.zutubi.pulse.xwork.results.UpResult"/>
         </result-types>
 
         <interceptors>

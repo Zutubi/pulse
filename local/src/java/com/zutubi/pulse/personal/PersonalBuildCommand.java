@@ -19,7 +19,7 @@ import java.util.*;
 public class PersonalBuildCommand implements Command
 {
     private File base;
-    private String[] files;
+    private String[] files = {};
     private CommandLineConfig switchConfig;
     private PropertiesConfig defineConfig;
     private String patchFilename;
@@ -27,7 +27,7 @@ public class PersonalBuildCommand implements Command
     private boolean statusOnly = false;
     private ConsoleUI console = new ConsoleUI();
 
-    public void processArguments(String... argv) throws ParseException
+    private void processArguments(String... argv) throws ParseException
     {
         switchConfig = new CommandLineConfig();
         Options options = new Options();
@@ -110,15 +110,8 @@ public class PersonalBuildCommand implements Command
         switchConfig.mapSwitch(Character.toString(shortOption), property);
     }
 
-    private int execute(String[] argv) throws ParseException
+    public int execute(PersonalBuildClient client)
     {
-        processArguments(argv);
-
-        CompositeConfig uiConfig = new CompositeConfig(switchConfig, defineConfig);
-        PersonalBuildConfig config = new PersonalBuildConfig(base, uiConfig);
-        PersonalBuildClient client = new PersonalBuildClient(config);
-        client.setUI(console);
-
         try
         {
             WorkingCopy wc = client.checkConfiguration();
@@ -175,6 +168,18 @@ public class PersonalBuildCommand implements Command
         }
 
         return 0;
+    }
+
+    private int execute(String[] argv) throws ParseException
+    {
+        processArguments(argv);
+
+        CompositeConfig uiConfig = new CompositeConfig(switchConfig, defineConfig);
+        PersonalBuildConfig config = new PersonalBuildConfig(base, uiConfig);
+        PersonalBuildClient client = new PersonalBuildClient(config);
+        client.setUI(console);
+
+        return execute(client);
     }
 
     public int execute(BootContext context) throws ParseException

@@ -8,6 +8,11 @@ public enum ResultState
 {
     INITIAL
             {
+                public boolean isBroken()
+                {
+                    return false;
+                }
+
                 public boolean isCompleted()
                 {
                     return false;
@@ -25,6 +30,11 @@ public enum ResultState
             },
     IN_PROGRESS
             {
+                public boolean isBroken()
+                {
+                    return false;
+                }
+
                 public boolean isCompleted()
                 {
                     return false;
@@ -42,6 +52,11 @@ public enum ResultState
             },
     TERMINATING
             {
+                public boolean isBroken()
+                {
+                    return false;
+                }
+
                 public boolean isCompleted()
                 {
                     return false;
@@ -59,6 +74,11 @@ public enum ResultState
             },
     SUCCESS
             {
+                public boolean isBroken()
+                {
+                    return false;
+                }
+
                 public boolean isCompleted()
                 {
                     return true;
@@ -76,6 +96,11 @@ public enum ResultState
             },
     FAILURE
             {
+                public boolean isBroken()
+                {
+                    return true;
+                }
+
                 public boolean isCompleted()
                 {
                     return true;
@@ -93,6 +118,11 @@ public enum ResultState
             },
     ERROR
             {
+                public boolean isBroken()
+                {
+                    return true;
+                }
+
                 public boolean isCompleted()
                 {
                     return true;
@@ -109,20 +139,28 @@ public enum ResultState
                 }
             };
 
+    public abstract boolean isBroken();
     public abstract boolean isCompleted();
     public abstract String getPrettyString();
     public abstract String getString();
 
 
     public static final String SEPARATOR = ",";
+    private static final ResultState[] BROKEN_STATES;
     private static final ResultState[] COMPLETED_STATES;
     private static final ResultState[] INCOMPLETE_STATES;
     static
     {
+        int broken = 0;
         int complete = 0;
         int incomplete = 0;
         for(ResultState state: values())
         {
+            if(state.isBroken())
+            {
+                broken++;
+            }
+
             if(state.isCompleted())
             {
                 complete++;
@@ -133,13 +171,20 @@ public enum ResultState
             }
         }
 
+        BROKEN_STATES = new ResultState[broken];
         COMPLETED_STATES = new ResultState[complete];
         INCOMPLETE_STATES = new ResultState[incomplete];
 
+        broken = 0;
         complete = 0;
         incomplete = 0;
         for(ResultState state: values())
         {
+            if(state.isBroken())
+            {
+                BROKEN_STATES[broken++] = state;
+            }
+
             if(state.isCompleted())
             {
                 COMPLETED_STATES[complete++] = state;
@@ -234,6 +279,11 @@ public enum ResultState
         return states;
     }
 
+    public static ResultState[] getBrokenStates()
+    {
+        return BROKEN_STATES;
+    }
+    
     public static ResultState[] getCompletedStates()
     {
         return COMPLETED_STATES;

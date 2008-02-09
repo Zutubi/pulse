@@ -188,6 +188,11 @@ public class MockBuildManager implements BuildManager
         throw new RuntimeException("Method not implemented.");
     }
 
+    public BuildResult getByUserAndVirtualId(User user, String buildId)
+    {
+        throw new RuntimeException("Method not yet implemented.");
+    }
+
     public long getNextBuildNumber(Project project)
     {
         return nextBuildNumber++;

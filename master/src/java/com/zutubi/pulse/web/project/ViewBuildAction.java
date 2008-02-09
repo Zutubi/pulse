@@ -1,19 +1,21 @@
 package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.core.config.NamedConfigurationComparator;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.TestSuiteResult;
-import com.zutubi.pulse.core.config.NamedConfigurationComparator;
 import com.zutubi.pulse.model.BuildColumns;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.prototype.config.user.UserSettingsConfiguration;
-import com.zutubi.pulse.prototype.config.project.hooks.BuildHookConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.project.hooks.BuildHookConfiguration;
+import com.zutubi.pulse.prototype.config.user.UserSettingsConfiguration;
 import com.zutubi.util.logging.Logger;
-import com.zutubi.util.Sort;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Stack;
 
 /**
  *
@@ -93,10 +95,13 @@ public class ViewBuildAction extends CommandActionBase
 
     public String execute()
     {
-        ProjectConfiguration projectConfig = getRequiredProject().getConfig();
-        hooks = new LinkedList<BuildHookConfiguration>(projectConfig.getBuildHooks().values());
-        Collections.sort(hooks, new NamedConfigurationComparator());
-        
+        if (!isPersonal())
+        {
+            ProjectConfiguration projectConfig = getRequiredProject().getConfig();
+            hooks = new LinkedList<BuildHookConfiguration>(projectConfig.getBuildHooks().values());
+            Collections.sort(hooks, new NamedConfigurationComparator());
+        }
+
         // Initialise detail down to the command level (optional)
         getCommandResult();
 

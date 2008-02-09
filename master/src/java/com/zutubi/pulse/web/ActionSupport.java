@@ -34,8 +34,8 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
- * 
- *
+ * Base for all actions.  Includes standard i18n, encoding, security and other
+ * utility methods.
  */
 public class ActionSupport extends com.opensymphony.xwork.ActionSupport implements Cancelable
 {

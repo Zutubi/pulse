@@ -1,12 +1,19 @@
 #helpTag("Build+Summary+Tab")
 #authorisationTags($principle)
 #buildTags($project $buildResult)
+
+#if($personal)
+    #set($ownerArg = "personal=true")
+#else
+    #set($ownerArg = "projectName=$u_projectName")
+#end
+
 <html>
 <head>
     <title>#wwtext("name=build") $result.number</title>
     <script type="text/javascript" src="$base/js/prototype.js"></script>
     <script type="text/javascript">
-        #updater("$base/ajax/viewBuildPanel.action?projectName=$u_projectName&buildVID=$buildResult.number" "panel" $principle)
+        #updater("$base/ajax/viewBuildPanel.action?${ownerArg}&buildVID=$buildResult.number" "panel" $principle)
 
         function triggerHook(hookHandle)
         {
@@ -17,7 +24,7 @@
             new Ajax.Request('${base}/ajax/triggerBuildHook.action',
               {
                   method:'get',
-                  parameters: 'projectName=$u_projectName&buildVID=$buildResult.number&hook=' + hookHandle,
+                  parameters: '${ownerArg}&buildVID=$buildResult.number&hook=' + hookHandle,
 
                   onSuccess: function(transport, response)
                   {
@@ -46,7 +53,7 @@
 <body>
     #buildTabs($buildResult "summary")
 
-    <div id='#id("${project.name}-build-${result.number}-summary")'></div>
+    <div id='#id("${result.ownerName}-build-${result.number}-summary")'></div>
     
     <p id="status" class="status-message" style="display: none"></p>
 
@@ -61,12 +68,12 @@
             <tr>
                 <td class="content">
                     <img alt="delete" src="$base/images/delete.gif"/>
-                    <a href="#" onclick="confirmUrl('$confirm', '$base/deleteBuild.action?projectName=$u_projectName&amp;buildVID=$buildResult.number')">#wwtext("name=build.delete")</a>
+                    <a href="#" onclick="confirmUrl('$confirm', '$base/deleteBuild.action?${ownerArg}&amp;buildVID=$buildResult.number')">#wwtext("name=build.delete")</a>
                 </td>
             </tr>
         </table>
 
-    #if($hooks.size() > 0)
+    #if(!$personal && $hooks.size() > 0)
         <table width="150" class="content">
             <tr>
                 <th class="heading">hooks</th>

@@ -169,6 +169,7 @@ public class Recipe extends SelfReference
 
     public void execute(ExecutionContext context)
     {
+        context.push();
         context.setLabel(LABEL_EXECUTE);
         try
         {
@@ -208,6 +209,7 @@ public class Recipe extends SelfReference
         }
         finally
         {
+            context.pop();
             if (version != null)
             {
                 context.setVersion(version.getValue());

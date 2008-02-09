@@ -10,11 +10,7 @@ import com.zutubi.pulse.model.persistence.ProjectDao;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  */
@@ -147,8 +143,8 @@ public class BuildQueryTest extends MasterPersistenceTestCase
 
     public void testErrorOrFail()
     {
-        List<BuildResult> results = buildResultDao.queryBuilds(null, new ResultState[] { ResultState.ERROR, ResultState.FAILURE } , 0, 0, null, -1, -1, true);
-        assertEquals(getFiltered(ResultState.ERROR, ResultState.FAILURE), results);
+        List<BuildResult> results = buildResultDao.queryBuilds(null, ResultState.getBrokenStates() , 0, 0, null, -1, -1, true);
+        assertEquals(getFiltered(ResultState.getBrokenStates()), results);
     }
 
     public void testEarliestTime()

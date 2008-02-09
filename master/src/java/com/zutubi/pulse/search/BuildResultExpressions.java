@@ -42,7 +42,7 @@ public class BuildResultExpressions
 
     public static Criterion buildResultCompleted()
     {
-        return statesIn(ResultState.SUCCESS, ResultState.FAILURE, ResultState.ERROR);
+        return statesIn(ResultState.getCompletedStates());
     }
 
     public static Criterion startsAfter(long timestamp)

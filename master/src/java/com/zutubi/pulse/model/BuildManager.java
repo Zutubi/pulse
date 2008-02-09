@@ -121,6 +121,18 @@ public interface BuildManager
     BuildResult getByUserAndNumber(User user, long id);
 
     /**
+     * Analogous to {@link #getByProjectAndVirtualId} , but used to find a
+     * personal rather than a project build.
+     *
+     * @param user    the user to find the personal build for
+     * @param buildId the real or virtual build id (see
+     *                {@link #getByProjectAndVirtualId})
+     * @return the described build, or null if there is no such build
+     */
+    @SecureResult
+    BuildResult getByUserAndVirtualId(User user, String buildId);
+
+    /**
      * Retrieve the build result that occured immediately before the specified build result.
      *
      * @param result

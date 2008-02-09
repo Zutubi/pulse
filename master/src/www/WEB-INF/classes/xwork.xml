@@ -264,6 +264,7 @@
         </action>
 
         <action name="deleteBuild" class="com.zutubi.pulse.web.project.DeleteBuildAction">
+            <result name="personal" type="redirect">/dashboard/my/</result>
             <result name="success" type="redirect">/browse/projects/${u_projectName}/</result>
         </action>
 

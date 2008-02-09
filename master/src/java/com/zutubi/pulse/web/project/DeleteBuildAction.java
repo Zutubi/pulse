@@ -3,6 +3,7 @@ package com.zutubi.pulse.web.project;
 import com.zutubi.pulse.model.BuildResult;
 
 /**
+ * Used to manually delete a build result from the web UI.
  */
 public class DeleteBuildAction extends BuildActionBase
 {
@@ -17,6 +18,14 @@ public class DeleteBuildAction extends BuildActionBase
 
         projectManager.checkWrite(result.getProject());
         buildManager.delete(result);
-        return SUCCESS;
+
+        if(isPersonal())
+        {
+            return "personal";
+        }
+        else
+        {
+            return SUCCESS;
+        }
     }
 }

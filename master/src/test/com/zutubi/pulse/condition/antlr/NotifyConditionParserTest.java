@@ -334,19 +334,6 @@ public class NotifyConditionParserTest extends PulseTestCase
         failureHelper("true or (previous)", "line 1:10: unexpected token: previous");
     }
 
-    public void testMismatchedValueComparison()
-    {
-        try
-        {
-            NotifyCondition condition = parseExpression("blah == 3");
-            condition.satisfied(null, null);
-        }
-        catch (IllegalArgumentException e)
-        {
-            assertTrue(e.getMessage().contains("Unable to compare values 'blah' and '3'.  Types do not match."));
-        }
-    }
-
     private void failureHelper(String expression, String error)
     {
         try

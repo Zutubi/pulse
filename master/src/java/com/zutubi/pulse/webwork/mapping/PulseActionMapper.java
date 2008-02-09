@@ -1,6 +1,5 @@
 package com.zutubi.pulse.webwork.mapping;
 
-import com.zutubi.util.TextUtils;
 import com.opensymphony.webwork.dispatcher.mapper.ActionMapper;
 import com.opensymphony.webwork.dispatcher.mapper.ActionMapping;
 import com.opensymphony.webwork.dispatcher.mapper.DefaultActionMapper;
@@ -8,7 +7,9 @@ import com.opensymphony.xwork.ActionProxyFactory;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.webwork.mapping.agents.AgentsActionResolver;
 import com.zutubi.pulse.webwork.mapping.browse.BrowseActionResolver;
+import com.zutubi.pulse.webwork.mapping.dashboard.MyBuildsActionResolver;
 import com.zutubi.pulse.webwork.mapping.server.ServerActionResolver;
+import com.zutubi.util.TextUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
@@ -174,6 +175,10 @@ public class PulseActionMapper implements ActionMapper
             Map<String, String> parameters = new HashMap<String, String>(1);
             parameters.put("id", elements[1]);
             return new ActionMapping("viewChangelist", "default", null, parameters);
+        }
+        else if(path.startsWith("my"))
+        {
+            return getResolverMapping(path.substring(2), DASHBOARD_NAMESPACE, new MyBuildsActionResolver());
         }
         else
         {

@@ -312,6 +312,18 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
         }
     }
 
+    public String getOwnerName()
+    {
+        if(isPersonal())
+        {
+            return "personal";
+        }
+        else
+        {
+            return project.getName();
+        }
+    }
+
     public void loadFeatures(File dataRoot)
     {
         root.loadFeatures(dataRoot);

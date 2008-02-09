@@ -37,7 +37,17 @@ public class Urls
 
     public String dashboardMyBuilds()
     {
-        return dashboard() + "my builds/";
+        return dashboard() + "my/";
+    }
+
+    public String dashboardMyBuild(String number)
+    {
+        return dashboardMyBuilds() + number + "/";
+    }
+
+    public String dashboardMyBuildStageDetails(String number, String stageName)
+    {
+        return dashboardMyBuild(number) + "details/" + stageName + "/";
     }
 
     public String browse()
@@ -112,7 +122,17 @@ public class Urls
     
     public String build(BuildResult build)
     {
-        return projectBuilds(build.getProject()) + Long.toString(build.getNumber()) + "/";
+        String prefix;
+        if(build.isPersonal())
+        {
+            prefix = dashboardMyBuilds();
+        }
+        else
+        {
+            prefix = projectBuilds(build.getProject());
+        }
+        
+        return prefix + Long.toString(build.getNumber()) + "/";
     }
 
     public String build(Object project, String number)

@@ -11,22 +11,16 @@ import java.io.File;
 
 /**
  */
-public class ViewPersonalChangesAction extends ProjectActionSupport
+public class ViewPersonalChangesAction extends BuildActionBase
 {
     private static final Logger LOG = Logger.getLogger(ViewPersonalChangesAction.class);
     private long id;
-    private BuildResult result;
     private PatchArchive patchArchive;
     private MasterConfigurationManager configurationManager;
 
     public void setId(long id)
     {
         this.id = id;
-    }
-
-    public BuildResult getResult()
-    {
-        return result;
     }
 
     public PatchArchive getPatchArchive()
@@ -36,20 +30,12 @@ public class ViewPersonalChangesAction extends ProjectActionSupport
 
     public String execute()
     {
-        result = getBuildManager().getBuildResult(id);
-        if(result == null)
-        {
-            addActionError("Unknown build [" + id + "]");
-            return ERROR;
-        }
-
+        BuildResult result = getRequiredBuildResult();
         if(!result.isPersonal())
         {
             addActionError("Build [" + id + "] is not a personal build");
             return ERROR;
         }
-
-        checkPermissions(result);
 
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
         File patchFile = paths.getUserPatchFile(getLoggedInUser().getId(), result.getNumber());

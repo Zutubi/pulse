@@ -87,9 +87,6 @@ public class ViewChangesAction extends BuildActionBase
     public String execute()
     {
         BuildResult result = getRequiredBuildResult();
-
-        // FIXME i don't think this will work so well: the build result will
-        // be looked up from project not user, so we cannot check it like this
         if(result.isPersonal())
         {
             return "personal";
@@ -135,7 +132,7 @@ public class ViewChangesAction extends BuildActionBase
         Collections.sort(changelists, new ChangelistComparator());
         
         previousSuccessful = getPrevious(new ResultState[] { ResultState.SUCCESS });
-        previousUnsuccessful = getPrevious(new ResultState[] { ResultState.ERROR, ResultState.FAILURE });
+        previousUnsuccessful = getPrevious(ResultState.getBrokenStates());
 
         return SUCCESS;
     }

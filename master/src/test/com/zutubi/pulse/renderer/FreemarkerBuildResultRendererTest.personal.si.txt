@@ -1,2 +1,2 @@
 project test project: personal build 12: failure
-see: /browse/projects/test%20project/builds/12/
+see: /dashboard/my/12/

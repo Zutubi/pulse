@@ -169,7 +169,7 @@ public class DefaultBuildManager implements BuildManager
 
     public void fillHistoryPage(HistoryPage page)
     {
-        fillHistoryPage(page, new ResultState[]{ResultState.ERROR, ResultState.FAILURE, ResultState.SUCCESS});
+        fillHistoryPage(page, ResultState.getCompletedStates());
     }
 
     public void fillHistoryPage(HistoryPage page, ResultState[] states)
@@ -195,25 +195,17 @@ public class DefaultBuildManager implements BuildManager
 
     public BuildResult getByProjectAndVirtualId(Project project, String buildId)
     {
-        if(buildId.equals("latest"))
+        if(isLatest(buildId))
         {
             return getLatestBuildResult(project);
         }
-        else if(buildId.equals("success") || buildId.equals("successful") || buildId.equals("latestsuccess") || buildId.equals("latestsuccessful"))
+        else if(isLatestSuccessful(buildId))
         {
             return getLatestSuccessfulBuildResult(project);
         }
-        else if(buildId.equals("broken") || buildId.equals("latestbroken"))
+        else if(isLatestBroken(buildId))
         {
-            List<BuildResult> results = queryBuilds(project, new ResultState[]{ResultState.ERROR, ResultState.FAILURE}, -1, -1, 1, 1, true, true);
-            if(results.size() > 0)
-            {
-                return results.get(0);
-            }
-            else
-            {
-                return null;
-            }
+            return extractResult(queryBuilds(project, ResultState.getBrokenStates(), -1, -1, 1, 1, true, true));
         }
         else
         {
@@ -229,9 +221,64 @@ public class DefaultBuildManager implements BuildManager
         }
     }
 
+    private BuildResult extractResult(List<BuildResult> results)
+    {
+        if(results.size() > 0)
+        {
+            return results.get(0);
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    private boolean isLatest(String buildId)
+    {
+        return buildId.equals("latest");
+    }
+
+    private boolean isLatestSuccessful(String buildId)
+    {
+        return buildId.equals("success") || buildId.equals("successful") || buildId.equals("latestsuccess") || buildId.equals("latestsuccessful");
+    }
+
+    private boolean isLatestBroken(String buildId)
+    {
+        return buildId.equals("broken") || buildId.equals("latestbroken");
+    }
+
     public BuildResult getByUserAndNumber(User user, long id)
     {
         return buildResultDao.findByUserAndNumber(user, id);
+    }
+
+    public BuildResult getByUserAndVirtualId(User user, String buildId)
+    {
+        if(isLatest(buildId))
+        {
+            return getLatestBuildResult(user);
+        }
+        else if(isLatestSuccessful(buildId))
+        {
+            return extractResult(buildResultDao.getLatestByUser(user, new ResultState[]{ ResultState.SUCCESS}, 1));
+        }
+        else if(isLatestBroken(buildId))
+        {
+            return extractResult(buildResultDao.getLatestByUser(user, ResultState.getBrokenStates(), 1));
+        }
+        else
+        {
+            try
+            {
+                long id = Long.parseLong(buildId);
+                return getByUserAndNumber(user, id);
+            }
+            catch(NumberFormatException e)
+            {
+                return null;
+            }
+        }
     }
 
     public CommandResult getCommandResult(long id)
@@ -256,15 +303,7 @@ public class DefaultBuildManager implements BuildManager
 
     public BuildResult getLatestBuildResult(User user)
     {
-        List<BuildResult> results = buildResultDao.getLatestByUser(user, null, 1);
-        if(results.size() > 0)
-        {
-            return results.get(0);
-        }
-        else
-        {
-            return null;
-        }
+        return extractResult(buildResultDao.getLatestByUser(user, null, 1));
     }
 
     public List<BuildResult> queryBuilds(Project[] projects, ResultState[] states, long earliestStartTime, long latestStartTime, Boolean hasWorkDir, int first, int max, boolean mostRecentFirst)

@@ -764,14 +764,14 @@
         <td class="warning">
             #statusImage($result $showAnimated)
         </td>
-        <td #if($result.number) id='#id("${result.project.name}.build.${result.number}.status")' #end class="warning">
+        <td #if($result.number) id='#id("${result.ownerName}.build.${result.number}.status")' #end class="warning">
             $result.state.prettyString
         </td>
     #else
         <td class="$result.state.string">
             #statusImage($result $showAnimated)
         </td>
-        <td #if($result.number) id='#id("${result.project.name}.build.${result.number}.status")' #end class="$result.state.string">
+        <td #if($result.number) id='#id("${result.ownerName}.build.${result.number}.status")' #end class="$result.state.string">
             $result.state.prettyString
         </td>
     #end
@@ -2348,7 +2348,7 @@
 #macro(buildTableCell $buildResult $columns $key $multiProject)
     #set($project = $buildResult.project)
     #if($key == "id")
-        <td class="content-right" id='#id("${buildResult.project.name}.build.${buildResult.number}.id")'>
+        <td class="content-right" id='#id("${buildResult.ownerName}.build.${buildResult.number}.id")'>
             <a href="$urls.build($buildResult)">$buildResult.number</a>
         </td>
     #elseif($key == "project")

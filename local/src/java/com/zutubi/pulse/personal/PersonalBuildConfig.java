@@ -9,7 +9,7 @@ import java.io.File;
  */
 public class PersonalBuildConfig implements Config
 {
-    private static final String PROPERTIES_FILENAME = ".pulse.properties";
+    public static final String PROPERTIES_FILENAME = ".pulse.properties";
     
     public static final String PROPERTY_PULSE_URL = "pulse.url";
     public static final String PROPERTY_PULSE_USER = "pulse.user";
@@ -25,13 +25,22 @@ public class PersonalBuildConfig implements Config
     private ConfigSupport localConfig;
     private ConfigSupport userConfig;
 
+    public PersonalBuildConfig(File base)
+    {
+        this(base, null);    
+    }
+
     public PersonalBuildConfig(File base, Config ui)
     {
         this.base = base;
-        
+        CompositeConfig composite = new CompositeConfig();
+
         // First, properties defined by the UI that is invoking us (e.g.
         // the command line)
-        CompositeConfig composite = new CompositeConfig(ui);
+        if (ui != null)
+        {
+            composite.append(ui);
+        }
 
         // Next: system properties
         composite.append(new PropertiesConfig(System.getProperties()));

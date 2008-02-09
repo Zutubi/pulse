@@ -36,6 +36,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
     private static final Logger LOG = Logger.getLogger(RemoteApi.class);
 
     private TokenManager tokenManager;
+    private AccessManager accessManager;
     private EventManager eventManager;
     private ShutdownManager shutdownManager;
     private MasterConfigurationManager configurationManager;
@@ -1308,12 +1309,12 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         }
     }
 
-    public Hashtable<String, String> preparePersonalBuild(String token, String projectName, String buildSpecification) throws AuthenticationException, ScmException
+    public Hashtable<String, String> preparePersonalBuild(String token, String projectName) throws AuthenticationException, ScmException
     {
         User user = tokenManager.loginUser(token);
         try
         {
-            if(!userManager.getPrinciple(user).hasAuthority(ServerPermission.PERSONAL_BUILD.toString()))
+            if(!accessManager.hasPermission(userManager.getPrinciple(user), ServerPermission.PERSONAL_BUILD.toString(), null))
             {
                 throw new AccessDeniedException("User does not have authority to submit personal build requests.");
             }
@@ -1554,5 +1555,10 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
     public void setScmClientFactory(ScmClientFactory<ScmConfiguration> scmClientFactory)
     {
         this.scmClientFactory = scmClientFactory;
+    }
+
+    public void setAccessManager(AccessManager accessManager)
+    {
+        this.accessManager = accessManager;
     }
 }

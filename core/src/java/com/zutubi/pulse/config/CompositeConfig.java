@@ -1,12 +1,13 @@
 package com.zutubi.pulse.config;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 /**
- * <class-comment/>
+ * A chain of config objects.  When looking up by key, the first config in
+ * the chain is asked first.  If the key is not found, the next config is
+ * asked and so on until the key is found or the end of the chain is reached.
  */
 public class CompositeConfig implements Config
 {
@@ -14,14 +15,7 @@ public class CompositeConfig implements Config
 
     public CompositeConfig(Config... configs)
     {
-        if(configs == null)
-        {
-            delegates = new ArrayList<Config>();
-        }
-        else
-        {
-            delegates = new LinkedList<Config>(Arrays.asList(configs));
-        }
+        delegates = new LinkedList<Config>(Arrays.asList(configs));
     }
 
     public void append(Config config)
