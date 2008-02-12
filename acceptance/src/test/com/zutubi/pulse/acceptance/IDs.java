@@ -6,6 +6,41 @@ public class IDs
 {
     public static String COLLECTION_TABLE = "config.table";
 
+    private static String buildTab(String name)
+    {
+        return "tab.build." + name;
+    }
+
+    public static String buildDetailsTab()
+    {
+        return buildTab("details");
+    }
+
+    public static String buildChangesTab()
+    {
+        return buildTab("changes");
+    }
+
+    public static String buildTestsTab()
+    {
+        return buildTab("tests");
+    }
+
+    public static String buildFileTab()
+    {
+        return buildTab("file");
+    }
+
+    public static String buildArtifactsTab()
+    {
+        return buildTab("artifacts");
+    }
+
+    public static String buildWorkingCopyTab()
+    {
+        return buildTab("wc");
+    }
+
     private static String buildCell(String project, long number)
     {
         return project + ".build." + Long.toString(number);

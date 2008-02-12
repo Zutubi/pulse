@@ -18,11 +18,7 @@ import org.eclipse.osgi.service.resolver.BundleSpecification;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.LinkedList;
@@ -205,7 +201,7 @@ public class PluginManager
                     resolvedPlugins.add(plugin);
                     break;
                 default:
-                    System.out.println("d'oh, problem: " + plugin.getName());
+                    System.out.println("Unexpected plugin state; plugin: " + plugin.getName() + "(" + plugin.getId() + "), state: " + plugin.bundle.getState());
             }
         }
 

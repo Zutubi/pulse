@@ -9,14 +9,14 @@
 <body>
     #buildTabs($buildResult "file")
 
+    <div id='#id("${buildResult.ownerName}-build-${buildResult.number}-file")'>
 #if($highlightedFile)
-    <h3 class="heading">#wwtext("name=pulse.file") &nbsp;<a href="$urls.buildFileDownload($buildResult)"><img alt="down" src="$base/images/arrow_down.gif"/>#wwtext("name=download")</a></h3>
-    <div class="box">
+    <h3 class="heading">#wwtext("name=pulse.file") &nbsp;<a id="download.file" href="$urls.buildFileDownload($buildResult)"><img alt="down" src="$base/images/arrow_down.gif"/>#wwtext("name=download")</a></h3>
+    <div id="highlighted.file" class="box">
         $highlightedFile
     </div>
 #else
-    <p>No pulse file available.</p>
+    <p id="no.file">No pulse file available.</p>
 #end
-
-
+    </div>
 </html>

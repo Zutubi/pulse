@@ -1,17 +1,17 @@
 package com.zutubi.pulse.acceptance.pages.dashboard;
 
 import com.thoughtworks.selenium.Selenium;
-import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
+import com.zutubi.pulse.acceptance.pages.browse.BuildFilePage;
 import com.zutubi.pulse.webwork.mapping.Urls;
 
 /**
- * The summary tab for a personal build result.
+ * The pulse file tab for a personal build result.
  */
-public class PersonalBuildSummaryPage extends BuildSummaryPage
+public class PersonalBuildFilePage extends BuildFilePage
 {
     private long buildId;
 
-    public PersonalBuildSummaryPage(Selenium selenium, Urls urls, long buildId)
+    public PersonalBuildFilePage(Selenium selenium, Urls urls, long buildId)
     {
         super(selenium, urls, "personal", buildId);
         this.buildId = buildId;
@@ -19,6 +19,6 @@ public class PersonalBuildSummaryPage extends BuildSummaryPage
 
     public String getUrl()
     {
-        return urls.dashboardMyBuild(Long.toString(buildId));
+        return urls.dashboardMyBuildFile(Long.toString(buildId));
     }
 }

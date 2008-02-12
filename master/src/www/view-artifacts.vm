@@ -40,7 +40,7 @@
 
     <h3>#wwtext("name=artifacts.all")</h3>
 
-    <table>
+    <table id='#id("${buildResult.ownerName}-build-${buildResult.number}-artifacts")'>
         <tr>
             <td class="columns" width="75%">
 
@@ -69,7 +69,4 @@
             </td>
         </tr>
     </table>
-
-
-
 </html>

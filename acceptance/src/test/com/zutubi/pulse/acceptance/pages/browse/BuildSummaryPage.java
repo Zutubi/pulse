@@ -1,9 +1,9 @@
 package com.zutubi.pulse.acceptance.pages.browse;
 
+import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.webwork.mapping.Urls;
 import com.zutubi.util.StringUtils;
-import com.thoughtworks.selenium.Selenium;
 
 /**
  * The summary tab for a build result.
@@ -15,7 +15,7 @@ public class BuildSummaryPage extends SeleniumPage
 
     public BuildSummaryPage(Selenium selenium, Urls urls, String projectName, long buildId)
     {
-        super(selenium, urls, StringUtils.uriComponentEncode(projectName) + "-build-" + Long.toString(buildId) + "-summary", StringUtils.uriComponentEncode(projectName));
+        super(selenium, urls, StringUtils.uriComponentEncode(projectName) + "-build-" + Long.toString(buildId) + "-summary", "build " + buildId);
         this.projectName = projectName;
         this.buildId = buildId;
     }

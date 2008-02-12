@@ -46,10 +46,10 @@
 <body>
     #buildTabs($buildResult "wc")
 
-<h3>#wwtext("name=working.copy")</h3>
+    <h3 id='#id("${buildResult.ownerName}-build-${buildResult.number}-wc")'>#wwtext("name=working.copy")</h3>
 
 #if ($buildResult.getHasWorkDir())
-        <p>
+        <p id="wc.blurb">
             The tree below allows you to navigate through the working directory for this build.  Click on the <img src="$base/images/arrow_down.gif"/> to download it.
         </p>
 
@@ -60,12 +60,12 @@
                 <div id="browseTree"></div>
             </div>
         #else
-            <p>
+            <p id="wc.pending">
                 #wwtext("name=working.dir.pending")
             </p>
         #end
 #else
-    <p style="max-width:600px">
+    <p id="wc.not.present" style="max-width:600px">
         The working copy for this build is not available.
         #if ($buildOptions.retainWorkingCopy)
             This is likely the result of one of the following:

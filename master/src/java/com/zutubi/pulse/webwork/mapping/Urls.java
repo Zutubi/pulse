@@ -45,9 +45,39 @@ public class Urls
         return dashboardMyBuilds() + number + "/";
     }
 
+    public String dashboardMyBuildChanges(String number)
+    {
+        return dashboardMyBuild(number) + "changes/";
+    }
+
+    public String dashboardMyBuildDetails(String number)
+    {
+        return dashboardMyBuild(number) + "details/";
+    }
+
     public String dashboardMyBuildStageDetails(String number, String stageName)
     {
-        return dashboardMyBuild(number) + "details/" + stageName + "/";
+        return dashboardMyBuildDetails(number) + stageName + "/";
+    }
+
+    public String dashboardMyBuildTests(String number)
+    {
+        return dashboardMyBuild(number) + "tests/";
+    }
+
+    public String dashboardMyBuildFile(String number)
+    {
+        return dashboardMyBuild(number) + "file/";
+    }
+
+    public String dashboardMyBuildArtifacts(String number)
+    {
+        return dashboardMyBuild(number) + "artifacts/";
+    }
+
+    public String dashboardMyBuildWorkingCopy(String number)
+    {
+        return dashboardMyBuild(number) + "wc/";
     }
 
     public String browse()
@@ -190,6 +220,11 @@ public class Urls
         return build(build) + "changes/";
     }
 
+    public String buildChanges(Object project, String number)
+    {
+        return build(project, number) + "changes/";
+    }
+
     public String buildChangelist(BuildResult build, long id)
     {
         return buildChanges(build) + Long.toString(id) + "/";
@@ -198,6 +233,11 @@ public class Urls
     public String buildTests(BuildResult build)
     {
         return build(build) + "tests/";
+    }
+
+    public String buildTests(Object project, String number)
+    {
+        return build(project, number) + "tests/";
     }
 
     public String stageTests(BuildResult build, RecipeResultNode node)
@@ -210,6 +250,11 @@ public class Urls
         return build(build) + "file/";
     }
 
+    public String buildFile(Object project, String number)
+    {
+        return build(project, number) + "file/";
+    }
+
     public String buildFileDownload(BuildResult build)
     {
         return buildFile(build) + "raw/";
@@ -218,6 +263,11 @@ public class Urls
     public String buildArtifacts(BuildResult build)
     {
         return build(build) + "artifacts/";
+    }
+
+    public String buildArtifacts(Object project, String number)
+    {
+        return build(project, number) + "artifacts/";
     }
 
     public String stageArtifacts(BuildResult build, RecipeResultNode node)
@@ -234,6 +284,11 @@ public class Urls
     public String buildWorkingCopy(BuildResult build)
     {
         return build(build) + "wc/";
+    }
+
+    public String buildWorkingCopy(Object project, String number)
+    {
+        return build(project, number) + "wc/";
     }
 
     private String getStageComponent(RecipeResultNode node)

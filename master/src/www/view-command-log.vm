@@ -17,7 +17,7 @@
 <body>
     #buildTabs($result "details")
 
-    <table id='#id("${project.name}-build-${result.number}-detailed")' class="twopane">
+    <table id='#id("${result.ownerName}-build-${result.number}-detailed")' class="twopane">
         <tr>
             <td class="leftpane">
                 <p>

@@ -1,7 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.pages.dashboard.MyBuildsPage;
-import com.zutubi.pulse.acceptance.pages.dashboard.PersonalBuildSummaryPage;
+import com.zutubi.pulse.acceptance.pages.dashboard.*;
 import com.zutubi.pulse.core.scm.WorkingCopyFactory;
 import com.zutubi.pulse.core.scm.svn.SubversionWorkingCopy;
 import com.zutubi.pulse.personal.PersonalBuildClient;
@@ -70,29 +69,58 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         goTo(urls.adminProjects());
         addProject(random);
 
+        // Request the build and wait for it to complete
         TestPersonalBuildUI ui = requestPersonalBuild();
 
+        assertTrue(ui.getStatuses().size() > 0);
+        assertTrue(ui.isPatchAccepted());
         assertEquals(0, ui.getWarnings().size());
         assertEquals(0, ui.getErrors().size());
-        assertTrue(ui.getStatuses().size() > 0);
 
-        String lastStatus = ui.getStatuses().get(ui.getStatuses().size() - 1);
-        assertTrue(lastStatus.startsWith("Patch accepted"));
-
-        String[] pieces = lastStatus.split(" ");
-        String number = pieces[pieces.length - 1];
-        number = number.substring(0, number.length() - 1);
-        long buildNumber = Long.parseLong(number);
-
+        long buildNumber = ui.getBuildNumber();
         MyBuildsPage myBuildsPage = new MyBuildsPage(selenium, urls);
         myBuildsPage.goTo();
         assertElementPresent(MyBuildsPage.getBuildNumberId(buildNumber));
         assertElementNotPresent(MyBuildsPage.getBuildNumberId(buildNumber + 1));
         SeleniumUtils.refreshUntilText(selenium, MyBuildsPage.getBuildStatusId(buildNumber), "failure");
 
+        // Verify each tab in turn
         PersonalBuildSummaryPage summaryPage = new PersonalBuildSummaryPage(selenium, urls, buildNumber);
         summaryPage.goTo();
         assertTextPresent("nosuchcommand");
+
+        selenium.click(IDs.buildDetailsTab());
+        PersonalBuildDetailedViewPage detailedViewPage = new PersonalBuildDetailedViewPage(selenium, urls, buildNumber);
+        detailedViewPage.waitFor();
+        detailedViewPage.clickCommand("default", "build");
+        assertTextPresent("nosuchcommand");
+
+        selenium.click(IDs.buildChangesTab());
+        PersonalBuildChangesPage changesPage = new PersonalBuildChangesPage(selenium, urls, buildNumber);
+        changesPage.waitFor();
+        assertEquals("1", changesPage.getCheckedOutRevision());
+        assertEquals("build.xml", changesPage.getChangedFile(0));
+
+        selenium.click(IDs.buildTestsTab());
+        PersonalBuildTestsPage testsPage = new PersonalBuildTestsPage(selenium, urls, buildNumber);
+        testsPage.waitFor();
+        assertTrue(testsPage.isBuildComplete());
+        assertFalse(testsPage.hasTests());
+
+        selenium.click(IDs.buildFileTab());
+        PersonalBuildFilePage filePage = new PersonalBuildFilePage(selenium, urls, buildNumber);
+        filePage.waitFor();
+        assertTrue(filePage.isHighlightedFilePresent());
+        assertTextPresent("ant build");
+
+        PersonalBuildArtifactsPage artifactsPage = new PersonalBuildArtifactsPage(selenium, urls, buildNumber);
+        artifactsPage.goTo();
+        SeleniumUtils.waitForLocator(selenium, artifactsPage.getCommandLocator("build"));
+
+        selenium.click(IDs.buildWorkingCopyTab());
+        PersonalBuildWorkingCopyPage wcPage = new PersonalBuildWorkingCopyPage(selenium, urls, buildNumber);
+        wcPage.waitFor();
+        assertTrue(wcPage.isWorkingCopyNotPresent());
     }
 
     private void createConfigFile() throws IOException
@@ -135,6 +163,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         private List<String> statuses = new LinkedList<String>();
         private List<String> warnings = new LinkedList<String>();
         private List<String> errors = new LinkedList<String>();
+        private long buildNumber = -1;
 
         public List<String> getDebugs()
         {
@@ -156,6 +185,16 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
             return errors;
         }
 
+        public boolean isPatchAccepted()
+        {
+            return buildNumber > 0;
+        }
+
+        public long getBuildNumber()
+        {
+            return buildNumber;
+        }
+
         public void setVerbosity(Verbosity verbosity)
         {
         }
@@ -167,6 +206,14 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
 
         public void status(String message)
         {
+            if (message.startsWith("Patch accepted"))
+            {
+                String[] pieces = message.split(" ");
+                String number = pieces[pieces.length - 1];
+                number = number.substring(0, number.length() - 1);
+                buildNumber = Long.parseLong(number);
+            }
+
             statuses.add(message);
         }
 

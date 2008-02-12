@@ -8,6 +8,7 @@
 <body>
     #buildTabs($result "tests")
 
+    <div id='#id("${result.ownerName}-build-${result.number}-tests")'>
 #if($result.completed())
     #if($result.hasTests())
     #testSummaryTable($result.testSummary)
@@ -37,15 +38,14 @@
 
     #buildTestFailures($result)
     #else
-    <p>
+    <p id="no.tests">
         #wwtext("name=build.no.tests")
     </p>
     #end
 #else
-    <p>
+    <p id="build.incomplete">
         #wwtext("name=tests.build.incomplete")
     </p>
 #end
-
-
+    </div>
 </html>
