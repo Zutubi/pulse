@@ -1,6 +1,6 @@
 package com.zutubi.prototype;
 
-import com.zutubi.prototype.i18n.Messages;
+import com.zutubi.i18n.Messages;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeProperty;
@@ -57,7 +57,8 @@ public class ExtensionOptionProvider extends MapOptionProvider
         for (CompositeType extension : extensions)
         {
             Messages messages = Messages.getInstance(extension.getClazz());
-            options.put(extension.getSymbolicName(), messages.format("label"));
+            String key = messages.isKeyDefined("wizard.label") ? "wizard.label" : "label";
+            options.put(extension.getSymbolicName(), messages.format(key));
         }
 
         return options;

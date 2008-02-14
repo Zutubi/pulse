@@ -22,11 +22,10 @@ import com.zutubi.pulse.prototype.config.group.ServerPermission;
 import com.zutubi.pulse.prototype.config.misc.LoginConfiguration;
 import com.zutubi.pulse.prototype.config.misc.TransientConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
-import com.zutubi.pulse.prototype.config.project.hooks.*;
 import com.zutubi.pulse.prototype.config.project.changeviewer.*;
-import com.zutubi.pulse.prototype.config.project.commit.CommitMessageTransformerConfiguration;
 import com.zutubi.pulse.prototype.config.project.commit.CustomTransformerConfiguration;
 import com.zutubi.pulse.prototype.config.project.commit.LinkTransformerConfiguration;
+import com.zutubi.pulse.prototype.config.project.hooks.*;
 import com.zutubi.pulse.prototype.config.project.triggers.BuildCompletedTriggerConfiguration;
 import com.zutubi.pulse.prototype.config.project.triggers.CronBuildTriggerConfiguration;
 import com.zutubi.pulse.prototype.config.project.triggers.ScmBuildTriggerConfiguration;
@@ -101,7 +100,7 @@ public class ConfigurationRegistry
             registerTransientConfiguration("login", LoginConfiguration.class);
             registerTransientConfiguration("signup", SignupUserConfiguration.class);
 
-            CompositeType typeConfig = registerConfigurationType(TypeConfiguration.class);
+            registerConfigurationType(TypeConfiguration.class);
             registerConfigurationType(AntTypeConfiguration.class);
             registerConfigurationType(BJamTypeConfiguration.class);
             registerConfigurationType(CustomTypeConfiguration.class);
@@ -113,7 +112,7 @@ public class ConfigurationRegistry
             registerConfigurationType(XCodeTypeConfiguration.class);
 
             // change viewer configuration
-            CompositeType changeViewerConfig = registerConfigurationType(ChangeViewerConfiguration.class);
+            registerConfigurationType(ChangeViewerConfiguration.class);
             registerConfigurationType(FisheyeConfiguration.class);
             registerConfigurationType(CustomChangeViewerConfiguration.class);
             registerConfigurationType(P4WebChangeViewer.class);
@@ -136,7 +135,7 @@ public class ConfigurationRegistry
             projectConfig.addProperty(new ExtensionTypeProperty("triggers", triggers));
 
             // Artifacts.
-            CompositeType artifactConfig = registerConfigurationType(ArtifactConfiguration.class);
+            registerConfigurationType(ArtifactConfiguration.class);
             registerConfigurationType(FileArtifactConfiguration.class);
             registerConfigurationType(DirectoryArtifactConfiguration.class);
 
@@ -227,7 +226,7 @@ public class ConfigurationRegistry
         {
             public void handle(CompositeType type) throws TypeException
             {
-                ConfigurationCheck annotation = (ConfigurationCheck) type.getAnnotation(ConfigurationCheck.class);
+                ConfigurationCheck annotation = type.getAnnotation(ConfigurationCheck.class);
                 if (annotation != null)
                 {
                     String checkClassName = annotation.value();

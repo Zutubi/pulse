@@ -102,7 +102,7 @@
     </table>
             #else
     <p>
-        This path has been configured in the following descedents (and thus cannot be configured at this level):
+        This path has been configured in the following descendents (and thus cannot be configured at this level):
         <ul>
                 #foreach($descendent in $config.configuredDescendents)
             <li id='#id("cd-$descendent")'>#html($descendent)</li>

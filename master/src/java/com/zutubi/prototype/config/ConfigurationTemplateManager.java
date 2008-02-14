@@ -2032,6 +2032,12 @@ public class ConfigurationTemplateManager implements Synchronization
         return false;
     }
 
+    /**
+     * @param path the path to test
+     * @return true iff the scope in which the path lies is persistent: no
+     *         verification of the path occurs other than identifying the
+     *         scope
+     */
     public boolean isPersistent(String path)
     {
         return configurationPersistenceManager.isPersistent(path);

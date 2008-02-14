@@ -179,6 +179,13 @@ public class PrototypeUtils
 
     public static String getDisplayName(String path, ConfigurationTemplateManager configurationTemplateManager)
     {
+        // Cases:
+        //   - Empty path: empty name
+        //   - Scope (single element path): the path itself, which is the
+        //     name of the scope
+        //   - Transient path: look for label in <type>.properties, otherwise
+        //     just use the basename
+        //   - Persistent path: see below
         if (TextUtils.stringSet(path))
         {
             String parentPath = PathUtils.getParentPath(path);
@@ -191,7 +198,7 @@ public class PrototypeUtils
             {
                 if (configurationTemplateManager.isPersistent(path))
                 {
-                    return getDisplayName(path, configurationTemplateManager.getType(parentPath), configurationTemplateManager.getRecord(path));
+                    return getDisplayName(path, configurationTemplateManager.getType(path), configurationTemplateManager.getType(parentPath), configurationTemplateManager.getRecord(path));
                 }
                 else
                 {
@@ -215,13 +222,14 @@ public class PrototypeUtils
         }
     }
 
-    public static String getDisplayName(String path, ComplexType parentType, Record value)
+    public static String getDisplayName(String path, ComplexType type, ComplexType parentType, Record value)
     {
         // One of:
         //   - the id, if this object is within a map
         //   - the value of the first defined i18n key if this is a composite
         //     property:
         //       <parent type>.properties: <property>.label
+        //       <type>.properties: label (if singular and configured)
         //       <property type>.properties: label.plural (if a collection)
         //       <property type>.properties: label (auto-pluralised if a collection)
         String result = null;
@@ -243,14 +251,13 @@ public class PrototypeUtils
                 }
                 else
                 {
-                    Type declaredType = parentType.getDeclaredPropertyType(baseName);
-                    if (declaredType instanceof CollectionType)
+                    if (type instanceof CollectionType)
                     {
-                        result = getPluralLabel(declaredType.getTargetType());
+                        result = getPluralLabel(type.getTargetType());
                     }
                     else
                     {
-                        messages = Messages.getInstance(declaredType.getClazz());
+                        messages = Messages.getInstance(type.getClazz());
                         result = messages.format("label");
                     }
                 }

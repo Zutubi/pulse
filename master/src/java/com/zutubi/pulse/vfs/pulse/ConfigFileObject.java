@@ -4,7 +4,6 @@ import com.zutubi.prototype.config.ConfigurationSecurityManager;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.type.ComplexType;
 import com.zutubi.prototype.type.Type;
-import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.webwork.PrototypeUtils;
@@ -76,7 +75,7 @@ public class ConfigFileObject extends AbstractPulseFileObject
 
     public String getDisplayName()
     {
-        return PrototypeUtils.getDisplayName(path, parentType, value);
+        return PrototypeUtils.getDisplayName(path, type, parentType, value);
     }
 
     protected FileType doGetType() throws Exception

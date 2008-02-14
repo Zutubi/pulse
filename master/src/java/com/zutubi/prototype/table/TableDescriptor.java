@@ -1,10 +1,10 @@
 package com.zutubi.prototype.table;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.prototype.AbstractParameterised;
 import com.zutubi.prototype.Descriptor;
 import com.zutubi.prototype.actions.ActionManager;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
-import com.zutubi.prototype.i18n.Messages;
 import com.zutubi.prototype.model.Cell;
 import com.zutubi.prototype.model.Row;
 import com.zutubi.prototype.model.RowAction;
