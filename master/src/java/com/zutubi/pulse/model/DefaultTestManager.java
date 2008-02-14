@@ -148,9 +148,11 @@ public class DefaultTestManager implements TestManager
         {
             String casePath = getCasePath(caseResult.getName());
             TestCaseIndex caseIndex = allCases.get(casePath);
+            boolean newIndex = false;
             if (caseIndex == null)
             {
                 caseIndex = new TestCaseIndex(projectId, stageNameId, casePath);
+                newIndex = true;
             }
 
             if (caseResult.hasBrokenTests() && !caseIndex.isHealthy())
@@ -168,6 +170,10 @@ public class DefaultTestManager implements TestManager
             }
 
             caseIndex.recordExecution(caseResult.getStatus(), buildId, buildNumber);
+            if(newIndex)
+            {
+                testCaseIndexDao.save(caseIndex);
+            }
             if((++count % 1000) == 0)
             {
                 sessionFactory.getCurrentSession().flush();
