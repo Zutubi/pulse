@@ -32,12 +32,12 @@ public class FisheyeChangeViewer extends BasePathChangeViewer
 
     public String getFileViewURL(String path, FileRevision revision)
     {
-        return StringUtils.join("/", true, true, getBaseURL(), "browse", getProjectPath(), StringUtils.urlEncodePath(path) + "?r=" + revision.getRevisionString());
+        return StringUtils.join("/", true, true, getBaseURL(), "browse", getProjectPath(), StringUtils.urlEncodePath(stripDepot(path)) + "?r=" + revision.getRevisionString());
     }
 
     public String getFileDownloadURL(String path, FileRevision revision)
     {
-        return StringUtils.join("/", true, true, getBaseURL(), "browse", "~raw,r=" + revision.getRevisionString(), getProjectPath(), StringUtils.urlEncodePath(path));
+        return StringUtils.join("/", true, true, getBaseURL(), "browse", "~raw,r=" + revision.getRevisionString(), getProjectPath(), StringUtils.urlEncodePath(stripDepot(path)));
     }
 
     public String getFileDiffURL(String path, FileRevision revision)
@@ -48,7 +48,7 @@ public class FisheyeChangeViewer extends BasePathChangeViewer
             return null;
         }
 
-        return StringUtils.join("/", true, true, getBaseURL(), "browse", getProjectPath(), StringUtils.urlEncodePath(path) + "?r1=" + previousRevision.getRevisionString() + "&r2=" + revision.getRevisionString());
+        return StringUtils.join("/", true, true, getBaseURL(), "browse", getProjectPath(), StringUtils.urlEncodePath(stripDepot(path)) + "?r1=" + previousRevision.getRevisionString() + "&r2=" + revision.getRevisionString());
     }
 
     public ChangeViewer copy()
@@ -65,5 +65,30 @@ public class FisheyeChangeViewer extends BasePathChangeViewer
         }
 
         return revision.getRevisionString();
+    }
+
+    private String stripDepot(String path)
+    {
+        // This is a workaround for CIB-1260: we detect Perforce depot paths
+        // and string the depot name.  It is the best I can do without a
+        // schema change.
+        String stripPrefix = System.getProperty("pulse.fisheye.strip.prefix");
+        if(stripPrefix != null && path.startsWith(stripPrefix))
+        {
+            return path.substring(stripPrefix.length());
+        }
+        else
+        {
+            if(path.startsWith("//"))
+            {
+                int index = path.indexOf("/", 2);
+                if(index >= 0)
+                {
+                    return path.substring(index + 1);
+                }
+            }
+        }
+
+        return path;
     }
 }
