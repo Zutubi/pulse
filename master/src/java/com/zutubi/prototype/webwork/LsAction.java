@@ -1,17 +1,21 @@
 package com.zutubi.prototype.webwork;
 
-import com.zutubi.util.TextUtils;
 import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.pulse.vfs.pulse.AbstractPulseFileObject;
+import com.zutubi.pulse.vfs.pulse.ComparatorProvider;
 import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.pulse.web.vfs.DirectoryComparator;
 import com.zutubi.pulse.web.vfs.FileObjectWrapper;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
+import com.zutubi.util.TextUtils;
 import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileSystemManager;
 import org.apache.commons.vfs.FileType;
 
 import java.util.Arrays;
+import java.util.Comparator;
 
 /**
  * Action for listing config objects.
@@ -79,7 +83,7 @@ public class LsAction extends ActionSupport
         FileObject[] children = fileObject.getChildren();
         if (children != null)
         {
-            Arrays.sort(children, new DirectoryComparator());
+            sortChildren(fileObject, children);
             listing = new ExtFile[children.length];
             CollectionUtils.mapToArray(children, new Mapping<FileObject, ExtFile>()
             {
@@ -91,6 +95,36 @@ public class LsAction extends ActionSupport
         }
 
         return SUCCESS;
+    }
+
+    private void sortChildren(FileObject fileObject, FileObject[] children)
+    {
+        Comparator<FileObject> comparator = getComparator(fileObject);
+        if (comparator != null)
+        {
+            Arrays.sort(children, comparator);
+        }
+    }
+
+    private Comparator<FileObject> getComparator(FileObject parentFile)
+    {
+        if(parentFile instanceof AbstractPulseFileObject)
+        {
+            try
+            {
+                ComparatorProvider provider = ((AbstractPulseFileObject) parentFile).getAncestor(ComparatorProvider.class);
+                if (provider != null)
+                {
+                    return provider.getComparator();
+                }
+            }
+            catch (FileSystemException e)
+            {
+                // Fall through to default.
+            }
+        }
+
+        return new DirectoryComparator();
     }
 
     public void setFileSystemManager(FileSystemManager fileSystemManager)

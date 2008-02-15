@@ -2,19 +2,22 @@ package com.zutubi.pulse.vfs.pulse;
 
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.RecipeResultNode;
+import com.zutubi.pulse.web.vfs.DirectoryComparator;
 import com.zutubi.util.StringUtils;
 import org.apache.commons.vfs.FileName;
+import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
 /**
  * <class comment/>
  */
-public class ArtifactsContextFileObject extends AbstractPulseFileObject implements AddressableFileObject
+public class ArtifactsContextFileObject extends AbstractPulseFileObject implements AddressableFileObject, ComparatorProvider
 {
     public ArtifactsContextFileObject(final FileName name, final AbstractFileSystem fs)
     {
@@ -75,6 +78,13 @@ public class ArtifactsContextFileObject extends AbstractPulseFileObject implemen
         }
 
         return new String[0];
+    }
+
+    public Comparator<FileObject> getComparator()
+    {
+        DirectoryComparator comp = new DirectoryComparator();
+        comp.setUseDisplayName(false);
+        return comp;
     }
 
     protected BuildResult getBuildResult() throws FileSystemException

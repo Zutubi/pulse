@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web.vfs;
 
+import com.zutubi.pulse.vfs.pulse.AbstractPulseFileObject;
 import com.zutubi.util.logging.Logger;
-import com.zutubi.pulse.vfs.pulse.PluginFileObject;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
@@ -10,13 +10,15 @@ import java.text.Collator;
 import java.util.Comparator;
 
 /**
- * <class-comment/>
+ * A comparator for sorting file objects with directories before files and
+ * alphabetical sorting by name within each of those categories.
  */
 public class DirectoryComparator implements Comparator<FileObject>
 {
     private static final Logger LOG = Logger.getLogger(DirectoryComparator.class);
 
     private Collator c = Collator.getInstance();
+    private boolean useDisplayName = true;
 
     public int compare(FileObject o1, FileObject o2)
     {
@@ -38,9 +40,9 @@ public class DirectoryComparator implements Comparator<FileObject>
             }
 
             // then sort alphabetically
-            if(o1 instanceof PluginFileObject)
+            if(useDisplayName && o1 instanceof AbstractPulseFileObject)
             {
-                return c.compare(((PluginFileObject)o1).getDisplayName(), ((PluginFileObject)o2).getDisplayName());
+                return c.compare(((AbstractPulseFileObject)o1).getDisplayName(), ((AbstractPulseFileObject)o2).getDisplayName());
             }
 
             return c.compare(o1.getName().getPath(), o2.getName().getPath());
@@ -52,4 +54,8 @@ public class DirectoryComparator implements Comparator<FileObject>
         }
     }
 
+    public void setUseDisplayName(boolean useDisplayName)
+    {
+        this.useDisplayName = useDisplayName;
+    }
 }

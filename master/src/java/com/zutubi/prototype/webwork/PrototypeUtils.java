@@ -4,6 +4,7 @@ import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.xwork.ValidationAware;
 import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.config.annotations.Classification;
+import com.zutubi.config.annotations.Listing;
 import com.zutubi.i18n.Messages;
 import com.zutubi.prototype.config.ConfigurationSecurityManager;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
@@ -21,8 +22,7 @@ import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.freemarker.FreemarkerConfigurationFactoryBean;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.webwork.mapping.PulseActionMapper;
-import com.zutubi.util.StringUtils;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.*;
 import freemarker.core.DelegateBuiltin;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -141,6 +141,7 @@ public class PrototypeUtils
         if (path.length() == 0)
         {
             listing = configurationTemplateManager.getRootListing();
+            Collections.sort(listing, new Sort.StringComparator());
         }
         else if (type instanceof MapType)
         {
@@ -148,14 +149,73 @@ public class PrototypeUtils
             if (record != null)
             {
                 listing = new LinkedList<String>(((CollectionType) type).getOrder(record));
+                Collections.sort(listing, new Sort.StringComparator());
             }
         }
         else if (type instanceof CompositeType)
         {
-            listing = ((CompositeType)type).getNestedPropertyNames();
+            listing = getSortedNestedProperties(path, (CompositeType) type, configurationTemplateManager);
         }
 
         return configurationSecurityManager.filterPaths(path, listing, AccessManager.ACTION_VIEW);
+    }
+
+    public static List<String> getSortedNestedProperties(final String path, final CompositeType type, final ConfigurationTemplateManager configurationTemplateManager)
+    {
+        List<String> result = new LinkedList<String>();
+        List<String> nestedProperties = type.getNestedPropertyNames();
+
+        // First process the order defined in @Listing (if any)
+        Listing annotation = type.getAnnotation(Listing.class);
+        if(annotation != null)
+        {
+            String[] definedOrder = annotation.order();
+            for(String property: definedOrder)
+            {
+                if(nestedProperties.remove(property))
+                {
+                    result.add(property);
+                }
+            }
+        }
+
+        // Remaining properties are sorted alphabetically by display name
+        if(nestedProperties.size() > 0)
+        {
+            final Record value = configurationTemplateManager.getRecord(path);
+
+            // Get property/display name pairs
+            List<Pair<String, String>> propertyDisplayPairs = CollectionUtils.map(nestedProperties, new Mapping<String, Pair<String, String>>()
+            {
+                public Pair<String, String> map(String s)
+                {
+                    String propertyPath = PathUtils.getPath(path, s);
+                    ComplexType propertyType = configurationTemplateManager.getType(propertyPath);
+                    return new Pair<String, String>(s, getDisplayName(propertyPath, propertyType, type, (Record) value.get(s)));
+                }
+            });
+
+            // Sort by display name
+            final Sort.StringComparator comp = new Sort.StringComparator();
+            Collections.sort(propertyDisplayPairs, new Comparator<Pair<String, String>>()
+            {
+                public int compare(Pair<String, String> o1, Pair<String, String> o2)
+                {
+                    return comp.compare(o1.second, o2.second);
+                }
+            });
+
+            // Pull out property names and add to result
+            CollectionUtils.map(propertyDisplayPairs, new Mapping<Pair<String, String>, String>()
+            {
+                public String map(Pair<String, String> pair)
+                {
+                    return pair.first;
+                }
+            }, result);
+        }
+
+        return result;
     }
 
     public static List<String> getEmbeddedCollections(CompositeType ctype)

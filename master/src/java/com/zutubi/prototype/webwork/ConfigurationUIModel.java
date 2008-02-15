@@ -1,6 +1,5 @@
 package com.zutubi.prototype.webwork;
 
-import com.zutubi.util.TextUtils;
 import com.zutubi.prototype.ConventionSupport;
 import com.zutubi.prototype.actions.ActionManager;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
@@ -19,11 +18,10 @@ import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
+import com.zutubi.util.TextUtils;
 import com.zutubi.util.bean.ObjectFactory;
 
-import java.text.Collator;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -118,6 +116,8 @@ public class ConfigurationUIModel
         instance = configurationTemplateManager.getInstance(path);
         targetType = type.getTargetType();
 
+        nestedProperties = PrototypeUtils.getPathListing(path, type, configurationTemplateManager, configurationSecurityManager);
+
         if (targetType instanceof CompositeType)
         {
             CompositeType ctype = (CompositeType) targetType;
@@ -125,17 +125,6 @@ public class ConfigurationUIModel
 
             formHeading = PrototypeUtils.getFormHeading(ctype);
             simpleProperties = ctype.getSimplePropertyNames();
-            nestedProperties = ctype.getNestedPropertyNames();
-
-            // sort the nested properties.... this is a ui thing.
-            final Collator collator = Collator.getInstance();
-            Collections.sort(nestedProperties, new Comparator<String>()
-            {
-                public int compare(String o1, String o2)
-                {
-                    return collator.compare(o1, o2);
-                }
-            });
 
             extensions.addAll(CollectionUtils.map(((CompositeType) targetType).getExtensions(), new Mapping<CompositeType, String>()
             {

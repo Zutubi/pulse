@@ -2,9 +2,9 @@ package com.zutubi.pulse.vfs.pulse;
 
 import com.zutubi.pulse.MasterBuildPaths;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.util.bean.ObjectFactory;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
@@ -21,6 +21,7 @@ import java.util.Collection;
  */
 public class PulseFileSystem extends AbstractFileSystem
 {
+    private RootFileObject rootFile;
     private ObjectFactory objectFactory;
     private BuildManager buildManager;
     private MasterConfigurationManager configurationManager;
@@ -46,12 +47,16 @@ public class PulseFileSystem extends AbstractFileSystem
         String path = fileName.getPath();
         if (path.equals(FileName.ROOT_PATH))
         {
-            AbstractPulseFileObject newFile = objectFactory.buildBean(RootFileObject.class,
-                    new Class[]{FileName.class, AbstractFileSystem.class},
-                    new Object[]{fileName, this}
-            );
-            newFile.init();
-            return newFile;
+            if(rootFile == null)
+            {
+                rootFile = objectFactory.buildBean(RootFileObject.class,
+                                                   new Class[]{FileName.class, AbstractFileSystem.class},
+                                                   new Object[]{fileName, this}
+                );
+                rootFile.init();
+            }
+
+            return rootFile;
         }
 
         // Delegate the creation of a file object to its parent.

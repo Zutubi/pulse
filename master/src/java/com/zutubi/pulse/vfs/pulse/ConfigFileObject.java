@@ -9,16 +9,18 @@ import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.pulse.filesystem.FileSystemException;
 import org.apache.commons.vfs.FileName;
+import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
+import java.util.Comparator;
 import java.util.List;
 
 /**
  * A file to represent the root of the server configuration.  Descendents of
  * this file represent paths into the config system.
  */
-public class ConfigFileObject extends AbstractPulseFileObject
+public class ConfigFileObject extends AbstractPulseFileObject implements ComparatorProvider
 {
     private ConfigurationTemplateManager configurationTemplateManager;
     private ConfigurationSecurityManager configurationSecurityManager;
@@ -111,6 +113,12 @@ public class ConfigFileObject extends AbstractPulseFileObject
     {
         List<String> listing = PrototypeUtils.getPathListing(path, type, configurationTemplateManager, configurationSecurityManager);
         return listing.toArray(new String[listing.size()]);
+    }
+
+    public Comparator<FileObject> getComparator()
+    {
+        // Indicates pre-sorted children.
+        return null;
     }
 
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)

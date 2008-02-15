@@ -1,7 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.config.ConfigurationRegistry;
+import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.acceptance.forms.admin.*;
 import com.zutubi.pulse.acceptance.pages.admin.*;
 import com.zutubi.pulse.core.config.ResourceProperty;
@@ -180,7 +180,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         ProjectConfigPage configPage = new ProjectConfigPage(selenium, urls, random, false);
         configPage.goTo();
-        configPage.clickComposite("type", "project type");
+        configPage.clickComposite("type", "ant command and artifacts");
         AntTypeForm form = new AntTypeForm(selenium);
         form.waitFor();
         form.assertFormElements("", "build.xml", "", "", "");
@@ -469,7 +469,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         childHierarchyPage.waitFor();
         ProjectConfigPage configPage = childHierarchyPage.clickConfigure();
         configPage.waitFor();
-        CompositePage scmPage = configPage.clickComposite("scm", "scm");
+        CompositePage scmPage = configPage.clickComposite("scm", "subversion configuration");
         scmPage.waitFor();
         SubversionForm subversionForm = new SubversionForm(selenium);
         subversionForm.waitFor();

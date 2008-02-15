@@ -1,8 +1,10 @@
 package com.zutubi.pulse.web.vfs;
 
-import com.zutubi.util.TextUtils;
 import com.zutubi.pulse.vfs.CompoundFileFilter;
 import com.zutubi.pulse.vfs.FilePrefixFilter;
+import com.zutubi.pulse.vfs.pulse.AbstractPulseFileObject;
+import com.zutubi.pulse.vfs.pulse.ComparatorProvider;
+import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.commons.vfs.*;
 
@@ -145,11 +147,7 @@ public class LsAction extends VFSActionSupport
 
         if (children != null)
         {
-            Arrays.sort(children, new DirectoryComparator());
-        }
-
-        if (children != null)
-        {
+            sortChildren(fo, children);
             for (FileObject child : children)
             {
                 if (showHidden || !child.isHidden())
@@ -158,6 +156,36 @@ public class LsAction extends VFSActionSupport
                 }
             }
         }
+    }
+
+    private void sortChildren(FileObject fileObject, FileObject[] children)
+    {
+        Comparator<FileObject> comparator = getComparator(fileObject);
+        if (comparator != null)
+        {
+            Arrays.sort(children, comparator);
+        }
+    }
+
+    private Comparator<FileObject> getComparator(FileObject parentFile)
+    {
+        if(parentFile instanceof AbstractPulseFileObject)
+        {
+            try
+            {
+                ComparatorProvider provider = ((AbstractPulseFileObject) parentFile).getAncestor(ComparatorProvider.class);
+                if (provider != null)
+                {
+                    return provider.getComparator();
+                }
+            }
+            catch (FileSystemException e)
+            {
+                // Fall through to default.
+            }
+        }
+
+        return new DirectoryComparator();
     }
 
     private static class FileTypeFilter implements FileFilter

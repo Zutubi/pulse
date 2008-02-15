@@ -134,7 +134,7 @@ public abstract class AbstractPulseFileObject extends AbstractFileObject
     @SuppressWarnings({"unchecked"})
     public <T> T getAncestor(Class<T> type) throws FileSystemException
     {
-        for(AbstractPulseFileObject ancestor = (AbstractPulseFileObject) getParent();
+        for(AbstractPulseFileObject ancestor = this;
             ancestor != null;
             ancestor = (AbstractPulseFileObject) ancestor.getParent())
         {

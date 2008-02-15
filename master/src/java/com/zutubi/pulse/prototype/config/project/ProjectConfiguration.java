@@ -21,6 +21,7 @@ import java.util.*;
  *
  */
 @Form(fieldOrder = {"name", "url", "description"})
+@Listing(order = {"type", "requirements", "properties", "stages", "options", "buildHooks", "scm", "changeViewer", "commitMessageTransformers", "labels", "permissions"})
 @Table(columns = {"name"})
 @SymbolicName("zutubi.projectConfig")
 public class ProjectConfiguration extends AbstractConfiguration implements Extendable, NamedConfiguration

@@ -67,7 +67,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
 
         loginAsAdmin();
         goTo(urls.adminProjects());
-        addProject(random);
+        ensureProject(PROJECT_NAME);
 
         // Request the build and wait for it to complete
         TestPersonalBuildUI ui = requestPersonalBuild();
@@ -130,7 +130,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         config.put(PersonalBuildConfig.PROPERTY_PULSE_URL, baseUrl);
         config.put(PersonalBuildConfig.PROPERTY_PULSE_USER, "admin");
         config.put(PersonalBuildConfig.PROPERTY_PULSE_PASSWORD, "admin");
-        config.put(PersonalBuildConfig.PROPERTY_PROJECT, random);
+        config.put(PersonalBuildConfig.PROPERTY_PROJECT, PROJECT_NAME);
 
         FileOutputStream os = null;
         try
