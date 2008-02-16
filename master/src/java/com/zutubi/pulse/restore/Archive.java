@@ -19,26 +19,6 @@ public class Archive
         this.manifest = manifest;
     }
 
-    private void loadManifest()
-    {
-        // manifest.txt, located in the root directory.
-        File manifestFile = new File(base, "manifest.txt");
-        if (!manifestFile.isFile())
-        {
-            // does this make this an invalid archive file?... probably.
-        }
-
-        try
-        {
-            manifest = ArchiveManifest.readFrom(manifestFile);
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-            // this is also likely to cause problems - invalid archive here...
-        }
-    }
-
     public ArchiveManifest getManifest()
     {
         return manifest;

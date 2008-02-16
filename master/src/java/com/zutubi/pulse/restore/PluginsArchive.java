@@ -10,24 +10,13 @@ import java.io.IOException;
  *
  *
  */
-public class PluginsArchive implements ArchiveableComponent
+public class PluginsArchive extends AbstractArchivableComponent
 {
     private PluginPaths pluginPaths;
 
     public String getName()
     {
         return "plugins";
-    }
-
-
-    public void backup(Archive archive) throws ArchiveException
-    {
-
-    }
-
-    public void restore(Archive archive) throws ArchiveException
-    {
-
     }
 
     public void backup(File base) throws ArchiveException
@@ -60,7 +49,7 @@ public class PluginsArchive implements ArchiveableComponent
             throw new ArchiveException(e);
         }
     }
-
+    
     public void setPluginPaths(PluginPaths pluginPaths)
     {
         this.pluginPaths = pluginPaths;

@@ -3,11 +3,11 @@
 <!--
 
 -->
-<beans>
+<beans default-autowire="byName">
 
-    <bean id="archiveManager" class="com.zutubi.pulse.restore.DefaultArchiveManager" autowire="byName">
+    <bean id="archiveManager" class="com.zutubi.pulse.restore.DefaultArchiveManager">
         <property name="tmpDirectory">
-            <bean id="configRoot" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+            <bean id="tmpRoot" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
                 <property name="targetBeanName">
                     <value>configurationManager</value>
                 </property>
@@ -15,6 +15,30 @@
                     <value>systemPaths.tmpRoot</value>
                 </property>
             </bean>
+        </property>
+        <property name="paths">
+            <bean id="userPaths" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+                <property name="targetBeanName">
+                    <value>configurationManager</value>
+                </property>
+                <property name="propertyPath">
+                    <value>userPaths</value>
+                </property>
+            </bean>
+        </property>
+        <property name="restorableComponents">
+            <list>
+                <ref local="recordsArchive"/>
+                <ref local="databaseArchive"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="recordsArchive" class="com.zutubi.pulse.restore.RecordsArchive"/>
+    
+    <bean id="databaseArchive" class="com.zutubi.pulse.restore.DatabaseArchive">
+        <property name="mappings">
+            <ref bean="hibernateMappings"/>
         </property>
     </bean>
 

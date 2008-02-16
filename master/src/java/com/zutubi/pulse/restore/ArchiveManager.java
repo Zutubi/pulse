@@ -1,6 +1,7 @@
 package com.zutubi.pulse.restore;
 
 import java.io.File;
+import java.util.List;
 
 /**
  *
@@ -12,11 +13,11 @@ public interface ArchiveManager
 
     Archive prepareRestore(File backup) throws ArchiveException;
 
-    Archive previewRestore();
+    List<RestoreTaskGroup> previewRestore();
 
     void restoreArchive();
 
-    Archive createArchive();
+    Archive createArchive() throws ArchiveException;
 
     void restoreArchive(Archive archive);
 
@@ -31,4 +32,9 @@ public interface ArchiveManager
     Archive getArchiveToBeRestoredOnRestart();
 
     // auto archive support.
+
+
+    //-----------------------------------------------------------
+
+
 }

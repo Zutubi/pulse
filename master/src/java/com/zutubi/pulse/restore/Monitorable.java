@@ -4,6 +4,7 @@ package com.zutubi.pulse.restore;
  *
  *
  */
-public class ArchiveEntry
+public interface Monitorable
 {
+    Monitor getMonitor();
 }

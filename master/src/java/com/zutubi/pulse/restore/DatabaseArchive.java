@@ -19,10 +19,14 @@ import javax.sql.DataSource;
  *
  *
  */
-public class DatabaseArchive implements ArchiveableComponent
+public class DatabaseArchive extends AbstractArchivableComponent
 {
+    private static final String EXPORT_FILENAME = "export.xml";
+
     private List<String> mappings = new LinkedList<String>();
+
     private DatabaseConfig databaseConfig = null;
+
     private DataSource dataSource = null;
 
     public String getName()
@@ -30,27 +34,43 @@ public class DatabaseArchive implements ArchiveableComponent
         return "database";
     }
 
-
-    public void backup(Archive archive) throws ArchiveException
+    public void backup(File base) throws ArchiveException
     {
+        try
+        {
+            if (!base.exists() && !base.mkdirs())
+            {
+                throw new IOException("Failed to create archive output directory.");
+            }
 
-    }
+            File export = new File(base, EXPORT_FILENAME);
+            MutableConfiguration configuration = new MutableConfiguration();
+            for (String mapping : mappings)
+            {
+                Resource resource = new ClassPathResource(mapping);
+                configuration.addInputStream(resource.getInputStream());
+            }
 
-    public void restore(Archive archive) throws ArchiveException
-    {
+            configuration.setProperties(databaseConfig.getHibernateProperties());
 
-    }
-
-    public void backup(File base)
-    {
-        throw new RuntimeException("not yet supported");
+            TransferAPI transfer = new TransferAPI();
+            transfer.dump(configuration, dataSource, export);
+        }
+        catch (IOException e)
+        {
+            throw new ArchiveException(e);
+        }
+        catch (TransferException e)
+        {
+            throw new ArchiveException(e);
+        }
     }
 
     public void restore(File base) throws ArchiveException
     {
         try
         {
-            File export = new File(base, "export.xml");
+            File export = new File(base, EXPORT_FILENAME);
             if (export.isFile())
             {
                 MutableConfiguration configuration = new MutableConfiguration();

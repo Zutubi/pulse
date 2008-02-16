@@ -1,5 +1,6 @@
 package com.zutubi.pulse.restore;
 
+import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.ZipUtils;
 import com.zutubi.util.RandomUtils;
 
@@ -26,20 +27,23 @@ public class ArchiveFactory
 
     public Archive createArchive() throws ArchiveException
     {
-        String archiveName = generateArchiveName();
+        File archiveBase = new File(tmpDirectory, RandomUtils.randomString(10));
+        while (archiveBase.exists())
+        {
+            archiveBase = new File(tmpDirectory, RandomUtils.randomString(10));
+        }
+
+        if (!archiveBase.mkdirs())
+        {
+            // failed to create the archive file.
+            throw new ArchiveException();
+        }
 
         // mostly for information at this stage, so that archives can be distinguished.  Will be used
         // for processing at some stage no doubt.
         ArchiveManifest manifest = new ArchiveManifest("created",
                 "version",
                 "author");
-
-        File archiveBase = new File(archiveDirectory, archiveName);
-        if (!archiveBase.mkdirs())
-        {
-            // failed to create the archive file.
-            throw new ArchiveException();
-        }
 
         // write the manifest - properties.
         try
@@ -55,37 +59,55 @@ public class ArchiveFactory
         return new Archive(archiveBase, manifest);
     }
 
-    public Archive openArchive(File archive) throws ArchiveException
+    public File exportArchive(Archive archive) throws ArchiveException
     {
-        File archiveBase = archive;
-
-        // ok, is this an expanded directory or a zip file?
-        if (archive.isFile() && archive.getName().endsWith(".zip"))
+        try
         {
-            if (tmpDirectory == null)
-            {
-                throw new ArchiveException("In place zip archives not supported.");
-            }
+            String archiveName = generateArchiveName() + ".zip";
 
+            File exportFile = new File(archiveDirectory, archiveName);
+
+            ZipUtils.createZip(exportFile, archive.getFile(), null);
+
+            return exportFile;
+        }
+        catch (IOException e)
+        {
+            throw new ArchiveException(e);
+        }
+    }
+
+    public Archive importArchive(File archive) throws ArchiveException
+    {
+        File archiveBase = new File(tmpDirectory, RandomUtils.randomString(10));
+        while (archiveBase.exists())
+        {
             archiveBase = new File(tmpDirectory, RandomUtils.randomString(10));
-            while (archiveBase.exists())
-            {
-                archiveBase = new File(tmpDirectory, RandomUtils.randomString(10));
-            }
-            
-            if (!archiveBase.mkdirs())
-            {
-                throw new ArchiveException();
-            }
+        }
 
-            try
+        if (!archiveBase.mkdirs())
+        {
+            throw new ArchiveException();
+        }
+
+        try
+        {
+            if (archive.isFile() && archive.getName().endsWith(".zip"))
             {
                 ZipUtils.extractZip(archive, archiveBase);
             }
-            catch (IOException e)
+            else if (archive.isDirectory())
             {
-                throw new ArchiveException(e);
+                FileSystemUtils.copy(archiveBase, archive);
             }
+            else
+            {
+                throw new ArchiveException("Unexpected archive file: " + archive.getAbsolutePath());
+            }
+        }
+        catch (IOException e)
+        {
+            throw new ArchiveException(e);
         }
 
         ArchiveManifest manifest;
@@ -94,7 +116,7 @@ public class ArchiveFactory
             File manifestFile = new File(archiveBase, MANIFEST_FILENAME);
             if (!manifestFile.isFile())
             {
-                throw new ArchiveException();
+                throw new ArchiveException("Invalid archive.  No manifest located.");
             }
             manifest = ArchiveManifest.readFrom(manifestFile);
         }
@@ -106,7 +128,7 @@ public class ArchiveFactory
         return new Archive(archiveBase, manifest);
     }
 
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd_hh-mm-ss");
 
     // name generator, based on a predefined file name format, rolling(of sorts) if the name is already in use.
     private String generateArchiveName()
@@ -122,7 +144,7 @@ public class ArchiveFactory
             archiveName = baseArchiveName + "_" + i;
             candidateArchiveFile = new File(archiveDirectory, archiveName);
         }
-        
+
         return archiveName;
     }
 

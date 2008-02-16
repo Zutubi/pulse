@@ -1,5 +1,8 @@
 package com.zutubi.pulse.restore;
 
+import java.io.File;
+import java.util.List;
+
 /**
  *
  *
@@ -20,7 +23,7 @@ public interface ArchiveableComponent
      *
      * @throws ArchiveException if the archive process encounters any problems.
      */
-    void backup(Archive archive) throws ArchiveException;
+    void backup(File archive) throws ArchiveException;
 
     /**
      * Restore the persistent state from the specified archive.
@@ -29,5 +32,7 @@ public interface ArchiveableComponent
      *
      * @throws ArchiveException if the archive process encounters any problems.
      */
-    void restore(Archive archive) throws ArchiveException;
+    void restore(File archive) throws ArchiveException;
+
+    List<RestoreTask> getRestoreTasks(File archiveComponentBase);
 }

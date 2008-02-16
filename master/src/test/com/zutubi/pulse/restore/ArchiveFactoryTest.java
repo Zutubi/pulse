@@ -56,7 +56,7 @@ public class ArchiveFactoryTest extends PulseTestCase
         assertNotNull(createdArchive.getFile());
         assertTrue(createdArchive.getFile().exists());
 
-        Archive loadedArchive = factory.openArchive(createdArchive.getFile());
+        Archive loadedArchive = factory.importArchive(createdArchive.getFile());
         assertEquals(createdArchive.getAuthor(), loadedArchive.getAuthor());
         assertEquals(createdArchive.getVersion(), loadedArchive.getVersion());
         assertEquals(createdArchive.getCreated(), loadedArchive.getCreated());
