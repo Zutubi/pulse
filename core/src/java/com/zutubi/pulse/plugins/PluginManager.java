@@ -8,6 +8,7 @@ import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.IOUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Predicate;
+import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.RegistryFactory;
@@ -129,21 +130,28 @@ public class PluginManager
             // initialise the installed plugins.
             if (entry.containsKey(PLUGIN_SOURCE_KEY))
             {
-                LocalPlugin plugin = createPluginHandle(entry.get(PLUGIN_SOURCE_KEY), Plugin.Type.valueOf(entry.get(PLUGIN_TYPE_KEY)));
-                plugin.setState(Plugin.State.INSTALLED);
-                State targetState = State.valueOf(entry.get(PLUGIN_STATE_KEY));
-                switch (targetState)
+                try
                 {
-                    case ENABLED:
-                        installedPlugins.add(plugin);
-                        break;
-                    case DISABLED:
-                        plugin.setState(Plugin.State.DISABLED);
-                        break;
-                    default:
-                        break;
+                    LocalPlugin plugin = createPluginHandle(entry.get(PLUGIN_SOURCE_KEY), Plugin.Type.valueOf(entry.get(PLUGIN_TYPE_KEY)));
+                    plugin.setState(Plugin.State.INSTALLED);
+                    State targetState = State.valueOf(entry.get(PLUGIN_STATE_KEY));
+                    switch (targetState)
+                    {
+                        case ENABLED:
+                            installedPlugins.add(plugin);
+                            break;
+                        case DISABLED:
+                            plugin.setState(Plugin.State.DISABLED);
+                            break;
+                        default:
+                            break;
+                    }
+                    plugins.add(plugin);
                 }
-                plugins.add(plugin);
+                catch (IllegalArgumentException e)
+                {
+                    LOG.warning("Unexpected IAE while setting up plugin handle for " + id + ".", e);
+                }
             }
         }
 
@@ -155,7 +163,13 @@ public class PluginManager
             Map<String, String> entry = registry.getEntry(plugin.getId());
             if (entry.containsKey(PLUGIN_VERSION_KEY))
             {
-                Version registryVersion = new Version(entry.get(PLUGIN_VERSION_KEY));
+                String registryVersionString = entry.get(PLUGIN_VERSION_KEY);
+                if (!TextUtils.stringSet(registryVersionString))
+                {
+                    LOG.warning("Unexpected null version string in plugin registry for " + plugin.getId() + ".");
+                    continue;
+                }
+                Version registryVersion = new Version(registryVersionString);
                 if (registryVersion.compareTo(plugin.getVersion()) != 0)
                 {
                     plugin.setState(Plugin.State.VERSION_CHANGE);
@@ -201,7 +215,7 @@ public class PluginManager
                     resolvedPlugins.add(plugin);
                     break;
                 default:
-                    System.out.println("Unexpected plugin state; plugin: " + plugin.getName() + "(" + plugin.getId() + "), state: " + plugin.bundle.getState());
+                    LOG.warning("Unexpected plugin state; plugin: " + plugin.getName() + "(" + plugin.getId() + "), state: " + plugin.bundle.getState());
             }
         }
 
@@ -277,7 +291,13 @@ public class PluginManager
                 // check for manually uninstalled plugins.
                 if (entry.containsKey(PLUGIN_SOURCE_KEY))
                 {
-                    File source = new File(new URI(entry.get(PLUGIN_SOURCE_KEY)));
+                    String sourceUriString = entry.get(PLUGIN_SOURCE_KEY);
+                    if (!TextUtils.stringSet(sourceUriString))
+                    {
+                        LOG.warning("Registry entry for plugin '" + id + "' is corrupt. It contains a null source string.");
+                        continue;
+                    }
+                    File source = new File(new URI(sourceUriString));
                     if (!source.exists())
                     {
                         // looks like this plugin is no longer available.
@@ -307,6 +327,11 @@ public class PluginManager
                     if (entry.containsKey(PLUGIN_PENDING_KEY))
                     {
                         String pendingAction = entry.get(PLUGIN_PENDING_KEY);
+                        if (!TextUtils.stringSet(pendingAction))
+                        {
+                            LOG.warning("Registry entry for plugin '" + id + "' is corrupt. Missing pending action.");
+                            continue;
+                        }
                         if (pendingAction.equals(DISABLE_PENDING_ACTION))
                         {
                             entry.put(PLUGIN_STATE_KEY, State.DISABLED.toString());
@@ -316,6 +341,10 @@ public class PluginManager
                             if (entry.containsKey(PLUGIN_SOURCE_KEY))
                             {
                                 String source = entry.get(PLUGIN_SOURCE_KEY);
+                                if (!TextUtils.stringSet(source))
+                                {
+                                    LOG.warning("Registry entry for plugin '" + id + "' is corrupt. Uninstall source not specified.");
+                                }
                                 File plugin = new File(new URI(source));
                                 FileSystemUtils.delete(plugin);
                                 entry.remove(PLUGIN_SOURCE_KEY);
@@ -410,7 +439,13 @@ public class PluginManager
                     }
 
                     // version check. if new version available, mark it for pending upgrade.
-                    LocalPlugin registeredPlugin = createPluginHandle(new URI(entry.get(PLUGIN_SOURCE_KEY)), Plugin.Type.valueOf(entry.get(PLUGIN_TYPE_KEY)));
+                    String pluginSourceString = entry.get(PLUGIN_SOURCE_KEY);
+                    if (!TextUtils.stringSet(pluginSourceString))
+                    {
+                        LOG.warning("Can not complete pre-packaged plugin version for " + plugin.getId() + ".  Installed source not available.");
+                        continue;
+                    }
+                    LocalPlugin registeredPlugin = createPluginHandle(new URI(pluginSourceString), Plugin.Type.valueOf(entry.get(PLUGIN_TYPE_KEY)));
 
                     //TODO: provide the user with the opportunity to not upgrade to the new version. They may have an old version for a specific reason.
 
@@ -545,14 +580,21 @@ public class PluginManager
             if (entry.containsKey(PLUGIN_SOURCE_KEY))
             {
                 String source = entry.get(PLUGIN_SOURCE_KEY);
-                File pluginFile = new File(new URI(source));
-                if (pluginFile.isDirectory())
+                if (!TextUtils.stringSet(source))
                 {
-                    FileSystemUtils.rmdir(pluginFile);
+                    LOG.warning("Unable to remove source for plugin " + plugin.getId() + " during uninstall.  Source not known.");
                 }
-                else if (pluginFile.isFile())
+                else
                 {
-                    FileSystemUtils.delete(pluginFile);
+                    File pluginFile = new File(new URI(source));
+                    if (pluginFile.isDirectory())
+                    {
+                        FileSystemUtils.rmdir(pluginFile);
+                    }
+                    else if (pluginFile.isFile())
+                    {
+                        FileSystemUtils.delete(pluginFile);
+                    }
                 }
 
                 entry.remove(PLUGIN_SOURCE_KEY);
@@ -591,13 +633,20 @@ public class PluginManager
         saveRegistry();
 
         // check version, if it has changed, then set the plugin state to VERSION_CHANGED.
-        if (entry.containsKey(PLUGIN_VERSION_KEY))
+        try
         {
-            Version registryVersion = new Version(entry.get(PLUGIN_VERSION_KEY));
-            if (registryVersion.compareTo(plugin.getVersion()) != 0)
+            if (entry.containsKey(PLUGIN_VERSION_KEY))
             {
-                plugin.setState(Plugin.State.VERSION_CHANGE);
+                Version registryVersion = new Version(entry.get(PLUGIN_VERSION_KEY));
+                if (registryVersion.compareTo(plugin.getVersion()) != 0)
+                {
+                    plugin.setState(Plugin.State.VERSION_CHANGE);
+                }
             }
+        }
+        catch (IllegalArgumentException e)
+        {
+            throw new PluginException("Version check during plugin enable failed. Cause: IllegalArgumentException - " + e.getMessage(), e);
         }
 
         //TODO: OK, so this plugin is enabled, when does the extension manager receive a callback
@@ -747,6 +796,10 @@ public class PluginManager
 
     private LocalPlugin createPluginHandle(String source, Plugin.Type type) throws PluginException
     {
+        if (!TextUtils.stringSet(source))
+        {
+            throw new IllegalArgumentException("Can not create a plugin handle without a source string defined.");                
+        }
         try
         {
             return createPluginHandle(new URI(source), type);
