@@ -63,7 +63,7 @@ public class DefaultArchiveManager implements ArchiveManager
 
             // does it matter if this does not exist, do we need to process something regardless?
 
-            taskGroup.setTasks(component.getRestoreTasks(archiveComponentBase));
+            taskGroup.addTask(new RestoreComponentTask(component, archiveComponentBase));
 
             groups.add(taskGroup);
         }

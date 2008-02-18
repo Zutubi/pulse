@@ -33,4 +33,8 @@ public class RestoreTaskGroup
         this.tasks = tasks;
     }
 
+    public void addTask(RestoreComponentTask task)
+    {
+        tasks.add(task);
+    }
 }
