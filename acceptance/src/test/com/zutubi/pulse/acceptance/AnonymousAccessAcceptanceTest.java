@@ -51,23 +51,9 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         loginPage.assertPresent();
     }
 
-    public void testAnonymousAccess() throws Exception
-    {
-        ensureSetting(KEY_ANONYMOUS_ACCESS, true);
-        goTo(urls.projects());
-
-        ProjectsPage projectsPage = new ProjectsPage(selenium, urls);
-        projectsPage.assertPresent();
-        assertElementPresent(ID_LOGIN);
-
-        // No dashboard tab, user info or logout link for anonymous users
-        assertElementNotPresent(ID_DASHBOARD_TAB);
-        assertElementNotPresent(ID_PREFERENCES);
-        assertElementNotPresent(ID_LOGOUT);
-    }
-
     public void testAnonymousSignup() throws Exception
     {
+        ensureSetting(KEY_ANONYMOUS_ACCESS, false);
         ensureSetting(KEY_ANONYMOUS_SIGNUP, true);
 
         LoginPage loginPage = new LoginPage(selenium, urls);
@@ -120,6 +106,21 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         form.saveFormElements("admin", "name", "p", "p");
         form.assertFormPresent();
         assertTextPresent("login 'admin' is already in use");
+    }
+
+    public void testAnonymousAccess() throws Exception
+    {
+        ensureSetting(KEY_ANONYMOUS_ACCESS, true);
+        goTo(urls.projects());
+
+        ProjectsPage projectsPage = new ProjectsPage(selenium, urls);
+        projectsPage.assertPresent();
+        assertElementPresent(ID_LOGIN);
+
+        // No dashboard tab, user info or logout link for anonymous users
+        assertElementNotPresent(ID_DASHBOARD_TAB);
+        assertElementNotPresent(ID_PREFERENCES);
+        assertElementNotPresent(ID_LOGOUT);
     }
 
     public void testAssignServerPermissionToAnonymousUsers() throws Exception
