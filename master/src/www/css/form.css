@@ -183,3 +183,8 @@ td.currentstep
     font-weight: bold;
     border-bottom: none;
 }
+
+.checkboxCell
+{
+    padding: 4px;
+}

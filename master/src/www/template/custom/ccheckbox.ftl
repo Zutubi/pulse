@@ -16,7 +16,7 @@
     <td align="center" valign="top" colspan="2">
         <table border="0" cellpadding="0" cellspacing="0">
             <tr>
-                <td valign="middle"><#include "/${parameters.templateDir}/simple/checkbox.ftl" /></td>
+                <td class="checkboxCell" valign="middle"><#include "/${parameters.templateDir}/simple/checkbox.ftl" /></td>
                 <td valign="middle"><#rt/>
                     <label<#t/>
 <#if parameters.id?exists>
