@@ -18,10 +18,6 @@ public class XMLTransferSource extends XMLTransferSupport implements TransferSou
 {
     private InputStream source;
 
-/*
-    private Configuration configuration;
-*/
-
     private Map<String, String> row;
 
     private TransferTarget target;
@@ -117,31 +113,6 @@ public class XMLTransferSource extends XMLTransferSupport implements TransferSou
     {
         currentColumn = null;
     }
-
-/*
-    private Table getTable(String tableName)
-    {
-        Iterator tables = configuration.getTableMappings();
-        while (tables.hasNext())
-        {
-            org.hibernate.mapping.Table table = (org.hibernate.mapping.Table) tables.next();
-            if (table.getName().equals(tableName))
-            {
-                return new HibernateTable(table);
-            }
-        }
-        if (HibernateUniqueKeyTable.isTable(tableName))
-        {
-            return new HibernateTable(HibernateUniqueKeyTable.getMapping());
-        }
-        return null;
-    }
-
-    public void setConfiguration(Configuration configuration)
-    {
-        this.configuration = configuration;
-    }
-*/
 
     private class Callback extends NodeFactory
     {

@@ -146,9 +146,9 @@ public class JDBCUtils
         {
             stmt = con.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery();
-            if(rs.next())
+            if (rs.next())
             {
-                return rs.getObject(1);                
+                return rs.getObject(1);
             }
             else
             {
@@ -191,7 +191,7 @@ public class JDBCUtils
     {
         try
         {
-            JDBCUtils.execute(dataSource, "SELECT COUNT("+columnName+") FROM " + tableName);
+            JDBCUtils.execute(dataSource, "SELECT COUNT(" + columnName + ") FROM " + tableName);
             return true;
         }
         catch (SQLException e)
@@ -204,7 +204,7 @@ public class JDBCUtils
     {
         try
         {
-            JDBCUtils.execute(con, "SELECT COUNT("+columnName+") FROM " + tableName);
+            JDBCUtils.execute(con, "SELECT COUNT(" + columnName + ") FROM " + tableName);
             return true;
         }
         catch (SQLException e)
@@ -212,6 +212,27 @@ public class JDBCUtils
             return false;
         }
     }
+
+    public static void dropAllTablesFromSchema(Connection con) throws SQLException
+    {
+        // 1) determine which database we are dealing with.
+        MiniDialect dialect = getMiniDialect(con);
+
+        // 2) get a list of all the tables
+        String[] tableNames = getSchemaTableNames(con);
+
+        // 3) generate the list of sql statements
+        List<String> statements = new LinkedList<String>();
+        for (String tableName : tableNames)
+        {
+            statements.add(dialect.sqlDropTable(tableName));
+        }
+
+        // 4) execute the sql.
+        String[] sql = statements.toArray(new String[statements.size()]);
+        JDBCUtils.executeSchemaScript(con, sql);
+    }
+
 
     public static String[] getSchemaTableNames(Connection con)
     {
@@ -358,15 +379,15 @@ public class JDBCUtils
         }
         else if (type == Types.INTEGER)
         {
-            setInt(ps, col, (Integer)obj);
+            setInt(ps, col, (Integer) obj);
         }
         else if (type == Types.VARCHAR)
         {
-            setString(ps, col, (String)obj);
+            setString(ps, col, (String) obj);
         }
         else if (type == Types.BIT)
         {
-            setBool(ps, col, (Boolean)obj);
+            setBool(ps, col, (Boolean) obj);
         }
         else
         {
@@ -381,7 +402,7 @@ public class JDBCUtils
         {
             return null;
         }
-        return (String)result;
+        return (String) result;
     }
 
     public static void setInt(PreparedStatement ps, int col, Integer i) throws SQLException
@@ -403,7 +424,7 @@ public class JDBCUtils
         {
             return null;
         }
-        return (Integer)result;
+        return (Integer) result;
     }
 
     public static void setLong(PreparedStatement ps, int col, Long l) throws SQLException
@@ -425,7 +446,7 @@ public class JDBCUtils
         {
             return null;
         }
-        return (Long)result;
+        return (Long) result;
     }
 
     public static void setBool(PreparedStatement ps, int col, Boolean b) throws SQLException
@@ -447,7 +468,7 @@ public class JDBCUtils
         {
             return null;
         }
-        return (Boolean)result;
+        return (Boolean) result;
     }
 
     public static void executeUpdate(Connection con, String sql, Object[] args, int[] types) throws SQLException
@@ -513,4 +534,49 @@ public class JDBCUtils
         }
     }
 
+    private static MiniDialect getMiniDialect(Connection con) throws SQLException
+    {
+        String driverName = con.getMetaData().getDriverName();
+        if (driverName.contains("hsql"))
+        {
+            return new HSQLMiniDialect();
+        }
+        else if (driverName.contains("ostgre"))
+        {
+            return new PostgresMiniDialect();
+        }
+        else
+        {
+            return new MySQLMiniDialect();
+        }
+    }
+
+    private static interface MiniDialect
+    {
+        public String sqlDropTable(String tableName);
+    }
+
+    private static class HSQLMiniDialect implements MiniDialect
+    {
+        public String sqlDropTable(String tableName)
+        {
+            return "DROP TABLE " + tableName + " IF EXISTS CASCADE";
+        }
+    }
+
+    private static class MySQLMiniDialect implements MiniDialect
+    {
+        public String sqlDropTable(String tableName)
+        {
+            return "DROP TABLE " + tableName + " IF EXISTS CASCADE";
+        }
+    }
+
+    private static class PostgresMiniDialect implements MiniDialect
+    {
+        public String sqlDropTable(String tableName)
+        {
+            return "DROP TABLE " + tableName + " CASCADE";
+        }
+    }
 }

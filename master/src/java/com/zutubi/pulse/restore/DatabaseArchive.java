@@ -1,19 +1,23 @@
 package com.zutubi.pulse.restore;
 
-import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
+import com.zutubi.pulse.database.DatabaseConfig;
 import com.zutubi.pulse.transfer.TransferAPI;
 import com.zutubi.pulse.transfer.TransferException;
-import com.zutubi.pulse.database.DatabaseConfig;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.LinkedList;
-
-import org.springframework.core.io.Resource;
+import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
+import com.zutubi.pulse.util.JDBCUtils;
+import com.zutubi.util.IOUtils;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
 import javax.sql.DataSource;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
@@ -41,6 +45,19 @@ public class DatabaseArchive extends AbstractArchivableComponent
             if (!base.exists() && !base.mkdirs())
             {
                 throw new IOException("Failed to create archive output directory.");
+            }
+
+            // need to export the configuration as part of the data export.
+            for (String mapping : mappings)
+            {
+                Resource resource = new ClassPathResource(mapping);
+                File file = new File(base, resource.getFilename());
+                if (!file.createNewFile())
+                {
+                    // :|
+                    System.out.println("Unexpected.");
+                }
+                IOUtils.writeToFile(file, resource.getInputStream());
             }
 
             File export = new File(base, EXPORT_FILENAME);
@@ -74,24 +91,51 @@ public class DatabaseArchive extends AbstractArchivableComponent
             if (export.isFile())
             {
                 MutableConfiguration configuration = new MutableConfiguration();
-                for (String mapping : mappings)
+
+                File[] mappingFiles = base.listFiles(new FilenameFilter()
                 {
-                    Resource resource = new ClassPathResource(mapping);
-                    configuration.addInputStream(resource.getInputStream());
+                    public boolean accept(File dir, String name)
+                    {
+                        return name.endsWith(".hbm.xml");
+                    }
+                });
+
+                for (File mappingFile : mappingFiles)
+                {
+                    // input stream closed by the addInputStream call.
+                    configuration.addInputStream(new FileInputStream(mappingFile));
                 }
 
                 configuration.setProperties(databaseConfig.getHibernateProperties());
+
+                Connection con = null;
+                try
+                {
+                    con = dataSource.getConnection();
+                    JDBCUtils.dropAllTablesFromSchema(con);
+                }
+                finally
+                {
+                    JDBCUtils.close(con);
+                }
 
                 TransferAPI transfer = new TransferAPI();
                 transfer.restore(configuration, export, dataSource);
             }
         }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+            throw new ArchiveException(e);
+        }
         catch (IOException e)
         {
+            e.printStackTrace();
             throw new ArchiveException(e);
         }
         catch (TransferException e)
         {
+            e.printStackTrace();
             throw new ArchiveException(e);
         }
     }

@@ -30,6 +30,8 @@ public class XMLTransferTarget extends XMLTransferSupport implements TransferTar
 
     private OutputStream output;
 
+    private String dataDefinition;
+
     public XMLTransferTarget()
     {
     }

@@ -138,6 +138,10 @@ public class TransferAPI
                 throw new TransferException("Failed to connect to the configured dataSource.  Cause: '"+e.getMessage()+"'");
             }
 
+            // we could use the configuration.validateSchema() except that the output is not as friendly or comprehensive
+            // as we would like - reporting only first error that it encounters.  The downside to the custom implementation
+            // is that it is not as comprehensive in its tests.
+
             // output diagnostics.
             StringBuilder builder = new StringBuilder();
             builder.append("The following expected schema entities are missing from the source database:\n");

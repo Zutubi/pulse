@@ -255,4 +255,9 @@ public class IOUtils
             IOUtils.close(writer);
         }
     }
+
+    public static void writeToFile(File file, InputStream inputStream) throws IOException
+    {
+        joinStreams(inputStream, new FileOutputStream(file), true);
+    }
 }

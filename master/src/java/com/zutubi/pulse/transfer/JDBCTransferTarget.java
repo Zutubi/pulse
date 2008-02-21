@@ -69,6 +69,12 @@ public class JDBCTransferTarget implements TransferTarget
                 {
                     throw new TransferException("Transfer target does not contain column " + column.getName() + " in table " + table.getName());
                 }
+                if (columnMapping.getSqlTypeCode() == null)
+                {
+                    // not sure why this is a problem when we run a restore via the restoration process, but not a
+                    // problem when we run an import via the commands.
+                    continue;
+                }
                 if (columnMapping.getSqlTypeCode() != column.getSqlTypeCode())
                 {
                     throw new TransferException("Column type mismatch for column " + column.getName() + ". " +
