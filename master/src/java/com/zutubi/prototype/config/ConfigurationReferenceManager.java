@@ -68,7 +68,7 @@ public class ConfigurationReferenceManager
         }
     }
 
-    public Configuration resolveReference(String fromPath, long toHandle, Instantiator instantiator) throws TypeException
+    public Configuration resolveReference(String fromPath, long toHandle, Instantiator instantiator, InstanceSource cache) throws TypeException
     {
         String toPath = recordManager.getPathForHandle(toHandle);
         if(toPath == null)
@@ -81,7 +81,7 @@ public class ConfigurationReferenceManager
             indexReference(fromPath, toPath);
         }
         
-        Configuration instance = configurationTemplateManager.getInstance(toPath);
+        Configuration instance = cache.getInstance(toPath);
         if (instance == null)
         {
             Record record = configurationTemplateManager.getRecord(toPath);

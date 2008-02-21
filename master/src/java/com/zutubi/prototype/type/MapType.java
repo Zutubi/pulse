@@ -61,6 +61,11 @@ public class MapType extends CollectionType
         }
     }
 
+    public CompositeType getTargetType()
+    {
+        return (CompositeType) super.getTargetType();
+    }
+
     @SuppressWarnings({"unchecked"})
     public Map instantiate(Object data, Instantiator instantiator) throws TypeException
     {

@@ -473,6 +473,38 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         assertEquals("er", er.getName());
     }
 
+    public void testDeepCloneWithInternalReference()
+    {
+        // We need to jump through hoops a bit to set this up.  It is not
+        // possible to set up a reference to something until it is saved.
+        // Hence we need to insert the referer and nested referee first, and
+        // then later we can add references to the nested referee.
+        MockReferee ee = new MockReferee("ee");
+        MockReferer er = new MockReferer("er");
+        er.setRef(ee);
+        configurationTemplateManager.insert("referer", er);
+        er = configurationTemplateManager.getInstance("referer/er", MockReferer.class);
+        er = configurationTemplateManager.deepClone(er);
+        ee = er.getRef();
+        er.setRefToRef(ee);
+        er.getRefToRefs().add(ee);
+        configurationTemplateManager.save(er);
+
+        er = configurationTemplateManager.getInstance("referer/er", MockReferer.class);
+        ee = er.getRef();
+        assertSame(ee, er.getRefToRef());
+        assertSame(ee, er.getRefToRefs().get(0));
+
+        // Now we can actually clone and test.
+        MockReferer clone = configurationTemplateManager.deepClone(er);
+        MockReferee refClone = clone.getRef();
+
+        assertNotSame(er, clone);
+        assertNotSame(ee, refClone);
+        assertSame(refClone, clone.getRefToRef());
+        assertSame(refClone, clone.getRefToRefs().get(0));
+    }
+
     public void testDeepClonePreservesPaths() throws TypeException
     {
         MockA a = new MockA("a");

@@ -108,7 +108,7 @@ public abstract class TypeProperty
 
     public abstract Object getValue(Object instance) throws Exception;
     
-    public abstract void setValue(Object instance, Object value) throws Exception;
+    public abstract void setValue(Object instance, Object value) throws TypeException;
 
     public abstract boolean isReadable();
     

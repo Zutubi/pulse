@@ -15,17 +15,19 @@ import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
+import com.zutubi.util.Sort;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.ValidationManager;
 import com.zutubi.validation.i18n.MessagesTextProvider;
+import com.zutubi.validation.i18n.TextProvider;
 
 import java.util.*;
 
 /**
  */
-public class ConfigurationTemplateManager implements Synchronization
+public class ConfigurationTemplateManager implements InstanceSource, Synchronization
 {
     private static final Logger LOG = Logger.getLogger(ConfigurationTemplateManager.class);
 
@@ -90,7 +92,19 @@ public class ConfigurationTemplateManager implements Synchronization
         return record;
     }
 
-    public TemplateRecord getParentRecord(String path)
+    /**
+     * Retrieves the template parent record for the record at the given path,
+     * if such a parent exists.  The given path must point to an existing
+     * record.
+     *
+     * @param path path to retrieve the template parent record for
+     * @return the template parent, or null if no such parent exists
+     *         (including the case where the path is not in a templated
+     *         scope)
+     * @throws IllegalArgumentException if the given path does not point to
+     *         an existing record
+     */
+    public TemplateRecord getTemplateParentRecord(String path)
     {
         checkPersistent(path);
 
@@ -100,7 +114,7 @@ public class ConfigurationTemplateManager implements Synchronization
             ConfigurationScopeInfo scopeInfo = configurationPersistenceManager.getScopeInfo(pathElements[0]);
             if (scopeInfo.isTemplated())
             {
-                return getParentRecord(pathElements);
+                return getTemplateParentRecord(pathElements);
             }
         }
 
@@ -135,9 +149,11 @@ public class ConfigurationTemplateManager implements Synchronization
 
     /**
      * Returns the path of the parent record in the template hierarchy, or
-     * null if no such parent exists.
+     * null if no such parent exists.  Must only be used with owning records,
+     * i.e. the actual elements of the templated collection, as these are the
+     * records marked with a parent handle.
      *
-     * @param path     path of the record
+     * @param path     path of the given record (should be two elements)
      * @param record   record to get the parent of
      * @param required if true and the parent does not exist, an
      *                 IllegalArgumentException is thrown
@@ -146,6 +162,11 @@ public class ConfigurationTemplateManager implements Synchronization
      */
     private String getTemplateParentPath(String path, Record record, boolean required)
     {
+        if(PathUtils.getPathElements(path).length != 2)
+        {
+            throw new IllegalArgumentException("Path '" + path + "' does not refer to an owning record");
+        }
+
         String result = null;
         long handle = getTemplateParentHandle(path, record);
         if (handle != 0)
@@ -167,7 +188,7 @@ public class ConfigurationTemplateManager implements Synchronization
         return result;
     }
 
-    private TemplateRecord getParentRecord(String[] pathElements)
+    private TemplateRecord getTemplateParentRecord(String[] pathElements)
     {
         // Get the top-level template record for our parent and then
         // ask it for the property to get our parent template record.
@@ -210,7 +231,7 @@ public class ConfigurationTemplateManager implements Synchronization
             ConfigurationScopeInfo scopeInfo = configurationPersistenceManager.getScopeInfo(pathElements[0]);
             if (scopeInfo.isTemplated())
             {
-                TemplateRecord parentTemplateRecord = getParentRecord(pathElements);
+                TemplateRecord parentTemplateRecord = getTemplateParentRecord(pathElements);
                 ComplexType type = parentTemplateRecord == null ? configurationPersistenceManager.getType(path) : parentTemplateRecord.getType();
                 record = new TemplateRecord(pathElements[1], parentTemplateRecord, type, record);
             }
@@ -381,7 +402,7 @@ public class ConfigurationTemplateManager implements Synchronization
         if (templateParentPath != null)
         {
             TemplateRecord templateParent = (TemplateRecord) getRecord(templateParentPath);
-            if(isConcrete(templateParent))
+            if(isConcreteOwner(templateParent))
             {
                 throw new IllegalArgumentException("Cannot inherit from concrete path '" + templateParentPath + "'");
             }
@@ -577,10 +598,10 @@ public class ConfigurationTemplateManager implements Synchronization
                 {
                     String itemPath = PathUtils.getPath(path, id);
                     Record record = getRecord(itemPath);
-                    boolean concrete = isConcrete(record);
+                    boolean concrete = isConcreteOwner(record);
                     try
                     {
-                        PersistentInstantiator instantiator = new PersistentInstantiator(path, concrete, instances, incompleteInstances, configurationReferenceManager);
+                        PersistentInstantiator instantiator = new PersistentInstantiator(path, concrete, instances, incompleteInstances, this, configurationReferenceManager);
                         Configuration instance = (Configuration) instantiator.instantiate(id, true, templatedType, record);
 
                         // Concrete instances go into the collection
@@ -599,7 +620,7 @@ public class ConfigurationTemplateManager implements Synchronization
             {
                 try
                 {
-                    PersistentInstantiator instantiator = new PersistentInstantiator(path, true, instances, incompleteInstances, configurationReferenceManager);
+                    PersistentInstantiator instantiator = new PersistentInstantiator(path, true, instances, incompleteInstances, this, configurationReferenceManager);
                     instantiator.instantiate(path, false, type, topRecord);
                 }
                 catch (TypeException e)
@@ -636,6 +657,32 @@ public class ConfigurationTemplateManager implements Synchronization
         });
     }
 
+    /**
+     * Tests if an existing path is part of a concrete instance (as opposed
+     * to a template).
+     *
+     * @see #isConcrete(String, com.zutubi.prototype.type.record.Record)
+     *
+     * @param path the path to test, which must exist
+     * @return true if the path points into a concrete instance, false if it
+     *         points into a template
+     * @throws IllegalArgumentException if no record exists at the path
+     */
+    public boolean isConcrete(String path)
+    {
+        Record subject = getRecord(path);
+        return isConcrete(PathUtils.getParentPath(path), subject);
+    }
+
+    /**
+     * Tests if the given record, inserted at the given path, would be part
+     * of a concrete instance (as opposed to a template).
+     *
+     * @param parentPath the path the record would be inserted into
+     * @param subject    the record to be inserted
+     * @return true if the record given, when inserted at the path given,
+     *         would be part of a concrete instance
+     */
     public boolean isConcrete(String parentPath, Record subject)
     {
         if (parentPath != null)
@@ -646,14 +693,14 @@ public class ConfigurationTemplateManager implements Synchronization
                 if (elements.length == 1)
                 {
                     // This record itself will carry the template marker
-                    return isConcrete(subject);
+                    return isConcreteOwner(subject);
                 }
                 else
                 {
                     // Load the owner to see if it is marked as a template
                     String ownerPath = PathUtils.getPath(elements[0], elements[1]);
                     Record ownerRecord = getRecord(ownerPath);
-                    return isConcrete(ownerRecord);
+                    return isConcreteOwner(ownerRecord);
                 }
             }
         }
@@ -661,7 +708,15 @@ public class ConfigurationTemplateManager implements Synchronization
         return true;
     }
 
-    private boolean isConcrete(Record record)
+    /**
+     * Tests if a record carries the template marker, return true if it does
+     * not.  Should only be appliued to owner records (i.e. elements of a
+     * templated collection), as the markers are only applied at this level.
+     *
+     * @param record the record to test
+     * @return true if the record does not carry the template marker
+     */
+    private boolean isConcreteOwner(Record record)
     {
         if (record instanceof TemplateRecord)
         {
@@ -718,7 +773,7 @@ public class ConfigurationTemplateManager implements Synchronization
     {
         String id = (String) record.get(idProperty);
         String path = PathUtils.getPath(scopeName, id);
-        TemplateNode node = new TemplateNode(path, id, isConcrete(record));
+        TemplateNode node = new TemplateNode(path, id, isConcreteOwner(record));
 
         List<Record> children = recordsByParent.get(record.getHandle());
         if (children != null)
@@ -791,7 +846,7 @@ public class ConfigurationTemplateManager implements Synchronization
         // Create an instance of the object represented by the record.  It is
         // during the instantiation that type conversion errors are detected.
         Configuration instance;
-        SimpleInstantiator instantiator = new SimpleInstantiator(configurationReferenceManager);
+        SimpleInstantiator instantiator = new SimpleInstantiator(this, configurationReferenceManager);
         instance = (Configuration) instantiator.instantiate(type, subject);
 
         // Now apply validations via using the validation manager.
@@ -1311,6 +1366,64 @@ public class ConfigurationTemplateManager implements Synchronization
         }
     }
 
+    /**
+     * Validates that a new name is unique in a collection.  This takes into
+     * account names in template ancestors and descendents: the name must be
+     * unique in the entire hierarchy.
+     *
+     * @param parentPath   path of the collection to test
+     * @param baseName     the name to check for uniqueness
+     * @param fieldName    the name of configuration instance field that
+     *                     holds the base name (i.e. the key property)
+     * @param textProvider used for formatting validation error messages
+     * @throws ValidationException if the name is not unique
+     */
+    public void validateNameIsUnique(String parentPath, String baseName, String fieldName, TextProvider textProvider) throws ValidationException
+    {
+        String path = PathUtils.getPath(parentPath, baseName);
+        if(pathExists(path))
+        {
+            throw new ValidationException(textProvider.getText(".inuse", "chosen " + fieldName + " is already in use", fieldName));
+        }
+        else if(PathUtils.getPathElements(path).length > 2)
+        {
+            // We only need to do these checks when potentially
+            // within a templated instance (hence the > 2 above).
+            String ancestorPath = findAncestorPath(path);
+            if(ancestorPath != null)
+            {
+                throw new ValidationException(textProvider.getText(".inancestor", "chosen " + fieldName + " is already in use in an ancestor", fieldName, PathUtils.getPathElements(ancestorPath)[1]));
+            }
+            else
+            {
+                List<String> descendentPaths = getDescendentPaths(path, true, false, false);
+                if(descendentPaths.size() > 0)
+                {
+                    List<String> descendentNames = CollectionUtils.map(descendentPaths, new Mapping<String, String>()
+                    {
+                        public String map(String descendentPath)
+                        {
+                            return PathUtils.getPathElements(descendentPath)[1];
+                        }
+                    });
+
+                    String message = "chosen " + fieldName + " is already in use in one or more descendents";
+                    if(descendentNames.size() == 1)
+                    {
+                        message = textProvider.getText(".indescendent", new Object[]{fieldName, descendentNames.get(0)});
+                    }
+                    else
+                    {
+                        Collections.sort(descendentNames, new Sort.StringComparator());
+                        message = textProvider.getText(".indescendents", new Object[]{fieldName, descendentNames.toString()});
+                    }
+
+                    throw new ValidationException(message);
+                }
+            }
+        }
+    }
+
     private boolean isSkeleton(String path)
     {
         String[] elements = PathUtils.getPathElements(path);
@@ -1562,7 +1675,7 @@ public class ConfigurationTemplateManager implements Synchronization
 
                 // Now we need to restore the skeletons at this path and all
                 // descendents.
-                TemplateRecord templateParent = getParentRecord(pathElements);
+                TemplateRecord templateParent = getTemplateParentRecord(pathElements);
                 TemplateHierarchy templateHierarchy = getTemplateHierarchy(scope);
                 TemplateNode node = templateHierarchy.getNodeById(pathElements[1]);
                 addInheritedSkeletons(scope, PathUtils.getPath(2, pathElements), typeRegistry.getType(templateParent.getSymbolicName()), templateParent.getMoi(), node.getParent());
@@ -1648,13 +1761,13 @@ public class ConfigurationTemplateManager implements Synchronization
         String path = instance.getConfigurationPath();
         Record record = getRecord(path);
         ComplexType type = getType(path);
-        PersistentInstantiator instantiator = new PersistentInstantiator(path, isConcrete(PathUtils.getParentPath(path), record), new DefaultInstanceCache(), new DefaultInstanceCache(), configurationReferenceManager);
+        CloningInstantiator instantiator = new CloningInstantiator(path, path, isConcrete(PathUtils.getParentPath(path), record), new DefaultInstanceCache(), new DefaultInstanceCache(), this, configurationReferenceManager);
         try
         {
             Configuration clone = (Configuration) instantiator.instantiate(path, false, type, record);
-            clone.setConfigurationPath(instance.getConfigurationPath());
-            clone.setHandle(instance.getHandle());
-            clone.setConcrete(instance.isConcrete());
+//            clone.setConfigurationPath(instance.getConfigurationPath());
+//            clone.setHandle(instance.getHandle());
+//            clone.setConcrete(instance.isConcrete());
             return (T) clone;
         }
         catch (TypeException e)
@@ -1879,6 +1992,19 @@ public class ConfigurationTemplateManager implements Synchronization
         return null;
     }
 
+    /**
+     * Retrieves the type for the given path, ensuring it is of the specified
+     * type.
+     *
+     * @see #getType(String)
+     *
+     * @param path      the path to retrieve the type for
+     * @param typeClass class of the expected type (the result may be a
+     *                  subtype)
+     * @return the type of the given path
+     * @throws IllegalArgumentException if the given path is not valid or
+     *         does not match the expected type
+     */
     @SuppressWarnings({"unchecked"})
     public <T extends Type> T getType(String path, Class<T> typeClass)
     {

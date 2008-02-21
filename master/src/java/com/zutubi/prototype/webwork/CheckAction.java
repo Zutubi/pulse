@@ -89,7 +89,7 @@ public class CheckAction extends PrototypeSupport
         }
 
         // Instantiate the primary configuration object.
-        SimpleInstantiator instantiator = new SimpleInstantiator(configurationReferenceManager);
+        SimpleInstantiator instantiator = new SimpleInstantiator(configurationTemplateManager, configurationReferenceManager);
         Configuration instance = (Configuration) instantiator.instantiate(type, record);
 
         // Instantiate and execute the check handler.

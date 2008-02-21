@@ -42,7 +42,7 @@ public class MapTypeTest extends TypeTestCase
         instance.put("keyB", new MockA("valueB"));
 
         Record record = (Record) mapType.unstantiate(instance);
-        SimpleInstantiator instantiator = new SimpleInstantiator(null);
+        SimpleInstantiator instantiator = new SimpleInstantiator(null, null);
         Map newInstance = (Map) instantiator.instantiate(mapType, record);
 
         assertEquals(2, newInstance.size());

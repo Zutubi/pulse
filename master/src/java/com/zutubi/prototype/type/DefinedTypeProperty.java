@@ -43,7 +43,7 @@ public class DefinedTypeProperty extends TypeProperty
         return null;
     }
 
-    public void setValue(Object instance, Object value) throws IllegalAccessException, InvocationTargetException
+    public void setValue(Object instance, Object value) throws TypeException
     {
         // This is a read only property.
         if (setter == null)
@@ -57,7 +57,14 @@ public class DefinedTypeProperty extends TypeProperty
             value = primitiveType.getNullValue();
         }
 
-        setter.invoke(instance, value);
+        try
+        {
+            setter.invoke(instance, value);
+        }
+        catch (Exception e)
+        {
+            throw new TypeException("Unable to set property '" + getName() + "': " + e.getMessage(), e);
+        }
     }
 
     public boolean isReadable()

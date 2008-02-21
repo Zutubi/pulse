@@ -57,7 +57,7 @@ public class CompositeTypeTest extends TypeTestCase
         instance.setString("howdy");
 
         Record record = basicType.unstantiate(instance);
-        SimpleInstantiator instantiator = new SimpleInstantiator(null);
+        SimpleInstantiator instantiator = new SimpleInstantiator(null, null);
         Object newInstance = instantiator.instantiate(basicType, record);
         assertTrue(newInstance instanceof BasicTypes);
         assertEquals(newInstance, instance);
@@ -74,7 +74,7 @@ public class CompositeTypeTest extends TypeTestCase
             }
         }
 
-        SimpleInstantiator instantiator = new SimpleInstantiator(null);
+        SimpleInstantiator instantiator = new SimpleInstantiator(null, null);
         BasicTypes instance = (BasicTypes) basicType.instantiate(record, instantiator);
         basicType.initialise(instance, record, instantiator);
         assertEquals(false, instance.isBooleanP());
@@ -95,7 +95,7 @@ public class CompositeTypeTest extends TypeTestCase
         instance.setA(objectTypeB);
 
         Record record = typeA.unstantiate(instance);
-        SimpleInstantiator instantiator = new SimpleInstantiator(null);
+        SimpleInstantiator instantiator = new SimpleInstantiator(null, null);
         ObjectTypeA newInstance = (ObjectTypeA) instantiator.instantiate(typeA, record);
 
         assertNotNull(newInstance.getA());

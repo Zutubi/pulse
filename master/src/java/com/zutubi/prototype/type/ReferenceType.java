@@ -2,6 +2,7 @@ package com.zutubi.prototype.type;
 
 import com.zutubi.config.annotations.ID;
 import com.zutubi.prototype.config.ConfigurationReferenceManager;
+import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.util.AnnotationUtils;
 import com.zutubi.util.logging.Logger;
@@ -81,7 +82,24 @@ public class ReferenceType extends SimpleType implements Type
 
     public Object unstantiate(Object instance) throws TypeException
     {
-        return instance == null ? 0 : Long.toString(((Configuration)instance).getHandle());
+        if(instance == null)
+        {
+            return 0;
+        }
+        else
+        {
+            long handle = ((Configuration) instance).getHandle();
+            if(handle == RecordManager.UNDEFINED)
+            {
+                // This should not be possible via the UI, as the user has no
+                // way to select a non-persistent (i.e. no handle) instance
+                // as the value of a reference.  It is possible
+                // programatically, but can be worked around.
+                throw new TypeException("Attempt to unstantiate a reference to an instance that is not yet persistent.  Ensure the referee is persistent before saving a reference to it.");
+            }
+
+            return Long.toString(handle);
+        }
     }
 
     public Object toXmlRpc(Object data) throws TypeException

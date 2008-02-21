@@ -3,6 +3,7 @@ package com.zutubi.pulse.vfs.pulse;
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.prototype.config.ConfigurationReferenceManager;
 import com.zutubi.prototype.config.ConfigurationRegistry;
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.type.SimpleInstantiator;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.TypeRegistry;
@@ -33,6 +34,7 @@ public class ProjectWizardFileObject extends AbstractPulseFileObject implements 
     }
 
     private TypeRegistry typeRegistry;
+    private ConfigurationTemplateManager configurationTemplateManager;
     private ConfigurationReferenceManager configurationReferenceManager;
 
     public ProjectWizardFileObject(final FileName name, final AbstractFileSystem fs)
@@ -79,7 +81,7 @@ public class ProjectWizardFileObject extends AbstractPulseFileObject implements 
             throw new FileSystemException("Scm details not configured");
         }
 
-        SimpleInstantiator instantiator = new SimpleInstantiator(configurationReferenceManager);
+        SimpleInstantiator instantiator = new SimpleInstantiator(configurationTemplateManager, configurationReferenceManager);
         Record record = state.getRenderRecord();
         try
         {
@@ -121,6 +123,11 @@ public class ProjectWizardFileObject extends AbstractPulseFileObject implements 
     public void setTypeRegistry(TypeRegistry typeRegistry)
     {
         this.typeRegistry = typeRegistry;
+    }
+
+    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
+    {
+        this.configurationTemplateManager = configurationTemplateManager;
     }
 
     public void setConfigurationReferenceManager(ConfigurationReferenceManager configurationReferenceManager)

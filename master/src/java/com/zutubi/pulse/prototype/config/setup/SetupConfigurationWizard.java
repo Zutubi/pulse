@@ -115,7 +115,7 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
         
         try
         {
-            SimpleInstantiator instantiator = new SimpleInstantiator(configurationReferenceManager);
+            SimpleInstantiator instantiator = new SimpleInstantiator(configurationTemplateManager, configurationReferenceManager);
             AdminUserConfiguration adminConfig = (AdminUserConfiguration) instantiator.instantiate(adminConfigType, getCompletedStateForType(adminConfigType).getDataRecord());
             MutableRecord serverConfigRecord = getCompletedStateForType(serverConfigType).getDataRecord();
 

@@ -24,7 +24,7 @@ public class RecordManager implements HandleAllocator
 {
     private static final Logger LOG = Logger.getLogger(RecordManager.class);
 
-    protected static final long UNDEFINED = 0;
+    public static final long UNDEFINED = 0;
 
     private TransactionalWrapper<RecordManagerState> stateWrapper;
 
@@ -177,14 +177,7 @@ public class RecordManager implements HandleAllocator
 
     private void allocateHandles(MutableRecord record)
     {
-/*
-        if (record.getHandle() == UNDEFINED)
-        {
-*/
-            record.setHandle(allocateHandle());
-/*
-        }
-*/
+        record.setHandle(allocateHandle());
         for (Object child : record.values())
         {
             if (child instanceof MutableRecord)
