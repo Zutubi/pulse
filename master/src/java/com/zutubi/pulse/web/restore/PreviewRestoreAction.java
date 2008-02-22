@@ -23,7 +23,7 @@ public class PreviewRestoreAction extends RestoreActionSupport
 
     public String execute() throws Exception
     {
-        //archive = archiveManager.previewRestore();
+        archive = archiveManager.getArchive();
 
         return SUCCESS;
     }

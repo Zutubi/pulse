@@ -37,4 +37,5 @@ public interface ArchiveManager
     //-----------------------------------------------------------
 
 
+    Archive getArchive();
 }

@@ -13,6 +13,8 @@ public class Archive
 
     private ArchiveManifest manifest;
 
+    private File original;
+
     public Archive(File base, ArchiveManifest manifest)
     {
         this.base = base;
@@ -42,5 +44,15 @@ public class Archive
     public String getAuthor()
     {
         return manifest.getAuthor();
+    }
+
+    public File getOriginal()
+    {
+        return original;
+    }
+
+    public void setOriginal(File original)
+    {
+        this.original = original;
     }
 }

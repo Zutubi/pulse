@@ -38,6 +38,7 @@ import freemarker.template.Configuration;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.FileFilter;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
@@ -464,16 +465,36 @@ public class DefaultSetupManager implements SetupManager
         return getArchiveFile() != null;
     }
 
+    /**
+     * The archive file is any zip file located in the PULSE_DATA/restore directory.  It is required that only
+     * one zip file be present.
+     *
+     * @return the zip file containing the archive.
+     */
+    //TODO: 1) pick the latest archive if multiple are detected?
     private File getArchiveFile()
     {
         UserPaths paths = configurationManager.getUserPaths();
         if (paths != null)
         {
-            File archive = new File(paths.getData(), "restore/archive.zip");
-            if (archive.exists())
+            File restoreDir = new File(paths.getData(), "restore");
+            File[] ls = restoreDir.listFiles(new FileFilter()
             {
-                return archive;
+                public boolean accept(File file)
+                {
+                    return file.getName().endsWith(".zip");
+                }
+            });
+            if (ls == null || ls.length == 0)
+            {
+                return null;
             }
+            if (ls.length > 1)
+            {
+                // too many files in the restore directory, do not know which one to pick.
+                return null;
+            }
+            return ls[0];
         }
 
         return null;

@@ -17,7 +17,7 @@
             </bean>
         </property>
         <property name="paths">
-            <bean id="userPaths" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+            <bean class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
                 <property name="targetBeanName">
                     <value>configurationManager</value>
                 </property>
@@ -30,6 +30,7 @@
             <list>
                 <ref local="recordsArchive"/>
                 <ref local="databaseArchive"/>
+                <ref local="dataDirectoryArchive"/>
             </list>
         </property>
     </bean>
@@ -39,6 +40,19 @@
     <bean id="databaseArchive" class="com.zutubi.pulse.restore.DatabaseArchive">
         <property name="mappings">
             <ref bean="hibernateMappings"/>
+        </property>
+    </bean>
+
+    <bean id="dataDirectoryArchive" class="com.zutubi.pulse.restore.DataDirectoryArchive">
+        <property name="userPaths">
+            <bean class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+                <property name="targetBeanName">
+                    <value>configurationManager</value>
+                </property>
+                <property name="propertyPath">
+                    <value>userPaths</value>
+                </property>
+            </bean>
         </property>
     </bean>
 

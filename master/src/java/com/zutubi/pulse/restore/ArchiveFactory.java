@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  *
@@ -20,6 +21,8 @@ public class ArchiveFactory
     private File archiveDirectory;
 
     private File tmpDirectory;
+
+    private static final SimpleDateFormat CREATED_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
 
     public ArchiveFactory()
     {
@@ -41,7 +44,8 @@ public class ArchiveFactory
 
         // mostly for information at this stage, so that archives can be distinguished.  Will be used
         // for processing at some stage no doubt.
-        ArchiveManifest manifest = new ArchiveManifest("created",
+        Date now = Calendar.getInstance().getTime();
+        ArchiveManifest manifest = new ArchiveManifest(CREATED_FORMAT.format(now),
                 "version",
                 "author");
 
@@ -125,7 +129,9 @@ public class ArchiveFactory
             throw new ArchiveException(e);
         }
 
-        return new Archive(archiveBase, manifest);
+        Archive importedArchive = new Archive(archiveBase, manifest);
+        importedArchive.setOriginal(archive);
+        return importedArchive;
     }
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd_hh-mm-ss");

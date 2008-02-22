@@ -71,6 +71,11 @@ public class DefaultArchiveManager implements ArchiveManager
         return archive;
     }
 
+    public Archive getArchive()
+    {
+        return archive;
+    }
+
     public List<RestoreTaskGroup> previewRestore()
     {
         // Check which of the restorable components is represented within the backup.

@@ -20,17 +20,14 @@
             <td>$info.version</td>
         </tr>
         <tr>
-            <td>Source</td>
-            <td>$info.file.absolutePath</td>
+            <td>Name</td>
+            <td>$info.original.name</td>
+        </tr>
+        <tr>
+            <td>Location</td>
+            <td>$info.original.parentFile.absolutePath</td>
         </tr>
     </table>
-    <p>&nbsp;</p>
-    <ul>
-        <li>Date: $info.created</li>
-        <li>Author: $info.author</li>
-        <li>Version: $info.version</li>
-        <li>Source: $info.file.absolutePath</li>
-    </ul>
 </p>
 
 <p style="width:50%">
