@@ -116,6 +116,11 @@ public class MockBuildManager implements BuildManager
         throw new RuntimeException("Method not implemented.");
     }
 
+    public List<BuildResult> queryBuildsWithMessages(Project[] projects, PersistentName[] specs, Feature.Level level, int max)
+    {
+        throw new RuntimeException("Method not yet implemented");
+    }
+
     public List<BuildResult> querySpecificationBuilds(Project project, PersistentName spec, ResultState[] states, long lowestNumber, long highestNumber, int first, int max, boolean mostRecentFirst, boolean initialise)
     {
         throw new RuntimeException("Method not implemented.");

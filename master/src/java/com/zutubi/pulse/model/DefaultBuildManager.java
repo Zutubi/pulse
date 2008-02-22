@@ -241,6 +241,11 @@ public class DefaultBuildManager implements BuildManager
         return buildResultDao.queryBuilds(projects, states, specs, earliestStartTime, latestStartTime, hasWorkDir, first, max, mostRecentFirst);
     }
 
+    public List<BuildResult> queryBuildsWithMessages(Project[] projects, PersistentName[] specs, Feature.Level level, int max)
+    {
+        return buildResultDao.queryBuildsWithMessages(projects, specs, level, max);
+    }
+
     public List<BuildResult> querySpecificationBuilds(Project project, PersistentName spec, ResultState[] states, long lowestNumber, long highestNumber, int first, int max, boolean mostRecentFirst, boolean initialise)
     {
         return buildResultDao.querySpecificationBuilds(project, spec, states, lowestNumber, highestNumber, first, max, mostRecentFirst, initialise);

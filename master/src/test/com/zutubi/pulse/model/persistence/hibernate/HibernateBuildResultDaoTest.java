@@ -863,6 +863,90 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         assertEquals(7, results.get(0).getNumber());
     }
 
+    public void testQueryBuildsWithMessagesWarnings()
+    {
+        Project p1 = new Project("a", "a");
+        BuildSpecification s1 = new BuildSpecification("s1");
+        p1.addBuildSpecification(s1);
+        projectDao.save(p1);
+
+        addMessageBuild(p1, s1, Feature.Level.WARNING, 1);
+
+        List<BuildResult> results = buildResultDao.queryBuildsWithMessages(new Project[]{p1}, new PersistentName[]{s1.getPname()}, Feature.Level.WARNING, 1);
+        assertEquals(1, results.size());
+        assertEquals(1, results.get(0).getNumber());
+
+        results = buildResultDao.queryBuildsWithMessages(new Project[]{p1}, new PersistentName[]{s1.getPname()}, Feature.Level.ERROR, 1);
+        assertEquals(0, results.size());
+    }
+
+    public void testQueryBuildsWithMessagesErrors()
+    {
+        Project p1 = new Project("a", "a");
+        BuildSpecification s1 = new BuildSpecification("s1");
+        p1.addBuildSpecification(s1);
+        projectDao.save(p1);
+
+        addMessageBuild(p1, s1, Feature.Level.ERROR, 1);
+
+        List<BuildResult> results = buildResultDao.queryBuildsWithMessages(new Project[]{p1}, new PersistentName[]{s1.getPname()}, Feature.Level.ERROR, 1);
+        assertEquals(1, results.size());
+        assertEquals(1, results.get(0).getNumber());
+
+        results = buildResultDao.queryBuildsWithMessages(new Project[]{p1}, new PersistentName[]{s1.getPname()}, Feature.Level.WARNING, 1);
+        assertEquals(0, results.size());
+    }
+
+    public void testQueryBuildsWithMessagesMultiple()
+    {
+        Project p1 = new Project("1", "1");
+        BuildSpecification s11 = new BuildSpecification("s1");
+        BuildSpecification s12 = new BuildSpecification("s2");
+        p1.addBuildSpecification(s11);
+        p1.addBuildSpecification(s12);
+        projectDao.save(p1);
+
+        Project p2 = new Project("2", "2");
+        BuildSpecification s21 = new BuildSpecification("s1");
+        BuildSpecification s22 = new BuildSpecification("s2");
+        p1.addBuildSpecification(s21);
+        p1.addBuildSpecification(s22);
+        projectDao.save(p2);
+
+        addMessageBuild(p1, s11, Feature.Level.ERROR, 1);
+        addMessageBuild(p1, s11, Feature.Level.ERROR, 2);
+        addMessageBuild(p2, s21, Feature.Level.WARNING, 1);
+        addMessageBuild(p2, s22, Feature.Level.ERROR, 2);
+        addMessageBuild(p2, s22, Feature.Level.WARNING, 3);
+
+        List<BuildResult> results = buildResultDao.queryBuildsWithMessages(new Project[]{p1, p2}, null, Feature.Level.ERROR, 10);
+        assertEquals(3, results.size());
+        assertEquals(2, results.get(0).getNumber());
+        assertEquals(p2, results.get(0).getProject());
+        assertEquals(2, results.get(1).getNumber());
+        assertEquals(p1, results.get(1).getProject());
+        assertEquals(1, results.get(2).getNumber());
+        assertEquals(p1, results.get(2).getProject());
+
+        results = buildResultDao.queryBuildsWithMessages(new Project[]{p1, p2}, null, Feature.Level.ERROR, 1);
+        assertEquals(1, results.size());
+        assertEquals(2, results.get(0).getNumber());
+        assertEquals(p2, results.get(0).getProject());
+
+        results = buildResultDao.queryBuildsWithMessages(new Project[]{p2}, new PersistentName[]{s22.getPname()}, Feature.Level.WARNING, 10);
+        assertEquals(1, results.size());
+        assertEquals(3, results.get(0).getNumber());
+        assertEquals(p2, results.get(0).getProject());
+    }
+
+    private void addMessageBuild(Project p1, BuildSpecification s11, Feature.Level level, int number)
+    {
+        BuildResult result = createCompletedBuild(p1, s11, number);
+        result.addFeature(level, "a message");
+        result.calculateFeatureCounts();
+        buildResultDao.save(result);
+    }
+
     private BuildResult createCompletedBuild(Project project, long number)
     {
         BuildSpecification spec = makeSpec();

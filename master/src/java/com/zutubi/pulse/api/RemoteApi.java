@@ -399,9 +399,38 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         return result;
     }
 
+    public Vector<Hashtable<String, Object>> getLatestBuildsWithWarnings(String token, String projectName, String buildSpecification, int maxResults) throws AuthenticationException
+    {
+        tokenManager.verifyUser(token);
+
+        Project project = internalGetProject(projectName);
+
+        PersistentName[] specs = null;
+        if (TextUtils.stringSet(buildSpecification))
+        {
+            BuildSpecification spec = getBuildSpecification(project, buildSpecification);
+            specs = new PersistentName[]{ spec.getPname() };
+        }
+
+        List<BuildResult> builds = buildManager.queryBuildsWithMessages(new Project[]{project}, specs, Feature.Level.WARNING, maxResults);
+        Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(builds.size());
+        for (BuildResult build : builds)
+        {
+            Hashtable<String, Object> buildDetails = convertResult(build);
+            result.add(buildDetails);
+        }
+
+        return result;
+    }
+
     public Vector<Hashtable<String, Object>> getLatestBuildForProject(String token, String projectName, String buildSpecification, boolean completedOnly) throws AuthenticationException
     {
         return getLatestBuildsForProject(token, projectName, buildSpecification, completedOnly, 1);
+    }
+
+    public Vector<Hashtable<String, Object>> getLatestBuildWithWarnings(String token, String projectName, String buildSpecification) throws AuthenticationException
+    {
+        return getLatestBuildsWithWarnings(token, projectName, buildSpecification, 1);
     }
 
     public Vector<Hashtable<String, Object>> getPersonalBuild(String token, int id) throws AuthenticationException

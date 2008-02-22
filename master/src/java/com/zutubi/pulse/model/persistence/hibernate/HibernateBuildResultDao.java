@@ -329,6 +329,29 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
         });
     }
 
+    public List<BuildResult> queryBuildsWithMessages(final Project[] projects, final PersistentName[] specs, final Feature.Level level, final int max)
+    {
+        return (List<BuildResult>) getHibernateTemplate().execute(new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                Criteria criteria = session.createCriteria(BuildResult.class);
+                criteria.add(Expression.isNull("user"));
+                addProjectsToCriteria(projects, criteria);
+                addSpecsToCriteria(specs, criteria);
+                criteria.add(Expression.gt(level.toString().toLowerCase() + "FeatureCount", 0));
+
+                if(max >= 0)
+                {
+                    criteria.setMaxResults(max);
+                }
+
+                criteria.addOrder(Order.desc("number"));
+                return criteria.list();
+            }
+        });
+    }
+
     public List<BuildResult> querySpecificationBuilds(final Project project, final PersistentName spec, final ResultState[] states, final long lowestNumber, final long highestNumber, final int first, final int max, final boolean mostRecentFirst, boolean initialise)
     {
         List<BuildResult> results =  (List<BuildResult>) getHibernateTemplate().execute(new HibernateCallback()
