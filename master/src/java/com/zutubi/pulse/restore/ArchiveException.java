@@ -8,13 +8,13 @@ import com.zutubi.pulse.core.PulseException;
  */
 public class ArchiveException extends PulseException
 {
+    public ArchiveException()
+    {
+    }
+
     public ArchiveException(String errorMessage)
     {
         super(errorMessage);
-    }
-
-    public ArchiveException()
-    {
     }
 
     public ArchiveException(Throwable cause)

@@ -12,10 +12,6 @@
             <td>$info.created</td>
         </tr>
         <tr>
-            <td>Author</td>
-            <td>$info.author</td>
-        </tr>
-        <tr>
             <td>Version</td>
             <td>$info.version</td>
         </tr>

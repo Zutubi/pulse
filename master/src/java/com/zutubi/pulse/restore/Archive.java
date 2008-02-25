@@ -1,7 +1,6 @@
 package com.zutubi.pulse.restore;
 
 import java.io.File;
-import java.io.IOException;
 
 /**
  *
@@ -9,16 +8,33 @@ import java.io.IOException;
  */
 public class Archive
 {
+    /**
+     * The base (expanded directory) for this imported archive.
+     */
     private File base;
 
-    private ArchiveManifest manifest;
-
+    /**
+     * If specified, this file is a reference to the original archive file, the file that was imported.
+     *
+     * @see ArchiveFactory#importArchive(java.io.File) 
+     */
     private File original;
 
-    public Archive(File base, ArchiveManifest manifest)
+    /**
+     * This archives manifest.
+     */
+    private ArchiveManifest manifest;
+
+    public Archive(File original, File base, ArchiveManifest manifest)
     {
         this.base = base;
         this.manifest = manifest;
+        this.original = original;
+    }
+
+    public Archive(File base, ArchiveManifest manifest)
+    {
+        this(null, base, manifest);
     }
 
     public ArchiveManifest getManifest()
@@ -26,7 +42,7 @@ public class Archive
         return manifest;
     }
 
-    public File getFile()
+    public File getBase()
     {
         return base;
     }
@@ -41,18 +57,8 @@ public class Archive
         return manifest.getCreated();
     }
 
-    public String getAuthor()
-    {
-        return manifest.getAuthor();
-    }
-
     public File getOriginal()
     {
         return original;
-    }
-
-    public void setOriginal(File original)
-    {
-        this.original = original;
     }
 }

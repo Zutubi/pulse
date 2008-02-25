@@ -59,7 +59,7 @@ public class DefaultArchiveManager implements ArchiveManager
             taskGroup.setSource(component);
 
             String name = component.getName();
-            File archiveComponentBase = new File(archive.getFile(), name);
+            File archiveComponentBase = new File(archive.getBase(), name);
 
             // does it matter if this does not exist, do we need to process something regardless?
 
@@ -132,7 +132,7 @@ public class DefaultArchiveManager implements ArchiveManager
         for (ArchiveableComponent component : archiveableComponents)
         {
             String name = component.getName();
-            File archiveComponentBase = new File(archive.getFile(), name);
+            File archiveComponentBase = new File(archive.getBase(), name);
             component.backup(archiveComponentBase);            
         }
 

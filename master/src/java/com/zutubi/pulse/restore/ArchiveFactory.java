@@ -16,10 +16,21 @@ import java.util.Date;
  */
 public class ArchiveFactory
 {
+    /**
+     * The name generator is used to generate the exported archive filenames.
+     */
+    private ArchiveNameGenerator nameGenerator = new UniqueDatestampedNameGenerator();
+
     private static final String MANIFEST_FILENAME = "manifest.properties";
 
+    /**
+     * Exported archive directory.
+     */
     private File archiveDirectory;
 
+    /**
+     * Imported/new archive directory.
+     */
     private File tmpDirectory;
 
     private static final SimpleDateFormat CREATED_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
@@ -28,6 +39,13 @@ public class ArchiveFactory
     {
     }
 
+    /**
+     * Generate a new archive.  This archive is initially empty.
+     *
+     * @return a reference to the new archive.
+     * 
+     * @throws ArchiveException if there is a problem creating the archive.
+     */
     public Archive createArchive() throws ArchiveException
     {
         File archiveBase = new File(tmpDirectory, RandomUtils.randomString(10));
@@ -39,15 +57,16 @@ public class ArchiveFactory
         if (!archiveBase.mkdirs())
         {
             // failed to create the archive file.
-            throw new ArchiveException();
+            throw new ArchiveException("Failed to create directory '" + archiveBase.getAbsolutePath() + "'");
         }
 
         // mostly for information at this stage, so that archives can be distinguished.  Will be used
         // for processing at some stage no doubt.
         Date now = Calendar.getInstance().getTime();
-        ArchiveManifest manifest = new ArchiveManifest(CREATED_FORMAT.format(now),
-                "version",
-                "author");
+        String creationDate = CREATED_FORMAT.format(now);
+
+        // the archive format version is not currently used for anything.
+        ArchiveManifest manifest = new ArchiveManifest(creationDate, "1.0");
 
         // write the manifest - properties.
         try
@@ -57,27 +76,50 @@ public class ArchiveFactory
         }
         catch (IOException e)
         {
-            throw new ArchiveException(e);
+            throw new ArchiveException("Failed to write the new archive manifest file.", e);
         }
 
         return new Archive(archiveBase, manifest);
     }
 
+    /**
+     * Exporting an archive zips up that archives directories and copies the zip file to the
+     * exported archives directory
+     *
+     * @param archive to be zipped.
+     * @return the file reference to the zip file.
+     *
+     * @throws ArchiveException if there is a problem zipping or copying the archive to the
+     * export directory. Typically, problems would include disk space shortages or a failure to zip
+     * the archive directory.
+     */
     public File exportArchive(Archive archive) throws ArchiveException
     {
+        File exportZipFile = null;
         try
         {
-            String archiveName = generateArchiveName() + ".zip";
+            String baseArchiveName = nameGenerator.newName(archiveDirectory);
 
-            File exportFile = new File(archiveDirectory, archiveName);
+            String archiveName = baseArchiveName + ".zip";
+            File candidateArchiveFile = new File(archiveDirectory, archiveName);
+            int i = 0;
+            while (candidateArchiveFile.exists())
+            {
+                i++;
+                archiveName = baseArchiveName + "_" + i + ".zip";
+                candidateArchiveFile = new File(archiveDirectory, archiveName);
+            }
 
-            ZipUtils.createZip(exportFile, archive.getFile(), null);
+            exportZipFile = new File(archiveDirectory, archiveName);
 
-            return exportFile;
+            ZipUtils.createZip(exportZipFile, archive.getBase(), null);
+
+            return exportZipFile;
         }
         catch (IOException e)
         {
-            throw new ArchiveException(e);
+            throw new ArchiveException("Failed to zip directory '" + archive.getBase().getAbsolutePath()
+                    + "' to file '" + exportZipFile.getAbsolutePath() + "'", e);
         }
     }
 
@@ -129,29 +171,7 @@ public class ArchiveFactory
             throw new ArchiveException(e);
         }
 
-        Archive importedArchive = new Archive(archiveBase, manifest);
-        importedArchive.setOriginal(archive);
-        return importedArchive;
-    }
-
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd_hh-mm-ss");
-
-    // name generator, based on a predefined file name format, rolling(of sorts) if the name is already in use.
-    private String generateArchiveName()
-    {
-        String baseArchiveName = "archive-" + DATE_FORMAT.format(Calendar.getInstance().getTime());
-
-        String archiveName = baseArchiveName;
-        File candidateArchiveFile = new File(archiveDirectory, archiveName);
-        int i = 0;
-        while (candidateArchiveFile.exists())
-        {
-            i++;
-            archiveName = baseArchiveName + "_" + i;
-            candidateArchiveFile = new File(archiveDirectory, archiveName);
-        }
-
-        return archiveName;
+        return new Archive(archive, archiveBase, manifest);
     }
 
     public void setTmpDirectory(File tmpDirectory)
@@ -162,5 +182,10 @@ public class ArchiveFactory
     public void setArchiveDirectory(File archiveDirectory)
     {
         this.archiveDirectory = archiveDirectory;
+    }
+
+    public void setArchiveNameGenerator(ArchiveNameGenerator nameGenerator)
+    {
+        this.nameGenerator = nameGenerator;
     }
 }

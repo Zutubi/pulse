@@ -2,10 +2,13 @@ package com.zutubi.pulse.restore;
 
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.util.IOUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.Calendar;
+import java.util.Properties;
 
 /**
  *
@@ -16,6 +19,8 @@ public class ArchiveFactoryTest extends PulseTestCase
     private ArchiveFactory factory;
 
     private File tmp;
+    private File importDir;
+    private File exportDir;
 
     protected void setUp() throws Exception
     {
@@ -23,13 +28,19 @@ public class ArchiveFactoryTest extends PulseTestCase
 
         tmp = FileSystemUtils.createTempDir();
         factory = new ArchiveFactory();
-        factory.setArchiveDirectory(new File(tmp, "archive"));
-        factory.setTmpDirectory(new File(tmp, "tmp"));
+        exportDir = new File(tmp, "export");
+        importDir = new File(tmp, "import");
+        factory.setArchiveDirectory(exportDir);
+        factory.setTmpDirectory(importDir);
     }
 
     protected void tearDown() throws Exception
     {
         removeDirectory(tmp);
+        tmp = null;
+        exportDir = null;
+        importDir = null;
+        
         super.tearDown();
     }
 
@@ -47,18 +58,46 @@ public class ArchiveFactoryTest extends PulseTestCase
 
         Date ac = Calendar.getInstance().getTime();
 
-        assertEquals("created", createdArchive.getCreated());       // ensure that the date is within the appropriate bounds.
-        assertEquals("version", createdArchive.getVersion());       // what do we expect here?
-        assertEquals("author", createdArchive.getAuthor());
+        assertNotNull(createdArchive.getCreated());       // ensure that the date is within the appropriate bounds.
+        assertNotNull(createdArchive.getVersion());       
 
-        // verify the generated file name - based on the file name generator, so maybe leave that to another test.
+        assertNotNull(createdArchive.getBase());
+        assertTrue(createdArchive.getBase().exists());
 
-        assertNotNull(createdArchive.getFile());
-        assertTrue(createdArchive.getFile().exists());
+        assertEquals(importDir, createdArchive.getBase().getParentFile());
+        assertNull(createdArchive.getOriginal());
+    }
 
-        Archive loadedArchive = factory.importArchive(createdArchive.getFile());
-        assertEquals(createdArchive.getAuthor(), loadedArchive.getAuthor());
-        assertEquals(createdArchive.getVersion(), loadedArchive.getVersion());
-        assertEquals(createdArchive.getCreated(), loadedArchive.getCreated());
+    public void testExportArchive() throws ArchiveException
+    {
+        Archive archive = factory.createArchive();
+        File exportedZipFile = factory.exportArchive(archive);
+        
+        assertNotNull(exportedZipFile);
+        assertEquals(exportDir, exportedZipFile.getParentFile());
+    }
+
+    public void testArchivingDataRoundTrip() throws ArchiveException, IOException
+    {
+        Archive archive = factory.createArchive();
+        File archiveBase = archive.getBase();
+
+        createSampleDataFile(new File(archiveBase, "sample.txt"));
+
+        File zip = factory.exportArchive(archive);
+
+        Archive importedArchive = factory.importArchive(zip);
+
+        assertNotSame(archive.getBase(), importedArchive.getBase());
+        assertTrue(new File(importedArchive.getBase(), "sample.txt").isFile());
+    }
+    
+    private void createSampleDataFile(File dataFile) throws IOException
+    {
+        if (!dataFile.exists() && !dataFile.createNewFile())
+        {
+            throw new IOException();
+        }
+        IOUtils.write(new Properties(), dataFile);
     }
 }
