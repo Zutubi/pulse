@@ -57,7 +57,10 @@ level.
 ---------------------------------------------------------------------------->
 [#macro resultMessages result level indent=""]
     [#list result.getFeatures(level) as feature]
+        [#if !renderer.featureLimitReached(buildMessageCount)]
 ${indent}  * ${renderer.wrapString(feature.summary, "${indent}    ")}
+            [#assign buildMessageCount = buildMessageCount + 1]
+        [/#if]
     [/#list]
 [/#macro]
 
@@ -66,11 +69,14 @@ Shows all messages of the given level on the file artifact as a flat list but
 with context.
 ---------------------------------------------------------------------------->
 [#macro fileArtifactMessages artifact level context]
-    [#if artifact.hasMessages(level)]
+    [#if !renderer.featureLimitReached(buildMessageCount) && artifact.hasMessages(level)]
   - ${renderer.wrapString("${context}", "    ")}
     ${renderer.wrapString("${artifact.path}", "    ")}
         [#list artifact.getFeatures(level) as feature]
+            [#if !renderer.featureLimitReached(buildMessageCount)]
     * ${renderer.wrapString(feature.summary, "      ")}
+                [#assign buildMessageCount = buildMessageCount + 1]
+            [/#if]
         [/#list]
     [/#if]
 [/#macro]
@@ -92,7 +98,7 @@ artifacts as a flat list but with context.
 ---------------------------------------------------------------------------->
 [#macro commandResultMessages result level context]
     [#local nestedContext = "${context} :: ${result.commandName}"]
-    [#if result.hasDirectMessages(level)]
+    [#if !renderer.featureLimitReached(buildMessageCount) && result.hasDirectMessages(level)]
   - ${renderer.wrapString(nestedContext, "    ")}
         [@resultMessages result=result level=level indent="  "/]
     [/#if]
@@ -106,7 +112,7 @@ Shows all messages of the given level on the recipe result and its included
 results as a flat list but with context.
 ---------------------------------------------------------------------------->
 [#macro recipeResultMessages result level context]
-    [#if result.hasDirectMessages(level)]
+    [#if !renderer.featureLimitReached(buildMessageCount) && result.hasDirectMessages(level)]
   - ${renderer.wrapString(context, "    ")}
         [@resultMessages result=result level=level indent="  "/]
     [/#if]
@@ -120,7 +126,7 @@ Shows all messages of the given level on the result node and its included
 results as a flat list but with context.
 ---------------------------------------------------------------------------->
 [#macro recipeNodeMessages node level context=""]
-    [#if node.hasMessages(level)]
+    [#if !renderer.featureLimitReached(buildMessageCount) && node.hasMessages(level)]
         [#if context?length &gt; 0]
             [#local nestedContext = "${context} :: stage ${node.stage} :: ${node.result.recipeNameSafe}@${node.hostSafe}"]
         [#else]
@@ -139,7 +145,14 @@ results as a flat list but with context.
 ---------------------------------------------------------------------------->
 [#macro buildMessages result level]
     [#if result.hasMessages(level)]
+        [#assign buildMessageCount = 0/]
 ${level?lower_case?cap_first} messages:
+        [#local limit = renderer.getFeatureLimit()/]
+        [#local excess = result.getFeatureCount(level) - limit/]
+        [#if limit &gt; 0 && excess &gt; 0]
+  NOTE: This build has ${excess} more ${level?lower_case} messages that have not
+  been reported as the feature limit has been reached.
+        [/#if]
         [@resultMessages result=result level=level/]
         [#list result.root.children as child]
             [@recipeNodeMessages node=child level=level/]
@@ -523,7 +536,10 @@ level as HTML list elements.
 ---------------------------------------------------------------------------->
 [#macro resultMessagesHTML result level]
     [#list result.getFeatures(level) as feature]
+        [#if !renderer.featureLimitReached(buildMessageCount)]
 <li class="${level?lower_case}"><pre class="feature">${feature.summary?html}</pre></li>
+            [#assign buildMessageCount = buildMessageCount + 1/]
+        [/#if]
     [/#list]
 [/#macro]
 
@@ -532,17 +548,20 @@ Shows all messages of the given level on the file artifact as a HTML nested
 list.
 ---------------------------------------------------------------------------->
 [#macro fileArtifactMessagesHTML result command artifact level]
-    [#if artifact.hasMessages(level)]
+    [#if !renderer.featureLimitReached(buildMessageCount) && artifact.hasMessages(level)]
 <li class="header">artifact :: ${artifact.path?html}
     <ul>
         [#list artifact.getFeatures(level) as feature]
+            [#if !renderer.featureLimitReached(buildMessageCount)]
         <li class="${level?lower_case}"><pre class="feature">${feature.summary?html}</pre>
-            [#if feature.isPlain()]
+                [#if feature.isPlain()]
                 <a class="unadorned" href="${baseUrl}/viewArtifactt.action?id=${artifact.id?c}&amp;buildId=${result.id?c}&amp;commandId=${command.id?c}#${feature.firstLine?c}">
                     <span class="small">jump to &gt;&gt;</span>
                 </a>
-            [/#if]
+                [/#if]
         </li>
+                [#assign buildMessageCount = buildMessageCount + 1/]
+            [/#if]
         [/#list]
     </ul>
 </li>
@@ -576,7 +595,7 @@ results as a HTML nested list.
 [#macro recipeResultMessagesHTML result recipe level]
     [@resultMessagesHTML result=recipe level=level/]
     [#list recipe.commandResults as command]
-        [#if command.hasMessages(level)]
+        [#if !renderer.featureLimitReached(buildMessageCount) && command.hasMessages(level)]
 <li class="header">command :: ${command.commandName?html}
     <ul>
         [@commandResultMessagesHTML result=result command=command level=level/]
@@ -591,7 +610,7 @@ Shows all messages of the given level on the result node and its included
 results as a HTML nested list.
 ---------------------------------------------------------------------------->
 [#macro recipeNodeMessagesHTML result node level]
-    [#if node.hasMessages(level)]
+    [#if !renderer.featureLimitReached(buildMessageCount) && node.hasMessages(level)]
 <li class="header">stage ${node.stage?html} :: ${node.result.recipeNameSafe?html}@${node.hostSafe?html}
     <ul>
         [@recipeResultMessagesHTML result=result recipe=node.result level=level/]
@@ -609,8 +628,14 @@ results as a HTML nested list.
 ---------------------------------------------------------------------------->
 [#macro buildMessagesHTML result level]
     [#if result.hasMessages(level)]
+        [#assign buildMessageCount = 0/]
 <h3 style="font-size: 100%">${level?lower_case} messages</h3>
 <ul class="${level?lower_case}">
+        [#local limit = renderer.getFeatureLimit()/]
+        [#local excess = result.getFeatureCount(level) - limit/]
+        [#if limit &gt; 0 && excess &gt; 0]
+    <li class="header">NOTE: This build has ${excess} more ${level?lower_case} messages that have not been reported as the feature limit has been reached.</li>
+        [/#if]
         [@resultMessagesHTML result=result level=level/]
         [#list result.root.children as child]
             [@recipeNodeMessagesHTML result=result node=child level=level/]

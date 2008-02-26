@@ -28,7 +28,7 @@ public class CustomChangeViewer extends ChangeViewer
     private static final String PROPERTY_TIMESTAMP_PULSE = "time.pulse";
     private static final String PROPERTY_TIMESTAMP_FISHEYE = "time.fisheye";
 
-    private static final SimpleDateFormat PULSE_DATE_FORMAT = new SimpleDateFormat("yyyyMMdd-HH:mm:ss");
+    public static final SimpleDateFormat PULSE_DATE_FORMAT = new SimpleDateFormat("yyyyMMdd-HH:mm:ss");
     public static final SimpleDateFormat FISHEYE_DATE_FORMAT = new SimpleDateFormat("yyyyMMddHHmmss");
 
     private String changesetURL;

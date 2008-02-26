@@ -374,6 +374,19 @@ public abstract class Result extends Entity
         return Feature.Level.valueOf(name);
     }
 
+    public int getFeatureCount(Feature.Level level)
+    {
+        switch(level)
+        {
+            case ERROR:
+                return errorFeatureCount;
+            case WARNING:
+                return warningFeatureCount;
+            default:
+                throw new IllegalArgumentException("Feature count not cached for level '" + level + "'");
+        }
+    }
+    
     /**
      * Getter for the warning feature count property.
      *

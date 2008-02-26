@@ -17,8 +17,10 @@ public class CustomChangeViewerTest extends PulseTestCase
     public void testGetChangesetURL()
     {
         viewer.setChangesetURL("${revision} ${author} ${branch} ${time.pulse} ${time.fisheye} ${unknown}");
-        Revision rev = new CvsRevision("author", "branch", "comment", new Date(1000));
-        assertEquals("author:branch:19700101-10:00:01 author branch 19700101-10:00:01 19700101000001 ${unknown}", viewer.getChangesetURL(rev));
+        Date date = new Date(1000);
+        Revision rev = new CvsRevision("author", "branch", "comment", date);
+        String formatted = CustomChangeViewer.PULSE_DATE_FORMAT.format(date);
+        assertEquals("author:branch:" + formatted + " author branch " + formatted + " 19700101000001 ${unknown}", viewer.getChangesetURL(rev));
     }
 
     public void testGetFileViewURL()

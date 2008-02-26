@@ -50,6 +50,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
     protected void tearDown() throws Exception
     {
         renderer = null;
+        System.clearProperty(FreemarkerBuildResultRenderer.FEATURE_LIMIT_PROPERTY);
         super.tearDown();
     }
 
@@ -70,6 +71,14 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
     public void testWithErrors() throws Exception
     {
         errorsHelper("plain-text-email");
+    }
+
+    public void testWithErrorLimit() throws Exception
+    {
+        List<Changelist> changes = getChanges();
+        BuildResult result = createBuildWithErrors(changes);
+        System.setProperty(FreemarkerBuildResultRenderer.FEATURE_LIMIT_PROPERTY, "7");
+        createAndVerify("excesserrors", "plain-text-email", "http://another.url", result, changes);
     }
 
     public void testSimpleInstantBasic() throws Exception
@@ -116,6 +125,15 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
     {
         errorsHelper("html-email");
     }
+
+    public void testHTMLWithErrorLimit() throws Exception
+    {
+        List<Changelist> changes = getChanges();
+        BuildResult result = createBuildWithErrors(changes);
+        System.setProperty(FreemarkerBuildResultRenderer.FEATURE_LIMIT_PROPERTY, "7");
+        createAndVerify("excesserrors", "html-email", "http://another.url", result, changes);
+    }
+
 
     public void testWithFailures() throws Exception
     {
@@ -193,6 +211,12 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
     private void errorsHelper(String type) throws Exception
     {
         List<Changelist> changes = getChanges();
+        BuildResult result = createBuildWithErrors(changes);
+        createAndVerify("errors", type, "http://another.url", result, changes);
+    }
+
+    private BuildResult createBuildWithErrors(List<Changelist> changes)
+    {
         BuildResult result = createBuildWithChanges(changes);
         result.error("test error message");
         result.addFeature(Feature.Level.WARNING, "warning message on result");
@@ -225,8 +249,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         command.addArtifact(new StoredArtifact("second-artifact", artifact));
 
         secondResult.add(command);
-
-        createAndVerify("errors", type, "http://another.url", result, changes);
+        return result;
     }
 
     private void failuresHelper(String type, boolean excessFailures) throws Exception
@@ -416,6 +439,8 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
 
     protected void createAndVerify(String expectedName, String type, String baseUrl, BuildResult result, List<Changelist> changelists, BuildResult lastSuccess, int unsuccessfulBuilds, int unsuccessfulDays) throws IOException
     {
+        result.calculateFeatureCounts();
+        
         Map<String, Object> dataMap = getDataMap(baseUrl, result, changelists, lastSuccess, unsuccessfulBuilds, unsuccessfulDays);
 
         String extension = "txt";

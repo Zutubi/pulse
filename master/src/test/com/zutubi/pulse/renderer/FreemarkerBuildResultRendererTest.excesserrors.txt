@@ -1,0 +1,54 @@
+=====================================================================
+:: test project ::
+=====================================================================
+Build 101 has completed with status 'error'.
+
+You can view the full build result at:
+
+http://another.url/viewBuild.action?id=11
+
+Build reason: trigger 'scm trigger'.
+
+Build stages:
+  * first stage :: first recipe@[pending] :: error
+  * second stage :: second recipe@[pending] :: error
+
+New changes in this build:
+  * 655 by test author:
+    CIB-1: short comment
+  * 656 by author2:
+    this time we will use a longer comment to make sure that the
+    renderer is applying some sort of trimming to the resulting
+    output dadada da dadad ad ad adadad ad ad ada d adada da...
+
+Error messages:
+  NOTE: This build has 3 more error messages that have not
+  been reported as the feature limit has been reached.
+  * test error message
+  - stage first stage :: first recipe@[pending]
+    * test recipe error message
+  - stage first stage :: first recipe@[pending] :: stage nested
+    stage :: nested recipe@[pending]
+    * test recipe failure message with the unfortunate need to wrap
+      because it is really quite ridiculously long
+  - stage second stage :: second recipe@[pending]
+    * Error executing command 'test command'
+  - stage second stage :: second recipe@[pending] :: test command
+    * bad stuff happened, so wrap this:
+      0000000000000000000000000000000000000000000000000000000000
+      00000000000
+  - stage second stage :: second recipe@[pending] :: artifact
+    command
+    * artifacts let me down
+  - stage second stage :: second recipe@[pending] :: artifact
+    command :: first-artifact
+    first-artifact/testpath
+    * error message
+
+Warning messages:
+  * warning message on result
+  - stage second stage :: second recipe@[pending] :: artifact
+    command :: first-artifact
+    first-artifact/testpath
+    * warning message
+
