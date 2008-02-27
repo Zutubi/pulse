@@ -2,7 +2,7 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.util.Predicate;
-import com.zutubi.util.UnaryFunction;
+import com.zutubi.util.UnaryProcedure;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -276,7 +276,7 @@ public class RecipeResultNode extends Entity
         return null;
     }
 
-    public void forEachNode(UnaryFunction<RecipeResultNode> fn)
+    public void forEachNode(UnaryProcedure<RecipeResultNode> fn)
     {
         fn.process(this);
 

@@ -333,13 +333,7 @@ public class CompositeType extends AbstractType implements ComplexType
                 unstantiateProperty(property, instance, result);
             }
 
-            if(instance instanceof Configuration)
-            {
-                if(((Configuration)instance).isPermanent())
-                {
-                    result.setPermanent(true);
-                }
-            }
+            copyMetaToRecord(instance, result);
 
             return result;
         }

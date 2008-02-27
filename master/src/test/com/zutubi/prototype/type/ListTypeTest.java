@@ -49,7 +49,7 @@ public class ListTypeTest extends TypeTestCase
 
         Record record = (Record) listType.unstantiate(list);
 
-        SimpleInstantiator instantiator = new SimpleInstantiator(null, null);
+        SimpleInstantiator instantiator = new SimpleInstantiator(null);
         List<Object> newList = (List<Object>) instantiator.instantiate(listType, record);
         assertEquals(2, newList.size());
         assertTrue(newList.get(0) instanceof MockA);

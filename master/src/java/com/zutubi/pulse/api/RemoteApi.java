@@ -1082,7 +1082,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
                 {
                     final BuildResult build = internalGetBuild(project, id);
 
-                    build.getRoot().forEachNode(new UnaryFunction<RecipeResultNode>()
+                    build.getRoot().forEachNode(new UnaryProcedure<RecipeResultNode>()
                     {
                         public void process(RecipeResultNode recipeResultNode)
                         {
@@ -1147,7 +1147,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
                         result.add(convertFeature(null, null, null, null, f));
                     }
 
-                    build.getRoot().forEachNode(new UnaryFunction<RecipeResultNode>()
+                    build.getRoot().forEachNode(new UnaryProcedure<RecipeResultNode>()
                     {
                         public void process(RecipeResultNode recipeResultNode)
                         {

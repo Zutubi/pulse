@@ -81,7 +81,7 @@ public class ProjectWizardFileObject extends AbstractPulseFileObject implements 
             throw new FileSystemException("Scm details not configured");
         }
 
-        SimpleInstantiator instantiator = new SimpleInstantiator(configurationTemplateManager, configurationReferenceManager);
+        SimpleInstantiator instantiator = new SimpleInstantiator(configurationReferenceManager);
         Record record = state.getRenderRecord();
         try
         {

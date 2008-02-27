@@ -1,18 +1,18 @@
 package com.zutubi.prototype.type.record;
 
 import com.zutubi.config.annotations.NoInherit;
-import com.zutubi.config.annotations.Internal;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.type.ComplexType;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeProperty;
+import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.StringUtils;
 
+import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import java.lang.annotation.Annotation;
 
 /**
  */
@@ -21,7 +21,7 @@ public class TemplateRecord extends AbstractRecord
     public static final String HIDDEN_KEY = "hidden";
 
     private static final char SEPARATOR = ',';
-    private static final String[] NO_INHERIT_META_KEYS = { HANDLE_KEY, HIDDEN_KEY, PERMANENT_KEY, SYMBOLIC_NAME_KEY,
+    private static final String[] NO_INHERIT_META_KEYS = { Configuration.HANDLE_KEY, HIDDEN_KEY, Configuration.PERMANENT_KEY, SYMBOLIC_NAME_KEY,
                                                            ConfigurationTemplateManager.PARENT_KEY,
                                                            ConfigurationTemplateManager.TEMPLATE_KEY };
     /**
@@ -181,7 +181,7 @@ public class TemplateRecord extends AbstractRecord
         MutableRecord record = new MutableRecordImpl();
         for (String metaKey : metaKeySet())
         {
-            if (!metaKey.equals(HANDLE_KEY))
+            if (!metaKey.equals(Configuration.HANDLE_KEY))
             {
                 record.putMeta(metaKey, getMeta(metaKey));
             }

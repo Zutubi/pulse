@@ -2,31 +2,48 @@ package com.zutubi.pulse.core.config;
 
 import com.zutubi.config.annotations.Transient;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Convenient base class for configuration types.
  */
 public abstract class AbstractConfiguration implements Configuration
 {
-    private long handle;
+    private Map<String, String> meta = new HashMap<String, String>();
     private String configurationPath;
     private boolean concrete;
-    private boolean permanent;
     private List<String> instanceErrors = new LinkedList<String>();
     private Map<String, List<String>> fieldErrors = new HashMap<String, List<String>>();
 
+    public String getMeta(String key)
+    {
+        return meta.get(key);
+    }
+
+    public void putMeta(String key, String value)
+    {
+        meta.put(key, value);
+    }
+
+    public Set<String> metaKeySet()
+    {
+        return meta.keySet();
+    }
+
     public long getHandle()
     {
-        return handle;
+        String m = getMeta(HANDLE_KEY);
+        if(m == null)
+        {
+            return 0;
+        }
+        
+        return Long.parseLong(m);
     }
 
     public void setHandle(long handle)
     {
-        this.handle = handle;
+        putMeta(HANDLE_KEY, Long.toString(handle));
     }
 
     public String getConfigurationPath()
@@ -51,12 +68,12 @@ public abstract class AbstractConfiguration implements Configuration
 
     public boolean isPermanent()
     {
-        return permanent;
+        return Boolean.parseBoolean(getMeta(PERMANENT_KEY));
     }
 
     public void setPermanent(boolean permanent)
     {
-        this.permanent = permanent;
+        putMeta(PERMANENT_KEY, Boolean.toString(permanent));
     }
 
     @Transient
@@ -130,7 +147,7 @@ public abstract class AbstractConfiguration implements Configuration
 
     public int hashCode()
     {
-        return new Long(handle).hashCode();
+        return new Long(getHandle()).hashCode();
     }
 
     public boolean equals(Object obj)
@@ -146,6 +163,6 @@ public abstract class AbstractConfiguration implements Configuration
         }
 
         AbstractConfiguration otherConfig = (AbstractConfiguration) obj;
-        return otherConfig.handle != 0 && otherConfig.handle == handle;
+        return otherConfig.getHandle() != 0 && otherConfig.getHandle() == getHandle();
     }
 }

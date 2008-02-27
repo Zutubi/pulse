@@ -2,7 +2,7 @@ package com.zutubi.prototype.config;
 
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.core.config.Configuration;
-import com.zutubi.util.UnaryFunction;
+import com.zutubi.util.UnaryProcedure;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -31,7 +31,7 @@ class DefaultInstanceCache implements InstanceCache
 
     public void markInvalid(String path)
     {
-        getEntry(path, new UnaryFunction<Entry>()
+        getEntry(path, new UnaryProcedure<Entry>()
         {
             public void process(Entry entry)
             {
@@ -52,12 +52,12 @@ class DefaultInstanceCache implements InstanceCache
         return entry == null ? null : entry.getInstance();
     }
 
-    private Entry getEntry(String path, UnaryFunction<Entry> f)
+    private Entry getEntry(String path, UnaryProcedure<Entry> f)
     {
         return getEntry(root, PathUtils.getPathElements(path), 0, f);
     }
 
-    private Entry getEntry(Entry entry, String[] elements, int index, UnaryFunction<Entry> f)
+    private Entry getEntry(Entry entry, String[] elements, int index, UnaryProcedure<Entry> f)
     {
         if (f != null)
         {

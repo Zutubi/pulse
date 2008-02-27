@@ -8,7 +8,8 @@ import com.zutubi.util.StringUtils;
  */
 public class PathUtils
 {
-    private static final String SEPARATOR = "/";
+    public static final char SEPARATOR_CHAR = '/';
+    public static final String SEPARATOR = "/";
     public static final String WILDCARD_ANY_ELEMENT = "*";
 
     public static String[] getPathElements(String path)

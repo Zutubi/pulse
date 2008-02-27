@@ -1,5 +1,7 @@
 package com.zutubi.prototype.type.record;
 
+import com.zutubi.pulse.core.config.Configuration;
+
 /**
  * Convenient base for mutable record implementations.
  */
@@ -7,11 +9,11 @@ public abstract class AbstractMutableRecord extends AbstractRecord implements Mu
 {
     public void setHandle(long id)
     {
-        putMeta(HANDLE_KEY, Long.toString(id));
+        putMeta(Configuration.HANDLE_KEY, Long.toString(id));
     }
 
     public void setPermanent(boolean permanent)
     {
-        putMeta(PERMANENT_KEY, Boolean.toString(permanent));
+        putMeta(Configuration.PERMANENT_KEY, Boolean.toString(permanent));
     }
 }

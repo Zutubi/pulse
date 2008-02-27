@@ -124,6 +124,8 @@ public class ListType extends CollectionType
     private MutableRecord convertToRecord(Collection collection, Type collectionType, ToRecord toRecord) throws TypeException
     {
         MutableRecord result = createNewRecord(true);
+        copyMetaToRecord(collection, result);
+
         List<String> order = new ArrayList<String>(collection.size());
         for(Object o: collection)
         {

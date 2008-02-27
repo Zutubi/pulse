@@ -1,5 +1,7 @@
 package com.zutubi.prototype.type;
 
+import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 
@@ -93,6 +95,18 @@ public abstract class AbstractType implements Type
         if(!expectedClass.isInstance(data))
         {
             throw new TypeException("Expecting '" + expectedClass.getName() + "', found '" + data.getClass().getName() + "'");
+        }
+    }
+
+    protected void copyMetaToRecord(Object instance, MutableRecord record)
+    {
+        if(instance instanceof Configuration)
+        {
+            Configuration configuration = (Configuration) instance;
+            for(String key: configuration.metaKeySet())
+            {
+                record.putMeta(key, configuration.getMeta(key));
+            }
         }
     }
 

@@ -102,10 +102,8 @@ public class ReferenceType extends SimpleType implements Type
         }
     }
 
-    public Object toXmlRpc(Object data) throws TypeException
+    public String getReferencedPath(Object data) throws TypeException
     {
-        // We return references via the remote api as paths so that the
-        // caller can use the value in subsequent calls.
         long handle = getHandle(data);
         if(handle > 0)
         {
@@ -115,6 +113,13 @@ public class ReferenceType extends SimpleType implements Type
         {
             return null;
         }
+    }
+
+    public Object toXmlRpc(Object data) throws TypeException
+    {
+        // We return references via the remote api as paths so that the
+        // caller can use the value in subsequent calls.
+        return getReferencedPath(data);
     }
 
     public String fromXmlRpc(Object data) throws TypeException

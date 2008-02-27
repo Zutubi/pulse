@@ -21,7 +21,7 @@ import java.util.*;
  * Manages the resolution, maintenance and cleanup of references between
  * configuration instances.
  */
-public class ConfigurationReferenceManager
+public class ConfigurationReferenceManager implements ReferenceResolver
 {
     private static final Logger LOG = Logger.getLogger(ConfigurationReferenceManager.class);
 
@@ -66,6 +66,11 @@ public class ConfigurationReferenceManager
         {
             return record.getHandle();
         }
+    }
+
+    public Configuration resolveReference(String fromPath, long toHandle, Instantiator instantiator) throws TypeException
+    {
+        return resolveReference(fromPath, toHandle, instantiator, configurationTemplateManager);
     }
 
     public Configuration resolveReference(String fromPath, long toHandle, Instantiator instantiator, InstanceSource cache) throws TypeException

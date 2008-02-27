@@ -1,7 +1,6 @@
 package com.zutubi.prototype.type;
 
-import com.zutubi.prototype.config.ConfigurationReferenceManager;
-import com.zutubi.prototype.config.ConfigurationTemplateManager;
+import com.zutubi.prototype.config.ReferenceResolver;
 import com.zutubi.pulse.core.config.Configuration;
 
 /**
@@ -10,13 +9,11 @@ import com.zutubi.pulse.core.config.Configuration;
  */
 public class SimpleInstantiator implements Instantiator
 {
-    private ConfigurationTemplateManager configurationTemplateManager;
-    private ConfigurationReferenceManager configurationReferenceManager;
+    private ReferenceResolver referenceResolver;
 
-    public SimpleInstantiator(ConfigurationTemplateManager configurationTemplateManager, ConfigurationReferenceManager configurationReferenceManager)
+    public SimpleInstantiator(ReferenceResolver referenceResolver)
     {
-        this.configurationTemplateManager = configurationTemplateManager;
-        this.configurationReferenceManager = configurationReferenceManager;
+        this.referenceResolver = referenceResolver;
     }
 
     public Object instantiate(String property, boolean relative, Type type, Object data) throws TypeException
@@ -36,6 +33,6 @@ public class SimpleInstantiator implements Instantiator
 
     public Configuration resolveReference(long toHandle) throws TypeException
     {
-        return configurationReferenceManager.resolveReference(null, toHandle, this, configurationTemplateManager);
+        return referenceResolver.resolveReference(null, toHandle, this);
     }
 }

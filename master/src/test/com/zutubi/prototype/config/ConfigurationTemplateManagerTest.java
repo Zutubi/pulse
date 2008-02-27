@@ -539,6 +539,24 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         assertEquals(a.getDs().get(0).getHandle(), clone.getDs().get(0).getHandle());
     }
 
+    public void testDeepCloneAndSavePreservesMeta() throws TypeException
+    {
+        MockA a = new MockA("a");
+        MutableRecord record = typeA.unstantiate(a);
+        record.putMeta("testkey", "value");
+
+        String path = configurationTemplateManager.insertRecord("sample", record);
+        Record savedRecord = configurationTemplateManager.getRecord(path);
+        assertEquals("value", savedRecord.getMeta("testkey"));
+
+        a = configurationTemplateManager.getInstance(path, MockA.class);
+        a = configurationTemplateManager.deepClone(a);
+        configurationTemplateManager.save(a);
+        
+        savedRecord = configurationTemplateManager.getRecord(path);
+        assertEquals("value", savedRecord.getMeta("testkey"));
+    }
+
     public void testValidate() throws TypeException
     {
         MutableRecord record = typeA.createNewRecord(true);

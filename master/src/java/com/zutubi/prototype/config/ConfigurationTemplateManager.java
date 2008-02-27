@@ -240,7 +240,7 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
         return record;
     }
 
-    private <T> T executeInsideTransaction(Action<T> a)
+    <T> T executeInsideTransaction(Action<T> a)
     {
         userTransaction.begin();
         try
@@ -266,7 +266,7 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
         this.configurationCleanupManager = configurationCleanupManager;
     }
 
-    private interface Action<T>
+    interface Action<T>
     {
         T execute() throws Exception;
     }
@@ -601,7 +601,7 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
                     boolean concrete = isConcreteOwner(record);
                     try
                     {
-                        PersistentInstantiator instantiator = new PersistentInstantiator(path, concrete, instances, incompleteInstances, this, configurationReferenceManager);
+                        PersistentInstantiator instantiator = new PersistentInstantiator(path, concrete, instances, incompleteInstances, configurationReferenceManager);
                         Configuration instance = (Configuration) instantiator.instantiate(id, true, templatedType, record);
 
                         // Concrete instances go into the collection
@@ -620,7 +620,7 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
             {
                 try
                 {
-                    PersistentInstantiator instantiator = new PersistentInstantiator(path, true, instances, incompleteInstances, this, configurationReferenceManager);
+                    PersistentInstantiator instantiator = new PersistentInstantiator(path, true, instances, incompleteInstances, configurationReferenceManager);
                     instantiator.instantiate(path, false, type, topRecord);
                 }
                 catch (TypeException e)
@@ -846,7 +846,7 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
         // Create an instance of the object represented by the record.  It is
         // during the instantiation that type conversion errors are detected.
         Configuration instance;
-        SimpleInstantiator instantiator = new SimpleInstantiator(this, configurationReferenceManager);
+        SimpleInstantiator instantiator = new SimpleInstantiator(configurationReferenceManager);
         instance = (Configuration) instantiator.instantiate(type, subject);
 
         // Now apply validations via using the validation manager.
@@ -1758,17 +1758,43 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
     @SuppressWarnings({"unchecked"})
     public <T extends Configuration> T deepClone(T instance)
     {
-        String path = instance.getConfigurationPath();
+        final String path = instance.getConfigurationPath();
         Record record = getRecord(path);
         ComplexType type = getType(path);
-        CloningInstantiator instantiator = new CloningInstantiator(path, path, isConcrete(PathUtils.getParentPath(path), record), new DefaultInstanceCache(), new DefaultInstanceCache(), this, configurationReferenceManager);
+        final DefaultInstanceCache cache = new DefaultInstanceCache();
+        final DefaultInstanceCache incompleteCache = new DefaultInstanceCache();
+        PersistentInstantiator instantiator = new PersistentInstantiator(path, isConcrete(PathUtils.getParentPath(path), record), cache, incompleteCache, new ReferenceResolver()
+        {
+            public Configuration resolveReference(String fromPath, long toHandle, Instantiator instantiator) throws TypeException
+            {
+                InstanceSource source = ConfigurationTemplateManager.this;
+                String targetPath = configurationReferenceManager.getPathForHandle(toHandle);
+                if(targetPath.startsWith(path))
+                {
+                    // This reference points within the object tree we are cloning.
+                    // We must update it to point to a new clone.
+                    source = new InstanceSource()
+                    {
+                        public Configuration getInstance(String path)
+                        {
+                            Configuration instance = cache.get(path);
+                            if(instance == null)
+                            {
+                                instance = incompleteCache.get(path);
+                            }
+
+                            return instance;
+                        }
+                    };
+                }
+
+                return configurationReferenceManager.resolveReference(path, toHandle, instantiator, source);
+            }
+        });
+
         try
         {
-            Configuration clone = (Configuration) instantiator.instantiate(path, false, type, record);
-//            clone.setConfigurationPath(instance.getConfigurationPath());
-//            clone.setHandle(instance.getHandle());
-//            clone.setConcrete(instance.isConcrete());
-            return (T) clone;
+            return (T) instantiator.instantiate(path, false, type, record);
         }
         catch (TypeException e)
         {

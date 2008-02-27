@@ -4,12 +4,20 @@ import com.zutubi.config.annotations.Transient;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Basic interface that must be implemented by all configuration types.
  */
 public interface Configuration
 {
+    static final String HANDLE_KEY    = "handle";
+    static final String PERMANENT_KEY = "permanent";
+
+    String getMeta(String key);
+    void putMeta(String key, String value);
+    Set<String> metaKeySet();
+
     @Transient
     long getHandle();
     void setHandle(long handle);

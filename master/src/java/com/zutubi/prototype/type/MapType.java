@@ -150,6 +150,8 @@ public class MapType extends CollectionType
     private MutableRecord convertToRecord(Map instance, ToRecord toRecord) throws TypeException
     {
         MutableRecord result = createNewRecord(true);
+        copyMetaToRecord(instance, result);
+        
         Type collectionType = getCollectionType();
         for(Object entry: instance.entrySet())
         {

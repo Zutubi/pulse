@@ -16,7 +16,7 @@ import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.RecipeResultNode;
 import com.zutubi.pulse.model.persistence.hibernate.HibernateBuildResultDao;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
-import com.zutubi.util.UnaryFunction;
+import com.zutubi.util.UnaryProcedure;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -68,7 +68,7 @@ public class BuildHookManager implements EventListener
                     executeTask(hook, context, result, null, true);
                 }
 
-                result.getRoot().forEachNode(new UnaryFunction<RecipeResultNode>()
+                result.getRoot().forEachNode(new UnaryProcedure<RecipeResultNode>()
                 {
                     public void process(RecipeResultNode recipeResultNode)
                     {

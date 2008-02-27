@@ -16,27 +16,19 @@ import com.zutubi.pulse.core.config.Configuration;
  */
 public class PersistentInstantiator implements Instantiator
 {
-    protected String path;
-    protected boolean concrete;
-    protected InstanceCache cache;
-    protected InstanceCache incompleteCache;
+    private String path;
+    private boolean concrete;
+    private InstanceCache cache;
+    private InstanceCache incompleteCache;
+    private ReferenceResolver referenceResolver;
 
-    protected ConfigurationTemplateManager configurationTemplateManager;
-    protected ConfigurationReferenceManager configurationReferenceManager;
-
-    public PersistentInstantiator(String path, boolean concrete, InstanceCache cache, InstanceCache incompleteCache, ConfigurationTemplateManager configurationTemplateManager, ConfigurationReferenceManager configurationReferenceManager)
+    public PersistentInstantiator(String path, boolean concrete, InstanceCache cache, InstanceCache incompleteCache, ReferenceResolver referenceResolver)
     {
         this.path = path;
         this.concrete = concrete;
         this.cache = cache;
         this.incompleteCache = incompleteCache;
-        this.configurationTemplateManager = configurationTemplateManager;
-        this.configurationReferenceManager = configurationReferenceManager;
-    }
-
-    public String getPath()
-    {
-        return path;
+        this.referenceResolver = referenceResolver;
     }
 
     public Object instantiate(String propertyPath, boolean relative, Type type, Object data) throws TypeException
@@ -49,7 +41,7 @@ public class PersistentInstantiator implements Instantiator
         Object instance = cache.get(propertyPath);
         if (instance == null)
         {
-            PersistentInstantiator childInstantiator = createChildInstantiator(propertyPath);
+            PersistentInstantiator childInstantiator = new PersistentInstantiator(propertyPath, concrete, cache, incompleteCache, referenceResolver);
             instance = type.instantiate(data, childInstantiator);
 
             if (instance != null)
@@ -61,10 +53,15 @@ public class PersistentInstantiator implements Instantiator
                     ComponentContext.autowire(instance);
 
                     Configuration configuration = (Configuration) instance;
+
+                    Record record = (Record) data;
+                    for(String key: record.metaKeySet())
+                    {
+                        configuration.putMeta(key, record.getMeta(key));
+                    }
+                    
                     configuration.setConfigurationPath(propertyPath);
-                    configuration.setHandle(((Record) data).getHandle());
                     configuration.setConcrete(concrete);
-                    configuration.setPermanent(((Record) data).isPermanent());
 
                     if(concrete)
                     {
@@ -83,13 +80,8 @@ public class PersistentInstantiator implements Instantiator
         return instance;
     }
 
-    protected PersistentInstantiator createChildInstantiator(String propertyPath)
-    {
-        return new PersistentInstantiator(propertyPath, concrete, cache, incompleteCache, configurationTemplateManager, configurationReferenceManager);
-    }
-
     public Configuration resolveReference(long toHandle) throws TypeException
     {
-        return configurationReferenceManager.resolveReference(path, toHandle, this, configurationTemplateManager);
+        return referenceResolver.resolveReference(path, toHandle, this);
     }
 }
