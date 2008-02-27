@@ -7,8 +7,10 @@ import com.zutubi.prototype.type.MapType;
 import com.zutubi.prototype.type.TemplatedMapType;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.record.MutableRecord;
-import com.zutubi.prototype.type.record.PathUtils;
+import static com.zutubi.prototype.type.record.PathUtils.getPath;
 import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
+import static com.zutubi.util.CollectionUtils.asMap;
+import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.validation.ValidationException;
 
 import java.util.HashMap;
@@ -20,10 +22,13 @@ import java.util.Map;
  */
 public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSystemTestCase
 {
+    private static final String SAMPLE_SCOPE = "sample";
+    private static final String TEMPLATE_SCOPE = "template";
+
     private ConfigurationRefactoringManager configurationRefactoringManager;
     private CompositeType typeA;
     private String rootPath;
-    private static final String SAMPLE_SCOPE = "sample";
+    private long rootHandle;
 
     protected void setUp() throws Exception
     {
@@ -39,48 +44,54 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         MapType templatedMap = new TemplatedMapType(typeA, typeRegistry);
 
         configurationPersistenceManager.register(SAMPLE_SCOPE, mapA);
-        configurationPersistenceManager.register("template", templatedMap);
+        configurationPersistenceManager.register(TEMPLATE_SCOPE, templatedMap);
 
         MutableRecord root = typeA.unstantiate(new MockA("root"));
         configurationTemplateManager.markAsTemplate(root);
-        rootPath = configurationTemplateManager.insertRecord("template", root);
+        rootPath = configurationTemplateManager.insertRecord(TEMPLATE_SCOPE, root);
+        rootHandle = configurationTemplateManager.getRecord(rootPath).getHandle();
     }
 
-    public void testCloneEmptyPath() throws ValidationException
+    public void testCloneEmptyPath()
     {
         illegalPathHelper("", "Invalid path '': no parent");
     }
 
-    public void testCloneSingleElementPath() throws ValidationException
+    public void testCloneSingleElementPath()
     {
         illegalPathHelper(SAMPLE_SCOPE, "Invalid path 'sample': no parent");
     }
 
-    public void testCloneInvalidParentPath() throws ValidationException
+    public void testCloneInvalidParentPath()
     {
         illegalPathHelper("huh/instance", "Invalid path 'huh': references non-existant root scope 'huh'");
     }
 
-    public void testCloneInvalidPath() throws ValidationException
+    public void testCloneInvalidPath()
     {
         illegalPathHelper("sample/nosuchinstance", "Invalid path 'sample/nosuchinstance': path does not exist");
     }
 
-    public void testCloneParentPathNotACollection() throws ValidationException
+    public void testCloneParentPathNotACollection()
     {
-        configurationTemplateManager.insert(SAMPLE_SCOPE, createAInstance());
+        configurationTemplateManager.insert(SAMPLE_SCOPE, createAInstance("a"));
         illegalPathHelper("sample/a/b", "Invalid parent path 'sample/a': only elements of a map collection may be cloned (parent has type com.zutubi.prototype.type.CompositeType)");
     }
 
-    public void testCloneParentPathAList() throws ValidationException
+    public void testCloneParentPathAList()
     {
-        String aPath = configurationTemplateManager.insert(SAMPLE_SCOPE, createAInstance());
-        String listPath = PathUtils.getPath(aPath, "blist");
-        String clonePath = PathUtils.getPath(listPath, configurationTemplateManager.getRecord(listPath).keySet().iterator().next());
+        String aPath = configurationTemplateManager.insert(SAMPLE_SCOPE, createAInstance("a"));
+        String listPath = getPath(aPath, "blist");
+        String clonePath = getPath(listPath, configurationTemplateManager.getRecord(listPath).keySet().iterator().next());
         illegalPathHelper(clonePath, "Invalid parent path '" + listPath + "': only elements of a map collection may be cloned (parent has type com.zutubi.prototype.type.ListType)");
     }
 
-    private void illegalPathHelper(String path, String expectedError) throws ValidationException
+    public void testCloneTemplateRoot()
+    {
+        illegalPathHelper(rootPath, "Invalid path '" + rootPath + "': cannot clone root of a template hierarchy");
+    }
+
+    private void illegalPathHelper(String path, String expectedError)
     {
         try
         {
@@ -99,27 +110,27 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         }
     }
 
-    public void testCloneEmptyCloneName() throws ValidationException, TypeException
+    public void testCloneEmptyCloneName() throws TypeException
     {
         invalidCloneNameHelper(insertTemplateA(rootPath, "a", false), "", "Invalid empty clone key");
     }
 
-    public void testCloneDuplicateCloneName() throws ValidationException, TypeException
+    public void testCloneDuplicateCloneName() throws TypeException
     {
         insertTemplateA(rootPath, "existing", false);
         invalidCloneNameHelper(insertTemplateA(rootPath, "a", false), "existing", "name is already in use, please select another name");
     }
 
-    public void testCloneCloneNameInAncestor() throws ValidationException, TypeException
+    public void testCloneCloneNameInAncestor() throws TypeException
     {
         addB(rootPath, "parentB");
         String childPath = insertTemplateA(rootPath, "child", false);
-        configurationTemplateManager.delete(PathUtils.getPath(childPath, "bmap", "parentB"));
+        configurationTemplateManager.delete(getPath(childPath, "bmap", "parentB"));
         String childBPath = addB(childPath, "childB");
         invalidCloneNameHelper(childBPath, "parentB", "name is already in use in ancestor \"root\", please select another name");
     }
 
-    public void testCloneCloneNameInDescendent() throws ValidationException, TypeException
+    public void testCloneCloneNameInDescendent() throws TypeException
     {
         String parentBPath = addB(rootPath, "parentB");
         String childPath = insertTemplateA(rootPath, "child", false);
@@ -127,39 +138,39 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         invalidCloneNameHelper(parentBPath, "childB", "name is already in use in descendent \"child\", please select another name");
     }
 
-    public void testSimpleClone() throws ValidationException
+    public void testSimpleClone()
     {
-        String path = configurationTemplateManager.insert(SAMPLE_SCOPE, createAInstance());
-        String clonePath = configurationRefactoringManager.clone(path, "clone");
-        assertEquals("sample/clone", clonePath);
-        assertClone(configurationTemplateManager.getInstance(clonePath, MockA.class));
+        String path = configurationTemplateManager.insert(SAMPLE_SCOPE, createAInstance("a"));
+        String clonePath = configurationRefactoringManager.clone(path, "clone of a");
+        assertEquals("sample/clone of a", clonePath);
+        assertClone(configurationTemplateManager.getInstance(clonePath, MockA.class), "a");
     }
 
-    public void testSimpleCloneInTemplateScope() throws ValidationException, TypeException
+    public void testSimpleCloneInTemplateScope() throws TypeException
     {
-        String path = insertTemplateAInstance(rootPath, createAInstance(), false);
-        String clonePath = configurationRefactoringManager.clone(path, "clone");
-        assertEquals("template/clone", clonePath);
+        String path = insertTemplateAInstance(rootPath, createAInstance("a"), false);
+        String clonePath = configurationRefactoringManager.clone(path, "clone of a");
+        assertEquals("template/clone of a", clonePath);
         MockA clone = configurationTemplateManager.getInstance(clonePath, MockA.class);
         assertTrue(clone.isConcrete());
-        assertEquals(configurationTemplateManager.getRecord(rootPath).getHandle(), configurationTemplateManager.getTemplateParentRecord(clonePath).getHandle());
-        assertClone(clone);
+        assertEquals(rootHandle, configurationTemplateManager.getTemplateParentRecord(clonePath).getHandle());
+        assertClone(clone, "a");
     }
 
-    public void testCloneOfTemplate() throws ValidationException, TypeException
+    public void testCloneOfTemplate() throws TypeException
     {
-        String path = insertTemplateAInstance(rootPath, createAInstance(), true);
-        String clonePath = configurationRefactoringManager.clone(path, "clone");
-        assertEquals("template/clone", clonePath);
+        String path = insertTemplateAInstance(rootPath, createAInstance("a"), true);
+        String clonePath = configurationRefactoringManager.clone(path, "clone of a");
+        assertEquals("template/clone of a", clonePath);
         MockA clone = configurationTemplateManager.getInstance(clonePath, MockA.class);
         assertFalse(clone.isConcrete());
-        assertEquals(configurationTemplateManager.getRecord(rootPath).getHandle(), configurationTemplateManager.getTemplateParentRecord(clonePath).getHandle());
-        assertClone(clone);
+        assertEquals(rootHandle, configurationTemplateManager.getTemplateParentRecord(clonePath).getHandle());
+        assertClone(clone, "a");
     }
 
-    public void testCloneBelowTopLevel() throws ValidationException
+    public void testCloneBelowTopLevel()
     {
-        String path = configurationTemplateManager.insert(SAMPLE_SCOPE, createAInstance());
+        String path = configurationTemplateManager.insert(SAMPLE_SCOPE, createAInstance("a"));
         MockB colby = configurationTemplateManager.getInstance(path, MockA.class).getBmap().values().iterator().next();
         String clonePath = configurationRefactoringManager.clone(colby.getConfigurationPath(), "clone");
         assertEquals("sample/a/bmap/clone", clonePath);
@@ -170,9 +181,20 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         assertEquals(1, clone.getY());
     }
 
-    public void testCloneWithInternalReference() throws ValidationException
+    public void testMultipleClone()
     {
-        String path = configurationTemplateManager.insert(SAMPLE_SCOPE, createAInstance());
+        configurationTemplateManager.insert(SAMPLE_SCOPE, createAInstance("1"));
+        configurationTemplateManager.insert(SAMPLE_SCOPE, createAInstance("2"));
+
+        configurationRefactoringManager.clone(SAMPLE_SCOPE, asMap(asPair("1", "clone of 1"), asPair("2", "clone of 2")));
+
+        assertClone(configurationTemplateManager.getInstance(getPath(SAMPLE_SCOPE, "clone of 1"), MockA.class), "1");
+        assertClone(configurationTemplateManager.getInstance(getPath(SAMPLE_SCOPE, "clone of 2"), MockA.class), "2");
+    }
+
+    public void testCloneWithInternalReference()
+    {
+        String path = configurationTemplateManager.insert(SAMPLE_SCOPE, createAInstance("a"));
         MockA instance = configurationTemplateManager.getInstance(path, MockA.class);
         instance.setRefToRef(instance.getRef());
         configurationTemplateManager.save(instance);
@@ -188,9 +210,60 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         assertSame(cloneInstance.getRef(), cloneInstance.getRefToRef());
     }
 
-    private MockA createAInstance()
+    public void testMultipleCloneWithReferenceBetween()
     {
-        MockA instance = new MockA("a");
+        String path1 = configurationTemplateManager.insert(SAMPLE_SCOPE, createAInstance("1"));
+        MockA instance1 = configurationTemplateManager.getInstance(path1, MockA.class);
+        MockA instance2 = createAInstance("2");
+        instance2.setRefToRef(instance1.getRef());
+        String path2 = configurationTemplateManager.insert(SAMPLE_SCOPE, instance2);
+
+        configurationRefactoringManager.clone(SAMPLE_SCOPE, asMap(asPair("1", "clone of 1"), asPair("2", "clone of 2")));
+
+        instance1 = configurationTemplateManager.getInstance(path1, MockA.class);
+        instance2 = configurationTemplateManager.getInstance(path2, MockA.class);
+        MockA clone1 = configurationTemplateManager.getInstance(getPath(SAMPLE_SCOPE, "clone of 1"), MockA.class);
+        MockA clone2 = configurationTemplateManager.getInstance(getPath(SAMPLE_SCOPE, "clone of 2"), MockA.class);
+
+        assertClone(clone1, "1");
+        assertClone(clone2, "2");
+        assertSame(instance1.getRef(), instance2.getRefToRef());
+        assertNotSame(instance1.getRef(), clone2.getRefToRef());
+        assertSame(clone1.getRef(), clone2.getRefToRef());
+    }
+
+    public void testMultipleCloneOfTemplateHierarchy() throws TypeException
+    {
+        templateHierarchyHelper(asMap(asPair("parent", "clone of parent"), asPair("child", "clone of child")));
+    }
+
+    public void testMultipleCloneOfTemplateHierarchyChildFirst() throws TypeException
+    {
+        templateHierarchyHelper(asMap(asPair("child", "clone of child"), asPair("parent", "clone of parent")));
+    }
+
+    private void templateHierarchyHelper(Map<String, String> originalKeyToCloneKey) throws TypeException
+    {
+        String parentPath = insertTemplateAInstance(rootPath, createAInstance("parent"), true);
+        insertTemplateAInstance(parentPath, createAInstance("child"), false);
+
+        configurationRefactoringManager.clone(TEMPLATE_SCOPE, originalKeyToCloneKey);
+
+        String parentClonePath = getPath(TEMPLATE_SCOPE, "clone of parent");
+        MockA parentClone = configurationTemplateManager.getInstance(parentClonePath, MockA.class);
+        assertFalse(parentClone.isConcrete());
+        assertClone(parentClone, "parent");
+        assertEquals(rootHandle, configurationTemplateManager.getTemplateParentRecord(parentClonePath).getHandle());
+
+        String childClonePath = getPath(TEMPLATE_SCOPE, "clone of child");
+        MockA childClone = configurationTemplateManager.getInstance(childClonePath, MockA.class);
+        assertTrue(childClone.isConcrete());
+        assertEquals(parentClone.getHandle(), configurationTemplateManager.getTemplateParentRecord(childClonePath).getHandle());
+    }
+
+    private MockA createAInstance(String name)
+    {
+        MockA instance = new MockA(name);
         instance.setX(10);
         MockB b = new MockB("b");
         b.setY(44);
@@ -203,9 +276,9 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         return instance;
     }
 
-    private void assertClone(MockA clone)
+    private void assertClone(MockA clone, String name)
     {
-        assertEquals("clone", clone.getName());
+        assertEquals("clone of " + name, clone.getName());
         assertEquals(10, clone.getX());
         MockB cloneB = clone.getB();
         assertEquals("b", cloneB.getName());
@@ -253,12 +326,12 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
             configurationTemplateManager.markAsTemplate(record);
         }
         configurationTemplateManager.setParentTemplate(record, configurationTemplateManager.getRecord(templateParentPath).getHandle());
-        return configurationTemplateManager.insertRecord("template", record);
+        return configurationTemplateManager.insertRecord(TEMPLATE_SCOPE, record);
     }
 
     private String addB(String aPath, String name)
     {
-        return configurationTemplateManager.insert(PathUtils.getPath(aPath, "bmap"), new MockB(name));
+        return configurationTemplateManager.insert(getPath(aPath, "bmap"), new MockB(name));
     }
 
     @SymbolicName("a")

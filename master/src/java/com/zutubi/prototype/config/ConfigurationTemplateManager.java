@@ -129,7 +129,7 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
      * @param record record to get parent handle for
      * @return parent handle, or 0 if there is no valid parent
      */
-    private long getTemplateParentHandle(String path, Record record)
+    long getTemplateParentHandle(String path, Record record)
     {
         String parentString = record.getMeta(PARENT_KEY);
         if (parentString != null)
@@ -1407,7 +1407,7 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
                         }
                     });
 
-                    String message = "chosen " + fieldName + " is already in use in one or more descendents";
+                    String message;
                     if(descendentNames.size() == 1)
                     {
                         message = textProvider.getText(".indescendent", new Object[]{fieldName, descendentNames.get(0)});
@@ -1569,7 +1569,7 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
         checkPersistent(path);
         configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_DELETE);
 
-        executeInsideTransaction(new Action()
+        executeInsideTransaction(new Action<Object>()
         {
             public Object execute() throws Exception
             {

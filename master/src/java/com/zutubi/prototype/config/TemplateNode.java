@@ -105,6 +105,18 @@ public class TemplateNode
         }
     }
 
+    public int getDepth()
+    {
+        if(parent == null)
+        {
+            return 0;
+        }
+        else
+        {
+            return parent.getDepth() + 1;
+        }
+    }
+
     public void forEachAncestor(NodeHandler callback, boolean strict)
     {
         if((strict || callback.handle(this)) && parent != null)
