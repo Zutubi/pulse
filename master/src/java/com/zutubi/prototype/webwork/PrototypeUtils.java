@@ -8,6 +8,7 @@ import com.zutubi.config.annotations.Listing;
 import com.zutubi.i18n.Messages;
 import com.zutubi.prototype.config.ConfigurationSecurityManager;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
+import com.zutubi.prototype.config.TemplateNode;
 import com.zutubi.prototype.freemarker.BaseNameMethod;
 import com.zutubi.prototype.freemarker.GetTextMethod;
 import com.zutubi.prototype.freemarker.ValidIdMethod;
@@ -422,6 +423,22 @@ public class PrototypeUtils
     public static String getIconCls(ComplexType type)
     {
         return "config-" + getClassification(type) + "-icon";
+    }
+
+    public static String getIconCls(String path, ConfigurationTemplateManager configurationTemplateManager)
+    {
+        String iconCls;
+        TemplateNode templateNode = configurationTemplateManager.getTemplateNode(path);
+        if(templateNode == null)
+        {
+            iconCls = getIconCls(configurationTemplateManager.getType(path));
+        }
+        else
+        {
+            iconCls = "config-" + (templateNode.isConcrete() ? "concrete" : "template") + "-icon";
+        }
+
+        return iconCls;
     }
 
     public static Map<String, Object> initialiseContext(Class clazz)

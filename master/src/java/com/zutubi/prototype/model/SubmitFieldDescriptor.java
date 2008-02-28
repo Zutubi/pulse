@@ -9,12 +9,14 @@ import com.zutubi.prototype.type.record.Record;
  */
 public class SubmitFieldDescriptor extends FieldDescriptor
 {
+    public static final String PARAM_DEFAULT = "default";
+
     public SubmitFieldDescriptor(boolean isDefault)
     {
         setType("submit");
         if(isDefault)
         {
-            addParameter("default", true);
+            addParameter(PARAM_DEFAULT, true);
         }
     }
 

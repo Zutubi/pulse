@@ -9,6 +9,9 @@ import com.zutubi.prototype.FieldDescriptor;
  */
 public class ControllingCheckboxFieldDescriptor extends FieldDescriptor
 {
+    public static final String PARAM_INVERT           = "invert";
+    public static final String PARAM_DEPENDENT_FIELDS = "dependentFields";
+
     public ControllingCheckboxFieldDescriptor()
     {
         setType(FieldType.CONTROLLING_CHECKBOX);
@@ -17,11 +20,11 @@ public class ControllingCheckboxFieldDescriptor extends FieldDescriptor
 
     public void setInvert(boolean invert)
     {
-        addParameter("invert", invert);
+        addParameter(PARAM_INVERT, invert);
     }
 
     public void setDependentFields(String[] deps)
     {
-        addParameter("dependentFields", deps);
+        addParameter(PARAM_DEPENDENT_FIELDS, deps);
     }
 }

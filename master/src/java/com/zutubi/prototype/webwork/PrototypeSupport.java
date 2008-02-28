@@ -18,6 +18,8 @@ import com.zutubi.pulse.web.ActionSupport;
  */
 public class PrototypeSupport extends ActionSupport implements MessagesProvider
 {
+    public static final String CANCEL = "cancel";
+    
     protected String path;
     protected ConfigurationResponse response;
     protected ConfigurationUIModel configuration;

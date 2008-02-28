@@ -1,5 +1,7 @@
 package com.zutubi.prototype.webwork;
 
+import com.zutubi.prototype.config.ConfigurationSecurityManager;
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.type.record.PathUtils;
 import flexjson.JSON;
 
@@ -61,6 +63,22 @@ public class ConfigurationResponse
     public String getNewTemplatePath()
     {
         return newTemplatePath;
+    }
+
+    /**
+     * Registers the path that this response selects as an addition.  This is
+     * a common case - something new is added and we want it to be selected
+     * in the UI.  A special case of {@link #addAddedFile(Addition)}.
+     *
+     * @param configurationTemplateManager required manager
+     * @param configurationSecurityManager required manager
+     */
+    public void registerNewPathAdded(ConfigurationTemplateManager configurationTemplateManager, ConfigurationSecurityManager configurationSecurityManager)
+    {
+        String displayName = PrototypeUtils.getDisplayName(newPath, configurationTemplateManager);
+        String iconCls = PrototypeUtils.getIconCls(newPath, configurationTemplateManager);
+        boolean leaf = PrototypeUtils.isLeaf(newPath, configurationTemplateManager, configurationSecurityManager);
+        addAddedFile(new Addition(newPath, displayName, newTemplatePath, iconCls, leaf));
     }
 
     public void addAddedFile(Addition addition)

@@ -30,6 +30,7 @@ public class CancelWorkflowInterceptor implements Interceptor
             Cancelable cancelable = (Cancelable) action;
             if (cancelable.isCancelled())
             {
+                cancelable.doCancel();
                 return CANCEL;
             }
         }

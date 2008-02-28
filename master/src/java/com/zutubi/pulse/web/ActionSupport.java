@@ -72,6 +72,11 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
         this.cancel = name;
     }
 
+    public void doCancel()
+    {
+        // Do nothing by default
+    }
+
     public Object getPrinciple()
     {
         // note, need to be careful - the returned user is likely to be
