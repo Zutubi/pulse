@@ -30,6 +30,7 @@
     <bean id="configurationExtensionManager" class="com.zutubi.prototype.config.ConfigurationExtensionManager" autowire="byName"/>
     <bean id="configurationPersistenceManager" class="com.zutubi.prototype.config.ConfigurationPersistenceManager" autowire="byName"/>
     <bean id="configurationReferenceManager" class="com.zutubi.prototype.config.ConfigurationReferenceManager" autowire="byName"/>
+    <bean id="configurationRefactoringManager" class="com.zutubi.prototype.config.ConfigurationRefactoringManager" autowire="byName"/>
     <bean id="configurationCleanupManager" class="com.zutubi.prototype.config.cleanup.ConfigurationCleanupManager" autowire="byName" init-method="init"/>
     <bean id="configurationTemplateManager" class="com.zutubi.prototype.config.ConfigurationTemplateManager" autowire="byName">
         <property name="transactionManager">

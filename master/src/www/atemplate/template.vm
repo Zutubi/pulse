@@ -11,6 +11,14 @@
         #actionHeader("configure" "configure" "pencil" "configureRecord('$path')")
         <td>jump to the configuration for this #i18n("key=label") #if(!$concrete) template #end</td>
     </tr>
+#if(!$rootTemplate)
+#auth("path=$path" "action=create")
+    <tr>
+        #actionHeader("clone" "clone" "page_copy" "clonePath('$path')")
+        <td>clone this #i18n("key=label") and optionally its descendents</td>
+    </tr>
+#end
+#end
 #if(!$concrete)
 #auth("path=$path" "action=create")
     <tr>

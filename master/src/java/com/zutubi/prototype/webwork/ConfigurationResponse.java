@@ -34,6 +34,14 @@ public class ConfigurationResponse
      */
     private String newTemplatePath;
 
+    /**
+     * Creates a response with a new path and optional template path to
+     * select in the view.
+     *
+     * @param newPath         new config path to select (config tree)
+     * @param newTemplatePath new template path to select (hierarchy tree),
+     *                        may be null
+     */
     public ConfigurationResponse(String newPath, String newTemplatePath)
     {
         this.newPath = newPath;

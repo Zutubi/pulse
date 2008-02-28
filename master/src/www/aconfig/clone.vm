@@ -1,0 +1,12 @@
+<div class="config-panel">
+    <h3 class="config-header">clone</h3>
+    <div class="config-form-container">
+        $formSource
+    </div>
+    <script type="text/javascript">
+        form.on('actioncomplete', function(form, action)
+        {
+            handleConfigurationResponse(action.result);
+        });
+    </script>
+</div>
