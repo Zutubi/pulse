@@ -24,6 +24,30 @@ public class ConfigurationRefactoringManager
     private ConfigurationReferenceManager configurationReferenceManager;
 
     /**
+     * Tests if the given path is cloneable.  This does <b>not</b> take into
+     * account security: i.e. it does not check that the user can insert into
+     * the parent path.
+     *
+     * @param path the path to test, which much exist
+     * @return true iff the path can be cloned; it must be a map item and not
+     *         the root of a template hierarch
+     */
+    public boolean canClone(String path)
+    {
+        String parentPath = PathUtils.getParentPath(path);
+        if(parentPath != null && configurationTemplateManager.pathExists(path))
+        {
+            Type parentType = configurationTemplateManager.getType(parentPath);
+            if(parentType instanceof MapType)
+            {
+                return !configurationTemplateManager.isTemplatedCollection(parentPath) || configurationTemplateManager.getTemplateParentRecord(path) != null;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * <p>
      * Clones elements of a map, producing exact replicas with the exception
      * of the keys which are changed.  The map can be a top-level map
@@ -60,6 +84,8 @@ public class ConfigurationRefactoringManager
      * The root of a template hierarchy cannot be cloned as each hierarchy
      * can only have one root.
      * <p>
+     *
+     * @see #canClone(String)
      *
      * @param parentPath            path of the map to clone elements of
      * @param originalKeyToCloneKey map from original keys (denoting the
@@ -164,12 +190,16 @@ public class ConfigurationRefactoringManager
                 Record record = checkKeys(parentPath, originalKey, cloneKey, templatedCollection, seenNames);
                 configurationTemplateManager.validateNameIsUnique(parentPath, cloneKey, keyPropertyName, textProvider);
 
+                MutableRecord clone;
                 if (record instanceof TemplateRecord)
                 {
-                    record = ((TemplateRecord) record).getMoi();
+                    clone = ((TemplateRecord) record).flatten();
                 }
-
-                MutableRecord clone = record.copy(true);
+                else
+                {
+                    clone = record.copy(true);
+                }
+                
                 clearHandles(clone);
                 clone.put(keyPropertyName, cloneKey);
 
@@ -328,7 +358,7 @@ public class ConfigurationRefactoringManager
 
         private boolean inCloneSet(String path, String parentPath, Set<String> oldKeys)
         {
-            if (path.startsWith(parentPath))
+            if (path != null && path.startsWith(parentPath))
             {
                 path = path.substring(parentPath.length());
                 String[] keyRest = StringUtils.getNextToken(path, PathUtils.SEPARATOR_CHAR, true);

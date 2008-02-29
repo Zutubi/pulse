@@ -1,5 +1,6 @@
 package com.zutubi.prototype.webwork;
 
+import com.zutubi.prototype.type.ComplexType;
 import com.zutubi.prototype.type.record.PathUtils;
 
 /**
@@ -13,7 +14,11 @@ public class RestoreAction extends PrototypeSupport
 
         configurationTemplateManager.restore(path);
         response = new ConfigurationResponse(parentPath, null);
-        response.registerNewPathAdded(configurationTemplateManager, configurationSecurityManager);
+        String displayName = PrototypeUtils.getDisplayName(path, configurationTemplateManager);
+ 	    ComplexType type = configurationTemplateManager.getType(path, ComplexType.class);
+ 	    boolean leaf = PrototypeUtils.isLeaf(path, configurationTemplateManager, configurationSecurityManager);
+ 	    String iconCls = PrototypeUtils.getIconCls(type);
+ 	    response.addAddedFile(new ConfigurationResponse.Addition(path, displayName, null, iconCls, leaf));
         path = response.getNewPath();
         return SUCCESS;
     }

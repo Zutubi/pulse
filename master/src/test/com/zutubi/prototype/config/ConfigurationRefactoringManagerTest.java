@@ -52,30 +52,76 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         rootHandle = configurationTemplateManager.getRecord(rootPath).getHandle();
     }
 
+    public void testCanCloneEmptyPath()
+    {
+        assertFalse(configurationRefactoringManager.canClone(""));
+    }
+
+    public void testCanCloneSingleElementPath()
+    {
+        assertFalse(configurationRefactoringManager.canClone(SAMPLE_SCOPE));
+    }
+
+    public void testCanCloneNonexistantPath()
+    {
+        assertFalse(configurationRefactoringManager.canClone("sample/fu"));
+    }
+
+    public void testCanCloneTemplateRoot()
+    {
+        assertFalse(configurationRefactoringManager.canClone(rootPath));
+    }
+
+    public void testCanCloneParentPathNotACollection()
+    {
+        configurationTemplateManager.insert(SAMPLE_SCOPE, createAInstance("a"));
+        assertFalse(configurationRefactoringManager.canClone("sample/a/b"));
+    }
+
+    public void testCanCloneParentPathAList()
+    {
+        String aPath = configurationTemplateManager.insert(SAMPLE_SCOPE, createAInstance("a"));
+        String listPath = getPath(aPath, "blist");
+        String clonePath = getPath(listPath, configurationTemplateManager.getRecord(listPath).keySet().iterator().next());
+        assertFalse(configurationRefactoringManager.canClone(clonePath));
+    }
+
+    public void testCanCloneTemplateItem()
+    {
+        configurationTemplateManager.insert(SAMPLE_SCOPE, createAInstance("a"));
+        assertTrue(configurationRefactoringManager.canClone("sample/a"));
+    }
+
+    public void testCanCloneItemBelowTopLevel()
+    {
+        configurationTemplateManager.insert(SAMPLE_SCOPE, createAInstance("a"));
+        assertTrue(configurationRefactoringManager.canClone("sample/a/bmap/colby"));
+    }
+
     public void testCloneEmptyPath()
     {
-        illegalPathHelper("", "Invalid path '': no parent");
+        illegalClonePathHelper("", "Invalid path '': no parent");
     }
 
     public void testCloneSingleElementPath()
     {
-        illegalPathHelper(SAMPLE_SCOPE, "Invalid path 'sample': no parent");
+        illegalClonePathHelper(SAMPLE_SCOPE, "Invalid path 'sample': no parent");
     }
 
     public void testCloneInvalidParentPath()
     {
-        illegalPathHelper("huh/instance", "Invalid path 'huh': references non-existant root scope 'huh'");
+        illegalClonePathHelper("huh/instance", "Invalid path 'huh': references non-existant root scope 'huh'");
     }
 
     public void testCloneInvalidPath()
     {
-        illegalPathHelper("sample/nosuchinstance", "Invalid path 'sample/nosuchinstance': path does not exist");
+        illegalClonePathHelper("sample/nosuchinstance", "Invalid path 'sample/nosuchinstance': path does not exist");
     }
 
     public void testCloneParentPathNotACollection()
     {
         configurationTemplateManager.insert(SAMPLE_SCOPE, createAInstance("a"));
-        illegalPathHelper("sample/a/b", "Invalid parent path 'sample/a': only elements of a map collection may be cloned (parent has type com.zutubi.prototype.type.CompositeType)");
+        illegalClonePathHelper("sample/a/b", "Invalid parent path 'sample/a': only elements of a map collection may be cloned (parent has type com.zutubi.prototype.type.CompositeType)");
     }
 
     public void testCloneParentPathAList()
@@ -83,15 +129,15 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         String aPath = configurationTemplateManager.insert(SAMPLE_SCOPE, createAInstance("a"));
         String listPath = getPath(aPath, "blist");
         String clonePath = getPath(listPath, configurationTemplateManager.getRecord(listPath).keySet().iterator().next());
-        illegalPathHelper(clonePath, "Invalid parent path '" + listPath + "': only elements of a map collection may be cloned (parent has type com.zutubi.prototype.type.ListType)");
+        illegalClonePathHelper(clonePath, "Invalid parent path '" + listPath + "': only elements of a map collection may be cloned (parent has type com.zutubi.prototype.type.ListType)");
     }
 
     public void testCloneTemplateRoot()
     {
-        illegalPathHelper(rootPath, "Invalid path '" + rootPath + "': cannot clone root of a template hierarchy");
+        illegalClonePathHelper(rootPath, "Invalid path '" + rootPath + "': cannot clone root of a template hierarchy");
     }
 
-    private void illegalPathHelper(String path, String expectedError)
+    private void illegalClonePathHelper(String path, String expectedError)
     {
         try
         {
@@ -240,6 +286,28 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
     public void testMultipleCloneOfTemplateHierarchyChildFirst() throws TypeException
     {
         templateHierarchyHelper(asMap(asPair("child", "clone of child"), asPair("parent", "clone of parent")));
+    }
+
+    public void testCloneWithInheritedItem() throws TypeException
+    {
+        String parentPath = insertTemplateAInstance(rootPath, createAInstance("parent"), true);
+        insertTemplateAInstance(parentPath, new MockA("child"), false);
+
+        String clonePath = configurationRefactoringManager.clone("template/child/bmap/colby", "clone of colby");
+        MockB clone = configurationTemplateManager.getInstance(clonePath, MockB.class);
+        assertEquals(1, clone.getY());
+    }
+
+    public void testCloneWithOveriddenItem() throws TypeException
+    {
+        String parentPath = insertTemplateAInstance(rootPath, createAInstance("parent"), true);
+        MockA childInstance = createAInstance("child");
+        childInstance.getBmap().get("colby").setY(111222333);
+        insertTemplateAInstance(parentPath, childInstance, false);
+
+        String clonePath = configurationRefactoringManager.clone("template/child/bmap/colby", "clone of colby");
+        MockB clone = configurationTemplateManager.getInstance(clonePath, MockB.class);
+        assertEquals(111222333, clone.getY());
     }
 
     private void templateHierarchyHelper(Map<String, String> originalKeyToCloneKey) throws TypeException

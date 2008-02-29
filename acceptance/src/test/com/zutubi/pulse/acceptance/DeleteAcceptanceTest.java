@@ -30,7 +30,6 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
     private static final String ACTION_DELETE_BUILDS = "delete all build results";
     private static final String ACTION_HIDE_RECORD   = "hide record";
 
-    private static final String ACTION_HIDE          = "hide";
     private static final String ACTION_RESTORE       = "restore";
 
     protected void setUp() throws Exception
@@ -267,7 +266,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         ListPage cleanupsPage = new ListPage(selenium, urls, cleanupsPath);
         cleanupsPage.goTo();
         cleanupsPage.expandTreeNode(cleanupsPath);
-        cleanupsPage.assertItemPresent("default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_DELETE);
+        cleanupsPage.assertItemPresent("default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_CLONE, AccessManager.ACTION_DELETE);
         cleanupsPage.assertTreeLinkPresent("default");
 
         DeleteConfirmPage confirmPage = cleanupsPage.clickDelete("default");
@@ -290,14 +289,14 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
 
         ListPage cleanupsPage = new ListPage(selenium, urls, cleanupssPath);
         cleanupsPage.goTo();
-        cleanupsPage.assertItemPresent("default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_DELETE);
+        cleanupsPage.assertItemPresent("default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_CLONE, AccessManager.ACTION_DELETE);
 
         DeleteConfirmPage confirmPage = cleanupsPage.clickDelete("default");
         confirmPage.waitFor();
         confirmPage.clickCancel();
 
         cleanupsPage.waitFor();
-        cleanupsPage.assertItemPresent("default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_DELETE);
+        cleanupsPage.assertItemPresent("default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_CLONE, AccessManager.ACTION_DELETE);
     }
 
     public void testHideMapItemWithSkeletonDescendent() throws Exception
@@ -315,7 +314,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
 
         ListPage cleanupsPage = new ListPage(selenium, urls, parentCleanupsPath);
         cleanupsPage.goTo();
-        cleanupsPage.assertItemPresent("default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_DELETE);
+        cleanupsPage.assertItemPresent("default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_CLONE, AccessManager.ACTION_DELETE);
 
         DeleteConfirmPage confirmPage = cleanupsPage.clickDelete("default");
         confirmPage.waitFor();
@@ -346,7 +345,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
 
         ListPage cleanupsPage = new ListPage(selenium, urls, parentCleanupsPath);
         cleanupsPage.goTo();
-        cleanupsPage.assertItemPresent("default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_DELETE);
+        cleanupsPage.assertItemPresent("default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_CLONE, AccessManager.ACTION_DELETE);
 
         DeleteConfirmPage confirmPage = cleanupsPage.clickDelete("default");
         confirmPage.waitFor();
@@ -376,7 +375,7 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
 
         cleanupsPage.clickRestore("default");
         cleanupsPage.waitFor();
-        cleanupsPage.assertItemPresent("default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_DELETE);
+        cleanupsPage.assertItemPresent("default", ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_CLONE, AccessManager.ACTION_DELETE);
         cleanupsPage.expandTreeNode(cleanupsPath);
         cleanupsPage.assertTreeLinkPresent("default");
     }

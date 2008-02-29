@@ -1,10 +1,12 @@
 package com.zutubi.prototype.actions;
 
 import com.zutubi.prototype.ConventionSupport;
+import com.zutubi.prototype.config.ConfigurationRefactoringManager;
 import com.zutubi.prototype.config.ConfigurationSecurityManager;
 import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeRegistry;
+import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
@@ -28,6 +30,7 @@ public class ActionManager
     private ObjectFactory objectFactory;
     private TypeRegistry typeRegistry;
     private ConfigurationSecurityManager configurationSecurityManager;
+    private ConfigurationRefactoringManager configurationRefactoringManager;
 
     public List<String> getActions(Configuration configurationInstance, boolean includeDefault)
     {
@@ -41,6 +44,11 @@ public class ActionManager
                 if(configurationSecurityManager.hasPermission(path, AccessManager.ACTION_VIEW))
                 {
                     result.add(AccessManager.ACTION_VIEW);
+                }
+
+                if(configurationRefactoringManager.canClone(path) && configurationSecurityManager.hasPermission(PathUtils.getParentPath(path), AccessManager.ACTION_CREATE))
+                {
+                    result.add(AccessManager.ACTION_CLONE);
                 }
 
                 if(!configurationInstance.isPermanent() && configurationSecurityManager.hasPermission(path, AccessManager.ACTION_DELETE))
@@ -136,5 +144,10 @@ public class ActionManager
     public void setConfigurationSecurityManager(ConfigurationSecurityManager configurationSecurityManager)
     {
         this.configurationSecurityManager = configurationSecurityManager;
+    }
+
+    public void setConfigurationRefactoringManager(ConfigurationRefactoringManager configurationRefactoringManager)
+    {
+        this.configurationRefactoringManager = configurationRefactoringManager;
     }
 }
