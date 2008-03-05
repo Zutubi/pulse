@@ -15,6 +15,7 @@ public class HierarchyPage extends SeleniumPage
 {
     public static final String LINK_ADD = "add.new";
     public static final String LINK_ADD_TEMPLATE = "add.template";
+    public static final String LINK_CLONE = "clone";
     public static final String LINK_CONFIGURE = "configure";
     public static final String LINK_DELETE = "delete";
 
@@ -49,13 +50,33 @@ public class HierarchyPage extends SeleniumPage
         return urls.admin() + scope + "/";
     }
 
+    public String getTreeItemLocator(String baseName)
+    {
+        return "link=" + baseName;
+    }
+
     public void goTo()
     {
         selenium.open(getUrl());
-        String linkLocator = "link=" + baseName;
+        String linkLocator = getTreeItemLocator(baseName);
         SeleniumUtils.waitForLocator(selenium, linkLocator);
         selenium.click(linkLocator);
         waitFor();
+    }
+
+    public boolean isTreeItemPresent(String baseName)
+    {
+        return selenium.isElementPresent(getTreeItemLocator(baseName));
+    }
+
+    public boolean isTreeItemVisible(String baseName)
+    {
+        return selenium.isVisible(getTreeItemLocator(baseName));
+    }
+
+    public void expandTreeItem(String baseName)
+    {
+        selenium.doubleClick(getTreeItemLocator(baseName));
     }
 
     public boolean isAddPresent()
@@ -71,6 +92,16 @@ public class HierarchyPage extends SeleniumPage
     public void clickAddTemplate()
     {
         selenium.click(LINK_ADD_TEMPLATE);
+    }
+
+    public boolean isClonePresent()
+    {
+        return selenium.isElementPresent(LINK_CLONE);
+    }
+
+    public void clickClone()
+    {
+        selenium.click(LINK_CLONE);
     }
 
     public void setTemplate(boolean template)

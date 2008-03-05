@@ -25,6 +25,7 @@ public class AcceptanceTestSuite
         //---( web ui acceptance tests )---
         suite.addTestSuite(ConfigUIAcceptanceTest.class);
         suite.addTestSuite(DeleteAcceptanceTest.class);
+        suite.addTestSuite(CloneAcceptanceTest.class);
         suite.addTestSuite(PluginUIAcceptanceTest.class);
         suite.addTestSuite(GroupAcceptanceTest.class);
         suite.addTestSuite(ProjectLabelAcceptanceTest.class);

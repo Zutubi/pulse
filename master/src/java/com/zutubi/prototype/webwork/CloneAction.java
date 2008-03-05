@@ -14,6 +14,7 @@ import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.util.TextUtils;
+import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.i18n.MessagesTextProvider;
 import com.zutubi.validation.i18n.TextProvider;
@@ -22,15 +23,19 @@ import freemarker.template.TemplateException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Action to gather new keys and request a clone for map items.
  */
 public class CloneAction extends PrototypeSupport
 {
-    private static final String CHECK_FIELD_PREFIX = "cloneCheck_";
-    private static final String KEY_FIELD_PREFIX   = "cloneKey_";
+    public static final String CHECK_FIELD_PREFIX = "cloneCheck_";
+    public static final String KEY_FIELD_PREFIX   = "cloneKey_";
+
+    private static final Logger LOG = Logger.getLogger(CloneAction.class);
 
     private ConfigurationPanel newPanel;
     private Record record;
@@ -59,7 +64,9 @@ public class CloneAction extends PrototypeSupport
 
     public void doCancel()
     {
-        response = new ConfigurationResponse(path, configurationTemplateManager.getTemplatePath(path));
+        String parentPath = PathUtils.getParentPath(path);
+        String newPath = configurationTemplateManager.isTemplatedCollection(parentPath) ? path : parentPath;
+        response = new ConfigurationResponse(newPath, configurationTemplateManager.getTemplatePath(newPath));
     }
 
     public String execute() throws Exception
@@ -72,7 +79,8 @@ public class CloneAction extends PrototypeSupport
         }
 
         MessagesTextProvider textProvider = new MessagesTextProvider(mapType.getTargetType().getClazz());
-        validateCloneKey("cloneKey", cloneKey, textProvider);
+        Set<String> seenKeys = new HashSet<String>();
+        validateCloneKey("cloneKey", cloneKey, seenKeys, textProvider);
 
         Map<String, String> keyMap = new HashMap<String, String>();
         keyMap.put(PathUtils.getBaseName(path), cloneKey);
@@ -80,7 +88,7 @@ public class CloneAction extends PrototypeSupport
 
         if(templatedCollection)
         {
-             getDescendents(keyMap, textProvider);
+             getDescendents(keyMap, seenKeys, textProvider);
         }
 
         if(hasErrors())
@@ -89,15 +97,26 @@ public class CloneAction extends PrototypeSupport
             return INPUT;
         }
 
-        configurationRefactoringManager.clone(parentPath, keyMap);
+        try
+        {
+            configurationRefactoringManager.clone(parentPath, keyMap);
 
-        String templatePath = configurationTemplateManager.getTemplatePath(newPath);
-        response = new ConfigurationResponse(newPath, templatePath);
-        response.registerNewPathAdded(configurationTemplateManager, configurationSecurityManager);
+            String templatePath = configurationTemplateManager.getTemplatePath(newPath);
+            response = new ConfigurationResponse(newPath, templatePath);
+            response.registerNewPathAdded(configurationTemplateManager, configurationSecurityManager);
+        }
+        catch(Exception e)
+        {
+            LOG.warning(e);
+            addActionError(e.getMessage());
+            renderForm();
+            return INPUT;
+        }
+
         return SUCCESS;
     }
 
-    private void validateCloneKey(String name, String value, TextProvider textProvider)
+    private void validateCloneKey(String name, String value, Set<String> seenKeys, TextProvider textProvider)
     {
         if(!TextUtils.stringSet(value))
         {
@@ -105,18 +124,27 @@ public class CloneAction extends PrototypeSupport
         }
         else
         {
-            try
+            if(seenKeys.contains(value))
             {
-                configurationTemplateManager.validateNameIsUnique(parentPath, value, mapType.getKeyProperty(), textProvider);
+                addFieldError(name, "duplicate clone name, all clones must have unique names");
             }
-            catch(ValidationException e)
+            else
             {
-                addFieldError(name, e.getMessage());
+                try
+                {
+                    configurationTemplateManager.validateNameIsUnique(parentPath, value, mapType.getKeyProperty(), textProvider);
+                }
+                catch(ValidationException e)
+                {
+                    addFieldError(name, e.getMessage());
+                }
             }
+
+            seenKeys.add(value);
         }
     }
 
-    private Map<String, String> getDescendents(Map<String, String> selectedDescedents, TextProvider textProvider)
+    private Map<String, String> getDescendents(Map<String, String> selectedDescedents, Set<String> seenKeys, TextProvider textProvider)
     {
         Map parameters = ActionContext.getContext().getParameters();
         for(Object n: parameters.keySet())
@@ -129,7 +157,7 @@ public class CloneAction extends PrototypeSupport
 
                 if (value != null)
                 {
-                    validateCloneKey(KEY_FIELD_PREFIX + descendentKey, value, textProvider);
+                    validateCloneKey(KEY_FIELD_PREFIX + descendentKey, value, seenKeys, textProvider);
                     selectedDescedents.put(descendentKey, value);
                 }
             }

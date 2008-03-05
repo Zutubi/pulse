@@ -211,14 +211,18 @@ public abstract class SeleniumForm
                 }
                 break;
             case CHECKBOX:
-                if(Boolean.valueOf(value))
+                if (value != null)
                 {
-                    selenium.check(id);
+                    setComponentValue(id, value);
                 }
-                else
-                {
-                    selenium.uncheck(id);
-                }
+//                if(Boolean.valueOf(value))
+//                {
+//                    selenium.check(id);
+//                }
+//                else
+//                {
+//                    selenium.uncheck(id);
+//                }
                 break;
             case MULTI_CHECKBOX:
                 if (value != null)

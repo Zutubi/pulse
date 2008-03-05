@@ -2002,6 +2002,14 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
         return null;
     }
 
+    /**
+     * Retrieves the template node for the given path, which should be an
+     * element of a templated collection.
+     *
+     * @param path the path to retrieve the node for
+     * @return the template node, or null if this path does not refer to an
+     *         element of a templated collection
+     */
     public TemplateNode getTemplateNode(String path)
     {
         String[] elements = PathUtils.getPathElements(path);

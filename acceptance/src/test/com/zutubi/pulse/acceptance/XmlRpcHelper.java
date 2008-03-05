@@ -2,8 +2,9 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.prototype.config.ConfigurationRegistry;
-import com.zutubi.prototype.type.record.PathUtils;
+import static com.zutubi.prototype.type.record.PathUtils.getPath;
 import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.prototype.config.group.GroupConfiguration;
 import com.zutubi.pulse.prototype.config.project.BuildStageConfiguration;
@@ -120,6 +121,16 @@ public class XmlRpcHelper
     public Vector<String> getConfigListing(String path) throws Exception
     {
         return call("getConfigListing", path);
+    }
+
+    public String getTemplateParent(String path) throws Exception
+    {
+        return call("getTemplateParent", path);
+    }
+
+    public Vector<String> getTemplateChildren(String path) throws Exception
+    {
+        return call("getTemplateChildren", path);
     }
 
     public <T> T getConfig(String path) throws Exception
@@ -265,12 +276,40 @@ public class XmlRpcHelper
         return false;
     }
 
+    public String insertProjectProperty(String project, String name, String value) throws Exception
+    {
+        return insertProjectProperty(project, name, value, false, false, false);
+    }
+
+    public String insertProjectProperty(String project, String name, String value, boolean resolveVariables, boolean addToEnvironment, boolean addToPath) throws Exception
+    {
+        String propertiesPath = getPath(ConfigurationRegistry.PROJECTS_SCOPE, project, "properties");
+        Hashtable<String, Object> property = createProperty(name, value, resolveVariables, addToEnvironment, addToPath);
+        return insertConfig(propertiesPath, property);
+    }
+
+    public Hashtable<String, Object> createProperty(String name, String value)
+    {
+        return createProperty(name, value, false, false, false);
+    }
+
+    public Hashtable<String, Object> createProperty(String name, String value, boolean resolveVariables, boolean addToEnvironment, boolean addToPath)
+    {
+        Hashtable<String, Object> property = createEmptyConfig(ResourceProperty.class);
+        property.put("name", name);
+        property.put("value", value);
+        property.put("resolveVariables", resolveVariables);
+        property.put("addToEnvironment", addToEnvironment);
+        property.put("addToPath", addToPath);
+        return property;
+    }
+
     public String addProjectPermissions(String projectPath, String groupPath, String... actions) throws Exception
     {
         Hashtable<String, Object> permission = createDefaultConfig(ProjectAclConfiguration.class);
         permission.put("group", groupPath);
         permission.put("allowedActions", new Vector<String>(Arrays.asList(actions)));
-        return insertConfig(PathUtils.getPath(projectPath, "permissions"), permission);
+        return insertConfig(getPath(projectPath, "permissions"), permission);
     }
 
     public String insertSimpleAgent(String name) throws Exception

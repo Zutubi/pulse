@@ -1,8 +1,10 @@
 package com.zutubi.pulse.api;
 
 import com.zutubi.prototype.actions.ActionManager;
+import com.zutubi.prototype.config.ConfigurationRegistry;
 import com.zutubi.prototype.config.ConfigurationSecurityManager;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
+import com.zutubi.prototype.config.TemplateNode;
 import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.*;
@@ -195,6 +197,81 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         {
             tokenManager.logoutUser();
         }
+    }
+
+    /**
+     * Returns the name of the template parent for the configuration at the
+     * given path.  The path mist refer to an element of a templated
+     * collection, e.g. a project.
+     *
+     * @param token authentication token (see {@link #login})
+     * @param path  path of the template to retrieve the parent for
+     * @return the key of the template parent for the given path or the empty
+     *         string if the path refers to the template root
+     * @throws AuthenticationException if the given token is invalid
+     * @throws IllegalArgumentException if the given path does not refer to
+     *         an element of a templated collection
+     */
+    public String getTemplateParent(String token, String path) throws AuthenticationException
+    {
+        tokenManager.logoutUser();
+        try
+        {
+            TemplateNode node = getTemplateNode(path);
+            TemplateNode parent = node.getParent();
+            return parent == null ? "" : parent.getId();
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    /**
+     * Returns the names of all template children of the template at the
+     * given path.  The path must refer to an element of a templated
+     * collection, e.g. a project.
+     *
+     * @param token authentication token (see {@link #login})
+     * @param path  path of the template to retrieve the children for
+     * @return the keys of all template children for the given path that are
+     *         visible to the logged-in user
+     * @throws AuthenticationException if the given token is invalid
+     * @throws IllegalArgumentException if the given path does not refer to
+     *         an element of a templated collection
+     */
+    public Vector<String> getTemplateChildren(String token, String path) throws AuthenticationException
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            TemplateNode node = getTemplateNode(path);
+
+            List<String> names = CollectionUtils.map(node.getChildren(), new Mapping<TemplateNode, String>()
+            {
+                public String map(TemplateNode templateNode)
+                {
+                    return templateNode.getId();
+                }
+            });
+
+            configurationSecurityManager.filterPaths(ConfigurationRegistry.PROJECTS_SCOPE, names, AccessManager.ACTION_VIEW);
+            return new Vector<String>(names);
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    private TemplateNode getTemplateNode(String path)
+    {
+        TemplateNode node = configurationTemplateManager.getTemplateNode(path);
+        if(node == null)
+        {
+            throw new IllegalArgumentException("Invalid path '" + path + "': path does not refer to a member of a templated collection");
+        }
+        return node;
     }
 
     /**

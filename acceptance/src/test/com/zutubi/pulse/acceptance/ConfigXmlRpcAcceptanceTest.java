@@ -468,8 +468,8 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         String path = insertSimpleProject(randomName());
         Hashtable<String, Object> project = call("getConfig", path);
         Hashtable<String, Object> properties = (Hashtable<String, Object>) project.get("properties");
-        properties.put("p1", createProperty("p1", "v1"));
-        properties.put("p2", createProperty("p2", "v2"));
+        properties.put("p1", xmlRpcHelper.createProperty("p1", "v1"));
+        properties.put("p2", xmlRpcHelper.createProperty("p2", "v2"));
         call("saveConfig", path, project, true);
 
         Hashtable<String, Object> loadedProperties = call("getConfig", path + "/properties");
@@ -491,7 +491,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
         Hashtable<String, Object> project = call("getConfig", parentPath);
         Hashtable<String, Object> properties = (Hashtable<String, Object>) project.get("properties");
-        properties.put("p1", createProperty("p1", "v1"));
+        properties.put("p1", xmlRpcHelper.createProperty("p1", "v1"));
         call("saveConfig", parentPath, project, true);
 
         assertEquals(1, call("deleteAllConfigs", childPath+ "/properties/*"));
@@ -526,10 +526,8 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         String random = randomName();
         String path = xmlRpcHelper.insertSimpleProject(random, true);
         String propertiesPath = PathUtils.getPath(path, "properties");
-        Hashtable<String, Object> p1 = createProperty("p1", "v1");
-        Hashtable<String, Object> p2 = createProperty("p2", "v2");
-        xmlRpcHelper.insertConfig(propertiesPath, p1);
-        xmlRpcHelper.insertConfig(propertiesPath, p2);
+        xmlRpcHelper.insertProjectProperty(random, "p1", "v1");
+        xmlRpcHelper.insertProjectProperty(random, "p2", "v2");
 
         assertEquals(Arrays.asList("p1", "p2"), new LinkedList<String>(xmlRpcHelper.getConfigListing(propertiesPath)));
         xmlRpcHelper.setConfigOrder(propertiesPath, "p2", "p1");
@@ -632,15 +630,6 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         {
             xmlRpcHelper.deleteConfig(path);
         }
-    }
-
-    private Hashtable<String, Object> createProperty(String name, String value)
-    {
-        Hashtable<String, Object> property = new Hashtable<String, Object>();
-        property.put(SYMBOLIC_NAME_KEY, "zutubi.resourceProperty");
-        property.put("name", name);
-        property.put("value", value);
-        return property;
     }
 
     private void assertSortedEquals(Collection<String> got, String... expected)

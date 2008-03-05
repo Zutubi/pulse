@@ -92,10 +92,15 @@ public class CollectionUtils
 
     public static <T, U> U[] mapToArray(T[] in, Mapping<T, U> m, U[] out)
     {
+        return mapToArray(in, m, out, 0);
+    }
+
+    public static <T, U> U[] mapToArray(T[] in, Mapping<T, U> m, U[] out, int offset)
+    {
         int i = 0;
         for(T t: in)
         {
-            out[i++] = m.map(t);
+            out[i++ + offset] = m.map(t);
         }
 
         return out;

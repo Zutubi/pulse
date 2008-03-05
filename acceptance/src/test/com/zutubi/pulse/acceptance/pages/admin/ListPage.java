@@ -4,6 +4,7 @@ import com.thoughtworks.selenium.Selenium;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.acceptance.IDs;
 import com.zutubi.pulse.acceptance.SeleniumUtils;
+import com.zutubi.pulse.acceptance.forms.admin.CloneForm;
 import com.zutubi.pulse.webwork.mapping.Urls;
 
 /**
@@ -87,6 +88,13 @@ public class ListPage extends ConfigPage
     public void clickView(String baseName)
     {
         selenium.click(getActionId("view", baseName));
+    }
+
+    public CloneForm clickClone(String baseName)
+    {
+        String actionId = getActionId("clone", baseName);
+        selenium.click(actionId);
+        return new CloneForm(selenium);
     }
 
     public DeleteConfirmPage clickDelete(String baseName)
