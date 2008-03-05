@@ -1,6 +1,8 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.prototype.config.ConfigurationRegistry;
 import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.prototype.config.agent.AgentConfigurationActions;
 import com.zutubi.pulse.prototype.config.user.SetPasswordConfiguration;
 import com.zutubi.pulse.prototype.config.user.UserConfiguration;
@@ -422,6 +424,40 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testDeleteConfigEmptyPath() throws Exception
     {
         callAndExpectError("path is empty", "deleteConfig", "");
+    }
+
+    public void testCanCloneNonexistantPath() throws Exception
+    {
+        assertEquals(false, call("canCloneConfig", "foo"));
+    }
+
+    public void testCanCloneUncloneablePath() throws Exception
+    {
+        assertEquals(false, call("canCloneConfig", PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, ProjectManager.GLOBAL_PROJECT_NAME)));
+    }
+
+    public void testCanCloneCloneablePath() throws Exception
+    {
+        String path = xmlRpcHelper.insertTrivialProject(randomName(), false);
+        assertEquals(true, call("canCloneConfig", path));
+    }
+
+    public void testCloneInvalidPath() throws Exception
+    {
+        Hashtable<String, String> keyMap = new Hashtable<String, String>(1);
+        keyMap.put("thisprojectdoesnotexist", "soicantcloneit");
+        callAndExpectError("Invalid path 'projects/thisprojectdoesnotexist': path does not exist", "cloneConfig", ConfigurationRegistry.PROJECTS_SCOPE, keyMap);
+    }
+
+    public void testClone() throws Exception
+    {
+        String name = randomName();
+        String cloneName = name + " clone";
+        xmlRpcHelper.insertTrivialProject(name, false);
+        Hashtable<String, String> keyMap = new Hashtable<String, String>(1);
+        keyMap.put(name, cloneName);
+        assertEquals(true, call("cloneConfig", ConfigurationRegistry.PROJECTS_SCOPE, keyMap));
+        assertTrue(xmlRpcHelper.configPathExists(PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, cloneName)));
     }
 
     public void testDeleteConfigNonExistantPath() throws Exception

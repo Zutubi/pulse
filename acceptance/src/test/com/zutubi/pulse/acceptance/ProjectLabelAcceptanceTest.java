@@ -2,6 +2,7 @@ package com.zutubi.pulse.acceptance;
 
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectsPage;
+import com.zutubi.pulse.prototype.config.LabelConfiguration;
 
 import java.util.Hashtable;
 
@@ -125,8 +126,7 @@ public class ProjectLabelAcceptanceTest extends SeleniumTestBase
 
     private Hashtable<String, Object> createLabel(String name)
     {
-        Hashtable<String, Object> label = new Hashtable<String, Object>(2);
-        label.put(XmlRpcHelper.SYMBOLIC_NAME_KEY, "zutubi.labelConfig");
+        Hashtable<String, Object> label = xmlRpcHelper.createEmptyConfig(LabelConfiguration.class);
         label.put("label", name);
         return label;
     }

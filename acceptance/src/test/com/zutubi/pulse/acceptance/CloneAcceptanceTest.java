@@ -8,9 +8,13 @@ import com.zutubi.pulse.acceptance.forms.admin.CloneForm;
 import com.zutubi.pulse.acceptance.forms.admin.ResourcePropertyForm;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
+import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.prototype.config.LabelConfiguration;
+import com.zutubi.pulse.prototype.config.group.ServerPermission;
 
 import java.util.ArrayList;
 import static java.util.Arrays.asList;
+import java.util.Hashtable;
 
 /**
  * Tests for cloning both of top-level template collection items and of
@@ -34,9 +38,77 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         super.tearDown();
     }
 
+    public void testCloneLinkNotPresentForListItems() throws Exception
+    {
+        String projectPath = xmlRpcHelper.insertTrivialProject(random, false);
+        Hashtable<String, Object> label = xmlRpcHelper.createDefaultConfig(LabelConfiguration.class);
+        label.put("label", "foo");
+        String labelsPath = PathUtils.getPath(projectPath, "labels");
+        String labelPath = xmlRpcHelper.insertConfig(labelsPath, label);
+        
+        loginAsAdmin();
+        assertCloneAvailability(labelPath, false);
+    }
+
+    public void testCloneLinkPresenceDependsOnWritePermission() throws Exception
+    {
+        String project = random + "-project";
+        String user = random + "-user";
+        String projectPath = xmlRpcHelper.insertTrivialProject(project, false);
+        String propertyPath = xmlRpcHelper.insertProjectProperty(project, TEST_PROPERTY_NAME, TEST_PROPERTY_VALUE);
+        String userPath = xmlRpcHelper.insertTrivialUser(user);
+
+        login(user, "");
+        assertCloneAvailability(propertyPath, false);
+
+        String groupPath = xmlRpcHelper.insertGroup(random + "-group", asList(userPath));
+        xmlRpcHelper.addProjectPermissions(projectPath, groupPath, AccessManager.ACTION_WRITE);
+
+        logout();
+        login(user, "");
+        assertCloneAvailability(propertyPath, true);
+    }
+
+    public void testProjectCloneLinkNotPresentForTemplateRoot() throws Exception
+    {
+        loginAsAdmin();
+        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, ProjectManager.GLOBAL_PROJECT_NAME, true);
+        hierarchyPage.goTo();
+        assertFalse(hierarchyPage.isClonePresent());
+    }
+
+    public void testProjectCloneLinkPresenceDependsOnCreatePermission() throws Exception
+    {
+        String project = random + "-project";
+        String user = random + "-user";
+        xmlRpcHelper.insertTrivialProject(project, false);
+        String userPath = xmlRpcHelper.insertTrivialUser(user);
+
+        login(user, "");
+        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, project, false);
+        hierarchyPage.goTo();
+        assertFalse(hierarchyPage.isClonePresent());
+
+        xmlRpcHelper.insertGroup(random, asList(userPath), ServerPermission.CREATE_PROJECT.toString());
+
+        logout();
+        login(user, "");
+        hierarchyPage.goTo();
+        assertTrue(hierarchyPage.isClonePresent());
+    }
+
+    private void assertCloneAvailability(String path, boolean expectedAvailable)
+    {
+        ListPage labelsPage = new ListPage(selenium, urls, PathUtils.getParentPath(path));
+        labelsPage.goTo();
+        String baseName = PathUtils.getBaseName(path);
+        labelsPage.assertItemPresent(baseName, null);
+        assertEquals(expectedAvailable, selenium.isElementPresent(labelsPage.getActionId(ListPage.ACTION_CLONE, baseName)));
+    }
+
     public void testCloneMapItem() throws Exception
     {
-        ListPage labelList = prepareListItem();
+        ListPage labelList = prepareMapItem();
         CloneForm cloneForm = labelList.clickClone(TEST_PROPERTY_NAME);
         cloneForm.waitFor();
         cloneForm.cloneFormElements(CLONE_PROPERTY_NAME);
@@ -51,7 +123,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
 
     public void testCloneMapItemValidation() throws Exception
     {
-        ListPage labelList = prepareListItem();
+        ListPage labelList = prepareMapItem();
         CloneForm cloneForm = labelList.clickClone(TEST_PROPERTY_NAME);
         cloneForm.waitFor();
 
@@ -66,7 +138,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
 
     public void testCloneMapItemCancel() throws Exception
     {
-        ListPage labelList = prepareListItem();
+        ListPage labelList = prepareMapItem();
         CloneForm cloneForm = labelList.clickClone(TEST_PROPERTY_NAME);
         cloneForm.waitFor();
 
@@ -76,7 +148,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         labelList.assertItemNotPresent(CLONE_PROPERTY_NAME);
     }
 
-    private ListPage prepareListItem() throws Exception
+    private ListPage prepareMapItem() throws Exception
     {
         xmlRpcHelper.insertTrivialProject(random, false);
         String propertyPath = xmlRpcHelper.insertProjectProperty(random, TEST_PROPERTY_NAME, TEST_PROPERTY_VALUE);

@@ -1,10 +1,7 @@
 package com.zutubi.pulse.api;
 
 import com.zutubi.prototype.actions.ActionManager;
-import com.zutubi.prototype.config.ConfigurationRegistry;
-import com.zutubi.prototype.config.ConfigurationSecurityManager;
-import com.zutubi.prototype.config.ConfigurationTemplateManager;
-import com.zutubi.prototype.config.TemplateNode;
+import com.zutubi.prototype.config.*;
 import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.*;
@@ -43,6 +40,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
     private ShutdownManager shutdownManager;
     private MasterConfigurationManager configurationManager;
     private ConfigurationTemplateManager configurationTemplateManager;
+    private ConfigurationRefactoringManager configurationRefactoringManager;
     private ConfigurationSecurityManager configurationSecurityManager;
     private TypeRegistry typeRegistry;
     private RecordManager recordManager;
@@ -515,6 +513,90 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
             }
 
             return configurationTemplateManager.saveRecord(path, record, deep);
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    /**
+     * Tests whether the given configuration path can be cloned.  Only map
+     * elements that are not the root of a template hierarchy may be cloned.
+     * This method does <b>not</b> verify whether the user actually has
+     * permission to perform the clone: only that the path is cloneable.
+     *
+     * @param token authentication token (see {@link #login})
+     * @param path  path to test
+     * @return true if the given path exists and is cloneable
+     * @throws AuthenticationException if the given token is invalid
+     */
+    public boolean canCloneConfig(String token, String path) throws AuthenticationException
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            return configurationRefactoringManager.canClone(path);
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    /**
+     * <p>
+     * Clones elements of a map, producing exact replicas with the exception
+     * of the keys which are changed.  The map can be a top-level map
+     * (including templated collections) or a map nested anywhere in a
+     * persistent scope.  The clone operation performs similarly in both
+     * cases with only the parent references in templates being treated
+     * specially (see below).
+     * </p>
+     * <p>
+     * Note that this method allows multiple elements of the same map to be
+     * cloned in a single operation.  Multiple elements should be cloned
+     * together when it is desirable to update references between them
+     * (including parent references) to point to the new clones.  For
+     * example, take two items map/a and map/b.  Say path map/a/ref is a
+     * reference that points to map/b/foo.  If map/a and map/b are cloned
+     * separately to form map/clonea and map/cloneb, then map/clonea/ref will
+     * continue to point to map/b/foo.  If these two operations were done in
+     * a single call to this method, however, then map/clonea/ref will point
+     * to map/cloneb/foo.  Similarly, to clone a parent and child in a
+     * template hierarchy and have the cloned parent be the parent of the
+     * cloned child, they must be cloned in a single operation.  A member of
+     * a template collection that is cloned without its parent being involved
+     * in the same operation will result in a clone that has the original
+     * parent.
+     * </p>
+     * <p>
+     * Each original key must refer to an existing item in the map.
+     * </p>
+     * <p>
+     * Each new clone key must be unique in its template hierarchy and also
+     * in the map itself.  For this reason no duplicate new keys are allowed.
+     * </p>
+     * <p>
+     * The root of a template hierarchy cannot be cloned as each hierarchy
+     * can only have one root.
+     * <p>
+     *
+     * @param token      authentication token (see {@link #login})
+     * @param parentPath path of the map to clone elements of
+     * @param keyMap     map from original keys (denoting the elements to
+     *                   clone) to clone keys (the new key for each clone)
+     * @return true
+     * @throws AuthenticationException if the given token is invalid
+     * @throws IllegalArgumentException if a given path or key is invalid
+     */
+    public boolean cloneConfig(String token, String parentPath, Hashtable<String, String> keyMap) throws AuthenticationException
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            configurationRefactoringManager.clone(parentPath, keyMap);
+            return true;
         }
         finally
         {
@@ -1637,5 +1719,10 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
     public void setAccessManager(AccessManager accessManager)
     {
         this.accessManager = accessManager;
+    }
+
+    public void setConfigurationRefactoringManager(ConfigurationRefactoringManager configurationRefactoringManager)
+    {
+        this.configurationRefactoringManager = configurationRefactoringManager;
     }
 }

@@ -13,6 +13,8 @@ import com.zutubi.pulse.webwork.mapping.Urls;
  */
 public class ListPage extends ConfigPage
 {
+    public static final String ACTION_CLONE = "clone";
+
     public static final String ANNOTATION_INHERITED  = "inherited";
     public static final String ANNOTATION_OVERRIDDEN = "overridden";
     public static final String ANNOTATION_HIDDEN     = "hidden";
@@ -75,7 +77,7 @@ public class ListPage extends ConfigPage
         }
     }
 
-    private String getActionId(String action, String baseName)
+    public String getActionId(String action, String baseName)
     {
         return action + ":" + baseName;
     }
@@ -92,7 +94,7 @@ public class ListPage extends ConfigPage
 
     public CloneForm clickClone(String baseName)
     {
-        String actionId = getActionId("clone", baseName);
+        String actionId = getActionId(ACTION_CLONE, baseName);
         selenium.click(actionId);
         return new CloneForm(selenium);
     }
