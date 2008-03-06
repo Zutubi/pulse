@@ -44,7 +44,7 @@
             return;
         }
 
-        var enabled = <#if parameters.invert>!</#if>checkbox.getValue();
+        var enabled = <#if parameters.invert>!</#if>checkbox.getValue() && !checkbox.disabled;
 
     <#if parameters.dependentFields?exists && parameters.dependentFields?size &gt; 0>
         if(enabled)
@@ -81,5 +81,8 @@
 
     var checkbox = form.findField('${parameters.id}');
     checkbox.on('check', function(checkbox, checked) { setEnabledState(checkbox); });
+    checkbox.on('disable', function(checkbox, checked) { setEnabledState(checkbox); });
+    checkbox.on('enable', function(checkbox, checked) { setEnabledState(checkbox); });
+
     form.on('render', function() { setEnabledState(checkbox) });
 }());

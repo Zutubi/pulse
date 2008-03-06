@@ -243,7 +243,7 @@ public class CloneAction extends PrototypeSupport
 
                 Field field = new Field(FieldType.CONTROLLING_CHECKBOX, CHECK_FIELD_PREFIX + key);
                 field.addParameter(ControllingCheckboxFieldDescriptor.PARAM_INVERT, false);
-                field.addParameter(ControllingCheckboxFieldDescriptor.PARAM_DEPENDENT_FIELDS, new String[]{nameField});
+                field.addParameter(ControllingCheckboxFieldDescriptor.PARAM_DEPENDENT_FIELDS, getDependentFields(nameField, node));
                 field.setLabel("clone descendent '" + key + "'");
                 if(parameters.containsKey(CHECK_FIELD_PREFIX + key))
                 {
@@ -259,6 +259,19 @@ public class CloneAction extends PrototypeSupport
                 return true;
             }
         }, true);
+    }
+
+    private String[] getDependentFields(String textField, TemplateNode node)
+    {
+        String[] result = new String[node.getChildren().size() + 1];
+        result[0] = textField;
+        int i = 1;
+        for(TemplateNode child: node.getChildren())
+        {
+            result[i++] = CHECK_FIELD_PREFIX + child.getId();
+        }
+
+        return result;
     }
 
     private void addSubmit(Form form, String name, boolean isDefault)
