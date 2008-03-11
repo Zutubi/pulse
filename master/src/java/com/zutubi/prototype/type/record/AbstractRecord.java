@@ -2,6 +2,7 @@ package com.zutubi.prototype.type.record;
 
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.GraphFunction;
 import com.zutubi.util.Predicate;
 
 import java.util.Arrays;
@@ -13,8 +14,6 @@ import java.util.Set;
  */
 public abstract class AbstractRecord implements Record
 {
-//    protected static final String HANDLE_KEY        = "handle";
-//    protected static final String PERMANENT_KEY     = "permanent";
     protected static final String SYMBOLIC_NAME_KEY = "symbolicName";
 
     protected static final long UNDEFINED = 0;
@@ -188,5 +187,16 @@ public abstract class AbstractRecord implements Record
         code = 31 * code + metaKeySet().hashCode();
         code = 31 * code + (getSymbolicName() == null ? 0 : getSymbolicName().hashCode());
         return code;
+    }
+
+    public void forEach(GraphFunction<Record> f)
+    {
+        f.process(this);
+        for(String key: nestedKeySet())
+        {
+            f.push(key);
+            ((Record) get(key)).forEach(f);
+            f.pop();
+        }
     }
 }

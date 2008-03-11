@@ -31,9 +31,6 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
 {
     private static final Logger LOG = Logger.getLogger(ConfigurationTemplateManager.class);
 
-    public static final String PARENT_KEY    = "parentHandle";
-    public static final String TEMPLATE_KEY  = "template";
-
     private StateTransactionalWrapper stateWrapper;
 
     private TypeRegistry typeRegistry;
@@ -131,7 +128,7 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
      */
     long getTemplateParentHandle(String path, Record record)
     {
-        String parentString = record.getMeta(PARENT_KEY);
+        String parentString = record.getMeta(TemplateRecord.PARENT_KEY);
         if (parentString != null)
         {
             try
@@ -557,7 +554,7 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
         return gotType;
     }
 
-    private void refreshCaches()
+    void refreshCaches()
     {
         configurationReferenceManager.clear();
         stateWrapper.execute(new TransactionalWrapper.Action<State>()
@@ -710,7 +707,7 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
 
     /**
      * Tests if a record carries the template marker, return true if it does
-     * not.  Should only be appliued to owner records (i.e. elements of a
+     * not.  Should only be applied to owner records (i.e. elements of a
      * templated collection), as the markers are only applied at this level.
      *
      * @param record the record to test
@@ -722,7 +719,7 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
         {
             record = ((TemplateRecord) record).getMoi();
         }
-        return !Boolean.valueOf(record.getMeta(TEMPLATE_KEY));
+        return !Boolean.valueOf(record.getMeta(TemplateRecord.TEMPLATE_KEY));
     }
 
     private void refreshTemplateHierarchies(State state)
@@ -1235,7 +1232,7 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
         }
     }
 
-    private void scrubInheritedValues(TemplateRecord templateParent, MutableRecord record, boolean deep)
+    void scrubInheritedValues(TemplateRecord templateParent, MutableRecord record, boolean deep)
     {
         ComplexType type = templateParent.getType();
         if (type instanceof CompositeType)
@@ -1962,12 +1959,12 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
 
     public void markAsTemplate(MutableRecord record)
     {
-        record.putMeta(TEMPLATE_KEY, "true");
+        record.putMeta(TemplateRecord.TEMPLATE_KEY, "true");
     }
 
     public void setParentTemplate(MutableRecord record, long parentHandle)
     {
-        record.putMeta(PARENT_KEY, Long.toString(parentHandle));
+        record.putMeta(TemplateRecord.PARENT_KEY, Long.toString(parentHandle));
     }
 
     public Set<String> getTemplateScopes()

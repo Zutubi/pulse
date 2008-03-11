@@ -1,7 +1,6 @@
 package com.zutubi.prototype.type.record;
 
 import com.zutubi.config.annotations.NoInherit;
-import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.type.ComplexType;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeProperty;
@@ -18,12 +17,16 @@ import java.util.Set;
  */
 public class TemplateRecord extends AbstractRecord
 {
-    public static final String HIDDEN_KEY = "hidden";
+    public static final String HIDDEN_KEY    = "hidden";
+    public static final String PARENT_KEY    = "parentHandle";
+    public static final String TEMPLATE_KEY  = "template";
+
+    public static final String[] NO_INHERIT_META_KEYS = { Configuration.HANDLE_KEY, HIDDEN_KEY, Configuration.PERMANENT_KEY, SYMBOLIC_NAME_KEY,
+                                                           PARENT_KEY,
+                                                           TEMPLATE_KEY };
 
     private static final char SEPARATOR = ',';
-    private static final String[] NO_INHERIT_META_KEYS = { Configuration.HANDLE_KEY, HIDDEN_KEY, Configuration.PERMANENT_KEY, SYMBOLIC_NAME_KEY,
-                                                           ConfigurationTemplateManager.PARENT_KEY,
-                                                           ConfigurationTemplateManager.TEMPLATE_KEY };
+
     /**
      * Id of the owning object.  For example, the name of the project his
      * record lives in.  This may be empty for new template records.
@@ -167,6 +170,10 @@ public class TemplateRecord extends AbstractRecord
     public Set<String> metaKeySet()
     {
         Set<String> set = parent == null ? new HashSet<String>() : new HashSet<String>(parent.metaKeySet());
+        for(String key: NO_INHERIT_META_KEYS)
+        {
+            set.remove(key);
+        }
         set.addAll(moi.metaKeySet());
         return set;
     }
@@ -312,7 +319,7 @@ public class TemplateRecord extends AbstractRecord
 
     public MutableRecord copy(boolean deep)
     {
-        throw new UnsupportedOperationException("Record is not mutable.");
+        return flatten();
     }
 
     public Set<String> getHiddenKeys()

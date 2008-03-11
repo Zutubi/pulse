@@ -249,4 +249,18 @@ public class CollectionUtils
 
         return result;
     }
+
+    public static <T, U> Map<T, U> retainAll(Map<T, U> m, Map<T, U> n)
+    {
+        for(Map.Entry<T, U> entry: m.entrySet())
+        {
+            U value = n.get(entry.getKey());
+            if(value == null || !value.equals(entry.getValue()))
+            {
+                m.remove(entry.getKey());
+            }
+        }
+
+        return m;
+    }
 }

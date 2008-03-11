@@ -1,5 +1,7 @@
 package com.zutubi.prototype.type.record;
 
+import com.zutubi.util.GraphFunction;
+
 import java.util.Collection;
 import java.util.Set;
 
@@ -94,5 +96,10 @@ public class ImmutableRecord implements Record
     public boolean shallowEquals(Record other)
     {
         return delegate.shallowEquals(other);
+    }
+
+    public void forEach(GraphFunction<Record> f)
+    {
+        delegate.forEach(f);
     }
 }

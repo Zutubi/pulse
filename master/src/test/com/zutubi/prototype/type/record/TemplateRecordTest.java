@@ -8,6 +8,57 @@ import java.util.Set;
  */
 public class TemplateRecordTest extends PulseTestCase
 {
+    public void testMetaKeySet()
+    {
+        MutableRecord record = new MutableRecordImpl();
+        record.putMeta("foo", "bar");
+        record.putMeta("baz", "quux");
+        record.put("a", "a");
+
+        TemplateRecord template = new TemplateRecord("jim", null, null, record);
+        Set<String> metaKeySet = template.metaKeySet();
+        assertTrue(metaKeySet.contains("foo"));
+        assertTrue(metaKeySet.contains("baz"));
+        assertFalse(metaKeySet.contains("a"));
+    }
+
+    public void testMetaKeySetInherited()
+    {
+        MutableRecord record = new MutableRecordImpl();
+        record.putMeta("inparent", "x");
+        record.put("a", "a");
+        TemplateRecord parent = new TemplateRecord("jim", null, null, record);
+
+        record = new MutableRecordImpl();
+        record.putMeta("inchild", "x");
+        record.put("b", "b");
+        TemplateRecord child = new TemplateRecord("bob", parent, null, record);
+
+        Set<String> metaKeySet = child.metaKeySet();
+        assertTrue(metaKeySet.contains("inparent"));
+        assertTrue(metaKeySet.contains("inchild"));
+        assertFalse(metaKeySet.contains("a"));
+        assertFalse(metaKeySet.contains("b"));
+    }
+
+    public void testMetaKeySetInheritedNoInherit()
+    {
+        MutableRecord record = new MutableRecordImpl();
+        record.putMeta("inparent", "x");
+        record.putMeta(TemplateRecord.PARENT_KEY, "x");
+        TemplateRecord parent = new TemplateRecord("jim", null, null, record);
+
+        record = new MutableRecordImpl();
+        record.putMeta("inchild", "x");
+        TemplateRecord child = new TemplateRecord("bob", parent, null, record);
+
+        Set<String> metaKeySet = child.metaKeySet();
+        assertTrue(metaKeySet.contains("inparent"));
+        assertTrue(metaKeySet.contains("inchild"));
+        assertFalse(metaKeySet.contains(TemplateRecord.PARENT_KEY));
+        assertTrue(parent.metaKeySet().contains(TemplateRecord.PARENT_KEY));
+    }
+
     public void testHideItem()
     {
         MutableRecord record = new MutableRecordImpl();

@@ -1,11 +1,12 @@
 package com.zutubi.prototype.type.record;
 
+import com.zutubi.util.GraphFunction;
+
 import java.util.Collection;
 import java.util.Set;
 
 /**
  * A record defines a simple map for storing data.  
- *
  */
 public interface Record
 {
@@ -92,8 +93,15 @@ public interface Record
      */
     long getHandle();
 
+    /**
+     * @return true if this record can never be deleted, i.e. it is permanent
+     */
     boolean isPermanent();
 
+    /**
+     * @return true if this record is a collection (as opposed to a
+     *         composite)
+     */
     boolean isCollection();
 
     /**
@@ -116,4 +124,12 @@ public interface Record
      *         record
      */
     boolean shallowEquals(Record other);
+
+    /**
+     * Executes the given function over this and all nested records
+     * recursively.
+     *
+     * @param f function to execute
+     */
+    void forEach(GraphFunction<Record> f);
 }

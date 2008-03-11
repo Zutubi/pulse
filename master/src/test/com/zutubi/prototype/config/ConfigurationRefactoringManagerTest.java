@@ -7,16 +7,16 @@ import com.zutubi.prototype.type.MapType;
 import com.zutubi.prototype.type.TemplatedMapType;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.record.MutableRecord;
+import static com.zutubi.prototype.type.record.PathUtils.getBaseName;
 import static com.zutubi.prototype.type.record.PathUtils.getPath;
+import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
 import static com.zutubi.util.CollectionUtils.asMap;
 import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.validation.ValidationException;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import static java.util.Arrays.asList;
+import java.util.*;
 
 /**
  */
@@ -37,6 +37,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         configurationRefactoringManager.setTypeRegistry(typeRegistry);
         configurationRefactoringManager.setConfigurationTemplateManager(configurationTemplateManager);
         configurationRefactoringManager.setConfigurationReferenceManager(configurationReferenceManager);
+        configurationRefactoringManager.setRecordManager(recordManager);
 
         typeA = typeRegistry.register(MockA.class);
         MapType mapA = new MapType(typeA, typeRegistry);
@@ -329,6 +330,106 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         assertEquals(parentClone.getHandle(), configurationTemplateManager.getTemplateParentRecord(childClonePath).getHandle());
     }
 
+    public void testExtractParentTemplateInvalidParentPath()
+    {
+        extractParentTemplateErrorHelper("nosuchscope", Collections.EMPTY_LIST, "foo", "Invalid parent path 'nosuchscope': does not refer to a templated collection");
+    }
+
+    public void testExtractParentTemplateParentPathNotAMap()
+    {
+        extractParentTemplateErrorHelper(rootPath, Collections.EMPTY_LIST, "foo", "Invalid parent path '" + rootPath + "': does not refer to a templated collection");
+    }
+
+    public void testExtractParentTemplateParentPathNotATemplatedScope()
+    {
+        extractParentTemplateErrorHelper(SAMPLE_SCOPE, Collections.EMPTY_LIST, "foo", "Invalid parent path '" + SAMPLE_SCOPE + "': does not refer to a templated collection");
+    }
+
+    public void testExtractParentTemplateInvalidChildKey()
+    {
+        extractParentTemplateErrorHelper(TEMPLATE_SCOPE, asList("nope"), "foo", "Invalid child key 'nope': does not refer to an element of the templated collection");
+    }
+
+    public void testExtractParentTemplateRootTemplate()
+    {
+        extractParentTemplateErrorHelper(TEMPLATE_SCOPE, asList(getBaseName(rootPath)), "foo", "Invalid child key 'root': cannot extract parent from the root of a template hierarchy");
+    }
+
+    public void testExtractParentTemplateChildKeysNotSiblings() throws TypeException
+    {
+        String parentPath = insertTemplateA(rootPath, "parent", true);
+        insertTemplateA(parentPath, "child", false);
+        extractParentTemplateErrorHelper(TEMPLATE_SCOPE, asList("parent", "child"), "foo", "Invalid child keys: all child keys must refer to siblings in the template hierarchy");
+    }
+
+    public void testExtractParentTemplateParentNameEmpty() throws TypeException
+    {
+        insertTemplateA(rootPath, "a", true);
+        extractParentTemplateErrorHelper(TEMPLATE_SCOPE, asList("a"), "", "Parent template name is required");
+    }
+
+    public void testExtractParentTemplateParentNameNotUnique() throws TypeException
+    {
+        insertTemplateA(rootPath, "a", true);
+        extractParentTemplateErrorHelper(TEMPLATE_SCOPE, asList("a"), "a", "com.zutubi.validation.ValidationException: name is already in use, please select another name");
+    }
+
+    private void extractParentTemplateErrorHelper(String parentPath, List<String> childKeys, String parentTemplateName, String expectedError)
+    {
+        try
+        {
+            configurationRefactoringManager.extractParentTemplate(parentPath, childKeys, parentTemplateName);
+            fail();
+        }
+        catch (Exception e)
+        {
+            assertEquals(expectedError, e.getMessage());
+        }
+    }
+
+    public void testExtractParentTemplateSimple() throws TypeException
+    {
+        String aPath = insertTemplateAInstance(rootPath, createAInstance("a"), false);
+        String extractedPath = configurationRefactoringManager.extractParentTemplate(TEMPLATE_SCOPE, asList("a"), "extracted");
+
+        // Ensure the instances both look as expected
+        MockA extractedInstance = configurationTemplateManager.getInstance(extractedPath, MockA.class);
+        assertAInstance(extractedInstance, "extracted");
+        assertFalse(extractedInstance.isConcrete());
+
+        MockA aInstance = configurationTemplateManager.getInstance(aPath, MockA.class);
+        assertAInstance(aInstance, "a");
+        assertTrue(aInstance.isConcrete());
+
+        // Assert the expected shape of the hierarchy
+        TemplateNode node = configurationTemplateManager.getTemplateNode(aPath);
+        assertNotNull(node);
+        assertEquals("root/extracted/a", node.getTemplatePath());
+
+        node = configurationTemplateManager.getTemplateNode(extractedPath);
+        assertNotNull(node);
+        assertEquals("root/extracted", node.getTemplatePath());
+
+        // Now assert that the fields have really been pulled up.
+        TemplateRecord record = (TemplateRecord) configurationTemplateManager.getRecord(aPath);
+        assertEquals("a", record.getOwner("name"));
+        assertEquals("10", record.get("x"));
+        assertEquals("extracted", record.getOwner("x"));
+
+        TemplateRecord bRecord = (TemplateRecord) record.get("b");
+        assertEquals("44", bRecord.get("y"));
+        assertEquals("extracted", bRecord.getOwner("y"));
+
+        TemplateRecord blistRecord = (TemplateRecord) record.get("blist");
+        TemplateRecord lisbyRecord = (TemplateRecord) blistRecord.get(blistRecord.nestedKeySet().iterator().next());
+        assertEquals("lisby", lisbyRecord.get("name"));
+
+        TemplateRecord bmapRecord = (TemplateRecord) record.get("bmap");
+        TemplateRecord colbyRecord = (TemplateRecord) bmapRecord.get("colby");
+        assertEquals("1", colbyRecord.get("y"));
+        assertEquals("extracted", colbyRecord.getOwner("y"));
+    }
+
     private MockA createAInstance(String name)
     {
         MockA instance = new MockA(name);
@@ -346,18 +447,23 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
     private void assertClone(MockA clone, String name)
     {
-        assertEquals("clone of " + name, clone.getName());
-        assertEquals(10, clone.getX());
-        MockB cloneB = clone.getB();
+        assertAInstance(clone, "clone of " + name);
+    }
+
+    private void assertAInstance(MockA instance, String name)
+    {
+        assertEquals(name, instance.getName());
+        assertEquals(10, instance.getX());
+        MockB cloneB = instance.getB();
         assertEquals("b", cloneB.getName());
         assertEquals(44, cloneB.getY());
-        assertEquals(1, clone.getBlist().size());
-        assertEquals("lisby", clone.getBlist().get(0).getName());
-        assertEquals(1, clone.getBmap().size());
-        MockB cloneColby = clone.getBmap().get("colby");
+        assertEquals(1, instance.getBlist().size());
+        assertEquals("lisby", instance.getBlist().get(0).getName());
+        assertEquals(1, instance.getBmap().size());
+        MockB cloneColby = instance.getBmap().get("colby");
         assertEquals("colby", cloneColby.getName());
         assertEquals(1, cloneColby.getY());
-        Referee cloneRef = clone.getRef();
+        Referee cloneRef = instance.getRef();
         assertNotNull(cloneRef);
         assertEquals("ee", cloneRef.getName());
     }
