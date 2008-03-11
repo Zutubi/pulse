@@ -807,31 +807,38 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
     }
 
     /**
+     * @see #validate(String, String, com.zutubi.prototype.type.record.Record, boolean, boolean, java.util.Set)
+     */
+    @SuppressWarnings({"unchecked"})
+    public <T> T validate(String parentPath, String baseName, Record subject, boolean concrete, boolean deep) throws TypeException
+    {
+        return (T) validate(parentPath, baseName, subject, concrete, deep, null);
+    }
+
+    /**
      * Validates the given record as a composite of some type, and returns
      * the instance if valid.  The validation occurs in the context of where
      * the record is to be stored, allowing inspection of associated
      * instances if necessary.
      *
-     * @param parentPath parent of the path where the record is to be stored
-     * @param baseName   base name of the path where the record is to be
-     *                   stored
-     * @param subject    record to validate
-     * @param deep       if true, child records will also be validated
-     *                   recursively (otherwise they are ignored)
+     * @param parentPath    parent of the path where the record is to be
+     *                      stored
+     * @param baseName      base name of the path where the record is to be
+     *                      stored
+     * @param subject       record to validate
+     * @param concrete      if true, the record should be validated as a
+     *                      concrete (i.e. complete) instance
+     * @param deep          if true, child records will also be validated
+     *                      recursively (otherwise they are ignored)
+     * @param ignoredFields fields for which validation errors should be
+     *                      ignored 
      * @return the instance, which will be marked up with any validation errors
      * @throws com.zutubi.prototype.type.TypeException
-     *          if an error prevents
-     *          creation of the instance: this is motre fatal than a normal
-     *          validation problem
+     *          if an error prevents creation of the instance: this is more
+     *          fatal than a normal validation problem
      */
     @SuppressWarnings({"unchecked"})
-    public <T> T validate(String parentPath, String baseName, Record subject, boolean deep) throws TypeException
-    {
-        return (T) validate(parentPath, baseName, subject, deep, null);
-    }
-
-    @SuppressWarnings({"unchecked"})
-    public <T> T validate(String parentPath, String baseName, Record subject, boolean deep, Set<String> ignoredFields) throws TypeException
+    public <T> T validate(String parentPath, String baseName, Record subject, boolean concrete, boolean deep, Set<String> ignoredFields) throws TypeException
     {
         // The type we are validating against.
         CompositeType type = typeRegistry.getType(subject.getSymbolicName());
@@ -846,10 +853,7 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
         SimpleInstantiator instantiator = new SimpleInstantiator(configurationReferenceManager);
         instance = (Configuration) instantiator.instantiate(type, subject);
 
-        // Now apply validations via using the validation manager.
-        boolean concrete = isConcrete(parentPath, subject);
         validateInstance(type, instance, parentPath, baseName, concrete, deep, ignoredFields);
-
         return (T) instance;
     }
 

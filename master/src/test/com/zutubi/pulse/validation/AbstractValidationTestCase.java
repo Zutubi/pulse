@@ -37,13 +37,13 @@ public class AbstractValidationTestCase extends AbstractConfigurationSystemTestC
 
     protected void assertValid(String parentPath, String baseName, Configuration instance) throws TypeException
     {
-        instance = configurationTemplateManager.validate(parentPath, baseName, unstantiate(instance), false);
+        instance = configurationTemplateManager.validate(parentPath, baseName, unstantiate(instance), true, false);
         assertTrue(instance.isValid());
     }
 
     protected void assertFieldErrors(String parentPath, String baseName, Configuration instance, String field, String... expectedErrors) throws TypeException
     {
-        instance = configurationTemplateManager.validate(parentPath, baseName, unstantiate(instance), false);
+        instance = configurationTemplateManager.validate(parentPath, baseName, unstantiate(instance), true, false);
         List<String> fieldErrors = instance.getFieldErrors(field);
         assertEquals(expectedErrors.length, fieldErrors.size());
         for(int i = 0; i < expectedErrors.length; i++)

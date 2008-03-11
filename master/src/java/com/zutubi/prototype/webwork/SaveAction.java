@@ -1,6 +1,5 @@
 package com.zutubi.prototype.webwork;
 
-import com.zutubi.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.prototype.type.ComplexType;
 import com.zutubi.prototype.type.CompositeType;
@@ -9,6 +8,7 @@ import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.util.TextUtils;
 
 /**
  *
@@ -69,7 +69,7 @@ public class SaveAction extends PrototypeSupport
         String baseName = PathUtils.getBaseName(path);
         try
         {
-            Configuration instance = configurationTemplateManager.validate(parentPath, baseName, record, false);
+            Configuration instance = configurationTemplateManager.validate(parentPath, baseName, record, configurationTemplateManager.isConcrete(path), false);
             if (!instance.isValid())
             {
                 PrototypeUtils.mapErrors(instance, this, null);

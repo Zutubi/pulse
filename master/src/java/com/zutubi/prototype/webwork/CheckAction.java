@@ -70,8 +70,8 @@ public class CheckAction extends PrototypeSupport
 
         try
         {
-            Configuration checkInstance = configurationTemplateManager.validate(null, null, checkRecord, false);
-            Configuration mainInstance = configurationTemplateManager.validate(PathUtils.getParentPath(path), PathUtils.getBaseName(path), record, false);
+            Configuration checkInstance = configurationTemplateManager.validate(null, null, checkRecord, true, false);
+            Configuration mainInstance = configurationTemplateManager.validate(PathUtils.getParentPath(path), PathUtils.getBaseName(path), record, true, false);
             if (!checkInstance.isValid() || !mainInstance.isValid())
             {
                 PrototypeUtils.mapErrors(checkInstance, this, null);

@@ -560,7 +560,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     public void testValidate() throws TypeException
     {
         MutableRecord record = typeA.createNewRecord(true);
-        Configuration instance = configurationTemplateManager.validate("template", "a", record, false);
+        Configuration instance = configurationTemplateManager.validate("template", "a", record, true, false);
         List<String> aErrors = instance.getFieldErrors("name");
         assertEquals(1, aErrors.size());
         assertEquals("name requires a value", aErrors.get(0));
@@ -570,7 +570,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     {
         MutableRecord record = typeA.createNewRecord(true);
         record.put("name", "value");
-        Configuration instance = configurationTemplateManager.validate(null, "a", record, false);
+        Configuration instance = configurationTemplateManager.validate(null, "a", record, true, false);
         assertTrue(instance.isValid());
     }
 
@@ -578,7 +578,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     {
         MutableRecord record = typeA.createNewRecord(true);
         record.put("name", "value");
-        Configuration instance = configurationTemplateManager.validate("template", null, record, false);
+        Configuration instance = configurationTemplateManager.validate("template", null, record, true, false);
         assertTrue(instance.isValid());
     }
 
@@ -590,7 +590,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         configurationTemplateManager.insertRecord("template", record);
 
         record = typeB.createNewRecord(false);
-        MockB instance = configurationTemplateManager.validate("template/a", "mock", record, false);
+        MockB instance = configurationTemplateManager.validate("template/a", "mock", record, false, false);
         assertTrue(instance.isValid());
     }
 
@@ -598,7 +598,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     {
         MutableRecord record = typeA.createNewRecord(true);
         configurationTemplateManager.markAsTemplate(record);
-        MockA instance = configurationTemplateManager.validate("template", "", record, false);
+        MockA instance = configurationTemplateManager.validate("template", "", record, false, false);
         assertFalse(instance.isValid());
         final List<String> errors = instance.getFieldErrors("name");
         assertEquals(1, errors.size());
@@ -612,7 +612,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         configurationTemplateManager.insertRecord("template", record);
 
         record = typeB.createNewRecord(true);
-        Configuration instance = configurationTemplateManager.validate("template/a", "b", record, false);
+        Configuration instance = configurationTemplateManager.validate("template/a", "b", record, true, false);
         List<String> aErrors = instance.getFieldErrors("b");
         assertEquals(1, aErrors.size());
         assertEquals("b requires a value", aErrors.get(0));
@@ -628,7 +628,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         configurationTemplateManager.insertRecord("template", record);
 
         record = typeB.createNewRecord(true);
-        MockB instance = configurationTemplateManager.validate("template/a", "b", record, false);
+        MockB instance = configurationTemplateManager.validate("template/a", "b", record, false, false);
         assertTrue(instance.isValid());
         assertNull(instance.getB());
     }
@@ -677,7 +677,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         a.setMock(new MockB());
         MutableRecord record = typeA.unstantiate(a);
 
-        MockA instance = configurationTemplateManager.validate("sample", null, record, false);
+        MockA instance = configurationTemplateManager.validate("sample", null, record, true, false);
         assertTrue(instance.isValid());
         assertTrue(instance.getMock().isValid());
     }
@@ -688,7 +688,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         a.setMock(new MockB());
         MutableRecord record = typeA.unstantiate(a);
 
-        MockA instance = configurationTemplateManager.validate("sample", null, record, true);
+        MockA instance = configurationTemplateManager.validate("sample", null, record, true, true);
         assertTrue(instance.isValid());
         assertFalse(instance.getMock().isValid());
     }
@@ -699,7 +699,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         a.getDs().add(new MockD());
         Record record = typeA.unstantiate(a);
 
-        MockA validated = configurationTemplateManager.validate("sample", null, record, true);
+        MockA validated = configurationTemplateManager.validate("sample", null, record, true, true);
         assertTrue(validated.isValid());
         MockD mockD = validated.getDs().get(0);
         assertMissingName(mockD);
@@ -711,7 +711,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         a.getCs().put("name", new MockC());
         Record record = typeA.unstantiate(a);
 
-        MockA validated = configurationTemplateManager.validate("sample", null, record, true);
+        MockA validated = configurationTemplateManager.validate("sample", null, record, true, true);
         assertTrue(validated.isValid());
         MockC mockC = validated.getCs().get("name");
         assertMissingName(mockC);

@@ -414,7 +414,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
             CompositeType type = configurationTemplateManager.typeCheck(expectedType, symbolicName);
             MutableRecord record = type.fromXmlRpc(config);
 
-            Configuration instance = configurationTemplateManager.validate(parentPath, baseName, record, true);
+            Configuration instance = configurationTemplateManager.validate(parentPath, baseName, record, true, true);
             if (!type.isValid(instance))
             {
                 throw new ValidationException(type, instance);
@@ -466,7 +466,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
                 configurationTemplateManager.markAsTemplate(record);
             }
 
-            Configuration instance = configurationTemplateManager.validate(insertPath, null, record, true);
+            Configuration instance = configurationTemplateManager.validate(insertPath, null, record, !template, true);
             if (!type.isValid(instance))
             {
                 throw new ValidationException(type, instance);
@@ -506,7 +506,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
             CompositeType type = typeRegistry.getType(existingSymbolicName);
             MutableRecord record = type.fromXmlRpc(config);
 
-            Configuration instance = configurationTemplateManager.validate(PathUtils.getParentPath(path), PathUtils.getBaseName(path), record, deep);
+            Configuration instance = configurationTemplateManager.validate(PathUtils.getParentPath(path), PathUtils.getBaseName(path), record, configurationTemplateManager.isConcrete(path), deep);
             if ((deep && !type.isValid(instance)) || !instance.isValid())
             {
                 throw new ValidationException(type, instance);
@@ -704,7 +704,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
             String symbolicName = CompositeType.getTypeFromXmlRpc(argument);
             CompositeType type = typeRegistry.getType(symbolicName);
             MutableRecord record = type.fromXmlRpc(argument);
-            Configuration arg = configurationTemplateManager.validate(null, null, record, true);
+            Configuration arg = configurationTemplateManager.validate(null, null, record, true, true);
             if(!type.isValid(arg))
             {
                 throw new ValidationException(type, arg);

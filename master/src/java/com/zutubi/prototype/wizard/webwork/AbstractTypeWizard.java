@@ -7,8 +7,8 @@ import com.zutubi.prototype.FieldDescriptor;
 import com.zutubi.prototype.FormDescriptor;
 import com.zutubi.prototype.FormDescriptorFactory;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
-import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.config.ConfigurationRegistry;
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.model.SelectFieldDescriptor;
 import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.MutableRecord;
@@ -368,7 +368,7 @@ public abstract class AbstractTypeWizard implements Wizard
         {
             try
             {
-                Configuration configuration = configurationTemplateManager.validate(parentPath, null, currentState.getRenderRecord(), false, ignoredFields);
+                Configuration configuration = configurationTemplateManager.validate(parentPath, null, currentState.getRenderRecord(), !template, false, ignoredFields);
                 PrototypeUtils.mapErrors(configuration, validationCallback, null);
                 return configuration.isValid();
             }

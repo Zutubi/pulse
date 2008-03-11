@@ -546,6 +546,106 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         listPage.assertItemPresent("scm trigger", ListPage.ANNOTATION_INHERITED, "view", "delete", "pause");
     }
 
+    public void testValidationInWizard()
+    {
+        loginAsAdmin();
+        ProjectHierarchyPage projectsPage = new ProjectHierarchyPage(selenium, urls, ProjectManager.GLOBAL_PROJECT_NAME, true);
+        projectsPage.goTo();
+        projectsPage.clickAdd();
+
+        AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(selenium);
+        projectState.waitFor();
+        projectState.nextFormElements(random, "", "");
+
+        SelectTypeState scmTypeState = new SelectTypeState(selenium);
+        scmTypeState.waitFor();
+        scmTypeState.nextFormElements("zutubi.subversionConfig");
+
+        // URL is required.
+        AddProjectWizard.SubversionState subversionState = new AddProjectWizard.SubversionState(selenium);
+        subversionState.waitFor();
+        subversionState.nextFormElements("", null, null, null, null, "CLEAN_CHECKOUT");
+        subversionState.assertFormPresent();
+        assertTextPresent("url requires a value");
+        subversionState.cancelFormElements(null, null, null, null, null, "CLEAN_CHECKOUT");
+    }
+
+    public void testTemplateValidationInWizard()
+    {
+        loginAsAdmin();
+        ProjectHierarchyPage projectsPage = new ProjectHierarchyPage(selenium, urls, ProjectManager.GLOBAL_PROJECT_NAME, true);
+        projectsPage.goTo();
+        projectsPage.clickAddTemplate();
+
+        // Despite the fact we are adding a template, we must specify the
+        // name.
+        AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(selenium);
+        projectState.waitFor();
+        projectState.nextFormElements("", "", "");
+        projectState.assertFormPresent();
+        assertTextPresent("the projects name is a required field");
+        projectState.nextFormElements(random, "", "");
+
+        SelectTypeState scmTypeState = new SelectTypeState(selenium);
+        scmTypeState.waitFor();
+        scmTypeState.nextFormElements("zutubi.subversionConfig");
+
+        // Here, we should get away without having a URL.
+        AddProjectWizard.SubversionState subversionState = new AddProjectWizard.SubversionState(selenium);
+        subversionState.waitFor();
+        subversionState.nextFormElements("", null, null, null, null, "CLEAN_CHECKOUT");
+
+        SelectTypeState projectTypeState = new SelectTypeState(selenium);
+        projectTypeState.waitFor();
+        projectTypeState.nextFormElements("zutubi.antTypeConfig");
+
+        AddProjectWizard.AntState antState = new AddProjectWizard.AntState(selenium);
+        antState.waitFor();
+        antState.finishFormElements(null, "build.xml", null, null);
+
+        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, random, true);
+        hierarchyPage.waitFor();
+    }
+
+    public void testValidationOnSave() throws Exception
+    {
+        xmlRpcHelper.insertSimpleProject(random, false);
+
+        loginAsAdmin();
+        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, random, false);
+        hierarchyPage.goTo();
+
+        ProjectConfigPage configPage = hierarchyPage.clickConfigure();
+        configPage.waitFor();
+        configPage.clickComposite("scm", "subversion configuration");
+
+        SubversionForm subversionForm = new SubversionForm(selenium);
+        subversionForm.waitFor();
+        subversionForm.applyFormElements("", null, null, null, null, null, null, null, null, null, null, null, null);
+        subversionForm.waitFor();
+        assertTextPresent("url requires a value");
+    }
+
+    public void testTemplateValidationOnSave() throws Exception
+    {
+        xmlRpcHelper.insertSimpleProject(random, true);
+
+        loginAsAdmin();
+        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, random, true);
+        hierarchyPage.goTo();
+
+        ProjectConfigPage configPage = hierarchyPage.clickConfigure();
+        configPage.waitFor();
+        configPage.clickComposite("scm", "subversion configuration");
+
+        SubversionForm subversionForm = new SubversionForm(selenium);
+        subversionForm.waitFor();
+
+        subversionForm.applyFormElements("", null, null, null, null, null, null, null, null, null, null, null, null);
+        subversionForm.waitFor();
+        assertTextNotPresent("url requires a value");
+    }
+
     private void insertProperty(String projectPath) throws Exception
     {
         insertProperty(projectPath, "p1");

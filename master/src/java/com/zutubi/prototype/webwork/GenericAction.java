@@ -101,7 +101,7 @@ public class GenericAction extends PrototypeSupport
                         String baseName = PathUtils.getBaseName(path);
                         try
                         {
-                            argument = configurationTemplateManager.validate(parentPath, baseName, record, false);
+                            argument = configurationTemplateManager.validate(parentPath, baseName, record, true, false);
                             if (!argument.isValid())
                             {
                                 PrototypeUtils.mapErrors(argument, this, null);

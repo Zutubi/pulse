@@ -215,14 +215,6 @@ public abstract class SeleniumForm
                 {
                     setComponentValue(id, value);
                 }
-//                if(Boolean.valueOf(value))
-//                {
-//                    selenium.check(id);
-//                }
-//                else
-//                {
-//                    selenium.uncheck(id);
-//                }
                 break;
             case MULTI_CHECKBOX:
                 if (value != null)
@@ -263,11 +255,19 @@ public abstract class SeleniumForm
         int[] types = getActualFieldTypes();
         Assert.assertEquals(values.length, types.length);
 
+        String[] names = getActualFieldNames();
         for (int i = 0; i < types.length; i++)
         {
-            String name = getActualFieldNames()[i];
+            String name = names[i];
             String value = values[i];
             setFormElement(name, value, types[i]);
+        }
+
+        // Hack: make sure buttons are updated.  Typing something empty in
+        // selenium doesn't work :|.
+        if (names.length > 0)
+        {
+            selenium.getEval("var field = selenium.browserbot.getCurrentWindow().Ext.getCmp('" + getFieldId(names[0]) + "'); field.form.updateButtons()");
         }
     }
 

@@ -1,6 +1,5 @@
 package com.zutubi.prototype.webwork;
 
-import com.zutubi.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.i18n.Messages;
 import com.zutubi.i18n.MessagesProvider;
@@ -13,6 +12,7 @@ import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.web.ActionSupport;
+import com.zutubi.util.TextUtils;
 
 /**
  * Base for actions that use transient configuration.
@@ -137,7 +137,7 @@ public abstract class TransientAction<T> extends ActionSupport implements Messag
         Configuration instance = null;
         try
         {
-            instance = configurationTemplateManager.validate(parentPath, baseName, record, false);
+            instance = configurationTemplateManager.validate(parentPath, baseName, record, true, false);
             if (!instance.isValid())
             {
                 PrototypeUtils.mapErrors(instance, this, null);
