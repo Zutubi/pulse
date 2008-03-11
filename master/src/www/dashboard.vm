@@ -13,7 +13,7 @@
         #updater("$base/ajax/dashboardPanel.action" "panel" $principle)
 
         var popup;
-        YAHOO.util.Event.addListener(window, "load", function() { popup = new BuildColumnPopup("my.projects", "$base", "$base/ajax/dashboardPanel.action", "panel"); });
+        YAHOO.util.Event.addListener(window, "load", function() { popup = new BuildColumnPopup("my.projects", "$base", "$base/ajax/dashboardPanel.action", "dashboard-panel"); });
     //]]>
     </script>
 #if ($rssEnabled)
@@ -23,7 +23,7 @@
 <body>
     #dashboardTabs("homepage")
 
-    <div id="panel">
+    <div id="dashboard-panel">
         #parse("ajax/dashboard-panel.vm")
     </div>
 
@@ -38,7 +38,5 @@
         <div id="commentsWindowContent">
         </div>
     </div>
-    
-
 </body>
 </html>

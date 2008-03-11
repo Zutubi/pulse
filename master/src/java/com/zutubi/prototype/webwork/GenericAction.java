@@ -1,6 +1,5 @@
 package com.zutubi.prototype.webwork;
 
-import com.zutubi.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.prototype.actions.ActionManager;
 import com.zutubi.prototype.actions.ConfigurationAction;
@@ -9,6 +8,7 @@ import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 
 /**
@@ -60,6 +60,11 @@ public class GenericAction extends PrototypeSupport
     protected void prepare()
     {
         newPanel = new ConfigurationPanel("aconfig/action.vm");
+    }
+
+    public void doCancel()
+    {
+        response = new ConfigurationResponse(path, configurationTemplateManager.getTemplatePath(path));
     }
 
     public String execute() throws Exception

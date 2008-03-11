@@ -14,12 +14,14 @@ import com.zutubi.pulse.webwork.mapping.Urls;
 public class ListPage extends ConfigPage
 {
     public static final String ACTION_CLONE = "clone";
+    public static final String ACTION_VIEW  = "view";
 
     public static final String ANNOTATION_INHERITED  = "inherited";
     public static final String ANNOTATION_OVERRIDDEN = "overridden";
     public static final String ANNOTATION_HIDDEN     = "hidden";
 
     private static final String ADD_LINK = "map:add";
+    
     private String path;
 
     public ListPage(Selenium selenium, Urls urls, String path)
@@ -87,15 +89,19 @@ public class ListPage extends ConfigPage
         selenium.click(ADD_LINK);
     }
 
+    public void clickAction(String baseName, String action)
+    {
+        selenium.click(getActionId(action, baseName));
+    }
+
     public void clickView(String baseName)
     {
-        selenium.click(getActionId("view", baseName));
+        clickAction(baseName, ACTION_VIEW);
     }
 
     public CloneForm clickClone(String baseName)
     {
-        String actionId = getActionId(ACTION_CLONE, baseName);
-        selenium.click(actionId);
+        clickAction(baseName, ACTION_CLONE);
         return new CloneForm(selenium);
     }
 
