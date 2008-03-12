@@ -100,7 +100,7 @@ public class CheckDirective extends PrototypeDirective
             CompositeType type = typeRegistry.getType(symbolicName);
             CompositeType checkType = configurationRegistry.getConfigurationCheckType(type);
 
-            FormDescriptor formDescriptor = formDescriptorFactory.createDescriptor(PathUtils.getParentPath(path), null, checkType, "check");
+            FormDescriptor formDescriptor = formDescriptorFactory.createDescriptor(PathUtils.getParentPath(path), null, checkType, true, "check");
             formDescriptor.setName(checkFormName);
             formDescriptor.setAction(action);
             formDescriptor.setActions("check");

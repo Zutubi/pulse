@@ -555,6 +555,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
         AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(selenium);
         projectState.waitFor();
+        assertTrue(projectState.isMarkedRequired("name"));
         projectState.nextFormElements(random, "", "");
 
         SelectTypeState scmTypeState = new SelectTypeState(selenium);
@@ -564,6 +565,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         // URL is required.
         AddProjectWizard.SubversionState subversionState = new AddProjectWizard.SubversionState(selenium);
         subversionState.waitFor();
+        assertTrue(subversionState.isMarkedRequired("url"));
         subversionState.nextFormElements("", null, null, null, null, "CLEAN_CHECKOUT");
         subversionState.assertFormPresent();
         assertTextPresent("url requires a value");
@@ -581,6 +583,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         // name.
         AddProjectWizard.ProjectState projectState = new AddProjectWizard.ProjectState(selenium);
         projectState.waitFor();
+        assertTrue(projectState.isMarkedRequired("name"));
         projectState.nextFormElements("", "", "");
         projectState.assertFormPresent();
         assertTextPresent("the projects name is a required field");
@@ -593,6 +596,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         // Here, we should get away without having a URL.
         AddProjectWizard.SubversionState subversionState = new AddProjectWizard.SubversionState(selenium);
         subversionState.waitFor();
+        assertFalse(subversionState.isMarkedRequired("url"));
         subversionState.nextFormElements("", null, null, null, null, "CLEAN_CHECKOUT");
 
         SelectTypeState projectTypeState = new SelectTypeState(selenium);
@@ -621,6 +625,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
         SubversionForm subversionForm = new SubversionForm(selenium);
         subversionForm.waitFor();
+        assertTrue(subversionForm.isMarkedRequired("url"));
         subversionForm.applyFormElements("", null, null, null, null, null, null, null, null, null, null, null, null);
         subversionForm.waitFor();
         assertTextPresent("url requires a value");
@@ -643,6 +648,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
         subversionForm.applyFormElements("", null, null, null, null, null, null, null, null, null, null, null, null);
         subversionForm.waitFor();
+        assertFalse(subversionForm.isMarkedRequired("url"));
         assertTextNotPresent("url requires a value");
     }
 

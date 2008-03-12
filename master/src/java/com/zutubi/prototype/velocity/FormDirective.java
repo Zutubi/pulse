@@ -4,6 +4,7 @@ import com.zutubi.prototype.FormDescriptor;
 import com.zutubi.prototype.FormDescriptorFactory;
 import com.zutubi.prototype.TemplateFormDecorator;
 import com.zutubi.prototype.config.ConfigurationSecurityManager;
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.model.Form;
 import com.zutubi.prototype.model.HiddenFieldDescriptor;
 import com.zutubi.prototype.security.AccessManager;
@@ -42,6 +43,7 @@ public class FormDirective extends PrototypeDirective
 
     private MasterConfigurationManager configurationManager;
     private ConfigurationSecurityManager configurationSecurityManager;
+    private ConfigurationTemplateManager configurationTemplateManager;
 
     /**
      * The name of this velocity directive.
@@ -101,7 +103,7 @@ public class FormDirective extends PrototypeDirective
             Record data = lookupRecord();
 
             String path = lookupPath();
-            FormDescriptor formDescriptor = formDescriptorFactory.createDescriptor(PathUtils.getParentPath(path), PathUtils.getBaseName(path), ctype, formName);
+            FormDescriptor formDescriptor = formDescriptorFactory.createDescriptor(PathUtils.getParentPath(path), PathUtils.getBaseName(path), ctype, configurationTemplateManager.isConcrete(path), formName);
             formDescriptor.setDisplayMode(displayMode);
             formDescriptor.setReadOnly(!configurationSecurityManager.hasPermission(path, AccessManager.ACTION_WRITE));
             formDescriptor.setAjax(ajax);
@@ -159,6 +161,11 @@ public class FormDirective extends PrototypeDirective
     public void setConfigurationSecurityManager(ConfigurationSecurityManager configurationSecurityManager)
     {
         this.configurationSecurityManager = configurationSecurityManager;
+    }
+
+    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
+    {
+        this.configurationTemplateManager = configurationTemplateManager;
     }
 }
 

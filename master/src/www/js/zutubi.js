@@ -475,7 +475,9 @@ Ext.extend(ZUTUBI.TemplateTree, ZUTUBI.ConfigTree, {
 ZUTUBI.Form = function(config)
 {
     var template = new Ext.Template('<tr id="x-form-row-{0}" class="x-form-row {5}">' +
-                                        '<td class="x-form-label"><label for="{0}" style="{2}">{1}{4}</label></td>' +
+                                        '<td class="x-form-label"><label for="{0}" style="{2}">{1}</td>' +
+                                        '<td class="x-form-label-annotation" id="x-form-label-annotation-{0}"></td>' +
+                                        '<td class="x-form-separator">{4}</td>' +
                                         '<td><div id="x-form-el-{0}" class="x-form-element" style="{3}">' +
                                         '</div></td>' +
                                     '</tr>');
@@ -506,11 +508,21 @@ Ext.extend(ZUTUBI.Form, Ext.form.Form, {
         return this;
     },
 
-    annotateField: function(id, imageName, tooltip)
+    markRequired: function(id, tooltip)
+    {
+        var cellEl = Ext.get('x-form-label-annotation-' + id);
+        var spanEl = cellEl.createChild({tag: 'span', cls: 'required', id: id + '.required', html: '*'});
+        if(tooltip)
+        {
+            spanEl.dom.qtip = tooltip;
+        }
+    },
+
+    annotateField: function(id, annotationName, imageName, tooltip)
     {
         var rowEl = Ext.get('x-form-row-' + id);
         var cellEl = rowEl.createChild({tag: 'td', cls: 'x-form-annotation'});
-        var imageEl = cellEl.createChild({tag: 'img', src: imageName, id: id + '.inherited'});
+        var imageEl = cellEl.createChild({tag: 'img', src: imageName, id: id + '.' + annotationName});
         if(tooltip)
         {
             imageEl.dom.qtip = tooltip;

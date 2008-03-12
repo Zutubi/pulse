@@ -33,6 +33,14 @@ public class ConfigurationValidationContext implements ValidationContext
     }
 
     /**
+     * @return the instance to be validation
+     */
+    public Configuration getInstance()
+    {
+        return instance;
+    }
+
+    /**
      * @return the parent path of the object being validated
      */
     public String getParentPath()

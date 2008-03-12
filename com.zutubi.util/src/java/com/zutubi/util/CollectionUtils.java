@@ -121,7 +121,7 @@ public class CollectionUtils
         }
     }
 
-    public static <T> T find(Collection<T> c, Predicate<T> p)
+    public static <T> T find(Iterable<T> c, Predicate<T> p)
     {
         for(T t: c)
         {
@@ -137,6 +137,11 @@ public class CollectionUtils
     public static <T> T find(T[] c, Predicate<T> p)
     {
         return find(Arrays.asList(c), p);
+    }
+
+    public static <T> boolean contains(Iterable<T> in, Predicate<T> p)
+    {
+        return find(in, p) != null;
     }
 
     public static <T> boolean containsIdentity(T[] a, T x)

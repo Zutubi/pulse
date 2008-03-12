@@ -3,16 +3,20 @@ package com.zutubi.prototype;
 import com.zutubi.config.annotations.FieldType;
 import com.zutubi.config.annotations.Handler;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
+import com.zutubi.prototype.config.ConfigurationValidationContext;
+import com.zutubi.prototype.config.ConfigurationValidatorProvider;
 import com.zutubi.prototype.handler.AnnotationHandler;
 import com.zutubi.prototype.handler.OptionAnnotationHandler;
 import com.zutubi.prototype.model.*;
 import com.zutubi.prototype.type.*;
+import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.prototype.config.EnumOptionProvider;
 import com.zutubi.util.AnnotationUtils;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
-import com.zutubi.validation.annotations.Constraint;
+import com.zutubi.validation.FieldValidator;
+import com.zutubi.validation.Validator;
 import com.zutubi.validation.annotations.Numeric;
 import com.zutubi.validation.validators.RequiredValidator;
 
@@ -35,6 +39,7 @@ public class FormDescriptorFactory
     private static final Logger LOG = Logger.getLogger(FormDescriptorFactory.class);
 
     private static final Map<Class, String> defaultFieldTypeMapping = new HashMap<Class, String>();
+
     static
     {
         defaultFieldTypeMapping.put(String.class, "text");
@@ -48,7 +53,7 @@ public class FormDescriptorFactory
 
     private Map<String, Class<? extends FieldDescriptor>> fieldDescriptorTypes = new HashMap<String, Class<? extends FieldDescriptor>>();
     private ConfigurationTemplateManager configurationTemplateManager;
-
+    private ConfigurationValidatorProvider configurationValidatorProvider;
 
     public void init()
     {
@@ -66,8 +71,8 @@ public class FormDescriptorFactory
     {
         fieldDescriptorTypes.put(type, clazz);
     }
-    
-    public FormDescriptor createDescriptor(String parentPath, String baseName, CompositeType type, String name)
+
+    public FormDescriptor createDescriptor(String parentPath, String baseName, CompositeType type, boolean concrete, String name)
     {
         FormDescriptor descriptor = new FormDescriptor();
         descriptor.setName(name);
@@ -81,39 +86,40 @@ public class FormDescriptorFactory
         List<Annotation> annotations = type.getAnnotations();
         handleAnnotations(type, descriptor, annotations);
 
-        descriptor.setFieldDescriptors(buildFieldDescriptors(parentPath, baseName, type, descriptor));
+        descriptor.setFieldDescriptors(buildFieldDescriptors(parentPath, baseName, type, concrete, descriptor));
 
         return descriptor;
     }
 
-    private List<FieldDescriptor> buildFieldDescriptors(String parentPath, String baseName, CompositeType type, FormDescriptor form)
+    private List<FieldDescriptor> buildFieldDescriptors(String parentPath, String baseName, CompositeType type, boolean concrete, FormDescriptor form)
     {
         List<FieldDescriptor> fieldDescriptors = new LinkedList<FieldDescriptor>();
+        List<Validator> validators = getValidators(parentPath, baseName, concrete, type);
 
         for (TypeProperty property : type.getProperties(SimpleType.class))
         {
             FieldDescriptor fd = createField(parentPath, baseName, property, form);
-            addFieldParameters(type, parentPath, baseName, property, fd);
+            addFieldParameters(type, parentPath, baseName, property, fd, validators);
             fieldDescriptors.add(fd);
         }
 
-        for(TypeProperty property: type.getProperties(CollectionType.class))
+        for (TypeProperty property : type.getProperties(CollectionType.class))
         {
             CollectionType propertyType = (CollectionType) property.getType();
             Type targetType = propertyType.getCollectionType();
-            if(targetType instanceof SimpleType)
+            if (targetType instanceof SimpleType)
             {
                 String fieldType = FieldType.SELECT;
                 com.zutubi.config.annotations.Field field = AnnotationUtils.findAnnotation(property.getAnnotations(), com.zutubi.config.annotations.Field.class);
-                if(field != null)
+                if (field != null)
                 {
                     fieldType = field.type();
                 }
 
                 FieldDescriptor fd = createFieldOfType(fieldType);
-                if(fd instanceof OptionFieldDescriptor)
+                if (fd instanceof OptionFieldDescriptor)
                 {
-                    ((OptionFieldDescriptor)fd).setMultiple(true);                    
+                    ((OptionFieldDescriptor) fd).setMultiple(true);
                 }
 
                 fd.setForm(form);
@@ -121,7 +127,7 @@ public class FormDescriptorFactory
                 fd.setBaseName(baseName);
                 fd.setProperty(property);
                 fd.setName(property.getName());
-                addFieldParameters(type, parentPath, baseName, property, fd);
+                addFieldParameters(type, parentPath, baseName, property, fd, validators);
                 fieldDescriptors.add(fd);
             }
         }
@@ -129,18 +135,36 @@ public class FormDescriptorFactory
         return fieldDescriptors;
     }
 
+    private List<Validator> getValidators(String parentPath, String baseName, boolean concrete, CompositeType type)
+    {
+        List<Validator> validators;
+        try
+        {
+            Configuration dummyInstance = (Configuration) type.getClazz().newInstance();
+            ConfigurationValidationContext validationContext = new ConfigurationValidationContext(dummyInstance, null, parentPath, baseName, !concrete, configurationTemplateManager);
+            validators = configurationValidatorProvider.getValidators(dummyInstance, validationContext);
+        }
+        catch (Exception e)
+        {
+            // Not ideal, but we can soldier on regardless.
+            LOG.warning("Unable to get validators for type '" + type.getSymbolicName() + "': " + e.getMessage(), e);
+            validators = new ArrayList<Validator>(0);
+        }
+        return validators;
+    }
+
     private FieldDescriptor createField(String parentPath, String baseName, TypeProperty property, FormDescriptor form)
     {
         String fieldType = FieldType.TEXT;
         com.zutubi.config.annotations.Field field = AnnotationUtils.findAnnotation(property.getAnnotations(), com.zutubi.config.annotations.Field.class);
-        if(field != null)
+        if (field != null)
         {
             fieldType = field.type();
         }
         else
         {
             SimpleType propertyType = (SimpleType) property.getType();
-            if(propertyType instanceof PrimitiveType)
+            if (propertyType instanceof PrimitiveType)
             {
                 // some little bit of magic, take a guess at any property called password. If we come up with any
                 // other magical cases, then we can refactor this a bit.
@@ -172,7 +196,7 @@ public class FormDescriptorFactory
     private FieldDescriptor createFieldOfType(String type)
     {
         Class<? extends FieldDescriptor> clazz = fieldDescriptorTypes.get(type);
-        if(clazz == null)
+        if (clazz == null)
         {
             return new FieldDescriptor();
         }
@@ -190,19 +214,19 @@ public class FormDescriptorFactory
         }
     }
 
-    private void addFieldParameters(CompositeType type, String parentPath, String baseName, TypeProperty property, FieldDescriptor fd)
+    private void addFieldParameters(CompositeType type, String parentPath, String baseName, TypeProperty property, FieldDescriptor fd, List<Validator> validators)
     {
         handleAnnotations(type, fd, property.getAnnotations());
 
         if (fd instanceof TextFieldDescriptor)
         {
             Numeric numeric = AnnotationUtils.findAnnotation(property.getAnnotations(), Numeric.class);
-            if(numeric != null)
+            if (numeric != null)
             {
                 fd.addParameter("size", 100);
             }
         }
-        else if(fd instanceof SelectFieldDescriptor)
+        else if (fd instanceof SelectFieldDescriptor)
         {
             SelectFieldDescriptor select = (SelectFieldDescriptor) fd;
             if (select.getList() == null)
@@ -210,11 +234,23 @@ public class FormDescriptorFactory
                 addDefaultOptions(parentPath, baseName, property, select);
             }
         }
+
+        for(Validator validator: validators)
+        {
+            if(validator instanceof FieldValidator && ((FieldValidator)validator).getFieldName().equals(fd.getName()))
+            {
+                fd.setConstrained(true);
+                if(validator instanceof RequiredValidator)
+                {
+                    fd.setRequired(true);
+                }
+            }
+        }
     }
 
     private void addDefaultOptions(String parentPath, String baseName, TypeProperty typeProperty, SelectFieldDescriptor fd)
     {
-        if(typeProperty.getType().getTargetType() instanceof EnumType)
+        if (typeProperty.getType().getTargetType() instanceof EnumType)
         {
             OptionAnnotationHandler.process(configurationTemplateManager, new EnumOptionProvider(), parentPath, baseName, fd);
         }
@@ -229,11 +265,11 @@ public class FormDescriptorFactory
      * hierarchy, looking for annotations that have a handler mapped to them.
      * When found, the handler is run in the context of the annotation and
      * the descriptor.
-     *
+     * <p/>
      * Note: This method will process all of the annotation's annotations as well.
      *
-     * @param type       the composite type that has been annotated (or meta-annotated)
-     * @param descriptor the target that will be modified by these annotations.
+     * @param type        the composite type that has been annotated (or meta-annotated)
+     * @param descriptor  the target that will be modified by these annotations.
      * @param annotations the annotations that need to be processed.
      */
     private void handleAnnotations(CompositeType type, Descriptor descriptor, List<Annotation> annotations)
@@ -249,7 +285,7 @@ public class FormDescriptorFactory
 
             // recurse up the annotation hierarchy.
             handleAnnotations(type, descriptor, Arrays.asList(annotationType.getAnnotations()));
-            
+
             Handler handlerAnnotation = annotationType.getAnnotation(Handler.class);
             if (handlerAnnotation != null)
             {
@@ -260,27 +296,15 @@ public class FormDescriptorFactory
                 }
                 catch (InstantiationException e)
                 {
-                    LOG.warning("Failed to instantiate annotation handler.", e); // failed to instantiate the annotation handler.
+                    LOG.warning("Failed to instantiate annotation handler.", e);
                 }
                 catch (IllegalAccessException e)
                 {
-                    LOG.warning("Failed to instantiate annotation handler.", e); // failed to instantiate the annotation handler.
+                    LOG.warning("Failed to instantiate annotation handler.", e);
                 }
                 catch (Exception e)
                 {
                     LOG.warning("Unexpected exception processing the annotation handler.", e);
-                }
-            }
-            // This needs to be handled by a handler somehow - remembering that the annotations themselves
-            // are not part of the form package.  ...
-            if (annotation instanceof Constraint)
-            {
-                FieldDescriptor fieldDescriptor = (FieldDescriptor) descriptor;
-                fieldDescriptor.setConstrained(true);
-                List<String> constraints = Arrays.asList(((Constraint)annotation).value());
-                if (constraints.contains(RequiredValidator.class.getName()))
-                {
-                    fieldDescriptor.setRequired(true);
                 }
             }
         }
@@ -294,5 +318,10 @@ public class FormDescriptorFactory
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
         this.configurationTemplateManager = configurationTemplateManager;
+    }
+
+    public void setConfigurationValidatorProvider(ConfigurationValidatorProvider configurationValidatorProvider)
+    {
+        this.configurationValidatorProvider = configurationValidatorProvider;
     }
 }

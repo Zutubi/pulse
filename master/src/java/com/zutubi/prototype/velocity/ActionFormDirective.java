@@ -80,7 +80,7 @@ public class ActionFormDirective extends PrototypeDirective
             String actionName = (String) lookup("actionName");
             String path = lookupPath();
 
-            FormDescriptor formDescriptor = formDescriptorFactory.createDescriptor(PathUtils.getParentPath(path), PathUtils.getBaseName(path), argumentType, formName);
+            FormDescriptor formDescriptor = formDescriptorFactory.createDescriptor(PathUtils.getParentPath(path), PathUtils.getBaseName(path), argumentType, true, formName);
             formDescriptor.setAjax(true);
             formDescriptor.setNamespace(namespace);
             formDescriptor.setAction(actionName);

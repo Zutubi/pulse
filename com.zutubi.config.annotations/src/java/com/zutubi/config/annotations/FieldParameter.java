@@ -12,6 +12,7 @@ public interface FieldParameter
     static final String PARENT_PATH     = "parentPath";
     static final String PROPERTY        = "property";
     static final String REQUIRED        = "required";
+    static final String REQUIRED_ALWAYS = "requiredAlways";
     static final String SCRIPTS         = "scripts";
     static final String SUBMIT_ON_ENTER = "submitOnEnter";
 }

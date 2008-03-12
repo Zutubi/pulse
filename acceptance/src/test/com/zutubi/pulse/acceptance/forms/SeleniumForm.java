@@ -82,6 +82,16 @@ public abstract class SeleniumForm
         return "zfid." + name;
     }
 
+    public boolean isAnnotationPresent(String fieldName, String annotation)
+    {
+        return selenium.isElementPresent(getFieldId(fieldName) + "." + annotation);
+    }
+
+    public boolean isMarkedRequired(String fieldName)
+    {
+        return isAnnotationPresent(fieldName, "required");
+    }
+
     /**
      * Returns the type identifiers for the form fields. The default implementation
      * returns an array of TEXTFIELD identifiers.

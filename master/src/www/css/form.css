@@ -82,10 +82,24 @@ input.submit {
 
 td.x-form-label
 {
+    padding-right: 1px;
     padding-top: 5px;
     text-align: right;
     white-space: nowrap;
-    /*font-size: 12px;*/
+}
+
+td.x-form-label-annotation
+{
+    padding: 0;
+    padding-top: 5px;
+}
+
+td.x-form-separator
+{
+    padding-left: 1px;
+    padding-top: 5px;
+    text-align: right;
+    white-space: nowrap;
 }
 
 td.x-form-annotation
