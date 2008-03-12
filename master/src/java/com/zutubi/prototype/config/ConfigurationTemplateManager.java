@@ -667,8 +667,15 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
      */
     public boolean isConcrete(String path)
     {
-        Record subject = getRecord(path);
-        return isConcrete(PathUtils.getParentPath(path), subject);
+        if (isPersistent(path))
+        {
+            Record subject = getRecord(path);
+            return isConcrete(PathUtils.getParentPath(path), subject);
+        }
+        else
+        {
+            return true;
+        }
     }
 
     /**
