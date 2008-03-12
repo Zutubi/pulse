@@ -2123,7 +2123,7 @@
             var params = "port=" + port + "&user=" + user + "&password=" + password + "&client=" + client;
 
             var updater = new Ajax.Updater({success: 'test-results'},
-                                           "ajax/testP4.action",
+                                           "$base/ajax/testP4.action",
                                            {
                                                method: 'get',
                                                parameters: params,
@@ -2153,7 +2153,7 @@
             var params = "username=" + username + "&password=" + password + "&url=" + url + "&keyfile=" + keyfile + "&passphrase=" + passphrase;
 
             var updater = new Ajax.Updater({success: 'test-results'},
-                                           "ajax/testSvn.action",
+                                           "$base/ajax/testSvn.action",
                                            {
                                                method: 'get',
                                                parameters: params,
@@ -2181,7 +2181,7 @@
             var params = "root=" + root + "&password=" + password + "&module=" + module;
 
             var updater = new Ajax.Updater({success: 'test-results'},
-                                           "ajax/testCVS.action",
+                                           "$base/ajax/testCVS.action",
                                            {
                                                method: 'get',
                                                parameters: params,

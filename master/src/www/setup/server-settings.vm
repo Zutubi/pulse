@@ -23,7 +23,7 @@
             var params = "host=" + host + "&ssl=" + ssl + "&from=" + from + "&username=" + username + "&password=" + password + "&prefix=" + prefix + "&to=" + to + "&customPort=" + customPort + "&port=" + port;
 
             var updater = new Ajax.Updater({success: 'test-results'},
-                                           "/ajax/testSmtp.action",
+                                           "$base/ajax/testSmtp.action",
                                            {
                                                method: 'get',
                                                parameters: params,

@@ -31,7 +31,7 @@
             var params = "host=" + host + "&baseDn=" + baseDn + "&managerDn=" + managerDn + "&managerPassword=" + managerPassword + "&userBase=" + userBase + "&userFilter=" + userFilter + "&groupDn=" + groupDn + "&groupFilter=" + groupFilter + "&groupRoleAttribute=" + groupRoleAttribute + "&groupSearchSubtree=" + groupSearchSubtree + "&followReferrals=" + followReferrals + "&escapeSpaces=" + escapeSpaces + "&login=" + login + "&password=" + password;
 
             var updater = new Ajax.Updater({success: 'test-results'},
-                                           "/ajax/testLdap.action",
+                                           "$base/ajax/testLdap.action",
                                            {
                                                method: 'get',
                                                parameters: params,

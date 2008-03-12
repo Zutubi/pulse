@@ -21,7 +21,7 @@
             var params = "host=" + host + "&port=" + port + "&username=" + username + "&password=" + password + "&forceSSL=" + forceSSL;
 
             var updater = new Ajax.Updater({success: 'test-results'},
-                                           "/ajax/testJabber.action",
+                                           "$base/ajax/testJabber.action",
                                            {
                                                method: 'get',
                                                parameters: params,
