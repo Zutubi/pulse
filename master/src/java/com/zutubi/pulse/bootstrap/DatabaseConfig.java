@@ -1,5 +1,7 @@
 package com.zutubi.pulse.bootstrap;
 
+import com.zutubi.pulse.util.logging.Logger;
+
 import java.util.Properties;
 
 /**
@@ -10,11 +12,20 @@ import java.util.Properties;
 public class DatabaseConfig
 {
     protected static final String JDBC_DRIVER_CLASS_NAME = "jdbc.driverClassName";
-    protected static final String JDBC_URL = "jdbc.url";
-    protected static final String JDBC_USERNAME = "jdbc.username";
-    protected static final String JDBC_PASSWORD = "jdbc.password";
-    protected static final String JDBC_PROPERTY_PREFIX = "jdbc.property.";
+    protected static final String JDBC_URL               = "jdbc.url";
+    protected static final String JDBC_USERNAME          = "jdbc.username";
+    protected static final String JDBC_PASSWORD          = "jdbc.password";
+
+    protected static final String POOL_INITIAL_SIZE = "pool.initialSize";
+    protected static final String POOL_MAX_ACTIVE   = "pool.maxActive";
+    protected static final String POOL_MAX_IDLE     = "pool.maxIdle";
+    protected static final String POOL_MIN_IDLE     = "pool.minIdle";
+    protected static final String POOL_MAX_WAIT     = "pool.maxWait";
+
+    protected static final String JDBC_PROPERTY_PREFIX      = "jdbc.property.";
     protected static final String HIBERNATE_PROPERTY_PREFIX = "hibernate.";
+
+    private static final Logger LOG = Logger.getLogger(DatabaseConfig.class);
 
     /**
      * The internal configuration store.
@@ -78,6 +89,50 @@ public class DatabaseConfig
     public String getPassword()
     {
         return properties.getProperty(JDBC_PASSWORD);
+    }
+
+    public int getPoolInitialSize()
+    {
+        return getIntProperty(POOL_INITIAL_SIZE, 0);
+    }
+
+    public int getPoolMaxActive()
+    {
+        return getIntProperty(POOL_MAX_ACTIVE, 32);
+    }
+
+    public int getPoolMaxIdle()
+    {
+        return getIntProperty(POOL_MAX_IDLE, 8);
+    }
+
+    public int getPoolMinIdle()
+    {
+        return getIntProperty(POOL_MIN_IDLE, 0);
+    }
+
+    public int getPoolMaxWait()
+    {
+        return getIntProperty(POOL_MAX_WAIT, -1);
+    }
+
+    private int getIntProperty(String name, int defaultValue)
+    {
+        int result = defaultValue;
+        String value = properties.getProperty(name);
+        if(value != null)
+        {
+            try
+            {
+                result = Integer.parseInt(value);
+            }
+            catch(NumberFormatException e)
+            {
+                LOG.warning("Unable to parse integer property '" + name + "', value '" + value + "', using default (" + defaultValue + ")");
+            }
+        }
+
+        return result;
     }
 
     /**

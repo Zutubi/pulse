@@ -70,3 +70,13 @@ hibernate.query.use_query_cache=true
 #
 #       jdbc.property.timeout=60
 #
+
+#
+# Database pool properties (see Apache Commons DBCP for details).  Defaults
+# are shown below.
+#
+#pool.initialSize=0
+#pool.maxActive=32
+#pool.maxIdle=8
+#pool.minIdle=0
+#pool.maxWait=-1
