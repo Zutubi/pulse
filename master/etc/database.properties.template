@@ -35,16 +35,12 @@ jdbc.url=jdbc:hsqldb:DB_ROOT/db
 # connection.
 #
 jdbc.username=sa
-#jdbc.username=postgres
-#jdbc.username=pulse
 
 #
 # The jdbc connection password. This is used to authenticate the jdbc
 # connection.
 #
 jdbc.password=
-#jdbc.password=postgres
-#jdbc.password=pulse
 
 #
 # Hibernate properties
