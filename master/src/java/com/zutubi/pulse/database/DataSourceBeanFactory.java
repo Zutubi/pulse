@@ -66,6 +66,12 @@ public class DataSourceBeanFactory implements FactoryBean
         dataSource.setUsername(databaseConfig.getUsername());
         dataSource.setPassword(databaseConfig.getPassword());
 
+        dataSource.setInitialSize(databaseConfig.getPoolInitialSize());
+        dataSource.setMaxActive(databaseConfig.getPoolMaxActive());
+        dataSource.setMaxIdle(databaseConfig.getPoolMaxIdle());
+        dataSource.setMinIdle(databaseConfig.getPoolMinIdle());
+        dataSource.setMaxWait(databaseConfig.getPoolMaxWait());
+
         // configure the dataSource using the custom connection properties.
         Properties connectionProperties = databaseConfig.getConnectionProperties();
         for (Object o : connectionProperties.keySet())
