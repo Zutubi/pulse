@@ -1,12 +1,14 @@
 package com.zutubi.pulse.jetty;
 
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.SystemPaths;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.util.logging.Logger;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.WebApplicationContext;
 import org.mortbay.jetty.servlet.WebApplicationHandler;
 import org.mortbay.util.MultiException;
+import org.mortbay.http.NCSARequestLog;
 
 import java.io.File;
 import java.net.BindException;
@@ -59,18 +61,32 @@ public class JettyManager implements Stoppable
             return;
         }
 
-        File wwwRoot = configurationManager.getSystemPaths().getContentRoot();
+        SystemPaths systemPaths = configurationManager.getSystemPaths();
+        File wwwRoot = systemPaths.getContentRoot();
 
         try
         {
             appContext = server.addWebApplication(getContextPath(), wwwRoot.getAbsolutePath());
             appContext.setDefaultsDescriptor(null);
-            File tmpRoot = configurationManager.getSystemPaths().getTmpRoot();
+            File tmpRoot = systemPaths.getTmpRoot();
             if(!tmpRoot.exists())
             {
                 tmpRoot.mkdirs();
             }
             appContext.setAttribute("javax.servlet.context.tempdir", tmpRoot);
+
+            File file = new File(systemPaths.getLogRoot(), "yyyy_mm_dd.request.log");
+
+            //TODO: make this configurable.
+
+            // configure the request logging.
+            NCSARequestLog requestLog = new NCSARequestLog();
+            requestLog.setAppend(false);
+            requestLog.setExtended(true);
+            requestLog.setIgnorePaths(new String[]{"/images/*.*", "*.css", "*.js", "*.ico", "*.gif"});
+            requestLog.setRetainDays(30);
+            requestLog.setFilename(file.getAbsolutePath());
+            appContext.setRequestLog(requestLog);
 
             server.start();
         }
