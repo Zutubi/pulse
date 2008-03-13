@@ -28,7 +28,7 @@ jdbc.driverClassName=org.hsqldb.jdbcDriver
 #
 jdbc.url=jdbc:hsqldb:DB_ROOT/db
 #jdbc.url=jdbc:postgresql://localhost:5432/pulse
-#jdbc.url=jdbc:mysql://localhost:3306/pulse
+#jdbc.url=jdbc:mysql://localhost:3306/pulse?autoReconnect=true
 
 #
 # The jdbc connection username. This is used to authenticate the jdbc
