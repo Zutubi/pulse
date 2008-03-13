@@ -20,6 +20,9 @@ import java.util.Properties;
  */
 public class FreemarkerBuildResultRenderer implements BuildResultRenderer
 {
+    public static final String FEATURE_LIMIT_PROPERTY = "pulse.feature.limit";
+    public static final int    DEFAULT_FEATURE_LIMIT  = 100;
+
     private static final Logger LOG = Logger.getLogger(FreemarkerBuildResultRenderer.class);
 
     private Configuration freemarkerConfiguration;
@@ -132,6 +135,17 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
         }
 
         return null;
+    }
+
+    public int getFeatureLimit()
+    {
+        return Integer.getInteger(FEATURE_LIMIT_PROPERTY, DEFAULT_FEATURE_LIMIT);
+    }
+
+    public boolean featureLimitReached(int count)
+    {
+        int limit = getFeatureLimit();
+        return limit > 0 && count >= limit;
     }
 
     public String trimmedString(String s, int length)
