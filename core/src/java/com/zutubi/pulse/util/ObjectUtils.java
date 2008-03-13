@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.LinkedList;
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Field;
 
 /**
  * <class-comment/>
@@ -41,5 +42,12 @@ public class ObjectUtils
         Method m = target.getClass().getDeclaredMethod(name, value.getClass());
         m.setAccessible(true);
         m.invoke(target, value);
+    }
+
+    public static Object getField(String name, Object target) throws NoSuchFieldException, IllegalAccessException
+    {
+        Field f = target.getClass().getDeclaredField(name);
+        f.setAccessible(true);
+        return f.get(target);
     }
 }
