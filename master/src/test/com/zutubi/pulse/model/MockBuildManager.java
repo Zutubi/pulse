@@ -110,6 +110,11 @@ public class MockBuildManager implements BuildManager
         throw new RuntimeException("Method not implemented.");
     }
 
+    public List<BuildResult> queryBuildsWithMessages(Project[] projects, Feature.Level level, int max)
+    {
+        throw new RuntimeException("Method not yet implemented");
+    }
+
     public List<BuildResult> getLatestBuildResultsForProject(Project project, int max)
     {
         throw new RuntimeException("Method not implemented.");

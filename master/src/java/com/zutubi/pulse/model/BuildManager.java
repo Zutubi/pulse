@@ -49,6 +49,9 @@ public interface BuildManager
     List<BuildResult> queryBuilds(Project[] projects, ResultState[] states, long earliestStartTime, long latestStartTime, Boolean hasWorkDir, int first, int max, boolean mostRecentFirst);
 
     @SecureResult
+    List<BuildResult> queryBuildsWithMessages(Project[] projects, Feature.Level level, int max);
+
+    @SecureResult
     List<BuildResult> queryBuilds(Project project, ResultState[] states, long lowestNumber, long highestNumber, int first, int max, boolean mostRecentFirst, boolean initialise);
 
     @SecureResult

@@ -316,6 +316,11 @@ public class DefaultBuildManager implements BuildManager
         return buildResultDao.queryBuilds(project, states, lowestNumber, highestNumber, first, max, mostRecentFirst, initialise);
     }
 
+    public List<BuildResult> queryBuildsWithMessages(Project[] projects, Feature.Level level, int max)
+    {
+        return buildResultDao.queryBuildsWithMessages(projects, level, max);
+    }
+
     public Revision getPreviousRevision(Project project)
     {
         Revision previousRevision = null;

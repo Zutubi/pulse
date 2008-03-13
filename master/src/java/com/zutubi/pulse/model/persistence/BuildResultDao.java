@@ -1,9 +1,6 @@
 package com.zutubi.pulse.model.persistence;
 
-import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.model.PersistentName;
-import com.zutubi.pulse.core.model.RecipeResult;
-import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.RecipeResultNode;
@@ -23,6 +20,8 @@ public interface BuildResultDao extends EntityDao<BuildResult>
     void save(CommandResult result);
 
     List<BuildResult> queryBuilds(Project[] projects, ResultState[] states, long earliestStartTime, long latestStartTime, Boolean hasWorkDir, int first, int max, boolean mostRecentFirst);
+
+    List<BuildResult> queryBuildsWithMessages(Project[] projects, Feature.Level level, int max);
 
     List<BuildResult> findLatestByProject(Project project, int max);
 
