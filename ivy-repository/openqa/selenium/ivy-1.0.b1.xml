@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivy-module version="1.0">
+    <info organisation="openqa" module="selenium" revision="1.0.b1" status="release">
+        <description homepage="http://www.openqa.org/selenium/">
+            Selenium is a test tool for web applications. Selenium tests run directly in a browser,
+            just as real users do. And they run in Internet Explorer, Mozilla and Firefox on Windows,
+            Linux, and Macintosh. No other test tool covers such a wide array of platforms.
+        </description>
+    </info>
+
+    <publications>
+        <artifact name="selenium-server" type="jar" conf="default"/>
+        <artifact name="selenium-java-client-driver" type="jar" conf="default"/>
+    </publications>
+</ivy-module>
