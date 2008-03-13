@@ -1,5 +1,6 @@
 package com.zutubi.pulse.bootstrap;
 
+import com.zutubi.pulse.Version;
 import com.zutubi.pulse.config.ConfigSupport;
 import com.zutubi.pulse.config.FileConfig;
 import com.zutubi.pulse.core.ObjectFactory;
@@ -10,6 +11,8 @@ import com.zutubi.pulse.security.AcegiSecurityManager;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.File;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -194,9 +197,8 @@ public class DefaultStartupManager implements StartupManager
         SystemConfiguration sysConfig = configurationManager.getSystemConfig();
 
         //TODO: I18N this message.
-        String str = "The server is now available on port %s at context path '%s' [base URL configured as: %s]";
-        String msg = String.format(str, sysConfig.getServerPort(), sysConfig.getContextPath(), appConfig.getBaseUrl());
-        System.err.println(msg);
+        String date = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG).format(new Date());
+        System.err.printf("[%s] Pulse %s is now available on port %s at context path '%s' [base URL configured as: %s]\n", date, Version.getVersion().getVersionNumber(), sysConfig.getServerPort(), sysConfig.getContextPath(), appConfig.getBaseUrl());
     }
 
     private void runStartupTasks()

@@ -5,6 +5,8 @@ import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.lang.reflect.Method;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -35,6 +37,8 @@ public class ShutdownManager
      */
     public void shutdown(boolean force, boolean exitJvm)
     {
+        System.err.printf("[%s] Shutting down...\n", getDateString());
+        
         LOG.info("Shutdown requested.");
         // Ensure that we only handle one shutdown request at a time.
         synchronized(this)
@@ -69,15 +73,22 @@ public class ShutdownManager
 
         if (exitJvm)
         {
-            // why exit? because some external packages do not clean up all of there threads...
+            // why exit? because some external packages do not clean up all of their threads...
             LOG.info("System exiting with exit status 0");
+            System.err.printf("[%s] Exiting.\n", getDateString());
             System.exit(0);
         }
         else
         {
             // cleanout the component context.
             ComponentContext.closeAll();
+            System.err.printf("[%s] Shutdown complete.\n", getDateString());
         }
+    }
+
+    private String getDateString()
+    {
+        return DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG).format(new Date());
     }
 
     public void stop(boolean force)

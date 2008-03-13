@@ -1,5 +1,6 @@
 package com.zutubi.pulse.slave;
 
+import com.zutubi.pulse.Version;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.Startup;
 import com.zutubi.pulse.bootstrap.StartupException;
@@ -17,6 +18,8 @@ import org.mortbay.jetty.servlet.WebApplicationContext;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -73,8 +76,9 @@ public class SlaveStartupManager implements Startup, Stoppable
             startTime = System.currentTimeMillis();
 
             LOG.info("Agent startup complete.");
-            
-            System.out.println("The agent is now listening on port: " + port);
+
+            String date = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG).format(new Date());
+            System.err.format("[%s] Pulse agent %s is now listening on port %d\n", date, Version.getVersion().getVersionNumber(), port);
         }
         catch (Exception e)
         {
