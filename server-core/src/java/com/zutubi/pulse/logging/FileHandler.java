@@ -187,13 +187,6 @@ public class FileHandler extends Handler
                 }
                 else if (ch2 == 'l')
                 {
-                    // we need to ensure that the path exists, else the java.util.logging.FileHandler will
-                    // have problems
-                    if (!logRoot.exists() && !logRoot.mkdirs())
-                    {
-                        // we have a slight problem.
-                    }
-
                     // replace with log root.
                     try
                     {

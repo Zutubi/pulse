@@ -14,33 +14,35 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 
 /**
- * The Log Configuration Manager handles the systems logging configuration.
- *
+ * The Log Configuration Manager handles configuration of logging, including
+ * the management of logging profiles (e.g. debug).
  */
 public class LogConfigurationManager
 {
-    private File logConfigDir;
-
-    private File configDir;
-
-    private LogManager logManager;
-
-    private EventManager eventManager;
-
-    /**
-     *
-     */
     private LogConfiguration logConfig;
+    private SystemPaths systemPaths;
+    private File logConfigDir;
+    private LogManager logManager;
+    private EventManager eventManager;
 
     public void init()
     {
         logManager.reset();
 
         // load default configuration.
-        logManager.configure(new File(configDir, "logging.properties"));
+        logManager.configure(new File(systemPaths.getConfigRoot(), "logging.properties"));
 
         applyConfig();
-        
+
+        // Ensure that the logs directory exists, before handlers try to
+        // write there.
+        File logRoot = systemPaths.getLogRoot();
+        if (!logRoot.exists() && !logRoot.mkdirs())
+        {
+            // Annoying: we can't log this!
+            System.err.printf("Log directory '%s' does not exist and cannot be created.", logRoot.getAbsolutePath());
+        }
+
         // publish all events that pass through the event manager to the event logger
         final Logger evtLogger = Loggers.getEventLogger();
         eventManager.register(new AllEventListener()
@@ -111,8 +113,8 @@ public class LogConfigurationManager
 
     public void setSystemPaths(SystemPaths paths)
     {
-        configDir = paths.getConfigRoot();
-        logConfigDir = new File(configDir, "logging");
+        systemPaths = paths;
+        logConfigDir = new File(paths.getConfigRoot(), "logging");
     }
 
     public void setLogConfiguration(LogConfiguration config)
