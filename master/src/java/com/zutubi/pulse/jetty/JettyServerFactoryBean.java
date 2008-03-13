@@ -1,10 +1,10 @@
 package com.zutubi.pulse.jetty;
 
+import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.SystemConfiguration;
-import com.zutubi.pulse.util.logging.Logger;
 import com.zutubi.pulse.core.PulseRuntimeException;
-import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.util.logging.Logger;
 import org.mortbay.http.SocketListener;
 import org.mortbay.http.SslListener;
 import org.mortbay.jetty.Server;
