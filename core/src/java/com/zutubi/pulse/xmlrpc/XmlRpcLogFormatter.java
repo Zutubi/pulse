@@ -1,11 +1,11 @@
 package com.zutubi.pulse.xmlrpc;
 
-import com.zutubi.pulse.util.Constants;
+import com.zutubi.util.Constants;
 
+import java.text.MessageFormat;
+import java.util.Date;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
-import java.util.Date;
-import java.text.MessageFormat;
 
 /**
  *
