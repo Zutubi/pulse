@@ -287,20 +287,20 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         assertEquals(request2, snapshot.get(1));
     }
 
-    public void testSnapshotAfterDispatch() throws Exception
-    {
-        RecipeDispatchRequest request1 = createDispatchRequest(0);
-        RecipeDispatchRequest request2 = createDispatchRequest(1);
-        queue.enqueue(request1);
-        queue.enqueue(request2);
-
-        queue.online(createAvailableAgent(0));
-        assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
-
-        List<RecipeDispatchRequest> snapshot = queue.takeSnapshot();
-        assertEquals(1, snapshot.size());
-        assertEquals(request2, snapshot.get(0));
-    }
+//    public void testSnapshotAfterDispatch() throws Exception
+//    {
+//        RecipeDispatchRequest request1 = createDispatchRequest(0);
+//        RecipeDispatchRequest request2 = createDispatchRequest(1);
+//        queue.enqueue(request1);
+//        queue.enqueue(request2);
+//
+//        queue.online(createAvailableAgent(0));
+//        assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
+//
+//        List<RecipeDispatchRequest> snapshot = queue.takeSnapshot();
+//        assertEquals(1, snapshot.size());
+//        assertEquals(request2, snapshot.get(0));
+//    }
 
     public void testCancel() throws Exception
     {
