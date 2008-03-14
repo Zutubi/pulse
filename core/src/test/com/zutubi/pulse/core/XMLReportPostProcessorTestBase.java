@@ -80,14 +80,35 @@ public abstract class XMLReportPostProcessorTestBase extends PulseTestCase
         assertEquals(errors, suite.getErrors());
     }
 
+    protected void checkPassCase(TestSuiteResult suite, String name)
+    {
+        TestCaseResult caseResult = suite.getCase(name);
+        assertNotNull(caseResult);
+        checkPassCase(caseResult, name);
+    }
+
     protected void checkPassCase(TestCaseResult caseResult, String name)
     {
         checkCase(caseResult, name, TestCaseResult.Status.PASS, null);
     }
 
+    protected void checkFailureCase(TestSuiteResult suite, String name, String message)
+    {
+        TestCaseResult caseResult = suite.getCase(name);
+        assertNotNull(caseResult);
+        checkFailureCase(caseResult, name, message);
+    }
+
     protected void checkFailureCase(TestCaseResult caseResult, String name, String message)
     {
         checkCase(caseResult, name, TestCaseResult.Status.FAILURE, message);
+    }
+
+    protected void checkErrorCase(TestSuiteResult suite, String name, String message)
+    {
+        TestCaseResult caseResult = suite.getCase(name);
+        assertNotNull(caseResult);
+        checkErrorCase(caseResult, name, message);
     }
 
     protected void checkErrorCase(TestCaseResult caseResult, String name, String message)

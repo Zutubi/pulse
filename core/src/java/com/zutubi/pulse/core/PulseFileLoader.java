@@ -23,6 +23,7 @@ public class PulseFileLoader extends FileLoader
         register("bjam.pp", BJamPostProcessor.class);
         register("boost-regression.pp", BoostRegressionPostProcessor.class);
         register("cppunit.pp", CppUnitReportPostProcessor.class);
+        register("cunit.pp", CUnitReportPostProcessor.class);
         register("gcc.pp", GccPostProcessor.class);
         register("junit.pp", JUnitReportPostProcessor.class);
         register("junit.summary.pp", JUnitSummaryPostProcessor.class);

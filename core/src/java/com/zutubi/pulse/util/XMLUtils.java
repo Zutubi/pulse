@@ -4,6 +4,8 @@ import nu.xom.*;
 
 import java.io.*;
 
+import com.opensymphony.util.TextUtils;
+
 /**
  */
 public class XMLUtils
@@ -59,7 +61,7 @@ public class XMLUtils
 
     public static String getText(Element element)
     {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         for(int i = 0; i < element.getChildCount(); i++)
         {
             Node child = element.getChild(i);
@@ -71,6 +73,59 @@ public class XMLUtils
         
         return result.toString();
     }
+
+    public static String getRequiredText(Element element, boolean trim)
+    {
+        String text = getText(element);
+        if(trim)
+        {
+            text = text.trim();
+        }
+
+        if(!TextUtils.stringSet(text))
+        {
+            throw new XMLException("Required text missing from element '" + element.getLocalName() + "'");
+        }
+
+        return text;
+    }
+
+    public static String getText(Element element, String defaultValue)
+    {
+        String result = getText(element);
+        if(TextUtils.stringSet(result))
+        {
+            return result;
+        }
+        else
+        {
+            return defaultValue;
+        }
+    }
+
+    public static String getChildText(Element element, String childName, String defaultValue)
+    {
+        Element child = element.getFirstChildElement(childName);
+        if(child == null)
+        {
+            return defaultValue;
+        }
+
+        String result = getText(child);
+        if(!TextUtils.stringSet(result))
+        {
+            return defaultValue;
+        }
+
+        return result;
+    }
+
+    public static String getRequiredChildText(Element element, String childName, boolean trim)
+    {
+        Element child = getRequiredChild(element, childName);
+        return getRequiredText(child, trim);
+    }
+
 
     public static String removeIllegalCharacters(String s)
     {
@@ -103,5 +158,25 @@ public class XMLUtils
         }
 
         return c <= 0xD7FF || c >= 0xE000 && (c <= 0xFFFD || c >= 0x10000 && c <= 0x10FFFF);
+    }
+
+    public static void forEachChild(Element element, String name, UnaryFunction<Element> fn)
+    {
+        Elements elements = element.getChildElements(name);
+        for(int i = 0; i < elements.size(); i++)
+        {
+            fn.process(elements.get(i));
+        }
+    }
+
+    public static Element getRequiredChild(Element element, String name)
+    {
+        Element child = element.getFirstChildElement(name);
+        if(child == null)
+        {
+            throw new XMLException("Required child element '" + name + "' not found for element '" + element.getLocalName() + "'");
+        }
+
+        return child;
     }
 }

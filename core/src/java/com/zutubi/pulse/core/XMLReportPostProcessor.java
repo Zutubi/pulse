@@ -9,6 +9,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import org.xml.sax.XMLReader;
+import org.xml.sax.SAXNotSupportedException;
+import org.xml.sax.SAXNotRecognizedException;
+
 /**
  */
 public abstract class XMLReportPostProcessor extends TestReportPostProcessor
@@ -27,7 +31,7 @@ public abstract class XMLReportPostProcessor extends TestReportPostProcessor
         try
         {
             input = new FileInputStream(file);
-            Builder builder = new Builder();
+            Builder builder = createBuilder();
             Document doc;
             doc = builder.build(input);
             processDocument(doc, suite);
@@ -55,6 +59,11 @@ public abstract class XMLReportPostProcessor extends TestReportPostProcessor
         {
             IOUtils.close(input);
         }
+    }
+
+    protected Builder createBuilder()
+    {
+        return new Builder();
     }
 
     protected String getText(Element element)
