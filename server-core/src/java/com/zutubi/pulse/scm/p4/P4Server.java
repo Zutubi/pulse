@@ -123,7 +123,7 @@ public class P4Server extends CachingSCMServer
 
     private boolean clientExists(String clientName) throws SCMException
     {
-        P4Client.P4Result result = client.runP4(null, P4_COMMAND, COMMAND_CLIENTS);
+        P4Client.P4Result result = client.runP4(null, getP4Command(COMMAND_CLIENTS), COMMAND_CLIENTS);
         String[] lines = client.splitLines(result);
         for (String line : lines)
         {
@@ -231,7 +231,7 @@ public class P4Server extends CachingSCMServer
 
         try
         {
-            P4Client.P4Result result = client.runP4(null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_SYNC, FLAG_FORCE, FLAG_PREVIEW);
+            P4Client.P4Result result = client.runP4(null, getP4Command(COMMAND_SYNC), FLAG_CLIENT, clientName, COMMAND_SYNC, FLAG_FORCE, FLAG_PREVIEW);
             Matcher matcher = syncPattern.matcher(result.stdout);
             while (matcher.find())
             {
@@ -261,7 +261,7 @@ public class P4Server extends CachingSCMServer
     {
         try
         {
-            client.runP4(null, P4_COMMAND, COMMAND_CLIENT, FLAG_DELETE, clientName);
+            client.runP4(null, getP4Command(COMMAND_CLIENT), COMMAND_CLIENT, FLAG_DELETE, clientName);
         }
         catch (SCMException e)
         {
@@ -280,7 +280,7 @@ public class P4Server extends CachingSCMServer
         //   ... <file>#<revision> <action>
         //   ... <file>#<revision> <action>
         //   ...
-        P4Client.P4Result result = client.runP4(false, null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_DESCRIBE, FLAG_SHORT, Long.toString(number));
+        P4Client.P4Result result = client.runP4(false, null, getP4Command(COMMAND_DESCRIBE), FLAG_CLIENT, clientName, COMMAND_DESCRIBE, FLAG_SHORT, Long.toString(number));
         if (result.stderr.length() > 0)
         {
             if (result.stderr.indexOf("no such changelist") >= 0)
@@ -426,11 +426,11 @@ public class P4Server extends CachingSCMServer
 
             if (force)
             {
-                client.runP4WithHandler(p4Handler, null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_SYNC, FLAG_FORCE, "@" + Long.toString(number));
+                client.runP4WithHandler(p4Handler, null, getP4Command(COMMAND_SYNC), FLAG_CLIENT, clientName, COMMAND_SYNC, FLAG_FORCE, "@" + Long.toString(number));
             }
             else
             {
-                client.runP4WithHandler(p4Handler, null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_SYNC, "@" + Long.toString(number));
+                client.runP4WithHandler(p4Handler, null, getP4Command(COMMAND_SYNC), FLAG_CLIENT, clientName, COMMAND_SYNC, "@" + Long.toString(number));
             }
         }
         finally
@@ -535,7 +535,7 @@ public class P4Server extends CachingSCMServer
                 fileArgument = fileArgument + "@" + revision;
             }
 
-            P4Client.P4Result result = client.runP4(null, P4_COMMAND, FLAG_CLIENT, clientName, "print", "-q", fileArgument);
+            P4Client.P4Result result = client.runP4(null, getP4Command("print"), FLAG_CLIENT, clientName, "print", "-q", fileArgument);
             return result.stdout.toString();
         }
         catch (SCMException e)
@@ -586,7 +586,7 @@ public class P4Server extends CachingSCMServer
         {
             if (start <= end)
             {
-                P4Client.P4Result p4Result = client.runP4(null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_CHANGES, FLAG_STATUS, VALUE_SUBMITTED, clientRoot.getAbsoluteFile() + "/...@" + Long.toString(start) + "," + Long.toString(end));
+                P4Client.P4Result p4Result = client.runP4(null, getP4Command(COMMAND_CHANGES), FLAG_CLIENT, clientName, COMMAND_CHANGES, FLAG_STATUS, VALUE_SUBMITTED, clientRoot.getAbsoluteFile() + "/...@" + Long.toString(start) + "," + Long.toString(end));
                 Matcher matcher = client.getChangesPattern().matcher(p4Result.stdout);
 
                 while (matcher.find())
@@ -680,7 +680,7 @@ public class P4Server extends CachingSCMServer
                 throw new SCMException("Cannot create label '" + name + "': label already exists");
             }
 
-            client.runP4(false, null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_LABELSYNC, FLAG_LABEL, name, clientRoot.getAbsoluteFile() + "/...@" + revision.toString());
+            client.runP4(false, null, getP4Command(COMMAND_LABELSYNC), FLAG_CLIENT, clientName, COMMAND_LABELSYNC, FLAG_LABEL, name, clientRoot.getAbsoluteFile() + "/...@" + revision.toString());
         }
         finally
         {
@@ -701,10 +701,10 @@ public class P4Server extends CachingSCMServer
 
     public void writeConnectionDetails(File outputDir) throws SCMException, IOException
     {
-        P4Client.P4Result result = client.runP4(null, P4_COMMAND, FLAG_CLIENT, resolveClient(null), COMMAND_INFO);
+        P4Client.P4Result result = client.runP4(null, getP4Command(COMMAND_INFO), FLAG_CLIENT, resolveClient(null), COMMAND_INFO);
         FileSystemUtils.createFile(new File(outputDir, "server-info.txt"), result.stdout.toString());
 
-        result = client.runP4(null, P4_COMMAND, FLAG_CLIENT, resolveClient(null), COMMAND_CLIENT, FLAG_OUTPUT);
+        result = client.runP4(null, getP4Command(COMMAND_CLIENT), FLAG_CLIENT, resolveClient(null), COMMAND_CLIENT, FLAG_OUTPUT);
         FileSystemUtils.createFile(new File(outputDir, "template-client.txt"), result.stdout.toString());
     }
 
@@ -741,7 +741,7 @@ public class P4Server extends CachingSCMServer
             public void checkCancelled() throws SCMCancelledException
             {
             }
-        }, null, P4_COMMAND, FLAG_CLIENT, resolveClient(null), COMMAND_CLIENT, FLAG_OUTPUT);
+        }, null, getP4Command(COMMAND_CLIENT), FLAG_CLIENT, resolveClient(null), COMMAND_CLIENT, FLAG_OUTPUT);
 
         return eol[0];
     }
@@ -778,7 +778,7 @@ public class P4Server extends CachingSCMServer
         try
         {
             File f = new File(clientRoot.getAbsoluteFile(), path);
-            P4Client.P4Result result = client.runP4(false, null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_FSTAT, f.getAbsolutePath() + "@" + repoRevision.getRevisionString());
+            P4Client.P4Result result = client.runP4(false, null, getP4Command(COMMAND_FSTAT), FLAG_CLIENT, clientName, COMMAND_FSTAT, f.getAbsolutePath() + "@" + repoRevision.getRevisionString());
             if (result.stderr.length() > 0)
             {
                 String error = result.stderr.toString();
@@ -827,7 +827,7 @@ public class P4Server extends CachingSCMServer
             {
                 long revisionNumber = Long.parseLong(revision);
                 // Run a quick check to ensure that the change exists.
-                client.runP4(true, null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_CHANGE, FLAG_OUTPUT, revision);
+                client.runP4(true, null, getP4Command(COMMAND_CHANGE), FLAG_CLIENT, clientName, COMMAND_CHANGE, FLAG_OUTPUT, revision);
                 return new NumericalRevision(revisionNumber);
             }
             catch (NumberFormatException e)
@@ -848,7 +848,7 @@ public class P4Server extends CachingSCMServer
 
     public boolean labelExists(String client, String name) throws SCMException
     {
-        P4Client.P4Result p4Result = this.client.runP4(null, P4_COMMAND, FLAG_CLIENT, client, COMMAND_LABELS);
+        P4Client.P4Result p4Result = this.client.runP4(null, getP4Command(COMMAND_LABELS), FLAG_CLIENT, client, COMMAND_LABELS);
 
         // $ p4 labels
         // Label jim 2006/06/20 'Created by Jason. '
@@ -867,8 +867,8 @@ public class P4Server extends CachingSCMServer
 
     private void createLabel(String client, String name) throws SCMException
     {
-        P4Client.P4Result p4Result = this.client.runP4(null, P4_COMMAND, FLAG_CLIENT, client, COMMAND_LABEL, FLAG_OUTPUT, name);
-        this.client.runP4(p4Result.stdout.toString(), P4_COMMAND, FLAG_CLIENT, client, COMMAND_LABEL, FLAG_INPUT);
+        P4Client.P4Result p4Result = this.client.runP4(null, getP4Command(COMMAND_LABEL), FLAG_CLIENT, client, COMMAND_LABEL, FLAG_OUTPUT, name);
+        this.client.runP4(p4Result.stdout.toString(), getP4Command(COMMAND_LABEL), FLAG_CLIENT, client, COMMAND_LABEL, FLAG_INPUT);
     }
 
     public static void main(String argv[])

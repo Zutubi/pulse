@@ -20,6 +20,7 @@ import java.util.Properties;
  */
 public class P4WorkingCopyTest extends PulseTestCase implements PersonalBuildUI
 {
+    private static final String P4_COMMAND = "p4";
     private static final String CLIENT_NAME = "test-client-1";
     private static final String OTHER_CLIENT_NAME = "test-client-2";
     private static final String HEAD_REVISION = "2";

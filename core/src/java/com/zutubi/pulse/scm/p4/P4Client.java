@@ -201,7 +201,7 @@ public class P4Client
 
     public void createClient(String templateClient, String clientName, File toDirectory) throws SCMException
     {
-        P4Client.P4Result result = runP4(null, P4_COMMAND, FLAG_CLIENT, templateClient, COMMAND_CLIENT, FLAG_OUTPUT);
+        P4Client.P4Result result = runP4(null, getP4Command(COMMAND_CLIENT), FLAG_CLIENT, templateClient, COMMAND_CLIENT, FLAG_OUTPUT);
         String clientSpec = result.stdout.toString();
 
         clientSpec = clientSpec.replaceAll("(\nOptions:.*) locked(.*)", "$1$2");
@@ -209,7 +209,7 @@ public class P4Client
         clientSpec = clientSpec.replaceAll("\nHost:.*", Matcher.quoteReplacement("\nHost: "));
         clientSpec = clientSpec.replaceAll("\nClient:.*" + templateClient, Matcher.quoteReplacement("\nClient: " + clientName));
         clientSpec = clientSpec.replaceAll("//" + templateClient + "/", Matcher.quoteReplacement("//" + clientName + "/"));
-        runP4(clientSpec, P4_COMMAND, COMMAND_CLIENT, FLAG_INPUT);
+        runP4(clientSpec, getP4Command(COMMAND_CLIENT), COMMAND_CLIENT, FLAG_INPUT);
     }
 
     public File getClientRoot() throws SCMException
@@ -229,7 +229,7 @@ public class P4Client
             public void checkCancelled() throws SCMCancelledException
             {
             }
-        }, null, P4_COMMAND, COMMAND_CLIENT, FLAG_OUTPUT);
+        }, null, getP4Command(COMMAND_CLIENT), COMMAND_CLIENT, FLAG_OUTPUT);
 
         return result[0];
     }
@@ -241,11 +241,11 @@ public class P4Client
 
         if (client == null)
         {
-            result = runP4(null, P4_COMMAND, COMMAND_INFO);
+            result = runP4(null, getP4Command(COMMAND_INFO), COMMAND_INFO);
         }
         else
         {
-            result = runP4(null, P4_COMMAND, FLAG_CLIENT, client, COMMAND_INFO);
+            result = runP4(null, getP4Command(COMMAND_INFO), FLAG_CLIENT, client, COMMAND_INFO);
         }
 
         for (String line : splitLines(result))
@@ -264,7 +264,7 @@ public class P4Client
     {
         List<String> args = new ArrayList<String>(8 + files.length);
 
-        args.add(P4_COMMAND);
+        args.add(getP4Command(COMMAND_CHANGES));
 
         if (clientName != null)
         {
@@ -298,11 +298,11 @@ public class P4Client
 
     public long createChangelist(String description) throws SCMException
     {
-        P4Client.P4Result result = runP4(null, P4_COMMAND, COMMAND_CHANGE, FLAG_OUTPUT);
+        P4Client.P4Result result = runP4(null, getP4Command(COMMAND_CHANGE), COMMAND_CHANGE, FLAG_OUTPUT);
         String changeSpec = result.stdout.toString();
 
         changeSpec = changeSpec.replaceAll("<enter description here>", Matcher.quoteReplacement(description));
-        result = runP4(changeSpec, P4_COMMAND, COMMAND_CHANGE, FLAG_INPUT);
+        result = runP4(changeSpec, getP4Command(COMMAND_CHANGE), COMMAND_CHANGE, FLAG_INPUT);
         Pattern created = Pattern.compile("Change ([0-9]+) created.");
         String response = result.stdout.toString().trim();
         Matcher m = created.matcher(response);
@@ -318,10 +318,10 @@ public class P4Client
 
     public void submit(String comment) throws SCMException
     {
-        P4Result result = runP4(null, P4_COMMAND, COMMAND_CHANGE, FLAG_OUTPUT);
+        P4Result result = runP4(null, getP4Command(COMMAND_CHANGE), COMMAND_CHANGE, FLAG_OUTPUT);
         String out = result.stdout.toString();
         out = out.replace("<enter description here>", comment);
-        runP4(out, P4_COMMAND, COMMAND_SUBMIT, FLAG_INPUT);
+        runP4(out, getP4Command(COMMAND_SUBMIT), COMMAND_SUBMIT, FLAG_INPUT);
     }
 
     public String[] splitLines(P4Result result)

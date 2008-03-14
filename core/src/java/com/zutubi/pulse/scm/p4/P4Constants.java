@@ -1,5 +1,9 @@
 package com.zutubi.pulse.scm.p4;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
 /**
  * Shared constants used in Perforce implementations.
  */
@@ -14,7 +18,6 @@ public class P4Constants
     public static final String ENV_USER = "P4USER";
     public static final String ENV_PASSWORD = "P4PASSWD";
     public static final String ENV_CLIENT = "P4CLIENT";
-    public static final String P4_COMMAND = "p4";
     public static final String COMMAND_ADD = "add";
     public static final String COMMAND_CHANGE = "change";
     public static final String COMMAND_CHANGES = "changes";
@@ -95,4 +98,38 @@ public class P4Constants
             "xtempobj",
             "xunicode"
     };
+
+    private static final String P4_COMMAND = System.getProperty("pulse.p4.command", "p4");
+    private static final String P4_COMMAND_PREFIX = "pulse.p4.command.";
+
+    /**
+     * Maps from a Perforce command (e.g. 'sync' to the binary that should be
+     * executed for that command (it defaults to p4).
+     *
+     * @see #getP4Command
+     */
+    private static Map<String, String> commandMap = new HashMap<String, String>();
+    static
+    {
+        Properties properties = System.getProperties();
+        for(Map.Entry<Object,Object> property: properties.entrySet())
+        {
+            String key = (String) property.getKey();
+            if(key.startsWith(P4_COMMAND_PREFIX))
+            {
+                commandMap.put(key.substring(P4_COMMAND_PREFIX.length()), (String) property.getValue());
+            }
+        }
+    }
+
+    public static String getP4Command(String command)
+    {
+        String result = commandMap.get(command);
+        if(result == null)
+        {
+            result = P4_COMMAND;
+        }
+
+        return result;
+    }
 }
