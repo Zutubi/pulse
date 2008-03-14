@@ -159,7 +159,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
 
         // set the poll time.
         scm.setLastPollTime(now);
-        save(scm);
+        scmDao.save(scm);
 
         SCMServer server = null;
         try
