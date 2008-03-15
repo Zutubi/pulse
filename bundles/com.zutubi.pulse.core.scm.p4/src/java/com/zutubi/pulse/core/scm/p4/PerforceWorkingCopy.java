@@ -42,7 +42,7 @@ public class PerforceWorkingCopy extends PersonalBuildSupport implements Working
         // P4PORT=10.0.0.3:1666
         // P4ROOT=C:\Program Files\Perforce (set -s)
         // P4USER=Jason (set)
-        PerforceCore.P4Result result = core.runP4(null, P4_COMMAND, COMMAND_SET);
+        PerforceCore.P4Result result = core.runP4(null, getP4Command(COMMAND_SET), COMMAND_SET);
         String[] lines = core.splitLines(result);
         for(String line: lines)
         {
@@ -88,7 +88,7 @@ public class PerforceWorkingCopy extends PersonalBuildSupport implements Working
             // convert revision.
             status = new WorkingCopyStatus(core.getClientRoot(), core.convertRevision(revision));
             PerforceFStatHandler handler = new PerforceFStatHandler(getUi(), status);
-            core.runP4WithHandler(handler, null, P4_COMMAND, COMMAND_FSTAT, FLAG_PATH_IN_DEPOT_FORMAT, "//...");
+            core.runP4WithHandler(handler, null, getP4Command(COMMAND_FSTAT), COMMAND_FSTAT, FLAG_PATH_IN_DEPOT_FORMAT, "//...");
 
             checkRevision = core.getLatestRevisionForFiles(null);
         } while (!checkRevision.equals(revision) && i++ < RETRY_LIMIT);
@@ -117,13 +117,13 @@ public class PerforceWorkingCopy extends PersonalBuildSupport implements Working
                 throw new ScmException("Empty changelist name specified (" + spec[0] + ")");
             }
 
-            core.runP4WithHandler(handler, null, P4_COMMAND, COMMAND_FSTAT, FLAG_PATH_IN_DEPOT_FORMAT, FLAG_FILES_OPENED, FLAG_AFFECTED_CHANGELIST, changelist, "//...");
+            core.runP4WithHandler(handler, null, getP4Command(COMMAND_FSTAT), COMMAND_FSTAT, FLAG_PATH_IN_DEPOT_FORMAT, FLAG_FILES_OPENED, FLAG_AFFECTED_CHANGELIST, changelist, "//...");
         }
         else if(spec.length > 0)
         {
             // Then it is a list of files
             String[] commands = new String[spec.length + 4];
-            commands[0] = P4_COMMAND;
+            commands[0] = getP4Command(COMMAND_FSTAT);
             commands[1] = COMMAND_FSTAT;
             commands[2] = FLAG_PATH_IN_DEPOT_FORMAT;
             commands[3] = FLAG_FILES_OPENED;
@@ -134,7 +134,7 @@ public class PerforceWorkingCopy extends PersonalBuildSupport implements Working
         else
         {
             // Emulate submit behaviour: default changelist
-            core.runP4WithHandler(handler, null, P4_COMMAND, COMMAND_FSTAT, FLAG_PATH_IN_DEPOT_FORMAT, FLAG_FILES_OPENED, FLAG_AFFECTED_CHANGELIST, "default", "//...");
+            core.runP4WithHandler(handler, null, getP4Command(COMMAND_FSTAT), COMMAND_FSTAT, FLAG_PATH_IN_DEPOT_FORMAT, FLAG_FILES_OPENED, FLAG_AFFECTED_CHANGELIST, "default", "//...");
         }
 
         return status;
@@ -145,7 +145,7 @@ public class PerforceWorkingCopy extends PersonalBuildSupport implements Working
         NumericalRevision revision = core.getLatestRevisionForFiles(null);
 
         PerforceSyncHandler syncHandler = new PerforceSyncHandler(getUi());
-        core.runP4WithHandler(syncHandler, null, P4_COMMAND, COMMAND_SYNC, "@" + revision.getRevisionString());
+        core.runP4WithHandler(syncHandler, null, getP4Command(COMMAND_SYNC), COMMAND_SYNC, "@" + revision.getRevisionString());
 
         if(syncHandler.isResolveRequired())
         {
@@ -167,7 +167,7 @@ public class PerforceWorkingCopy extends PersonalBuildSupport implements Working
             enterContext();
             try
             {
-                core.runP4WithHandler(new PerforceProgressPrintingHandler(getUi(), false), null, P4_COMMAND, COMMAND_RESOLVE, FLAG_AUTO_MERGE);
+                core.runP4WithHandler(new PerforceProgressPrintingHandler(getUi(), false), null, getP4Command(COMMAND_RESOLVE), COMMAND_RESOLVE, FLAG_AUTO_MERGE);
             }
             finally
             {

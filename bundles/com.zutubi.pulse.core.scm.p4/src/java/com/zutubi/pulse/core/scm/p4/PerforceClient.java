@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core.scm.p4;
 
-import com.zutubi.util.TextUtils;
 import com.zutubi.pulse.core.Property;
 import com.zutubi.pulse.core.PulseScope;
 import com.zutubi.pulse.core.VariableHelper;
@@ -12,6 +11,7 @@ import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.process.AsyncProcess;
 import com.zutubi.pulse.util.process.BufferingCharHandler;
+import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.*;
@@ -125,7 +125,7 @@ public class PerforceClient extends CachingScmClient
 
     private boolean clientExists(String clientName) throws ScmException
     {
-        PerforceCore.P4Result result = core.runP4(null, P4_COMMAND, COMMAND_CLIENTS);
+        PerforceCore.P4Result result = core.runP4(null, getP4Command(COMMAND_CLIENTS), COMMAND_CLIENTS);
         String[] lines = core.splitLines(result);
         for (String line : lines)
         {
@@ -238,7 +238,7 @@ public class PerforceClient extends CachingScmClient
 
         try
         {
-            PerforceCore.P4Result result = core.runP4(null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_SYNC, FLAG_FORCE, FLAG_PREVIEW);
+            PerforceCore.P4Result result = core.runP4(null, getP4Command(COMMAND_SYNC), FLAG_CLIENT, clientName, COMMAND_SYNC, FLAG_FORCE, FLAG_PREVIEW);
             Matcher matcher = syncPattern.matcher(result.stdout);
             while (matcher.find())
             {
@@ -268,7 +268,7 @@ public class PerforceClient extends CachingScmClient
     {
         try
         {
-            core.runP4(null, P4_COMMAND, COMMAND_CLIENT, FLAG_DELETE, clientName);
+            core.runP4(null, getP4Command(COMMAND_CLIENT), COMMAND_CLIENT, FLAG_DELETE, clientName);
         }
         catch (ScmException e)
         {
@@ -287,7 +287,7 @@ public class PerforceClient extends CachingScmClient
         //   ... <file>#<revision> <action>
         //   ... <file>#<revision> <action>
         //   ...
-        PerforceCore.P4Result result = core.runP4(false, null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_DESCRIBE, FLAG_SHORT, Long.toString(number));
+        PerforceCore.P4Result result = core.runP4(false, null, getP4Command(COMMAND_DESCRIBE), FLAG_CLIENT, clientName, COMMAND_DESCRIBE, FLAG_SHORT, Long.toString(number));
         if (result.stderr.length() > 0)
         {
             if (result.stderr.indexOf("no such changelist") >= 0)
@@ -433,11 +433,11 @@ public class PerforceClient extends CachingScmClient
 
             if (force)
             {
-                core.runP4WithHandler(perforceHandler, null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_SYNC, FLAG_FORCE, "@" + Long.toString(number));
+                core.runP4WithHandler(perforceHandler, null, getP4Command(COMMAND_SYNC), FLAG_CLIENT, clientName, COMMAND_SYNC, FLAG_FORCE, "@" + Long.toString(number));
             }
             else
             {
-                core.runP4WithHandler(perforceHandler, null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_SYNC, "@" + Long.toString(number));
+                core.runP4WithHandler(perforceHandler, null, getP4Command(COMMAND_SYNC), FLAG_CLIENT, clientName, COMMAND_SYNC, "@" + Long.toString(number));
             }
         }
         finally
@@ -553,7 +553,7 @@ public class PerforceClient extends CachingScmClient
                 fileArgument = fileArgument + "@" + revision;
             }
 
-            PerforceCore.P4Result result = core.runP4(null, P4_COMMAND, FLAG_CLIENT, clientName, "print", "-q", fileArgument);
+            PerforceCore.P4Result result = core.runP4(null, getP4Command("print"), FLAG_CLIENT, clientName, "print", "-q", fileArgument);
             return new ByteArrayInputStream(result.stdout.toString().getBytes("US-ASCII"));
         }
         catch (ScmException e)
@@ -610,7 +610,7 @@ public class PerforceClient extends CachingScmClient
         {
             if (start <= end)
             {
-                PerforceCore.P4Result p4Result = core.runP4(null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_CHANGES, FLAG_STATUS, VALUE_SUBMITTED, clientRoot.getAbsoluteFile() + "/...@" + Long.toString(start) + "," + Long.toString(end));
+                PerforceCore.P4Result p4Result = core.runP4(null, getP4Command(COMMAND_CHANGES), FLAG_CLIENT, clientName, COMMAND_CHANGES, FLAG_STATUS, VALUE_SUBMITTED, clientRoot.getAbsoluteFile() + "/...@" + Long.toString(start) + "," + Long.toString(end));
                 Matcher matcher = core.getChangesPattern().matcher(p4Result.stdout);
 
                 while (matcher.find())
@@ -702,7 +702,7 @@ public class PerforceClient extends CachingScmClient
                 throw new ScmException("Cannot create label '" + name + "': label already exists");
             }
 
-            core.runP4(false, null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_LABELSYNC, FLAG_LABEL, name, clientRoot.getAbsoluteFile() + "/...@" + revision.toString());
+            core.runP4(false, null, getP4Command(COMMAND_LABELSYNC), FLAG_CLIENT, clientName, COMMAND_LABELSYNC, FLAG_LABEL, name, clientRoot.getAbsoluteFile() + "/...@" + revision.toString());
         }
         finally
         {
@@ -721,10 +721,10 @@ public class PerforceClient extends CachingScmClient
 
     public void storeConnectionDetails(File outputDir) throws ScmException, IOException
     {
-        PerforceCore.P4Result result = core.runP4(null, P4_COMMAND, FLAG_CLIENT, resolveClient(null), COMMAND_INFO);
+        PerforceCore.P4Result result = core.runP4(null, getP4Command(COMMAND_INFO), FLAG_CLIENT, resolveClient(null), COMMAND_INFO);
         FileSystemUtils.createFile(new File(outputDir, "server-info.txt"), result.stdout.toString());
 
-        result = core.runP4(null, P4_COMMAND, FLAG_CLIENT, resolveClient(null), COMMAND_CLIENT, FLAG_OUTPUT);
+        result = core.runP4(null, getP4Command(COMMAND_CLIENT), FLAG_CLIENT, resolveClient(null), COMMAND_CLIENT, FLAG_OUTPUT);
         FileSystemUtils.createFile(new File(outputDir, "template-client.txt"), result.stdout.toString());
     }
 
@@ -761,7 +761,7 @@ public class PerforceClient extends CachingScmClient
             public void checkCancelled() throws ScmCancelledException
             {
             }
-        }, null, P4_COMMAND, FLAG_CLIENT, resolveClient(null), COMMAND_CLIENT, FLAG_OUTPUT);
+        }, null, getP4Command(COMMAND_CLIENT), FLAG_CLIENT, resolveClient(null), COMMAND_CLIENT, FLAG_OUTPUT);
 
         return eol[0];
     }
@@ -798,7 +798,7 @@ public class PerforceClient extends CachingScmClient
         try
         {
             File f = new File(clientRoot.getAbsoluteFile(), path);
-            PerforceCore.P4Result result = core.runP4(false, null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_FSTAT, f.getAbsolutePath() + "@" + repoRevision.getRevisionString());
+            PerforceCore.P4Result result = core.runP4(false, null, getP4Command(COMMAND_FSTAT), FLAG_CLIENT, clientName, COMMAND_FSTAT, f.getAbsolutePath() + "@" + repoRevision.getRevisionString());
             if (result.stderr.length() > 0)
             {
                 String error = result.stderr.toString();
@@ -846,7 +846,7 @@ public class PerforceClient extends CachingScmClient
             {
                 long revisionNumber = Long.parseLong(revision);
                 // Run a quick check to ensure that the change exists.
-                core.runP4(true, null, P4_COMMAND, FLAG_CLIENT, clientName, COMMAND_CHANGE, FLAG_OUTPUT, revision);
+                core.runP4(true, null, getP4Command(COMMAND_CHANGE), FLAG_CLIENT, clientName, COMMAND_CHANGE, FLAG_OUTPUT, revision);
                 return core.convertRevision(new NumericalRevision(revisionNumber));
             }
             catch (NumberFormatException e)
@@ -862,7 +862,7 @@ public class PerforceClient extends CachingScmClient
 
     public boolean labelExists(String client, String name) throws ScmException
     {
-        PerforceCore.P4Result p4Result = this.core.runP4(null, P4_COMMAND, FLAG_CLIENT, client, COMMAND_LABELS);
+        PerforceCore.P4Result p4Result = this.core.runP4(null, getP4Command(COMMAND_LABELS), FLAG_CLIENT, client, COMMAND_LABELS);
 
         // $ p4 labels
         // Label jim 2006/06/20 'Created by Jason. '
@@ -881,8 +881,8 @@ public class PerforceClient extends CachingScmClient
 
     private void createLabel(String client, String name) throws ScmException
     {
-        PerforceCore.P4Result p4Result = this.core.runP4(null, P4_COMMAND, FLAG_CLIENT, client, COMMAND_LABEL, FLAG_OUTPUT, name);
-        this.core.runP4(p4Result.stdout.toString(), P4_COMMAND, FLAG_CLIENT, client, COMMAND_LABEL, FLAG_INPUT);
+        PerforceCore.P4Result p4Result = this.core.runP4(null, getP4Command(COMMAND_LABEL), FLAG_CLIENT, client, COMMAND_LABEL, FLAG_OUTPUT, name);
+        this.core.runP4(p4Result.stdout.toString(), getP4Command(COMMAND_LABEL), FLAG_CLIENT, client, COMMAND_LABEL, FLAG_INPUT);
     }
 
     public static void main(String argv[])
