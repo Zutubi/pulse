@@ -5,6 +5,8 @@ import nu.xom.*;
 import java.io.*;
 
 import com.zutubi.util.IOUtils;
+import com.zutubi.util.UnaryFunction;
+import com.opensymphony.util.TextUtils;
 
 /**
  */
@@ -65,6 +67,35 @@ public class XMLUtils
 
         return defaultValue;
     }
+
+    public static String getRequiredText(Element element, boolean trim)
+    {
+        String text = getText(element, null, trim);
+        if(!TextUtils.stringSet(text))
+        {
+            throw new XMLException("Required text missing from element '" + element.getLocalName() + "'");
+        }
+
+        return text;
+    }
+
+    public static String getChildText(Element element, String childName, String defaultValue)
+    {
+        Element child = element.getFirstChildElement(childName);
+        if(child == null)
+        {
+            return defaultValue;
+        }
+
+        return getText(child, defaultValue);
+    }
+
+    public static String getRequiredChildText(Element element, String childName, boolean trim)
+    {
+        Element child = getRequiredChild(element, childName);
+        return getRequiredText(child, trim);
+    }
+
 
     public static String getRequiredAttribute(Element e, String attribute) throws ParsingException
     {
@@ -172,5 +203,25 @@ public class XMLUtils
         }
 
         return c <= 0xD7FF || c >= 0xE000 && (c <= 0xFFFD || c >= 0x10000 && c <= 0x10FFFF);
+    }
+
+    public static void forEachChild(Element element, String name, UnaryFunction<Element> fn)
+    {
+        Elements elements = element.getChildElements(name);
+        for(int i = 0; i < elements.size(); i++)
+        {
+            fn.process(elements.get(i));
+        }
+    }
+
+    public static Element getRequiredChild(Element element, String name)
+    {
+        Element child = element.getFirstChildElement(name);
+        if(child == null)
+        {
+            throw new XMLException("Required child element '" + name + "' not found for element '" + element.getLocalName() + "'");
+        }
+
+        return child;
     }
 }

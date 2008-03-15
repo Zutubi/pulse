@@ -29,7 +29,7 @@ public abstract class XMLReportPostProcessor extends TestReportPostProcessor
         try
         {
             input = new FileInputStream(file);
-            Builder builder = new Builder();
+            Builder builder = createBuilder();
             Document doc;
             doc = builder.build(input);
             processDocument(doc, suite);
@@ -57,6 +57,11 @@ public abstract class XMLReportPostProcessor extends TestReportPostProcessor
         {
             IOUtils.close(input);
         }
+    }
+
+    protected Builder createBuilder()
+    {
+        return new Builder();
     }
 
     protected abstract void processDocument(Document doc, TestSuiteResult tests);
