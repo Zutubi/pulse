@@ -337,6 +337,8 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         queue.online(createAvailableAgent(0));
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
 
+        Thread.sleep(500);
+
         List<RecipeDispatchRequest> snapshot = queue.takeSnapshot();
         assertEquals(1, snapshot.size());
         assertEquals(request2, snapshot.get(0));
