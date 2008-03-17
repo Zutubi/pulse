@@ -1,11 +1,11 @@
 package com.zutubi.pulse.logging;
 
-import com.zutubi.pulse.bootstrap.SystemPaths;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.bootstrap.SystemPaths;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.io.File;
 import java.util.logging.*;
 
 /**
@@ -187,13 +187,6 @@ public class FileHandler extends Handler
                 }
                 else if (ch2 == 'l')
                 {
-                    // we need to ensure that the path exists, else the java.util.logging.FileHandler will
-                    // have problems
-                    if (!logRoot.exists() && !logRoot.mkdirs())
-                    {
-                        // we have a slight problem.
-                    }
-
                     // replace with log root.
                     try
                     {

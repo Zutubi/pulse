@@ -20,8 +20,7 @@ import java.util.logging.Level;
 public class LogConfigurationManager
 {
     private File logConfigDir;
-
-    private File configDir;
+    private SystemPaths systemPaths;
 
     private LogManager logManager;
 
@@ -37,10 +36,19 @@ public class LogConfigurationManager
         logManager.reset();
 
         // load default configuration.
-        logManager.configure(new File(configDir, "logging.properties"));
+        logManager.configure(new File(systemPaths.getConfigRoot(), "logging.properties"));
 
         // load the default level configuration.
         updateConfiguration(logConfig.getLoggingLevel());
+
+        // We need to ensure that the path exists before handlers try to
+        // write there.
+        File logRoot = systemPaths.getLogRoot();
+        if (!logRoot.exists() && !logRoot.mkdirs())
+        {
+            // Annoying: we can't log this!
+            System.err.printf("Log directory '%s' does not exist and cannot be created.", logRoot.getAbsolutePath());
+        }
 
         // publish all events that pass through the event manager to the event logger
         final Logger evtLogger = Loggers.getEventLogger();
@@ -123,8 +131,8 @@ public class LogConfigurationManager
 
     public void setSystemPaths(SystemPaths paths)
     {
-        configDir = paths.getConfigRoot();
-        logConfigDir = new File(configDir, "logging");
+        this.systemPaths = paths;
+        logConfigDir = new File(paths.getConfigRoot(), "logging");
     }
 
     /**
