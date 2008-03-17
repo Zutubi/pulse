@@ -10,8 +10,6 @@ import com.zutubi.util.Constants;
 import org.acegisecurity.AuthenticationManager;
 import org.acegisecurity.context.SecurityContextHolder;
 import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.digest.DigestUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -58,9 +56,8 @@ public class DefaultTokenManager implements TokenManager
 
             // Generate a token which is good for 30 minutes for this user
             long expiryTime = System.currentTimeMillis() + expiry;
-            String signatureValue = getTokenSignature(username, expiryTime, password);
-            String tokenValue = username + ":" + expiryTime + ":" + signatureValue;
-            String encoded = new String(Base64.encodeBase64(tokenValue.getBytes()));
+            APIAuthenticationToken token = new APIAuthenticationToken(username, password, expiryTime);
+            String encoded = APIAuthenticationToken.encode(token);
 
             validTokens.add(encoded);
 
@@ -198,21 +195,15 @@ public class DefaultTokenManager implements TokenManager
         // Token cannot have a bad format or expiry as it was found in
         // validTokens.  We don't even have to verify the signature
         // separately!
-        String decoded = new String(Base64.decodeBase64(token.getBytes()));
-        String parts[] = decoded.split(":");
+        APIAuthenticationToken t = APIAuthenticationToken.decode(token);
 
-        long expiry = Long.parseLong(parts[1]);
+        long expiry = t.getExpiryTime();
         if (System.currentTimeMillis() > expiry)
         {
             throw new AuthenticationException("Token expired");
         }
 
-        return parts[0];
-    }
-
-    private String getTokenSignature(String username, long expiryTime, String password)
-    {
-        return DigestUtils.md5Hex(username + ":" + expiryTime + ":" + password);
+        return t.getUsername();
     }
 
     private void checkTokenAccessEnabled() throws AuthenticationException

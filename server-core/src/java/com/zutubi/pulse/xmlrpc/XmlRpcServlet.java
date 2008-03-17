@@ -30,7 +30,7 @@ public class XmlRpcServlet extends HttpServlet
                 {
                     // extract the handler mapping - stupid i know, but there are limited options.
                     XmlRpcHandlerMapping handlerMapping = (XmlRpcHandlerMapping) ObjectUtils.getField("handlerMapping", worker);
-                    return new LoggingXmlRpcWorker(handlerMapping);
+                    return new PulseXmlRpcWorker(handlerMapping);
                 }
                 catch (Exception e)
                 {
