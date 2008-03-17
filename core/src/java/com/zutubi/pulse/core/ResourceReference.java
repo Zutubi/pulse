@@ -3,6 +3,7 @@ package com.zutubi.pulse.core;
 import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.core.model.ResourceVersion;
+import com.zutubi.validation.annotations.Required;
 
 /**
  * A resource references adds the named resource to the current scope.
@@ -100,7 +101,7 @@ public class ResourceReference implements ResourceAware, ScopeAware, InitCompone
      *
      * @param name
      */
-    public void setName(String name)
+    @Required public void setName(String name)
     {
         this.name = name;
     }

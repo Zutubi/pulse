@@ -1,7 +1,7 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.core.TypeLoadPredicate;
 import com.zutubi.pulse.core.ResourceReference;
+import com.zutubi.pulse.core.TypeLoadPredicate;
 import nu.xom.Element;
 
 /**
@@ -23,5 +23,10 @@ public class CustomProjectValidationPredicate implements TypeLoadPredicate
     public boolean allowUnresolved(Object type, Element element)
     {
         return true;
+    }
+
+    public boolean validate(Object type, Element element)
+    {
+        return loadType(type, element);
     }
 }

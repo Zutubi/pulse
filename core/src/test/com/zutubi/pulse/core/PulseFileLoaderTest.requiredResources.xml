@@ -13,4 +13,25 @@
 
         <resource name="explicitlyrequired" required="true"/>
     </recipe>
+
+    <recipe name="nested">
+        <executable name="nested" exe="test">
+            <resource name="nested"/>
+        </executable>
+    </recipe>
+
+    <recipe name="unresolvables">
+        <property name="hey" value="${ho}"/>
+        
+        <resource name="un"/>
+
+        <command name="foo">
+            <sleep name="snoozy"/>
+            <artifact name="${foo}" file="jim"/>
+        </command>
+    </recipe>
+
+    <recipe name="noname">
+        <resource/>
+    </recipe>
 </project>

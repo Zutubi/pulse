@@ -21,4 +21,9 @@ public class RecipeListingPredicate implements TypeLoadPredicate
     {
         return true;
     }
+
+    public boolean validate(Object type, Element element)
+    {
+        return loadType(type, element);
+    }
 }
