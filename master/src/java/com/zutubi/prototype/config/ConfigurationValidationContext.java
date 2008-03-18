@@ -149,19 +149,9 @@ public class ConfigurationValidationContext implements ValidationContext
         return textProvider.getText(key);
     }
 
-    public String getText(String key, String defaultValue)
-    {
-        return textProvider.getText(key, defaultValue);
-    }
-
     public String getText(String key, Object... args)
     {
         return textProvider.getText(key, args);
-    }
-
-    public String getText(String key, String defaultValue, Object... args)
-    {
-        return textProvider.getText(key, defaultValue, args);
     }
 
     public TextProvider getTextProvider(Object context)

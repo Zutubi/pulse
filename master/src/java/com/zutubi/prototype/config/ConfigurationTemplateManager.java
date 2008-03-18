@@ -1391,7 +1391,7 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
         String path = PathUtils.getPath(parentPath, baseName);
         if(pathExists(path))
         {
-            throw new ValidationException(textProvider.getText(".inuse", "chosen " + fieldName + " is already in use", fieldName));
+            throw new ValidationException(textProvider.getText(".inuse", fieldName));
         }
         else if(PathUtils.getPathElements(path).length > 2)
         {
@@ -1400,7 +1400,7 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
             String ancestorPath = findAncestorPath(path);
             if(ancestorPath != null)
             {
-                throw new ValidationException(textProvider.getText(".inancestor", "chosen " + fieldName + " is already in use in an ancestor", fieldName, PathUtils.getPathElements(ancestorPath)[1]));
+                throw new ValidationException(textProvider.getText(".inancestor", fieldName, PathUtils.getPathElements(ancestorPath)[1]));
             }
             else
             {
