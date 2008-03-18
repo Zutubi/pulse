@@ -8,6 +8,7 @@ import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.PrimitiveType;
+import com.zutubi.pulse.bootstrap.SystemPaths;
 
 /**
  * The table descriptor factory is an implementation of a descriptor factory that uses an objects type definition
@@ -19,11 +20,12 @@ public class TableDescriptorFactory
     private ActionManager actionManager;
     private ConfigurationSecurityManager configurationSecurityManager;
     private ConfigurationTemplateManager configurationTemplateManager;
+    private SystemPaths systemPaths;
 
     public TableDescriptor create(String path, CollectionType collectionType)
     {
         CompositeType type = (CompositeType) collectionType.getCollectionType();
-        TableDescriptor td = new TableDescriptor(collectionType, configurationSecurityManager.hasPermission(path, AccessManager.ACTION_WRITE), configurationSecurityManager.hasPermission(path, AccessManager.ACTION_CREATE), configurationTemplateManager, actionManager);
+        TableDescriptor td = new TableDescriptor(collectionType, configurationSecurityManager.hasPermission(path, AccessManager.ACTION_WRITE), configurationSecurityManager.hasPermission(path, AccessManager.ACTION_CREATE), configurationTemplateManager, actionManager, systemPaths);
 
         // does the table has a Table annotation defining the columns to be rendered?
         Table tableAnnotation = (Table) type.getAnnotation(Table.class);
@@ -64,5 +66,10 @@ public class TableDescriptorFactory
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
         this.configurationTemplateManager = configurationTemplateManager;
+    }
+
+    public void setSystemPaths(SystemPaths systemPaths)
+    {
+        this.systemPaths = systemPaths;
     }
 }

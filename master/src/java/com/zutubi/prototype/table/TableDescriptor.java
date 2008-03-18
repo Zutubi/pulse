@@ -17,6 +17,8 @@ import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.pulse.bootstrap.SystemPaths;
+import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.logging.Logger;
@@ -25,6 +27,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.io.File;
 
 /**
  * The table descriptor represents the model used to render a table to the UI.
@@ -45,8 +48,9 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
     private List<ColumnDescriptor> columns = new LinkedList<ColumnDescriptor>();
     private ConfigurationTemplateManager configurationTemplateManager;
     private ActionManager actionManager;
+    private File iconPath;
 
-    public TableDescriptor(CollectionType collectionType, boolean orderAllowed, boolean addAllowed, ConfigurationTemplateManager configurationTemplateManager, ActionManager actionManager)
+    public TableDescriptor(CollectionType collectionType, boolean orderAllowed, boolean addAllowed, ConfigurationTemplateManager configurationTemplateManager, ActionManager actionManager, SystemPaths systemPaths)
     {
         this.collectionType = collectionType;
         this.type = (CompositeType) collectionType.getCollectionType();
@@ -57,6 +61,7 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
 
         this.configurationTemplateManager = configurationTemplateManager;
         this.actionManager = actionManager;
+        iconPath = new File(systemPaths.getContentRoot(), FileSystemUtils.composeFilename("images", "config", "actions"));
     }
 
     public Table instantiate(String path, Record data)
@@ -106,7 +111,7 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
                         String parentItemPath = PathUtils.getPath(parentPath, hidden);
                         Configuration instance = configurationTemplateManager.getInstance(parentItemPath);
                         messages = Messages.getInstance(instance.getClass());
-                        Row row = new Row(PathUtils.getPath(path, hidden), true, Arrays.asList(new RowAction("restore", format(messages, "restore.label"))));
+                        Row row = new Row(PathUtils.getPath(path, hidden), true, Arrays.asList(new RowAction("restore", format(messages, "restore.label"), "restore")));
                         addCells(row, instance);
                         row.addParameter("hiddenFrom", templateParent.getOwner(hidden));
                         row.addParameter("cls", "item-hidden");
@@ -184,6 +189,7 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
         if (deleteAction != null)
         {
             deleteAction.setLabel(format(messages, action + ".label"));
+            deleteAction.setIcon(action);
         }
     }
 
@@ -196,7 +202,8 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
             {
                 public RowAction map(String actionName)
                 {
-                    return new RowAction(actionName, format(messages, actionName + ".label"));
+                    File iconFile = new File(iconPath, actionName + ".gif");
+                    return new RowAction(actionName, format(messages, actionName + ".label"), iconFile.exists() ? actionName : "generic");
                 }
             });
         }

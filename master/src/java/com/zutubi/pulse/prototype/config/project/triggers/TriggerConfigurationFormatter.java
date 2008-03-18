@@ -16,9 +16,9 @@ public class TriggerConfigurationFormatter
         Trigger trigger = scheduler.getTrigger(config.getTriggerId());
         if (trigger != null)
         {
-            return trigger.getState().toString();
+            return trigger.getState().toString().toLowerCase();
         }
-        return "N/A";
+        return "n/a";
     }
 
     public String getType(TriggerConfiguration config)

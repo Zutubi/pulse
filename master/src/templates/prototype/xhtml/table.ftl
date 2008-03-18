@@ -29,7 +29,7 @@
         <#assign suffix = "?${action}"/>
     <#/if>
         |
-    <a href="${base}/config/${item.configurationPath}${suffix}">${actionlabel?i18n}</a>
+    <a href="${base}/config/${item.configurationPath}${suffix}"><#if ${action?icon?exists}><img alt="${actionlabel?i18n}" src="${base}/images/config/actions/${action.icon}.gif"/> </#if>${actionlabel?i18n}</a>
     <assign firstaction = false/>
 </#list>
         </td>

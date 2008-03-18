@@ -6,11 +6,13 @@ public class RowAction
 {
     private String action;
     private String label;
+    private String icon;
 
-    public RowAction(String action, String label)
+    public RowAction(String action, String label, String icon)
     {
         this.action = action;
         this.label = label;
+        this.icon = icon;
     }
 
     public String getAction()
@@ -31,5 +33,15 @@ public class RowAction
     public void setLabel(String label)
     {
         this.label = label;
+    }
+
+    public String getIcon()
+    {
+        return icon;
+    }
+
+    public void setIcon(String icon)
+    {
+        this.icon = icon;
     }
 }

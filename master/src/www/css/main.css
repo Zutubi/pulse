@@ -1117,7 +1117,7 @@ ul.config-links li {
 }
 
 ul.config-actions li {
-    background: url(../images/lightning_go.gif) no-repeat 0 2px;
+    background: url(../images/config/actions/generic.gif) no-repeat 0 2px;
 }
 
 .item-hidden {

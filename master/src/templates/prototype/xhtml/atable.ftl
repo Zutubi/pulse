@@ -93,7 +93,7 @@
             <#if !first>
             |
             </#if>
-            <a id="${actionId?id}"
+            <a href="#" id="${actionId?id}" class="unadorned"
             <#if rowAction.action == "view">
                 <#if embedded>
                     <#assign clickAction = "edit"/>
@@ -105,6 +105,9 @@
                 onclick="deletePath('${row.path}'); return false;">
             <#else>
                 onclick="actionPath('${row.path}?${rowAction.action}'); return false;">
+            </#if>
+            <#if rowAction.icon?exists>
+                <img alt="${rowAction.label?html}" src="${base}/images/config/actions/${rowAction.icon}.gif"/>
             </#if>
                 ${rowAction.label?html}<#t>
         </a><#lt>
@@ -118,7 +121,12 @@
 </#list>
 <#if table.addAllowed>
     <tr>
-        <td class="content" colspan="${table.width}"><a id="map:add" onclick="addToPath('${path}'); return false;">${"add.label"?i18n}</a></td>
+        <td class="content" colspan="${table.width}">
+            <a id="map:add" class="unadorned" href="#" onclick="addToPath('${path}'); return false;">
+                <img alt="add" src="${base}/images/config/actions/add.gif"/>
+                ${"add.label"?i18n}
+            </a>
+        </td>
     </tr>
 </#if>
 </table>
