@@ -43,9 +43,20 @@ public class CompositeType extends AbstractType implements ComplexType
 
     private Map<Class, List<String>> propertiesByClass = new HashMap<Class, List<String>>();
 
-    public CompositeType(Class type, String symbolicName)
+    public CompositeType(Class type, String symbolicName) throws TypeException
     {
         super(type, symbolicName);
+        if (!Modifier.isAbstract(type.getModifiers()))
+        {
+            try
+            {
+                type.newInstance();
+            }
+            catch (Exception e)
+            {
+                throw new TypeException("Cannot instantiate class '" + type.getName() + "' (is there a public default constructor): " + e.getMessage(), e);
+            }
+        }
     }
 
     public void addProperty(TypeProperty property) throws TypeException
@@ -63,7 +74,7 @@ public class CompositeType extends AbstractType implements ComplexType
         }
         else
         {
-            if(!isSimpleProperty(property.getType()))
+            if (!isSimpleProperty(property.getType()))
             {
                 throw new TypeException("Internal property '" + property.getName() + "' has non-simple type");
             }
@@ -139,9 +150,9 @@ public class CompositeType extends AbstractType implements ComplexType
     public List<String> getSimplePropertyNames()
     {
         List<String> result = new LinkedList<String>();
-        for(Map.Entry<String, TypeProperty> entry: properties.entrySet())
+        for (Map.Entry<String, TypeProperty> entry : properties.entrySet())
         {
-            if(isSimpleProperty(entry.getValue().getType()))
+            if (isSimpleProperty(entry.getValue().getType()))
             {
                 result.add(entry.getKey());
             }
@@ -157,9 +168,9 @@ public class CompositeType extends AbstractType implements ComplexType
     public List<String> getNestedPropertyNames()
     {
         List<String> result = new LinkedList<String>();
-        for(Map.Entry<String, TypeProperty> entry: properties.entrySet())
+        for (Map.Entry<String, TypeProperty> entry : properties.entrySet())
         {
-            if(!isSimpleProperty(entry.getValue().getType()))
+            if (!isSimpleProperty(entry.getValue().getType()))
             {
                 result.add(entry.getKey());
             }
@@ -182,7 +193,7 @@ public class CompositeType extends AbstractType implements ComplexType
     {
         return internalProperties.size() > 0;
     }
-    
+
     public boolean hasInternalProperty(String propertyName)
     {
         return internalProperties.containsKey(propertyName);
@@ -206,12 +217,12 @@ public class CompositeType extends AbstractType implements ComplexType
 
     private void checkExtension(CompositeType type) throws TypeException
     {
-        if(!isExtendable())
+        if (!isExtendable())
         {
             throw new TypeException("Class '" + getClass().getName() + "' is not extendable");
         }
 
-        if(!this.getClazz().isAssignableFrom(type.getClazz()))
+        if (!this.getClazz().isAssignableFrom(type.getClazz()))
         {
             throw new TypeException("Extension class '" + type.getClazz().getName() + "' is not a subtype of '" + getClazz().getName() + "'");
         }
@@ -271,7 +282,7 @@ public class CompositeType extends AbstractType implements ComplexType
     public void initialise(Object instance, Object data, Instantiator instantiator)
     {
         Type actualType = typeRegistry.getType(instance.getClass());
-        if(this == actualType)
+        if (this == actualType)
         {
             Record record = (Record) data;
             for (Map.Entry<String, TypeProperty> entry : properties.entrySet())
@@ -341,7 +352,7 @@ public class CompositeType extends AbstractType implements ComplexType
 
     public Hashtable<String, Object> toXmlRpc(Object data) throws TypeException
     {
-        if(data == null)
+        if (data == null)
         {
             return null;
         }
@@ -350,11 +361,11 @@ public class CompositeType extends AbstractType implements ComplexType
             typeCheck(data, Record.class);
 
             Record record = (Record) data;
-            if(getSymbolicName().equals(record.getSymbolicName()))
+            if (getSymbolicName().equals(record.getSymbolicName()))
             {
                 Hashtable<String, Object> result = new Hashtable<String, Object>();
                 result.put(XML_RPC_SYMBOLIC_NAME, getSymbolicName());
-                
+
                 for (Map.Entry<String, TypeProperty> entry : properties.entrySet())
                 {
                     propertyToXmlRpc(entry, record, result);
@@ -374,7 +385,7 @@ public class CompositeType extends AbstractType implements ComplexType
     private void propertyToXmlRpc(Map.Entry<String, TypeProperty> entry, Record record, Hashtable<String, Object> result) throws TypeException
     {
         Object propertyValue = record.get(entry.getKey());
-        if(propertyValue != null)
+        if (propertyValue != null)
         {
             result.put(entry.getKey(), entry.getValue().getType().toXmlRpc(propertyValue));
         }
@@ -390,7 +401,7 @@ public class CompositeType extends AbstractType implements ComplexType
     public static String getTypeFromXmlRpc(Hashtable rpcForm) throws TypeException
     {
         Object o = rpcForm.get(XML_RPC_SYMBOLIC_NAME);
-        if(o == null)
+        if (o == null)
         {
             throw new TypeException("No symbolic name found in XML-RPC struct");
         }
@@ -405,14 +416,14 @@ public class CompositeType extends AbstractType implements ComplexType
 
         Hashtable rpcForm = (Hashtable) data;
         String symbolicName = getTypeFromXmlRpc(rpcForm);
-        if(symbolicName.equals(getSymbolicName()))
+        if (symbolicName.equals(getSymbolicName()))
         {
             // Check that we recognise all of the properties given.
-            for(Object key: rpcForm.keySet())
+            for (Object key : rpcForm.keySet())
             {
                 typeCheck(key, String.class);
                 String keyString = (String) key;
-                if(!recognisedProperty(keyString))
+                if (!recognisedProperty(keyString))
                 {
                     throw new TypeException("Unrecognised property '" + keyString + "' for type '" + symbolicName + "'");
                 }
@@ -430,7 +441,7 @@ public class CompositeType extends AbstractType implements ComplexType
         {
             // Actually a derived type
             CompositeType actualType = typeRegistry.getType(symbolicName);
-            if(actualType == null)
+            if (actualType == null)
             {
                 throw new TypeException("XML-RPC struct has unrecognised symbolic name '" + symbolicName + "'");
             }
@@ -447,7 +458,7 @@ public class CompositeType extends AbstractType implements ComplexType
     private void propertyFromXmlRpc(TypeProperty property, Hashtable rpcForm, MutableRecord result) throws TypeException
     {
         Object value = rpcForm.get(property.getName());
-        if(value != null)
+        if (value != null)
         {
             try
             {
@@ -516,7 +527,7 @@ public class CompositeType extends AbstractType implements ComplexType
         for (TypeProperty property : getProperties(CollectionType.class))
         {
             CollectionType type = (CollectionType) property.getType();
-            if(type.getCollectionType() instanceof ComplexType)
+            if (type.getCollectionType() instanceof ComplexType)
             {
                 record.put(property.getName(), type.createNewRecord(true));
             }
@@ -532,13 +543,13 @@ public class CompositeType extends AbstractType implements ComplexType
 
     public CompositeType getActualType(Object value)
     {
-        if(value == null || extensions.size() == 0 && internalExtensions.size() == 0)
+        if (value == null || extensions.size() == 0 && internalExtensions.size() == 0)
         {
             return this;
         }
         else
         {
-            return typeRegistry.getType(((Record)value).getSymbolicName());
+            return typeRegistry.getType(((Record) value).getSymbolicName());
         }
     }
 
@@ -558,17 +569,17 @@ public class CompositeType extends AbstractType implements ComplexType
     {
         Configuration configuration = (Configuration) instance;
         CompositeType actualType = typeRegistry.getType(configuration.getClass());
-        if(actualType != this)
+        if (actualType != this)
         {
             return actualType.isValid(configuration);
         }
-        
-        if(!configuration.isValid())
+
+        if (!configuration.isValid())
         {
             return false;
         }
 
-        for(String propertyName: getPropertyNames(ComplexType.class))
+        for (String propertyName : getPropertyNames(ComplexType.class))
         {
             TypeProperty property = getProperty(propertyName);
             try
@@ -576,13 +587,13 @@ public class CompositeType extends AbstractType implements ComplexType
                 Object nestedInstance = property.getValue(configuration);
                 if (nestedInstance != null)
                 {
-                    if(!((ComplexType) property.getType()).isValid(nestedInstance))
+                    if (!((ComplexType) property.getType()).isValid(nestedInstance))
                     {
                         return false;
                     }
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 LOG.severe(e);
                 return false;
@@ -596,7 +607,7 @@ public class CompositeType extends AbstractType implements ComplexType
     {
         f.process(instance);
 
-        for(String propertyName: getPropertyNames(ComplexType.class))
+        for (String propertyName : getPropertyNames(ComplexType.class))
         {
             TypeProperty property = getProperty(propertyName);
             try

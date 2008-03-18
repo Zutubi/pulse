@@ -22,6 +22,10 @@ public class CustomTransformerConfiguration extends CommitMessageTransformerConf
     private String expression;
     private String replacement;
 
+    public CustomTransformerConfiguration()
+    {
+    }
+
     public CustomTransformerConfiguration(String name, String expression, String replacement)
     {
         setName(name);
