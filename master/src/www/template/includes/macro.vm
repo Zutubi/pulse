@@ -2631,7 +2631,7 @@
         #i18nexists("key=test.description" "context=$type.symbolicName")<p class="config-description">#i18n("key=test.description" "context=$type.symbolicName")</p>#end
         <p class="config-check-result" id="check.result" style="display: none">
         </p>
-        <div class="config-form-container">
+        <div class="config-container">
             #checkform("path=$path" "symbolicName=$type.symbolicName" "mainFormName=$formName" "checkFormName=checkform" "namespace=$namespace")
         </div>
         <script type="text/javascript">

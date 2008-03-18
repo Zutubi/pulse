@@ -16,7 +16,7 @@
         <tr>
             <td>
                 <h3 class="config-header">#wwtext("name=plugin.upload")</h3>
-                <div class="config-form-container">
+                <div class="config-container">
                $uploadFormSource
                 </div>
             </td>
@@ -27,7 +27,7 @@
         <tr>
             <td>
                 <h3 class="config-header">#wwtext("name=plugin.local")</h3>
-                <div class="config-form-container">
+                <div class="config-container">
                     $localFormSource
                 </div>
             </td>

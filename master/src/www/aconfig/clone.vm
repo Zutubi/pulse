@@ -1,6 +1,6 @@
 <div class="config-panel">
     <h3 class="config-header">clone #i18n("key=label")</h3>
-    <div class="config-form-container">
+    <div class="config-container">
         $formSource
     </div>
     <script type="text/javascript">

@@ -1020,7 +1020,7 @@ table.template-actions
     border-bottom-width:1px;
     border-right-width:1px;
     border-left-width:1px;
-    margin-bottom:3em;
+    margin-bottom:1.8em;
 }
 
 .config-header {
@@ -1056,6 +1056,7 @@ table.template-actions
 {
     width:100%
 }
+
 .config-state-table th {
     font-weight:bold;
     font-size:large;
@@ -1085,28 +1086,38 @@ table.template-actions
     padding-left:5px;
     border-right: solid 1px #ddd;
     background-color:#f6f6f6;
-
 }
 .config-state-table .value {
     font-weight:normal;
-    padding-top:3px;
-    padding-right:5px;
-    padding-bottom:3px;
-    padding-left:5px;
+    padding:5px;
 }
 
-.config-form-container {
+.config-container {
     padding:10px;
 }
 
 #left-column {
-
+    vertical-align:top;
 }
 
 #right-column {
     padding-left:50px;
     width:300px;
     vertical-align:top;
+}
+
+ul.config-links li, ul.config-actions li {
+    padding: 1px;
+    padding-left: 20px;
+    line-height: 1.4em;
+}
+
+ul.config-links li {
+    background: url(../images/bullet_go.gif) no-repeat 0 2px;
+}
+
+ul.config-actions li {
+    background: url(../images/lightning_go.gif) no-repeat 0 2px;
 }
 
 .item-hidden {

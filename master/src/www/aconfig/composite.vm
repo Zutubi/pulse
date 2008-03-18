@@ -5,7 +5,7 @@
     <div class="config-panel">
         <h3 class="config-header">${config.formHeading}</h3>
         ##<!-- add some space around the form so that it does not sit directly on the border. -->
-        <div class="config-form-container">
+        <div class="config-container">
             #pform("path=$path" "formName=mainform" "displayMode=$config.displayMode" "ajax=true" "namespace=aconfig")
         </div>
         <script type="text/javascript">
@@ -63,28 +63,28 @@
         
         <td id="right-column">
             #if ($config.actions.size() > 0)
-            <div style="padding-bottom:15px;">
-            <h3>actions</h3>
-            <p>
-            <ul>
+            <div class="config-panel">
+            <h3 class="config-header">actions</h3>
+            <div class="config-container">
+            <ul class="config-actions">
                 #foreach($action in $config.actions)
-                    <li>+ <a href="#" id='#id("action.${action}")' onclick="actionPath('${path}?${action}'); return false;">#i18n("key=${action}.label")</a></li>
+                    <li><a href="#" id='#id("action.${action}")' onclick="actionPath('${path}?${action}'); return false;">#i18n("key=${action}.label")</a></li>
                 #end
             </ul>
-            </p>
+            </div>
             </div>
             #end
 
             #if( $config.nestedProperties.size() > 0)
-            <div>
-            <h3>links</h3>
-            <p>
-            <ul>
+            <div class="config-panel">
+            <h3 class="config-header">links</h3>
+            <div class="config-container">
+            <ul class="config-links">
                 #foreach($prop in $config.nestedProperties)
-                    <li>+ <a href="#" onclick="selectPath('${path}/${prop}'); return false;">#displayname("path=${path}/${prop}")</a></li>
+                    <li><a href="#" onclick="selectPath('${path}/${prop}'); return false;">#displayname("path=${path}/${prop}")</a></li>
                 #end
             </ul>
-            </p>
+            </div>
             </div>
             #end
         </td>

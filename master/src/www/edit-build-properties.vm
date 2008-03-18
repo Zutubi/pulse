@@ -12,7 +12,7 @@
     <table class="config-panel">
     <tr><td>
         <h3 class="config-header">#wwtext("name=build.properties.specify")</h3>
-        <div class="config-form-container">
+        <div class="config-container">
             $formSource
         </div>
     </td></tr>

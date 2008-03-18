@@ -1,5 +1,5 @@
 <h3 class="config-header">${"label"?i18n}</h3>
-<div class="config-form-container">
+<div class="config-container">
     <p class="introduction">
         ${"introduction"?i18n}
     </p>
