@@ -56,24 +56,5 @@
             access to the UI, functionality and resources.  
         </p>
     </p>
-    <h1> :: what's missing :: </h1>
-    <p>
-        As we are moving things over to a new architecture in Pulse 2.0, some Pulse 1.2 features are not
-        yet available.  They will be readded in future EAP builds:
-
-        <h3>Project Configuration</h3>
-        <p>
-            Some project configuration options have also not yet been transferred to the new system.  For
-            example, we are planning to make post-build actions more flexible in Pulse 2.0, so have not
-            moved them over in their existing form.  Stay tuned.
-        </p>
-
-        <h3>Upgrade Path</h3>
-        <p>
-            You cannot upgrade to or from EAP builds.  This is a Good Thing, as they are experimental and
-            must not be used with production data.
-        </p>
-    </p>
-
 </body>
 </html>
