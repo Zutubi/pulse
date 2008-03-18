@@ -54,7 +54,7 @@ public class FormDescriptorFactoryTest extends TestCase
     }
 
     @SymbolicName("mockText")
-    private class MockText extends AbstractConfiguration
+    public static class MockText extends AbstractConfiguration
     {
         private String text;
 
@@ -70,7 +70,7 @@ public class FormDescriptorFactoryTest extends TestCase
     }
 
     @SymbolicName("mockPassword")
-    private class MockPassword extends AbstractConfiguration
+    public static class MockPassword extends AbstractConfiguration
     {
         private String password;
 
