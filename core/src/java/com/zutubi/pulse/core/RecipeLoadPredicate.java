@@ -49,4 +49,9 @@ public class RecipeLoadPredicate implements TypeLoadPredicate
     {
         return false;
     }
+
+    public boolean validate(Object type, Element element)
+    {
+        return loadType(type, element);
+    }
 }

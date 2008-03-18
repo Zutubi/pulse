@@ -208,8 +208,11 @@ public class FileLoader
                 {
                     ((InitComponent) type).initAfterChildren();
                 }
+            }
 
-                // Apply declarative validation
+            // Apply declarative validation
+            if (predicate.validate(type, e))
+            {
                 validate(type);
             }
         }

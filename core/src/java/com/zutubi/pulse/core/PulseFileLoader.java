@@ -16,7 +16,6 @@ public class PulseFileLoader extends FileLoader
      */
     PulseFileLoader()
     {
-
         register("register", Register.class);
         register("version", Version.class);
     }

@@ -3,6 +3,7 @@ package com.zutubi.pulse.core;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceVersion;
 import com.zutubi.util.TextUtils;
+import com.zutubi.validation.annotations.Required;
 
 /**
  * A resource references adds the named resource to the current scope.
@@ -97,7 +98,7 @@ public class ResourceReference implements ResourceAware, ScopeAware, InitCompone
      * @param name name of the resource being referenced. This parameter is
      *             required.
      */
-    public void setName(String name)
+    @Required public void setName(String name)
     {
         this.name = name;
     }

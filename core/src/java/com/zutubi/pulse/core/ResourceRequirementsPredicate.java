@@ -61,6 +61,11 @@ public class ResourceRequirementsPredicate implements TypeLoadPredicate
         return false;
     }
 
+    public boolean validate(Object type, Element element)
+    {
+        return type instanceof ResourceReference;
+    }
+
     public List<ResourceReference> getReferences()
     {
         return references;

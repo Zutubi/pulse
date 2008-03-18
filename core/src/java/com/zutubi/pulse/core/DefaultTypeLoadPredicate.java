@@ -20,4 +20,9 @@ public class DefaultTypeLoadPredicate implements TypeLoadPredicate
     {
         return false;
     }
+
+    public boolean validate(Object type, Element element)
+    {
+        return true;
+    }
 }
