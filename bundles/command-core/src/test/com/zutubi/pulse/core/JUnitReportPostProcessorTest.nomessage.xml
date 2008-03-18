@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites>
+  <testsuite errors="0" failures="2" id="2" name="NoMessages" package="com.zutubi.pulse.junit" tests="2" time="0.09">
+    <properties>
+      <property name="java.runtime.name" value="Java(TM) 2 Runtime Environment, Standard Edition"></property>
+      </properties>
+
+      <testcase classname="com.zutubi.pulse.junit.NoMessages" name="testFailureNoMessageAtAll">
+          <failure type="junit.framework.AssertionFailedError"/>
+      </testcase>
+
+      <testcase classname="com.zutubi.pulse.junit.NoMessages" name="testFailureMessageInAttribute">
+          <failure message="this message only" type="junit.framework.AssertionFailedError"/>
+      </testcase>
+
+      <system-out></system-out>
+
+      <system-err></system-err>
+  </testsuite>
+</testsuites>

@@ -122,6 +122,15 @@ public class JUnitReportPostProcessorTest extends XMLReportPostProcessorTestBase
         assertEquals("bogosity", result.getFeatures().get(0).getSummary());
     }
 
+    public void testNoMessage()
+    {
+        TestSuiteResult tests = runProcessor("nomessage");
+        TestSuiteResult suite = tests.getSuite("com.zutubi.pulse.junit.NoMessages");
+        checkSuite(suite, "com.zutubi.pulse.junit.NoMessages", 2, 2, 0);
+        checkFailureCase(suite, "testFailureNoMessageAtAll", null);
+        checkFailureCase(suite, "testFailureMessageInAttribute", "this message only");
+    }
+
     private void checkWarning(TestResult testResult, String name, long duration, String contents)
     {
         assertTrue(testResult instanceof TestSuiteResult);

@@ -9,24 +9,26 @@ import nu.xom.*;
  */
 public class JUnitReportPostProcessor extends XMLReportPostProcessor
 {
-    private static final String ELEMENT_SUITE = "testsuite";
-    private static final String ELEMENT_CASE = "testcase";
-    private static final String ELEMENT_ERROR = "error";
+    private static final String ELEMENT_SUITE   = "testsuite";
+    private static final String ELEMENT_CASE    = "testcase";
+    private static final String ELEMENT_ERROR   = "error";
     private static final String ELEMENT_FAILURE = "failure";
 
-    private static final String ATTRIBUTE_CLASS = "classname";
-    private static final String ATTRIBUTE_NAME = "name";
+    private static final String ATTRIBUTE_CLASS   = "classname";
+    private static final String ATTRIBUTE_MESSAGE = "message";
+    private static final String ATTRIBUTE_NAME    = "name";
     private static final String ATTRIBUTE_PACKAGE = "package";
-    private static final String ATTRIBUTE_TIME = "time";
+    private static final String ATTRIBUTE_TIME    = "time";
 
-    private String suiteElement = ELEMENT_SUITE;
-    private String caseElement = ELEMENT_CASE;
-    private String errorElement = ELEMENT_ERROR;
-    private String failureElement = ELEMENT_FAILURE;
-    private String classAttribute = ATTRIBUTE_CLASS;
-    private String nameAttribute = ATTRIBUTE_NAME;
+    private String suiteElement     = ELEMENT_SUITE;
+    private String caseElement      = ELEMENT_CASE;
+    private String errorElement     = ELEMENT_ERROR;
+    private String failureElement   = ELEMENT_FAILURE;
+    private String classAttribute   = ATTRIBUTE_CLASS;
+    private String messageAttribute = ATTRIBUTE_MESSAGE;
+    private String nameAttribute    = ATTRIBUTE_NAME;
     private String packageAttribute = ATTRIBUTE_PACKAGE;
-    private String timeAttribute = ATTRIBUTE_TIME;
+    private String timeAttribute    = ATTRIBUTE_TIME;
 
     public JUnitReportPostProcessor()
     {
@@ -125,12 +127,23 @@ public class JUnitReportPostProcessor extends XMLReportPostProcessor
         }
     }
 
-    private void getMessage(Element child, TestCaseResult caseResult)
+    private void getMessage(Element element, TestCaseResult caseResult)
     {
-        Node node = child.getChild(0);
-        if(node != null && node instanceof Text)
+        if (element.getChildCount() > 0)
         {
-            caseResult.setMessage(node.getValue().trim());
+            Node node = element.getChild(0);
+            if(node != null && node instanceof Text)
+            {
+                caseResult.setMessage(node.getValue().trim());
+            }
+        }
+        else
+        {
+            String message = element.getAttributeValue(ATTRIBUTE_MESSAGE);
+            if(message != null)
+            {
+                caseResult.setMessage(message);
+            }
         }
     }
 
@@ -178,6 +191,11 @@ public class JUnitReportPostProcessor extends XMLReportPostProcessor
     public void setClassAttribute(String classAttribute)
     {
         this.classAttribute = classAttribute;
+    }
+
+    public void setMessageAttribute(String messageAttribute)
+    {
+        this.messageAttribute = messageAttribute;
     }
 
     public void setNameAttribute(String nameAttribute)
