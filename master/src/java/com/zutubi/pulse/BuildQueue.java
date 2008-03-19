@@ -42,18 +42,15 @@ public class BuildQueue
         checkOwner(owner);
 
         List<AbstractBuildRequestEvent> entityRequests = requests.get(owner);
-        synchronized(entityRequests)
+        if (entityRequests.size() > 0)
         {
-            if (entityRequests.size() > 0)
-            {
-                enqueueRequest(entityRequests, event);
-                return false;
-            }
-            else
-            {
-                entityRequests.add(event);
-                return true;
-            }
+            enqueueRequest(entityRequests, event);
+            return false;
+        }
+        else
+        {
+            entityRequests.add(event);
+            return true;
         }
     }
 
@@ -98,19 +95,15 @@ public class BuildQueue
     {
         List<AbstractBuildRequestEvent> entityRequests = requests.get(owner);
         assert(entityRequests.size() > 0);
-        
-        synchronized(entityRequests)
-        {
-            entityRequests.remove(0);
+        entityRequests.remove(0);
 
-            if (entityRequests.size() > 0)
-            {
-                return entityRequests.get(0);
-            }
-            else
-            {
-                return null;
-            }
+        if (entityRequests.size() > 0)
+        {
+            return entityRequests.get(0);
+        }
+        else
+        {
+            return null;
         }
     }
 
@@ -132,14 +125,14 @@ public class BuildQueue
         for (Map.Entry<Object, List<AbstractBuildRequestEvent>> entry : requests.entrySet())
         {
             List<AbstractBuildRequestEvent> events = entry.getValue();
-            synchronized(events)
+            // Ignore the first in the list: it is already running
+            Iterator<AbstractBuildRequestEvent> it = events.iterator();
+            if(it.hasNext())
             {
-                // Ingore the first in the list: it is alreayd running
-                Iterator<AbstractBuildRequestEvent> it = events.iterator();
-                if(it.hasNext())
+                it.next();
+                while(it.hasNext())
                 {
-                    it.next();
-                    while(it.hasNext())
+                    if (it.next().getId() == id)
                     {
                         AbstractBuildRequestEvent event = it.next();
                         if (event.getId() == id)
@@ -148,6 +141,9 @@ public class BuildQueue
                             it.remove();
                             return true;
                         }
+
+                        it.remove();
+                        return true;
                     }
                 }
             }
