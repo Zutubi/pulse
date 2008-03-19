@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -50,11 +51,12 @@ public class FatController implements EventListener, Stoppable
     private MasterConfigurationManager configManager;
     private RecipeQueue recipeQueue;
 
-    private ReentrantLock lock = new ReentrantLock();
-    private Condition stoppedCondition = lock.newCondition();
+    private Lock runningBuildsLock = new ReentrantLock();
+    private Condition stoppedCondition = runningBuildsLock.newCondition();
     private boolean stopping = false;
-    private BuildQueue buildQueue = new BuildQueue();
     private Set<BuildController> runningBuilds = new HashSet<BuildController>();
+    private Lock buildQueueLock = new ReentrantLock();
+    private BuildQueue buildQueue = new BuildQueue();
     private Scheduler quartzScheduler;
     private ProjectManager projectManager;
     private UserManager userManager;
@@ -95,6 +97,7 @@ public class FatController implements EventListener, Stoppable
      * If enabled, this fat controller is accepting build requests.
      *
      * @see #isDisabled()
+     * @return true if builds are enabled
      */
     public boolean isEnabled()
     {
@@ -105,6 +108,7 @@ public class FatController implements EventListener, Stoppable
      * If disabled, this fat controller is ignoring build requests.
      *
      * @see #isEnabled()
+     * @return true if builds are disabled
      */
     public boolean isDisabled()
     {
@@ -136,7 +140,7 @@ public class FatController implements EventListener, Stoppable
     public void stop(boolean force)
     {
         // Make sure all controllers are done
-        lock.lock();
+        runningBuildsLock.lock();
         try
         {
             // Flag that no new builds should be initiated
@@ -167,7 +171,7 @@ public class FatController implements EventListener, Stoppable
         }
         finally
         {
-            lock.unlock();
+            runningBuildsLock.unlock();
         }
 
         // Now stop handling events
@@ -175,11 +179,6 @@ public class FatController implements EventListener, Stoppable
         asyncListener.stop(force);
     }
 
-    /**
-     * Handle the incoming event.
-     *
-     * @param event
-     */
     public void handleEvent(Event event)
     {
         if (event instanceof AbstractBuildRequestEvent)
@@ -192,11 +191,11 @@ public class FatController implements EventListener, Stoppable
         }
         else if (event instanceof LicenseEvent)
         {
-            handleLicenseEvent((LicenseEvent)event);
+            handleLicenseEvent();
         }
     }
 
-    private void handleLicenseEvent(LicenseEvent event)
+    private void handleLicenseEvent()
     {
         // the type or detail of the license event does not matter at this stage.
         if (LicenseHolder.hasAuthorization(LicenseHolder.AUTH_RUN_PULSE))
@@ -224,7 +223,18 @@ public class FatController implements EventListener, Stoppable
             return;
         }
 
-        if (buildQueue.buildRequested(event))
+        boolean requested;
+        buildQueueLock.lock();
+        try
+        {
+            requested = buildQueue.buildRequested(event);
+        }
+        finally
+        {
+            buildQueueLock.unlock();
+        }
+
+        if (requested)
         {
             startBuild(event);
         }
@@ -235,7 +245,7 @@ public class FatController implements EventListener, Stoppable
         final Project project = event.getProject();
         BuildSpecification buildSpec = event.getSpecification();
 
-        lock.lock();
+        runningBuildsLock.lock();
         try
         {
             if (!stopping)
@@ -253,7 +263,7 @@ public class FatController implements EventListener, Stoppable
         }
         finally
         {
-            lock.unlock();
+            runningBuildsLock.unlock();
         }
     }
 
@@ -264,7 +274,7 @@ public class FatController implements EventListener, Stoppable
 
     private void handleBuildCompleted(BuildCompletedEvent event)
     {
-        lock.lock();
+        runningBuildsLock.lock();
         try
         {
             BuildResult result = event.getResult();
@@ -284,8 +294,17 @@ public class FatController implements EventListener, Stoppable
             if (!stopping)
             {
                 Entity owner = result.getOwner();
-                AbstractBuildRequestEvent queuedEvent = buildQueue.buildCompleted(owner);
-
+                AbstractBuildRequestEvent queuedEvent;
+                buildQueueLock.lock();
+                try
+                {
+                    queuedEvent = buildQueue.buildCompleted(owner);
+                }
+                finally
+                {
+                    buildQueueLock.unlock();
+                }
+                
                 if (queuedEvent != null)
                 {
                     startBuild(queuedEvent);
@@ -294,7 +313,7 @@ public class FatController implements EventListener, Stoppable
         }
         finally
         {
-            lock.unlock();
+            runningBuildsLock.unlock();
         }
     }
 
@@ -316,72 +335,75 @@ public class FatController implements EventListener, Stoppable
      */
     public Map<Entity, List<AbstractBuildRequestEvent>> snapshotBuildQueue()
     {
-        lock.lock();
+        buildQueueLock.lock();
         try
         {
             return buildQueue.takeSnapshot();
         }
         finally
         {
-            lock.unlock();
+            buildQueueLock.unlock();
         }
     }
 
     /**
-     * Required resource.
+     * Cancel the queued build.
      *
-     * @param buildManager
+     * @param id uniquely representing the queued build.
+     *
+     * @return true if the build has been cancelled, false otherwise.
      */
+    public boolean cancelQueuedBuild(long id)
+    {
+        buildQueueLock.lock();
+        try
+        {
+            return buildQueue.cancelBuild(id);
+        }
+        finally
+        {
+            buildQueueLock.unlock();
+        }
+    }
+
+    public AbstractBuildRequestEvent findQueuedBuild(long id)
+    {
+        buildQueueLock.lock();
+        try
+        {
+            return buildQueue.findEvent(id);
+        }
+        finally
+        {
+            buildQueueLock.unlock();
+        }
+    }
+
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param recipeQueue
-     */
     public void setRecipeQueue(RecipeQueue recipeQueue)
     {
         this.recipeQueue = recipeQueue;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param eventManager
-     */
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param quartzScheduler
-     */
     public void setQuartzScheduler(Scheduler quartzScheduler)
     {
         this.quartzScheduler = quartzScheduler;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param configManager
-     */
     public void setConfigurationManager(MasterConfigurationManager configManager)
     {
         this.configManager = configManager;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param projectManager
-     */
     public void setProjectManager(ProjectManager projectManager)
     {
         this.projectManager = projectManager;
@@ -395,23 +417,6 @@ public class FatController implements EventListener, Stoppable
     public void setUserManager(UserManager userManager)
     {
         this.userManager = userManager;
-    }
-
-    public AbstractBuildRequestEvent findQueuedBuild(long id)
-    {
-        return buildQueue.findEvent(id);
-    }
-
-    /**
-     * Cancel the queued build.
-     *
-     * @param id uniquely representing the queued build.
-     *
-     * @return true if the build has been cancelled, false otherwise.
-     */
-    public boolean cancelQueuedBuild(long id)
-    {
-        return buildQueue.cancelBuild(id);
     }
 
     public void setTestManager(TestManager testManager)
