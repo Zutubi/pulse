@@ -214,8 +214,13 @@ public class SeleniumUtils
         Assert.assertFalse(selenium.isVisible(locator));
     }
 
+    public static String getCellContents(Selenium selenium, String tableLocator, int row, int column)
+    {
+        return selenium.getTable(StringUtils.toValidHtmlName(tableLocator + "." + row + "." + column));
+    }
+
     public static void assertCellContents(Selenium selenium, String tableLocator, int row, int column, String text)
     {
-        Assert.assertEquals(text, selenium.getTable(StringUtils.toValidHtmlName(tableLocator + "." + row + "." + column)));
+        Assert.assertEquals(text, getCellContents(selenium, tableLocator, row, column));
     }
 }
