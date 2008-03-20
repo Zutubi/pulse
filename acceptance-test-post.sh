@@ -13,7 +13,7 @@ export PULSE_HOME=
 ./pulse-accept/pulse-${version}/bin/pulse shutdown -p 8889
 
 # Wait for it to shut down
-while netstat -an | grep 8889 > /dev/null
+while netstat -an | grep '\b8889\b' > /dev/null
 do
     sleep 2
 done
