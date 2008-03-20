@@ -62,7 +62,14 @@ public class ChangelistHashUpgradeTask extends DatabaseUpgradeTask
             // It may not exist, so ignore this error
         }
 
-        addIndex(con, "BUILD_CHANGELIST", "idx_changelist_hash", "HASH");
+        try
+        {
+            addIndex(con, "BUILD_CHANGELIST", "idx_changelist_hash", "HASH");
+        }
+        catch (SQLException e)
+        {
+            // It may already exist, so ignore this too
+        }
     }
 
     private void prepareStatements(Connection con) throws SQLException
@@ -123,8 +130,7 @@ public class ChangelistHashUpgradeTask extends DatabaseUpgradeTask
         String hash = getHash(author, comment, date, branch, revisionString);
         setHash.setString(1, hash);
         setHash.setLong(2, id);
-        int i = setHash.executeUpdate();
-        System.out.println("i = " + i);
+        setHash.executeUpdate();
     }
 
     public String getHash(String author, String comment, Long date, String branch, String revisionString)
