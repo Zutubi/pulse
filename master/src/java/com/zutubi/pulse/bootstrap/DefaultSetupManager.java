@@ -15,6 +15,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
@@ -77,7 +79,7 @@ public class DefaultSetupManager implements SetupManager
             {
                 baseUrl = systemConfig.getHostUrl();
             }
-            System.err.println("Now go to " + baseUrl + " and follow the prompts.");
+            printConsoleMessage("Now go to %s and follow the prompts.", baseUrl);
             promptShown = true;
         }
     }
@@ -97,6 +99,8 @@ public class DefaultSetupManager implements SetupManager
 
         if (isDataRequired())
         {
+            printConsoleMessage("No data path configured, requesting via web UI...");
+
             // request data input.
             state = SetupState.DATA;
 
@@ -122,8 +126,12 @@ public class DefaultSetupManager implements SetupManager
         {
             configFile = configFile.getCanonicalFile();
         }
+
+        printConsoleMessage("Using config file '%s'.", configFile.getAbsolutePath());
         if (!configFile.isFile())
         {
+            printConsoleMessage("Config file does not exist, creating a default one.");
+
             // copy the template file into the config location.
             SystemPaths paths = configurationManager.getSystemPaths();
             File configTemplate = new File(paths.getConfigRoot(), "config.properties.template");
@@ -148,16 +156,21 @@ public class DefaultSetupManager implements SetupManager
         // to ensure that it is initialised. If we are working with an already existing directory,
         // then it will have been initialised and no re-initialisation is required (or allowed).
         Data d = configurationManager.getData();
+        printConsoleMessage("Using data path '%s'.", d.getData().getAbsolutePath());
         if (!d.isInitialised())
         {
+            printConsoleMessage("Empty data directory, initialising...");
             configurationManager.getData().init(configurationManager.getSystemPaths());
+            printConsoleMessage("Data directory initialised.");
         }
 
         loadSystemProperties();
 
         state = SetupState.STARTING;
+        printConsoleMessage("Checking license...");
         if (isLicenseRequired())
         {
+            printConsoleMessage("No valid license found, requesting via web UI...");
             //TODO: we need to provide some feedback to the user about what / why there current license
             //TODO: if one exists is not sufficient.
             state = SetupState.LICENSE;
@@ -191,6 +204,7 @@ public class DefaultSetupManager implements SetupManager
 
     public void requestLicenseComplete()
     {
+        printConsoleMessage("License accepted.");
         state = SetupState.STARTING;
 
         // License is allowed to run this version of pulse. Therefore, it is okay to go ahead with an upgrade.
@@ -200,8 +214,18 @@ public class DefaultSetupManager implements SetupManager
 
         // create the database based on the hibernate configuration.
         databaseConsole = (DatabaseConsole) ComponentContext.getBean("databaseConsole");
+        if(databaseConsole.isEmbedded())
+        {
+            printConsoleMessage("Using embedded database (only recommended for evaluation purposes).");
+        }
+        else
+        {
+            printConsoleMessage("Using external database '%s'.", databaseConsole.getConfig().getUrl());
+        }
+
         if (!databaseConsole.schemaExists())
         {
+            printConsoleMessage("Database schema does not exist, initialising...");
             try
             {
                 databaseConsole.createSchema();
@@ -210,6 +234,7 @@ public class DefaultSetupManager implements SetupManager
             {
                 throw new StartupException("Failed to create the database schema. Cause: " + e.getMessage());
             }
+            printConsoleMessage("Database initialised.");
         }
 
         databaseConsole.postSchemaHook();
@@ -217,6 +242,7 @@ public class DefaultSetupManager implements SetupManager
 
         if (isUpgradeRequired())
         {
+            printConsoleMessage("Upgrade is required: existing data version '" + configurationManager.getData().getVersion().getVersionNumber() + ", Pulse version " + Version.getVersion().getVersionNumber() + "...");
             state = SetupState.UPGRADE;
             showPrompt();
             return;
@@ -229,6 +255,10 @@ public class DefaultSetupManager implements SetupManager
 
     public void requestUpgradeComplete(boolean changes)
     {
+        if (changes)
+        {
+            printConsoleMessage("Upgrade complete.");
+        }
         databaseConsole.postUpgradeHook(changes);
 
         state = SetupState.STARTING;
@@ -241,14 +271,20 @@ public class DefaultSetupManager implements SetupManager
 
         if (isSetupRequired())
         {
+            printConsoleMessage("Database empty, requesting setup via web UI...");
             state = SetupState.SETUP;
             return;
         }
-        requestSetupComplete();
+        requestSetupComplete(false);
     }
 
-    public void requestSetupComplete()
+    public void requestSetupComplete(boolean setupWizard)
     {
+        if (setupWizard)
+        {
+            printConsoleMessage("Setup wizard complete.");
+        }
+        
         state = SetupState.STARTING;
 
         // load the remaining contexts.
@@ -305,41 +341,27 @@ public class DefaultSetupManager implements SetupManager
         }
     }
 
-    /**
-     * Required resource.
-     *
-     * @param userManager
-     */
+    public static void printConsoleMessage(String format, Object... args)
+    {
+        String date = "[" + DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG).format(new Date()) + "] ";
+        System.err.printf(date + format + "\n", args);
+    }
+
     public void setUserManager(UserManager userManager)
     {
         this.userManager = userManager;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param startupManager
-     */
     public void setStartupManager(StartupManager startupManager)
     {
         this.startupManager = startupManager;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param upgradeManager
-     */
     public void setUpgradeManager(UpgradeManager upgradeManager)
     {
         this.upgradeManager = upgradeManager;
     }
 
-    /**
-     * Required resources.
-     *
-     * @param configurationManager
-     */
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
@@ -369,5 +391,4 @@ public class DefaultSetupManager implements SetupManager
     {
         this.upgradeContexts = upgradeContexts;
     }
-
 }

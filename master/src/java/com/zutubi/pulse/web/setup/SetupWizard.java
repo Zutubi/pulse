@@ -106,7 +106,7 @@ public class SetupWizard extends BaseWizard
             {
                 public void run()
                 {
-                    setupManager.requestSetupComplete();
+                    setupManager.requestSetupComplete(true);
                 }
             }).start();
         }
