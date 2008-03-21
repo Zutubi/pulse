@@ -17,13 +17,13 @@ public class Row extends AbstractParameterised
     private static final String PARAM_HIDDEN = "hidden";
 
     private List<Cell> cells = new LinkedList<Cell>();
-    private List<RowAction> actions = null;
+    private List<ActionLink> actions = null;
 
     public Row()
     {
     }
 
-    public Row(String path, boolean hidden, List<RowAction> actions)
+    public Row(String path, boolean hidden, List<ActionLink> actions)
     {
         addParameter(PARAM_PATH, path);
         addParameter(PARAM_HIDDEN, hidden);
@@ -55,23 +55,23 @@ public class Row extends AbstractParameterised
         cells.add(cell);
     }
 
-    public List<RowAction> getActions()
+    public List<ActionLink> getActions()
     {
         return actions;
     }
 
-    public RowAction getAction(final String actionName)
+    public ActionLink getAction(final String actionName)
     {
-        return CollectionUtils.find(actions, new Predicate<RowAction>()
+        return CollectionUtils.find(actions, new Predicate<ActionLink>()
         {
-            public boolean satisfied(RowAction rowAction)
+            public boolean satisfied(ActionLink actionLink)
             {
-                return rowAction.getAction().equals(actionName);
+                return actionLink.getAction().equals(actionName);
             }
         });
     }
 
-    public void addAction(RowAction action)
+    public void addAction(ActionLink action)
     {
         actions.add(action);
     }

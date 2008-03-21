@@ -39,6 +39,7 @@ public class UserConfiguration extends AbstractConfiguration implements Extendab
 
     public UserConfiguration()
     {
+        preferences.setPermanent(true);
         directAuthorities = new LinkedList<String>();
         directAuthorities.add(GrantedAuthority.USER);
     }

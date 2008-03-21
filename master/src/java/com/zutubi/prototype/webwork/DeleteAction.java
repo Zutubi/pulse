@@ -2,6 +2,7 @@ package com.zutubi.prototype.webwork;
 
 import com.zutubi.prototype.config.cleanup.HideRecordCleanupTask;
 import com.zutubi.prototype.config.cleanup.RecordCleanupTask;
+import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.validation.i18n.MessagesTextProvider;
 import com.zutubi.validation.i18n.TextProvider;
@@ -62,13 +63,24 @@ public class DeleteAction extends PrototypeSupport
             if (isDeleteSelected())
             {
                 String newTemplatePath = templatePath == null ? null : PathUtils.getParentPath(templatePath);
+                String originalDisplayName = PrototypeUtils.getDisplayName(path, configurationTemplateManager);
                 configurationTemplateManager.delete(path);
 
                 response = new ConfigurationResponse(parentPath, newTemplatePath);
-                if (!configurationTemplateManager.pathExists(path))
+                boolean collectionElement = (configurationTemplateManager.getType(parentPath) instanceof CollectionType);
+                if (collectionElement)
                 {
                     response.addRemovedPath(path);
                 }
+                else
+                {
+                    String newDisplayName = PrototypeUtils.getDisplayName(path, configurationTemplateManager);
+                    if(!newDisplayName.equals(originalDisplayName))
+                    {
+                        response.addRenamedPath(new ConfigurationResponse.Rename(path, path, newDisplayName));
+                    }
+                }
+
                 path = response.getNewPath();
                 return SUCCESS;
             }

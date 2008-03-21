@@ -45,6 +45,10 @@
     </div>
 #end
 
+#macro(actionAnchor $actionLink)
+
+#end
+
 <h2 id='#id($path)'>$!webwork.htmlEncode($config.displayName)</h2>
 <p class="introduction">
     #i18n("key=introduction")
@@ -68,7 +72,17 @@
             <div class="config-container">
             <ul class="config-actions">
                 #foreach($action in $config.actions)
-                    <li><a href="#" id='#id("action.${action}")' onclick="actionPath('${path}?${action}'); return false;">#i18n("key=${action}.label")</a></li>
+                    <li>
+                        <a href="#" id='#id("action.${action.action}")' class="unadorned"
+                    #if($action.action == "delete")
+                            onclick="deletePath('${path}'); return false;"
+                    #else
+                            onclick="actionPath('${path}?${action.action}'); return false;"
+                    #end
+                        >
+                            <img src="${base}/images/config/actions/${action.icon}.gif"/> ${action.label}
+                        </a>
+                    </li>
                 #end
             </ul>
             </div>

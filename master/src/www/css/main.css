@@ -1108,16 +1108,12 @@ table.template-actions
 
 ul.config-links li, ul.config-actions li {
     padding: 1px;
-    padding-left: 20px;
     line-height: 1.4em;
 }
 
 ul.config-links li {
+    padding-left: 20px;
     background: url(../images/bullet_go.gif) no-repeat 0 2px;
-}
-
-ul.config-actions li {
-    background: url(../images/config/actions/generic.gif) no-repeat 0 2px;
 }
 
 .item-hidden {

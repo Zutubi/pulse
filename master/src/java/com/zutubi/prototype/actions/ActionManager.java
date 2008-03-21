@@ -51,7 +51,8 @@ public class ActionManager
                     result.add(AccessManager.ACTION_CLONE);
                 }
 
-                if(!configurationInstance.isPermanent() && configurationSecurityManager.hasPermission(path, AccessManager.ACTION_DELETE))
+                String[] elements = PathUtils.getPathElements(path);
+                if(elements.length > 1 && !configurationInstance.isPermanent() && configurationSecurityManager.hasPermission(path, AccessManager.ACTION_DELETE))
                 {
                     result.add(AccessManager.ACTION_DELETE);
                 }

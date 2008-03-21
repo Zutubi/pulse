@@ -1,20 +1,20 @@
 package com.zutubi.pulse.prototype.config.project.commit;
 
-import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Form;
+import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.pulse.committransformers.Substitution;
 import com.zutubi.validation.annotations.Required;
 import com.zutubi.validation.annotations.ValidRegex;
-import com.zutubi.pulse.committransformers.Substitution;
 
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * A transformer that simplifies the common case of turning some text into a
  * link.
  */
 @SymbolicName("zutubi.linkTransformerConfig")
-@Form(fieldOrder = {"name", "expression", "url"})
+@Form(fieldOrder = {"name", "expression", "url", "exclusive"})
 public class LinkTransformerConfiguration extends CommitMessageTransformerConfiguration
 {
     @Required
@@ -56,6 +56,6 @@ public class LinkTransformerConfiguration extends CommitMessageTransformerConfig
 
     public List<Substitution> substitutions()
     {
-        return Arrays.asList(new Substitution(expression, "<a href='" + url + "'>$0</a>"));
+        return Arrays.asList(new Substitution(expression, "<a href='" + url + "'>$0</a>", isExclusive()));
     }
 }

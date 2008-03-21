@@ -44,9 +44,19 @@ public class CompositePage extends ConfigPage
         }
     }
 
+    public String getActionId(String action)
+    {
+        return "action." + action;
+    }
+
+    public boolean isActionPresent(String action)
+    {
+        return selenium.isElementPresent(getActionId(action));
+    }
+    
     public void clickAction(String action)
     {
-        selenium.click("action." + action);
+        selenium.click(getActionId(action));
     }
 
     public void clickActionAndWait(String action)

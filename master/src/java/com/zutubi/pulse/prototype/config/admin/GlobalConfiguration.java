@@ -1,7 +1,7 @@
 package com.zutubi.pulse.prototype.config.admin;
 
-import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Classification;
+import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
@@ -26,6 +26,16 @@ public class GlobalConfiguration extends AbstractConfiguration
     private LicenseConfiguration licenseConfig = new LicenseConfiguration();
 
     private ConfigurationTemplateManager configurationTemplateManager;
+
+    public GlobalConfiguration()
+    {
+        generalConfig.setPermanent(true);
+        loggingConfig.setPermanent(true);
+        emailConfig.setPermanent(true);
+        ldapConfig.setPermanent(true);
+        jabberConfig.setPermanent(true);
+        licenseConfig.setPermanent(true);
+    }
 
     public GeneralAdminConfiguration getGeneralConfig()
     {

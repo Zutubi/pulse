@@ -88,28 +88,28 @@
         <td class="content" width="1%">
     <#if row.actions?size &gt; 0>
         <#assign first = true/>
-        <#list row.actions as rowAction>
-            <#assign actionId = "${rowAction.action}:${row.baseName}"/>
+        <#list row.actions as actionLink>
+            <#assign actionId = "${actionLink.action}:${row.baseName}"/>
             <#if !first>
             |
             </#if>
             <a href="#" id="${actionId?id}" class="unadorned"
-            <#if rowAction.action == "view">
+            <#if actionLink.action == "view">
                 <#if embedded>
                     <#assign clickAction = "edit"/>
                 <#else>
                     <#assign clickAction = "select"/>
                 </#if>
                 onclick="${clickAction}Path('${row.path}'); return false">
-            <#elseif rowAction.action == "delete">
+            <#elseif actionLink.action == "delete">
                 onclick="deletePath('${row.path}'); return false;">
             <#else>
-                onclick="actionPath('${row.path}?${rowAction.action}'); return false;">
+                onclick="actionPath('${row.path}?${actionLink.action}'); return false;">
             </#if>
-            <#if rowAction.icon?exists>
-                <img alt="${rowAction.label?html}" src="${base}/images/config/actions/${rowAction.icon}.gif"/>
+            <#if actionLink.icon?exists>
+                <img alt="${actionLink.label?html}" src="${base}/images/config/actions/${actionLink.icon}.gif"/>
             </#if>
-                ${rowAction.label?html}<#t>
+                ${actionLink.label?html}<#t>
         </a><#lt>
             <#assign first = false/>
         </#list>

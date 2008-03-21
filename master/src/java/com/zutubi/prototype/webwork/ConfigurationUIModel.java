@@ -1,5 +1,6 @@
 package com.zutubi.prototype.webwork;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.prototype.ConventionSupport;
 import com.zutubi.prototype.actions.ActionManager;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
@@ -7,6 +8,7 @@ import com.zutubi.prototype.config.ConfigurationRegistry;
 import com.zutubi.prototype.config.ConfigurationSecurityManager;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.format.Display;
+import com.zutubi.prototype.model.ActionLink;
 import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.ComplexType;
@@ -15,6 +17,7 @@ import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.bootstrap.SystemPaths;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
@@ -37,6 +40,7 @@ public class ConfigurationUIModel
     private ConfigurationRegistry configurationRegistry;
     private ActionManager actionManager;
     private ObjectFactory objectFactory;
+    private SystemPaths systemPaths;
 
     private Record record;
     private Type type;
@@ -56,7 +60,7 @@ public class ConfigurationUIModel
     private List<String> nestedProperties;
     private List<String> extensions = new LinkedList<String>();
 
-    private List<String> actions = new LinkedList<String>();
+    private List<ActionLink> actions = new LinkedList<ActionLink>();
 
     private List<String> displayFields = new LinkedList<String>();
 
@@ -140,7 +144,17 @@ public class ConfigurationUIModel
         if (!(type instanceof CollectionType))
         {
             // determine the actions.
-            actions = actionManager.getActions(instance, false);
+            final Messages messages = Messages.getInstance(type.getClazz());
+            List<String> actionNames = actionManager.getActions(instance, true);
+            actionNames.remove(AccessManager.ACTION_VIEW);
+            actionNames.remove(AccessManager.ACTION_CLONE);
+            actions = CollectionUtils.map(actionNames, new Mapping<String, ActionLink>()
+            {
+                public ActionLink map(String actionName)
+                {
+                    return PrototypeUtils.getActionLink(actionName, record, null, messages, systemPaths);
+                }
+            });
 
             Class displayHandler = ConventionSupport.getDisplay(type);
             if (displayHandler != null)
@@ -270,7 +284,7 @@ public class ConfigurationUIModel
         return targetSymbolicName;
     }
 
-    public List<String> getActions()
+    public List<ActionLink> getActions()
     {
         return actions;
     }
@@ -328,5 +342,10 @@ public class ConfigurationUIModel
     public void setConfigurationSecurityManager(ConfigurationSecurityManager configurationSecurityManager)
     {
         this.configurationSecurityManager = configurationSecurityManager;
+    }
+
+    public void setSystemPaths(SystemPaths systemPaths)
+    {
+        this.systemPaths = systemPaths;
     }
 }

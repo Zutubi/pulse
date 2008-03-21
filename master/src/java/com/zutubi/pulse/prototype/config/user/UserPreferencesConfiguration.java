@@ -1,7 +1,7 @@
 package com.zutubi.pulse.prototype.config.user;
 
-import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Classification;
+import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.prototype.config.user.contacts.ContactConfiguration;
 
@@ -19,6 +19,12 @@ public class UserPreferencesConfiguration extends AbstractConfiguration
     private Map<String, ContactConfiguration> contacts = new HashMap<String, ContactConfiguration>();
     private Map<String, SubscriptionConfiguration> subscriptions = new HashMap<String, SubscriptionConfiguration>();
     private DashboardConfiguration dashboard = new DashboardConfiguration();
+
+    public UserPreferencesConfiguration()
+    {
+        settings.setPermanent(true);
+        dashboard.setPermanent(true);
+    }
 
     public UserSettingsConfiguration getSettings()
     {

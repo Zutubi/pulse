@@ -5,20 +5,18 @@ import com.zutubi.prototype.AbstractParameterised;
 import com.zutubi.prototype.Descriptor;
 import com.zutubi.prototype.actions.ActionManager;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
+import com.zutubi.prototype.model.ActionLink;
 import com.zutubi.prototype.model.Cell;
 import com.zutubi.prototype.model.Row;
-import com.zutubi.prototype.model.RowAction;
 import com.zutubi.prototype.model.Table;
-import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.prototype.webwork.PrototypeUtils;
-import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.bootstrap.SystemPaths;
-import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.logging.Logger;
@@ -27,7 +25,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.io.File;
 
 /**
  * The table descriptor represents the model used to render a table to the UI.
@@ -48,7 +45,7 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
     private List<ColumnDescriptor> columns = new LinkedList<ColumnDescriptor>();
     private ConfigurationTemplateManager configurationTemplateManager;
     private ActionManager actionManager;
-    private File iconPath;
+    private SystemPaths systemPaths;
 
     public TableDescriptor(CollectionType collectionType, boolean orderAllowed, boolean addAllowed, ConfigurationTemplateManager configurationTemplateManager, ActionManager actionManager, SystemPaths systemPaths)
     {
@@ -61,7 +58,7 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
 
         this.configurationTemplateManager = configurationTemplateManager;
         this.actionManager = actionManager;
-        iconPath = new File(systemPaths.getContentRoot(), FileSystemUtils.composeFilename("images", "config", "actions"));
+        this.systemPaths = systemPaths;
     }
 
     public Table instantiate(String path, Record data)
@@ -75,7 +72,7 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
         for (ColumnDescriptor column : columns)
         {
             String key = column.getName() + ".label";
-            table.addHeader(format(messages, key));
+            table.addHeader(PrototypeUtils.format(messages, key));
         }
 
         if (data != null)
@@ -85,9 +82,9 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
                 String itemPath = PathUtils.getPath(path, key);
                 Configuration instance = configurationTemplateManager.getInstance(itemPath);
                 messages = Messages.getInstance(instance.getClass());
-                Row row = new Row(itemPath, false, getActions(instance, messages));
+                Row row = new Row(itemPath, false, getActions(instance, data, key, messages));
                 addCells(row, instance);
-                applyRowDecorations(data, key, row, messages);
+                applyRowDecorations(data, key, row);
                 table.addRow(row);
             }
 
@@ -111,7 +108,7 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
                         String parentItemPath = PathUtils.getPath(parentPath, hidden);
                         Configuration instance = configurationTemplateManager.getInstance(parentItemPath);
                         messages = Messages.getInstance(instance.getClass());
-                        Row row = new Row(PathUtils.getPath(path, hidden), true, Arrays.asList(new RowAction("restore", format(messages, "restore.label"), "restore")));
+                        Row row = new Row(PathUtils.getPath(path, hidden), true, Arrays.asList(new ActionLink("restore", PrototypeUtils.format(messages, "restore.label"), "restore")));
                         addCells(row, instance);
                         row.addParameter("hiddenFrom", templateParent.getOwner(hidden));
                         row.addParameter("cls", "item-hidden");
@@ -156,7 +153,7 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
         }
     }
 
-    private void applyRowDecorations(Record data, String key, Row row, Messages messages)
+    private void applyRowDecorations(Record data, String key, Row row)
     {
         if (data instanceof TemplateRecord)
         {
@@ -165,7 +162,6 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
             if (!itemOwner.equals(templateRecord.getOwner()))
             {
                 row.addParameter("inheritedFrom", itemOwner);
-                transformDeleteAction(row, "hide", messages);
             }
             else
             {
@@ -176,34 +172,32 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
                     if (parentItemOwner != null)
                     {
                         row.addParameter("overriddenOwner", parentItemOwner);
-                        transformDeleteAction(row, "hide", messages);
                     }
                 }
             }
         }
     }
 
-    private void transformDeleteAction(Row row, String action, Messages messages)
-    {
-        RowAction deleteAction = row.getAction(AccessManager.ACTION_DELETE);
-        if (deleteAction != null)
-        {
-            deleteAction.setLabel(format(messages, action + ".label"));
-            deleteAction.setIcon(action);
-        }
-    }
+//    private void transformDeleteAction(Row row, String action, Messages messages)
+//    {
+//        RowAction deleteAction = row.getAction(AccessManager.ACTION_DELETE);
+//        if (deleteAction != null)
+//        {
+//            deleteAction.setLabel(format(messages, action + ".label"));
+//            deleteAction.setIcon(action);
+//        }
+//    }
 
-    private List<RowAction> getActions(Object instance, final Messages messages)
+    private List<ActionLink> getActions(Object instance, final Record data, final String key, final Messages messages)
     {
         try
         {
             List<String> actionNames = actionManager.getActions((Configuration) instance, true);
-            return CollectionUtils.map(actionNames, new Mapping<String, RowAction>()
+            return CollectionUtils.map(actionNames, new Mapping<String, ActionLink>()
             {
-                public RowAction map(String actionName)
+                public ActionLink map(String actionName)
                 {
-                    File iconFile = new File(iconPath, actionName + ".gif");
-                    return new RowAction(actionName, format(messages, actionName + ".label"), iconFile.exists() ? actionName : "generic");
+                    return PrototypeUtils.getActionLink(actionName, data, key, messages, systemPaths);
                 }
             });
         }
@@ -219,13 +213,4 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
         columns.add(descriptor);
     }
 
-    private String format(Messages messages, String key)
-    {
-        String value = messages.format(key);
-        if(value == null)
-        {
-            value = key;
-        }
-        return value;
-    }
 }

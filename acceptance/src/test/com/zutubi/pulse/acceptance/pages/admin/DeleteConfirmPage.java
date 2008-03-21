@@ -31,10 +31,30 @@ public class DeleteConfirmPage extends SeleniumPage
         return null;
     }
 
-    public ListPage confirm()
+    public void clickDelete()
     {
         selenium.click(CONFIRM_LINK);
-        return new ListPage(selenium, urls, PathUtils.getParentPath(path));
+    }
+
+    public void clickCancel()
+    {
+        selenium.click(CANCEL_LINK);
+    }
+
+    public ListPage confirmDeleteListItem()
+    {
+        clickDelete();
+        ListPage listPage = new ListPage(selenium, urls, PathUtils.getParentPath(path));
+        listPage.waitFor();
+        return listPage;
+    }
+
+    public CompositePage confirmDeleteSingleton()
+    {
+        clickDelete();
+        CompositePage compositePage = new CompositePage(selenium, urls, PathUtils.getParentPath(path));
+        compositePage.waitFor();
+        return compositePage;
     }
 
     public ListPage cancel()
@@ -60,15 +80,5 @@ public class DeleteConfirmPage extends SeleniumPage
         String actionsCell = SeleniumUtils.getCellContents(selenium, getId(), i + 1, 0);
         actionsCell = actionsCell.replaceAll(" +", " ");
         Assert.assertEquals((hide ? "hide" : "delete") + " cancel", actionsCell);
-    }
-
-    public void clickDelete()
-    {
-        selenium.click("confirm.delete");
-    }
-
-    public void clickCancel()
-    {
-        selenium.click("cancel.delete");
     }
 }

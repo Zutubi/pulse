@@ -51,7 +51,12 @@ public class AjaxEnabledConfigurationWizardAction extends ConfigurationWizardAct
             else
             {
                 configurationResponse = new ConfigurationResponse(newPath, configurationTemplateManager.getTemplatePath(newPath));
-                if(!originalPath.equals(newPath))
+                if(originalPath.equals(newPath))
+                {
+                    // We configured a singleton, and may have relabelled.
+                    configurationResponse.addRenamedPath(new ConfigurationResponse.Rename(originalPath, newPath, PrototypeUtils.getDisplayName(newPath, configurationTemplateManager)));
+                }
+                else
                 {
                     // Then we just added this path
                     configurationResponse.registerNewPathAdded(configurationTemplateManager, configurationSecurityManager);

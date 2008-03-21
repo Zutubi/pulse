@@ -70,7 +70,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         labelsPage.assertItemPresent(baseName, null, "view", "delete");
         DeleteConfirmPage deleteConfirmPage = labelsPage.clickDelete(baseName);
         deleteConfirmPage.waitFor();
-        labelsPage = deleteConfirmPage.confirm();
+        labelsPage = deleteConfirmPage.confirmDeleteListItem();
 
         labelsPage.assertItemNotPresent(baseName);
     }

@@ -7,11 +7,13 @@ public class Substitution
 {
     private String expression;
     private String replacement;
+    private boolean exclusive;
 
-    public Substitution(String expression, String replacement)
+    public Substitution(String expression, String replacement, boolean exclusive)
     {
         this.expression = expression;
         this.replacement = replacement;
+        this.exclusive = exclusive;
     }
 
     public String getExpression()
@@ -22,6 +24,16 @@ public class Substitution
     public String getReplacement()
     {
         return replacement;
+    }
+
+    public boolean isExclusive()
+    {
+        return exclusive;
+    }
+
+    public void setExclusive(boolean exclusive)
+    {
+        this.exclusive = exclusive;
     }
 
     public boolean equals(Object o)
@@ -36,7 +48,16 @@ public class Substitution
         }
 
         Substitution that = (Substitution) o;
-        return expression.equals(that.expression) && replacement.equals(that.replacement);
+
+        if (exclusive != that.exclusive)
+        {
+            return false;
+        }
+        if (!expression.equals(that.expression))
+        {
+            return false;
+        }
+        return replacement.equals(that.replacement);
     }
 
     public int hashCode()
@@ -44,6 +65,7 @@ public class Substitution
         int result;
         result = expression.hashCode();
         result = 31 * result + replacement.hashCode();
+        result = 31 * result + (exclusive ? 1 : 0);
         return result;
     }
 }

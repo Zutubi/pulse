@@ -243,6 +243,7 @@ Ext.extend(ZUTUBI.ConfigTreeLoader, Ext.tree.TreeLoader, {
 ZUTUBI.ConfigTree = function(id, config)
 {
     ZUTUBI.ConfigTree.superclass.constructor.call(this, id, config);
+    this.dead = false;
 }
 
 Ext.extend(ZUTUBI.ConfigTree, Ext.tree.TreePanel, {
@@ -398,9 +399,16 @@ Ext.extend(ZUTUBI.ConfigTree, Ext.tree.TreePanel, {
         if (path)
         {
             var node = this.getNodeByConfigPath(path);
-            if (node && !node.isRoot)
+            if (node)
             {
-                node.parentNode.removeChild(node);
+                if(node.isRoot)
+                {
+                    this.dead = true;
+                }
+                else
+                {
+                    node.parentNode.removeChild(node);
+                }
             }
         }
     },
@@ -418,6 +426,7 @@ Ext.extend(ZUTUBI.ConfigTree, Ext.tree.TreePanel, {
 ZUTUBI.TemplateTree = function(scope, id, config)
 {
     this.scope = scope;
+    this.dead = false;
     ZUTUBI.TemplateTree.superclass.constructor.call(this, id, config);
 }
 

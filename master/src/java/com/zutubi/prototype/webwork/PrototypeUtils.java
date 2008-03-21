@@ -12,22 +12,23 @@ import com.zutubi.prototype.config.TemplateNode;
 import com.zutubi.prototype.freemarker.BaseNameMethod;
 import com.zutubi.prototype.freemarker.GetTextMethod;
 import com.zutubi.prototype.freemarker.ValidIdMethod;
+import com.zutubi.prototype.model.ActionLink;
 import com.zutubi.prototype.model.Form;
 import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.prototype.type.*;
-import com.zutubi.prototype.type.record.MutableRecord;
-import com.zutubi.prototype.type.record.MutableRecordImpl;
-import com.zutubi.prototype.type.record.PathUtils;
-import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.*;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.bootstrap.SystemPaths;
 import com.zutubi.pulse.bootstrap.freemarker.FreemarkerConfigurationFactoryBean;
 import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.webwork.mapping.PulseActionMapper;
 import com.zutubi.util.*;
 import freemarker.core.DelegateBuiltin;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
@@ -439,6 +440,46 @@ public class PrototypeUtils
         }
 
         return iconCls;
+    }
+
+    /**
+     * Creates an action link for a given action on the given data.  The link
+     * includes extra UI decoration, e.g. the icon and potential
+     * transformation of "delete" into "hide" for display purposes.
+     *
+     * @param actionName   action to create the link for
+     * @param data         record the action applies to
+     * @param key          if the record is a map item, the map key,
+     *                     otherwise it should be null
+     * @param messages     used to format UI labels
+     * @param systemPaths  used to locate icons
+     * @return details of an action link for UI display
+     */
+    public static ActionLink getActionLink(String actionName, Record data, String key, Messages messages, SystemPaths systemPaths)
+    {
+        String action = actionName;
+        if(actionName.equals(AccessManager.ACTION_DELETE) && data instanceof TemplateRecord)
+        {
+            TemplateRecord templateRecord = (TemplateRecord) data;
+            TemplateRecord templateParent = templateRecord.getParent();
+            if(templateParent != null && key != null && templateParent.getOwner(key) != null)
+            {
+                actionName = "hide";
+            }
+        }
+
+        File iconFile = new File(systemPaths.getContentRoot(), FileSystemUtils.composeFilename("images", "config", "actions", actionName + ".gif"));
+        return new ActionLink(action, format(messages, actionName + ".label"), iconFile.exists() ? actionName : "generic");
+    }
+
+    public static String format(Messages messages, String key)
+    {
+        String value = messages.format(key);
+        if(value == null)
+        {
+            value = key;
+        }
+        return value;
     }
 
     public static Map<String, Object> initialiseContext(Class clazz)

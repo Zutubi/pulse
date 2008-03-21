@@ -159,13 +159,14 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
             // apply the settings
             CompositeType generalType = typeRegistry.getType(GeneralAdminConfiguration.class);
             MutableRecord record = generalType.createNewRecord(true);
+            record.setPermanent(true);
             String baseUrl = (String) serverConfigRecord.get("baseUrl");
             record.put("baseUrl", baseUrl);
             record.put("masterHost", getMasterHost(baseUrl));
             configurationTemplateManager.saveRecord(PathUtils.getPath(GlobalConfiguration.SCOPE_NAME, "generalConfig"), record);
 
             // Now copy over the email properties
-            extractAndSave(EmailConfiguration.class, serverConfigRecord);
+            extractAndSave(EmailConfiguration.class, serverConfigRecord, true);
             return adminUser;
         }
         finally
@@ -209,11 +210,12 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
         return masterHost;
     }
 
-    private void extractAndSave(Class clazz, MutableRecord wizardRecord)
+    private void extractAndSave(Class clazz, MutableRecord wizardRecord, boolean permanent)
     {
         CompositeType type = typeRegistry.getType(clazz);
 
         MutableRecord record = type.createNewRecord(true);
+        record.setPermanent(permanent);
         for(TypeProperty property: type.getProperties())
         {
             String name = property.getName();

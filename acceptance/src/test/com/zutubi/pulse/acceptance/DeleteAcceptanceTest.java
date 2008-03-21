@@ -3,10 +3,7 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.prototype.config.ConfigurationRegistry;
 import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.prototype.type.record.PathUtils;
-import com.zutubi.pulse.acceptance.pages.admin.AgentHierarchyPage;
-import com.zutubi.pulse.acceptance.pages.admin.DeleteConfirmPage;
-import com.zutubi.pulse.acceptance.pages.admin.ListPage;
-import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
+import com.zutubi.pulse.acceptance.pages.admin.*;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectsPage;
 import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.model.ProjectManager;
@@ -438,6 +435,23 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         reqsPage.waitFor();
         reqsPage.assertItemPresent(baseName, ListPage.ANNOTATION_INHERITED, AccessManager.ACTION_VIEW, AccessManager.ACTION_DELETE);
         assertTrue(xmlRpcHelper.configPathExists(childReqPath));
+    }
+
+    public void testDeleteSingleton() throws Exception
+    {
+        String projectPath = xmlRpcHelper.insertSimpleProject(random, false);
+
+        loginAsAdmin();
+        String path = PathUtils.getPath(projectPath, "scm");
+        CompositePage subversionPage = new CompositePage(selenium, urls, path);
+        subversionPage.goTo();
+        assertTrue(subversionPage.isActionPresent(AccessManager.ACTION_DELETE));
+        subversionPage.clickAction(AccessManager.ACTION_DELETE);
+
+        DeleteConfirmPage confirmPage = new DeleteConfirmPage(selenium, urls, path, false);
+        confirmPage.waitFor();
+        CompositePage projectPage = confirmPage.confirmDeleteSingleton();
+        projectPage.assertTreeLinkPresent("scm");
     }
 
     private String insertBuildCompletedTrigger(String refereePath, String refererPath) throws Exception

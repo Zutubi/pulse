@@ -2,13 +2,13 @@ package com.zutubi.prototype.model;
 
 /**
  */
-public class RowAction
+public class ActionLink
 {
     private String action;
     private String label;
     private String icon;
 
-    public RowAction(String action, String label, String icon)
+    public ActionLink(String action, String label, String icon)
     {
         this.action = action;
         this.label = label;

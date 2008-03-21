@@ -14,7 +14,7 @@ import java.util.List;
  * expression and replacement.
  */
 @SymbolicName("zutubi.customTransformerConfig")
-@Form(fieldOrder = {"name", "expression", "replacement"})
+@Form(fieldOrder = {"name", "expression", "replacement", "exclusive"})
 public class CustomTransformerConfiguration extends CommitMessageTransformerConfiguration
 {
     @Required
@@ -55,6 +55,6 @@ public class CustomTransformerConfiguration extends CommitMessageTransformerConf
 
     public List<Substitution> substitutions()
     {
-        return Arrays.asList(new Substitution(expression, replacement));
+        return Arrays.asList(new Substitution(expression, replacement,isExclusive()));
     }
 }

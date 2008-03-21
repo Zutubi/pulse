@@ -33,6 +33,13 @@
                     templateTree.handleResponse(result);
                 }
 
+                if (visibleTree.dead)
+                {
+                    // Config tree dies when the root is deleted.
+                    nestedLayout.getRegion('west').showPanel('template-tree');
+                    visibleTree = templateTree;                    
+                }
+
                 visibleTree.redirectToNewPath(result);
             }
         }

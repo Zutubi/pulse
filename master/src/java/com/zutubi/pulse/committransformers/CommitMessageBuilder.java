@@ -4,25 +4,30 @@ import com.opensymphony.util.TextUtils;
 
 import java.util.LinkedList;
 import java.util.Stack;
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
- * <class comment/>
+ * Used to apply multiple transformations to a commit message.  The process
+ * is quite tricky as we have multiple replacements, encoding issues trimming
+ * issues and so on.
  */
 public class CommitMessageBuilder
 {
     private String message;
     private LinkedList<Boolean> mods;
+    private LinkedList<Boolean> exclusiveMods;
     private LinkedList<Boolean> visible;
 
     public CommitMessageBuilder(String message)
     {
         this.message = message;
         this.mods = new LinkedList<Boolean>();
+        this.exclusiveMods = new LinkedList<Boolean>();
         for (int i = 0; i < message.length(); i++)
         {
             mods.add(false);
+            exclusiveMods.add(false);
         }
     }
 
@@ -33,36 +38,44 @@ public class CommitMessageBuilder
 
     public String replace(Substitution substitution)
     {
-        return replace(substitution.getExpression(), substitution.getReplacement());
+        return replace(substitution.getExpression(), substitution.getReplacement(), false);
     }
 
-    public String replace(String regex, String replacement)
+    public String replace(String regex, String replacement, boolean exclusive)
     {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(message);
 
         StringBuilder modifiedMessage = new StringBuilder();
         LinkedList<Boolean> modifiedMods = new LinkedList<Boolean>();
+        LinkedList<Boolean> modifiedExclusiveMods = new LinkedList<Boolean>();
 
         int end = 0;
 
         while (matcher.find())
         {
-            int start = matcher.start();
-
-            // a) the unmatched piece up to the start of the match.
-            modifiedMessage.append(message.substring(end, start));
-            modifiedMods.addAll(mods.subList(end, start));
-
-            // b) the replacement for the matched region
-            String replacementStr = processSubstitution(replacement, matcher);
-            modifiedMessage.append(replacementStr);
-            for (int i = 0; i < replacementStr.length(); i++)
+            // Ignore matches that overlap an exclusive-modified area.
+            if (!exclusiveMods.subList(matcher.start(), matcher.end()).contains(true))
             {
-                modifiedMods.add(true);
-            }
+                // Ignore this match if it overlaps a modified region.
+                int start = matcher.start();
 
-            end = matcher.end();
+                // a) the unmatched piece up to the start of the match.
+                modifiedMessage.append(message.substring(end, start));
+                modifiedMods.addAll(mods.subList(end, start));
+                modifiedExclusiveMods.addAll(exclusiveMods.subList(end, start));
+
+                // b) the replacement for the matched region
+                String replacementStr = processSubstitution(replacement, matcher);
+                modifiedMessage.append(replacementStr);
+                for (int i = 0; i < replacementStr.length(); i++)
+                {
+                    modifiedMods.add(true);
+                    modifiedExclusiveMods.add(exclusive);
+                }
+
+                end = matcher.end();
+            }
         }
 
         if (end < message.length())
@@ -70,11 +83,13 @@ public class CommitMessageBuilder
             String tail = message.substring(end);
             modifiedMessage.append(tail);
             modifiedMods.addAll(mods.subList(end, mods.size()));
+            modifiedExclusiveMods.addAll(exclusiveMods.subList(end, exclusiveMods.size()));
         }
 
         // update the stored message.
         message = modifiedMessage.toString();
         mods = modifiedMods;
+        exclusiveMods = modifiedExclusiveMods;
 
         return toString();
     }

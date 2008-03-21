@@ -45,7 +45,7 @@ public abstract class ConfigPage extends SeleniumPage
 
     public String getTreeLinkLocator(String displayName)
     {
-        return "link=" + displayName;
+        return "//div[@id='config-tree']//a[span='" + displayName + "']";
     }
 
     public boolean isTreeLinkPresent(String displayName)

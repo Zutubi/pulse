@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.external.jira;
 
 import com.zutubi.config.annotations.*;
-import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
 import com.zutubi.pulse.committransformers.Substitution;
 import com.zutubi.pulse.prototype.config.project.commit.CommitMessageTransformerConfiguration;
 import com.zutubi.util.CollectionUtils;
@@ -9,15 +8,15 @@ import com.zutubi.util.Mapping;
 import com.zutubi.validation.annotations.Required;
 import com.zutubi.validation.annotations.Url;
 
-import java.util.List;
-import java.util.LinkedList;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * A transformer that links Jira issue keys to the issues in a Jira install.
  */
 @SymbolicName("zutubi.jiraTransformerConfig")
-@Form(fieldOrder = {"name", "url", "matchAnyKey", "keys"})
+@Form(fieldOrder = {"name", "url", "matchAnyKey", "keys", "exclusive"})
 public class JiraTransformerConfiguration extends CommitMessageTransformerConfiguration
 {
     @Required
@@ -81,7 +80,7 @@ public class JiraTransformerConfiguration extends CommitMessageTransformerConfig
         {
             public Substitution map(String keyPattern)
             {
-                return new Substitution("(" + keyPattern + "-[0-9]+)", replacement);
+                return new Substitution("(" + keyPattern + "-[0-9]+)", replacement, isExclusive());
             }
         });
     }
