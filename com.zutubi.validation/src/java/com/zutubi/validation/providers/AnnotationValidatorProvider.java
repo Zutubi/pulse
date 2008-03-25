@@ -27,6 +27,7 @@ public class AnnotationValidatorProvider implements ValidatorProvider
     // unless an object factory is specified, use the default. We may not always be in a
     // happy autowiring context.
     private ObjectFactory objectFactory = new DefaultObjectFactory();
+    private Map<Class, List<Validator>> cache = Collections.synchronizedMap(new HashMap<Class, List<Validator>>());
 
     public void setObjectFactory(ObjectFactory objectFactory)
     {
@@ -83,45 +84,51 @@ public class AnnotationValidatorProvider implements ValidatorProvider
     {
         // validators are based on the runtime type of the object, not the runtime state, so we can happily cache
         // the details.
-
-        List<Validator> validators = new LinkedList<Validator>();
-        try
+        List<Validator> validators = cache.get(clazz);
+        if(validators == null)
         {
-            Class stopClass = clazz.getSuperclass();
-            for (PropertyDescriptor descriptor : Introspector.getBeanInfo(clazz, stopClass).getPropertyDescriptors())
+            validators = new LinkedList<Validator>();
+            try
             {
-                // the property must be readable for us to be able to validate it.
-                Method read = descriptor.getReadMethod();
-                if (read != null)
+                Class stopClass = clazz.getSuperclass();
+                for (PropertyDescriptor descriptor : Introspector.getBeanInfo(clazz, stopClass).getPropertyDescriptors())
                 {
-                    List<Annotation> constraints = new LinkedList<Annotation>();
-                    constraints.addAll(constraintsOn(read));
-                    Method write = descriptor.getWriteMethod();
-                    if (write != null)
+                    // the property must be readable for us to be able to validate it.
+                    Method read = descriptor.getReadMethod();
+                    if (read != null)
                     {
-                        constraints.addAll(constraintsOn(write));
-                    }
+                        List<Annotation> constraints = new LinkedList<Annotation>();
+                        constraints.addAll(constraintsOn(read));
+                        Method write = descriptor.getWriteMethod();
+                        if (write != null)
+                        {
+                            constraints.addAll(constraintsOn(write));
+                        }
 
-                    // analyse the field (if it exists).
-                    try
-                    {
-                        Field field = clazz.getDeclaredField(descriptor.getName());
-                        constraints.addAll(constraintsOn(field));
-                    }
-                    catch (NoSuchFieldException e)
-                    {
-                        // noop
-                    }
+                        // analyse the field (if it exists).
+                        try
+                        {
+                            Field field = clazz.getDeclaredField(descriptor.getName());
+                            constraints.addAll(constraintsOn(field));
+                        }
+                        catch (NoSuchFieldException e)
+                        {
+                            // noop
+                        }
 
-                    // convert constraints into validators.
-                    validators.addAll(validatorsFromConstraints(clazz, constraints, descriptor));
+                        // convert constraints into validators.
+                        validators.addAll(validatorsFromConstraints(clazz, constraints, descriptor));
+                    }
                 }
+
+                cache.put(clazz, validators);
+            }
+            catch (IntrospectionException e)
+            {
+                // noop.
             }
         }
-        catch (IntrospectionException e)
-        {
-            // noop.
-        }
+
         return validators;
     }
 
