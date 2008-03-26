@@ -6,21 +6,34 @@ import com.zutubi.validation.Validator;
 import com.zutubi.validation.ValidatorProvider;
 import com.zutubi.validation.validators.ValidateableValidator;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
- * <class-comment/>
+ * Provides a validator for classes that extend Validateable.
  */
 public class ReflectionValidatorProvider implements ValidatorProvider
 {
+    private static final List<Validator> VALIDATEABLE_VALIDATOR = Arrays.<Validator>asList(new ValidateableValidator());
+
+    private Map<Class, Boolean> cache = Collections.synchronizedMap(new HashMap<Class, Boolean>());
+
     public List<Validator> getValidators(Object obj, ValidationContext context)
     {
-        List<Validator> validators = new LinkedList<Validator>();
-        if (Validateable.class.isAssignableFrom(obj.getClass()))
+        Class clazz = obj.getClass();
+        Boolean isValidateable = cache.get(clazz);
+        if(isValidateable == null)
         {
-            validators.add(new ValidateableValidator());
+            isValidateable = Validateable.class.isAssignableFrom(clazz);
+            cache.put(clazz, isValidateable);
         }
-        return validators;
+
+        if (isValidateable)
+        {
+            return VALIDATEABLE_VALIDATOR;
+        }
+        else
+        {
+            return Collections.EMPTY_LIST;
+        }
     }
 }

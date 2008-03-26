@@ -20,14 +20,24 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 /**
- * <class-comment/>
+ * Provides validators based on the type of an object.  The object's class
+ * (and its superclasses) are analysed for {@link com.zutubi.validation.annotations.Constraint}
+ * references, applied either directly to properties or indirectly through
+ * other annotations on properties.
  */
 public class AnnotationValidatorProvider implements ValidatorProvider
 {
     // unless an object factory is specified, use the default. We may not always be in a
     // happy autowiring context.
     private ObjectFactory objectFactory = new DefaultObjectFactory();
-    private Map<Class, List<Validator>> cache = Collections.synchronizedMap(new HashMap<Class, List<Validator>>());
+    /**
+     * High-level cache of the results of {@link #getValidators(Object, com.zutubi.validation.ValidationContext)}.
+     */
+    private Map<Class, List<Validator>> secondLevelCache = Collections.synchronizedMap(new HashMap<Class, List<Validator>>());
+    /**
+     * Low-level cache of the result of {@link #analyze(Class)}.
+     */
+    private Map<Class, List<Validator>> firstLevelCache = Collections.synchronizedMap(new HashMap<Class, List<Validator>>());
 
     public void setObjectFactory(ObjectFactory objectFactory)
     {
@@ -36,7 +46,15 @@ public class AnnotationValidatorProvider implements ValidatorProvider
 
     public List<Validator> getValidators(Object obj, ValidationContext context)
     {
-        return traverse(obj.getClass(), new HashSet<Class>());
+        Class<? extends Object> clazz = obj.getClass();
+        List<Validator> validators = secondLevelCache.get(clazz);
+        if(validators == null)
+        {
+            validators = traverse(clazz, new HashSet<Class>());
+            secondLevelCache.put(clazz, validators);
+        }
+
+        return validators;
     }
 
     public List<Validator> traverse(Class clazz, Set<Class> checked)
@@ -80,11 +98,11 @@ public class AnnotationValidatorProvider implements ValidatorProvider
         return validators;
     }
 
-    public List<Validator> analyze(Class clazz)
+    private List<Validator> analyze(Class clazz)
     {
         // validators are based on the runtime type of the object, not the runtime state, so we can happily cache
         // the details.
-        List<Validator> validators = cache.get(clazz);
+        List<Validator> validators = firstLevelCache.get(clazz);
         if(validators == null)
         {
             validators = new LinkedList<Validator>();
@@ -121,7 +139,7 @@ public class AnnotationValidatorProvider implements ValidatorProvider
                     }
                 }
 
-                cache.put(clazz, validators);
+                firstLevelCache.put(clazz, validators);
             }
             catch (IntrospectionException e)
             {

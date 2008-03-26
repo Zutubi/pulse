@@ -270,16 +270,22 @@ public class StringUtils
         return -1;
     }
 
+    public static String[] split(String s, char c)
+    {
+        return split(s, c, false);
+    }
+
     /**
      * Splits the given string around occurences of the given character.  The
      * behaviour is the same as {@link String#split}, but given the simpler
      * semantics (no regex, no limit) this implementation is faster.
      *
-     * @param s string to split
-     * @param c character to split on
+     * @param s         string to split
+     * @param c         character to split on
+     * @param skipEmpty if true, no empty strings are allowed in the result
      * @return the split pieces of the string
      */
-    public static String[] split(String s, char c)
+    public static String[] split(String s, char c, boolean skipEmpty)
     {
         int length = s.length();
         while(length > 0 && s.charAt(length - 1) == c)
@@ -293,7 +299,7 @@ public class StringUtils
         // path simpler.
         if(length == 0)
         {
-            if(s.length() == 0)
+            if(s.length() == 0 && !skipEmpty)
             {
                 return new String[]{""};
             }
@@ -305,6 +311,7 @@ public class StringUtils
 
         List<Integer> indices = new LinkedList<Integer>();
         int startIndex = 0;
+        int emptyCount = 0;
         while(startIndex < length)
         {
             int nextIndex = s.indexOf(c, startIndex);
@@ -313,19 +320,42 @@ public class StringUtils
                 nextIndex = length;
             }
 
+            if(nextIndex == startIndex)
+            {
+                emptyCount++;
+            }
+
             indices.add(nextIndex);
             startIndex = nextIndex + 1;
         }
 
-        String[] result = new String[indices.size()];
-        startIndex = 0;
-        int i = 0;
-        for(Integer index: indices)
+        String[] result;
+        if (skipEmpty)
         {
-            result[i++] = s.substring(startIndex, index);
-            startIndex = index + 1;
+            result = new String[indices.size() - emptyCount];
+            startIndex = 0;
+            int i = 0;
+            for(int index: indices)
+            {
+                if(index > startIndex)
+                {
+                    result[i++] = s.substring(startIndex, index);
+                }
+                startIndex = index + 1;
+            }
         }
-        
+        else
+        {
+            result = new String[indices.size()];
+            startIndex = 0;
+            int i = 0;
+            for(int index: indices)
+            {
+                result[i++] = s.substring(startIndex, index);
+                startIndex = index + 1;
+            }
+        }
+
         return result;
     }
 
@@ -512,39 +542,44 @@ public class StringUtils
     {
         StringBuilder result = new StringBuilder();
 
-        if (skipEmpty)
+        // If skipping empty, move length backwards to ignore empty pieces at
+        // the end (helps us know when we are on the last actual piece).
+        int length = pieces.length;
+        if(skipEmpty)
         {
-            // For total consistency, strip out empty pieces first
-            List<String> list = new ArrayList<String>(pieces.length);
-            for (String piece : pieces)
+            while(length > 0 && pieces[length - 1].length() == 0)
             {
-                if (piece.length() > 0)
-                {
-                    list.add(piece);
-                }
+                length--;
             }
-
-            pieces = list.toArray(new String[list.size()]);
         }
 
-        for (int i = 0; i < pieces.length; i++)
+        boolean first = true;
+        for (int i = 0; i < length; i++)
         {
             String piece = pieces[i];
+            if(skipEmpty && piece.length() == 0)
+            {
+                continue;
+            }
 
             if (glueCheck)
             {
-                if (i > 0 && piece.startsWith(glue))
+                if (!first && piece.startsWith(glue))
                 {
                     piece = piece.substring(glue.length());
                 }
 
-                if (i < pieces.length - 1 && piece.endsWith(glue))
+                if (i < length - 1 && piece.endsWith(glue))
                 {
                     piece = piece.substring(0, piece.length() - glue.length());
                 }
             }
 
-            if (i > 0)
+            if (first)
+            {
+                first = false;
+            }
+            else
             {
                 result.append(glue);
             }
@@ -558,6 +593,58 @@ public class StringUtils
     public static String join(String separator, Collection<String> parts)
     {
         return join(separator, parts.toArray(new String[parts.size()]));
+    }
+
+    public static String join(char glue, boolean glueCheck, boolean skipEmpty, String... pieces)
+    {
+        StringBuilder result = new StringBuilder();
+
+        // If skipping empty, move length backwards to ignore empty pieces at
+        // the end (helps us know when we are on the last actual piece).
+        int length = pieces.length;
+        if(skipEmpty)
+        {
+            while(length > 0 && pieces[length - 1].length() == 0)
+            {
+                length--;
+            }
+        }
+
+        boolean first = true;
+        for (int i = 0; i < length; i++)
+        {
+            String piece = pieces[i];
+            if(skipEmpty && piece.length() == 0)
+            {
+                continue;
+            }
+
+            if (glueCheck)
+            {
+                if (!first && piece.charAt(0) == glue)
+                {
+                    piece = piece.substring(1);
+                }
+
+                if (i < length - 1 && piece.charAt(piece.length() - 1) == glue)
+                {
+                    piece = piece.substring(0, piece.length() - 1);
+                }
+            }
+
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                result.append(glue);
+            }
+
+            result.append(piece);
+        }
+
+        return result.toString();
     }
 
     /**

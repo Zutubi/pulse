@@ -1,7 +1,5 @@
 package com.zutubi.prototype.type.record;
 
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Predicate;
 import com.zutubi.util.StringUtils;
 
 /**
@@ -23,20 +21,8 @@ public class PathUtils
         {
             return new String[0];
         }
-        
-        String[] elements = StringUtils.split(path, SEPARATOR_CHAR);
-        if (!allowEmpty)
-        {
-            elements = CollectionUtils.filterToArray(elements, new Predicate<String>()
-            {
-                public boolean satisfied(String s)
-                {
-                    return s.length() > 0;
-                }
-            });
-        }
 
-        return elements;
+        return StringUtils.split(path, SEPARATOR_CHAR, !allowEmpty);
     }
 
     public static String[] getParentPathElements(String path)
@@ -103,7 +89,7 @@ public class PathUtils
 
     public static String getPath(String... pathElements)
     {
-        return StringUtils.join(SEPARATOR, true, true, pathElements);
+        return StringUtils.join(SEPARATOR_CHAR, true, true, pathElements);
     }
 
     public static String getPath(int beginIndex, String... pathElements)

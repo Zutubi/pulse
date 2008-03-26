@@ -970,7 +970,18 @@ public class StringUtilsTest extends TestCase
 
     private void splitChHelper(String s)
     {
-        assertEquals(s.split("/"), StringUtils.split(s, '/'));
+        String[] javaApi = s.split("/");
+        assertEquals(javaApi, StringUtils.split(s, '/'));
+
+        javaApi = CollectionUtils.filterToArray(javaApi, new Predicate<String>()
+        {
+            public boolean satisfied(String s)
+            {
+                return s.length() > 0;
+            }
+        });
+
+        assertEquals(javaApi, StringUtils.split(s, '/', true));
     }
 
     private <T> T[] a(T... a)
