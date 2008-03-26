@@ -271,6 +271,65 @@ public class StringUtils
     }
 
     /**
+     * Splits the given string around occurences of the given character.  The
+     * behaviour is the same as {@link String#split}, but given the simpler
+     * semantics (no regex, no limit) this implementation is faster.
+     *
+     * @param s string to split
+     * @param c character to split on
+     * @return the split pieces of the string
+     */
+    public static String[] split(String s, char c)
+    {
+        int length = s.length();
+        while(length > 0 && s.charAt(length - 1) == c)
+        {
+            length--;
+        }
+
+        // String.split has unusual semantics: it trims trailing empty
+        // strings from the result; with the exception of the case where the
+        // input String is empty.  A special case here makes the usual code
+        // path simpler.
+        if(length == 0)
+        {
+            if(s.length() == 0)
+            {
+                return new String[]{""};
+            }
+            else
+            {
+                return new String[]{};
+            }
+        }
+
+        List<Integer> indices = new LinkedList<Integer>();
+        int startIndex = 0;
+        while(startIndex < length)
+        {
+            int nextIndex = s.indexOf(c, startIndex);
+            if(nextIndex < 0)
+            {
+                nextIndex = length;
+            }
+
+            indices.add(nextIndex);
+            startIndex = nextIndex + 1;
+        }
+
+        String[] result = new String[indices.size()];
+        startIndex = 0;
+        int i = 0;
+        for(Integer index: indices)
+        {
+            result[i++] = s.substring(startIndex, index);
+            startIndex = index + 1;
+        }
+        
+        return result;
+    }
+
+    /**
      * Splits the given string at spaces, allowing use of quoting to override
      * spaces (i.e. foo bar is split into [foo, bar] but "foo bar" gives
      * [foo bar]).  Backslashes may be used to escape quotes or spaces.

@@ -24,7 +24,7 @@ public class PathUtils
             return new String[0];
         }
         
-        String[] elements = path.split(SEPARATOR);
+        String[] elements = StringUtils.split(path, SEPARATOR_CHAR);
         if (!allowEmpty)
         {
             elements = CollectionUtils.filterToArray(elements, new Predicate<String>()

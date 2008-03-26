@@ -903,6 +903,76 @@ public class StringUtilsTest extends TestCase
         assertEquals("afewlineswithvarious breaksin between", StringUtils.stripLineBreaks("a\nfew\rlines\r\nwith\n\nvarious breaks\n\rin between\r\r"));
     }
 
+    public void testSplitChEmpty()
+    {
+        splitChHelper("");
+    }
+
+    public void testSplitChSeparator()
+    {
+        splitChHelper("/");
+    }
+
+    public void testSplitChMultiSeparator()
+    {
+        splitChHelper("///");
+    }
+
+    public void testSplitChSingleCharacter()
+    {
+        splitChHelper("a");
+    }
+
+    public void testSplitChMultiCharacter()
+    {
+        splitChHelper("abc");
+    }
+
+    public void testSplitChMatchStart()
+    {
+        splitChHelper("/abc");
+    }
+
+    public void testSplitChMatchMiddle()
+    {
+        splitChHelper("a/bc");
+    }
+
+    public void testSplitChMatchEnd()
+    {
+        splitChHelper("abc/");
+    }
+
+    public void testSplitChMultipleMatches()
+    {
+        splitChHelper("a/b/c");
+    }
+
+    public void testSplitChMultipleMatchesIncludingStartAndEnd()
+    {
+        splitChHelper("/abc");
+    }
+
+    public void testSplitChAdjacentSeparators()
+    {
+        splitChHelper("a//bc");
+    }
+
+    public void testSplitChAdjacentSeparatorsStart()
+    {
+        splitChHelper("//abc");
+    }
+
+    public void testSplitChAdjacentSeparatorsEnd()
+    {
+        splitChHelper("abc//");
+    }
+
+    private void splitChHelper(String s)
+    {
+        assertEquals(s.split("/"), StringUtils.split(s, '/'));
+    }
+
     private <T> T[] a(T... a)
     {
         return a;
@@ -916,5 +986,34 @@ public class StringUtilsTest extends TestCase
         {
             assertEquals(expected[i++], s);
         }
+    }
+
+    private void assertEquals(String[] expected, String[] got)
+    {
+        assertTrue("Expected " + format(expected) + ", got " + format(got), Arrays.equals(expected, got));
+    }
+
+    private String format(String[] a)
+    {
+        StringBuilder result = new StringBuilder();
+        result.append('[');
+        boolean first = true;
+        for(String s: a)
+        {
+            if(first)
+            {
+                first = false;
+            }
+            else
+            {
+                result.append(", ");
+            }
+            result.append('"');
+            result.append(s);
+            result.append('"');
+        }
+
+        result.append(']');
+        return result.toString();
     }
 }
