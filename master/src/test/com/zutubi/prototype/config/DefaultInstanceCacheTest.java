@@ -43,37 +43,37 @@ public class DefaultInstanceCacheTest extends PulseTestCase
 
     public void testHasInstancesUnderSingleEmptyPath()
     {
-        cache.put("a", new TestConfiguration(1));
+        cache.put("a", new TestConfiguration(1), true);
         assertTrue(cache.hasInstancesUnder(""));
     }
 
     public void testHasInstancesUnderSingleSinglePath()
     {
-        cache.put("a", new TestConfiguration(1));
+        cache.put("a", new TestConfiguration(1), true);
         assertTrue(cache.hasInstancesUnder("a"));
     }
 
     public void testHasInstancesUnderSingleMultiPath()
     {
-        cache.put("a", new TestConfiguration(1));
+        cache.put("a", new TestConfiguration(1), true);
         assertFalse(cache.hasInstancesUnder("a/b/c"));
     }
 
     public void testHasInstancesUnderMultiEmptyPath()
     {
-        cache.put("a/b/c", new TestConfiguration(1));
+        cache.put("a/b/c", new TestConfiguration(1), true);
         assertTrue(cache.hasInstancesUnder(""));
     }
 
     public void testHasInstancesUnderMultiSinglePath()
     {
-        cache.put("a/b/c", new TestConfiguration(1));
+        cache.put("a/b/c", new TestConfiguration(1), true);
         assertTrue(cache.hasInstancesUnder("a"));
     }
 
     public void testHasInstancesUnderMultiMultiPath()
     {
-        cache.put("a/b/c", new TestConfiguration(1));
+        cache.put("a/b/c", new TestConfiguration(1), true);
         assertTrue(cache.hasInstancesUnder("a/b/c"));
     }
 
@@ -104,100 +104,100 @@ public class DefaultInstanceCacheTest extends PulseTestCase
 
     private void markInvalidHelper(String path, boolean a, boolean ab, boolean abc, boolean ad)
     {
-        cache.put("a", new TestConfiguration(1));
-        cache.put("a/b", new TestConfiguration(2));
-        cache.put("a/b/c", new TestConfiguration(3));
-        cache.put("a/d", new TestConfiguration(4));
+        cache.put("a", new TestConfiguration(1), true);
+        cache.put("a/b", new TestConfiguration(2), true);
+        cache.put("a/b/c", new TestConfiguration(3), true);
+        cache.put("a/d", new TestConfiguration(4), true);
 
         cache.markInvalid(path);
-        assertFalse(cache.isValid(""));
-        assertEquals(a, cache.isValid("a"));
-        assertEquals(ab, cache.isValid("a/b"));
-        assertEquals(abc, cache.isValid("a/b/c"));
-        assertEquals(ad, cache.isValid("a/d"));
+        assertFalse(cache.isValid("", true));
+        assertEquals(a, cache.isValid("a", true));
+        assertEquals(ab, cache.isValid("a/b", true));
+        assertEquals(abc, cache.isValid("a/b/c", true));
+        assertEquals(ad, cache.isValid("a/d", true));
     }
 
     public void testIsValidNoSuchPath()
     {
-        assertFalse(cache.isValid("a"));
+        assertFalse(cache.isValid("a", true));
     }
 
     public void testGetSimpleEmptyCache()
     {
-        assertNull(cache.get("trivial"));
+        assertNull(cache.get("trivial", true));
     }
 
     public void testGetEmptyPathEmptyCache()
     {
-        assertNull(cache.get(""));
+        assertNull(cache.get("", true));
     }
 
     public void testGetEmptyPath()
     {
-        cache.put("anything", new TestConfiguration(1));
-        assertNull(cache.get(""));
+        cache.put("anything", new TestConfiguration(1), true);
+        assertNull(cache.get("", true));
     }
 
     public void testGetMultipleEmptyCache()
     {
-        assertNull(cache.get("multi/part/path"));
+        assertNull(cache.get("multi/part/path", true));
     }
 
     public void testPutEmptyPath()
     {
         TestConfiguration o = new TestConfiguration(1);
-        cache.put("", o);
-        assertEquals(o, cache.get(""));
+        cache.put("", o, true);
+        assertEquals(o, cache.get("", true));
     }
 
     public void testPutSimple()
     {
         TestConfiguration o = new TestConfiguration(1);
-        cache.put("simple", o);
-        assertEquals(o, cache.get("simple"));
+        cache.put("simple", o, true);
+        assertEquals(o, cache.get("simple", true));
     }
 
     public void testPutMultipleNoParent()
     {
         TestConfiguration o = new TestConfiguration(1);
-        cache.put("multi/part/path", o);
-        assertEquals(o, cache.get("multi/part/path"));
+        cache.put("multi/part/path", o, true);
+        assertEquals(o, cache.get("multi/part/path", true));
     }
 
     public void testPutMultipleParent()
     {
         TestConfiguration p = new TestConfiguration(1);
         TestConfiguration c = new TestConfiguration(2);
-        cache.put("multi", p);
-        cache.put("multi/part", c);
-        assertEquals(p, cache.get("multi"));
-        assertEquals(c, cache.get("multi/part"));
+        cache.put("multi", p, true);
+        cache.put("multi/part", c, true);
+        assertEquals(p, cache.get("multi", true));
+        assertEquals(c, cache.get("multi/part", true));
     }
 
     public void testGetAllEmptyCache()
     {
         List<Configuration> all = new LinkedList<Configuration>();
-        cache.getAllMatchingPathPattern("path", all);
+        cache.getAllMatchingPathPattern("path", all, true);
         assertEquals(0, all.size());
     }
 
     public void testGetAllEmptyPath()
     {
         List<Configuration> all = new LinkedList<Configuration>();
-        cache.getAllMatchingPathPattern("", all);
+        cache.getAllMatchingPathPattern("", all, true);
         assertEquals(0, all.size());
     }
 
     public void testGetAllOneMatch()
     {
         TestConfiguration o = new TestConfiguration(1);
-        cache.put("foo", new TestConfiguration(2));
-        cache.put("foo/bar", new TestConfiguration(3));
-        cache.put("foo/baz", o);
-        cache.put("foo/quux", new TestConfiguration(4));
+        cache.put("foo", new TestConfiguration(2), true);
+        cache.put("foo/bar", new TestConfiguration(3), true);
+        cache.put("foo/baz", o, true);
+        cache.put("foo/quux", new TestConfiguration(4), true);
         
         List<Configuration> all = new LinkedList<Configuration>();
-        cache.getAllMatchingPathPattern("foo/baz", all);
+        cache.getAllMatchingPathPattern("foo/baz", all, true);
         assertEquals(1, all.size());
         assertEquals(o, all.get(0));
     }
@@ -207,13 +207,13 @@ public class DefaultInstanceCacheTest extends PulseTestCase
         TestConfiguration bar = new TestConfiguration(1);
         TestConfiguration baz = new TestConfiguration(2);
         TestConfiguration quux = new TestConfiguration(3);
-        cache.put("foo", new TestConfiguration(4));
-        cache.put("foo/bar", bar);
-        cache.put("foo/baz", baz);
-        cache.put("foo/quux", quux);
+        cache.put("foo", new TestConfiguration(4), true);
+        cache.put("foo/bar", bar, true);
+        cache.put("foo/baz", baz, true);
+        cache.put("foo/quux", quux, true);
 
         List<Configuration> all = new LinkedList<Configuration>();
-        cache.getAllMatchingPathPattern("foo/*", all);
+        cache.getAllMatchingPathPattern("foo/*", all, true);
         assertEquals(3, all.size());
         assertTrue(all.contains(bar));
         assertTrue(all.contains(baz));
@@ -228,7 +228,7 @@ public class DefaultInstanceCacheTest extends PulseTestCase
     public void testForAllSingleEntry()
     {
         TestConfiguration foo = new TestConfiguration(1);
-        cache.put("foo", foo);
+        cache.put("foo", foo, true);
         forAllHelper(new CollectingHandler.Entry(foo, "foo", null));
     }
 
@@ -236,8 +236,8 @@ public class DefaultInstanceCacheTest extends PulseTestCase
     {
         TestConfiguration foo = new TestConfiguration(1);
         TestConfiguration fooBar = new TestConfiguration(2);
-        cache.put("foo", foo);
-        cache.put("foo/bar", fooBar);
+        cache.put("foo", foo, true);
+        cache.put("foo/bar", fooBar, true);
         forAllHelper(new CollectingHandler.Entry(foo, "foo", null), new CollectingHandler.Entry(fooBar, "foo/bar", foo));
     }
 
@@ -245,8 +245,8 @@ public class DefaultInstanceCacheTest extends PulseTestCase
     {
         TestConfiguration foo = new TestConfiguration(1);
         TestConfiguration fooBarBaz = new TestConfiguration(2);
-        cache.put("foo", foo);
-        cache.put("foo/bar/baz", fooBarBaz);
+        cache.put("foo", foo, true);
+        cache.put("foo/bar/baz", fooBarBaz, true);
         forAllHelper(new CollectingHandler.Entry(foo, "foo", null), new CollectingHandler.Entry(fooBarBaz, "foo/bar/baz", null));
     }
 
@@ -256,17 +256,17 @@ public class DefaultInstanceCacheTest extends PulseTestCase
         TestConfiguration fooBar = new TestConfiguration(2);
         TestConfiguration baz = new TestConfiguration(3);
         TestConfiguration bazQuux = new TestConfiguration(4);
-        cache.put("foo", foo);
-        cache.put("foo/bar", fooBar);
-        cache.put("baz", baz);
-        cache.put("baz/quux", bazQuux);
+        cache.put("foo", foo, true);
+        cache.put("foo/bar", fooBar, true);
+        cache.put("baz", baz, true);
+        cache.put("baz/quux", bazQuux, true);
         forAllHelper(new CollectingHandler.Entry(baz, "baz", null), new CollectingHandler.Entry(bazQuux, "baz/quux", baz), new CollectingHandler.Entry(foo, "foo", null), new CollectingHandler.Entry(fooBar, "foo/bar", foo));
     }
 
     private List<CollectingHandler.Entry> forAllHelper(CollectingHandler.Entry... expected)
     {
         CollectingHandler handler = new CollectingHandler();
-        cache.forAllInstances(handler);
+        cache.forAllInstances(handler, true);
         assertEquals(expected.length, handler.entries.size());
         final Sort.StringComparator stringComp = new Sort.StringComparator();
         Collections.sort(handler.entries, new Comparator<CollectingHandler.Entry>()
@@ -297,7 +297,7 @@ public class DefaultInstanceCacheTest extends PulseTestCase
     {
         List<Entry> entries = new LinkedList<Entry>();
 
-        public void handle(Configuration instance, String path, Configuration parentInstance)
+        public void handle(Configuration instance, String path, boolean complete, Configuration parentInstance)
         {
             entries.add(new Entry(instance, path, parentInstance));
         }

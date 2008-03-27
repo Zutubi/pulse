@@ -19,16 +19,16 @@ public class PersistentInstantiator implements Instantiator
     private String path;
     private boolean concrete;
     private InstanceCache cache;
-    private InstanceCache incompleteCache;
     private ReferenceResolver referenceResolver;
+    private ConfigurationTemplateManager configurationTemplateManager;
 
-    public PersistentInstantiator(String path, boolean concrete, InstanceCache cache, InstanceCache incompleteCache, ReferenceResolver referenceResolver)
+    public PersistentInstantiator(String path, boolean concrete, InstanceCache cache, ReferenceResolver referenceResolver, ConfigurationTemplateManager configurationTemplateManager)
     {
         this.path = path;
         this.concrete = concrete;
         this.cache = cache;
-        this.incompleteCache = incompleteCache;
         this.referenceResolver = referenceResolver;
+        this.configurationTemplateManager = configurationTemplateManager;
     }
 
     public Object instantiate(String propertyPath, boolean relative, Type type, Object data) throws TypeException
@@ -38,16 +38,16 @@ public class PersistentInstantiator implements Instantiator
             propertyPath = PathUtils.getPath(path, propertyPath);
         }
 
-        Object instance = cache.get(propertyPath);
+        Object instance = cache.get(propertyPath, true);
         if (instance == null)
         {
-            PersistentInstantiator childInstantiator = new PersistentInstantiator(propertyPath, concrete, cache, incompleteCache, referenceResolver);
+            PersistentInstantiator childInstantiator = new PersistentInstantiator(propertyPath, concrete, cache, referenceResolver, configurationTemplateManager);
             instance = type.instantiate(data, childInstantiator);
 
             if (instance != null)
             {
                 // If this is a newly-created Configuration (as opposed to a
-                // reference), we need to initialise and cache it.
+                // reference), we need to initialise, cache and validate it.
                 if (type instanceof ComplexType && instance instanceof Configuration)
                 {
                     ComponentContext.autowire(instance);
@@ -63,17 +63,15 @@ public class PersistentInstantiator implements Instantiator
                     configuration.setConfigurationPath(propertyPath);
                     configuration.setConcrete(concrete);
 
-                    if(concrete)
-                    {
-                        cache.put(propertyPath, configuration);
-                    }
-                    else
-                    {
-                        incompleteCache.put(propertyPath, configuration);
-                    }
+                    cache.put(propertyPath, configuration, concrete);
                 }
 
                 type.initialise(instance, data, childInstantiator);
+
+//                if (type instanceof CompositeType && instance instanceof Configuration)
+//                {
+//                    configurationTemplateManager.validateInstance((CompositeType) type, (Configuration) instance, PathUtils.getParentPath(path), PathUtils.getBaseName(path), concrete);
+//                }
             }
         }
 

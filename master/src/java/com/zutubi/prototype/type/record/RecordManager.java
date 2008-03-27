@@ -98,7 +98,7 @@ public class RecordManager implements HandleAllocator
      * @return the path for the record with the given handle, or null if no
      *         record has that handle
      */
-    public String getPathForHandle(long handle)
+    public synchronized String getPathForHandle(long handle)
     {
         return getState().getPathForHandle(handle);
     }
@@ -109,7 +109,7 @@ public class RecordManager implements HandleAllocator
      * @param pattern pattern to match, may include wildcards
      * @return the paths of all records whose path matches the pattern
      */
-    public List<String> getAllPaths(String pattern)
+    public synchronized List<String> getAllPaths(String pattern)
     {
         RecordQueries queries = new RecordQueries(recordStore.select());
         return queries.selectPaths(pattern);

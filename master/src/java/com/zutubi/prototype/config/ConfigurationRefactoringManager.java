@@ -128,6 +128,25 @@ public class ConfigurationRefactoringManager
         return getPath(parentPath, cloneKey);
     }
 
+    /**
+     * Extracts the common values from a set of siblings into a parent
+     * template.  After the operation is complete, the final values of all
+     * fields (in the deep sense) of each sibling is unchanged, but any value
+     * that is identical in all siblings is now inherited from the new
+     * template parent.
+     *
+     * @param parentPath         path of the templated collection that the
+     *                           siblings are items of
+     * @param keys               keys of the sibling items to extract the
+     *                           parent from (all keys must refer to items
+     *                           with the same template parent)
+     * @param parentTemplateName name for the new template parent
+     * @return the path of the new template parent
+     * @throws IllegalArgumentException if the the parent path is not a
+     *         templated collection; if no keys are specified; if the keys do
+     *         not share a common, non-null template parent; if the parent
+     *         template name is invalid or in use
+     */
     public String extractParentTemplate(final String parentPath, final List<String> keys, final String parentTemplateName)
     {
         return configurationTemplateManager.executeInsideTransaction(new ExtractParentTemplateAction(parentPath, parentTemplateName, keys));
@@ -408,10 +427,6 @@ public class ConfigurationRefactoringManager
             // First: what happens to references?  And state?  They want to stay
             // pointing at the same handles, so best to keep the current records
             // 'as-is' and pull the values up.
-
-            // To pull values up, we may be able to use scrubbing code.  Copy the
-            // records, insert as the parent, save the child?  Something like
-            // that.
             if(!configurationTemplateManager.isTemplatedCollection(parentPath))
             {
                 throw new IllegalArgumentException("Invalid parent path '" + parentPath + "': does not refer to a templated collection");

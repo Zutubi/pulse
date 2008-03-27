@@ -6,51 +6,40 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * <class-comment/>
+ * Maintains a registry of type converters known as "squeezers".
  */
 public class Squeezers
 {
-    private static final Map<Class, Class<? extends TypeSqueezer>> registry = new HashMap<Class, Class<? extends TypeSqueezer>>();
+    private static final Map<Class, TypeSqueezer> registry = new HashMap<Class, TypeSqueezer>();
 
     static
     {
         // initialise.
-        register(String.class, StringSqueezer.class);
-        register(Boolean.class, BooleanSqueezer.class);
-        register(Boolean.TYPE, BooleanSqueezer.class);
-        register(Byte.class, ByteSqueezer.class);
-        register(Byte.TYPE, ByteSqueezer.class);
-        register(Character.class, CharacterSqueezer.class);
-        register(Character.TYPE, CharacterSqueezer.class);
-        register(Integer.class, IntegerSqueezer.class);
-        register(Integer.TYPE, IntegerSqueezer.class);
-        register(Long.class, LongSqueezer.class);
-        register(Long.TYPE, LongSqueezer.class);
-        register(Double.class, DoubleSqueezer.class);
-        register(Double.TYPE, DoubleSqueezer.class);
-        register(Short.class, ShortSqueezer.class);
-        register(Short.TYPE, ShortSqueezer.class);
-        register(Float.class, FloatSqueezer.class);
-        register(Float.TYPE, FloatSqueezer.class);
+        register(String.class, new StringSqueezer());
+        register(Boolean.class, new BooleanSqueezer());
+        register(Boolean.TYPE, new BooleanSqueezer());
+        register(Byte.class, new ByteSqueezer());
+        register(Byte.TYPE, new ByteSqueezer());
+        register(Character.class, new CharacterSqueezer());
+        register(Character.TYPE, new CharacterSqueezer());
+        register(Integer.class, new IntegerSqueezer());
+        register(Integer.TYPE, new IntegerSqueezer());
+        register(Long.class, new LongSqueezer());
+        register(Long.TYPE, new LongSqueezer());
+        register(Double.class, new DoubleSqueezer());
+        register(Double.TYPE, new DoubleSqueezer());
+        register(Short.class, new ShortSqueezer());
+        register(Short.TYPE, new ShortSqueezer());
+        register(Float.class, new FloatSqueezer());
+        register(Float.TYPE, new FloatSqueezer());
     }
 
     public static TypeSqueezer findSqueezer(Class type)
     {
-        if (registry.containsKey(type))
-        {
-            try
-            {
-                return registry.get(type).newInstance();
-            }
-            catch (Exception e)
-            {
-                throw new RuntimeException(e);
-            }
-        }
-        return null;
+        return registry.get(type);
     }
 
-    public static void register(Class type, Class<? extends TypeSqueezer> squeezer)
+    public static void register(Class type, TypeSqueezer squeezer)
     {
         registry.put(type, squeezer);
     }

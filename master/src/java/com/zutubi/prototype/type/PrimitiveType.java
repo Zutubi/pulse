@@ -38,6 +38,8 @@ public class PrimitiveType extends SimpleType implements Type
         NULL_VALUES_MAP.put(short.class, Short.MIN_VALUE);
     }
 
+    private TypeSqueezer squeezer;
+
     public PrimitiveType(Class type)
     {
         this(type, null);
@@ -46,7 +48,8 @@ public class PrimitiveType extends SimpleType implements Type
     public PrimitiveType(Class type, String symbolicName)
     {
         super(type, symbolicName);
-        if (Squeezers.findSqueezer(type) == null)
+        squeezer = Squeezers.findSqueezer(type);
+        if (squeezer == null)
         {
             throw new IllegalArgumentException("Unsupported primitive type: " + type);
         }
@@ -54,7 +57,6 @@ public class PrimitiveType extends SimpleType implements Type
 
     public Object instantiate(Object data, Instantiator instantiator) throws TypeException
     {
-        TypeSqueezer squeezer = Squeezers.findSqueezer(getClazz());
         try
         {
             if (data instanceof String[])
@@ -75,7 +77,6 @@ public class PrimitiveType extends SimpleType implements Type
 
     public String unstantiate(Object instance) throws TypeException
     {
-        TypeSqueezer squeezer = Squeezers.findSqueezer(getClazz());
         try
         {
             return squeezer.squeeze(instance);

@@ -257,12 +257,14 @@ public class CollectionUtils
 
     public static <T, U> Map<T, U> retainAll(Map<T, U> m, Map<T, U> n)
     {
-        for(Map.Entry<T, U> entry: m.entrySet())
+        Iterator<Map.Entry<T, U>> it = m.entrySet().iterator();
+        while(it.hasNext())
         {
+            Map.Entry<T, U> entry = it.next();
             U value = n.get(entry.getKey());
             if(value == null || !value.equals(entry.getValue()))
             {
-                m.remove(entry.getKey());
+                it.remove();
             }
         }
 

@@ -456,7 +456,7 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
         for (String concretePath : concretePaths)
         {
             // Raise an event for all the config instances under this path.
-            for (Object instance : instances.getAllDescendents(concretePath))
+            for (Object instance : instances.getAllDescendents(concretePath, false))
             {
                 if (isComposite(instance))
                 {
@@ -572,10 +572,7 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
     private void refreshInstances(State state)
     {
         DefaultInstanceCache instances = state.instances;
-        DefaultInstanceCache incompleteInstances = state.incompleteInstances;
-        
         instances.clear();
-        incompleteInstances.clear();
 
         for (ConfigurationScopeInfo scope : configurationPersistenceManager.getScopes())
         {
@@ -590,7 +587,7 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
                 CollectionType collectionType = (CollectionType) type;
                 CompositeType templatedType = (CompositeType) collectionType.getCollectionType();
                 ConfigurationMap<Configuration> topInstance = new ConfigurationMap<Configuration>();
-                instances.put(path, topInstance);
+                instances.put(path, topInstance, true);
                 for (String id : collectionType.getOrder(topRecord))
                 {
                     String itemPath = PathUtils.getPath(path, id);
@@ -598,7 +595,7 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
                     boolean concrete = isConcreteOwner(record);
                     try
                     {
-                        PersistentInstantiator instantiator = new PersistentInstantiator(path, concrete, instances, incompleteInstances, configurationReferenceManager);
+                        PersistentInstantiator instantiator = new PersistentInstantiator(path, concrete, instances, configurationReferenceManager, this);
                         Configuration instance = (Configuration) instantiator.instantiate(id, true, templatedType, record);
 
                         // Concrete instances go into the collection
@@ -617,7 +614,7 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
             {
                 try
                 {
-                    PersistentInstantiator instantiator = new PersistentInstantiator(path, true, instances, incompleteInstances, configurationReferenceManager);
+                    PersistentInstantiator instantiator = new PersistentInstantiator(path, true, instances, configurationReferenceManager, this);
                     instantiator.instantiate(path, false, type, topRecord);
                 }
                 catch (TypeException e)
@@ -630,28 +627,27 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
             }
         }
 
-        validateInstances(instances, true);
-        validateInstances(incompleteInstances, false);
+        validateInstances(instances);
     }
 
-    private void validateInstances(final InstanceCache instances, final boolean concrete)
+    private void validateInstances(final InstanceCache instances)
     {
         instances.forAllInstances(new InstanceCache.InstanceHandler()
         {
-            public void handle(Configuration instance, String path, Configuration parentInstance)
+            public void handle(Configuration instance, String path, boolean complete, Configuration parentInstance)
             {
                 CompositeType type = typeRegistry.getType(instance.getClass());
                 if (type != null)
                 {
                     // Then we have a composite
-                    validateInstance(type, instance, PathUtils.getParentPath(path), PathUtils.getBaseName(path), concrete, false, null);
+                    validateInstance(type, instance, PathUtils.getParentPath(path), PathUtils.getBaseName(path), complete, false, null);
                     if (!instance.isValid())
                     {
                         instances.markInvalid(path);
                     }
                 }
             }
-        });
+        }, true);
     }
 
     /**
@@ -802,15 +798,7 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
      */
     public boolean isDeeplyValid(String path)
     {
-        State state = getState();
-        if (state.instances.get(path) != null)
-        {
-            return state.instances.isValid(path);
-        }
-        else
-        {
-            return state.incompleteInstances.isValid(path);
-        }
+        return getState().instances.isValid(path, true);
     }
 
     /**
@@ -1127,7 +1115,7 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
         State state = getState();
         for (String concretePath : getDescendentPaths(path, false, true, false))
         {
-            Configuration instance = state.instances.get(concretePath);
+            Configuration instance = state.instances.get(concretePath, false);
             if (isComposite(instance))
             {
                 publishEvent(new PostSaveEvent(this, instance));
@@ -1595,7 +1583,7 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
                 List<PostDeleteEvent> events = new LinkedList<PostDeleteEvent>();
                 for (String concretePath : getDescendentPaths(path, false, true, false))
                 {
-                    for (Object instance : state.instances.getAllDescendents(concretePath))
+                    for (Object instance : state.instances.getAllDescendents(concretePath, false))
                     {
                         if (isComposite(instance))
                         {
@@ -1770,8 +1758,7 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
         Record record = getRecord(path);
         ComplexType type = getType(path);
         final DefaultInstanceCache cache = new DefaultInstanceCache();
-        final DefaultInstanceCache incompleteCache = new DefaultInstanceCache();
-        PersistentInstantiator instantiator = new PersistentInstantiator(path, isConcrete(PathUtils.getParentPath(path), record), cache, incompleteCache, new ReferenceResolver()
+        PersistentInstantiator instantiator = new PersistentInstantiator(path, isConcrete(PathUtils.getParentPath(path), record), cache, new ReferenceResolver()
         {
             public Configuration resolveReference(String fromPath, long toHandle, Instantiator instantiator) throws TypeException
             {
@@ -1785,20 +1772,14 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
                     {
                         public Configuration getInstance(String path)
                         {
-                            Configuration instance = cache.get(path);
-                            if(instance == null)
-                            {
-                                instance = incompleteCache.get(path);
-                            }
-
-                            return instance;
+                            return cache.get(path, true);
                         }
                     };
                 }
 
                 return configurationReferenceManager.resolveReference(path, toHandle, instantiator, source);
             }
-        });
+        }, this);
 
         try
         {
@@ -1825,13 +1806,7 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
             return null;    
         }
 
-        Configuration instance = state.instances.get(path);
-        if (instance == null)
-        {
-            instance = state.incompleteInstances.get(path);
-        }
-
-        return instance;
+        return state.instances.get(path, true);
     }
 
     /**
@@ -1852,13 +1827,7 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
             return Collections.EMPTY_LIST;
         }
 
-        Collection<Configuration> instances = state.instances.getAllDescendents(prefix);
-        if (allowIncomplete)
-        {
-            instances.addAll(state.incompleteInstances.getAllDescendents(prefix));
-        }
-
-        return instances;
+        return state.instances.getAllDescendents(prefix, allowIncomplete);
     }
 
     private ConfigurationTemplateManager.State getState()
@@ -1916,11 +1885,7 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
     public <T extends Configuration> void getAllInstances(String path, Collection<T> result, boolean allowIncomplete)
     {
         State state = getState();
-        state.instances.getAllMatchingPathPattern(path, (Collection<Configuration>) result);
-        if (allowIncomplete)
-        {
-            state.incompleteInstances.getAllMatchingPathPattern(path, (Collection<Configuration>) result);
-        }
+        state.instances.getAllMatchingPathPattern(path, (Collection<Configuration>) result, allowIncomplete);
     }
 
     @SuppressWarnings({"unchecked"})
@@ -1939,7 +1904,7 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
             State state = getState();
             for (String path : paths)
             {
-                state.instances.getAllMatchingPathPattern(path, (Collection<Configuration>) result);
+                state.instances.getAllMatchingPathPattern(path, (Collection<Configuration>) result, false);
             }
         }
 
@@ -2311,11 +2276,6 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
          * Cache of complete instances.
          */
         DefaultInstanceCache instances = new DefaultInstanceCache();
-        /**
-         * Cache of incomplete instances.
-         */
-        DefaultInstanceCache incompleteInstances = new DefaultInstanceCache();
-
         Map<String, TemplateHierarchy> templateHierarchies = new HashMap<String, TemplateHierarchy>();
 
         /**

@@ -10,26 +10,24 @@ import java.util.Collection;
  */
 public interface InstanceCache
 {
-    boolean hasInstancesUnder(String path);
-
     void markInvalid(String path);
 
-    boolean isValid(String path);
+    boolean isValid(String path, boolean allowIncomplete);
 
-    Configuration get(String path);
+    Configuration get(String path, boolean allowIncomplete);
 
-    Collection<Configuration> getAllDescendents(String path);
+    Collection<Configuration> getAllDescendents(String path, boolean allowIncomplete);
 
-    void getAllMatchingPathPattern(String path, Collection<Configuration> result);
+    void getAllMatchingPathPattern(String path, Collection<Configuration> result, boolean allowIncomplete);
 
-    void put(String path, Configuration instance);
+    void put(String path, Configuration instance, boolean complete);
 
-    void forAllInstances(InstanceHandler handler);
+    void forAllInstances(InstanceHandler handler, boolean allowIncomplete);
 
     void clear();
 
     public static interface InstanceHandler
     {
-        void handle(Configuration instance, String path, Configuration parentInstance);
+        void handle(Configuration instance, String path, boolean complete, Configuration parentInstance);
     }
 }

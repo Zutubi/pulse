@@ -15,7 +15,7 @@ import java.util.Map;
  */
 class DefaultInstanceCache implements InstanceCache
 {
-    private Entry root = new Entry(null);
+    private Entry root = new Entry(null, true);
 
     public boolean hasInstancesUnder(String path)
     {
@@ -25,13 +25,13 @@ class DefaultInstanceCache implements InstanceCache
         }
         else
         {
-            return getEntry(path, null) != null;
+            return getEntry(path, true, null) != null;
         }
     }
 
     public void markInvalid(String path)
     {
-        getEntry(path, new UnaryProcedure<Entry>()
+        getEntry(path, true, new UnaryProcedure<Entry>()
         {
             public void process(Entry entry)
             {
@@ -40,25 +40,30 @@ class DefaultInstanceCache implements InstanceCache
         });
     }
 
-    public boolean isValid(String path)
+    public boolean isValid(String path, boolean allowIncomplete)
     {
-        DefaultInstanceCache.Entry entry = getEntry(path, null);
+        DefaultInstanceCache.Entry entry = getEntry(path, allowIncomplete, null);
         return entry != null && entry.isValid();
     }
 
-    public Configuration get(String path)
+    public Configuration get(String path, boolean allowIncomplete)
     {
-        Entry entry = getEntry(path, null);
+        Entry entry = getEntry(path, allowIncomplete, null);
         return entry == null ? null : entry.getInstance();
     }
 
-    private Entry getEntry(String path, UnaryProcedure<Entry> f)
+    private Entry getEntry(String path, boolean allowIncomplete, UnaryProcedure<Entry> f)
     {
-        return getEntry(root, PathUtils.getPathElements(path), 0, f);
+        return getEntry(root, PathUtils.getPathElements(path), 0, allowIncomplete, f);
     }
 
-    private Entry getEntry(Entry entry, String[] elements, int index, UnaryProcedure<Entry> f)
+    private Entry getEntry(Entry entry, String[] elements, int index, boolean allowIncomplete, UnaryProcedure<Entry> f)
     {
+        if(!allowIncomplete && !entry.complete)
+        {
+            return null;
+
+        }
         if (f != null)
         {
             f.process(entry);
@@ -70,31 +75,31 @@ class DefaultInstanceCache implements InstanceCache
         }
 
         entry = entry.getChild(elements[index]);
-        return entry == null ? null : getEntry(entry, elements, index + 1, f);
+        return entry == null ? null : getEntry(entry, elements, index + 1, allowIncomplete, f);
     }
 
-    public Collection<Configuration> getAllDescendents(String path)
+    public Collection<Configuration> getAllDescendents(String path, boolean allowIncomplete)
     {
         Collection<Configuration> result = new LinkedList<Configuration>();
-        Entry entry = getEntry(path, null);
+        Entry entry = getEntry(path, allowIncomplete, null);
         if (entry != null)
         {
-            entry.getAllDescendents(result);
+            entry.getAllDescendents(result, allowIncomplete);
         }
         return result;
     }
 
-    public void getAllMatchingPathPattern(String path, Collection<Configuration> result)
+    public void getAllMatchingPathPattern(String path, Collection<Configuration> result, boolean allowIncomplete)
     {
-        getAll(root, PathUtils.getPathElements(path), 0, result);
+        getAll(root, PathUtils.getPathElements(path), 0, result, allowIncomplete);
     }
 
-    private void getAll(Entry entry, String[] elements, int index, Collection<Configuration> result)
+    private void getAll(Entry entry, String[] elements, int index, Collection<Configuration> result, boolean allowIncomplete)
     {
         if (index == elements.length)
         {
             Configuration instance = entry.getInstance();
-            if (instance != null)
+            if (instance != null && (entry.isComplete() || allowIncomplete))
             {
                 result.add(instance);
             }
@@ -110,23 +115,23 @@ class DefaultInstanceCache implements InstanceCache
             {
                 if (PathUtils.elementMatches(pattern, child.getKey()))
                 {
-                    getAll(child.getValue(), elements, index + 1, result);
+                    getAll(child.getValue(), elements, index + 1, result, allowIncomplete);
                 }
             }
         }
     }
 
-    public void put(String path, Configuration instance)
+    public void put(String path, Configuration instance, boolean complete)
     {
-        put(instance, root, PathUtils.getPathElements(path), 0);
+        put(instance, complete, root, PathUtils.getPathElements(path), 0);
     }
 
-    public void forAllInstances(InstanceHandler handler)
+    public void forAllInstances(InstanceHandler handler, boolean allowIncomplete)
     {
-        root.forAllInstances(null, "", handler);
+        root.forAllInstances(null, allowIncomplete, "", handler);
     }
 
-    private void put(Configuration instance, Entry entry, String[] elements, int index)
+    private void put(Configuration instance, boolean complete, Entry entry, String[] elements, int index)
     {
         if (index == elements.length)
         {
@@ -134,12 +139,12 @@ class DefaultInstanceCache implements InstanceCache
             return;
         }
 
-        put(instance, entry.getOrCreateChild(elements[index]), elements, index + 1);
+        put(instance, complete, entry.getOrCreateChild(elements[index], complete), elements, index + 1);
     }
 
     public void clear()
     {
-        root = new Entry(null);
+        root = new Entry(null, true);
     }
 
     private class Entry
@@ -157,10 +162,15 @@ class DefaultInstanceCache implements InstanceCache
          * True if this entry and all children are valid.
          */
         private boolean valid = true;
+        /**
+         * True if this entry is complete.
+         */
+        private boolean complete;
 
-        public Entry(Configuration instance)
+        public Entry(Configuration instance, boolean complete)
         {
             this.instance = instance;
+            this.complete = complete;
         }
 
         public Configuration getInstance()
@@ -187,21 +197,21 @@ class DefaultInstanceCache implements InstanceCache
             return children == null ? null : children.get(element);
         }
 
-        public Entry getOrCreateChild(String element)
+        public Entry getOrCreateChild(String element, boolean complete)
         {
             Entry child = getChild(element);
             if (child == null)
             {
-                child = new Entry(null);
+                child = new Entry(null, complete);
                 addChild(element, child);
             }
 
             return child;
         }
 
-        public void getAllDescendents(Collection<Configuration> result)
+        public void getAllDescendents(Collection<Configuration> result, boolean allowIncomplete)
         {
-            if(instance != null)
+            if(instance != null && (complete || allowIncomplete))
             {
                 result.add(instance);
             }
@@ -210,23 +220,23 @@ class DefaultInstanceCache implements InstanceCache
             {
                 for(Entry child: children.values())
                 {
-                    child.getAllDescendents(result);
+                    child.getAllDescendents(result, allowIncomplete);
                 }
             }
         }
 
-        public void forAllInstances(Configuration parentInstance, String path, InstanceHandler handler)
+        public void forAllInstances(Configuration parentInstance, boolean allowIncomplete, String path, InstanceHandler handler)
         {
-            if(instance != null)
+            if(instance != null && (complete || allowIncomplete))
             {
-                handler.handle(instance, path, parentInstance);
+                handler.handle(instance, path, complete, parentInstance);
             }
 
             if (children != null)
             {
                 for(Map.Entry<String,Entry> childEntry: children.entrySet())
                 {
-                    childEntry.getValue().forAllInstances(instance, PathUtils.getPath(path, childEntry.getKey()), handler);
+                    childEntry.getValue().forAllInstances(instance, allowIncomplete, PathUtils.getPath(path, childEntry.getKey()), handler);
                 }
             }
         }
@@ -244,6 +254,11 @@ class DefaultInstanceCache implements InstanceCache
         public void markInvalid()
         {
             valid = false;
+        }
+
+        public boolean isComplete()
+        {
+            return complete;
         }
     }
 }
