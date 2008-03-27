@@ -2,6 +2,7 @@ package com.zutubi.pulse.prototype.config.project.types;
 
 import com.zutubi.config.annotations.Select;
 import com.zutubi.config.annotations.Transient;
+import com.zutubi.config.annotations.Wire;
 import com.zutubi.config.annotations.Wizard;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.BuildException;
@@ -21,6 +22,7 @@ import java.util.*;
  *
  *
  */
+@Wire
 public abstract class TemplateTypeConfiguration extends TypeConfiguration
 {
     private static final Logger LOG = Logger.getLogger(TemplateTypeConfiguration.class);

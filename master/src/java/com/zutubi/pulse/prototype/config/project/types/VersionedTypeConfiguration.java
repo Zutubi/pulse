@@ -2,6 +2,7 @@ package com.zutubi.pulse.prototype.config.project.types;
 
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Transient;
+import com.zutubi.config.annotations.Wire;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.pulse.core.scm.ScmClientFactory;
@@ -16,6 +17,7 @@ import java.io.InputStream;
  *
  */
 @SymbolicName("zutubi.versionedTypeConfig")
+@Wire
 public class VersionedTypeConfiguration extends TypeConfiguration
 {
     private String pulseFileName;

@@ -23,6 +23,7 @@ import java.util.List;
 @SymbolicName("zutubi.projectSubscriptionConfig")
 @Form(fieldOrder = {"name", "projects", "contact", "template"})
 @Classification(single = "favourite")
+@Wire
 public class ProjectSubscriptionConfiguration extends SubscriptionConfiguration
 {
     private static final Logger LOG = Logger.getLogger(ProjectSubscriptionConfiguration.class);
