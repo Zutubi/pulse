@@ -87,6 +87,14 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         assertFalse(configurationRefactoringManager.canClone(clonePath));
     }
 
+    public void testCanClonePermanent()
+    {
+        MockA a = createAInstance("a");
+        a.setPermanent(true);
+        String aPath = configurationTemplateManager.insert(SAMPLE_SCOPE, a);
+        assertFalse(configurationRefactoringManager.canClone(aPath));
+    }
+
     public void testCanCloneTemplateItem()
     {
         configurationTemplateManager.insert(SAMPLE_SCOPE, createAInstance("a"));
@@ -138,6 +146,14 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         illegalClonePathHelper(rootPath, "Invalid path '" + rootPath + "': cannot clone root of a template hierarchy");
     }
 
+    public void testClonePermanent() throws TypeException
+    {
+        MockA a = createAInstance("a");
+        a.setPermanent(true);
+        String aPath = configurationTemplateManager.insert(SAMPLE_SCOPE, a);
+        invalidCloneNameHelper(aPath, "clone", "Invalid path '" + aPath + "': refers to a permanent record");
+    }
+
     private void illegalClonePathHelper(String path, String expectedError)
     {
         try
@@ -147,7 +163,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         }
         catch(IllegalArgumentException e)
         {
-            assertEquals(expectedError, e.getMessage());            
+            assertEquals(expectedError, e.getMessage());
         }
         catch (ConfigRuntimeException e)
         {

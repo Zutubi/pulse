@@ -34,21 +34,31 @@ public class ConfigurationRefactoringManager
      *
      * @param path the path to test, which much exist
      * @return true iff the path can be cloned; it must be a map item and not
-     *         the root of a template hierarch
+     *         permananet or the root of a template hierarchy
      */
-    public boolean canClone(String path)
+    public boolean canClone(final String path)
     {
-        String parentPath = PathUtils.getParentPath(path);
-        if(parentPath != null && configurationTemplateManager.pathExists(path))
+        return configurationTemplateManager.executeInsideTransaction(new ConfigurationTemplateManager.Action<Boolean>()
         {
-            Type parentType = configurationTemplateManager.getType(parentPath);
-            if(parentType instanceof MapType)
+            public Boolean execute() throws Exception
             {
-                return !configurationTemplateManager.isTemplatedCollection(parentPath) || configurationTemplateManager.getTemplateParentRecord(path) != null;
-            }
-        }
+                String parentPath = PathUtils.getParentPath(path);
+                if (parentPath != null && configurationTemplateManager.pathExists(path))
+                {
+                    Record record = configurationTemplateManager.getRecord(path);
+                    if (!record.isPermanent())
+                    {
+                        Type parentType = configurationTemplateManager.getType(parentPath);
+                        if (parentType instanceof MapType)
+                        {
+                            return !configurationTemplateManager.isTemplatedCollection(parentPath) || configurationTemplateManager.getTemplateParentRecord(path) != null;
+                        }
+                    }
+                }
 
-        return false;
+                return false;
+            }
+        });
     }
 
     /**
@@ -115,17 +125,23 @@ public class ConfigurationRefactoringManager
      * @return the path of the new clone
      * @throws IllegalArgumentException if the given path or key is invalid
      */
-    public String clone(String path, String cloneKey)
+    public String clone(final String path, final String cloneKey)
     {
         // Validate new name, get a clone of the instance, set new key, insert?
-        String parentPath = PathUtils.getParentPath(path);
-        if (parentPath == null)
+        return configurationTemplateManager.executeInsideTransaction(new ConfigurationTemplateManager.Action<String>()
         {
-            throw new IllegalArgumentException("Invalid path '" + path + "': no parent");
-        }
+            public String execute() throws Exception
+            {
+                String parentPath = PathUtils.getParentPath(path);
+                if (parentPath == null)
+                {
+                    throw new IllegalArgumentException("Invalid path '" + path + "': no parent");
+                }
 
-        clone(parentPath, asMap(asPair(PathUtils.getBaseName(path), cloneKey)));
-        return getPath(parentPath, cloneKey);
+                ConfigurationRefactoringManager.this.clone(parentPath, asMap(asPair(PathUtils.getBaseName(path), cloneKey)));
+                return getPath(parentPath, cloneKey);
+            }
+        });
     }
 
     /**
@@ -293,6 +309,11 @@ public class ConfigurationRefactoringManager
                 throw new IllegalArgumentException("Invalid path '" + path + "': path does not exist");
             }
 
+            if (record.isPermanent())
+            {
+                throw new IllegalArgumentException("Invalid path '" + path + "': refers to a permanent record");
+            }
+            
             if(templatedCollection && configurationTemplateManager.getTemplateParentHandle(path, record) == 0)
             {
                 throw new IllegalArgumentException("Invalid path '" + path + "': cannot clone root of a template hierarchy");
