@@ -61,6 +61,7 @@ public class GroupAcceptanceTest extends SeleniumTestBase
         form.waitFor();
         form.finishFormElements(random, null, ServerPermission.CREATE_PROJECT.toString());
         waitForElement(getGroupPath(random));
+        form.waitFor();
         form.applyFormElements(null, userHandle, null);
         form.waitFor();
         logout();

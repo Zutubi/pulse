@@ -257,8 +257,8 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         ProjectHomePage home = new ProjectHomePage(selenium, urls, projectName);
         home.goTo();
         String statusId = IDs.buildStatusCell(projectName, 1);
-        SeleniumUtils.refreshUntilElement(selenium, statusId);
-        SeleniumUtils.refreshUntilText(selenium, statusId, "success");
+        SeleniumUtils.refreshUntilElement(selenium, statusId, 30000);
+        SeleniumUtils.refreshUntilText(selenium, statusId, "success", 30000);
         SeleniumUtils.assertText(selenium, IDs.stageAgentCell(projectName, 1, "default"), agent);
     }
 }
