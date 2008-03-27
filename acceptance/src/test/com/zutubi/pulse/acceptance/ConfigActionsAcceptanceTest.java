@@ -48,7 +48,7 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         SetPasswordForm form = new SetPasswordForm(selenium);
         form.waitFor();
         form.saveFormElements("one", "two");
-        form.assertFormPresent();
+        form.waitFor();
         assertTextPresent("passwords do not match");
     }
 

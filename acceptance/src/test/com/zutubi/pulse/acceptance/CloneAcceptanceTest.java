@@ -128,11 +128,11 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         cloneForm.waitFor();
 
         cloneForm.cloneFormElements("");
-        cloneForm.assertFormPresent();
+        cloneForm.waitFor();
         assertTextPresent("clone name is required");
 
         cloneForm.cloneFormElements(TEST_PROPERTY_NAME);
-        cloneForm.assertFormPresent();
+        cloneForm.waitFor();
         assertTextPresent("name is already in use");
     }
 
@@ -190,7 +190,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         cloneForm.waitFor();
 
         cloneForm.cloneFormElements("");
-        cloneForm.assertFormPresent();
+        cloneForm.waitFor();
         assertTextPresent("clone name is required");
 
         cloneForm.cloneFormElements(random);
@@ -247,7 +247,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         cloneForm.waitFor();
         String parentCloneName = parentName + CLONE_PROPERTY_NAME;
         cloneForm.cloneFormElements(parentCloneName, "true", "");
-        cloneForm.assertFormPresent();
+        cloneForm.waitFor();
         assertTextPresent("clone name is required");
 
         cloneForm.cloneFormElements(parentCloneName, "true", parentName);
