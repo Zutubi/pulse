@@ -44,15 +44,15 @@
     #foreach($query in $queries)
     <table class="content">
         #headingRow($query 2)
-        #set($queryStats = $queryStats.get($query))
-        #statRow("cache hit" $queryStats.cacheHitCount)
-        #statRow("cache miss" $queryStats.cacheMissCount)
-        #statRow("cache put" $queryStats.cachePutCount)
-        #statRow("execution count" $queryStats.executionCount)
-        #statRow("execution average time" $queryStats.executionAvgTime)
-        #statRow("execution max time" $queryStats.executionMaxTime)
-        #statRow("execution min time" $queryStats.executionMinTime)
-        #statRow("execution row count" $queryStats.executionRowCount)
+        #set($qs = $queryStats.get($query))
+        #statRow("cache hit" $qs.cacheHitCount)
+        #statRow("cache miss" $qs.cacheMissCount)
+        #statRow("cache put" $qs.cachePutCount)
+        #statRow("execution count" $qs.executionCount)
+        #statRow("execution average time" $qs.executionAvgTime)
+        #statRow("execution max time" $qs.executionMaxTime)
+        #statRow("execution min time" $qs.executionMinTime)
+        #statRow("execution row count" $qs.executionRowCount)
     </table>
     #end
 
