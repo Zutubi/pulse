@@ -59,7 +59,10 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
         {
             public void handleConfigurationEvent(ConfigurationEvent event)
             {
-                initGroupsByUser();
+                if(event.isPost())
+                {
+                    initGroupsByUser();
+                }
             }
         }, true, true, ConfigurationRegistry.GROUPS_SCOPE);
 

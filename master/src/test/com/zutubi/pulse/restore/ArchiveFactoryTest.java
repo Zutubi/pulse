@@ -6,13 +6,11 @@ import com.zutubi.util.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Date;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Properties;
 
 /**
- *
- *
  */
 public class ArchiveFactoryTest extends PulseTestCase
 {

@@ -18,15 +18,13 @@ import com.zutubi.pulse.core.config.Configuration;
 public class PersistentInstantiator implements Instantiator
 {
     private String path;
-    private boolean concrete;
     private InstanceCache cache;
     private ReferenceResolver referenceResolver;
     private ConfigurationTemplateManager configurationTemplateManager;
 
-    public PersistentInstantiator(String path, boolean concrete, InstanceCache cache, ReferenceResolver referenceResolver, ConfigurationTemplateManager configurationTemplateManager)
+    public PersistentInstantiator(String path, InstanceCache cache, ReferenceResolver referenceResolver, ConfigurationTemplateManager configurationTemplateManager)
     {
         this.path = path;
-        this.concrete = concrete;
         this.cache = cache;
         this.referenceResolver = referenceResolver;
         this.configurationTemplateManager = configurationTemplateManager;
@@ -42,7 +40,7 @@ public class PersistentInstantiator implements Instantiator
         Object instance = cache.get(propertyPath, true);
         if (instance == null)
         {
-            PersistentInstantiator childInstantiator = new PersistentInstantiator(propertyPath, concrete, cache, referenceResolver, configurationTemplateManager);
+            PersistentInstantiator childInstantiator = new PersistentInstantiator(propertyPath, cache, referenceResolver, configurationTemplateManager);
             instance = type.instantiate(data, childInstantiator);
 
             if (instance != null)
@@ -65,17 +63,12 @@ public class PersistentInstantiator implements Instantiator
                     }
                     
                     configuration.setConfigurationPath(propertyPath);
-                    configuration.setConcrete(concrete);
+                    configuration.setConcrete(configurationTemplateManager.isConcrete(propertyPath));
 
-                    cache.put(propertyPath, configuration, concrete);
+                    cache.put(propertyPath, configuration, configuration.isConcrete());
                 }
 
                 type.initialise(instance, data, childInstantiator);
-
-//                if (type instanceof CompositeType && instance instanceof Configuration)
-//                {
-//                    configurationTemplateManager.validateInstance((CompositeType) type, (Configuration) instance, PathUtils.getParentPath(path), PathUtils.getBaseName(path), concrete);
-//                }
             }
         }
 

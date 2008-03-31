@@ -576,7 +576,7 @@ public class ConfigurationTemplateManager implements InstanceSource
                     boolean concrete = isConcreteOwner(record);
                     try
                     {
-                        PersistentInstantiator instantiator = new PersistentInstantiator(path, concrete, instances, configurationReferenceManager, this);
+                        PersistentInstantiator instantiator = new PersistentInstantiator(path, instances, configurationReferenceManager, this);
                         Configuration instance = (Configuration) instantiator.instantiate(id, true, templatedType, record);
 
                         // Concrete instances go into the collection
@@ -595,7 +595,7 @@ public class ConfigurationTemplateManager implements InstanceSource
             {
                 try
                 {
-                    PersistentInstantiator instantiator = new PersistentInstantiator(path, true, instances, configurationReferenceManager, this);
+                    PersistentInstantiator instantiator = new PersistentInstantiator(path, instances, configurationReferenceManager, this);
                     instantiator.instantiate(path, false, type, topRecord);
                 }
                 catch (TypeException e)
@@ -1766,7 +1766,7 @@ public class ConfigurationTemplateManager implements InstanceSource
         Record record = getRecord(path);
         ComplexType type = getType(path);
         final DefaultInstanceCache cache = new DefaultInstanceCache();
-        PersistentInstantiator instantiator = new PersistentInstantiator(path, isConcrete(PathUtils.getParentPath(path), record), cache, new ReferenceResolver()
+        PersistentInstantiator instantiator = new PersistentInstantiator(path, cache, new ReferenceResolver()
         {
             public Configuration resolveReference(String fromPath, long toHandle, Instantiator instantiator) throws TypeException
             {
