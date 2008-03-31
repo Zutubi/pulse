@@ -80,6 +80,11 @@ public class Urls
         return dashboardMyBuild(number) + "wc/";
     }
 
+    public String dashboardPreferences()
+    {
+        return dashboard() + "preferences/";
+    }
+
     public String browse()
     {
         return baseUrl + "/browse/";
@@ -381,7 +386,22 @@ public class Urls
         return adminProjects() + project + "/";
     }
 
-    private String adminGroups()
+    public String adminAgents()
+    {
+        return admin() + "agents/";
+    }
+
+    public String adminAgent(String agent)
+    {
+        return adminAgents() + agent + "/";
+    }
+
+    public String adminSettings()
+    {
+        return admin() + "settings/";
+    }
+
+    public String adminGroups()
     {
         return admin() + "groups/";
     }
@@ -389,6 +409,16 @@ public class Urls
     public String adminGroup(String group)
     {
         return adminGroups() + group + "/";
+    }
+
+    public String adminUsers()
+    {
+        return admin() + "users/";
+    }
+
+    public String adminUser(String user)
+    {
+        return adminUsers() + user + "/";
     }
 
     public String adminPlugins()

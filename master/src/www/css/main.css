@@ -846,14 +846,17 @@ table.template-actions
     border: solid 1px #e0e0e0;
 }
 
+.template-actions th.category
+{
+    background: #ffffe0;
+    border-style: solid;
+}
+
 .template-actions th, .template-actions td
 {
     padding: 6px;
     border: dotted 1px #e0e0e0;
-}
-
-.template-actions th
-{
+    vertical-align: top;
 }
 
 .template-actions td

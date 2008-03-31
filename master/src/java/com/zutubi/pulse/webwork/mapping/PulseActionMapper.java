@@ -182,6 +182,11 @@ public class PulseActionMapper implements ActionMapper
         }
         else
         {
+            if (path.length() == 0)
+            {
+                path = "home";
+            }
+            
             // All other dashboard paths are trivial action names.
             return new ActionMapping(path, DASHBOARD_NAMESPACE, null, null);
         }

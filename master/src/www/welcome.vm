@@ -1,60 +1,136 @@
+#macro(actionHeader $id $action $img $url)
+    <th><img alt="$action" src="$base/images/${img}.gif"/> #if($url)<a href="$url" id="$id">#end$action#if($url)</a>#end</th>
+#end
+
 #authorisationTags($principle)
 <html>
 <head>
     <title>welcome</title>
     <style>
-        p { width: 770px; }
+        h1 { margin-top: 0.8em; }
+        table.template-actions, p { width: 770px; }
     </style>
 </head>
 <body>
     <h1 id="welcome.heading">:: #wwtext("name=welcome") :: </h1>
     <p>
-        Welcome to the Pulse 2.0 Early Access Program.  This is your opportunity to play with Pulse 2.0
-        before it is <strike>stable</strike> feature complete.  It is a great time to provide feedback:
-        let us know what you think of the new features!
+        Welcome to Pulse 2.0 [beta]!  This is your opportunity to start working with Pulse 2.0
+        before its final release.  It is a great time to provide feedback: let us know what you
+        think of the new features!
     </p>
     <p>
         You can return to this page at any time by clicking on the pulse link in the top left corner.
     </p>
+    <h1> :: getting started :: </h1>
+    <p>
+        New to Pulse?  Here are a few ways to get started:
+    </p>
+    <p>
+        <table class="template-actions" cellspacing="5px">
+            <tr>
+                <th class="category" colspan="2">configure</th>
+            </tr>
+#auth("path=projects" "action=create")
+            <tr>
+                #actionHeader("add.projects" "add new projects" "add" "$urls.adminProjects()")
+                <td>using the add project wizard (administration &gt; projects tab)</td>
+            </tr>
+#end
+#auth("path=users" "action=create")
+            <tr>
+                #actionHeader("add.users" "add new users" "add" "$urls.adminUsers()")
+                <td>at the users view (administration &gt; users tab)</td>
+            </tr>
+#end
+#auth("path=agents" "action=create")
+            <tr>
+                #actionHeader("add.agents" "add new agents" "add" "$urls.adminAgents()")
+                <td>using the add agent wizard (administration &gt; agents tab)</td>
+            </tr>
+#end
+#auth("path=settings" "action=write")
+            <tr>
+                #actionHeader("configure.settings" "configure server settings" "pencil" "$urls.adminSettings()")
+                <td>at the server settings view (administration &gt; settings tab)</td>
+            </tr>
+#end
+            <tr>
+                #actionHeader("configure.preferences" "configure your preferences" "pencil" "$urls.dashboardPreferences()")
+                <td>at the preferences view (dashboard &gt; preferences tab)</td>
+            </tr>
+            <tr>
+                <th class="category" colspan="2">explore</th>
+            </tr>
+            <tr>
+                #actionHeader("view.dashboard" "go to your home page" "zoom" "$urls.dashboard()")
+                <td>at the dashboard view (dashboard &gt; home)</td>
+            </tr>
+            <tr>
+                #actionHeader("browse.projects" "browse build reports" "zoom" "$urls.browse()")
+                <td>at the browse view (browse)</td>
+            </tr>
+            <tr>
+                #actionHeader("view.activity" "view server activity" "zoom" "$urls.server()")
+                <td>at the server view (server)</td>
+            </tr>
+            <tr>
+                #actionHeader("view.agents" "view all agents" "zoom" "$urls.agents()")
+                <td>at the agents view (agents)</td>
+            </tr>
+        </table>
+    </p>
+    
     <h1> :: what's new :: </h1>
     <p>
         Pulse 2.0 is a major rework, boasting largely new internals that enable important new features.
-        New things to look at so far include:
-
-        <h3><a href="/admin/projects/">Configuration UI</a></h3>
-        <p>
-            The configuration UI has been completely redone.  All configuration is now in the one place,
-            under 'administration'.  We have used AJAX to create a more consistent interface that is also
-            more responsive.
-        </p>
-
-        <h3><a href="/admin/projects/">Templated Configuration</a></h3>
-        <p>
-            The new configuration system supports templating: a way to share common configuration between
-            related projects (and agents) by inheritance from ancestor templates.  You will notice that
-            the configuration system allows you to configure a hierarchy of projects/agents, and shows
-            the inheritance relationship of fields.
-        </p>
-
-        <h3><a href="/admin/users/">New Security System</a></h3>
-        <p>
-            User and group management has been updated to allow finer-grained control of security.  It is
-            now possible to assign more specific privileges to groups using ACLs, controlling access to
-            both projects and agents.  It is also possible to configure permissions for all users and
-            anonymous users via two special groups.
-        </p>
-
-        <h3><a href="/admin/plugins/">Plugins</a></h3>
-        <p>
-            Support for various tools is being extracted into plugins.  Further, the new configuration UI
-            is generated: so plugin authors do not need to write any UI code!
-        </p>
-
-        <h3>Predictable URLS</h3>
-        <p>
-            The URL scheme used to access Pulses' resources has been reviewed and updated, allowing improved
-            access to the UI, functionality and resources.  
-        </p>
+        Major changes include:
+    </p>
+    <p>
+        <table class="template-actions" cellspacing="5px">
+            <tr>
+                <th class="category" colspan="2">new in 2.0</th>
+            </tr>
+            <tr>
+                #actionHeader("configuration.ui" "configuration ui" "accept" false)
+                <td>
+                    The configuration UI has been completely redone.  All configuration is now in the one place,
+                    under 'administration'.  We have used AJAX to create a more consistent interface that is also
+                    more responsive.
+                </td>
+            </tr>
+            <tr>
+                #actionHeader("templated.configuration" "templated configuration" "accept" false)
+                <td>
+                    The new configuration system supports templating: a way to share common configuration between
+                    related projects (and agents) by inheritance from ancestor templates.  You will notice that
+                    the configuration system allows you to configure a hierarchy of projects/agents, and shows
+                    the inheritance relationship of fields.
+                </td>
+            </tr>
+            <tr>
+                #actionHeader("security.system" "new security system" "accept" false)
+                <td>
+                    User and group management has been updated to allow finer-grained control of security.  It is
+                    now possible to assign more specific privileges to groups using ACLs, controlling access to
+                    both projects and agents.  It is also possible to configure permissions for all users and
+                    anonymous users via two special groups.
+                </td>
+            </tr>
+            <tr>
+                #actionHeader("plugin.system" "plugins" "accept" false)
+                <td>
+                    Support for various tools is being extracted into plugins.  Further, the new configuration UI
+                    is generated: so plugin authors do not need to write any UI code!
+                </td>
+            </tr>
+            <tr>
+                #actionHeader("predictable.urls" "predictable urls" "accept" false)
+                <td>
+                    The URL scheme used to access Pulses' resources has been reviewed and updated, allowing improved
+                    access to the UI, functionality and resources.
+                </td>
+            </tr>
+        </table>
     </p>
 </body>
 </html>

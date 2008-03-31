@@ -180,7 +180,7 @@
 #end
       <ul id="nav">
 #if($loggedInUser)
-        <li><a #if($selectedTab && $selectedTab == "dashboard")      class="active" #end id="tab.dashboard" href="$base/dashboard/home/">dashboard</a></li>
+        <li><a #if($selectedTab && $selectedTab == "dashboard")      class="active" #end id="tab.dashboard" href="$base/dashboard/">dashboard</a></li>
 #end
         <li><a #if($selectedTab && $selectedTab == "projects")       class="active" #end id="tab.projects" href="$base/browse/">browse</a></li>
         <li><a #if($selectedTab && $selectedTab == "server")         class="active" #end id="tab.queues" href="$base/server/">server</a></li>
