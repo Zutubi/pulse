@@ -427,11 +427,18 @@ public class SVNServer implements SCMServer
             try
             {
                 SVNWCClient wcClient = new SVNWCClient(repository.getAuthenticationManager(), null);
-                for (String externalPath : externalsPaths)
+                for (String externalsPath : externalsPaths)
                 {
-                    SVNURL url = repository.getLocation().appendPath(externalPath, false);
+                    SVNURL url = repository.getLocation().appendPath(externalsPath, false);
                     SVNPropertyData data = wcClient.doGetProperty(url, SVNProperty.EXTERNALS, SVNRevision.HEAD, convertRevision(revision), false);
-                    addExternalsFromProperty(StringUtils.join("/", true, true, externalPath, data.getValue()), result);
+                    if (data == null)
+                    {
+                        LOG.warning("Configured externals path '" + externalsPath + "' for URL '" + repository.getLocation().toString() + "' does not exist or does not have svn:externals property set: ignoring.");
+                    }
+                    else
+                    {
+                        addExternalsFromProperty(StringUtils.join("/", true, true, externalsPath, data.getValue()), result);
+                    }
                 }
             }
             catch (IOException e)
