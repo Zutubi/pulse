@@ -3,15 +3,12 @@ package com.zutubi.prototype.config;
 import com.zutubi.config.annotations.NoInherit;
 import com.zutubi.config.annotations.Ordered;
 import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.prototype.config.events.ConfigurationEvent;
-import com.zutubi.prototype.config.events.PostDeleteEvent;
-import com.zutubi.prototype.config.events.PostInsertEvent;
-import com.zutubi.prototype.config.events.PostSaveEvent;
+import com.zutubi.prototype.config.events.*;
 import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
-import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.util.CollectionUtils;
@@ -449,7 +446,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         record.put("property", createProperty("foo", "bar"));
         configurationTemplateManager.saveRecord(path, record, true);
 
-        listener.assertEvents(new PostInsertEventSpec(path + "/property", false));
+        listener.assertEvents(new InsertEventSpec(path + "/property", false), new PostInsertEventSpec(path + "/property", false));
         Project newInstance = configurationTemplateManager.getInstance(path, Project.class);
         assertNotSame(instance, newInstance);
         assertEquals("bar", newInstance.getProperty().getValue());
@@ -480,7 +477,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         clone.setProperty(new Property("foo", "bar"));
         configurationTemplateManager.save(clone);
 
-        listener.assertEvents(new PostInsertEventSpec(path + "/property", false));
+        listener.assertEvents(new InsertEventSpec(path + "/property", false), new PostInsertEventSpec(path + "/property", false));
         Project newInstance = configurationTemplateManager.getInstance(path, Project.class);
         assertNotSame(instance, newInstance);
         assertEquals("bar", newInstance.getProperty().getValue());
@@ -598,7 +595,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         long globalHandle = configurationTemplateManager.getRecord("project/global").getHandle();
         for(int i = 0; i < 10; i++)
         {
-            insertLargeProject("project" + i, globalHandle, 2, 2);
+            insertLargeProject("project" + i, globalHandle, 5, 5);
         }
     }
 
@@ -658,7 +655,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
 
         Listener listener = registerListener();
         configurationTemplateManager.delete(path);
-        listener.assertEvents(new PostDeleteEventSpec(path, false));
+        listener.assertEvents(new DeleteEventSpec(path, false), new PostDeleteEventSpec(path, false));
         assertHiddenItem(path);
     }
 
@@ -720,7 +717,10 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
 
         Listener listener = registerListener();
         hideStage(stagePath);
-        listener.assertEvents(new PostDeleteEventSpec(stagePath, false),
+        listener.assertEvents(new DeleteEventSpec(stagePath, false),
+                              new DeleteEventSpec(stagePath + "/properties/p1", true),
+                              new DeleteEventSpec(stagePath + "/properties/new", true),
+                              new PostDeleteEventSpec(stagePath, false),
                               new PostDeleteEventSpec(stagePath + "/properties/p1", true),
                               new PostDeleteEventSpec(stagePath + "/properties/new", true));
     }
@@ -735,7 +735,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
 
         Listener listener = registerListener();
         hideStage(stagePath);
-        listener.assertEvents(new PostDeleteEventSpec(stagePath, false));
+        listener.assertEvents(new DeleteEventSpec(stagePath, false), new PostDeleteEventSpec(stagePath, false));
     }
 
     public void testHideIndirectlyInherited()
@@ -790,7 +790,10 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
 
         Listener listener = registerListener();
         hideStage("project/child/stages/default");
-        listener.assertEvents(new PostDeleteEventSpec(gcStagePath, false),
+        listener.assertEvents(new DeleteEventSpec(gcStagePath, false),
+                              new DeleteEventSpec(gcStagePath + "/properties/p1", true),
+                              new DeleteEventSpec(gcStagePath + "/properties/new", true),
+                              new PostDeleteEventSpec(gcStagePath, false),
                               new PostDeleteEventSpec(gcStagePath + "/properties/p1", true),
                               new PostDeleteEventSpec(gcStagePath + "/properties/new", true));
         assertDeletedStage(gcStagePath);
@@ -805,7 +808,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
 
         Listener listener = registerListener();
         hideStage("project/child/stages/default");
-        listener.assertEvents(new PostDeleteEventSpec(gcStagePath, false));
+        listener.assertEvents(new DeleteEventSpec(gcStagePath, false), new PostDeleteEventSpec(gcStagePath, false));
         assertDeletedStage(gcStagePath);
     }
 
@@ -897,7 +900,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         configurationTemplateManager.delete(path);
         Listener listener = registerListener();
         configurationTemplateManager.restore(path);
-        listener.assertEvents(new PostInsertEventSpec(path, false), new PostInsertEventSpec(path + "/properties/p1", true));
+        listener.assertEvents(new InsertEventSpec(path, false), new PostInsertEventSpec(path, false), new InsertEventSpec(path + "/properties/p1", true), new PostInsertEventSpec(path + "/properties/p1", true));
         assertStage(path);
         TemplateRecord stagesRecord = (TemplateRecord) configurationTemplateManager.getRecord(PathUtils.getParentPath(path));
         assertEquals("global", stagesRecord.getOwner("default"));
@@ -914,7 +917,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         configurationTemplateManager.delete(path);
         Listener listener = registerListener();
         configurationTemplateManager.restore(path);
-        listener.assertEvents(new PostInsertEventSpec(path, false));
+        listener.assertEvents(new InsertEventSpec(path, false), new PostInsertEventSpec(path, false));
         assertTrue(configurationTemplateManager.pathExists(path));
         assertEquals("foo", configurationTemplateManager.getRecord(path).get("name"));
     }
@@ -943,7 +946,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
 
         Listener listener = registerListener();
         configurationTemplateManager.save(stage);
-        listener.assertEvents(new PostSaveEventSpec(path));
+        listener.assertEvents(new SaveEventSpec(path), new PostSaveEventSpec(path));
 
         assertEquals("edited", configurationTemplateManager.getInstance(path, Stage.class).getRecipe());
     }
@@ -961,7 +964,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
 
         Listener listener = registerListener();
         configurationTemplateManager.save(stage);
-        listener.assertEvents(new PostInsertEventSpec(path + "/properties/new", false));
+        listener.assertEvents(new InsertEventSpec(path + "/properties/new", false), new PostInsertEventSpec(path + "/properties/new", false));
 
         assertEquals("value", configurationTemplateManager.getInstance(path, Stage.class).getProperties().get("new").getValue());
     }
@@ -975,7 +978,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         Listener listener = registerListener();
         configurationTemplateManager.restore(path);
         String gcStagePath = "project/grandchild/stages/default";
-        listener.assertEvents(new PostInsertEventSpec(gcStagePath, false), new PostInsertEventSpec(gcStagePath + "/properties/p1", true));
+        listener.assertEvents(new InsertEventSpec(gcStagePath, false), new PostInsertEventSpec(gcStagePath, false), new InsertEventSpec(gcStagePath + "/properties/p1", true), new PostInsertEventSpec(gcStagePath + "/properties/p1", true));
         assertStage(gcStagePath);
     }
 
@@ -990,7 +993,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
 
         Listener listener = registerListener();
         configurationTemplateManager.restore(cStagePath);
-        listener.assertEvents(new PostInsertEventSpec(gcStagePath, false), new PostInsertEventSpec(gcStagePath + "/properties/p1", true));
+        listener.assertEvents(new InsertEventSpec(gcStagePath, false), new PostInsertEventSpec(gcStagePath, false), new PostInsertEventSpec(gcStagePath + "/properties/p1", true), new PostInsertEventSpec(gcStagePath + "/properties/p1", true));
         assertStage(gcStagePath);
     }
 
@@ -1053,7 +1056,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
     {
         Listener listener = registerListener();
         hideStage(deletePath);
-        listener.assertEvents(new PostDeleteEventSpec(concretePath, false), new PostDeleteEventSpec(concretePath + "/properties/p1", true));
+        listener.assertEvents(new DeleteEventSpec(concretePath, false), new DeleteEventSpec(concretePath + "/properties/p1", true), new PostDeleteEventSpec(concretePath, false), new PostDeleteEventSpec(concretePath + "/properties/p1", true));
     }
 
     public void testSetOrderEmptyPath()
@@ -1122,7 +1125,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
 
         Listener listener = registerListener();
         configurationTemplateManager.setOrder(stagesPath, Arrays.asList("two", "one"));
-        listener.assertEvents(new PostSaveEventSpec("nproject/test"));
+        listener.assertEvents(new SaveEventSpec("nproject/test"), new PostSaveEventSpec("nproject/test"));
         assertEquals(Arrays.asList("two", "one"), getOrder(stagesPath));
     }
 
@@ -1183,7 +1186,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
 
         Listener listener = registerListener();
         configurationTemplateManager.setOrder(stagesPath, Arrays.asList("default2", "default"));
-        listener.assertEvents(new PostSaveEventSpec("project/child"));
+        listener.assertEvents(new SaveEventSpec("project/child"), new PostSaveEventSpec("project/child"));
         assertEquals(Arrays.asList("default2", "default"), getOrder(stagesPath));
     }
 
@@ -1535,16 +1538,31 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
     public static abstract class EventSpec
     {
         private String path;
+        private boolean cascaded;
         private Class<? extends ConfigurationEvent> eventClass;
 
         protected EventSpec(String path, Class<? extends ConfigurationEvent> eventClass)
         {
+            this(path, false, eventClass);
+        }
+
+        protected EventSpec(String path, boolean cascaded, Class<? extends ConfigurationEvent> eventClass)
+        {
             this.path = path;
+            this.cascaded = cascaded;
             this.eventClass = eventClass;
         }
 
         public boolean matches(ConfigurationEvent event)
         {
+            if(event instanceof CascadableEvent)
+            {
+                if(cascaded != ((CascadableEvent)event).isCascaded())
+                {
+                    return false;
+                }
+            }
+
             return eventClass.isInstance(event) && event.getInstance().getConfigurationPath().equals(path);
         }
 
@@ -1554,35 +1572,43 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         }
     }
 
+    public static class InsertEventSpec extends EventSpec
+    {
+        public InsertEventSpec(String path, boolean cascaded)
+        {
+            super(path, cascaded, InsertEvent.class);
+        }
+    }
+
+    public static class DeleteEventSpec extends EventSpec
+    {
+        public DeleteEventSpec(String path, boolean cascaded)
+        {
+            super(path, cascaded, DeleteEvent.class);
+        }
+    }
+
+    public static class SaveEventSpec extends EventSpec
+    {
+        public SaveEventSpec(String path)
+        {
+            super(path, SaveEvent.class);
+        }
+    }
+
     public static class PostInsertEventSpec extends EventSpec
     {
-        private boolean cascaded;
-
         public PostInsertEventSpec(String path, boolean cascaded)
         {
-            super(path, PostInsertEvent.class);
-            this.cascaded = cascaded;
-        }
-
-        public boolean matches(ConfigurationEvent event)
-        {
-            return super.matches(event) && ((PostInsertEvent)event).isCascaded() == cascaded;
+            super(path, cascaded, PostInsertEvent.class);
         }
     }
 
     public static class PostDeleteEventSpec extends EventSpec
     {
-        private boolean cascaded;
-
         public PostDeleteEventSpec(String path, boolean cascaded)
         {
-            super(path, PostDeleteEvent.class);
-            this.cascaded = cascaded;
-        }
-
-        public boolean matches(ConfigurationEvent event)
-        {
-            return super.matches(event) && ((PostDeleteEvent)event).isCascaded() == cascaded;
+            super(path, cascaded, PostDeleteEvent.class);
         }
     }
 
