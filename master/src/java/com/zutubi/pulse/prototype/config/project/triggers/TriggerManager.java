@@ -1,7 +1,6 @@
 package com.zutubi.pulse.prototype.config.project.triggers;
 
-import com.zutubi.prototype.config.ConfigurationProvider;
-import com.zutubi.prototype.config.TypeListener;
+import com.zutubi.prototype.config.*;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.PulseRuntimeException;
 import com.zutubi.pulse.scheduling.Scheduler;
@@ -13,7 +12,7 @@ import com.zutubi.util.logging.Logger;
  * 
  *
  */
-public class TriggerManager
+public class TriggerManager implements ExternalStateManager<TriggerConfiguration>
 {
     private static final Logger LOG = Logger.getLogger(TriggerManager.class);
 
@@ -23,41 +22,14 @@ public class TriggerManager
 
     public void init()
     {
-        TypeListener<TriggerConfiguration> listener = new TypeListener<TriggerConfiguration>(TriggerConfiguration.class)
+        TypeListener<TriggerConfiguration> listener = new TypeAdapter<TriggerConfiguration>(TriggerConfiguration.class)
         {
-            public void postInsert(TriggerConfiguration instance)
-            {
-                try
-                {
-                    ComponentContext.autowire(instance);
-                    Trigger trigger = instance.newTrigger();
-                    scheduler.schedule(trigger);
-                    instance.setTriggerId(trigger.getId());
-
-                    // resave required 
-                    configurationProvider.save(instance);
-                }
-                catch (SchedulingException e)
-                {
-                    LOG.severe(e);
-                    throw new PulseRuntimeException(e);
-                }
-            }
-
             public void postDelete(TriggerConfiguration instance)
             {
-                try
-                {
-                    Trigger trigger = scheduler.getTrigger(instance.getTriggerId());
-                    scheduler.unschedule(trigger);
-                }
-                catch (SchedulingException e)
-                {
-                    LOG.severe(e);
-                }
+                TriggerManager.this.delete(instance.getTriggerId());
             }
 
-            public void postSave(TriggerConfiguration instance)
+            public void postSave(TriggerConfiguration instance, boolean nested)
             {
                 try
                 {
@@ -74,7 +46,41 @@ public class TriggerManager
                 }
             }
         };
-        listener.register(configurationProvider);
+        listener.register(configurationProvider, true);
+    }
+
+    private void delete(long id)
+    {
+        try
+        {
+            Trigger trigger = scheduler.getTrigger(id);
+            scheduler.unschedule(trigger);
+        }
+        catch (SchedulingException e)
+        {
+            LOG.severe(e);
+        }
+    }
+
+    public long createState(TriggerConfiguration instance)
+    {
+        try
+        {
+            ComponentContext.autowire(instance);
+            Trigger trigger = instance.newTrigger();
+            scheduler.schedule(trigger);
+            return trigger.getId();
+        }
+        catch (SchedulingException e)
+        {
+            LOG.severe(e);
+            throw new PulseRuntimeException(e);
+        }
+    }
+
+    public void rollbackState(long id)
+    {
+        delete(id);
     }
 
     public void setScheduler(Scheduler scheduler)
@@ -85,5 +91,10 @@ public class TriggerManager
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)
     {
         this.configurationProvider = configurationProvider;
+    }
+
+    public void setConfigurationStateManager(ConfigurationStateManager configurationStateManager)
+    {
+        configurationStateManager.register(TriggerConfiguration.class, this);
     }
 }

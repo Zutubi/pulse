@@ -51,7 +51,7 @@ import java.util.*;
  * 
  *
  */
-public class DefaultProjectManager implements ProjectManager, ConfigurationInjector.ConfigurationSetter<Project>, EventListener
+public class DefaultProjectManager implements ProjectManager, ExternalStateManager<ProjectConfiguration>, ConfigurationInjector.ConfigurationSetter<Project>, EventListener
 {
     private static final Logger LOG = Logger.getLogger(DefaultProjectManager.class);
 
@@ -87,13 +87,10 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
         addProjectAuthorisation.setProjectManager(this);
         licenseManager.addAuthorisation(addProjectAuthorisation);
 
-        TypeListener<ProjectConfiguration> listener = new TypeListener<ProjectConfiguration>(ProjectConfiguration.class)
+        TypeListener<ProjectConfiguration> listener = new TypeAdapter<ProjectConfiguration>(ProjectConfiguration.class)
         {
             public void postInsert(ProjectConfiguration instance)
             {
-                Project project = new Project();
-                save(project);
-                instance.setProjectId(project.getId());
                 registerProjectConfig(instance);
             }
 
@@ -105,7 +102,7 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
                 removeFromLabelMap(instance);
             }
 
-            public void postSave(ProjectConfiguration instance)
+            public void postSave(ProjectConfiguration instance, boolean nested)
             {
                 // Tricky: the name may have changed.
                 ProjectConfiguration old = idToConfig.remove(instance.getProjectId());
@@ -119,7 +116,7 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
                 registerProjectConfig(instance);
             }
         };
-        listener.register(configurationProvider);
+        listener.register(configurationProvider, true);
         updateProjects();
 
         // create default project if it is required.
@@ -169,6 +166,22 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
             {
                 LOG.severe("Unable to create global project template: " + e.getMessage(), e);
             }
+        }
+    }
+
+    public long createState(ProjectConfiguration instance)
+    {
+        Project project = new Project();
+        save(project);
+        return project.getId();
+    }
+
+    public void rollbackState(long id)
+    {
+        Project project = projectDao.findById(id);
+        if (project != null)
+        {
+            projectDao.delete(project);
         }
     }
 
@@ -634,6 +647,11 @@ public class DefaultProjectManager implements ProjectManager, ConfigurationInjec
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
         this.configurationTemplateManager = configurationTemplateManager;
+    }
+
+    public void setConfigurationStateManager(ConfigurationStateManager configurationStateManager)
+    {
+        configurationStateManager.register(ProjectConfiguration.class, this);
     }
 
     public void setTypeRegistry(TypeRegistry typeRegistry)

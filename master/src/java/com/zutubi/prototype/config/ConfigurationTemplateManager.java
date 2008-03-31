@@ -1,9 +1,7 @@
 package com.zutubi.prototype.config;
 
 import com.zutubi.prototype.config.cleanup.*;
-import com.zutubi.prototype.config.events.PostDeleteEvent;
-import com.zutubi.prototype.config.events.PostInsertEvent;
-import com.zutubi.prototype.config.events.PostSaveEvent;
+import com.zutubi.prototype.config.events.*;
 import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.prototype.transaction.*;
 import com.zutubi.prototype.type.*;
@@ -11,7 +9,6 @@ import com.zutubi.prototype.type.record.*;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.config.ConfigurationList;
 import com.zutubi.pulse.core.config.ConfigurationMap;
-import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
@@ -27,7 +24,7 @@ import java.util.*;
 
 /**
  */
-public class ConfigurationTemplateManager implements InstanceSource, Synchronization
+public class ConfigurationTemplateManager implements InstanceSource
 {
     private static final Logger LOG = Logger.getLogger(ConfigurationTemplateManager.class);
 
@@ -39,9 +36,9 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
     private ConfigurationReferenceManager configurationReferenceManager;
     private ConfigurationSecurityManager configurationSecurityManager;
     private ConfigurationCleanupManager configurationCleanupManager;
+    private ConfigurationStateManager configurationStateManager;
 
     private EventManager eventManager;
-
     private TransactionManager transactionManager;
 
     private UserTransaction userTransaction;
@@ -242,6 +239,32 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
         userTransaction.begin();
         try
         {
+            // Add a resource that publishes events on commit.
+            Transaction txn = transactionManager.getTransaction();
+            txn.enlistResource(new TransactionResource()
+            {
+                public boolean prepare()
+                {
+                    return true;
+                }
+
+                public void commit()
+                {
+                    ConfigurationTemplateManager.State state = getState();
+                    for(ConfigurationEvent e: state.pendingEvents)
+                    {
+                        eventManager.publish(e);
+                    }
+
+                    state.pendingEvents.clear();
+                }
+
+                public void rollback()
+                {
+                    // Just don't raise the events.
+                }
+            });
+
             T result = a.execute();
             userTransaction.commit();
             return result;
@@ -256,16 +279,6 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
             userTransaction.rollback();
             throw new ConfigRuntimeException(t);
         }
-    }
-
-    public void setConfigurationCleanupManager(ConfigurationCleanupManager configurationCleanupManager)
-    {
-        this.configurationCleanupManager = configurationCleanupManager;
-    }
-
-    interface Action<T>
-    {
-        T execute() throws Exception;
     }
 
     public String insert(final String path, Object instance)
@@ -452,6 +465,8 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
 
     private void raiseInsertEvents(DefaultInstanceCache instances, List<String> concretePaths)
     {
+        State state = getState();
+
         // For every new concrete path that has appeared (possibly inherited)
         for (String concretePath : concretePaths)
         {
@@ -461,8 +476,10 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
                 if (isComposite(instance))
                 {
                     Configuration configuration = (Configuration) instance;
-                    publishEvent(new PostInsertEvent(this, configuration, !concretePath.equals(configuration.getConfigurationPath())));
-                    updateInternalProperties(configuration);
+                    boolean cascaded = !concretePath.equals(configuration.getConfigurationPath());
+                    eventManager.publish(new InsertEvent(this, configuration, cascaded));
+                    state.pendingEvents.add(new PostInsertEvent(this, configuration, cascaded));
+                    configurationStateManager.instanceInserted(configuration);
                 }
             }
         }
@@ -474,42 +491,6 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
         return instance != null && typeRegistry.getType(instance.getClass()) != null;
     }
 
-    private void updateInternalProperties(Configuration configuration)
-    {
-        String path = configuration.getConfigurationPath();
-        CompositeType type = (CompositeType) getType(path);
-        if (type.hasInternalProperties())
-        {
-            MutableRecord mutable = recordManager.select(path).copy(false);
-            for (TypeProperty property : type.getInternalProperties())
-            {
-                try
-                {
-                    Object value = property.getValue(configuration);
-                    if (value != null)
-                    {
-                        value = property.getType().unstantiate(value);
-                    }
-
-                    if (value == null)
-                    {
-                        mutable.remove(property.getName());
-                    }
-                    else
-                    {
-                        mutable.put(property.getName(), value);
-                    }
-                }
-                catch (Exception e)
-                {
-                    LOG.severe(e);
-                }
-            }
-
-            recordManager.update(path, mutable);
-        }
-    }
-    
     private CompositeType checkRecordType(Type expectedType, MutableRecord record)
     {
         if (!(expectedType instanceof CompositeType))
@@ -1113,13 +1094,23 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
     private void raiseSaveEvents(String path)
     {
         State state = getState();
+
+        // Pile up the events before raising any, as the handlers may make
+        // their own changes!
+        List<SaveEvent> saveEvents = new LinkedList<SaveEvent>();
         for (String concretePath : getDescendentPaths(path, false, true, false))
         {
             Configuration instance = state.instances.get(concretePath, false);
             if (isComposite(instance))
             {
-                publishEvent(new PostSaveEvent(this, instance));
+                saveEvents.add(new SaveEvent(this, instance));
+                state.pendingEvents.add(new PostSaveEvent(this, instance));
             }
+        }
+
+        for (SaveEvent e: saveEvents)
+        {
+            eventManager.publish(e);
         }
     }
 
@@ -1406,12 +1397,12 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
                     String message;
                     if(descendentNames.size() == 1)
                     {
-                        message = textProvider.getText(".indescendent", new Object[]{fieldName, descendentNames.get(0)});
+                        message = textProvider.getText(".indescendent", fieldName, descendentNames.get(0));
                     }
                     else
                     {
                         Collections.sort(descendentNames, new Sort.StringComparator());
-                        message = textProvider.getText(".indescendents", new Object[]{fieldName, descendentNames.toString()});
+                        message = textProvider.getText(".indescendents", fieldName, descendentNames.toString());
                     }
 
                     throw new ValidationException(message);
@@ -1579,30 +1570,47 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
                     throw new IllegalArgumentException("Cannot delete instance at path '" + path + "': marked permanent");
                 }
 
-                State state = getState();
-                List<PostDeleteEvent> events = new LinkedList<PostDeleteEvent>();
-                for (String concretePath : getDescendentPaths(path, false, true, false))
-                {
-                    for (Object instance : state.instances.getAllDescendents(concretePath, false))
-                    {
-                        if (isComposite(instance))
-                        {
-                            Configuration configuration = (Configuration) instance;
-                            events.add(new PostDeleteEvent(ConfigurationTemplateManager.this, configuration, !concretePath.equals(configuration.getConfigurationPath())));
-                        }
-                    }
-                }
-
+                List<ConfigurationEvent> events = prepareDeleteEvents(path);
                 configurationCleanupManager.runCleanupTasks(getCleanupTasks(path));
                 refreshCaches();
 
-                for (PostDeleteEvent event : events)
+                State state = getState();
+                for(ConfigurationEvent e: events)
                 {
-                    publishEvent(event);
+                    if (e.isPost())
+                    {
+                        state.pendingEvents.add(e);
+                    }
+                    else
+                    {
+                        eventManager.publish(e);
+                    }
                 }
+
                 return null;
             }
         });
+    }
+
+    private List<ConfigurationEvent> prepareDeleteEvents(String path)
+    {
+        List<ConfigurationEvent> result = new LinkedList<ConfigurationEvent>();
+        State state = getState();
+        for (String concretePath : getDescendentPaths(path, false, true, false))
+        {
+            for (Object instance : state.instances.getAllDescendents(concretePath, false))
+            {
+                if (isComposite(instance))
+                {
+                    Configuration configuration = (Configuration) instance;
+                    boolean cascaded = !concretePath.equals(configuration.getConfigurationPath());
+                    result.add(new DeleteEvent(this, configuration, cascaded));
+                    result.add(new PostDeleteEvent(this, configuration, cascaded));
+                }
+            }
+        }
+
+        return result;
     }
 
     public int deleteAll(final String pathPattern)
@@ -2181,50 +2189,6 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
         return refreshCount;
     }
 
-    //---( implementation of the transactional synchronization interface. )---
-
-    public void postCompletion(TransactionStatus status)
-    {
-        List<Event> eventsToPublish = new LinkedList<Event>();
-        State state = getState();
-
-        eventsToPublish.addAll(state.pendingEvents);
-        state.pendingEvents.clear();
-
-        // we only want to generate events if the transaction that made the changes is successful.
-        if (status == TransactionStatus.COMMITTED)
-        {
-            userTransaction.begin();
-            for (Event event : eventsToPublish)
-            {
-                eventManager.publish(event);
-                if (event instanceof PostInsertEvent)
-                {
-                    PostInsertEvent postInsertEvent = (PostInsertEvent) event;
-                    updateInternalProperties(postInsertEvent.getInstance());
-                }
-            }
-            userTransaction.commit();
-        }
-    }
-
-    private void publishEvent(Event evt)
-    {
-        // If we are inside an action transaction, then we capture this event until
-        // the transaction is committed.  Otherwise, we publish it straight away.
-        Transaction txn = transactionManager.getTransaction();
-        if (txn != null)
-        {
-            //FIXME: What happens if this transaction is in the process of committing or rolling back?
-            txn.registerSynchronization(this);
-            getState().pendingEvents.add(evt);
-        }
-        else
-        {
-            eventManager.publish(evt);
-        }
-    }
-
     public void setTypeRegistry(TypeRegistry typeRegistry)
     {
         this.typeRegistry = typeRegistry;
@@ -2265,6 +2229,21 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
         this.transactionManager = transactionManager;
     }
 
+    public void setConfigurationCleanupManager(ConfigurationCleanupManager configurationCleanupManager)
+    {
+        this.configurationCleanupManager = configurationCleanupManager;
+    }
+
+    public void setConfigurationStateManager(ConfigurationStateManager configurationStateManager)
+    {
+        this.configurationStateManager = configurationStateManager;
+    }
+
+    interface Action<T>
+    {
+        T execute() throws Exception;
+    }
+
     /**
      * The state class encapsulates the state of the configuration template manager that is subject to
      * transactional control / isolation etc.
@@ -2281,7 +2260,7 @@ public class ConfigurationTemplateManager implements InstanceSource, Synchroniza
         /**
          * A list of events to be published if the current transaction commits.
          */
-        List<Event> pendingEvents = new LinkedList<Event>();
+        List<ConfigurationEvent> pendingEvents = new LinkedList<ConfigurationEvent>();
     }
 
     private class StateTransactionalWrapper extends TransactionalWrapper<State>

@@ -55,7 +55,7 @@ public class AgentConfigurationActions
     @Permission(ACTION_PING)
     public void doPing(AgentConfiguration config)
     {
-        agentManager.pingAgent(config);
+        agentManager.pingAgent(config, true);
     }
 
     public void doGc(AgentConfiguration config)

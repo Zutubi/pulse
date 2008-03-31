@@ -2,9 +2,7 @@ package com.zutubi.prototype.config;
 
 import com.zutubi.config.annotations.ID;
 import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.prototype.config.events.PostDeleteEvent;
-import com.zutubi.prototype.config.events.PostInsertEvent;
-import com.zutubi.prototype.config.events.PostSaveEvent;
+import com.zutubi.prototype.config.events.*;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.MapType;
 import com.zutubi.prototype.type.TemplatedMapType;
@@ -67,6 +65,7 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
 
         // check the insert events.
         String path = configurationTemplateManager.insert("sample", a);
+        listener.assertNextEvent(InsertEvent.class, "sample/a");
         listener.assertNextEvent(PostInsertEvent.class, "sample/a");
         listener.assertNoMoreEvents();
 
@@ -74,11 +73,13 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
         a = configurationTemplateManager.getCloneOfInstance(path, A.class);
         a.setField("edited");
         configurationTemplateManager.save(a);
+        listener.assertNextEvent(SaveEvent.class, "sample/edited");
         listener.assertNextEvent(PostSaveEvent.class, "sample/edited");
         listener.assertNoMoreEvents();
 
         // check the delete events.
         configurationTemplateManager.delete("sample/edited");
+        listener.assertNextEvent(DeleteEvent.class, "sample/edited");
         listener.assertNextEvent(PostDeleteEvent.class, "sample/edited");
         listener.assertNoMoreEvents();
     }
@@ -96,11 +97,13 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
 
         // check the insert events.
         String aPath = configurationTemplateManager.insert("sample", a);
+        includingChildren.assertNextEvent(InsertEvent.class, "sample/a");
         includingChildren.assertNextEvent(PostInsertEvent.class, "sample/a");
         includingChildren.assertNoMoreEvents();
         excludingChildren.assertNoMoreEvents();
 
         configurationTemplateManager.insert("sample/a/b", new B("b"));
+        includingChildren.assertNextEvent(InsertEvent.class, "sample/a/b");
         includingChildren.assertNextEvent(PostInsertEvent.class, "sample/a/b");
         includingChildren.assertNoMoreEvents();
         excludingChildren.assertNoMoreEvents();
@@ -110,6 +113,7 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
         a.setField("edited");
         configurationTemplateManager.save(a);
         // including listening at "sample", will see everything that happens below it.
+        includingChildren.assertNextEvent(SaveEvent.class, "sample/edited");
         includingChildren.assertNextEvent(PostSaveEvent.class, "sample/edited");
         includingChildren.assertNoMoreEvents();
         // excludingChildren listening at "sample", will not see changes to "sample/a"
@@ -118,12 +122,15 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
         B b = configurationTemplateManager.getCloneOfInstance("sample/edited/b", B.class);
         b.setField("edited");
         configurationTemplateManager.save(b);
+        includingChildren.assertNextEvent(SaveEvent.class, "sample/edited/b");
         includingChildren.assertNextEvent(PostSaveEvent.class, "sample/edited/b");
         includingChildren.assertNoMoreEvents();
         excludingChildren.assertNoMoreEvents();
 
         // check the delete events.
         configurationTemplateManager.delete("sample/edited");
+        includingChildren.assertNextEvent(DeleteEvent.class, "sample/edited");
+        includingChildren.assertNextEvent(DeleteEvent.class, "sample/edited/b");
         includingChildren.assertNextEvent(PostDeleteEvent.class, "sample/edited");
         includingChildren.assertNextEvent(PostDeleteEvent.class, "sample/edited/b");
         includingChildren.assertNoMoreEvents();
@@ -142,10 +149,12 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
 
         // check the insert event.
         configurationTemplateManager.insert("sample", a);
+        listener.assertNextEvent(InsertEvent.class, "sample/a/b");
         listener.assertNextEvent(PostInsertEvent.class, "sample/a/b");
         listener.assertNoMoreEvents();
 
         configurationTemplateManager.delete("sample/a");
+        listener.assertNextEvent(DeleteEvent.class, "sample/a/b");
         listener.assertNextEvent(PostDeleteEvent.class, "sample/a/b");
         listener.assertNoMoreEvents();
     }

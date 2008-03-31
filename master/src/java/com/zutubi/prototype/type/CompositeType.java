@@ -1,5 +1,6 @@
 package com.zutubi.prototype.type;
 
+import com.zutubi.config.annotations.ExternalState;
 import com.zutubi.config.annotations.Internal;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.MutableRecordImpl;
@@ -38,6 +39,8 @@ public class CompositeType extends AbstractType implements ComplexType
      * Those properties that are marked with the @Internal annotation.
      */
     private Map<String, TypeProperty> internalProperties = new HashMap<String, TypeProperty>();
+
+    private TypeProperty externalStateProperty = null;
 
     private Map<String, TypeProperty> properties = new HashMap<String, TypeProperty>();
 
@@ -80,7 +83,23 @@ public class CompositeType extends AbstractType implements ComplexType
             }
 
             internalProperties.put(property.getName(), property);
+
+            if(property.getAnnotation(ExternalState.class) != null)
+            {
+                if(property.getType().getClazz() != long.class)
+                {
+                    throw new TypeException("External state property '" + property.getName() + "' is not of type long");
+                }
+
+                if(externalStateProperty != null)
+                {
+                    throw new TypeException("Type has two external state properties '" + externalStateProperty.getName() + "' and '" + property.getName() + "'");
+                }
+
+                externalStateProperty = property;
+            }
         }
+
     }
 
     public List<TypeProperty> getProperties()
@@ -207,6 +226,11 @@ public class CompositeType extends AbstractType implements ComplexType
     public List<TypeProperty> getInternalProperties()
     {
         return Collections.unmodifiableList(new LinkedList<TypeProperty>(internalProperties.values()));
+    }
+
+    public TypeProperty getExternalStateProperty()
+    {
+        return externalStateProperty;
     }
 
     public boolean isExtendable()

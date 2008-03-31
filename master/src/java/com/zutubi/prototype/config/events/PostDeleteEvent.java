@@ -5,45 +5,16 @@ import com.zutubi.pulse.core.config.Configuration;
 
 /**
  */
-public class PostDeleteEvent extends ConfigurationEvent
+public class PostDeleteEvent extends CascadableEvent
 {
-    private boolean cascaded;
-
     public PostDeleteEvent(ConfigurationTemplateManager source, Configuration oldInstance, boolean cascaded)
     {
-        super(source, oldInstance);
-        this.cascaded = cascaded;
+        super(source, oldInstance, cascaded);
     }
 
-    public boolean isCascaded()
+    public boolean isPost()
     {
-        return cascaded;
-    }
-
-    public boolean equals(Object o)
-    {
-        if (this == o)
-        {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass())
-        {
-            return false;
-        }
-        if (!super.equals(o))
-        {
-            return false;
-        }
-
-        PostDeleteEvent event = (PostDeleteEvent) o;
-        return cascaded == event.cascaded;
-    }
-
-    public int hashCode()
-    {
-        int result = super.hashCode();
-        result = 31 * result + (cascaded ? 1 : 0);
-        return result;
+        return true;
     }
 
     public String toString()

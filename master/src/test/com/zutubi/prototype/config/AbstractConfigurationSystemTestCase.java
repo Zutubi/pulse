@@ -17,8 +17,6 @@ import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.security.GlobalAuthorityProvider;
 import com.zutubi.pulse.security.PulseThreadFactory;
 import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.util.bean.DefaultObjectFactory;
-import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.bean.WiringObjectFactory;
 import com.zutubi.validation.DefaultValidationManager;
 import com.zutubi.validation.ValidatorProvider;
@@ -43,9 +41,11 @@ public abstract class AbstractConfigurationSystemTestCase extends PulseTestCase
     protected ConfigurationReferenceManager configurationReferenceManager;
     protected ConfigurationSecurityManager configurationSecurityManager;
     protected ConfigurationCleanupManager configurationCleanupManager;
+    protected ConfigurationStateManager configurationStateManager;
     protected TransactionManager transactionManager;
     protected DefaultAccessManager accessManager;
     private PulseThreadFactory threadFactory;
+    protected DefaultConfigurationProvider configurationProvider = null;
 
     protected void setUp() throws Exception
     {
@@ -111,13 +111,27 @@ public abstract class AbstractConfigurationSystemTestCase extends PulseTestCase
         configurationCleanupManager.setObjectFactory(objectFactory);
         configurationCleanupManager.setThreadFactory(threadFactory);
 
+        configurationStateManager = new ConfigurationStateManager();
+        configurationStateManager.setRecordManager(recordManager);
+        configurationStateManager.setTransactionManager(transactionManager);
+        configurationStateManager.setTypeRegistry(typeRegistry);
+
         configurationTemplateManager.setConfigurationReferenceManager(configurationReferenceManager);
         configurationTemplateManager.setConfigurationSecurityManager(configurationSecurityManager);
         configurationTemplateManager.setConfigurationCleanupManager(configurationCleanupManager);
+        configurationTemplateManager.setConfigurationStateManager(configurationStateManager);
+
+        configurationProvider = new DefaultConfigurationProvider();
+        configurationProvider.setEventManager(eventManager);
+        configurationProvider.setTypeRegistry(typeRegistry);
+        configurationProvider.setConfigurationPersistenceManager(configurationPersistenceManager);
+        configurationProvider.setConfigurationTemplateManager(configurationTemplateManager);
+        configurationProvider.setThreadFactory(threadFactory);
 
         configurationTemplateManager.init();
         configurationCleanupManager.init();
-        
+        configurationProvider.init();
+
         typeRegistry.setConfigurationReferenceManager(configurationReferenceManager);
         typeRegistry.setHandleAllocator(recordManager);
 
@@ -132,6 +146,7 @@ public abstract class AbstractConfigurationSystemTestCase extends PulseTestCase
         recordManager = null;
         configurationReferenceManager = null;
         configurationPersistenceManager = null;
+        configurationStateManager = null;
 
         super.tearDown();
     }

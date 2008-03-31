@@ -38,7 +38,7 @@ public class TransactionManager
     }
 
     /**
-     * Being a transaction on the current thread.  This creates a new transaction if one does
+     * Begin a transaction on the current thread.  This creates a new transaction if one does
      * not already exist, or joins an existing transaction if it does.
      *
      * @return the active transaction.
@@ -186,7 +186,7 @@ public class TransactionManager
 
     /**
      * Mark the transaction associated with the current thread as 'rollback only'.  This indicates
-     * that this transaction can not be committed.
+     * that this transaction cannot be committed.
      *
      * @throws TransactionException if no transaction is associated with the current thread.
      */

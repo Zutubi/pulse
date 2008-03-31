@@ -22,6 +22,7 @@ import com.zutubi.pulse.prototype.config.group.ServerPermission;
 import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.util.logging.Logger;
+import org.acegisecurity.providers.encoding.PasswordEncoder;
 
 import java.net.InetAddress;
 import java.net.MalformedURLException;
@@ -45,6 +46,7 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
     private SetupManager setupManager;
     private ConfigurationReferenceManager configurationReferenceManager;
     private ThreadFactory threadFactory;
+    private PasswordEncoder passwordEncoder;
 
     public void initialise()
     {
@@ -124,7 +126,7 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
             adminUser.setPermanent(true);
             adminUser.setLogin(adminConfig.getLogin());
             adminUser.setName(adminConfig.getName());
-            adminUser.setPassword(adminConfig.getPassword());
+            adminUser.setPassword(passwordEncoder.encodePassword(adminConfig.getPassword(), null));
             adminUser.addDirectAuthority(ServerPermission.ADMINISTER.toString());
             configurationTemplateManager.insert(ConfigurationRegistry.USERS_SCOPE, adminUser);
 
@@ -255,5 +257,10 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
     public void setThreadFactory(ThreadFactory threadFactory)
     {
         this.threadFactory = threadFactory;
+    }
+
+    public void setPasswordEncoder(PasswordEncoder passwordEncoder)
+    {
+        this.passwordEncoder = passwordEncoder;
     }
 }

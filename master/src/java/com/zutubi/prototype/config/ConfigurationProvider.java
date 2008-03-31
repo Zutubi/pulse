@@ -1,6 +1,7 @@
 package com.zutubi.prototype.config;
 
 import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.util.NullaryFunction;
 
 import java.util.Collection;
 
@@ -101,4 +102,5 @@ public interface ConfigurationProvider
     String insert(String path, Object instance);
     String save(Configuration instance);
     void delete(String path);
+    <T> T executeInsideTransaction(NullaryFunction<T> f);
 }

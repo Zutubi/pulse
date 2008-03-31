@@ -1,9 +1,6 @@
 package com.zutubi.prototype.config;
 
-import com.zutubi.prototype.config.events.ConfigurationEvent;
-import com.zutubi.prototype.config.events.PostDeleteEvent;
-import com.zutubi.prototype.config.events.PostInsertEvent;
-import com.zutubi.prototype.config.events.PostSaveEvent;
+import com.zutubi.prototype.config.events.*;
 import com.zutubi.pulse.core.config.Configuration;
 
 /**
@@ -21,9 +18,9 @@ public abstract class TypeListener<T extends Configuration> implements Configura
         this.configurationClass = configurationClass;
     }
 
-    public void register(final ConfigurationProvider configurationProvider)
+    public void register(final ConfigurationProvider configurationProvider, boolean synchronous)
     {
-        configurationProvider.registerEventListener(this, true, true, configurationClass);
+        configurationProvider.registerEventListener(this, synchronous, true, configurationClass);
     }
 
     public void handleConfigurationEvent(ConfigurationEvent event)
@@ -35,13 +32,25 @@ public abstract class TypeListener<T extends Configuration> implements Configura
         if(configurationClass.isInstance(instance))
         {
             // Change occured directly to an instance of our type
-            if (event instanceof PostInsertEvent)
+            if (event instanceof InsertEvent)
+            {
+                insert((T) event.getInstance());
+            }
+            else if (event instanceof DeleteEvent)
+            {
+                delete((T) event.getInstance());
+            }
+            else if(event instanceof SaveEvent)
+            {
+                save((T) event.getInstance(), false);
+            }
+            else if (event instanceof PostInsertEvent)
             {
                 postInsert((T) event.getInstance());
             }
             else if(event instanceof PostSaveEvent)
             {
-                postSave((T) event.getInstance());
+                postSave((T) event.getInstance(), false);
             }
             else if (event instanceof PostDeleteEvent)
             {
@@ -59,7 +68,14 @@ public abstract class TypeListener<T extends Configuration> implements Configura
                 T ancestor = event.getSource().getAncestorOfType((Configuration) instance, configurationClass);
                 if (ancestor != null)
                 {
-                    postSave(ancestor);
+                    if (event.isPost())
+                    {
+                        postSave(ancestor, true);
+                    }
+                    else
+                    {
+                        save(ancestor, true);
+                    }
                 }
             }
         }
@@ -68,13 +84,9 @@ public abstract class TypeListener<T extends Configuration> implements Configura
 
     private boolean cascaded(ConfigurationEvent event)
     {
-        if(event instanceof PostInsertEvent)
+        if(event instanceof CascadableEvent)
         {
-            return ((PostInsertEvent)event).isCascaded();
-        }
-        else if(event instanceof PostDeleteEvent)
-        {
-            return ((PostDeleteEvent)event).isCascaded();
+            return ((CascadableEvent)event).isCascaded();
         }
         else
         {
@@ -82,7 +94,10 @@ public abstract class TypeListener<T extends Configuration> implements Configura
         }
     }
 
+    public abstract void insert(T instance);
     public abstract void postInsert(T instance);
+    public abstract void delete(T instance);
     public abstract void postDelete(T instance);
-    public abstract void postSave(T instance);
+    public abstract void save(T instance, boolean nested);
+    public abstract void postSave(T instance, boolean nested);
 }

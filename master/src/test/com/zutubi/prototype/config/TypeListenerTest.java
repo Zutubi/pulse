@@ -14,7 +14,6 @@ import junit.framework.Assert;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executors;
 
 /**
  *
@@ -22,7 +21,6 @@ import java.util.concurrent.Executors;
  */
 public class TypeListenerTest extends AbstractConfigurationSystemTestCase
 {
-    private DefaultConfigurationProvider provider = null;
     private CompositeType typeA;
     private CompositeType typeB;
     private long globalHandle;
@@ -31,14 +29,6 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-
-        provider = new DefaultConfigurationProvider();
-        provider.setEventManager(eventManager);
-        provider.setTypeRegistry(typeRegistry);
-        provider.setConfigurationPersistenceManager(configurationPersistenceManager);
-        provider.setConfigurationTemplateManager(configurationTemplateManager);
-        provider.setThreadFactory(Executors.defaultThreadFactory());
-        provider.init();
 
         typeA = typeRegistry.register(A.class);
         typeB = typeRegistry.getType(B.class);
@@ -111,7 +101,7 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
 
     protected void tearDown() throws Exception
     {
-        provider = null;
+        configurationProvider = null;
         super.tearDown();
     }
 
@@ -120,6 +110,7 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         MockTypeListener<A> listener = register(A.class);
         configurationTemplateManager.insert("sample", new A("a"));
         listener.assertInsert("sample/a");
+        listener.assertPostInsert("sample/a");
         listener.assertDone();
     }
 
@@ -131,7 +122,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         A clone = configurationTemplateManager.getCloneOfInstance(path, A.class);
         clone.setThing("edited");
         configurationTemplateManager.save(clone);
-        listener.assertSave("sample/a");
+        listener.assertSave("sample/a", false);
+        listener.assertPostSave("sample/a", false);
         listener.assertDone();
     }
 
@@ -141,6 +133,7 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         MockTypeListener<A> listener = register(A.class);
         configurationTemplateManager.delete("sample/a");
         listener.assertDelete("sample/a");
+        listener.assertPostDelete("sample/a");
         listener.assertDone();
     }
 
@@ -149,7 +142,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         configurationTemplateManager.insert("sample", new A("a"));
         MockTypeListener<A> listener = register(A.class);
         configurationTemplateManager.insert("sample/a/b", new B("b"));
-        listener.assertSave("sample/a");
+        listener.assertSave("sample/a", true);
+        listener.assertPostSave("sample/a", true);
         listener.assertDone();
     }
 
@@ -161,7 +155,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         B clone = configurationTemplateManager.getCloneOfInstance(bPath, B.class);
         clone.setName("edited");
         configurationTemplateManager.save(clone);
-        listener.assertSave("sample/a");
+        listener.assertSave("sample/a", true);
+        listener.assertPostSave("sample/a", true);
         listener.assertDone();
     }
 
@@ -171,7 +166,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         configurationTemplateManager.insert("sample/a/b", new B("b"));
         MockTypeListener<A> listener = register(A.class);
         configurationTemplateManager.delete("sample/a/b");
-        listener.assertSave("sample/a");
+        listener.assertSave("sample/a", true);
+        listener.assertPostSave("sample/a", true);
         listener.assertDone();
     }
 
@@ -200,6 +196,7 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         MockTypeListener<B> lb = register(B.class);
         insertA("test", globalHandle, false);
         la.assertInsert("template/test");
+        la.assertPostInsert("template/test");
         la.assertDone();
         lb.assertDone();
     }
@@ -211,8 +208,10 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         MockTypeListener<B> lb = register(B.class);
         insertA("test", globalHandle, false);
         la.assertInsert("template/test");
+        la.assertPostInsert("template/test");
         la.assertDone();
         lb.assertInsert("template/test/b");
+        lb.assertPostInsert("template/test/b");
         lb.assertDone();
     }
 
@@ -223,8 +222,10 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         MockTypeListener<B> lb = register(B.class);
         insertA("test", globalHandle, false);
         la.assertInsert("template/test");
+        la.assertPostInsert("template/test");
         la.assertDone();
         lb.assertInsert("template/test/bees/nesty");
+        lb.assertPostInsert("template/test/bees/nesty");
         lb.assertDone();
     }
 
@@ -233,9 +234,11 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         MockTypeListener<A> la = register(A.class);
         MockTypeListener<B> lb = register(B.class);
         insertB("test", "template/child/b");
-        la.assertSave("template/child");
+        la.assertSave("template/child", true);
+        la.assertPostSave("template/child", true);
         la.assertDone();
         lb.assertInsert("template/child/b");
+        lb.assertPostInsert("template/child/b");
         lb.assertDone();
     }
 
@@ -244,9 +247,11 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         MockTypeListener<A> la = register(A.class);
         MockTypeListener<B> lb = register(B.class);
         insertB("test", "template/child/bees");
-        la.assertSave("template/child");
+        la.assertSave("template/child", true);
+        la.assertPostSave("template/child", true);
         la.assertDone();
         lb.assertInsert("template/child/bees/test");
+        lb.assertPostInsert("template/child/bees/test");
         lb.assertDone();
     }
 
@@ -255,9 +260,11 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         MockTypeListener<A> la = register(A.class);
         MockTypeListener<B> lb = register(B.class);
         insertB("test", "template/childt/b");
-        la.assertSave("template/grandchild");
+        la.assertSave("template/grandchild", true);
+        la.assertPostSave("template/grandchild", true);
         la.assertDone();
         lb.assertInsert("template/grandchild/b");
+        lb.assertPostInsert("template/grandchild/b");
         lb.assertDone();
     }
 
@@ -266,9 +273,11 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         MockTypeListener<A> la = register(A.class);
         MockTypeListener<B> lb = register(B.class);
         insertB("test", "template/childt/bees");
-        la.assertSave("template/grandchild");
+        la.assertSave("template/grandchild", true);
+        la.assertPostSave("template/grandchild", true);
         la.assertDone();
         lb.assertInsert("template/grandchild/bees/test");
+        lb.assertPostInsert("template/grandchild/bees/test");
         lb.assertDone();
     }
     
@@ -277,11 +286,15 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         MockTypeListener<A> la = register(A.class);
         MockTypeListener<B> lb = register(B.class);
         insertB("test", "template/globalt/b");
-        la.assertSave("template/grandchild");
-        la.assertSave("template/child");
+        la.assertSave("template/grandchild", true);
+        la.assertSave("template/child", true);
+        la.assertPostSave("template/grandchild", true);
+        la.assertPostSave("template/child", true);
         la.assertDone();
         lb.assertInsert("template/grandchild/b");
         lb.assertInsert("template/child/b");
+        lb.assertPostInsert("template/grandchild/b");
+        lb.assertPostInsert("template/child/b");
         lb.assertDone();
     }
 
@@ -290,11 +303,15 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         MockTypeListener<A> la = register(A.class);
         MockTypeListener<B> lb = register(B.class);
         insertB("test", "template/globalt/bees");
-        la.assertSave("template/grandchild");
-        la.assertSave("template/child");
+        la.assertSave("template/grandchild", true);
+        la.assertSave("template/child", true);
+        la.assertPostSave("template/grandchild", true);
+        la.assertPostSave("template/child", true);
         la.assertDone();
         lb.assertInsert("template/grandchild/bees/test");
         lb.assertInsert("template/child/bees/test");
+        lb.assertPostInsert("template/grandchild/bees/test");
+        lb.assertPostInsert("template/child/bees/test");
         lb.assertDone();
     }
 
@@ -303,7 +320,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         MockTypeListener<A> la = register(A.class);
         MockTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/child", createEditedA("child"));
-        la.assertSave("template/child");
+        la.assertSave("template/child", false);
+        la.assertPostSave("template/child", false);
         la.assertDone();
         lb.assertDone();
     }
@@ -313,7 +331,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         MockTypeListener<A> la = register(A.class);
         MockTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/child", createA("newname"));
-        la.assertSave("template/newname");
+        la.assertSave("template/newname", false);
+        la.assertPostSave("template/newname", false);
         la.assertDone();
         lb.assertDone();
     }
@@ -341,7 +360,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         MockTypeListener<A> la = register(A.class);
         MockTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/childt", createEditedA("childt"));
-        la.assertSave("template/grandchild");
+        la.assertSave("template/grandchild", false);
+        la.assertPostSave("template/grandchild", false);
         la.assertDone();
         lb.assertDone();
     }
@@ -351,7 +371,8 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         MockTypeListener<A> la = register(A.class);
         MockTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/childt", createA("newname"));
-        la.assertSave("template/grandchild");
+        la.assertSave("template/grandchild", false);
+        la.assertPostSave("template/grandchild", false);
         la.assertDone();
         lb.assertDone();
     }
@@ -361,8 +382,10 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         MockTypeListener<A> la = register(A.class);
         MockTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/globalt", createEditedA("globalt"));
-        la.assertSave("template/grandchild");
-        la.assertSave("template/child");
+        la.assertSave("template/grandchild", false);
+        la.assertPostSave("template/grandchild", false);
+        la.assertSave("template/child", false);
+        la.assertPostSave("template/child", false);
         la.assertDone();
         lb.assertDone();
     }
@@ -372,8 +395,10 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         MockTypeListener<A> la = register(A.class);
         MockTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/globalt", createA("newname"));
-        la.assertSave("template/grandchild");
-        la.assertSave("template/child");
+        la.assertSave("template/grandchild", false);
+        la.assertPostSave("template/grandchild", false);
+        la.assertSave("template/child", false);
+        la.assertPostSave("template/child", false);
         la.assertDone();
         lb.assertDone();
     }
@@ -384,9 +409,11 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         MockTypeListener<A> la = register(A.class);
         MockTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/child/b", createEditedB("test"));
-        la.assertSave("template/child");
+        la.assertSave("template/child", true);
+        la.assertPostSave("template/child", true);
         la.assertDone();
-        lb.assertSave("template/child/b");
+        lb.assertSave("template/child/b", false);
+        lb.assertPostSave("template/child/b", false);
         lb.assertDone();
     }
 
@@ -396,9 +423,11 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         MockTypeListener<A> la = register(A.class);
         MockTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/child/bees/test", createEditedB("test"));
-        la.assertSave("template/child");
+        la.assertSave("template/child", true);
+        la.assertPostSave("template/child", true);
         la.assertDone();
-        lb.assertSave("template/child/bees/test");
+        lb.assertSave("template/child/bees/test", false);
+        lb.assertPostSave("template/child/bees/test", false);
         lb.assertDone();
     }
 
@@ -408,9 +437,11 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         MockTypeListener<A> la = register(A.class);
         MockTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/child/bees/test", createEditedB("newname"));
-        la.assertSave("template/child");
+        la.assertSave("template/child", true);
+        la.assertPostSave("template/child", true);
         la.assertDone();
-        lb.assertSave("template/child/bees/newname");
+        lb.assertSave("template/child/bees/newname", false);
+        lb.assertPostSave("template/child/bees/newname", false);
         lb.assertDone();
     }
 
@@ -420,9 +451,11 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         MockTypeListener<A> la = register(A.class);
         MockTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/childt/b", createEditedB("test"));
-        la.assertSave("template/grandchild");
+        la.assertSave("template/grandchild", true);
+        la.assertPostSave("template/grandchild", true);
         la.assertDone();
-        lb.assertSave("template/grandchild/b");
+        lb.assertSave("template/grandchild/b", false);
+        lb.assertPostSave("template/grandchild/b", false);
         lb.assertDone();
     }
 
@@ -432,9 +465,11 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         MockTypeListener<A> la = register(A.class);
         MockTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/childt/bees/test", createEditedB("test"));
-        la.assertSave("template/grandchild");
+        la.assertSave("template/grandchild", true);
+        la.assertPostSave("template/grandchild", true);
         la.assertDone();
-        lb.assertSave("template/grandchild/bees/test");
+        lb.assertSave("template/grandchild/bees/test", false);
+        lb.assertPostSave("template/grandchild/bees/test", false);
         lb.assertDone();
     }
 
@@ -444,9 +479,11 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         MockTypeListener<A> la = register(A.class);
         MockTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/childt/bees/test", createB("newname"));
-        la.assertSave("template/grandchild");
+        la.assertSave("template/grandchild", true);
+        la.assertPostSave("template/grandchild", true);
         la.assertDone();
-        lb.assertSave("template/grandchild/bees/newname");
+        lb.assertSave("template/grandchild/bees/newname", false);
+        lb.assertPostSave("template/grandchild/bees/newname", false);
         lb.assertDone();
     }
 
@@ -456,11 +493,15 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         MockTypeListener<A> la = register(A.class);
         MockTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/globalt/b", createEditedB("test"));
-        la.assertSave("template/grandchild");
-        la.assertSave("template/child");
+        la.assertSave("template/grandchild",  true);
+        la.assertSave("template/child", true);
+        la.assertPostSave("template/grandchild",  true);
+        la.assertPostSave("template/child", true);
         la.assertDone();
-        lb.assertSave("template/grandchild/b");
-        lb.assertSave("template/child/b");
+        lb.assertSave("template/grandchild/b", false);
+        lb.assertPostSave("template/grandchild/b", false);
+        lb.assertSave("template/child/b", false);
+        lb.assertPostSave("template/child/b", false);
         lb.assertDone();
     }
 
@@ -470,11 +511,15 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         MockTypeListener<A> la = register(A.class);
         MockTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/globalt/bees/test", createEditedB("test"));
-        la.assertSave("template/grandchild");
-        la.assertSave("template/child");
+        la.assertSave("template/grandchild", true);
+        la.assertSave("template/child", true);
+        la.assertPostSave("template/grandchild", true);
+        la.assertPostSave("template/child", true);
         la.assertDone();
-        lb.assertSave("template/grandchild/bees/test");
-        lb.assertSave("template/child/bees/test");
+        lb.assertSave("template/grandchild/bees/test", false);
+        lb.assertPostSave("template/grandchild/bees/test", false);
+        lb.assertSave("template/child/bees/test", false);
+        lb.assertPostSave("template/child/bees/test", false);
         lb.assertDone();
     }
 
@@ -484,11 +529,15 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         MockTypeListener<A> la = register(A.class);
         MockTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/globalt/bees/test", createEditedB("newname"));
-        la.assertSave("template/grandchild");
-        la.assertSave("template/child");
+        la.assertSave("template/grandchild", true);
+        la.assertSave("template/child", true);
+        la.assertPostSave("template/grandchild", true);
+        la.assertPostSave("template/child", true);
         la.assertDone();
-        lb.assertSave("template/grandchild/bees/newname");
-        lb.assertSave("template/child/bees/newname");
+        lb.assertSave("template/grandchild/bees/newname", false);
+        lb.assertPostSave("template/grandchild/bees/newname", false);
+        lb.assertSave("template/child/bees/newname", false);
+        lb.assertPostSave("template/child/bees/newname", false);
         lb.assertDone();
     }
 
@@ -498,6 +547,7 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         MockTypeListener<B> lb = register(B.class);
         configurationTemplateManager.delete("template/child");
         la.assertDelete("template/child");
+        la.assertPostDelete("template/child");
         la.assertDone();
         lb.assertDone();
     }
@@ -509,8 +559,10 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         MockTypeListener<B> lb = register(B.class);
         configurationTemplateManager.delete("template/child");
         la.assertDelete("template/child");
+        la.assertPostDelete("template/child");
         la.assertDone();
         lb.assertDelete("template/child/b");
+        lb.assertPostDelete("template/child/b");
         lb.assertDone();
     }
 
@@ -521,8 +573,10 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         MockTypeListener<B> lb = register(B.class);
         configurationTemplateManager.delete("template/child");
         la.assertDelete("template/child");
+        la.assertPostDelete("template/child");
         la.assertDone();
         lb.assertDelete("template/child/bees/test");
+        lb.assertPostDelete("template/child/bees/test");
         lb.assertDone();
     }
 
@@ -561,9 +615,11 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         MockTypeListener<A> la = register(A.class);
         MockTypeListener<B> lb = register(B.class);
         configurationTemplateManager.delete("template/grandchild/b");
-        la.assertSave("template/grandchild");
+        la.assertSave("template/grandchild", true);
+        la.assertPostSave("template/grandchild", true);
         la.assertDone();
         lb.assertDelete("template/grandchild/b");
+        lb.assertPostDelete("template/grandchild/b");
         lb.assertDone();
     }
 
@@ -573,9 +629,11 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         MockTypeListener<A> la = register(A.class);
         MockTypeListener<B> lb = register(B.class);
         configurationTemplateManager.delete("template/grandchild/bees/test");
-        la.assertSave("template/grandchild");
+        la.assertSave("template/grandchild", true);
+        la.assertPostSave("template/grandchild", true);
         la.assertDone();
         lb.assertDelete("template/grandchild/bees/test");
+        lb.assertPostDelete("template/grandchild/bees/test");
         lb.assertDone();
     }
 
@@ -585,9 +643,11 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         MockTypeListener<A> la = register(A.class);
         MockTypeListener<B> lb = register(B.class);
         configurationTemplateManager.delete("template/childt/b");
-        la.assertSave("template/grandchild");
+        la.assertSave("template/grandchild", true);
+        la.assertPostSave("template/grandchild", true);
         la.assertDone();
         lb.assertDelete("template/grandchild/b");
+        lb.assertPostDelete("template/grandchild/b");
         lb.assertDone();
     }
 
@@ -597,9 +657,11 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         MockTypeListener<A> la = register(A.class);
         MockTypeListener<B> lb = register(B.class);
         configurationTemplateManager.delete("template/childt/bees/test");
-        la.assertSave("template/grandchild");
+        la.assertSave("template/grandchild", true);
+        la.assertPostSave("template/grandchild", true);
         la.assertDone();
         lb.assertDelete("template/grandchild/bees/test");
+        lb.assertPostDelete("template/grandchild/bees/test");
         lb.assertDone();
     }
 
@@ -609,11 +671,15 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         MockTypeListener<A> la = register(A.class);
         MockTypeListener<B> lb = register(B.class);
         configurationTemplateManager.delete("template/globalt/b");
-        la.assertSave("template/grandchild");
-        la.assertSave("template/child");
+        la.assertSave("template/grandchild", true);
+        la.assertSave("template/child", true);
+        la.assertPostSave("template/grandchild", true);
+        la.assertPostSave("template/child", true);
         la.assertDone();
         lb.assertDelete("template/grandchild/b");
         lb.assertDelete("template/child/b");
+        lb.assertPostDelete("template/grandchild/b");
+        lb.assertPostDelete("template/child/b");
         lb.assertDone();
     }
 
@@ -623,11 +689,15 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         MockTypeListener<A> la = register(A.class);
         MockTypeListener<B> lb = register(B.class);
         configurationTemplateManager.delete("template/globalt/bees/test");
-        la.assertSave("template/grandchild");
-        la.assertSave("template/child");
+        la.assertSave("template/grandchild", true);
+        la.assertSave("template/child", true);
+        la.assertPostSave("template/grandchild", true);
+        la.assertPostSave("template/child", true);
         la.assertDone();
         lb.assertDelete("template/grandchild/bees/test");
         lb.assertDelete("template/child/bees/test");
+        lb.assertPostDelete("template/grandchild/bees/test");
+        lb.assertPostDelete("template/child/bees/test");
         lb.assertDone();
     }
 
@@ -637,9 +707,11 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         MockTypeListener<A> la = register(A.class);
         MockTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/grandchild/b", createEditedB("test"));
-        la.assertSave("template/grandchild");
+        la.assertSave("template/grandchild", true);
+        la.assertPostSave("template/grandchild", true);
         la.assertDone();
-        lb.assertSave("template/grandchild/b");
+        lb.assertSave("template/grandchild/b", false);
+        lb.assertPostSave("template/grandchild/b", false);
         lb.assertDone();
     }
 
@@ -649,9 +721,11 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         MockTypeListener<A> la = register(A.class);
         MockTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/grandchild/bees/test", createEditedB("test"));
-        la.assertSave("template/grandchild");
+        la.assertSave("template/grandchild", true);
+        la.assertPostSave("template/grandchild", true);
         la.assertDone();
-        lb.assertSave("template/grandchild/bees/test");
+        lb.assertSave("template/grandchild/bees/test", false);
+        lb.assertPostSave("template/grandchild/bees/test", false);
         lb.assertDone();
     }
 
@@ -661,9 +735,11 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         MockTypeListener<A> la = register(A.class);
         MockTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/childt/b", createEditedB("test"));
-        la.assertSave("template/grandchild");
+        la.assertSave("template/grandchild", true);
+        la.assertPostSave("template/grandchild", true);
         la.assertDone();
-        lb.assertSave("template/grandchild/b");
+        lb.assertSave("template/grandchild/b", false);
+        lb.assertPostSave("template/grandchild/b", false);
         lb.assertDone();
     }
 
@@ -673,16 +749,18 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
         MockTypeListener<A> la = register(A.class);
         MockTypeListener<B> lb = register(B.class);
         configurationTemplateManager.saveRecord("template/childt/bees/test", createEditedB("test"));
-        la.assertSave("template/grandchild");
+        la.assertSave("template/grandchild", true);
+        la.assertPostSave("template/grandchild", true);
         la.assertDone();
-        lb.assertSave("template/grandchild/bees/test");
+        lb.assertSave("template/grandchild/bees/test", false);
+        lb.assertPostSave("template/grandchild/bees/test", false);
         lb.assertDone();
     }
 
     public void testAssignId()
     {
         IDAssigningListener<A> listener = new IDAssigningListener<A>(A.class);
-        listener.register(provider);
+        listener.register(configurationProvider, true);
 
         configurationTemplateManager.insertRecord("sample", createA("a"));
         assertId("sample/a", 1);
@@ -691,7 +769,7 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
     public void testAssignedIdSurvivesRefresh()
     {
         IDAssigningListener<A> listener = new IDAssigningListener<A>(A.class);
-        listener.register(provider);
+        listener.register(configurationProvider, true);
 
         configurationTemplateManager.insertRecord("sample", createA("a"));
         configurationTemplateManager.saveRecord("sample/a", createA("a"));
@@ -701,7 +779,7 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
     public void testNewConcreteAssignedId()
     {
         IDAssigningListener<A> listener = new IDAssigningListener<A>(A.class);
-        listener.register(provider);
+        listener.register(configurationProvider, true);
 
         insertA("new", childtHandle, false);
         assertId("template/new", 1);
@@ -710,11 +788,40 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
     public void testAllConcreteGetAssignedIds()
     {
         IDAssigningListener<B> listener = new IDAssigningListener<B>(B.class);
-        listener.register(provider);
+        listener.register(configurationProvider, true);
 
         insertB("new", "template/globalt/b");
         assertId("template/grandchild/b", 1);
         assertId("template/child/b", 2);
+    }
+
+    public void testChangeInSave()
+    {
+        A a = new A("a");
+        a.setB(new B("b"));
+        String path = configurationTemplateManager.insert("sample", a);
+        MockTypeListener<A> listener = register(A.class);
+        TypeListener<A> changingListener = new TypeAdapter<A>(A.class)
+        {
+            public void save(A instance, boolean nested)
+            {
+                if (!nested)
+                {
+                    B b = configurationTemplateManager.deepClone(instance.b);
+                    b.setThing("something");
+                    configurationProvider.save(b);
+                }
+            }
+        };
+        changingListener.register(configurationProvider, true);
+        A clone = configurationTemplateManager.getCloneOfInstance(path, A.class);
+        clone.setThing("edited");
+        configurationTemplateManager.save(clone);
+        listener.assertSave("sample/a", false);
+        listener.assertSave("sample/a", true);
+        listener.assertPostSave("sample/a", false);
+        listener.assertPostSave("sample/a", true);
+        listener.assertDone();
     }
 
     private void assertId(String path, int id)
@@ -727,7 +834,7 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
     private <T extends Configuration> MockTypeListener<T> register(Class<T> clazz)
     {
         MockTypeListener<T> listener = new MockTypeListener<T>(clazz);
-        listener.register(provider);
+        listener.register(configurationProvider, true);
         return listener;
     }
 
@@ -739,16 +846,26 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
             {
                 INSERT,
                 DELETE,
-                SAVE
+                SAVE,
+                POST_INSERT,
+                POST_DELETE,
+                POST_SAVE,
             }
 
             public Type type;
             public String path;
+            public boolean nested;
 
             public Event(Type type, String path)
             {
+                this(type, path, false);
+            }
+
+            public Event(Type type, String path, boolean nested)
+            {
                 this.type = type;
                 this.path = path;
+                this.nested = nested;
             }
 
             public boolean equals(Object o)
@@ -764,14 +881,23 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
 
                 Event event = (Event) o;
 
-                return !(path != null ? !path.equals(event.path) : event.path != null) && type == event.type;
+                if (nested != event.nested)
+                {
+                    return false;
+                }
+                if (!path.equals(event.path))
+                {
+                    return false;
+                }
+                return type == event.type;
             }
 
             public int hashCode()
             {
                 int result;
-                result = (type != null ? type.hashCode() : 0);
-                result = 31 * result + (path != null ? path.hashCode() : 0);
+                result = type.hashCode();
+                result = 31 * result + path.hashCode();
+                result = 31 * result + (nested ? 1 : 0);
                 return result;
             }
         }
@@ -783,24 +909,44 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
             super(configurationClass);
         }
 
-        public void postInsert(X instance)
+        public void insert(X instance)
         {
             got.add(new Event(Event.Type.INSERT, instance.getConfigurationPath()));
         }
 
-        public void postDelete(X instance)
+        public void delete(X instance)
         {
             got.add(new Event(Event.Type.DELETE, instance.getConfigurationPath()));
         }
 
-        public void postSave(X instance)
+        public void save(X instance, boolean nested)
         {
             got.add(new Event(Event.Type.SAVE, instance.getConfigurationPath()));
         }
 
+        public void postInsert(X instance)
+        {
+            got.add(new Event(Event.Type.POST_INSERT, instance.getConfigurationPath()));
+        }
+
+        public void postDelete(X instance)
+        {
+            got.add(new Event(Event.Type.POST_DELETE, instance.getConfigurationPath()));
+        }
+
+        public void postSave(X instance, boolean nested)
+        {
+            got.add(new Event(Event.Type.POST_SAVE, instance.getConfigurationPath()));
+        }
+
         private void assertEvent(String path, Event.Type type)
         {
-            assertTrue(got.remove(new Event(type, path)));
+            assertEvent(path, type, false);
+        }
+
+        private void assertEvent(String path, Event.Type type, boolean nested)
+        {
+            assertTrue(got.remove(new Event(type, path, nested)));
         }
 
         public void assertInsert(String path)
@@ -813,9 +959,24 @@ public class TypeListenerTest extends AbstractConfigurationSystemTestCase
             assertEvent(path, Event.Type.DELETE);
         }
 
-        public void assertSave(String path)
+        public void assertSave(String path, boolean nested)
         {
             assertEvent(path, Event.Type.SAVE);
+        }
+
+        public void assertPostInsert(String path)
+        {
+            assertEvent(path, Event.Type.POST_INSERT);
+        }
+
+        public void assertPostDelete(String path)
+        {
+            assertEvent(path, Event.Type.POST_DELETE);
+        }
+
+        public void assertPostSave(String path, boolean nested)
+        {
+            assertEvent(path, Event.Type.POST_SAVE);
         }
 
         public void assertDone()

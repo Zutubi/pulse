@@ -12,6 +12,11 @@ public class PostSaveEvent extends ConfigurationEvent
         super(source, newInstance);
     }
 
+    public boolean isPost()
+    {
+        return true;
+    }
+
     public String toString()
     {
         return "Post Save Event: " + getInstance().getConfigurationPath();

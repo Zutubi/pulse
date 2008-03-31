@@ -18,12 +18,12 @@ public class ConfigLicenseKeyStore extends AbstractLicenseKeyStore
     {
         TypeListener<LicenseConfiguration> listener = new TypeAdapter<LicenseConfiguration>(LicenseConfiguration.class)
         {
-            public void postSave(LicenseConfiguration instance)
+            public void postSave(LicenseConfiguration instance, boolean nested)
             {
                 notifyListeners();
             }
         };
-        listener.register(configurationProvider);
+        listener.register(configurationProvider, false);
     }
 
     public String getKey()

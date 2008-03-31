@@ -5,19 +5,16 @@ import com.zutubi.pulse.core.config.Configuration;
 
 /**
  */
-public class PostInsertEvent extends ConfigurationEvent
+public class PostInsertEvent extends CascadableEvent
 {
-    private boolean cascaded;
-
     public PostInsertEvent(ConfigurationTemplateManager source, Configuration newInstance, boolean cascaded)
     {
-        super(source, newInstance);
-        this.cascaded = cascaded;
+        super(source, newInstance, cascaded);
     }
 
-    public boolean isCascaded()
+    public boolean isPost()
     {
-        return cascaded;
+        return true;
     }
 
     public String toString()

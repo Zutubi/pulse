@@ -1,12 +1,16 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.prototype.config.ConfigurationProvider;
+import com.zutubi.prototype.config.TypeAdapter;
 import com.zutubi.prototype.config.TypeListener;
-import com.zutubi.pulse.core.ConfigurableResourceRepository;
+import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceVersion;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
+import com.zutubi.util.NullaryFunction;
+import com.zutubi.util.logging.Logger;
 
 import java.util.*;
 
@@ -14,6 +18,8 @@ import java.util.*;
  */
 public class DefaultResourceManager implements ResourceManager
 {
+    private static final Logger LOG = Logger.getLogger(DefaultResourceManager.class);
+
     private Map<Long, ConfigurationResourceRepository> agentRepositories = new TreeMap<Long, ConfigurationResourceRepository>();
     private ConfigurationProvider configurationProvider;
     private Map<Long, Resource> resourcesByHandle = new HashMap<Long, Resource>();
@@ -21,7 +27,7 @@ public class DefaultResourceManager implements ResourceManager
 
     public void init()
     {
-        TypeListener<AgentConfiguration> agentListener = new TypeListener<AgentConfiguration>(AgentConfiguration.class)
+        TypeListener<AgentConfiguration> agentListener = new TypeAdapter<AgentConfiguration>(AgentConfiguration.class)
         {
             public void postInsert(AgentConfiguration instance)
             {
@@ -33,17 +39,25 @@ public class DefaultResourceManager implements ResourceManager
                 agentRepositories.remove(instance.getHandle());
             }
 
-            public void postSave(AgentConfiguration instance)
+            public void postSave(AgentConfiguration instance, boolean nested)
             {
                 // Replaces the existing as it is stored by the (unchanging)
                 // handle.
                 addAgentRepo(instance);
             }
         };
-        agentListener.register(configurationProvider);
+        agentListener.register(configurationProvider, true);
 
-        TypeListener<Resource> resourceListener = new TypeListener<Resource>(Resource.class)
+        TypeListener<Resource> resourceListener = new TypeAdapter<Resource>(Resource.class)
         {
+            public void save(Resource instance, boolean nested)
+            {
+                if (!nested)
+                {
+                    updateResource(instance);
+                }
+            }
+
             public void postInsert(Resource instance)
             {
                 addResource(instance);
@@ -54,15 +68,25 @@ public class DefaultResourceManager implements ResourceManager
                 removeResource(instance);
             }
 
-            public void postSave(Resource instance)
+            public void postSave(Resource instance, boolean nested)
             {
-                updateResource(instance);
+                // Replaces the existing as it is stored by the (unchanging)
+                // handle.
+                addResource(instance);
             }
         };
-        resourceListener.register(configurationProvider);
+        resourceListener.register(configurationProvider, true);
 
-        TypeListener<ResourceVersion> resourceVersionListener = new TypeListener<ResourceVersion>(ResourceVersion.class)
+        TypeListener<ResourceVersion> resourceVersionListener = new TypeAdapter<ResourceVersion>(ResourceVersion.class)
         {
+            public void save(ResourceVersion instance, boolean nested)
+            {
+                if (!nested)
+                {
+                    updateResourceVersion(instance);
+                }
+            }
+
             public void postInsert(ResourceVersion instance)
             {
                 addResourceVersion(instance);
@@ -73,12 +97,14 @@ public class DefaultResourceManager implements ResourceManager
                 removeResourceVersion(instance);
             }
 
-            public void postSave(ResourceVersion instance)
+            public void postSave(ResourceVersion instance, boolean nested)
             {
-                updateResourceVersion(instance);
+                // Replaces the existing as it is stored by the (unchanging)
+                // handle.
+                addResourceVersion(instance);
             }
         };
-        resourceVersionListener.register(configurationProvider);
+        resourceVersionListener.register(configurationProvider, true);
 
         for (Resource resource : configurationProvider.getAll(Resource.class))
         {
@@ -108,7 +134,7 @@ public class DefaultResourceManager implements ResourceManager
 
     private void updateResource(Resource resource)
     {
-        Resource oldResource = resourcesByHandle.remove(resource.getHandle());
+        Resource oldResource = resourcesByHandle.get(resource.getHandle());
         if (oldResource != null)
         {
             String oldName = oldResource.getName();
@@ -119,13 +145,12 @@ public class DefaultResourceManager implements ResourceManager
                 {
                     if (requirement.getResource().equals(oldName))
                     {
-                        requirement.setResource(newName);
-                        configurationProvider.save(requirement);
+                        ResourceRequirement clone = configurationProvider.deepClone(requirement);
+                        clone.setResource(newName);
+                        configurationProvider.save(clone);
                     }
                 }
             }
-
-            addResource(resource);
         }
     }
 
@@ -141,7 +166,7 @@ public class DefaultResourceManager implements ResourceManager
 
     private void updateResourceVersion(ResourceVersion resourceVersion)
     {
-        ResourceVersion oldVersion = resourceVersionsByHandle.remove(resourceVersion.getHandle());
+        ResourceVersion oldVersion = resourceVersionsByHandle.get(resourceVersion.getHandle());
         if (oldVersion != null)
         {
             String oldValue = oldVersion.getValue();
@@ -154,19 +179,18 @@ public class DefaultResourceManager implements ResourceManager
                 {
                     if (requirement.getResource().equals(resourceName) && requirement.getVersion().equals(oldValue))
                     {
-                        requirement.setVersion(newValue);
-                        configurationProvider.save(requirement);
+                        ResourceRequirement clone = configurationProvider.deepClone(requirement);
+                        clone.setVersion(newValue);
+                        configurationProvider.save(clone);
                     }
                 }
             }
-
-            addResourceVersion(resourceVersion);
         }
     }
 
     private void addAgentRepo(AgentConfiguration agentConfiguration)
     {
-        agentRepositories.put(agentConfiguration.getHandle(), new ConfigurationResourceRepository(agentConfiguration, configurationProvider));
+        agentRepositories.put(agentConfiguration.getHandle(), new ConfigurationResourceRepository(agentConfiguration));
     }
 
     public ResourceRepository getAgentRepository(long handle)
@@ -174,18 +198,81 @@ public class DefaultResourceManager implements ResourceManager
         return agentRepositories.get(handle);
     }
 
-    public void addDiscoveredResources(long handle, List<Resource> resources)
+    public void addDiscoveredResources(final String agentPath, final List<Resource> discoveredResources)
     {
-        ConfigurableResourceRepository repository = agentRepositories.get(handle);
-        if (repository != null)
+        // Go direct to the config system.  We don't want to mess with our
+        // cache here at all, because:
+        //   - it may be out of date (if an event is pending); and
+        //   - it will be invalidated by this change and updated by our event
+        //     handler anyway
+        configurationProvider.executeInsideTransaction(new NullaryFunction<Object>()
         {
-            for (Resource r : resources)
+            public Object process()
             {
-                if (!repository.hasResource(r.getName()))
+                AgentConfiguration config = configurationProvider.get(agentPath, AgentConfiguration.class);
+                if(config != null)
                 {
-                    repository.addResource(r);
+                    Map<String, Resource> agentResources = config.getResources();
+                    for (Resource r : discoveredResources)
+                    {
+                        addResource(agentPath, r, agentResources.get(r.getName()));
+                    }
+                }
+
+                return null;
+            }
+        });
+    }
+
+    private void addResource(String agentPath, Resource discoveredResource, Resource existingResource)
+    {
+        if (existingResource == null)
+        {
+            configurationProvider.insert(PathUtils.getPath(agentPath, "resources"), discoveredResource);
+        }
+        else
+        {
+            existingResource = configurationProvider.deepClone(existingResource);
+
+            // we have an existing resource, so merge the details.
+            for (String propertyName: discoveredResource.getProperties().keySet())
+            {
+                if (!existingResource.hasProperty(propertyName))
+                {
+                    existingResource.addProperty(discoveredResource.getProperty(propertyName));
                 }
             }
+
+            for (String versionStr : discoveredResource.getVersions().keySet())
+            {
+                if (!existingResource.hasVersion(versionStr))
+                {
+                    existingResource.add(discoveredResource.getVersion(versionStr));
+                }
+                else
+                {
+                    ResourceVersion version = discoveredResource.getVersion(versionStr);
+                    ResourceVersion existingVersion = existingResource.getVersion(versionStr);
+
+                    for (String propertyName: version.getProperties().keySet())
+                    {
+                        try
+                        {
+                            if (!existingVersion.hasProperty(propertyName))
+                            {
+                                existingVersion.addProperty(version.getProperty(propertyName));
+                            }
+                        }
+                        catch (FileLoadException e)
+                        {
+                            // should never happen.
+                            LOG.severe(e);
+                        }
+                    }
+                }
+            }
+
+            configurationProvider.save(existingResource);
         }
     }
 

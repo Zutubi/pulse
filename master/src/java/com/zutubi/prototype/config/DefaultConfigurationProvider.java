@@ -5,6 +5,7 @@ import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.events.*;
+import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.Predicate;
 
 import java.util.Collection;
@@ -81,6 +82,17 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
     public void delete(String path)
     {
         configurationTemplateManager.delete(path);
+    }
+
+    public <T> T executeInsideTransaction(final NullaryFunction<T> f)
+    {
+        return configurationTemplateManager.executeInsideTransaction(new ConfigurationTemplateManager.Action<T>()
+        {
+            public T execute() throws Exception
+            {
+                return f.process();
+            }
+        });
     }
 
     public void registerEventListener(ConfigurationEventListener listener, boolean synchronous, boolean includeChildPaths, Class clazz)

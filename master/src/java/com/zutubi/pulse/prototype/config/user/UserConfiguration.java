@@ -34,7 +34,7 @@ public class UserConfiguration extends AbstractConfiguration implements Extendab
     @Transient
     private Map<String, Object> extensions;
 
-    @Internal
+    @ExternalState
     private long userId;
 
     public UserConfiguration()

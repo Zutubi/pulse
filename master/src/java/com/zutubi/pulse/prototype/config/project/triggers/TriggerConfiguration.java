@@ -1,6 +1,6 @@
 package com.zutubi.pulse.prototype.config.project.triggers;
 
-import com.zutubi.config.annotations.Internal;
+import com.zutubi.config.annotations.ExternalState;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Table;
 import com.zutubi.config.annotations.Transient;
@@ -15,7 +15,7 @@ import com.zutubi.pulse.scheduling.Trigger;
 @SymbolicName("zutubi.triggerConfig")
 public abstract class TriggerConfiguration extends AbstractNamedConfiguration
 {
-    @Internal
+    @ExternalState
     private long triggerId;
 
     public long getTriggerId()

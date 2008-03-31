@@ -9,6 +9,7 @@ import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.prototype.config.group.GroupConfiguration;
 import com.zutubi.pulse.prototype.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectAclConfiguration;
+import com.zutubi.pulse.prototype.config.user.SetPasswordConfiguration;
 import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 import org.apache.xmlrpc.XmlRpcClient;
 
@@ -338,7 +339,12 @@ public class XmlRpcHelper
         Hashtable<String, Object> user = createDefaultConfig(UserConfiguration.class);
         user.put("login", login);
         user.put("name", login);
-        return insertConfig(ConfigurationRegistry.USERS_SCOPE, user);
+        String path = insertConfig(ConfigurationRegistry.USERS_SCOPE, user);
+        Hashtable <String, Object> password = createEmptyConfig(SetPasswordConfiguration.class);
+        password.put("password", "");
+        password.put("confirmPassword", "");
+        doConfigActionWithArgument(path, "setPassword", password);
+        return path;
     }
 
     public String insertGroup(String name, List<String> memberPaths, String... serverPermissions) throws Exception

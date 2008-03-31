@@ -7,7 +7,7 @@ import com.zutubi.pulse.events.Event;
 /**
  * Base for events raised when configuration changes occur.
  */
-public class ConfigurationEvent extends Event<ConfigurationTemplateManager>
+public abstract class ConfigurationEvent extends Event<ConfigurationTemplateManager>
 {
     private Configuration instance;
 
@@ -21,7 +21,6 @@ public class ConfigurationEvent extends Event<ConfigurationTemplateManager>
     {
         return instance;
     }
-
 
     public boolean equals(Object o)
     {
@@ -42,4 +41,6 @@ public class ConfigurationEvent extends Event<ConfigurationTemplateManager>
     {
         return (instance != null ? instance.hashCode() : 0);
     }
+
+    public abstract boolean isPost();
 }

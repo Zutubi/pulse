@@ -26,7 +26,7 @@ import java.util.*;
 @SymbolicName("zutubi.projectConfig")
 public class ProjectConfiguration extends AbstractConfiguration implements Extendable, NamedConfiguration
 {
-    @Internal
+    @ExternalState
     private long projectId;
     @NoInherit
     private String name;

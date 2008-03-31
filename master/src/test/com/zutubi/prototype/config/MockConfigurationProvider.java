@@ -1,6 +1,7 @@
 package com.zutubi.prototype.config;
 
 import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.util.NullaryFunction;
 
 import java.util.*;
 
@@ -98,5 +99,10 @@ public class MockConfigurationProvider implements ConfigurationProvider
     public void delete(String path)
     {
         throw new RuntimeException("Method not yet implemented.");
+    }
+
+    public <T> T executeInsideTransaction(NullaryFunction<T> f)
+    {
+        throw new RuntimeException("Method not yet implemented");
     }
 }

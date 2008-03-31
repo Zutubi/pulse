@@ -1,8 +1,6 @@
 package com.zutubi.pulse.cleanup;
 
 import com.zutubi.prototype.config.ConfigurationProvider;
-import com.zutubi.prototype.config.TypeAdapter;
-import com.zutubi.prototype.config.TypeListener;
 import com.zutubi.pulse.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.cleanup.config.CleanupWhat;
 import com.zutubi.pulse.events.Event;
@@ -84,10 +82,10 @@ public class CleanupManager
             }
         }
 
-        TypeListener<ProjectConfiguration> listener = new TypeAdapter<ProjectConfiguration>(ProjectConfiguration.class)
-        {
-            public void postInsert(ProjectConfiguration instance)
-            {
+//        TypeListener<ProjectConfiguration> listener = new TypeAdapter<ProjectConfiguration>(ProjectConfiguration.class)
+//        {
+//            public void postInsert(ProjectConfiguration instance)
+//            {
                 // FIXME: need to actually contribute to the global project
                 // This breaks the inserted project as it causes an instance
                 // refresh while handling insert events which is a Bad Thing.
@@ -98,10 +96,10 @@ public class CleanupManager
 //                cleanupConfiguration.setRetain(10);
 //                cleanupConfiguration.setUnit(CleanupUnit.BUILDS);
 //                configurationProvider.insert(PathUtils.getPath(instance.getConfigurationPath(), "cleanup"), cleanupConfiguration);
-            }
-        };
-        listener.register(configurationProvider);
-
+//            }
+//        };
+//        listener.register(configurationProvider, false);
+        
         Thread cleanupThread = threadFactory.newThread(new Runnable()
         {
             @SuppressWarnings({"InfiniteLoopStatement"})

@@ -2,10 +2,7 @@ package com.zutubi.prototype.config;
 
 import com.zutubi.config.annotations.Reference;
 import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.prototype.config.events.ConfigurationEvent;
-import com.zutubi.prototype.config.events.PostDeleteEvent;
-import com.zutubi.prototype.config.events.PostInsertEvent;
-import com.zutubi.prototype.config.events.PostSaveEvent;
+import com.zutubi.prototype.config.events.*;
 import com.zutubi.prototype.security.*;
 import com.zutubi.prototype.transaction.UserTransaction;
 import com.zutubi.prototype.type.CompositeType;
@@ -353,11 +350,15 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
         configurationTemplateManager.insert("sample", a);
 
-        assertEquals(2, events.size());
-        assertTrue(events.get(0) instanceof PostInsertEvent);
+        assertEquals(4, events.size());
+        assertTrue(events.get(0) instanceof InsertEvent);
         assertEquals("sample/a", events.get(0).getInstance().getConfigurationPath());
-        assertTrue(events.get(1) instanceof PostInsertEvent);
+        assertTrue(events.get(1) instanceof InsertEvent);
         assertEquals("sample/a/mock", events.get(1).getInstance().getConfigurationPath());
+        assertTrue(events.get(2) instanceof PostInsertEvent);
+        assertEquals("sample/a", events.get(2).getInstance().getConfigurationPath());
+        assertTrue(events.get(3) instanceof PostInsertEvent);
+        assertEquals("sample/a/mock", events.get(3).getInstance().getConfigurationPath());
     }
 
     public void testSaveRecord()
@@ -938,8 +939,10 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
         configurationTemplateManager.save(instance);
 
-        assertEquals(1, listener.getEvents().size());
+        assertEquals(2, listener.getEvents().size());
         Event evt = listener.getEvents().get(0);
+        assertTrue(evt instanceof SaveEvent);
+        evt = listener.getEvents().get(1);
         assertTrue(evt instanceof PostSaveEvent);
     }
 
@@ -951,8 +954,10 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         MockA a = new MockA("a");
         configurationTemplateManager.insert("sample", a);
 
-        assertEquals(1, listener.getEvents().size());
+        assertEquals(2, listener.getEvents().size());
         Event evt = listener.getEvents().get(0);
+        assertTrue(evt instanceof InsertEvent);
+        evt = listener.getEvents().get(1);
         assertTrue(evt instanceof PostInsertEvent);
     }
 
@@ -968,8 +973,10 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
 
         configurationTemplateManager.delete("sample/a");
 
-        assertEquals(1, listener.getEvents().size());
+        assertEquals(2, listener.getEvents().size());
         Event evt = listener.getEvents().get(0);
+        assertTrue(evt instanceof DeleteEvent);
+        evt = listener.getEvents().get(1);
         assertTrue(evt instanceof PostDeleteEvent);
     }
 
@@ -984,11 +991,11 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         MockA a = new MockA("a");
         configurationTemplateManager.insert("sample", a);
 
-        assertEquals(0, listener.getEvents().size());
+        assertEquals(1, listener.getEvents().size());
 
         transaction.commit();
 
-        assertEquals(1, listener.getEvents().size());
+        assertEquals(2, listener.getEvents().size());
     }
 
     public void testEventsAreNotPublishedOnPostRollback()
@@ -1002,11 +1009,11 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         MockA a = new MockA("a");
         configurationTemplateManager.insert("sample", a);
 
-        assertEquals(0, listener.getEvents().size());
+        assertEquals(1, listener.getEvents().size());
 
         transaction.rollback();
 
-        assertEquals(0, listener.getEvents().size());
+        assertEquals(1, listener.getEvents().size());
     }
 
     public void testInstanceCacheAwareOfRollback()

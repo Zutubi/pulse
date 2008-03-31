@@ -24,7 +24,7 @@ import java.util.*;
  *
  *
  */
-public class DefaultUserManager implements UserManager, ConfigurationInjector.ConfigurationSetter<User>
+public class DefaultUserManager implements UserManager, ExternalStateManager<UserConfiguration>, ConfigurationInjector.ConfigurationSetter<User>
 {
     private UserDao userDao;
     private PasswordEncoder passwordEncoder;
@@ -63,16 +63,11 @@ public class DefaultUserManager implements UserManager, ConfigurationInjector.Co
             }
         }, true, true, ConfigurationRegistry.GROUPS_SCOPE);
 
-        TypeListener<UserConfiguration> userListener = new TypeListener<UserConfiguration>(UserConfiguration.class)
+        TypeListener<UserConfiguration> userListener = new TypeAdapter<UserConfiguration>(UserConfiguration.class)
         {
             public void postInsert(UserConfiguration instance)
             {
-                User user = new User();
-                userDao.save(user);
-                instance.setUserId(user.getId());
-                instance.setPassword(passwordEncoder.encodePassword(instance.getPassword(), null));
-                
-                userConfigsById.put(user.getId(), instance);
+                userConfigsById.put(instance.getUserId(), instance);
             }
 
             public void postDelete(UserConfiguration instance)
@@ -83,13 +78,29 @@ public class DefaultUserManager implements UserManager, ConfigurationInjector.Co
                 userConfigsById.remove(instance.getUserId());
             }
 
-            public void postSave(UserConfiguration instance)
+            public void postSave(UserConfiguration instance, boolean nested)
             {
                 userConfigsById.remove(instance.getUserId());
                 userConfigsById.put(instance.getUserId(), instance);
             }
         };
-        userListener.register(configurationProvider);
+        userListener.register(configurationProvider, true);
+    }
+
+    public long createState(UserConfiguration instance)
+    {
+        User user = new User();
+        userDao.save(user);
+        return user.getId();
+    }
+
+    public void rollbackState(long id)
+    {
+        User user = userDao.findById(id);
+        if (user != null)
+        {
+            userDao.delete(user);
+        }
     }
 
     private void initGroupsByUser()
@@ -303,6 +314,11 @@ public class DefaultUserManager implements UserManager, ConfigurationInjector.Co
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)
     {
         this.configurationProvider = configurationProvider;
+    }
+
+    public void setConfigurationStateManager(ConfigurationStateManager configurationStateManager)
+    {
+        configurationStateManager.register(UserConfiguration.class, this);
     }
 
     public void setConfigurationInjector(ConfigurationInjector configurationInjector)

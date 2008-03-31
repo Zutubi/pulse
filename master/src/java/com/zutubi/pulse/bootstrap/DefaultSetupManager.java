@@ -1,13 +1,7 @@
 package com.zutubi.pulse.bootstrap;
 
 import com.opensymphony.xwork.spring.SpringObjectFactory;
-import com.zutubi.prototype.config.ConfigurationExtensionManager;
-import com.zutubi.prototype.config.ConfigurationPersistenceManager;
-import com.zutubi.prototype.config.ConfigurationProvider;
-import com.zutubi.prototype.config.ConfigurationReferenceManager;
-import com.zutubi.prototype.config.ConfigurationRegistry;
-import com.zutubi.prototype.config.ConfigurationTemplateManager;
-import com.zutubi.prototype.config.DefaultConfigurationProvider;
+import com.zutubi.prototype.config.*;
 import com.zutubi.prototype.type.record.DelegatingHandleAllocator;
 import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.pulse.Version;
@@ -22,9 +16,9 @@ import com.zutubi.pulse.logging.LogConfigurationManager;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.plugins.PluginManager;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
+import com.zutubi.pulse.restore.ArchiveException;
 import com.zutubi.pulse.restore.ArchiveManager;
 import com.zutubi.pulse.restore.ProgressMonitor;
-import com.zutubi.pulse.restore.ArchiveException;
 import com.zutubi.pulse.upgrade.UpgradeManager;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.IOUtils;
@@ -36,9 +30,9 @@ import freemarker.cache.TemplateLoader;
 import freemarker.template.Configuration;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.FileFilter;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
@@ -318,6 +312,7 @@ public class DefaultSetupManager implements SetupManager
         ConfigurationTemplateManager configurationTemplateManager = ComponentContext.getBean("configurationTemplateManager");
         ConfigurationRegistry configurationRegistry = ComponentContext.getBean("configurationRegistry");
         ConfigurationExtensionManager configurationExtensionManager = ComponentContext.getBean("configurationExtensionManager");
+        ConfigurationStateManager configurationStateManager = ComponentContext.getBean("configurationStateManager");
         DefaultConfigurationProvider configurationProvider = ComponentContext.getBean("configurationProvider");
 
         recordManager.init();
@@ -331,6 +326,8 @@ public class DefaultSetupManager implements SetupManager
         configurationExtensionManager.setPluginManager(pluginManager);
         configurationExtensionManager.init();
 
+        configurationStateManager.setRecordManager(recordManager);
+        
         configurationTemplateManager.init();
         configurationProvider.init();
         this.configurationProvider = configurationProvider;

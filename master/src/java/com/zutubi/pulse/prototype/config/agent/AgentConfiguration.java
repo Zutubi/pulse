@@ -18,7 +18,7 @@ import java.util.Map;
 @SymbolicName("zutubi.agentConfig")
 public class AgentConfiguration extends AbstractConfiguration implements NamedConfiguration
 {
-    @Internal
+    @ExternalState
     private long agentStateId;
     @ControllingCheckbox(dependentFields = {"host", "port"})
     private boolean remote = true;

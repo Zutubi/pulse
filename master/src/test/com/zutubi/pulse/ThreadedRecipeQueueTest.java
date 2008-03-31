@@ -110,7 +110,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
                 return new FileResourceRepository();
             }
 
-            public void addDiscoveredResources(long handle, List<Resource> resources)
+            public void addDiscoveredResources(String agentPath, List<Resource> resources)
             {
             }
 
@@ -836,7 +836,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             return onlineAgents.get(handle);
         }
 
-        public void pingAgent(AgentConfiguration agentConfig)
+        public void pingAgent(AgentConfiguration agentConfig, boolean inline)
         {
             throw new RuntimeException("Method not yet implemented.");
         }

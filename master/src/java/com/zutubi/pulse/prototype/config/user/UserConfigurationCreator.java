@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.config.ConfigurationCreator;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.annotations.Required;
+import org.acegisecurity.providers.encoding.PasswordEncoder;
 
 /**
  * Used when creating new users.  Handles the confirmation of the user's
@@ -13,6 +14,7 @@ import com.zutubi.validation.annotations.Required;
  */
 @SymbolicName("zutubi.userConfigCreator")
 @Form(fieldOrder = {"login", "name", "authenticatedViaLdap", "password", "confirmPassword"})
+@Wire
 public class UserConfigurationCreator extends AbstractConfiguration implements ConfigurationCreator<UserConfiguration>, Validateable
 {
     @ID
@@ -25,6 +27,8 @@ public class UserConfigurationCreator extends AbstractConfiguration implements C
     private String password;
     @Password
     private String confirmPassword;
+    @Transient
+    private PasswordEncoder passwordEncoder;
 
     public UserConfiguration create()
     {
@@ -35,8 +39,7 @@ public class UserConfigurationCreator extends AbstractConfiguration implements C
         }
         else
         {
-            // Hashing is handled at a lower level
-            user.setPassword(password);
+            user.setPassword(passwordEncoder.encodePassword(password, null));
         }
 
         return user;
@@ -104,5 +107,10 @@ public class UserConfigurationCreator extends AbstractConfiguration implements C
                 }
             }
         }
+    }
+
+    public void setPasswordEncoder(PasswordEncoder passwordEncoder)
+    {
+        this.passwordEncoder = passwordEncoder;
     }
 }
