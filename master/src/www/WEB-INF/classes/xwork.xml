@@ -891,7 +891,7 @@
             <result name="input" type="velocity">edit-specification-property.vm</result>
             <result name="cancel" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}</result>
             <result name="error" type="velocity">/generic-error.vm</result>
-            <result name="success" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}&amp;selectedNode=${id}</result>
+            <result name="success" type="redirect">/viewBuildSpecification.action?id=${specId}&amp;projectId=${projectId}</result>
         </action>
 
         <action name="deleteBuildSpecificationProperty" class="com.zutubi.pulse.web.project.DeletePropertyAction">
