@@ -5,7 +5,7 @@ set -e
 echo "Waiting for pulse server to start..."
 # Wait for pulse to come online
 i=0
-while ! netstat -an | grep 8889 > /dev/null
+while ! netstat -an | grep '\b8889\b' > /dev/null
 do
     sleep 2
     if [[ $i -eq 8 ]]
