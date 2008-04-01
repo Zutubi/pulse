@@ -9,7 +9,8 @@ import com.zutubi.pulse.webwork.mapping.Urls;
 
 /**
  * A page in the admin UI that displays a list of composites.  The list is
- * shown in a table with edit and delete links, and there are no child nodes.
+ * shown in a table with annotations and actions.  This page applies to both
+ * lists and maps in the configuration model.
  */
 public class ListPage extends ConfigPage
 {

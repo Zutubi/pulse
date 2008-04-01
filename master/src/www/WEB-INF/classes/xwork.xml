@@ -496,6 +496,7 @@
             <result name="composite" type="flexjson">configurationResponse</result>
             <result name="map" type="flexjson">configurationResponse</result>
             <result name="input" type="flexjson">configurationErrors</result>
+            <result name="cancel" type="flexjson">configurationResponse</result>
         </action>
 
         <action name="delete" class="com.zutubi.prototype.webwork.DeleteAction">

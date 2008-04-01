@@ -11,8 +11,8 @@ import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.util.TextUtils;
 
 /**
- *
- *
+ * Generic configuration save action.  Applies changes made to an existing
+ * record.
  */
 public class SaveAction extends PrototypeSupport
 {
@@ -28,25 +28,28 @@ public class SaveAction extends PrototypeSupport
         this.symbolicName = symbolicName;
     }
 
+    public void doCancel()
+    {
+        String parentPath = PathUtils.getParentPath(path);
+        Type parentType = configurationTemplateManager.getType(parentPath);
+        if(PrototypeUtils.isEmbeddedCollection(parentType))
+        {
+            path = parentPath;
+        }
+
+        response = new ConfigurationResponse(path, configurationTemplateManager.getTemplatePath(path));
+    }
+
     public String execute() throws Exception
     {
         if (isSaveSelected())
         {
             return doSave();
         }
-        else if(isCancelSelected())
+        else
         {
-            String parentPath = PathUtils.getParentPath(path);
-            Type parentType = configurationTemplateManager.getType(parentPath);
-            if(PrototypeUtils.isEmbeddedCollection(parentType))
-            {
-                path = parentPath;
-            }
-
-            response = new ConfigurationResponse(path, configurationTemplateManager.getTemplatePath(path));
+            return doRender();
         }
-        
-        return doRender();
     }
 
     @SuppressWarnings({"unchecked"})

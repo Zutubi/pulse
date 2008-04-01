@@ -6,6 +6,7 @@ import com.zutubi.pulse.acceptance.forms.admin.*;
 import com.zutubi.pulse.acceptance.pages.admin.*;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.prototype.config.LabelConfiguration;
 import com.zutubi.pulse.prototype.config.project.changeviewer.CustomChangeViewerConfiguration;
 import com.zutubi.pulse.prototype.config.project.triggers.ScmBuildTriggerConfiguration;
 
@@ -73,6 +74,48 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         labelsPage = deleteConfirmPage.confirmDeleteListItem();
 
         labelsPage.assertItemNotPresent(baseName);
+    }
+
+    public void testCancelAddListItem() throws Exception
+    {
+        String projectPath = xmlRpcHelper.insertTrivialProject(random, false);
+
+        loginAsAdmin();
+        ListPage labelsPage = new ListPage(selenium, urls, PathUtils.getPath(projectPath, "labels"));
+        labelsPage.goTo();
+        labelsPage.clickAdd();
+
+        LabelForm labelForm = new LabelForm(selenium);
+        labelForm.waitFor();
+        labelForm.cancelFormElements("my-label");
+
+        labelsPage.waitFor();
+        labelsPage.assertItemNotPresent("my-label");
+    }
+
+    public void testCancelViewListItem() throws Exception
+    {
+        String projectPath = xmlRpcHelper.insertTrivialProject(random, false);
+        String labelBaseName = insertLabel(projectPath);
+
+        loginAsAdmin();
+        ListPage labelsPage = new ListPage(selenium, urls, PathUtils.getPath(projectPath, "labels"));
+        labelsPage.goTo();
+        labelsPage.clickView(labelBaseName);
+
+        LabelForm labelForm = new LabelForm(selenium);
+        labelForm.waitFor();
+        labelForm.cancelFormElements("");
+
+        labelsPage.waitFor();
+        labelsPage.assertItemPresent(labelBaseName, null);
+    }
+
+    private String insertLabel(String projectPath) throws Exception
+    {
+        Hashtable<String, Object> label = xmlRpcHelper.createEmptyConfig(LabelConfiguration.class);
+        label.put("label", "test");
+        return PathUtils.getBaseName(xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, "labels"), label));
     }
 
     public void testCheckForm() throws Exception
