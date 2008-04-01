@@ -5,15 +5,12 @@ import nu.xom.Attribute;
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Node;
-import org.hibernate.mapping.Column;
-import org.hibernate.mapping.Table;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -27,13 +24,15 @@ public class XMLTransferTarget extends XMLTransferSupport implements TransferTar
 
     private Element tableElement;
 
-    private Table table;
+    private com.zutubi.pulse.transfer.Table table;
 
     private String version;
 
     private Map<String, Integer> columnTypes;
 
     private OutputStream output;
+
+    private String dataDefinition;
 
     public XMLTransferTarget()
     {
@@ -72,7 +71,7 @@ public class XMLTransferTarget extends XMLTransferSupport implements TransferTar
         }
     }
 
-    public void startTable(Table table) throws TransferException
+    public void startTable(com.zutubi.pulse.transfer.Table table) throws TransferException
     {
         try
         {
@@ -92,7 +91,7 @@ public class XMLTransferTarget extends XMLTransferSupport implements TransferTar
         }
     }
 
-    private void writeTableDef(Table table) throws TransferException
+    private void writeTableDef(com.zutubi.pulse.transfer.Table table) throws TransferException
     {
         try
         {
@@ -101,10 +100,8 @@ public class XMLTransferTarget extends XMLTransferSupport implements TransferTar
             Element defs = new Element("type-defs");
             tableElement.appendChild(defs);
 
-            Iterator columns = table.getColumnIterator();
-            while (columns.hasNext())
+            for (com.zutubi.pulse.transfer.Column column : table.getColumns())
             {
-                Column column = (Column) columns.next();
                 Element def = new Element("type-def");
                 def.addAttribute(new Attribute("name", column.getName()));
                 def.addAttribute(new Attribute("type", JDBCTypes.toString(column.getSqlTypeCode())));
@@ -129,7 +126,7 @@ public class XMLTransferTarget extends XMLTransferSupport implements TransferTar
             patchElementWithParent(rowElement, tableElement);
             serializer.writeStartTag(rowElement);
 
-            for (Column column : MappingUtils.getColumns(table))
+            for (com.zutubi.pulse.transfer.Column column : table.getColumns())
             {
                 String columnName = column.getName();
 

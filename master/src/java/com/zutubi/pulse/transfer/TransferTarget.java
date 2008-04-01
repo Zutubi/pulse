@@ -1,7 +1,5 @@
 package com.zutubi.pulse.transfer;
 
-import org.hibernate.mapping.Table;
-
 import java.util.Map;
 
 /**

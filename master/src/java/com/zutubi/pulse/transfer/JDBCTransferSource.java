@@ -5,6 +5,7 @@ import com.zutubi.pulse.util.JDBCUtils;
 import org.hibernate.engine.Mapping;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.Table;
+import org.hibernate.cfg.Configuration;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -24,14 +25,14 @@ public class JDBCTransferSource implements TransferSource
 {
     private DataSource dataSource;
 
-    private MutableConfiguration configuration;
+    private Configuration configuration;
 
     public void setDataSource(DataSource dataSource)
     {
         this.dataSource = dataSource;
     }
 
-    public void setConfiguration(MutableConfiguration configuration)
+    public void setConfiguration(Configuration configuration)
     {
         this.configuration = configuration;
     }
@@ -40,8 +41,9 @@ public class JDBCTransferSource implements TransferSource
     {
         try
         {
+            // ensure that the mappings are built.
             configuration.buildMappings();
-            Mapping mapping = configuration.getMapping();
+            Mapping mapping = new HibernateMapping(configuration);
 
             target.start();
 
@@ -54,6 +56,7 @@ public class JDBCTransferSource implements TransferSource
                 while (tables.hasNext())
                 {
                     Table table = (Table) tables.next();
+
                     List<Column> columns = MappingUtils.getColumns(table);
                     for (Column column : columns)
                     {
@@ -87,7 +90,7 @@ public class JDBCTransferSource implements TransferSource
     private void exportTable(TransferTarget target, Table table, Connection con, List<Column> columns)
             throws TransferException, SQLException
     {
-        target.startTable(table);
+        target.startTable(new HibernateTable(table));
 
         String sql = MappingUtils.sqlSelectAll(table);
 

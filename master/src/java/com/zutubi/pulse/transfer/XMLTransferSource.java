@@ -6,9 +6,15 @@ import nu.xom.Builder;
 import nu.xom.NodeFactory;
 import org.hibernate.mapping.Table;
 import org.xml.sax.Attributes;
+import org.xml.sax.XMLReader;
+import org.xml.sax.InputSource;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.Locator;
+import org.xml.sax.SAXException;
 
 import java.io.InputStream;
 import java.util.*;
+import java.lang.reflect.Field;
 
 /**
  *
@@ -18,20 +24,14 @@ public class XMLTransferSource extends XMLTransferSupport implements TransferSou
 {
     private InputStream source;
 
-    private MutableConfiguration configuration;
-
     private Map<String, String> row;
 
     private TransferTarget target;
 
-    /**
-     * The names of the columns, in the order in which the data is represented within the xml document.
-     */
-    private List<String> columnNames;
-    private Map<String, Integer> columnTypes;
+    private TransferTable currentTable;
 
-    private Iterator<String> columnIterator;
-    private String columnName;
+    private Column currentColumn;
+    private Iterator<Column> columnIterator;
 
     public void setSource(InputStream source)
     {
@@ -44,8 +44,11 @@ public class XMLTransferSource extends XMLTransferSupport implements TransferSou
         {
             this.target = target;
             this.target.start();
-            Builder builder = new Builder(new Callback());
-            builder.build(source);
+
+            XMLReader reader = loadXMLReader();
+            reader.setContentHandler(new Callback());
+            reader.parse(new InputSource(source));
+
             this.target.end();
         }
         catch (Exception e)
@@ -58,11 +61,26 @@ public class XMLTransferSource extends XMLTransferSupport implements TransferSou
         }
     }
 
+    private XMLReader loadXMLReader() throws TransferException
+    {
+        try
+        {
+            Builder builder = new Builder();
+
+            Field field = Builder.class.getDeclaredField("parser");
+            field.setAccessible(true);
+            return (XMLReader) field.get(builder);
+        }
+        catch (Exception e)
+        {
+            throw new TransferException(e);
+        }
+    }
+
     protected void startTable(String uri, String localName, String qName, Attributes atts) throws TransferException
     {
-        String tableName = atts.getValue("name");
-        Table table = getTable(tableName);
-        target.startTable(table);
+        currentTable = new TransferTable();
+        currentTable.setName(atts.getValue("name"));
     }
 
     protected void endTable(String uri, String localName, String qName) throws TransferException
@@ -73,7 +91,7 @@ public class XMLTransferSource extends XMLTransferSupport implements TransferSou
     protected void startRow(String uri, String localName, String qName, Attributes atts)
     {
         row = new HashMap<String, String>();
-        columnIterator = columnNames.iterator();
+        columnIterator = currentTable.getColumns().iterator();
     }
 
     protected void endRow(String uri, String localName, String qName) throws TransferException
@@ -82,69 +100,54 @@ public class XMLTransferSource extends XMLTransferSupport implements TransferSou
         Map<String, Object> convertedRow = new HashMap<String, Object>();
         for (String key : row.keySet())
         {
-            Object value = fromText(columnTypes.get(key), row.get(key));
+            Object value = fromText(currentTable.getColumnType(key), row.get(key));
             convertedRow.put(key, value);
         }
         target.row(convertedRow);
         row = null;
     }
 
-    private void startTypeDefs(CharSequence uri, String localName, String qName, Attributes atts)
-    {
-        columnNames = new LinkedList<String>();
-        columnTypes = new HashMap<String, Integer>();
-    }
-
     private void startTypeDef(CharSequence uri, String localName, String qName, Attributes atts)
     {
         String columnName = atts.getValue("name");
         String columnType = atts.getValue("type");
-        
-        columnNames.add(columnName);
-        columnTypes.put(columnName, JDBCTypes.valueOf(columnType));
+
+        TransferColumn column = new TransferColumn();
+        column.setName(columnName);
+        column.setSqlTypeCode(JDBCTypes.valueOf(columnType));
+        currentTable.add(column);
+    }
+
+    private void endTypeDefs(CharSequence uri, String localName, String qName) throws TransferException
+    {
+        // we now have the full table definition, so we can start the table.
+        target.startTable(currentTable);
     }
 
     protected void startColumn(String uri, String localName, String qName, Attributes atts)
     {
-        columnName = columnIterator.next();
+        currentColumn = columnIterator.next();
+
         if(atts.getValue("null") == null)
         {
-            row.put(columnName, "");
+            row.put(currentColumn.getName(), "");
         }
     }
 
     protected void endColumn(String uri, String localName, String qName)
     {
-        columnName = null;
+        currentColumn = null;
     }
 
-    private Table getTable(String tableName)
+    private class Callback implements ContentHandler
     {
-        Iterator tables = configuration.getTableMappings();
-        while (tables.hasNext())
-        {
-            Table table = (Table) tables.next();
-            if (table.getName().equals(tableName))
-            {
-                return table;
-            }
-        }
-        if (HibernateUniqueKeyTable.isTable(tableName))
-        {
-            return HibernateUniqueKeyTable.getMapping();
-        }
-        return null;
-    }
+        public void setDocumentLocator(Locator locator) {}
+        public void startDocument() throws SAXException {}
+        public void endDocument() throws SAXException {}
+        public void startPrefixMapping(String prefix, String uri) throws SAXException {}
+        public void endPrefixMapping(String prefix) throws SAXException {}
 
-    public void setConfiguration(MutableConfiguration configuration)
-    {
-        this.configuration = configuration;
-    }
-
-    private class Callback extends NodeFactory
-    {
-
-        public void startElement(String uri, String localName, String qName, Attributes atts)
+        public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException
         {
             try
             {
@@ -163,11 +166,6 @@ public class XMLTransferSource extends XMLTransferSupport implements TransferSou
                     startColumn(uri, localName, qName, atts);
                 }
 
-                if (localName.equals("type-defs"))
-                {
-                    startTypeDefs(uri, localName, qName, atts);
-                }
-
                 if (localName.equals("type-def"))
                 {
                     startTypeDef(uri, localName, qName, atts);
@@ -179,7 +177,7 @@ public class XMLTransferSource extends XMLTransferSupport implements TransferSou
             }
         }
 
-        public void endElement(String uri, String localName, String qName)
+        public void endElement(String uri, String localName, String qName) throws SAXException
         {
             try
             {
@@ -197,6 +195,11 @@ public class XMLTransferSource extends XMLTransferSupport implements TransferSou
                 {
                     endTable(uri, localName, qName);
                 }
+
+                if (localName.equals("type-defs"))
+                {
+                    endTypeDefs(uri, localName, qName);
+                }
             }
             catch (TransferException e)
             {
@@ -204,8 +207,9 @@ public class XMLTransferSource extends XMLTransferSupport implements TransferSou
             }
         }
 
-        public void characters(char ch[], int start, int length)
+        public void characters(char ch[], int start, int length) throws SAXException
         {
+            String columnName = currentColumn.getName();
             if (columnName != null)
             {
                 String str = new String(ch, start, length);
@@ -216,5 +220,9 @@ public class XMLTransferSource extends XMLTransferSupport implements TransferSou
                 row.put(columnName, str);
             }
         }
+
+        public void ignorableWhitespace(char ch[], int start, int length) throws SAXException { }
+        public void processingInstruction(String target, String data) throws SAXException { }
+        public void skippedEntity(String name) throws SAXException { }
     }
 }
