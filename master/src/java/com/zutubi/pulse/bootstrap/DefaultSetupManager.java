@@ -186,9 +186,6 @@ public class DefaultSetupManager implements SetupManager
 
         ConfigurationRegistry configurationRegistry = ComponentContext.getBean("configurationRegistry");
         configurationRegistry.initSetup();
-
-        LogConfigurationManager logConfigurationManager = ComponentContext.getBean("logConfigurationManager");
-        logConfigurationManager.applyConfig();
     }
 
     public void requestDataComplete()
@@ -357,6 +354,9 @@ public class DefaultSetupManager implements SetupManager
         configurationTemplateManager.init();
         configurationProvider.init();
         this.configurationProvider = configurationProvider;
+
+        LogConfigurationManager logConfigurationManager = ComponentContext.getBean("logConfigurationManager");
+        logConfigurationManager.init();        
     }
 
     public void requestUpgradeComplete(boolean changes)
