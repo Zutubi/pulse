@@ -23,7 +23,7 @@ public interface SetupManager
 
     void requestUpgradeComplete(boolean changes);
 
-    void requestSetupComplete();
+    void requestSetupComplete(boolean setupWizard);
 
     void requestRestoreComplete();
 }

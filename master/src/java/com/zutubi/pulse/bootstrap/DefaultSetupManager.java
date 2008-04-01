@@ -34,6 +34,8 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -117,6 +119,8 @@ public class DefaultSetupManager implements SetupManager
 
         if (isDataRequired())
         {
+            printConsoleMessage("No data path configured, requesting via web UI...");
+
             // request data input.
             state = SetupState.DATA;
             showPrompt();
@@ -147,8 +151,12 @@ public class DefaultSetupManager implements SetupManager
             {
                 configFile = configFile.getCanonicalFile();
             }
+
+            printConsoleMessage("Using config file '%s'.", configFile.getAbsolutePath());
             if (!configFile.isFile())
             {
+                printConsoleMessage("Config file does not exist, creating a default one.");
+
                 // copy the template file into the config location.
                 SystemPaths paths = configurationManager.getSystemPaths();
                 File configTemplate = new File(paths.getConfigRoot(), "config.properties.template");
@@ -189,9 +197,12 @@ public class DefaultSetupManager implements SetupManager
         // to ensure that it is initialised. If we are working with an already existing directory,
         // then it will have been initialised and no re-initialisation is required (or allowed).
         Data d = configurationManager.getData();
+        printConsoleMessage("Using data path '%s'.", d.getData().getAbsolutePath());
         if (!d.isInitialised())
         {
+            printConsoleMessage("Empty data directory, initialising...");
             configurationManager.getData().init(configurationManager.getSystemPaths());
+            printConsoleMessage("Data directory initialised.");
         }
 
         eventManager.publish(new DataDirectoryLocatedEvent(this));
@@ -212,9 +223,11 @@ public class DefaultSetupManager implements SetupManager
         loadContexts(licenseContexts);
 
         state = SetupState.STARTING;
+        printConsoleMessage("Checking license...");
         if (isLicenseRequired())
         {
-            //TODO: we need to provide some feedback to the user about what / why their current license
+            printConsoleMessage("No valid license found, requesting via web UI...");
+            //TODO: we need to provide some feedback to the user about what / why there current license
             //TODO: (if one exists) is not sufficient.
             state = SetupState.LICENSE;
             showPrompt();
@@ -269,14 +282,25 @@ public class DefaultSetupManager implements SetupManager
 
     public void requestLicenseComplete()
     {
+        printConsoleMessage("License accepted.");
         state = SetupState.STARTING;
 
         // License is allowed to run this version of pulse. Therefore, it is okay to go ahead with an upgrade.
 
         // create the database based on the hibernate configuration.
         databaseConsole = (DatabaseConsole) ComponentContext.getBean("databaseConsole");
+        if(databaseConsole.isEmbedded())
+        {
+            printConsoleMessage("Using embedded database (only recommended for evaluation purposes).");
+        }
+        else
+        {
+            printConsoleMessage("Using external database '%s'.", databaseConsole.getConfig().getUrl());
+        }
+
         if (!databaseConsole.schemaExists())
         {
+            printConsoleMessage("Database schema does not exist, initialising...");
             try
             {
                 databaseConsole.createSchema();
@@ -285,6 +309,7 @@ public class DefaultSetupManager implements SetupManager
             {
                 throw new StartupException("Failed to create the database schema. Cause: " + e.getMessage());
             }
+            printConsoleMessage("Database initialised.");
         }
 
         databaseConsole.postSchemaHook();
@@ -292,6 +317,7 @@ public class DefaultSetupManager implements SetupManager
 
         if (isUpgradeRequired())
         {
+            printConsoleMessage("Upgrade is required: existing data version '" + configurationManager.getData().getVersion().getVersionNumber() + ", Pulse version " + Version.getVersion().getVersionNumber() + "...");
             state = SetupState.UPGRADE;
             showPrompt();
             return;
@@ -335,6 +361,10 @@ public class DefaultSetupManager implements SetupManager
 
     public void requestUpgradeComplete(boolean changes)
     {
+        if (changes)
+        {
+            printConsoleMessage("Upgrade complete.");
+        }
         databaseConsole.postUpgradeHook(changes);
 
         state = SetupState.STARTING;
@@ -347,15 +377,21 @@ public class DefaultSetupManager implements SetupManager
 
         if (isSetupRequired())
         {
+            printConsoleMessage("Database empty, requesting setup via web UI...");
             state = SetupState.SETUP;
             initialInstallation = true;
             return;
         }
-        requestSetupComplete();
+        requestSetupComplete(false);
     }
 
-    public void requestSetupComplete()
+    public void requestSetupComplete(boolean setupWizard)
     {
+        if (setupWizard)
+        {
+            printConsoleMessage("Setup wizard complete.");
+        }
+        
         state = SetupState.STARTING;
 
         // load the remaining contexts.
@@ -412,6 +448,12 @@ public class DefaultSetupManager implements SetupManager
         }
     }
 
+    public static void printConsoleMessage(String format, Object... args)
+    {
+        String date = "[" + DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG).format(new Date()) + "] ";
+        System.err.printf(date + format + "\n", args);
+    }
+
     /**
      * Prompt the user via the command line to go to the Web UI to continue the setup process.
      */
@@ -446,7 +488,7 @@ public class DefaultSetupManager implements SetupManager
             //          installation or possibly a restore) results in possibly inconsistent behaviour.  It may be
             //          worth while always using the calculated host url since this is being printed on the local host.
 
-            System.err.println("Now go to " + baseUrl + " and follow the prompts.");
+            printConsoleMessage("Now go to %s and follow the prompts.", baseUrl);
             promptShown = true;
         }
     }
@@ -605,7 +647,6 @@ public class DefaultSetupManager implements SetupManager
     {
         this.upgradeContexts = upgradeContexts;
     }
-
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;

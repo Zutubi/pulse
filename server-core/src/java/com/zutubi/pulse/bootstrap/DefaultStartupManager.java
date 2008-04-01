@@ -2,9 +2,9 @@ package com.zutubi.pulse.bootstrap;
 
 import com.zutubi.pulse.config.ConfigSupport;
 import com.zutubi.pulse.config.FileConfig;
-import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.system.SystemStartedEvent;
+import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
@@ -93,6 +93,8 @@ public class DefaultStartupManager implements StartupManager
             throw new StartupException("The system is currently starting up.");
         }
 
+        checkForGCJ();
+        
         try
         {
             starting = true;
@@ -124,6 +126,18 @@ public class DefaultStartupManager implements StartupManager
         catch (Exception e)
         {
             throw new StartupException(e);
+        }
+    }
+
+    private void checkForGCJ()
+    {
+        String vm = System.getProperty("java.vm.name");
+        if(vm != null && vm.toLowerCase().contains("gcj"))
+        {
+            System.err.println("You appear to be running the GNU Classpath JVM (libgcj/gij).  Due to missing\n" +
+                    "features in this VM, Pulse does currently not support it.  Please consider\n" +
+                    "installing another JVM (a free one is provided by Sun for Linux systems).");
+            System.exit(1);
         }
     }
 

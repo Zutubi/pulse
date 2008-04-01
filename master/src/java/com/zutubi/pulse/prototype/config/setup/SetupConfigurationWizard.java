@@ -95,7 +95,7 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
                 {
                     public void run()
                     {
-                        setupManager.requestSetupComplete();
+                        setupManager.requestSetupComplete(true);
                     }
                 }).start();
             }
