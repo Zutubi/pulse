@@ -4,6 +4,7 @@ import com.zutubi.pulse.util.JDBCTypes;
 import nu.xom.Attribute;
 import nu.xom.Document;
 import nu.xom.Element;
+import nu.xom.Node;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.Table;
 
@@ -12,6 +13,7 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.lang.reflect.Field;
 
 /**
  *
@@ -124,7 +126,7 @@ public class XMLTransferTarget extends XMLTransferSupport implements TransferTar
         try
         {
             Element rowElement = new Element("r");
-            tableElement.appendChild(rowElement);
+            patchElementWithParent(rowElement, tableElement);
             serializer.writeStartTag(rowElement);
 
             for (Column column : MappingUtils.getColumns(table))
@@ -157,6 +159,36 @@ public class XMLTransferTarget extends XMLTransferSupport implements TransferTar
         }
     }
 
+    private void patchElementWithParent(Element node, Node parent)
+    {
+        try
+        {
+            Class nodeClass = node.getClass();
+            while (nodeClass != null && nodeClass != Node.class)
+            {
+                nodeClass = nodeClass.getSuperclass();
+            }
+            if (nodeClass == null)
+            {
+                // we did not find what we wanted, abort the patch.
+                return;
+            }
+
+            Field parentField = nodeClass.getDeclaredField("parent");
+            if (parentField == null)
+            {
+                // we did not find what we wanted, abort the patch.
+                return;
+            }
+
+            parentField.setAccessible(true);
+            parentField.set(node, parent);
+        }
+        catch (Exception e)
+        {
+            // noop.
+        }
+    }
     public void endTable() throws TransferException
     {
         try
