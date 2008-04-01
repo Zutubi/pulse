@@ -2,13 +2,18 @@ package com.zutubi.pulse.transfer;
 
 import com.zutubi.pulse.util.JDBCTypes;
 import nu.xom.Builder;
-import nu.xom.NodeFactory;
 import org.xml.sax.Attributes;
+import org.xml.sax.XMLReader;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.Locator;
+import org.xml.sax.SAXException;
+import org.xml.sax.InputSource;
 
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.lang.reflect.Field;
 
 /**
  *
@@ -38,8 +43,11 @@ public class XMLTransferSource extends XMLTransferSupport implements TransferSou
         {
             this.target = target;
             this.target.start();
-            Builder builder = new Builder(new Callback());
-            builder.build(source);
+
+            XMLReader reader = loadXMLReader();
+            reader.setContentHandler(new Callback());
+            reader.parse(new InputSource(source));
+
             this.target.end();
         }
         catch (Exception e)
@@ -48,6 +56,22 @@ public class XMLTransferSource extends XMLTransferSupport implements TransferSou
             {
                 throw (TransferException)e.getCause();
             }
+            throw new TransferException(e);
+        }
+    }
+
+    private XMLReader loadXMLReader() throws TransferException
+    {
+        try
+        {
+            Builder builder = new Builder();
+
+            Field field = Builder.class.getDeclaredField("parser");
+            field.setAccessible(true);
+            return (XMLReader) field.get(builder);
+        }
+        catch (Exception e)
+        {
             throw new TransferException(e);
         }
     }
@@ -114,9 +138,15 @@ public class XMLTransferSource extends XMLTransferSupport implements TransferSou
         currentColumn = null;
     }
 
-    private class Callback extends NodeFactory
+    private class Callback implements ContentHandler
     {
-        public void startElement(String uri, String localName, String qName, Attributes atts)
+        public void setDocumentLocator(Locator locator) {}
+        public void startDocument() throws SAXException {}
+        public void endDocument() throws SAXException {}
+        public void startPrefixMapping(String prefix, String uri) throws SAXException {}
+        public void endPrefixMapping(String prefix) throws SAXException {}
+
+        public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException
         {
             try
             {
@@ -146,7 +176,7 @@ public class XMLTransferSource extends XMLTransferSupport implements TransferSou
             }
         }
 
-        public void endElement(String uri, String localName, String qName)
+        public void endElement(String uri, String localName, String qName) throws SAXException
         {
             try
             {
@@ -176,7 +206,7 @@ public class XMLTransferSource extends XMLTransferSupport implements TransferSou
             }
         }
 
-        public void characters(char ch[], int start, int length)
+        public void characters(char ch[], int start, int length) throws SAXException
         {
             String columnName = currentColumn.getName();
             if (columnName != null)
@@ -189,5 +219,9 @@ public class XMLTransferSource extends XMLTransferSupport implements TransferSou
                 row.put(columnName, str);
             }
         }
+
+        public void ignorableWhitespace(char ch[], int start, int length) throws SAXException { }
+        public void processingInstruction(String target, String data) throws SAXException { }
+        public void skippedEntity(String name) throws SAXException { }
     }
 }
