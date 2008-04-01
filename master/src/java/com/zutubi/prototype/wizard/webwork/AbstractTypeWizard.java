@@ -72,7 +72,6 @@ public abstract class AbstractTypeWizard implements Wizard
 
     protected List<AbstractChainableState> addWizardStates(List<AbstractChainableState> previousStates, String parentPath, CompositeType baseType, TemplateRecord templateParentRecord)
     {
-
         // If we have a template record, then we are configuring an override.
         // The type is pre-determined as it must be the same as the template
         // parent.
@@ -266,11 +265,6 @@ public abstract class AbstractTypeWizard implements Wizard
 
     public abstract Type getType();
 
-    /**
-     * Required resource.
-     *
-     * @param typeRegistry instance
-     */
     public void setTypeRegistry(TypeRegistry typeRegistry)
     {
         this.typeRegistry = typeRegistry;

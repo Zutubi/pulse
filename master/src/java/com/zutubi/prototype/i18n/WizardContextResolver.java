@@ -15,7 +15,7 @@ import java.util.List;
 public class WizardContextResolver implements ContextResolver<WizardContext>
 {
     private ClassContextResolver delegateClassResolver = new ClassContextResolver();
-    private ExtendedClassContextResolver delegateExtendedClassResolver = new ExtendedClassContextResolver();
+    private PackageContextResolver delegatePackageContextResolver = new PackageContextResolver();
 
     public String[] resolve(WizardContext context)
     {
@@ -30,8 +30,10 @@ public class WizardContextResolver implements ContextResolver<WizardContext>
         resolvedNames.add(wizardTypeResourceName);
 
         resolveUsingDelegateResolver(new ClassContext(wizard.getClass()), resolvedNames);
-        resolveUsingDelegateResolver(new ExtendedClassContext(currentState.getType().getClazz()), resolvedNames);
-        resolveUsingDelegateResolver(new ExtendedClassContext(wizard.getType().getClazz()), resolvedNames);
+        resolveUsingDelegateResolver(new ClassContext(currentState.getType().getClazz()), resolvedNames);
+        resolveUsingDelegateResolver(new ClassContext(wizard.getType().getClazz()), resolvedNames);
+        resolveUsingDelegateResolver(new PackageContext(currentState.getType().getClazz()), resolvedNames);
+        resolveUsingDelegateResolver(new PackageContext(wizard.getType().getClazz()), resolvedNames);
 
         return resolvedNames.toArray(new String[resolvedNames.size()]);
     }
@@ -41,9 +43,9 @@ public class WizardContextResolver implements ContextResolver<WizardContext>
         resolvedNames.addAll(Arrays.asList(delegateClassResolver.resolve(context)));
     }
 
-    private void resolveUsingDelegateResolver(ExtendedClassContext context, List<String> resolvedNames)
+    private void resolveUsingDelegateResolver(PackageContext context, List<String> resolvedNames)
     {
-        resolvedNames.addAll(Arrays.asList(delegateExtendedClassResolver.resolve(context)));
+        resolvedNames.addAll(Arrays.asList(delegatePackageContextResolver.resolve(context)));
     }
 
     public Class<WizardContext> getContextType()
