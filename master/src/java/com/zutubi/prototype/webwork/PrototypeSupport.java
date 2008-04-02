@@ -34,6 +34,12 @@ public class PrototypeSupport extends ActionSupport implements MessagesProvider
 
     private String submitField;
 
+
+    public boolean isCancelled()
+    {
+        return isCancelSelected();
+    }
+
     public boolean isCancelSelected()
     {
         return isSelected("cancel") || isSelected("reset");
