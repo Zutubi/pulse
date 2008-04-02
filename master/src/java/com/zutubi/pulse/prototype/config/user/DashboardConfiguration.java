@@ -49,6 +49,11 @@ public class DashboardConfiguration extends AbstractConfiguration
      */
     private int projectChangeCount = 10;
 
+    public DashboardConfiguration()
+    {
+        setPermanent(true);
+    }
+
     public int getBuildCount()
     {
         return buildCount;

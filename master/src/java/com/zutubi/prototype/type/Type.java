@@ -18,6 +18,14 @@ public interface Type
 
     List<Annotation> getAnnotations(Class annotationType);
 
+    /**
+     * Tests if this type is decorated with the given annotation.
+     *
+     * @param annotationType annotation to test for
+     * @return true if this type is decorated with the given annotation
+     */
+    <T extends Annotation> boolean hasAnnotation(Class<T> annotationType);
+
     <T extends Annotation> T getAnnotation(Class<T> annotationType);
 
     Type getTargetType();

@@ -1,8 +1,8 @@
 package com.zutubi.pulse.prototype.config.admin;
 
-import com.zutubi.util.TextUtils;
 import com.zutubi.config.annotations.*;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
+import com.zutubi.util.TextUtils;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.ValidationException;
@@ -35,6 +35,11 @@ public class EmailConfiguration extends AbstractConfiguration implements Validat
     
     @Numeric(min = 1)
     private int port;
+
+    public EmailConfiguration()
+    {
+        setPermanent(true);
+    }
 
     public String getHost()
     {

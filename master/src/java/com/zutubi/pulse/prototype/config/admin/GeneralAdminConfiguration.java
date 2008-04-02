@@ -1,11 +1,11 @@
 package com.zutubi.pulse.prototype.config.admin;
 
-import com.zutubi.util.TextUtils;
+import com.zutubi.config.annotations.Classification;
+import com.zutubi.config.annotations.ControllingCheckbox;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.ControllingCheckbox;
-import com.zutubi.config.annotations.Classification;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
+import com.zutubi.util.TextUtils;
 
 /**
  *
@@ -27,6 +27,11 @@ public class GeneralAdminConfiguration extends AbstractConfiguration
     @ControllingCheckbox(dependentFields = {"recipeTimeout"})
     private boolean recipeTimeoutEnabled = true;
     private int recipeTimeout = 15;
+
+    public GeneralAdminConfiguration()
+    {
+        setPermanent(true);
+    }
 
     public String getBaseUrl()
     {

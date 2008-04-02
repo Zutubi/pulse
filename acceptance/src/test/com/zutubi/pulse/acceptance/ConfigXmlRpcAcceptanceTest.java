@@ -668,6 +668,18 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         }
     }
 
+    public void testDefaultConstructorAppliedToUser() throws Exception
+    {
+        String random = randomName();
+
+        // Use empty config so we don't get bits from default config.
+        Hashtable<String, Object> user = xmlRpcHelper.createEmptyConfig(UserConfiguration.class);
+        user.put("login", random);
+        user.put("name", random);
+        String path = xmlRpcHelper.insertConfig(ConfigurationRegistry.USERS_SCOPE, user);
+        assertTrue(xmlRpcHelper.isConfigPermanent(PathUtils.getPath(path, "preferences")));
+    }
+
     private void assertSortedEquals(Collection<String> got, String... expected)
     {
         assertEquals(expected.length, got.size());

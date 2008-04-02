@@ -69,6 +69,11 @@ public class UserSettingsConfiguration extends AbstractConfiguration
     @Internal
     private String projectHistoryColumns = defaultProjectColumns();
 
+    public UserSettingsConfiguration()
+    {
+        setPermanent(true);
+    }
+
     public List<String> getAliases()
     {
         return aliases;

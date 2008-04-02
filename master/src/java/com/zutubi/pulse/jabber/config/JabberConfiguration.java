@@ -1,8 +1,8 @@
 package com.zutubi.pulse.jabber.config;
 
 import com.zutubi.config.annotations.*;
-import com.zutubi.pulse.jabber.JabberManager;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
+import com.zutubi.pulse.jabber.JabberManager;
 import com.zutubi.validation.annotations.Required;
 
 /**
@@ -26,6 +26,11 @@ public class JabberConfiguration extends AbstractConfiguration
     private String username;
     private String password;
     private boolean ssl;
+
+    public JabberConfiguration()
+    {
+        setPermanent(true);
+    }
 
     public boolean isEnabled()
     {

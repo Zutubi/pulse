@@ -22,8 +22,7 @@ public class UserPreferencesConfiguration extends AbstractConfiguration
 
     public UserPreferencesConfiguration()
     {
-        settings.setPermanent(true);
-        dashboard.setPermanent(true);
+        setPermanent(true);
     }
 
     public UserSettingsConfiguration getSettings()

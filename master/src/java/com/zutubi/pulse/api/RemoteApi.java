@@ -364,6 +364,26 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         }
     }
 
+    public boolean isConfigPermanent(String token, String path) throws AuthenticationException
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            Configuration instance = configurationTemplateManager.getInstance(path);
+            if(instance == null)
+            {
+                throw new IllegalArgumentException("Path '" + path + "' does not exist");
+            }
+
+            configurationSecurityManager.ensurePermission(path, AccessManager.ACTION_VIEW);
+            return instance.isPermanent();
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
     public boolean isConfigValid(String token, String path) throws AuthenticationException
     {
         tokenManager.loginUser(token);

@@ -143,7 +143,7 @@ public class TypeRegistry
                 CompositeType superType = getType(superClass);
                 if(superType != null && superType.isExtendable())
                 {
-                    if(type.getAnnotation(Internal.class) != null)
+                    if(type.hasAnnotation(Internal.class))
                     {
                         superType.addInternalExtension(type);
                     }

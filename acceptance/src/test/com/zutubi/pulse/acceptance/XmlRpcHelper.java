@@ -144,11 +144,16 @@ public class XmlRpcHelper
         return call("getConfigHandle", path);
     }
 
+    public boolean isConfigPermanent(String path) throws Exception
+    {
+        return (Boolean) call("isConfigPermanent", path);
+    }
+
     public boolean isConfigValid(String path) throws Exception
     {
         return (Boolean) call("isConfigValid", path);
     }
-    
+
     public String insertConfig(String path, Hashtable<String, Object> config) throws Exception
     {
         return call("insertConfig", path, config);

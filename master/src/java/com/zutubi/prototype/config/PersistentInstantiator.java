@@ -49,7 +49,7 @@ public class PersistentInstantiator implements Instantiator
                 // reference), we need to initialise, cache and validate it.
                 if (type instanceof ComplexType && instance instanceof Configuration)
                 {
-                    if (type.getAnnotation(Wire.class) != null)
+                    if (type.hasAnnotation(Wire.class))
                     {
                         ComponentContext.autowire(instance);
                     }

@@ -1,8 +1,8 @@
 package com.zutubi.pulse.prototype.config.admin;
 
 import com.zutubi.config.annotations.*;
-import com.zutubi.validation.annotations.Required;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
+import com.zutubi.validation.annotations.Required;
 
 /**
  * Configuration for LDAP auth integration.
@@ -39,6 +39,11 @@ public class LDAPConfiguration extends AbstractConfiguration
 
     private boolean escapeSpaceCharacters;
     private boolean followReferrals;
+
+    public LDAPConfiguration()
+    {
+        setPermanent(true);
+    }
 
     public boolean isEnabled()
     {

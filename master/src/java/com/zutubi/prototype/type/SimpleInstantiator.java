@@ -1,6 +1,8 @@
 package com.zutubi.prototype.type;
 
+import com.zutubi.config.annotations.Wire;
 import com.zutubi.prototype.config.ReferenceResolver;
+import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.config.Configuration;
 
 /**
@@ -26,6 +28,11 @@ public class SimpleInstantiator implements Instantiator
         Object instance = type.instantiate(data, this);
         if (instance != null)
         {
+            if (type instanceof ComplexType && instance instanceof Configuration && type.hasAnnotation(Wire.class))
+            {
+                ComponentContext.autowire(instance);
+            }
+
             type.initialise(instance, data, this);
         }
         return instance;

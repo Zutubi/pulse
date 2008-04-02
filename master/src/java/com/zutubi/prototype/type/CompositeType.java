@@ -453,7 +453,7 @@ public class CompositeType extends AbstractType implements ComplexType
                 }
             }
 
-            MutableRecord result = newRecord();
+            MutableRecord result = createNewRecord(true);
             for (TypeProperty property : properties.values())
             {
                 propertyFromXmlRpc(property, rpcForm, result);

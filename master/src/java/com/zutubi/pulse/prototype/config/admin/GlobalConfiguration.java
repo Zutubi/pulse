@@ -27,16 +27,6 @@ public class GlobalConfiguration extends AbstractConfiguration
 
     private ConfigurationTemplateManager configurationTemplateManager;
 
-    public GlobalConfiguration()
-    {
-        generalConfig.setPermanent(true);
-        loggingConfig.setPermanent(true);
-        emailConfig.setPermanent(true);
-        ldapConfig.setPermanent(true);
-        jabberConfig.setPermanent(true);
-        licenseConfig.setPermanent(true);
-    }
-
     public GeneralAdminConfiguration getGeneralConfig()
     {
         return generalConfig;
