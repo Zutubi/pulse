@@ -44,10 +44,16 @@ public class DeleteAction extends PrototypeSupport
         return textProvider;
     }
 
+    public void doCancel()
+    {
+        parentPath = PathUtils.getParentPath(path);
+        response = new ConfigurationResponse(parentPath, configurationTemplateManager.getTemplatePath(path));
+        path = response.getNewPath();
+    }
+
     public String execute() throws Exception
     {
         parentPath = PathUtils.getParentPath(path);
-
         type = configurationTemplateManager.getType(path);
         textProvider = new MessagesTextProvider(type.getClazz());
 
@@ -83,12 +89,6 @@ public class DeleteAction extends PrototypeSupport
 
                 path = response.getNewPath();
                 return SUCCESS;
-            }
-            else if (isCancelSelected())
-            {
-                response = new ConfigurationResponse(parentPath, templatePath);
-                path = response.getNewPath();
-                return "cancel";
             }
         }
         return ERROR;
