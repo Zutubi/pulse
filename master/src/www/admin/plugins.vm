@@ -30,13 +30,11 @@
                             initialSize: 300,
                             titlebar: false,
                             collapsible: true,
-                            animate: true,
-                            tabPosition: 'top',
-                            autoScroll: true
+                            animate: true
                         });
 
                         nestedLayout.beginUpdate();
-                        nestedLayout.add('west', new Ext.ContentPanel('plugin-tree', {titlebar: false}));
+                        nestedLayout.add('west', new Ext.ContentPanel('plugin-tree', {titlebar: false, autoScroll: true, fitToFrame: true}));
                         nestedLayout.endUpdate();
 
                         this.createTree();

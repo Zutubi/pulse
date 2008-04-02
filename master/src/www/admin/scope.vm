@@ -116,13 +116,12 @@
                     });
 
                     nestedLayout.addRegion('west', {
-                        split:true,
+                        split: true,
                         initialSize: 300,
                         titlebar: false,
                         collapsible: true,
                         animate: true,
-                        tabPosition: 'bottom',
-                        autoScroll: true
+                        tabPosition: 'bottom'
                     });
 
                     var loader = new ZUTUBI.ConfigTreeLoader('$base/aconfig');
@@ -149,8 +148,7 @@
                     tree.getSelectionModel().on('selectionchange', onSelect);
 
                     nestedLayout.beginUpdate();
-                    nestedLayout.add('north', new Ext.ContentPanel('innernorth', {title: 'inner north'}));
-                    nestedLayout.add('west', new Ext.ContentPanel('config-tree', {}));
+                    nestedLayout.add('west', new Ext.ContentPanel('config-tree', {autoScroll: true, fitToFrame: true}));
                     nestedLayout.endUpdate();
 
                     tree.render();
@@ -176,9 +174,6 @@
 #else
     #dashboardTabs("${tab}")
 #end
-
-    <div id="innernorth" style="padding: 0px;">
-    </div>
 
     <div id="config-tree" style="padding: 10px">
     </div>

@@ -4,19 +4,19 @@ import com.zutubi.prototype.config.ConfigurationRegistry;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.acceptance.forms.ConfigurationForm;
 import com.zutubi.pulse.acceptance.forms.admin.SelectTypeState;
-import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.admin.CompositePage;
+import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
-import com.zutubi.pulse.prototype.config.project.hooks.*;
 import com.zutubi.pulse.prototype.config.project.BuildSelectorConfiguration;
+import com.zutubi.pulse.prototype.config.project.hooks.*;
 import com.zutubi.pulse.test.TestUtils;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.IOUtils;
 
-import java.util.Arrays;
-import java.util.Hashtable;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Hashtable;
 
 /**
  * Tests for build hooks, both configuration and ensuring they are executed
@@ -206,7 +206,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         BuildSummaryPage summaryPage = new BuildSummaryPage(selenium, urls, PROJECT_NAME, buildNumber);
         summaryPage.goTo();
         summaryPage.clickHook(random);
-        SeleniumUtils.waitForVisible(selenium, "status");
+        SeleniumUtils.waitForVisible(selenium, "status-message");
         assertTextPresent("triggered hook '" + random + "'");
 
         waitForTask();

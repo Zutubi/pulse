@@ -68,6 +68,8 @@
             
             var layout;
             var nestedLayout;
+            var statusAreaEl;
+            var statusMessageEl;
 
             var PageLayout = function() {
                 return {
@@ -99,13 +101,17 @@
 
                         nestedLayout = new Ext.BorderLayout('content', {
                             hideOnLayout: true,
+                            north: {
+                                split: false
+                            },
                             center: {
                                 autoScroll: true
                             }
                         });
 
                         nestedLayout.beginUpdate();
-                        nestedLayout.add('center', new Ext.ContentPanel('center', {title: 'Close Me', closable: false}));
+                        nestedLayout.add('north', new Ext.ContentPanel('status-area'));
+                        nestedLayout.add('center', new Ext.ContentPanel('center'));
                         nestedLayout.endUpdate();
 
                         layout.beginUpdate();
@@ -113,11 +119,52 @@
                         layout.add('south', new Ext.ContentPanel('south', 'South'));
                         layout.add('center', new Ext.NestedLayoutPanel(nestedLayout));
                         layout.endUpdate();
+
+                        statusAreaEl = Ext.get('status-area');
+                        statusMessageEl = Ext.get('status-message');
+                        hideStatus();
                     }
                 }
             }();
 
             Ext.onReady(PageLayout.init, PageLayout, true);
+
+            function hideStatus(animate)
+            {
+                if(animate)
+                {
+                    statusAreaEl.setVisible(false, {
+                        callback: function() {
+                            nestedLayout.getRegion('north').hide();
+                        }
+                    });
+                }
+                else
+                {
+                    statusAreaEl.setVisible(false, false);
+                    nestedLayout.getRegion('north').hide();
+                }
+            }
+
+            function showStatus(message, type)
+            {
+                if(type)
+                {
+                    var imageMap = {
+                        'success': 'accept',
+                        'failure': 'exclamation',
+                        'working': 'inprogress'
+                    }
+
+                    message = '<img src="${base}/images/' + imageMap[type] + '.gif" alt="' + type + '"/> ' + message;
+                }
+
+                var northRegion = nestedLayout.getRegion('north');
+                northRegion.show();
+                statusMessageEl.update(message);
+                statusAreaEl.setVisible(true, true);
+                northRegion.resizeTo(statusAreaEl.getHeight());
+            }
         </script>
 
 		$head
@@ -190,7 +237,12 @@
       <div class="clear"></div>
       </div>
 
-      <div id="content" class="ylayout-inactive-content"></div>
+      <div id="status-area" class="x-layout-inactive-content status-message">
+          <span style="float: right"><a href="#" onclick="hideStatus(); return false">close</a></span>
+          <span id="status-message"></span>
+      </div>
+
+      <div id="content" class="x-layout-inactive-content"></div>
 
       <div id="center">
           $body

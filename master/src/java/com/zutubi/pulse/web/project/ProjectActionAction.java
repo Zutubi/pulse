@@ -1,9 +1,9 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.util.TextUtils;
 import com.zutubi.prototype.actions.ActionManager;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.webwork.mapping.Urls;
+import com.zutubi.util.TextUtils;
 
 /**
  * Used to execute a named config action with/on a project.
@@ -38,7 +38,7 @@ public class ProjectActionAction extends ProjectActionBase
     }
     public String execute() throws Exception
     {
-        ProjectConfiguration config =  getRequiredProject().getConfig();
+        ProjectConfiguration config = getRequiredProject().getConfig();
 
         try
         {

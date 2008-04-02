@@ -17,10 +17,8 @@
 
         function triggerHook(hookHandle)
         {
-            var statusEl = Ext.get('status');
-            statusEl.enableDisplayMode();
-            statusEl.setVisible(false);
-
+            hideStatus(false);
+            
             new Ajax.Request('${base}/ajax/triggerBuildHook.action',
               {
                   method:'get',
@@ -31,20 +29,17 @@
                       var response = eval("(" + transport.responseText + ")");
                       if(response.success)
                       {
-                          statusEl.update('<img src="${base}/images/accept.gif" alt="success"/> ' + response.detail);
+                          showStatus(response.detail, 'success');
                       }
                       else
                       {
-                          statusEl.update('<img src="${base}/images/exclamation.gif" alt="success"/> Unable to trigger hook: ' + response.detail);
+                          showStatus('Unable to trigger hook: ' + response.detail, 'failure');
                       }
-
-                      statusEl.setVisible(true, true);
                   },
 
                   onFailure: function()
                   {
-                      statusEl.update('<img src="${base}/images/exclamation.gif" alt="success"/> Hook trigger failed.');
-                      statusEl.setVisible(true, true);
+                      showStatus.update('Hook trigger failed.', 'failure');
                   }
               });
         }
@@ -54,8 +49,6 @@
     #buildTabs($buildResult "summary")
 
     <div id='#id("${result.ownerName}-build-${result.number}-summary")'></div>
-    
-    <p id="status" class="status-message" style="display: none"></p>
 
 #if($result.completed())
 #auth("resource=project" "action=write")

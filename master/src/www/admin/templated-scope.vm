@@ -202,18 +202,12 @@
                     centerPanel.setTitle('');
                     centerPanel.getEl().setStyle('margin', '4px');
 
-                    nestedLayout.addRegion('north', {
-                        split: false,
-                        titlebar: false
-                    });
-
                     nestedLayout.addRegion('west', {
                         split:true,
                         initialSize: 300,
                         titlebar: false,
                         collapsible: true,
-                        animate: true,
-                        autoScroll: true
+                        animate: true
                     });
 
                     var templateLoader = new ZUTUBI.ConfigTreeLoader('$base/atemplate/$scope');
@@ -236,9 +230,8 @@
                     templateTree.getSelectionModel().on('selectionchange', onTemplateSelect);
 
                     nestedLayout.beginUpdate();
-                    nestedLayout.add('north', new Ext.ContentPanel('innernorth', {title: 'inner north'}));
-                    nestedLayout.add('west', new Ext.ContentPanel('template-tree', {title: 'hierarchy'}));
-                    nestedLayout.add('west', new Ext.ContentPanel('config-tree', {title: 'configuration'}));
+                    nestedLayout.add('west', new Ext.ContentPanel('template-tree', {title: 'hierarchy', autoScroll: true, fitToFrame: true}));
+                    nestedLayout.add('west', new Ext.ContentPanel('config-tree', {title: 'configuration', autoScroll: true, fitToFrame: true}));
                     nestedLayout.endUpdate();
 
                     nestedLayout.getRegion('west').on('panelactivated', function(region, panel) {
@@ -303,13 +296,10 @@
 <body>
     #adminTabs("${tab}")
 
-    <div id="innernorth" style="padding: 0px;">
+    <div id="template-tree" class="x-layout-inactive-content" style="padding: 10px">
     </div>
 
-    <div id="template-tree" class="ylayout-inactive-content" style="padding: 10px">
-    </div>
-
-    <div id="config-tree" class="ylayout-inactive-content" style="padding: 10px">
+    <div id="config-tree" class="x-layout-inactive-content" style="padding: 10px">
     </div>
 
     <div id="detail-pane" style="padding: 10px; min-height: 100%">

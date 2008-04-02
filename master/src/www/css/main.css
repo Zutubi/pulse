@@ -11,7 +11,7 @@ body {
     height: 100%;
 }
 
-pre{
+pre {
     margin:0; padding:0
 }
 
@@ -397,7 +397,7 @@ p.note {
     background: #ffffc0;
     text-align: center;
     padding: 5px;
-    border: dotted 1px #bbb
+    border-bottom: solid 1px #c0c0c0;
 }
 
 td.content, td.content-nowrap {
