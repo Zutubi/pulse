@@ -3,6 +3,7 @@ package com.zutubi.prototype.actions;
 import com.zutubi.prototype.ConventionSupport;
 import com.zutubi.prototype.config.ConfigurationRefactoringManager;
 import com.zutubi.prototype.config.ConfigurationSecurityManager;
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeRegistry;
@@ -31,6 +32,7 @@ public class ActionManager
     private TypeRegistry typeRegistry;
     private ConfigurationSecurityManager configurationSecurityManager;
     private ConfigurationRefactoringManager configurationRefactoringManager;
+    private ConfigurationTemplateManager configurationTemplateManager;
 
     public List<String> getActions(Configuration configurationInstance, boolean includeDefault)
     {
@@ -51,8 +53,7 @@ public class ActionManager
                     result.add(AccessManager.ACTION_CLONE);
                 }
 
-                String[] elements = PathUtils.getPathElements(path);
-                if(elements.length > 1 && !configurationInstance.isPermanent() && configurationSecurityManager.hasPermission(path, AccessManager.ACTION_DELETE))
+                if(configurationTemplateManager.canDelete(path) && configurationSecurityManager.hasPermission(path, AccessManager.ACTION_DELETE))
                 {
                     result.add(AccessManager.ACTION_DELETE);
                 }
@@ -150,5 +151,10 @@ public class ActionManager
     public void setConfigurationRefactoringManager(ConfigurationRefactoringManager configurationRefactoringManager)
     {
         this.configurationRefactoringManager = configurationRefactoringManager;
+    }
+
+    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
+    {
+        this.configurationTemplateManager = configurationTemplateManager;
     }
 }

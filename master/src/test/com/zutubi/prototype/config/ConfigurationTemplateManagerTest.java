@@ -10,6 +10,7 @@ import com.zutubi.prototype.type.MapType;
 import com.zutubi.prototype.type.TemplatedMapType;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
@@ -737,6 +738,78 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         configurationTemplateManager.insert("template", a);
 
         assertFalse(configurationTemplateManager.isTemplatedCollection("template/a"));
+    }
+
+    public void testCanDeleteInvalidPath()
+    {
+        assertFalse(configurationTemplateManager.canDelete("skgjkg"));
+    }
+
+    public void testCanDeleteScope()
+    {
+        assertFalse(configurationTemplateManager.canDelete("sample"));
+    }
+
+    public void testCanDeletePermanent()
+    {
+        MockA a = new MockA("mock");
+        a.setPermanent(true);
+        String path = configurationTemplateManager.insert("sample", a);
+        assertFalse(configurationTemplateManager.canDelete(path));
+    }
+
+    public void testCanDeleteInheritedComposite() throws TypeException
+    {
+        assertFalse(configurationTemplateManager.canDelete(PathUtils.getPath(insertInherited(), "mock")));
+    }
+
+    public void testCanDeleteSimple()
+    {
+        MockA a = new MockA("mock");
+        String path = configurationTemplateManager.insert("sample", a);
+        assertTrue(configurationTemplateManager.canDelete(path));
+    }
+
+    public void testCanDeleteCompositeChild()
+    {
+        MockA a = new MockA("mock");
+        a.setMock(new MockB("b"));
+        String path = configurationTemplateManager.insert("sample", a);
+        assertTrue(configurationTemplateManager.canDelete(PathUtils.getPath(path, "mock")));
+    }
+
+    public void testCanDeleteMapItem()
+    {
+        MockA a = new MockA("mock");
+        a.getCs().put("cee", new MockC("cee"));
+        String path = configurationTemplateManager.insert("sample", a);
+        assertTrue(configurationTemplateManager.canDelete(PathUtils.getPath(path, "cs/cee")));
+    }
+
+    public void testCanDeleteOwnedComposite() throws TypeException
+    {
+        insertInherited();
+        assertTrue(configurationTemplateManager.canDelete("template/mock/mock"));
+    }
+    
+    public void testCanDeleteInheritedMapItem() throws TypeException
+    {
+        assertTrue(configurationTemplateManager.canDelete(PathUtils.getPath(insertInherited(), "cs/cee")));
+    }
+
+    private String insertInherited() throws TypeException
+    {
+        MockA a = new MockA("mock");
+        a.setMock(new MockB("bee"));
+        a.getCs().put("cee", new MockC("cee"));
+        MutableRecord record = typeA.unstantiate(a);
+        configurationTemplateManager.markAsTemplate(record);
+        String path = configurationTemplateManager.insertRecord("template", record);
+
+        record = typeA.unstantiate(new MockA("child"));
+        configurationTemplateManager.setParentTemplate(record, configurationReferenceManager.getHandleForPath(path));
+        path = configurationTemplateManager.insertRecord("template", record);
+        return path;
     }
 
     public void testDelete()

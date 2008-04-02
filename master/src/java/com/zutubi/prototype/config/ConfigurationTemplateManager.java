@@ -1438,15 +1438,72 @@ public class ConfigurationTemplateManager implements InstanceSource
         return false;
     }
 
+    /**
+     * Determines if the given path exists and can be deleted.  Note that
+     * this method does <b>not</b> take security considerations into account.
+     *
+     * @param path path to test
+     * @return true if the path is deletable
+     */
+    public boolean canDelete(final String path)
+    {
+        return executeInsideTransaction(new Action<Boolean>()
+        {
+            public Boolean execute() throws Exception
+            {
+                Record record = recordManager.select(path);
+                if(record == null)
+                {
+                    return false;
+                }
+
+                if(record.isPermanent())
+                {
+                    return false;
+                }
+
+                String[] pathElements = PathUtils.getPathElements(path);
+                if(pathElements.length == 1)
+                {
+                    return false;
+                }
+
+                if(isTemplatedPath(path) && pathElements.length > 2)
+                {
+                    // We are deleting something inside a template: make sure
+                    // it is not an inherited composite.
+                    String parentPath = PathUtils.getParentPath(path);
+                    String baseName = PathUtils.getBaseName(path);
+                    TemplateRecord parentRecord = (TemplateRecord) getRecord(parentPath);
+                    TemplateRecord parentsTemplateParent = parentRecord.getParent();
+
+                    if(parentsTemplateParent != null && parentsTemplateParent.containsKey(baseName) && !parentRecord.isCollection())
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        });
+    }
+
+
     public RecordCleanupTask getCleanupTasks(final String path)
     {
         return executeInsideTransaction(new Action<RecordCleanupTask>()
         {
             public RecordCleanupTask execute() throws Exception
             {
-                if(!pathExists(path))
+                Record record = recordManager.select(path);
+                if(record == null)
                 {
                     throw new IllegalArgumentException("Invalid path '" + path + "': does not exist");
+                }
+
+                if(record.isPermanent())
+                {
+                    throw new IllegalArgumentException("Cannot delete instance at path '" + path + "': marked permanent");
                 }
 
                 String[] pathElements = PathUtils.getPathElements(path);
