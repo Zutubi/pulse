@@ -28,7 +28,6 @@ public class DataDirectoryArchive extends AbstractArchivableComponent
         }
         catch (IOException e)
         {
-            e.printStackTrace();
             throw new ArchiveException(e);
         }
     }
@@ -36,7 +35,6 @@ public class DataDirectoryArchive extends AbstractArchivableComponent
     public void restore(File archive) throws ArchiveException
     {
         // replace the existing files with the archived files.
-
         try
         {
             FileSystemUtils.delete(paths.getUserConfigRoot());
@@ -47,10 +45,8 @@ public class DataDirectoryArchive extends AbstractArchivableComponent
         }
         catch (IOException e)
         {
-            e.printStackTrace();
             throw new ArchiveException(e);
         }
-
     }
 
     public void setUserPaths(MasterUserPaths paths)

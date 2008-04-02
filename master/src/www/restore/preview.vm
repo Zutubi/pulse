@@ -29,7 +29,10 @@
 <p style="width:50%">
     Please be aware that this restore will overwrite all of your existing configuration and settings.
 </p>
-
+<p style="width:50%">
+    Warning: a restore will drop all of the tables in your specified pulse database.  If you have any custom
+    tables in the same database as Pulse, please ensure that you back them up before continuing with this restore.
+</p>
 
 <table class="form">
     <tr width="2">

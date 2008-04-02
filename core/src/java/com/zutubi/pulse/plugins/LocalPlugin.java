@@ -1,5 +1,6 @@
 package com.zutubi.pulse.plugins;
 
+import com.zutubi.util.StringUtils;
 import org.eclipse.osgi.framework.util.Headers;
 import org.eclipse.osgi.service.resolver.BundleDescription;
 import org.osgi.framework.Bundle;
@@ -7,10 +8,6 @@ import org.osgi.framework.Bundle;
 import java.io.File;
 import java.net.URI;
 import java.util.List;
-
-import com.zutubi.pulse.plugins.PluginException;
-import com.zutubi.pulse.plugins.Version;
-import com.zutubi.util.StringUtils;
 
 /**
  *
@@ -57,7 +54,12 @@ public abstract class LocalPlugin implements Plugin
 
     public String getId()
     {
-        String[] nextToken = StringUtils.getNextToken((String) manifest.get(HEADER_SYMBOLICNAME), ';', true);
+        Object entry = manifest.get(HEADER_SYMBOLICNAME);
+        if (entry == null)
+        {
+            return null;
+        }
+        String[] nextToken = StringUtils.getNextToken((String) entry, ';', true);
         if(nextToken == null)
         {
             return null;
@@ -275,7 +277,7 @@ public abstract class LocalPlugin implements Plugin
         }
 
         LocalPlugin other = (LocalPlugin) obj;
-        return getId().equals(other.getId()) && getVersion().equals(other.getVersion());
+        return StringUtils.equals(getId(), other.getId()) && getVersion().equals(other.getVersion());
     }
 
     public int hashCode()

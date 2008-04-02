@@ -85,12 +85,14 @@ public abstract class AbstractExtensionManager implements IExtensionChangeHandle
         }
         catch (ClassNotFoundException e)
         {
-            LOG.warning("Failed to add extension class: " + cls + ". Cause: " + e.getMessage(), e);
+            LOG.warning("Failed to add extension class: " + cls + " due to ClassNotFoundException. Cause: " + e.getMessage());
+            LOG.info(e);
             handleExtensionError(extension, e);
         }
         catch (NoClassDefFoundError e)
         {
-            LOG.warning("Failed to add extension class: " + cls + ". Cause: " + e.getMessage(), e);
+            LOG.warning("Failed to add extension class: " + cls + " due to NoClassDefFoundError. Cause: " + e.getMessage());
+            LOG.info(e);
             handleExtensionError(extension, e);
         }
 

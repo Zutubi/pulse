@@ -16,6 +16,10 @@ public class Version implements Comparable<Version>
     
     public Version(String version) throws IllegalArgumentException
     {
+        if (version == null)
+        {
+            throw new IllegalArgumentException("Version can not be null.");
+        }
         String[] pieces = version.split("\\.", 4);
         if(pieces.length < 3)
         {
