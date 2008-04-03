@@ -31,13 +31,14 @@
     </tr>
     <tr>
         <td colspan="2" style="padding-left: 30px">
-            #wwcform("action=projectReports.action" "heading=%{getText('chart.parameters')}" "colspan=5" "width=100%" "method=post")
+            #wwcform("action=projectReports.action" "heading=%{getText('chart.parameters')}" "colspan=7" "width=100%" "method=post")
                 #wwhidden("name=id")
                 <tr>
                     #wwselect("name=specId" "label=%{getText('chart.specification')}" "list=buildSpecifications" "singleRow=true" "tabindex=1")
                     #wwselect("name=timeframe" "label=%{getText('chart.timeframe')}" "list=timeframes" "singleRow=true" "tabindex=2")
+                    #wwcheckbox("name=zoom" "label=%{getText('chart.zoom')}" "singleRow=true" "tabindex=3")
                     <td>
-                        #wwsubmit("name=refresh" "value=%{getText('refresh.name')}" "tabindex=$tabIndex")
+                        #wwsubmit("name=refresh" "value=%{getText('refresh.name')}" "tabindex=4")
                     </td>
                 </tr>
             #end

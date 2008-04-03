@@ -4,7 +4,6 @@ import com.zutubi.pulse.charting.*;
 import com.zutubi.pulse.model.BuildSpecification;
 import com.zutubi.pulse.model.NamedEntityComparator;
 import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
 import com.zutubi.pulse.web.ActionSupport;
 
@@ -29,6 +28,7 @@ public class ViewReportsAction extends ActionSupport
     private Map stageTimesChart;
 
     private int timeframe = 45;
+    private boolean zoom = false;
 
     private BuildResultDao buildResultDao;
 
@@ -50,6 +50,16 @@ public class ViewReportsAction extends ActionSupport
     public void setTimeframe(int timeframe)
     {
         this.timeframe = timeframe;
+    }
+
+    public boolean isZoom()
+    {
+        return zoom;
+    }
+
+    public void setZoom(boolean zoom)
+    {
+        this.zoom = zoom;
     }
 
     public Project getProject()
@@ -132,15 +142,15 @@ public class ViewReportsAction extends ActionSupport
         chart.setData(chartData);
         this.buildResultsChart = ChartUtils.renderForWeb(chart.render(), WIDTH, HEIGHT);
 
-        BuildTimesChart btChart = new BuildTimesChart(false);
+        BuildTimesChart btChart = new BuildTimesChart(false, zoom);
         btChart.setData(chartData);
         this.buildTimesChart = ChartUtils.renderForWeb(btChart.render(), WIDTH, HEIGHT);
 
-        BuildTimesChart stChart = new BuildTimesChart(true);
+        BuildTimesChart stChart = new BuildTimesChart(true, zoom);
         stChart.setData(chartData);
         this.stageTimesChart = ChartUtils.renderForWeb(stChart.render(), WIDTH, HEIGHT);
 
-        TestCountChart tcChart = new TestCountChart();
+        TestCountChart tcChart = new TestCountChart(zoom);
         tcChart.setData(chartData);
         this.testCountChart = ChartUtils.renderForWeb(tcChart.render(), WIDTH, HEIGHT);
 

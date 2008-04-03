@@ -4,7 +4,6 @@ import com.zutubi.pulse.i18n.Messages;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.labels.XYToolTipGenerator;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.DefaultXYItemRenderer;
@@ -24,6 +23,7 @@ public class BuildTimesChart implements XYToolTipGenerator, Chart
     private static final Messages I18N = Messages.getInstance(BuildTimesChart.class);
 
     private boolean stages;
+    private boolean zoom;
     private TimeBasedChartData data;
 
     private String domainAxisLabel = "axis.domain.label";
@@ -33,9 +33,10 @@ public class BuildTimesChart implements XYToolTipGenerator, Chart
     private String seriesTimeTooltip = "series.time.tooltip";
 
 
-    public BuildTimesChart(boolean stages)
+    public BuildTimesChart(boolean stages, boolean zoom)
     {
         this.stages = stages;
+        this.zoom = zoom;
         if(stages)
         {
             chartLabel += ".stages";
@@ -92,10 +93,13 @@ public class BuildTimesChart implements XYToolTipGenerator, Chart
             maxTime[0] = 100;
         }
 
-        ValueAxis rangeAxis = new NumberAxis(I18N.format(rangeAxisLabel));
-        double buffer = Math.max(maxTime[0] / 15.0, 5);
-        rangeAxis.setLowerBound(Math.max(minTime[0] - buffer, 0));
-        rangeAxis.setUpperBound(maxTime[0] + buffer);
+        NumberAxis rangeAxis = new NumberAxis(I18N.format(rangeAxisLabel));
+        if (zoom)
+        {
+            double buffer = Math.max(maxTime[0] / 15.0, 5);
+            rangeAxis.setLowerBound(Math.max(0, minTime[0] - buffer));
+            rangeAxis.setUpperBound(maxTime[0] + buffer);
+        }
 
         XYPlot plot = new XYPlot(ds, domainAxis, rangeAxis, renderer);
 

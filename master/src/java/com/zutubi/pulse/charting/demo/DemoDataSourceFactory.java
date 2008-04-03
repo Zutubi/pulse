@@ -3,8 +3,9 @@ package com.zutubi.pulse.charting.demo;
 import com.zutubi.pulse.charting.BuildResultsDataSource;
 import com.zutubi.pulse.charting.DemoBuildResultDataSource;
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.model.BuildReason;
 import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.BuildSpecification;
+import com.zutubi.pulse.model.UnknownBuildReason;
 
 import java.util.Calendar;
 import java.util.LinkedList;
@@ -36,7 +37,7 @@ public class DemoDataSourceFactory
             {
                 boolean success = RAND.nextInt(50) < 40;
                 long finished = date.getTimeInMillis();
-                long started = finished - 1000 - (RAND.nextInt(3000) + 200 * i);
+                long started = finished - 10000 - (RAND.nextInt(3000) + 200 * i);
                 buildResults.add(createBuildResult(l++, success, started, finished));
             }
             date.add(Calendar.DAY_OF_YEAR, 1);
@@ -46,7 +47,7 @@ public class DemoDataSourceFactory
 
     private static BuildResult createBuildResult(long id, boolean successful, long started, long finished)
     {
-        BuildResult result = new BuildResult((BuildReason)null, null, null, id, false);
+        BuildResult result = new BuildResult(new UnknownBuildReason(), null, new BuildSpecification("test"), id, false);
         result.setId(id);
         if (successful)
         {

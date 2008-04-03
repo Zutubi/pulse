@@ -4,7 +4,6 @@ import com.zutubi.pulse.i18n.Messages;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.labels.XYToolTipGenerator;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.DefaultXYItemRenderer;
@@ -23,6 +22,7 @@ public class TestCountChart implements XYToolTipGenerator, Chart
 {
     private static final Messages I18N = Messages.getInstance(TestCountChart.class);
 
+    private boolean zoom;
     private TimeBasedChartData data;
 
     private String domainAxisLabel = "axis.domain.label";
@@ -31,6 +31,11 @@ public class TestCountChart implements XYToolTipGenerator, Chart
     private String seriesTimeLabel = "series.time.label";
     private String seriesTimeTooltip = "series.time.tooltip";
 
+
+    public TestCountChart(boolean zoom)
+    {
+        this.zoom = zoom;
+    }
 
     public String generateToolTip(XYDataset dataset, int series, int item)
     {
@@ -55,7 +60,6 @@ public class TestCountChart implements XYToolTipGenerator, Chart
                     minCount[0] = Math.min(minCount[0], testCount);
                     maxCount[0] = Math.max(maxCount[0], testCount);
                 }
-
             }
         });
 
@@ -72,10 +76,13 @@ public class TestCountChart implements XYToolTipGenerator, Chart
             maxCount[0] = 100;
         }
 
-        ValueAxis rangeAxis = new NumberAxis(I18N.format(rangeAxisLabel));
-        double buffer = Math.max(maxCount[0] / 15.0, 5);
-        rangeAxis.setLowerBound(Math.max(minCount[0] - buffer, 0));
-        rangeAxis.setUpperBound(maxCount[0] + buffer);
+        NumberAxis rangeAxis = new NumberAxis(I18N.format(rangeAxisLabel));
+        if (zoom)
+        {
+            double buffer = Math.max(maxCount[0] / 15.0, 5);
+            rangeAxis.setLowerBound(Math.max(minCount[0] - buffer, 0));
+            rangeAxis.setUpperBound(maxCount[0] + buffer);
+        }
 
         XYPlot plot = new XYPlot(ds, domainAxis, rangeAxis, renderer);
 
