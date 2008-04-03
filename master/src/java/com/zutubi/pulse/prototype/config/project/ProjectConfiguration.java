@@ -17,8 +17,10 @@ import com.zutubi.validation.annotations.Url;
 import java.util.*;
 
 /**
- *
- *
+ * A project defines how and when to run a build.  It is the fundamental unit
+ * of configuration for builds.  Note that a "software project" is likely to
+ * be represented by many projects in Pulse.  For example, there may be one
+ * Pulse project for a nightly build and another for a continuous build.
  */
 @Form(fieldOrder = {"name", "url", "description"})
 @Listing(order = {"type", "requirements", "properties", "stages", "options", "buildHooks", "scm", "changeViewer", "commitMessageTransformers", "labels", "permissions"})

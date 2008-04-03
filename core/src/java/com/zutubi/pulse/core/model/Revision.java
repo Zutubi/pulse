@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.model;
 
-import com.zutubi.pulse.util.StringUtils;
+import com.zutubi.util.StringUtils;
 
 import java.util.Date;
 
@@ -38,7 +38,10 @@ public class Revision extends Entity implements Comparable<Revision>
     public Revision(String author, String comment, Date date, String revisionString)
     {
         this.author = author;
-        this.comment = StringUtils.trimmedString(comment, MAX_COMMENT_LENGTH, COMMENT_TRIM_MESSAGE);
+        if (comment != null)
+        {
+            this.comment = StringUtils.trimmedString(comment, MAX_COMMENT_LENGTH, COMMENT_TRIM_MESSAGE);
+        }
         setDate(date);
         setRevisionString(revisionString);
     }

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.model;
 
-import com.zutubi.pulse.util.StringUtils;
+import com.zutubi.util.StringUtils;
 
 public class Feature extends Entity
 {
@@ -48,7 +48,10 @@ public class Feature extends Entity
     public Feature(Level level, String summary)
     {
         this.level = level;
-        this.summary = StringUtils.trimmedString(summary, MAX_SUMMARY_LENGTH, SUMMARY_TRIM_MESSAGE);
+        if (summary != null)
+        {
+            this.summary = StringUtils.trimmedString(summary, MAX_SUMMARY_LENGTH, SUMMARY_TRIM_MESSAGE);
+        }
     }
 
     public Level getLevel()
@@ -68,7 +71,7 @@ public class Feature extends Entity
 
     public void appendToSummary(String s)
     {
-        this.summary = StringUtils.trimmedString(this.summary + s, MAX_SUMMARY_LENGTH, SUMMARY_TRIM_MESSAGE);
+        this.summary = StringUtils.trimmedString(summary == null ? s : summary + s, MAX_SUMMARY_LENGTH, SUMMARY_TRIM_MESSAGE);
     }
 
     private String getLevelName()
@@ -91,7 +94,7 @@ public class Feature extends Entity
         if (o instanceof Feature)
         {
             Feature other = (Feature) o;
-            return other.level == level && other.summary.equals(summary);
+            return other.level == level && StringUtils.equals(other.summary, summary);
         }
 
         return false;

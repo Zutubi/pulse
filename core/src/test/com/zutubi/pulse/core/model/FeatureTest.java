@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.model;
 
 import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.util.StringUtils;
+import com.zutubi.util.StringUtils;
 
 /**
  */

@@ -1,13 +1,13 @@
 package com.zutubi.pulse.bootstrap;
 
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.database.DatabaseConsole;
-import com.zutubi.pulse.database.HSQLDBUtils;
 import com.zutubi.pulse.config.Config;
 import com.zutubi.pulse.config.FileConfig;
+import com.zutubi.pulse.database.DatabaseConsole;
+import com.zutubi.pulse.database.HSQLDBUtils;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.util.IOUtils;
 import com.zutubi.pulse.util.ZipUtils;
+import com.zutubi.util.IOUtils;
 import com.zutubi.util.logging.Logger;
 
 import javax.sql.DataSource;
@@ -135,9 +135,7 @@ public class Data implements MasterUserPaths
         }
 
         FileSystemUtils.copy(new File(tmpBackup, CONFIG_FILE_NAME), getConfigFile());
-
         ZipUtils.createZip(backup, tmpBackup, null);
-
         FileSystemUtils.rmdir(tmpBackup);
         // - done.
     }
