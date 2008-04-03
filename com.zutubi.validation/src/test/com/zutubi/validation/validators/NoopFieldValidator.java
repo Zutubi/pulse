@@ -7,7 +7,7 @@ import com.zutubi.validation.ValidationException;
  */
 public class NoopFieldValidator extends FieldValidatorSupport
 {
-    public void validate(Object obj) throws ValidationException
+    public void validateField(Object value) throws ValidationException
     {
 
     }

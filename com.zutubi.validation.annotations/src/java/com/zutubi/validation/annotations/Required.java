@@ -13,19 +13,15 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Required
 {
-    public static final String DEFAULT_messageKey = "";
+    static final String DEFAULT_defaultKeySuffix = "";
 
-    public static final String DEFAULT_defaultMessage = "";
+    static final boolean DEFAULT_shortCircuit = true;
 
-    public static final boolean DEFAULT_shortCircuit = true;
+    static final boolean DEFAULT_ignorable = true;
 
-    public static final boolean DEFAULT_ignorable = true;
+    String defaultKeySuffix() default DEFAULT_defaultKeySuffix;
 
-    public String messageKey() default DEFAULT_messageKey;
+    boolean shortCircuit() default DEFAULT_shortCircuit;
 
-    public String defaultMessage() default DEFAULT_defaultMessage;
-
-    public boolean shortCircuit() default DEFAULT_shortCircuit;
-
-    public boolean ignorable() default DEFAULT_ignorable;
+    boolean ignorable() default DEFAULT_ignorable;
 }

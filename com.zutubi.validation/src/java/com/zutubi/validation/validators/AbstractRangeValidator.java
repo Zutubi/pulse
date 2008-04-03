@@ -5,12 +5,10 @@ import com.zutubi.validation.ValidationException;
 /**
  * <class-comment/>
  */
-public abstract class AbstractRangeValidator extends FieldValidatorSupport
+public abstract class AbstractRangeValidator<T extends Comparable> extends FieldValidatorSupport
 {
-    public void validate(Object object) throws ValidationException
+    public void validateField(Object obj) throws ValidationException
     {
-        Object obj = getFieldValue(getFieldName(), object);
-
         // if there is no value - don't do comparison. If a value is required, a required validator should be
         // added to the field
         if (obj == null)
@@ -28,17 +26,16 @@ public abstract class AbstractRangeValidator extends FieldValidatorSupport
         // only check for a minimum value if the min parameter is set
         if ((getMinComparatorValue() != null) && (value.compareTo(getMinComparatorValue()) < 0))
         {
-            validationContext.addFieldError(getFieldName(), object.toString());
+            addError(".min");
         }
 
         // only check for a maximum value if the max parameter is set
         if ((getMaxComparatorValue() != null) && (value.compareTo(getMaxComparatorValue()) > 0))
         {
-            validationContext.addFieldError(getFieldName(), object.toString());
+            addError(".max");
         }
     }
 
-    protected abstract Comparable getMaxComparatorValue();
-
-    protected abstract Comparable getMinComparatorValue();
+    protected abstract T getMaxComparatorValue();
+    protected abstract T getMinComparatorValue();
 }

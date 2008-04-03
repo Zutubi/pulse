@@ -7,9 +7,9 @@ import com.zutubi.validation.ValidationException;
  */
 public class NumericValidator extends FieldValidatorSupport
 {
-    public static final String MIN = ".min";
+    public static final String MIN = "min";
 
-    public static final String MAX = ".max";
+    public static final String MAX = "max";
 
     private long max = Long.MAX_VALUE;
     
@@ -35,9 +35,8 @@ public class NumericValidator extends FieldValidatorSupport
         return min;
     }
 
-    public void validate(Object obj) throws ValidationException
+    public void validateField(Object value) throws ValidationException
     {
-        Object value = getFieldValue(getFieldName(), obj);
         if (value instanceof Integer)
         {
             Integer integerValue = (Integer) value;
@@ -70,11 +69,5 @@ public class NumericValidator extends FieldValidatorSupport
                 }
             }
         }
-    }
-
-    private void addError(String suffix)
-    {
-        setMessageKey(getFieldName() + suffix);
-        addFieldError(getFieldName());
     }
 }

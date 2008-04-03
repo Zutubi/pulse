@@ -6,41 +6,19 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
 /**
- * <class-comment/>
+ * Checks that a field has a valid email address.
  */
-public class EmailValidator extends FieldValidatorSupport
+public class EmailValidator extends StringFieldValidatorSupport
 {
-    public EmailValidator()
+    public void validateStringField(String str) throws ValidationException
     {
-        setDefaultMessageKey(".invalid");
-        setMessageKey("${fieldName}.invalid");
-    }
-
-    public void validate(Object obj) throws ValidationException
-    {
-        Object fieldValue = getFieldValue(getFieldName(), obj);
-        if (fieldValue == null)
+        try
         {
-            return;
+            new InternetAddress(str);
         }
-
-        if (fieldValue instanceof String)
+        catch (AddressException e)
         {
-            String str = ((String) fieldValue);
-
-            if (str.length() > 0)
-            {
-                try
-                {
-                    new InternetAddress(str);
-                }
-                catch (AddressException e)
-                {
-                    setDefaultMessage(getDefaultMessage());
-                    addFieldError(getFieldName());
-                }
-            }
+            addError();
         }
-
     }
 }

@@ -3,25 +3,22 @@ package com.zutubi.validation.validators;
 import com.zutubi.validation.ValidationException;
 
 /**
- * <class-comment/>
+ * Used to ensure a field has a non-empty value.
  */
 public class RequiredValidator extends FieldValidatorSupport
 {
-    public static final String REQUIRED = ".required";
     private boolean ignorable = true;
 
     public RequiredValidator()
     {
-        setMessageKey("${fieldName}.required");
-        setDefaultMessageKey(".required");
+        super("required");
     }
 
-    public void validate(Object obj) throws ValidationException
+    public void validateField(Object fieldValue) throws ValidationException
     {
-        Object fieldValue = getFieldValue(getFieldName(), obj);
         if (fieldValue == null)
         {
-            addFieldError(getFieldName());
+            addError();
             return;
         }
 
@@ -30,7 +27,7 @@ public class RequiredValidator extends FieldValidatorSupport
             String str = ((String)fieldValue);
             if (str.length() == 0)
             {
-                addFieldError(getFieldName());
+                addError();
             }
         }
     }

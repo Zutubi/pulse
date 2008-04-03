@@ -373,12 +373,20 @@ public class NotifyConditionParserTest extends PulseTestCase
     {
         NotifyConditionFactory factory = new NotifyConditionFactory();
         factory.setObjectFactory(new DefaultObjectFactory());
-        SubscriptionConditionValidator validator = new SubscriptionConditionValidator();
+        final String[] errorMessage = new String[1];
+        SubscriptionConditionValidator validator = new SubscriptionConditionValidator()
+        {
+            public void addErrorMessage(String message)
+            {
+                errorMessage[0] = message;
+            }
+        };
+
         validator.setNotifyConditionFactory(factory);
         NotifyCondition condition = validator.validateCondition(expression);
         if(condition == null)
         {
-            throw new PulseRuntimeException(validator.getMessage());
+            throw new PulseRuntimeException(errorMessage[0]);
         }
 
         return condition;

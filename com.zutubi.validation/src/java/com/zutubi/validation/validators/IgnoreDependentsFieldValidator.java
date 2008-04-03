@@ -21,9 +21,8 @@ public class IgnoreDependentsFieldValidator extends FieldValidatorSupport
         this.dependentFields = dependentFields;
     }
 
-    public void validate(Object obj) throws ValidationException
+    public void validateField(Object value) throws ValidationException
     {
-        Object value = getFieldValue(getFieldName(), obj);
         boolean equal;
         if(value == null)
         {

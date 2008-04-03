@@ -6,16 +6,23 @@ import com.zutubi.validation.FieldValidator;
 import com.zutubi.validation.ValidationException;
 
 /**
- * <class-comment/>
+ * Helper base class for implementing fieldd validators.  Includes support
+ * for getting the field value and addition of field error messages.
  */
 public abstract class FieldValidatorSupport extends ValidatorSupport implements FieldValidator
 {
     private String fieldName;
 
-    private String defaultMessage;
+    private String defaultKeySuffix = "invalid";
 
-    private String messageKey;
-    private String defaultMessageKey;
+    protected FieldValidatorSupport()
+    {
+    }
+
+    protected FieldValidatorSupport(String defaultKeySuffix)
+    {
+        this.defaultKeySuffix = defaultKeySuffix;
+    }
 
     public String getFieldName()
     {
@@ -27,111 +34,78 @@ public abstract class FieldValidatorSupport extends ValidatorSupport implements 
         this.fieldName = fieldName;
     }
 
-    protected Object getFieldValue(String name, Object target) throws ValidationException
+    public String getDefaultKeySuffix()
+    {
+        return defaultKeySuffix;
+    }
+
+    public void setDefaultKeySuffix(String defaultKeySuffix)
+    {
+        this.defaultKeySuffix = defaultKeySuffix;
+    }
+
+    public void addError()
+    {
+        addError(defaultKeySuffix);
+    }
+
+    public void addError(String keySuffix, Object... args)
+    {
+        Object[] actualArgs = new String[args.length + 1];
+        actualArgs[0] = getFieldLabel();
+        System.arraycopy(args, 0, actualArgs, 1, args.length);
+
+        String error = validationContext.getText(fieldName + "." + keySuffix, actualArgs);
+        if(error == null)
+        {
+            error = validationContext.getText("." + keySuffix, actualArgs);
+            if(error == null)
+            {
+                error = actualArgs[0] + " is invalid";
+            }
+        }
+
+        addErrorMessage(error);
+    }
+
+    public void addErrorMessage(String message)
+    {
+        validationContext.addFieldError(fieldName, message);
+    }
+
+    protected String getFieldLabel()
+    {
+        String label = validationContext.getText(fieldName + ".label");
+        if(label == null)
+        {
+            label = fieldName;
+        }
+        return label;
+    }
+
+    public void validate(Object obj) throws ValidationException
+    {
+        validateField(getFieldValue(fieldName, obj));
+    }
+
+    protected Object getFieldValue(String fieldName, Object target) throws ValidationException
     {
         try
         {
-            return BeanUtils.getProperty(name, target);
+            return BeanUtils.getProperty(fieldName, target);
         }
         catch (PropertyNotFoundException e)
         {
-            throw new ValidationException("Field '" + name + "' is not a property on object of type '" +
+            throw new ValidationException("Field '" + fieldName + "' is not a property on object of type '" +
                     target.getClass().getName() + "'");
         }
         catch (Exception e)
         {
-            throw new ValidationException("Failed to retrieve the field '" + name +
+            throw new ValidationException("Failed to retrieve the field '" + fieldName +
                     "' from an object of type '" + target.getClass().getName() +
                     "'. Cause: " + e.getMessage(), e);
         }
     }
 
-    protected Object[] getMessageArgs()
-    {
-        return new Object[]{getFieldName()};
-    }
-
-    public String getMessage()
-    {
-        // just a bit of craziness...
-        String message;
-
-        if (messageKey != null)
-        {
-            messageKey = messageKey.replace("${fieldName}", getFieldName());
-            message = validationContext.getText(messageKey, getMessageArgs());
-            if (message == null)
-            {
-                message = determineDefaultMessage();
-            }
-        }
-        else
-        {
-            message = determineDefaultMessage();
-        }
-
-        if (message == null)
-        {
-            message = "no.message.available";
-        }
-        return message;
-    }
-
-    private String determineDefaultMessage()
-    {
-        if (defaultMessage != null)
-        {
-            return defaultMessage;
-        }
-        else
-        {
-            if (defaultMessageKey != null)
-            {
-                defaultMessageKey = defaultMessageKey.replace("${fieldName}", getFieldName());
-                defaultMessage = validationContext.getText(defaultMessageKey, getMessageArgs());
-            }
-            if (defaultMessage == null)
-            {
-                defaultMessage = messageKey;
-            }
-            return defaultMessage;
-        }
-    }
-
-    public String getDefaultMessage()
-    {
-        return defaultMessage;
-    }
-
-    public void setDefaultMessage(String defaultMessage)
-    {
-        this.defaultMessage = defaultMessage;
-    }
-
-    public String getMessageKey()
-    {
-        return messageKey;
-    }
-
-    public void setMessageKey(String messageKey)
-    {
-        this.messageKey = messageKey;
-    }
-
-    protected void setDefaultMessageKey(String messageKey)
-    {
-        this.defaultMessageKey = messageKey;
-    }
-
-    // helper methods
-
-    protected void addFieldError(String fieldName)
-    {
-        validationContext.addFieldError(fieldName, getMessage());
-    }
-
-    protected void addActionError()
-    {
-        validationContext.addActionError(getMessage());
-    }
+    protected abstract void validateField(Object value) throws ValidationException;
 }

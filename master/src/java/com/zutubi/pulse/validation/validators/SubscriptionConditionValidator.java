@@ -9,7 +9,7 @@ import com.zutubi.pulse.condition.antlr.NotifyConditionLexer;
 import com.zutubi.pulse.condition.antlr.NotifyConditionParser;
 import com.zutubi.pulse.condition.antlr.NotifyConditionTreeParser;
 import com.zutubi.validation.ValidationException;
-import com.zutubi.validation.validators.FieldValidatorSupport;
+import com.zutubi.validation.validators.StringFieldValidatorSupport;
 
 import java.io.StringReader;
 
@@ -17,21 +17,19 @@ import java.io.StringReader;
  * Validates custom project subscription condition expressions by parsing
  * them.
  */
-public class SubscriptionConditionValidator extends FieldValidatorSupport
+public class SubscriptionConditionValidator extends StringFieldValidatorSupport
 {
     private NotifyConditionFactory notifyConditionFactory;
 
-    public void validate(Object object) throws ValidationException
+    public void validateStringField(String condition) throws ValidationException
     {
-        Object obj = getFieldValue(getFieldName(), object);
-        if(validateCondition((String) obj) == null)
-        {
-            addFieldError(getFieldName());
-        }
+        validateCondition(condition);
     }
 
     public NotifyCondition validateCondition(String condition)
     {
+        NotifyCondition result = null;
+
         try
         {
             NotifyConditionLexer lexer = new NotifyConditionLexer(new StringReader(condition));
@@ -42,37 +40,42 @@ public class SubscriptionConditionValidator extends FieldValidatorSupport
             {
                 NotifyConditionTreeParser tree = new NotifyConditionTreeParser();
                 tree.setNotifyConditionFactory(notifyConditionFactory);
-                return tree.cond(t);
+                result = tree.cond(t);
+            }
+
+            if(result == null)
+            {
+                addError();
             }
         }
         catch(MismatchedTokenException mte)
         {
             if(mte.token.getText() == null)
             {
-                setDefaultMessage("line " + mte.getLine() + ":" + mte.getColumn() + ": end of input when expecting " + NotifyConditionParser._tokenNames[mte.expecting]);
+                addErrorMessage("line " + mte.getLine() + ":" + mte.getColumn() + ": end of input when expecting " + NotifyConditionParser._tokenNames[mte.expecting]);
             }
             else
             {
-                setDefaultMessage(mte.toString());
+                addErrorMessage(mte.toString());
             }
         }
         catch(NoViableAltException nvae)
         {
             if(nvae.token.getText() == null)
             {
-                setDefaultMessage("line " + nvae.getLine() + ":" + nvae.getColumn() + ": unexpected end of input");
+                addErrorMessage("line " + nvae.getLine() + ":" + nvae.getColumn() + ": unexpected end of input");
             }
             else
             {
-                setDefaultMessage(nvae.toString());
+                addErrorMessage(nvae.toString());
             }
         }
         catch (Exception e)
         {
-            setDefaultMessage(e.toString());
+            addErrorMessage(e.toString());
         }
 
-        return null;
+        return result;
     }
 
     public void setNotifyConditionFactory(NotifyConditionFactory notifyConditionFactory)

@@ -5,29 +5,13 @@ import com.zutubi.validation.ValidationException;
 /**
  * Validates names used for entities in configuration.
  */
-public class NameValidator extends RegexValidator
+public class NameValidator extends StringFieldValidatorSupport
 {
-    public NameValidator()
+    public void validateStringField(String s) throws ValidationException
     {
-        setDefaultMessageKey(".invalid");
-        setMessageKey("${fieldName}.invalid");
-    }
-
-    public void validate(Object object) throws ValidationException
-    {
-        Object obj = getFieldValue(getFieldName(), object);
-        if (obj == null || !(obj instanceof String))
+        if(Character.isWhitespace(s.charAt(0)) || Character.isWhitespace(s.charAt(s.length() - 1)) || s.contains("/") || s.contains("\\") || s.contains("$"))
         {
-            return;
-        }
-
-        String s = (String) obj;
-        if(s.length() > 0)
-        {
-            if(Character.isWhitespace(s.charAt(0)) || Character.isWhitespace(s.charAt(s.length() - 1)) || s.contains("/") || s.contains("\\") || s.contains("$"))
-            {
-                addFieldError(getFieldName());
-            }
+            addError();
         }
     }
 }

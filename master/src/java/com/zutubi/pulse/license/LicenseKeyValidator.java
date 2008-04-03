@@ -9,18 +9,11 @@ import com.zutubi.validation.validators.FieldValidatorSupport;
  */
 public class LicenseKeyValidator extends FieldValidatorSupport
 {
-    public LicenseKeyValidator()
+    public void validateField(Object obj) throws ValidationException
     {
-        setDefaultMessageKey(".invalid");
-        setMessageKey("${fieldName}.invalid");
-    }
-
-    public void validate(Object object) throws ValidationException
-    {
-        Object obj = getFieldValue(getFieldName(), object);
         if (obj == null || !(obj instanceof String))
         {
-            addFieldError(getFieldName());
+            addError();
             return;
         }
 
@@ -36,7 +29,7 @@ public class LicenseKeyValidator extends FieldValidatorSupport
             if (decoder.decode(licenseKey.getBytes()) == null)
             {
                 // validation of the license key has failed.
-                addFieldError(getFieldName());
+                addError();
             }
         }
         catch (LicenseException e)
@@ -45,6 +38,5 @@ public class LicenseKeyValidator extends FieldValidatorSupport
             // the license key may in fact be valid.. lets ignore this problem
             // for now since we will deal with it as an action error later.
         }
-
     }
 }

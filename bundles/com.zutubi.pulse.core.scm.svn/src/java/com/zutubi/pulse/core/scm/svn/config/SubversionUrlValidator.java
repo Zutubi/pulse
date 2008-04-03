@@ -1,34 +1,24 @@
 package com.zutubi.pulse.core.scm.svn.config;
 
 import com.zutubi.validation.ValidationException;
-import com.zutubi.validation.validators.FieldValidatorSupport;
+import com.zutubi.validation.validators.StringFieldValidatorSupport;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
 
 /**
  * Validates that a string will parse as a Subversion URL.
  */
-public class SubversionUrlValidator extends FieldValidatorSupport
+public class SubversionUrlValidator extends StringFieldValidatorSupport
 {
-    public void validate(Object obj) throws ValidationException
+    public void validateStringField(String url) throws ValidationException
     {
-        Object value = getFieldValue(getFieldName(), obj);
-        if (value != null && value instanceof String)
+        try
         {
-            String url = (String) value;
-
-            if (url.length() > 0)
-            {
-                try
-                {
-                    SVNURL.parseURIDecoded(url);
-                }
-                catch (SVNException e)
-                {
-                    setDefaultMessage(e.getMessage());
-                    addFieldError(getFieldName());
-                }
-            }
+            SVNURL.parseURIDecoded(url);
+        }
+        catch (SVNException e)
+        {
+            addErrorMessage(e.getMessage());
         }
     }
 }

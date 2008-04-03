@@ -20,6 +20,13 @@ public class RequiredValidatorTest extends FieldValidatorTestCase
         return new RequiredValidator();
     }
 
+    public void setUp() throws Exception
+    {
+        super.setUp();
+
+        textProvider.addText("field.required", "field.required");
+    }
+
     public void testNullObject() throws ValidationException
     {
         validator.validate(new FieldProvider(null));
@@ -49,19 +56,10 @@ public class RequiredValidatorTest extends FieldValidatorTestCase
 
     public void testDefaultErrorMessageKey() throws ValidationException
     {
-        textProvider.addText(".required", "Required Field");
+        textProvider.addText("field.required", "Required Field");
         validator.validate(new FieldProvider(""));
         assertTrue(validationAware.hasFieldErrors());
         assertEquals(Arrays.asList("Required Field"), validationAware.getFieldErrors("field"));
-    }
-
-    public void testDefaultErrorMessage() throws ValidationException
-    {
-        textProvider.addText(".required", "Required Field");
-        ((RequiredValidator)validator).setDefaultMessage("Default Message");
-        validator.validate(new FieldProvider(""));
-        assertTrue(validationAware.hasFieldErrors());
-        assertEquals(Arrays.asList("Default Message"), validationAware.getFieldErrors("field"));
     }
 
     public void testErrorMessage() throws ValidationException

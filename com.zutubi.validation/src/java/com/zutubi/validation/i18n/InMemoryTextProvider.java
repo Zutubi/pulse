@@ -1,7 +1,8 @@
 package com.zutubi.validation.i18n;
 
-import java.util.Map;
+import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <class-comment/>
@@ -17,7 +18,12 @@ public class InMemoryTextProvider extends TextProviderSupport
 
     protected String lookupText(String key, Object... args)
     {
-        return texts.get(key);
+        String value = texts.get(key);
+        if (value != null)
+        {
+            value = MessageFormat.format(value, args);
+        }
+        return value;
     }
 }
 

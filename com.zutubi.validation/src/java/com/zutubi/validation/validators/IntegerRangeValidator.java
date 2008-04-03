@@ -3,7 +3,7 @@ package com.zutubi.validation.validators;
 /**
  * <class-comment/>
  */
-public class IntegerRangeValidator extends AbstractRangeValidator
+public class IntegerRangeValidator extends AbstractRangeValidator<Integer>
 {
     Integer max = null;
     Integer min = null;
@@ -18,7 +18,7 @@ public class IntegerRangeValidator extends AbstractRangeValidator
         return max;
     }
 
-    public Comparable getMaxComparatorValue()
+    public Integer getMaxComparatorValue()
     {
         return max;
     }
@@ -33,7 +33,7 @@ public class IntegerRangeValidator extends AbstractRangeValidator
         return min;
     }
 
-    public Comparable getMinComparatorValue()
+    public Integer getMinComparatorValue()
     {
         return min;
     }

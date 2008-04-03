@@ -1,9 +1,9 @@
 package com.zutubi.validation.annotations;
 
-import java.lang.annotation.Target;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * <class-comment/>
@@ -13,11 +13,21 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Numeric
 {
-    public static final int DEFAULT_max = Integer.MAX_VALUE;
+    static final String DEFAULT_defaultKeySuffix = "";
 
-    public static final int DEFAULT_min = Integer.MIN_VALUE;
+    static final boolean DEFAULT_shortCircuit = true;
+
+    static final int DEFAULT_max = Integer.MAX_VALUE;
+
+    static final int DEFAULT_min = Integer.MIN_VALUE;
+
+    String defaultKeySuffix() default DEFAULT_defaultKeySuffix;
+
+    boolean shortCircuit() default DEFAULT_shortCircuit;
 
     int max() default DEFAULT_max;
 
     int min() default DEFAULT_min;
 }
+
+

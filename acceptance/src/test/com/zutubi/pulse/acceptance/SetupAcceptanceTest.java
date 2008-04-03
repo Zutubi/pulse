@@ -74,7 +74,7 @@ public class SetupAcceptanceTest extends SeleniumTestBase
         assertFormFieldNotEmpty("zfid.data");
 
         form.nextFormElements("");
-        assertTextPresent("data requires a value");
+        assertTextPresent("pulse data directory requires a value");
         form.assertFormPresent();
 
         form.nextFormElements("data");
@@ -90,7 +90,7 @@ public class SetupAcceptanceTest extends SeleniumTestBase
         licenseForm.nextFormElements("");
         licenseForm.assertFormPresent();
         licenseForm.assertFormElements("");
-        assertTextPresent("license requires a value");
+        assertTextPresent("license key requires a value");
 
         // check that license validation works.
         licenseForm.nextFormElements(invalidLicenseKey);

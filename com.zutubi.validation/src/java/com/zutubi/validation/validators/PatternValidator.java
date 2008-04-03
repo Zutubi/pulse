@@ -6,38 +6,19 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 /**
- * <class comment/>
+ * Validates that a string field can be compiled as a regular expression.
  */
-public class PatternValidator extends FieldValidatorSupport
+public class PatternValidator extends StringFieldValidatorSupport
 {
-    public PatternValidator()
+    public void validateStringField(String str) throws ValidationException
     {
-        setDefaultMessageKey(".invalid");
-        setMessageKey("${fieldName}.invalid");
-    }
-
-    public void validate(Object obj) throws ValidationException
-    {
-        Object fieldValue = getFieldValue(getFieldName(), obj);
-        if (fieldValue == null)
+        try
         {
-            addFieldError(getFieldName());
-            return;
+            Pattern.compile(str);
         }
-
-        if (fieldValue instanceof String)
+        catch (PatternSyntaxException e)
         {
-            String str = ((String) fieldValue);
-
-            try
-            {
-                Pattern.compile(str);
-            }
-            catch (PatternSyntaxException e)
-            {
-                setDefaultMessage(getDefaultMessage());
-                validationContext.addFieldError(getFieldName(), e.getMessage());
-            }
+            addErrorMessage(e.getMessage());
         }
     }
 }

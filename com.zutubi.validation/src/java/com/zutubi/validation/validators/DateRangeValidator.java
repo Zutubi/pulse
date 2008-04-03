@@ -1,13 +1,13 @@
 package com.zutubi.validation.validators;
 
-import java.util.Date;
-import java.text.SimpleDateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * <class-comment/>
  */
-public class DateRangeValidator extends AbstractRangeValidator
+public class DateRangeValidator extends AbstractRangeValidator<Date>
 {
     private String dateFormat = "dd/MM/yyyy";
 
@@ -34,7 +34,7 @@ public class DateRangeValidator extends AbstractRangeValidator
         return min;
     }
 
-    protected Comparable getMaxComparatorValue()
+    protected Date getMaxComparatorValue()
     {
         if (max != null)
         {
@@ -47,10 +47,10 @@ public class DateRangeValidator extends AbstractRangeValidator
                 e.printStackTrace();
             }
         }
-        return max;
+        return null;
     }
 
-    protected Comparable getMinComparatorValue()
+    protected Date getMinComparatorValue()
     {
         if (min != null)
         {
@@ -63,7 +63,7 @@ public class DateRangeValidator extends AbstractRangeValidator
                 e.printStackTrace();
             }
         }
-        return min;
+        return null;
     }
 
     private Date toDate(String str) throws ParseException

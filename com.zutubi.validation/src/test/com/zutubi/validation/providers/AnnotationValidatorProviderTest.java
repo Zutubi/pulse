@@ -52,12 +52,12 @@ public class AnnotationValidatorProviderTest extends TestCase
         assertEquals(20, n.getMax());
     }
 
-    public void testCustomMessageKeyDefinedOnConstraint()
+    public void testCustomKeySuffixDefinedOnConstraint()
     {
         MockAnimal animal = new MockAnimal();
         List<Validator> validators = provider.getValidators(animal, null);
         RequiredValidator r = (RequiredValidator) validators.get(0);
-        assertEquals("animal.head.required", r.getMessageKey());
+        assertEquals("myrequired", r.getDefaultKeySuffix());
     }
 
     public void testNestedValidation()

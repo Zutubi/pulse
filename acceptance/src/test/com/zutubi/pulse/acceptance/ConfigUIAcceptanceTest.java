@@ -163,7 +163,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         form.waitFor();
         EmailSettingsCheckForm checkForm = new EmailSettingsCheckForm(form);
         checkForm.checkAndAssertResult(false, "unable to check configuration due to validation errors", "");
-        assertTextPresent("emailAddress requires a value");
+        assertTextPresent("recipient address requires a value");
     }
 
     public void testCheckFormInWizard() throws Exception

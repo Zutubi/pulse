@@ -13,4 +13,11 @@ import java.lang.annotation.Target;
 @Constraint("com.zutubi.validation.validators.URLValidator")
 public @interface Url
 {
+    static final String DEFAULT_defaultKeySuffix = "";
+
+    static final boolean DEFAULT_shortCircuit = true;
+
+    String defaultKeySuffix() default DEFAULT_defaultKeySuffix;
+
+    boolean shortCircuit() default DEFAULT_shortCircuit;    
 }

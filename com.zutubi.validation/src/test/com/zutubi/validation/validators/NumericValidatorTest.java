@@ -15,6 +15,14 @@ public class NumericValidatorTest extends FieldValidatorTestCase
         super(testName);
     }
 
+    public void setUp() throws Exception
+    {
+        super.setUp();
+        
+        textProvider.addText("field.min", "field.min");
+        textProvider.addText("field.max", "field.max");
+    }
+
     protected FieldValidator createValidator()
     {
         return new NumericValidator();

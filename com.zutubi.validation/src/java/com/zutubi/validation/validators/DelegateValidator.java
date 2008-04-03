@@ -14,10 +14,8 @@ public class DelegateValidator extends FieldValidatorSupport
 {
     private ValidationManager validationManager;
 
-    public void validate(Object obj) throws ValidationException
+    public void validateField(Object value) throws ValidationException
     {
-        String fieldName = getFieldName();
-        Object value = getFieldValue(fieldName, obj);
         if (value != null)
         {
             // validate the value object.
@@ -26,23 +24,24 @@ public class DelegateValidator extends FieldValidatorSupport
                 Collection coll = (Collection) value;
                 Object[] array = coll.toArray();
 
-                validateArrayElements(array, fieldName);
+                validateArrayElements(array);
             }
             else if (value instanceof Object[])
             {
                 Object[] array = (Object[]) value;
 
-                validateArrayElements(array, fieldName);
+                validateArrayElements(array);
             }
             else
             {
-                validateObject(value, fieldName);
+                validateObject(value, getFieldName());
             }
         }
     }
 
-    private void validateArrayElements(Object[] array, String fieldName) throws ValidationException
+    private void validateArrayElements(Object[] array) throws ValidationException
     {
+        String fieldName = getFieldName();
         for (int i = 0; i < array.length; i++)
         {
             validateObject(array[i], fieldName + "[" + i + "]");
@@ -54,11 +53,6 @@ public class DelegateValidator extends FieldValidatorSupport
         validationManager.validate(value, new AppendingValidationContext(validationContext, value, fieldName));
     }
 
-    /**
-     * Required resource.
-     *
-     * @param validationManager
-     */
     public void setValidationManager(ValidationManager validationManager)
     {
         this.validationManager = validationManager;

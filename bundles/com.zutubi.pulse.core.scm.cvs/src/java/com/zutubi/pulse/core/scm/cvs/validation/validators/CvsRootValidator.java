@@ -1,36 +1,24 @@
 package com.zutubi.pulse.core.scm.cvs.validation.validators;
 
-import org.netbeans.lib.cvsclient.CVSRoot;
-import com.zutubi.validation.validators.FieldValidatorSupport;
 import com.zutubi.validation.ValidationException;
+import com.zutubi.validation.validators.StringFieldValidatorSupport;
+import org.netbeans.lib.cvsclient.CVSRoot;
 
 /**
  *
  *
  */
-public class CvsRootValidator extends FieldValidatorSupport
+public class CvsRootValidator extends StringFieldValidatorSupport
 {
-    public CvsRootValidator()
+    public void validateStringField(String value) throws ValidationException
     {
-        setDefaultMessageKey(".invalid");
-        setMessageKey("${fieldName}.invalid");
-    }
-
-    public void validate(Object object) throws ValidationException
-    {
-        Object obj = getFieldValue(getFieldName(), object);
-        if (obj == null)
-        {
-            return;
-        }
         try
         {
-            CVSRoot.parse((String) obj);
+            CVSRoot.parse(value);
         }
         catch (IllegalArgumentException iae)
         {
-            setDefaultMessage(iae.getMessage());
-            addFieldError(getFieldName());
+            addError(iae.getMessage());
         }
     }
 }

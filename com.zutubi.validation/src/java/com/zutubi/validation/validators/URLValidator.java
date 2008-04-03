@@ -1,54 +1,25 @@
 package com.zutubi.validation.validators;
 
 import com.zutubi.validation.ValidationException;
-import com.zutubi.util.TextUtils;
 
-import java.net.URL;
 import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
- * <class-comment/>
+ * Checks for valid URLs.
  */
-public class URLValidator extends FieldValidatorSupport
+public class URLValidator extends StringFieldValidatorSupport
 {
-    public URLValidator()
+    public void validateStringField(String value) throws ValidationException
     {
-        setMessageKey("${fieldName}.invalid");
-        setDefaultMessageKey(".invalid");
-    }
-
-    public void validate(Object obj) throws ValidationException
-    {
-        String fieldName = getFieldName();
-        Object value = this.getFieldValue(fieldName, obj);
-
-        if (value == null || value.toString().length() == 0)
-        {
-            return;
-        }
-
-        if (!(value.getClass().equals(String.class)) || !verifyUrl((String) value))
-        {
-            addFieldError(fieldName);
-        }
-    }
-
-    private boolean verifyUrl(String url)
-    {
-        if (url == null)
-        {
-            return false;
-        }
-
         try
         {
-            new URL(url);
-
-            return true;
+            new URL(value);
         }
         catch (MalformedURLException e)
         {
-            return false;
+            addError();
         }
     }
+
 }
