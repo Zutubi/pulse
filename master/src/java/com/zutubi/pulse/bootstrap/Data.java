@@ -150,9 +150,7 @@ public class Data implements MasterUserPaths
         }
 
         FileSystemUtils.copy(new File(tmpBackup, CONFIG_FILE_NAME), getConfigFile());
-
         ZipUtils.createZip(backup, tmpBackup, null);
-
         FileSystemUtils.rmdir(tmpBackup);
         // - done.
     }

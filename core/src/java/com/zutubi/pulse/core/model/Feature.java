@@ -1,7 +1,12 @@
 package com.zutubi.pulse.core.model;
 
+import com.zutubi.pulse.util.StringUtils;
+
 public class Feature extends Entity
 {
+    private static final int MAX_SUMMARY_LENGTH = 4095;
+    private static final String SUMMARY_TRIM_MESSAGE = "... [trimmed]";
+
     public enum Level
     {
         INFO
@@ -43,7 +48,7 @@ public class Feature extends Entity
     public Feature(Level level, String summary)
     {
         this.level = level;
-        this.summary = summary;
+        this.summary = StringUtils.trimmedString(summary, MAX_SUMMARY_LENGTH, SUMMARY_TRIM_MESSAGE);
     }
 
     public Level getLevel()
@@ -56,6 +61,16 @@ public class Feature extends Entity
         return summary;
     }
 
+    private void setSummary(String summary)
+    {
+        this.summary = summary;
+    }
+
+    public void appendToSummary(String s)
+    {
+        this.summary = StringUtils.trimmedString(this.summary + s, MAX_SUMMARY_LENGTH, SUMMARY_TRIM_MESSAGE);
+    }
+
     private String getLevelName()
     {
         return level.name();
@@ -64,11 +79,6 @@ public class Feature extends Entity
     private void setLevelName(String name)
     {
         level = Level.valueOf(name);
-    }
-
-    public void setSummary(String summary)
-    {
-        this.summary = summary;
     }
 
     public boolean isPlain()

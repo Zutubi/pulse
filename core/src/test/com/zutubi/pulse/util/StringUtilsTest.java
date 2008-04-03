@@ -44,6 +44,28 @@ public class StringUtilsTest extends PulseTestCase
         assertEquals("", StringUtils.trimmedString("12345", 0));
     }
 
+    public void testTrimStringNegativeLimit()
+    {
+        try
+        {
+            StringUtils.trimmedString("", -1);
+            fail();
+        }
+        catch(IllegalArgumentException e)
+        {
+        }
+    }
+
+    public void testTrimStringCustomMessage()
+    {
+        assertEquals("this is a long s... [my message]", StringUtils.trimmedString("this is a long string that will need trimming", 32, "... [my message]"));
+    }
+
+    public void testTrimStringCustomMessageTooLong()
+    {
+        assertEquals("... [my me", StringUtils.trimmedString("this is a long string that will need trimming", 10, "... [my message]"));
+    }
+
     public void testWrapShort()
     {
         assertEquals("12345", StringUtils.wrapString("12345", 10, null));
@@ -364,6 +386,26 @@ public class StringUtilsTest extends PulseTestCase
     public void testUrlEncodePathEmpty()
     {
         assertEquals("", StringUtils.urlEncodePath(""));
+    }
+
+    public void testTimesEmptyString()
+    {
+        assertEquals("", StringUtils.times("", 10));
+    }
+
+    public void testTimesZeroCount()
+    {
+        assertEquals("", StringUtils.times("hello", 0));
+    }
+    
+    public void testTimesOneCount()
+    {
+        assertEquals("hello", StringUtils.times("hello", 1));
+    }
+
+    public void testTimes()
+    {
+        assertEquals("123123123", StringUtils.times("123", 3));
     }
 
     private void splitHelper(String s, String... expected)

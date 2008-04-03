@@ -204,7 +204,7 @@ public class RegexPostProcessor implements PostProcessor, Validateable
             PlainFeature previous = features.get(features.size() - 1);
             long overlappingLines = previous.getLastLine() - feature.getFirstLine() + 1;
             String remainingSummary = getRemainingSummary(feature.getSummary(), overlappingLines);
-            previous.setSummary(previous.getSummary() + remainingSummary);
+            previous.appendToSummary(remainingSummary);
             previous.setLastLine(feature.getLastLine());
         }
         else
