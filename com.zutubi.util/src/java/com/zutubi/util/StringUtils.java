@@ -37,33 +37,50 @@ public class StringUtils
     }
 
     /**
-     * Returns the given string, trimmed if necessary to the given maximum
-     * length.  Upon trimming, the last 3 characters in the returned string
-     * will be "...": and the returned string will be exactly length
-     * characters long including these dots.  If 3 characters cannot fit
-     * under the limit, only length dots will be returned.
+     * Equivalent to calling {@link #trimmedString(String, int, String)} with
+     * the given string and length and a trim message of "...".
      *
      * @param s      the string to trim
      * @param length the maximum length of the returned string
      * @return the given string, trimmed if necessary
+     * @throws IllegalArgumentException if length is negative
      */
     public static String trimmedString(String s, int length)
     {
+        return trimmedString(s, length, "...");
+    }
+
+    /**
+     * Returns the given string, trimmed if necessary to the given maximum
+     * length.  Upon trimming, the returned string will end with the given
+     * trim message and be exactly length characters long including this
+     * message.  If the trim message cannot fit within length, it will, be
+     * truncated after length characters.
+     *
+     * @param s           the string to trim
+     * @param length      the maximum length of the returned string
+     * @param trimMessage message to append to a trimmed string (can be
+     *                    empty)
+     * @return the given string, trimmed if necessary
+     * @throws IllegalArgumentException if length is negative
+     */
+    public static String trimmedString(String s, int length, String trimMessage)
+    {
+        if(length < 0)
+        {
+            throw new IllegalArgumentException("Length must be non-negative (got " + length + ")");
+        }
+
         if (s.length() > length)
         {
-            if (length >= 3)
+            int trimMessageLength = trimMessage.length();
+            if (length >= trimMessageLength)
             {
-                return s.substring(0, length - 3) + "...";
+                return s.substring(0, length - trimMessageLength) + trimMessage;
             }
             else
             {
-                String result = "";
-                for (int i = 0; i < length; i++)
-                {
-                    result += ".";
-                }
-
-                return result;
+                return trimMessage.substring(0, length);
             }
         }
 
@@ -1260,5 +1277,24 @@ public class StringUtils
     public static String stripLineBreaks(String s)
     {
         return s.replaceAll("\r|\n", "");
+    }
+
+    /**
+     * Returns a string that is built by concatenating together count copies
+     * of s.
+     *
+     * @param s     string to multiply to produce result
+     * @param count number of copies of s to concatenate
+     * @return count copies of s concatentated together
+     */
+    public static String times(String s, int count)
+    {
+        StringBuilder result = new StringBuilder(count * s.length());
+        for(int i = 0; i < count; i++)
+        {
+            result.append(s);
+        }
+
+        return result.toString();
     }
 }
