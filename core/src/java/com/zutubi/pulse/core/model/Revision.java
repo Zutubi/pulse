@@ -26,7 +26,10 @@ public class Revision extends Entity implements Comparable<Revision>
     public Revision(String author, String comment, Date date)
     {
         this.author = author;
-        this.comment = StringUtils.trimmedString(comment, MAX_COMMENT_LENGTH, COMMENT_TRIM_MESSAGE);
+        if (comment != null)
+        {
+            this.comment = StringUtils.trimmedString(comment, MAX_COMMENT_LENGTH, COMMENT_TRIM_MESSAGE);
+        }
         setDate(date);
     }
 
