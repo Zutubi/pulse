@@ -71,7 +71,7 @@ public class RegexTestPostProcessorTest extends PulseTestCase
 
     public void testConflictsAppend() throws FileLoadException
     {
-        TestSuiteResult tests = process("append", false);
+        TestSuiteResult tests = process("append", false, -1);
         assertEquals(5, tests.getTotal());
         assertTrue(tests.hasCase(" <TEST COMMAND0>"));
         assertTrue(tests.hasCase(" <TEST COMMAND1>"));
@@ -91,7 +91,7 @@ public class RegexTestPostProcessorTest extends PulseTestCase
 
     public void testConflictsPrepend() throws FileLoadException
     {
-        TestSuiteResult tests = process("prepend", false);
+        TestSuiteResult tests = process("prepend", false, -1);
         assertEquals(5, tests.getTotal());
         assertTrue(tests.hasCase(" <TEST COMMAND0>"));
         assertTrue(tests.hasCase(" <TEST COMMAND1>"));
@@ -102,7 +102,7 @@ public class RegexTestPostProcessorTest extends PulseTestCase
 
     public void testAutoFail() throws FileLoadException
     {
-        TestSuiteResult tests = process("off", true);
+        TestSuiteResult tests = process("off", true, -1);
         assertEquals(5, tests.getTotal());
         assertEquals(3, tests.getFailures());
         assertEquals(1, tests.getErrors());
@@ -126,17 +126,27 @@ public class RegexTestPostProcessorTest extends PulseTestCase
         assertFalse(tests.hasCase("test5"));
     }
 
-    private TestSuiteResult process() throws FileLoadException
+    public void testDetails() throws FileLoadException
     {
-        return process("off", false);
+        TestSuiteResult tests = process("off", false, 3);
+        assertEquals(4, tests.getTotal());
+        assertEquals(2, tests.getFailures());
+        assertEquals("fail 1 details", tests.getCase(" <FAIL1>").getMessage());
+        assertEquals("fail 2 details", tests.getCase(" <FAIL2>").getMessage());
     }
 
-    private TestSuiteResult process(String resolution, boolean autoFail) throws FileLoadException
+    private TestSuiteResult process() throws FileLoadException
+    {
+        return process("off", false, -1);
+    }
+
+    private TestSuiteResult process(String resolution, boolean autoFail, int detailsGroup) throws FileLoadException
     {
         RegexTestPostProcessor pp = new RegexTestPostProcessor();
-        pp.setRegex("\\[(.*)\\] .*EDT:(.*)");
+        pp.setRegex("\\[(.*)\\] .*EDT:([^:]*)(?:\\: (.*))?");
         pp.setStatusGroup(1);
         pp.setNameGroup(2);
+        pp.setDetailsGroup(detailsGroup);
         pp.setPassStatus("PASS");
         pp.setFailureStatus("FAIL");
         pp.setResolveConflicts(resolution);
