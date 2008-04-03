@@ -367,12 +367,6 @@
             <result name="success" type="redirect">viewUsers.action?startPage=${startPage}</result>
         </action>
 
-        <action name="editLicense" class="com.zutubi.pulse.web.admin.ManageLicenseAction">
-            <result name="input" type="velocity">edit-license.vm</result>
-            <result name="success" type="redirect">/admin/serverSettings.action</result>
-            <result name="cancel" type="redirect">/admin/serverSettings.action</result>
-        </action>
-
         <action name="addSystemProperty" class="com.zutubi.pulse.web.admin.SystemPropertiesAction" method="doAdd">
             <result name="success" type="redirect">/admin/serverSettings.action</result>
         </action>

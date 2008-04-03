@@ -253,7 +253,19 @@ public class PulseActionMapper implements ActionMapper
 
     private ActionMapping getAdminMapping(String path, HttpServletRequest request)
     {
-        if(path.startsWith("plugins"))
+        if(path.startsWith("actions"))
+        {
+            // /admin/actions?action=method takes your to:
+            //   <action>!<method>
+            if(TextUtils.stringSet(request.getQueryString()))
+            {
+                String[] pieces = request.getQueryString().split("=", 2);
+                return new ActionMapping(pieces[0], ADMIN_NAMESPACE, pieces.length > 1 ? pieces[1] : null, null);
+            }
+
+            return null;
+        }
+        else if(path.startsWith("plugins"))
         {
             // /admin/plugins?<action>=<method> takes you to:
             //   <action>Plugin.action!<method>

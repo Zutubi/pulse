@@ -299,6 +299,7 @@ The beans defined within the security subsystem need not be accessed by other co
                 /rss.action*=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER
                 /view/**/*=ROLE_GUEST,ROLE_USER
                 /file/**/*=ROLE_GUEST,ROLE_USER
+                /admin/actions/**=ADMINISTER
                 /admin/settings/**=ADMINISTER
                 /admin/users/**=ADMINISTER
                 /admin/groups/**=ADMINISTER
