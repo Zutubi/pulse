@@ -194,7 +194,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         assertTextPresent("clone name is required");
 
         cloneForm.cloneFormElements(random);
-        cloneForm.assertFormPresent();
+        cloneForm.waitFor();
         assertTextPresent("name is already in use");
     }
 
