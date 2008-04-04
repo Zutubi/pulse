@@ -81,7 +81,7 @@ public class DirectoryArtifact extends LocalArtifact
 
         if (!base.exists())
         {
-            if(getFailIfNotPresent())
+            if(result.succeeded() && getFailIfNotPresent())
             {
                 throw new BuildException("Capturing artifact '" + getName() + "': base directory '" + base.getAbsolutePath() + "' does not exist");
             }

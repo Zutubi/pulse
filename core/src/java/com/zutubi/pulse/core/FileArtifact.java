@@ -63,7 +63,7 @@ public class FileArtifact extends LocalArtifact
             {
                 // absolute file without wildcards that does not exist. This will be picked up by the getFailIfNotPresent
                 // check at the end of this method.
-                if (getFailIfNotPresent())
+                if (result.succeeded() && getFailIfNotPresent())
                 {
                     throw new BuildException("Capturing artifact '" + getName() + "': no file matching '" + file + "' exists");
                 }
@@ -95,7 +95,7 @@ public class FileArtifact extends LocalArtifact
         }
         else
         {
-            if (getFailIfNotPresent())
+            if (result.succeeded() && getFailIfNotPresent())
             {
                 throw new BuildException("Capturing artifact '" + getName() + "': no file matching '" + file + "' exists");
             }

@@ -51,6 +51,8 @@ public class FileArtifactTest extends PulseTestCase
         fileArtifactObject.setName("test");
         fileArtifactObject.setFailIfNotPresent(false);
         result = new CommandResult("test");
+        result.commence();
+        result.complete();
     }
 
     protected void tearDown() throws Exception
