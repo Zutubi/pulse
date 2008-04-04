@@ -7,13 +7,14 @@ import com.zutubi.util.Sort;
 import java.util.*;
 
 /**
- *
- *
+ * The main page for the browse view, which shows the latest build of each
+ * project, with projects grouped where applicable.
  */
 public class ViewProjectsAction extends ProjectActionSupport
 {
     private List<ProjectGroup> groups;
     private List<Project> projects;
+    private int totalProjectCount;
     private BuildColumns buildColumns;
     private Map<Long, String> projectHealths = new HashMap<Long, String>();
     private Map<Long, BuildResult> latestBuilds = new HashMap<Long, BuildResult>();
@@ -26,6 +27,11 @@ public class ViewProjectsAction extends ProjectActionSupport
     public List<ProjectGroup> getGroups()
     {
         return groups;
+    }
+
+    public int getTotalProjectCount()
+    {
+        return totalProjectCount;
     }
 
     public String getHealth(Project project)
@@ -56,6 +62,7 @@ public class ViewProjectsAction extends ProjectActionSupport
         });
 
         projects = getProjectManager().getProjects(false);
+        totalProjectCount = projects.size();
         for (Project p : projects)
         {
             String health = "unknown";
@@ -109,7 +116,7 @@ public class ViewProjectsAction extends ProjectActionSupport
             projects.removeAll(g.getProjects());
         }
 
-//        Collections.sort(projects, new NamedEntityComparator());
+        Collections.sort(projects, new NamedEntityComparator());
 
         User user = getLoggedInUser();
         buildColumns = new BuildColumns(user == null ? UserSettingsConfiguration.defaultAllProjectsColumns() : user.getPreferences().getSettings().getAllProjectsColumns(), projectManager);

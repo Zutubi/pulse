@@ -6,7 +6,6 @@
     <title>$!webwork.htmlEncode($project.name)</title>
     <script type="text/javascript" src="/js/yahoo/utilities.js"></script>
     <script type="text/javascript" src="$base/js/prototype.js"></script>
-    <script type="text/javascript" src="$base/js/scriptaculous/scriptaculous.js"></script>
     <script type="text/javascript" src="$base/js/buildcolumns.js"></script>
     <script type="text/javascript">
     //<![CDATA[
@@ -16,8 +15,8 @@
         var summaryPopup;
         var recentPopup;
         YAHOO.util.Event.addListener(window, "load", function() {
-            summaryPopup = new BuildColumnPopup("project.summary", "$base", "$ajaxUrl", "panel");
-            recentPopup = new BuildColumnPopup("project.recent", "$base", "$ajaxUrl", "panel");
+            summaryPopup = new BuildColumnPopup("project.summary", "$base", "$ajaxUrl", "project-home-#uce($project.name)");
+            recentPopup = new BuildColumnPopup("project.recent", "$base", "$ajaxUrl", "project-home-#uce($project.name)");
         });
     //]]>
     </script>

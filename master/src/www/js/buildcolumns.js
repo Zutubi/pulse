@@ -6,7 +6,6 @@ var keyToText = {
         'project': 'project',
         'reason': 'reason',
         'rev': 'revision',
-        'spec': 'spec',
         'status': 'status',
         'tests': 'tests',
         'version': 'version',

@@ -2423,7 +2423,7 @@
                 </th>
             </tr>
             <tr>
-                <td class="content" style="padding-top: 0">
+                <td style="padding-top: 0">
                     <h3 class="popup">#wwtext("name=build.columns.order")</h3>
                     <table>
                         <tr id="build-header-row-$idSuffix">
@@ -2431,7 +2431,7 @@
                     </table>
 
                     <h3 class="popup">#wwtext("name=build.columns.select")</h3>
-                    <table class="columns">
+                    <table class="build-columns">
                         <tr>
                             #buildColumnCheckbox("id" $idSuffix $popupName)
                             #buildColumnCheckbox("project" $idSuffix $popupName)
@@ -2454,12 +2454,12 @@
                     </table>
 
                     <div class="popup-actions">
-                        <a href="#" onclick="${popupName}.applyBuildColumns(); return false;">
+                        <a href="#" class="unadorned" onclick="${popupName}.applyBuildColumns(); return false;">
                             <img alt="accept" src="$base/images/accept.gif"/>
                             #wwtext("name=build.columns.apply")
                         </a>
                         &nbsp;
-                        <a href="#" onclick="${popupName}.cancelBuildColumns(); return false;">
+                        <a href="#" class="unadorned" onclick="${popupName}.cancelBuildColumns(); return false;">
                             <img alt="cancel" src="$base/images/cancel.gif"/>
                             #wwtext("name=build.columns.cancel")
                         </a>

@@ -63,11 +63,20 @@
         </table>
 #end
 
-#foreach($group in $groups)
-    #recentBuilds($group $group.projects)
-#end
-#if($projects.size() > 0)
-    #recentBuilds(false $projects)
+#if($totalProjectCount > 0)
+    #foreach($group in $groups)
+        #recentBuilds($group $group.projects)
+    #end
+    #if($projects.size() > 0)
+        #recentBuilds(false $projects)
+    #end
+#else
+    <p>
+        No projects found.
+    #auth("path=projects" "action=create")
+        You can add new projects at the <a href="$urls.adminProjects()">projects tab</a> in the administration section.
+    #end
+    </p>
 #end
 
 #buildTableColumns($columns "all.projects")

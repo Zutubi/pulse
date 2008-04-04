@@ -505,6 +505,10 @@ div.floating {
     padding: 5px;
 }
 
+table.build-columns td {
+    border: none;
+}
+
     /*------------------------------
     Artifact/feature lists
     */
@@ -775,6 +779,7 @@ div.panecontent
 h3.popup {
     font-size: 100%;
     margin-top: 1em;
+    margin-bottom: 0.7em;
 }
 
 div.popup-actions {
