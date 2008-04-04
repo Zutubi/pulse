@@ -4,13 +4,15 @@ import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.events.build.*;
+import com.zutubi.pulse.util.Pair;
+import com.zutubi.pulse.util.Sort;
 import com.zutubi.util.IOUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
-import java.util.Date;
+import java.util.*;
 
 /**
  * A logger that writes the details out to a log file.
@@ -79,6 +81,38 @@ public class DefaultRecipeLogger implements RecipeLogger
         }
 
         logMarker("Command '" + result.getCommandName() + "' completed with status " + result.getState().getPrettyString(), result.getStamps().getEndTime());
+        if (result.getProperties().size() > 0)
+        {
+            List<Pair<String, String>> details = new ArrayList<Pair<String, String>>(result.getProperties().size());
+            int longestKey = 0;
+            for (Map.Entry property: result.getProperties().entrySet())
+            {
+                Pair<String, String> detail = new Pair<String, String>(property.getKey().toString(), property.getValue().toString());
+                int keyLength = detail.first.length();
+                if (keyLength > longestKey)
+                {
+                    longestKey = keyLength;
+                }
+
+                details.add(detail);
+            }
+
+            final Comparator<String> stringComparator = new Sort.StringComparator();
+            Collections.sort(details, new Comparator<Pair<String, String>>()
+            {
+                public int compare(Pair<String, String> o1, Pair<String, String> o2)
+                {
+                    return stringComparator.compare(o1.first, o2.first);
+                }
+            });
+
+            logMarker("Command details: ");
+            for(Pair<String, String> detail: details)
+            {
+                logMarker(String.format("    %" + longestKey + "s: %s", detail.first, detail.second));
+            }
+            logMarker("End command details.");
+        }
     }
 
     public void log(RecipeCompletedEvent event, RecipeResult result)
