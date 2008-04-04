@@ -13,7 +13,7 @@ public class BuildTimesChartDemo extends ChartDemoSupport
 {
     public static void main(final String[] args) throws IOException
     {
-        final BuildTimesChart chart = new BuildTimesChart(false);
+        final BuildTimesChart chart = new BuildTimesChart(false, false);
         BuildResultsDataSource source = DemoDataSourceFactory.createBuildResultsDataSource();
         TimeBasedChartData data = new TimeBasedChartData();
         data.setTimeframe(35);

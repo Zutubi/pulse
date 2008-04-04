@@ -21,6 +21,7 @@ public class ViewReportsAction extends ProjectActionBase
     private Map stageTimesChart;
 
     private int timeframe = 45;
+    private boolean zoom = false;
 
     private BuildResultDao buildResultDao;
 
@@ -32,6 +33,16 @@ public class ViewReportsAction extends ProjectActionBase
     public void setTimeframe(int timeframe)
     {
         this.timeframe = timeframe;
+    }
+
+    public boolean isZoom()
+    {
+        return zoom;
+    }
+
+    public void setZoom(boolean zoom)
+    {
+        this.zoom = zoom;
     }
 
     public String doInput() throws Exception
@@ -65,15 +76,15 @@ public class ViewReportsAction extends ProjectActionBase
         chart.setData(chartData);
         this.buildResultsChart = ChartUtils.renderForWeb(chart.render(), WIDTH, HEIGHT);
 
-        BuildTimesChart btChart = new BuildTimesChart(false);
+        BuildTimesChart btChart = new BuildTimesChart(false, zoom);
         btChart.setData(chartData);
         this.buildTimesChart = ChartUtils.renderForWeb(btChart.render(), WIDTH, HEIGHT);
 
-        BuildTimesChart stChart = new BuildTimesChart(true);
+        BuildTimesChart stChart = new BuildTimesChart(true, zoom);
         stChart.setData(chartData);
         this.stageTimesChart = ChartUtils.renderForWeb(stChart.render(), WIDTH, HEIGHT);
 
-        TestCountChart tcChart = new TestCountChart();
+        TestCountChart tcChart = new TestCountChart(zoom);
         tcChart.setData(chartData);
         this.testCountChart = ChartUtils.renderForWeb(tcChart.render(), WIDTH, HEIGHT);
 
