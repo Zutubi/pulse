@@ -31,7 +31,7 @@
     </tr>
     <tr>
         <td colspan="2" style="padding-left: 30px">
-            #wwcform("action=projectReports.action" "heading=%{getText('chart.parameters')}" "colspan=7" "width=100%" "method=post")
+            #wwcform("action=projectReports.action" "heading=%{getText('chart.parameters')}" "colspan=5" "width=100%" "method=post")
                 #wwhidden("name=projectName")
                 <tr>
                     #wwselect("name=timeframe" "label=%{getText('chart.timeframe')}" "list=timeframes" "singleRow=true" "tabindex=1")
