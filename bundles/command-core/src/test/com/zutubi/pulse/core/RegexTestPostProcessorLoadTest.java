@@ -18,6 +18,7 @@ public class RegexTestPostProcessorLoadTest extends FileLoaderTestBase
         assertEquals("\\[(.*)\\].*E[S|D]T:(.*)", pp.getRegex().trim());
         assertEquals(1, pp.getStatusGroup());
         assertEquals(2, pp.getNameGroup());
+        assertEquals(0, pp.getDetailsGroup());
         assertEquals("PASS", pp.getPassStatus());
         assertEquals("FAIL", pp.getFailureStatus());
         assertEquals(RegexTestPostProcessor.Resolution.APPEND, pp.getResolveConflicts());

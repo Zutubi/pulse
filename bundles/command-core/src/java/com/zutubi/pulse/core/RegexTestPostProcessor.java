@@ -4,8 +4,8 @@ import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.TestCaseResult;
 import com.zutubi.pulse.core.model.TestSuiteResult;
 import com.zutubi.util.IOUtils;
-import com.zutubi.util.logging.Logger;
 import com.zutubi.util.TextUtils;
+import com.zutubi.util.logging.Logger;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -37,6 +37,7 @@ public class RegexTestPostProcessor extends TestReportPostProcessor
     private String regex;
     private int statusGroup;
     private int nameGroup;
+    private int detailsGroup = -1;
 
     private boolean autoFail = false;
     private boolean trim = true;
@@ -106,8 +107,11 @@ public class RegexTestPostProcessor extends TestReportPostProcessor
                 {
                     String testName = m.group(nameGroup);
 
-                    TestCaseResult result = new TestCaseResult();
-                    result.setName(testName);
+                    TestCaseResult result = new TestCaseResult(testName);
+                    if (detailsGroup >= 0)
+                    {
+                        result.setMessage(m.group(detailsGroup));
+                    }
 
                     TestCaseResult.Status status = statusMap.get(statusString);
                     if(status == null)
@@ -186,6 +190,16 @@ public class RegexTestPostProcessor extends TestReportPostProcessor
     public int getNameGroup()
     {
         return nameGroup;
+    }
+
+    public int getDetailsGroup()
+    {
+        return detailsGroup;
+    }
+
+    public void setDetailsGroup(int detailsGroup)
+    {
+        this.detailsGroup = detailsGroup;
     }
 
     public String getPassStatus()

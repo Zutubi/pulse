@@ -1,8 +1,7 @@
 <?xml version="1.0"?>
 <project>
 
-    <regex-test.pp name="tests.pp" status-group="1" name-group="2" pass-status="PASS" failure-status="FAIL" resolve-conflicts="append">
+    <regex-test.pp name="tests.pp" status-group="1" name-group="2" details-group="0" pass-status="PASS" failure-status="FAIL" resolve-conflicts="append">
         <![CDATA[\\[(.*)\\].*E[S|D]T:(.*)]]>
     </regex-test.pp>
-
 </project>
