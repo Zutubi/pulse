@@ -31,6 +31,7 @@
                 <ref local="recordsArchive"/>
                 <ref local="databaseArchive"/>
                 <ref local="dataDirectoryArchive"/>
+                <ref local="artifactArchive"/>
             </list>
         </property>
     </bean>
@@ -44,6 +45,19 @@
     </bean>
 
     <bean id="dataDirectoryArchive" class="com.zutubi.pulse.restore.DataDirectoryArchive">
+        <property name="userPaths">
+            <bean class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+                <property name="targetBeanName">
+                    <value>configurationManager</value>
+                </property>
+                <property name="propertyPath">
+                    <value>userPaths</value>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="artifactArchive" class="com.zutubi.pulse.restore.ArtifactArchive">
         <property name="userPaths">
             <bean class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
                 <property name="targetBeanName">

@@ -1,6 +1,7 @@
 package com.zutubi.pulse.restore;
 
 import com.zutubi.pulse.bootstrap.UserPaths;
+import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -24,6 +25,7 @@ public class DefaultArchiveManager implements ArchiveManager
     private List<ArchiveableComponent> archiveableComponents = new LinkedList<ArchiveableComponent>();
 
     private LinkedList<RestoreTaskGroup> groups;
+    private static final Logger LOG = Logger.getLogger(DefaultArchiveManager.class);
 
     public void add(ArchiveableComponent component)
     {
@@ -115,6 +117,7 @@ public class DefaultArchiveManager implements ArchiveManager
         }
         catch (ArchiveException e)
         {
+            LOG.error(e);
             monitor.fail();
         }
     }

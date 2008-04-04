@@ -16,7 +16,7 @@ public class DataDirectoryArchive extends AbstractArchivableComponent
 
     public String getName()
     {
-        return "data";
+        return "config";
     }
 
     public void backup(File archive) throws ArchiveException
@@ -37,7 +37,7 @@ public class DataDirectoryArchive extends AbstractArchivableComponent
         // replace the existing files with the archived files.
         try
         {
-            FileSystemUtils.delete(paths.getUserConfigRoot());
+            cleanup(paths.getUserConfigRoot());
             FileSystemUtils.delete(new File(paths.getData(), "pulse.config.properties"));
             
             FileSystemUtils.copy(paths.getUserConfigRoot(), new File(archive, "config"));
@@ -46,6 +46,21 @@ public class DataDirectoryArchive extends AbstractArchivableComponent
         catch (IOException e)
         {
             throw new ArchiveException(e);
+        }
+    }
+
+    private void cleanup(File base) throws IOException
+    {
+        for (File file : base.listFiles())
+        {
+            if (file.isDirectory())
+            {
+                cleanup(file);
+            }
+            if (!file.getName().equals("database.properties"))
+            {
+                FileSystemUtils.delete(file);   
+            }
         }
     }
 
