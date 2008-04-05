@@ -31,6 +31,7 @@ public class AcceptanceTestSuite
         suite.addTestSuite(GroupAcceptanceTest.class);
         suite.addTestSuite(ProjectLabelAcceptanceTest.class);
         suite.addTestSuite(AnonymousAccessAcceptanceTest.class);
+        suite.addTestSuite(DashboardAcceptanceTest.class);
         suite.addTestSuite(ServerSectionAcceptanceTest.class);
 
         //---( build tests )---

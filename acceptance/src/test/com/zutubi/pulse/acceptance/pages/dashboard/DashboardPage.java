@@ -18,4 +18,34 @@ public class DashboardPage extends SeleniumPage
     {
         return urls.dashboard();
     }
+
+    public String getGroupId(String group)
+    {
+        return "group_" + group;
+    }
+
+    public String getGroupedProjectId(String group, String project)
+    {
+        return getGroupId(group) + "_" + getUngroupedProjectId(project);
+    }
+
+    public String getUngroupedProjectId(String project)
+    {
+        return "project_" + project;
+    }
+
+    public boolean isGroupPresent(String group)
+    {
+        return selenium.isElementPresent(getGroupId(group));
+    }
+
+    public boolean isGroupedProjectPresent(String group, String project)
+    {
+        return selenium.isElementPresent(getGroupedProjectId(group, project));
+    }
+
+    public boolean isUngroupedProjectPresent(String project)
+    {
+        return selenium.isElementPresent(getUngroupedProjectId(project));
+    }
 }

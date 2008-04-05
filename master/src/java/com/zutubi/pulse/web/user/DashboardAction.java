@@ -133,8 +133,6 @@ public class DashboardAction extends ActionSupport
         {
             shownProjects = projectManager.mapConfigsToProjects(dashboardConfig.getShownProjects());
         }
-        
-        Collections.sort(shownProjects, new NamedEntityComparator());
 
         if (dashboardConfig.isShowAllGroups())
         {
@@ -149,6 +147,16 @@ public class DashboardAction extends ActionSupport
                 shownGroups.add(projectManager.getProjectGroup(groupName));
             }
         }
+
+        for(ProjectGroup group: shownGroups)
+        {
+            for(Project project: group.getProjects())
+            {
+                shownProjects.remove(project);
+            }
+        }
+
+        Collections.sort(shownProjects, new NamedEntityComparator());
 
         changelists = buildManager.getLatestChangesForUser(user, dashboardConfig.getMyChangeCount());
         Collections.sort(changelists, new ChangelistComparator());

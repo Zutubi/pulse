@@ -1,6 +1,10 @@
 #macro(buildsTable $project $showHideLink $firstTable)
     #set($recentBuilds = $action.getLatestBuilds($project))
-        <tr>
+#if($showHideLink)
+        <tr id='#id("project_$project.name")'>
+#else
+        <tr id='#id("group_${group.name}_project_${project.name}")'>
+#end
             <th class="heading" colspan="$columns.totalSpan">
 #if($firstTable)            
                 <span class="action">
@@ -78,7 +82,7 @@
 
 #set($firstTable = true)
 #foreach($group in $shownGroups)
-    <table class="content" id="group_$!webwork.htmlEncode($group.name)">
+    <table class="content" id='#id("group_$group.name")'>
         <tr>
             <th class="group" colspan="$columns.totalSpan">
                 <span class="action">

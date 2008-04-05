@@ -133,7 +133,7 @@ public class ProjectLabelAcceptanceTest extends SeleniumTestBase
 
     private String insertLabel(String project, Hashtable<String, Object> label) throws Exception
     {
-        return xmlRpcHelper.call("insertConfig", PathUtils.getPath("projects", project, "labels"), label);
+        return xmlRpcHelper.insertConfig(PathUtils.getPath("projects", project, "labels"), label);
     }
 
 }
