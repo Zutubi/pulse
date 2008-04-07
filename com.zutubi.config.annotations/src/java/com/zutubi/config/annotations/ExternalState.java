@@ -7,7 +7,8 @@ import java.lang.annotation.Target;
 
 /**
  * Marks a property that stores a handle to external state.  This property
- * must be of type long.
+ * must be of type long - the value of which is a handle or identifier for
+ * the external state.
  */
 @Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)

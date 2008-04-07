@@ -731,6 +731,16 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         assertGenericError("Invalid path 'projects/global project template/name': references non-complex type");
     }
 
+    public void testInstanceErrorsDisplayed() throws Exception
+    {
+        String projectPath = xmlRpcHelper.insertTrivialProject(random, false);
+        loginAsAdmin();
+        CompositePage compositePage = new CompositePage(selenium, urls, projectPath);
+        compositePage.goTo();
+        assertTrue(compositePage.areErrorsPresent());
+        assertTextPresent("An SCM must be configured to complete this project.");
+    }
+
     private void insertProperty(String projectPath) throws Exception
     {
         insertProperty(projectPath, "p1");

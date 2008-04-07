@@ -3,6 +3,7 @@ package com.zutubi.pulse.prototype.config.project;
 import com.zutubi.config.annotations.*;
 import com.zutubi.prototype.type.Extendable;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
+import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
 import com.zutubi.pulse.core.config.NamedConfiguration;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
@@ -30,6 +31,10 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
 {
     @ExternalState
     private long projectId;
+    /**
+     * Note that we manage the name ourselves (rather than extending {@link
+     * AbstractNamedConfiguration}) so we can tag it with @NoInherit.
+     */
     @NoInherit
     private String name;
     @Url
@@ -37,9 +42,9 @@ public class ProjectConfiguration extends AbstractConfiguration implements Exten
     @NoInherit
     @TextArea(rows = 7, cols = 70)
     private String description;
-
+    @Essential
     private ScmConfiguration scm;
-
+    @Essential
     private TypeConfiguration type;
 
     @Ordered

@@ -141,7 +141,7 @@ public class FormDescriptorFactory
         try
         {
             Configuration dummyInstance = (Configuration) type.getClazz().newInstance();
-            ConfigurationValidationContext validationContext = new ConfigurationValidationContext(dummyInstance, null, parentPath, baseName, !concrete, configurationTemplateManager);
+            ConfigurationValidationContext validationContext = new ConfigurationValidationContext(dummyInstance, null, parentPath, baseName, !concrete, false, configurationTemplateManager);
             validators = configurationValidatorProvider.getValidators(dummyInstance, validationContext);
         }
         catch (Exception e)

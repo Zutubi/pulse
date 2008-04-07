@@ -56,7 +56,7 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
             public void add(String name) throws Exception
             {
-                xmlRpcHelper.insertTrivialProject(name, false);
+                xmlRpcHelper.insertSimpleProject(name, false);
             }
         });
     }
@@ -124,7 +124,7 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testGetAllProjectGroups() throws Exception
     {
         String projectName = randomName() + "-project";
-        final String projectPath = xmlRpcHelper.insertTrivialProject(projectName, false);
+        final String projectPath = xmlRpcHelper.insertSimpleProject(projectName, false);
 
         getAllHelper(new GetAllHelper()
         {
@@ -149,7 +149,7 @@ public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         String projectName = random + "-project";
         String labelName = random + "-label";
 
-        String projectPath = xmlRpcHelper.insertTrivialProject(projectName, false);
+        String projectPath = xmlRpcHelper.insertSimpleProject(projectName, false);
         String labelsPath = PathUtils.getPath(projectPath, "labels");
         Hashtable<String, Object> label = xmlRpcHelper.createDefaultConfig(LabelConfiguration.class);
         label.put("label", labelName);

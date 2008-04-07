@@ -75,4 +75,14 @@ public class CompositePage extends ConfigPage
     {
         return "state." + name;
     }
+
+    public String getErrorsId()
+    {
+        return "instance-errors";
+    }
+
+    public boolean areErrorsPresent()
+    {
+        return selenium.isElementPresent(getErrorsId());
+    }
 }

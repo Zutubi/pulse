@@ -44,12 +44,12 @@ public abstract class FieldValidatorSupport extends ValidatorSupport implements 
         this.defaultKeySuffix = defaultKeySuffix;
     }
 
-    public void addError()
+    public String getErrorMessage()
     {
-        addError(defaultKeySuffix);
+        return getErrorMessage(defaultKeySuffix);
     }
 
-    public void addError(String keySuffix, Object... args)
+    public String getErrorMessage(String keySuffix, Object... args)
     {
         Object[] actualArgs = new String[args.length + 1];
         actualArgs[0] = getFieldLabel();
@@ -64,8 +64,17 @@ public abstract class FieldValidatorSupport extends ValidatorSupport implements 
                 error = actualArgs[0] + " is invalid";
             }
         }
+        return error;
+    }
 
-        addErrorMessage(error);
+    public void addError()
+    {
+        addError(defaultKeySuffix);
+    }
+
+    public void addError(String keySuffix, Object... args)
+    {
+        addErrorMessage(getErrorMessage(keySuffix, args));
     }
 
     public void addErrorMessage(String message)

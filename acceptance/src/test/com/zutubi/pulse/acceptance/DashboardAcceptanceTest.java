@@ -46,7 +46,7 @@ public class DashboardAcceptanceTest extends SeleniumTestBase
         String group = random + "-group";
         String project = random + "-project";
 
-        String projectPath = xmlRpcHelper.insertTrivialProject(project, false);
+        String projectPath = xmlRpcHelper.insertSimpleProject(project, false);
         addLabel(projectPath, group);
 
         DashboardPage dashboard = new DashboardPage(selenium, urls);
@@ -64,7 +64,7 @@ public class DashboardAcceptanceTest extends SeleniumTestBase
 
         setDashboard(asPair(SHOW_ALL_GROUPS, false), asPair(SHOWN_GROUPS, asVector(group1)), asPair(SHOW_ALL_PROJECTS, true));
 
-        String projectPath = xmlRpcHelper.insertTrivialProject(project, false);
+        String projectPath = xmlRpcHelper.insertSimpleProject(project, false);
         addLabel(projectPath, group1);
         addLabel(projectPath, group2);
 
@@ -85,7 +85,7 @@ public class DashboardAcceptanceTest extends SeleniumTestBase
 
         setDashboard(asPair(SHOW_ALL_GROUPS, true), asPair(SHOW_ALL_PROJECTS, true));
 
-        String projectPath = xmlRpcHelper.insertTrivialProject(project, false);
+        String projectPath = xmlRpcHelper.insertSimpleProject(project, false);
         addLabel(projectPath, group1);
         addLabel(projectPath, group2);
 
@@ -107,8 +107,8 @@ public class DashboardAcceptanceTest extends SeleniumTestBase
         String project1 = random + "-project1";
         String project2 = random + "-project2";
 
-        String project1Path = xmlRpcHelper.insertTrivialProject(project1, false);
-        xmlRpcHelper.insertTrivialProject(project2, false);
+        String project1Path = xmlRpcHelper.insertSimpleProject(project1, false);
+        xmlRpcHelper.insertSimpleProject(project2, false);
 
         setDashboard(asPair(SHOW_ALL_GROUPS, true), asPair(SHOW_ALL_PROJECTS, false), asPair(SHOWN_PROJECTS, asVector(project1Path)));
 
@@ -125,8 +125,8 @@ public class DashboardAcceptanceTest extends SeleniumTestBase
 
         setDashboard(asPair(SHOW_ALL_GROUPS, true), asPair(SHOW_ALL_PROJECTS, true));
 
-        xmlRpcHelper.insertTrivialProject(project1, false);
-        xmlRpcHelper.insertTrivialProject(project2, false);
+        xmlRpcHelper.insertSimpleProject(project1, false);
+        xmlRpcHelper.insertSimpleProject(project2, false);
 
         DashboardPage dashboard = new DashboardPage(selenium, urls);
         dashboard.goTo();

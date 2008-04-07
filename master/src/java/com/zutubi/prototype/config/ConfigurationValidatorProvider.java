@@ -21,7 +21,7 @@ public class ConfigurationValidatorProvider implements ValidatorProvider
     public List<Validator> getValidators(Object obj, ValidationContext context)
     {
         List<Validator> validators = new LinkedList<Validator>();
-        final boolean includeRequired = !(context instanceof ConfigurationValidationContext) || !((ConfigurationValidationContext)context).isIgnoreRequired();
+        final boolean includeRequired = !(context instanceof ConfigurationValidationContext) || !((ConfigurationValidationContext)context).isTemplate();
         for(ValidatorProvider delegate: delegates)
         {
             CollectionUtils.filter(delegate.getValidators(obj, context), new Predicate<Validator>()

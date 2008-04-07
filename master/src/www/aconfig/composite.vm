@@ -57,50 +57,62 @@
     <tr>
 #if($config.record || !$config.type.extendable)
         <td id="left-column">
-            #if ($config.displayFields.size() > 0)
+    #if($config.instance.instanceErrors.size() > 0)
+            <div class="config-panel">
+            <h3 id="instance-errors" class="config-error-header">errors</h3>
+            <div class="config-container">
+            <ul class="config-errors">
+        #foreach($error in $config.instance.instanceErrors)
+                <li>#html($error)</li>
+        #end
+            </ul>
+            </div>
+            </div>
+    #end
+    #if ($config.displayFields.size() > 0)
                 #renderstate()
-            #end
-            #if( $config.simpleProperties.size() > 0)
+    #end
+    #if( $config.simpleProperties.size() > 0)
                 #renderform()
-            #end
+    #end
         </td>
         
         <td id="right-column">
-            #if ($config.actions.size() > 0)
+    #if ($config.actions.size() > 0)
             <div class="config-panel">
             <h3 class="config-header">actions</h3>
             <div class="config-container">
             <ul class="config-actions">
-                #foreach($action in $config.actions)
+        #foreach($action in $config.actions)
                     <li>
                         <a href="#" id='#id("action.${action.action}")' class="unadorned"
-                    #if($action.action == "delete")
+            #if($action.action == "delete")
                             onclick="deletePath('${path}'); return false;"
-                    #else
+            #else
                             onclick="actionPath('${path}?${action.action}'); return false;"
-                    #end
+            #end
                         >
                             <img src="${base}/images/config/actions/${action.icon}.gif"/> ${action.label}
                         </a>
                     </li>
-                #end
+        #end
             </ul>
             </div>
             </div>
-            #end
+    #end
 
-            #if( $config.nestedProperties.size() > 0)
+    #if( $config.nestedProperties.size() > 0)
             <div class="config-panel">
             <h3 class="config-header">links</h3>
             <div class="config-container">
             <ul class="config-links">
-                #foreach($prop in $config.nestedProperties)
+        #foreach($prop in $config.nestedProperties)
                     <li><a href="#" onclick="selectPath('${path}/${prop}'); return false;">#displayname("path=${path}/${prop}")</a></li>
-                #end
+        #end
             </ul>
             </div>
             </div>
-            #end
+    #end
         </td>
 #else
     ## We don't know what type we are dealing with, it needs to be configured

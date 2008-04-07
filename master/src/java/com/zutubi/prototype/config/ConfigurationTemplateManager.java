@@ -621,7 +621,7 @@ public class ConfigurationTemplateManager implements InstanceSource
                 if (type != null)
                 {
                     // Then we have a composite
-                    validateInstance(type, instance, PathUtils.getParentPath(path), PathUtils.getBaseName(path), complete, false, null);
+                    validateInstance(type, instance, PathUtils.getParentPath(path), PathUtils.getBaseName(path), complete, true, false, null);
                     if (!instance.isValid())
                     {
                         instances.markInvalid(path);
@@ -829,7 +829,7 @@ public class ConfigurationTemplateManager implements InstanceSource
         SimpleInstantiator instantiator = new SimpleInstantiator(configurationReferenceManager);
         instance = (Configuration) instantiator.instantiate(type, subject);
 
-        validateInstance(type, instance, parentPath, baseName, concrete, deep, ignoredFields);
+        validateInstance(type, instance, parentPath, baseName, concrete, false, deep, ignoredFields);
         return (T) instance;
     }
 
@@ -846,15 +846,15 @@ public class ConfigurationTemplateManager implements InstanceSource
      * @param concrete       if true, the validation will check for
      *                       completeness
      */
-    public void validateInstance(CompositeType type, Configuration instance, String parentPath, String baseName, boolean concrete)
+    public void validateInstance(CompositeType type, Configuration instance, String parentPath, String baseName, boolean concrete, boolean checkEssential)
     {
-        validateInstance(type, instance, parentPath, baseName, concrete, false, null);
+        validateInstance(type, instance, parentPath, baseName, concrete, checkEssential, false, null);
     }
 
-    private void validateInstance(CompositeType type, Configuration instance, String parentPath, String baseName, boolean concrete, boolean deep, Set<String> ignoredFields)
+    private void validateInstance(CompositeType type, Configuration instance, String parentPath, String baseName, boolean concrete, boolean checkEssential, boolean deep, Set<String> ignoredFields)
     {
         MessagesTextProvider textProvider = new MessagesTextProvider(type.getClazz());
-        ValidationContext context = new ConfigurationValidationContext(instance, textProvider, parentPath, baseName, !concrete, this);
+        ValidationContext context = new ConfigurationValidationContext(instance, textProvider, parentPath, baseName, !concrete, checkEssential, this);
         if (ignoredFields != null)
         {
             context.addIgnoredFields(ignoredFields);
@@ -871,11 +871,11 @@ public class ConfigurationTemplateManager implements InstanceSource
 
         if (deep)
         {
-            validateNestedInstances(type, instance, concrete, ignoredFields);
+            validateNestedInstances(type, instance, concrete, checkEssential, ignoredFields);
         }
     }
 
-    private void validateNestedInstances(CompositeType type, Configuration instance, boolean concrete, Set<String> ignoredFields)
+    private void validateNestedInstances(CompositeType type, Configuration instance, boolean concrete, boolean checkEssential, Set<String> ignoredFields)
     {
         for (String key : type.getPropertyNames(ComplexType.class))
         {
@@ -886,13 +886,13 @@ public class ConfigurationTemplateManager implements InstanceSource
                 Type targetType = nestedType.getTargetType();
                 if (targetType instanceof CompositeType)
                 {
-                    validateNestedInstance(instance, property, (CompositeType) targetType, nestedType, concrete);
+                    validateNestedInstance(instance, property, (CompositeType) targetType, nestedType, concrete, checkEssential);
                 }
             }
         }
     }
 
-    private void validateNestedInstance(Configuration instance, TypeProperty property, CompositeType validateType, ComplexType nestedType, boolean concrete)
+    private void validateNestedInstance(Configuration instance, TypeProperty property, CompositeType validateType, ComplexType nestedType, boolean concrete, boolean checkEssential)
     {
         try
         {
@@ -901,14 +901,14 @@ public class ConfigurationTemplateManager implements InstanceSource
             {
                 if (nestedType instanceof CompositeType)
                 {
-                    validateInstance(validateType, nestedInstance, instance.getConfigurationPath(), property.getName(), concrete, true, null);
+                    validateInstance(validateType, nestedInstance, instance.getConfigurationPath(), property.getName(), concrete, checkEssential, true, null);
                 }
                 else if (nestedType instanceof ListType)
                 {
                     ConfigurationList list = (ConfigurationList) nestedInstance;
                     for (Object element : list)
                     {
-                        validateInstance(validateType, (Configuration) element, nestedInstance.getConfigurationPath(), null, concrete, true, null);
+                        validateInstance(validateType, (Configuration) element, nestedInstance.getConfigurationPath(), null, concrete, checkEssential, true, null);
                     }
                 }
                 else if (nestedType instanceof MapType)
@@ -916,7 +916,7 @@ public class ConfigurationTemplateManager implements InstanceSource
                     ConfigurationMap<Configuration> map = (ConfigurationMap) nestedInstance;
                     for (Map.Entry<String, Configuration> entry : map.entrySet())
                     {
-                        validateInstance(validateType, entry.getValue(), nestedInstance.getConfigurationPath(), entry.getKey(), concrete, true, null);
+                        validateInstance(validateType, entry.getValue(), nestedInstance.getConfigurationPath(), entry.getKey(), concrete, checkEssential, true, null);
                     }
                 }
                 else

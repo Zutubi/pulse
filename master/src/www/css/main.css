@@ -1031,12 +1031,19 @@ table.template-actions
     margin-bottom:1.8em;
 }
 
-.config-header {
+.config-header, .config-error-header {
     padding:8px;
-    background-color:#E0E6F0;
     border-top-width:1px;
     border-top-style:dotted;
     border-top-color:gray;
+}
+
+.config-header {
+    background-color:#E0E6F0;
+}
+
+.config-error-header {
+    background-color: #F6D0D0;
 }
 
 .config-description {
@@ -1114,9 +1121,15 @@ table.template-actions
     vertical-align:top;
 }
 
-ul.config-links li, ul.config-actions li {
+ul.config-errors li, ul.config-links li, ul.config-actions li {
     padding: 1px;
     line-height: 1.4em;
+}
+
+ul.config-errors li {
+    color: #b22;
+    padding-left: 20px;
+    background: url(../images/exclamation.gif) no-repeat 0 2px;
 }
 
 ul.config-links li {

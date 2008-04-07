@@ -16,19 +16,21 @@ public class ConfigurationValidationContext implements ValidationContext
     private TextProvider textProvider;
     private String parentPath;
     private String baseName;
-    private boolean ignoreRequired;
+    private boolean template;
+    private boolean checkEssential;
     private boolean ignoreAllFields = false;
     private Set<String> ignoredFields = new HashSet<String>();
 
     private ConfigurationTemplateManager configurationTemplateManager;
 
-    public ConfigurationValidationContext(Configuration instance, TextProvider textProvider, String parentPath, String baseName, boolean ignoreRequired, ConfigurationTemplateManager configurationTemplateManager)
+    public ConfigurationValidationContext(Configuration instance, TextProvider textProvider, String parentPath, String baseName, boolean template, boolean checkEssential, ConfigurationTemplateManager configurationTemplateManager)
     {
         this.instance = instance;
         this.textProvider = textProvider;
         this.parentPath = parentPath;
         this.baseName = baseName;
-        this.ignoreRequired = ignoreRequired;
+        this.template = template;
+        this.checkEssential = checkEssential;
         this.configurationTemplateManager = configurationTemplateManager;
     }
 
@@ -61,9 +63,14 @@ public class ConfigurationValidationContext implements ValidationContext
      * @return true if the required validator should be ignored (as is the
      *         case when validating a template)
      */
-    public boolean isIgnoreRequired()
+    public boolean isTemplate()
     {
-        return ignoreRequired;
+        return template;
+    }
+
+    public boolean isCheckEssential()
+    {
+        return checkEssential;
     }
 
     public void addIgnoredField(String field)
