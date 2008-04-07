@@ -48,4 +48,26 @@ public class DashboardPage extends SeleniumPage
     {
         return selenium.isElementPresent(getUngroupedProjectId(project));
     }
+
+    public String getHideGroupLinkId(String group)
+    {
+        return "hide_" + getGroupId(group);
+    }
+
+    public void hideGroupAndWait(String group)
+    {
+        selenium.click(getHideGroupLinkId(group));
+        selenium.waitForPageToLoad("30000");
+    }
+
+    public String getHideProjectLinkId(String project)
+    {
+        return "hide_" + getUngroupedProjectId(project);
+    }
+
+    public void hideProjectAndWait(String project)
+    {
+        selenium.click(getHideProjectLinkId(project));
+        selenium.waitForPageToLoad("30000");
+    }
 }

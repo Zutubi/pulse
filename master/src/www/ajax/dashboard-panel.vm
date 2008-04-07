@@ -9,9 +9,9 @@
 #if($firstTable)            
                 <span class="action">
                     <a class="unadorned" href="#" id="columns-popup-link-my.projects" onclick="popup.popup(); return false"><img src="$base/images/text_columns.gif"/></a>
-##    #if($showHideLink)
-##                    <a href="$base/user/hideDashboardProject.action?id=$project.id" class="unadorned">X</a>
-##    #end
+    #if($showHideLink)
+                    <a id='#id("hide_project_$project.name")' href="$base/user/hideDashboardProject.action?id=$project.id" class="unadorned">X</a>
+    #end
                 </span>
 #end
                 <a href="$urls.projectHome($project)" id="home_$!webwork.htmlEncode($project.name)">
@@ -86,7 +86,7 @@
         <tr>
             <th class="group" colspan="$columns.totalSpan">
                 <span class="action">
-                    <a href="$base/user/hideDashboardGroup.action?groupName=#uce($group.name)" class="unadorned">X</a>
+                    <a id='#id("hide_group_$group.name")' href="$base/user/hideDashboardGroup.action?groupName=#uce($group.name)" class="unadorned">X</a>
                 </span>
                 $!webwork.htmlEncode($group.name)
             </th>
@@ -99,8 +99,7 @@
 #end
     <table class="content">
 #foreach($project in $shownProjects)
-        #buildsTable($project true $firstTable)
-        #set($firstTable = false)
+        #buildsTable($project true true)
 #end
     </table>
 

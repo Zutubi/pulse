@@ -255,6 +255,17 @@ public class CollectionUtils
         return result;
     }
 
+    public static <T> Vector<T> asVector(T... ts)
+    {
+        Vector<T> result = new Vector<T>(ts.length);
+        for(T t: ts)
+        {
+            result.add(t);
+        }
+        
+        return result;
+    }
+
     public static <T, U> Map<T, U> retainAll(Map<T, U> m, Map<T, U> n)
     {
         Iterator<Map.Entry<T, U>> it = m.entrySet().iterator();

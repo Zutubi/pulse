@@ -1,9 +1,12 @@
 package com.zutubi.pulse.web.user;
 
 import com.zutubi.prototype.config.ConfigurationProvider;
+import com.zutubi.pulse.model.ProjectGroup;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.prototype.config.user.DashboardConfiguration;
 import com.zutubi.pulse.security.AcegiUtils;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
 
 /**
  * Action allowing a user to hide a chosen project group from their dashboard.
@@ -35,7 +38,19 @@ public class HideDashboardGroupAction extends UserActionSupport
 
         User user = getUser();
 
-        DashboardConfiguration configuration = user.getPreferences().getDashboard();
+        DashboardConfiguration configuration = configurationProvider.deepClone(user.getPreferences().getDashboard());
+        if(configuration.isShowAllGroups())
+        {
+            configuration.setShowAllGroups(false);
+            configuration.getShownGroups().addAll(CollectionUtils.map(projectManager.getAllProjectGroups(), new Mapping<ProjectGroup, String>()
+            {
+                public String map(ProjectGroup projectGroup)
+                {
+                    return projectGroup.getName();
+                }
+            }));
+        }
+        
         configuration.getShownGroups().remove(groupName);
         configurationProvider.save(configuration);
         return SUCCESS;

@@ -3,6 +3,9 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
 import com.zutubi.pulse.prototype.config.LabelConfiguration;
+import static com.zutubi.util.CollectionUtils.asPair;
+import static com.zutubi.util.CollectionUtils.asVector;
+import com.zutubi.util.Pair;
 import com.zutubi.util.RandomUtils;
 
 import java.util.Hashtable;
@@ -12,10 +15,13 @@ import java.util.Hashtable;
  */
 public class DashboardAcceptanceTest extends SeleniumTestBase
 {
+    private static final String SHOW_ALL_GROUPS   = "showAllGroups";
+    private static final String SHOWN_GROUPS      = "shownGroups";
+    private static final String SHOW_ALL_PROJECTS = "showAllProjects";
+    private static final String SHOWN_PROJECTS    = "shownProjects";
+
     private String user;
     private String userPath;
-    private static final String SHOW_ALL_GROUPS = "showAllGroups";
-    private static final String SHOW_ALL_PROJECTS = "showAllProjects";
 
     protected void setUp() throws Exception
     {
@@ -35,16 +41,13 @@ public class DashboardAcceptanceTest extends SeleniumTestBase
 
     public void testShowGroups() throws Exception
     {
-        setShowAllGroups(true);
-        setShowAllProjects(true);
+        setDashboard(asPair(SHOW_ALL_GROUPS, true), asPair(SHOW_ALL_PROJECTS, true));
 
         String group = random + "-group";
         String project = random + "-project";
 
         String projectPath = xmlRpcHelper.insertTrivialProject(project, false);
-        Hashtable label = xmlRpcHelper.createDefaultConfig(LabelConfiguration.class);
-        label.put("label", group);
-        xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, "labels"), label);
+        addLabel(projectPath, group);
 
         DashboardPage dashboard = new DashboardPage(selenium, urls);
         dashboard.goTo();
@@ -53,24 +56,107 @@ public class DashboardAcceptanceTest extends SeleniumTestBase
         assertFalse(dashboard.isUngroupedProjectPresent(project));
     }
 
-    private void setShowAllGroups(Boolean showAll) throws Exception
+    public void testShowSpecificGroups() throws Exception
     {
-        setBoolean(SHOW_ALL_GROUPS, showAll);
+        String group1 = random + "-group1";
+        String group2 = random + "-group2";
+        String project = random + "-project";
+
+        setDashboard(asPair(SHOW_ALL_GROUPS, false), asPair(SHOWN_GROUPS, asVector(group1)), asPair(SHOW_ALL_PROJECTS, true));
+
+        String projectPath = xmlRpcHelper.insertTrivialProject(project, false);
+        addLabel(projectPath, group1);
+        addLabel(projectPath, group2);
+
+        DashboardPage dashboard = new DashboardPage(selenium, urls);
+        dashboard.goTo();
+        assertTrue(dashboard.isGroupPresent(group1));
+        assertTrue(dashboard.isGroupedProjectPresent(group1, project));
+        assertFalse(dashboard.isGroupPresent(group2));
+        assertFalse(dashboard.isGroupedProjectPresent(group2, project));
+        assertFalse(dashboard.isUngroupedProjectPresent(project));
     }
 
-    private void setShowAllProjects(Boolean showAll) throws Exception
+    public void testHideGroup() throws Exception
     {
-        setBoolean(SHOW_ALL_PROJECTS, showAll);
+        String group1 = random + "-group1";
+        String group2 = random + "-group2";
+        String project = random + "-project";
+
+        setDashboard(asPair(SHOW_ALL_GROUPS, true), asPair(SHOW_ALL_PROJECTS, true));
+
+        String projectPath = xmlRpcHelper.insertTrivialProject(project, false);
+        addLabel(projectPath, group1);
+        addLabel(projectPath, group2);
+
+        DashboardPage dashboard = new DashboardPage(selenium, urls);
+        dashboard.goTo();
+        assertTrue(dashboard.isGroupPresent(group1));
+        assertTrue(dashboard.isGroupPresent(group2));
+        assertFalse(dashboard.isUngroupedProjectPresent(project));
+
+        dashboard.hideGroupAndWait(group1);
+
+        assertFalse(dashboard.isGroupPresent(group1));
+        assertTrue(dashboard.isGroupPresent(group2));
+        assertFalse(dashboard.isUngroupedProjectPresent(project));
     }
 
-    private void setBoolean(String key, Boolean b) throws Exception
+    public void testShowSpecificProjects() throws Exception
+    {
+        String project1 = random + "-project1";
+        String project2 = random + "-project2";
+
+        String project1Path = xmlRpcHelper.insertTrivialProject(project1, false);
+        xmlRpcHelper.insertTrivialProject(project2, false);
+
+        setDashboard(asPair(SHOW_ALL_GROUPS, true), asPair(SHOW_ALL_PROJECTS, false), asPair(SHOWN_PROJECTS, asVector(project1Path)));
+
+        DashboardPage dashboard = new DashboardPage(selenium, urls);
+        dashboard.goTo();
+        assertTrue(dashboard.isUngroupedProjectPresent(project1));
+        assertFalse(dashboard.isUngroupedProjectPresent(project2));
+    }
+
+    public void testHideProject() throws Exception
+    {
+        String project1 = random + "-project1";
+        String project2 = random + "-project2";
+
+        setDashboard(asPair(SHOW_ALL_GROUPS, true), asPair(SHOW_ALL_PROJECTS, true));
+
+        xmlRpcHelper.insertTrivialProject(project1, false);
+        xmlRpcHelper.insertTrivialProject(project2, false);
+
+        DashboardPage dashboard = new DashboardPage(selenium, urls);
+        dashboard.goTo();
+        assertTrue(dashboard.isUngroupedProjectPresent(project1));
+        assertTrue(dashboard.isUngroupedProjectPresent(project2));
+
+        dashboard.hideProjectAndWait(project1);
+
+        assertFalse(dashboard.isUngroupedProjectPresent(project1));
+        assertTrue(dashboard.isUngroupedProjectPresent(project2));
+    }
+
+    private void addLabel(String projectPath, String label) throws Exception
+    {
+        Hashtable labelConfig = xmlRpcHelper.createDefaultConfig(LabelConfiguration.class);
+        labelConfig.put("label", label);
+        xmlRpcHelper.insertConfig(PathUtils.getPath(projectPath, "labels"), labelConfig);
+    }
+
+    private void setDashboard(Pair<String, ?>... values) throws Exception
     {
         String dashboardPath = PathUtils.getPath(userPath, "preferences", "dashboard");
         Hashtable dashboardConfig = xmlRpcHelper.getConfig(dashboardPath);
-        if(!b.equals(dashboardConfig.get(key)))
+        for (Pair<String, ?> pair : values)
         {
-            dashboardConfig.put(key, b);
-            xmlRpcHelper.saveConfig(dashboardPath, dashboardConfig, false);
+            if (!pair.second.equals(dashboardConfig.get(pair.first)))
+            {
+                dashboardConfig.put(pair.first, pair.second);
+                xmlRpcHelper.saveConfig(dashboardPath, dashboardConfig, false);
+            }
         }
     }
 }
