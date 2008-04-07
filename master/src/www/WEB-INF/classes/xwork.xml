@@ -359,7 +359,7 @@
         </action>
 
         <action name="toggleRecipeQueue" class="com.zutubi.pulse.web.admin.ToggleRecipeQueueAction">
-            <result name="success" type="redirect">/viewServerQueues.action</result>
+            <result name="success" type="redirect">/server/activity/</result>
         </action>
 
         <action name="disableUser" class="com.zutubi.pulse.web.admin.user.DisableUserAction">
@@ -368,11 +368,11 @@
         </action>
 
         <action name="addSystemProperty" class="com.zutubi.pulse.web.admin.SystemPropertiesAction" method="doAdd">
-            <result name="success" type="redirect">/admin/serverSettings.action</result>
+            <result name="success" type="redirect">/admin/settings/</result>
         </action>
         
         <action name="removeSystemProperty" class="com.zutubi.pulse.web.admin.SystemPropertiesAction" method="doRemove">
-            <result name="success" type="redirect">/admin/serverSettings.action</result>
+            <result name="success" type="redirect">/admin/settings/</result>
         </action>
 
         <action name="installPlugin" class="com.zutubi.pulse.web.admin.plugins.InstallPluginAction">
@@ -387,7 +387,7 @@
             <result name="config" type="velocity">scope.vm</result>
             <result name="template" type="velocity">templated-scope.vm</result>
             <!-- FIXME: replace this and related code in the action with an interceptor -->
-            <result name="guest" type="redirect">/viewProjects.action</result>
+            <result name="guest" type="redirect">/browse/projects/</result>
         </action>
 
         <action name="plugins" class="com.zutubi.pulse.web.admin.plugins.PluginsAction">

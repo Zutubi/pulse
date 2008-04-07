@@ -125,6 +125,12 @@ public class SeleniumTestBase extends TestCase
         SeleniumUtils.waitForElementId(selenium, id, timeout);
     }
 
+    protected void assertGenericError(String message)
+    {
+        assertElementPresent("generic-error");
+        assertTextPresent(message);
+    }
+    
     protected void addProject(String name)
     {
         addProject(name, false, "global project template");

@@ -1,12 +1,12 @@
 package com.zutubi.prototype.webwork;
 
-import com.zutubi.util.TextUtils;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.config.TemplateNode;
-import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.ComplexType;
+import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.web.ActionSupport;
+import com.zutubi.util.TextUtils;
 
 /**
  * This action provides support for rendering the admins configuration pages.
@@ -133,6 +133,11 @@ public class DisplayScopeAction extends ActionSupport
             return ERROR;
         }
 
+        // This also serves as a validity check for the path: the user should
+        // only be requesting a complex type that can be determined.  Note
+        // that the path may not exist - although its parent must.
+        ComplexType type = configurationTemplateManager.getType(path);
+
         String[] pathElements = PathUtils.getPathElements(path);
         if (pathElements.length > 0)
         {
@@ -173,7 +178,6 @@ public class DisplayScopeAction extends ActionSupport
         }
         else
         {
-            ComplexType type = configurationTemplateManager.getType(path, ComplexType.class);
             configClassification = PrototypeUtils.getClassification(type);
         }
 

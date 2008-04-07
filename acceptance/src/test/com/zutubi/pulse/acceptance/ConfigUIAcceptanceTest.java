@@ -696,6 +696,41 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         assertTextNotPresent("url requires a value");
     }
 
+    public void testInvalidPathNonExistantScope() throws Exception
+    {
+        loginAsAdmin();
+        goTo(urls.admin() + "scopish/");
+        assertGenericError("Invalid path 'scopish': references non-existant root scope 'scopish'");
+    }
+
+    public void testInvalidPathNonExistantCollectionItem() throws Exception
+    {
+        loginAsAdmin();
+        goTo(urls.adminUser("nosuchuser"));
+        assertGenericError("Invalid path 'users/nosuchuser': references unknown child 'nosuchuser' of collection");
+    }
+
+    public void testInvalidPathNonExistantTemplateItem() throws Exception
+    {
+        loginAsAdmin();
+        goTo(urls.adminProject("nosuchproject"));
+        assertGenericError("Invalid path 'projects/nosuchproject': references unknown child 'nosuchproject' of collection");
+    }
+
+    public void testInvalidPathNonExistantProperty() throws Exception
+    {
+        loginAsAdmin();
+        goTo(urls.adminProject(ProjectManager.GLOBAL_PROJECT_NAME) + "nosuchproperty/");
+        assertGenericError("Invalid path 'projects/global project template/nosuchproperty': references unknown property 'nosuchproperty' of type 'zutubi.projectConfig'");
+    }
+
+    public void testInvalidPathSimpleProperty() throws Exception
+    {
+        loginAsAdmin();
+        goTo(urls.adminProject(ProjectManager.GLOBAL_PROJECT_NAME) + "name/");
+        assertGenericError("Invalid path 'projects/global project template/name': references non-complex type");
+    }
+
     private void insertProperty(String projectPath) throws Exception
     {
         insertProperty(projectPath, "p1");
