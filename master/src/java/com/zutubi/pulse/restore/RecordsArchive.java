@@ -21,6 +21,12 @@ public class RecordsArchive extends AbstractArchivableComponent
         return "records";
     }
 
+    public String getDescription()
+    {
+        return "The records restoration will replace the current Pulse system configuration with " +
+                "the archived configuration.";
+    }
+
     public void backup(File base)
     {
         Record export = recordStore.exportRecords();

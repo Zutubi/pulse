@@ -1,5 +1,7 @@
 package com.zutubi.pulse.restore;
 
+import com.zutubi.pulse.restore.feedback.TaskMonitor;
+
 import java.io.File;
 import java.util.List;
 
@@ -9,11 +11,11 @@ import java.util.List;
  */
 public interface ArchiveManager
 {
-    ProgressMonitor getMonitor();
+    TaskMonitor getTaskMonitor();
 
     Archive prepareRestore(File backup) throws ArchiveException;
 
-    List<RestoreTaskGroup> previewRestore();
+    List<RestoreTask> previewRestore();
 
     void restoreArchive();
 

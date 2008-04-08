@@ -26,16 +26,6 @@ public interface UpgradeTask
     String getDescription();
 
     /**
-     * Return the build number that will trigger this upgrade task.
-     *
-     * For example: If the setting this to 301 will cause this task to
-     * be executed on all installations with build version 300 and below (inclusive).
-     */
-/*
-    int getBuildNumber();
-*/
-
-    /**
      * Run this upgrade task.
      *
      * @throws UpgradeException

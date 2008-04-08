@@ -19,6 +19,11 @@ public class PluginsArchive extends AbstractArchivableComponent
         return "plugins";
     }
 
+    public String getDescription()
+    {
+        return "";
+    }
+
     public void backup(File base) throws ArchiveException
     {
         try

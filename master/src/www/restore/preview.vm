@@ -6,25 +6,42 @@
 
 <p>
     blurb about restore, including details of the data to be restored.
-    <table border="1">
+    <table class="content" border="1">
         <tr>
-            <td>Date</td>
-            <td>$info.created</td>
+            <th class="content-row">Date</th>
+            <td class="content">$info.created</td>
         </tr>
         <tr>
-            <td>Version</td>
-            <td>$info.version</td>
+            <th class="content-row">Version</th>
+            <td class="content">$info.version</td>
         </tr>
         <tr>
-            <td>Name</td>
-            <td>$info.original.name</td>
+            <th class="content-row">Name</th>
+            <td class="content">$info.original.name</td>
         </tr>
         <tr>
-            <td>Location</td>
-            <td>$info.original.parentFile.absolutePath</td>
+            <th class="content-row">Location</th>
+            <td class="content">$info.original.parentFile.absolutePath</td>
         </tr>
     </table>
 </p>
+
+<!--
+This task listing needs work - do we actually need it? 
+#if($tasks.size() > 0)
+<p >
+    The following tasks will be executed during the restore:
+    <table id="restore.task.details"  style="width:50%" class="content">
+        #foreach($task in $tasks)
+        <tr style="width:50%">
+            <th class="content-row">$task.name</th>
+            <td>$task.description</td>
+        </tr>
+        #end
+    </table>
+</p>
+#end
+-->
 
 <p style="width:50%">
     Please be aware that this restore will overwrite all of your existing configuration and settings.

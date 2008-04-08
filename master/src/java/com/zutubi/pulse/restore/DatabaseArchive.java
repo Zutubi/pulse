@@ -38,6 +38,13 @@ public class DatabaseArchive extends AbstractArchivableComponent
         return "database";
     }
 
+    public String getDescription()
+    {
+        return "The database restoration process takes the 1.2.x data export and imports it into your 2.0 database. " +
+                "Please be aware that this process will reconstruct the 2.0 schema in your specified database.  " +
+                "All existing data will be replaced.";
+    }
+
     public void backup(File base) throws ArchiveException
     {
         try

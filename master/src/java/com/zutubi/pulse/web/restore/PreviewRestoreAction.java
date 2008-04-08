@@ -5,8 +5,11 @@ import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.SetupManager;
 import com.zutubi.pulse.bootstrap.DefaultSetupManager;
 import com.zutubi.pulse.restore.Archive;
+import com.zutubi.pulse.restore.RestoreTaskGroup;
+import com.zutubi.pulse.restore.RestoreTask;
 
 import java.io.File;
+import java.util.List;
 
 /**
  *
@@ -15,6 +18,11 @@ import java.io.File;
 public class PreviewRestoreAction extends RestoreActionSupport
 {
     private Archive archive;
+
+    public List<RestoreTask> getTasks()
+    {
+        return archiveManager.previewRestore();
+    }
 
     public Archive getInfo()
     {

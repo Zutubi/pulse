@@ -1,6 +1,9 @@
 package com.zutubi.pulse.restore;
 
 import com.zutubi.pulse.bootstrap.UserPaths;
+import com.zutubi.pulse.restore.feedback.TaskMonitor;
+import com.zutubi.pulse.restore.feedback.Feedback;
+import com.zutubi.pulse.restore.feedback.TaskListener;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
@@ -13,7 +16,9 @@ import java.util.List;
  */
 public class DefaultArchiveManager implements ArchiveManager
 {
-    private ProgressMonitor monitor = new ProgressMonitor();
+    private TaskMonitor taskMonitor = new TaskMonitor();
+
+    private List<RestoreTask> tasks = new LinkedList<RestoreTask>();
 
     private Archive archive;
 
@@ -24,7 +29,6 @@ public class DefaultArchiveManager implements ArchiveManager
 
     private List<ArchiveableComponent> archiveableComponents = new LinkedList<ArchiveableComponent>();
 
-    private LinkedList<RestoreTaskGroup> groups;
     private static final Logger LOG = Logger.getLogger(DefaultArchiveManager.class);
 
     public void add(ArchiveableComponent component)
@@ -37,9 +41,9 @@ public class DefaultArchiveManager implements ArchiveManager
         archiveableComponents = new LinkedList<ArchiveableComponent>(components);
     }
 
-    public ProgressMonitor getMonitor()
+    public TaskMonitor getTaskMonitor()
     {
-        return monitor;
+        return taskMonitor;
     }
 
     public Archive prepareRestore(File source) throws ArchiveException
@@ -49,25 +53,27 @@ public class DefaultArchiveManager implements ArchiveManager
 
         archive = factory.importArchive(source);
 
-        // is this a complete restore? (all archiveable components are cleared first) or a partial
-        // restore where only those components represented within the archive are cleared.?
-
-        groups = new LinkedList<RestoreTaskGroup>();
-
         for (ArchiveableComponent component : archiveableComponents)
         {
-            // task group takes details from the upgradeable component.
-            RestoreTaskGroup taskGroup = new RestoreTaskGroup();
-            taskGroup.setSource(component);
-
             String name = component.getName();
             File archiveComponentBase = new File(archive.getBase(), name);
 
             // does it matter if this does not exist, do we need to process something regardless?
 
-            taskGroup.addTask(new RestoreComponentTask(component, archiveComponentBase));
+            RestoreComponentTask task = new RestoreComponentTask(component, archiveComponentBase);
+            final Feedback feedback = taskMonitor.add(task);
+            
+            // if we can monitor the archiveable components progress, then we attach a listener that
+            // feeds back the information to the feedback instance
+            task.setListener(new TaskListener()
+            {
+                public void setPercentageComplete(int percentage)
+                {
+                    feedback.setPercetageComplete(percentage);
+                }
+            });
 
-            groups.add(taskGroup);
+            tasks.add(task);
         }
 
         return archive;
@@ -78,47 +84,46 @@ public class DefaultArchiveManager implements ArchiveManager
         return archive;
     }
 
-    public List<RestoreTaskGroup> previewRestore()
+    public List<RestoreTask> previewRestore()
     {
         // Check which of the restorable components is represented within the backup.
 
         // return a list of tasks that need to be processed.
 
-        return new LinkedList<RestoreTaskGroup>();
+        return tasks;
     }
 
     public void restoreArchive()
     {
-        if (monitor.isStarted())
+        if (taskMonitor.isStarted())
         {
             throw new IllegalStateException("Can not start restoration of archive. Restoration in progress.");
         }
 
         try
         {
-            monitor.start();
-
             // -- we should know which restorable components we are dealing with at this stage, so should
             //    not need to run the componentBase.isDirectory check.
 
-            for (RestoreTaskGroup group : groups)
+            for (RestoreTask task : tasks)
             {
-                // monitor start group.
-                for (RestoreTask task : group.getTasks())
-                {
-                    // monitor start task
-                    task.execute();
-                    // monitor end task
-                }
-                // monitor end group.
+                // monitor start task
+                taskMonitor.started(task);
+                task.execute();
+                taskMonitor.completed();
             }
 
-            monitor.finish();
         }
         catch (ArchiveException e)
         {
             LOG.error(e);
-            monitor.fail();
+
+            Feedback feedback = taskMonitor.getCurrentTaskProgress();
+            feedback.setStatusMessage(e.getMessage());
+            
+            taskMonitor.errored();
+
+            // abort the remaining.
         }
     }
 

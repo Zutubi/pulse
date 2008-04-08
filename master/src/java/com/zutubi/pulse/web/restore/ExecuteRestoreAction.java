@@ -1,8 +1,11 @@
 package com.zutubi.pulse.web.restore;
 
-import com.zutubi.pulse.restore.ProgressMonitor;
 import com.zutubi.pulse.bootstrap.DefaultSetupManager;
 import com.zutubi.pulse.bootstrap.SetupManager;
+import com.zutubi.pulse.restore.feedback.TaskMonitor;
+import com.zutubi.pulse.restore.RestoreTask;
+
+import java.util.List;
 
 /**
  *
@@ -10,12 +13,17 @@ import com.zutubi.pulse.bootstrap.SetupManager;
  */
 public class ExecuteRestoreAction extends RestoreActionSupport
 {
-    public ProgressMonitor getMonitor()
-    {
-        return archiveManager.getMonitor();
-    }
-
     private SetupManager setupManager;
+
+    public List<RestoreTask> getTasks()
+    {
+        return archiveManager.previewRestore();
+    }
+    
+    public TaskMonitor getMonitor()
+    {
+        return archiveManager.getTaskMonitor();
+    }
 
     public String execute() throws Exception
     {

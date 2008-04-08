@@ -19,6 +19,14 @@ public class ArtifactArchive extends AbstractArchivableComponent
         return "artifacts";
     }
 
+    public String getDescription()
+    {
+        return "The artifacts restoration consists of moving around the directories located within the " +
+                "PULSE_DATA/projects directory to match the restructured project hierarchy.  This step is " +
+                "only necessary if the projects directory has been manually transfered from the 1.2.x " +
+                "PULSE_DATA directory into the 2.0 PULSE_DATA directory.";
+    }
+
     public void backup(File archive) throws ArchiveException
     {
 

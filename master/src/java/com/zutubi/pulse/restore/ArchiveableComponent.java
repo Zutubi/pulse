@@ -16,6 +16,8 @@ public interface ArchiveableComponent
      */
     String getName();
 
+    String getDescription();
+
     /**
      * Backup the persistent state to the specified archive
      *
@@ -35,4 +37,5 @@ public interface ArchiveableComponent
     void restore(File archive) throws ArchiveException;
 
     List<RestoreTask> getRestoreTasks(File archiveComponentBase);
+
 }
