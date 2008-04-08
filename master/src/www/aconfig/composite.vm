@@ -29,7 +29,7 @@
 #end
 
 #macro(renderstate)
-    <div class="config-panel">
+    <div id="config-state" class="config-panel">
         #i18nexists("key=state.heading")<h3 class="config-header">#i18n("key=state.heading")</h3>#end
         <table class="config-state-table">
             #i18nexists("key=state.table.heading")<th colspan="2">#i18n("key=state.table.heading")</th>#end
@@ -58,8 +58,8 @@
 #if($config.record || !$config.type.extendable)
         <td id="left-column">
     #if($config.instance.instanceErrors.size() > 0)
-            <div class="config-panel">
-            <h3 id="instance-errors" class="config-error-header">errors</h3>
+            <div id="instance-errors" class="config-panel">
+            <h3 class="config-error-header">errors</h3>
             <div class="config-container">
             <ul class="config-errors">
         #foreach($error in $config.instance.instanceErrors)

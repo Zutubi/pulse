@@ -7,8 +7,7 @@ import com.zutubi.pulse.license.AbstractLicenseKeyStore;
 import com.zutubi.pulse.license.LicenseException;
 
 /**
- *
- *
+ * License key store backed by the normal configuration system.
  */
 public class ConfigLicenseKeyStore extends AbstractLicenseKeyStore
 {
@@ -23,7 +22,7 @@ public class ConfigLicenseKeyStore extends AbstractLicenseKeyStore
                 notifyListeners();
             }
         };
-        listener.register(configurationProvider, false);
+        listener.register(configurationProvider, true);
     }
 
     public String getKey()
@@ -38,7 +37,7 @@ public class ConfigLicenseKeyStore extends AbstractLicenseKeyStore
 
     public void setKey(String licenseKey) throws LicenseException
     {
-        LicenseConfiguration licenseConfiguration = configurationProvider.get(LicenseConfiguration.class);
+        LicenseConfiguration licenseConfiguration = configurationProvider.deepClone(configurationProvider.get(LicenseConfiguration.class));
         licenseConfiguration.setKey(licenseKey);
         configurationProvider.save(licenseConfiguration);
     }

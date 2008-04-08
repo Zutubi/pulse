@@ -184,7 +184,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         selectFromAllTasks();
         CompositePage hookPage = addTask("${project} ${status}");
         hookPage.clickActionAndWait("disable");
-        assertEquals("disabled", hookPage.getState("state"));
+        assertEquals("disabled", hookPage.getStateField("state"));
 
         xmlRpcHelper.runBuild(PROJECT_NAME, 60000);
         assertFalse(new File(tempDir, "args.txt").exists());

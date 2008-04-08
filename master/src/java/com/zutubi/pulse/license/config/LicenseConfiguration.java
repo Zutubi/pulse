@@ -7,8 +7,7 @@ import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.license.LicenseKey;
 
 /**
- *
- *
+ * A simple hashed key that holds the server license.
  */
 @SymbolicName("zutubu.licenseConfig")
 @Classification(single = "license")

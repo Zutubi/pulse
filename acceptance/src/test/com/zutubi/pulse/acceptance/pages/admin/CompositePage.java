@@ -66,14 +66,29 @@ public class CompositePage extends ConfigPage
         waitFor();
     }
 
-    public String getState(String name)
+    public String getStateId()
     {
-        return selenium.getText(getStateId(name));
+        return "config-state";
     }
 
-    private String getStateId(String name)
+    public boolean isStatePresent()
+    {
+        return selenium.isElementPresent(getStateId());
+    }
+
+    public String getStateFieldId(String name)
     {
         return "state." + name;
+    }
+
+    public boolean isStateFieldPresent(String field)
+    {
+        return selenium.isElementPresent(getStateFieldId(field));
+    }
+
+    public String getStateField(String name)
+    {
+        return selenium.getText(getStateFieldId(name));
     }
 
     public String getErrorsId()
