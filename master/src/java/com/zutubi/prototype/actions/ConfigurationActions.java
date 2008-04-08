@@ -137,11 +137,6 @@ public class ConfigurationActions
         return actionHandlerClass;
     }
 
-    public void addAction(ConfigurationAction action)
-    {
-        availableActions.put(action.getName(), action);
-    }
-
     public ConfigurationAction getAction(String name)
     {
         return availableActions.get(name);

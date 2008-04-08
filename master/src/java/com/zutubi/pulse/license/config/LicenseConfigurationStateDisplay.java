@@ -6,26 +6,38 @@ import com.zutubi.pulse.license.LicenseHolder;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 /**
- *
- *
+ * Shows the decoded license information to the user.
  */
-public class LicenseConfigurationDisplay
+public class LicenseConfigurationStateDisplay
 {
-    public String getName()
+    public List<String> getFields()
+    {
+        License license = LicenseHolder.getLicense();
+        return Arrays.asList("type", "status", "name", license.isEvaluation() ? "expiry" : "supportExpiry", "supportedAgents", "supportedProjects", "supportedUsers");
+    }
+
+    public String formatName()
     {
         return LicenseHolder.getLicense().getHolder();
     }
 
-    public String getType()
+    public String formatType()
     {
         return LicenseHolder.getLicense().getType().name().toLowerCase().replace("_", " ");
     }
 
-    public String getExpiry()
+    public String formatSupportExpiry()
+    {
+        return formatExpiry();
+    }
+
+    public String formatExpiry()
     {
         License license = LicenseHolder.getLicense();
         Date expiryDate = license.getExpiryDate();
@@ -47,7 +59,7 @@ public class LicenseConfigurationDisplay
         return messages.format("no.expiry");
     }
 
-    public String getStatus()
+    public String formatStatus()
     {
         License license = LicenseHolder.getLicense();
         if (license.isExpired())
@@ -58,7 +70,7 @@ public class LicenseConfigurationDisplay
         return "active";
     }
 
-    public String getSupportedUsers()
+    public String formatSupportedUsers()
     {
         License license = LicenseHolder.getLicense();
         if (license.getSupportedUsers() == License.UNRESTRICTED)
@@ -68,7 +80,7 @@ public class LicenseConfigurationDisplay
         return String.valueOf(license.getSupportedUsers());
     }
     
-    public String getSupportedProjects()
+    public String formatSupportedProjects()
     {
         License license = LicenseHolder.getLicense();
         if (license.getSupportedProjects() == License.UNRESTRICTED)
@@ -78,7 +90,7 @@ public class LicenseConfigurationDisplay
         return String.valueOf(license.getSupportedProjects());
     }
 
-    public String getSupportedAgents()
+    public String formatSupportedAgents()
     {
         License license = LicenseHolder.getLicense();
         if (license.getSupportedAgents() == License.UNRESTRICTED)

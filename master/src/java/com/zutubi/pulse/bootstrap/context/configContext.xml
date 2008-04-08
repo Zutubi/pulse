@@ -43,6 +43,7 @@
         </property>
     </bean>
     <bean id="actionManager" class="com.zutubi.prototype.actions.ActionManager" autowire="byName"/>
+    <bean id="stateDisplayManager" class="com.zutubi.prototype.format.StateDisplayManager" autowire="byName"/>
 
     <bean id="formDescriptorFactory" class="com.zutubi.prototype.FormDescriptorFactory" autowire="byName" init-method="init"/>
     <bean id="freemarkerConfiguration" class="com.zutubi.pulse.bootstrap.freemarker.FreemarkerConfigurationFactoryBean" autowire="byName"/>

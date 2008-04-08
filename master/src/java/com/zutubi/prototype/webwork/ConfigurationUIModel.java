@@ -1,13 +1,12 @@
 package com.zutubi.prototype.webwork;
 
 import com.zutubi.i18n.Messages;
-import com.zutubi.prototype.ConventionSupport;
 import com.zutubi.prototype.actions.ActionManager;
 import com.zutubi.prototype.config.ConfigurationPersistenceManager;
 import com.zutubi.prototype.config.ConfigurationRegistry;
 import com.zutubi.prototype.config.ConfigurationSecurityManager;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
-import com.zutubi.prototype.format.Display;
+import com.zutubi.prototype.format.StateDisplayManager;
 import com.zutubi.prototype.model.ActionLink;
 import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.prototype.type.CollectionType;
@@ -22,7 +21,6 @@ import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.TextUtils;
-import com.zutubi.util.bean.ObjectFactory;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -39,7 +37,7 @@ public class ConfigurationUIModel
     private ConfigurationSecurityManager configurationSecurityManager;
     private ConfigurationRegistry configurationRegistry;
     private ActionManager actionManager;
-    private ObjectFactory objectFactory;
+    private StateDisplayManager stateDisplayManager;
     private SystemPaths systemPaths;
 
     private Record record;
@@ -156,18 +154,8 @@ public class ConfigurationUIModel
                 }
             });
 
-            Class displayHandler = ConventionSupport.getDisplay(type);
-            if (displayHandler != null)
-            {
-                // do not show display fields for template records.
-                if (instance != null && instance.isConcrete())
-                {
-                    Display displaySupport = new Display();
-                    displaySupport.setObjectFactory(objectFactory);
-                    displayFields = displaySupport.getDisplayFields(displayHandler);
-                }
-            }
-
+            displayFields = stateDisplayManager.getDisplayFields(instance);
+            
             if(instance == null)
             {
                 // Is this path configured in any descendents?
@@ -187,21 +175,7 @@ public class ConfigurationUIModel
 
     public Object format(String fieldName)
     {
-        Class displayHandler = ConventionSupport.getDisplay(targetType);
-        if (displayHandler != null)
-        {
-            try
-            {
-                Display displaySupport = new Display();
-                displaySupport.setObjectFactory(objectFactory);
-                return displaySupport.format(displayHandler, fieldName, instance);
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-        }
-        return null;
+        return stateDisplayManager.format(fieldName, instance);
     }
 
     public boolean isConfigurationCheckAvailable()
@@ -329,11 +303,6 @@ public class ConfigurationUIModel
         this.configurationTemplateManager = configurationTemplateManager;
     }
 
-    public void setObjectFactory(ObjectFactory objectFactory)
-    {
-        this.objectFactory = objectFactory;
-    }
-
     public void setActionManager(ActionManager actionManager)
     {
         this.actionManager = actionManager;
@@ -347,5 +316,10 @@ public class ConfigurationUIModel
     public void setSystemPaths(SystemPaths systemPaths)
     {
         this.systemPaths = systemPaths;
+    }
+
+    public void setStateDisplayManager(StateDisplayManager stateDisplayManager)
+    {
+        this.stateDisplayManager = stateDisplayManager;
     }
 }

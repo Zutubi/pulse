@@ -4,7 +4,7 @@ import java.lang.reflect.Method;
 
 /**
  * Describes an action that can be performed on a configuration object.  The
- * action is executed using the <configuration type>Actions class.
+ * action is executed using the &lt;configuration type&gt;Actions class.
  */
 public class ConfigurationAction
 {

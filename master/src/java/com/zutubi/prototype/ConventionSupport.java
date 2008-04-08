@@ -4,8 +4,8 @@ import com.zutubi.prototype.type.Type;
 import com.zutubi.pulse.core.config.Configuration;
 
 /**
- *
- *
+ * Helper methods for finding classes associated with configuration types,
+ * for example for finding custom wizard classes.
  */
 public class ConventionSupport
 {
@@ -29,9 +29,9 @@ public class ConventionSupport
         return loadClass(type, "Formatter");
     }
 
-    public static Class getDisplay(Type type)
+    public static Class getStateDisplay(Class<? extends Configuration> clazz)
     {
-        return loadClass(type, "Display");
+        return loadClass(clazz, "StateDisplay");
     }
 
     public static Class getCreator(Type type)

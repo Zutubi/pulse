@@ -1,17 +1,16 @@
 package com.zutubi.pulse.prototype.config.agent;
 
-import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.agent.Agent;
+import com.zutubi.pulse.agent.AgentManager;
 
 /**
- *
- *
+ * Shows agent status information.
  */
-public class AgentConfigurationDisplay
+public class AgentConfigurationStateDisplay
 {
     private AgentManager agentManager;
 
-    public String getStatus(AgentConfiguration config)
+    public String formatStatus(AgentConfiguration config)
     {
         Agent agent = agentManager.getAgent(config.getHandle());
         return agent.getStatus().getPrettyString();
