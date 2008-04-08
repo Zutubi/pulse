@@ -16,7 +16,7 @@ import org.apache.velocity.VelocityContext;
 public class MakeTypeConfiguration extends TemplateTypeConfiguration
 {
     /**
-     * Path relative to work.dir in which to execute the make.
+     * Path relative to base.dir in which to execute the make.
      */
     @FieldAction(template = "actions/browse-scm-dir")
     private String workingDir;
@@ -24,9 +24,8 @@ public class MakeTypeConfiguration extends TemplateTypeConfiguration
     @FieldAction(template = "actions/browse-scm-file")
     @Parameter(name = "baseDirField", value = "workingDir")
     private String makefile;
-
     /**
-     * Space-separated list of target names (persists more efficiently)
+     * Space-separated list of target names.
      */
     private String targets;
 

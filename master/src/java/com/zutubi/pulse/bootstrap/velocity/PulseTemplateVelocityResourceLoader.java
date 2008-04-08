@@ -11,7 +11,6 @@ import java.io.File;
 /**
  * A velocity resource file loader that uses the application installation
  * directories to lookup velocity templates.
- *
  */
 public class PulseTemplateVelocityResourceLoader extends FileResourceLoader
 {
@@ -28,6 +27,7 @@ public class PulseTemplateVelocityResourceLoader extends FileResourceLoader
      * Retrieve a comma separated list of the systems template paths. These paths
      * are represented as absolute paths.
      *
+     * @return the template paths added by this loader
      */
     public String getFullTemplatePath()
     {
@@ -51,11 +51,6 @@ public class PulseTemplateVelocityResourceLoader extends FileResourceLoader
         super.init(configuration);
     }
 
-    /**
-     * Required resource.
-     *
-     * @param configManager
-     */
     public void setConfigurationManager(MasterConfigurationManager configManager)
     {
         this.configManager = configManager;

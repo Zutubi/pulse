@@ -3,6 +3,8 @@
 <plugin>
     <extension point="com.zutubi.pulse.core.commands">
         <command name="xcode" class="com.zutubi.pulse.core.XCodeCommand"/>
-        <command name="xcode.pp" class="com.zutubi.pulse.core.XCodePostProcessor"/>
+    </extension>
+    <extension point="com.zutubi.pulse.core.postprocessors">
+        <post-processor name="xcode.pp" class="com.zutubi.pulse.core.XCodePostProcessor"/>
     </extension>
 </plugin>

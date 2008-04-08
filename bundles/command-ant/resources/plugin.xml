@@ -3,6 +3,8 @@
 <plugin>
     <extension point="com.zutubi.pulse.core.commands">
         <command name="ant" class="com.zutubi.pulse.core.AntCommand"/>
-        <command name="ant.pp" class="com.zutubi.pulse.core.AntPostProcessor"/>
+    </extension>
+    <extension point="com.zutubi.pulse.core.postprocessors">
+        <post-processor name="ant.pp" class="com.zutubi.pulse.core.AntPostProcessor"/>
     </extension>
 </plugin>
