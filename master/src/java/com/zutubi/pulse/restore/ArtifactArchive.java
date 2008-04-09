@@ -1,10 +1,16 @@
 package com.zutubi.pulse.restore;
 
 import com.zutubi.pulse.bootstrap.MasterUserPaths;
-import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.util.IOUtils;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -34,9 +40,41 @@ public class ArtifactArchive extends AbstractArchivableComponent
 
     public void restore(File archive) throws ArchiveException
     {
+        // load the mappings file.
         try
         {
-            FileSystemUtils.copy(paths.getProjectRoot(), archive);
+            File mappingsFile = new File(archive, "mappings.txt");
+            Map<Long, Long> mappings = readMappings(mappingsFile);
+
+            File base = paths.getProjectRoot();
+
+            for (File projectDir : base.listFiles(new DirectoryFilter()))
+            {
+                for (File buildDir : projectDir.listFiles(new DirectoryFilter()))
+                {
+                    for (File recipeDir : buildDir.listFiles(new DirectoryFilter()))
+                    {
+                        Long recipeResultId = Long.valueOf(recipeDir.getName());
+                        if (mappings.containsKey(recipeResultId))
+                        {
+                            Long projectId = mappings.get(recipeResultId);
+
+                            // move the build directory into the specified project.
+                            File mappedProjectDir = new File(base, Long.toString(projectId));
+                            if (!mappedProjectDir.isDirectory() && !mappedProjectDir.mkdirs())
+                            {
+                                throw new IOException("Failed to create new project directory: " + mappedProjectDir.getCanonicalPath());
+                            }
+
+                            File newBuildDir = new File(mappedProjectDir, buildDir.getName());
+                            if (!buildDir.renameTo(newBuildDir))
+                            {
+                                throw new IOException("Failed to move " + buildDir.getCanonicalPath() + " to " + newBuildDir.getCanonicalPath());
+                            }
+                        }
+                    }
+                }
+            }
         }
         catch (IOException e)
         {
@@ -48,4 +86,42 @@ public class ArtifactArchive extends AbstractArchivableComponent
     {
         this.paths = paths;
     }
+
+    private Map<Long, Long> readMappings(File file) throws IOException
+    {
+        Map<Long, Long> mappings = new HashMap<Long, Long>();
+
+        BufferedReader reader = null;
+        try
+        {
+            reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+            String line;
+            while ((line = reader.readLine()) != null)
+            {
+                if (line.startsWith("#"))
+                {
+                    continue;
+                }
+                int index = line.indexOf("->");
+                Long recipeResultId = Long.valueOf(line.substring(0, index));
+                Long projectId = Long.valueOf(line.substring(index + 2));
+                mappings.put(recipeResultId, projectId);
+            }
+        }
+        finally
+        {
+            IOUtils.close(reader);
+        }
+
+        return mappings;
+    }
+
+    private class DirectoryFilter implements FileFilter
+    {
+        public boolean accept(File file)
+        {
+            return file.isDirectory();
+        }
+    }
 }
+
