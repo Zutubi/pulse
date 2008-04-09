@@ -512,6 +512,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         childHierarchyPage.waitFor();
         ProjectConfigPage configPage = childHierarchyPage.clickConfigure();
         configPage.waitFor();
+        SeleniumUtils.waitForLocator(selenium, configPage.getTreeLinkLocator("subversion configuration"));
         CompositePage scmPage = configPage.clickComposite("scm", "subversion configuration");
         scmPage.waitFor();
         SubversionForm subversionForm = new SubversionForm(selenium);

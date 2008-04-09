@@ -4,7 +4,8 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 /**
- * <class-comment/>
+ * Collection of all acceptance tests, mainly required to ensure the setup
+ * test runs first.
  */
 public class AcceptanceTestSuite
 {
