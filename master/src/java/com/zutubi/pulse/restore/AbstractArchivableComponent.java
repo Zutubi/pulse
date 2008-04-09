@@ -11,8 +11,10 @@ import java.io.File;
  */
 public abstract class AbstractArchivableComponent implements ArchiveableComponent
 {
+/*
     public List<RestoreTask> getRestoreTasks(final File archiveComponentBase)
     {
         return new LinkedList<RestoreTask>();
     }
+*/
 }

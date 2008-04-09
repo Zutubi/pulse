@@ -1,10 +1,6 @@
 package com.zutubi.pulse.restore;
 
-import com.zutubi.pulse.util.TimeStamps;
-import com.zutubi.pulse.restore.feedback.TaskListener;
-
 import java.io.File;
-import java.util.Random;
 
 /**
  *
@@ -15,11 +11,13 @@ public class RestoreComponentTask implements RestoreTask
     private ArchiveableComponent component;
     private File archiveBase;
 
+/*
     private long startTimestamp = 0;
 
     private long finishTimestamp = 0;
 
-    private TaskListener listener;
+*/
+//    private TaskListener listener;
 
     public RestoreComponentTask(ArchiveableComponent component, File archiveBase)
     {
@@ -29,6 +27,7 @@ public class RestoreComponentTask implements RestoreTask
 
     public void execute() throws ArchiveException
     {
+/*
         startTimestamp = System.currentTimeMillis();
 
         try
@@ -39,9 +38,11 @@ public class RestoreComponentTask implements RestoreTask
         {
             e.printStackTrace();
         }
+*/
         component.restore(archiveBase);
-
+/*
         finishTimestamp = System.currentTimeMillis();
+*/
     }
 
     public String getName()
@@ -60,6 +61,7 @@ public class RestoreComponentTask implements RestoreTask
         return "place holder";
     }
 
+/*
     public long getElapsedTime()
     {
         // if start timestamp is zero, we have not started.
@@ -90,12 +92,14 @@ public class RestoreComponentTask implements RestoreTask
     {
         return "unknown";
     }
+*/
 
     public boolean isSuccessful()
     {
         return true;
     }
     
+/*
     public int getPercentageComplete()
     {
         if (startTimestamp != 0)
@@ -108,8 +112,11 @@ public class RestoreComponentTask implements RestoreTask
         }
     }
 
+*/
+/*
     public void setListener(TaskListener listener)
     {
         this.listener = listener;
     }
+*/
 }

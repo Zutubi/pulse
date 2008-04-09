@@ -1,7 +1,6 @@
 package com.zutubi.pulse.restore;
 
 import java.io.File;
-import java.util.List;
 
 /**
  *
@@ -36,6 +35,6 @@ public interface ArchiveableComponent
      */
     void restore(File archive) throws ArchiveException;
 
-    List<RestoreTask> getRestoreTasks(File archiveComponentBase);
+//    List<RestoreTask> getRestoreTasks(File archiveComponentBase);
 
 }

@@ -1,9 +1,9 @@
 package com.zutubi.pulse.restore;
 
 import com.zutubi.pulse.bootstrap.UserPaths;
-import com.zutubi.pulse.restore.feedback.TaskMonitor;
 import com.zutubi.pulse.restore.feedback.Feedback;
-import com.zutubi.pulse.restore.feedback.TaskListener;
+import com.zutubi.pulse.restore.feedback.TaskMonitor;
+import com.zutubi.pulse.restore.feedback.FeedbackProvider;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
@@ -62,17 +62,11 @@ public class DefaultArchiveManager implements ArchiveManager
 
             RestoreComponentTask task = new RestoreComponentTask(component, archiveComponentBase);
             final Feedback feedback = taskMonitor.add(task);
-            
-            // if we can monitor the archiveable components progress, then we attach a listener that
-            // feeds back the information to the feedback instance
-            task.setListener(new TaskListener()
+            if (component instanceof FeedbackProvider)
             {
-                public void setPercentageComplete(int percentage)
-                {
-                    feedback.setPercetageComplete(percentage);
-                }
-            });
-
+                ((FeedbackProvider)component).setFeedback(feedback);
+            }
+            
             tasks.add(task);
         }
 

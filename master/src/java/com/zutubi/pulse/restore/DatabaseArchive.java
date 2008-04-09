@@ -1,8 +1,12 @@
 package com.zutubi.pulse.restore;
 
 import com.zutubi.pulse.database.DatabaseConfig;
+import com.zutubi.pulse.restore.feedback.Feedback;
+import com.zutubi.pulse.restore.feedback.FeedbackProvider;
+import com.zutubi.pulse.transfer.Table;
 import com.zutubi.pulse.transfer.TransferAPI;
 import com.zutubi.pulse.transfer.TransferException;
+import com.zutubi.pulse.transfer.TransferListener;
 import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
 import com.zutubi.pulse.util.JDBCUtils;
 import com.zutubi.util.IOUtils;
@@ -10,28 +14,36 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 import javax.sql.DataSource;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
  *
  */
-public class DatabaseArchive extends AbstractArchivableComponent
+public class DatabaseArchive extends AbstractArchivableComponent implements FeedbackProvider
 {
     private static final String EXPORT_FILENAME = "export.xml";
-
+    
+    private static final String TABLE_FILENAME = "table.properties";
+    
     private List<String> mappings = new LinkedList<String>();
 
     private DatabaseConfig databaseConfig = null;
 
     private DataSource dataSource = null;
+    
+    private Feedback feedback;
 
     public String getName()
     {
@@ -61,8 +73,7 @@ public class DatabaseArchive extends AbstractArchivableComponent
                 File file = new File(base, resource.getFilename());
                 if (!file.createNewFile())
                 {
-                    // :|
-                    System.out.println("Unexpected.");
+                    throw new ArchiveException("Failed to create new file: " + file.getCanonicalPath());
                 }
                 IOUtils.writeToFile(file, resource.getInputStream());
             }
@@ -94,6 +105,14 @@ public class DatabaseArchive extends AbstractArchivableComponent
     {
         try
         {
+            final Map<String, Long> tableSizes = readTableSizes(new File(base, "tables.properties"));
+            long i = 0;
+            for (long rowCount : tableSizes.values())
+            {
+                i += rowCount;
+            }
+            final long allTablesRowCount = i;
+            
             File export = new File(base, EXPORT_FILENAME);
             if (export.isFile())
             {
@@ -127,24 +146,77 @@ public class DatabaseArchive extends AbstractArchivableComponent
                 }
 
                 TransferAPI transfer = new TransferAPI();
+                transfer.setListener(new TransferListener()
+                {
+                    private String currentTable = "";
+                    private long rowCount = 0;
+                    private long tableRowCount = 0;
+                    private long rowsCountedSoFar = 0;
+
+                    public void startTable(Table table)
+                    {
+                        currentTable = table.getName();
+                        tableRowCount = tableSizes.get(currentTable);
+                    }
+
+                    public void row(Map<String, Object> row)
+                    {
+                        rowCount++;
+                        rowsCountedSoFar++;
+                        feedback.setStatusMessage("" + currentTable + ": " + rowCount + "/" + tableRowCount);
+                        feedback.setPercetageComplete((int)((100 * rowsCountedSoFar)/ allTablesRowCount));
+                    }
+
+                    public void endTable()
+                    {
+                        rowCount = 0;
+                        currentTable = "";
+                    }
+                });
                 transfer.restore(configuration, export, dataSource);
             }
         }
         catch (SQLException e)
         {
-            e.printStackTrace();
             throw new ArchiveException(e);
         }
         catch (IOException e)
         {
-            e.printStackTrace();
             throw new ArchiveException(e);
         }
         catch (TransferException e)
         {
-            e.printStackTrace();
             throw new ArchiveException(e);
         }
+    }
+
+    private Map<String, Long> readTableSizes(File file) throws IOException
+    {
+        Map<String, Long> tableSizes = new HashMap<String, Long>();
+
+        BufferedReader reader = null;
+        try
+        {
+            reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+            String line;
+            while ((line = reader.readLine()) != null)
+            {
+                if (line.startsWith("#"))
+                {
+                    continue;
+                }
+                int index = line.indexOf('=');
+                String tableName = line.substring(0, index);
+                Long rowCount = Long.valueOf(line.substring(index + 1));
+                tableSizes.put(tableName, rowCount);
+            }
+        }
+        finally
+        {
+            IOUtils.close(reader);
+        }
+
+        return tableSizes;
     }
 
     public void setMappings(List<String> mappings)
@@ -160,5 +232,10 @@ public class DatabaseArchive extends AbstractArchivableComponent
     public void setDataSource(DataSource dataSource)
     {
         this.dataSource = dataSource;
+    }
+
+    public void setFeedback(Feedback feedback)
+    {
+        this.feedback = feedback;
     }
 }

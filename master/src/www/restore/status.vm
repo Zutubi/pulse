@@ -15,38 +15,46 @@
     </ul>
 </p>
 
+#set($overallPercentageComplete = $monitor.percentageComplete)
+#set($overallPercentageRemaining = 100 - $overallPercentageComplete)
+
+<p>
+    <table width=500>
+        <tr width="40%">
+            <td width="$overallPercentageComplete%" class="okaybar">&nbsp;</td><td width="$overallPercentageRemaining%" class="clearbar">&nbsp;</td>
+        </tr>
+    </table>
+</p>
+
+<p>
+    &nbsp;
+</p>
+#set($currentTask = $monitor.currentTask)
+#set($currentFeedback = $monitor.currentTaskProgress)
 <p>
     <ul>
-        #set($currentTask = $monitor.currentTask)
         <li>Current task: $currentTask.name</li>
-        <li>Percentage complete: $currentTask.percentageComplete</li>
-        <li>Elapsed time: $currentTask.elapsedTimePretty</li>
-        <li>Estimated time: $currentTask.estimatedTimePretty</li>
-        <li>Status message: $currentTask.statusMessage</li>
+        <li>Percentage complete: $currentFeedback.percentageCompletePretty</li>
+        <li>Elapsed time: $currentFeedback.elapsedTimePretty</li>
+        <li>Estimated time: $currentFeedback.estimatedTimePretty</li>
+        <li>Status message: $currentFeedback.statusMessage</li>
     </ul>
 </p>
 
 <p>
     Task overview:
-    <table style="border-width:1px; border-style:solid;" width=500>
+    <table width=500>
         #foreach($task in $tasks)
             #set($feedback = $monitor.getProgress($task))
         <tr width="40%">
-            <td nowrap>$task.name</td>
-            #if ($feedback.isSuccessful())
-                #set($styleClass = "okaybar")
-            #elseif($feedback.isError())
-                #set($styleClass = "errorbar")
-            #else
-                #set($styleClass = "clearbar")
-            #end
-
-            #set($styleClass = "okaybar")
-
+            <td>$task.name</td>
             #if ($feedback.getPercentageComplete() <= 0)
-                <td width="100%" colspan=2 class="clearbar"/>
+                <td width="100%" colspan=2 class="clearbar">&nbsp;</td>
+            #elseif ($feedback.getPercentageComplete() == 100)
+                <td width="100%" colspan=2 class="okaybar">&nbsp;</td>
             #else
-                <td width="$feedback.getPercentageComplete()%" class="$styleClass"/>
+                <td width="$feedback.getPercentageComplete()%" class="okaybar">&nbsp;</td>
+                <td width="$feedback.getPercentageRemaining()%" class="clearbar">&nbsp;</td>
             #end
         </tr>
         #end

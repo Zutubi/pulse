@@ -19,6 +19,7 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -26,6 +27,8 @@ import java.util.List;
  */
 public class TransferAPI
 {
+    private TransferListener listener;
+
     public void dump(Configuration config, DataSource dataSource, File outFile) throws TransferException
     {
         FileOutputStream outputStream = null;
@@ -48,7 +51,7 @@ public class TransferAPI
 
     public void dump(Configuration config, DataSource dataSource, OutputStream outputStream) throws TransferException
     {
-        XMLTransferTarget target = null;
+        TransferTarget target = null;
         try
         {
             if (!isSchemaMappingValid(config, dataSource))
@@ -56,22 +59,29 @@ public class TransferAPI
                 throw new JDBCTransferException("Schema export aborted due to schema / mapping mismatch");
             }
 
-            target = new XMLTransferTarget();
-            target.setOutput(outputStream);
-            target.setVersion(Version.getVersion().getBuildNumber());
+            XMLTransferTarget xmlTarget = new XMLTransferTarget();
+            xmlTarget.setOutput(outputStream);
+            xmlTarget.setVersion(Version.getVersion().getBuildNumber());
 
             JDBCTransferSource source = new JDBCTransferSource();
             source.setConfiguration(config);
             source.setDataSource(dataSource);
 
+            target = wrapTargetIfNecessary(xmlTarget);
+
             source.transferTo(target);
         }
         finally
         {
-            if (target != null)
-            {
-                target.close();
-            }
+            close(target);
+        }
+    }
+
+    private void close(TransferTarget target)
+    {
+        if (target != null)
+        {
+            target.close();
         }
     }
 
@@ -96,24 +106,35 @@ public class TransferAPI
     public void restore(Configuration configuration, DataSource dataSource, InputStream inputStream) throws TransferException
     {
         // configure the import.
-        JDBCTransferTarget target = null;
+        TransferTarget target = null;
         try
         {
-            target = new JDBCTransferTarget();
-            target.setDataSource(dataSource);
-            target.setConfiguration(configuration);
+            JDBCTransferTarget jdbcTarget = new JDBCTransferTarget();
+            jdbcTarget.setDataSource(dataSource);
+            jdbcTarget.setConfiguration(configuration);
 
             XMLTransferSource source = new XMLTransferSource();
             source.setSource(inputStream);
+
+            target = wrapTargetIfNecessary(jdbcTarget);
 
             source.transferTo(target);
         }
         finally
         {
-            if (target != null)
-            {
-                target.close();
-            }
+            close(target);
+        }
+    }
+
+    private TransferTarget wrapTargetIfNecessary(TransferTarget target)
+    {
+        if (listener != null)
+        {
+            return new ListenerTransferTarget(target, listener);
+        }
+        else
+        {
+            return  target;
         }
     }
 
@@ -206,5 +227,53 @@ public class TransferAPI
         }
     }
 
+    public void setListener(TransferListener listener)
+    {
+        this.listener = listener;
+    }
 
+    private class ListenerTransferTarget implements TransferTarget
+    {
+        private TransferListener listener;
+        private TransferTarget delegate;
+
+        public ListenerTransferTarget(TransferTarget delegate, TransferListener listener)
+        {
+            this.listener = listener;
+            this.delegate = delegate;
+        }
+
+        public void start() throws TransferException
+        {
+            delegate.start();
+        }
+
+        public void startTable(com.zutubi.pulse.transfer.Table table) throws TransferException
+        {
+            listener.startTable(table);
+            delegate.startTable(table);
+        }
+
+        public void row(Map<String, Object> row) throws TransferException
+        {
+            listener.row(row);
+            delegate.row(row);
+        }
+
+        public void endTable() throws TransferException
+        {
+            listener.endTable();
+            delegate.endTable();
+        }
+
+        public void end() throws TransferException
+        {
+            delegate.end();
+        }
+
+        public void close()
+        {
+            delegate.close();
+        }
+    }
 }

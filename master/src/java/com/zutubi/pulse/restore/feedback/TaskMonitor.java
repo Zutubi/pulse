@@ -121,7 +121,7 @@ public class TaskMonitor
         {
             int singleTaskPercentage = (100 / numberOfTasks);
             Feedback currentProgress = getCurrentTaskProgress();
-            int currentTaskCompletion = singleTaskPercentage * (currentProgress.getPercentageComplete() / 100);
+            int currentTaskCompletion = (int)(singleTaskPercentage * (((double)currentProgress.getPercentageComplete()) / 100));
 
             if (currentTaskCompletion > 0)
             {

@@ -1,5 +1,7 @@
 package com.zutubi.pulse.restore.feedback;
 
+import com.zutubi.pulse.util.TimeStamps;
+
 /**
  *
  *
@@ -92,6 +94,11 @@ public class Feedback
         return finishTime - startTime;
     }
 
+    public String getElapsedTimePretty()
+    {
+        return TimeStamps.getPrettyElapsed(getElapsedTime());
+    }
+
     public void setPercetageComplete(int percentage)
     {
         if (percentage > 100)
@@ -118,6 +125,36 @@ public class Feedback
         return percentageComplete;
     }
 
+    public int getPercentageRemaining()
+    {
+        int complete = getPercentageComplete();
+        if (complete == UNDEFINED)
+        {
+            return UNDEFINED;
+        }
+        return 100 - complete;
+    }
+
+    public String getPercentageRemainingPretty()
+    {
+        int percentage = getPercentageRemaining();
+        if (percentage == UNDEFINED)
+        {
+            return "unknown";
+        }
+        return Integer.toString(percentage);
+    }
+
+    public String getPercentageCompletePretty()
+    {
+        int percentage = getPercentageComplete();
+        if (percentage == UNDEFINED)
+        {
+            return "unknown";
+        }
+        return Integer.toString(percentage);
+    }
+
     public long getEstimatedTime()
     {
         if (percentageComplete == UNDEFINED)
@@ -139,9 +176,19 @@ public class Feedback
         return (elapsedTime / percentageComplete) * percentageRemaining;
     }
 
+    public String getEstimatedTimePretty()
+    {
+        long l = getEstimatedTime();
+        if (l == UNDEFINED)
+        {
+            return "unknown";
+        }
+        return TimeStamps.getPrettyElapsed(l);
+    }
+
     public String getStatusMessage()
     {
-        return statusMessage;
+        return (statusMessage != null) ? statusMessage : "";
     }
 
     public void setStatusMessage(String statusMessage)
