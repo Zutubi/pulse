@@ -4,6 +4,7 @@ import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.XMLUtils;
 import com.zutubi.pulse.util.logging.Logger;
 import nu.xom.*;
+import org.apache.commons.codec.binary.Base64;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,6 +22,7 @@ public class TestSuitePersister
     public static final String ELEMENT_SUITE = "suite";
     public static final String ELEMENT_CASE = "case";
     public static final String ELEMENT_MESSAGE = "message";
+    public static final String ENCODED_PREFIX = "encoded-";
     public static final String ATTRIBUTE_TOTAL = "total";
     public static final String ATTRIBUTE_FAILURES = "failures";
     public static final String ATTRIBUTE_ERRORS = "errors";
@@ -59,7 +61,7 @@ public class TestSuitePersister
         for (TestSuiteResult child : suite.getSuites())
         {
             Element suiteElement = new Element(ELEMENT_SUITE);
-            suiteElement.addAttribute(new Attribute(ATTRIBUTE_NAME, child.getName()));
+            suiteElement.addAttribute(safeAttribute(ATTRIBUTE_NAME, child.getName()));
             suiteElement.addAttribute(new Attribute(ATTRIBUTE_TOTAL, Integer.toString(child.getTotal())));
             suiteElement.addAttribute(new Attribute(ATTRIBUTE_FAILURES, Integer.toString(child.getFailures())));
             suiteElement.addAttribute(new Attribute(ATTRIBUTE_ERRORS, Integer.toString(child.getErrors())));
@@ -71,15 +73,14 @@ public class TestSuitePersister
         for (TestCaseResult child : suite.getCases())
         {
             Element caseElement = new Element(ELEMENT_CASE);
-            caseElement.addAttribute(new Attribute(ATTRIBUTE_NAME, child.getName()));
+            caseElement.addAttribute(safeAttribute(ATTRIBUTE_NAME, child.getName()));
             caseElement.addAttribute(new Attribute(ATTRIBUTE_DURATION, Long.toString(child.getDuration())));
             caseElement.addAttribute(new Attribute(ATTRIBUTE_STATUS, child.getStatusName()));
 
             String message = child.getMessage();
             if (message != null)
             {
-                Element messageElement = new Element(ELEMENT_MESSAGE);
-                messageElement.appendChild(message);
+                Element messageElement = safeElement(ELEMENT_MESSAGE, message);
                 caseElement.appendChild(messageElement);
             }
 
@@ -87,6 +88,46 @@ public class TestSuitePersister
         }
 
         return new Document(root);
+    }
+
+    private String base64Encode(String value)
+    {
+        try
+        {
+            return new String(Base64.encodeBase64(value.getBytes("UTF-8")), "UTF-8");
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            return value;
+        }
+    }
+
+    private Attribute safeAttribute(String name, String value)
+    {
+        try
+        {
+            return new Attribute(name, value);
+        }
+        catch(IllegalCharacterDataException e)
+        {
+            return new Attribute(ENCODED_PREFIX + name, base64Encode(value));
+        }
+    }
+
+    private Element safeElement(String name, String text)
+    {
+        try
+        {
+            Element element = new Element(name);
+            element.appendChild(text);
+            return element;
+        }
+        catch (IllegalCharacterDataException e)
+        {
+            Element element = new Element(ENCODED_PREFIX + name);
+            element.appendChild(base64Encode(text));
+            return element;
+        }
     }
 
     public TestSuiteResult read(String name, File directory, boolean deep, boolean failuresOnly, int limit) throws IOException, ParsingException
@@ -123,7 +164,7 @@ public class TestSuitePersister
         for (int i = 0; i < elements.size(); i++)
         {
             Element element = elements.get(i);
-            String name = element.getAttributeValue(ATTRIBUTE_NAME);
+            String name = getSafeAttributeValue(element, ATTRIBUTE_NAME);
             long duration = getDuration(element);
             int total = getIntAttribute(element, ATTRIBUTE_TOTAL);
             int errors = getIntAttribute(element, ATTRIBUTE_ERRORS);
@@ -152,6 +193,33 @@ public class TestSuitePersister
                 handler.endSuite();
             }
         }
+    }
+
+    private String base64Decode(String value)
+    {
+        try
+        {
+            return new String(Base64.decodeBase64(value.getBytes("UTF-8")), "UTF-8");
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            return value;
+        }
+    }
+
+    private String getSafeAttributeValue(Element element, String name)
+    {
+        String result = element.getAttributeValue(name);
+        if(result == null)
+        {
+            result = element.getAttributeValue(ENCODED_PREFIX + name);
+            if(result != null)
+            {
+                result = base64Decode(result);
+            }
+        }
+
+        return result;
     }
 
     private int getIntAttribute(Element element, String attribute)
@@ -185,7 +253,7 @@ public class TestSuitePersister
                 continue;
             }
 
-            TestCaseResult caseResult = new TestCaseResult(element.getAttributeValue(ATTRIBUTE_NAME), getDuration(element), status, getMessage(element));
+            TestCaseResult caseResult = new TestCaseResult(getSafeAttributeValue(element, ATTRIBUTE_NAME), getDuration(element), status, getSafeText(element, ELEMENT_MESSAGE));
             if(caseResult.getStatus() == TestCaseResult.Status.PASS)
             {
                 caseResult.setFixed(element.getAttributeValue(ATTRIBUTE_FIXED) != null);
@@ -262,19 +330,25 @@ public class TestSuitePersister
         return status;
     }
 
-    private String getMessage(Element element)
+    private String getSafeText(Element element, String name)
     {
-        Elements messageElements = element.getChildElements(ELEMENT_MESSAGE);
-        if (messageElements.size() > 0 && messageElements.get(0).getChildCount() > 0)
+        String message = XMLUtils.getChildText(element, name, null);
+        if(message == null)
         {
-            Node child = messageElements.get(0).getChild(0);
-            if (child instanceof Text)
+            if(element.getFirstChildElement(name) != null)
             {
-                return child.getValue();
+                // Actually there, but with an empty message
+                return "";
+            }
+            
+            message = XMLUtils.getChildText(element, ENCODED_PREFIX + name, null);
+            if(message != null)
+            {
+                message = base64Decode(message);
             }
         }
 
-        return null;
+        return message;
     }
 
     private Document readDoc(File file) throws IOException, ParsingException

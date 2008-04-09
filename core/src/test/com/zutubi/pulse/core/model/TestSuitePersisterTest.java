@@ -76,6 +76,36 @@ public class TestSuitePersisterTest extends PulseTestCase
         roundTrip(suite);
     }
 
+    public void testXMLSpecialCharacters() throws Exception
+    {
+        TestSuiteResult suite = new TestSuiteResult("<>&'\"!<!-- -->");
+        suite.add(new TestCaseResult("<>&'\"!<!-- -->", 1, TestCaseResult.Status.PASS, "<>&'\"!<!-- -->"));
+
+        TestSuiteResult outer = new TestSuiteResult("outer");
+        outer.add(suite);
+        roundTrip(outer);
+    }
+
+    public void testControlCharacters() throws Exception
+    {
+        TestSuiteResult suite = new TestSuiteResult("\u0018");
+        suite.add(new TestCaseResult("\u0018", 1, TestCaseResult.Status.PASS, "\u0018"));
+
+        TestSuiteResult outer = new TestSuiteResult("outer");
+        outer.add(suite);
+        roundTrip(outer);
+    }
+
+    public void testEmptyMessage() throws Exception
+    {
+        TestSuiteResult suite = new TestSuiteResult("suity");
+        suite.add(new TestCaseResult("castor", 1, TestCaseResult.Status.PASS, ""));
+
+        TestSuiteResult outer = new TestSuiteResult("outer");
+        outer.add(suite);
+        roundTrip(outer);
+    }
+
     private void roundTrip(TestSuiteResult suite) throws IOException, ParsingException
     {
         persister.write(suite, tempDir);
