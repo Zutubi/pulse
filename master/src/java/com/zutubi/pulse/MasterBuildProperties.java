@@ -50,7 +50,10 @@ public class MasterBuildProperties extends BuildProperties
         ProjectConfiguration projectConfig = project.getConfig();
         context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_NUMBER, Long.toString(buildResult.getNumber()));
         context.addString(NAMESPACE_INTERNAL, PROPERTY_PROJECT, projectConfig.getName());
-        context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_DIRECTORY, buildDir.getAbsolutePath());
+        if (buildDir != null)
+        {
+            context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_DIRECTORY, buildDir.getAbsolutePath());
+        }
 
         BuildReason buildReason = buildResult.getReason();
         context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_REASON, buildReason.getSummary());
@@ -153,6 +156,10 @@ public class MasterBuildProperties extends BuildProperties
         prefix += "command." + commandName + ".";
 
         context.addString(NAMESPACE_INTERNAL, prefix + PROPERTY_STATUS, commandResult.getState().getString());
-        context.addString(NAMESPACE_INTERNAL, prefix + PROPERTY_DIRECTORY, commandResult.getAbsoluteOutputDir(configurationManager.getDataDirectory()).getAbsolutePath());
+        File outputDir = commandResult.getAbsoluteOutputDir(configurationManager.getDataDirectory());
+        if (outputDir != null)
+        {
+            context.addString(NAMESPACE_INTERNAL, prefix + PROPERTY_DIRECTORY, outputDir.getAbsolutePath());
+        }
     }
 }

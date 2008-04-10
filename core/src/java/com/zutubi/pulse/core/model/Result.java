@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.model;
 
 import com.zutubi.pulse.core.BuildException;
-import com.zutubi.util.IOUtils;
 import com.zutubi.pulse.util.TimeStamps;
+import com.zutubi.util.IOUtils;
 
 import java.io.*;
 import java.util.LinkedList;
@@ -249,16 +249,18 @@ public abstract class Result extends Entity
 
     public String getExceptionTrace()
     {
-        File exceptionFile = new File(outputDir, EXCEPTION_FILE);
         String result = null;
-
-        try
+        if (outputDir != null)
         {
-            result = IOUtils.fileToString(exceptionFile);
-        }
-        catch (IOException e)
-        {
-            // Empty
+            try
+            {
+                File exceptionFile = new File(outputDir, EXCEPTION_FILE);
+                result = IOUtils.fileToString(exceptionFile);
+            }
+            catch (IOException e)
+            {
+                // Empty
+            }
         }
 
         return result;
@@ -272,6 +274,10 @@ public abstract class Result extends Entity
      */
     public File getAbsoluteOutputDir(File dataRoot)
     {
+        if (outputDir == null)
+        {
+            return null;
+        }
         return new File(dataRoot, outputDir.getPath());
     }
 

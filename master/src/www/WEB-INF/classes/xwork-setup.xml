@@ -50,7 +50,7 @@
         <default-interceptor-ref name="completeStack"/>
 
         <action name="wizard" class="com.zutubi.prototype.wizard.webwork.ConfigurationWizardAction">
-            <interceptor-ref name="prototypeWizardStack"/>
+            <interceptor-ref name="configWizardStack"/>
             <result name="step" type="velocity">wizard.vm</result>
             <result name="input" type="velocity">wizard.vm</result>
             <result name="success" type="redirect">/setup/execute.action</result>
