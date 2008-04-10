@@ -77,9 +77,9 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         setLicenseViaUI(LicenseHelper.newLicenseKey(LicenseType.EVALUATION, random, twoDaysAgo()));
 
         goTo("/");
-        assertElementNotPresent("support-expired");
-        assertElementPresent("license-expired");
+        waitForElement("license-expired");
         assertTextPresent("Your license has expired.");
+        assertElementNotPresent("support-expired");
 
         // Build triggers should be ignored
         xmlRpcHelper.insertSimpleProject(random, false);
@@ -92,9 +92,9 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         setLicenseViaUI(LicenseHelper.newLicenseKey(LicenseType.CUSTOM, random, twoDaysAgo()));
 
         goTo("/");
-        assertElementNotPresent("license-expired");
-        assertElementPresent("support-expired");
+        waitForElement("support-expired");
         assertTextPresent("support/upgrades have expired");
+        assertElementNotPresent("license-expired");
 
         // Build triggers should behave normally
         xmlRpcHelper.insertSimpleProject(random, false);
@@ -107,10 +107,10 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         setLicenseViaUI(LicenseHelper.newLicenseKey(LicenseType.CUSTOM, random, new Date(System.currentTimeMillis() - 999999 * Constants.DAY)));
 
         goTo("/");
+        waitForElement("license-cannot-run");
+        assertTextPresent("Your license cannot run this version of Pulse, as it was released after the license expiry date.");
         assertElementNotPresent("license-expired");
         assertElementNotPresent("support-expired");
-        assertElementPresent("license-cannot-run");
-        assertTextPresent("Your license cannot run this version of Pulse, as it was released after the license expiry date.");
 
         // Build triggers should behave normally
         xmlRpcHelper.insertSimpleProject(random, false);
@@ -237,7 +237,7 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
     private void assertExceeded() throws Exception
     {
         goTo("/");
-        assertElementPresent("license-exceeded");
+        waitForElement("license-exceeded");
         assertTextPresent("Your license limits have been exceeded.");
 
         // No builds for you!
