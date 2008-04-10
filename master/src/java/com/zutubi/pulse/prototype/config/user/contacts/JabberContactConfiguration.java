@@ -1,12 +1,13 @@
 package com.zutubi.pulse.prototype.config.user.contacts;
 
+import com.zutubi.config.annotations.Classification;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.Classification;
 import com.zutubi.pulse.jabber.JabberManager;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.NotificationException;
 import com.zutubi.util.logging.Logger;
+import com.zutubi.validation.annotations.Required;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.XMPPConnection;
 
@@ -22,6 +23,7 @@ public class JabberContactConfiguration extends ContactConfiguration
     private static final String NO_SERVER_ERROR = "Unable to send Jabber notification: Jabber server not configured.";
     private static final String NO_CONNECTION_ERROR = "Unable to send Jabber notification: not connected to Jabber server.";
 
+    @Required
     private String username;
 
     private JabberManager jabberManager;

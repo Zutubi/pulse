@@ -1,14 +1,16 @@
 package com.zutubi.pulse.prototype.config.user.contacts;
 
-import com.zutubi.util.TextUtils;
+import com.zutubi.config.annotations.Classification;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.Classification;
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.NotificationException;
 import com.zutubi.pulse.prototype.config.admin.EmailConfiguration;
+import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
+import com.zutubi.validation.annotations.Email;
+import com.zutubi.validation.annotations.Required;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
@@ -37,7 +39,8 @@ public class EmailContactConfiguration extends ContactConfiguration
     private static final String SMTPS_LOCALHOST_PROPERTY = "mail.smtps.localhost";
 
     private static final String NO_SMTP_HOST_ERROR = "Unable to deliver email: SMTP host not configured.";
-
+    @Required
+    @Email
     private String address;
 
     private ConfigurationProvider configurationProvider;

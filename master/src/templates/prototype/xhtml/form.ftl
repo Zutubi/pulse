@@ -15,6 +15,7 @@ width of its contents.  Floating it works, but hurts other things.
     {
         var form = new ZUTUBI.Form({
             method: 'post'
+            , formName: '${form.name?js_string}'
             , waitMsgTarget: 'center'
 <#if form.fileUpload>
             , fileUpload: true
@@ -30,6 +31,7 @@ width of its contents.  Floating it works, but hurts other things.
                 Ext.DomHelper.append(form.el, {tag: 'input', type: 'hidden', name: 'cancel', value: 'true'});
             }
 
+            form.clearInvalid();
     <#if form.ajax>
             window.formSubmitting = true;
             form.submit({

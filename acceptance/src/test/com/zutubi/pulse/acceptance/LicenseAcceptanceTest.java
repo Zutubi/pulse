@@ -129,7 +129,7 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         // Adding a project should fail
         AddProjectWizard.AntState state = runProjectWizard(random + "-2", false, ProjectManager.GLOBAL_PROJECT_NAME);
         state.waitFor();
-        waitForStatus("Unable to add project: license limit exceeded");
+        assertTextPresent("Unable to add project: license limit exceeded");
     }
 
     public void testAgentsExceeded() throws Exception
@@ -148,7 +148,7 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         form.waitFor();
         form.finishFormElements(random, "true", "localhost", "8090");
         form.waitFor();
-        waitForStatus("Unable to add agent: license limit exceeded");
+        assertTextPresent("Unable to add agent: license limit exceeded");
     }
 
     public void testUsersExceeded() throws Exception
@@ -167,7 +167,7 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         form.waitFor();
         form.finishFormElements(random, random, "false", "", "");
         form.waitFor();
-        waitForStatus("Unable to add user: license limit exceeded");
+        assertTextPresent("Unable to add user: license limit exceeded");
     }
 
     public void testEnforcedViaRemoteApi() throws Exception
@@ -199,7 +199,7 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         cloneForm.waitFor();
         cloneForm.cloneFormElements(random + "clone");
         cloneForm.waitFor();
-        waitForStatus("Unable to add project: license limit exceeded");
+        assertTextPresent("Unable to add project: license limit exceeded");
     }
 
     private Date tomorrow()

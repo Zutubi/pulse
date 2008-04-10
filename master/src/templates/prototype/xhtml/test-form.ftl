@@ -1,11 +1,11 @@
 <#if form?exists>
-<div id="${form.id}" style="width: 350px"></div>
-<script type="text/javascript" src="${base}/js/zutubi.js"></script>
+<table class="eform"><tr><td id="${form.name}.status"></td></tr><tr><td id="${form.id}"><td></tr></table>
 <script type="text/javascript">
     var ${form.name} = function()
     {
         var form = new ZUTUBI.CheckForm(${mainFormName}, {
             method: 'post',
+            formName: '${form.name?js_string}',
             labelAlign: 'right',
             labelWidth: 150,
             waitMsgTarget: true
@@ -15,6 +15,7 @@
         {
             if(form.isValid())
             {
+                form.clearInvalid();
                 window.formSubmitting = true;
                 form.submit({
                     clientValidation: false

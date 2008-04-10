@@ -2690,7 +2690,7 @@
         });
         ${formName}.on('actionfailed', function(form, action)
         {
-            handleConfigurationResponse(action.result);
+            form.handleActionErrors(action.result.actionErrors);
         });
     </script>
 #end

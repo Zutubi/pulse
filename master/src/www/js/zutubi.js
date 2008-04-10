@@ -543,6 +543,11 @@ Ext.extend(ZUTUBI.Form, Ext.form.Form, {
         if(this.displayMode)
         {
             var dirty = this.isDirty();
+            if(!dirty)
+            {
+                this.clearInvalid();
+            }
+            
             for(var i = 0; i < this.buttons.length; i++)
             {
                 if(dirty)
@@ -555,6 +560,28 @@ Ext.extend(ZUTUBI.Form, Ext.form.Form, {
                 }
             }
         }
+    },
+
+    handleActionErrors: function(errors)
+    {
+        var statusEl = Ext.get(this.formName + '.status');
+        statusEl.update('');
+
+        if(errors && errors.length > 0)
+        {
+            var listEl = statusEl.createChild({tag: 'ul', cls: 'validation-error'});
+            for(var i = 0; i < errors.length; i++)
+            {
+                listEl.createChild({tag: 'li', html: errors[i]});
+            }
+        }
+    },
+
+    clearInvalid: function()
+    {
+        ZUTUBI.Form.superclass.clearInvalid.call(this);
+        var statusEl = Ext.get(this.formName + '.status');
+        statusEl.update('');
     }
 });
 

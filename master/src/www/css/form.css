@@ -202,3 +202,10 @@ td.currentstep
 {
     padding: 4px;
 }
+
+.validation-error li
+{
+    padding: 2px 2px 2px 18px;
+    color: #e00;
+    background: transparent url(../images/default/shared/warning.gif) no-repeat scroll 0 2px;
+}
