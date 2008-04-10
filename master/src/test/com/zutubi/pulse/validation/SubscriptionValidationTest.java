@@ -6,8 +6,6 @@ import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.condition.NotifyConditionFactory;
 import com.zutubi.pulse.prototype.config.user.*;
 import com.zutubi.pulse.prototype.config.user.contacts.EmailContactConfiguration;
-import com.zutubi.pulse.validation.validators.SubscriptionConditionValidator;
-import com.zutubi.util.bean.DefaultObjectFactory;
 
 /**
  */
@@ -42,34 +40,34 @@ public class SubscriptionValidationTest extends AbstractValidationTestCase
     {
         RepeatedUnsuccessfulConditionConfiguration condition = new RepeatedUnsuccessfulConditionConfiguration();
         condition.setAfter(10);
-        assertValid(subscriptionPath, "condition", condition);
+        validatedAndAssertValid(subscriptionPath, "condition", condition);
     }
 
     public void testRepeatedUnsuccessfulConditionZeroAfter() throws TypeException
     {
         RepeatedUnsuccessfulConditionConfiguration condition = new RepeatedUnsuccessfulConditionConfiguration();
         condition.setAfter(0);
-        assertFieldErrors(subscriptionPath, "condition", condition, "after", "after must be positive");
+        validateAndAssertFieldErrors(subscriptionPath, "condition", condition, "after", "after must be positive");
     }
 
     public void testRepeatedUnsuccessfulConditionNegativeAfter() throws TypeException
     {
         RepeatedUnsuccessfulConditionConfiguration condition = new RepeatedUnsuccessfulConditionConfiguration();
         condition.setAfter(-1);
-        assertFieldErrors(subscriptionPath, "condition", condition, "after", "after must be positive");
+        validateAndAssertFieldErrors(subscriptionPath, "condition", condition, "after", "after must be positive");
     }
 
     public void testCustomConditionValid() throws TypeException
     {
         CustomConditionConfiguration condition = new CustomConditionConfiguration();
         condition.setCustomCondition("changed or not success");
-        assertValid(subscriptionPath, "condition", condition);
+        validatedAndAssertValid(subscriptionPath, "condition", condition);
     }
 
     public void testCustomConditionInvalid() throws TypeException
     {
         CustomConditionConfiguration condition = new CustomConditionConfiguration();
         condition.setCustomCondition("invalid");
-        assertFieldErrors(subscriptionPath, "condition", condition, "customCondition", "line 1:1: unexpected token: invalid");
+        validateAndAssertFieldErrors(subscriptionPath, "condition", condition, "customCondition", "line 1:1: unexpected token: invalid");
     }
 }

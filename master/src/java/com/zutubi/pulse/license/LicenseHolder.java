@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- *
+ * Singleton to hold the server license.
  */
 public class LicenseHolder
 {
@@ -42,7 +42,7 @@ public class LicenseHolder
             }
         }
     }
-    
+
     public static synchronized void setAuthorizations(List<String> authorisations)
     {
         LicenseHolder.authorisations = authorisations;

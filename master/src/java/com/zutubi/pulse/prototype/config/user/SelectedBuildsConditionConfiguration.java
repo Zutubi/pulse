@@ -4,6 +4,9 @@ import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.pulse.condition.NotifyConditionFactory;
 import com.zutubi.util.StringUtils;
+import com.zutubi.validation.Validateable;
+import com.zutubi.validation.ValidationContext;
+import com.zutubi.i18n.Messages;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -13,7 +16,7 @@ import java.util.List;
  */
 @SymbolicName("zutubi.selectedBuildsConditionConfig")
 @Form(labelWidth = 350, fieldOrder = {"unsuccessful", "statusChange", "includeChanges", "includeChangesByMe"})
-public class SelectedBuildsConditionConfiguration extends SubscriptionConditionConfiguration
+public class SelectedBuildsConditionConfiguration extends SubscriptionConditionConfiguration implements Validateable
 {
     private boolean unsuccessful;
     private boolean includeChanges;
@@ -62,6 +65,19 @@ public class SelectedBuildsConditionConfiguration extends SubscriptionConditionC
 
     public String getExpression()
     {
+        List<String> expressions = determineExpressions();
+        if(expressions.size() > 0)
+        {
+            return StringUtils.join("or", expressions);
+        }
+        else
+        {
+            return "false";
+        }
+    }
+
+    private List<String> determineExpressions()
+    {
         List<String> expressions = new LinkedList<String>();
         if(unsuccessful)
         {
@@ -82,7 +98,14 @@ public class SelectedBuildsConditionConfiguration extends SubscriptionConditionC
         {
             expressions.add(NotifyConditionFactory.STATE_CHANGE);
         }
+        return expressions;
+    }
 
-        return StringUtils.join("or", expressions);
+    public void validate(ValidationContext context)
+    {
+        if(determineExpressions().size() == 0)
+        {
+            context.addActionError(Messages.getInstance(SelectedBuildsConditionConfiguration.class).format("no.conditions.selected"));
+        }
     }
 }

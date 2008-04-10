@@ -19,6 +19,7 @@ import com.zutubi.pulse.database.DatabaseConsole;
 import com.zutubi.pulse.events.DataDirectoryLocatedEvent;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.license.LicenseHolder;
+import com.zutubi.pulse.license.License;
 import com.zutubi.pulse.logging.LogConfigurationManager;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.plugins.PluginManager;

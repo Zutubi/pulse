@@ -1,6 +1,7 @@
 package com.zutubi.pulse;
 
 import com.zutubi.util.IOUtils;
+import com.zutubi.util.Constants;
 import com.zutubi.util.logging.Logger;
 
 import java.io.*;
@@ -158,7 +159,10 @@ public class Version implements Comparable
             catch (ParseException e1)
             {
                 LOG.severe("Failed to parse '" + getReleaseDate() + "'.", e);
-                return null;
+                // In this case the most conservative thing is to pretend the
+                // release is very new.  We give a week leeway, which is
+                // quite harmless and aids testing.
+                return new Date(System.currentTimeMillis() - 7 * Constants.DAY);
             }
         }
     }

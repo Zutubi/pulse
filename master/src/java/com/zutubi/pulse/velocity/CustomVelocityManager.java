@@ -64,10 +64,14 @@ public class CustomVelocityManager extends VelocityManager
         context.put("build_number", v.getBuildNumber());
 
         License license = LicenseHolder.getLicense();
-        context.put("license", license);
-        ProjectManager projectManager = getProjectManager();
-        AgentManager agentManager = getAgentManager();
-        context.put("licenseExceeded", projectManager != null && agentManager != null && license.isExceeded(projectManager.getProjectCount(), agentManager.getAgentCount(), getUserManager().getUserCount()));
+        if (license != null)
+        {
+            context.put("license", license);
+            ProjectManager projectManager = getProjectManager();
+            AgentManager agentManager = getAgentManager();
+            context.put("licenseExceeded", projectManager != null && agentManager != null && license.isExceeded(projectManager.getProjectCount(), agentManager.getAgentCount(), getUserManager().getUserCount()));
+            context.put("licenseCanRunVersion", license.canRunVersion(v));
+        }
 
         return context;
     }

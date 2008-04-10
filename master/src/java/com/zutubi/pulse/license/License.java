@@ -2,6 +2,7 @@ package com.zutubi.pulse.license;
 
 import com.zutubi.util.Constants;
 import com.zutubi.util.ObjectUtils;
+import com.zutubi.pulse.Version;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -125,6 +126,11 @@ public class License
         return supportedUsers;
     }
 
+    public boolean canAddUser(int userCount)
+    {
+        return supportedUsers == UNRESTRICTED || userCount < supportedUsers;
+    }
+
     /**
      * Get the number of agents supported by this license.
      *
@@ -187,6 +193,30 @@ public class License
     private boolean limitExceeded(int count, int supported)
     {
         return supported != UNRESTRICTED && count > supported;
+    }
+
+    /**
+     * Indicates if this license can be used to run the given version of
+     * Pulse.  Running is allowed if either the license is not expired or
+     * the license is commercial and the version was released before the
+     * expiry date.
+     *
+     * @param version version to check (used for the release date)
+     * @return true if this license allows the user to run the given version
+     */
+    public boolean canRunVersion(Version version)
+    {
+        if(!isExpired())
+        {
+            return true;
+        }
+
+        if(isEvaluation())
+        {
+            return false;
+        }
+
+        return version.getReleaseDateAsDate().getTime() < expiryDate.getTime();
     }
 
     /**

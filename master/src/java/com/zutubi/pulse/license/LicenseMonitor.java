@@ -31,30 +31,10 @@ public class LicenseMonitor implements Task
     private LicenseManager licenseManager;
 
     /**
-     * Required resource.
-     *
-     * @param eventManager
-     */
-    public void setEventManager(EventManager eventManager)
-    {
-        this.eventManager = eventManager;
-    }
-
-    /**
-     * Required resource.
-     *
-     * @param scheduler
-     */
-    public void setScheduler(Scheduler scheduler)
-    {
-        this.scheduler = scheduler;
-    }
-
-    /**
      * The execution of this task is to check whether or not the license is expired. If the
      * installed license is expired, then generate an appropriate LicenseEvent.
      *
-     * @param context
+     * @param context trigger execution context
      */
     public void execute(TaskExecutionContext context)
     {
@@ -97,6 +77,16 @@ public class LicenseMonitor implements Task
             // be run. Should the system startup continue?
             LOG.severe(e);
         }
+    }
+
+    public void setEventManager(EventManager eventManager)
+    {
+        this.eventManager = eventManager;
+    }
+
+    public void setScheduler(Scheduler scheduler)
+    {
+        this.scheduler = scheduler;
     }
 
     public void setLicenseManager(LicenseManager licenseManager)

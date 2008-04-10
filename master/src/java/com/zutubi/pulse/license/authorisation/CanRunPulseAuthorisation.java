@@ -43,22 +43,7 @@ public class CanRunPulseAuthorisation implements Authorisation
             return NO_AUTH;
         }
 
-        if (!license.isExpired())
-        {
-            return AUTH;
-        }
-
-        if (LicenseType.EVALUATION == license.getType())
-        {
-            // eval license expiry is a hard expiry.
-            return NO_AUTH;
-        }
-
-        // can continue to run pulse on patch releases.
-        Date vrd = version.getReleaseDateAsDate();
-        Date expiry = license.getExpiryDate();
-
-        if (vrd.getTime() < expiry.getTime())
+        if (license.canRunVersion(version))
         {
             return AUTH;
         }

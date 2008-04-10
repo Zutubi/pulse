@@ -15,8 +15,8 @@ import com.zutubi.pulse.events.build.AbstractBuildRequestEvent;
 import com.zutubi.pulse.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.events.build.BuildTerminationRequestEvent;
 import com.zutubi.pulse.events.build.RecipeTimeoutEvent;
-import com.zutubi.pulse.license.License;
 import com.zutubi.pulse.license.LicenseHolder;
+import com.zutubi.pulse.license.License;
 import com.zutubi.pulse.license.events.LicenseEvent;
 import com.zutubi.pulse.license.events.LicenseExpiredEvent;
 import com.zutubi.pulse.license.events.LicenseUpdateEvent;
@@ -108,8 +108,10 @@ public class FatController implements EventListener, Stoppable
 
     private boolean licensedToBuild()
     {
+        // First check we can run (handles eval expiry and illegal upgrades
+        // for commercial license) and then ensure we are within our limits.
         License license = LicenseHolder.getLicense();
-        return !license.isExpired() && !license.isExceeded(projectManager.getProjectCount(), agentManager.getAgentCount(), userManager.getUserCount());
+        return license.canRunVersion(Version.getVersion()) && !license.isExceeded(projectManager.getProjectCount(), agentManager.getAgentCount(), userManager.getUserCount());
     }
 
     /**

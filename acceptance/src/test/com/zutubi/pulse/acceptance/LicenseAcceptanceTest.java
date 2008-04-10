@@ -101,6 +101,22 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         assertTriggersHandled();
     }
 
+    public void testExpiredCommercialLicenseInvalidUpgrade() throws Exception
+    {
+        goToLicensePage();
+        setLicenseViaUI(LicenseHelper.newLicenseKey(LicenseType.CUSTOM, random, new Date(System.currentTimeMillis() - 999999 * Constants.DAY)));
+
+        goTo("/");
+        assertElementNotPresent("license-expired");
+        assertElementNotPresent("support-expired");
+        assertElementPresent("license-cannot-run");
+        assertTextPresent("Your license cannot run this version of Pulse, as it was released after the license expiry date.");
+
+        // Build triggers should behave normally
+        xmlRpcHelper.insertSimpleProject(random, false);
+        assertTriggersIgnored();
+    }
+
     public void testProjectsExceeded() throws Exception
     {
         xmlRpcHelper.insertSimpleProject(random, false);

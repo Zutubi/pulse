@@ -7,6 +7,7 @@ import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.license.LicenseType;
 import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.model.UserManager;
+import com.zutubi.pulse.Version;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -73,7 +74,20 @@ public class LicenseConfigurationStateDisplay
         if (license.isExpired())
         {
             Messages messages = Messages.getInstance(LicenseConfiguration.class);
-            return messages.format(license.isEvaluation() ? "license.expired" : "license.support.expired");
+            String key;
+            if (license.isEvaluation())
+            {
+                key = "license.expired";
+            }
+            else if(license.canRunVersion(Version.getVersion()))
+            {
+                key = "license.support.expired";
+            }
+            else
+            {
+                key = "license.cannot.run.version";
+            }
+            return messages.format(key);
         }
         return "active";
     }

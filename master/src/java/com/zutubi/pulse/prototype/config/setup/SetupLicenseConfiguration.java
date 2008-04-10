@@ -7,6 +7,7 @@ import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.license.License;
 import com.zutubi.pulse.license.LicenseDecoder;
 import com.zutubi.pulse.license.LicenseException;
+import com.zutubi.pulse.Version;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.annotations.Required;
@@ -43,11 +44,14 @@ public class SetupLicenseConfiguration extends AbstractConfiguration implements 
             if (l == null)
             {
                 context.addFieldError("license", "license.key.invalid");
-                return;
             }
-            if (l.isExpired())
+            else if (l.isExpired() && l.isEvaluation())
             {
                 context.addFieldError("license", "license.key.expired");
+            }
+            else if(!l.canRunVersion(Version.getVersion()))
+            {
+                context.addFieldError("license", "license.key.cannot.run");
             }
         }
         catch (LicenseException e)
