@@ -693,16 +693,16 @@ td.clearbar {
     padding: 0;
 }
 
-#statusmessage {
-    margin:1em;
-    padding:0.5em;
+.license-status {
+    margin: 1em;
+    padding: 0.5em;
     border: 1px solid #c00000;
     color: #000;
     background-color: #ffdddd;
-    text-align:center;
+    text-align: center;
 }
 
-#statusmessage a {
+.license-status a {
     color: #000;
     border-color: #000;
 }

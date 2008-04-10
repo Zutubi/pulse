@@ -1,8 +1,12 @@
 package com.zutubi.pulse.license.config;
 
 import com.zutubi.i18n.Messages;
+import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.license.License;
 import com.zutubi.pulse.license.LicenseHolder;
+import com.zutubi.pulse.license.LicenseType;
+import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.model.UserManager;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -16,10 +20,14 @@ import java.util.List;
  */
 public class LicenseConfigurationStateDisplay
 {
+    private ProjectManager projectManager;
+    private AgentManager agentManager;
+    private UserManager userManager;
+
     public List<String> getFields()
     {
         License license = LicenseHolder.getLicense();
-        return Arrays.asList("type", "status", "name", license.isEvaluation() ? "expiry" : "supportExpiry", "supportedAgents", "supportedProjects", "supportedUsers");
+        return Arrays.asList("type", "status", "name", license.isEvaluation() || license.getType() == LicenseType.SMALL_TEAM ? "expiry" : "supportExpiry", "supportedAgents", "supportedProjects", "supportedUsers");
     }
 
     public String formatName()
@@ -77,7 +85,7 @@ public class LicenseConfigurationStateDisplay
         {
             return "unrestricted";
         }
-        return String.valueOf(license.getSupportedUsers());
+        return String.format("%d of %d", userManager.getUserCount(), license.getSupportedUsers());
     }
     
     public String formatSupportedProjects()
@@ -87,7 +95,7 @@ public class LicenseConfigurationStateDisplay
         {
             return "unrestricted";
         }
-        return String.valueOf(license.getSupportedProjects());
+        return String.format("%d of %d", projectManager.getProjectCount(), license.getSupportedProjects());
     }
 
     public String formatSupportedAgents()
@@ -97,6 +105,21 @@ public class LicenseConfigurationStateDisplay
         {
             return "unrestricted";
         }
-        return String.valueOf(license.getSupportedAgents());
+        return String.format("%d of %d", agentManager.getAgentCount(), license.getSupportedAgents());
+    }
+
+    public void setProjectManager(ProjectManager projectManager)
+    {
+        this.projectManager = projectManager;
+    }
+
+    public void setAgentManager(AgentManager agentManager)
+    {
+        this.agentManager = agentManager;
+    }
+
+    public void setUserManager(UserManager userManager)
+    {
+        this.userManager = userManager;
     }
 }

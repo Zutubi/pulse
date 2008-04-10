@@ -130,7 +130,14 @@ public class SeleniumTestBase extends TestCase
         assertElementPresent("generic-error");
         assertTextPresent(message);
     }
-    
+
+    protected void waitForStatus(String message)
+    {
+        SeleniumUtils.waitForVisible(selenium, IDs.STATUS_MESSAGE);
+        String text = selenium.getText(IDs.STATUS_MESSAGE);
+        assertTrue(text.contains(message));        
+    }
+
     protected void addProject(String name)
     {
         addProject(name, false, "global project template");
@@ -138,8 +145,17 @@ public class SeleniumTestBase extends TestCase
 
     protected void addProject(String name, boolean template, String parentName)
     {
+        runProjectWizard(name, template, parentName);
+
+        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, name, template);
+        hierarchyPage.waitFor();
+        hierarchyPage.assertPresent();
+    }
+
+    protected AddProjectWizard.AntState runProjectWizard(String name, boolean template, String parentName)
+    {
         ProjectHierarchyPage globalPage = new ProjectHierarchyPage(selenium, urls, parentName, true);
-        globalPage.waitFor();
+        globalPage.goTo();
         if (template)
         {
             globalPage.clickAddTemplate();
@@ -168,10 +184,7 @@ public class SeleniumTestBase extends TestCase
         AddProjectWizard.AntState antState = new AddProjectWizard.AntState(selenium);
         antState.waitFor();
         antState.finishFormElements(null, "build.xml", null, null);
-
-        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, name, template);
-        hierarchyPage.waitFor();
-        hierarchyPage.assertPresent();
+        return antState;
     }
 
     protected boolean ensureProject(final String name) throws Exception

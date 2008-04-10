@@ -2681,3 +2681,16 @@
         </script>
     </div>
 #end
+
+#macro(standardFormEvents $formName)
+    <script type="text/javascript">
+        ${formName}.on('actioncomplete', function(form, action)
+        {
+            handleConfigurationResponse(action.result);
+        });
+        ${formName}.on('actionfailed', function(form, action)
+        {
+            handleConfigurationResponse(action.result);
+        });
+    </script>
+#end

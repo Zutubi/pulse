@@ -97,21 +97,11 @@ public class CloneAction extends PrototypeSupport
             return INPUT;
         }
 
-        try
-        {
-            configurationRefactoringManager.clone(parentPath, keyMap);
+        configurationRefactoringManager.clone(parentPath, keyMap);
 
-            String templatePath = configurationTemplateManager.getTemplatePath(newPath);
-            response = new ConfigurationResponse(newPath, templatePath);
-            response.registerNewPathAdded(configurationTemplateManager, configurationSecurityManager);
-        }
-        catch(Exception e)
-        {
-            LOG.warning(e);
-            addActionError(e.getMessage());
-            renderForm();
-            return INPUT;
-        }
+        String templatePath = configurationTemplateManager.getTemplatePath(newPath);
+        response = new ConfigurationResponse(newPath, templatePath);
+        response.registerNewPathAdded(configurationTemplateManager, configurationSecurityManager);
 
         return SUCCESS;
     }

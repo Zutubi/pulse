@@ -135,48 +135,40 @@ public class ConfigurationWizardAction extends com.opensymphony.xwork.ActionSupp
 
     public String execute()
     {
-        try
+        if (isInitialised())
         {
-            if (isInitialised())
-            {
-                getState().updateRecord(ActionContext.getContext().getParameters());
-            }
-
-            // only validate when we are moving forwards in the wizard
-            if (isSelected(SUBMIT_NEXT) || isSelected(SUBMIT_FINISH))
-            {
-                if (!validateState() || !validateWizard())
-                {
-                    // if there is a validation failure, then we stay where we are.
-                    return INPUT;
-                }
-            }
-
-            initWizardIfRequired();
-            if (isSelected(SUBMIT_CANCEL))
-            {
-                return doCancel();
-            }
-            else if (isSelected(SUBMIT_NEXT))
-            {
-                return doNext();
-            }
-            else if (isSelected(SUBMIT_PREVIOUS))
-            {
-                return doPrevious();
-            }
-            else if (isSelected(SUBMIT_FINISH))
-            {
-                return doFinish();
-            }
-
-            return "step";
+            getState().updateRecord(ActionContext.getContext().getParameters());
         }
-        catch (Exception e)
+
+        // only validate when we are moving forwards in the wizard
+        if (isSelected(SUBMIT_NEXT) || isSelected(SUBMIT_FINISH))
         {
-            handleException(e);
-            return ERROR;
+            if (!validateState() || !validateWizard())
+            {
+                // if there is a validation failure, then we stay where we are.
+                return INPUT;
+            }
         }
+
+        initWizardIfRequired();
+        if (isSelected(SUBMIT_CANCEL))
+        {
+            return doCancel();
+        }
+        else if (isSelected(SUBMIT_NEXT))
+        {
+            return doNext();
+        }
+        else if (isSelected(SUBMIT_PREVIOUS))
+        {
+            return doPrevious();
+        }
+        else if (isSelected(SUBMIT_FINISH))
+        {
+            return doFinish();
+        }
+
+        return "step";
     }
 
     private String doFinish()
@@ -245,15 +237,6 @@ public class ConfigurationWizardAction extends com.opensymphony.xwork.ActionSupp
     {
         String sessionKey = PathUtils.normalizePath(this.path);
         ActionContext.getContext().getSession().remove(sessionKey);
-    }
-
-    private void handleException(Exception e)
-    {
-        LOG.error(e.getMessage(), e);
-        addActionError("Unexpected exception: " + e.getClass().getName() + ", " + e.getMessage());
-
-        // remove the wizard from the session so that we can start fresh
-        removeWizard();
     }
 
     @SuppressWarnings({ "unchecked" })

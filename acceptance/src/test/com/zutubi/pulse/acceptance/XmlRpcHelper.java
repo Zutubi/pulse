@@ -199,9 +199,19 @@ public class XmlRpcHelper
         call("doConfigActionWithArgument", path, action, argument);
     }
 
+    public int getUserCount() throws Exception
+    {
+        return (Integer) call("getUserCount");
+    }
+
     public Vector<String> getAllUserLogins() throws Exception
     {
         return call("getAllUserLogins");
+    }
+
+    public int getProjectCount() throws Exception
+    {
+        return (Integer) call("getProjectCount");
     }
 
     public Vector<String> getAllProjectNames() throws Exception
@@ -222,6 +232,11 @@ public class XmlRpcHelper
     public Hashtable<String, Object> getProjectGroup(String name) throws Exception
     {
         return call("getProjectGroup", name);
+    }
+
+    public int getAgentCount() throws Exception
+    {
+        return (Integer) call("getAgentCount");
     }
 
     public Vector<String> getAllAgentNames() throws Exception

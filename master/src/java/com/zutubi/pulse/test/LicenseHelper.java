@@ -1,10 +1,13 @@
 package com.zutubi.pulse.test;
 
-import com.zutubi.pulse.license.*;
+import com.zutubi.pulse.license.License;
+import com.zutubi.pulse.license.LicenseException;
+import com.zutubi.pulse.license.LicenseKeyFactory;
+import com.zutubi.pulse.license.LicenseType;
 import com.zutubi.util.StringUtils;
 
-import java.util.Date;
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * <class-comment/>
@@ -70,6 +73,13 @@ public class LicenseHelper
     public static String newLicenseKey(LicenseType type, String holder, Date expiry) throws LicenseException
     {
         return newLicenseKey(new License(type, holder, expiry));
+    }
+
+    public static String newLicenseKey(LicenseType type, String holder, Date expiry, int projectLimit, int agentLimit, int userLimit) throws LicenseException
+    {
+        License license = new License(type, holder, expiry);
+        license.setSupported(agentLimit, projectLimit, userLimit);
+        return newLicenseKey(license);
     }
 
     public static String newLicenseKey(License license) throws LicenseException

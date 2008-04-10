@@ -281,6 +281,15 @@ public class ConfigurationTemplateManager implements InstanceSource
         }
     }
 
+    private void publishEvent(ConfigurationEvent event)
+    {
+        eventManager.publish(event);
+        if (event.hasExceptions())
+        {
+            throw new ConfigurationException(event.getExceptions().get(0));
+        }
+    }
+
     public String insert(final String path, Object instance)
     {
         CompositeType type = typeRegistry.getType(instance.getClass());
@@ -477,7 +486,8 @@ public class ConfigurationTemplateManager implements InstanceSource
                 {
                     Configuration configuration = (Configuration) instance;
                     boolean cascaded = !concretePath.equals(configuration.getConfigurationPath());
-                    eventManager.publish(new InsertEvent(this, configuration, cascaded));
+                    InsertEvent insertEvent = new InsertEvent(this, configuration, cascaded);
+                    publishEvent(insertEvent);
                     state.pendingEvents.add(new PostInsertEvent(this, configuration, cascaded));
                     configurationStateManager.instanceInserted(configuration);
                 }
@@ -1110,7 +1120,7 @@ public class ConfigurationTemplateManager implements InstanceSource
 
         for (SaveEvent e: saveEvents)
         {
-            eventManager.publish(e);
+            publishEvent(e);
         }
     }
 
@@ -1640,7 +1650,7 @@ public class ConfigurationTemplateManager implements InstanceSource
                     }
                     else
                     {
-                        eventManager.publish(e);
+                        publishEvent(e);
                     }
                 }
 

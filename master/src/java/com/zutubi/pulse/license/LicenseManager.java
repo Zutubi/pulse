@@ -1,13 +1,18 @@
 package com.zutubi.pulse.license;
 
+import com.zutubi.prototype.config.events.InsertEvent;
+import com.zutubi.pulse.bootstrap.DataResolver;
+import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.events.DataDirectoryChangedEvent;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.license.authorisation.Authorisation;
-import com.zutubi.pulse.license.events.LicenseUpdateEvent;
 import com.zutubi.pulse.license.config.OneXDataLicenseKeyStore;
-import com.zutubi.pulse.bootstrap.DataResolver;
+import com.zutubi.pulse.license.events.LicenseUpdateEvent;
+import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
+import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
+import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 import com.zutubi.util.logging.Logger;
 
 import java.util.Arrays;
@@ -53,20 +58,49 @@ public class LicenseManager
      */
     public void init()
     {
-        // the license manager monitors for changes in the system data directory. We 'know' this is
-        // where the license is stored, so if there is a change, we need to refresh.  This SHOULD be reflected
-        // in the licenseKeyStore / licenseManager interaction somehow since it is the license key store that
-        // is using the data directory for storage purposes.
         eventManager.register(new EventListener()
         {
             public void handleEvent(Event evt)
             {
-                refresh();
+                if(evt instanceof DataDirectoryChangedEvent)
+                {
+                    // the license manager monitors for changes in the system data directory. We 'know' this is
+                    // where the license is stored, so if there is a change, we need to refresh.  This SHOULD be reflected
+                    // in the licenseKeyStore / licenseManager interaction somehow since it is the license key store that
+                    // is using the data directory for storage purposes.
+                    refresh();
+                }
+                else
+                {
+                    InsertEvent insertEvent = (InsertEvent) evt;
+                    Configuration instance = insertEvent.getInstance();
+                    if(instance instanceof ProjectConfiguration)
+                    {
+                        if(!LicenseHolder.hasAuthorization(LicenseHolder.AUTH_ADD_PROJECT))
+                        {
+                            throw new LicenseException("Unable to add project: license limit exceeded");
+                        }
+                    }
+                    else if(instance instanceof AgentConfiguration)
+                    {
+                        if(!LicenseHolder.hasAuthorization(LicenseHolder.AUTH_ADD_AGENT))
+                        {
+                            throw new LicenseException("Unable to add agent: license limit exceeded");
+                        }
+                    }
+                    else if(instance instanceof UserConfiguration)
+                    {
+                        if(!LicenseHolder.hasAuthorization(LicenseHolder.AUTH_ADD_USER))
+                        {
+                            throw new LicenseException("Unable to add user: license limit exceeded");   
+                        }
+                    }
+                }
             }
 
             public Class[] getHandledEvents()
             {
-                return new Class[]{DataDirectoryChangedEvent.class};
+                return new Class[]{DataDirectoryChangedEvent.class, InsertEvent.class};
             }
         });
 

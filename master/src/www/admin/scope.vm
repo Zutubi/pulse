@@ -25,6 +25,13 @@
                 tree.handleResponse(result);
                 tree.redirectToNewPath(result);
             }
+            else
+            {
+                if(result.actionErrors && result.actionErrors.length > 0)
+                {
+                    showStatus(result.actionErrors[0], 'failure');
+                }
+            }
         }
 
         var getAjaxCallback = function(maskedElement)
@@ -51,6 +58,7 @@
                     {
                         maskedElement.unmask();
                     }
+                    showStatus('Unable to contact Pulse server', 'failure');
                 }
             }
         }

@@ -4,9 +4,4 @@
     #checkForm($action.path $state.type "wizardForm" "aconfig")
 #end
 </div>
-<script type="text/javascript">
-    wizardForm.on('actioncomplete', function(form, action)
-    {
-        handleConfigurationResponse(action.result);
-    });
-</script>
+#standardFormEvents("wizardForm")

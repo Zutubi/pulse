@@ -24,7 +24,7 @@ public class LicenseHolder
 
     public static synchronized void setLicense(License l)
     {
-        LicenseHolder.license = l;
+        license = l;
     }
 
     public static synchronized boolean hasAuthorization(String auth)

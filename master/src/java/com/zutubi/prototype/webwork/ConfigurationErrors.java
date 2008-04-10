@@ -4,13 +4,14 @@ import com.opensymphony.xwork.ValidationAware;
 import com.zutubi.util.StringUtils;
 import flexjson.JSON;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
  * Class that holds errors in a form that serialises to JSON in a way that is
- * understood by the client side.
+ * understood by the Ext forms on the client side.
  */
 public class ConfigurationErrors
 {
@@ -24,6 +25,13 @@ public class ConfigurationErrors
     public boolean getSuccess()
     {
         return false;
+    }
+
+    @JSON
+    public String[] getActionErrors()
+    {
+        Collection actionErrors = aware.getActionErrors();
+        return (String[]) actionErrors.toArray(new String[actionErrors.size()]);
     }
 
     @JSON
@@ -41,6 +49,9 @@ public class ConfigurationErrors
         return result;
     }
 
+    /**
+     * Field errors in the form expected by an Ext form.
+     */
     public static class FieldError
     {
         private String id;

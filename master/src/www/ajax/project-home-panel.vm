@@ -146,7 +146,7 @@
                     #end
                     <td class="content">
 #auth("resource=project" "action=$actionSpec.get(0)")
-                        <img src="$base/images/${actionSpec.get(1)}.gif"/> <a href="$actionSpec.get(2)">#wwtext("name=project.$actionSpec.get(3)")</a>
+                        <img src="$base/images/${actionSpec.get(1)}.gif"/> <a id="action.$actionSpec.get(0)" href="$actionSpec.get(2)">#wwtext("name=project.$actionSpec.get(3)")</a>
 #end
                     </td>
                 </tr>

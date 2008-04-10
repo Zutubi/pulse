@@ -3,10 +3,5 @@
     <div class="config-container">
         #actionform("path=$path" "formName=actionform" "namespace=aconfig")
     </div>
-    <script type="text/javascript">
-        actionform.on('actioncomplete', function(form, action)
-        {
-            handleConfigurationResponse(action.result);
-        });
-    </script>
+    #standardFormEvents("actionform")
 </div>

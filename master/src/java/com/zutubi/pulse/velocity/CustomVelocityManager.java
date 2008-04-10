@@ -4,8 +4,11 @@ import com.opensymphony.webwork.views.velocity.VelocityManager;
 import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.Version;
+import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.license.License;
 import com.zutubi.pulse.license.LicenseHolder;
+import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
@@ -20,6 +23,8 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class CustomVelocityManager extends VelocityManager
 {
+    private ProjectManager projectManager;
+    private AgentManager agentManager;
     private UserManager userManager;
     private ConfigurationProvider configurationProvider;
 
@@ -58,7 +63,11 @@ public class CustomVelocityManager extends VelocityManager
         context.put("build_date", v.getBuildDate());
         context.put("build_number", v.getBuildNumber());
 
-        context.put("license", LicenseHolder.getLicense());
+        License license = LicenseHolder.getLicense();
+        context.put("license", license);
+        ProjectManager projectManager = getProjectManager();
+        AgentManager agentManager = getAgentManager();
+        context.put("licenseExceeded", projectManager != null && agentManager != null && license.isExceeded(projectManager.getProjectCount(), agentManager.getAgentCount(), getUserManager().getUserCount()));
 
         return context;
     }
@@ -66,6 +75,34 @@ public class CustomVelocityManager extends VelocityManager
     // HACK: the autowiring does not work correctly when the app is first setup - the
     //       context does not contain a user manager instance when this 'singleton' is
     //       first created. SOO, we need to help it out a little.
+    public ProjectManager getProjectManager()
+    {
+        if (projectManager == null && ComponentContext.containsBean("projectManager"))
+        {
+            projectManager = (ProjectManager) ComponentContext.getBean("projectManager");
+        }
+        return projectManager;
+    }
+
+    public void setProjectManager(ProjectManager projectManager)
+    {
+        this.projectManager = projectManager;
+    }
+
+    public AgentManager getAgentManager()
+    {
+        if (agentManager == null && ComponentContext.containsBean("agentManager"))
+        {
+            agentManager = (AgentManager) ComponentContext.getBean("agentManager");
+        }
+        return agentManager;
+    }
+
+    public void setAgentManager(AgentManager agentManager)
+    {
+        this.agentManager = agentManager;
+    }
+
     public UserManager getUserManager()
     {
         if (userManager == null)

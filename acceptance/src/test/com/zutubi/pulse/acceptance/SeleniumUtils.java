@@ -156,6 +156,12 @@ public class SeleniumUtils
         }
     }
 
+    public static void waitAndClickId(Selenium selenium, String id)
+    {
+        waitForElementId(selenium, id);
+        selenium.click(id);
+    }
+
     public static void assertElementPresent(Selenium selenium, String id)
     {
         Assert.assertTrue("No element with id '" + id + "' found", selenium.isElementPresent(StringUtils.toValidHtmlName(id)));

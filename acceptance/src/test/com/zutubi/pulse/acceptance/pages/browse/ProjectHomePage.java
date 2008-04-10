@@ -4,7 +4,6 @@ import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.webwork.mapping.Urls;
 import com.zutubi.util.StringUtils;
-import junit.framework.Assert;
 
 /**
  * The project home page is a summary of the state and recent activity for a
@@ -20,6 +19,21 @@ public class ProjectHomePage extends SeleniumPage
         this.projectName = projectName;
     }
 
+    public String getActionLinkId(String action)
+    {
+        return "action." + action;
+    }
+
+    public void clickAction(String action)
+    {
+        selenium.click(getActionLinkId(action));
+    }
+
+    public void triggerBuild()
+    {
+        clickAction("trigger");
+    }
+    
     public String getUrl()
     {
         return urls.project(projectName);

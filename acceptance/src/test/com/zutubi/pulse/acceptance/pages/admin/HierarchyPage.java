@@ -86,12 +86,12 @@ public class HierarchyPage extends SeleniumPage
 
     public void clickAdd()
     {
-        selenium.click(LINK_ADD);
+        SeleniumUtils.waitAndClickId(selenium, LINK_ADD);
     }
 
     public void clickAddTemplate()
     {
-        selenium.click(LINK_ADD_TEMPLATE);
+        SeleniumUtils.waitAndClickId(selenium, LINK_ADD_TEMPLATE);
     }
 
     public boolean isClonePresent()
@@ -101,7 +101,7 @@ public class HierarchyPage extends SeleniumPage
 
     public void clickClone()
     {
-        selenium.click(LINK_CLONE);
+        SeleniumUtils.waitAndClickId(selenium, LINK_CLONE);
     }
 
     public void setTemplate(boolean template)
@@ -111,7 +111,7 @@ public class HierarchyPage extends SeleniumPage
 
     public DeleteConfirmPage clickDelete()
     {
-        selenium.click(LINK_DELETE);
+        SeleniumUtils.waitAndClickId(selenium, LINK_DELETE);
         return new DeleteConfirmPage(selenium, urls, getId(), false);
     }
 }

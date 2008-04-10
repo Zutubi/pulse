@@ -171,9 +171,25 @@ public class License
                 ObjectUtils.equals(supportedProjects, other.supportedProjects);
     }
 
+    /**
+     * Indicates whether the license limits have been exceeded.
+     *
+     * @param projectCount actual number of projects
+     * @param agentCount   actual number of agents
+     * @param userCount    actual number of users
+     * @return true if one or more of the license limits have been exceeded
+     */
+    public boolean isExceeded(int projectCount, int agentCount, int userCount)
+    {
+        return limitExceeded(projectCount, supportedProjects) || limitExceeded(agentCount, supportedAgents) || limitExceeded(userCount, supportedUsers);
+    }
+
+    private boolean limitExceeded(int count, int supported)
+    {
+        return supported != UNRESTRICTED && count > supported;
+    }
 
     /**
-     *
      * @return true if the license has expired, false otherwise.
      */
     public boolean isExpired()
@@ -210,6 +226,10 @@ public class License
      * falls on the same day as the expiry date, then we indicate 1 day as remaining. Expiry
      * occurs at midnight.
      *
+     * @param now    the date to calculate from
+     * @param expiry the date the license expires
+     * @return the number of days between now and the expiry day (part days
+     *         count as one)
      */
     static int calculateDaysRemaining(Date now, Date expiry)
     {

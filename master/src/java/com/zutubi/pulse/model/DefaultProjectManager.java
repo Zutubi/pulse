@@ -306,7 +306,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
     public int getProjectCount()
     {
-        return projectDao.count();
+        return getProjects(true).size();
     }
 
     private void deleteProject(Project entity)

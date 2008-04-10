@@ -32,6 +32,10 @@ public class AjaxEnabledConfigurationWizardAction extends ConfigurationWizardAct
 
     public ConfigurationErrors getConfigurationErrors()
     {
+        if(configurationErrors == null)
+        {
+            configurationErrors = new ConfigurationErrors(this);
+        }
         return configurationErrors;
     }
 

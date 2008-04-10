@@ -23,16 +23,16 @@ public interface UserManager extends EntityManager<User>, UserDetailsService
 
     /**
      * Retrieve an instance of the user identified by the login name
-     * @param login
      *
+     * @param login login of the user to find
      * @return a user instance, or null if no matching user is found.
      */
     User getUser(String login);
 
     /**
      * Retrieve an instance of the user identified by the unique id.
-     * @param id
-     *
+     * 
+     * @param id id of the user to find
      * @return a user instance, or null if no matching user is found.
      */
     User getUser(long id);
@@ -45,8 +45,7 @@ public interface UserManager extends EntityManager<User>, UserDetailsService
     List<User> getAllUsers();
 
     /**
-     * Return the number of users configured in the system.
-     *
+     * @return the number of users configured in the system.
      */
     int getUserCount();
 

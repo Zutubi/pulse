@@ -2,6 +2,7 @@ package com.zutubi.pulse;
 
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.security.AccessManager;
+import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.model.Entity;
@@ -14,6 +15,7 @@ import com.zutubi.pulse.events.build.AbstractBuildRequestEvent;
 import com.zutubi.pulse.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.events.build.BuildTerminationRequestEvent;
 import com.zutubi.pulse.events.build.RecipeTimeoutEvent;
+import com.zutubi.pulse.license.License;
 import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.license.events.LicenseEvent;
 import com.zutubi.pulse.license.events.LicenseExpiredEvent;
@@ -64,6 +66,7 @@ public class FatController implements EventListener, Stoppable
     private BuildQueue buildQueue = new BuildQueue();
     private Scheduler quartzScheduler;
     private ProjectManager projectManager;
+    private AgentManager agentManager;
     private UserManager userManager;
     private ServiceTokenManager serviceTokenManager;
     private ThreadFactory threadFactory;
@@ -93,7 +96,7 @@ public class FatController implements EventListener, Stoppable
         quartzScheduler.addJob(detail, true);
 
         // check license: enable the fat controller iff the license is valid.
-        if (LicenseHolder.hasAuthorization(LicenseHolder.AUTH_RUN_PULSE))
+        if (licensedToBuild())
         {
             enable();
         }
@@ -101,6 +104,12 @@ public class FatController implements EventListener, Stoppable
         {
             disable();
         }
+    }
+
+    private boolean licensedToBuild()
+    {
+        License license = LicenseHolder.getLicense();
+        return !license.isExpired() && !license.isExceeded(projectManager.getProjectCount(), agentManager.getAgentCount(), userManager.getUserCount());
     }
 
     /**
@@ -206,7 +215,7 @@ public class FatController implements EventListener, Stoppable
     private void handleLicenseEvent()
     {
         // the type or detail of the license event does not matter at this stage.
-        if (LicenseHolder.hasAuthorization(LicenseHolder.AUTH_RUN_PULSE))
+        if (licensedToBuild())
         {
             enable();
         }
@@ -221,6 +230,7 @@ public class FatController implements EventListener, Stoppable
         // if we are disabled, we ignore incoming build requests.
         if (isDisabled())
         {
+            LOG.warning("Build request ignored as license is expired or exceeded.");
             return;
         }
 
@@ -457,5 +467,10 @@ public class FatController implements EventListener, Stoppable
     public void setResourceManager(ResourceManager resourceManager)
     {
         this.resourceManager = resourceManager;
+    }
+
+    public void setAgentManager(AgentManager agentManager)
+    {
+        this.agentManager = agentManager;
     }
 }

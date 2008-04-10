@@ -43,9 +43,9 @@
             <interceptor name="prototypeWizard" class="com.zutubi.prototype.wizard.webwork.ConfigurationWizardInterceptor"/>
             <interceptor name="ajax" class="com.zutubi.pulse.xwork.interceptor.AjaxInterceptor"/>
             <interceptor name="errorHanding" class="com.zutubi.pulse.xwork.interceptor.ErrorHandlingInterceptor"/>
+            <interceptor name="configErrorHandling" class="com.zutubi.pulse.xwork.interceptor.ConfigErrorHandlingInterceptor"/>
             <interceptor name="hibernateSession" class="com.zutubi.pulse.xwork.interceptor.HibernateSessionInterceptor"/>
             <interceptor name="readOnly" class="com.zutubi.pulse.xwork.interceptor.ReadOnlyInterceptor"/>
-            <interceptor name="licensed" class="com.zutubi.pulse.xwork.interceptor.LicensedInterceptor"/>
 
             <!-- Primitive stack with no hibernate session -->
             <interceptor-stack name="noSessionStack">
@@ -53,7 +53,6 @@
                 <interceptor-ref name="prepare"/>
                 <interceptor-ref name="static-params"/>
                 <interceptor-ref name="params"/>
-                <interceptor-ref name="licensed"/>
                 <interceptor-ref name="cancel"/>
                 <interceptor-ref name="conversionError"/>
                 <interceptor-ref name="errorHanding"/>
@@ -88,7 +87,6 @@
                 <interceptor-ref name="fileUpload"/>
                 <interceptor-ref name="static-params"/>
                 <interceptor-ref name="params"/>
-                <interceptor-ref name="licensed"/>
                 <interceptor-ref name="cancel"/>
                 <interceptor-ref name="conversionError"/>
                 <interceptor-ref name="validation">
@@ -128,7 +126,6 @@
                 <interceptor-ref name="fileUpload"/>
                 <interceptor-ref name="static-params"/>
                 <interceptor-ref name="params"/>
-                <interceptor-ref name="licensed"/>
                 <interceptor-ref name="cancel"/>
                 <interceptor-ref name="conversionError"/>
                 <interceptor-ref name="validation">
@@ -150,13 +147,18 @@
                 <interceptor-ref name="errorHanding"/>
             </interceptor-stack>
 
+            <interceptor-stack name="ajaxConfigStack">
+                <interceptor-ref name="ajaxStack"/>
+                <interceptor-ref name="configErrorHandling"/>
+            </interceptor-stack>
+
             <interceptor-stack name="ajaxReadOnlyStack">
                 <interceptor-ref name="completeReadOnlyStack"/>
                 <interceptor-ref name="ajax"/>
                 <interceptor-ref name="errorHanding"/>
             </interceptor-stack>
 
-            <interceptor-stack name="prototypeWizardStack">
+            <interceptor-stack name="configWizardStack">
                 <interceptor-ref name="hibernateSession"/>
                 <interceptor-ref name="prepare"/>
                 <interceptor-ref name="servlet-config"/>
@@ -167,7 +169,6 @@
                 <interceptor-ref name="params"/> <!-- needs to be here twice. First time, wizardAction is populated. Second time, the updates to the stack provided by the prototypeWizard Interceptor -->
                 <interceptor-ref name="prototypeWizard"/>
                 <interceptor-ref name="params"/>
-                <interceptor-ref name="licensed"/>
                 <interceptor-ref name="cancel"/>
                 <interceptor-ref name="conversionError"/>
                 <interceptor-ref name="validation">
@@ -179,9 +180,10 @@
                 <interceptor-ref name="errorHanding"/>
             </interceptor-stack>
 
-            <interceptor-stack name="ajaxPrototypeWizardStack">
+            <interceptor-stack name="ajaxConfigWizardStack">
                 <interceptor-ref name="ajax"/>
-                <interceptor-ref name="prototypeWizardStack"/>
+                <interceptor-ref name="configWizardStack"/>
+                <interceptor-ref name="configErrorHandling"/>
             </interceptor-stack>
         </interceptors>
 
@@ -191,13 +193,6 @@
                 <param name="location">rss_2.0</param>
             </result>
             <result name="error" type="velocity">/generic-error.vm</result>
-            <result name="notlicensed" type="chain">notlicensed</result>
         </global-results>
-
-        <action name="notlicensed" class="com.zutubi.pulse.web.NotLicensedErrorAction">
-            <result name="success" type="velocity">/not-licensed-error.vm</result>
-            <result name="input" type="velocity">/not-licensed-error.vm</result>
-        </action>
-
     </package>
 </xwork>

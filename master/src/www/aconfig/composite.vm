@@ -8,12 +8,7 @@
         <div class="config-container">
             #pform("path=$path" "formName=mainform" "displayMode=$config.displayMode" "ajax=true" "namespace=aconfig")
         </div>
-        <script type="text/javascript">
-            mainform.on('actioncomplete', function(form, action)
-            {
-                handleConfigurationResponse(action.result);
-            });
-        </script>
+        #standardFormEvents("mainform")
     #if($config.configurationCheckAvailable && $config.writable)
        #checkForm($path $config.type "mainform" "aconfig")
     #end

@@ -8,7 +8,6 @@ import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.acceptance.pages.browse.BuildDetailedViewPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
-import com.zutubi.pulse.acceptance.pages.browse.ProjectsPage;
 import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.model.ResourceRequirement;
@@ -248,14 +247,10 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
     private void triggerSuccessfulBuild(String projectName, String agent)
     {
-        ProjectsPage projectsPage = new ProjectsPage(selenium, urls);
-        projectsPage.goTo();
-        projectsPage.assertProjectPresent(projectName);
-        projectsPage.triggerProject(projectName);
-        projectsPage.waitFor();
-
         ProjectHomePage home = new ProjectHomePage(selenium, urls, projectName);
         home.goTo();
+        home.triggerBuild();
+        home.waitFor();
         String statusId = IDs.buildStatusCell(projectName, 1);
         SeleniumUtils.refreshUntilElement(selenium, statusId, 30000);
         SeleniumUtils.refreshUntilText(selenium, statusId, "success", 30000);

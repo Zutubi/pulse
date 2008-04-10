@@ -755,6 +755,26 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         return true;
     }
 
+    /**
+     * Indicates the number of users configured on this server.
+     *
+     * @param token authentication token, see {@link #login}
+     * @return the total number of users
+     * @throws AuthenticationException if the given token is invalid
+     */
+    public int getUserCount(String token) throws AuthenticationException
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            return userManager.getUserCount();
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
     public Vector<String> getAllUserLogins(String token) throws AuthenticationException
     {
         tokenManager.loginUser(token);
@@ -768,6 +788,26 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
             }
 
             return result;
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
+    }
+
+    /**
+     * Indicates the number of concrete projects configured on this server.
+     *
+     * @param token authentication token, see {@link #login}
+     * @return the total number of concrete projects
+     * @throws AuthenticationException if the given token is invalid
+     */
+    public int getProjectCount(String token) throws AuthenticationException
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            return projectManager.getProjectCount();
         }
         finally
         {
@@ -862,6 +902,26 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         }, result);
 
         return result;
+    }
+
+    /**
+     * Indicates the number of concrete agents configured on this server.
+     *
+     * @param token authentication token, see {@link #login}
+     * @return the total number of concrete agents
+     * @throws AuthenticationException if the given token is invalid
+     */
+    public int getAgentCount(String token) throws AuthenticationException
+    {
+        tokenManager.loginUser(token);
+        try
+        {
+            return agentManager.getAgentCount();
+        }
+        finally
+        {
+            tokenManager.logoutUser();
+        }
     }
 
     public Vector<String> getAllAgentNames(String token) throws AuthenticationException
