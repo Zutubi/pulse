@@ -166,6 +166,11 @@ public class Feedback
             return 0;
         }
 
+        if (percentageComplete == 0)
+        {
+            return UNDEFINED;
+        }
+
         long elapsedTime = getElapsedTime();
         if (elapsedTime <= 0)
         {

@@ -1,8 +1,8 @@
 package com.zutubi.pulse.prototype.config.project.changeviewer;
 
+import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
-import com.zutubi.prototype.config.ConfigurationProvider;
 
 /**
  * A type of change viewer that can be configured using a base URL and a

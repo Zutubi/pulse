@@ -281,11 +281,24 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     public Project getProject(long id, boolean allowInvalid)
     {
         Project project = projectDao.findById(id);
-        if(!allowInvalid && project != null && !configurationTemplateManager.isDeeplyValid(project.getConfig().getConfigurationPath()))
+        if (project == null)
         {
             return null;
         }
-        return project;
+        if (project.getConfig() == null)
+        {
+            // no confg instance, this is likely a template.  templates do not have states, so return null.
+            return null;
+        }
+        if (allowInvalid)
+        {
+            return project;
+        }
+        if (configurationTemplateManager.isDeeplyValid(project.getConfig().getConfigurationPath()))
+        {
+            return project;
+        }
+        return null;
     }
 
     public List<Project> getProjects(boolean allowInvalid)
@@ -597,7 +610,9 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
     public void setConfiguration(Project state)
     {
-        state.setConfig(idToConfig.get(state.getId()));
+        long projectId = state.getId();
+        ProjectConfiguration projectConfiguration = idToConfig.get(projectId);
+        state.setConfig(projectConfiguration);
     }
 
     public void handleEvent(Event evt)

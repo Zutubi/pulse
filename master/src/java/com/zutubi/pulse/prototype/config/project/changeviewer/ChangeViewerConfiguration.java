@@ -2,6 +2,7 @@ package com.zutubi.pulse.prototype.config.project.changeviewer;
 
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Transient;
+import com.zutubi.config.annotations.Wire;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.core.model.Revision;
 
@@ -10,6 +11,7 @@ import com.zutubi.pulse.core.model.Revision;
  * ViewVC.
  */
 @SymbolicName("zutubi.changeViewerConfig")
+@Wire
 public abstract class ChangeViewerConfiguration extends AbstractConfiguration
 {
     public enum Capability

@@ -2,6 +2,7 @@ package com.zutubi.pulse.prototype.config.project.changeviewer;
 
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.Wire;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.util.StringUtils;
@@ -11,6 +12,7 @@ import com.zutubi.util.StringUtils;
  */
 @Form(fieldOrder = {"baseURL", "projectPath"})
 @SymbolicName("zutubi.viewVCChangeViewerConfig")
+@Wire
 public class ViewVCChangeViewer extends BasePathChangeViewer
 {
     private static final String CVS_TYPE = "cvs";
