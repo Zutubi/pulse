@@ -1,6 +1,7 @@
 package com.zutubi.pulse.restore.feedback;
 
 import com.zutubi.pulse.util.TimeStamps;
+import com.zutubi.pulse.restore.RestoreTask;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,7 +43,12 @@ public class TaskMonitor
         return feedbacks.get(task);
     }
 
-    public void started(Object task)
+    public void start()
+    {
+        internalStart();
+    }
+
+    public Feedback started(Object task)
     {
         internalStart();
         
@@ -54,6 +60,8 @@ public class TaskMonitor
 
         Feedback feedback = getProgress(task);
         feedback.start();
+        
+        return feedback;
     }
 
     private void internalStart()
@@ -65,7 +73,7 @@ public class TaskMonitor
         }
     }
 
-    public void errored()
+    public void failed()
     {
         Feedback feedback = getCurrentTaskProgress();
         feedback.failed();
@@ -83,12 +91,25 @@ public class TaskMonitor
         finishCurrentTask();
     }
 
+    public void aborted()
+    {
+        Feedback feedback = getCurrentTaskProgress();
+        feedback.aborted();
+
+        successful = false;
+
+        finishCurrentTask();
+    }
+
     private void finishCurrentTask()
     {
         currentTask = null;
         completedTasks++;
+    }
 
-        if (completedTasks == feedbacks.size())
+    public void finish()
+    {
+        if (!finished)
         {
             finished = true;
             finishTime = System.currentTimeMillis();
@@ -167,4 +188,5 @@ public class TaskMonitor
     {
         return successful;
     }
+
 }

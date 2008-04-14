@@ -21,9 +21,9 @@ public interface ArchiveManager
 
     Archive createArchive() throws ArchiveException;
 
+    //--( proposed interface, not yet implemented )---
+/*
     void restoreArchive(Archive archive);
-
-    // restore on restart handling.
 
     void cancelRestoreOnRestart();
 
@@ -32,6 +32,7 @@ public interface ArchiveManager
     boolean isRestoreOnRestartRequested();
 
     Archive getArchiveToBeRestoredOnRestart();
+*/
 
     // auto archive support.
 

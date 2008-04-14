@@ -12,4 +12,11 @@ public interface RestoreTask
     
     String getDescription();
 
+    boolean hasFailed();
+
+    String[] getErrors();
+
+    boolean haltOnFailure();
+
+    ArchiveableComponent getComponent();
 }

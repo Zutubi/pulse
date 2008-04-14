@@ -2,8 +2,8 @@ package com.zutubi.pulse.restore;
 
 import com.zutubi.pulse.bootstrap.UserPaths;
 import com.zutubi.pulse.restore.feedback.Feedback;
-import com.zutubi.pulse.restore.feedback.TaskMonitor;
 import com.zutubi.pulse.restore.feedback.FeedbackProvider;
+import com.zutubi.pulse.restore.feedback.TaskMonitor;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
@@ -64,9 +64,9 @@ public class DefaultArchiveManager implements ArchiveManager
             final Feedback feedback = taskMonitor.add(task);
             if (component instanceof FeedbackProvider)
             {
-                ((FeedbackProvider)component).setFeedback(feedback);
+                ((FeedbackProvider) component).setFeedback(feedback);
             }
-            
+
             tasks.add(task);
         }
 
@@ -91,34 +91,86 @@ public class DefaultArchiveManager implements ArchiveManager
     {
         if (taskMonitor.isStarted())
         {
-            throw new IllegalStateException("Can not start restoration of archive. Restoration in progress.");
+            LOG.warning("Attempted to execute an executing upgrade.  Request has been ignored.");
+            return;
         }
 
-        try
-        {
-            // -- we should know which restorable components we are dealing with at this stage, so should
-            //    not need to run the componentBase.isDirectory check.
+        taskMonitor.start();
 
-            for (RestoreTask task : tasks)
+        // this task listener is here to as part of the synchronisation process with the UpgradeManager.  They both
+        // execute a sequence of tasks, both of which require monitoring, so both of which should be the same / extracted.
+        TaskListener listener = new DelegateTaskListener();
+
+        List<RestoreTask> tasksToExecute = tasks;
+
+        boolean abort = false;
+        for (RestoreTask task : tasksToExecute)
+        {
+            try
             {
-                // monitor start task
-                taskMonitor.started(task);
-                task.execute();
-                taskMonitor.completed();
+                if (!abort)
+                {
+                    final Feedback feedback = taskMonitor.started(task);
+
+                    // some of the components are able to provide finer grained feedback on the
+                    // tasks progress. If this is the case, hook it up!.
+                    ArchiveableComponent component = task.getComponent();
+                    if (component instanceof FeedbackProvider)
+                    {
+                        ((FeedbackProvider) component).setFeedback(feedback);
+                    }
+
+                    try
+                    {
+                        LOG.info("Executing restore task: " + task.getName());
+                        task.execute();
+                    }
+                    catch (ArchiveException e)
+                    {
+                        throw e;
+                    }
+                    catch (Throwable t)
+                    {
+                        throw new ArchiveException(t);
+                    }
+
+                    if (task.hasFailed())
+                    {
+                        // use an exception to break out to the task failure handling.
+                        StringBuffer errors = new StringBuffer();
+                        String sep = "\n";
+                        for (String error : task.getErrors())
+                        {
+                            errors.append(sep);
+                            errors.append(error);
+                        }
+
+                        throw new ArchiveException("RestoreTask '" + task.getName() + "' is marked as failed. " +
+                                "The following errors were recorded:" + errors.toString());
+                    }
+
+                    taskMonitor.completed();
+                    listener.taskCompleted(task);
+                }
+                else
+                {
+                    taskMonitor.aborted();
+                    listener.taskAborted(task);
+                }
             }
-
+            catch (ArchiveException e)
+            {
+                taskMonitor.failed();
+                listener.taskFailed(task);
+                if (task.haltOnFailure())
+                {
+                    abort = true;
+                }
+                LOG.severe(e);
+            }
         }
-        catch (ArchiveException e)
-        {
-            LOG.error(e);
 
-            Feedback feedback = taskMonitor.getCurrentTaskProgress();
-            feedback.setStatusMessage(e.getMessage());
-            
-            taskMonitor.errored();
-
-            // abort the remaining.
-        }
+        taskMonitor.finish();
     }
 
     public Archive createArchive() throws ArchiveException
@@ -127,7 +179,7 @@ public class DefaultArchiveManager implements ArchiveManager
         ArchiveFactory factory = new ArchiveFactory();
         factory.setArchiveDirectory(archiveDirectory);
         factory.setTmpDirectory(tmpDirectory);
-        
+
         Archive archive = factory.createArchive();
 
         // now we fill the archive.
@@ -135,37 +187,12 @@ public class DefaultArchiveManager implements ArchiveManager
         {
             String name = component.getName();
             File archiveComponentBase = new File(archive.getBase(), name);
-            component.backup(archiveComponentBase);            
+            component.backup(archiveComponentBase);
         }
 
         factory.exportArchive(archive);
 
         return archive;
-    }
-
-    public void restoreArchive(Archive archive)
-    {
-
-    }
-
-    public void cancelRestoreOnRestart()
-    {
-
-    }
-
-    public void requestRestoreOnRestart(Archive archive)
-    {
-
-    }
-
-    public boolean isRestoreOnRestartRequested()
-    {
-        return false;
-    }
-
-    public Archive getArchiveToBeRestoredOnRestart()
-    {
-        return null;
     }
 
     public void setTmpDirectory(File tmpDirectory)
@@ -177,4 +204,43 @@ public class DefaultArchiveManager implements ArchiveManager
     {
         this.paths = paths;
     }
+
+    private class DelegateTaskListener implements TaskListener
+    {
+        private TaskListener delegate = null;
+
+        public DelegateTaskListener()
+        {
+        }
+
+        public DelegateTaskListener(TaskListener delegate)
+        {
+            this.delegate = delegate;
+        }
+
+        public void taskCompleted(RestoreTask task)
+        {
+            if (delegate != null)
+            {
+                delegate.taskCompleted(task);
+            }
+        }
+
+        public void taskAborted(RestoreTask task)
+        {
+            if (delegate != null)
+            {
+                delegate.taskAborted(task);
+            }
+        }
+
+        public void taskFailed(RestoreTask task)
+        {
+            if (delegate != null)
+            {
+                delegate.taskFailed(task);
+            }
+        }
+    }
+
 }

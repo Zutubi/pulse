@@ -1,6 +1,8 @@
 package com.zutubi.pulse.restore;
 
 import com.zutubi.pulse.bootstrap.MasterUserPaths;
+import com.zutubi.pulse.restore.feedback.Feedback;
+import com.zutubi.pulse.restore.feedback.FeedbackProvider;
 import com.zutubi.util.IOUtils;
 
 import java.io.BufferedReader;
@@ -16,9 +18,10 @@ import java.util.Map;
  *
  *
  */
-public class ArtifactArchive extends AbstractArchivableComponent
+public class ArtifactArchive extends AbstractArchivableComponent implements FeedbackProvider
 {
     private MasterUserPaths paths;
+    private Feedback feedback;
 
     public String getName()
     {
@@ -46,8 +49,26 @@ public class ArtifactArchive extends AbstractArchivableComponent
             File mappingsFile = new File(archive, "mappings.txt");
             Map<Long, Long> mappings = readMappings(mappingsFile);
 
+            // progress on this restoration is based on how quickly and how many directories
+            // we need to move/rename.  This is based purely on the number of build directories,
+            // not the number of mappings.
+
             File base = paths.getProjectRoot();
 
+            // a) get a quick overall directory count.
+            DirectoryFilter directoriesOnly = new DirectoryFilter();
+
+            long todoCount = 0;
+            for (File projectDir : base.listFiles(directoriesOnly))
+            {
+                File[] listing = projectDir.listFiles(directoriesOnly);
+                if (listing != null)
+                {
+                    todoCount = todoCount + listing.length;
+                }
+            }
+
+            long completedCout = 0;
             for (File projectDir : base.listFiles(new DirectoryFilter()))
             {
                 for (File buildDir : projectDir.listFiles(new DirectoryFilter()))
@@ -72,6 +93,10 @@ public class ArtifactArchive extends AbstractArchivableComponent
                                 throw new IOException("Failed to move " + buildDir.getCanonicalPath() + " to " + newBuildDir.getCanonicalPath());
                             }
                         }
+
+                        completedCout++;
+
+                        feedback.setPercetageComplete((int)(completedCout * 100 / todoCount));
                     }
                 }
             }
@@ -114,6 +139,11 @@ public class ArtifactArchive extends AbstractArchivableComponent
         }
 
         return mappings;
+    }
+
+    public void setFeedback(Feedback feedback)
+    {
+        this.feedback = feedback;
     }
 
     private class DirectoryFilter implements FileFilter
