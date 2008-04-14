@@ -11,6 +11,8 @@ import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 
+import java.util.List;
+
 /**
  */
 public class GenericAction extends PrototypeSupport
@@ -69,80 +71,112 @@ public class GenericAction extends PrototypeSupport
 
     public String execute() throws Exception
     {
-        if (TextUtils.stringSet(actionName))
+        if(!TextUtils.stringSet(path))
         {
-            configurationType = (CompositeType) configurationTemplateManager.getType(path);
-            ConfigurationActions configurationActions = actionManager.getConfigurationActions(configurationType);
-            ConfigurationAction configurationAction = configurationActions.getAction(actionName);
+            addActionError("Path is required");
+            return ERROR;
+        }
 
-            if (configurationAction != null)
+        if(!TextUtils.stringSet(actionName))
+        {
+            addActionError("Action name is required");
+            return ERROR;
+        }
+
+        Configuration config = configurationTemplateManager.getInstance(path);
+        if(config == null)
+        {
+            addActionError("Path '" + path + "' does not exist");
+            return ERROR;
+        }
+
+        configurationType = (CompositeType) configurationTemplateManager.getType(path);
+        ConfigurationActions configurationActions = actionManager.getConfigurationActions(configurationType);
+        ConfigurationAction configurationAction = configurationActions.getAction(actionName);
+
+        if(configurationAction == null)
+        {
+            addActionError("Unknown action '" + actionName + "' for path '" + path + "'");
+            return ERROR;
+        }
+
+        if (isInputSelected())
+        {
+            Configuration result = actionManager.prepare(actionName, config);
+            if(result != null)
             {
-                if (configurationAction.hasArgument())
+                CompositeType type = typeRegistry.getType(result.getClass());
+                try
                 {
-                    type = typeRegistry.getType(configurationAction.getArgumentClass());
-
-                    if (isInputSelected())
-                    {
-                        prepare();
-                        return INPUT;
-                    }
+                    record = type.unstantiate(result);
                 }
-
-                if (!isCancelSelected())
+                catch (TypeException e)
                 {
-                    Configuration argument = null;
-                    if (configurationAction.hasArgument())
-                    {
-                        // Instantiate the argument from POSTed params.
-                        CompositeType argumentType = typeRegistry.getType(configurationAction.getArgumentClass());
-                        record = PrototypeUtils.toRecord(argumentType, ActionContext.getContext().getParameters());
-
-                        String parentPath = PathUtils.getParentPath(path);
-                        String baseName = PathUtils.getBaseName(path);
-                        try
-                        {
-                            argument = configurationTemplateManager.validate(parentPath, baseName, record, true, false);
-                            if (!argument.isValid())
-                            {
-                                PrototypeUtils.mapErrors(argument, this, null);
-                            }
-                        }
-                        catch (TypeException e)
-                        {
-                            addActionError(e.getMessage());
-                        }
-
-                        if (hasErrors())
-                        {
-                            prepare();
-                            return INPUT;
-                        }
-                    }
-
-                    // need the configuration instance.
-                    Configuration config = configurationTemplateManager.getInstance(path);
-                    actionManager.execute(actionName, config, argument);
-                }
-
-                if (TextUtils.stringSet(newPath))
-                {
-                    response = new ConfigurationResponse(newPath, null);
-                }
-                else
-                {
-                    response = new ConfigurationResponse(path, configurationTemplateManager.getTemplatePath(path));
+                    LOG.severe("Unable to unstantiate prepared argument: " + e.getMessage(), e);
                 }
             }
-            else
+        }
+
+        if (configurationAction.hasArgument())
+        {
+            type = typeRegistry.getType(configurationAction.getArgumentClass());
+
+            if (isInputSelected())
             {
-                LOG.warning("Request for unknown action '" + actionName + "' on path '" + path + "'");
+                prepare();
+                return INPUT;
             }
+        }
+
+        // If we have an argument, it must be valid.
+        Configuration argument = null;
+        if (configurationAction.hasArgument())
+        {
+            // Instantiate the argument from POSTed params.
+            CompositeType argumentType = typeRegistry.getType(configurationAction.getArgumentClass());
+            record = PrototypeUtils.toRecord(argumentType, ActionContext.getContext().getParameters());
+
+            String parentPath = PathUtils.getParentPath(path);
+            String baseName = PathUtils.getBaseName(path);
+            try
+            {
+                argument = configurationTemplateManager.validate(parentPath, baseName, record, true, false);
+                if (!argument.isValid())
+                {
+                    PrototypeUtils.mapErrors(argument, this, null);
+                }
+            }
+            catch (TypeException e)
+            {
+                addActionError(e.getMessage());
+            }
+
+            if (hasErrors())
+            {
+                return ERROR;
+            }
+        }
+
+        // All clear to execute action.
+        List<String> invalidatedPaths = actionManager.execute(actionName, config, argument);
+
+        if (TextUtils.stringSet(newPath))
+        {
+            response = new ConfigurationResponse(newPath, null);
         }
         else
         {
-            LOG.warning("Request for empty action on path '" + path + "'");
+            response = new ConfigurationResponse(path, configurationTemplateManager.getTemplatePath(path));
         }
 
+        if(invalidatedPaths != null)
+        {
+            for(String invalidatedPath: invalidatedPaths)
+            {
+                response.addRenamedPath(new ConfigurationResponse.Rename(invalidatedPath, invalidatedPath, PrototypeUtils.getDisplayName(invalidatedPath, configurationTemplateManager)));
+            }
+        }
+        
         return SUCCESS;
     }
 

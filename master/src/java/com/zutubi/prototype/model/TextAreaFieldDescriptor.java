@@ -18,6 +18,7 @@ public class TextAreaFieldDescriptor extends FieldDescriptor
     public TextAreaFieldDescriptor()
     {
         setType("textarea");
+        addParameter("submitOnEnter", false);
     }
 
     public int getCols()

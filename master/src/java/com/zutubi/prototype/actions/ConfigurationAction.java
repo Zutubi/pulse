@@ -25,6 +25,11 @@ public class ConfigurationAction
      */
     private Class argumentClass;
     /**
+     * Optionally method to call before executing this action: e.g. to
+     * prepare a default argument.
+     */
+    private Method prepareMethod;
+    /**
      * The do... method used to execute this action.
      */
     private Method method;
@@ -35,11 +40,12 @@ public class ConfigurationAction
         this.method = method;
     }
 
-    public ConfigurationAction(String name, String permissionName, Class argumentClass, Method method)
+    public ConfigurationAction(String name, String permissionName, Class argumentClass, Method prepareMethod, Method method)
     {
         this.name = name;
         this.permissionName = permissionName;
         this.argumentClass = argumentClass;
+        this.prepareMethod = prepareMethod;
         this.method = method;
     }
 
@@ -61,6 +67,11 @@ public class ConfigurationAction
     public boolean hasArgument()
     {
         return argumentClass != null;
+    }
+
+    public Method getPrepareMethod()
+    {
+        return prepareMethod;
     }
 
     public Method getMethod()

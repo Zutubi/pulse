@@ -19,6 +19,7 @@ import com.zutubi.pulse.core.config.NamedConfiguration;
 import com.zutubi.pulse.events.AllEventListener;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
+import com.zutubi.util.Pair;
 import com.zutubi.validation.annotations.Required;
 
 import java.util.*;
@@ -1131,6 +1132,255 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
                 assertNotNull(configurationTemplateManager.getInstance("sample/a"));
             }
         });
+    }
+
+    public void testInTemplateParentInvalidPath()
+    {
+        assertFalse(configurationTemplateManager.existsInTemplateParent("there/is/no/such/path"));
+    }
+
+    public void testInTemplateParentEmptyPath()
+    {
+        assertFalse(configurationTemplateManager.existsInTemplateParent(""));
+    }
+
+    public void testInTemplateParentScope()
+    {
+        assertFalse(configurationTemplateManager.existsInTemplateParent("sample"));
+    }
+
+    public void testInTemplateParentTemplatedScope()
+    {
+        assertFalse(configurationTemplateManager.existsInTemplateParent("template"));
+    }
+
+    public void testInTemplateParentRegularRecord()
+    {
+        MockA a = new MockA("a");
+        a.setMock(new MockB("b"));
+        String path = configurationTemplateManager.insert("sample", a);
+        assertFalse(configurationTemplateManager.existsInTemplateParent(PathUtils.getPath(path, "mock")));
+    }
+
+    public void testInTemplateParentTemplateRecord()
+    {
+        MockA a = new MockA("a");
+        a.setMock(new MockB("b"));
+        String path = configurationTemplateManager.insert("template", a);
+        assertFalse(configurationTemplateManager.existsInTemplateParent(PathUtils.getPath(path, "mock")));
+    }
+
+    public void testInTemplateParentInheritedComposite() throws TypeException
+    {
+        MockA parent = new MockA("parent");
+        parent.setMock(new MockB("inheritme"));
+        MockA child = new MockA("child");
+        String childPath = insertParentAndChildA(parent, child).second;
+        assertTrue(configurationTemplateManager.existsInTemplateParent(PathUtils.getPath(childPath, "mock")));
+    }
+
+    public void testInTemplateParentOwnedComposite() throws TypeException
+    {
+        MockA parent = new MockA("parent");
+        MockA child = new MockA("child");
+        child.setMock(new MockB("ownme"));
+        String childPath = insertParentAndChildA(parent, child).second;
+        assertFalse(configurationTemplateManager.existsInTemplateParent(PathUtils.getPath(childPath, "mock")));
+    }
+
+    public void testInTemplateParentOverriddenComposite() throws TypeException
+    {
+        MockA parent = new MockA("parent");
+        parent.setMock(new MockB("overrideme"));
+        MockA child = new MockA("child");
+        MockB b = new MockB("overrideme");
+        b.setB("hehe");
+        child.setMock(b);
+        String childPath = insertParentAndChildA(parent, child).second;
+        assertTrue(configurationTemplateManager.existsInTemplateParent(PathUtils.getPath(childPath, "mock")));
+    }
+
+    public void testInTemplateParentInheritedValue() throws TypeException
+    {
+        MockA parent = new MockA("parent");
+        parent.setB("pb");
+        MockA child = new MockA("child");
+        String childPath = insertParentAndChildA(parent, child).second;
+        assertTrue(configurationTemplateManager.existsInTemplateParent(PathUtils.getPath(childPath, "b")));
+    }
+
+    public void testInTemplateParentOwnedValue() throws TypeException
+    {
+        MockA parent = new MockA("parent");
+        parent.setB("pb");
+        MockA child = new MockA("child");
+        child.setB("cb");
+        String childPath = insertParentAndChildA(parent, child).second;
+        assertTrue(configurationTemplateManager.existsInTemplateParent(PathUtils.getPath(childPath, "b")));
+    }
+
+    public void testIsOverriddenInvalidPath()
+    {
+        assertFalse(configurationTemplateManager.isOverridden("there/is/no/such/path"));
+    }
+
+    public void testIsOverriddenEmptyPath()
+    {
+        assertFalse(configurationTemplateManager.isOverridden(""));
+    }
+
+    public void testIsOverriddenScope()
+    {
+        assertFalse(configurationTemplateManager.isOverridden("sample"));
+    }
+
+    public void testIsOverriddenTemplatedScope()
+    {
+        assertFalse(configurationTemplateManager.isOverridden("template"));
+    }
+
+    public void testIsOverriddenRegularRecord()
+    {
+        MockA a = new MockA("a");
+        a.setMock(new MockB("b"));
+        String path = configurationTemplateManager.insert("sample", a);
+        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(path, "mock")));
+    }
+
+    public void testIsOverriddenTemplateRecord()
+    {
+        MockA a = new MockA("a");
+        a.setMock(new MockB("b"));
+        String path = configurationTemplateManager.insert("template", a);
+        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(path, "mock")));
+    }
+
+    public void testIsOverriddenInheritedComposite() throws TypeException
+    {
+        MockA parent = new MockA("parent");
+        parent.setMock(new MockB("inheritme"));
+        MockA child = new MockA("child");
+        Pair<String, String> paths = insertParentAndChildA(parent, child);
+        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(paths.first, "mock")));
+        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(paths.second, "mock")));
+    }
+
+    public void testIsOverriddenOwnedComposite() throws TypeException
+    {
+        MockA parent = new MockA("parent");
+        MockA child = new MockA("child");
+        child.setMock(new MockB("ownme"));
+        Pair<String, String> paths = insertParentAndChildA(parent, child);
+        assertTrue(configurationTemplateManager.isOverridden(PathUtils.getPath(paths.first, "mock")));
+        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(paths.second, "mock")));
+    }
+
+    public void testIsOverriddenOverriddenComposite() throws TypeException
+    {
+        MockA parent = new MockA("parent");
+        parent.setMock(new MockB("overrideme"));
+        MockA child = new MockA("child");
+        MockB b = new MockB("overrideme");
+        b.setB("hehe");
+        child.setMock(b);
+        Pair<String, String> paths = insertParentAndChildA(parent, child);
+        assertTrue(configurationTemplateManager.isOverridden(PathUtils.getPath(paths.first, "mock")));
+        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(paths.second, "mock")));
+    }
+
+    public void testIsOverriddenInheritedValue() throws TypeException
+    {
+        MockA parent = new MockA("parent");
+        parent.setB("pb");
+        MockA child = new MockA("child");
+        Pair<String, String> paths = insertParentAndChildA(parent, child);
+        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(paths.first, "b")));
+        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(paths.second, "b")));
+    }
+
+    public void testIsOverriddenOverriddenValue() throws TypeException
+    {
+        MockA parent = new MockA("parent");
+        parent.setB("pb");
+        MockA child = new MockA("child");
+        child.setB("cb");
+        Pair<String, String> paths = insertParentAndChildA(parent, child);
+        assertTrue(configurationTemplateManager.isOverridden(PathUtils.getPath(paths.first, "b")));
+        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(paths.second, "b")));
+    }
+
+    public void testIsOverriddenOverriddenInGrandchild() throws TypeException
+    {
+        MockA parent = new MockA("parent");
+        parent.setB("pb");
+        MockA child = new MockA("child");
+        MockA grandchild = new MockA("grandchild");
+        grandchild.setB("cb");
+        String[] paths = insertParentChildAndGrandchildA(parent, child, grandchild);
+        assertTrue(configurationTemplateManager.isOverridden(PathUtils.getPath(paths[0], "b")));
+        assertTrue(configurationTemplateManager.isOverridden(PathUtils.getPath(paths[1], "b")));
+        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(paths[2], "b")));
+    }
+
+    public void testIsOverriddenCompositeOverriddenInGrandchild() throws TypeException
+    {
+        MockA parent = new MockA("parent");
+        parent.setMock(new MockB("overrideme"));
+        MockA child = new MockA("child");
+        MockA grandchild = new MockA("grandchild");
+        MockB b = new MockB("overrideme");
+        b.setB("hehe");
+        grandchild.setMock(b);
+        String[] paths = insertParentChildAndGrandchildA(parent, child, grandchild);
+        assertTrue(configurationTemplateManager.isOverridden(PathUtils.getPath(paths[0], "mock")));
+        assertTrue(configurationTemplateManager.isOverridden(PathUtils.getPath(paths[1], "mock")));
+        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(paths[2], "mock")));
+    }
+
+    public void testIsOverriddenCompositeHiddenInChild() throws TypeException
+    {
+        MockA parent = new MockA("parent");
+        parent.getCs().put("hideme", new MockC("hideme"));
+        MockA child = new MockA("child");
+        MockA grandchild = new MockA("grandchild");
+        String[] paths = insertParentChildAndGrandchildA(parent, child, grandchild);
+
+        configurationTemplateManager.delete(PathUtils.getPath(paths[1], "cs", "hideme"));
+
+        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(paths[0], "cs", "hideme")));
+        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(paths[1], "cs", "hideme")));
+        assertFalse(configurationTemplateManager.isOverridden(PathUtils.getPath(paths[2], "cs", "hideme")));
+    }
+
+    private Pair<String, String> insertParentAndChildA(MockA parent, MockA child) throws TypeException
+    {
+        MutableRecord record = typeA.unstantiate(parent);
+        configurationTemplateManager.markAsTemplate(record);
+        String parentPath = configurationTemplateManager.insertRecord("template", record);
+        long parentHandle = configurationReferenceManager.getHandleForPath(parentPath);
+
+        record = typeA.unstantiate(child);
+        configurationTemplateManager.setParentTemplate(record, parentHandle);
+        return new Pair(parentPath, configurationTemplateManager.insertRecord("template", record));
+    }
+
+    private String[] insertParentChildAndGrandchildA(MockA parent, MockA child, MockA grandchild) throws TypeException
+    {
+        MutableRecord record = typeA.unstantiate(parent);
+        configurationTemplateManager.markAsTemplate(record);
+        String parentPath = configurationTemplateManager.insertRecord("template", record);
+        long parentHandle = configurationReferenceManager.getHandleForPath(parentPath);
+
+        record = typeA.unstantiate(child);
+        configurationTemplateManager.markAsTemplate(record);
+        configurationTemplateManager.setParentTemplate(record, parentHandle);
+        String childPath = configurationTemplateManager.insertRecord("template", record);
+        long childHandle = configurationReferenceManager.getHandleForPath(childPath);
+
+        record = typeA.unstantiate(grandchild);
+        configurationTemplateManager.setParentTemplate(record, childHandle);
+        String grandChildPath = configurationTemplateManager.insertRecord("template", record);
+        return new String[]{parentPath, childPath, grandChildPath};
     }
 
     private void assertNoSuchPath(String path)

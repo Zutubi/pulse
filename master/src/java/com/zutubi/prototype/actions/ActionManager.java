@@ -59,10 +59,11 @@ public class ActionManager
                 }
             }
 
-            if (configurationInstance.isConcrete())
+            CompositeType type = getType(configurationInstance);
+            ConfigurationActions configurationActions = getConfigurationActions(type);
+
+            if (configurationActions.actionsEnabled(configurationInstance, configurationTemplateManager.isDeeplyValid(path)))
             {
-                CompositeType type = getType(configurationInstance);
-                ConfigurationActions configurationActions = getConfigurationActions(type);
                 try
                 {
                     List<ConfigurationAction> actions = configurationActions.getActions(configurationInstance);
@@ -84,7 +85,7 @@ public class ActionManager
         return result;
     }
 
-    public void execute(String actionName, Configuration configurationInstance, Configuration argumentInstance)
+    public Configuration prepare(String actionName, Configuration configurationInstance)
     {
         CompositeType type = getType(configurationInstance);
         ConfigurationActions actions = getConfigurationActions(type);
@@ -96,7 +97,34 @@ public class ActionManager
 
             try
             {
-                actions.execute(actionName, configurationInstance, argumentInstance);
+                return actions.prepare(actionName, configurationInstance);
+            }
+            catch (Exception e)
+            {
+                LOG.severe(e);
+                throw new RuntimeException(e);
+            }
+        }
+        else
+        {
+            LOG.warning("Request to prepare unrecognised action '" + actionName + "' on path '" + configurationInstance.getConfigurationPath() + "'");
+            return null;
+        }
+    }
+
+    public List<String> execute(String actionName, Configuration configurationInstance, Configuration argumentInstance)
+    {
+        CompositeType type = getType(configurationInstance);
+        ConfigurationActions actions = getConfigurationActions(type);
+        ConfigurationAction action = actions.getAction(actionName);
+
+        if (action != null)
+        {
+            configurationSecurityManager.ensurePermission(configurationInstance.getConfigurationPath(), action.getPermissionName());
+
+            try
+            {
+                return actions.execute(actionName, configurationInstance, argumentInstance);
             }
             catch (Exception e)
             {
@@ -108,6 +136,8 @@ public class ActionManager
         {
             LOG.warning("Request for unrecognised action '" + actionName + "' on path '" + configurationInstance.getConfigurationPath() + "'");
         }
+
+        return null;
     }
 
     private CompositeType getType(Object configurationInstance)

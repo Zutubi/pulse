@@ -1,11 +1,20 @@
 package com.zutubi.pulse.prototype.config.project;
 
 import com.zutubi.config.annotations.Permission;
+import com.zutubi.prototype.config.ConfigurationProvider;
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
+import com.zutubi.prototype.security.AccessManager;
+import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.model.ManualTriggerBuildReason;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.prototype.config.project.types.CustomTypeConfiguration;
+import com.zutubi.pulse.prototype.config.project.types.VersionedTypeConfiguration;
 import com.zutubi.pulse.security.AcegiUtils;
+import com.zutubi.util.NullaryFunction;
+import com.zutubi.util.logging.Logger;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -14,34 +23,69 @@ import java.util.List;
  */
 public class ProjectConfigurationActions
 {
-    public static final String ACTION_CANCEL_BUILD = "cancel build";
-    public static final String ACTION_PAUSE        = "pause";
-    public static final String ACTION_RESUME       = "resume";
-    public static final String ACTION_VIEW_SOURCE  = "view source";
-    public static final String ACTION_TRIGGER      = "trigger";
-    public static final String ACTION_MARK_CLEAN   = "clean";
+    public static final String ACTION_CANCEL_BUILD         = "cancel build";
+    public static final String ACTION_CONVERT_TO_CUSTOM    = "convertToCustom";
+    public static final String ACTION_CONVERT_TO_VERSIONED = "convertToVersioned";
+    public static final String ACTION_PAUSE                = "pause";
+    public static final String ACTION_RESUME               = "resume";
+    public static final String ACTION_VIEW_SOURCE          = "view source";
+    public static final String ACTION_TRIGGER              = "trigger";
+    public static final String ACTION_MARK_CLEAN           = "clean";
+
+    private static final Logger LOG = Logger.getLogger(ProjectConfigurationActions.class);
 
     private ProjectManager projectManager;
+    private ConfigurationProvider configurationProvider;
+    private ConfigurationTemplateManager configurationTemplateManager;
+
+    public boolean actionsEnabled(ProjectConfiguration instance, boolean deeplyValid)
+    {
+        return deeplyValid;
+    }
 
     public List<String> getActions(ProjectConfiguration instance)
     {
         List<String> result = new LinkedList<String>();
-        result.add(ACTION_TRIGGER);
-        result.add(ACTION_MARK_CLEAN);
-        Project project = projectManager.getProject(instance.getProjectId(), true);
-        if (project != null)
+        if (instance.isConcrete())
         {
-            if (project.isPaused())
+            result.add(ACTION_TRIGGER);
+            result.add(ACTION_MARK_CLEAN);
+            Project project = projectManager.getProject(instance.getProjectId(), true);
+            if (project != null)
             {
-                result.add(ACTION_RESUME);
+                if (project.isPaused())
+                {
+                    result.add(ACTION_RESUME);
+                }
+                else
+                {
+                    result.add(ACTION_PAUSE);
+                }
             }
-            else
+        }
+
+        if(canConvertType(instance))
+        {
+            if(!(instance.getType() instanceof CustomTypeConfiguration))
             {
-                result.add(ACTION_PAUSE);
+                result.add(ACTION_CONVERT_TO_CUSTOM);
+            }
+
+            if(!(instance.getType() instanceof VersionedTypeConfiguration))
+            {
+                result.add(ACTION_CONVERT_TO_VERSIONED);
             }
         }
 
         return result;
+    }
+
+    private boolean canConvertType(ProjectConfiguration instance)
+    {
+        // We can only convert types if this project owns the type (i.e. it
+        // is not inherited) and it is not overridden.
+        String typePath = PathUtils.getPath(instance.getConfigurationPath(), "type");
+        return !configurationTemplateManager.existsInTemplateParent(typePath) && !configurationTemplateManager.isOverridden(typePath);
     }
 
     @Permission(ACTION_TRIGGER)
@@ -83,8 +127,74 @@ public class ProjectConfigurationActions
         }
     }
 
+    public CustomTypeConfiguration prepareConvertToCustom(final ProjectConfiguration projectConfiguration)
+    {
+        CustomTypeConfiguration result = new CustomTypeConfiguration();
+        try
+        {
+            result.setPulseFileString(projectConfiguration.getType().getPulseFile(0, projectConfiguration, null, null));
+        }
+        catch (Exception e)
+        {
+            // We tried, and no damage is done.
+            LOG.warning(e);
+        }
+
+        return result;
+    }
+
+    @Permission(AccessManager.ACTION_WRITE)
+    public List<String> doConvertToCustom(final ProjectConfiguration projectConfig, final CustomTypeConfiguration custom)
+    {
+        return configurationProvider.executeInsideTransaction(new NullaryFunction<List<String>>()
+        {
+            public List<String> process()
+            {
+                if(!canConvertType(projectConfig))
+                {
+                    throw new IllegalArgumentException("Cannot convert type as it is either not defined at this level or overridden");
+                }
+
+                String typePath = projectConfig.getType().getConfigurationPath();
+                configurationProvider.delete(typePath);
+                configurationProvider.insert(typePath, custom);
+                return Arrays.asList(typePath);
+            }
+        });
+    }
+
+    @Permission(AccessManager.ACTION_WRITE)
+    public List<String> doConvertToVersioned(final ProjectConfiguration projectConfig, final VersionedTypeConfiguration versioned)
+    {
+        return configurationProvider.executeInsideTransaction(new NullaryFunction<List<String>>()
+        {
+            public List<String> process()
+            {
+                if(!canConvertType(projectConfig))
+                {
+                    throw new IllegalArgumentException("Cannot convert type as it is either not defined at this level or overridden");
+                }
+
+                String typePath = projectConfig.getType().getConfigurationPath();
+                configurationProvider.delete(typePath);
+                configurationProvider.insert(typePath, versioned);
+                return Arrays.asList(typePath);
+            }
+        });
+    }
+
     public void setProjectManager(ProjectManager projectManager)
     {
         this.projectManager = projectManager;
+    }
+
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    {
+        this.configurationProvider = configurationProvider;
+    }
+
+    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
+    {
+        this.configurationTemplateManager = configurationTemplateManager;
     }
 }

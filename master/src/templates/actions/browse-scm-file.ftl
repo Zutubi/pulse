@@ -1,8 +1,33 @@
 form.items.last().on('browse', function(field)
 {
-    var projectPath = '${field.parameters.parentPath}';
-<#if !field.parameters.baseName?exists>
-    projectPath = 'wizards/' + projectPath;
+    function getParentPath(path)
+    {
+        var index = path.lastIndexOf('/');
+        if(index >= 0)
+        {
+            return path.slice(0, index);
+        }
+
+        return null;
+    }
+
+    function findProjectPath(path)
+    {
+        var parentPath = getParentPath(path);
+        while(parentPath != null && parentPath != 'projects')
+        {
+            path = getParentPath(path);
+            parentPath = getParentPath(path);
+        }
+        
+        return path;
+    }
+
+    var projectPath;
+<#if field.parameters.baseName?exists>
+     projectPath = findProjectPath('${field.parameters.parentPath}/${field.parameters.baseName}');
+<#else>
+     projectPath = 'wizards/' + projectPath;
 </#if>
 
     var prefix = 'scm';

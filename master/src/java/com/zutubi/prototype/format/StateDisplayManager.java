@@ -26,7 +26,7 @@ public class StateDisplayManager
 
     public List<String> getDisplayFields(Configuration configurationInstance)
     {
-        if (configurationInstance != null)
+        if (configurationInstance != null && configurationInstance.isConcrete())
         {
             try
             {

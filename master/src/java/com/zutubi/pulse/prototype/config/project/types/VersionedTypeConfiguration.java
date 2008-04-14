@@ -1,5 +1,6 @@
 package com.zutubi.pulse.prototype.config.project.types;
 
+import com.zutubi.config.annotations.FieldAction;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Transient;
 import com.zutubi.config.annotations.Wire;
@@ -10,16 +11,19 @@ import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.util.IOUtils;
+import com.zutubi.validation.annotations.Required;
 
 import java.io.InputStream;
 
 /**
- *
+ * Pulse file project where the pulse file is stored in the project's SCM.
  */
 @SymbolicName("zutubi.versionedTypeConfig")
 @Wire
 public class VersionedTypeConfiguration extends TypeConfiguration
 {
+    @Required
+    @FieldAction(template = "actions/browse-scm-file")
     private String pulseFileName;
     @Transient
     private ScmClientFactory scmClientFactory;

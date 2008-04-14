@@ -85,7 +85,6 @@ public class SaveAction extends PrototypeSupport
 
         if(hasErrors())
         {
-            prepare();
             return INPUT;
         }
 

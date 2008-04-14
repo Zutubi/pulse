@@ -40,10 +40,6 @@
     </div>
 #end
 
-#macro(actionAnchor $actionLink)
-
-#end
-
 <h2 id='#id($path)'>$!webwork.htmlEncode($config.displayName)</h2>
 <p class="introduction">
     #i18n("key=introduction")

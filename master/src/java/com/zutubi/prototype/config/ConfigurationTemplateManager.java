@@ -13,6 +13,7 @@ import com.zutubi.pulse.events.EventManager;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Sort;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.ValidationException;
@@ -639,6 +640,92 @@ public class ConfigurationTemplateManager implements InstanceSource
                 }
             }
         }, true);
+    }
+
+    /**
+     * Tests if the given path is inherited from an ancestor template, rather
+     * than being first defined at its own level of the hierarchy.  Note that
+     * this method takes no account of whether the path is overridden - just
+     * whether it exists in the template parent.
+     *
+     * If the path does not exist or is not in a templated scope, it is
+     * deemed to not be inherited.
+     * 
+     * @param path the path to test
+     * @return true if the path is inherited
+     */
+    public boolean existsInTemplateParent(final String path)
+    {
+        return executeInsideTransaction(new Action<Boolean>()
+        {
+            public Boolean execute() throws Exception
+            {
+                String parentPath = PathUtils.getParentPath(path);
+                if(parentPath == null || !pathExists(parentPath))
+                {
+                    return false;
+                }
+
+                if(!isTemplatedPath(path))
+                {
+                    return false;
+                }
+
+                TemplateRecord parentTemplateParent = getTemplateParentRecord(parentPath);
+                return parentTemplateParent != null && parentTemplateParent.containsKey(PathUtils.getBaseName(path));
+            }
+        });
+    }
+
+    /**
+     * Tests if the given path is overridden in any template descendent.
+     * Overrides may be indirect - for example if you have a template parent
+     * and child "myscope/parent" and "myscope/child" that are identical
+     * apart from an override at path "myscope/child/some/nested/value", then
+     * this method will return true for "myscope/parent".
+     *
+     * Hiding a path in a descdent does not constitute an override.
+     *
+     * If the path does not exist or is not in a templated scope, this
+     * method will return false.
+     *
+     * @param path the path to test
+     * @return true if the path is overridden in any template descendent
+     */
+    public boolean isOverridden(final String path)
+    {
+        return executeInsideTransaction(new Action<Boolean>()
+        {
+            public Boolean execute() throws Exception
+            {
+                String parentPath = PathUtils.getParentPath(path);
+                if(parentPath == null || !pathExists(parentPath))
+                {
+                    return false;
+                }
+
+                if(!isTemplatedPath(path))
+                {
+                    return false;
+                }
+
+                String baseName = PathUtils.getBaseName(path);
+                TemplateRecord parentRecord = (TemplateRecord) getRecord(parentPath);
+                String pathOwner = parentRecord.getOwner(baseName);
+
+                List<String> descendentPaths = getDescendentPaths(parentPath, true, false, false);
+                for(String descedentPath: descendentPaths)
+                {
+                    parentRecord = (TemplateRecord) getRecord(descedentPath);
+                    if(!StringUtils.equals(pathOwner, parentRecord.getOwner(baseName)))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        });
     }
 
     /**

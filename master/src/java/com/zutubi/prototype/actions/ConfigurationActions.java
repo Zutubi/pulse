@@ -24,6 +24,7 @@ public class ConfigurationActions
 
     private Class configurationClass;
     private Class actionHandlerClass;
+    private Method enabledMethod;
     private Method actionListingMethod;
     private Map<String, ConfigurationAction> availableActions = new HashMap<String, ConfigurationAction>();
     private ObjectFactory objectFactory;
@@ -33,8 +34,25 @@ public class ConfigurationActions
         this.configurationClass = configurationClass;
         this.actionHandlerClass = actionHandlerClass;
         this.objectFactory = objectFactory;
+        findEnabledMethod();
         findActionListingMethod();
         findAvailableActions();
+    }
+
+    private void findEnabledMethod()
+    {
+        if (actionHandlerClass != null)
+        {
+            enabledMethod = CollectionUtils.find(actionHandlerClass.getMethods(), new Predicate<Method>()
+            {
+                public boolean satisfied(Method method)
+                {
+                    return method.getName().equals("actionsEnabled") &&
+                            (ReflectionUtils.acceptsParameters(method, configurationClass, boolean.class)) &&
+                            method.getReturnType().equals(boolean.class);
+                }
+            });
+        }
     }
 
     private void findActionListingMethod()
@@ -67,7 +85,7 @@ public class ConfigurationActions
                 {
                     continue;
                 }
-                if (method.getReturnType() != Void.TYPE)
+                if (method.getReturnType() != Void.TYPE && !ReflectionUtils.returnsParameterisedType(method, List.class, String.class))
                 {
                     continue;
                 }
@@ -99,7 +117,7 @@ public class ConfigurationActions
 
                 // ok, we have an action here.
                 String action = methodToAction(methodName);
-                availableActions.put(action, new ConfigurationAction(action, getPermissionName(method), argumentType, method));
+                availableActions.put(action, new ConfigurationAction(action, getPermissionName(method), argumentType, getPrepareMethod(action, argumentType), method));
             }
         }
     }
@@ -127,6 +145,29 @@ public class ConfigurationActions
         return permissionName;
     }
 
+    private Method getPrepareMethod(final String action, final Class argumentType)
+    {
+        final String expectedName = "prepare" + action.substring(0, 1).toUpperCase() + action.substring(1);
+        return CollectionUtils.find(actionHandlerClass.getMethods(), new Predicate<Method>()
+        {
+            public boolean satisfied(Method method)
+            {
+                if(!method.getName().equals(expectedName))
+                {
+                    return false;
+                }
+
+                if(!ReflectionUtils.acceptsParameters(method) && !ReflectionUtils.acceptsParameters(method, configurationClass))
+                {
+                    return false;
+                }
+
+                Class<?> returnType = method.getReturnType();
+                return  returnType == Void.TYPE || argumentType != null && argumentType.isAssignableFrom(returnType);
+            }
+        });
+    }
+
     public Class getConfigurationClass()
     {
         return configurationClass;
@@ -150,6 +191,31 @@ public class ConfigurationActions
     public boolean hasAction(String name)
     {
         return getAction(name) != null;
+    }
+
+    boolean hasEnabledMethod()
+    {
+        return enabledMethod != null;
+    }
+    
+    boolean actionsEnabled(Configuration instance, boolean deeplyValid)
+    {
+        if (enabledMethod != null)
+        {
+            try
+            {
+                Object actionHandler = objectFactory.buildBean(actionHandlerClass);
+                return (Boolean) enabledMethod.invoke(actionHandler, instance, deeplyValid);
+            }
+            catch (Exception e)
+            {
+                LOG.severe(e);
+                // Fall through to default behaviour
+            }
+        }
+
+        // By default only concrete, valid instances may have actions
+        return instance.isConcrete() && deeplyValid;
     }
 
     List<ConfigurationAction> getActions(Object configurationInstance) throws Exception
@@ -183,7 +249,7 @@ public class ConfigurationActions
                 }
                 else
                 {
-                    LOG.warning("Dropping action '" + action + "' from class '" + configurationClass.getName() + "' because no corresponding method was found");
+                    LOG.warning("Dropping action '" + actionName + "' from class '" + configurationClass.getName() + "' because no corresponding method was found");
                 }
             }
         }
@@ -191,7 +257,49 @@ public class ConfigurationActions
         return actions;
     }
 
-    void execute(String name, Object configurationInstance, Object argument) throws Exception
+    Configuration prepare(String name, Configuration configurationInstance) throws Exception
+    {
+        ConfigurationAction action = verifyAction(name, configurationInstance);
+        Method prepareMethod = action.getPrepareMethod();
+        Configuration result = null;
+        if(prepareMethod != null)
+        {
+            Object handlerInstance = objectFactory.buildBean(actionHandlerClass);
+            if(prepareMethod.getParameterTypes().length == 0)
+            {
+                result = (Configuration) prepareMethod.invoke(handlerInstance);
+            }
+            else
+            {
+                result = (Configuration) prepareMethod.invoke(handlerInstance, configurationInstance);
+            }
+        }
+
+        return result;
+    }
+
+    List<String> execute(String name, Configuration configurationInstance, Configuration argument) throws Exception
+    {
+        ConfigurationAction action = verifyAction(name, configurationInstance);
+
+        Object handlerInstance = objectFactory.buildBean(actionHandlerClass);
+        Class argumentClass = action.getArgumentClass();
+        if (argumentClass == null)
+        {
+            return (List<String>) action.getMethod().invoke(handlerInstance, configurationInstance);
+        }
+        else
+        {
+            if(argument != null && !argumentClass.isInstance(argument))
+            {
+                throw new IllegalArgumentException("Invoking action '" + name + "' of type '" + configurationClass.getName() + "': argument instance is of wrong type: expecting '" + argumentClass.getName() + "', got '" + argument.getClass().getName() + "'");
+            }
+
+            return (List<String>) action.getMethod().invoke(handlerInstance, configurationInstance, argument);
+        }
+    }
+
+    private ConfigurationAction verifyAction(String name, Configuration configurationInstance)
     {
         ConfigurationAction action = availableActions.get(name);
         if(action == null)
@@ -203,21 +311,6 @@ public class ConfigurationActions
         {
             throw new IllegalArgumentException("Invoking action '" + name + "': configuration instance is of wrong type: expecting '" + configurationClass.getName() + "', got '" + configurationInstance.getClass().getName() + "'");
         }
-
-        Object handlerInstance = objectFactory.buildBean(actionHandlerClass);
-        Class argumentClass = action.getArgumentClass();
-        if (argumentClass == null)
-        {
-            action.getMethod().invoke(handlerInstance, configurationInstance);
-        }
-        else
-        {
-            if(argument != null && !argumentClass.isInstance(argument))
-            {
-                throw new IllegalArgumentException("Invoking action '" + name + "' of type '" + configurationClass.getName() + "': argument instance is of wrong type: expecting '" + argumentClass.getName() + "', got '" + argument.getClass().getName() + "'");
-            }
-
-            action.getMethod().invoke(handlerInstance, configurationInstance, argument);
-        }
+        return action;
     }
 }
