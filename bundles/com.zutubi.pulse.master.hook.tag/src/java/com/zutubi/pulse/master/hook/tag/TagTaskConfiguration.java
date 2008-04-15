@@ -2,6 +2,7 @@ package com.zutubi.pulse.master.hook.tag;
 
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.Wire;
 import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.VariableHelper;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
@@ -16,6 +17,7 @@ import com.zutubi.pulse.prototype.config.project.hooks.BuildHookTaskConfiguratio
 import com.zutubi.pulse.prototype.config.project.hooks.CompatibleHooks;
 import com.zutubi.pulse.prototype.config.project.hooks.ManualBuildHookConfiguration;
 import com.zutubi.pulse.prototype.config.project.hooks.PostBuildHookConfiguration;
+import com.zutubi.validation.annotations.Required;
 
 /**
  * A hook task that tags the built revision in the scm.
@@ -23,8 +25,10 @@ import com.zutubi.pulse.prototype.config.project.hooks.PostBuildHookConfiguratio
 @SymbolicName("zutubi.tagTaskConfig")
 @Form(fieldOrder = {"tag", "moveExisting"})
 @CompatibleHooks({ManualBuildHookConfiguration.class, PostBuildHookConfiguration.class})
+@Wire
 public class TagTaskConfiguration extends AbstractConfiguration implements BuildHookTaskConfiguration
 {
+    @Required
     private String tag;
     private boolean moveExisting;
 
