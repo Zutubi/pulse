@@ -4,6 +4,7 @@ import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
+import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 
@@ -23,6 +24,10 @@ public class CompositeTypeTest extends TypeTestCase
     private CompositeType typeB;
     private CompositeType baseType;
     private CompositeType extensionType;
+    private CompositeType interfaceType;
+    private CompositeType grandparentType;
+    private CompositeType parentType;
+    private CompositeType childType;
 
     protected void setUp() throws Exception
     {
@@ -36,6 +41,10 @@ public class CompositeTypeTest extends TypeTestCase
 
         baseType = typeRegistry.register(BaseConfiguration.class);
         extensionType = typeRegistry.register(ExtensionConfiguration.class);
+        interfaceType = typeRegistry.register(ConfigInterface.class);
+        grandparentType = typeRegistry.register(GrandparentConfig.class);
+        parentType = typeRegistry.register(ParentConfig.class);
+        childType = typeRegistry.register(ChildConfig.class);
     }
 
     protected void tearDown() throws Exception
@@ -324,6 +333,18 @@ public class CompositeTypeTest extends TypeTestCase
         assertTrue(extensionType.hasAnnotation(OverriddenAnnotation.class, false));
     }
 
+    public void testHasAnnotationIndirect()
+    {
+        assertTrue(childType.hasAnnotation(GrandparentAnnotation.class, true));
+        assertFalse(childType.hasAnnotation(GrandparentAnnotation.class, false));
+    }
+
+    public void testHasAnnotationFromInterface()
+    {
+        assertTrue(childType.hasAnnotation(InterfaceAnnotation.class, true));
+        assertFalse(childType.hasAnnotation(InterfaceAnnotation.class, false));
+    }
+    
     public void testGetAnnotationDirect()
     {
         assertNotNull(extensionType.getAnnotation(DirectAnnotation.class, true));
@@ -340,6 +361,18 @@ public class CompositeTypeTest extends TypeTestCase
     {
         assertEquals("extension", extensionType.getAnnotation(OverriddenAnnotation.class, true).value());
         assertEquals("extension", extensionType.getAnnotation(OverriddenAnnotation.class, true).value());
+    }
+
+    public void testGetAnnotationIndirect()
+    {
+        assertNotNull(childType.getAnnotation(GrandparentAnnotation.class, true));
+        assertNull(childType.getAnnotation(GrandparentAnnotation.class, false));
+    }
+
+    public void testGetAnnotationFromInterface()
+    {
+        assertNotNull(childType.getAnnotation(InterfaceAnnotation.class, true));
+        assertNull(childType.getAnnotation(InterfaceAnnotation.class, false));
     }
 
     public void testGetAnnotations()
@@ -373,6 +406,22 @@ public class CompositeTypeTest extends TypeTestCase
         assertAnnotationCount(2, annotations, OverriddenAnnotation.class);
     }
 
+    public void testGetAnnotationsIndirectAndInterface()
+    {
+        List<Annotation> annotations = childType.getAnnotations(false);
+        assertEquals(2, annotations.size());
+        assertAnnotation(annotations, SymbolicName.class);
+        assertAnnotation(annotations, ChildAnnotation.class);
+
+        annotations = childType.getAnnotations(true);
+        assertEquals(8, annotations.size());
+        assertAnnotationCount(4, annotations, SymbolicName.class);
+        assertAnnotation(annotations, GrandparentAnnotation.class);
+        assertAnnotation(annotations, ParentAnnotation.class);
+        assertAnnotation(annotations, InterfaceAnnotation.class);
+        assertAnnotation(annotations, ChildAnnotation.class);
+    }
+
     public void testGetSpecificAnnotationsDirect()
     {
         List<Annotation> annotations = extensionType.getAnnotations(DirectAnnotation.class, false);
@@ -397,6 +446,22 @@ public class CompositeTypeTest extends TypeTestCase
         assertEquals(2, annotations.size());
     }
 
+    public void testGetSpecificAnnotationsIndirect()
+    {
+        List<Annotation> annotations = childType.getAnnotations(GrandparentAnnotation.class, false);
+        assertEquals(0, annotations.size());
+        annotations = childType.getAnnotations(GrandparentAnnotation.class, true);
+        assertEquals(1, annotations.size());
+    }
+
+    public void testGetSpecificAnnotationsFromInterface()
+    {
+        List<Annotation> annotations = childType.getAnnotations(InterfaceAnnotation.class, false);
+        assertEquals(0, annotations.size());
+        annotations = childType.getAnnotations(InterfaceAnnotation.class, true);
+        assertEquals(1, annotations.size());
+    }
+
     private void assertAnnotation(List<Annotation> annotations, final Class clazz)
     {
         assertTrue(CollectionUtils.contains(annotations, new Predicate<Annotation>()
@@ -417,6 +482,42 @@ public class CompositeTypeTest extends TypeTestCase
                 return annotation.annotationType() == clazz;
             }
         }).size());
+    }
+
+    public void testSupertypesRegistered()
+    {
+        List<CompositeType> superTypes = childType.getSuperTypes();
+        assertEquals(2, superTypes.size());
+        assertTrue(superTypes.contains(interfaceType));
+        assertTrue(superTypes.contains(parentType));
+
+        superTypes = interfaceType.getSuperTypes();
+        assertEquals(0, superTypes.size());
+
+        superTypes = parentType.getSuperTypes();
+        assertEquals(1, superTypes.size());
+        assertTrue(superTypes.contains(grandparentType));
+
+        superTypes = grandparentType.getSuperTypes();
+        assertEquals(0, superTypes.size());
+    }
+    
+    public void testExtensionsRegistered()
+    {
+        List<CompositeType> extensions = grandparentType.getExtensions();
+        assertEquals(1, extensions.size());
+        assertTrue(extensions.contains(childType));
+
+        extensions = parentType.getExtensions();
+        assertEquals(1, extensions.size());
+        assertTrue(extensions.contains(childType));
+
+        extensions = interfaceType.getExtensions();
+        assertEquals(1, extensions.size());
+        assertTrue(extensions.contains(childType));
+
+        extensions = childType.getExtensions();
+        assertEquals(0, extensions.size());
     }
 
     @SymbolicName("typeA")
@@ -827,6 +928,30 @@ public class CompositeTypeTest extends TypeTestCase
     {
     }
 
+    @InterfaceAnnotation
+    @SymbolicName("configinterface")
+    public static interface ConfigInterface extends Configuration
+    {
+    }
+
+    @GrandparentAnnotation
+    @SymbolicName("grandparentconfig")
+    public static abstract class GrandparentConfig extends AbstractConfiguration
+    {
+    }
+
+    @ParentAnnotation
+    @SymbolicName("parentconfig")
+    public static abstract class ParentConfig extends GrandparentConfig
+    {
+    }
+
+    @ChildAnnotation
+    @SymbolicName("childconfig")
+    public static class ChildConfig extends ParentConfig implements ConfigInterface
+    {
+    }
+
     @Target({ElementType.TYPE})
     @Retention(RetentionPolicy.RUNTIME)
     private static @interface DirectAnnotation
@@ -844,5 +969,29 @@ public class CompositeTypeTest extends TypeTestCase
     private static @interface OverriddenAnnotation
     {
         String value();
+    }
+
+    @Target({ElementType.TYPE})
+    @Retention(RetentionPolicy.RUNTIME)
+    private static @interface InterfaceAnnotation
+    {
+    }
+
+    @Target({ElementType.TYPE})
+    @Retention(RetentionPolicy.RUNTIME)
+    private static @interface GrandparentAnnotation
+    {
+    }
+
+    @Target({ElementType.TYPE})
+    @Retention(RetentionPolicy.RUNTIME)
+    private static @interface ParentAnnotation
+    {
+    }
+
+    @Target({ElementType.TYPE})
+    @Retention(RetentionPolicy.RUNTIME)
+    private static @interface ChildAnnotation
+    {
     }
 }

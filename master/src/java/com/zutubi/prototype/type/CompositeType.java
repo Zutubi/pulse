@@ -32,7 +32,7 @@ public class CompositeType extends AbstractType implements ComplexType
     /**
      * If this type extends another, the type it extends (else null).
      */
-    private CompositeType superType = null;
+    private List<CompositeType> superTypes = new LinkedList<CompositeType>();
     /**
      * The list of types that 'extend' this type.
      */
@@ -253,10 +253,13 @@ public class CompositeType extends AbstractType implements ComplexType
 
     public List<Annotation> getAnnotations(boolean includeInherited)
     {
-        if(includeInherited && superType != null)
+        if(includeInherited)
         {
-            List<Annotation> result = new LinkedList<Annotation>(superType.getAnnotations(true));
-            result.addAll(annotations);
+            List<Annotation> result = new LinkedList<Annotation>(annotations);
+            for (CompositeType superType: superTypes)
+            {
+                result.addAll(superType.getAnnotations(true));
+            }
             return result;
         }
         else
@@ -268,9 +271,12 @@ public class CompositeType extends AbstractType implements ComplexType
     public List<Annotation> getAnnotations(final Class annotationType, boolean includeInherited)
     {
         List<Annotation> result = new LinkedList<Annotation>();
-        if(includeInherited && superType != null)
+        if(includeInherited)
         {
-            result.addAll(superType.getAnnotations(annotationType, true));
+            for(CompositeType superType: superTypes)
+            {
+                result.addAll(superType.getAnnotations(annotationType, true));
+            }
         }
 
         CollectionUtils.filter(annotations, new Predicate<Annotation>()
@@ -299,9 +305,16 @@ public class CompositeType extends AbstractType implements ComplexType
             }
         });
 
-        if(result == null && includeInherited && superType != null)
+        if(result == null && includeInherited)
         {
-            result = superType.getAnnotation(annotationType, includeInherited);
+            for(CompositeType superType: superTypes)
+            {
+                result = superType.getAnnotation(annotationType, includeInherited);
+                if(result != null)
+                {
+                    break;
+                }
+            }
         }
 
         return result;
@@ -313,12 +326,12 @@ public class CompositeType extends AbstractType implements ComplexType
         return Modifier.isAbstract(modifiers) || Modifier.isInterface(modifiers);
     }
 
-    public CompositeType getSuperType()
+    public List<CompositeType> getSuperTypes()
     {
-        return superType;
+        return superTypes;
     }
 
-    private void checkSubtypeAndRecordSupertype(CompositeType type) throws TypeException
+    private void registerSubtype(CompositeType type, boolean internal, boolean direct) throws TypeException
     {
         if (!isExtendable())
         {
@@ -330,24 +343,35 @@ public class CompositeType extends AbstractType implements ComplexType
             throw new TypeException("Extension class '" + type.getClazz().getName() + "' is not a subtype of '" + getClazz().getName() + "'");
         }
 
-        if (type.superType == null)
+        // All of our concrete descendents get registered on the extensions
+        // list.
+        if (!type.isExtendable())
         {
-            type.superType = this;
+            if(internal)
+            {
+                internalExtensions.add(type);
+            }
+            else
+            {
+                extensions.add(type);
+            }
+        }
+
+        if (direct)
+        {
+            type.superTypes.add(this);
+        }
+
+        // Recurse up to register indirect concrete extensions with parent
+        for(CompositeType superType: superTypes)
+        {
+            superType.registerSubtype(type, internal, false);
         }
     }
 
     void registerSubtype(CompositeType type) throws TypeException
     {
-        checkSubtypeAndRecordSupertype(type);
-        if (!type.isExtendable())
-        {
-            this.extensions.add(type);
-        }
-
-        if(superType != null)
-        {
-            superType.registerSubtype(type);
-        }
+        registerSubtype(type, false, true);
     }
 
     public List<CompositeType> getExtensions()
@@ -357,16 +381,7 @@ public class CompositeType extends AbstractType implements ComplexType
 
     void registerInternalSubtype(CompositeType type) throws TypeException
     {
-        checkSubtypeAndRecordSupertype(type);
-        if (!type.isExtendable())
-        {
-            internalExtensions.add(type);
-        }
-
-        if(superType != null)
-        {
-            superType.registerInternalSubtype(type);
-        }
+        registerSubtype(type, true, true);
     }
 
     public List<CompositeType> getInternalExtensions()
