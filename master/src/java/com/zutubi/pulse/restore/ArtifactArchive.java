@@ -5,12 +5,7 @@ import com.zutubi.pulse.restore.feedback.Feedback;
 import com.zutubi.pulse.restore.feedback.FeedbackProvider;
 import com.zutubi.util.IOUtils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,50 +51,55 @@ public class ArtifactArchive extends AbstractArchivableComponent implements Feed
             File base = paths.getProjectRoot();
 
             // a) get a quick overall directory count.
-            DirectoryFilter directoriesOnly = new DirectoryFilter();
-
-            long todoCount = 0;
-            for (File projectDir : base.listFiles(directoriesOnly))
+            if (base.isDirectory())
             {
-                File[] listing = projectDir.listFiles(directoriesOnly);
-                if (listing != null)
-                {
-                    todoCount = todoCount + listing.length;
-                }
-            }
+                DirectoryFilter directoriesOnly = new DirectoryFilter();
 
-            long completedCout = 0;
-            for (File projectDir : base.listFiles(new DirectoryFilter()))
-            {
-                for (File buildDir : projectDir.listFiles(new DirectoryFilter()))
+                long todoCount = 0;
+                for (File projectDir : base.listFiles(directoriesOnly))
                 {
-                    for (File recipeDir : buildDir.listFiles(new DirectoryFilter()))
+                    File[] listing = projectDir.listFiles(directoriesOnly);
+                    if (listing != null)
                     {
-                        Long recipeResultId = Long.valueOf(recipeDir.getName());
-                        if (mappings.containsKey(recipeResultId))
+                        todoCount = todoCount + listing.length;
+                    }
+                }
+
+                long completedCout = 0;
+                for (File projectDir : base.listFiles(new DirectoryFilter()))
+                {
+                    for (File buildDir : projectDir.listFiles(new DirectoryFilter()))
+                    {
+                        for (File recipeDir : buildDir.listFiles(new DirectoryFilter()))
                         {
-                            Long projectId = mappings.get(recipeResultId);
-
-                            // move the build directory into the specified project.
-                            File mappedProjectDir = new File(base, Long.toString(projectId));
-                            if (!mappedProjectDir.isDirectory() && !mappedProjectDir.mkdirs())
+                            Long recipeResultId = Long.valueOf(recipeDir.getName());
+                            if (mappings.containsKey(recipeResultId))
                             {
-                                throw new IOException("Failed to create new project directory: " + mappedProjectDir.getCanonicalPath());
+                                Long projectId = mappings.get(recipeResultId);
+
+                                // move the build directory into the specified project.
+                                File mappedProjectDir = new File(base, Long.toString(projectId));
+                                if (!mappedProjectDir.isDirectory() && !mappedProjectDir.mkdirs())
+                                {
+                                    throw new IOException("Failed to create new project directory: " + mappedProjectDir.getCanonicalPath());
+                                }
+
+                                File newBuildDir = new File(mappedProjectDir, buildDir.getName());
+                                if (!buildDir.renameTo(newBuildDir))
+                                {
+                                    throw new IOException("Failed to move " + buildDir.getCanonicalPath() + " to " + newBuildDir.getCanonicalPath());
+                                }
                             }
 
-                            File newBuildDir = new File(mappedProjectDir, buildDir.getName());
-                            if (!buildDir.renameTo(newBuildDir))
-                            {
-                                throw new IOException("Failed to move " + buildDir.getCanonicalPath() + " to " + newBuildDir.getCanonicalPath());
-                            }
+                            completedCout++;
+
+                            feedback.setPercetageComplete((int)(completedCout * 100 / todoCount));
                         }
-
-                        completedCout++;
-
-                        feedback.setPercetageComplete((int)(completedCout * 100 / todoCount));
                     }
                 }
             }
+
+            feedback.setPercetageComplete(100);
         }
         catch (IOException e)
         {
