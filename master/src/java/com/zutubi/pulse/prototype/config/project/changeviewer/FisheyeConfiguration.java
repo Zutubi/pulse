@@ -2,7 +2,6 @@ package com.zutubi.pulse.prototype.config.project.changeviewer;
 
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.Wire;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.util.StringUtils;
@@ -13,7 +12,6 @@ import com.zutubi.util.TextUtils;
  */
 @Form(fieldOrder = {"baseURL", "projectPath", "pathStripPrefix"})
 @SymbolicName("zutubi.fisheyeChangeViewerConfig")
-@Wire
 public class FisheyeConfiguration extends BasePathChangeViewer
 {
     /**

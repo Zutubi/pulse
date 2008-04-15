@@ -1,5 +1,7 @@
 package com.zutubi.pulse.prototype.config.project.changeviewer;
 
+import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.Wire;
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
@@ -8,6 +10,8 @@ import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
  * A type of change viewer that can be configured using a base URL and a
  * project path.
  */
+@Wire
+@SymbolicName("zutubi.basePathChangeViewer")
 public abstract class BasePathChangeViewer extends ChangeViewerConfiguration
 {
     private String baseURL;

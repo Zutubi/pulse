@@ -1,13 +1,11 @@
 package com.zutubi.prototype.config;
 
-import com.zutubi.config.annotations.Wire;
 import com.zutubi.prototype.type.ComplexType;
 import com.zutubi.prototype.type.Instantiator;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
-import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.config.Configuration;
 
 /**
@@ -49,10 +47,7 @@ public class PersistentInstantiator implements Instantiator
                 // reference), we need to initialise, cache and validate it.
                 if (type instanceof ComplexType && instance instanceof Configuration)
                 {
-                    if (type.hasAnnotation(Wire.class))
-                    {
-                        ComponentContext.autowire(instance);
-                    }
+                    configurationTemplateManager.wireIfRequired((Configuration) instance);
 
                     Configuration configuration = (Configuration) instance;
 

@@ -101,6 +101,7 @@ public class ConfigurationRegistry
             registerTransientConfiguration("signup", SignupUserConfiguration.class);
 
             registerConfigurationType(TypeConfiguration.class);
+            registerConfigurationType(TemplateTypeConfiguration.class);
             registerConfigurationType(AntTypeConfiguration.class);
             registerConfigurationType(BJamTypeConfiguration.class);
             registerConfigurationType(CustomTypeConfiguration.class);
@@ -113,6 +114,7 @@ public class ConfigurationRegistry
 
             // change viewer configuration
             registerConfigurationType(ChangeViewerConfiguration.class);
+            registerConfigurationType(BasePathChangeViewer.class);
             registerConfigurationType(FisheyeConfiguration.class);
             registerConfigurationType(CustomChangeViewerConfiguration.class);
             registerConfigurationType(P4WebChangeViewer.class);
@@ -226,7 +228,7 @@ public class ConfigurationRegistry
         {
             public void handle(CompositeType type) throws TypeException
             {
-                ConfigurationCheck annotation = type.getAnnotation(ConfigurationCheck.class);
+                ConfigurationCheck annotation = type.getAnnotation(ConfigurationCheck.class, false);
                 if (annotation != null)
                 {
                     String checkClassName = annotation.value();

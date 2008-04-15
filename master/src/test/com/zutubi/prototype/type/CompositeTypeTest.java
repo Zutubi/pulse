@@ -4,8 +4,12 @@ import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
 
+import java.lang.annotation.*;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -17,7 +21,8 @@ public class CompositeTypeTest extends TypeTestCase
     private CompositeType basicType;
     private CompositeType typeA;
     private CompositeType typeB;
-    private CompositeType typeBExtension;
+    private CompositeType baseType;
+    private CompositeType extensionType;
 
     protected void setUp() throws Exception
     {
@@ -27,7 +32,10 @@ public class CompositeTypeTest extends TypeTestCase
         basicType.setTypeRegistry(typeRegistry);
         typeA = typeRegistry.register(ObjectTypeA.class);
         typeB = typeRegistry.getType(ObjectTypeB.class);
-        typeBExtension = typeRegistry.register(ObjectTypeBExtension.class);
+        typeRegistry.register(ObjectTypeBExtension.class);
+
+        baseType = typeRegistry.register(BaseConfiguration.class);
+        extensionType = typeRegistry.register(ExtensionConfiguration.class);
     }
 
     protected void tearDown() throws Exception
@@ -57,7 +65,7 @@ public class CompositeTypeTest extends TypeTestCase
         instance.setString("howdy");
 
         Record record = basicType.unstantiate(instance);
-        SimpleInstantiator instantiator = new SimpleInstantiator(null);
+        SimpleInstantiator instantiator = new SimpleInstantiator(null, configurationTemplateManager);
         Object newInstance = instantiator.instantiate(basicType, record);
         assertTrue(newInstance instanceof BasicTypes);
         assertEquals(newInstance, instance);
@@ -74,7 +82,7 @@ public class CompositeTypeTest extends TypeTestCase
             }
         }
 
-        SimpleInstantiator instantiator = new SimpleInstantiator(null);
+        SimpleInstantiator instantiator = new SimpleInstantiator(null, configurationTemplateManager);
         BasicTypes instance = (BasicTypes) basicType.instantiate(record, instantiator);
         basicType.initialise(instance, record, instantiator);
         assertEquals(false, instance.isBooleanP());
@@ -95,7 +103,7 @@ public class CompositeTypeTest extends TypeTestCase
         instance.setA(objectTypeB);
 
         Record record = typeA.unstantiate(instance);
-        SimpleInstantiator instantiator = new SimpleInstantiator(null);
+        SimpleInstantiator instantiator = new SimpleInstantiator(null, configurationTemplateManager);
         ObjectTypeA newInstance = (ObjectTypeA) instantiator.instantiate(typeA, record);
 
         assertNotNull(newInstance.getA());
@@ -298,6 +306,118 @@ public class CompositeTypeTest extends TypeTestCase
         assertFalse(typeA.isValid(a));
     }
 
+    public void testHasAnnotationDirect()
+    {
+        assertTrue(extensionType.hasAnnotation(DirectAnnotation.class, true));
+        assertTrue(extensionType.hasAnnotation(DirectAnnotation.class, false));
+    }
+
+    public void testHasAnnotationInherited()
+    {
+        assertTrue(extensionType.hasAnnotation(InheritedAnnotation.class, true));
+        assertFalse(extensionType.hasAnnotation(InheritedAnnotation.class, false));
+    }
+
+    public void testHasAnnotationOverridden()
+    {
+        assertTrue(extensionType.hasAnnotation(OverriddenAnnotation.class, true));
+        assertTrue(extensionType.hasAnnotation(OverriddenAnnotation.class, false));
+    }
+
+    public void testGetAnnotationDirect()
+    {
+        assertNotNull(extensionType.getAnnotation(DirectAnnotation.class, true));
+        assertNotNull(extensionType.getAnnotation(DirectAnnotation.class, false));
+    }
+
+    public void testGetAnnotationInherited()
+    {
+        assertNotNull(extensionType.getAnnotation(InheritedAnnotation.class, true));
+        assertNull(extensionType.getAnnotation(InheritedAnnotation.class, false));
+    }
+
+    public void testGetAnnotationOverridden()
+    {
+        assertEquals("extension", extensionType.getAnnotation(OverriddenAnnotation.class, true).value());
+        assertEquals("extension", extensionType.getAnnotation(OverriddenAnnotation.class, true).value());
+    }
+
+    public void testGetAnnotations()
+    {
+        List<Annotation> annotations = baseType.getAnnotations(false);
+        assertEquals(3, annotations.size());
+        assertAnnotation(annotations, SymbolicName.class);
+        assertAnnotation(annotations, InheritedAnnotation.class);
+        assertAnnotation(annotations, OverriddenAnnotation.class);
+
+        annotations = baseType.getAnnotations(true);
+        assertEquals(3, annotations.size());
+        assertAnnotation(annotations, SymbolicName.class);
+        assertAnnotation(annotations, InheritedAnnotation.class);
+        assertAnnotation(annotations, OverriddenAnnotation.class);
+    }
+
+    public void testGetAnnotationsExtension()
+    {
+        List<Annotation> annotations = extensionType.getAnnotations(false);
+        assertEquals(3, annotations.size());
+        assertAnnotation(annotations, SymbolicName.class);
+        assertAnnotation(annotations, DirectAnnotation.class);
+        assertAnnotation(annotations, OverriddenAnnotation.class);
+
+        annotations = extensionType.getAnnotations(true);
+        assertEquals(6, annotations.size());
+        assertAnnotationCount(2, annotations, SymbolicName.class);
+        assertAnnotation(annotations, DirectAnnotation.class);
+        assertAnnotation(annotations, InheritedAnnotation.class);
+        assertAnnotationCount(2, annotations, OverriddenAnnotation.class);
+    }
+
+    public void testGetSpecificAnnotationsDirect()
+    {
+        List<Annotation> annotations = extensionType.getAnnotations(DirectAnnotation.class, false);
+        assertEquals(1, annotations.size());
+        annotations = extensionType.getAnnotations(DirectAnnotation.class, true);
+        assertEquals(1, annotations.size());
+    }
+
+    public void testGetSpecificAnnotationsInherited()
+    {
+        List<Annotation> annotations = extensionType.getAnnotations(InheritedAnnotation.class, false);
+        assertEquals(0, annotations.size());
+        annotations = extensionType.getAnnotations(InheritedAnnotation.class, true);
+        assertEquals(1, annotations.size());
+    }
+
+    public void testGetSpecificAnnotationsOverridden()
+    {
+        List<Annotation> annotations = extensionType.getAnnotations(OverriddenAnnotation.class, false);
+        assertEquals(1, annotations.size());
+        annotations = extensionType.getAnnotations(OverriddenAnnotation.class, true);
+        assertEquals(2, annotations.size());
+    }
+
+    private void assertAnnotation(List<Annotation> annotations, final Class clazz)
+    {
+        assertTrue(CollectionUtils.contains(annotations, new Predicate<Annotation>()
+        {
+            public boolean satisfied(Annotation annotation)
+            {
+                return annotation.annotationType() == clazz;
+            }
+        }));
+    }
+
+    private void assertAnnotationCount(int count, List<Annotation> annotations, final Class clazz)
+    {
+        assertEquals(count, CollectionUtils.filter(annotations, new Predicate<Annotation>()
+        {
+            public boolean satisfied(Annotation annotation)
+            {
+                return annotation.annotationType() == clazz;
+            }
+        }).size());
+    }
 
     @SymbolicName("typeA")
     public static class ObjectTypeA extends AbstractConfiguration
@@ -693,4 +813,36 @@ public class CompositeTypeTest extends TypeTestCase
         }
     }
 
+    @InheritedAnnotation
+    @OverriddenAnnotation("base")
+    @SymbolicName("basetype")
+    public static abstract class BaseConfiguration extends AbstractConfiguration
+    {
+    }
+
+    @DirectAnnotation
+    @OverriddenAnnotation("extension")
+    @SymbolicName("extensiontype")
+    public static class ExtensionConfiguration extends BaseConfiguration
+    {
+    }
+
+    @Target({ElementType.TYPE})
+    @Retention(RetentionPolicy.RUNTIME)
+    private static @interface DirectAnnotation
+    {
+    }
+
+    @Target({ElementType.TYPE})
+    @Retention(RetentionPolicy.RUNTIME)
+    private static @interface InheritedAnnotation
+    {
+    }
+
+    @Target({ElementType.TYPE})
+    @Retention(RetentionPolicy.RUNTIME)
+    private static @interface OverriddenAnnotation
+    {
+        String value();
+    }
 }

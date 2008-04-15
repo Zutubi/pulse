@@ -1,11 +1,13 @@
 package com.zutubi.prototype.config;
 
+import com.zutubi.config.annotations.Wire;
 import com.zutubi.prototype.config.cleanup.*;
 import com.zutubi.prototype.config.events.*;
 import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.prototype.transaction.*;
 import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.*;
+import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.config.ConfigurationList;
 import com.zutubi.pulse.core.config.ConfigurationMap;
@@ -561,6 +563,15 @@ public class ConfigurationTemplateManager implements InstanceSource
         refreshCount++;
     }
 
+    public void wireIfRequired(Configuration instance)
+    {
+        CompositeType type = typeRegistry.getType(instance.getClass());
+        if(type != null && type.hasAnnotation(Wire.class, true))
+        {
+            ComponentContext.autowire(instance);
+        }
+    }
+
     private void refreshInstances(State state)
     {
         DefaultInstanceCache instances = state.instances;
@@ -923,7 +934,7 @@ public class ConfigurationTemplateManager implements InstanceSource
         // Create an instance of the object represented by the record.  It is
         // during the instantiation that type conversion errors are detected.
         Configuration instance;
-        SimpleInstantiator instantiator = new SimpleInstantiator(configurationReferenceManager);
+        SimpleInstantiator instantiator = new SimpleInstantiator(configurationReferenceManager, this);
         instance = (Configuration) instantiator.instantiate(type, subject);
 
         validateInstance(type, instance, parentPath, baseName, concrete, false, deep, ignoredFields);

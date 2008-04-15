@@ -48,7 +48,7 @@ public class BuildHookConfigurationWizard extends AbstractTypeWizard
         {
             public boolean satisfied(CompositeType compositeType)
             {
-                CompatibleHooks compatible = compositeType.getAnnotation(CompatibleHooks.class);
+                CompatibleHooks compatible = compositeType.getAnnotation(CompatibleHooks.class, true);
                  return compatible == null || CollectionUtils.contains(compatible.value(), hookClass);
             }
         });

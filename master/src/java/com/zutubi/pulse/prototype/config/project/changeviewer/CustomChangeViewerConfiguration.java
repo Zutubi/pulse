@@ -2,6 +2,7 @@ package com.zutubi.pulse.prototype.config.project.changeviewer;
 
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.Wire;
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.core.Property;
@@ -22,6 +23,7 @@ import java.util.TimeZone;
  */
 @Form(fieldOrder = {"changesetURL", "fileViewURL", "fielDownloadURL", "fileDiffURL"})
 @SymbolicName("zutubi.customChangeViewerConfig")
+@Wire
 public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
 {
     private static final String PROPERTY_REVISION = "revision";

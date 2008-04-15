@@ -1,8 +1,7 @@
 package com.zutubi.prototype.type;
 
-import com.zutubi.config.annotations.Wire;
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.config.ReferenceResolver;
-import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.config.Configuration;
 
 /**
@@ -12,10 +11,12 @@ import com.zutubi.pulse.core.config.Configuration;
 public class SimpleInstantiator implements Instantiator
 {
     private ReferenceResolver referenceResolver;
+    private ConfigurationTemplateManager configurationTemplateManager;
 
-    public SimpleInstantiator(ReferenceResolver referenceResolver)
+    public SimpleInstantiator(ReferenceResolver referenceResolver, ConfigurationTemplateManager configurationTemplateManager)
     {
         this.referenceResolver = referenceResolver;
+        this.configurationTemplateManager = configurationTemplateManager;
     }
 
     public Object instantiate(String property, boolean relative, Type type, Object data) throws TypeException
@@ -28,9 +29,9 @@ public class SimpleInstantiator implements Instantiator
         Object instance = type.instantiate(data, this);
         if (instance != null)
         {
-            if (type instanceof ComplexType && instance instanceof Configuration && type.hasAnnotation(Wire.class))
+            if (instance instanceof Configuration)
             {
-                ComponentContext.autowire(instance);
+                configurationTemplateManager.wireIfRequired((Configuration) instance);
             }
 
             type.initialise(instance, data, this);

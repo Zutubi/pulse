@@ -28,7 +28,7 @@ public class TableDescriptorFactory
         TableDescriptor td = new TableDescriptor(collectionType, configurationSecurityManager.hasPermission(path, AccessManager.ACTION_WRITE), configurationSecurityManager.hasPermission(path, AccessManager.ACTION_CREATE), configurationTemplateManager, actionManager, systemPaths);
 
         // does the table has a Table annotation defining the columns to be rendered?
-        Table tableAnnotation = type.getAnnotation(Table.class);
+        Table tableAnnotation = type.getAnnotation(Table.class, true);
         if (tableAnnotation != null)
         {
             for (String columnName : tableAnnotation.columns())

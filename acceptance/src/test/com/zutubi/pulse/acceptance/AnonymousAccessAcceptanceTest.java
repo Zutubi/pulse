@@ -137,7 +137,7 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         group.put("serverPermissions", new Vector<String>(Arrays.asList(ServerPermission.CREATE_PROJECT.toString())));
         xmlRpcHelper.saveConfig(ANONYMOUS_GROUP_PATH, group, false);
         hierarchyPage.goTo();
-        assertTrue(hierarchyPage.isAddPresent());
+        waitForElement(ProjectHierarchyPage.LINK_ADD);
     }
 
     private void ensureSetting(String key, boolean enabled) throws Exception

@@ -2,7 +2,6 @@ package com.zutubi.pulse.prototype.config.project.changeviewer;
 
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.Wire;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.util.StringUtils;
@@ -12,7 +11,6 @@ import com.zutubi.util.StringUtils;
  */
 @Form(fieldOrder = {"baseURL", "projectPath"})
 @SymbolicName("zutubi.p4WebChangeViewerConfig")
-@Wire
 public class P4WebChangeViewer extends BasePathChangeViewer
 {
     public P4WebChangeViewer()

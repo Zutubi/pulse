@@ -6,7 +6,6 @@ import com.zutubi.prototype.type.record.HandleAllocator;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.util.AnnotationUtils;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.ReflectionUtils;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -136,22 +135,30 @@ public class TypeRegistry
 
     private void checkForExtensionParent(CompositeType type) throws TypeException
     {
-        if(!type.isExtendable())
+        Class superClass = type.getClazz().getSuperclass();
+        if(superClass != Object.class)
         {
-            for(Class superClass: ReflectionUtils.getSupertypes(type.getClazz(), Object.class, true))
+            checkSuperType(type, superClass);
+        }
+
+        for(Class iface: type.getClazz().getInterfaces())
+        {
+            checkSuperType(type, iface);
+        }
+    }
+
+    private void checkSuperType(CompositeType type, Class superType) throws TypeException
+    {
+        CompositeType candidateSuper = getType(superType);
+        if(candidateSuper != null && candidateSuper.isExtendable())
+        {
+            if(type.hasAnnotation(Internal.class, false))
             {
-                CompositeType superType = getType(superClass);
-                if(superType != null && superType.isExtendable())
-                {
-                    if(type.hasAnnotation(Internal.class))
-                    {
-                        superType.addInternalExtension(type);
-                    }
-                    else
-                    {
-                        superType.addExtension(type);
-                    }
-                }
+                candidateSuper.registerInternalSubtype(type);
+            }
+            else
+            {
+                candidateSuper.registerSubtype(type);
             }
         }
     }

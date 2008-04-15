@@ -21,6 +21,7 @@ public abstract class TypeTestCase extends TestCase
         typeRegistry = new TypeRegistry();
         recordManager = new RecordManager();
         configurationTemplateManager = new ConfigurationTemplateManager();
+        configurationTemplateManager.setTypeRegistry(typeRegistry);
         typeRegistry.setHandleAllocator(recordManager);
     }
 

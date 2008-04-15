@@ -168,7 +168,7 @@ public class PrototypeUtils
         List<String> nestedProperties = type.getNestedPropertyNames();
 
         // First process the order defined in @Listing (if any)
-        Listing annotation = type.getAnnotation(Listing.class);
+        Listing annotation = type.getAnnotation(Listing.class, true);
         if(annotation != null)
         {
             String[] definedOrder = annotation.order();
@@ -399,21 +399,25 @@ public class PrototypeUtils
 
     public static String getClassification(ComplexType type)
     {
-        Classification classification = type.getTargetType().getAnnotation(Classification.class);
-        if(classification != null)
+        Type targetType = type.getTargetType();
+        if(targetType instanceof CompositeType)
         {
-            if(type instanceof CompositeType)
+            Classification classification = ((CompositeType)targetType).getAnnotation(Classification.class, true);
+            if(classification != null)
             {
-                if(TextUtils.stringSet(classification.single()))
+                if(type instanceof CompositeType)
                 {
-                    return classification.single();
+                    if(TextUtils.stringSet(classification.single()))
+                    {
+                        return classification.single();
+                    }
                 }
-            }
-            else
-            {
-                if(TextUtils.stringSet(classification.collection()))
+                else
                 {
-                    return classification.collection();
+                    if(TextUtils.stringSet(classification.collection()))
+                    {
+                        return classification.collection();
+                    }
                 }
             }
         }

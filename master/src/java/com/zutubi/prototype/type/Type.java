@@ -1,8 +1,5 @@
 package com.zutubi.prototype.type;
 
-import java.lang.annotation.Annotation;
-import java.util.List;
-
 /**
  *
  *
@@ -14,9 +11,9 @@ public interface Type
      *
      * @return a list of annotations.
      */
-    List<Annotation> getAnnotations();
+//    List<Annotation> getAnnotations();
 
-    List<Annotation> getAnnotations(Class annotationType);
+//    List<Annotation> getAnnotations(Class annotationType);
 
     /**
      * Tests if this type is decorated with the given annotation.
@@ -24,9 +21,9 @@ public interface Type
      * @param annotationType annotation to test for
      * @return true if this type is decorated with the given annotation
      */
-    <T extends Annotation> boolean hasAnnotation(Class<T> annotationType);
+//    <T extends Annotation> boolean hasAnnotation(Class<T> annotationType);
 
-    <T extends Annotation> T getAnnotation(Class<T> annotationType);
+//    <T extends Annotation> T getAnnotation(Class<T> annotationType);
 
     Type getTargetType();
 

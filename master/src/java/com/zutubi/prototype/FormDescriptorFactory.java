@@ -83,7 +83,7 @@ public class FormDescriptorFactory
         descriptor.setId(type.getClazz().getName());
 
         // Process the annotations at apply to the type / form.
-        List<Annotation> annotations = type.getAnnotations();
+        List<Annotation> annotations = type.getAnnotations(false);
         handleAnnotations(type, descriptor, annotations);
 
         descriptor.setFieldDescriptors(buildFieldDescriptors(parentPath, baseName, type, concrete, descriptor));
