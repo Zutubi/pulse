@@ -1,11 +1,10 @@
-package com.zutubi.pulse.model;
+package com.zutubi.pulse.prototype.config.project.changeviewer;
 
 import com.zutubi.prototype.config.MockConfigurationProvider;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
-import com.zutubi.pulse.prototype.config.project.changeviewer.TracChangeViewer;
 import com.zutubi.pulse.test.PulseTestCase;
 
 /**

@@ -5,6 +5,8 @@ import com.zutubi.config.annotations.Wire;
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
+import com.zutubi.validation.annotations.Required;
+import com.zutubi.validation.annotations.Url;
 
 /**
  * A type of change viewer that can be configured using a base URL and a
@@ -14,6 +16,8 @@ import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 @SymbolicName("zutubi.basePathChangeViewer")
 public abstract class BasePathChangeViewer extends ChangeViewerConfiguration
 {
+    @Required
+    @Url
     private String baseURL;
     private String projectPath;
     protected ConfigurationProvider configurationProvider = null;
