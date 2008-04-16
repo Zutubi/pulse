@@ -18,7 +18,7 @@ public class RestoreAction extends PrototypeSupport
  	    ComplexType type = configurationTemplateManager.getType(path, ComplexType.class);
  	    boolean leaf = PrototypeUtils.isLeaf(path, configurationTemplateManager, configurationSecurityManager);
  	    String iconCls = PrototypeUtils.getIconCls(type);
- 	    response.addAddedFile(new ConfigurationResponse.Addition(path, displayName, null, iconCls, leaf));
+ 	    response.addAddedFile(new ConfigurationResponse.Addition(path, displayName, null, iconCls, leaf, false));
         path = response.getNewPath();
         return SUCCESS;
     }

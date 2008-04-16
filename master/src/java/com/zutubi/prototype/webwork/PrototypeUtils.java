@@ -127,7 +127,7 @@ public class PrototypeUtils
     public static boolean isFolder(String path, ConfigurationTemplateManager configurationTemplateManager, ConfigurationSecurityManager configurationSecurityManager)
     {
         Type type = configurationTemplateManager.getType(path);
-        return (type instanceof MapType) || getPathListing(path, type, configurationTemplateManager, configurationSecurityManager).size() > 0;
+        return getPathListing(path, type, configurationTemplateManager, configurationSecurityManager).size() > 0;
     }
 
     public static boolean isLeaf(String path, ConfigurationTemplateManager configurationTemplateManager, ConfigurationSecurityManager configurationSecurityManager)

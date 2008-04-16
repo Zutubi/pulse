@@ -40,9 +40,9 @@
         <tr>
             <td>
 
-            <table width="100%" class="content">
+            <table width="100%">
                 #pagingRow("$urls.projectHistory($u_projectName)" "stateFilter/$stateFilter/" $pagingSupport)
-                <tr><th colspan="5">$action.getText("history.count", ["$pagingSupport.totalItems"])</th></tr>
+                <tr><th class="content-centre" colspan="5">$action.getText("history.count", ["$pagingSupport.totalItems"])</th></tr>
             </table>
 #else
         <tr>

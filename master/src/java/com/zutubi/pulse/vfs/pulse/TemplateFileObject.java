@@ -10,11 +10,13 @@ import com.zutubi.util.Mapping;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.Sort;
 import org.apache.commons.vfs.FileName;
+import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -22,7 +24,7 @@ import java.util.List;
  *
  * @see TemplateScopesFileObject
  */
-public class TemplateFileObject extends AbstractPulseFileObject
+public class TemplateFileObject extends AbstractPulseFileObject implements ComparatorProvider
 {
     private TemplateNode node;
     private ConfigurationTemplateManager configurationTemplateManager;
@@ -50,7 +52,14 @@ public class TemplateFileObject extends AbstractPulseFileObject
 
     protected FileType doGetType() throws Exception
     {
-        return FileType.FOLDER;
+        if(node != null && node.getChildren().size() > 0)
+        {
+            return FileType.FOLDER;
+        }
+        else
+        {
+            return FileType.FILE;
+        }
     }
 
     protected String[] doListChildren() throws Exception
@@ -103,6 +112,20 @@ public class TemplateFileObject extends AbstractPulseFileObject
         {
             return "config-template-icon";
         }
+    }
+
+    public Comparator<FileObject> getComparator()
+    {
+        final Comparator<String> c = new Sort.StringComparator();
+        return new Comparator<FileObject>()
+        {
+            public int compare(FileObject o1, FileObject o2)
+            {
+                TemplateFileObject tfo1 = (TemplateFileObject) o1;
+                TemplateFileObject tfo2 = (TemplateFileObject) o2;
+                return c.compare(tfo1.getDisplayName(), tfo2.getDisplayName());
+            }
+        };
     }
 
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)

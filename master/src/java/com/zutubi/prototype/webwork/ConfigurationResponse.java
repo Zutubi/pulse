@@ -2,6 +2,7 @@ package com.zutubi.prototype.webwork;
 
 import com.zutubi.prototype.config.ConfigurationSecurityManager;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
+import com.zutubi.prototype.config.TemplateNode;
 import com.zutubi.prototype.type.record.PathUtils;
 import flexjson.JSON;
 
@@ -78,7 +79,9 @@ public class ConfigurationResponse
         String displayName = PrototypeUtils.getDisplayName(newPath, configurationTemplateManager);
         String iconCls = PrototypeUtils.getIconCls(newPath, configurationTemplateManager);
         boolean leaf = PrototypeUtils.isLeaf(newPath, configurationTemplateManager, configurationSecurityManager);
-        addAddedFile(new Addition(newPath, displayName, newTemplatePath, iconCls, leaf));
+        TemplateNode templateNode = configurationTemplateManager.getTemplateNode(newPath);
+        boolean templateLeaf = !(templateNode != null && templateNode.getChildren().size() > 0);
+        addAddedFile(new Addition(newPath, displayName, newTemplatePath, iconCls, leaf, templateLeaf));
     }
 
     public void addAddedFile(Addition addition)
@@ -152,8 +155,9 @@ public class ConfigurationResponse
         private String displayName;
         private String iconCls;
         private boolean leaf;
+        private boolean templateLeaf;
 
-        public Addition(String path, String displayName, String templatePath, String iconCls, boolean leaf)
+        public Addition(String path, String displayName, String templatePath, String iconCls, boolean leaf, boolean templateLeaf)
         {
             this.parentPath = PathUtils.getParentPath(path);
             if (templatePath != null)
@@ -164,6 +168,7 @@ public class ConfigurationResponse
             this.displayName = displayName;
             this.iconCls = iconCls;
             this.leaf = leaf;
+            this.templateLeaf = templateLeaf;
         }
 
         public String getParentPath()
@@ -194,6 +199,11 @@ public class ConfigurationResponse
         public boolean isLeaf()
         {
             return leaf;
+        }
+
+        public boolean isTemplateLeaf()
+        {
+            return templateLeaf;
         }
     }
 

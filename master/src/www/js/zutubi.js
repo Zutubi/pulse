@@ -376,6 +376,7 @@ Ext.extend(ZUTUBI.ConfigTree, Ext.tree.TreePanel, {
             if (parentNode)
             {
                 var newNode = this.getLoader().createNode(config);
+                parentNode.leaf = false;
                 parentNode.appendChild(newNode);
             }
         }
@@ -440,7 +441,7 @@ Ext.extend(ZUTUBI.TemplateTree, ZUTUBI.ConfigTree, {
             each(response.addedFiles, function(addition) {
                 if (addition.parentTemplatePath && addition.parentPath == tree.scope)
                 {
-                    tree.addNode(addition.parentTemplatePath, {id: addition.baseName, text: addition.displayName, iconCls: addition.iconCls, leaf: addition.leaf});
+                    tree.addNode(addition.parentTemplatePath, {id: addition.baseName, text: addition.displayName, iconCls: addition.iconCls, leaf: addition.templateLeaf});
                 }
             });
         }

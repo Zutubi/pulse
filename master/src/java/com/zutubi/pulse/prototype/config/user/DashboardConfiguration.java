@@ -11,7 +11,7 @@ import java.util.List;
  * User preferences controlling what they see on their dashboard.
  */
 @SymbolicName("zutubi.dashboardConfig")
-@Form(labelWidth = 300, fieldOrder = {"buildCount", "showAllProjects", "shownProjects", "showMyChanges", "myChangeCount", "showProjectChanges", "projectChangeCount"})
+@Form(labelWidth = 300, fieldOrder = {"buildCount", "showAllProjects", "shownProjects", "showAllGroups", "shownGroups", "showMyChanges", "myChangeCount", "showProjectChanges", "projectChangeCount"})
 @Classification(single = "dashboard")
 public class DashboardConfiguration extends AbstractConfiguration
 {
