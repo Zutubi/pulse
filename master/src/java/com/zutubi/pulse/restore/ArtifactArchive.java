@@ -5,7 +5,12 @@ import com.zutubi.pulse.restore.feedback.Feedback;
 import com.zutubi.pulse.restore.feedback.FeedbackProvider;
 import com.zutubi.util.IOUtils;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,60 +55,80 @@ public class ArtifactArchive extends AbstractArchivableComponent implements Feed
 
             File base = paths.getProjectRoot();
 
-            // a) get a quick overall directory count.
             if (base.isDirectory())
             {
-                DirectoryFilter directoriesOnly = new DirectoryFilter();
+                // a) get a quick overall directory count.
+                NonDeadDirectoryFilter directoriesOnly = new NonDeadDirectoryFilter();
 
                 long todoCount = 0;
                 for (File projectDir : base.listFiles(directoriesOnly))
                 {
-                    File[] listing = projectDir.listFiles(directoriesOnly);
-                    if (listing != null)
+                    for (File buildDir : projectDir.listFiles(directoriesOnly))
                     {
-                        todoCount = todoCount + listing.length;
+                        if (buildDir.getName().equals("builds"))
+                        {
+                            todoCount = todoCount + buildDir.listFiles(directoriesOnly).length;
+                        }
+                        else
+                        {
+                            todoCount++;
+                        }
                     }
                 }
 
                 long completedCout = 0;
-                for (File projectDir : base.listFiles(new DirectoryFilter()))
+                for (File projectDir : base.listFiles(directoriesOnly))
                 {
-                    for (File buildDir : projectDir.listFiles(new DirectoryFilter()))
+                    for (File buildDir : projectDir.listFiles(directoriesOnly))
                     {
-                        for (File recipeDir : buildDir.listFiles(new DirectoryFilter()))
+                        if (buildDir.getName().equals("builds"))
                         {
-                            Long recipeResultId = Long.valueOf(recipeDir.getName());
-                            if (mappings.containsKey(recipeResultId))
+                            for (File nestedBuildDir : buildDir.listFiles(directoriesOnly))
                             {
-                                Long projectId = mappings.get(recipeResultId);
-
-                                // move the build directory into the specified project.
-                                File mappedProjectDir = new File(base, Long.toString(projectId));
-                                if (!mappedProjectDir.isDirectory() && !mappedProjectDir.mkdirs())
-                                {
-                                    throw new IOException("Failed to create new project directory: " + mappedProjectDir.getCanonicalPath());
-                                }
-
-                                File newBuildDir = new File(mappedProjectDir, buildDir.getName());
-                                if (!buildDir.renameTo(newBuildDir))
-                                {
-                                    throw new IOException("Failed to move " + buildDir.getCanonicalPath() + " to " + newBuildDir.getCanonicalPath());
-                                }
+                                processBuildDirectory(nestedBuildDir, directoriesOnly, mappings, base);
+                                completedCout++;
+                                feedback.setPercetageComplete((int) (completedCout * 100 / todoCount));
                             }
-
+                        }
+                        else
+                        {
+                            processBuildDirectory(buildDir, directoriesOnly, mappings, base);
                             completedCout++;
-
-                            feedback.setPercetageComplete((int)(completedCout * 100 / todoCount));
+                            feedback.setPercetageComplete((int) (completedCout * 100 / todoCount));
                         }
                     }
                 }
             }
-
             feedback.setPercetageComplete(100);
         }
         catch (IOException e)
         {
             throw new ArchiveException(e);
+        }
+    }
+
+    private void processBuildDirectory(File buildDir, NonDeadDirectoryFilter directoriesOnly, Map<Long, Long> mappings, File base) throws IOException
+    {
+        for (File recipeDir : buildDir.listFiles(directoriesOnly))
+        {
+            Long recipeResultId = Long.valueOf(recipeDir.getName());
+            if (mappings.containsKey(recipeResultId))
+            {
+                Long projectId = mappings.get(recipeResultId);
+
+                // move the build directory into the specified project.
+                File mappedProjectDir = new File(base, Long.toString(projectId));
+                if (!mappedProjectDir.isDirectory() && !mappedProjectDir.mkdirs())
+                {
+                    throw new IOException("Failed to create new project directory: " + mappedProjectDir.getCanonicalPath());
+                }
+
+                File newBuildDir = new File(mappedProjectDir, buildDir.getName());
+                if (!buildDir.renameTo(newBuildDir))
+                {
+                    throw new IOException("Failed to move " + buildDir.getCanonicalPath() + " to " + newBuildDir.getCanonicalPath());
+                }
+            }
         }
     }
 
@@ -146,11 +171,11 @@ public class ArtifactArchive extends AbstractArchivableComponent implements Feed
         this.feedback = feedback;
     }
 
-    private class DirectoryFilter implements FileFilter
+    private class NonDeadDirectoryFilter implements FileFilter
     {
         public boolean accept(File file)
         {
-            return file.isDirectory();
+            return file.isDirectory() && !file.getName().endsWith(".dead");
         }
     }
 }
