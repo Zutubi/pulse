@@ -85,7 +85,7 @@ public class ShutdownCommand extends AdminCommand
         try
         {
             command.parse(argv);
-            command.execute(new BootContext(null, argv, null, null, null));
+            command.execute(new BootContext(null, null, argv, null, null, null));
         }
         catch (Exception e)
         {

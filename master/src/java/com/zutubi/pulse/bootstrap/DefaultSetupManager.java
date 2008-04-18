@@ -1,14 +1,7 @@
 package com.zutubi.pulse.bootstrap;
 
 import com.opensymphony.xwork.spring.SpringObjectFactory;
-import com.zutubi.prototype.config.ConfigurationExtensionManager;
-import com.zutubi.prototype.config.ConfigurationPersistenceManager;
-import com.zutubi.prototype.config.ConfigurationProvider;
-import com.zutubi.prototype.config.ConfigurationReferenceManager;
-import com.zutubi.prototype.config.ConfigurationRegistry;
-import com.zutubi.prototype.config.ConfigurationStateManager;
-import com.zutubi.prototype.config.ConfigurationTemplateManager;
-import com.zutubi.prototype.config.DefaultConfigurationProvider;
+import com.zutubi.prototype.config.*;
 import com.zutubi.prototype.type.record.DelegatingHandleAllocator;
 import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.pulse.Version;
@@ -16,10 +9,10 @@ import com.zutubi.pulse.bootstrap.conf.EnvConfig;
 import com.zutubi.pulse.bootstrap.tasks.ProcessSetupStartupTask;
 import com.zutubi.pulse.config.PropertiesWriter;
 import com.zutubi.pulse.database.DatabaseConsole;
+import com.zutubi.pulse.database.DatabaseConfig;
 import com.zutubi.pulse.events.DataDirectoryLocatedEvent;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.license.LicenseHolder;
-import com.zutubi.pulse.license.License;
 import com.zutubi.pulse.logging.LogConfigurationManager;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.plugins.PluginManager;
@@ -28,6 +21,7 @@ import com.zutubi.pulse.restore.ArchiveException;
 import com.zutubi.pulse.restore.ArchiveManager;
 import com.zutubi.pulse.restore.feedback.TaskMonitor;
 import com.zutubi.pulse.upgrade.UpgradeManager;
+import com.zutubi.pulse.util.DriverWrapper;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.IOUtils;
 import com.zutubi.util.TextUtils;
@@ -41,6 +35,10 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.sql.Driver;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.util.Date;
@@ -49,7 +47,8 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * <class-comment/>
+ * Works through the setup process, gradually starting Pulse as more bits and
+ * pieces become available.
  */
 public class DefaultSetupManager implements SetupManager
 {
@@ -70,33 +69,35 @@ public class DefaultSetupManager implements SetupManager
      */
     private List<String> configContexts = new LinkedList<String>();
 
-    private List<String> restoreContexts = new LinkedList<String>();
+    /**
+     * Contexts for Stage B: database
+     */
+    private List<String> dataContexts = new LinkedList<String>();
 
     /**
-     * Contexts for Stage B: the database.
+     * Contexts for Stage C: restore
      */
-    private List<String> daoContexts = new LinkedList<String>();
+    private List<String> restoreContexts = new LinkedList<String>();
 
-    // Stage B.2
     private List<String> licenseContexts = new LinkedList<String>();
 
     /**
-     * Contexts for Stage C: the upgrade system.
+     * Contexts for Stage D: the upgrade system.
      */
     private List<String> upgradeContexts = new LinkedList<String>();
 
     /**
-     * Contexts for Stage D: setup / configuration.
+     * Contexts for Stage E: setup / configuration.
      */
     private List<String> setupContexts = new LinkedList<String>();
 
     /**
-     * Contexts for Stage E: application startup.
+     * Contexts for Stage F: application startup.
      */
     private List<String> startupContexts = new LinkedList<String>();
 
     /**
-     * Contexts for Stage F: post-startup.
+     * Contexts for Stage G: post-startup.
      */
     private List<String> postStartupContexts = new LinkedList<String>();
 
@@ -213,37 +214,14 @@ public class DefaultSetupManager implements SetupManager
         eventManager.publish(new DataDirectoryLocatedEvent(this));
 
         loadSystemProperties();
-
-        handleRestorationProcess();
-    }
-
-    public void requestRestoreComplete()
-    {
-        linkUserTemplates();
-
-        // load db contexts...
-        loadContexts(daoContexts);
-        initialiseConfigurationPersistence();
-
-        loadContexts(licenseContexts);
-
-        state = SetupState.STARTING;
-        printConsoleMessage("Checking license...");
-        if (isLicenseRequired())
-        {
-            printConsoleMessage("No valid license found, requesting via web UI...");
-            //TODO: we need to provide some feedback to the user about what / why there current license
-            //TODO: (if one exists) is not sufficient.
-            state = SetupState.LICENSE;
-            showPrompt();
-            return;
-        }
-        requestLicenseComplete();
+        handleDbSetup();
     }
 
     //TODO: replace this with a configuration listener that monitors for the DataDirectoryLocatedEvent, and
     //TODO: loads the system.properties file accordingly.  Why? To keep all of the config work in one place.
     //TODO: At the moment, it is split up into little bits in lots of places which makes it awkward.
+    // I don't get this: won't moving this code into a listener split things up more?  Currently this class
+    // is the closest thing we have to 'one place' to look for startup stuff.
     private void loadSystemProperties()
     {
         File propFile = new File(configurationManager.getUserPaths().getUserConfigRoot(), "system.properties");
@@ -266,32 +244,25 @@ public class DefaultSetupManager implements SetupManager
         }
     }
 
-    private void linkUserTemplates()
+    private void handleDbSetup()
     {
-        File userTemplateRoot = configurationManager.getUserPaths().getUserTemplateRoot();
-        if (userTemplateRoot.isDirectory())
+        File databaseConfig = new File(configurationManager.getData().getUserConfigRoot(), "database.properties");
+        if(!databaseConfig.exists())
         {
-            Configuration freemarkerConfiguration = ComponentContext.getBean("freemarkerConfiguration");
-            TemplateLoader existingLoader = freemarkerConfiguration.getTemplateLoader();
-            try
-            {
-                TemplateLoader userLoader = new FileTemplateLoader(userTemplateRoot);
-                freemarkerConfiguration.setTemplateLoader(new MultiTemplateLoader(new TemplateLoader[]{userLoader, existingLoader}));
-            }
-            catch (IOException e)
-            {
-                LOG.warning(e);
-            }
+            printConsoleMessage("No database setup, requesting details via web UI...");    
+            state = SetupState.DATABASE;
+            showPrompt();
+            return;
         }
+
+        requestDbComplete();
     }
 
-    public void requestLicenseComplete()
+    public void requestDbComplete()
     {
-        printConsoleMessage("License accepted.");
-        state = SetupState.STARTING;
-
-        // License is allowed to run this version of pulse. Therefore, it is okay to go ahead with an upgrade.
-
+        loadDriver();
+        loadContexts(dataContexts);
+        
         // create the database based on the hibernate configuration.
         databaseConsole = (DatabaseConsole) ComponentContext.getBean("databaseConsole");
         if(databaseConsole.isEmbedded())
@@ -317,6 +288,92 @@ public class DefaultSetupManager implements SetupManager
             printConsoleMessage("Database initialised.");
         }
 
+        handleRestorationProcess();
+    }
+
+    private void loadDriver()
+    {
+        try
+        {
+            Class driverClass = null;
+            DatabaseConfig databaseConfig = configurationManager.getDatabaseConfig();
+            
+            File driverDir = configurationManager.getData().getDriverRoot();
+            if (driverDir.isDirectory())
+            {
+                File[] drivers = driverDir.listFiles();
+                if (drivers != null && drivers.length > 0)
+                {
+                    if (drivers.length > 1)
+                    {
+                        LOG.warning("Multiple driver jars found, choosing '" + drivers[0].getAbsolutePath() + "'");
+                    }
+
+                    URLClassLoader loader = new URLClassLoader(new URL[]{drivers[0].toURI().toURL()});
+                    driverClass = loader.loadClass(databaseConfig.getDriverClassName());
+                }
+            }
+
+            if(driverClass == null)
+            {
+                driverClass = Class.forName(databaseConfig.getDriverClassName());
+            }
+
+            Driver driver = new DriverWrapper((Driver) driverClass.newInstance());
+            DriverManager.registerDriver(driver);
+        }
+        catch (Exception e)
+        {
+            LOG.severe(e);
+            throw new StartupException("Unable to load database driver: " + e.getMessage(), e);
+        }
+    }
+
+    public void requestRestoreComplete()
+    {
+        linkUserTemplates();
+
+        initialiseConfigurationPersistence();
+
+        loadContexts(licenseContexts);
+
+        printConsoleMessage("Checking license...");
+        if (isLicenseRequired())
+        {
+            printConsoleMessage("No valid license found, requesting via web UI...");
+            //TODO: we need to provide some feedback to the user about what / why there current license
+            //TODO: (if one exists) is not sufficient.
+            state = SetupState.LICENSE;
+            showPrompt();
+            return;
+        }
+        requestLicenseComplete();
+    }
+
+    private void linkUserTemplates()
+    {
+        File userTemplateRoot = configurationManager.getUserPaths().getUserTemplateRoot();
+        if (userTemplateRoot.isDirectory())
+        {
+            Configuration freemarkerConfiguration = ComponentContext.getBean("freemarkerConfiguration");
+            TemplateLoader existingLoader = freemarkerConfiguration.getTemplateLoader();
+            try
+            {
+                TemplateLoader userLoader = new FileTemplateLoader(userTemplateRoot);
+                freemarkerConfiguration.setTemplateLoader(new MultiTemplateLoader(new TemplateLoader[]{userLoader, existingLoader}));
+            }
+            catch (IOException e)
+            {
+                LOG.warning(e);
+            }
+        }
+    }
+
+    public void requestLicenseComplete()
+    {
+        printConsoleMessage("License accepted.");
+
+        // License is allowed to run this version of pulse. Therefore, it is okay to go ahead with an upgrade.
         databaseConsole.postSchemaHook();
         loadContexts(upgradeContexts);
 
@@ -374,8 +431,6 @@ public class DefaultSetupManager implements SetupManager
             printConsoleMessage("Upgrade complete.");
         }
         databaseConsole.postUpgradeHook(changes);
-
-        state = SetupState.STARTING;
 
         // Remove the upgrade context from the ComponentContext stack / namespace.
         // They are no longer required.
@@ -621,9 +676,9 @@ public class DefaultSetupManager implements SetupManager
         this.configContexts = configContexts;
     }
 
-    public void setDaoContexts(List<String> daoContexts)
+    public void setDataContexts(List<String> dataContexts)
     {
-        this.daoContexts = daoContexts;
+        this.dataContexts = dataContexts;
     }
 
     public void setLicenseContexts(List<String> licenseContexts)
@@ -655,6 +710,7 @@ public class DefaultSetupManager implements SetupManager
     {
         this.upgradeContexts = upgradeContexts;
     }
+
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;

@@ -1,5 +1,7 @@
 package com.zutubi.prototype.model;
 
+import com.zutubi.prototype.type.record.Record;
+
 /**
  *
  *

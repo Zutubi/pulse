@@ -16,10 +16,13 @@
     </style>
 </head>
 <body>
-    <h1>:: #i18n("key=data.setup") ::</h1>
-
-    #pform("path=$path" "action=setup/setupData.action" "namespace=setup")
-
+    <div class="config-panel">
+        <h3 class="config-header">#i18n("key=data.setup")</h3>
+        <div class="config-container">
+            #pform("path=$path" "action=setup/setupData.action" "namespace=setup")
+        </div>
+    </div>
+    
     <p>
         <img alt="info" src="$base/images/information.gif"/> $action.getText("data.using.config", [$pulseConfigPath])
     </p>

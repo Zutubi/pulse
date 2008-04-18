@@ -35,4 +35,6 @@ public interface MasterUserPaths extends UserPaths
     File getUserTemplateRoot();
 
     File getRecordRoot();
+
+    File getDriverRoot();
 }

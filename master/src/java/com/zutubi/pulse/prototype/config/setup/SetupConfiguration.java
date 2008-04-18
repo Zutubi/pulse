@@ -11,6 +11,7 @@ import com.zutubi.pulse.core.config.AbstractConfiguration;
 public class SetupConfiguration extends AbstractConfiguration
 {
     private SetupDataConfiguration data;
+    private SetupDatabaseTypeConfiguration databaseType;
     private SetupLicenseConfiguration license;
     private RequestLicenseConfiguration requestLicense;
     private AdminUserConfiguration admin;
@@ -24,6 +25,16 @@ public class SetupConfiguration extends AbstractConfiguration
     public void setData(SetupDataConfiguration data)
     {
         this.data = data;
+    }
+
+    public SetupDatabaseTypeConfiguration getDatabaseType()
+    {
+        return databaseType;
+    }
+
+    public void setDatabaseType(SetupDatabaseTypeConfiguration databaseType)
+    {
+        this.databaseType = databaseType;
     }
 
     public SetupLicenseConfiguration getLicense()

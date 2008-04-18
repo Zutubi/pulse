@@ -86,7 +86,7 @@ public class SetPasswordCommand extends AdminCommand
         SetPasswordCommand command = new SetPasswordCommand();
         try
         {
-            command.execute(new BootContext(null, argv, null, null, null));
+            command.execute(new BootContext(null, null, argv, null, null, null));
         }
         catch (Exception e)
         {

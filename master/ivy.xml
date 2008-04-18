@@ -28,7 +28,8 @@
         <dependency org="acegisecurity" name="acegisecurity" rev="1.0.0" conf="external,build,release->default"/>
 
         <dependency org="apache" name="commons-dbcp" rev="1.2.1" conf="external,build,release->default"/>
-        <dependency org="apache" name="commons-fileupload" rev="1.0" conf="external,build,release->default"/>
+        <dependency org="apache" name="commons-fileupload" rev="1.1.1" conf="external,build,release->default"/>
+        <dependency org="apache" name="commons-io" rev="1.1" conf="external,build,release->default"/>
         <dependency org="apache" name="commons-pool" rev="1.2" conf="external,build,release->default"/>
         <dependency org="apache" name="velocity" rev="1.3.1" conf="external,build,release->default"/>
 
@@ -44,8 +45,7 @@
 
         <dependency org="opensymphony" name="quartz" rev="20060404" conf="external,build,release->default"/>
         <dependency org="opensymphony" name="sitemesh" rev="2.2.1" conf="external,build,release->default"/>
-        <dependency org="opensymphony" name="xwork" rev="1.1.1" conf="external,build,release->default"/>
-        <dependency org="opensymphony" name="webwork" rev="2.2.1" conf="external,build,release->default"/>
+        <dependency org="opensymphony" name="webwork" rev="2.2.6" conf="external,build,release->default"/>
 
         <!-- we need the portlet api at the moment since the IBM JDK on the power pc does not include it. -->
         <dependency org="portlet-api" name="portlet-api" rev="1.0" conf="external,build,release->default"/>

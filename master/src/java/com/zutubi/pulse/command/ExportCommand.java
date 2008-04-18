@@ -99,7 +99,7 @@ public class ExportCommand extends DataCommand
         ExportCommand command = new ExportCommand();
         try
         {
-            command.execute(new BootContext(null, argv, null, null, null));
+            command.execute(new BootContext(null, null, argv, null, null, null));
         }
         catch (Exception e)
         {

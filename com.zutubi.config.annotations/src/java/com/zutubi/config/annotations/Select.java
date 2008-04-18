@@ -20,7 +20,7 @@ import java.lang.annotation.Target;
 @Handler(className = DefaultAnnotationHandlers.SELECT)
 public @interface Select
 {
-    String optionProvider();
+    String optionProvider() default "";
 
     /**
      * The DEFAULT_size indicates that, by default, no size value will be rendered.  For convenience, the

@@ -1,7 +1,9 @@
-<h2 class="content" style="margin-top: 16px; margin-bottom: 8px">:: #i18n("key=license.request.evaluation") ::</h2>
-
-#pform("formName=requestForm" "path=$path" "action=ajax/requestLicense.action" "ajax=true")
-
+<div class="config-panel">
+    <h3 class="config-header">#i18n("key=license.request.evaluation")</h3>
+    <div class="config-container">
+        #pform("formName=requestForm" "path=$path" "action=ajax/requestLicense.action" "ajax=true")
+    </div>
+</div>
 <script type="text/javascript">
     requestForm.on('actioncomplete', function(requestForm, action)
     {
@@ -14,6 +16,9 @@
 
     requestForm.on('actionfailed', function(form, action)
     {
-        Ext.get('requestForm.status').update('<ul class="error"><li class="error">' + action.result.detail + '</li></ul>');
+        if(action.failureType != Ext.form.Action.SERVER_INVALID)
+        {
+            Ext.get('requestForm.status').update('<ul class="error"><li class="error">' + action.result.detail + '</li></ul>');
+        }
     });
 </script>

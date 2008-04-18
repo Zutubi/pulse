@@ -208,12 +208,8 @@ public class CloneAction extends PrototypeSupport
         addSubmit(form, "clone", true);
         addSubmit(form, "cancel", false);
 
-        Map<String, Object> context = new HashMap<String, Object>();
-        context.put("actionErrors", getActionErrors());
-        context.put("fieldErrors", getFieldErrors());
-
         StringWriter writer = new StringWriter();
-        PrototypeUtils.renderForm(context, form, getClass(), writer, configurationManager);
+        PrototypeUtils.renderForm(new HashMap<String, Object>(), form, getClass(), writer, configurationManager);
         formSource = writer.toString();
 
         newPanel = new ConfigurationPanel("aconfig/clone.vm");

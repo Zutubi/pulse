@@ -60,8 +60,9 @@ public class DataSourceBeanFactory implements FactoryBean
     private BasicDataSource createDataSource() throws IOException
     {
         BasicDataSource dataSource = new BasicDataSource();
-        
-        dataSource.setDriverClassName(databaseConfig.getDriverClassName());
+
+        // We don't set the driver class as it is loaded earlier (potentially
+        // from a dynamic classpath).
         dataSource.setUrl(databaseConfig.getUrl());
         dataSource.setUsername(databaseConfig.getUsername());
         dataSource.setPassword(databaseConfig.getPassword());

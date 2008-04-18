@@ -1,14 +1,15 @@
 package com.zutubi.pulse.bootstrap;
 
 /**
- * <class-comment/>
+ * States reached through the setup process.
  */
 public enum SetupState
 {
-    STARTING,
     DATA,
+    DATABASE,
+    RESTORE,
     LICENSE,
     UPGRADE,
     SETUP,
-    RESTORE,
+    STARTING,
 }

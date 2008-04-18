@@ -26,7 +26,7 @@
         <dependency org="zutubi" name="com.zutubi.config.annotations" rev="latest.integration" conf="release,external,build->@"/>
 
         <!-- Library dependencies -->
-        <dependency org="zutubi" name="boot" rev="1.2" conf="external,build,release->default"/>
+        <dependency org="zutubi" name="boot" rev="2.0" conf="external,build,release->default"/>
 
         <dependency org="apache" name="ant" rev="1.6.5" conf="external,build,release->directoryscanner"/>
         <dependency org="apache" name="commons-cli" rev="1.0" conf="external,build,release->default"/>
@@ -36,8 +36,7 @@
 
         <dependency org="junit" name="junit" rev="3.8.1" conf="external,build->default"/>
 
-        <dependency org="opensymphony" name="xwork" rev="1.1.1" conf="external,build,release->minimal"/>
-        <dependency org="opensymphony" name="oscore" rev="2.2.4" conf="external,build,release->default"/>
+        <dependency org="opensymphony" name="xwork" rev="1.2.3" conf="external,build,release->minimal"/>
 
         <dependency org="sun" name="javamail" rev="1.3.2" conf="external,build,release->default"/>
 

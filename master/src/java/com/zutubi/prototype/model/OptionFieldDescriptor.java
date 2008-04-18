@@ -9,10 +9,10 @@ import java.util.List;
  */
 public class OptionFieldDescriptor extends FieldDescriptor
 {
-    private static final String PARAMETER_EMPTY_OPTION = "emptyOption";
-    private static final String PARAMETER_LIST = "list";
-    private static final String PARAMETER_MULTIPLE = "multiple";
-    private static final String PARAMETER_SIZE = "size";
+    public static final String PARAMETER_EMPTY_OPTION = "emptyOption";
+    public static final String PARAMETER_LIST = "list";
+    public static final String PARAMETER_MULTIPLE = "multiple";
+    public static final String PARAMETER_SIZE = "size";
 
     public Object getEmptyOption()
     {
@@ -46,7 +46,7 @@ public class OptionFieldDescriptor extends FieldDescriptor
 
     public boolean getMultiple()
     {
-        return (Boolean) getParameter(PARAMETER_MULTIPLE, false);
+        return getParameter(PARAMETER_MULTIPLE, false);
     }
 
     public void setMultiple(boolean multiple)
@@ -66,11 +66,16 @@ public class OptionFieldDescriptor extends FieldDescriptor
 
     public Field instantiate(String path, Record instance)
     {
-        if(!getMultiple() && (!hasParameter(PARAMETER_SIZE) || getSize() == 1))
+        if(transformToSelect())
         {
             setType("combobox");
         }
 
         return super.instantiate(path, instance);
+    }
+
+    protected boolean transformToSelect()
+    {
+        return !getMultiple() && (!hasParameter(PARAMETER_SIZE) || getSize() == 1);
     }
 }

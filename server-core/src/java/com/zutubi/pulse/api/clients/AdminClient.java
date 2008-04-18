@@ -42,7 +42,7 @@ public class AdminClient
             }
 
             Command command = commands.get(commandName);
-            return command.execute(new BootContext(null, argv, null, null, null));
+            return command.execute(new BootContext(null, null, argv, null, null, null));
         }
         catch (Exception e)
         {

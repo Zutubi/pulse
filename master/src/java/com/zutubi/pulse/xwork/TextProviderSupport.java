@@ -37,6 +37,11 @@ public class TextProviderSupport implements com.opensymphony.xwork.TextProvider
         delegate = new com.opensymphony.xwork.TextProviderSupport(clazz, provider);
     }
 
+    public boolean hasKey(String key)
+    {
+        return delegate.hasKey(key);
+    }
+
     public String getText(String key)
     {
         return getText(key, key);
@@ -47,9 +52,19 @@ public class TextProviderSupport implements com.opensymphony.xwork.TextProvider
         return getText(key, key, args);
     }
 
+    public String getText(String key, String[] args)
+    {
+        return getText(key, key, args);
+    }
+
     public String getText(String key, String defaultValue)
     {
-        return getText(key, defaultValue, null);
+        return getText(key, defaultValue, (List) null);
+    }
+
+    public String getText(String key, String defaultValue, String obj)
+    {
+        return wrapText(key, delegate.getText(key, defaultValue, obj));
     }
 
     public String getText(String key, String defaultValue, List args)
@@ -57,7 +72,17 @@ public class TextProviderSupport implements com.opensymphony.xwork.TextProvider
         return wrapText(key, delegate.getText(key, defaultValue, args));
     }
 
+    public String getText(String key, String defaultValue, String[] args)
+    {
+        return wrapText(key, delegate.getText(key, defaultValue, args));
+    }
+
     public String getText(String key, String defaultValue, List args, OgnlValueStack stack)
+    {
+        return wrapText(key, delegate.getText(key, defaultValue, args, stack));
+    }
+
+    public String getText(String key, String defaultValue, String[] args, OgnlValueStack stack)
     {
         return wrapText(key, delegate.getText(key, defaultValue, args, stack));
     }

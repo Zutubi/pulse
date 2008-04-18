@@ -76,18 +76,25 @@ public class SimpleMasterConfigurationManager extends AbstractConfigurationManag
     {
         if (dbConfig == null)
         {
-            File configFile = null;
+            Properties p = new Properties();
+
             if (getUserPaths() != null && getUserPaths().getUserConfigRoot() != null)
             {
-                configFile = new File(getUserPaths().getUserConfigRoot(), "database.properties");
-            }
-            if (configFile == null || !configFile.exists())
-            {
-                configFile = new File(getSystemPaths().getConfigRoot(), "database.properties.template");
+                File configFile = new File(getUserPaths().getUserConfigRoot(), "database.properties");
+                if (configFile.exists())
+                {
+                    p.putAll(IOUtils.read(configFile));
+                }
+
+                configFile = new File(getUserPaths().getUserConfigRoot(), "database.user.properties");
+                if (configFile.exists())
+                {
+                    p.putAll(IOUtils.read(configFile));
+                }
             }
 
-            // It is an existing installation, fallback to the defaults.
-            dbConfig = new DatabaseConfig(IOUtils.read(configFile));
+
+            dbConfig = new DatabaseConfig(p);
             dbConfig.setUserPaths(getUserPaths());
         }
         return dbConfig;

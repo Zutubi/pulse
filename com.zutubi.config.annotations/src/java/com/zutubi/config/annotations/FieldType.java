@@ -7,6 +7,7 @@ public interface FieldType
 {
     static final String CHECKBOX = "checkbox";
     static final String CONTROLLING_CHECKBOX = "controlling-checkbox";
+    static final String CONTROLLING_SELECT = "controlling-select";
     static final String FILE = "file";
     /**
      * A field used to carry an internal value.

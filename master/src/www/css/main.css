@@ -1065,6 +1065,7 @@ table.template-actions
 {
     color: #b22;
     font-weight: bold;
+    white-space: pre;
 }
 
 .config-state-table

@@ -6,9 +6,13 @@ import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.model.OptionFieldDescriptor;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeProperty;
+import com.zutubi.prototype.type.EnumType;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.pulse.prototype.config.EnumOptionProvider;
+import com.zutubi.pulse.prototype.config.EmptyOptionProvider;
 import com.zutubi.util.ClassLoaderUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.util.bean.ObjectFactory;
 
 import java.lang.annotation.Annotation;
@@ -30,11 +34,27 @@ public abstract class OptionAnnotationHandler extends FieldAnnotationHandler
         // do everything that the standard field annotation handler does,
         super.process(annotatedType, annotation, descriptor);
 
+        OptionFieldDescriptor field = (OptionFieldDescriptor) descriptor;
+        OptionProvider optionProvider;
+
         //  and then a little bit extra.
         String className = getOptionProviderClass(annotation);
-        OptionProvider optionProvider = (OptionProvider) objectFactory.buildBean(ClassLoaderUtils.loadAssociatedClass(annotatedType.getClazz(), className));
+        if(!TextUtils.stringSet(className))
+        {
+            if(field.getProperty().getType() instanceof EnumType)
+            {
+                optionProvider = new EnumOptionProvider();
+            }
+            else
+            {
+                optionProvider = new EmptyOptionProvider();
+            }
+        }
+        else
+        {
+            optionProvider = (OptionProvider) objectFactory.buildBean(ClassLoaderUtils.loadAssociatedClass(annotatedType.getClazz(), className));
+        }
 
-        OptionFieldDescriptor field = (OptionFieldDescriptor) descriptor;
         process(configurationTemplateManager, optionProvider, field.getParentPath(), field.getBaseName(), field);
     }
 

@@ -1,9 +1,6 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.acceptance.forms.setup.CreateAdminForm;
-import com.zutubi.pulse.acceptance.forms.setup.PulseLicenseForm;
-import com.zutubi.pulse.acceptance.forms.setup.ServerSettingsForm;
-import com.zutubi.pulse.acceptance.forms.setup.SetPulseDataForm;
+import com.zutubi.pulse.acceptance.forms.setup.*;
 import com.zutubi.pulse.license.LicenseType;
 import com.zutubi.pulse.test.LicenseHelper;
 import org.xml.sax.SAXException;
@@ -46,13 +43,16 @@ public class SetupAcceptanceTest extends SeleniumTestBase
         // step one. setting the pulse home variable.
         checkSetPulseData();
 
-        // step two. setting the license details.
+        // step two. setting up the database
+        checkSetupDatabase();
+
+        // step three. setting the license details.
         checkLicenseDetails();
 
-        // step three. creating the administration user.
+        // step four. creating the administration user.
         checkCreateAdmin();
 
-        // step four. configuring the server essentials.
+        // step five. configuring the server essentials.
         checkServerSettings();
 
         assertTextPresent("system setup");
@@ -78,6 +78,13 @@ public class SetupAcceptanceTest extends SeleniumTestBase
         form.assertFormPresent();
 
         form.nextFormElements("data");
+    }
+
+    private void checkSetupDatabase()
+    {
+        SetupDatabaseTypeForm form = new SetupDatabaseTypeForm(selenium);
+        form.assertFormPresent();
+        form.nextFormElements("EMBEDDED", null, null, null, null, null, null);
     }
 
     private void checkLicenseDetails()

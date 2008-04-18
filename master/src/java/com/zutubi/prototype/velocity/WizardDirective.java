@@ -115,6 +115,7 @@ public class WizardDirective extends AbstractDirective
 
             // validation support:
             OgnlValueStack stack = ActionContext.getContext().getValueStack();
+            context.put("actionErrors", stack.findValue("actionErrors"));
             context.put("fieldErrors", stack.findValue("fieldErrors"));
 
             // provide some syntactic sweetener by linking the i18n text method to the ?i18n builtin function.

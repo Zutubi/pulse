@@ -528,6 +528,57 @@ Ext.extend(ZUTUBI.Form, Ext.form.Form, {
         }
     },
 
+    enableField: function(id)
+    {
+        var field = this.findField(id);
+        if(field)
+        {
+            field.enable();
+
+            var labelDomEl = this.getFieldLabelDomEl(id);
+            if (labelDomEl)
+            {
+                Ext.get(labelDomEl).removeClass('x-item-disabled');
+            }
+            var helpDomEl = this.getFieldHelpDomEl(id);
+            if (helpDomEl)
+            {
+                Ext.get(helpDomEl).removeClass('x-item-disabled');
+            }
+        }
+    },
+
+    disableField: function(id)
+    {
+        var field = this.findField(id);
+        if(field)
+        {
+            field.clearInvalid();
+            field.disable();
+
+            var labelDomEl = this.getFieldLabelDomEl(id);
+            if (labelDomEl)
+            {
+                Ext.get(labelDomEl).addClass('x-item-disabled');
+            }
+            var helpDomEl = this.getFieldHelpDomEl(id);
+            if (helpDomEl)
+            {
+                Ext.get(helpDomEl).addClass('x-item-disabled');
+            }
+        }
+    },
+
+    getFieldLabelDomEl: function(id)
+    {
+        return Ext.query("//[@for='" + id + "']", this.el.dom)[0];
+    },
+
+    getFieldHelpDomEl: function(id)
+    {
+        return Ext.query("//[@id='" + id + "-inline-help']", this.el.dom)[0];
+    },
+
     annotateField: function(id, annotationName, imageName, tooltip)
     {
         var rowEl = Ext.get('x-form-row-' + id);

@@ -327,6 +327,6 @@ public class UpgradeAcceptanceTest extends SeleniumTestBase
 
     private BootContext getBootContext(String... args)
     {
-        return new BootContext(null, args, null, null, null);
+        return new BootContext(null, null, args, null, null, null);
     }
 }

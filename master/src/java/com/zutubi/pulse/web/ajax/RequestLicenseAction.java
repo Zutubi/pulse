@@ -1,6 +1,7 @@
 package com.zutubi.pulse.web.ajax;
 
 import com.zutubi.prototype.webwork.TransientAction;
+import com.zutubi.prototype.webwork.ConfigurationErrors;
 import com.zutubi.pulse.prototype.config.setup.RequestLicenseConfiguration;
 import com.zutubi.util.StringUtils;
 import org.apache.xmlrpc.XmlRpcClient;
@@ -15,12 +16,17 @@ public class RequestLicenseAction extends TransientAction<RequestLicenseConfigur
 
     public RequestLicenseAction()
     {
-        super("init/requestLicense");
+        super("init/requestLicense", true);
     }
 
     public SimpleResult getResult()
     {
         return result;
+    }
+
+    public ConfigurationErrors getConfigurationErrors()
+    {
+        return new ConfigurationErrors(this);
     }
 
     protected RequestLicenseConfiguration initialise()

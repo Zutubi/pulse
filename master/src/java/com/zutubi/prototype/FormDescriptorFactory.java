@@ -59,6 +59,7 @@ public class FormDescriptorFactory
     {
         registerFieldType(FieldType.CHECKBOX, CheckboxFieldDescriptor.class);
         registerFieldType(FieldType.CONTROLLING_CHECKBOX, ControllingCheckboxFieldDescriptor.class);
+        registerFieldType(FieldType.CONTROLLING_SELECT, ControllingSelectFieldDescriptor.class);
         registerFieldType(FieldType.HIDDEN, HiddenFieldDescriptor.class);
         registerFieldType(FieldType.PASSWORD, PasswordFieldDescriptor.class);
         registerFieldType(FieldType.SELECT, SelectFieldDescriptor.class);

@@ -1,60 +1,60 @@
 [#ftl]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 =============================================================================
 Functions that return useful urls.
 =============================================================================
------------------------------------------------------------------------------>
+-----------------------------------------------------------------------------]
 
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 Returns a link to the projecty home page for the project the given build
 belongs to.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#function projectLink result]
     [#return urls.project(result.project)/]
 [/#function]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 Returns a link to the summary page for a build result.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#function buildLink result]
     [#return urls.build(result)/]
 [/#function]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 Returns a link to the tests page for a build result.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#function testsLink result]
     [#return urls.buildTests(result)/]
 [/#function]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 Returns a link to the detailed view page for a build stage.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#function stageDetailsLink result node]
     [#return urls.stageDetails(result, node)/]
 [/#function]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 Returns a link to the tests page for a build stage.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#function stageTestsLink result node]
     [#return urls.stageTests(result, node)/]
 [/#function]
 
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 =============================================================================
 Macros that output plain text.
 =============================================================================
------------------------------------------------------------------------------>
+-----------------------------------------------------------------------------]
 
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 A macro to show the messages directly on the result object of the given
 level.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro resultMessages result level indent=""]
     [#list result.getFeatures(level) as feature]
         [#if !renderer.featureLimitReached(buildMessageCount)]
@@ -64,10 +64,10 @@ ${indent}  * ${renderer.wrapString(feature.summary, "${indent}    ")}
     [/#list]
 [/#macro]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 Shows all messages of the given level on the file artifact as a flat list but
 with context.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro fileArtifactMessages artifact level context]
     [#if !renderer.featureLimitReached(buildMessageCount) && artifact.hasMessages(level)]
   - ${renderer.wrapString("${context}", "    ")}
@@ -81,10 +81,10 @@ with context.
     [/#if]
 [/#macro]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 Shows all messages of the given level on the artifact as a flat list but with
 context.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro artifactMessages artifact level context]
     [#local fileContext="${context} :: ${artifact.name}"]
     [#list artifact.children as fileArtifact]
@@ -92,10 +92,10 @@ context.
     [/#list]
 [/#macro]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 Shows all messages of the given level on the command result and its included
 artifacts as a flat list but with context.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro commandResultMessages result level context]
     [#local nestedContext = "${context} :: ${result.commandName}"]
     [#if !renderer.featureLimitReached(buildMessageCount) && result.hasDirectMessages(level)]
@@ -107,10 +107,10 @@ artifacts as a flat list but with context.
     [/#list]
 [/#macro]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 Shows all messages of the given level on the recipe result and its included
 results as a flat list but with context.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro recipeResultMessages result level context]
     [#if !renderer.featureLimitReached(buildMessageCount) && result.hasDirectMessages(level)]
   - ${renderer.wrapString(context, "    ")}
@@ -121,10 +121,10 @@ results as a flat list but with context.
     [/#list]
 [/#macro]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 Shows all messages of the given level on the result node and its included
 results as a flat list but with context.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro recipeNodeMessages node level context=""]
     [#if !renderer.featureLimitReached(buildMessageCount) && node.hasMessages(level)]
         [#if context?length &gt; 0]
@@ -139,10 +139,10 @@ results as a flat list but with context.
     [/#if]
 [/#macro]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 Shows all messages of the given level on the build result and its included
 results as a flat list but with context.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro buildMessages result level]
     [#if result.hasMessages(level)]
         [#assign buildMessageCount = 0/]
@@ -160,18 +160,18 @@ ${level?lower_case?cap_first} messages:
     [/#if]
 [/#macro]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 Outputs a list of build stage results for the given build.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro buildStages result]
     [#list result.root.children as child]
   * ${child.stageName} :: ${child.result.recipeNameSafe}@${child.hostSafe} :: ${child.result.state.prettyString}
     [/#list]
 [/#macro]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 Shows a list of the changes made in a build.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro buildChanges]
     [#if changelists?exists]
         [#if changelists?size &gt; 0]
@@ -187,9 +187,9 @@ There were no new changes in this build.
     [/#if]
 [/#macro]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 A macro to show a failed test case as part of a flat plain text list.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro showTestCaseFailure test suiteContext=""]
     [#local testStatus = "${test.name} (${test.status?lower_case})"]
     [#if suiteContext?length &gt; 0]
@@ -203,9 +203,9 @@ A macro to show a failed test case as part of a flat plain text list.
     [/#if]
 [/#macro]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 A macro to show test suite failures as part of a flat plain text list.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro showTestSuiteFailures suite showContext=true suiteContext=""]
     [#if showContext]
         [#if suiteContext?length &gt; 0]
@@ -224,10 +224,10 @@ A macro to show test suite failures as part of a flat plain text list.
     [/#list]
 [/#macro]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 A macro to show the test summary in a recipe, include the failed tests as a
 flat plain text list.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro recipeTestSummary result context]
     [#local summary = result.testSummary]
     [#if summary.total &gt; 0]
@@ -244,10 +244,10 @@ flat plain text list.
     [/#if]
 [/#macro]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 A macro to show the test summary for a recipe node, including the failed
 tests as a flat plain text list.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro recipeNodeTestSummary node context=""]
     [#if context?length &gt; 0]
         [#local nestedContext = "${context} :: ${node.stageName} :: ${node.result.recipeNameSafe}@${node.hostSafe}"]
@@ -262,10 +262,10 @@ tests as a flat plain text list.
     [/#list]
 [/#macro]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 A macro to show test summary information for a build including the failed
 tests as a flat plain text list.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro buildTestSummary result]
     [#local summary = result.testSummary]
     [#if summary.total &gt; 0]
@@ -279,16 +279,16 @@ Test summary: total: ${summary.total}, errors: ${summary.errors}, failures: ${su
 [/#macro]
 
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 =============================================================================
 HTML-specific macros
 =============================================================================
------------------------------------------------------------------------------>
+-----------------------------------------------------------------------------]
 
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 Outputs inline style definitions for HTML result emails.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro stylesHTML]
     <style type="text/css">
     <!--
@@ -408,9 +408,9 @@ pre.feature {
     </style>
 [/#macro]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 Shows a list of links for a build.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro buildLinksHTML result]
     <p style="font-size: 85%">
         jump to ::
@@ -421,9 +421,9 @@ Shows a list of links for a build.
     <p/>
 [/#macro]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 Shows a summary table for a build.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro buildSummaryHTML result]
     [@openTable/]
         [@headingRow heading="summary" span=8/]
@@ -449,9 +449,9 @@ Shows a summary table for a build.
     </table>
 [/#macro]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 Shows a list of links to build stage logs.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro stageLogLinksHTML result]
     <p style="font-size: 85%">
         stage logs ::
@@ -461,9 +461,9 @@ Shows a list of links to build stage logs.
     </p>
 [/#macro]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 Shows a summary for each stage in a build.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro buildStageSummariesHTML result]
     [@openTable/]
         [@headingRow heading="stages" span=8/]
@@ -493,9 +493,9 @@ Shows a summary for each stage in a build.
     </table>
 [/#macro]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 Shows a table with the given changelists.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro buildChangesHTML result changelists trim=true limit=60]
     [@openTable/]
         [@headingRow heading="changes" span=5/]
@@ -528,10 +528,10 @@ Shows a table with the given changelists.
     </table>
 [/#macro]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 A macro to show the messages directly on the result object of the given
 level as HTML list elements.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro resultMessagesHTML result level]
     [#list result.getFeatures(level) as feature]
         [#if !renderer.featureLimitReached(buildMessageCount)]
@@ -541,10 +541,10 @@ level as HTML list elements.
     [/#list]
 [/#macro]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 Shows all messages of the given level on the file artifact as a HTML nested
 list.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro fileArtifactMessagesHTML result command artifact level]
     [#if !renderer.featureLimitReached(buildMessageCount) && artifact.hasMessages(level)]
 <li class="header">artifact :: ${artifact.path?html}
@@ -566,19 +566,19 @@ list.
     [/#if]
 [/#macro]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 Shows all messages of the given level on the artifact as a HTML nested list.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro artifactMessagesHTML result command artifact level]
     [#list artifact.children as fileArtifact]
         [@fileArtifactMessagesHTML result=result command=command artifact=fileArtifact level=level/]
     [/#list]
 [/#macro]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 Shows all messages of the given level on the command result and its included
 artifacts as HTML nested list.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro commandResultMessagesHTML result command level]
     [@resultMessagesHTML result=command level=level/]
     [#list command.artifacts as artifact]
@@ -586,10 +586,10 @@ artifacts as HTML nested list.
     [/#list]
 [/#macro]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 Shows all messages of the given level on the recipe result and its included
 results as a HTML nested list.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro recipeResultMessagesHTML result recipe level]
     [@resultMessagesHTML result=recipe level=level/]
     [#list recipe.commandResults as command]
@@ -603,10 +603,10 @@ results as a HTML nested list.
     [/#list]
 [/#macro]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 Shows all messages of the given level on the result node and its included
 results as a HTML nested list.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro recipeNodeMessagesHTML result node level]
     [#if !renderer.featureLimitReached(buildMessageCount) && node.hasMessages(level)]
 <li class="header">stage ${node.stageName?html} :: ${node.result.recipeNameSafe?html}@${node.hostSafe?html}
@@ -620,10 +620,10 @@ results as a HTML nested list.
     [/#if]
 [/#macro]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 Shows all messages of the given level on the build result and its included
 results as a HTML nested list.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro buildMessagesHTML result level]
     [#if result.hasMessages(level)]
         [#assign buildMessageCount = 0/]
@@ -642,9 +642,9 @@ results as a HTML nested list.
     [/#if]
 [/#macro]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 Shows failing tests from a test suite.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro showSuiteFailuresHTML test showSummary=true indent=""]
     [#if showSummary]
     <tr>
@@ -665,9 +665,9 @@ Shows failing tests from a test suite.
     [/#list]
 [/#macro]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 Outputs a single failing test case.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro showCaseFailureHTML test indent=""]
     <tr>
     [#assign class = "test-failure"]
@@ -683,9 +683,9 @@ Outputs a single failing test case.
     </tr>
 [/#macro]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 Outputs failing test cases for the given recipe node.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro recipeNodeFailedTestsHTML node]
     [#if node.result?exists]
         [#if node.result.hasBrokenTests() && node.result.failedTestResults?exists]
@@ -712,67 +712,67 @@ Outputs failing test cases for the given recipe node.
     [/#list]
 [/#macro]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 Outputs failing test cases for the given build.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro buildFailedTestsHTML result]
     [#list result.root.children as child]
         [@recipeNodeFailedTestsHTML node=child/]
     [/#list]
 [/#macro]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 Opens a table, adding embedded styles.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro openTable]
     <table class="content" style="border-collapse: collapse; border: 1px solid #bbb; margin-bottom: 16px;">
 [/#macro]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 Opens a table cell, adding embedded styles.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro openCell type="td" class="content" span=1]
     <${type} class="${class}" colspan="${span}" style="border: 1px solid #bbb; padding: 3px; text-align: left;">
 [/#macro]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 A content header cell
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro contentHeader cc span=1]
     [@openCell type="th" span=span/]${cc}</th>
 [/#macro]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 A content cell
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro contentCell cc span=1]
     [@openCell span=span/]${cc}</td>
 [/#macro]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 A content cell with content escaped HTML-wise
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro dynamicCell cc]
     [@openCell/]${cc?html}</td>
 [/#macro]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 A content cell with CSS class set to the value of $class
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro classCell cc]
     [@openCell class="${class}"/]${cc}</td>
 [/#macro]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 A content cell with a link
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro linkCell cc url class="content"]
     [@openCell class=class/]<a href="${url}">${cc}</a></td>
 [/#macro]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 A heading row to top a table.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro headingRow heading span]
     <tr>
         <th class="heading" colspan="${span}" style="border: 1px solid #bbb; padding: 3px; text-align: left; vertical-align: top; background: #e9e9f5;">
@@ -781,9 +781,9 @@ A heading row to top a table.
     </tr>
 [/#macro]
 
-<#---------------------------------------------------------------------------
+[#---------------------------------------------------------------------------
 A row in a project summary notification table.
----------------------------------------------------------------------------->
+----------------------------------------------------------------------------]
 [#macro summaryRow ch cc url="" colour=""]
     <tr>
         <th style="text-align: right; background: #fafae8; color: #124; border-right: solid 1px #124; padding: 4px">${ch}</th>

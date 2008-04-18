@@ -96,8 +96,6 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         addSubmit(form, "cancel");
 
         Map<String, Object> context = new HashMap<String, Object>();
-        context.put("actionErrors", getActionErrors());
-        context.put("fieldErrors", getFieldErrors());
         context.put("projectId", project.getId());
 
         StringWriter writer = new StringWriter();

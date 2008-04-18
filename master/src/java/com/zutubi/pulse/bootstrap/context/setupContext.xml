@@ -9,9 +9,8 @@
                 <value>classpath:/com/zutubi/pulse/bootstrap/context/transactionContext.xml</value>
             </list>
         </property>
-        <property name="restoreContexts">
+        <property name="dataContexts">
             <list>
-                <value>classpath:/com/zutubi/pulse/bootstrap/context/restoreContext.xml</value>
                 <value>classpath:/com/zutubi/pulse/bootstrap/context/databaseContext.xml</value>
                 <value>classpath:/com/zutubi/pulse/bootstrap/context/recordContext.xml</value>
                 <value>classpath:/com/zutubi/pulse/bootstrap/context/hibernateContext.xml</value>
@@ -19,12 +18,11 @@
                 <value>classpath:/com/zutubi/pulse/bootstrap/context/pluginContext.xml</value>
             </list>
         </property>
-<!--
-        <property name="daoContexts">
+        <property name="restoreContexts">
             <list>
+                <value>classpath:/com/zutubi/pulse/bootstrap/context/restoreContext.xml</value>
             </list>
         </property>
--->
         <property name="licenseContexts">
             <list>
                 <value>classpath:/com/zutubi/pulse/bootstrap/context/licenseContext.xml</value>

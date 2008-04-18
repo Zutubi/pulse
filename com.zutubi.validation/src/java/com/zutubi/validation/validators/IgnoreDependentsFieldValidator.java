@@ -1,6 +1,7 @@
 package com.zutubi.validation.validators;
 
 import com.zutubi.validation.ValidationException;
+import com.zutubi.util.CollectionUtils;
 
 /**
  * A validator that inspects the value of a field and decides based on this
@@ -8,12 +9,12 @@ import com.zutubi.validation.ValidationException;
  */
 public class IgnoreDependentsFieldValidator extends FieldValidatorSupport
 {
-    private String nonIgnoreValue;
+    private String[] nonIgnoreValues;
     private String[] dependentFields;
 
-    public void setNonIgnoreValue(String nonIgnoreValue)
+    public void setNonIgnoreValues(String... nonIgnoreValues)
     {
-        this.nonIgnoreValue = nonIgnoreValue;
+        this.nonIgnoreValues = nonIgnoreValues;
     }
 
     public void setDependentFields(String[] dependentFields)
@@ -23,17 +24,24 @@ public class IgnoreDependentsFieldValidator extends FieldValidatorSupport
 
     public void validateField(Object value) throws ValidationException
     {
-        boolean equal;
+        boolean found = false;
         if(value == null)
         {
-            equal = nonIgnoreValue == null;
+            for(String nonIgnore: nonIgnoreValues)
+            {
+                if(nonIgnore == null)
+                {
+                    found = true;
+                    break;
+                }
+            }
         }
         else
         {
-            equal = value.toString().equals(nonIgnoreValue);
+            found = CollectionUtils.contains(nonIgnoreValues, value.toString());
         }
 
-        if(!equal)
+        if(!found)
         {
             if(dependentFields.length > 0)
             {

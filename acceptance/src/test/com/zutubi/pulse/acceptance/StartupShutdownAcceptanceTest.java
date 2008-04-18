@@ -442,7 +442,7 @@ public class StartupShutdownAcceptanceTest extends TestCase
 
     private BootContext getBootContext(List<String> args)
     {
-        return new BootContext(null, args.toArray(new String[args.size()]), null, null, null);
+        return new BootContext(null, null, args.toArray(new String[args.size()]), null, null, null);
     }
 
     private void assertExternalConfigNotAvailable(RuntimeContext ctx)

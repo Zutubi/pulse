@@ -10,8 +10,11 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.List;
 import java.util.LinkedList;
+import java.sql.Driver;
+import java.sql.DriverManager;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.hsqldb.jdbcDriver;
 
 /**
  * <class-comment/>
@@ -45,6 +48,7 @@ public abstract class BaseUpgradeTaskTestCase extends PulseTestCase
         factory.setDataSource(dataSource);
         factory.setHibernateMappings(getTestMappings());
 
+        DriverManager.registerDriver(new jdbcDriver());
         databaseConsole = (DatabaseConsole) factory.getObject();
         databaseConsole.createSchema();
     }

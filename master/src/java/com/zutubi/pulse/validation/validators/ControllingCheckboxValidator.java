@@ -27,7 +27,7 @@ public class ControllingCheckboxValidator extends FieldValidatorSupport
     {
         IgnoreDependentsFieldValidator delegate = new IgnoreDependentsFieldValidator();
         delegate.setFieldName(getFieldName());
-        delegate.setNonIgnoreValue(Boolean.toString(!invert));
+        delegate.setNonIgnoreValues(Boolean.toString(!invert));
         delegate.setDependentFields(dependentFields);
         delegate.setValidationContext(getValidationContext());
         delegate.validateField(object);

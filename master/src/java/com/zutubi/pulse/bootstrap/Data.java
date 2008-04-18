@@ -48,6 +48,7 @@ public class Data implements MasterUserPaths
     private File databaseRoot;
     private File userTemplateRoot;
     private File recordRoot;
+    private File driverRoot;
 
     private File backupRoot;
 
@@ -200,8 +201,8 @@ public class Data implements MasterUserPaths
     }
 
     /**
-     * Transfer the database.properties.template file into the data directory so that it is available for pulse
-     * to create the database connection.
+     * Transfer the database.user.properties.template file into the data
+     * directory so that it is available to create the database connection.
      *
      * @param systemPaths paths to pulse system info
      *
@@ -211,13 +212,13 @@ public class Data implements MasterUserPaths
     {
         try
         {
-            File databaseConfig = new File(getUserConfigRoot(), "database.properties");
+            File databaseConfig = new File(getUserConfigRoot(), "database.user.properties");
             
-            // if the database.properties file already exists in the database directory, do not over write it.
-            // This allows pre-configured database.properties files to be used when pulse starts up.
+            // if the database.user.properties file already exists in the database directory, do not over write it.
+            // This allows pre-configured database.user.properties files to be used when pulse starts up.
             if (!databaseConfig.exists())
             {
-                File databaseConfigTemplate = new File(systemPaths.getConfigRoot(), "database.properties.template");
+                File databaseConfigTemplate = new File(systemPaths.getConfigRoot(), "database.user.properties.template");
                 IOUtils.copyTemplate(databaseConfigTemplate, databaseConfig);
             }
         }
@@ -333,6 +334,15 @@ public class Data implements MasterUserPaths
             recordRoot = new File(getData(), "records");
         }
         return recordRoot;
+    }
+
+    public File getDriverRoot()
+    {
+        if(driverRoot == null)
+        {
+            driverRoot = new File(getData(), "driver");
+        }
+        return driverRoot;
     }
 
     public Config getConfig()

@@ -22,7 +22,7 @@ public class DataDirectoryArchive extends AbstractArchivableComponent
     public String getDescription()
     {
         return "The configuration restoration takes the appropriate 1.2.x system files and restores " +
-                "them to there 2.0 locations.  Note, the one system file excluded from this process is the" +
+                "them to their 2.0 locations.  Note, the one system file excluded from this process is the" +
                 "database.properties file.  The database configured for your 2.0 installation will be retained.";
     }
 

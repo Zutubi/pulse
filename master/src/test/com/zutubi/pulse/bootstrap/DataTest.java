@@ -36,7 +36,7 @@ public class DataTest extends PulseTestCase
         systemPaths = new DefaultSystemPaths(new File(tempDir, "pulse-home"), new File(tempDir, "version-home"));
         File configRoot = systemPaths.getConfigRoot();
         configRoot.mkdirs();
-        File dbtemplate = new File(configRoot, "database.properties.template");
+        File dbtemplate = new File(configRoot, "database.user.properties.template");
         dbtemplate.createNewFile();
     }
 

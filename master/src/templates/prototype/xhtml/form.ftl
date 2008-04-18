@@ -2,7 +2,22 @@
 A table is used as there is no good way to have a div collapse to the
 width of its contents.  Floating it works, but hurts other things.
 -->
-<table class="eform"><tr><td id="${form.name}.status"></td></tr><tr><td id="${form.id}"><td></tr></table>
+<table class="eform">
+    <tr>
+        <td id="${form.name}.status">
+<#if actionErrors?exists>
+            <ul class="validation-error">
+    <#list actionErrors as error>
+                <li>${error?html}</li>
+    </#list>
+            </ul>
+</#if>
+        </td>
+    </tr>
+    <tr>
+        <td id="${form.id}"><td>
+    </tr>
+</table>
 
 <#-- render form -->
 <script type="text/javascript">

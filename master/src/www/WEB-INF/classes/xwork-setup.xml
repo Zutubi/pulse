@@ -23,16 +23,22 @@
 
         <action name="setup" class="com.zutubi.pulse.web.setup.SetupWorkflowAction">
             <result name="data" type="redirect">/setup/setupData!input.action</result>
-            <result name="setup" type="redirect">/setupwizard/init/?wizard</result>
-            <result name="license" type="redirect">/setup/setupLicense!input.action</result>
+            <result name="database" type="redirect">/setup/setupDatabaseType!input.action</result>
             <result name="restore" type="redirect">/restore/preview.action</result>
+            <result name="license" type="redirect">/setup/setupLicense!input.action</result>
             <result name="upgrade" type="redirect">/upgrade/preview.action</result>
+            <result name="setup" type="redirect">/setupwizard/init/?wizard</result>
             <result name="starting" type="redirect">/startup/starting.action</result>
             <result name="success" type="redirect">/</result>
         </action>
 
         <action name="setupData" class="com.zutubi.pulse.web.setup.SetupDataAction">
             <result name="input" type="velocity">/setup/configure-pulsedata.vm</result>
+            <result name="success" type="redirect">/</result>
+        </action>
+
+        <action name="setupDatabaseType" class="com.zutubi.pulse.web.setup.SetupDatabaseTypeAction">
+            <result name="input" type="velocity">/setup/configure-databasetype.vm</result>
             <result name="success" type="redirect">/</result>
         </action>
 
@@ -142,7 +148,8 @@
         </action>
 
         <action name="requestLicense" class="com.zutubi.pulse.web.ajax.RequestLicenseAction">
-            <result name="input" type="velocity">request-license.vm</result>
+            <result name="render" type="velocity">request-license.vm</result>
+            <result name="input" type="flexjson">configurationErrors</result>
             <result name="success" type="flexjson">result</result>
         </action>
     </package>

@@ -12,10 +12,12 @@ import java.util.Properties;
  */
 public class DatabaseConfig
 {
-    protected static final String JDBC_DRIVER_CLASS_NAME = "jdbc.driverClassName";
-    protected static final String JDBC_URL               = "jdbc.url";
-    protected static final String JDBC_USERNAME          = "jdbc.username";
-    protected static final String JDBC_PASSWORD          = "jdbc.password";
+    public static final String JDBC_DRIVER_CLASS_NAME = "jdbc.driverClassName";
+    public static final String JDBC_URL               = "jdbc.url";
+    public static final String JDBC_USERNAME          = "jdbc.username";
+    public static final String JDBC_PASSWORD          = "jdbc.password";
+
+    public static final String HIBERNATE_DIALECT      = "hibernate.dialect";
 
     protected static final String POOL_INITIAL_SIZE = "pool.initialSize";
     protected static final String POOL_MAX_ACTIVE   = "pool.maxActive";

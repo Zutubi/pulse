@@ -20,6 +20,7 @@ import com.zutubi.util.TextUtils;
 public abstract class TransientAction<T> extends ActionSupport implements MessagesProvider
 {
     protected String path;
+    protected boolean ajax;
     protected ConfigurationUIModel configuration;
 
     protected TypeRegistry typeRegistry;
@@ -35,6 +36,12 @@ public abstract class TransientAction<T> extends ActionSupport implements Messag
         this.path = path;
     }
 
+    protected TransientAction(String path, boolean ajax)
+    {
+        this(path);
+        this.ajax = ajax;
+    }
+
     public String getSymbolicName()
     {
         return symbolicName;
@@ -44,6 +51,7 @@ public abstract class TransientAction<T> extends ActionSupport implements Messag
     {
         this.symbolicName = symbolicName;
     }
+    
     public boolean isCancelSelected()
     {
         if (TextUtils.stringSet(submitField))
@@ -106,11 +114,11 @@ public abstract class TransientAction<T> extends ActionSupport implements Messag
         {
             record = type.unstantiate(instance);
         }
-        return INPUT;
+        return ajax ? "render" : INPUT;
     }
 
     @SuppressWarnings({"unchecked"})
-    public String execute() throws Exception
+    public String execute()
     {
         if(isCancelSelected())
         {
@@ -153,7 +161,15 @@ public abstract class TransientAction<T> extends ActionSupport implements Messag
             return INPUT;
         }
 
-        return complete((T) instance);
+        try
+        {
+            return complete((T) instance);
+        }
+        catch (Exception e)
+        {
+            addActionError(e.getMessage());
+            return ERROR;
+        }
     }
 
     protected abstract T initialise() throws Exception;

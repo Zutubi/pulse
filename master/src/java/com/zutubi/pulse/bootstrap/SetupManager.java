@@ -19,6 +19,8 @@ public interface SetupManager
 
     void requestDataComplete() throws IOException;
 
+    void requestDbComplete();
+
     void requestLicenseComplete();
 
     void requestUpgradeComplete(boolean changes);

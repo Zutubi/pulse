@@ -10,6 +10,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.hsqldb.jdbcDriver;
 
 import javax.sql.DataSource;
 import java.beans.BeanInfo;
@@ -20,6 +21,7 @@ import java.lang.reflect.Method;
 import java.util.logging.Filter;
 import java.util.logging.LogRecord;
 import java.util.logging.Level;
+import java.sql.DriverManager;
 
 /**
  *
@@ -58,8 +60,9 @@ public abstract class PersistenceTestCase extends PulseTestCase
         Logger.getLogger("org.hibernate.cfg.SettingsFactory").setFilter(new IgnoreInfoFilter());
         Logger.getLogger("org.springframework.beans.factory.xml.XmlBeanDefinitionReader").setFilter(new IgnoreInfoFilter());
 
-        String[] configLocations = getConfigLocations();
+        DriverManager.registerDriver(new jdbcDriver());
 
+        String[] configLocations = getConfigLocations();
         ComponentContext.addClassPathContextDefinitions(configLocations);
         context = ComponentContext.getContext();
 
