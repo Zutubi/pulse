@@ -1,7 +1,5 @@
 package com.zutubi.validation.validators;
 
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 import java.io.File;
 
 /**
@@ -13,7 +11,6 @@ public class FileValidator extends StringFieldValidatorSupport
     private boolean verifyDirectory;
     private boolean verifyReadable;
     private boolean verifyWriteable;
-    private boolean verifyExecutable;
 
     protected FileValidator()
     {
@@ -49,11 +46,6 @@ public class FileValidator extends StringFieldValidatorSupport
         if(verifyWriteable && !f.canWrite())
         {
             addError("not.writable");
-        }
-
-        if(verifyExecutable && !f.canExecute())
-        {
-            addError("not.executable");
         }
     }
 
@@ -95,15 +87,5 @@ public class FileValidator extends StringFieldValidatorSupport
     public void setVerifyWriteable(boolean verifyWriteable)
     {
         this.verifyWriteable = verifyWriteable;
-    }
-
-    public boolean isVerifyExecutable()
-    {
-        return verifyExecutable;
-    }
-
-    public void setVerifyExecutable(boolean verifyExecutable)
-    {
-        this.verifyExecutable = verifyExecutable;
     }
 }
