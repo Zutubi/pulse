@@ -87,6 +87,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         hookForm.waitFor();
         hookForm.nextFormElements(random, "true", null, "true", null, "false");
 
+        selectFromStageTasks();
         addTask("${project} ${stage} ${recipe} ${status}");
 
         xmlRpcHelper.runBuild(PROJECT_NAME, 60000);
@@ -134,6 +135,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         hookForm.waitFor();
         hookForm.nextFormElements(random, "true", null, "true", null, "false");
 
+        selectFromStageTasks();
         CompositePage hookPage = addTask("${project} ${stage} ${recipe} ${status}");
         triggerHook(hookPage, buildNumber);
         assertArgs(PROJECT_NAME, "default", "[default]", "success");
@@ -257,6 +259,14 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         SelectTypeState taskType = new SelectTypeState(selenium);
         taskType.waitFor();
         assertEquals(Arrays.asList("zutubi.emailCommittersTaskConfig", "zutubi.runExecutableTaskConfig", "zutubi.tagTaskConfig"), taskType.getSortedOptionList());
+        taskType.nextFormElements("zutubi.runExecutableTaskConfig");
+    }
+
+    private void selectFromStageTasks()
+    {
+        SelectTypeState taskType = new SelectTypeState(selenium);
+        taskType.waitFor();
+        assertEquals(Arrays.asList("zutubi.runExecutableTaskConfig", "zutubi.tagTaskConfig"), taskType.getSortedOptionList());
         taskType.nextFormElements("zutubi.runExecutableTaskConfig");
     }
 
