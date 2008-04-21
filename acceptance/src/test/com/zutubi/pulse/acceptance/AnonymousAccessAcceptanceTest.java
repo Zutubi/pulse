@@ -83,7 +83,7 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         SignupForm form = new SignupForm(selenium);
         form.assertFormPresent();
         form.saveFormElements(random, random, "", "");
-        assertTextPresent("Unauthorized");
+        assertTextPresent("Anonymous signup is not enabled");
     }
 
     public void testAnonymousSingupPasswordMismatch() throws Exception

@@ -12,13 +12,13 @@
         if(enabled)
         {
         <#list parameters.dependentFields as dependent>
-            form.enableField('${dependent}');
+            form.enableField('zfid.${dependent}');
         </#list>
         }
         else
         {
         <#list parameters.dependentFields as dependent>
-            form.disableField('${dependent}');
+            form.disableField('zfid.${dependent}');
         </#list>
         }
     <#else>
