@@ -154,6 +154,7 @@ public class DefaultArchiveManager implements ArchiveManager
                 }
                 else
                 {
+                    taskMonitor.started(task);
                     taskMonitor.aborted();
                     listener.taskAborted(task);
                 }

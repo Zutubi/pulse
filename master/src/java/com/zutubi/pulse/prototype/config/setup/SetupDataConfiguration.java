@@ -39,12 +39,6 @@ public class SetupDataConfiguration extends AbstractConfiguration implements Val
     {
         File data = new File(this.data);
 
-        // FIXME: remove this check when upgrades work
-        if(data.exists() && data.list().length > 0)
-        {
-            context.addFieldError("data", "data.not.empty");
-        }
-        
         if (!data.exists() && !data.mkdirs())
         {
             context.addFieldError("data", "data.create.failed");

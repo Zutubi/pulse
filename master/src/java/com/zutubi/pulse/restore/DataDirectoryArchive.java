@@ -45,14 +45,38 @@ public class DataDirectoryArchive extends AbstractArchivableComponent
         try
         {
             cleanup(paths.getUserConfigRoot());
+
             FileSystemUtils.delete(new File(paths.getData(), "pulse.config.properties"));
-            
-            FileSystemUtils.copy(paths.getUserConfigRoot(), new File(archive, "config"));
+
+            // can not use the fsu.copy since it expects the destination directory to be empty, which
+            // will not always be the case.
+            copy(paths.getUserConfigRoot(), new File(archive, "config").listFiles());
+
             FileSystemUtils.copy(paths.getData(), new File(archive, "pulse.config.properties"));
         }
         catch (IOException e)
         {
             throw new ArchiveException(e);
+        }
+    }
+
+    private void copy(File dest, File[] files) throws IOException
+    {
+        for (File file : files)
+        {
+            if (file.isFile())
+            {
+                FileSystemUtils.copy(dest, file);
+            }
+            else if (file.isDirectory())
+            {
+                File nestedDestination = new File(dest, file.getName());
+                if (!nestedDestination.isDirectory() && !nestedDestination.mkdirs())
+                {
+                    throw new IOException("Failed to create destination directory: " + nestedDestination);
+                }
+                copy(nestedDestination, file.listFiles());
+            }
         }
     }
 
@@ -64,7 +88,7 @@ public class DataDirectoryArchive extends AbstractArchivableComponent
             {
                 cleanup(file);
             }
-            if (!file.getName().equals("database.properties"))
+            if (!file.getName().startsWith("database"))
             {
                 FileSystemUtils.delete(file);   
             }

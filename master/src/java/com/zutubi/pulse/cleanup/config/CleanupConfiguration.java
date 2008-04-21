@@ -19,10 +19,11 @@ import java.util.List;
  */
 @SymbolicName("zutubi.cleanupConfig")
 @Form(fieldOrder = {"name", "what", "retain", "unit"})
-@Table(columns = {"name", "states", "after"})
+@Table(columns = {"name", "what", "after", "states"})
 public class CleanupConfiguration extends AbstractNamedConfiguration
 {
     @Required
+    @Format("CleanupWhatColumnFormatter")
     private CleanupWhat what;
 
     @Numeric(min = 1)
