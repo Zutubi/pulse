@@ -1,5 +1,7 @@
 package com.zutubi.pulse.command;
 
+import com.zutubi.pulse.transfer.JDBCTransferException;
+import com.zutubi.pulse.transfer.TransferAPI;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.ParseException;
@@ -10,23 +12,20 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import com.zutubi.pulse.transfer.TransferAPI;
-import com.zutubi.pulse.transfer.JDBCTransferException;
-
 /**
  */
 public class ExportCommand extends DataCommand
 {
-    public int doExecute(BootContext context) throws IOException, ParseException
+    public int doExecute(String... argv) throws IOException, ParseException
     {
         CommandLineParser parser = new PosixParser();
-        CommandLine commandLine = parser.parse(getSharedOptions(), context.getCommandArgv(), true);
+        CommandLine commandLine = parser.parse(getSharedOptions(), argv, true);
 
         String[] args = commandLine.getArgs();
         if (args.length == 0)
         {
             HelpCommand helpCommand = new HelpCommand();
-            helpCommand.showHelp(context.getArgv()[0], this);
+            helpCommand.showHelp("export", this);
             return 1;
         }
 
@@ -99,7 +98,7 @@ public class ExportCommand extends DataCommand
         ExportCommand command = new ExportCommand();
         try
         {
-            command.execute(new BootContext(null, null, argv, null, null, null));
+            command.execute(argv);
         }
         catch (Exception e)
         {

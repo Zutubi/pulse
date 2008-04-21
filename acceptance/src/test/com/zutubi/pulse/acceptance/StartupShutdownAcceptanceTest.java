@@ -1,18 +1,17 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.util.TextUtils;
 import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.forms.setup.PulseLicenseForm;
 import com.zutubi.pulse.acceptance.forms.setup.SetPulseDataForm;
 import com.zutubi.pulse.bootstrap.SystemConfiguration;
-import com.zutubi.pulse.command.BootContext;
 import com.zutubi.pulse.command.PingServerCommand;
 import com.zutubi.pulse.command.ShutdownCommand;
 import com.zutubi.pulse.command.StartCommand;
 import com.zutubi.pulse.config.Config;
 import com.zutubi.pulse.config.FileConfig;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.util.TextUtils;
 import junit.framework.TestCase;
 import org.apache.commons.cli.ParseException;
 
@@ -390,7 +389,6 @@ public class StartupShutdownAcceptanceTest extends TestCase
         StartCommand start = new StartCommand();
         List<String> args = new LinkedList<String>();
 
-        args.add("start");
         if (TextUtils.stringSet(commandline.getPort()))
         {
             args.add("-p");
@@ -411,7 +409,7 @@ public class StartupShutdownAcceptanceTest extends TestCase
             args.add("-f");
             args.add(commandline.getExternalConfig());
         }
-        assertEquals(0, start.execute(getBootContext(args)));
+        assertEquals(0, start.execute(args.toArray(new String[args.size()])));
     }
 
     private void assertShutdownServer(RuntimeContext commandline) throws ParseException, InterruptedException, IOException
@@ -435,14 +433,9 @@ public class StartupShutdownAcceptanceTest extends TestCase
             args.add(commandline.getExternalConfig());
         }
         shutdown.setExitJvm(false);
-        assertEquals(0, shutdown.execute(getBootContext(args)));
+        assertEquals(0, shutdown.execute(args.toArray(new String[args.size()])));
 
         Thread.sleep(2000); // give pulse a chance to shutdown.
-    }
-
-    private BootContext getBootContext(List<String> args)
-    {
-        return new BootContext(null, null, args.toArray(new String[args.size()]), null, null, null);
     }
 
     private void assertExternalConfigNotAvailable(RuntimeContext ctx)

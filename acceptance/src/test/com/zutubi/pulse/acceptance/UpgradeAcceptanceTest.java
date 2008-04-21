@@ -1,6 +1,5 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.command.BootContext;
 import com.zutubi.pulse.command.ShutdownCommand;
 import com.zutubi.pulse.command.StartCommand;
 import com.zutubi.pulse.license.LicenseException;
@@ -13,11 +12,11 @@ import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.ZipUtils;
 import com.zutubi.util.IOUtils;
+import org.apache.commons.cli.ParseException;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.apache.commons.cli.ParseException;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -251,7 +250,7 @@ public class UpgradeAcceptanceTest extends SeleniumTestBase
             {
                 try
                 {
-                    assertEquals(0, start.execute(getBootContext("start", "-p", "8990", "-d", tmpDir.getAbsolutePath())));
+                    assertEquals(0, start.execute("-p", "8990", "-d", tmpDir.getAbsolutePath()));
                 }
                 catch (ParseException e)
                 {
@@ -291,7 +290,7 @@ public class UpgradeAcceptanceTest extends SeleniumTestBase
 
         ShutdownCommand shutdown = new ShutdownCommand();
         shutdown.setExitJvm(false);
-        assertEquals(0, shutdown.execute(getBootContext("shutdown", "-F", "true", "-p", "8990")));
+        assertEquals(0, shutdown.execute("-F", "true", "-p", "8990"));
         waitForServerToExit(8990);
         
         // allow time for the shutdown to complete.
@@ -323,10 +322,5 @@ public class UpgradeAcceptanceTest extends SeleniumTestBase
                 break;
             }
         }
-    }
-
-    private BootContext getBootContext(String... args)
-    {
-        return new BootContext(null, null, args, null, null, null);
     }
 }

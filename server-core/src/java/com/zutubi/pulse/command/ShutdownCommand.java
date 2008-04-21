@@ -67,9 +67,9 @@ public class ShutdownCommand extends AdminCommand
         return options;
     }
 
-    public int doExecute(BootContext context) throws XmlRpcException, IOException, ParseException
+    public int doExecute(String[] argv) throws XmlRpcException, IOException, ParseException
     {
-        parse(context.getCommandArgv());
+        parse(argv);
         return execute();
     }
 
@@ -84,8 +84,7 @@ public class ShutdownCommand extends AdminCommand
         ShutdownCommand command = new ShutdownCommand();
         try
         {
-            command.parse(argv);
-            command.execute(new BootContext(null, null, argv, null, null, null));
+            command.execute(argv);
         }
         catch (Exception e)
         {

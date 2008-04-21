@@ -1,26 +1,21 @@
 package com.zutubi.pulse.command;
 
-import com.zutubi.util.TextUtils;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.SystemBootstrapManager;
-import com.zutubi.pulse.database.DatabaseConfig;
 import com.zutubi.pulse.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.bootstrap.conf.EnvConfig;
+import com.zutubi.pulse.database.DatabaseConfig;
 import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.OptionBuilder;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.PosixParser;
-import org.springframework.core.io.Resource;
+import com.zutubi.util.TextUtils;
+import org.apache.commons.cli.*;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The abstract base command for commands used to import/export data.
@@ -63,9 +58,14 @@ public abstract class DataCommand implements Command
         this.pulseData = data;
     }
 
-    public int execute(BootContext context) throws ParseException, IOException
+    public int execute(BootContext bootContext) throws Exception
     {
-        parse(context.getCommandArgv());
+        return execute(bootContext.getCommandArgv());
+    }
+
+    public int execute(String... argv) throws ParseException, IOException
+    {
+        parse(argv);
 
         // update the system properties
         if (TextUtils.stringSet(pulseData))
@@ -101,7 +101,7 @@ public abstract class DataCommand implements Command
         databaseConfig = (DatabaseConfig) ComponentContext.getBean("databaseConfig");
         configuration.setProperties(databaseConfig.getHibernateProperties());
 
-        return doExecute(context);
+        return doExecute(argv);
    }
 
     public Map<String, String> getOptions()
@@ -122,7 +122,7 @@ public abstract class DataCommand implements Command
      * functionality in this method. When this method is invoked, the
      * dataSource will be available.
      */
-    public abstract int doExecute(BootContext context) throws IOException, ParseException;
+    public abstract int doExecute(String... argv) throws IOException, ParseException;
 
     @SuppressWarnings({ "AccessStaticViaInstance" })
     protected Options getSharedOptions()

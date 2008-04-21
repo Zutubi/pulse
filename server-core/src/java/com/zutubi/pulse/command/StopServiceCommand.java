@@ -48,10 +48,10 @@ public class StopServiceCommand extends AdminCommand
         return false;
     }
 
-    public int doExecute(BootContext context) throws XmlRpcException, IOException, ParseException
+    public int doExecute(String[] argv) throws XmlRpcException, IOException, ParseException
     {
         CommandLineParser parser = new PosixParser();
-        CommandLine commandLine = parser.parse(getSharedOptions(), context.getCommandArgv(), true);
+        CommandLine commandLine = parser.parse(getSharedOptions(), argv, true);
         super.processSharedOptions(commandLine);
         xmlRpcClient.execute("RemoteApi.stopService", new Vector<Object>(Arrays.asList(new Object[]{ adminToken })));
         return 0;

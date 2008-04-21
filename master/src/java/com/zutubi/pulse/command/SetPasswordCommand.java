@@ -60,16 +60,16 @@ public class SetPasswordCommand extends AdminCommand
         return Arrays.asList(new String[] { "passwd", "password", "sp", "setp" });
     }
 
-    public int doExecute(BootContext context) throws XmlRpcException, IOException, ParseException
+    public int doExecute(String[] argv) throws XmlRpcException, IOException, ParseException
     {
         CommandLineParser parser = new PosixParser();
-        CommandLine commandLine = parser.parse(getSharedOptions(), context.getCommandArgv(), true);
+        CommandLine commandLine = parser.parse(getSharedOptions(), argv, true);
 
         String[] args = commandLine.getArgs();
         if(args.length < 2)
         {
             HelpCommand helpCommand = new HelpCommand();
-            helpCommand.showHelp(context.getArgv()[0], this);
+            helpCommand.showHelp("setpassword", this);
             return 1;
         }
         // process the command.
@@ -86,7 +86,7 @@ public class SetPasswordCommand extends AdminCommand
         SetPasswordCommand command = new SetPasswordCommand();
         try
         {
-            command.execute(new BootContext(null, null, argv, null, null, null));
+            command.execute(argv);
         }
         catch (Exception e)
         {

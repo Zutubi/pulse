@@ -16,16 +16,16 @@ import java.util.List;
  */
 public class ImportCommand extends DataCommand
 {
-    public int doExecute(BootContext context) throws IOException, ParseException
+    public int doExecute(String... argv) throws IOException, ParseException
     {
         CommandLineParser parser = new PosixParser();
-        CommandLine commandLine = parser.parse(getSharedOptions(), context.getCommandArgv(), true);
+        CommandLine commandLine = parser.parse(getSharedOptions(), argv, true);
 
         String[] args = commandLine.getArgs();
         if (args.length == 0)
         {
             HelpCommand helpCommand = new HelpCommand();
-            helpCommand.showHelp(context.getArgv()[0], this);
+            helpCommand.showHelp("import", this);
             return 1;
         }
 
@@ -84,7 +84,7 @@ public class ImportCommand extends DataCommand
         ImportCommand command = new ImportCommand();
         try
         {
-            command.execute(new BootContext(null, null, argv, null, null, null));
+            command.execute(argv);
         }
         catch (Exception e)
         {

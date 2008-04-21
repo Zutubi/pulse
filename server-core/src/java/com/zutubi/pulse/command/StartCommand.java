@@ -1,9 +1,9 @@
 package com.zutubi.pulse.command;
 
-import com.zutubi.util.TextUtils;
 import com.zutubi.pulse.bootstrap.SystemBootstrapManager;
 import com.zutubi.pulse.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.bootstrap.conf.EnvConfig;
+import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.commons.cli.*;
 
@@ -135,7 +135,7 @@ public class StartCommand implements Command
         return execute(context.getCommandArgv());
     }
 
-    public int execute(String[] argv) throws ParseException
+    public int execute(String... argv) throws ParseException
     {
         parse(argv);
         return execute();

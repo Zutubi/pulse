@@ -1,6 +1,5 @@
 package com.zutubi.pulse.command;
 
-import com.zutubi.util.TextUtils;
 import com.zutubi.pulse.api.AdminTokenManager;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
@@ -10,6 +9,7 @@ import com.zutubi.pulse.bootstrap.conf.EnvConfig;
 import com.zutubi.pulse.config.ConfigSupport;
 import com.zutubi.pulse.config.FileConfig;
 import com.zutubi.util.IOUtils;
+import com.zutubi.util.TextUtils;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
@@ -79,6 +79,11 @@ public abstract class AdminCommand implements Command
 
     public int execute(BootContext context) throws ParseException, IOException
     {
+        return execute(context.getCommandArgv());
+    }
+
+    public int execute(String... argv) throws ParseException, IOException
+    {
         // initialise the necessary resources
         // a) the xml rpc client
         // b) the admin token.
@@ -143,7 +148,7 @@ public abstract class AdminCommand implements Command
         try
         {
             adminToken = loadAdminToken(configurationManager);
-            return doExecute(context);
+            return doExecute(argv);
         }
         catch (IOException e)
         {
@@ -182,7 +187,7 @@ public abstract class AdminCommand implements Command
      * in this method. When this method is invoked, both the XmlRpcClient and the
      * AdminToken will be available.
      */
-    public abstract int doExecute(BootContext context) throws XmlRpcException, IOException, ParseException;
+    public abstract int doExecute(String[] argv) throws XmlRpcException, IOException, ParseException;
 
     @SuppressWarnings({ "AccessStaticViaInstance" })
     protected Options getSharedOptions()

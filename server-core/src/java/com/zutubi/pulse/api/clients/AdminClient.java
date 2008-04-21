@@ -1,7 +1,6 @@
 package com.zutubi.pulse.api.clients;
 
-import com.zutubi.pulse.command.BootContext;
-import com.zutubi.pulse.command.Command;
+import com.zutubi.pulse.command.AdminCommand;
 import com.zutubi.pulse.command.ShutdownCommand;
 
 import java.util.HashMap;
@@ -12,7 +11,7 @@ import java.util.Map;
  */
 public class AdminClient
 {
-    private Map<String, Command> commands = new HashMap<String, Command>();
+    private Map<String, AdminCommand> commands = new HashMap<String, AdminCommand>();
 
     public AdminClient()
     {
@@ -41,8 +40,8 @@ public class AdminClient
                 return 2;
             }
 
-            Command command = commands.get(commandName);
-            return command.execute(new BootContext(null, null, argv, null, null, null));
+            AdminCommand command = commands.get(commandName);
+            return command.execute(argv);
         }
         catch (Exception e)
         {
