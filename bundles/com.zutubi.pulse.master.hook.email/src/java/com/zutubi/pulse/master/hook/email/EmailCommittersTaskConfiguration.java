@@ -20,6 +20,7 @@ import com.zutubi.pulse.prototype.config.project.hooks.BuildHookTaskConfiguratio
 import com.zutubi.pulse.prototype.config.project.hooks.CompatibleHooks;
 import com.zutubi.pulse.prototype.config.project.hooks.ManualBuildHookConfiguration;
 import com.zutubi.pulse.prototype.config.project.hooks.PostBuildHookConfiguration;
+import com.zutubi.pulse.prototype.config.project.hooks.PostStageHookConfiguration;
 import com.zutubi.pulse.prototype.config.user.contacts.EmailContactConfiguration;
 import com.zutubi.pulse.renderer.BuildResultRenderer;
 import com.zutubi.util.StringUtils;
@@ -35,7 +36,7 @@ import java.util.List;
  */
 @SymbolicName("zutubi.emailCommittersTaskConfig")
 @Form(fieldOrder = {"emailDomain", "template", "ignorePulseUsers"})
-@CompatibleHooks({ManualBuildHookConfiguration.class, PostBuildHookConfiguration.class})
+@CompatibleHooks({ManualBuildHookConfiguration.class, PostBuildHookConfiguration.class, PostStageHookConfiguration.class})
 @Wire
 public class EmailCommittersTaskConfiguration extends AbstractConfiguration implements BuildHookTaskConfiguration
 {
