@@ -8,7 +8,7 @@ import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.model.ResourceManager;
-import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
+import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.services.SlaveService;
@@ -87,9 +87,9 @@ public class SlaveAgentService implements AgentService
 
     public boolean build(RecipeRequest request)
     {
-        GeneralAdminConfiguration generalConfig = configurationProvider.get(GeneralAdminConfiguration.class);
+        GlobalConfiguration globalConfiguration = configurationProvider.get(GlobalConfiguration.class);
         SystemConfiguration systemConfig = configurationManager.getSystemConfig();
-        String masterUrl = "http://" + MasterAgentService.constructMasterLocation(generalConfig, systemConfig);
+        String masterUrl = "http://" + MasterAgentService.constructMasterLocation(globalConfiguration, systemConfig);
 
         try
         {

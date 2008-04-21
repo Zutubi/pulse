@@ -1,9 +1,9 @@
 package com.zutubi.prototype.type.record.store;
 
-import com.zutubi.prototype.transaction.TransactionManager;
-import com.zutubi.prototype.transaction.UserTransaction;
 import com.zutubi.prototype.transaction.Transaction;
+import com.zutubi.prototype.transaction.TransactionManager;
 import com.zutubi.prototype.transaction.TransactionStatus;
+import com.zutubi.prototype.transaction.UserTransaction;
 import com.zutubi.prototype.type.record.DefaultRecordSerialiser;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.MutableRecordImpl;
@@ -604,7 +604,7 @@ public class FileSystemRecordStoreTest extends PulseTestCase
     }
 
     /**
-     * Caused by: java.lang.IllegalArgumentException: No record at path 'settings/licenseConfig'
+     * Caused by: java.lang.IllegalArgumentException: No record at path 'settings/license'
      * at com.zutubi.prototype.type.record.store.InMemoryRecordStore.update(InMemoryRecordStore.java:105)
      * at com.zutubi.prototype.type.record.store.InMemoryRecordStore$2.execute(InMemoryRecordStore.java:50)
      * at com.zutubi.prototype.type.record.store.InMemoryRecordStore$2.execute(InMemoryRecordStore.java:48)

@@ -6,7 +6,7 @@ import com.zutubi.pulse.model.BuildColumns;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.prototype.config.user.UserSettingsConfiguration;
+import com.zutubi.pulse.prototype.config.user.UserPreferencesConfiguration;
 
 import java.util.List;
 
@@ -122,8 +122,8 @@ public class ProjectHomeAction extends ProjectActionBase
         }
 
         User user = getLoggedInUser();
-        summaryColumns = new BuildColumns(user == null ? UserSettingsConfiguration.defaultProjectColumns() : user.getPreferences().getSettings().getProjectSummaryColumns(), projectManager);
-        recentColumns = new BuildColumns(user == null ? UserSettingsConfiguration.defaultProjectColumns() : user.getPreferences().getSettings().getProjectRecentColumns(), projectManager);
+        summaryColumns = new BuildColumns(user == null ? UserPreferencesConfiguration.defaultProjectColumns() : user.getPreferences().getProjectSummaryColumns(), projectManager);
+        recentColumns = new BuildColumns(user == null ? UserPreferencesConfiguration.defaultProjectColumns() : user.getPreferences().getProjectRecentColumns(), projectManager);
 
         return SUCCESS;
     }

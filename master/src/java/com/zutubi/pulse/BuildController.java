@@ -13,7 +13,7 @@ import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.model.*;
-import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
+import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.project.BuildOptionsConfiguration;
 import com.zutubi.pulse.prototype.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
@@ -124,7 +124,7 @@ public class BuildController implements EventListener
         buildDir = paths.getBuildDir(buildResult);
 
         buildContext = new ExecutionContext();
-        addBuildProperties(buildContext, buildResult, project, buildDir, MasterAgentService.constructMasterUrl(configurationProvider.get(GeneralAdminConfiguration.class), configurationManager.getSystemConfig()));
+        addBuildProperties(buildContext, buildResult, project, buildDir, MasterAgentService.constructMasterUrl(configurationProvider.get(GlobalConfiguration.class), configurationManager.getSystemConfig()));
 
         configure(root, buildResult.getRoot());
 

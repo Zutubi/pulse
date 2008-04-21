@@ -7,7 +7,7 @@ import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.RecipeResultNode;
 import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.prototype.config.user.UserSettingsConfiguration;
+import com.zutubi.pulse.prototype.config.user.UserPreferencesConfiguration;
 import com.zutubi.util.CircularBuffer;
 
 import java.io.File;
@@ -177,35 +177,35 @@ public class TailRecipeLogAction extends StageActionBase
             {
                 boolean changed = false;
 
-                UserSettingsConfiguration settings = user.getPreferences().getSettings();
+                UserPreferencesConfiguration preferences = user.getPreferences();
                 if (refreshInterval <= 0)
                 {
-                    refreshInterval = settings.getTailRefreshInterval();
+                    refreshInterval = preferences.getTailRefreshInterval();
                 }
-                else if (refreshInterval != settings.getTailRefreshInterval())
+                else if (refreshInterval != preferences.getTailRefreshInterval())
                 {
-                    settings = configurationProvider.deepClone(settings);
-                    settings.setTailRefreshInterval(refreshInterval);
+                    preferences = configurationProvider.deepClone(preferences);
+                    preferences.setTailRefreshInterval(refreshInterval);
                     changed = true;
                 }
 
                 if (maxLines <= 0)
                 {
-                    maxLines = settings.getTailLines();
+                    maxLines = preferences.getTailLines();
                 }
-                else if (maxLines != settings.getTailLines())
+                else if (maxLines != preferences.getTailLines())
                 {
                     if (!changed)
                     {
-                        settings = configurationProvider.deepClone(settings);
+                        preferences = configurationProvider.deepClone(preferences);
                     }
-                    settings.setTailLines(maxLines);
+                    preferences.setTailLines(maxLines);
                     changed = true;
                 }
 
                 if (changed)
                 {
-                    configurationProvider.save(settings);
+                    configurationProvider.save(preferences);
                 }
             }
         }

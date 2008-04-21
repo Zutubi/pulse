@@ -1,6 +1,5 @@
 package com.zutubi.pulse.web.rss;
 
-import com.zutubi.util.TextUtils;
 import com.sun.syndication.feed.WireFeed;
 import com.sun.syndication.feed.module.content.ContentModule;
 import com.sun.syndication.feed.module.content.ContentModuleImpl;
@@ -14,7 +13,7 @@ import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.ProjectGroup;
 import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
+import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.renderer.BuildResultRenderer;
 import com.zutubi.pulse.search.BuildResultExpressions;
 import com.zutubi.pulse.search.Queries;
@@ -23,8 +22,7 @@ import com.zutubi.pulse.web.project.ProjectActionSupport;
 import com.zutubi.pulse.webwork.mapping.Urls;
 import com.zutubi.pulse.xwork.results.JITFeed;
 import com.zutubi.util.StringUtils;
-import org.hibernate.criterion.Expression;
-import org.hibernate.criterion.Order;
+import com.zutubi.util.TextUtils;
 import org.hibernate.criterion.Projections;
 
 import java.io.StringWriter;
@@ -68,7 +66,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
         urls = new Urls(getBaseUrl());
 
         // check that rss is enabled.
-        if (!configurationProvider.get(GeneralAdminConfiguration.class).isRssEnabled())
+        if (!configurationProvider.get(GlobalConfiguration.class).isRssEnabled())
         {
             addActionError("rss feed is disabled");
             return "disabled";
@@ -122,7 +120,7 @@ public class BuildResultsRssAction extends ProjectActionSupport
 
     private String getBaseUrl()
     {
-        return configurationProvider.get(GeneralAdminConfiguration.class).getBaseUrl();
+        return configurationProvider.get(GlobalConfiguration.class).getBaseUrl();
     }
 
     public void setConfigurationManager(MasterConfigurationManager configurationManager)

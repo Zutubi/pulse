@@ -6,6 +6,7 @@ import com.zutubi.pulse.acceptance.pages.WelcomePage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectsPage;
 import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.group.ServerPermission;
 
 import java.util.Arrays;
@@ -16,7 +17,6 @@ import java.util.Vector;
  */
 public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
 {
-    private static final String GENERAL_CONFIG_PATH  = "settings/generalConfig";
     private static final String ANONYMOUS_GROUP_PATH = "groups/anonymous users";
 
     private static final String KEY_ANONYMOUS_ACCESS = "anonymousAccessEnabled";
@@ -142,11 +142,11 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
 
     private void ensureSetting(String key, boolean enabled) throws Exception
     {
-        Hashtable<String, Object> general = xmlRpcHelper.getConfig(GENERAL_CONFIG_PATH);
+        Hashtable<String, Object> general = xmlRpcHelper.getConfig(GlobalConfiguration.SCOPE_NAME);
         if((Boolean)general.get(key) != enabled)
         {
             general.put(key, enabled);
-            xmlRpcHelper.saveConfig(GENERAL_CONFIG_PATH, general, false);
+            xmlRpcHelper.saveConfig(GlobalConfiguration.SCOPE_NAME, general, false);
         }
     }
 }

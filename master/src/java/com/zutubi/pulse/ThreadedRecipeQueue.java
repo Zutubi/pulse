@@ -17,21 +17,17 @@ import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.events.*;
+import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.model.ResourceManager;
-import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
+import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.project.types.TypeConfiguration;
 import com.zutubi.pulse.scm.ScmChangeEvent;
 import com.zutubi.util.Constants;
 import com.zutubi.util.logging.Logger;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.Collection;
-import java.util.Iterator;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
@@ -96,7 +92,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     private AgentManager agentManager;
     private EventManager eventManager;
     private ResourceManager resourceManager;
-    private GeneralAdminConfiguration adminConfiguration;
+    private GlobalConfiguration globalConfiguration;
     private ScmClientFactory scmClientFactory;
     private ThreadFactory threadFactory;
 
@@ -744,14 +740,14 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     {
         if(event instanceof PostSaveEvent)
         {
-            adminConfiguration = (GeneralAdminConfiguration) event.getInstance();
-            updateTimeout(adminConfiguration);
+            globalConfiguration = (GlobalConfiguration) event.getInstance();
+            updateTimeout(globalConfiguration);
         }
     }
 
-    private void updateTimeout(GeneralAdminConfiguration adminConfiguration)
+    private void updateTimeout(GlobalConfiguration globalConfiguration)
     {
-        long timeout = adminConfiguration.getRecipeTimeout();
+        long timeout = globalConfiguration.getRecipeTimeout();
         if(timeout > 0)
         {
             timeout *= Constants.MINUTE;
@@ -782,10 +778,10 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)
     {
-        adminConfiguration = configurationProvider.get(GeneralAdminConfiguration.class);
-        updateTimeout(adminConfiguration);
+        globalConfiguration = configurationProvider.get(GlobalConfiguration.class);
+        updateTimeout(globalConfiguration);
 
-        configurationProvider.registerEventListener(this, false, false, GeneralAdminConfiguration.class);
+        configurationProvider.registerEventListener(this, false, false, GlobalConfiguration.class);
     }
 
     public void setScmClientFactory(ScmClientFactory scmClientFactory)

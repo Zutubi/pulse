@@ -2,7 +2,7 @@ package com.zutubi.pulse.web;
 
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.prototype.config.user.UserSettingsConfiguration;
+import com.zutubi.pulse.prototype.config.user.UserPreferencesConfiguration;
 import com.zutubi.pulse.security.AcegiUtils;
 
 /**
@@ -17,9 +17,9 @@ public class DismissWelcomeAction extends ActionSupport
     {
         String login = AcegiUtils.getLoggedInUsername();
         User user = userManager.getUser(login);
-        UserSettingsConfiguration settings = configurationProvider.deepClone(user.getPreferences().getSettings());
-        settings.setDefaultAction(DefaultAction.DASHBOARD_ACTION);
-        configurationProvider.save(settings);
+        UserPreferencesConfiguration preferences = configurationProvider.deepClone(user.getPreferences());
+        preferences.setDefaultAction(DefaultAction.DASHBOARD_ACTION);
+        configurationProvider.save(preferences);
         return SUCCESS;
     }
 

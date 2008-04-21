@@ -51,7 +51,7 @@ public class HibernateChangelistDao extends HibernateEntityDao<Changelist> imple
     {
         final List<String> allLogins = new LinkedList<String>();
         allLogins.add(user.getConfig().getLogin());
-        allLogins.addAll(user.getPreferences().getSettings().getAliases());
+        allLogins.addAll(user.getPreferences().getAliases());
 
         return findUnique(new ChangelistQuery()
         {

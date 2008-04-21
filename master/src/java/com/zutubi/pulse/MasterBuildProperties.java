@@ -10,7 +10,7 @@ import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.TestResultSummary;
 import com.zutubi.pulse.core.scm.CheckoutScheme;
 import com.zutubi.pulse.model.*;
-import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
+import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 
 import java.io.File;
@@ -31,9 +31,9 @@ public class MasterBuildProperties extends BuildProperties
         }
     }
 
-    public static void addAllBuildProperties(ExecutionContext context, BuildResult result, GeneralAdminConfiguration adminConfiguration, MasterConfigurationManager configurationManager)
+    public static void addAllBuildProperties(ExecutionContext context, BuildResult result, GlobalConfiguration globalConfiguration, MasterConfigurationManager configurationManager)
     {
-        String masterUrl = MasterAgentService.constructMasterUrl(adminConfiguration, configurationManager.getSystemConfig());
+        String masterUrl = MasterAgentService.constructMasterUrl(globalConfiguration, configurationManager.getSystemConfig());
         addBuildProperties(context, result, result.getProject(), result.getAbsoluteOutputDir(configurationManager.getDataDirectory()), masterUrl);
         if(result.getRevision() != null)
         {

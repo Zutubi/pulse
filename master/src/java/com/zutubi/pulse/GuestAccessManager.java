@@ -8,7 +8,7 @@ import com.zutubi.prototype.config.events.PostSaveEvent;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.model.GrantedAuthority;
 import com.zutubi.pulse.model.UserManager;
-import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
+import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.group.AbstractGroupConfiguration;
 import com.zutubi.pulse.prototype.config.group.BuiltinGroupConfiguration;
 import org.acegisecurity.GrantedAuthorityImpl;
@@ -29,7 +29,7 @@ public class GuestAccessManager implements ConfigurationEventListener
 
         newAttribute.setPassword(userAttribute.getPassword());
         newAttribute.addAuthority(new GrantedAuthorityImpl(GrantedAuthority.ANONYMOUS));
-        if(configurationProvider.get(GeneralAdminConfiguration.class).isAnonymousAccessEnabled())
+        if(configurationProvider.get(GlobalConfiguration.class).isAnonymousAccessEnabled())
         {
             BuiltinGroupConfiguration group = configurationProvider.get(PathUtils.getPath(ConfigurationRegistry.GROUPS_SCOPE, UserManager.ANONYMOUS_USERS_GROUP_NAME), BuiltinGroupConfiguration.class);
             if(group != null)
@@ -60,7 +60,7 @@ public class GuestAccessManager implements ConfigurationEventListener
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)
     {
         this.configurationProvider = configurationProvider;
-        configurationProvider.registerEventListener(this, true, false, GeneralAdminConfiguration.class);
+        configurationProvider.registerEventListener(this, true, false, GlobalConfiguration.class);
         configurationProvider.registerEventListener(this, true, true, AbstractGroupConfiguration.class);
     }
 }

@@ -12,7 +12,7 @@ import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.logging.ServerMessagesHandler;
 import com.zutubi.pulse.model.ResourceManager;
-import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
+import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.resources.ResourceDiscoverer;
 import com.zutubi.pulse.services.SlaveStatus;
@@ -46,9 +46,9 @@ public class MasterAgentService implements AgentService
 
     public String getUrl()
     {
-        GeneralAdminConfiguration generalConfig = configurationProvider.get(GeneralAdminConfiguration.class);
+        GlobalConfiguration globalConfig = configurationProvider.get(GlobalConfiguration.class);
         SystemConfiguration systemConfig = configurationManager.getSystemConfig();
-        return constructMasterLocation(generalConfig, systemConfig);
+        return constructMasterLocation(globalConfig, systemConfig);
     }
 
     public int ping()
@@ -185,14 +185,14 @@ public class MasterAgentService implements AgentService
         return false;
     }
 
-    public static String constructMasterUrl(GeneralAdminConfiguration generalConfig, SystemConfiguration systemConfig)
+    public static String constructMasterUrl(GlobalConfiguration globalConfig, SystemConfiguration systemConfig)
     {
-        return "http://" + constructMasterLocation(generalConfig, systemConfig);
+        return "http://" + constructMasterLocation(globalConfig, systemConfig);
     }
 
-    public static String constructMasterLocation(GeneralAdminConfiguration generalConfig, SystemConfiguration systemConfig)
+    public static String constructMasterLocation(GlobalConfiguration globalConfig, SystemConfiguration systemConfig)
     {
-        String url = generalConfig.getMasterHost() + ":" + systemConfig.getServerPort() + systemConfig.getContextPath();
+        String url = globalConfig.getMasterHost() + ":" + systemConfig.getServerPort() + systemConfig.getContextPath();
         if (url.endsWith("/"))
         {
             url = url.substring(0, url.length() - 1);

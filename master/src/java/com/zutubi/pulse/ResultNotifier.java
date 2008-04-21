@@ -13,7 +13,7 @@ import com.zutubi.pulse.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
+import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.user.SubscriptionConfiguration;
 import com.zutubi.pulse.prototype.config.user.contacts.ContactConfiguration;
@@ -66,7 +66,7 @@ public class ResultNotifier implements EventListener
 
         Set<Long> notifiedContactPoints = new HashSet<Long>();
         Map<String, RenderedResult> renderCache = new HashMap<String, RenderedResult>();
-        Map<String, Object> dataMap = getDataMap(buildResult, configurationProvider.get(GeneralAdminConfiguration.class).getBaseUrl(), buildManager, buildResultRenderer);
+        Map<String, Object> dataMap = getDataMap(buildResult, configurationProvider.get(GlobalConfiguration.class).getBaseUrl(), buildManager, buildResultRenderer);
 
         Collection<SubscriptionConfiguration> subscriptions = configurationProvider.getAll(SubscriptionConfiguration.class);
         for (SubscriptionConfiguration subscription : subscriptions)

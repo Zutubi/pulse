@@ -15,7 +15,7 @@ import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.RecipeResultNode;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.prototype.config.admin.EmailConfiguration;
-import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
+import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.project.hooks.BuildHookTaskConfiguration;
 import com.zutubi.pulse.prototype.config.project.hooks.CompatibleHooks;
 import com.zutubi.pulse.prototype.config.project.hooks.ManualBuildHookConfiguration;
@@ -93,11 +93,11 @@ public class EmailCommittersTaskConfiguration extends AbstractConfiguration impl
             throw new PulseException("Cannot execute email build hook task as no SMTP host is configured.");
         }
 
-        GeneralAdminConfiguration adminConfiguration = configurationProvider.get(GeneralAdminConfiguration.class);
+        GlobalConfiguration globalConfiguration = configurationProvider.get(GlobalConfiguration.class);
         List<String> emails = getEmails(buildResult);
         if (emails.size() > 0)
         {
-            ResultNotifier.RenderedResult rendered = ResultNotifier.renderResult(buildResult, adminConfiguration.getBaseUrl(), buildManager, buildResultRenderer, template);
+            ResultNotifier.RenderedResult rendered = ResultNotifier.renderResult(buildResult, globalConfiguration.getBaseUrl(), buildManager, buildResultRenderer, template);
             String mimeType = buildResultRenderer.getTemplateInfo(template, buildResult.isPersonal()).getMimeType();
             String subject = rendered.getSubject();
             if (TextUtils.stringSet(emailConfiguration.getSubjectPrefix()))

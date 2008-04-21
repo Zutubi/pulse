@@ -57,7 +57,7 @@ public class DashboardAction extends ActionSupport
     {
         if(columns == null)
         {
-            columns = new BuildColumns(user.getPreferences().getSettings().getMyProjectsColumns(), projectManager);
+            columns = new BuildColumns(user.getPreferences().getMyProjectsColumns(), projectManager);
         }
         return columns;
     }

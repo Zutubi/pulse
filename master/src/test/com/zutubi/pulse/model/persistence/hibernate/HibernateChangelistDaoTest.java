@@ -162,8 +162,8 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
         commitAndRefreshTransaction();
 
         User user = createUser();
-        user.getConfig().getPreferences().getSettings().getAliases().add("alias1");
-        user.getConfig().getPreferences().getSettings().getAliases().add("alias3");
+        user.getConfig().getPreferences().getAliases().add("alias1");
+        user.getConfig().getPreferences().getAliases().add("alias3");
 
         List<Changelist> changes = changelistDao.findLatestByUser(user, 10);
         assertEquals(4, changes.size());

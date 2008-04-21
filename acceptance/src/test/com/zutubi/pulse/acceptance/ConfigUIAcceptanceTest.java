@@ -157,7 +157,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     public void testCheckFormCheckFieldValidationFailure() throws Exception
     {
         loginAsAdmin();
-        goTo(urls.admin() + "settings/emailConfig/");
+        goTo(urls.admin() + "settings/email/");
         EmailSettingsForm form = new EmailSettingsForm(selenium);
         form.waitFor();
         EmailSettingsCheckForm checkForm = new EmailSettingsCheckForm(form);

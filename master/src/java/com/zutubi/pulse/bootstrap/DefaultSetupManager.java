@@ -8,15 +8,15 @@ import com.zutubi.pulse.Version;
 import com.zutubi.pulse.bootstrap.conf.EnvConfig;
 import com.zutubi.pulse.bootstrap.tasks.ProcessSetupStartupTask;
 import com.zutubi.pulse.config.PropertiesWriter;
-import com.zutubi.pulse.database.DatabaseConsole;
 import com.zutubi.pulse.database.DatabaseConfig;
+import com.zutubi.pulse.database.DatabaseConsole;
 import com.zutubi.pulse.events.DataDirectoryLocatedEvent;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.logging.LogConfigurationManager;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.plugins.PluginManager;
-import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
+import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.restore.ArchiveException;
 import com.zutubi.pulse.restore.ArchiveManager;
 import com.zutubi.pulse.restore.feedback.TaskMonitor;
@@ -533,7 +533,7 @@ public class DefaultSetupManager implements SetupManager
             // upgrade process - which only happens when we are working with an existing installation.
             if (configurationProvider != null)
             {
-                GeneralAdminConfiguration config = configurationProvider.get(GeneralAdminConfiguration.class);
+                GlobalConfiguration config = configurationProvider.get(GlobalConfiguration.class);
                 if (config != null)
                 {
                     baseUrl = config.getBaseUrl();

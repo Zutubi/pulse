@@ -166,7 +166,7 @@
                     }
                     else
                     {
-                        tree.selectConfigPath('global/emailConfig');
+                        tree.selectConfigPath('global/email');
                     }
                     root.expand();
                 }

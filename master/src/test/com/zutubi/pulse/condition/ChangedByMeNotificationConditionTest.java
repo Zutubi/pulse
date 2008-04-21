@@ -47,7 +47,7 @@ public class ChangedByMeNotificationConditionTest extends PulseTestCase
     {
         BuildResult result = getBuildWithChanges(getChangelistBy("my alias"));
         UserConfiguration me = new UserConfiguration("me", "Your Overlord");
-        me.getPreferences().getSettings().getAliases().add("my alias");
+        me.getPreferences().getAliases().add("my alias");
         assertTrue(condition.satisfied(result, me));
     }
 

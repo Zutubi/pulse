@@ -10,7 +10,7 @@ import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
+import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.scheduling.SchedulingException;
@@ -307,7 +307,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
 
     public int getDefaultPollingInterval()
     {
-        return configurationProvider.get(GeneralAdminConfiguration.class).getScmPollingInterval();
+        return configurationProvider.get(GlobalConfiguration.class).getScmPollingInterval();
     }
 
     public void setEventManager(EventManager eventManager)

@@ -62,7 +62,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testGetConfigListingComposite() throws Exception
     {
         Vector<String> listing = call("getConfigListing", "settings");
-        assertSortedEquals(listing, "emailConfig", "generalConfig", "jabberConfig", "ldapConfig", "licenseConfig", "loggingConfig");
+        assertSortedEquals(listing, "email", "jabber", "ldap", "license", "logging");
     }
 
     public void testGetConfigListingCollection() throws Exception
@@ -93,9 +93,9 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         emailConfig.put("host", "localhost");
         emailConfig.put("from", "pulse@zutubi.com");
         emailConfig.put("ssl", true);
-        call("saveConfig", "settings/emailConfig", emailConfig, false);
+        call("saveConfig", "settings/email", emailConfig, false);
 
-        emailConfig = call("getConfig", "settings/emailConfig");
+        emailConfig = call("getConfig", "settings/email");
         assertEquals("zutubi.emailConfig", emailConfig.get(SYMBOLIC_NAME_KEY));
         assertEquals("localhost", emailConfig.get("host"));
         assertEquals("pulse@zutubi.com", emailConfig.get("from"));
@@ -133,7 +133,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testGetRawConfig() throws Exception
     {
-        Hashtable<String, Object> emailConfig = call("getRawConfig", "settings/emailConfig");
+        Hashtable<String, Object> emailConfig = call("getRawConfig", "settings/email");
         assertEquals("zutubi.emailConfig", emailConfig.get(SYMBOLIC_NAME_KEY));
         assertTrue(emailConfig.containsKey("host"));
         assertTrue(emailConfig.containsKey("port"));
@@ -179,7 +179,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     {
         Hashtable<String, Object> config = new Hashtable<String, Object>();
         config.put(SYMBOLIC_NAME_KEY, "zutubi.emailConfig");
-        callAndExpectError("record already exists", "insertConfig", "settings/emailConfig", config);
+        callAndExpectError("record already exists", "insertConfig", "settings/email", config);
     }
 
     public void testInsertConfigNoSymbolicName() throws Exception
@@ -258,7 +258,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 
     public void testInsertTemplatedConfigNonTemplatedParentPath() throws Exception
     {
-        callAndExpectError("parent path 'settings' is not a templated collection", "insertTemplatedConfig", "settings/emailConfig", new Hashtable(), false);
+        callAndExpectError("parent path 'settings' is not a templated collection", "insertTemplatedConfig", "settings/email", new Hashtable(), false);
     }
 
     public void testInsertTemplatedConfigConcreteParentPath() throws Exception

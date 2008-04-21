@@ -23,7 +23,7 @@ import com.zutubi.pulse.model.AgentState;
 import com.zutubi.pulse.model.AgentStateManager;
 import com.zutubi.pulse.model.ResourceManager;
 import com.zutubi.pulse.model.UserManager;
-import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
+import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.agent.AgentAclConfiguration;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.prototype.config.group.AbstractGroupConfiguration;
@@ -399,7 +399,7 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         agentStateManager.save(agentState);
         agent.setAgentState(agentState);
 
-        String masterUrl = "http://" + MasterAgentService.constructMasterLocation(configurationProvider.get(GeneralAdminConfiguration.class), configurationManager.getSystemConfig());
+        String masterUrl = "http://" + MasterAgentService.constructMasterLocation(configurationProvider.get(GlobalConfiguration.class), configurationManager.getSystemConfig());
         AgentUpdater updater = new AgentUpdater(agent, masterUrl, eventManager, configurationManager.getSystemPaths(), threadFactory);
         updatersLock.lock();
 
@@ -733,7 +733,7 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
                 int build = agent.getService().ping();
                 if (build == masterBuildNumber)
                 {
-                    status = agent.getService().getStatus("http://" + MasterAgentService.constructMasterLocation(configurationProvider.get(GeneralAdminConfiguration.class), configurationManager.getSystemConfig()));
+                    status = agent.getService().getStatus("http://" + MasterAgentService.constructMasterLocation(configurationProvider.get(GlobalConfiguration.class), configurationManager.getSystemConfig()));
                 }
                 else
                 {

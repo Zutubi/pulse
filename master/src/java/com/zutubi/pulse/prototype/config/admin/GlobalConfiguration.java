@@ -1,6 +1,8 @@
 package com.zutubi.pulse.prototype.config.admin;
 
 import com.zutubi.config.annotations.Classification;
+import com.zutubi.config.annotations.ControllingCheckbox;
+import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.type.record.PathUtils;
@@ -8,83 +10,181 @@ import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.jabber.config.JabberConfiguration;
 import com.zutubi.pulse.license.config.LicenseConfiguration;
+import com.zutubi.util.TextUtils;
 
 /**
  * The global configuration scope, which holds server-wide configuration.
  */
 @SymbolicName("zutubi.globalConfig")
 @Classification(single = "settings")
+@Form(fieldOrder={"baseUrl", "masterHost", "baseHelpUrl", "rssEnabled", "anonymousAccessEnabled", "anonymousSignupEnabled", "scmPollingInterval", "recipeTimeoutEnabled", "recipeTimeout" })
 public class GlobalConfiguration extends AbstractConfiguration
 {
     public static final String SCOPE_NAME = "settings";
 
-    private GeneralAdminConfiguration generalConfig = new GeneralAdminConfiguration();
-    private LoggingConfiguration loggingConfig = new LoggingConfiguration();
-    private EmailConfiguration emailConfig = new EmailConfiguration();
-    private LDAPConfiguration ldapConfig = new LDAPConfiguration();
-    private JabberConfiguration jabberConfig = new JabberConfiguration();
-    private LicenseConfiguration licenseConfig = new LicenseConfiguration();
+    private String baseUrl;
+    private String masterHost;
+    private String baseHelpUrl = "http://confluence.zutubi.com/display/pulse0200";
+    private boolean rssEnabled = true;
+    private boolean anonymousAccessEnabled = false;
+    private boolean anonymousSignupEnabled = false;
+    private int scmPollingInterval = 5;
+
+    @ControllingCheckbox(dependentFields = {"recipeTimeout"})
+    private boolean recipeTimeoutEnabled = true;
+    private int recipeTimeout = 15;
+
+    private LoggingConfiguration logging = new LoggingConfiguration();
+    private EmailConfiguration email = new EmailConfiguration();
+    private LDAPConfiguration ldap = new LDAPConfiguration();
+    private JabberConfiguration jabber = new JabberConfiguration();
+    private LicenseConfiguration license = new LicenseConfiguration();
 
     private ConfigurationTemplateManager configurationTemplateManager;
 
-    public GeneralAdminConfiguration getGeneralConfig()
+    public String getBaseUrl()
     {
-        return generalConfig;
+        return baseUrl;
     }
 
-    public void setGeneralConfig(GeneralAdminConfiguration generalConfig)
+    public void setBaseUrl(String baseUrl)
     {
-        this.generalConfig = generalConfig;
+        // munge the url a little. We assume that there is no trailing '/' when using this property.
+        if (TextUtils.stringSet(baseUrl) && baseUrl.endsWith("/"))
+        {
+            baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
+        }
+        this.baseUrl = baseUrl;
     }
 
-    public LoggingConfiguration getLoggingConfig()
+    public String getMasterHost()
     {
-        return loggingConfig;
+        return masterHost;
     }
 
-    public void setLoggingConfig(LoggingConfiguration loggingConfig)
+    public void setMasterHost(String masterHost)
     {
-        this.loggingConfig = loggingConfig;
+        this.masterHost = masterHost;
     }
 
-    public EmailConfiguration getEmailConfig()
+    public String getBaseHelpUrl()
     {
-        return emailConfig;
+        return baseHelpUrl;
     }
 
-    public void setEmailConfig(EmailConfiguration emailConfig)
+    public void setBaseHelpUrl(String baseHelpUrl)
     {
-        this.emailConfig = emailConfig;
+        this.baseHelpUrl = baseHelpUrl;
     }
 
-    public LDAPConfiguration getLdapConfig()
+    public boolean isRssEnabled()
     {
-        return ldapConfig;
+        return rssEnabled;
     }
 
-    public void setLdapConfig(LDAPConfiguration ldapConfig)
+    public void setRssEnabled(boolean rssEnabled)
     {
-        this.ldapConfig = ldapConfig;
+        this.rssEnabled = rssEnabled;
     }
 
-    public JabberConfiguration getJabberConfig()
+    public boolean isAnonymousAccessEnabled()
     {
-        return jabberConfig;
+        return anonymousAccessEnabled;
     }
 
-    public void setJabberConfig(JabberConfiguration jabberConfig)
+    public void setAnonymousAccessEnabled(boolean anonymousAccessEnabled)
     {
-        this.jabberConfig = jabberConfig;
+        this.anonymousAccessEnabled = anonymousAccessEnabled;
     }
 
-    public LicenseConfiguration getLicenseConfig()
+    public boolean isAnonymousSignupEnabled()
     {
-        return licenseConfig;
+        return anonymousSignupEnabled;
     }
 
-    public void setLicenseConfig(LicenseConfiguration licenseConfig)
+    public void setAnonymousSignupEnabled(boolean anonymousSignupEnabled)
     {
-        this.licenseConfig = licenseConfig;
+        this.anonymousSignupEnabled = anonymousSignupEnabled;
+    }
+
+    public int getScmPollingInterval()
+    {
+        return scmPollingInterval;
+    }
+
+    public void setScmPollingInterval(int scmPollingInterval)
+    {
+        this.scmPollingInterval = scmPollingInterval;
+    }
+
+    public boolean isRecipeTimeoutEnabled()
+    {
+        return recipeTimeoutEnabled;
+    }
+
+    public void setRecipeTimeoutEnabled(boolean recipeTimeoutEnabled)
+    {
+        this.recipeTimeoutEnabled = recipeTimeoutEnabled;
+    }
+
+    public int getRecipeTimeout()
+    {
+        return recipeTimeout;
+    }
+
+    public void setRecipeTimeout(int recipeTimeout)
+    {
+        this.recipeTimeout = recipeTimeout;
+    }
+
+    public LoggingConfiguration getLogging()
+    {
+        return logging;
+    }
+
+    public void setLogging(LoggingConfiguration logging)
+    {
+        this.logging = logging;
+    }
+
+    public EmailConfiguration getEmail()
+    {
+        return email;
+    }
+
+    public void setEmail(EmailConfiguration email)
+    {
+        this.email = email;
+    }
+
+    public LDAPConfiguration getLdap()
+    {
+        return ldap;
+    }
+
+    public void setLdap(LDAPConfiguration ldap)
+    {
+        this.ldap = ldap;
+    }
+
+    public JabberConfiguration getJabber()
+    {
+        return jabber;
+    }
+
+    public void setJabber(JabberConfiguration jabber)
+    {
+        this.jabber = jabber;
+    }
+
+    public LicenseConfiguration getLicense()
+    {
+        return license;
+    }
+
+    public void setLicense(LicenseConfiguration license)
+    {
+        this.license = license;
     }
 
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)

@@ -1139,10 +1139,9 @@ public class ConfigurationTemplateManager implements InstanceSource
                     throw new IllegalArgumentException("Illegal path '" + path + "': no existing record found");
                 }
 
-                final String parentPath = PathUtils.getParentPath(path);
-                if (parentPath == null)
+                if(existingRecord.isCollection())
                 {
-                    throw new IllegalArgumentException("Illegal path '" + path + "': no parent record");
+                    throw new IllegalArgumentException("Illegal path '" + path + "': attempt to save a collection");
                 }
 
                 // Type check of incoming record.
@@ -1151,8 +1150,18 @@ public class ConfigurationTemplateManager implements InstanceSource
                     throw new IllegalArgumentException("Saved record has type '" + record.getSymbolicName() + "' which does not match existing type '" + existingRecord.getSymbolicName() + "'");
                 }
 
-                ComplexType parentType = configurationPersistenceManager.getType(parentPath);
-                String newPath = parentType.getSavePath(path, record);
+                String newPath;
+                String parentPath = PathUtils.getParentPath(path);
+                if(parentPath == null)
+                {
+                    newPath = path;
+                }
+                else
+                {
+                    ComplexType parentType = configurationPersistenceManager.getType(parentPath);
+                    newPath = parentType.getSavePath(path, record);
+                }
+
                 CompositeType type = typeRegistry.getType(record.getSymbolicName());
 
                 MutableRecord newRecord = updateRecord(existingRecord, record, type);

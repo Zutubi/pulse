@@ -6,7 +6,7 @@ import com.zutubi.pulse.bootstrap.DefaultSetupManager;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.StartupTask;
 import com.zutubi.pulse.bootstrap.SystemConfiguration;
-import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
+import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 
 /**
  */
@@ -18,11 +18,11 @@ public class SystemStartedMessageStartupTask implements StartupTask
     public void execute()
     {
         // let the user know that the system is now up and running.
-        GeneralAdminConfiguration adminConfig = configurationProvider.get(GeneralAdminConfiguration.class);
+        GlobalConfiguration globalConfig = configurationProvider.get(GlobalConfiguration.class);
         SystemConfiguration sysConfig = configurationManager.getSystemConfig();
 
         //TODO: I18N this message.
-        DefaultSetupManager.printConsoleMessage("Pulse %s is now available on port %s at context path '%s' [base URL configured as: %s]", Version.getVersion().getVersionNumber(), sysConfig.getServerPort(), sysConfig.getContextPath(), adminConfig.getBaseUrl());
+        DefaultSetupManager.printConsoleMessage("Pulse %s is now available on port %s at context path '%s' [base URL configured as: %s]", Version.getVersion().getVersionNumber(), sysConfig.getServerPort(), sysConfig.getContextPath(), globalConfig.getBaseUrl());
     }
 
     public boolean haltOnFailure()

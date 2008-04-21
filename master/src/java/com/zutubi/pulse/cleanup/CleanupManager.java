@@ -1,6 +1,5 @@
 package com.zutubi.pulse.cleanup;
 
-import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.cleanup.config.CleanupWhat;
 import com.zutubi.pulse.events.Event;
@@ -43,8 +42,6 @@ public class CleanupManager
     private EventManager eventManager;
     private Scheduler scheduler;
     private BuildManager buildManager;
-
-    private ConfigurationProvider configurationProvider;
 
     private ProjectManager projectManager;
     private BuildResultDao buildResultDao;
@@ -233,11 +230,6 @@ public class CleanupManager
         this.buildResultDao = buildResultDao;
     }
 
-    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
-    {
-        this.configurationProvider = configurationProvider;
-    }
-
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
@@ -380,7 +372,7 @@ public class CleanupManager
 
         public void cleanup()
         {
-            List<BuildResult> results = buildResultDao.getOldestCompletedBuilds(user, user.getPreferences().getSettings().getMyBuildsCount());
+            List<BuildResult> results = buildResultDao.getOldestCompletedBuilds(user, user.getPreferences().getMyBuildsCount());
             for(BuildResult result: results)
             {
                 buildManager.cleanupResult(result, true);

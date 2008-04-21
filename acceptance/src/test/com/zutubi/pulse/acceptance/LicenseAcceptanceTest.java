@@ -22,7 +22,7 @@ import java.util.Hashtable;
  */
 public class LicenseAcceptanceTest extends SeleniumTestBase
 {
-    private static final String LICENSE_PATH = "settings/licenseConfig";
+    private static final String LICENSE_PATH = "settings/license";
 
     protected void setUp() throws Exception
     {

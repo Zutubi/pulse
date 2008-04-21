@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.model.*;
-import com.zutubi.pulse.prototype.config.user.UserSettingsConfiguration;
+import com.zutubi.pulse.prototype.config.user.UserPreferencesConfiguration;
 import com.zutubi.util.Sort;
 
 import java.util.*;
@@ -119,7 +119,7 @@ public class ViewProjectsAction extends ProjectActionSupport
         Collections.sort(projects, new NamedEntityComparator());
 
         User user = getLoggedInUser();
-        buildColumns = new BuildColumns(user == null ? UserSettingsConfiguration.defaultAllProjectsColumns() : user.getPreferences().getSettings().getAllProjectsColumns(), projectManager);
+        buildColumns = new BuildColumns(user == null ? UserPreferencesConfiguration.defaultAllProjectsColumns() : user.getPreferences().getAllProjectsColumns(), projectManager);
 
         return SUCCESS;
     }

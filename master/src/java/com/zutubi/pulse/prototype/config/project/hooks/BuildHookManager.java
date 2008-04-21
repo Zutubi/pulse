@@ -15,7 +15,7 @@ import com.zutubi.pulse.events.build.StageEvent;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.RecipeResultNode;
 import com.zutubi.pulse.model.persistence.hibernate.HibernateBuildResultDao;
-import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
+import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.util.UnaryProcedure;
 
 import java.util.concurrent.ExecutorService;
@@ -62,7 +62,7 @@ public class BuildHookManager implements EventListener
             public void run()
             {
                 final ExecutionContext context = new ExecutionContext();
-                MasterBuildProperties.addAllBuildProperties(context, result, configurationProvider.get(GeneralAdminConfiguration.class), configurationManager);
+                MasterBuildProperties.addAllBuildProperties(context, result, configurationProvider.get(GlobalConfiguration.class), configurationManager);
                 if (hook.appliesTo(result))
                 {
                     executeTask(hook, context, result, null, true);

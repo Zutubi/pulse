@@ -11,7 +11,7 @@ import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.UserManager;
-import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
+import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.webwork.mapping.Urls;
 import org.apache.velocity.context.Context;
@@ -40,7 +40,7 @@ public class CustomVelocityManager extends VelocityManager
         
         if(getConfigurationProvider() != null)
         {
-            GeneralAdminConfiguration config = getConfigurationProvider().get(GeneralAdminConfiguration.class);
+            GlobalConfiguration config = getConfigurationProvider().get(GlobalConfiguration.class);
             if (config != null)
             {
                 context.put("helpUrl", config.getBaseHelpUrl());

@@ -27,7 +27,7 @@ public class GlobalAuthorityProvider implements AuthorityProvider<Object>
         if(CREATE_USER.equals(action))
         {
             GlobalConfiguration config = configurationTemplateManager.getInstance(GlobalConfiguration.SCOPE_NAME, GlobalConfiguration.class);
-            if(config.getGeneralConfig().isAnonymousSignupEnabled())
+            if(config.isAnonymousSignupEnabled())
             {
                 result.add(GrantedAuthority.ANONYMOUS);
                 result.add(GrantedAuthority.GUEST);

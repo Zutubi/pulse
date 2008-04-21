@@ -4,7 +4,7 @@ import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.config.ConfigurationRegistry;
 import com.zutubi.prototype.webwork.TransientAction;
 import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
+import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.user.SignupUserConfiguration;
 import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 import com.zutubi.pulse.security.AcegiUtils;
@@ -28,7 +28,7 @@ public class SignupUserAction extends TransientAction<SignupUserConfiguration>
 
     protected String complete(SignupUserConfiguration instance) throws Exception
     {
-        if (!configurationProvider.get(GeneralAdminConfiguration.class).isAnonymousSignupEnabled())
+        if (!configurationProvider.get(GlobalConfiguration.class).isAnonymousSignupEnabled())
         {
             throw new AccessDeniedException("Anonymous signup is not enabled");
         }

@@ -27,7 +27,7 @@ import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.personal.PatchArchive;
-import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
+import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.prototype.config.project.AgentRequirements;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
@@ -87,7 +87,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
 
         MasterConfigurationManager configurationManager = new SimpleMasterConfigurationManager();
         MockConfigurationProvider configurationProvider = new MockConfigurationProvider();
-        configurationProvider.insert("test", new GeneralAdminConfiguration());
+        configurationProvider.insert("test", new GlobalConfiguration());
 
         queue = new ThreadedRecipeQueue();
         queue.setEventManager(eventManager);

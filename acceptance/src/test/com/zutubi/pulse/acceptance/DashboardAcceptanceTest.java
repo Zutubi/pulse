@@ -20,7 +20,6 @@ public class DashboardAcceptanceTest extends SeleniumTestBase
     private static final String SHOW_ALL_PROJECTS = "showAllProjects";
     private static final String SHOWN_PROJECTS    = "shownProjects";
 
-    private String user;
     private String userPath;
 
     protected void setUp() throws Exception
@@ -28,7 +27,7 @@ public class DashboardAcceptanceTest extends SeleniumTestBase
         super.setUp();
 
         xmlRpcHelper.loginAsAdmin();
-        user = RandomUtils.randomString(10);
+        String user = RandomUtils.randomString(10);
         userPath = xmlRpcHelper.insertTrivialUser(user);
         login(user, "");
     }

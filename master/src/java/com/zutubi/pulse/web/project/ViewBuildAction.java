@@ -9,7 +9,7 @@ import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.project.hooks.BuildHookConfiguration;
-import com.zutubi.pulse.prototype.config.user.UserSettingsConfiguration;
+import com.zutubi.pulse.prototype.config.user.UserPreferencesConfiguration;
 import com.zutubi.util.logging.Logger;
 
 import java.util.Collections;
@@ -59,7 +59,7 @@ public class ViewBuildAction extends CommandActionBase
         if(summaryColumns == null)
         {
             User u = getLoggedInUser();
-            summaryColumns = new BuildColumns(u == null ? UserSettingsConfiguration.defaultProjectColumns() : u.getPreferences().getSettings().getProjectSummaryColumns(), projectManager);
+            summaryColumns = new BuildColumns(u == null ? UserPreferencesConfiguration.defaultProjectColumns() : u.getPreferences().getProjectSummaryColumns(), projectManager);
         }
         return summaryColumns;
     }

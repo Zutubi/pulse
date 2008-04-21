@@ -2,7 +2,7 @@ package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.model.*;
-import com.zutubi.pulse.prototype.config.user.UserSettingsConfiguration;
+import com.zutubi.pulse.prototype.config.user.UserPreferencesConfiguration;
 import com.zutubi.pulse.web.PagingSupport;
 import com.zutubi.pulse.xwork.interceptor.Preparable;
 
@@ -138,7 +138,7 @@ public class HistoryAction extends ProjectActionBase implements Preparable
         }
 
         User user = getLoggedInUser();
-        columns = new BuildColumns(user == null ? UserSettingsConfiguration.defaultProjectColumns() : user.getPreferences().getSettings().getProjectHistoryColumns(), projectManager);
+        columns = new BuildColumns(user == null ? UserPreferencesConfiguration.defaultProjectColumns() : user.getPreferences().getProjectHistoryColumns(), projectManager);
 
         return SUCCESS;
     }

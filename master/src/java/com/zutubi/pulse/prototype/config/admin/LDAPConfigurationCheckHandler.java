@@ -40,7 +40,10 @@ public class LDAPConfigurationCheckHandler extends ConfigurationCheckHandlerSupp
 
     public void test(LDAPConfiguration configuration)
     {
-        ldapManager.testAuthenticate(configuration, login, password);
+        if (configuration.isEnabled())
+        {
+            ldapManager.testAuthenticate(configuration, login, password);
+        }
     }
 
     public void setLdapManager(LdapManager ldapManager)

@@ -48,7 +48,7 @@ public class DefaultAction extends ActionSupport
         else
         {
             User user = userManager.getUser(login);
-            return user.getPreferences().getSettings().getDefaultAction();
+            return user.getPreferences().getDefaultAction();
         }
     }
 }

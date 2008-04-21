@@ -411,7 +411,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
         }
         catch (IllegalArgumentException e)
         {
-            assertEquals("Illegal path 'sample': no parent record", e.getMessage());
+            assertEquals("Illegal path 'sample': attempt to save a collection", e.getMessage());
         }
     }
 

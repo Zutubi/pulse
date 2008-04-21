@@ -4,7 +4,6 @@ import com.zutubi.prototype.config.ConfigurationReferenceManager;
 import com.zutubi.prototype.config.ConfigurationRegistry;
 import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.MutableRecord;
-import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.wizard.WizardTransition;
 import com.zutubi.prototype.wizard.webwork.AbstractTypeWizard;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
@@ -14,7 +13,6 @@ import com.zutubi.pulse.model.AcegiUser;
 import com.zutubi.pulse.model.GrantedAuthority;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.prototype.config.admin.EmailConfiguration;
-import com.zutubi.pulse.prototype.config.admin.GeneralAdminConfiguration;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.group.BuiltinGroupConfiguration;
 import com.zutubi.pulse.prototype.config.group.GroupConfiguration;
@@ -159,13 +157,12 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
             configurationTemplateManager.insert(ConfigurationRegistry.GROUPS_SCOPE, developersGroup);
 
             // apply the settings
-            CompositeType generalType = typeRegistry.getType(GeneralAdminConfiguration.class);
-            MutableRecord record = generalType.createNewRecord(true);
+            MutableRecord record = configurationTemplateManager.getRecord(GlobalConfiguration.SCOPE_NAME).copy(false);
             record.setPermanent(true);
             String baseUrl = (String) serverConfigRecord.get("baseUrl");
             record.put("baseUrl", baseUrl);
             record.put("masterHost", getMasterHost(baseUrl));
-            configurationTemplateManager.saveRecord(PathUtils.getPath(GlobalConfiguration.SCOPE_NAME, "generalConfig"), record);
+            configurationTemplateManager.saveRecord(GlobalConfiguration.SCOPE_NAME, record);
 
             // Now copy over the email properties
             extractAndSave(EmailConfiguration.class, serverConfigRecord, true);

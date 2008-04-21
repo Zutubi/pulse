@@ -59,7 +59,7 @@ public class ChangedByMeNotifyCondition implements NotifyCondition
             return true;
         }
 
-        for(String alias: user.getPreferences().getSettings().getAliases())
+        for(String alias: user.getPreferences().getAliases())
         {
             if(author.equals(alias))
             {
