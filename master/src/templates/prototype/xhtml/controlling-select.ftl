@@ -19,7 +19,6 @@
     <#include "/prototype/xhtml/controlling-field.ftl" />
 
     var select = form.findField('${parameters.id}');
-    select.on('select', function() { console.log('select'); });
     select.on('select', setEnabledState);
     select.on('disable', setEnabledState);
     select.on('enable', setEnabledState);
