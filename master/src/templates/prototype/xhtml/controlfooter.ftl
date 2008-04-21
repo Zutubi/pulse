@@ -4,7 +4,7 @@ form.items.last().on('render', function(field)
     <#list parameters.actions as action>
         <#assign i18nKey = "${parameters.name}.${action}"/>
         var linkEl = Ext.DomHelper.append(field.getEl().dom.parentNode, { tag: 'a', href: '#', html: '${i18nKey?i18n?js_string}', cls: 'field-action', id: '${parameters.id}.${action?js_string}'}, true);
-        linkEl.on('click', function(e) { field.fireEvent('${action?js_string}', field); e.preventDefault(); });
+        linkEl.on('click', function(e) { if(!linkEl.hasClass('x-item-disabled')) { field.fireEvent('${action?js_string}', field); } e.preventDefault(); });
     </#list>
 </#if>
 

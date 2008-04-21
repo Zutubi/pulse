@@ -540,10 +540,13 @@ Ext.extend(ZUTUBI.Form, Ext.form.Form, {
             {
                 Ext.get(labelDomEl).removeClass('x-item-disabled');
             }
-            var helpDomEl = this.getFieldHelpDomEl(id);
-            if (helpDomEl)
+            var actionDomEls = this.getFieldActionDomEls(id);
+            if (actionDomEls)
             {
-                Ext.get(helpDomEl).removeClass('x-item-disabled');
+                for(var i = 0; i < actionDomEls.length; i++)
+                {
+                    Ext.get(actionDomEls[i]).removeClass('x-item-disabled');
+                }
             }
         }
     },
@@ -561,27 +564,37 @@ Ext.extend(ZUTUBI.Form, Ext.form.Form, {
             {
                 Ext.get(labelDomEl).addClass('x-item-disabled');
             }
-            var helpDomEl = this.getFieldHelpDomEl(id);
-            if (helpDomEl)
+            var actionDomEls = this.getFieldActionDomEls(id);
+            if (actionDomEls)
             {
-                Ext.get(helpDomEl).addClass('x-item-disabled');
+                for(var i = 0; i < actionDomEls.length; i++)
+                {
+                    Ext.get(actionDomEls[i]).addClass('x-item-disabled');
+                }
             }
         }
     },
 
     getFieldLabelDomEl: function(id)
     {
-        return Ext.query("//[@for='" + id + "']", this.el.dom)[0];
+        var rowEl = this.getFieldRowEl(id);
+        return Ext.query(">td[class*='x-form-label']", rowEl.dom)[0];
     },
 
-    getFieldHelpDomEl: function(id)
+    getFieldActionDomEls: function(id)
     {
-        return Ext.query("//[@id='" + id + "-inline-help']", this.el.dom)[0];
+        var rowEl = this.getFieldRowEl(id);
+        return Ext.query("a[class*='field-action']", rowEl.dom);
+    },
+
+    getFieldRowEl: function(id)
+    {
+        return Ext.get('x-form-row-' + id);
     },
 
     annotateField: function(id, annotationName, imageName, tooltip)
     {
-        var rowEl = Ext.get('x-form-row-' + id);
+        var rowEl = this.getFieldRowEl(id);
         var cellEl = rowEl.createChild({tag: 'td', cls: 'x-form-annotation'});
         var imageEl = cellEl.createChild({tag: 'img', src: imageName, id: id + '.' + annotationName});
         if(tooltip)
