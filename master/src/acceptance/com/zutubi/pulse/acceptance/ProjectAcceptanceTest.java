@@ -1301,7 +1301,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
     {
         assertAndClick("add_post_action_default");
 
-        AddPostBuildActionForm typeForm = new AddPostBuildActionForm(tester, true);
+        AddPostStageActionForm typeForm = new AddPostStageActionForm(tester, true);
         typeForm.assertFormPresent();
         typeForm.nextFormElements(name, "tag", null, "true");
 
@@ -1315,7 +1315,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         clickLink("edit_default");
         assertAndClick("add_post_action_default");
 
-        AddPostBuildActionForm typeForm = new AddPostBuildActionForm(tester, true);
+        AddPostStageActionForm typeForm = new AddPostStageActionForm(tester, true);
         typeForm.assertFormPresent();
         typeForm.nextFormElements("test-action", "tag", "FAILURE", "false");
 
@@ -1336,7 +1336,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         clickLink("edit_default");
         assertAndClick("add_post_action_default");
 
-        AddPostBuildActionForm typeForm = new AddPostBuildActionForm(tester, true);
+        AddPostStageActionForm typeForm = new AddPostStageActionForm(tester, true);
         typeForm.assertFormPresent();
         typeForm.nextFormElements("", "tag", null, "true");
         typeForm.assertFormPresent();
@@ -1427,7 +1427,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
     {
         assertAndClick("add_post_action_default");
 
-        AddPostBuildActionForm typeForm = new AddPostBuildActionForm(tester, true);
+        AddPostStageActionForm typeForm = new AddPostStageActionForm(tester, true);
         typeForm.assertFormPresent();
         typeForm.nextFormElements(name, "exe", null, "true");
 
@@ -1441,7 +1441,7 @@ public class ProjectAcceptanceTest extends ProjectAcceptanceTestBase
         clickLink("edit_default");
         assertAndClick("add_post_action_default");
 
-        AddPostBuildActionForm typeForm = new AddPostBuildActionForm(tester, true);
+        AddPostStageActionForm typeForm = new AddPostStageActionForm(tester, true);
         typeForm.assertFormPresent();
         typeForm.nextFormElements("", "exe", null, "true");
         typeForm.assertFormPresent();
