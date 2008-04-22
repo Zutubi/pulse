@@ -41,7 +41,7 @@ public enum DatabaseType
 
         public Properties getDatabaseProperties(SetupDatabaseTypeConfiguration config)
         {
-            return getStandardProperties("org.postgresql.Driver", "jdbc:postgresql://" + config.getHost() + ":" + config.getPort() + "/" + config.getDatabase(), config.getUser(), config.getPassword(), "org.hibernate.dialect.PostrgeSQLDialect");
+            return getStandardProperties("org.postgresql.Driver", "jdbc:postgresql://" + config.getHost() + ":" + config.getPort() + "/" + config.getDatabase(), config.getUser(), config.getPassword(), "org.hibernate.dialect.PostgreSQLDialect");
         }
     },
     ;
