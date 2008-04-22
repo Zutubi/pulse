@@ -408,21 +408,24 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         result.commence(10000);
 
         RecipeResult recipeResult = new RecipeResult("first recipe");
-        recipeResult.commence();
+        recipeResult.commence(10001);
         recipeResult.complete();
+        recipeResult.getStamps().setEndTime(99998);
         RecipeResultNode node = new RecipeResultNode("first stage", 1, recipeResult);
         result.getRoot().addChild(node);
 
         recipeResult = new RecipeResult("second recipe");
-        recipeResult.commence();
+        recipeResult.commence(10001);
         recipeResult.complete();
+        recipeResult.getStamps().setEndTime(99998);
         node = new RecipeResultNode("second stage", 2, recipeResult);
         result.getRoot().addChild(node);
 
         recipeResult = new RecipeResult("nested recipe");
-        recipeResult.commence();
+        recipeResult.commence(10002);
         recipeResult.complete();
         node = new RecipeResultNode("nested stage", 3, recipeResult);
+        recipeResult.getStamps().setEndTime(99999);
         result.getRoot().getChildren().get(0).addChild(node);
 
         result.complete();

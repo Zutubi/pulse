@@ -485,8 +485,8 @@ Shows a summary for each stage in a build.
             [@classCell cc=child.hostSafe/]
             [@classCell cc=child.result.stateName?lower_case/]
             [@linkCell cc=child.testSummary url="${stageTestsLink(result, child)}" class=class/]
-            [@classCell cc=result.stamps.prettyStartDate/]
-            [@classCell cc=result.stamps.prettyEndDate/]
+            [@classCell cc=child.result.stamps.prettyStartDate/]
+            [@classCell cc=child.result.stamps.prettyEndDate/]
             [@classCell cc=child.result.stamps.prettyElapsed/]
         </tr>
     [/#list]
