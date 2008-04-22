@@ -19,6 +19,7 @@ public class DirectoryArtifact extends LocalArtifact
     private List<Pattern> inclusions;
     private List<Pattern> exclusions;
     private String type = null;
+    private boolean followSymlinks;
 
     public DirectoryArtifact()
     {
@@ -109,6 +110,7 @@ public class DirectoryArtifact extends LocalArtifact
             scanner.setExcludes(flattenPatterns(exclusions));
         }
 
+        scanner.setFollowSymlinks(followSymlinks);
         scanner.scan();
 
         StoredArtifact artifact = new StoredArtifact(getName());
@@ -129,6 +131,11 @@ public class DirectoryArtifact extends LocalArtifact
     public void setType(String type)
     {
         this.type = type;
+    }
+
+    public void setFollowSymlinks(boolean followSymlinks)
+    {
+        this.followSymlinks = followSymlinks;
     }
 
     private String[] flattenPatterns(List<Pattern> patterns)
