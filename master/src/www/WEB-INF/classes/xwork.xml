@@ -743,11 +743,12 @@
 
         <action name="addPostStageAction" class="com.zutubi.pulse.web.wizard.WizardAction">
             <interceptor-ref name="wizardStack"/>
-            <param name="wizardClass">com.zutubi.pulse.web.project.AddPostBuildActionWizard</param>
+            <param name="wizardClass">com.zutubi.pulse.web.project.AddPostStageActionWizard</param>
             <result name="select" type="velocity">select-post-stage-action.vm</result>
             <result name="exe" type="velocity">configure-exe-action.vm</result>
             <result name="tag" type="velocity">configure-tag-action.vm</result>
-            <result name="email" type="velocity">configure-email-action.vm</result>
+            <!-- not appropriate for the add post stage action -->            
+            <!--<result name="email" type="velocity">configure-email-action.vm</result>-->
             <result name="success" type="redirect">/viewBuildSpecification.action?id=${wizard.specId}&amp;projectId=${wizard.projectId}&amp;selectedNode=${wizard.nodeId}</result>
             <result name="cancel" type="redirect">/viewBuildSpecification.action?id=${wizard.specId}&amp;projectId=${wizard.projectId}&amp;selectedNode=${wizard.nodeId}</result>
         </action>
