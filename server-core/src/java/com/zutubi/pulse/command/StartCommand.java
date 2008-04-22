@@ -47,6 +47,8 @@ public class StartCommand implements Command
 
     private String bindAddress = null;
 
+    private String restoreFile = null;
+
     /**
      * Specify the port to which pulse will bind its web user interface.
      *
@@ -105,6 +107,10 @@ public class StartCommand implements Command
                 .hasArg()
                 .create('b'));
 
+        options.addOption(OptionBuilder.withLongOpt("restore")
+                .hasArg()
+                .create('r'));
+
         CommandLineParser parser = new PosixParser();
         CommandLine commandLine = parser.parse(options, argv, true);
 
@@ -128,6 +134,15 @@ public class StartCommand implements Command
         {
             setBindAddress(commandLine.getOptionValue('b'));
         }
+        if (commandLine.hasOption('r'))
+        {
+            setRestoreFile(commandLine.getOptionValue('r'));
+        }
+    }
+
+    private void setRestoreFile(String optionValue)
+    {
+        this.restoreFile = optionValue;
     }
 
     public int execute(BootContext context) throws ParseException
@@ -172,6 +187,11 @@ public class StartCommand implements Command
             if (TextUtils.stringSet(contextPath))
             {
                 System.setProperty(SystemConfiguration.CONTEXT_PATH, contextPath);
+            }
+
+            if (TextUtils.stringSet(restoreFile))
+            {
+                System.setProperty(SystemConfiguration.RESTORE_FILE, restoreFile);
             }
 
             if (TextUtils.stringSet(bindAddress))

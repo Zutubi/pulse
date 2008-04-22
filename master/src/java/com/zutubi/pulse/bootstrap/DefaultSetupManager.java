@@ -247,9 +247,9 @@ public class DefaultSetupManager implements SetupManager
     private void handleDbSetup()
     {
         File databaseConfig = new File(configurationManager.getData().getUserConfigRoot(), "database.properties");
-        if(!databaseConfig.exists())
+        if (!databaseConfig.exists())
         {
-            printConsoleMessage("No database setup, requesting details via web UI...");    
+            printConsoleMessage("No database setup, requesting details via web UI...");
             state = SetupState.DATABASE;
             showPrompt();
             return;
@@ -262,10 +262,10 @@ public class DefaultSetupManager implements SetupManager
     {
         loadDriver();
         loadContexts(dataContexts);
-        
+
         // create the database based on the hibernate configuration.
         databaseConsole = (DatabaseConsole) ComponentContext.getBean("databaseConsole");
-        if(databaseConsole.isEmbedded())
+        if (databaseConsole.isEmbedded())
         {
             printConsoleMessage("Using embedded database (only recommended for evaluation purposes).");
         }
@@ -297,7 +297,7 @@ public class DefaultSetupManager implements SetupManager
         {
             Class driverClass = null;
             DatabaseConfig databaseConfig = configurationManager.getDatabaseConfig();
-            
+
             File driverDir = configurationManager.getData().getDriverRoot();
             if (driverDir.isDirectory())
             {
@@ -314,7 +314,7 @@ public class DefaultSetupManager implements SetupManager
                 }
             }
 
-            if(driverClass == null)
+            if (driverClass == null)
             {
                 driverClass = Class.forName(databaseConfig.getDriverClassName());
             }
@@ -415,13 +415,13 @@ public class DefaultSetupManager implements SetupManager
         configurationExtensionManager.init();
 
         configurationStateManager.setRecordManager(recordManager);
-        
+
         configurationTemplateManager.init();
         configurationProvider.init();
         this.configurationProvider = configurationProvider;
 
         LogConfigurationManager logConfigurationManager = ComponentContext.getBean("logConfigurationManager");
-        logConfigurationManager.init();        
+        logConfigurationManager.init();
     }
 
     public void requestUpgradeComplete(boolean changes)
@@ -454,7 +454,7 @@ public class DefaultSetupManager implements SetupManager
         {
             printConsoleMessage("Setup wizard complete.");
         }
-        
+
         state = SetupState.STARTING;
 
         // load the remaining contexts.
@@ -564,7 +564,17 @@ public class DefaultSetupManager implements SetupManager
     private boolean isRestoreRequested()
     {
         // check for the existance of a PULSE_DATA/restore/archive.zip
-        return getArchiveFile() != null;
+        File archive = getArchiveFile();
+        if (archive == null)
+        {
+            return false;
+        }
+        if (archive.isFile())
+        {
+            return true;
+        }
+        printConsoleMessage("Specified restore archive file " + archive.getAbsolutePath() + " does not exist. Skipping restore.");
+        return false;
     }
 
     /**
@@ -576,6 +586,15 @@ public class DefaultSetupManager implements SetupManager
     //TODO: 1) pick the latest archive if multiple are detected?
     private File getArchiveFile()
     {
+        // there are two ways to trigger a restore.
+        // a) --restore filename on the command line.
+        // b) dropping a zip into the PULSE_DATA/restore directory
+        SystemConfiguration systemConfig = configurationManager.getSystemConfig();
+        if (systemConfig.getRestoreFile() != null)
+        {
+            return new File(systemConfig.getRestoreFile());
+        }
+
         UserPaths paths = configurationManager.getUserPaths();
         if (paths != null)
         {
@@ -584,7 +603,7 @@ public class DefaultSetupManager implements SetupManager
             {
                 public boolean accept(File file)
                 {
-                    return file.getName().endsWith(".zip");
+                    return file.isFile() && file.getName().endsWith(".zip");
                 }
             });
             if (ls == null || ls.length == 0)
@@ -609,10 +628,20 @@ public class DefaultSetupManager implements SetupManager
 
         if (isRestoreRequested())
         {
+            File backup = getArchiveFile();
+            try
+            {
+                printConsoleMessage("Restoring from archive file: " + backup.getCanonicalPath());
+            }
+            catch (IOException e)
+            {
+                printConsoleMessage("Restoring from archive file: " + backup.getAbsolutePath());
+            }
+
 
             try
             {
-                archiveManager.prepareRestore(getArchiveFile());
+                archiveManager.prepareRestore(backup);
             }
             catch (ArchiveException e)
             {

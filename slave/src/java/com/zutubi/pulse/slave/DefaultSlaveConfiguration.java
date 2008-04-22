@@ -87,6 +87,11 @@ public class DefaultSlaveConfiguration implements SlaveConfiguration, SystemConf
         return config.getProperty(CONTEXT_PATH, "/");
     }
 
+    public String getRestoreFile()
+    {
+        return config.getProperty(RESTORE_FILE);
+    }
+
     public String getContextPathNormalised()
     {
         // TODO share with master.  more of this whole class, preferrably

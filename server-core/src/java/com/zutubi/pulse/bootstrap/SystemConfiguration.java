@@ -21,6 +21,8 @@ public interface SystemConfiguration
      */
     public static final String PULSE_DATA = "pulse.data";
 
+    public static final String RESTORE_FILE = "pulse.restore.file";
+
     public static final String SSL_ENABLED      = "ssl.enabled";
     public static final String SSL_KEYSTORE     = "ssl.keystore";
     public static final String SSL_PASSWORD     = "ssl.password";
@@ -45,6 +47,8 @@ public interface SystemConfiguration
     String getContextPath();
 
     String getContextPathNormalised();
+
+    String getRestoreFile();
 
     void setDataPath(String path);
 
