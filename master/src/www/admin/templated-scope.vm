@@ -16,7 +16,6 @@
 
         var handleConfigurationResponse = function(result)
         {
-            console.dir(response);
             if (result.success)
             {
                 if (result.newPanel)
