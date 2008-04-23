@@ -30,9 +30,6 @@
         <property name="transactionManager">
             <ref bean="pulseTransactionManager"/>
         </property>
-    </bean>
-
-    <bean id="configurationProvider" class="com.zutubi.prototype.config.DefaultConfigurationProvider" autowire="byName"/>
-    
+    </bean>    
 </beans>
         

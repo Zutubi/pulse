@@ -11,6 +11,7 @@ import com.zutubi.pulse.events.AsynchronousDelegatingListener;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.system.SystemStartedEvent;
 import com.zutubi.pulse.events.build.AbstractBuildRequestEvent;
 import com.zutubi.pulse.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.events.build.BuildTerminationRequestEvent;
@@ -94,16 +95,6 @@ public class FatController implements EventListener, Stoppable
         detail.getJobDataMap().put(PARAM_EVENT_MANAGER, eventManager);
         detail.setDurability(true); // will stay around after the trigger has gone.
         quartzScheduler.addJob(detail, true);
-
-        // check license: enable the fat controller iff the license is valid.
-        if (licensedToBuild())
-        {
-            enable();
-        }
-        else
-        {
-            disable();
-        }
     }
 
     private boolean licensedToBuild()
@@ -211,6 +202,18 @@ public class FatController implements EventListener, Stoppable
         else if (event instanceof LicenseEvent)
         {
             handleLicenseEvent();
+        }
+        else if (event instanceof SystemStartedEvent)
+        {
+            // check license: enable the fat controller iff the license is valid.
+            if (licensedToBuild())
+            {
+                enable();
+            }
+            else
+            {
+                disable();
+            }
         }
     }
 
@@ -358,7 +361,8 @@ public class FatController implements EventListener, Stoppable
                 BuildCompletedEvent.class,
                 RecipeTimeoutEvent.class,
                 LicenseExpiredEvent.class,
-                LicenseUpdateEvent.class
+                LicenseUpdateEvent.class,
+                SystemStartedEvent.class
         };
     }
 

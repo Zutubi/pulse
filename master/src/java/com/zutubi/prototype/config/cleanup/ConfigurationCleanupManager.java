@@ -1,10 +1,14 @@
 package com.zutubi.prototype.config.cleanup;
 
 import com.zutubi.prototype.ConventionSupport;
-import com.zutubi.prototype.config.ConfigurationTemplateManager;
+import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.security.PulseThreadFactory;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.EventListener;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
@@ -16,13 +20,13 @@ import java.util.concurrent.Executors;
 
 /**
  */
-public class ConfigurationCleanupManager
+public class ConfigurationCleanupManager implements EventListener
 {
     private static final Logger LOG = Logger.getLogger(ConfigurationCleanupManager.class);
 
     private Map<Class, ConfigurationCleanupTaskFinder> findersByType = new HashMap<Class, ConfigurationCleanupTaskFinder>();
     private Executor executor;
-    private ConfigurationTemplateManager configurationTemplateManager;
+    private ConfigurationProvider configurationProvider;
     private ObjectFactory objectFactory;
     private PulseThreadFactory threadFactory;
 
@@ -34,7 +38,7 @@ public class ConfigurationCleanupManager
     public void addCustomCleanupTasks(RecordCleanupTaskSupport topTask)
     {
         String path = topTask.getAffectedPath();
-        Configuration instance = configurationTemplateManager.getInstance(path);
+        Configuration instance = configurationProvider.get(path, Configuration.class);
 
         if (instance != null)
         {
@@ -90,9 +94,14 @@ public class ConfigurationCleanupManager
         return finder;
     }
 
-    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
+    public void handleEvent(Event event)
     {
-        this.configurationTemplateManager = configurationTemplateManager;
+        configurationProvider = ((ConfigurationSystemStartedEvent)event).getConfigurationProvider();
+    }
+
+    public Class[] getHandledEvents()
+    {
+        return new Class[]{ ConfigurationSystemStartedEvent.class };
     }
 
     public void setObjectFactory(ObjectFactory objectFactory)
@@ -103,5 +112,10 @@ public class ConfigurationCleanupManager
     public void setThreadFactory(PulseThreadFactory threadFactory)
     {
         this.threadFactory = threadFactory;
+    }
+
+    public void setEventManager(EventManager eventManager)
+    {
+        eventManager.register(this);
     }
 }

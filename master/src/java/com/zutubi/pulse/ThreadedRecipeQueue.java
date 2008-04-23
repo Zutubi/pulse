@@ -18,6 +18,8 @@ import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.events.*;
 import com.zutubi.pulse.events.EventListener;
+import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
+import com.zutubi.pulse.events.system.SystemStartedEvent;
 import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.model.ResourceManager;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
@@ -110,8 +112,6 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
             {
                 online(a);
             }
-
-            eventManager.register(this);
 
             Thread dispatcherThread = new Thread(new Dispatcher(), "Recipe Dispatcher Service");
             dispatcherThread.setDaemon(true);
@@ -600,6 +600,17 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         {
             handleScmChange((ScmChangeEvent) evt);
         }
+        else if (evt instanceof ConfigurationSystemStartedEvent)
+        {
+            ConfigurationProvider configurationProvider = ((ConfigurationSystemStartedEvent)evt).getConfigurationProvider();
+            globalConfiguration = configurationProvider.get(GlobalConfiguration.class);
+            updateTimeout(globalConfiguration);
+            configurationProvider.registerEventListener(this, false, false, GlobalConfiguration.class);
+        }
+        else if (evt instanceof SystemStartedEvent)
+        {
+            init();
+        }
     }
 
     private void handleRecipeEvent(RecipeEvent event)
@@ -733,7 +744,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
     public Class[] getHandledEvents()
     {
-        return new Class[]{RecipeCompletedEvent.class, RecipeErrorEvent.class, ScmChangeEvent.class, AgentEvent.class};
+        return new Class[]{RecipeCompletedEvent.class, RecipeErrorEvent.class, ScmChangeEvent.class, AgentEvent.class, ConfigurationSystemStartedEvent.class, SystemStartedEvent.class };
     }
 
     public void handleConfigurationEvent(ConfigurationEvent event)
@@ -769,19 +780,12 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
+        eventManager.register(this);
     }
 
     public void setAgentManager(AgentManager agentManager)
     {
         this.agentManager = agentManager;
-    }
-
-    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
-    {
-        globalConfiguration = configurationProvider.get(GlobalConfiguration.class);
-        updateTimeout(globalConfiguration);
-
-        configurationProvider.registerEventListener(this, false, false, GlobalConfiguration.class);
     }
 
     public void setScmClientFactory(ScmClientFactory scmClientFactory)

@@ -23,7 +23,7 @@ public interface ConfigurationProvider
 
     /**
      * Retrieve a configuration instance of the specified type.  Note, if there is more than one instance
-     * of the specified type, no guarentee is provided regarding which of those instances will be returned.
+     * of the specified type, no guarantee is provided regarding which of those instances will be returned.
      *
      * If no instance exists, null is returned.
      *
@@ -59,8 +59,8 @@ public interface ConfigurationProvider
     /**
      * Retrieve the ancestor of the specific configuration instance that is of the specified type.
      *
-     * For example, a configuration instance that is part of a projects configuration can use this method to
-     * retrieve the project that it is associated with.
+     * For example, a configuration instance that is part of a project's configuration can use this method to
+     * retrieve the project that it is associated with:
      * <code>configurationProvider.getAncestorOfType(config, ProjectConfiguration.class);</code>
      *
      * @param c is the configuration instance from which the search is started.

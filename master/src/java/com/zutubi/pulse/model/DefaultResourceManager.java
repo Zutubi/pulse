@@ -9,6 +9,8 @@ import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceVersion;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
+import com.zutubi.pulse.events.*;
+import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.logging.Logger;
 
@@ -16,7 +18,7 @@ import java.util.*;
 
 /**
  */
-public class DefaultResourceManager implements ResourceManager
+public class DefaultResourceManager implements ResourceManager, com.zutubi.pulse.events.EventListener
 {
     private static final Logger LOG = Logger.getLogger(DefaultResourceManager.class);
 
@@ -25,8 +27,9 @@ public class DefaultResourceManager implements ResourceManager
     private Map<Long, Resource> resourcesByHandle = new HashMap<Long, Resource>();
     private Map<Long, ResourceVersion> resourceVersionsByHandle = new HashMap<Long, ResourceVersion>();
 
-    public void init()
+    public void init(ConfigurationProvider configurationProvider)
     {
+        this.configurationProvider = configurationProvider;
         TypeListener<AgentConfiguration> agentListener = new TypeAdapter<AgentConfiguration>(AgentConfiguration.class)
         {
             public void postInsert(AgentConfiguration instance)
@@ -287,8 +290,18 @@ public class DefaultResourceManager implements ResourceManager
         return allResources;
     }
 
-    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    public void handleEvent(Event event)
     {
-        this.configurationProvider = configurationProvider;
+        init(((ConfigurationSystemStartedEvent)event).getConfigurationProvider());
+    }
+
+    public Class[] getHandledEvents()
+    {
+        return new Class[]{ ConfigurationSystemStartedEvent.class };
+    }
+
+    public void setEventManager(EventManager eventManager)
+    {
+        eventManager.register(this);
     }
 }

@@ -4,7 +4,7 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.prototype.AbstractParameterised;
 import com.zutubi.prototype.Descriptor;
 import com.zutubi.prototype.actions.ActionManager;
-import com.zutubi.prototype.config.ConfigurationTemplateManager;
+import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.model.ActionLink;
 import com.zutubi.prototype.model.Cell;
 import com.zutubi.prototype.model.Row;
@@ -43,11 +43,11 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
      * The columns descriptors associated with this table descriptor.
      */
     private List<ColumnDescriptor> columns = new LinkedList<ColumnDescriptor>();
-    private ConfigurationTemplateManager configurationTemplateManager;
+    private ConfigurationProvider configurationProvider;
     private ActionManager actionManager;
     private SystemPaths systemPaths;
 
-    public TableDescriptor(CollectionType collectionType, boolean orderAllowed, boolean addAllowed, ConfigurationTemplateManager configurationTemplateManager, ActionManager actionManager, SystemPaths systemPaths)
+    public TableDescriptor(CollectionType collectionType, boolean orderAllowed, boolean addAllowed, ConfigurationProvider configurationProvider, ActionManager actionManager, SystemPaths systemPaths)
     {
         this.collectionType = collectionType;
         this.type = (CompositeType) collectionType.getCollectionType();
@@ -56,7 +56,7 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
         addParameter(PARAM_ADD_ALLOWED, addAllowed);
         addParameter(PARAM_ORDER_ALLOWED, orderAllowed && collectionType.isOrdered());
 
-        this.configurationTemplateManager = configurationTemplateManager;
+        this.configurationProvider = configurationProvider;
         this.actionManager = actionManager;
         this.systemPaths = systemPaths;
     }
@@ -80,7 +80,7 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
             for (String key : collectionType.getOrder(data))
             {
                 String itemPath = PathUtils.getPath(path, key);
-                Configuration instance = configurationTemplateManager.getInstance(itemPath);
+                Configuration instance = configurationProvider.get(itemPath, Configuration.class);
                 messages = Messages.getInstance(instance.getClass());
                 Row row = new Row(itemPath, false, getActions(instance, data, key, messages));
                 addCells(row, instance);
@@ -106,7 +106,7 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
                     for (String hidden : hiddenKeys)
                     {
                         String parentItemPath = PathUtils.getPath(parentPath, hidden);
-                        Configuration instance = configurationTemplateManager.getInstance(parentItemPath);
+                        Configuration instance = configurationProvider.get(parentItemPath, Configuration.class);
                         messages = Messages.getInstance(instance.getClass());
                         Row row = new Row(PathUtils.getPath(path, hidden), true, Arrays.asList(new ActionLink("restore", PrototypeUtils.format(messages, "restore.label"), "restore")));
                         addCells(row, instance);

@@ -4,10 +4,7 @@ import com.zutubi.config.annotations.Classification;
 import com.zutubi.config.annotations.ControllingCheckbox;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.prototype.config.ConfigurationTemplateManager;
-import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
-import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.jabber.config.JabberConfiguration;
 import com.zutubi.pulse.license.config.LicenseConfiguration;
 import com.zutubi.util.TextUtils;
@@ -39,8 +36,6 @@ public class GlobalConfiguration extends AbstractConfiguration
     private LDAPConfiguration ldap = new LDAPConfiguration();
     private JabberConfiguration jabber = new JabberConfiguration();
     private LicenseConfiguration license = new LicenseConfiguration();
-
-    private ConfigurationTemplateManager configurationTemplateManager;
 
     public String getBaseUrl()
     {
@@ -185,15 +180,5 @@ public class GlobalConfiguration extends AbstractConfiguration
     public void setLicense(LicenseConfiguration license)
     {
         this.license = license;
-    }
-
-    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
-    {
-        this.configurationTemplateManager = configurationTemplateManager;
-    }
-
-    public <T extends Configuration> T lookupExtendedConfig(String name, Class<T> clazz)
-    {
-        return configurationTemplateManager.getInstance(PathUtils.getPath(SCOPE_NAME, name), clazz);
     }
 }

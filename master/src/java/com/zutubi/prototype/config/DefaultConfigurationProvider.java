@@ -5,6 +5,7 @@ import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.events.*;
+import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.Predicate;
 
@@ -35,6 +36,10 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
         asyncMux = new MultiplexingListener(ConfigurationEvent.class);
         AsynchronousDelegatingListener asych = new AsynchronousDelegatingListener(asyncMux, threadFactory);
         eventManager.register(asych);
+
+        configurationTemplateManager.refreshCaches();
+
+        eventManager.publish(new ConfigurationSystemStartedEvent(this));
     }
 
     public <T extends Configuration> T get(String path, Class<T> clazz)

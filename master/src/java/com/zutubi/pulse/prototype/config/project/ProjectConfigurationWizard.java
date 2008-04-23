@@ -1,6 +1,7 @@
 package com.zutubi.pulse.prototype.config.project;
 
 import com.zutubi.prototype.config.ConfigurationRegistry;
+import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.TemplateRecord;
@@ -19,11 +20,11 @@ import java.util.Map;
  */
 public class ProjectConfigurationWizard extends AbstractTypeWizard
 {
-    private static final Logger LOG = Logger.getLogger(ProjectConfigurationWizard.class);
-
     private CompositeType projectType;
     private CompositeType scmType;
     private CompositeType typeType;
+
+    private ConfigurationProvider configurationProvider;
 
     public void initialise()
     {
@@ -46,7 +47,7 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
         record.put("scm", getCompletedStateForType(scmType).getDataRecord());
         record.put("type", getCompletedStateForType(typeType).getDataRecord());
 
-        ProjectConfiguration templateParentProject = configurationTemplateManager.getInstance(templateParentPath, ProjectConfiguration.class);
+        ProjectConfiguration templateParentProject = configurationProvider.get(templateParentPath, ProjectConfiguration.class);
         if(templateParentProject.getStages().size() == 0)
         {
             // Add a default stage to our new project.
@@ -97,5 +98,10 @@ public class ProjectConfigurationWizard extends AbstractTypeWizard
     public Type getType()
     {
         return projectType;
+    }
+
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    {
+        this.configurationProvider = configurationProvider;
     }
 }

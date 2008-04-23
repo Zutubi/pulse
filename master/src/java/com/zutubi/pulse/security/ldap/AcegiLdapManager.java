@@ -14,6 +14,8 @@ import com.zutubi.pulse.prototype.config.group.GroupConfiguration;
 import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 import com.zutubi.pulse.prototype.config.user.UserPreferencesConfiguration;
 import com.zutubi.pulse.prototype.config.user.contacts.EmailContactConfiguration;
+import com.zutubi.pulse.events.*;
+import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.BadCredentialsException;
 import org.acegisecurity.GrantedAuthority;
@@ -31,7 +33,7 @@ import java.util.*;
 
 /**
  */
-public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
+public class AcegiLdapManager implements LdapManager, ConfigurationEventListener, com.zutubi.pulse.events.EventListener
 {
     private static final Logger LOG = Logger.getLogger(AcegiLdapManager.class);
 
@@ -49,15 +51,16 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
     private UserManager userManager;
     private Map<String, LdapUserDetails> detailsMap = new HashMap<String, LdapUserDetails>();
 
-    public synchronized void init()
+    public void init(ConfigurationProvider configurationProvider)
     {
+        this.configurationProvider = configurationProvider;
         configurationProvider.registerEventListener(this, false, false, LDAPConfiguration.class);
         LDAPConfiguration ldapConfiguration = configurationProvider.get(LDAPConfiguration.class);
 
         init(ldapConfiguration);
     }
 
-    private void init(LDAPConfiguration ldapConfiguration)
+    private synchronized void init(LDAPConfiguration ldapConfiguration)
     {
         initialised = false;
         statusMessage = null;
@@ -382,13 +385,23 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
         }
     }
 
+    public void handleEvent(Event event)
+    {
+        init(((ConfigurationSystemStartedEvent)event).getConfigurationProvider());
+    }
+
+    public Class[] getHandledEvents()
+    {
+        return new Class[]{ ConfigurationSystemStartedEvent.class };
+    }
+
     public void setUserManager(UserManager userManager)
     {
         this.userManager = userManager;
     }
 
-    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    public void setEventManager(EventManager eventManager)
     {
-        this.configurationProvider = configurationProvider;
+        eventManager.register(this);
     }
 }

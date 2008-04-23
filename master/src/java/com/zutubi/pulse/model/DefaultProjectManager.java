@@ -24,6 +24,7 @@ import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.pulse.events.build.BuildRequestEvent;
 import com.zutubi.pulse.events.build.PersonalBuildRequestEvent;
 import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
@@ -77,8 +78,9 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     private List<ProjectConfiguration> validConfigs = new LinkedList<ProjectConfiguration>();
     private Map<String, Set<ProjectConfiguration>> labelToConfigs = new HashMap<String, Set<ProjectConfiguration>>();
 
-    public void initialise()
+    public void initialise(ConfigurationProvider configurationProvider)
     {
+        this.configurationProvider = configurationProvider;
         changelistIsolator = new ChangelistIsolator(buildManager);
         changelistIsolator.setScmClientFactory(scmClientManager);
 
@@ -617,25 +619,33 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
     public void handleEvent(Event evt)
     {
-        RecipeDispatchedEvent rde = (RecipeDispatchedEvent) evt;
-        RecipeRequest request = rde.getRequest();
-        ProjectConfiguration projectConfig = nameToConfig.get(request.getProject());
-        if(projectConfig != null)
+        if (evt instanceof RecipeDispatchedEvent)
         {
-            Project project = projectDao.findById(projectConfig.getProjectId());
-            if(project != null)
+            RecipeDispatchedEvent rde = (RecipeDispatchedEvent) evt;
+            RecipeRequest request = rde.getRequest();
+            ProjectConfiguration projectConfig = nameToConfig.get(request.getProject());
+            if(projectConfig != null)
             {
-                if(project.clearForceCleanForAgent(rde.getAgent().getId()))
+                Project project = projectDao.findById(projectConfig.getProjectId());
+                if(project != null)
                 {
-                    projectDao.save(project);
+                    if(project.clearForceCleanForAgent(rde.getAgent().getId()))
+                    {
+                        projectDao.save(project);
+                    }
                 }
             }
+        }
+        else
+        {
+            ConfigurationSystemStartedEvent csse = (ConfigurationSystemStartedEvent) evt;
+            initialise(csse.getConfigurationProvider());
         }
     }
 
     public Class[] getHandledEvents()
     {
-        return new Class[] { RecipeDispatchedEvent.class };
+        return new Class[] { RecipeDispatchedEvent.class, ConfigurationSystemStartedEvent.class };
     }
 
     public void setLicenseManager(LicenseManager licenseManager)
@@ -652,11 +662,6 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     public void setTestCaseIndexDao(TestCaseIndexDao testCaseIndexDao)
     {
         this.testCaseIndexDao = testCaseIndexDao;
-    }
-
-    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
-    {
-        this.configurationProvider = configurationProvider;
     }
 
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)

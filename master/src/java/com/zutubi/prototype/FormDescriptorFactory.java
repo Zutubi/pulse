@@ -5,6 +5,7 @@ import com.zutubi.config.annotations.Handler;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.config.ConfigurationValidationContext;
 import com.zutubi.prototype.config.ConfigurationValidatorProvider;
+import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.handler.AnnotationHandler;
 import com.zutubi.prototype.handler.OptionAnnotationHandler;
 import com.zutubi.prototype.model.*;
@@ -54,6 +55,7 @@ public class FormDescriptorFactory
     private Map<String, Class<? extends FieldDescriptor>> fieldDescriptorTypes = new HashMap<String, Class<? extends FieldDescriptor>>();
     private ConfigurationTemplateManager configurationTemplateManager;
     private ConfigurationValidatorProvider configurationValidatorProvider;
+    private ConfigurationProvider configurationProvider;
 
     public void init()
     {
@@ -253,7 +255,7 @@ public class FormDescriptorFactory
     {
         if (typeProperty.getType().getTargetType() instanceof EnumType)
         {
-            OptionAnnotationHandler.process(configurationTemplateManager, new EnumOptionProvider(), parentPath, baseName, fd);
+            OptionAnnotationHandler.process(configurationProvider, new EnumOptionProvider(), parentPath, baseName, fd);
         }
         else
         {
@@ -324,5 +326,10 @@ public class FormDescriptorFactory
     public void setConfigurationValidatorProvider(ConfigurationValidatorProvider configurationValidatorProvider)
     {
         this.configurationValidatorProvider = configurationValidatorProvider;
+    }
+
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    {
+        this.configurationProvider = configurationProvider;
     }
 }

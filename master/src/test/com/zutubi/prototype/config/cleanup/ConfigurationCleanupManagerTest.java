@@ -40,8 +40,8 @@ public class ConfigurationCleanupManagerTest extends AbstractConfigurationSystem
         c1Path = configurationTemplateManager.insert("custom", new CustomTasksConfiguration("c1"));
         refereePath = configurationTemplateManager.insert("referee", new Referee("ee"));
         listRefereePath = configurationTemplateManager.insert("referee", new Referee("listee"));
-        refererPath = configurationTemplateManager.insert("referer", new Referer("er1", configurationTemplateManager.getInstance(refereePath, Referee.class)));
-        listRefererPath = configurationTemplateManager.insert("list", new ListReferer("lister", configurationTemplateManager.getInstance(listRefereePath, Referee.class)));
+        refererPath = configurationTemplateManager.insert("referer", new Referer("er1", configurationProvider.get(refereePath, Referee.class)));
+        listRefererPath = configurationTemplateManager.insert("list", new ListReferer("lister", configurationProvider.get(listRefereePath, Referee.class)));
     }
 
     private void registerMap(Class clazz, String scope) throws TypeException

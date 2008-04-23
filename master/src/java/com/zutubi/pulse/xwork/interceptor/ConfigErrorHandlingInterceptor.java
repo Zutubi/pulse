@@ -28,7 +28,7 @@ public class ConfigErrorHandlingInterceptor implements Interceptor
         }
         catch(Exception e)
         {
-            LOG.info(e);
+            LOG.severe(e);
             ActionSupport action = (ActionSupport) invocation.getAction();
             action.addActionError(e.getMessage());
             return Action.ERROR;

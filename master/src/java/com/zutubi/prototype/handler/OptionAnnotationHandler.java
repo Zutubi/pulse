@@ -3,6 +3,7 @@ package com.zutubi.prototype.handler;
 import com.zutubi.prototype.Descriptor;
 import com.zutubi.prototype.OptionProvider;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
+import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.model.OptionFieldDescriptor;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeProperty;
@@ -23,11 +24,11 @@ import java.util.List;
  */
 public abstract class OptionAnnotationHandler extends FieldAnnotationHandler
 {
-    private ConfigurationTemplateManager configurationTemplateManager;
     /**
      * Object factory provides access to object instantiation services.
      */
     private ObjectFactory objectFactory;
+    private ConfigurationProvider configurationProvider;
 
     public void process(CompositeType annotatedType, Annotation annotation, Descriptor descriptor) throws Exception
     {
@@ -55,15 +56,15 @@ public abstract class OptionAnnotationHandler extends FieldAnnotationHandler
             optionProvider = (OptionProvider) objectFactory.buildBean(ClassLoaderUtils.loadAssociatedClass(annotatedType.getClazz(), className));
         }
 
-        process(configurationTemplateManager, optionProvider, field.getParentPath(), field.getBaseName(), field);
+        process(configurationProvider, optionProvider, field.getParentPath(), field.getBaseName(), field);
     }
 
-    public static void process(ConfigurationTemplateManager configurationTemplateManager, OptionProvider optionProvider, String parentPath, String baseName, OptionFieldDescriptor field)
+    public static void process(ConfigurationProvider configurationProvider, OptionProvider optionProvider, String parentPath, String baseName, OptionFieldDescriptor field)
     {
         Configuration instance = null;
-        if(baseName != null)
+        if(baseName != null && configurationProvider != null)
         {
-            instance = configurationTemplateManager.getInstance(PathUtils.getPath(parentPath, baseName));
+            instance = configurationProvider.get(PathUtils.getPath(parentPath, baseName), Configuration.class);
         }
 
         TypeProperty fieldTypeProperty = field.getProperty();
@@ -91,18 +92,13 @@ public abstract class OptionAnnotationHandler extends FieldAnnotationHandler
 
     protected abstract String getOptionProviderClass(Annotation annotation);
 
-    /**
-     * Required resource.
-     *
-     * @param objectFactory instance
-     */
     public void setObjectFactory(ObjectFactory objectFactory)
     {
         this.objectFactory = objectFactory;
     }
 
-    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
     {
-        this.configurationTemplateManager = configurationTemplateManager;
+        this.configurationProvider = configurationProvider;
     }
 }

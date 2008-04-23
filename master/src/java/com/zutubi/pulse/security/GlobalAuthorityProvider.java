@@ -1,11 +1,15 @@
 package com.zutubi.pulse.security;
 
-import com.zutubi.prototype.config.ConfigurationTemplateManager;
+import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.security.AuthorityProvider;
 import com.zutubi.prototype.security.DefaultAccessManager;
 import com.zutubi.pulse.model.GrantedAuthority;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.group.ServerPermission;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.EventListener;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -13,11 +17,11 @@ import java.util.Set;
 /**
  * Provides allowed authorities for global (i.e. server-wide) actions.
  */
-public class GlobalAuthorityProvider implements AuthorityProvider<Object>
+public class GlobalAuthorityProvider implements AuthorityProvider<Object>, EventListener
 {
     public static final String CREATE_USER = "CREATE_USER";
 
-    private ConfigurationTemplateManager configurationTemplateManager;
+    private ConfigurationProvider configurationProvider;
 
     public Set<String> getAllowedAuthorities(String action, Object resource)
     {
@@ -26,7 +30,7 @@ public class GlobalAuthorityProvider implements AuthorityProvider<Object>
 
         if(CREATE_USER.equals(action))
         {
-            GlobalConfiguration config = configurationTemplateManager.getInstance(GlobalConfiguration.SCOPE_NAME, GlobalConfiguration.class);
+            GlobalConfiguration config = configurationProvider.get(GlobalConfiguration.SCOPE_NAME, GlobalConfiguration.class);
             if(config.isAnonymousSignupEnabled())
             {
                 result.add(GrantedAuthority.ANONYMOUS);
@@ -44,8 +48,18 @@ public class GlobalAuthorityProvider implements AuthorityProvider<Object>
         accessManager.registerAuthorityProvider(this);
     }
 
-    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
+    public void setEventManager(EventManager eventManager)
     {
-        this.configurationTemplateManager = configurationTemplateManager;
+        eventManager.register(this);
+    }
+
+    public void handleEvent(Event event)
+    {
+        this.configurationProvider = ((ConfigurationSystemStartedEvent)event).getConfigurationProvider();
+    }
+
+    public Class[] getHandledEvents()
+    {
+        return new Class[]{ ConfigurationSystemStartedEvent.class };
     }
 }

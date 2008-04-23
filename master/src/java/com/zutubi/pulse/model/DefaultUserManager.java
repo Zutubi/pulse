@@ -13,6 +13,8 @@ import com.zutubi.pulse.prototype.config.group.GroupConfiguration;
 import com.zutubi.pulse.prototype.config.user.DashboardConfiguration;
 import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 import com.zutubi.pulse.security.ldap.LdapManager;
+import com.zutubi.pulse.events.*;
+import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import org.acegisecurity.providers.encoding.PasswordEncoder;
 import org.acegisecurity.userdetails.UserDetails;
 import org.acegisecurity.userdetails.UsernameNotFoundException;
@@ -24,7 +26,7 @@ import java.util.*;
  *
  *
  */
-public class DefaultUserManager implements UserManager, ExternalStateManager<UserConfiguration>, ConfigurationInjector.ConfigurationSetter<User>
+public class DefaultUserManager implements UserManager, ExternalStateManager<UserConfiguration>, ConfigurationInjector.ConfigurationSetter<User>, com.zutubi.pulse.events.EventListener
 {
     private UserDao userDao;
     private PasswordEncoder passwordEncoder;
@@ -45,8 +47,10 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
     private Map<Long, UserConfiguration> userConfigsById = new HashMap<Long, UserConfiguration>();
     private BuiltinGroupConfiguration allUsersGroup;
 
-    public void init()
+    public void init(ConfigurationProvider configurationProvider)
     {
+        this.configurationProvider = configurationProvider;
+
         // register the canAddUser license authorisation
         AddUserAuthorisation addUserAuthorisation = new AddUserAuthorisation();
         addUserAuthorisation.setUserManager(this);
@@ -266,6 +270,16 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
         configurationProvider.save(user);
     }
 
+    public void handleEvent(Event event)
+    {
+        init(((ConfigurationSystemStartedEvent)event).getConfigurationProvider());
+    }
+
+    public Class[] getHandledEvents()
+    {
+        return new Class[]{ ConfigurationSystemStartedEvent.class };
+    }
+
     public void setPasswordEncoder(PasswordEncoder passwordEncoder)
     {
         this.passwordEncoder = passwordEncoder;
@@ -314,11 +328,6 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
         state.setConfig(userConfigsById.get(state.getId()));
     }
 
-    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
-    {
-        this.configurationProvider = configurationProvider;
-    }
-
     public void setConfigurationStateManager(ConfigurationStateManager configurationStateManager)
     {
         configurationStateManager.register(UserConfiguration.class, this);
@@ -327,5 +336,10 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
     public void setConfigurationInjector(ConfigurationInjector configurationInjector)
     {
         configurationInjector.registerSetter(User.class, this);
+    }
+
+    public void setEventManager(EventManager eventManager)
+    {
+        eventManager.register(this);
     }
 }

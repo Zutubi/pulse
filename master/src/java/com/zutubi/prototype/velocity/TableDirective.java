@@ -19,7 +19,6 @@ import org.apache.velocity.runtime.parser.node.Node;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -113,24 +112,6 @@ public class TableDirective extends PrototypeDirective
             writer.write(renderError("Failed to render form. Unexpected " + e.getClass() + ": " + e.getMessage()));
             return true;
         }
-    }
-
-    private Collection getTableData(String path)
-    {
-        Collection data;
-        Object collection = configurationTemplateManager.getInstance(path);
-
-        if (collection instanceof Map)
-        {
-            Map map = (Map) collection;
-            data = map.values();
-        }
-        else
-        {
-            data = (Collection) collection;
-        }
-
-        return data;
     }
 
     public void setFreemarkerConfiguration(Configuration configuration)

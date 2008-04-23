@@ -11,13 +11,17 @@ import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.group.AbstractGroupConfiguration;
 import com.zutubi.pulse.prototype.config.group.BuiltinGroupConfiguration;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.EventListener;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import org.acegisecurity.GrantedAuthorityImpl;
 import org.acegisecurity.providers.anonymous.AnonymousProcessingFilter;
 import org.acegisecurity.userdetails.memory.UserAttribute;
 
 /**
  */
-public class GuestAccessManager implements ConfigurationEventListener
+public class GuestAccessManager implements ConfigurationEventListener, EventListener
 {
     private AnonymousProcessingFilter anonymousProcessingFilter;
     private ConfigurationProvider configurationProvider;
@@ -52,15 +56,25 @@ public class GuestAccessManager implements ConfigurationEventListener
         }
     }
 
+    public void handleEvent(Event event)
+    {
+        configurationProvider = ((ConfigurationSystemStartedEvent)event).getConfigurationProvider();
+        configurationProvider.registerEventListener(this, true, false, GlobalConfiguration.class);
+        configurationProvider.registerEventListener(this, true, true, AbstractGroupConfiguration.class);
+    }
+
+    public Class[] getHandledEvents()
+    {
+        return new Class[]{ConfigurationSystemStartedEvent.class };
+    }
+
     public void setAnonymousProcessingFilter(AnonymousProcessingFilter anonymousProcessingFilter)
     {
         this.anonymousProcessingFilter = anonymousProcessingFilter;
     }
 
-    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    public void setEventManager(EventManager eventManager)
     {
-        this.configurationProvider = configurationProvider;
-        configurationProvider.registerEventListener(this, true, false, GlobalConfiguration.class);
-        configurationProvider.registerEventListener(this, true, true, AbstractGroupConfiguration.class);
+        eventManager.register(this);
     }
 }

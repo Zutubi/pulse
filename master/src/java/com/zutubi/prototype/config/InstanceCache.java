@@ -8,13 +8,11 @@ import java.util.Collection;
  * A cache of configuration instances.  These instances are shared and thus
  * should be treated as read-only.
  */
-public interface InstanceCache
+public interface InstanceCache extends InstanceSource
 {
     void markInvalid(String path);
 
     boolean isValid(String path, boolean allowIncomplete);
-
-    Configuration get(String path, boolean allowIncomplete);
 
     Collection<Configuration> getAllDescendents(String path, boolean allowIncomplete);
 

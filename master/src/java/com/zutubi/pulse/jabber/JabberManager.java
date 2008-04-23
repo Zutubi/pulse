@@ -6,6 +6,10 @@ import com.zutubi.prototype.config.events.ConfigurationEvent;
 import com.zutubi.prototype.config.events.PostSaveEvent;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.jabber.config.JabberConfiguration;
+import com.zutubi.pulse.events.EventListener;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.util.Constants;
 import com.zutubi.util.logging.Logger;
 import org.jivesoftware.smack.*;
@@ -16,7 +20,7 @@ import org.jivesoftware.smack.packet.XMPPError;
 
 /**
  */
-public class JabberManager implements Stoppable, PacketListener, ConfigurationEventListener
+public class JabberManager implements Stoppable, PacketListener, ConfigurationEventListener, EventListener
 {
     public static final int DEFAULT_PORT = 5222;
 
@@ -201,11 +205,6 @@ public class JabberManager implements Stoppable, PacketListener, ConfigurationEv
         return statusMessage;
     }
 
-    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
-    {
-        this.configurationProvider = configurationProvider;
-    }
-
     public void handleConfigurationEvent(ConfigurationEvent event)
     {
         if(event instanceof PostSaveEvent)
@@ -213,5 +212,21 @@ public class JabberManager implements Stoppable, PacketListener, ConfigurationEv
             stop(true);
             init((JabberConfiguration) event.getInstance());
         }
+    }
+
+    public void handleEvent(Event event)
+    {
+        configurationProvider = ((ConfigurationSystemStartedEvent)event).getConfigurationProvider();
+        init();
+    }
+
+    public Class[] getHandledEvents()
+    {
+        return new Class[]{ConfigurationSystemStartedEvent.class};
+    }
+
+    public void setEventManager(EventManager eventManager)
+    {
+        eventManager.register(this);
     }
 }

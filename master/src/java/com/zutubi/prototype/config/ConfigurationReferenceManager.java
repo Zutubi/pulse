@@ -70,7 +70,7 @@ public class ConfigurationReferenceManager implements ReferenceResolver
 
     public Configuration resolveReference(String fromPath, long toHandle, Instantiator instantiator) throws TypeException
     {
-        return resolveReference(fromPath, toHandle, instantiator, configurationTemplateManager);
+        return resolveReference(fromPath, toHandle, instantiator, configurationTemplateManager.getState().instances);
     }
 
     public Configuration resolveReference(String fromPath, long toHandle, Instantiator instantiator, InstanceSource cache) throws TypeException
@@ -86,7 +86,7 @@ public class ConfigurationReferenceManager implements ReferenceResolver
             indexReference(fromPath, toPath);
         }
         
-        Configuration instance = cache.getInstance(toPath);
+        Configuration instance = cache.get(toPath, true);
         if (instance == null)
         {
             Record record = configurationTemplateManager.getRecord(toPath);

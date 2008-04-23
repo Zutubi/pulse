@@ -3,6 +3,8 @@ package com.zutubi.prototype.config;
 import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.pulse.events.*;
+import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import org.acegisecurity.AccessDeniedException;
 
 import java.util.*;
@@ -11,13 +13,14 @@ import java.util.*;
  * Manages access to the configuration system.  Allows UIs to filter what a
  * user can see and do to configuration.
  */
-public class ConfigurationSecurityManager
+public class ConfigurationSecurityManager implements com.zutubi.pulse.events.EventListener
 {
     private List<PathPermission> globalPermissions = new LinkedList<PathPermission>();
     private Set<String> ownedScopes = new HashSet<String>();
 
     private AccessManager accessManager;
     private ConfigurationTemplateManager configurationTemplateManager;
+    private boolean configurationSystemStarted;
 
     /**
      * Registers a mapping from an action on some path to a pre-defined
@@ -100,6 +103,11 @@ public class ConfigurationSecurityManager
      */
     public boolean hasPermission(String path, String action)
     {
+        if(!configurationSystemStarted)
+        {
+            return true;
+        }
+
         String global = getGlobalPermission(path, action);
         if(global == null)
         {
@@ -224,6 +232,16 @@ public class ConfigurationSecurityManager
         }
     }
 
+    public void handleEvent(Event event)
+    {
+        configurationSystemStarted = true;
+    }
+
+    public Class[] getHandledEvents()
+    {
+        return new Class[]{ConfigurationSystemStartedEvent.class };
+    }
+
     public void setAccessManager(AccessManager accessManager)
     {
         this.accessManager = accessManager;
@@ -266,5 +284,10 @@ public class ConfigurationSecurityManager
         {
             return action.equals(this.action) && PathUtils.pathMatches(pathPattern, path);
         }
+    }
+
+    public void setEventManager(EventManager eventManager)
+    {
+        eventManager.register(this);
     }
 }

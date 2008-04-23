@@ -2,10 +2,7 @@ package com.zutubi.prototype.webwork;
 
 import com.zutubi.i18n.Messages;
 import com.zutubi.prototype.actions.ActionManager;
-import com.zutubi.prototype.config.ConfigurationPersistenceManager;
-import com.zutubi.prototype.config.ConfigurationRegistry;
-import com.zutubi.prototype.config.ConfigurationSecurityManager;
-import com.zutubi.prototype.config.ConfigurationTemplateManager;
+import com.zutubi.prototype.config.*;
 import com.zutubi.prototype.format.StateDisplayManager;
 import com.zutubi.prototype.model.ActionLink;
 import com.zutubi.prototype.security.AccessManager;
@@ -35,6 +32,7 @@ public class ConfigurationUIModel
     private ConfigurationPersistenceManager configurationPersistenceManager;
     private ConfigurationTemplateManager configurationTemplateManager;
     private ConfigurationSecurityManager configurationSecurityManager;
+    private ConfigurationProvider configurationProvider;
     private ConfigurationRegistry configurationRegistry;
     private ActionManager actionManager;
     private StateDisplayManager stateDisplayManager;
@@ -98,11 +96,6 @@ public class ConfigurationUIModel
         parentPath = PathUtils.getPath(parentPathElements);
         currentPath = pathElements[pathElements.length - 1];
 
-        if (configurationPersistenceManager.isPersistent(path))
-        {
-            record = configurationTemplateManager.getRecord(path);
-        }
-
         parentPath = PathUtils.getParentPath(path);
         if (parentPath != null)
         {
@@ -115,7 +108,6 @@ public class ConfigurationUIModel
         }
 
         type = configurationTemplateManager.getType(path);
-        instance = configurationTemplateManager.getInstance(path);
         targetType = type.getTargetType();
 
         nestedProperties = PrototypeUtils.getPathListing(path, type, configurationTemplateManager, configurationSecurityManager);
@@ -137,6 +129,12 @@ public class ConfigurationUIModel
             }));
             writable = configurationSecurityManager.hasPermission(path, AccessManager.ACTION_WRITE);
             configurationCheckAvailable = configurationRegistry.getConfigurationCheckType(ctype) != null;
+        }
+
+        if (configurationPersistenceManager.isPersistent(path))
+        {
+            record = configurationTemplateManager.getRecord(path);
+            instance = configurationProvider.get(path, Configuration.class);
         }
 
         if (!(type instanceof CollectionType))
@@ -321,5 +319,10 @@ public class ConfigurationUIModel
     public void setStateDisplayManager(StateDisplayManager stateDisplayManager)
     {
         this.stateDisplayManager = stateDisplayManager;
+    }
+
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    {
+        this.configurationProvider = configurationProvider;
     }
 }

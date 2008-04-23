@@ -11,8 +11,6 @@ import java.util.List;
  */
 public interface LdapManager
 {
-    void init();
-
     void connect();
 
     public UserConfiguration authenticate(String username, String password);

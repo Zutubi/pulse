@@ -2,8 +2,8 @@ package com.zutubi.prototype.table;
 
 import com.zutubi.config.annotations.Table;
 import com.zutubi.prototype.actions.ActionManager;
+import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.config.ConfigurationSecurityManager;
-import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.prototype.type.CollectionType;
 import com.zutubi.prototype.type.CompositeType;
@@ -19,13 +19,13 @@ public class TableDescriptorFactory
 {
     private ActionManager actionManager;
     private ConfigurationSecurityManager configurationSecurityManager;
-    private ConfigurationTemplateManager configurationTemplateManager;
+    private ConfigurationProvider configurationProvider;
     private SystemPaths systemPaths;
 
     public TableDescriptor create(String path, CollectionType collectionType)
     {
         CompositeType type = (CompositeType) collectionType.getCollectionType();
-        TableDescriptor td = new TableDescriptor(collectionType, configurationSecurityManager.hasPermission(path, AccessManager.ACTION_WRITE), configurationSecurityManager.hasPermission(path, AccessManager.ACTION_CREATE), configurationTemplateManager, actionManager, systemPaths);
+        TableDescriptor td = new TableDescriptor(collectionType, configurationSecurityManager.hasPermission(path, AccessManager.ACTION_WRITE), configurationSecurityManager.hasPermission(path, AccessManager.ACTION_CREATE), configurationProvider, actionManager, systemPaths);
 
         // does the table has a Table annotation defining the columns to be rendered?
         Table tableAnnotation = type.getAnnotation(Table.class, true);
@@ -63,9 +63,9 @@ public class TableDescriptorFactory
         this.configurationSecurityManager = configurationSecurityManager;
     }
 
-    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
     {
-        this.configurationTemplateManager = configurationTemplateManager;
+        this.configurationProvider = configurationProvider;
     }
 
     public void setSystemPaths(SystemPaths systemPaths)

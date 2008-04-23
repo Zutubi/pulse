@@ -13,12 +13,15 @@ import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.util.TextUtils;
+import com.zutubi.util.logging.Logger;
 
 /**
  * Base for actions that use transient configuration.
  */
 public abstract class TransientAction<T> extends ActionSupport implements MessagesProvider
 {
+    private static final Logger LOG = Logger.getLogger(TransientAction.class);
+    
     protected String path;
     protected boolean ajax;
     protected ConfigurationUIModel configuration;
@@ -167,6 +170,7 @@ public abstract class TransientAction<T> extends ActionSupport implements Messag
         }
         catch (Exception e)
         {
+            LOG.severe(e);
             addActionError(e.getMessage());
             return ERROR;
         }

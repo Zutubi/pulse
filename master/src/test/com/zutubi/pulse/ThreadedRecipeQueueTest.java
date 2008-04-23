@@ -5,8 +5,6 @@ import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.agent.DefaultAgent;
 import com.zutubi.pulse.agent.Status;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.bootstrap.SimpleMasterConfigurationManager;
 import com.zutubi.pulse.core.*;
 import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.config.Resource;
@@ -24,6 +22,7 @@ import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.build.RecipeCompletedEvent;
 import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
+import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.personal.PatchArchive;
@@ -85,7 +84,6 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         slave3000 = createAgentConfig(3000);
         agentManager.addAgent(slave3000);
 
-        MasterConfigurationManager configurationManager = new SimpleMasterConfigurationManager();
         MockConfigurationProvider configurationProvider = new MockConfigurationProvider();
         configurationProvider.insert("test", new GlobalConfiguration());
 
@@ -93,7 +91,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         queue.setEventManager(eventManager);
         queue.setAgentManager(agentManager);
         queue.setUnsatisfiableTimeout(-1);
-        queue.setConfigurationProvider(configurationProvider);
+        queue.handleEvent(new ConfigurationSystemStartedEvent(configurationProvider));
         queue.setScmClientFactory(new DelegateScmClientFactory()
         {
             public ScmClient createClient(ScmConfiguration config) throws ScmException

@@ -9,7 +9,7 @@ import com.zutubi.pulse.security.AcegiUtils;
  *
  * It handles a number of things.
  * 1) if the system has not been setup, then it will direct the user to the setup wizard.
- * 2) directs the user to there default page, either the welcome page or the dashboard.
+ * 2) directs the user to their default page, either the welcome page or the dashboard.
  */
 public class DefaultAction extends ActionSupport
 {

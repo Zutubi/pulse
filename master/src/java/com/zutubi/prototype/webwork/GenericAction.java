@@ -83,7 +83,7 @@ public class GenericAction extends PrototypeSupport
             return ERROR;
         }
 
-        Configuration config = configurationTemplateManager.getInstance(path);
+        Configuration config = configurationProvider.get(path, Configuration.class);
         if(config == null)
         {
             addActionError("Path '" + path + "' does not exist");

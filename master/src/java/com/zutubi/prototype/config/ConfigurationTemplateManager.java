@@ -27,7 +27,7 @@ import java.util.*;
 
 /**
  */
-public class ConfigurationTemplateManager implements InstanceSource
+public class ConfigurationTemplateManager
 {
     private static final Logger LOG = Logger.getLogger(ConfigurationTemplateManager.class);
 
@@ -55,8 +55,6 @@ public class ConfigurationTemplateManager implements InstanceSource
         stateWrapper.setTransactionManager(transactionManager);
 
         userTransaction = new UserTransaction(transactionManager);
-
-        refreshCaches();
     }
 
     private void checkPersistent(String path)
@@ -1934,7 +1932,7 @@ public class ConfigurationTemplateManager implements InstanceSource
     }
 
     @SuppressWarnings({"unchecked"})
-    public <T extends Configuration> T deepClone(T instance)
+    <T extends Configuration> T deepClone(T instance)
     {
         final String path = instance.getConfigurationPath();
         Record record = getRecord(path);
@@ -1944,7 +1942,7 @@ public class ConfigurationTemplateManager implements InstanceSource
         {
             public Configuration resolveReference(String fromPath, long toHandle, Instantiator instantiator) throws TypeException
             {
-                InstanceSource source = ConfigurationTemplateManager.this;
+                InstanceSource source = getState().instances;
                 String targetPath = configurationReferenceManager.getPathForHandle(toHandle);
                 if(targetPath.startsWith(path))
                 {
@@ -1952,9 +1950,9 @@ public class ConfigurationTemplateManager implements InstanceSource
                     // We must update it to point to a new clone.
                     source = new InstanceSource()
                     {
-                        public Configuration getInstance(String path)
+                        public Configuration get(String path, boolean allowIncomplete)
                         {
-                            return cache.get(path, true);
+                            return cache.get(path, allowIncomplete);
                         }
                     };
                 }
@@ -1980,7 +1978,7 @@ public class ConfigurationTemplateManager implements InstanceSource
      * @param path path of the instance to retrieve
      * @return object defined by the path.
      */
-    public Configuration getInstance(String path)
+    Configuration getInstance(String path)
     {
         State state = getState();
         if (state == null)
@@ -1991,28 +1989,7 @@ public class ConfigurationTemplateManager implements InstanceSource
         return state.instances.get(path, true);
     }
 
-    /**
-     * Returns all instances with paths that start with the given prefix.
-     * Any instance stored directly at the prefix path would also be
-     * returned.
-     *
-     * @param prefix          prefix path used to find instances
-     * @param allowIncomplete if true, the result will also include
-     *                        non-concrete instances that live under the path
-     * @return all instances stored at or below the given path prefix
-     */
-    public Collection<Configuration> getInstancesByPathPrefix(String prefix, boolean allowIncomplete)
-    {
-        State state = getState();
-        if (state == null)
-        {
-            return Collections.EMPTY_LIST;
-        }
-
-        return state.instances.getAllDescendents(prefix, allowIncomplete);
-    }
-
-    private ConfigurationTemplateManager.State getState()
+    ConfigurationTemplateManager.State getState()
     {
         if (stateWrapper != null)
         {
@@ -2029,7 +2006,7 @@ public class ConfigurationTemplateManager implements InstanceSource
      * @return instance
      */
     @SuppressWarnings({"unchecked"})
-    public <T extends Configuration> T getInstance(String path, Class<T> clazz)
+    <T extends Configuration> T getInstance(String path, Class<T> clazz)
     {
         Configuration instance = getInstance(path);
         if (instance == null)
@@ -2045,7 +2022,7 @@ public class ConfigurationTemplateManager implements InstanceSource
         return (T) instance;
     }
 
-    public <T extends Configuration> T getCloneOfInstance(String path, Class<T> clazz)
+    <T extends Configuration> T getCloneOfInstance(String path, Class<T> clazz)
     {
         T instance = getInstance(path, clazz);
         if (instance == null)
@@ -2056,7 +2033,7 @@ public class ConfigurationTemplateManager implements InstanceSource
         return deepClone(instance);
     }
 
-    public <T extends Configuration> Collection<T> getAllInstances(String path, Class<T> clazz, boolean allowIncomplete)
+    <T extends Configuration> Collection<T> getAllInstances(String path, Class<T> clazz, boolean allowIncomplete)
     {
         List<T> result = new LinkedList<T>();
         getAllInstances(path, result, allowIncomplete);
@@ -2064,14 +2041,14 @@ public class ConfigurationTemplateManager implements InstanceSource
     }
 
     @SuppressWarnings({"unchecked"})
-    public <T extends Configuration> void getAllInstances(String path, Collection<T> result, boolean allowIncomplete)
+    <T extends Configuration> void getAllInstances(String path, Collection<T> result, boolean allowIncomplete)
     {
         State state = getState();
         state.instances.getAllMatchingPathPattern(path, (Collection<Configuration>) result, allowIncomplete);
     }
 
     @SuppressWarnings({"unchecked"})
-    public <T extends Configuration> Collection<T> getAllInstances(Class<T> clazz)
+    <T extends Configuration> Collection<T> getAllInstances(Class<T> clazz)
     {
         CompositeType type = typeRegistry.getType(clazz);
         if (type == null)
@@ -2094,7 +2071,7 @@ public class ConfigurationTemplateManager implements InstanceSource
     }
 
     @SuppressWarnings({"unchecked"})
-    public <T extends Configuration> T getAncestorOfType(Configuration c, Class<T> clazz)
+    <T extends Configuration> T getAncestorOfType(Configuration c, Class<T> clazz)
     {
         CompositeType type = typeRegistry.getType(clazz);
         if (type != null)
@@ -2423,7 +2400,7 @@ public class ConfigurationTemplateManager implements InstanceSource
      * transactional control / isolation etc.
      *
      */
-    private class State
+    class State
     {
         /**
          * Cache of complete instances.

@@ -302,11 +302,6 @@ public class ConfigurationRegistry
         return checkTypeMapping.get(type);
     }
 
-    public GlobalConfiguration getGlobalConfiguration()
-    {
-        return configurationTemplateManager.getInstance(GlobalConfiguration.SCOPE_NAME, GlobalConfiguration.class);
-    }
-
     public void setTypeRegistry(TypeRegistry typeRegistry)
     {
         this.typeRegistry = typeRegistry;

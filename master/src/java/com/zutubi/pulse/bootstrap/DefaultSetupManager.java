@@ -2,6 +2,7 @@ package com.zutubi.pulse.bootstrap;
 
 import com.opensymphony.xwork.spring.SpringObjectFactory;
 import com.zutubi.prototype.config.*;
+import com.zutubi.prototype.config.cleanup.ConfigurationCleanupManager;
 import com.zutubi.prototype.type.record.DelegatingHandleAllocator;
 import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.pulse.Version;
@@ -14,7 +15,6 @@ import com.zutubi.pulse.events.DataDirectoryLocatedEvent;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.logging.LogConfigurationManager;
-import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.plugins.PluginManager;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.restore.ArchiveException;
@@ -60,7 +60,6 @@ public class DefaultSetupManager implements SetupManager
     public static boolean initialInstallation = false;
 
     private MasterConfigurationManager configurationManager;
-    private UserManager userManager;
     private UpgradeManager upgradeManager;
     private EventManager eventManager;
 
@@ -401,7 +400,6 @@ public class DefaultSetupManager implements SetupManager
         ConfigurationRegistry configurationRegistry = ComponentContext.getBean("configurationRegistry");
         ConfigurationExtensionManager configurationExtensionManager = ComponentContext.getBean("configurationExtensionManager");
         ConfigurationStateManager configurationStateManager = ComponentContext.getBean("configurationStateManager");
-        DefaultConfigurationProvider configurationProvider = ComponentContext.getBean("configurationProvider");
 
         recordManager.init();
 
@@ -417,8 +415,6 @@ public class DefaultSetupManager implements SetupManager
         configurationStateManager.setRecordManager(recordManager);
 
         configurationTemplateManager.init();
-        configurationProvider.init();
-        this.configurationProvider = configurationProvider;
 
         LogConfigurationManager logConfigurationManager = ComponentContext.getBean("logConfigurationManager");
         logConfigurationManager.init();
@@ -435,7 +431,6 @@ public class DefaultSetupManager implements SetupManager
         // Remove the upgrade context from the ComponentContext stack / namespace.
         // They are no longer required.
         ComponentContext.pop();
-
         loadContexts(setupContexts);
 
         if (isSetupRequired())
@@ -458,8 +453,15 @@ public class DefaultSetupManager implements SetupManager
         state = SetupState.STARTING;
 
         // load the remaining contexts.
+        // The user contexts are separate as otherwise there is a cycle in
+        // dependencies that confuses spring and then me (as spring gives a
+        // useless error message).
         loadContexts(startupContexts);
         loadContexts(postStartupContexts);
+
+        DefaultConfigurationProvider configurationProvider = ComponentContext.getBean("configurationProvider");
+        configurationProvider.init();
+        this.configurationProvider = configurationProvider;
 
         setupCallback.finaliseSetup();
     }
@@ -495,7 +497,8 @@ public class DefaultSetupManager implements SetupManager
 
     private boolean isSetupRequired()
     {
-        return userManager.getUserCount() == 0;
+        ConfigurationTemplateManager configurationTemplateManager = ComponentContext.getBean("configurationTemplateManager");
+        return configurationTemplateManager.getRecord(ConfigurationRegistry.USERS_SCOPE).size() == 0;
     }
 
     private void updateVersionIfNecessary()
@@ -684,11 +687,6 @@ public class DefaultSetupManager implements SetupManager
     }
 
     //---( end )
-
-    public void setUserManager(UserManager userManager)
-    {
-        this.userManager = userManager;
-    }
 
     public void setUpgradeManager(UpgradeManager upgradeManager)
     {

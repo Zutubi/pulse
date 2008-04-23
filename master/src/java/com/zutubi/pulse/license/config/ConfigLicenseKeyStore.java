@@ -3,47 +3,74 @@ package com.zutubi.pulse.license.config;
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.config.TypeAdapter;
 import com.zutubi.prototype.config.TypeListener;
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
+import com.zutubi.prototype.config.events.PostSaveEvent;
+import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.pulse.license.AbstractLicenseKeyStore;
 import com.zutubi.pulse.license.LicenseException;
+import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.EventListener;
+import com.zutubi.pulse.events.Event;
 
 /**
  * License key store backed by the normal configuration system.
  */
 public class ConfigLicenseKeyStore extends AbstractLicenseKeyStore
 {
-    private ConfigurationProvider configurationProvider;
+    private static final String LICENSE_PATH = PathUtils.getPath(GlobalConfiguration.SCOPE_NAME, "license");
+    private static final String LICENSE_PROPERTY = "key";
+
+    private EventManager eventManager;
+    private ConfigurationTemplateManager configurationTemplateManager;
 
     public void init()
     {
-        TypeListener<LicenseConfiguration> listener = new TypeAdapter<LicenseConfiguration>(LicenseConfiguration.class)
+        eventManager.register(new EventListener()
         {
-            public void postSave(LicenseConfiguration instance, boolean nested)
+            public void handleEvent(Event event)
             {
-                notifyListeners();
+                if (((PostSaveEvent)event).getInstance() instanceof LicenseConfiguration)
+                {
+                    notifyListeners();
+                }
             }
-        };
-        listener.register(configurationProvider, true);
+
+            public Class[] getHandledEvents()
+            {
+                return new Class[]{PostSaveEvent.class};
+            }
+        });
     }
 
     public String getKey()
     {
-        LicenseConfiguration licenseConfiguration = configurationProvider.get(LicenseConfiguration.class);
-        if (licenseConfiguration != null)
+        // Note that we talk directly in records as we are accessed early in
+        // setup before instances are available.
+        Record licenseRecord = configurationTemplateManager.getRecord(LICENSE_PATH);
+        if (licenseRecord != null)
         {
-            return licenseConfiguration.getKey();
+            return (String) licenseRecord.get(LICENSE_PROPERTY);
         }
         return null;
     }
 
     public void setKey(String licenseKey) throws LicenseException
     {
-        LicenseConfiguration licenseConfiguration = configurationProvider.deepClone(configurationProvider.get(LicenseConfiguration.class));
-        licenseConfiguration.setKey(licenseKey);
-        configurationProvider.save(licenseConfiguration);
+        MutableRecord licenseRecord = configurationTemplateManager.getRecord(LICENSE_PATH).copy(false);
+        licenseRecord.put(LICENSE_PROPERTY, licenseKey);
+        configurationTemplateManager.saveRecord(LICENSE_PATH, licenseRecord);
     }
 
-    public void setConfigurationProvider(ConfigurationProvider provider)
+    public void setEventManager(EventManager eventManager)
     {
-        this.configurationProvider = provider;
+        this.eventManager = eventManager;
+    }
+
+    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
+    {
+        this.configurationTemplateManager = configurationTemplateManager;
     }
 }

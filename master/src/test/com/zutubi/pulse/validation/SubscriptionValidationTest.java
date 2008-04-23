@@ -27,7 +27,7 @@ public class SubscriptionValidationTest extends AbstractValidationTestCase
         contact.setAddress("foo@bar.com");
         String preferencesPath = PathUtils.getPath(userPath, "preferences");
         String contactPath = configurationTemplateManager.insert(PathUtils.getPath(preferencesPath, "contacts"), contact);
-        contact = configurationTemplateManager.getInstance(contactPath, EmailContactConfiguration.class);
+        contact = configurationProvider.get(contactPath, EmailContactConfiguration.class);
 
         ProjectSubscriptionConfiguration subscription = new ProjectSubscriptionConfiguration();
         subscription.setName("subscription");

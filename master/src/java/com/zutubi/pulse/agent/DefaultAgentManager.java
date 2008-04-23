@@ -16,6 +16,7 @@ import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.events.*;
 import com.zutubi.pulse.events.EventListener;
+import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.pulse.license.LicenseManager;
 import com.zutubi.pulse.license.authorisation.AddAgentAuthorisation;
 import com.zutubi.pulse.logging.ServerMessagesHandler;
@@ -85,8 +86,9 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
     private Map<Long, AgentUpdater> updaters = new TreeMap<Long, AgentUpdater>();
     private ReentrantLock updatersLock = new ReentrantLock();
 
-    public void init()
+    public void handleConfigurationSystemStarted(ConfigurationSystemStartedEvent event)
     {
+        configurationProvider = event.getConfigurationProvider();
         pingPool = Executors.newCachedThreadPool(threadFactory);
         pingerThreadPool = Executors.newCachedThreadPool(threadFactory);
 
@@ -440,7 +442,18 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
 
     public void handleEvent(Event evt)
     {
-        AgentUpgradeCompleteEvent suce = (AgentUpgradeCompleteEvent) evt;
+        if (evt instanceof AgentUpgradeCompleteEvent)
+        {
+            handleAgentUpgradeComplete((AgentUpgradeCompleteEvent) evt);
+        }
+        else
+        {
+            handleConfigurationSystemStarted((ConfigurationSystemStartedEvent) evt);
+        }
+    }
+
+    private void handleAgentUpgradeComplete(AgentUpgradeCompleteEvent suce)
+    {
         Agent agent = suce.getAgent();
         AgentState agentState = agentStateManager.getAgentState(agent.getId());
 
@@ -472,7 +485,7 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
 
     public Class[] getHandledEvents()
     {
-        return new Class[]{AgentUpgradeCompleteEvent.class};
+        return new Class[]{AgentUpgradeCompleteEvent.class, ConfigurationSystemStartedEvent.class};
     }
 
     public List<Agent> getAllAgents()
@@ -673,11 +686,6 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
     public void setLicenseManager(LicenseManager licenseManager)
     {
         this.licenseManager = licenseManager;
-    }
-
-    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
-    {
-        this.configurationProvider = configurationProvider;
     }
 
     public void setMasterRecipeProcessor(MasterRecipeProcessor masterRecipeProcessor)

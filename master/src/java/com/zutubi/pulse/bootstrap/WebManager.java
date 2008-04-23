@@ -4,6 +4,10 @@ import com.zutubi.pulse.jetty.JettyManager;
 import com.opensymphony.xwork.config.ConfigurationManager;
 import com.opensymphony.xwork.config.providers.XmlConfigurationProvider;
 import com.zutubi.pulse.security.SecurityManager;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.EventListener;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.system.SystemStartedEvent;
 
 /**
  */
@@ -51,11 +55,6 @@ public class WebManager
         }
     }
 
-    /**
-     * Required resource.
-     *
-     * @param jettyManager
-     */
     public void setJettyManager(JettyManager jettyManager)
     {
         this.jettyManager = jettyManager;

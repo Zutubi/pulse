@@ -42,6 +42,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
     private ConfigurationTemplateManager configurationTemplateManager;
     private ConfigurationRefactoringManager configurationRefactoringManager;
     private ConfigurationSecurityManager configurationSecurityManager;
+    private ConfigurationProvider configurationProvider;
     private TypeRegistry typeRegistry;
     private RecordManager recordManager;
 
@@ -303,7 +304,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
 
         try
         {
-            Object instance = configurationTemplateManager.getInstance(path);
+            Configuration instance = configurationProvider.get(path, Configuration.class);
             if (instance == null)
             {
                 throw new IllegalArgumentException("Path '" + path + "' does not exist");
@@ -369,7 +370,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         tokenManager.loginUser(token);
         try
         {
-            Configuration instance = configurationTemplateManager.getInstance(path);
+            Configuration instance = configurationProvider.get(path, Configuration.class);
             if(instance == null)
             {
                 throw new IllegalArgumentException("Path '" + path + "' does not exist");
@@ -389,7 +390,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         tokenManager.loginUser(token);
         try
         {
-            Configuration instance = configurationTemplateManager.getInstance(path);
+            Configuration instance = configurationProvider.get(path, Configuration.class);
             if(instance == null)
             {
                 throw new IllegalArgumentException("Path '" + path + "' does not exist");
@@ -689,7 +690,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         tokenManager.loginUser(token);
         try
         {
-            Configuration instance = configurationTemplateManager.getInstance(path);
+            Configuration instance = configurationProvider.get(path, Configuration.class);
             return new Vector<String>(actionManager.getActions(instance, false));
         }
         finally
@@ -703,7 +704,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         tokenManager.loginUser(token);
         try
         {
-            Configuration instance = configurationTemplateManager.getInstance(path);
+            Configuration instance = configurationProvider.get(path, Configuration.class);
             actionManager.execute(action, instance, null);
             return true;
         }
@@ -719,7 +720,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         tokenManager.loginUser(token);
         try
         {
-            Configuration instance = configurationTemplateManager.getInstance(path);
+            Configuration instance = configurationProvider.get(path, Configuration.class);
 
             String symbolicName = CompositeType.getTypeFromXmlRpc(argument);
             CompositeType type = typeRegistry.getType(symbolicName);
@@ -1825,5 +1826,10 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
     public void setConfigurationRefactoringManager(ConfigurationRefactoringManager configurationRefactoringManager)
     {
         this.configurationRefactoringManager = configurationRefactoringManager;
+    }
+
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    {
+        this.configurationProvider = configurationProvider;
     }
 }

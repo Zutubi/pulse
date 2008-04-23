@@ -6,21 +6,23 @@ import com.zutubi.pulse.core.PulseRuntimeException;
 import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.scheduling.SchedulingException;
 import com.zutubi.pulse.scheduling.Trigger;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.EventListener;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.util.logging.Logger;
 
 /**
  * 
  *
  */
-public class TriggerManager implements ExternalStateManager<TriggerConfiguration>
+public class TriggerManager implements ExternalStateManager<TriggerConfiguration>, EventListener
 {
     private static final Logger LOG = Logger.getLogger(TriggerManager.class);
 
     private Scheduler scheduler;
 
-    private ConfigurationProvider configurationProvider;
-
-    public void init()
+    public void init(ConfigurationProvider configurationProvider)
     {
         TypeListener<TriggerConfiguration> listener = new TypeAdapter<TriggerConfiguration>(TriggerConfiguration.class)
         {
@@ -83,14 +85,24 @@ public class TriggerManager implements ExternalStateManager<TriggerConfiguration
         delete(id);
     }
 
+    public void handleEvent(Event event)
+    {
+        init(((ConfigurationSystemStartedEvent)event).getConfigurationProvider());
+    }
+
+    public Class[] getHandledEvents()
+    {
+        return new Class[]{ ConfigurationSystemStartedEvent.class };
+    }
+
     public void setScheduler(Scheduler scheduler)
     {
         this.scheduler = scheduler;
     }
 
-    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    public void setEventManager(EventManager eventManager)
     {
-        this.configurationProvider = configurationProvider;
+        eventManager.register(this);
     }
 
     public void setConfigurationStateManager(ConfigurationStateManager configurationStateManager)

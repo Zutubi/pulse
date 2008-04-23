@@ -13,6 +13,7 @@ import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.prototype.type.record.store.InMemoryRecordStore;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.events.DefaultEventManager;
+import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.security.GlobalAuthorityProvider;
 import com.zutubi.pulse.security.PulseThreadFactory;
@@ -107,7 +108,6 @@ public abstract class AbstractConfigurationSystemTestCase extends PulseTestCase
         configurationSecurityManager.setConfigurationTemplateManager(configurationTemplateManager);
 
         configurationCleanupManager = new ConfigurationCleanupManager();
-        configurationCleanupManager.setConfigurationTemplateManager(configurationTemplateManager);
         configurationCleanupManager.setObjectFactory(objectFactory);
         configurationCleanupManager.setThreadFactory(threadFactory);
 
@@ -131,6 +131,10 @@ public abstract class AbstractConfigurationSystemTestCase extends PulseTestCase
         configurationTemplateManager.init();
         configurationCleanupManager.init();
         configurationProvider.init();
+
+        ConfigurationSystemStartedEvent event = new ConfigurationSystemStartedEvent(configurationProvider);
+        configurationCleanupManager.handleEvent(event);
+        configurationSecurityManager.handleEvent(event);
 
         typeRegistry.setConfigurationReferenceManager(configurationReferenceManager);
         typeRegistry.setHandleAllocator(recordManager);

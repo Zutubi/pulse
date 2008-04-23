@@ -7,6 +7,7 @@ import com.zutubi.pulse.events.DataDirectoryChangedEvent;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.pulse.license.authorisation.Authorisation;
 import com.zutubi.pulse.license.config.OneXDataLicenseKeyStore;
 import com.zutubi.pulse.license.events.LicenseUpdateEvent;
@@ -72,35 +73,14 @@ public class LicenseManager
                 }
                 else
                 {
-                    InsertEvent insertEvent = (InsertEvent) evt;
-                    Configuration instance = insertEvent.getInstance();
-                    if(instance instanceof ProjectConfiguration)
-                    {
-                        if(!LicenseHolder.hasAuthorization(LicenseHolder.AUTH_ADD_PROJECT))
-                        {
-                            throw new LicenseException("Unable to add project: license limit exceeded");
-                        }
-                    }
-                    else if(instance instanceof AgentConfiguration)
-                    {
-                        if(!LicenseHolder.hasAuthorization(LicenseHolder.AUTH_ADD_AGENT))
-                        {
-                            throw new LicenseException("Unable to add agent: license limit exceeded");
-                        }
-                    }
-                    else if(instance instanceof UserConfiguration)
-                    {
-                        if(!LicenseHolder.hasAuthorization(LicenseHolder.AUTH_ADD_USER))
-                        {
-                            throw new LicenseException("Unable to add user: license limit exceeded");   
-                        }
-                    }
+                    // Now the config system is up, we can start enforcing the license.
+                    eventManager.register(new LicenseEnforcingListener());
                 }
             }
 
             public Class[] getHandledEvents()
             {
-                return new Class[]{DataDirectoryChangedEvent.class, InsertEvent.class};
+                return new Class[]{DataDirectoryChangedEvent.class, ConfigurationSystemStartedEvent.class};
             }
         });
 
@@ -187,21 +167,11 @@ public class LicenseManager
         refreshAuthorisations();
     }
 
-    /**
-     * Required resource.
-     *
-     * @param eventManager instance.
-     */
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param keyStore instance
-     */
     public void setLicenseKeyStore(LicenseKeyStore keyStore)
     {
         this.keyStore = keyStore;
@@ -210,5 +180,44 @@ public class LicenseManager
     public void setDataResolver(DataResolver dataResolver)
     {
         this.dataResolver = dataResolver;
+    }
+
+    /**
+     * This listener enforces limits on configured entities.  We hook it up
+     * once the configuration system is ready.
+     */
+    private static class LicenseEnforcingListener implements EventListener
+    {
+        public void handleEvent(Event event)
+        {
+            InsertEvent insertEvent = (InsertEvent) event;
+            Configuration instance = insertEvent.getInstance();
+            if(instance instanceof ProjectConfiguration)
+            {
+                if(!LicenseHolder.hasAuthorization(LicenseHolder.AUTH_ADD_PROJECT))
+                {
+                    throw new LicenseException("Unable to add project: license limit exceeded");
+                }
+            }
+            else if(instance instanceof AgentConfiguration)
+            {
+                if(!LicenseHolder.hasAuthorization(LicenseHolder.AUTH_ADD_AGENT))
+                {
+                    throw new LicenseException("Unable to add agent: license limit exceeded");
+                }
+            }
+            else if(instance instanceof UserConfiguration)
+            {
+                if(!LicenseHolder.hasAuthorization(LicenseHolder.AUTH_ADD_USER))
+                {
+                    throw new LicenseException("Unable to add user: license limit exceeded");
+                }
+            }
+        }
+
+        public Class[] getHandledEvents()
+        {
+            return new Class[]{InsertEvent.class};
+        }
     }
 }
