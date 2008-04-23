@@ -64,6 +64,8 @@ The beans defined within the security subsystem need not be accessed by other co
                 CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
                 PATTERN_TYPE_APACHE_ANT
                 /ajax/**=authenticationProcessingFilter,basicProcessingFilter,rememberMeProcessingFilter,anonymousProcessingFilter,ajaxExceptionTranslationFilter,filterInvocationInterceptor
+                /aconfig/**=authenticationProcessingFilter,basicProcessingFilter,rememberMeProcessingFilter,anonymousProcessingFilter,ajaxExceptionTranslationFilter,filterInvocationInterceptor
+                /atemplate/**=authenticationProcessingFilter,basicProcessingFilter,rememberMeProcessingFilter,anonymousProcessingFilter,ajaxExceptionTranslationFilter,filterInvocationInterceptor
                 /**=authenticationProcessingFilter,basicProcessingFilter,rememberMeProcessingFilter,anonymousProcessingFilter,exceptionTranslationFilter,filterInvocationInterceptor
             </value>
         </property>

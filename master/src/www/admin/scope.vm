@@ -6,11 +6,47 @@
 	<script type="text/javascript">
         var tree;
         
+        var onSelectFailure = function(element, response)
+        {
+            if(response.status == 0)
+            {
+                showStatus(response.statusText, 'failure');
+            }
+            else
+            {
+                var message = 'Pulse server returned status ' + response.status;
+                if(response.statusText)
+                {
+                    message = message + ' (' + response.statusText + ')';
+                }
+
+                showStatus(message, 'failure');
+            }
+
+            if(response.responseText)
+            {
+                element.update(response.responseText);
+            }
+            else
+            {
+                element.update('');
+            }
+        }
+
         var onSelect = function(sm, node)
         {
             if(node)
             {
-                Ext.get('detail-pane').load({url: tree.loader.getNodePath(node), scripts:true});
+                Ext.get('detail-pane').load({
+                    url: tree.loader.getNodePath(node),
+                    scripts: true,
+                    callback: function(element, success, response) {
+                        if(!success)
+                        {
+                            onSelectFailure(element, response);
+                        }
+                    }
+                });
             }
         }
 

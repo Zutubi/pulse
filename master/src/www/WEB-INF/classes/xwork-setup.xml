@@ -124,12 +124,10 @@
     <package name="ajax" namespace="/ajax" extends="webwork-default-package">
         <default-interceptor-ref name="ajaxStack"/>
 
-        <default-action-ref name="404"/>
+        <default-action-ref name="default"/>
 
-        <action name="404">
-            <result name="success" type="httpheader">
-                <param name="status">404</param>
-            </result>
+        <action name="default">
+            <result name="success" type="startupajax"/>
         </action>
         
         <action name="ls" class="com.zutubi.pulse.web.vfs.LsAction">
@@ -154,6 +152,26 @@
         </action>
     </package>
 
+    <package name="aconfig" namespace="/aconfig" extends="webwork-default-package">
+        <default-interceptor-ref name="ajaxStack"/>
+
+        <default-action-ref name="default"/>
+
+        <action name="default">
+            <result name="success" type="startupajax"/>
+        </action>
+    </package>
+
+    <package name="atemplate" namespace="/atemplate" extends="webwork-default-package">
+        <default-interceptor-ref name="ajaxStack"/>
+
+        <default-action-ref name="default"/>
+
+        <action name="default">
+            <result name="success" type="startupajax"/>
+        </action>
+    </package>
+    
     <package name="popups" namespace="/popups" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 

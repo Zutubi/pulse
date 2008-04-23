@@ -16,6 +16,7 @@
 
         var handleConfigurationResponse = function(result)
         {
+            console.dir(response);
             if (result.success)
             {
                 if (result.newPanel)
@@ -92,6 +93,33 @@
             Ext.lib.Ajax.request('get', url, getAjaxCallback(pane));
         }
 
+        var onSelectFailure = function(element, response)
+        {
+            if(response.status == 0)
+            {
+                showStatus(response.statusText, 'failure');
+            }
+            else
+            {
+                var message = 'Pulse server returned status ' + response.status;
+                if(response.statusText)
+                {
+                    message = message + ' (' + response.statusText + ')';
+                }
+                
+                showStatus(message, 'failure');
+            }
+
+            if(response.responseText)
+            {
+                element.update(response.responseText);
+            }
+            else
+            {
+                element.update('');
+            }
+        }
+
         // ------------------------------------------------------------------
         // Config tree
         // ------------------------------------------------------------------
@@ -100,7 +128,16 @@
         {
             if(node)
             {
-                Ext.get('detail-pane').load({url: configTree.loader.getNodePath(node), scripts:true});
+                Ext.get('detail-pane').load({
+                    url: configTree.loader.getNodePath(node),
+                    scripts: true,
+                    callback: function(element, success, response) {
+                        if(!success)
+                        {
+                            onSelectFailure(element, response);
+                        }
+                    }
+                });
             }
         }
 
@@ -174,7 +211,16 @@
         {
             if(node)
             {
-                Ext.get('detail-pane').load({url: '$base/atemplate/$scope/' + node.id, scripts:true});
+                Ext.get('detail-pane').load({
+                    url: '$base/atemplate/$scope/' + node.id,
+                    scripts: true,
+                    callback: function(element, success, response) {
+                        if(!success)
+                        {
+                            onSelectFailure(element, response);
+                        }
+                    }
+                });
             }
         }
 
