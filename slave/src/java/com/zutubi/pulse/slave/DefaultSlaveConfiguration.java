@@ -92,6 +92,11 @@ public class DefaultSlaveConfiguration implements SlaveConfiguration, SystemConf
         return config.getProperty(RESTORE_FILE);
     }
 
+    public String getRestoreArtifacts()
+    {
+        return config.getProperty(RESTORE_ARTIFACTS);
+    }
+
     public String getContextPathNormalised()
     {
         // TODO share with master.  more of this whole class, preferrably

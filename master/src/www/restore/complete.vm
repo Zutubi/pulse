@@ -30,8 +30,26 @@
 #if ($monitor.isSuccessful())
     The restore has completed. <a id="continue" href="continue.action">continue</a>.
 #else
-    The upgrade has failed. Please report this failure to <a href="mailto:support@zutubi.com">zutubi support</a>,
+    The restore has failed. If you believe this to be a bug, please report this failure to <a href="mailto:support@zutubi.com">zutubi support</a>,
     including a screenshot of this page and your server log files.
+
+<p>
+    Task overview:
+    <table width=500>
+        #foreach($task in $monitor.tasks)
+            #set($feedback = $monitor.getProgress($task))
+        <tr width="40%">
+            <td>$task.name</td>
+            <td>$feedback.status</td>
+            #if($feedback.hasFailed())
+            <td><b>Cause of failure:</b>$feedback.statusMessage</td>
+            #end
+        </tr>
+        #end
+    </table>
+
+</p>
+
 #end
 </p>
 

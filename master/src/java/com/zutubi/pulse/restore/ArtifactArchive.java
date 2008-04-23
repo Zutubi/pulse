@@ -1,6 +1,7 @@
 package com.zutubi.pulse.restore;
 
 import com.zutubi.pulse.bootstrap.MasterUserPaths;
+import com.zutubi.pulse.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.restore.feedback.Feedback;
 import com.zutubi.pulse.restore.feedback.FeedbackProvider;
 import com.zutubi.util.IOUtils;
@@ -22,6 +23,7 @@ public class ArtifactArchive extends AbstractArchivableComponent implements Feed
 {
     private MasterUserPaths paths;
     private Feedback feedback;
+    private SystemConfiguration systemConfiguration;
 
     public String getName()
     {
@@ -31,9 +33,7 @@ public class ArtifactArchive extends AbstractArchivableComponent implements Feed
     public String getDescription()
     {
         return "The artifacts restoration consists of moving around the directories located within the " +
-                "PULSE_DATA/projects directory to match the restructured project hierarchy.  This step is " +
-                "only necessary if the projects directory has been manually transfered from the 1.2.x " +
-                "PULSE_DATA directory into the 2.0 PULSE_DATA directory.";
+                "PULSE_DATA/projects directory to match the restructured project hierarchy.";
     }
 
     public void backup(File archive) throws ArchiveException
@@ -54,6 +54,15 @@ public class ArtifactArchive extends AbstractArchivableComponent implements Feed
             // not the number of mappings.
 
             File base = paths.getProjectRoot();
+
+            if (systemConfiguration.getRestoreArtifacts() != null)
+            {
+                base = new File(systemConfiguration.getRestoreArtifacts());
+                if (!base.isDirectory())
+                {
+                    throw new ArchiveException("Requested artifact restore path " + base.getCanonicalPath() + " does not exist.");
+                }
+            }
 
             if (base.isDirectory())
             {
@@ -169,6 +178,11 @@ public class ArtifactArchive extends AbstractArchivableComponent implements Feed
     public void setFeedback(Feedback feedback)
     {
         this.feedback = feedback;
+    }
+
+    public void setSystemConfiguration(SystemConfiguration systemConfiguration)
+    {
+        this.systemConfiguration = systemConfiguration;
     }
 
     private class NonDeadDirectoryFilter implements FileFilter

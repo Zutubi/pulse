@@ -23,6 +23,8 @@ public interface SystemConfiguration
 
     public static final String RESTORE_FILE = "pulse.restore.file";
 
+    public static final String RESTORE_ARTIFACTS = "pulse.restore.artifacts";
+
     public static final String SSL_ENABLED      = "ssl.enabled";
     public static final String SSL_KEYSTORE     = "ssl.keystore";
     public static final String SSL_PASSWORD     = "ssl.password";
@@ -49,6 +51,8 @@ public interface SystemConfiguration
     String getContextPathNormalised();
 
     String getRestoreFile();
+
+    String getRestoreArtifacts();
 
     void setDataPath(String path);
 

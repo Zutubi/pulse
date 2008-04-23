@@ -46,6 +46,11 @@ public class SystemConfigurationSupport extends ConfigSupport implements SystemC
         return config.getProperty(RESTORE_FILE);
     }
 
+    public String getRestoreArtifacts()
+    {
+        return config.getProperty(RESTORE_ARTIFACTS);
+    }
+
     /**
      * @return the web app context path in a normalised form suitable for
      *         appending further path elements like: contextPath + "/" + path

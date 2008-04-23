@@ -127,6 +127,7 @@ public class DefaultArchiveManager implements ArchiveManager
                     }
                     catch (ArchiveException e)
                     {
+                        feedback.setStatusMessage(e.getMessage());
                         throw e;
                     }
                     catch (Throwable t)
@@ -145,8 +146,11 @@ public class DefaultArchiveManager implements ArchiveManager
                             errors.append(error);
                         }
 
-                        throw new ArchiveException("RestoreTask '" + task.getName() + "' is marked as failed. " +
-                                "The following errors were recorded:" + errors.toString());
+                        String message = "RestoreTask '" + task.getName() + "' is marked as failed. The " +
+                                "following errors were recorded:" + errors.toString();
+                        feedback.setStatusMessage(message);
+                        
+                        throw new ArchiveException(message);
                     }
 
                     taskMonitor.completed();

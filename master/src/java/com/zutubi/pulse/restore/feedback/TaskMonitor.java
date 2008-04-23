@@ -1,9 +1,10 @@
 package com.zutubi.pulse.restore.feedback;
 
 import com.zutubi.pulse.util.TimeStamps;
-import com.zutubi.pulse.restore.RestoreTask;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -13,6 +14,7 @@ import java.util.Map;
 public class TaskMonitor
 {
     private Map<Object, Feedback> feedbacks = new HashMap<Object, Feedback>();
+    private List<Object> tasks = new LinkedList<Object>();
 
     private Object currentTask = null;
 
@@ -34,6 +36,7 @@ public class TaskMonitor
         {
             feedback = new Feedback();
             feedbacks.put(task, feedback);
+            tasks.add(task);
         }
         return feedback;
     }
@@ -189,4 +192,8 @@ public class TaskMonitor
         return successful;
     }
 
+    public List<Object> getTasks()
+    {
+        return tasks;
+    }
 }

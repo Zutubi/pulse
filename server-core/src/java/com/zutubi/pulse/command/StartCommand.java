@@ -49,6 +49,8 @@ public class StartCommand implements Command
 
     private String restoreFile = null;
 
+    private String restoreArtifacts = null;
+
     /**
      * Specify the port to which pulse will bind its web user interface.
      *
@@ -83,6 +85,16 @@ public class StartCommand implements Command
         this.bindAddress = bindAddress;
     }
 
+    public void setRestoreArtifacts(String value)
+    {
+        this.restoreArtifacts = value;
+    }
+
+    public void setRestoreFile(String optionValue)
+    {
+        this.restoreFile = optionValue;
+    }
+
     @SuppressWarnings({ "ACCESS_STATIC_VIA_INSTANCE", "AccessStaticViaInstance" })
     private void parse(String... argv) throws ParseException
     {
@@ -111,6 +123,10 @@ public class StartCommand implements Command
                 .hasArg()
                 .create('r'));
 
+        options.addOption(OptionBuilder.withLongOpt("restore-artifacts")
+                .hasArg()
+                .create('a'));
+
         CommandLineParser parser = new PosixParser();
         CommandLine commandLine = parser.parse(options, argv, true);
 
@@ -138,11 +154,10 @@ public class StartCommand implements Command
         {
             setRestoreFile(commandLine.getOptionValue('r'));
         }
-    }
-
-    private void setRestoreFile(String optionValue)
-    {
-        this.restoreFile = optionValue;
+        if (commandLine.hasOption('a'))
+        {
+            setRestoreArtifacts(commandLine.getOptionValue('a'));
+        }
     }
 
     public int execute(BootContext context) throws ParseException
@@ -189,14 +204,19 @@ public class StartCommand implements Command
                 System.setProperty(SystemConfiguration.CONTEXT_PATH, contextPath);
             }
 
+            if (TextUtils.stringSet(bindAddress))
+            {
+                System.setProperty(SystemConfiguration.WEBAPP_BIND_ADDRESS, bindAddress);
+            }
+
             if (TextUtils.stringSet(restoreFile))
             {
                 System.setProperty(SystemConfiguration.RESTORE_FILE, restoreFile);
             }
 
-            if (TextUtils.stringSet(bindAddress))
+            if (TextUtils.stringSet(restoreArtifacts))
             {
-                System.setProperty(SystemConfiguration.WEBAPP_BIND_ADDRESS, bindAddress);
+                System.setProperty(SystemConfiguration.RESTORE_ARTIFACTS, restoreArtifacts);
             }
 
             SystemBootstrapManager bootstrap = new SystemBootstrapManager();
@@ -239,6 +259,8 @@ public class StartCommand implements Command
         options.put("-c [--contextpath] path", "the pulse web application context path");
         options.put("-b [--bindaddress] addr", "the address to bind the server to");
         options.put("-f [--config] file", "specify an alternate config file");
+        options.put("-r [--restore] file", "restore this pulse installation from the specified archive");
+        options.put("-a [--restore-artifacts] dir", "restore the artifacts from the specified directory");
         return options;
     }
 

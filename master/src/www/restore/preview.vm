@@ -26,23 +26,6 @@
     </table>
 </p>
 
-<!--
-This task listing needs work - do we actually need it? 
-#if($tasks.size() > 0)
-<p >
-    The following tasks will be executed during the restore:
-    <table id="restore.task.details"  style="width:50%" class="content">
-        #foreach($task in $tasks)
-        <tr style="width:50%">
-            <th class="content-row">$task.name</th>
-            <td>$task.description</td>
-        </tr>
-        #end
-    </table>
-</p>
-#end
--->
-
 <p style="width:50%">
     Please be aware that this restore will overwrite all of your existing configuration and settings.
 </p>

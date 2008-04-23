@@ -56,6 +56,16 @@ public class Feedback
         status = TaskStatus.FAILURE;
     }
 
+    public boolean hasFailed()
+    {
+        return status == TaskStatus.FAILURE;
+    }
+
+    public TaskStatus getStatus()
+    {
+        return status;
+    }
+
     public void errored()
     {
         finish();
