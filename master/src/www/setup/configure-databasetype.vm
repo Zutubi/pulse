@@ -1,17 +1,26 @@
 <html>
 <head>
     <title>#i18n("key=database.type.setup")</title>
+    <link rel="stylesheet" type="text/css" href="/css/setup.css"></link>
 </head>
 <body>
-    <div class="config-panel">
-        <h3 class="config-header">#i18n("key=database.type.setup")</h3>
-        <div class="config-container">
-            #pform("path=$path" "formName=mainform" "action=setup/setupDatabaseType.action" "namespace=setup")
+
+    <div id="rightcolumn">
+        <div id="description-panel">
+            <div id="description">
+                #i18n("key=database.type.blurb")
+            </div>
         </div>
-        #checkForm($path $type "mainform" "setupwizard")
     </div>
-    <div style="text-align:left;width:70%">
-        #i18n("key=database.type.blurb")
+
+    <div id="leftcolumn">
+        <div class="config-panel">
+            <h3 class="config-header">#i18n("key=database.type.setup")</h3>
+            <div class="config-container">
+                #pform("path=$path" "formName=mainform" "action=setup/setupDatabaseType.action" "namespace=setup")
+            </div>
+            #checkForm($path $type "mainform" "setupwizard")
+        </div>
     </div>
 </body>
 </html>

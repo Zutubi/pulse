@@ -1,10 +1,31 @@
 <html>
+<head>
+    <link rel="stylesheet" type="text/css" href="/css/setup.css"></link>
+</head>
 <body>
-<div class="config-panel">
-    #pwizard("path=$action.path" "namespace=setupwizard")
-#if($state.hasConfigurationCheck())
-    #checkForm($action.path $state.type "wizardForm" "setupwizard")
-#end
-</div>
+
+    <div id="rightcolumn">
+        <div id="description-panel">
+            <div id="description">
+                <h2>Admin User</h2>
+                <p>The admin user is the special administration user account created to administer this server.  It is
+                    through this account that you will begin setting up your installation, adding users and projects
+                    as necessary.  This user can not be deleted.</p>
+                <h2>Server Settings.</h2>
+                <p>The server settings allows you to speed up the configuration of this pulse installation by providing
+                you with some of the more common server settings.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="leftcolumn">
+        <div class="config-panel">
+            #pwizard("path=$action.path" "namespace=setupwizard")
+        #if($state.hasConfigurationCheck())
+            #checkForm($action.path $state.type "wizardForm" "setupwizard")
+        #end
+        </div>
+    </div>
+
 </body>
 </html>
