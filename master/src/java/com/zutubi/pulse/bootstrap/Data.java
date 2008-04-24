@@ -51,6 +51,7 @@ public class Data implements MasterUserPaths
     private File driverRoot;
 
     private File backupRoot;
+    private File restoreRoot;
 
     private Config config = null;
 
@@ -361,6 +362,15 @@ public class Data implements MasterUserPaths
             backupRoot = new File(pulseData, "backups");
         }
         return backupRoot;
+    }
+
+    public File getRestoreRoot()
+    {
+        if (restoreRoot == null)
+        {
+            restoreRoot = new File(pulseData, "restore");
+        }
+        return restoreRoot;
     }
 
     private File getConfigFile()

@@ -19,6 +19,8 @@ public interface ArchiveManager
 
     void restoreArchive();
 
+    File postRestore();
+
     Archive createArchive() throws ArchiveException;
 
     //--( proposed interface, not yet implemented )---

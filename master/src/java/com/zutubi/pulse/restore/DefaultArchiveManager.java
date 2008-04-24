@@ -1,12 +1,13 @@
 package com.zutubi.pulse.restore;
 
-import com.zutubi.pulse.bootstrap.UserPaths;
+import com.zutubi.pulse.bootstrap.Data;
 import com.zutubi.pulse.restore.feedback.Feedback;
 import com.zutubi.pulse.restore.feedback.FeedbackProvider;
 import com.zutubi.pulse.restore.feedback.TaskMonitor;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -20,12 +21,14 @@ public class DefaultArchiveManager implements ArchiveManager
 
     private List<RestoreTask> tasks = new LinkedList<RestoreTask>();
 
+    private File source;
     private Archive archive;
+    private File backedUpArchive;
 
     private File tmpDirectory;
 
     //TODO: bypass the UserPaths instance, set the directory directly to ease testing and minimise the dependencies.
-    private UserPaths paths = null;
+    private Data paths = null;
 
     private List<ArchiveableComponent> archiveableComponents = new LinkedList<ArchiveableComponent>();
 
@@ -48,6 +51,8 @@ public class DefaultArchiveManager implements ArchiveManager
 
     public Archive prepareRestore(File source) throws ArchiveException
     {
+        this.source = source;
+
         ArchiveFactory factory = new ArchiveFactory();
         factory.setTmpDirectory(tmpDirectory);
 
@@ -176,6 +181,44 @@ public class DefaultArchiveManager implements ArchiveManager
         }
 
         taskMonitor.finish();
+
+        if(taskMonitor.isSuccessful())
+        {
+            backupSourceFile();
+        }
+    }
+
+    public File postRestore()
+    {
+        return backedUpArchive;
+    }
+
+    private void backupSourceFile()
+    {
+        if(source.getParentFile().equals(paths.getRestoreRoot()))
+        {
+            File backupRoot = paths.getBackupRoot();
+            if(backupRoot.isDirectory() || backupRoot.mkdirs())
+            {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
+                backedUpArchive = new File(backupRoot, String.format("restored-%s.zip", sdf.format(System.currentTimeMillis())));
+                if(!backedUpArchive.exists())
+                {
+                    if(!source.renameTo(backedUpArchive))
+                    {
+                        LOG.severe("Unable to backup restore archive to '" + backedUpArchive.getAbsolutePath() + "'");
+                    }
+                }
+                else
+                {
+                    LOG.severe("Unable to store backup of restore archive as a file '" + backedUpArchive.getAbsolutePath() + "' already exists.");
+                }
+            }
+            else
+            {
+                LOG.severe("Unable to create backup directory '" + backupRoot.getAbsolutePath() + "'");
+            }
+        }
     }
 
     public Archive createArchive() throws ArchiveException
@@ -205,7 +248,7 @@ public class DefaultArchiveManager implements ArchiveManager
         this.tmpDirectory = tmpDirectory;
     }
 
-    public void setPaths(UserPaths paths)
+    public void setPaths(Data paths)
     {
         this.paths = paths;
     }

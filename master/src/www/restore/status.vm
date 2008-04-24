@@ -25,12 +25,6 @@
         </div>
     </div>
 </div>
-
-    #set($currentTask = $monitor.currentTask)
-    #set($currentFeedback = $monitor.currentTaskProgress)
-    #set($percentageComplete = $currentFeedback.percentageComplete)
-    #set($percentageRemaining = 100 - $percentageComplete)
-
 <div id="leftcolumn">
     <h1 id="restore.progress">Restore Progress</h1>
 
@@ -54,6 +48,12 @@
             </td>
 
             <!-- Current task progress (right side) -->
+
+    #set($currentTask = $monitor.currentTask)
+    #set($currentFeedback = $monitor.currentTaskProgress)
+    #set($percentageComplete = $currentFeedback.percentageComplete)
+    #set($percentageRemaining = 100 - $percentageComplete)
+
             <td style="width: 100%; border: solid 1px #dde; padding: 10px;">
                 <table id="task-progress">
                     <tr>

@@ -14,12 +14,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 import javax.sql.DataSource;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -34,8 +29,6 @@ import java.util.Map;
 public class DatabaseArchive extends AbstractArchivableComponent implements FeedbackProvider
 {
     private static final String EXPORT_FILENAME = "export.xml";
-    
-    private static final String TABLE_FILENAME = "table.properties";
     
     private List<String> mappings = new LinkedList<String>();
 

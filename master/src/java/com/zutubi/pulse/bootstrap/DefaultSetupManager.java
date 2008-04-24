@@ -21,7 +21,6 @@ import com.zutubi.pulse.restore.ArchiveManager;
 import com.zutubi.pulse.restore.feedback.TaskMonitor;
 import com.zutubi.pulse.upgrade.UpgradeManager;
 import com.zutubi.pulse.util.DriverWrapper;
-import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.IOUtils;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
@@ -598,10 +597,10 @@ public class DefaultSetupManager implements SetupManager
             return new File(systemConfig.getRestoreFile());
         }
 
-        UserPaths paths = configurationManager.getUserPaths();
+        MasterUserPaths paths = configurationManager.getUserPaths();
         if (paths != null)
         {
-            File restoreDir = new File(paths.getData(), "restore");
+            File restoreDir = paths.getRestoreRoot();
             File[] ls = restoreDir.listFiles(new FileFilter()
             {
                 public boolean accept(File file)
@@ -648,7 +647,7 @@ public class DefaultSetupManager implements SetupManager
             }
             catch (ArchiveException e)
             {
-                e.printStackTrace();
+                LOG.severe("Restore preparation failed: " + e.getMessage(), e);
             }
 
             // show restoration preview page.
@@ -672,17 +671,11 @@ public class DefaultSetupManager implements SetupManager
 
     public void doCancelRestorationRequest() throws IOException
     {
-        // delete the PULSE_DATA/restore/archive.zip
-        FileSystemUtils.delete(getArchiveFile());
-
         requestRestoreComplete();
     }
 
     public void doCompleteRestoration() throws IOException
     {
-        // remove the archive since the restoration is complete.
-        FileSystemUtils.delete(getArchiveFile());
-
         requestRestoreComplete();
     }
 

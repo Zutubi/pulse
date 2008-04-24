@@ -23,14 +23,18 @@
     The restore has been successful (time elapsed: $monitor.elapsedTimePretty). Please click <a id="continue" href="continue.action">continue</a> to proceed with
     the server startup.  
 </p>
+#if ($archiveBackedUp)
+<p>
+    <img alt="info" src="$base/images/information.gif"/> Archive backed up to '$backedUpArchive.absolutePath'.
+</p>
+#end
 #else
 <div id="leftcolumn">
 <h1 id="restore.complete">Restore Failed</h1>
 <p>
-    The restore has failed.
+    The restore has failed.  See below for details.
 </p>
 <p>
-    <h2>Task Overview</h2>
     <table class="columns" width="70%">
         <tr>
             <td class="columns" width="90%">

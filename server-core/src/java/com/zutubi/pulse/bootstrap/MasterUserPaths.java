@@ -30,6 +30,8 @@ public interface MasterUserPaths extends UserPaths
      */
     File getBackupRoot();
 
+    File getRestoreRoot();
+
     File getUserRoot();
 
     File getUserTemplateRoot();

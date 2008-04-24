@@ -2,9 +2,10 @@ package com.zutubi.pulse.web.restore;
 
 import com.zutubi.pulse.bootstrap.DefaultSetupManager;
 import com.zutubi.pulse.bootstrap.SetupManager;
-import com.zutubi.pulse.restore.feedback.TaskMonitor;
 import com.zutubi.pulse.restore.RestoreTask;
+import com.zutubi.pulse.restore.feedback.TaskMonitor;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -14,6 +15,17 @@ import java.util.List;
 public class ExecuteRestoreAction extends RestoreActionSupport
 {
     private SetupManager setupManager;
+    private File backedUpArchive;
+
+    public boolean isArchiveBackedUp()
+    {
+        return backedUpArchive != null;
+    }
+
+    public File getBackedUpArchive()
+    {
+        return backedUpArchive;
+    }
 
     public List<RestoreTask> getTasks()
     {
@@ -28,26 +40,8 @@ public class ExecuteRestoreAction extends RestoreActionSupport
     public String execute() throws Exception
     {
         ((DefaultSetupManager)setupManager).doExecuteRestorationRequest();
-
-        while (!getMonitor().isStarted())
-        {
-            // this is to give the restore an opportunity to start before we return to the user.
-            pause(200);
-        }
-
+        backedUpArchive = archiveManager.postRestore();
         return SUCCESS;
-    }
-
-    private void pause(long time)
-    {
-        try
-        {
-            Thread.sleep(time);
-        }
-        catch (InterruptedException e)
-        {
-            // noop.
-        }
     }
 
     public void setSetupManager(SetupManager setupManager)
