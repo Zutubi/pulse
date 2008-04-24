@@ -5,13 +5,10 @@ import com.zutubi.pulse.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.restore.feedback.Feedback;
 import com.zutubi.pulse.restore.feedback.FeedbackProvider;
 import com.zutubi.util.IOUtils;
+import com.zutubi.util.Pair;
+import com.zutubi.util.StringUtils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,7 +44,7 @@ public class ArtifactArchive extends AbstractArchivableComponent implements Feed
         try
         {
             File mappingsFile = new File(archive, "mappings.txt");
-            Map<Long, Long> mappings = readMappings(mappingsFile);
+            Map<Pair<String, String>, String> mappings = readMappings(mappingsFile);
 
             // progress on this restoration is based on how quickly and how many directories
             // we need to move/rename.  This is based purely on the number of build directories,
@@ -88,20 +85,21 @@ public class ArtifactArchive extends AbstractArchivableComponent implements Feed
                 long completedCout = 0;
                 for (File projectDir : base.listFiles(directoriesOnly))
                 {
+                    String fromProject = projectDir.getName();
                     for (File buildDir : projectDir.listFiles(directoriesOnly))
                     {
                         if (buildDir.getName().equals("builds"))
                         {
                             for (File nestedBuildDir : buildDir.listFiles(directoriesOnly))
                             {
-                                processBuildDirectory(nestedBuildDir, directoriesOnly, mappings, base);
+                                processBuildDirectory(fromProject, nestedBuildDir, mappings, base);
                                 completedCout++;
                                 feedback.setPercetageComplete((int) (completedCout * 100 / todoCount));
                             }
                         }
                         else
                         {
-                            processBuildDirectory(buildDir, directoriesOnly, mappings, base);
+                            processBuildDirectory(fromProject, buildDir, mappings, base);
                             completedCout++;
                             feedback.setPercetageComplete((int) (completedCout * 100 / todoCount));
                         }
@@ -116,27 +114,24 @@ public class ArtifactArchive extends AbstractArchivableComponent implements Feed
         }
     }
 
-    private void processBuildDirectory(File buildDir, NonDeadDirectoryFilter directoriesOnly, Map<Long, Long> mappings, File base) throws IOException
+    private void processBuildDirectory(String fromProject, File buildDir, Map<Pair<String, String>, String> mappings, File base) throws IOException
     {
-        for (File recipeDir : buildDir.listFiles(directoriesOnly))
+        // move the build directory into the specified project.
+        String buildNumber = buildDir.getName();
+        String toProject = mappings.get(new Pair<String, String>(fromProject, buildNumber));
+
+        if (toProject != null)
         {
-            Long recipeResultId = Long.valueOf(recipeDir.getName());
-            if (mappings.containsKey(recipeResultId))
+            File mappedProjectDir = new File(base, toProject);
+            if (!mappedProjectDir.isDirectory() && !mappedProjectDir.mkdirs())
             {
-                Long projectId = mappings.get(recipeResultId);
+                throw new IOException("Failed to create new project directory: " + mappedProjectDir.getCanonicalPath());
+            }
 
-                // move the build directory into the specified project.
-                File mappedProjectDir = new File(base, Long.toString(projectId));
-                if (!mappedProjectDir.isDirectory() && !mappedProjectDir.mkdirs())
-                {
-                    throw new IOException("Failed to create new project directory: " + mappedProjectDir.getCanonicalPath());
-                }
-
-                File newBuildDir = new File(mappedProjectDir, buildDir.getName());
-                if (!buildDir.renameTo(newBuildDir))
-                {
-                    throw new IOException("Failed to move " + buildDir.getCanonicalPath() + " to " + newBuildDir.getCanonicalPath());
-                }
+            File newBuildDir = new File(mappedProjectDir, buildNumber);
+            if (!buildDir.renameTo(newBuildDir))
+            {
+                throw new IOException("Failed to move " + buildDir.getCanonicalPath() + " to " + newBuildDir.getCanonicalPath());
             }
         }
     }
@@ -146,9 +141,9 @@ public class ArtifactArchive extends AbstractArchivableComponent implements Feed
         this.paths = paths;
     }
 
-    private Map<Long, Long> readMappings(File file) throws IOException
+    private Map<Pair<String, String>, String> readMappings(File file) throws IOException
     {
-        Map<Long, Long> mappings = new HashMap<Long, Long>();
+        Map<Pair<String, String>, String> mappings = new HashMap<Pair<String, String>, String>();
 
         BufferedReader reader = null;
         try
@@ -161,10 +156,14 @@ public class ArtifactArchive extends AbstractArchivableComponent implements Feed
                 {
                     continue;
                 }
-                int index = line.indexOf("->");
-                Long recipeResultId = Long.valueOf(line.substring(0, index));
-                Long projectId = Long.valueOf(line.substring(index + 2));
-                mappings.put(recipeResultId, projectId);
+
+                String[] pieces = StringUtils.split(line, ',');
+                if(pieces.length != 3)
+                {
+                    continue;
+                }
+
+                mappings.put(new Pair<String, String>(pieces[0], pieces[1]), pieces[2]);
             }
         }
         finally
