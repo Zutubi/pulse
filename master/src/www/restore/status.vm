@@ -3,98 +3,94 @@
     <meta http-equiv="refresh" content='5;url=#wwurl("includeParams=all")'/>
     <link rel="stylesheet" type="text/css" href="/css/setup.css"></link>
 </head>
-
 <body>
-
 <div id="rightcolumn">
     <div id="description-panel">
         <div id="description">
-            <h2>Records</h2>
+            <h3>Records</h3>
             <p>The records restore task imports the systems configuration into the 2.0 record storage system. This
             data includes, amongst other things, your project and user configuration.</p>
-            <h2>Database</h2>
-            <p>The database restoration imports the pulse runtime data into your selected database.  Depending on
-            the amount of runtime data, this may take from several seconds to 10s of minutes.</p>
+            <h3>Database</h3>
+            <p>The database restoration imports the Pulse runtime data into your selected database.  Depending on
+            the amount of runtime data, this may take from several seconds to tens of minutes.</p>
             <p>The status message for the database restoration will give you an indication of which table is being
             imported, and in the case of very large tables, what row it is up to.</p>
-            <h2>Custom configuration</h2>
-            <p>The customisations restore task will restore any custom templates that you may have stored in the
-            PULSE_DATA/config directory.</p>
-            <h2>Artifacts</h2>
-            <p>This restore task will run only if you have chosen to import the artifacts from your previous installation.
+            <h3>Custom Configuration</h3>
+            <p>This task will restore any custom templates that you may have stored in the $PULSE_DATA/config
+            directory.</p>
+            <h3>Artifacts</h3>
+            <p>This task will run only if you have chosen to import the artifacts from your previous installation.
             Since the directory layout has changed slightly between 1.2.x and 2.0, this task will reorganise your artifacts
-            accordingly.  Depending on the number of directories that need to be renamed / moved, this may take some time.</p>
+            accordingly.  Depending on the number of directories that need to be moved, this may take some time.</p>
         </div>
     </div>
 </div>
 
+    #set($currentTask = $monitor.currentTask)
+    #set($currentFeedback = $monitor.currentTaskProgress)
+    #set($percentageComplete = $currentFeedback.percentageComplete)
+    #set($percentageRemaining = 100 - $percentageComplete)
+
 <div id="leftcolumn">
     <h1 id="restore.progress">Restore Progress</h1>
 
-    #set($overallPercentageComplete = $monitor.percentageComplete)
-    #set($overallPercentageRemaining = 100 - $overallPercentageComplete)
+    <table style="width: 540px; margin: 20px;">
+        <tr>
+            <!-- Task list (left side) -->
+            <td style="vertical-align: top;">
+                <ul id="restore-tasks">
+#foreach($task in $tasks)
+    #set($taskIndex = $velocityCount - 1)
+    #if($monitor.completedTasks > $taskIndex)
+        #set($taskClass = "task-complete")
+    #elseif($monitor.completedTasks == $taskIndex)
+        #set($taskClass = "task-inprogress")
+    #else
+        #set($taskClass = "task-pending")
+    #end
+                    <li class="$taskClass">$task.name</li>
+#end
+                </ul>
+            </td>
+
+            <!-- Current task progress (right side) -->
+            <td style="width: 100%; border: solid 1px #dde; padding: 10px;">
+                <table id="task-progress">
+                    <tr>
+                        <th>Task Progress:</th>
+                        <td class="stretch">
+                            <table width="100%">
+                                <tr>
+                                    #if ($percentageComplete > 0)
+                                        <td width="$percentageComplete%" class="okaybar">#if($percentageComplete >= 50) $percentageComplete% #else &nbsp; #end</td>
+                                    #end
+                                    #if ($percentageComplete < 100)
+                                        <td width="$percentageRemaining%" class="clearbar">#if($percentageComplete >= 0 && $percentageComplete < 50) $percentageComplete% #else &nbsp; #end</td>
+                                    #end
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Elapsed time:</th>
+                        <td class="stretch">$currentFeedback.elapsedTimePretty</td>
+                    </tr>
+                    <tr>
+                        <th>Estimated time:</th>
+                        <td class="stretch">$currentFeedback.estimatedTimePretty</td>
+                    </tr>
+                    <tr>
+                        <th>Status message:</th>
+                        <td class="stretch">$currentFeedback.statusMessage</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
 
     <p>
-        <table width="85%" class="content" border="1">
-            <tr>
-                <th class="content-row">Percentage complete</th>
-                <td class="content">$monitor.percentageComplete %</td>
-            </tr>
-            <tr>
-                <th class="content-row">Elapsed time</th>
-                <td class="content" style="width:60%">$monitor.elapsedTimePretty</td>
-            </tr>
-        </table>
+        <strong>Total Elapsed Time</strong>: $monitor.elapsedTimePretty
     </p>
-
-    #set($currentTask = $monitor.currentTask)
-    #set($currentFeedback = $monitor.currentTaskProgress)
-
-    <p>
-        <table width="85%">
-            <tr width="40%" style="text-align:center;">
-            #foreach($task in $tasks)
-                #set($feedback = $monitor.getProgress($task))
-                #if ($feedback.getPercentageComplete() <= 0)
-                    <td colspan=2 class="clearbar">$task.name</td>
-                #elseif ($feedback.getPercentageComplete() == 100)
-                    <td colspan=2 class="okaybar">$task.name</td>
-                #else
-                    <td width="$feedback.getPercentageComplete()%" class="okaybar">$task.name</td>
-                    <td width="$feedback.getPercentageRemaining()%" class="clearbar">&nbsp;</td>
-                #end
-            #end
-            </tr>
-        </table>
-    </p>
-
-    <p>
-        <table width="85%" class="content" border="1">
-            <tr>
-                <th class="content-row">Current task</th>
-                <td class="content" style="width:60%">$currentTask.name</td>
-            </tr>
-            <tr>
-                <th class="content-row">Percentage complete</th>
-                <td class="content" style="width:60%">$currentFeedback.percentageCompletePretty</td>
-            </tr>
-            <tr>
-                <th class="content-row">Elapsed time</th>
-                <td class="content" style="width:60%">$currentFeedback.elapsedTimePretty</td>
-            </tr>
-            <tr>
-                <th class="content-row">Estimated time</th>
-                <td class="content" style="width:60%">$currentFeedback.estimatedTimePretty</td>
-            </tr>
-            <tr>
-                <th class="content-row">Status message</th>
-                <td class="content" style="width:60%">$currentFeedback.statusMessage</td>
-            </tr>
-        </table>
-
-    </p>
-
 </div>
-
 </body>
 </html>

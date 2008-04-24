@@ -4,11 +4,11 @@
     <link rel="stylesheet" type="text/css" href="/css/setup.css"></link>
 </head>
 <body>
-
     <div id="rightcolumn">
         <div id="description-panel">
             <div id="description">
-                #i18n("key=database.type.blurb")
+                <h3>#i18n("key=database.type.blurb.heading")</h3>
+                <p>#i18n("key=database.type.blurb")</p>
             </div>
         </div>
     </div>

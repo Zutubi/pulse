@@ -672,7 +672,9 @@ a.dec {
 td.okaybar {
     background: #eeeeff;
     border: 1px solid #9c9c9c;
-    padding: 0;
+    padding: 1px;
+    text-align: right;
+    font-size: 10px;
 }
 
 td.errorbar {
@@ -690,7 +692,8 @@ td.warningbar {
 td.clearbar {
     background: #ffffff;
     border: 1px solid #9c9c9c;
-    padding: 0;
+    padding: 1px;
+    font-size: 10px;
 }
 
 .license-status {

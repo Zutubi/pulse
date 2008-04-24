@@ -2,7 +2,6 @@ package com.zutubi.pulse.bootstrap;
 
 import com.opensymphony.xwork.spring.SpringObjectFactory;
 import com.zutubi.prototype.config.*;
-import com.zutubi.prototype.config.cleanup.ConfigurationCleanupManager;
 import com.zutubi.prototype.type.record.DelegatingHandleAllocator;
 import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.pulse.Version;
@@ -438,6 +437,7 @@ public class DefaultSetupManager implements SetupManager
             printConsoleMessage("Database empty, requesting setup via web UI...");
             state = SetupState.SETUP;
             initialInstallation = true;
+            showPrompt();
             return;
         }
         requestSetupComplete(false);

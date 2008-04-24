@@ -7,11 +7,11 @@
     <div id="rightcolumn">
         <div id="description-panel">
             <div id="description">
-                <h2>Obtaining a license key</h2>
-                <p>Licenses to activate pulse are available from the <a href="http://www.zutubi.com/sales/">zutubi.com</a> website.</p>
+                <h3>Obtaining a license key</h3>
+                <p>Licenses to activate Pulse are available from the <a href="http://www.zutubi.com/sales/">zutubi.com</a> website.</p>
                 <p>Alternatively, you can request a new evaluation license directly
-                    by entering your contact details in the form provided.  Please note, for this to work
-                    the pulse installation will need network access to http://zutubi.com.</p>
+                    by entering your contact details in the form provided.  Please note that for this to work
+                    the Pulse installation will need network access to http://zutubi.com.</p>
             </div>
         </div>
     </div>
@@ -25,6 +25,5 @@
         </div>
         #wwaction("namespace=/ajax" "name=requestLicense!input" "executeResult=true" "flush=true")
     </div>
-
 </body>
 </html>

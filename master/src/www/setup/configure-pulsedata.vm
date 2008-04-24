@@ -4,13 +4,9 @@
     <link rel="stylesheet" type="text/css" href="/css/setup.css"></link>
 </head>
 <body>
-
-
     <div id="rightcolumn">
         <div id="description-panel">
-
             <div id="description">
-
                 <h3>What is the data directory?</h3>
                 <p> The data directory is where your pulse server stores all data, including: </p>
                 <p>
@@ -23,13 +19,12 @@
                 <h3>Where should it go?</h3>
                 <p> This directory may be stored anywhere on the host machine. It is best to keep this directory
                     separate to the pulse installation directory, so that it can be easily backed up and/or upgraded to a new version of pulse. </p>
-
             </div>
         </div>
     </div>
 
     <div id="leftcolumn">
-        <div class="config">
+        <div class="config-panel">
             <h3 class="config-header">#i18n("key=data.setup")</h3>
             <div class="config-container">
                 #pform("path=$path" "action=setup/setupData.action" "namespace=setup")
@@ -46,8 +41,6 @@
                 </p>
             #end
         </div>
-
     </div>
-
 </body>
 </html>

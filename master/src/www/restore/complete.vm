@@ -5,15 +5,13 @@
 
 <body>
 
-#if ($monitor.isSuccessful())
-
-#else
+#if (!$monitor.isSuccessful())
 <div id="rightcolumn">
     <div id="description-panel">
         <div id="description">
-            <p>It appears as though one of the restoration tasks has failed.  The cause of this failure will be listed
-            in the task overview on the left.  If you believe this to be a bug, please report this failure to <a href="mailto:support@zutubi.com">zutubi support</a>.
-            Please include your server log files with this report.</p>
+            <p>A restoration task has failed.  The cause of this failure is listed in the task overview on the left.
+            If you believe this to be a bug, please report this failure to <a href="mailto:support@zutubi.com">zutubi
+            support</a>.  Please include the message on this page and your server log files with this report.</p>
         </div>
     </div>
 </div>
@@ -22,35 +20,30 @@
 #if ($monitor.isSuccessful())
 <h1 id="restore.complete">Restore Complete</h1>
 <p>
-    The restore has been successful after $monitor.elapsedTimePretty. Please click <a id="continue" href="continue.action">continue</a> to proceed with
+    The restore has been successful (time elapsed: $monitor.elapsedTimePretty). Please click <a id="continue" href="continue.action">continue</a> to proceed with
     the server startup.  
 </p>
-
-
 #else
 <div id="leftcolumn">
 <h1 id="restore.complete">Restore Failed</h1>
 <p>
-    The restore has been unsuccessful.
+    The restore has failed.
 </p>
-
 <p>
-    <h2>Task overview</h2>
+    <h2>Task Overview</h2>
     <table class="columns" width="70%">
         <tr>
             <td class="columns" width="90%">
                 <table id="upgrade.task.details" class="fill-content">
-                    #foreach($task in $monitor.tasks)
-                        #set($feedback = $monitor.getProgress($task))
+#foreach($task in $monitor.tasks)
+    #set($feedback = $monitor.getProgress($task))
                     #dynamicRow($task.name $feedback.status)
-                    #if($feedback.hasFailed())
+    #if($feedback.hasFailed())
                     <tr>
                         <td colspan="2"><b>Cause of failure:</b> $feedback.statusMessage</td>
                     </tr>
-                </table>
-                <table class="fill-content">
-                        #end
-                    #end
+    #end
+#end
                 </table>
             </td>
         </tr>

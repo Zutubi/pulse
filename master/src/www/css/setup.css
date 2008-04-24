@@ -22,7 +22,8 @@
     margin-right: 30px;
     padding: 8px 15px 10px 15px;
     margin-bottom: 0;
-    background-color: #ffcccc;
+    background-color: #ffffcc;
+    border: solid 1px #ee8;
 }
 
 #description {
@@ -45,4 +46,39 @@ li {
     list-style: disc;
     padding: 4px;
     margin-left: 20px;
+}
+
+#task-progress {
+    width: 100%;
+}
+
+#task-progress th {
+    text-align: right;
+    padding: 4px;
+}
+
+#task-progress td.stretch {
+    width: 100%;
+    padding: 4px;
+}
+
+#restore-tasks {
+    padding: 0;
+}
+
+#restore-tasks li {
+    margin: 0;
+    font-size: 13px;
+    line-height: 20px;
+    padding-left: 24px;
+    list-style: none;
+}
+
+li.task-inprogress {
+    font-weight: bold;
+    background: url( ../images/inprogress.gif ) no-repeat 4px 6px #dde;
+}
+
+li.task-complete {
+    background: url( ../images/accept.gif ) no-repeat 4px 6px;
 }

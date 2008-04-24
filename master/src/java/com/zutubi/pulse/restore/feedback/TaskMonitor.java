@@ -124,6 +124,11 @@ public class TaskMonitor
         return currentTask;
     }
 
+    public int getCompletedTasks()
+    {
+        return completedTasks;
+    }
+
     public Feedback getCurrentTaskProgress()
     {
         return getProgress(currentTask);

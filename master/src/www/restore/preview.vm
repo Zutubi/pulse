@@ -6,10 +6,10 @@
 <body>
 
 <div id="rightcolumn">
-    <div id="description-panel">
+    <div id="description-warning">
         <div id="description">
-            <h2>Warning</h2>
-            <p>This restore will drop all existing tables in your specified pulse database.  If you have any custom
+            <h3>Warning</h3>
+            <p>This restore will drop all existing tables in your specified Pulse database.  If you have any custom
             tables in the same database as Pulse, please ensure that you back them up before continuing with this restore.
             </p>
         </div>
@@ -21,21 +21,21 @@
     <p>
         <table class="content" border="1">
             <tr>
-                <th class="content-row">Date</th>
+                <th class="content-row">Archive Date</th>
                 <td class="content">$info.created</td>
             </tr>
             <tr>
-                <th class="content-row">Name</th>
+                <th class="content-row">Archive Name</th>
                 <td class="content">$info.original.name</td>
             </tr>
             <tr>
-                <th class="content-row">Location</th>
+                <th class="content-row">Archive Location</th>
                 <td class="content">$info.original.parentFile.absolutePath</td>
             </tr>
         </table>
     </p>
-    <p>
-        Please be aware that this restore will overwrite all of your existing configuration and settings.
+    <p style="margin-bottom: 16px">
+        <img alt="warning" src="$base/images/exclamation.gif"/> Please be aware that this restore will overwrite all of your existing configuration and settings.
     </p>
     <table class="form">
         <tr width="2">
