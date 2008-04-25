@@ -3,9 +3,7 @@ package com.zutubi.pulse.command;
 import com.zutubi.pulse.transfer.TransferAPI;
 import com.zutubi.pulse.transfer.TransferException;
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,13 +14,10 @@ import java.util.List;
  */
 public class ImportCommand extends DataCommand
 {
-    public int doExecute(String... argv) throws IOException, ParseException
+    public int doExecute(CommandLine commandLine) throws IOException, ParseException
     {
-        CommandLineParser parser = new PosixParser();
-        CommandLine commandLine = parser.parse(getSharedOptions(), argv, true);
-
         String[] args = commandLine.getArgs();
-        if (args.length == 0)
+        if (args.length != 1)
         {
             HelpCommand helpCommand = new HelpCommand();
             helpCommand.showHelp("import", this);

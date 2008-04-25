@@ -1,14 +1,14 @@
 package com.zutubi.pulse.bootstrap;
 
-import com.zutubi.util.TextUtils;
 import com.zutubi.pulse.bootstrap.conf.EnvConfig;
 import com.zutubi.pulse.bootstrap.conf.VolatileReadOnlyConfig;
 import com.zutubi.pulse.config.Config;
 import com.zutubi.pulse.config.FileConfig;
+import com.zutubi.pulse.database.DatabaseConfig;
 import com.zutubi.pulse.events.DataDirectoryChangedEvent;
 import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.database.DatabaseConfig;
 import com.zutubi.util.IOUtils;
+import com.zutubi.util.TextUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -72,6 +72,11 @@ public class SimpleMasterConfigurationManager extends AbstractConfigurationManag
         return null;
     }
 
+    public File getDatabaseConfigFile()
+    {
+        return new File(getUserPaths().getUserConfigRoot(), "database.properties");
+    }
+
     public DatabaseConfig getDatabaseConfig() throws IOException
     {
         if (dbConfig == null)
@@ -80,7 +85,7 @@ public class SimpleMasterConfigurationManager extends AbstractConfigurationManag
 
             if (getUserPaths() != null && getUserPaths().getUserConfigRoot() != null)
             {
-                File configFile = new File(getUserPaths().getUserConfigRoot(), "database.properties");
+                File configFile = getDatabaseConfigFile();
                 if (configFile.exists())
                 {
                     p.putAll(IOUtils.read(configFile));
@@ -92,7 +97,6 @@ public class SimpleMasterConfigurationManager extends AbstractConfigurationManag
                     p.putAll(IOUtils.read(configFile));
                 }
             }
-
 
             dbConfig = new DatabaseConfig(p);
             dbConfig.setUserPaths(getUserPaths());
