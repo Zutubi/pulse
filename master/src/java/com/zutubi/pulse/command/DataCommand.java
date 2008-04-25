@@ -1,26 +1,19 @@
 package com.zutubi.pulse.command;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.bootstrap.SystemBootstrapManager;
-import com.zutubi.pulse.bootstrap.DatabaseConfig;
-import com.zutubi.pulse.bootstrap.SystemConfiguration;
+import com.zutubi.pulse.bootstrap.*;
 import com.zutubi.pulse.bootstrap.conf.EnvConfig;
 import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.OptionBuilder;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.PosixParser;
-import org.springframework.core.io.Resource;
+import org.apache.commons.cli.*;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
 import javax.sql.DataSource;
+import java.io.File;
 import java.io.IOException;
 import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The abstract base command for commands used to import/export data.
@@ -40,6 +33,7 @@ public abstract class DataCommand implements Command
     private String pulseConfig;
 
     protected DataSource dataSource;
+    protected MasterConfigurationManager configurationManager;
     protected DatabaseConfig databaseConfig;
     protected MutableConfiguration configuration;
 
@@ -65,25 +59,18 @@ public abstract class DataCommand implements Command
 
     public int execute(BootContext context) throws ParseException, IOException
     {
-        parse(context.getCommandArgv());
-
-        // update the system properties
-        if (TextUtils.stringSet(pulseData))
-        {
-            System.setProperty(SystemConfiguration.PULSE_DATA, pulseData);
-        }
-
-        if (TextUtils.stringSet(pulseConfig))
-        {
-            System.setProperty(EnvConfig.PULSE_CONFIG, pulseConfig);
-        }
-        else if (TextUtils.stringSet(System.getenv(ENV_PULSE_CONFIG)))
-        {
-            System.setProperty(EnvConfig.PULSE_CONFIG, System.getenv(ENV_PULSE_CONFIG));
-        }
+        CommandLine commandLine = parse(context.getCommandArgv());
+        updateSystemProperties();
 
         SystemBootstrapManager sbm = new SystemBootstrapManager();
         sbm.loadBootstrapContext();
+
+        configurationManager = (MasterConfigurationManager) ComponentContext.getBean("configurationManager");
+        if (!checkConfigFile())
+        {
+            return 2;
+        }
+
         ComponentContext.addClassPathContextDefinitions("classpath:/com/zutubi/pulse/bootstrap/context/databaseContext.xml");
         ComponentContext.addClassPathContextDefinitions("classpath:/com/zutubi/pulse/bootstrap/context/hibernateMappingsContext.xml");
 
@@ -98,11 +85,60 @@ public abstract class DataCommand implements Command
             configuration.addInputStream(resource.getInputStream());
         }
 
-        databaseConfig = (DatabaseConfig) ComponentContext.getBean("databaseConfig");
+        databaseConfig = configurationManager.getDatabaseConfig();
         configuration.setProperties(databaseConfig.getHibernateProperties());
 
-        return doExecute(context);
+        DefaultSetupManager.printConsoleMessage("Using database configuration '%s'", configurationManager.getDatabaseConfigFile());
+        DefaultSetupManager.printConsoleMessage("Using database '%s'", databaseConfig.getUrl());
+
+        return doExecute(commandLine);
    }
+
+    private void updateSystemProperties()
+    {
+        if (TextUtils.stringSet(pulseData))
+        {
+            System.setProperty(SystemConfiguration.PULSE_DATA, pulseData);
+        }
+
+        if (TextUtils.stringSet(pulseConfig))
+        {
+            System.setProperty(EnvConfig.PULSE_CONFIG, pulseConfig);
+        }
+        else if (TextUtils.stringSet(System.getenv(ENV_PULSE_CONFIG)))
+        {
+            System.setProperty(EnvConfig.PULSE_CONFIG, System.getenv(ENV_PULSE_CONFIG));
+        }
+    }
+
+    private boolean checkConfigFile()
+    {
+        EnvConfig envConfig = configurationManager.getEnvConfig();
+        String configFileName = envConfig.getPulseConfig();
+        if(TextUtils.stringSet(configFileName))
+        {
+            File configFile = new File(configFileName);
+            DefaultSetupManager.printConsoleMessage("Using config file '%s'", configFile.getAbsolutePath());
+            if(!configFile.exists())
+            {
+                System.err.println("Specified config file '" + configFileName + "' does not exist");
+                return false;
+            }
+        }
+        else
+        {
+            configFileName = envConfig.getDefaultPulseConfig(MasterConfigurationManager.CONFIG_DIR);
+            File configFile = new File(configFileName);
+            DefaultSetupManager.printConsoleMessage("No config file specified, using default '%s'", configFile.getAbsolutePath());
+            if(!configFile.exists())
+            {
+                System.err.println("Default config file '" + configFileName + "' does not exist");
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     public Map<String, String> getOptions()
     {
@@ -122,7 +158,7 @@ public abstract class DataCommand implements Command
      * functionality in this method. When this method is invoked, the
      * dataSource will be available.
      */
-    public abstract int doExecute(BootContext context) throws IOException, ParseException;
+    public abstract int doExecute(CommandLine commandLine) throws IOException, ParseException;
 
     @SuppressWarnings({ "AccessStaticViaInstance" })
     protected Options getSharedOptions()
@@ -149,13 +185,14 @@ public abstract class DataCommand implements Command
         }
     }
 
-    public void parse(String... argv) throws ParseException
+    public CommandLine parse(String... argv) throws ParseException
     {
         Options options = getSharedOptions();
         
         CommandLineParser parser = new PosixParser();
-        CommandLine commandLine = parser.parse(options, argv, true);
+        CommandLine commandLine = parser.parse(options, argv, false);
 
         processSharedOptions(commandLine);
+        return commandLine;
     }
 }

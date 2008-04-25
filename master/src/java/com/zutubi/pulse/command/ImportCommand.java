@@ -1,32 +1,26 @@
 package com.zutubi.pulse.command;
 
+import com.zutubi.pulse.transfer.JDBCTransferException;
+import com.zutubi.pulse.transfer.TransferAPI;
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import com.zutubi.pulse.transfer.TransferAPI;
-import com.zutubi.pulse.transfer.JDBCTransferException;
-
 /**
  */
 public class ImportCommand extends DataCommand
 {
-    public int doExecute(BootContext context) throws IOException, ParseException
+    public int doExecute(CommandLine commandLine) throws IOException, ParseException
     {
-        CommandLineParser parser = new PosixParser();
-        CommandLine commandLine = parser.parse(getSharedOptions(), context.getCommandArgv(), true);
-
         String[] args = commandLine.getArgs();
-        if (args.length == 0)
+        if (args.length != 1)
         {
             HelpCommand helpCommand = new HelpCommand();
-            helpCommand.showHelp(context.getArgv()[0], this);
+            helpCommand.showHelp("import", this);
             return 1;
         }
 

@@ -27,5 +27,6 @@ public interface MasterConfigurationManager extends ConfigurationManager, DataRe
 
     File getHomeDirectory();
 
+    File getDatabaseConfigFile();
     DatabaseConfig getDatabaseConfig() throws IOException;
 }

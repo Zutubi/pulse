@@ -5,8 +5,8 @@ import com.zutubi.pulse.bootstrap.conf.EnvConfig;
 import com.zutubi.pulse.bootstrap.conf.VolatileReadOnlyConfig;
 import com.zutubi.pulse.config.Config;
 import com.zutubi.pulse.config.FileConfig;
-import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.DataDirectoryChangedEvent;
+import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.util.IOUtils;
 
 import java.io.File;
@@ -92,19 +92,25 @@ public class SimpleMasterConfigurationManager extends AbstractConfigurationManag
         return null;
     }
 
+    public File getDatabaseConfigFile()
+    {
+        File configFile = null;
+        if (getUserPaths() != null && getUserPaths().getUserConfigRoot() != null)
+        {
+            configFile = new File(getUserPaths().getUserConfigRoot(), "database.properties");
+        }
+        if (configFile == null || !configFile.exists())
+        {
+            configFile = new File(getSystemPaths().getConfigRoot(), "database.properties.template");
+        }
+        return configFile;
+    }
+
     public DatabaseConfig getDatabaseConfig() throws IOException
     {
         if (dbConfig == null)
         {
-            File configFile = null;
-            if (getUserPaths() != null && getUserPaths().getUserConfigRoot() != null)
-            {
-                configFile = new File(getUserPaths().getUserConfigRoot(), "database.properties");
-            }
-            if (configFile == null || !configFile.exists())
-            {
-                configFile = new File(getSystemPaths().getConfigRoot(), "database.properties.template");
-            }
+            File configFile = getDatabaseConfigFile();
 
             // It is an existing installation, fallback to the defaults.
             dbConfig = new DatabaseConfig(IOUtils.read(configFile));
