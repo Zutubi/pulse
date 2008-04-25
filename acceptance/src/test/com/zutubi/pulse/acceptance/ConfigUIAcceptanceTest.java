@@ -740,6 +740,32 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         assertTextPresent("An SCM must be configured to complete this project.");
     }
 
+    public void testSaveNoParentPath() throws Exception
+    {
+        loginAsAdmin();
+        goTo(urls.adminSettings());
+        ServerSettingsForm form = new ServerSettingsForm(selenium);
+        form.waitFor();
+        String url = "http://somehelpurl.com/" + random;
+        form.applyFormElements(null, null, url, null, null, null, null, null, null);
+
+        form.waitFor();
+        form.assertFormElements(null, null, url, null, null, null, null, null, null);
+    }
+
+    public void testCancelNoParentPath() throws Exception
+    {
+        loginAsAdmin();
+        goTo(urls.adminSettings());
+        ServerSettingsForm form = new ServerSettingsForm(selenium);
+        form.waitFor();
+        String originalUrl = form.getFieldValue("baseHelpUrl");
+        form.resetFormElements(null, null, "http://somehelpurl.com/" + random, null, null, null, null, null, null);
+
+        form.waitFor();
+        form.assertFormElements(null, null, originalUrl, null, null, null, null, null, null);
+    }
+
     private void insertProperty(String projectPath) throws Exception
     {
         insertProperty(projectPath, "p1");

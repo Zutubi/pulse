@@ -156,6 +156,11 @@ public abstract class SeleniumForm
         submitFormElements("cancel", args);
     }
 
+    public void resetFormElements(String... args)
+    {
+        submitFormElements("reset", args);
+    }
+
     private void submit(String id)
     {
         selenium.click("zfid." + id);

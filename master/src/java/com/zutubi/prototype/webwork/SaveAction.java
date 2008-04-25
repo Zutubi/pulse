@@ -3,7 +3,6 @@ package com.zutubi.prototype.webwork;
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.prototype.type.ComplexType;
 import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.TypeException;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
@@ -31,8 +30,7 @@ public class SaveAction extends PrototypeSupport
     public void doCancel()
     {
         String parentPath = PathUtils.getParentPath(path);
-        Type parentType = configurationTemplateManager.getType(parentPath);
-        if(PrototypeUtils.isEmbeddedCollection(parentType))
+        if(isParentEmbeddedCollection(parentPath))
         {
             path = parentPath;
         }
@@ -90,8 +88,7 @@ public class SaveAction extends PrototypeSupport
 
         String newPath = configurationTemplateManager.saveRecord(path, (MutableRecord) record);
 
-        ComplexType parentType = configurationTemplateManager.getType(parentPath);
-        if(PrototypeUtils.isEmbeddedCollection(parentType))
+        if(isParentEmbeddedCollection(parentPath))
         {
             path = PathUtils.getParentPath(newPath);
             response = new ConfigurationResponse(path, configurationTemplateManager.getTemplatePath(path));
@@ -109,5 +106,16 @@ public class SaveAction extends PrototypeSupport
         }
 
         return doRender();
+    }
+
+    private boolean isParentEmbeddedCollection(String parentPath)
+    {
+        if(parentPath == null)
+        {
+            return false;
+        }
+
+        ComplexType parentType = configurationTemplateManager.getType(parentPath);
+        return PrototypeUtils.isEmbeddedCollection(parentType);
     }
 }
