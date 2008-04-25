@@ -39,6 +39,7 @@
             <interceptor name="fileUpload" class="com.opensymphony.webwork.interceptor.FileUploadInterceptor"/>
             <interceptor name="execAndWait" class="com.opensymphony.webwork.interceptor.ExecuteAndWaitInterceptor"/>
 
+            <interceptor name="taskExecAndWait" class="com.zutubi.pulse.webwork.interceptor.ExecAndWaitInterceptor"/>
             <interceptor name="prepare" class="com.zutubi.pulse.xwork.interceptor.PrepareInterceptor"/>
             <interceptor name="cancel" class="com.zutubi.pulse.xwork.interceptor.CancelWorkflowInterceptor"/>
             <interceptor name="prototypeWizard" class="com.zutubi.prototype.wizard.webwork.ConfigurationWizardInterceptor"/>
@@ -77,6 +78,11 @@
             <interceptor-stack name="executeAndWaitStack">
                 <interceptor-ref name="defaultStack"/>
                 <interceptor-ref name="execAndWait"/>
+            </interceptor-stack>
+
+            <interceptor-stack name="taskExecuteAndWaitStack">
+                <interceptor-ref name="defaultStack"/>
+                <interceptor-ref name="taskExecAndWait"/>
             </interceptor-stack>
 
             <!-- Everything minus the hibernate session.  Not typically used for actions -->

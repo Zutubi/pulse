@@ -245,6 +245,7 @@ public class TransferAPI
 
         public void start() throws TransferException
         {
+            listener.start();
             delegate.start();
         }
 
@@ -268,6 +269,7 @@ public class TransferAPI
 
         public void end() throws TransferException
         {
+            listener.end();
             delegate.end();
         }
 

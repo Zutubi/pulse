@@ -146,6 +146,11 @@ public class DatabaseArchive extends AbstractArchivableComponent implements Feed
                     private long tableRowCount = 0;
                     private long rowsCountedSoFar = 0;
 
+                    public void start()
+                    {
+
+                    }
+
                     public void startTable(Table table)
                     {
                         currentTable = table.getName();
@@ -157,13 +162,28 @@ public class DatabaseArchive extends AbstractArchivableComponent implements Feed
                         rowCount++;
                         rowsCountedSoFar++;
                         feedback.setStatusMessage("" + currentTable + ": " + rowCount + "/" + tableRowCount);
-                        feedback.setPercetageComplete((int)((100 * rowsCountedSoFar)/ allTablesRowCount));
+                        int percentageComplete = (int)((100 * rowsCountedSoFar)/ allTablesRowCount);
+                        if (percentageComplete < 100)
+                        {
+                            feedback.setPercetageComplete(percentageComplete);
+                        }
+                        else
+                        {
+                            // will leaving the feedback at 99 cause a problem?.. if so, we will need a hook to
+                            // tell us when the processing is complete so that we can set it to 100.
+                            feedback.setPercetageComplete(99);
+                        }
                     }
 
                     public void endTable()
                     {
                         rowCount = 0;
                         currentTable = "";
+                    }
+
+                    public void end()
+                    {
+                        feedback.setStatusMessage("finalizing database scheme, applying constraints.");
                     }
                 });
                 transfer.restore(configuration, export, dataSource);

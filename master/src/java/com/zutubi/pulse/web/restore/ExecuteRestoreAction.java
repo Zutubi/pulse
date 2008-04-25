@@ -39,8 +39,21 @@ public class ExecuteRestoreAction extends RestoreActionSupport
 
     public String execute() throws Exception
     {
+        // Ensure that we behave correctly if this action is triggered a second time.
+        TaskMonitor monitor = archiveManager.getTaskMonitor();
+        if (monitor.isFinished())
+        {
+            return SUCCESS;
+        }
+
+        if (monitor.isStarted())
+        {
+            return "wait";
+        }
+        
         ((DefaultSetupManager)setupManager).doExecuteRestorationRequest();
         backedUpArchive = archiveManager.postRestore();
+
         return SUCCESS;
     }
 
