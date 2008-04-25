@@ -102,6 +102,8 @@ public class FileServlet extends HttpServlet
             response.setContentType(URLConnection.guessContentTypeFromName(filename));
         }
 
+        response.setContentLength((int) pfo.getContent().getSize());
+
         InputStream is = null;
         try
         {
