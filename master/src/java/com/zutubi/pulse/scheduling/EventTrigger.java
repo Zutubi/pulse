@@ -56,19 +56,6 @@ public class EventTrigger extends Trigger
         return TYPE;
     }
 
-    public String getEditKey()
-    {
-        String result = getType();
-
-        for(Class c: triggers)
-        {
-            result += '.';
-            result += c.getSimpleName();
-        }
-
-        return result;
-    }
-
     /**
      * Get the array of Event classes that will trigger this event trigger.
      *
