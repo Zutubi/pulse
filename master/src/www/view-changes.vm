@@ -26,10 +26,9 @@
     #else
         #set($revision = "no build")
     #end
-
     <tr>
         #contentRowHeading($key)
-        #contentCell($revision)
+        #staticCell($revision)
     </tr>
 #end
 
