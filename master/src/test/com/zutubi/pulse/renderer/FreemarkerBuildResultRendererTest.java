@@ -33,7 +33,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         freemarkerConfiguration.setDirectoryForTemplateLoading(pulseRoot);
         freemarkerConfiguration.setObjectWrapper(new DefaultObjectWrapper());
         freemarkerConfiguration.addAutoInclude("macro.ftl");
-        freemarkerConfiguration.setSharedVariable("urls", new Urls(""));
+        freemarkerConfiguration.setSharedVariable("externalUrls", new Urls(""));
         renderer.setFreemarkerConfiguration(freemarkerConfiguration);
     }
 

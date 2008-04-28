@@ -12,35 +12,35 @@ Returns a link to the projecty home page for the project the given build
 belongs to.
 ----------------------------------------------------------------------------]
 [#function projectLink result]
-    [#return urls.project(result.project)/]
+    [#return externalUrls.project(result.project)/]
 [/#function]
 
 [#---------------------------------------------------------------------------
 Returns a link to the summary page for a build result.
 ----------------------------------------------------------------------------]
 [#function buildLink result]
-    [#return urls.build(result)/]
+    [#return externalUrls.build(result)/]
 [/#function]
 
 [#---------------------------------------------------------------------------
 Returns a link to the tests page for a build result.
 ----------------------------------------------------------------------------]
 [#function testsLink result]
-    [#return urls.buildTests(result)/]
+    [#return externalUrls.buildTests(result)/]
 [/#function]
 
 [#---------------------------------------------------------------------------
 Returns a link to the detailed view page for a build stage.
 ----------------------------------------------------------------------------]
 [#function stageDetailsLink result node]
-    [#return urls.stageDetails(result, node)/]
+    [#return externalUrls.stageDetails(result, node)/]
 [/#function]
 
 [#---------------------------------------------------------------------------
 Returns a link to the tests page for a build stage.
 ----------------------------------------------------------------------------]
 [#function stageTestsLink result node]
-    [#return urls.stageTests(result, node)/]
+    [#return externalUrls.stageTests(result, node)/]
 [/#function]
 
 
@@ -414,10 +414,10 @@ Shows a list of links for a build.
 [#macro buildLinksHTML result]
     <p style="font-size: 85%">
         jump to ::
-          <a href="${urls.buildSummary(result)}">summary</a>
-        | <a href="${urls.buildChanges(result)}">changes</a>
-        | <a href="${urls.buildTests(result)}">tests</a>
-        | <a href="${urls.buildArtifacts(result)}">artifacts</a>
+          <a href="${externalUrls.buildSummary(result)}">summary</a>
+        | <a href="${externalUrls.buildChanges(result)}">changes</a>
+        | <a href="${externalUrls.buildTests(result)}">tests</a>
+        | <a href="${externalUrls.buildArtifacts(result)}">artifacts</a>
     <p/>
 [/#macro]
 
@@ -438,7 +438,7 @@ Shows a summary table for a build.
         </tr>
         <tr>
             [#assign class = result.state.string]
-            [@linkCell cc=result.number?c url="${urls.build(result)}" class=class/]
+            [@linkCell cc=result.number?c url="${externalUrls.build(result)}" class=class/]
             [@classCell cc=result.stateName?lower_case/]
             [@classCell cc=result.reason.summary/]
             [@linkCell cc=result.testSummary url="${testsLink(result)}" class=class/]
@@ -456,7 +456,7 @@ Shows a list of links to build stage logs.
     <p style="font-size: 85%">
         stage logs ::
     [#list result.root.children as child]
-        <a href="${urls.stageLogs(result, child)}">${child.stageName?html}</a> [#if child_has_next]|[/#if]
+        <a href="${externalUrls.stageLogs(result, child)}">${child.stageName?html}</a> [#if child_has_next]|[/#if]
     [/#list]
     </p>
 [/#macro]
@@ -517,7 +517,7 @@ Shows a table with the given changelists.
             [#else]
             [@contentCell cc=renderer.transformCommentWithoutTrimming(result, change)/]
             [/#if]
-            [@linkCell cc="view" url="${urls.buildChangelist(result, change.id)}"/]
+            [@linkCell cc="view" url="${externalUrls.buildChangelist(result, change.id)}"/]
         </tr>
         [/#list]
     [#else]
@@ -553,7 +553,7 @@ list.
             [#if !renderer.featureLimitReached(buildMessageCount)]
         <li class="${level?lower_case}"><pre class="feature">${feature.summary?html}</pre>
                 [#if feature.isPlain()]
-                <a class="unadorned" href="${urls.commandArtifacts(result, command)}${artifact.pathUrl}/#${feature.firstLine?c}">
+                <a class="unadorned" href="${externalUrls.commandArtifacts(result, command)}${artifact.pathUrl}/#${feature.firstLine?c}">
                     <span class="small">jump to &gt;&gt;</span>
                 </a>
                 [/#if]

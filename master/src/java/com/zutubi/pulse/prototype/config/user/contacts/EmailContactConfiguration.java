@@ -3,6 +3,7 @@ package com.zutubi.pulse.prototype.config.user.contacts;
 import com.zutubi.config.annotations.Classification;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.Wire;
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.NotificationException;
@@ -25,6 +26,7 @@ import java.util.Properties;
 @SymbolicName("zutubi.emailContactConfig")
 @Form(fieldOrder = {"name", "address"})
 @Classification(single = "email")
+@Wire
 public class EmailContactConfiguration extends ContactConfiguration
 {
     private static final Logger LOG = Logger.getLogger(EmailContactConfiguration.class);
