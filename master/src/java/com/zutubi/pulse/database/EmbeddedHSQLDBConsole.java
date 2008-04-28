@@ -4,6 +4,7 @@ import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
 import com.zutubi.pulse.upgrade.tasks.SchemaRefactor;
 import com.zutubi.pulse.util.JDBCUtils;
 import com.zutubi.util.logging.Logger;
+import org.apache.commons.dbcp.BasicDataSource;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
@@ -83,6 +84,30 @@ public class EmbeddedHSQLDBConsole implements DatabaseConsole
 
     public void postSchemaHook()
     {
+    }
+
+    public void postRestoreHook(boolean restored)
+    {
+        // This full restart of the database is required as HSQL handling of
+        // foreign key constraints seems to go awry after constraints are
+        // added to an existing table and the same Database instance
+        // continues to be used.  This could even happen after a single
+        // unclean restart as in this case the constraints could be replayed
+        // from the db.log file.  A full shutdown here refreshes the
+        // Database instance for this run of Pulse, and the compaction
+        // ensures that no replays occur from db.log.
+        if(restored)
+        {
+            stop(true);
+            try
+            {
+                ((BasicDataSource)dataSource).close();
+            }
+            catch (SQLException e)
+            {
+                LOG.severe(e);
+            }
+        }
     }
 
     public void postUpgradeHook(boolean changes)

@@ -70,6 +70,10 @@ public class RemoteDatabaseConsole implements DatabaseConsole, ApplicationContex
         checkPostgres();
     }
 
+    public void postRestoreHook(boolean restored)
+    {
+    }
+
     public void postUpgradeHook(boolean changes)
     {
         if(changes)

@@ -21,11 +21,11 @@ public interface SetupManager
 
     void requestDbComplete();
 
+    void requestRestoreComplete(boolean restored);
+
     void requestLicenseComplete();
 
     void requestUpgradeComplete(boolean changes);
 
     void requestSetupComplete(boolean setupWizard);
-
-    void requestRestoreComplete();
 }

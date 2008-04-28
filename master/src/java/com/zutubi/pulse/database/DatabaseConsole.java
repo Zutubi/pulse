@@ -24,5 +24,7 @@ public interface DatabaseConsole extends Stoppable
 
     void postSchemaHook();
 
+    void postRestoreHook(boolean restored);
+
     void postUpgradeHook(boolean changes);
 }

@@ -326,8 +326,10 @@ public class DefaultSetupManager implements SetupManager
         }
     }
 
-    public void requestRestoreComplete()
+    public void requestRestoreComplete(boolean restored)
     {
+        databaseConsole.postRestoreHook(restored);
+        
         linkUserTemplates();
 
         initialiseConfigurationPersistence();
@@ -571,7 +573,7 @@ public class DefaultSetupManager implements SetupManager
         {
             return false;
         }
-        if (archive.isFile())
+        if (archive.exists())
         {
             return true;
         }
@@ -656,7 +658,7 @@ public class DefaultSetupManager implements SetupManager
             return;
         }
 
-        requestRestoreComplete();
+        requestRestoreComplete(false);
     }
 
     // continue selected on the restoration preview page.
@@ -671,12 +673,12 @@ public class DefaultSetupManager implements SetupManager
 
     public void doCancelRestorationRequest() throws IOException
     {
-        requestRestoreComplete();
+        requestRestoreComplete(false);
     }
 
     public void doCompleteRestoration() throws IOException
     {
-        requestRestoreComplete();
+        requestRestoreComplete(true);
     }
 
     //---( end )
