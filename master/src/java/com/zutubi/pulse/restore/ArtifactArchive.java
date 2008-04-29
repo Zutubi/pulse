@@ -44,64 +44,67 @@ public class ArtifactArchive extends AbstractArchivableComponent implements Feed
         try
         {
             File mappingsFile = new File(archive, "mappings.txt");
-            Map<Pair<String, String>, String> mappings = readMappings(mappingsFile);
-
-            // progress on this restoration is based on how quickly and how many directories
-            // we need to move/rename.  This is based purely on the number of build directories,
-            // not the number of mappings.
-
-            File base = paths.getProjectRoot();
-
-            if (systemConfiguration.getRestoreArtifacts() != null)
+            if (mappingsFile.isFile())
             {
-                base = new File(systemConfiguration.getRestoreArtifacts());
-                if (!base.isDirectory())
-                {
-                    throw new ArchiveException("Requested artifact restore path " + base.getCanonicalPath() + " does not exist.");
-                }
-            }
+                Map<Pair<String, String>, String> mappings = readMappings(mappingsFile);
 
-            if (base.isDirectory())
-            {
-                // a) get a quick overall directory count.
-                NonDeadDirectoryFilter directoriesOnly = new NonDeadDirectoryFilter();
+                // progress on this restoration is based on how quickly and how many directories
+                // we need to move/rename.  This is based purely on the number of build directories,
+                // not the number of mappings.
 
-                long todoCount = 0;
-                for (File projectDir : base.listFiles(directoriesOnly))
+                File base = paths.getProjectRoot();
+
+                if (systemConfiguration.getRestoreArtifacts() != null)
                 {
-                    for (File buildDir : projectDir.listFiles(directoriesOnly))
+                    base = new File(systemConfiguration.getRestoreArtifacts());
+                    if (!base.isDirectory())
                     {
-                        if (buildDir.getName().equals("builds"))
-                        {
-                            todoCount = todoCount + buildDir.listFiles(directoriesOnly).length;
-                        }
-                        else
-                        {
-                            todoCount++;
-                        }
+                        throw new ArchiveException("Requested artifact restore path " + base.getCanonicalPath() + " does not exist.");
                     }
                 }
 
-                long completedCout = 0;
-                for (File projectDir : base.listFiles(directoriesOnly))
+                if (base.isDirectory())
                 {
-                    String fromProject = projectDir.getName();
-                    for (File buildDir : projectDir.listFiles(directoriesOnly))
+                    // a) get a quick overall directory count.
+                    NonDeadDirectoryFilter directoriesOnly = new NonDeadDirectoryFilter();
+
+                    long todoCount = 0;
+                    for (File projectDir : base.listFiles(directoriesOnly))
                     {
-                        if (buildDir.getName().equals("builds"))
+                        for (File buildDir : projectDir.listFiles(directoriesOnly))
                         {
-                            for (File nestedBuildDir : buildDir.listFiles(directoriesOnly))
+                            if (buildDir.getName().equals("builds"))
                             {
-                                processBuildDirectory(fromProject, nestedBuildDir, mappings, base);
+                                todoCount = todoCount + buildDir.listFiles(directoriesOnly).length;
+                            }
+                            else
+                            {
+                                todoCount++;
+                            }
+                        }
+                    }
+
+                    long completedCout = 0;
+                    for (File projectDir : base.listFiles(directoriesOnly))
+                    {
+                        String fromProject = projectDir.getName();
+                        for (File buildDir : projectDir.listFiles(directoriesOnly))
+                        {
+                            if (buildDir.getName().equals("builds"))
+                            {
+                                for (File nestedBuildDir : buildDir.listFiles(directoriesOnly))
+                                {
+                                    processBuildDirectory(fromProject, nestedBuildDir, mappings, base);
+                                    completedCout++;
+                                    feedback.setPercetageComplete((int) (completedCout * 100 / todoCount));
+                                }
+                            }
+                            else
+                            {
+                                processBuildDirectory(fromProject, buildDir, mappings, base);
                                 completedCout++;
                                 feedback.setPercetageComplete((int) (completedCout * 100 / todoCount));
                             }
-                        }
-                        else
-                        {
-                            processBuildDirectory(fromProject, buildDir, mappings, base);
-                            completedCout++;
-                            feedback.setPercetageComplete((int) (completedCout * 100 / todoCount));
                         }
                     }
                 }
