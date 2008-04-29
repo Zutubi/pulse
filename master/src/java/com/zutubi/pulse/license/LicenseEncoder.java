@@ -309,13 +309,21 @@ public class LicenseEncoder implements LicenseKeyFactory
             expiry.add(Calendar.YEAR, 1);
             license.setExpiryDate(expiry.getTime());
 
+            System.out.println("Name: " + license.getHolder());
+            System.out.println("Type: " + license.getType());
+            System.out.println("Expiry: " + license.getExpiryDate());
+            System.out.println(" - projects: " + license.getSupportedProjects());
+            System.out.println(" - users: " + license.getSupportedUsers());
+            System.out.println(" - agents: " + license.getSupportedAgents());
+            System.out.println("");
+            
             LicenseEncoder encoder = new LicenseEncoder();
             return new String(encoder.encode(license));
         }
 
         public static void main(String argv[])
         {
-            String licenseKey = "AAAAQEVOVEVSUFJJU0UKaW5zZXJ0IG5hbWUgaGVyZQoyMDA5LTA1LTE0IDEzOjQ2OjIyIEVTVAoxNgotMQotMQotMQof0dwX73ZRIZ3JnmoE8u0qS5BUaoQZjLUaJQPB2+1YzQ6FLCyGDbuNGw78W8oJ+s0f2Fw/s7t/qBqb1t0YCOokj2td1ll3rwVKsvPFzdOqxl/BzaMvQ6rN/DKSFg+PwV/Pd1sLu1H3kkqsMVSN2CjydT/oI9CxEtL5uq8r3bEQHQ==";
+            String licenseKey = "";
             System.out.println(new RenewLicense(licenseKey).renew());
         }
 
