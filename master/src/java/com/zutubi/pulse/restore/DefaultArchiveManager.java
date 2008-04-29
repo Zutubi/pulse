@@ -4,6 +4,7 @@ import com.zutubi.pulse.bootstrap.Data;
 import com.zutubi.pulse.restore.feedback.Feedback;
 import com.zutubi.pulse.restore.feedback.FeedbackProvider;
 import com.zutubi.pulse.restore.feedback.TaskMonitor;
+import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
@@ -185,6 +186,12 @@ public class DefaultArchiveManager implements ArchiveManager
         if(taskMonitor.isSuccessful())
         {
             backupSourceFile();
+        }
+
+        // cleanup the extracted archive.
+        if (!FileSystemUtils.rmdir(archive.getBase()))
+        {
+            // Failed to cleanup the extracted archive file.  This is not desired, but not fatal.
         }
     }
 
