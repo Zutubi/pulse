@@ -13,7 +13,7 @@ import java.util.Date;
  *
  *
  */
-public class License
+public final class License
 {
     private LicenseType type;
     private String holder;
@@ -69,6 +69,11 @@ public class License
     {
         this.supportedContactPoints = contactPoints;
         return this;
+    }
+
+    public void setExpiryDate(Date date)
+    {
+        this.expiryDate = date;
     }
 
     /**

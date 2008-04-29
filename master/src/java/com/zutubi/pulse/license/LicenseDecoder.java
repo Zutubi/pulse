@@ -31,6 +31,11 @@ public class LicenseDecoder
                     "xJtqrYf3DVKE+YOOGBoemnfxv2me6BZ2KQl4++xyw98Hou7uTu84qhdR+IU9jCp96sExUV6GGEmqBpca" +
                     "PYVXIwb48/NndEhEktXIc4hpMXhWWxF1GbMb8bLf3umas4onAgMBAAE=").getBytes();
 
+    public License decode(String raw) throws LicenseException
+    {
+        return decode(raw.getBytes());
+    }
+
     public License decode(byte[] raw) throws LicenseException
     {
         // remove the base 64 encoding.
