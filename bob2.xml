@@ -32,8 +32,8 @@
             <ant targets="accept.master"/>
             <macro-ref macro="${capture-junit}"/>
             <dir-artifact name="acceptance output" base="working" fail-if-not-present="false">
-                <include pattern="**/*std*.txt"/>
-                <include pattern="pulse-accept/*/logs/**"/>
+	        <include pattern="**/*"/>
+                <exclude pattern="pulse-accept/pulse-*"/>
             </dir-artifact>
         </command>
     </recipe>
