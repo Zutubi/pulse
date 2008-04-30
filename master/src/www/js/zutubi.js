@@ -535,11 +535,12 @@ Ext.extend(ZUTUBI.Form, Ext.form.Form, {
         {
             field.enable();
 
-            var labelDomEl = this.getFieldLabelDomEl(id);
-            if (labelDomEl)
+            var rowEl = this.getFieldRowEl(id);
+            if (rowEl)
             {
-                Ext.get(labelDomEl).removeClass('x-item-disabled');
+                Ext.get(rowEl).removeClass('x-item-disabled');
             }
+
             var actionDomEls = this.getFieldActionDomEls(id);
             if (actionDomEls)
             {
@@ -559,11 +560,12 @@ Ext.extend(ZUTUBI.Form, Ext.form.Form, {
             field.clearInvalid();
             field.disable();
 
-            var labelDomEl = this.getFieldLabelDomEl(id);
-            if (labelDomEl)
+            var rowEl = this.getFieldRowEl(id);
+            if (rowEl)
             {
-                Ext.get(labelDomEl).addClass('x-item-disabled');
+                Ext.get(rowEl).addClass('x-item-disabled');
             }
+
             var actionDomEls = this.getFieldActionDomEls(id);
             if (actionDomEls)
             {
@@ -585,6 +587,12 @@ Ext.extend(ZUTUBI.Form, Ext.form.Form, {
     {
         var rowEl = this.getFieldRowEl(id);
         return Ext.query("a[class*='field-action']", rowEl.dom);
+    },
+
+    getFieldRequiredDomEls: function(id)
+    {
+        var rowEl = this.getFieldRowEl(id);
+        return Ext.query("span[class*='required']", rowEl.dom);
     },
 
     getFieldRowEl: function(id)

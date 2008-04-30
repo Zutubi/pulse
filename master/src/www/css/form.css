@@ -69,6 +69,15 @@ input.submit {
     letter-spacing: 3px;
 }
 
+.x-item-disabled .required {
+    color: gray;
+}
+
+a.x-item-disabled {
+    color: gray;
+    border:none;
+}
+
 .x-form-btns-ct
 {
     margin-top: 6px;
