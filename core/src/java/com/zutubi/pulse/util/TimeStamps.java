@@ -320,6 +320,69 @@ public class TimeStamps implements Serializable
         return result.toString();
     }
 
+    public static String getPrettyEstimated(long estimated)
+    {
+        // what is the scale we are dealing with?
+        // < 1 minute
+        if (estimated < Constants.MINUTE)
+        {
+            return "< 1 minute";
+        }
+        if (estimated == Constants.MINUTE)
+        {
+            return "About 1 minute";
+        }
+        // About 2 minutes
+        // About 3 minutes
+        // ...
+        // ...
+        // About 50 minsutes
+        if (Constants.MINUTE < estimated && estimated < 55 * Constants.MINUTE)
+        {
+            long minutes = (estimated / Constants.MINUTE);
+            if (minutes == 1)
+            {
+                return "About 1 minute";
+            }
+            return "About " + minutes + " minutes";
+        }
+        // < 1 hour
+        if (estimated < Constants.HOUR)
+        {
+            return "< 1 hour";
+        }
+        if (estimated == Constants.HOUR)
+        {
+            return "About 1 hour";
+        }
+        // About 2 hours
+        // ...
+        // ...
+        // About 23 hours
+        if (Constants.HOUR < estimated && estimated < 23 * Constants.HOUR)
+        {
+            long hours = (estimated / Constants.HOUR);
+            if (hours == 1)
+            {
+                return "About 1 hour";
+            }
+            return "About " + hours + " hours";
+        }
+        // < 1 day
+        if (estimated < Constants.DAY)
+        {
+            return "< 1 day";
+        }
+        if (estimated == Constants.DAY)
+        {
+            return "About 1 day";
+        }
+        // ...
+        // ...
+
+        return "A very long time";
+    }
+
     public String getPrettyElapsed()
     {
         return getPrettyElapsed(getElapsed());

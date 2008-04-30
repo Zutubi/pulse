@@ -198,7 +198,7 @@ public class Feedback
         {
             return "unknown";
         }
-        return TimeStamps.getPrettyElapsed(l);
+        return TimeStamps.getPrettyEstimated(l);
     }
 
     public String getStatusMessage()
