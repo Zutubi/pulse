@@ -130,12 +130,15 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         group.put("serverPermissions", new Vector(0));
         xmlRpcHelper.saveConfig(ANONYMOUS_GROUP_PATH, group, false);
 
+        newSession();
         ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, ProjectManager.GLOBAL_PROJECT_NAME, true);
         hierarchyPage.goTo();
         assertFalse(hierarchyPage.isAddPresent());
 
         group.put("serverPermissions", new Vector<String>(Arrays.asList(ServerPermission.CREATE_PROJECT.toString())));
         xmlRpcHelper.saveConfig(ANONYMOUS_GROUP_PATH, group, false);
+        
+        newSession();
         hierarchyPage.goTo();
         waitForElement(ProjectHierarchyPage.LINK_ADD);
     }
@@ -147,6 +150,7 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         {
             general.put(key, enabled);
             xmlRpcHelper.saveConfig(GlobalConfiguration.SCOPE_NAME, general, false);
+            newSession();
         }
     }
 }

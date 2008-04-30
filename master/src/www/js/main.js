@@ -508,3 +508,127 @@ function setSelectionRange(id, start, end)
         r.select();
     }
 }
+
+/*===========================================================================
+ * Functions used for configuration UI
+ *=========================================================================*/
+
+var onSelectFailure = function(element, response)
+{
+    if(response.status == 0)
+    {
+        showStatus(response.statusText, 'failure');
+    }
+    else
+    {
+        var message = 'Pulse server returned status ' + response.status;
+        if(response.statusText)
+        {
+            message = message + ' (' + response.statusText + ')';
+        }
+
+        showStatus(message, 'failure');
+    }
+
+    if(response.responseText)
+    {
+        element.update(response.responseText);
+    }
+    else
+    {
+        element.update('');
+    }
+}
+
+var onConfigSelect = function(sm, node)
+{
+    if(node)
+    {
+        Ext.get('detail-pane').load({
+            url: configTree.loader.getNodePath(node),
+            scripts: true,
+            callback: function(element, success, response) {
+                if(!success)
+                {
+                    onSelectFailure(element, response);
+                }
+            }
+        });
+    }
+}
+
+var getAjaxCallback = function(maskedElement)
+{
+    return {
+        success: function(response)
+        {
+            try
+            {
+                handleConfigurationResponse(Ext.decode(response.responseText));
+            }
+            finally
+            {
+                if(maskedElement)
+                {
+                    maskedElement.unmask();
+                }
+
+                window.actionInProgress = false;
+            }
+        },
+
+        failure: function(response)
+        {
+            try
+            {
+                if(maskedElement)
+                {
+                    maskedElement.unmask();
+                }
+                showStatus('Unable to contact Pulse server', 'failure');
+            }
+            finally
+            {
+                window.actionInProgress = false;
+            }
+        }
+    }
+}
+
+var runAjaxRequest = function(url)
+{
+    var pane = Ext.get('center');
+    pane.mask('Please wait...');
+    window.actionInProgress = true;
+    Ext.lib.Ajax.request('get', url, getAjaxCallback(pane));
+}
+
+var selectPath = function(path)
+{
+    configTree.getSelectionModel().clearSelections();
+    configTree.selectConfigPath(path);
+}
+
+var editPath = function(path)
+{
+    Ext.get('detail-pane').load({url: window.baseUrl + '/aconfig/' + path, scripts:true});
+}
+
+var addToPath = function(path, template)
+{
+    runAjaxRequest(window.baseUrl + '/aconfig/' + path + '?wizard' + (template ? '=template' : ''));
+}
+
+var actionPath = function(path)
+{
+    var detailPane = Ext.get('detail-pane').getUpdateManager().defaultUrl;
+    // trim the url prefix so that we are just left with the path.
+    var oldPath = detailPane.substring(window.baseUrl + '/aconfig/'.length, detailPane.length);
+    runAjaxRequest(window.baseUrl + '/aconfig/' + path + '=input&newPath=' + oldPath);
+}
+
+var deletePath = function(path)
+{
+    runAjaxRequest(window.baseUrl + '/aconfig/' + path + '?delete=confirm');
+}
+        

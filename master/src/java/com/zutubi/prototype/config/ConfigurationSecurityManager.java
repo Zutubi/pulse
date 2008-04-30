@@ -3,11 +3,14 @@ package com.zutubi.prototype.config;
 import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.core.config.Configuration;
-import com.zutubi.pulse.events.*;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
+import com.zutubi.util.logging.Logger;
 import org.acegisecurity.AccessDeniedException;
 
 import java.util.*;
+import java.util.logging.Level;
 
 /**
  * Manages access to the configuration system.  Allows UIs to filter what a
@@ -15,6 +18,8 @@ import java.util.*;
  */
 public class ConfigurationSecurityManager implements com.zutubi.pulse.events.EventListener
 {
+    private static final Logger LOG = Logger.getLogger(ConfigurationSecurityManager.class);
+
     private List<PathPermission> globalPermissions = new LinkedList<PathPermission>();
     private Set<String> ownedScopes = new HashSet<String>();
 
@@ -108,6 +113,11 @@ public class ConfigurationSecurityManager implements com.zutubi.pulse.events.Eve
             return true;
         }
 
+        if (LOG.isLoggable(Level.FINEST))
+        {
+            LOG.finest(String.format("hasPermission('%s', '%s')", path, action));
+        }
+
         String global = getGlobalPermission(path, action);
         if(global == null)
         {
@@ -121,6 +131,7 @@ public class ConfigurationSecurityManager implements com.zutubi.pulse.events.Eve
                     Configuration resource = findOwningResource(path);
                     if(accessManager.hasPermission(action, resource))
                     {
+                        LOG.finest("Permission granted directly on owning resource");
                         return true;
                     }
 
@@ -132,11 +143,13 @@ public class ConfigurationSecurityManager implements com.zutubi.pulse.events.Eve
                             Configuration instance = configurationTemplateManager.getInstance(descendentPath);
                             if(instance != null && accessManager.hasPermission(action, instance))
                             {
+                                LOG.finest("Permission reverse inherited via descendent");
                                 return true;
                             }
                         }
                     }
 
+                    LOG.finest("Permission denied");
                     return false;
                 }
                 else
@@ -153,18 +166,38 @@ public class ConfigurationSecurityManager implements com.zutubi.pulse.events.Eve
                     }
 
                     Configuration resource = findOwningResource(path);
-                    return accessManager.hasPermission(action, resource);
+                    boolean result = accessManager.hasPermission(action, resource);
+                    if(LOG.isLoggable(Level.FINEST))
+                    {
+                        if(result)
+                        {
+                            LOG.finest("Permission granted");
+                        }
+                        else
+                        {
+                            LOG.finest("Permission denied");
+                        }
+                    }
+
+                    return result;
                 }
             }
             else
             {
                 // Transient paths are a free-for-all.
+                LOG.finest("Permission granted for transient path");
                 return true;
             }
         }
         else
         {
-            return accessManager.hasPermission(global, null);
+            boolean result = accessManager.hasPermission(global, null);
+            if(LOG.isLoggable(Level.FINEST))
+            {
+                String message = String.format("Permission %s via global permission '%s'", result ? "granted" : "denied", global);
+                LOG.finest(message);
+            }
+            return result;
         }
     }
 

@@ -62,6 +62,12 @@ public class SeleniumTestBase extends TestCase
         super.tearDown();
     }
 
+    protected void newSession()
+    {
+        selenium.stop();
+        selenium.start();
+    }
+
     protected void login(String username, String password)
     {
         LoginPage page = new LoginPage(selenium, urls);

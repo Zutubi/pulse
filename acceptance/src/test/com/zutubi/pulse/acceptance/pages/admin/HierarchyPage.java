@@ -3,7 +3,6 @@ package com.zutubi.pulse.acceptance.pages.admin;
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.acceptance.SeleniumUtils;
-import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.webwork.mapping.Urls;
 import com.zutubi.util.CollectionUtils;
 import junit.framework.Assert;
@@ -11,7 +10,7 @@ import junit.framework.Assert;
 /**
  * The page shown when looking at the heirarchy view of a templated scope.
  */
-public class HierarchyPage extends SeleniumPage
+public class HierarchyPage extends ConfigurationPanePage
 {
     public static final String LINK_ADD = "add.new";
     public static final String LINK_ADD_TEMPLATE = "add.template";

@@ -65,6 +65,7 @@
             Ext.BLANK_IMAGE_URL = '$base/images/default/s.gif';
 
             window.formSubmitting = false;
+            window.baseUrl = '$base';
             
             var layout;
             var nestedLayout;

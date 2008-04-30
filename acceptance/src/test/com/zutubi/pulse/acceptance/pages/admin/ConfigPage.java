@@ -3,7 +3,6 @@ package com.zutubi.pulse.acceptance.pages.admin;
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.acceptance.SeleniumUtils;
-import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.webwork.mapping.Urls;
 import junit.framework.Assert;
 
@@ -11,7 +10,7 @@ import junit.framework.Assert;
  * Base for config pages that appear when the "configuration" tab is selected
  * in the tree pane.
  */
-public abstract class ConfigPage extends SeleniumPage
+public abstract class ConfigPage extends ConfigurationPanePage
 {
     public ConfigPage(Selenium selenium, Urls urls, String id)
     {

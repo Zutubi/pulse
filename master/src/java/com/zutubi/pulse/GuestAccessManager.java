@@ -6,15 +6,16 @@ import com.zutubi.prototype.config.ConfigurationRegistry;
 import com.zutubi.prototype.config.events.ConfigurationEvent;
 import com.zutubi.prototype.config.events.PostSaveEvent;
 import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.EventListener;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.pulse.model.GrantedAuthority;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.group.AbstractGroupConfiguration;
 import com.zutubi.pulse.prototype.config.group.BuiltinGroupConfiguration;
-import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.events.EventListener;
-import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
+import com.zutubi.util.logging.Logger;
 import org.acegisecurity.GrantedAuthorityImpl;
 import org.acegisecurity.providers.anonymous.AnonymousProcessingFilter;
 import org.acegisecurity.userdetails.memory.UserAttribute;
@@ -23,6 +24,8 @@ import org.acegisecurity.userdetails.memory.UserAttribute;
  */
 public class GuestAccessManager implements ConfigurationEventListener, EventListener
 {
+    private static final Logger LOG = Logger.getLogger(GuestAccessManager.class);
+
     private AnonymousProcessingFilter anonymousProcessingFilter;
     private ConfigurationProvider configurationProvider;
 
@@ -52,6 +55,7 @@ public class GuestAccessManager implements ConfigurationEventListener, EventList
     {
         if(event instanceof PostSaveEvent)
         {
+            LOG.fine("Refreshing anonymous group authorities");
             init();
         }
     }

@@ -3,7 +3,6 @@ package com.zutubi.pulse.acceptance.pages.admin;
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.acceptance.SeleniumUtils;
-import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.webwork.mapping.Urls;
 import junit.framework.Assert;
 
@@ -11,7 +10,7 @@ import junit.framework.Assert;
  * The delete record confirmation page, which shows the necessary actions for
  * a record to be deleted.
  */
-public class DeleteConfirmPage extends SeleniumPage
+public class DeleteConfirmPage extends ConfigurationPanePage
 {
     public static final String CONFIRM_LINK = "confirm.delete";
     public static final String CANCEL_LINK = "cancel.delete";

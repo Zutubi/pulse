@@ -4,51 +4,8 @@
 <head>
     <title>#wwtext("name=${section}")</title>
 	<script type="text/javascript">
-        var tree;
-        
-        var onSelectFailure = function(element, response)
-        {
-            if(response.status == 0)
-            {
-                showStatus(response.statusText, 'failure');
-            }
-            else
-            {
-                var message = 'Pulse server returned status ' + response.status;
-                if(response.statusText)
-                {
-                    message = message + ' (' + response.statusText + ')';
-                }
-
-                showStatus(message, 'failure');
-            }
-
-            if(response.responseText)
-            {
-                element.update(response.responseText);
-            }
-            else
-            {
-                element.update('');
-            }
-        }
-
-        var onSelect = function(sm, node)
-        {
-            if(node)
-            {
-                Ext.get('detail-pane').load({
-                    url: tree.loader.getNodePath(node),
-                    scripts: true,
-                    callback: function(element, success, response) {
-                        if(!success)
-                        {
-                            onSelectFailure(element, response);
-                        }
-                    }
-                });
-            }
-        }
+	    var actionInProgress = false;
+        var configTree;
 
         var handleConfigurationResponse = function(result)
         {
@@ -58,8 +15,8 @@
                 {
                     Ext.get('detail-pane').update(result.newPanel, true);
                 }
-                tree.handleResponse(result);
-                tree.redirectToNewPath(result);
+                configTree.handleResponse(result);
+                configTree.redirectToNewPath(result);
             }
             else
             {
@@ -68,73 +25,6 @@
                     showStatus(result.actionErrors[0], 'failure');
                 }
             }
-        }
-
-        var getAjaxCallback = function(maskedElement)
-        {
-            return {
-                success: function(response)
-                {
-                    try
-                    {
-                        handleConfigurationResponse(Ext.decode(response.responseText));
-                    }
-                    finally
-                    {
-                        if(maskedElement)
-                        {
-                            maskedElement.unmask();
-                        }
-                    }
-                },
-
-                failure: function(response)
-                {
-                    if(maskedElement)
-                    {
-                        maskedElement.unmask();
-                    }
-                    showStatus('Unable to contact Pulse server', 'failure');
-                }
-            }
-        }
-
-        var runAjaxRequest = function(url)
-        {
-            var pane = Ext.get('detail-pane');
-            pane.mask('Please wait...');
-            Ext.lib.Ajax.request('get', url, getAjaxCallback(pane));
-        }
-
-        var selectPath = function(path)
-        {
-            tree.getSelectionModel().clearSelections();
-            tree.selectConfigPath(path);
-        }
-
-        var editPath = function(path)
-        {
-            Ext.get('detail-pane').load({url: '$base/aconfig/' + path, scripts:true});
-        }
-
-        var addToPath = function(path)
-        {
-            runAjaxRequest('$base/aconfig/' + path + '?wizard');
-        }
-
-        var actionPath = function(path)
-        {
-            // ajax actions are executed in place. so that we know where to refresh to, we
-            // first need to know where we are.
-            var detailPane = Ext.get('detail-pane').getUpdateManager().defaultUrl;
-            var oldPath = detailPane.substring('$base/aconfig/'.length, detailPane.length);
-            
-            runAjaxRequest('$base/aconfig/' + path + '=input&newPath=' + oldPath);
-        }
-
-        var deletePath = function(path)
-        {
-            runAjaxRequest('$base/aconfig/' + path + '?delete=confirm');
         }
 
         var Layout = function()
@@ -171,7 +61,7 @@
                     var loader = new ZUTUBI.ConfigTreeLoader('$base/aconfig');
                     //loader.on('loadexception', function(loader, node, response) {  console.dir(response); });
 
-                    tree = new ZUTUBI.ConfigTree('config-tree', {
+                    configTree = new ZUTUBI.ConfigTree('config-tree', {
 #if($prefixPath)
                         pathPrefix: '$prefixPath',
 #end
@@ -188,22 +78,20 @@
                         allowDrop: false
                     });
                     
-                    tree.setRootNode(root);
-                    tree.getSelectionModel().on('selectionchange', onSelect);
+                    configTree.setRootNode(root);
+                    configTree.getSelectionModel().on('selectionchange', onConfigSelect);
 
                     nestedLayout.beginUpdate();
                     nestedLayout.add('west', new Ext.ContentPanel('config-tree', {autoScroll: true, fitToFrame: true}));
                     nestedLayout.endUpdate();
 
-                    tree.render();
-                    if (path && path != 'global')
+                    configTree.render();
+                    if (!path)
                     {
-                        tree.selectConfigPath(path);
+                        path = 'global';
                     }
-                    else
-                    {
-                        tree.selectConfigPath('global/email');
-                    }
+
+                    configTree.selectConfigPath(path);
                     root.expand();
                 }
             }

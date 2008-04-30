@@ -3,6 +3,7 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.prototype.config.ConfigurationRegistry;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.acceptance.forms.admin.GroupForm;
+import com.zutubi.pulse.acceptance.pages.admin.HierarchyPage;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.model.ProjectManager;
@@ -68,7 +69,7 @@ public class GroupAcceptanceTest extends SeleniumTestBase
 
         login(login, "");
         globalPage.goTo();
-        assertTrue(globalPage.isAddPresent());
+        SeleniumUtils.waitForElementId(selenium, HierarchyPage.LINK_ADD);
         logout();
     }
 

@@ -51,94 +51,9 @@
             }
         }
 
-        var getAjaxCallback = function(maskedElement)
-        {
-            return {
-                success: function(response)
-                {
-                    try
-                    {
-                        handleConfigurationResponse(Ext.decode(response.responseText));
-                    }
-                    finally
-                    {
-                        if(maskedElement)
-                        {
-                            maskedElement.unmask();
-                        }
-                    }
-
-                    actionInProgress = false;
-                },
-
-                failure: function(response)
-                {
-                    if(maskedElement)
-                    {
-                        maskedElement.unmask();
-                    }
-
-                    showStatus('Unable to contact Pulse server', 'failure');
-                    actionInProgress = false;
-                }
-            }
-        }
-
-        var runAjaxRequest = function(url)
-        {
-            actionInProgress = true;
-            var pane = Ext.get('center');
-            pane.mask('Please wait...');
-            Ext.lib.Ajax.request('get', url, getAjaxCallback(pane));
-        }
-
-        var onSelectFailure = function(element, response)
-        {
-            if(response.status == 0)
-            {
-                showStatus(response.statusText, 'failure');
-            }
-            else
-            {
-                var message = 'Pulse server returned status ' + response.status;
-                if(response.statusText)
-                {
-                    message = message + ' (' + response.statusText + ')';
-                }
-                
-                showStatus(message, 'failure');
-            }
-
-            if(response.responseText)
-            {
-                element.update(response.responseText);
-            }
-            else
-            {
-                element.update('');
-            }
-        }
-
         // ------------------------------------------------------------------
         // Config tree
         // ------------------------------------------------------------------
-
-        var onConfigSelect = function(sm, node)
-        {
-            if(node)
-            {
-                Ext.get('detail-pane').load({
-                    url: configTree.loader.getNodePath(node),
-                    scripts: true,
-                    callback: function(element, success, response) {
-                        if(!success)
-                        {
-                            onSelectFailure(element, response);
-                        }
-                    }
-                });
-            }
-        }
 
         var createConfigTree = function(project, cls, iconCls)
         {
@@ -169,37 +84,9 @@
             root.expand();
         }
 
-        var selectPath = function(path)
-        {
-            configTree.selectConfigPath(path);
-        }
-
-        var editPath = function(path)
-        {
-            Ext.get('detail-pane').load({url: '$base/aconfig/' + path, scripts:true});
-        }
-
-        var addToPath = function(path, template)
-        {
-            runAjaxRequest('$base/aconfig/' + path + '?wizard' + (template ? '=template' : ''));
-        }
-
         var clonePath = function(path)
         {
             runAjaxRequest('$base/aconfig/' + path + '?clone=input');
-        }
-
-        var actionPath = function(path)
-        {
-            var detailPane = Ext.get('detail-pane').getUpdateManager().defaultUrl;
-            // trim the url prefix so that we are just left with the path.
-            var oldPath = detailPane.substring('$base/aconfig/'.length, detailPane.length);
-            runAjaxRequest('$base/aconfig/' + path + '=input&newPath=' + oldPath);
-        }
-
-        var deletePath = function(path)
-        {
-            runAjaxRequest('$base/aconfig/' + path + '?delete=confirm');
         }
 
         // ------------------------------------------------------------------
