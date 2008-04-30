@@ -9,7 +9,6 @@ import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.pulse.license.authorisation.Authorisation;
-import com.zutubi.pulse.license.config.OneXDataLicenseKeyStore;
 import com.zutubi.pulse.license.events.LicenseUpdateEvent;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
@@ -100,17 +99,6 @@ public class LicenseManager
         String key = keyStore.getKey();
         License license = null;
 
-        if (key == null)
-        {
-            // we may be dealing with an older version of Pulses' license store.  If this is the case,
-            // then use the 1.x compatible store and automatically transfer the license to the new store.
-            key = check1XKeyStore();
-            if (key != null)
-            {
-                keyStore.setKey(key);
-            }
-        }
-
         if (key != null)
         {
             try
@@ -131,13 +119,6 @@ public class LicenseManager
         // refresh the supported authorisations.
         refreshAuthorisations();
         eventManager.publish(new LicenseUpdateEvent(license));
-    }
-
-    private String check1XKeyStore()
-    {
-        OneXDataLicenseKeyStore oneXKeyStore = new OneXDataLicenseKeyStore();
-        oneXKeyStore.setDataResolver(dataResolver);
-        return oneXKeyStore.getKey();
     }
 
     public void refreshAuthorisations()

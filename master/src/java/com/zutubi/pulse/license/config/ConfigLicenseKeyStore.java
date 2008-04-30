@@ -1,19 +1,16 @@
 package com.zutubi.pulse.license.config;
 
-import com.zutubi.prototype.config.ConfigurationProvider;
-import com.zutubi.prototype.config.TypeAdapter;
-import com.zutubi.prototype.config.TypeListener;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.config.events.PostSaveEvent;
-import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.prototype.type.record.Record;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.EventListener;
+import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.license.AbstractLicenseKeyStore;
 import com.zutubi.pulse.license.LicenseException;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
-import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.events.EventListener;
-import com.zutubi.pulse.events.Event;
 
 /**
  * License key store backed by the normal configuration system.
