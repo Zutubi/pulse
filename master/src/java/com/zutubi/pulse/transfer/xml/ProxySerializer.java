@@ -1,4 +1,4 @@
-package com.zutubi.pulse.transfer;
+package com.zutubi.pulse.transfer.xml;
 
 import nu.xom.Serializer;
 import nu.xom.Element;

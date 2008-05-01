@@ -18,5 +18,5 @@ public interface TransferTarget
 
     void end() throws TransferException;
 
-    void close();
+    void close() throws TransferException;
 }

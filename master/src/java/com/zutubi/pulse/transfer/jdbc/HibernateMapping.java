@@ -1,4 +1,4 @@
-package com.zutubi.pulse.transfer;
+package com.zutubi.pulse.transfer.jdbc;
 
 import org.hibernate.MappingException;
 import org.hibernate.cfg.Configuration;

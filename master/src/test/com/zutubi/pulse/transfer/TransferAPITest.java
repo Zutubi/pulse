@@ -36,10 +36,15 @@ public class TransferAPITest extends TestCase
 
     private DataSource createDataSource()
     {
+        return createDataSource("testdb");
+    }
+
+    private DataSource createDataSource(String name)
+    {
         BasicDataSource dataSource = new BasicDataSource();
 
         dataSource.setDriverClassName("org.hsqldb.jdbcDriver");
-        dataSource.setUrl("jdbc:hsqldb:mem:testdb");
+        dataSource.setUrl("jdbc:hsqldb:mem:" + name);
         dataSource.setUsername("sa");
         dataSource.setPassword("");
 
@@ -67,8 +72,8 @@ public class TransferAPITest extends TestCase
         configuration.setProperties(getHibernateProperties());
 
         // SETUP THE DATABASE SCHEMA FOR TESTING.
-        createSchema(configuration);
-        createSchemaConstraints(configuration);
+        createSchema(dataSource, configuration);
+        createSchemaConstraints(dataSource, configuration);
 
         // SETUP TEST DATA.
         JDBCUtils.execute(dataSource, "insert into TYPES (ID, STRING_TYPE, BOOLEAN_TYPE) values (1, 'string', '1')");
@@ -93,7 +98,40 @@ public class TransferAPITest extends TestCase
         assertEquals(1, JDBCUtils.executeCount(dataSource, "select * from RELATED_TYPES"));
     }
 
-    private void createSchema(MutableConfiguration configuration) throws SQLException
+    public void testMigrateDatabase() throws SQLException, IOException, TransferException
+    {
+        MutableConfiguration configuration = new MutableConfiguration();
+
+        // CONFIGURE HIBERNATE.
+        List<Resource> mappings = getHibernateMappings();
+        for (Resource mapping : mappings)
+        {
+            configuration.addInputStream(mapping.getInputStream());
+        }
+        configuration.setProperties(getHibernateProperties());
+
+        DataSource dataSource = createDataSource("source");
+
+        // SETUP THE DATABASE SCHEMA FOR TESTING.
+        createSchema(dataSource, configuration);
+        createSchemaConstraints(dataSource, configuration);
+
+        // SETUP TEST DATA.
+        JDBCUtils.execute(dataSource, "insert into TYPES (ID, STRING_TYPE, BOOLEAN_TYPE) values (1, 'string', '1')");
+        JDBCUtils.execute(dataSource, "insert into TYPES (ID, STRING_TYPE, BOOLEAN_TYPE) values (2, '', '1')");
+        JDBCUtils.execute(dataSource, "insert into TYPES (ID, STRING_TYPE, BOOLEAN_TYPE) values (3, null, '1')");
+        JDBCUtils.execute(dataSource, "insert into RELATED_TYPES (ID, TYPE) values (1, 1)");
+
+        DataSource dataTarget = createDataSource("target");
+
+        TransferAPI transfer = new TransferAPI();
+        transfer.migrate(configuration, dataSource, dataTarget);
+
+        assertEquals(3, JDBCUtils.executeCount(dataTarget, "select * from TYPES"));
+        assertEquals(1, JDBCUtils.executeCount(dataTarget, "select * from RELATED_TYPES"));
+    }
+
+    private void createSchema(DataSource dataSource, MutableConfiguration configuration) throws SQLException
     {
         Dialect dialect = Dialect.getDialect(configuration.getProperties());
         String[] sqlCreate = configuration.generateSchemaCreationScript(dialect);
@@ -107,7 +145,7 @@ public class TransferAPITest extends TestCase
         }
     }
 
-    private void createSchemaConstraints(MutableConfiguration configuration) throws SQLException
+    private void createSchemaConstraints(DataSource dataSource, MutableConfiguration configuration) throws SQLException
     {
         Dialect dialect = Dialect.getDialect(configuration.getProperties());
         String[] sqlAlter = configuration.generateSchemaCreationScript(dialect);

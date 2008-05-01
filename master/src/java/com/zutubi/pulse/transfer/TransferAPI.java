@@ -1,6 +1,12 @@
 package com.zutubi.pulse.transfer;
 
 import com.zutubi.pulse.Version;
+import com.zutubi.pulse.transfer.xml.XMLTransferTarget;
+import com.zutubi.pulse.transfer.xml.XMLTransferSource;
+import com.zutubi.pulse.transfer.jdbc.HibernateTransferSource;
+import com.zutubi.pulse.transfer.jdbc.HibernateTransferTarget;
+import com.zutubi.pulse.transfer.jdbc.HibernateTransferException;
+import com.zutubi.pulse.transfer.jdbc.MappingUtils;
 import com.zutubi.pulse.util.JDBCUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.IOUtils;
@@ -58,14 +64,14 @@ public class TransferAPI
         {
             if (!isSchemaMappingValid(config, dataSource))
             {
-                throw new JDBCTransferException("Schema export aborted due to schema / mapping mismatch");
+                throw new HibernateTransferException("Schema export aborted due to schema / mapping mismatch");
             }
 
             XMLTransferTarget xmlTarget = new XMLTransferTarget();
             xmlTarget.setOutput(outputStream);
             xmlTarget.setVersion(Version.getVersion().getBuildNumber());
 
-            JDBCTransferSource source = new JDBCTransferSource();
+            HibernateTransferSource source = new HibernateTransferSource();
             source.setConfiguration(config);
             source.setDataSource(dataSource);
 
@@ -76,14 +82,6 @@ public class TransferAPI
         finally
         {
             close(target);
-        }
-    }
-
-    private void close(TransferTarget target)
-    {
-        if (target != null)
-        {
-            target.close();
         }
     }
 
@@ -111,14 +109,14 @@ public class TransferAPI
         TransferTarget target = null;
         try
         {
-            JDBCTransferTarget jdbcTarget = new JDBCTransferTarget();
-            jdbcTarget.setDataSource(dataSource);
-            jdbcTarget.setConfiguration(configuration);
-
             XMLTransferSource source = new XMLTransferSource();
             source.setSource(inputStream);
 
-            target = wrapTargetIfNecessary(jdbcTarget);
+            HibernateTransferTarget hibernateTarget = new HibernateTransferTarget();
+            hibernateTarget.setDataSource(dataSource);
+            hibernateTarget.setConfiguration(configuration);
+
+            target = wrapTargetIfNecessary(hibernateTarget);
 
             source.transferTo(target);
         }
@@ -126,6 +124,35 @@ public class TransferAPI
         {
             close(target);
         }
+    }
+
+    public void migrate(Configuration configuration, DataSource dataSource, DataSource dataTarget) throws TransferException
+    {
+        HibernateTransferTarget target = new HibernateTransferTarget();
+        target.setDataSource(dataTarget);
+        target.setConfiguration(configuration);
+
+        HibernateTransferSource source = new HibernateTransferSource();
+        source.setConfiguration(configuration);
+        source.setDataSource(dataSource);
+
+        try
+        {
+            source.transferTo(target);
+        }
+        finally
+        {
+            close(target);
+        }
+    }
+
+    public void addListener(TransferListener listener)
+    {
+        if (listeners == null)
+        {
+            listeners = new LinkedList<TransferListener>();
+        }
+        listeners.add(listener);
     }
 
     private TransferTarget wrapTargetIfNecessary(TransferTarget target)
@@ -137,6 +164,14 @@ public class TransferAPI
         else
         {
             return  target;
+        }
+    }
+
+    private void close(TransferTarget target) throws TransferException
+    {
+        if (target != null)
+        {
+            target.close();
         }
     }
 
@@ -229,15 +264,6 @@ public class TransferAPI
         }
     }
 
-    public void addListener(TransferListener listener)
-    {
-        if (listeners == null)
-        {
-            listeners = new LinkedList<TransferListener>();
-        }
-        listeners.add(listener);
-    }
-
     /**
      * 
      */
@@ -312,7 +338,7 @@ public class TransferAPI
             delegate.end();
         }
 
-        public void close()
+        public void close() throws TransferException
         {
             delegate.close();
         }

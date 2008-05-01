@@ -1,7 +1,7 @@
 package com.zutubi.pulse.command;
 
-import com.zutubi.pulse.transfer.JDBCTransferException;
 import com.zutubi.pulse.transfer.TransferAPI;
+import com.zutubi.pulse.transfer.TransferException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 
@@ -50,7 +50,7 @@ public class ExportCommand extends DataCommand
         {
             transferAPI.dump(configuration, dataSource, outFile);
         }
-        catch (JDBCTransferException e)
+        catch (TransferException e)
         {
             System.err.println("Error exporting data from database located at "+ databaseConfig.getUrl() +".  Trace below:");
             e.printStackTrace(System.err);

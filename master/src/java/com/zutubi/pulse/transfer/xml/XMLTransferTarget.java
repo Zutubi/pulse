@@ -1,6 +1,11 @@
-package com.zutubi.pulse.transfer;
+package com.zutubi.pulse.transfer.xml;
 
 import com.zutubi.pulse.util.JDBCTypes;
+import com.zutubi.pulse.transfer.TransferTarget;
+import com.zutubi.pulse.transfer.xml.ProxySerializer;
+import com.zutubi.pulse.transfer.Table;
+import com.zutubi.pulse.transfer.TransferException;
+import com.zutubi.pulse.transfer.Column;
 import nu.xom.Attribute;
 import nu.xom.Document;
 import nu.xom.Element;

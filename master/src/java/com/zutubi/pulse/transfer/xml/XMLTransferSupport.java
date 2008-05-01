@@ -1,4 +1,4 @@
-package com.zutubi.pulse.transfer;
+package com.zutubi.pulse.transfer.xml;
 
 import org.apache.ws.commons.util.Base64;
 
@@ -6,6 +6,8 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.sql.Types;
+
+import com.zutubi.pulse.transfer.TransferException;
 
 /**
  *

@@ -1,4 +1,4 @@
-package com.zutubi.pulse.transfer;
+package com.zutubi.pulse.transfer.jdbc;
 
 import org.hibernate.mapping.Table;
 import org.hibernate.mapping.Column;

@@ -1,7 +1,13 @@
-package com.zutubi.pulse.transfer;
+package com.zutubi.pulse.transfer.jdbc;
 
 import com.zutubi.pulse.util.JDBCUtils;
 import com.zutubi.pulse.util.JDBCTypes;
+import com.zutubi.pulse.transfer.TransferTarget;
+import com.zutubi.pulse.transfer.Table;
+import com.zutubi.pulse.transfer.TransferException;
+import com.zutubi.pulse.transfer.Column;
+import com.zutubi.pulse.transfer.jdbc.MappingUtils;
+import com.zutubi.pulse.transfer.jdbc.HibernateUniqueKeyTable;
 import com.zutubi.util.logging.Logger;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
@@ -20,9 +26,9 @@ import java.util.Map;
  *
  *
  */
-public class JDBCTransferTarget implements TransferTarget
+public class HibernateTransferTarget implements TransferTarget
 {
-    private static final Logger LOG = Logger.getLogger(JDBCTransferTarget.class);
+    private static final Logger LOG = Logger.getLogger(HibernateTransferTarget.class);
 
     private Table table;
 
@@ -47,7 +53,7 @@ public class JDBCTransferTarget implements TransferTarget
         }
         catch (SQLException e)
         {
-            throw new JDBCTransferException(e);
+            throw new HibernateTransferException(e);
         }
     }
 
@@ -89,7 +95,7 @@ public class JDBCTransferTarget implements TransferTarget
         }
         catch (SQLException e)
         {
-            throw new JDBCTransferException(e);
+            throw new HibernateTransferException(e);
         }
     }
 
@@ -116,7 +122,7 @@ public class JDBCTransferTarget implements TransferTarget
         }
         catch (SQLException e)
         {
-            throw new JDBCTransferException(e);
+            throw new HibernateTransferException(e);
         }
     }
 
@@ -128,7 +134,7 @@ public class JDBCTransferTarget implements TransferTarget
         }
         catch (SQLException e)
         {
-            throw new JDBCTransferException(e);
+            throw new HibernateTransferException(e);
         }
         JDBCUtils.close(insert);
     }
@@ -143,7 +149,7 @@ public class JDBCTransferTarget implements TransferTarget
         }
         catch (SQLException e)
         {
-            throw new JDBCTransferException(e);
+            throw new HibernateTransferException(e);
         }
     }
 
@@ -171,7 +177,7 @@ public class JDBCTransferTarget implements TransferTarget
             org.hibernate.mapping.Table table = (org.hibernate.mapping.Table) tableMappings.next();
             if (JDBCUtils.tableExists(connection, table.getName()))
             {
-                throw new JDBCTransferException("Unable to create the new database schema. The table '" + table.getName() + "' " +
+                throw new HibernateTransferException("Unable to create the new database schema. The table '" + table.getName() + "' " +
                         "already exists. Please ensure that you are importing into a blank database.");
             }
         }

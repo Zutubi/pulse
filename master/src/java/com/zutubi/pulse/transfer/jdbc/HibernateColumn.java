@@ -1,4 +1,6 @@
-package com.zutubi.pulse.transfer;
+package com.zutubi.pulse.transfer.jdbc;
+
+import com.zutubi.pulse.transfer.Column;
 
 /**
  *

@@ -1,6 +1,13 @@
-package com.zutubi.pulse.transfer;
+package com.zutubi.pulse.transfer.jdbc;
 
 import com.zutubi.pulse.util.JDBCUtils;
+import com.zutubi.pulse.transfer.TransferSource;
+import com.zutubi.pulse.transfer.TransferTarget;
+import com.zutubi.pulse.transfer.TransferException;
+import com.zutubi.pulse.transfer.jdbc.HibernateMapping;
+import com.zutubi.pulse.transfer.jdbc.MappingUtils;
+import com.zutubi.pulse.transfer.jdbc.HibernateUniqueKeyTable;
+import com.zutubi.pulse.transfer.jdbc.HibernateTable;
 import org.hibernate.engine.Mapping;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.Table;
@@ -20,7 +27,7 @@ import java.util.Map;
  *
  *
  */
-public class JDBCTransferSource implements TransferSource
+public class HibernateTransferSource implements TransferSource
 {
     private DataSource dataSource;
 
@@ -82,12 +89,11 @@ public class JDBCTransferSource implements TransferSource
         }
         catch (SQLException e)
         {
-            throw new JDBCTransferException(e);
+            throw new HibernateTransferException(e);
         }
     }
 
-    private void exportTable(TransferTarget target, Table table, Connection con, List<Column> columns)
-            throws TransferException, SQLException
+    private void exportTable(TransferTarget target, Table table, Connection con, List<Column> columns) throws TransferException, SQLException
     {
         target.startTable(new HibernateTable(table));
 

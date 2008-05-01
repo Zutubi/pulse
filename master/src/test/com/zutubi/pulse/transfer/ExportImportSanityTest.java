@@ -2,6 +2,8 @@ package com.zutubi.pulse.transfer;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
+import com.zutubi.pulse.transfer.jdbc.HibernateTransferSource;
+import com.zutubi.pulse.transfer.jdbc.HibernateTransferTarget;
 import junit.framework.TestCase;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.springframework.core.io.ClassPathResource;
@@ -54,11 +56,11 @@ public class ExportImportSanityTest extends TestCase
         target.setUsername("postgres");
         target.setPassword("postgres");
 
-        JDBCTransferSource transferSource = new JDBCTransferSource();
+        HibernateTransferSource transferSource = new HibernateTransferSource();
         transferSource.setConfiguration(configuration);
         transferSource.setDataSource(source);
 
-        JDBCTransferTarget transferTarget = new JDBCTransferTarget();
+        HibernateTransferTarget transferTarget = new HibernateTransferTarget();
         transferTarget.setConfiguration(configuration);
         transferTarget.setDataSource(target);
 
