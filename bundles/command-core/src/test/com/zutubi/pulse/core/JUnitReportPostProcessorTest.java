@@ -131,6 +131,18 @@ public class JUnitReportPostProcessorTest extends XMLReportPostProcessorTestBase
         checkFailureCase(suite, "testFailureMessageInAttribute", "this message only");
     }
 
+    public void testNested()
+    {
+        TestSuiteResult tests = runProcessor("nested");
+        TestSuiteResult suite = tests.getSuite("Outer");
+        assertNotNull(suite);
+        checkSuite(suite, "Outer", 2, 0, 0);
+        TestSuiteResult nested = suite.getSuite("Nested");
+        checkSuite(nested, "Nested", 2, 0, 0);
+        checkPassCase(nested, "test1");
+        checkPassCase(nested, "test2");
+    }
+
     private void checkWarning(TestResult testResult, String name, long duration, String contents)
     {
         assertTrue(testResult instanceof TestSuiteResult);

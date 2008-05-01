@@ -79,6 +79,12 @@ public class JUnitReportPostProcessor extends XMLReportPostProcessor
         long duration = getDuration(element);
 
         TestSuiteResult suite = new TestSuiteResult(name, duration);
+        Elements nested = element.getChildElements(suiteElement);
+        for(int i = 0; i < nested.size(); i++)
+        {
+            processSuite(nested.get(i), suite);
+        }
+
         Elements cases = element.getChildElements(caseElement);
         for(int i = 0; i < cases.size(); i++)
         {

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite tests="2" failures="0" disabled="0" errors="0" time="321" name="Outer">
+    <testsuite name="Nested" tests="2" failures="0" disabled="0" errors="0" time="157">
+        <testcase name="test1" status="run" classname="Nested"/>
+        <testcase name="test2" status="run" classname="Nested"/>
+    </testsuite>
+</testsuite>
