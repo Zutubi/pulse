@@ -281,4 +281,12 @@ public class CollectionUtils
 
         return m;
     }
+    
+    public static <T> void traverse(Collection<T> c, UnaryFunction<T> f)
+    {
+        for (T t : c)
+        {
+            f.process(t);
+        }
+    }
 }

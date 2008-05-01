@@ -1,8 +1,10 @@
 package com.zutubi.pulse.transfer;
 
 import com.zutubi.pulse.Version;
-import com.zutubi.util.IOUtils;
 import com.zutubi.pulse.util.JDBCUtils;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.IOUtils;
+import com.zutubi.util.UnaryFunction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.Table;
@@ -27,7 +29,7 @@ import java.util.Map;
  */
 public class TransferAPI
 {
-    private TransferListener listener;
+    private List<TransferListener> listeners;
 
     public void dump(Configuration config, DataSource dataSource, File outFile) throws TransferException
     {
@@ -128,9 +130,9 @@ public class TransferAPI
 
     private TransferTarget wrapTargetIfNecessary(TransferTarget target)
     {
-        if (listener != null)
+        if (listeners != null && listeners.size() > 0)
         {
-            return new ListenerTransferTarget(target, listener);
+            return new InterceptorTransferTarget(target, listeners);
         }
         else
         {
@@ -227,49 +229,86 @@ public class TransferAPI
         }
     }
 
-    public void setListener(TransferListener listener)
+    public void addListener(TransferListener listener)
     {
-        this.listener = listener;
+        if (listeners == null)
+        {
+            listeners = new LinkedList<TransferListener>();
+        }
+        listeners.add(listener);
     }
 
-    private class ListenerTransferTarget implements TransferTarget
+    /**
+     * 
+     */
+    private class InterceptorTransferTarget implements TransferTarget
     {
-        private TransferListener listener;
+        private List<TransferListener> listeners;
         private TransferTarget delegate;
 
-        public ListenerTransferTarget(TransferTarget delegate, TransferListener listener)
+        public InterceptorTransferTarget(TransferTarget delegate, List<TransferListener> listeners)
         {
-            this.listener = listener;
+            this.listeners= listeners;
             this.delegate = delegate;
         }
 
         public void start() throws TransferException
         {
-            listener.start();
+            CollectionUtils.traverse(listeners, new UnaryFunction<TransferListener>()
+            {
+                public void process(TransferListener transferListener)
+                {
+                    transferListener.start();
+                }
+            });
             delegate.start();
         }
 
-        public void startTable(com.zutubi.pulse.transfer.Table table) throws TransferException
+        public void startTable(final com.zutubi.pulse.transfer.Table table) throws TransferException
         {
-            listener.startTable(table);
+            CollectionUtils.traverse(listeners, new UnaryFunction<TransferListener>()
+            {
+                public void process(TransferListener transferListener)
+                {
+                    transferListener.startTable(table);
+                }
+            });
             delegate.startTable(table);
         }
 
-        public void row(Map<String, Object> row) throws TransferException
+        public void row(final Map<String, Object> row) throws TransferException
         {
-            listener.row(row);
+            CollectionUtils.traverse(listeners, new UnaryFunction<TransferListener>()
+            {
+                public void process(TransferListener transferListener)
+                {
+                    transferListener.row(row);
+                }
+            });
             delegate.row(row);
         }
 
         public void endTable() throws TransferException
         {
-            listener.endTable();
+            CollectionUtils.traverse(listeners, new UnaryFunction<TransferListener>()
+            {
+                public void process(TransferListener transferListener)
+                {
+                    transferListener.endTable();
+                }
+            });
             delegate.endTable();
         }
 
         public void end() throws TransferException
         {
-            listener.end();
+            CollectionUtils.traverse(listeners, new UnaryFunction<TransferListener>()
+            {
+                public void process(TransferListener transferListener)
+                {
+                    transferListener.end();
+                }
+            });
             delegate.end();
         }
 

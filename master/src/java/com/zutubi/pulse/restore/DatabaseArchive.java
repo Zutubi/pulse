@@ -88,7 +88,7 @@ public class DatabaseArchive extends AbstractArchivableComponent implements Feed
             final Map<String, Long> transferedTableSizes = new HashMap<String, Long>();
 
             TransferAPI transfer = new TransferAPI();
-            transfer.setListener(new LogTableSizeTransferListener(transferedTableSizes));
+            transfer.addListener(new LogTableSizeTransferListener(transferedTableSizes));
             transfer.dump(configuration, dataSource, export);
 
             writeTableSizes(transferedTableSizes, new File(base, "tables.properties"));
@@ -146,7 +146,7 @@ public class DatabaseArchive extends AbstractArchivableComponent implements Feed
                 }
 
                 TransferAPI transfer = new TransferAPI();
-                transfer.setListener(new FeedbackTransferListener(tableSizes, feedback));
+                transfer.addListener(new FeedbackTransferListener(tableSizes, feedback));
                 transfer.restore(configuration, export, dataSource);
             }
         }
