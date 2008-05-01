@@ -21,22 +21,23 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Date;
+import java.util.Properties;
 
 /**
- *
- *
+ * An archive wrapper around the transfer api to enable backup and restore of database contents.
  */
 public class DatabaseArchive extends AbstractArchivableComponent implements FeedbackProvider
 {
     private static final String EXPORT_FILENAME = "export.xml";
-    
+
     private List<String> mappings = new LinkedList<String>();
 
-    private DatabaseConfig databaseConfig = null;
-
     private DataSource dataSource = null;
-    
+
     private Feedback feedback;
+
+    private Properties hibernatePropeties;
 
     public String getName()
     {
@@ -59,10 +60,15 @@ public class DatabaseArchive extends AbstractArchivableComponent implements Feed
                 throw new IOException("Failed to create archive output directory.");
             }
 
-            // need to export the configuration as part of the data export.
+            List<Resource> resources = new LinkedList<Resource>();
             for (String mapping : mappings)
             {
-                Resource resource = new ClassPathResource(mapping);
+                resources.add(new ClassPathResource(mapping));
+            }
+
+            // need to export the configuration as part of the data export.
+            for (Resource resource : resources)
+            {
                 File file = new File(base, resource.getFilename());
                 if (!file.createNewFile())
                 {
@@ -73,16 +79,20 @@ public class DatabaseArchive extends AbstractArchivableComponent implements Feed
 
             File export = new File(base, EXPORT_FILENAME);
             MutableConfiguration configuration = new MutableConfiguration();
-            for (String mapping : mappings)
+            for (Resource resource : resources)
             {
-                Resource resource = new ClassPathResource(mapping);
                 configuration.addInputStream(resource.getInputStream());
             }
+            configuration.setProperties(hibernatePropeties);
 
-            configuration.setProperties(databaseConfig.getHibernateProperties());
+            final Map<String, Long> transferedTableSizes = new HashMap<String, Long>();
 
             TransferAPI transfer = new TransferAPI();
+            transfer.setListener(new LogTableSizeTransferListener(transferedTableSizes));
             transfer.dump(configuration, dataSource, export);
+
+            writeTableSizes(transferedTableSizes, new File(base, "tables.properties"));
+
         }
         catch (IOException e)
         {
@@ -99,13 +109,7 @@ public class DatabaseArchive extends AbstractArchivableComponent implements Feed
         try
         {
             final Map<String, Long> tableSizes = readTableSizes(new File(base, "tables.properties"));
-            long i = 0;
-            for (long rowCount : tableSizes.values())
-            {
-                i += rowCount;
-            }
-            final long allTablesRowCount = i;
-            
+
             File export = new File(base, EXPORT_FILENAME);
             if (export.isFile())
             {
@@ -125,8 +129,11 @@ public class DatabaseArchive extends AbstractArchivableComponent implements Feed
                     configuration.addInputStream(new FileInputStream(mappingFile));
                 }
 
-                configuration.setProperties(databaseConfig.getHibernateProperties());
+                configuration.setProperties(hibernatePropeties);
 
+                // clean out the existing database tables to that the import can be successful.
+                //TODO: use the mappings file to define which tables to drop to that we are a little more
+                //TODO: considerate of the existing content of the database.
                 Connection con = null;
                 try
                 {
@@ -139,53 +146,7 @@ public class DatabaseArchive extends AbstractArchivableComponent implements Feed
                 }
 
                 TransferAPI transfer = new TransferAPI();
-                transfer.setListener(new TransferListener()
-                {
-                    private String currentTable = "";
-                    private long rowCount = 0;
-                    private long tableRowCount = 0;
-                    private long rowsCountedSoFar = 0;
-
-                    public void start()
-                    {
-
-                    }
-
-                    public void startTable(Table table)
-                    {
-                        currentTable = table.getName();
-                        tableRowCount = tableSizes.get(currentTable);
-                    }
-
-                    public void row(Map<String, Object> row)
-                    {
-                        rowCount++;
-                        rowsCountedSoFar++;
-                        feedback.setStatusMessage("" + currentTable + ": " + rowCount + "/" + tableRowCount);
-                        int percentageComplete = (int)((100 * rowsCountedSoFar)/ allTablesRowCount);
-                        if (percentageComplete < 100)
-                        {
-                            feedback.setPercetageComplete(percentageComplete);
-                        }
-                        else
-                        {
-                            // will leaving the feedback at 99 cause a problem?.. if so, we will need a hook to
-                            // tell us when the processing is complete so that we can set it to 100.
-                            feedback.setPercetageComplete(99);
-                        }
-                    }
-
-                    public void endTable()
-                    {
-                        rowCount = 0;
-                        currentTable = "";
-                    }
-
-                    public void end()
-                    {
-                        feedback.setStatusMessage("finalizing database scheme, applying constraints.");
-                    }
-                });
+                transfer.setListener(new FeedbackTransferListener(tableSizes, feedback));
                 transfer.restore(configuration, export, dataSource);
             }
         }
@@ -201,6 +162,31 @@ public class DatabaseArchive extends AbstractArchivableComponent implements Feed
         {
             throw new ArchiveException(e);
         }
+    }
+
+    private void writeTableSizes(Map<String, Long> tableSizes, File file) throws IOException
+    {
+        BufferedWriter writer = null;
+        try
+        {
+            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "8859_1"));
+            writeln(writer, "#" + new Date().toString());
+            for (Map.Entry<String, Long> entry : tableSizes.entrySet())
+            {
+                writeln(writer, entry.getKey() + "=" + entry.getValue());
+            }
+            writer.flush();
+        }
+        finally
+        {
+            IOUtils.close(writer);
+        }
+    }
+
+    private void writeln(BufferedWriter writer, String s) throws IOException
+    {
+        writer.write(s);
+        writer.newLine();
     }
 
     private Map<String, Long> readTableSizes(File file) throws IOException
@@ -239,7 +225,12 @@ public class DatabaseArchive extends AbstractArchivableComponent implements Feed
 
     public void setDatabaseConfig(DatabaseConfig databaseConfig)
     {
-        this.databaseConfig = databaseConfig;
+        this.hibernatePropeties = databaseConfig.getHibernateProperties();
+    }
+
+    public void setHibernateProperties(Properties props)
+    {
+        this.hibernatePropeties = props;
     }
 
     public void setDataSource(DataSource dataSource)
@@ -250,5 +241,107 @@ public class DatabaseArchive extends AbstractArchivableComponent implements Feed
     public void setFeedback(Feedback feedback)
     {
         this.feedback = feedback;
+    }
+
+    public static class FeedbackTransferListener implements TransferListener
+    {
+        private String currentTable = "";
+        private long rowCount = 0;
+        private long tableRowCount = 0;
+        private long rowsCountedSoFar = 0;
+
+        private Map<String, Long> tableSizes;
+        private Feedback feedback;
+        private long allTablesRowCount = 0;
+
+        public FeedbackTransferListener(Map<String, Long> tableSizes, Feedback feedback)
+        {
+            this.tableSizes = tableSizes;
+            this.feedback = feedback;
+
+            for (long rowCount : tableSizes.values())
+            {
+                allTablesRowCount += rowCount;
+            }
+        }
+
+        public void start()
+        {
+
+        }
+
+        public void startTable(Table table)
+        {
+            currentTable = table.getName();
+            tableRowCount = tableSizes.get(currentTable);
+        }
+
+        public void row(Map<String, Object> row)
+        {
+            rowCount++;
+            rowsCountedSoFar++;
+            feedback.setStatusMessage("" + currentTable + ": " + rowCount + "/" + tableRowCount);
+            int percentageComplete = (int) ((100 * rowsCountedSoFar) / allTablesRowCount);
+            if (percentageComplete < 100)
+            {
+                feedback.setPercetageComplete(percentageComplete);
+            }
+            else
+            {
+                // will leaving the feedback at 99 cause a problem?.. if so, we will need a hook to
+                // tell us when the processing is complete so that we can set it to 100.
+                feedback.setPercetageComplete(99);
+            }
+        }
+
+        public void endTable()
+        {
+            rowCount = 0;
+            currentTable = "";
+        }
+
+        public void end()
+        {
+            feedback.setStatusMessage("finalizing database scheme, applying constraints.");
+        }
+    }
+
+    public static class LogTableSizeTransferListener implements TransferListener
+    {
+        private long rowCount = 0;
+        private String currentTableName;
+        private Map<String, Long> transferedTableSizes;
+
+        public LogTableSizeTransferListener(Map<String, Long> transferedTableSizes)
+        {
+            this.transferedTableSizes = transferedTableSizes;
+        }
+
+        public void start()
+        {
+
+        }
+
+        public void startTable(Table table)
+        {
+            rowCount = 0;
+            currentTableName = table.getName();
+            transferedTableSizes.put(currentTableName, rowCount);
+        }
+
+        public void row(Map<String, Object> row)
+        {
+            rowCount++;
+        }
+
+        public void endTable()
+        {
+            transferedTableSizes.put(currentTableName, rowCount);
+        }
+
+        public void end()
+        {
+
+        }
     }
 }

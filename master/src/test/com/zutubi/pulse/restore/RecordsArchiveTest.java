@@ -2,11 +2,9 @@ package com.zutubi.pulse.restore;
 
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.prototype.type.record.store.RecordStore;
-import com.zutubi.prototype.type.record.store.FileSystemRecordStore;
 import com.zutubi.prototype.type.record.store.InMemoryRecordStore;
-import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.MutableRecordImpl;
+import com.zutubi.prototype.type.record.RecordQueries;
 import com.zutubi.prototype.transaction.TransactionManager;
 
 import java.io.File;
@@ -17,7 +15,7 @@ import java.io.File;
  */
 public class RecordsArchiveTest extends PulseTestCase
 {
-    private RecordsArchive archive;
+    private RecordsArchive recordStoreArchive;
     private InMemoryRecordStore recordStore;
 
     private File tmp;
@@ -33,36 +31,45 @@ public class RecordsArchiveTest extends PulseTestCase
         recordStore = new InMemoryRecordStore();
         recordStore.setTransactionManager(txnManager);
 
-        archive = new RecordsArchive();
-        archive.setRecordStore(recordStore);
+        recordStoreArchive = new RecordsArchive();
+        recordStoreArchive.setRecordStore(recordStore);
 
         tmp = FileSystemUtils.createTempDir();
     }
 
     protected void tearDown() throws Exception
     {
-        archive = null;
+        recordStoreArchive = null;
         recordStore = null;
         txnManager = null;
         
         super.tearDown();
     }
 
-    public void testBackupRestore()
+    public void testEmptyStore()
+    {
+        recordStoreArchive.backup(tmp);
+        assertNull(RecordQueries.getQueries(recordStore).select("some"));
+
+        recordStore.insert("some", new MutableRecordImpl());
+        assertNotNull(RecordQueries.getQueries(recordStore).select("some"));
+
+        recordStoreArchive.restore(tmp);
+        assertNull(RecordQueries.getQueries(recordStore).select("some"));
+    }
+
+    public void testSimpleDataBackup()
     {
         recordStore.insert("some", new MutableRecordImpl());
         recordStore.insert("some/path", new MutableRecordImpl());
         
-        archive.backup(tmp);
-
-        assertNotNull(recordStore.select().get("some"));
+        recordStoreArchive.backup(tmp);
+        assertNotNull(RecordQueries.getQueries(recordStore).select("some/path"));
 
         recordStore.delete("some");
+        assertNull(RecordQueries.getQueries(recordStore).select("some/path"));
 
-        assertNull(recordStore.select().get("some"));
-
-        archive.restore(tmp);
-
-        assertNotNull(recordStore.select().get("some"));
+        recordStoreArchive.restore(tmp);
+        assertNotNull(RecordQueries.getQueries(recordStore).select("some/path"));
     }
 }

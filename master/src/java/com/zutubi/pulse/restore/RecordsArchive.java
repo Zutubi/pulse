@@ -4,12 +4,13 @@ import com.zutubi.prototype.type.record.RecordSerialiser;
 import com.zutubi.prototype.type.record.DefaultRecordSerialiser;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.RecordHandler;
+import com.zutubi.prototype.type.record.NoopRecordHandler;
 import com.zutubi.prototype.type.record.store.RecordStore;
 
 import java.io.File;
 
 /**
- *
+ * The records archive handles the backup and restoration of a record store.
  *
  */
 public class RecordsArchive extends AbstractArchivableComponent
@@ -23,14 +24,14 @@ public class RecordsArchive extends AbstractArchivableComponent
 
     public String getDescription()
     {
-        return "The records restoration will replace the current Pulse system configuration with " +
-                "the archived configuration.";
+        return "The records restoration will replace the current Pulse system configuration with the archived configuration.";
     }
 
     public void backup(File base)
     {
         Record export = recordStore.exportRecords();
 
+        // serialise the record structure to disk.
         RecordSerialiser serialiser = new DefaultRecordSerialiser(base);
         serialiser.serialise("", export, true);
     }
@@ -38,13 +39,7 @@ public class RecordsArchive extends AbstractArchivableComponent
     public void restore(File base)
     {
         RecordSerialiser serialiser = new DefaultRecordSerialiser(base);
-        Record baseRecord = serialiser.deserialise("", new RecordHandler()
-        {
-            public void handle(String path, Record record)
-            {
-                // use these callbacks to provide user feedback.
-            }
-        });
+        Record baseRecord = serialiser.deserialise("", new NoopRecordHandler());
 
         recordStore.importRecords(baseRecord);
     }

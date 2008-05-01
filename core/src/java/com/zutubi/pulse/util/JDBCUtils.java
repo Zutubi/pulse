@@ -223,9 +223,12 @@ public class JDBCUtils
 
         // 3) generate the list of sql statements
         List<String> statements = new LinkedList<String>();
-        for (String tableName : tableNames)
+        if (tableNames != null && tableNames.length > 0)
         {
-            statements.add(dialect.sqlDropTable(tableName));
+            for (String tableName : tableNames)
+            {
+                statements.add(dialect.sqlDropTable(tableName));
+            }
         }
 
         // 4) execute the sql.

@@ -1,5 +1,7 @@
 package com.zutubi.prototype.type.record;
 
+import com.zutubi.prototype.type.record.store.RecordStore;
+
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Map;
@@ -12,6 +14,11 @@ import java.util.HashMap;
 public class RecordQueries
 {
     private Record base;
+
+    public static RecordQueries getQueries(RecordStore store)
+    {
+        return new RecordQueries(store.select());
+    }
 
     public RecordQueries(Record record)
     {
