@@ -57,6 +57,13 @@ public class HierarchyPage extends ConfigurationPanePage
     public void goTo()
     {
         selenium.open(getUrl());
+        // Allow the initial page load.
+        selenium.waitForPageToLoad("30000");
+
+        // Wait for the default right panel to load.
+        waitForActionToComplete();
+
+        // Choose our panel and wait for it.
         String linkLocator = getTreeItemLocator(baseName);
         SeleniumUtils.waitForLocator(selenium, linkLocator);
         selenium.click(linkLocator);

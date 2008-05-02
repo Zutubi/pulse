@@ -36,7 +36,7 @@ public class SeleniumUtils
 
     public static void waitForElementId(Selenium selenium, String id, long timeout)
     {
-        selenium.waitForCondition("selenium.browserbot.getCurrentWindow().document.getElementById('" + StringUtils.toValidHtmlName(id) + "') != null", Long.toString(timeout));
+        selenium.waitForCondition("selenium.browserbot.findElementOrNull('id=" + StringUtils.toValidHtmlName(id) + "') != null", Long.toString(timeout));
     }
 
     public static void waitForLocator(Selenium selenium, String locator)
