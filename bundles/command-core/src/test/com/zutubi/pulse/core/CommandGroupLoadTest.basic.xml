@@ -17,5 +17,9 @@
             <executable exe="jim"/>
             <link-artifact name="link" url="http://my/url"/>
         </command>
+
+        <command name="nested force">
+            <executable force="true" exe="jim"/>
+        </command>
     </recipe>
 </project>

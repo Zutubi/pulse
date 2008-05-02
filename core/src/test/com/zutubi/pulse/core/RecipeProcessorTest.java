@@ -87,7 +87,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
 
     public void testBasicRecipe() throws Exception
     {
-        recipeProcessor.build(new RecipeRequest(new SimpleBootstrapper(), getPulseFile("basic"), makeContext(1, "default")));
+        runBasicRecipe("default");
         assertRecipeCommenced(1, "default");
         assertCommandCommenced(1, "bootstrap");
         assertCommandCompleted(1, ResultState.SUCCESS);
@@ -97,21 +97,9 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         assertNoMoreEvents();
     }
 
-    private ExecutionContext makeContext(long id, String recipeName)
-    {
-        ExecutionContext context = new ExecutionContext();
-        context.setWorkingDir(paths.getBaseDir());
-        context.addValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, paths);
-        context.addValue(NAMESPACE_INTERNAL, PROPERTY_RESOURCE_REPOSITORY, resourceRepository);
-        context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE_ID, Long.toString(id));
-        context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE, recipeName);
-        return context;
-    }
-
     public void testVersion() throws Exception
     {
-        ExecutionContext context = makeContext(1, "version");
-        recipeProcessor.build(new RecipeRequest(new SimpleBootstrapper(), getPulseFile("basic"), context));
+        ExecutionContext context = runBasicRecipe("version");
         assertRecipeCommenced(1, "version");
         assertCommandCommenced(1, "bootstrap");
         assertCommandCompleted(1, ResultState.SUCCESS);
@@ -143,7 +131,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
 
     public void testCommandFailure() throws Exception
     {
-        recipeProcessor.build(new RecipeRequest(new SimpleBootstrapper(), getPulseFile("basic"), makeContext(1, "failure")));
+        runBasicRecipe("failure");
         assertRecipeCommenced(1, "failure");
         assertCommandCommenced(1, "bootstrap");
         assertCommandCompleted(1, ResultState.SUCCESS);
@@ -157,7 +145,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
 
     public void testCommandException() throws Exception
     {
-        recipeProcessor.build(new RecipeRequest(new SimpleBootstrapper(), getPulseFile("basic"), makeContext(1, "exception")));
+        runBasicRecipe("exception");
         assertRecipeCommenced(1, "exception");
         assertCommandCommenced(1, "bootstrap");
         assertCommandCompleted(1, ResultState.SUCCESS);
@@ -171,7 +159,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
 
     public void testCommandUnexpectedException() throws Exception
     {
-        recipeProcessor.build(new RecipeRequest(new SimpleBootstrapper(), getPulseFile("basic"), makeContext(1, "unexpected exception")));
+        runBasicRecipe("unexpected exception");
         assertRecipeCommenced(1, "unexpected exception");
         assertCommandCommenced(1, "bootstrap");
         assertCommandCompleted(1, ResultState.SUCCESS);
@@ -181,6 +169,24 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         // RecipeControllers so it is not used from this event
         assertRecipeCompleted(1, ResultState.SUCCESS);
         assertNoMoreEvents();
+    }
+
+    private ExecutionContext runBasicRecipe(String recipeName) throws IOException
+    {
+        ExecutionContext context = makeContext(1, recipeName);
+        recipeProcessor.build(new RecipeRequest(new SimpleBootstrapper(), getPulseFile("basic"), context));
+        return context;
+    }
+
+    private ExecutionContext makeContext(long id, String recipeName)
+    {
+        ExecutionContext context = new ExecutionContext();
+        context.setWorkingDir(paths.getBaseDir());
+        context.addValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, paths);
+        context.addValue(NAMESPACE_INTERNAL, PROPERTY_RESOURCE_REPOSITORY, resourceRepository);
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE_ID, Long.toString(id));
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE, recipeName);
+        return context;
     }
 
     public void testTerminate() throws Exception

@@ -99,6 +99,13 @@ public class CommandGroupLoadTest extends FileLoaderTestBase
         }
     }
 
+    public void testNestedForce() throws Exception
+    {
+        CommandGroup group = loadGroup("basic", "nested force");
+        assertTrue(group.isForce());
+    }
+
+
     private CommandGroup loadGroup(String name, String commandName) throws PulseException
     {
         PulseFile bf = load(name);

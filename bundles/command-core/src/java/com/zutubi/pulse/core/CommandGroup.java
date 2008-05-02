@@ -1,10 +1,10 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.util.TextUtils;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.annotations.Required;
-import com.zutubi.util.TextUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -34,6 +34,11 @@ public class CommandGroup extends CommandSupport implements Validateable
         {
             this.command.setName(getName());
         }
+    }
+
+    public boolean isForce()
+    {
+        return super.isForce() || command.isForce();
     }
 
     public void terminate()
