@@ -35,6 +35,11 @@ public class CommandGroup extends CommandSupport implements Validateable
         }
     }
 
+    public boolean isForce()
+    {
+        return super.isForce() || command.isForce();
+    }
+
     public void terminate()
     {
         command.terminate();

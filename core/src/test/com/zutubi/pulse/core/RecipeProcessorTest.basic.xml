@@ -19,4 +19,11 @@
     <recipe name="unexpected exception">
         <unexpected-exception name="oops"/>
     </recipe>
+
+    <recipe name="nested force">
+        <failure name="fail"/>
+        <command name="should force">
+            <print force="true" message="me for the win"/>
+        </command>
+    </recipe>
 </project>
