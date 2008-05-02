@@ -32,10 +32,5 @@
 
     #buildColumnsPopup("project.summary" "summaryPopup")
     #buildColumnsPopup("project.recent" "recentPopup")
-
-    <div id="commentsWindow" class="floating" style="display: none;">
-        <div id="commentsWindowContent">
-        </div>
-    </div>
 </body>
 </html>

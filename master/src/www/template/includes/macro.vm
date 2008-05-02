@@ -848,13 +848,13 @@
             #wwtext("builds.none")
         #else
             $selectedResult.state.prettyString
-            <a href="#" id="${changeId}_link" onclick="showHideBuildsFloat('$changeId'); return false">+</a>
+            <a href="#" id="${changeId}_link" onclick="showHideFloat('builds', '$changeId'); return false">+</a>
             <div id="$changeId" style="display: none">
             <table class="content" style="margin: 0">
                 <tr>
                     <th class="heading" colspan="4">
                         <span class="action">
-                            <a href="#" onclick="showHideBuildsFloat('$changeId'); return false;"><img alt="$action.getText('close')" src="$base/images/delete.gif"/>#wwtext("name=close")</a>
+                            <a href="#" onclick="showHideFloat('builds', '$changeId'); return false;"><img alt="$action.getText('close')" src="$base/images/delete.gif"/>#wwtext("name=close")</a>
                         </span>
                         #wwtext("name=build.results")
                     </th>
@@ -890,13 +890,13 @@
 
     #if ($commitMessageSupport.length > 60)
         $commitMessageSupport.trim(60)
-        <a href="#" id="${changeId}_link" onclick="showHideCommentsWindow('$changeId'); return false;">+</a>
+        <a href="#" id="${changeId}_link" onclick="showHideFloat('comments', '$changeId'); return false;">+</a>
         <div id="$changeId" style="display: none">
             <table class="content" style="margin: 0">
                 <tr>
                     <th class="heading" colspan="5">
                         <span class="action">
-                            <a href="#" onclick="showHideCommentsWindow('$changeId'); return false;"><img alt="$action.getText('close')" src="$base/images/delete.gif"/>#wwtext("name=close")</a>
+                            <a href="#" onclick="showHideFloat('comments', '$changeId'); return false;"><img alt="$action.getText('close')" src="$base/images/delete.gif"/>#wwtext("name=close")</a>
                         </span>
                         #wwtext("name=change.comment")
                     </th>

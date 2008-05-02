@@ -27,15 +27,5 @@
     </div>
 
     #buildColumnsPopup("my.projects" "popup")
-
-    <div id="buildsWindow" class="floating" style="display: none;">
-        <div id="buildsWindowContent">
-        </div>
-    </div>
-
-    <div id="commentsWindow" class="floating" style="display: none;">
-        <div id="commentsWindowContent">
-        </div>
-    </div>
 </body>
 </html>

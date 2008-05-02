@@ -102,11 +102,4 @@
         </td>
     </p>
 #end
-
-    <div id="commentsWindow" class="floating" style="display: none;">
-        <div id="commentsWindowContent">
-        </div>
-    </div>
-    
-
 </html>

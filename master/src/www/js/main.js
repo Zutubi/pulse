@@ -415,78 +415,42 @@ function openDebugAlert(obj)
 }
 
 /**
- * Show / Hide the commit comment popup.  Requires that the following be added to the page.
+ * Function to show or hide a small floating window.  Used to popup full
+ * comments from summaries and lists of build results.  Note that it is
+ * critical that the element being popped up is a direct child of the
+ * document body (Ext.anchorTo requires this).
  *
- *    <div id="commentsWindow" class="floating" style="display: none;">
- *       <div id="commentsWindowContent">
- *       </div>
- *   </div>
+ * The category is used to differentiate popups of different purposes.  If
+ * the user requests a popup of category X, and a popup is already showing of
+ * the same category, then this latter popup will be reused and moved.
  */
-function showHideCommentsWindow(id)
+function showHideFloat(category, id)
 {
-    var window = getElement('commentsWindow');
-    var link = getElement(id + "_link");
+    var windowId = category + '-window';
+    var contentId = category + '-window-content';
 
-    if(window.style.display == 'none')
+    var windowEl = Ext.get(windowId);
+    if(windowEl && windowEl.isDisplayed() && windowEl.displayedId == id)
     {
-        var element = getElement(id);
-        var cell = getElement(id + "_cell");
-        var windowContent = getElement('commentsWindowContent');
-
-        windowContent.innerHTML = element.innerHTML;
-        
-        var row = cell.parentNode;
-        var position = Position.positionedOffset(cell);
-        var rowPosition = Position.positionedOffset(row);
-
-        window.style.visibility = 'hidden';
-        window.style.display = '';
-
-        var desiredLeft = position[0] + cell.offsetWidth - window.offsetWidth + 20;
-        var maxLeft = rowPosition[0];
-        if (desiredLeft < maxLeft)
-        {
-            window.style.left = maxLeft + "px";
-        }
-        else
-        {
-            window.style.left = desiredLeft + "px";
-        }
-
-        window.style.visibility = 'visible';
-        window.style.top = position[1] + 20 + "px";
+        windowEl.setDisplayed(false);
     }
     else
     {
-        window.style.display = 'none';
-    }
-}
+        if(!windowEl)
+        {
+            windowEl = Ext.DomHelper.append(document.body, '<div id="' + windowId + '" class="floating" style="display: none;"><div id="' + contentId + '"></div></div>', true);
+        }
 
-/**
- * A slight variation on the above.
- */
-function showHideBuildsFloat(id)
-{
-    var window = getElement('buildsWindow');
-    var link = getElement(id + "_link");
+        windowEl.displayedId = id;
+        getElement(contentId).innerHTML = getElement(id).innerHTML;
 
-    if(window.style.display == 'none')
-    {
-        var element = getElement(id);
-        var cell = getElement(id + "_cell");
-        var windowContent = getElement('buildsWindowContent');
+        if (!windowEl.isDisplayed())
+        {
+            windowEl.setDisplayed(true);
+        }
 
-        windowContent.innerHTML = element.innerHTML;
-        var position = Position.positionedOffset(cell);
-        window.style.visibility = 'hidden';
-        window.style.display = '';
-        window.style.left = position[0] + cell.offsetWidth - window.offsetWidth - 20 + "px";
-        window.style.visibility = 'visible';
-        window.style.top = position[1] + 20 + "px";
-    }
-    else
-    {
-        window.style.display = 'none';
+        var linkEl = Ext.get(id + "_link");
+        windowEl.anchorTo(linkEl, 'tr-br?');
     }
 }
 
