@@ -12,7 +12,6 @@ import com.zutubi.pulse.web.wizard.BaseWizard;
 import com.zutubi.pulse.web.wizard.BaseWizardState;
 import com.zutubi.pulse.web.wizard.Wizard;
 
-import java.net.MalformedURLException;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -22,8 +21,6 @@ import java.util.TreeMap;
 public class AddResourceWizard extends BaseWizard
 {
     private long agentId = -1;
-
-    private Slave slave;
 
     private Select select;
 
@@ -95,21 +92,13 @@ public class AddResourceWizard extends BaseWizard
 
     protected boolean isResourceHome(ResourceConstructor c, String path)
     {
-        try
+        if (agentId != -1)
         {
-            if (agentId != -1)
-            {
-                return slaveProxyFactory.createProxy(getSlave()).isResourceHome(c, path);
-            }
-            else
-            {
-                return c.isResourceHome(path);
-            }
+            return slaveProxyFactory.createProxy(getSlave()).isResourceHome(c, path);
         }
-        catch (MalformedURLException e)
+        else
         {
-            e.printStackTrace();
-            return false;
+            return c.isResourceHome(path);
         }
     }
 

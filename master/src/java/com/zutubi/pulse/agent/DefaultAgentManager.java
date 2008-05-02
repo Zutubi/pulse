@@ -23,7 +23,6 @@ import com.zutubi.pulse.services.UpgradeStatus;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.net.ConnectException;
-import java.net.MalformedURLException;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
@@ -92,30 +91,23 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 
     private void addSlaveAgent(Slave slave, boolean ping)
     {
-        try
+        SlaveService service = slaveProxyFactory.createProxy(slave);
+        SlaveBuildService buildService = new SlaveBuildService(service, serviceTokenManager, slave, configurationManager, resourceManager);
+
+        if (slave.getEnableState() == Slave.EnableState.UPGRADING)
         {
-            SlaveService service = slaveProxyFactory.createProxy(slave);
-            SlaveBuildService buildService = new SlaveBuildService(service, serviceTokenManager, slave, configurationManager, resourceManager);
-
-            if (slave.getEnableState() == Slave.EnableState.UPGRADING)
-            {
-                // Something went wrong: lost contact with slave (or master
-                // died) during upgrade.
-                slave.setEnableState(Slave.EnableState.FAILED_UPGRADE);
-                slaveManager.save(slave);
-            }
-
-            SlaveAgent agent = new SlaveAgent(slave, service, serviceTokenManager, buildService);
-            slaveAgents.put(slave.getId(), agent);
-
-            if (ping)
-            {
-                pingSlave(agent);
-            }
+            // Something went wrong: lost contact with slave (or master
+            // died) during upgrade.
+            slave.setEnableState(Slave.EnableState.FAILED_UPGRADE);
+            slaveManager.save(slave);
         }
-        catch (MalformedURLException e)
+
+        SlaveAgent agent = new SlaveAgent(slave, service, serviceTokenManager, buildService);
+        slaveAgents.put(slave.getId(), agent);
+
+        if (ping)
         {
-            LOG.severe("Unable to contact slave '" + slave.getName() + "': " + e.getMessage());
+            pingSlave(agent);
         }
     }
 

@@ -1,9 +1,12 @@
 package com.zutubi.pulse.web.agents;
 
+import com.zutubi.pulse.SlaveProxyFactory;
+import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.model.Slave;
 import com.zutubi.pulse.model.SlaveManager;
 import com.zutubi.pulse.web.ActionSupport;
-import com.zutubi.pulse.agent.AgentManager;
+
+import java.net.MalformedURLException;
 
 /**
  */
@@ -13,6 +16,7 @@ public class EditAgentAction extends ActionSupport
     private Slave slave = new Slave();
     private AgentManager agentManager;
     private SlaveManager slaveManager;
+    private SlaveProxyFactory slaveProxyFactory;
 
     public long getId()
     {
@@ -51,6 +55,15 @@ public class EditAgentAction extends ActionSupport
                 addFieldError("slave.name", "An agent with name '" + slave.getName() + "' already exists.");
             }
         }
+
+        try
+        {
+            slaveProxyFactory.unsafeCreateProxy(slave);
+        }
+        catch (MalformedURLException e)
+        {
+            addFieldError("slave.host", e.getMessage());
+        }
     }
 
     public String execute()
@@ -72,5 +85,10 @@ public class EditAgentAction extends ActionSupport
     public void setAgentManager(AgentManager agentManager)
     {
         this.agentManager = agentManager;
+    }
+
+    public void setSlaveProxyFactory(SlaveProxyFactory slaveProxyFactory)
+    {
+        this.slaveProxyFactory = slaveProxyFactory;
     }
 }
