@@ -14,7 +14,6 @@ import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileSystemOptions;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
-import java.net.MalformedURLException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -114,16 +113,8 @@ public class AgentFileSystem extends AbstractFileSystem
 
     protected SlaveService getProxy() throws FileSystemException
     {
-        try
-        {
-            Agent agent = agentManager.getAgent(Long.valueOf(this.agent));
-            return proxyFactory.createProxy(agent.getConfig());
-        }
-        catch (MalformedURLException e)
-        {
-            e.printStackTrace();
-            throw new FileSystemException(e);
-        }
+        Agent agent = agentManager.getAgent(Long.valueOf(this.agent));
+        return proxyFactory.createProxy(agent.getConfig());
     }
 
     protected String getToken()

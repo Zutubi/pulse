@@ -226,7 +226,7 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         }
     }
 
-    private AgentService createAgentService(AgentConfiguration agentConfig) throws Exception
+    private AgentService createAgentService(AgentConfiguration agentConfig)
     {
         if (agentConfig.isRemote())
         {

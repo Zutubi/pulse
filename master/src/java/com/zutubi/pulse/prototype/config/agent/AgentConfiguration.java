@@ -1,12 +1,16 @@
 package com.zutubi.pulse.prototype.config.agent;
 
 import com.zutubi.config.annotations.*;
+import com.zutubi.pulse.SlaveProxyFactory;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.core.config.NamedConfiguration;
 import com.zutubi.pulse.core.config.Resource;
+import com.zutubi.validation.Validateable;
+import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.annotations.Numeric;
 import com.zutubi.validation.annotations.Required;
 
+import java.net.MalformedURLException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +20,8 @@ import java.util.Map;
 @Form(fieldOrder = {"name", "remote", "host", "port"})
 @Table(columns = {"name", "location", "status"})
 @SymbolicName("zutubi.agentConfig")
-public class AgentConfiguration extends AbstractConfiguration implements NamedConfiguration
+@Wire
+public class AgentConfiguration extends AbstractConfiguration implements NamedConfiguration, Validateable
 {
     @ExternalState
     private long agentStateId;
@@ -30,6 +35,9 @@ public class AgentConfiguration extends AbstractConfiguration implements NamedCo
     private int port = 8090;
     private Map<String, Resource> resources;
     private List<AgentAclConfiguration> permissions = new LinkedList<AgentAclConfiguration>();
+
+    @Transient
+    private SlaveProxyFactory slaveProxyFactory;
 
     public String getName()
     {
@@ -104,5 +112,25 @@ public class AgentConfiguration extends AbstractConfiguration implements NamedCo
     public void addPermission(AgentAclConfiguration permission)
     {
         permissions.add(permission);
+    }
+
+    public void validate(ValidationContext context)
+    {
+        if (remote)
+        {
+            try
+            {
+                slaveProxyFactory.unsafeCreateProxy(this);
+            }
+            catch (MalformedURLException e)
+            {
+                context.addFieldError("host", e.getMessage());
+            }
+        }
+    }
+
+    public void setSlaveProxyFactory(SlaveProxyFactory slaveProxyFactory)
+    {
+        this.slaveProxyFactory = slaveProxyFactory;
     }
 }
