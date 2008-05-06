@@ -1,7 +1,8 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.core.RecipePaths;
+import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -17,6 +18,11 @@ import java.net.URLEncoder;
  */
 public class ServerRecipePaths implements RecipePaths
 {
+    private static final String PROPERTY_PERSISTENT_WORK_DIR = "pulse.persistent.work.dir";
+    private static final String DEFAULT_PERSISTENT_WORK_DIR = "${data}/work/${project}";
+
+    private static final Logger LOG = Logger.getLogger(ServerRecipePaths.class);
+
     private long id;
     private File dataDir;
     private String project;
@@ -42,7 +48,21 @@ public class ServerRecipePaths implements RecipePaths
 
     public File getPersistentWorkDir()
     {
-        return new File(dataDir, FileSystemUtils.composeFilename("work", encode(project)));
+        String pattern = System.getProperty(PROPERTY_PERSISTENT_WORK_DIR, DEFAULT_PERSISTENT_WORK_DIR);
+        Scope scope = new PulseScope();
+        scope.add(new Property("data", dataDir.getAbsolutePath()));
+        scope.add(new Property("project", encode(project)));
+
+        try
+        {
+            String path = VariableHelper.replaceVariables(pattern, scope, true);
+            return new File(path);
+        }
+        catch (FileLoadException e)
+        {
+            LOG.warning("Invalid persistent work directory '" + pattern + "': " + e.getMessage(), e);
+            return new File(dataDir, FileSystemUtils.composeFilename("work", encode(project)));
+        }
     }
 
     private String encode(String s)
