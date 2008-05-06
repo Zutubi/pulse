@@ -44,6 +44,11 @@
 
     #parse("/template/includes/actionerrors.vm")
 
+    #if($clean)
+    <p class="note" style="text-align: center">
+        Marked for clean build on all agents.
+    </p>
+    #end
     <p style="text-align: right; margin-bottom: 0">
         <a href="triggerBuild.action?id=$specification.id&amp;projectId=$project.id"><img alt="trigger" src="$base/images/lightning.gif"/> #wwtext("name=buildspec.trigger")</a>
         [ <a href="forceCleanBuild.action?id=$specification.id&amp;projectId=$project.id">#wwtext("name=buildspec.force.clean")</a> ]

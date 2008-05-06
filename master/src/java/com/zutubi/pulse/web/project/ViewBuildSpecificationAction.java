@@ -1,14 +1,12 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.model.BuildSpecification;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.NamedEntityComparator;
-import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
 import com.zutubi.pulse.core.model.ResourceProperty;
+import com.zutubi.pulse.model.BuildSpecification;
+import com.zutubi.pulse.model.NamedEntityComparator;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 /**
  */
@@ -17,6 +15,10 @@ public class ViewBuildSpecificationAction extends ProjectActionSupport
     private BuildSpecification specification;
     private long id;
     private long selectedNode;
+    /**
+     * Set to true when coming from ForceCleanBuildAction.
+     */
+    private boolean clean;
     private List<ResourceProperty> properties;
 
     public BuildSpecification getSpecification()
@@ -52,6 +54,16 @@ public class ViewBuildSpecificationAction extends ProjectActionSupport
     public boolean haveSelectedNode()
     {
         return selectedNode != 0L && selectedNode != specification.getRoot().getId();
+    }
+
+    public boolean isClean()
+    {
+        return clean;
+    }
+
+    public void setClean(boolean clean)
+    {
+        this.clean = clean;
     }
 
     public List<ResourceProperty> getProperties()

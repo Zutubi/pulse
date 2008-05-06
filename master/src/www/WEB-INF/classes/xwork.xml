@@ -238,7 +238,7 @@
         </action>
 
         <action name="forceCleanBuild" class="com.zutubi.pulse.web.project.ForceCleanBuildAction">
-            <result name="success" type="redirect">/viewBuildSpecification.action?id=${id}&amp;projectId=${projectId}</result>
+            <result name="success" type="redirect">/viewBuildSpecification.action?id=${id}&amp;projectId=${projectId}&amp;clean=true</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
