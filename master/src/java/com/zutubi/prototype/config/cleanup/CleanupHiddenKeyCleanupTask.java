@@ -12,23 +12,23 @@ import java.util.Set;
 public class CleanupHiddenKeyCleanupTask extends RecordCleanupTaskSupport
 {
     private RecordManager recordManager;
+    private long handle;
 
-    public CleanupHiddenKeyCleanupTask(String path, RecordManager recordManager)
+    public CleanupHiddenKeyCleanupTask(long handle, String path, RecordManager recordManager)
     {
         super(path);
+        this.handle = handle;
         this.recordManager = recordManager;
     }
 
     public void run()
     {
         String parentPath = PathUtils.getParentPath(getAffectedPath());
-        String baseName = PathUtils.getBaseName(getAffectedPath());
-
         Record parent = recordManager.select(parentPath);
-        if(parent != null && TemplateRecord.getHiddenKeys(parent).contains(baseName))
+        if(parent != null && TemplateRecord.getHiddenHandles(parent).contains(handle))
         {
             MutableRecord mutableParent = parent.copy(false);
-            TemplateRecord.restoreItem(mutableParent, baseName);
+            TemplateRecord.restoreItem(mutableParent, handle);
             recordManager.update(parentPath, mutableParent);
         }
     }

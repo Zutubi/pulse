@@ -1,6 +1,11 @@
 package com.zutubi.prototype.type.record;
 
+import com.zutubi.prototype.type.ComplexType;
+import com.zutubi.prototype.type.Instantiator;
+import com.zutubi.prototype.type.Type;
+import com.zutubi.prototype.type.TypeException;
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.util.GraphFunction;
 
 import java.util.Set;
 
@@ -61,73 +66,68 @@ public class TemplateRecordTest extends PulseTestCase
 
     public void testHideItem()
     {
-        MutableRecord record = new MutableRecordImpl();
-        String key = "foo";
-        record.put(key, "bar");
+        MutableRecord record = newRecord(1);
+        record.put("foo", newRecord(2));
 
-        TemplateRecord.hideItem(record, key);
-        Set<String> hidden = TemplateRecord.getHiddenKeys(record);
+        TemplateRecord.hideItem(record, 2);
+        Set<Long> hidden = TemplateRecord.getHiddenHandles(record);
         assertEquals(1, hidden.size());
-        assertTrue(hidden.contains(key));
+        assertTrue(hidden.contains(2L));
     }
 
     public void testRestoreItem()
     {
-        MutableRecord record = new MutableRecordImpl();
-        String key = "foo";
-        record.put(key, "bar");
+        MutableRecord record = newRecord(1);
+        record.put("foo", newRecord(2));
 
-        TemplateRecord.hideItem(record, key);
-        assertTrue(TemplateRecord.restoreItem(record, key));
-        Set<String> hidden = TemplateRecord.getHiddenKeys(record);
+        TemplateRecord.hideItem(record, 2);
+        assertTrue(TemplateRecord.restoreItem(record, 2));
+        Set<Long> hidden = TemplateRecord.getHiddenHandles(record);
         assertEquals(0, hidden.size());
     }
 
     public void testHideMultipleItems()
     {
-        MutableRecord record = new MutableRecordImpl();
-        String key1 = "foo1";
-        String key2 = "foo2";
-        record.put(key1, "bar");
-        record.put(key2, "bar");
+        MutableRecord record = newRecord(1);
+        record.put("foo1", newRecord(2));
+        record.put("foo2", newRecord(3));
 
-        TemplateRecord.hideItem(record, key1);
-        TemplateRecord.hideItem(record, key2);
-        Set<String> hidden = TemplateRecord.getHiddenKeys(record);
+        TemplateRecord.hideItem(record, 2);
+        TemplateRecord.hideItem(record, 3);
+        Set<Long> hidden = TemplateRecord.getHiddenHandles(record);
         assertEquals(2, hidden.size());
-        assertTrue(hidden.contains(key1));
-        assertTrue(hidden.contains(key2));
+        assertTrue(hidden.contains(2L));
+        assertTrue(hidden.contains(3L));
     }
 
     public void testRestoreMultipleItems()
     {
-        MutableRecord record = new MutableRecordImpl();
+        MutableRecord record = newRecord(1);
         String key1 = "foo1";
         String key2 = "foo2";
-        record.put(key1, "bar");
-        record.put(key2, "bar");
+        record.put(key1, newRecord(2));
+        record.put(key1, newRecord(3));
 
-        TemplateRecord.hideItem(record, key1);
-        TemplateRecord.hideItem(record, key2);
+        TemplateRecord.hideItem(record, 2);
+        TemplateRecord.hideItem(record, 3);
 
-        assertTrue(TemplateRecord.restoreItem(record, key1));
-        Set<String> hidden = TemplateRecord.getHiddenKeys(record);
+        assertTrue(TemplateRecord.restoreItem(record, 2));
+        Set<Long> hidden = TemplateRecord.getHiddenHandles(record);
         assertEquals(1, hidden.size());
-        assertTrue(hidden.contains(key2));
+        assertTrue(hidden.contains(3L));
 
-        assertTrue(TemplateRecord.restoreItem(record, key2));
-        hidden = TemplateRecord.getHiddenKeys(record);
+        assertTrue(TemplateRecord.restoreItem(record, 3));
+        hidden = TemplateRecord.getHiddenHandles(record);
         assertEquals(0, hidden.size());
     }
 
     public void testRestoreItemNotHidden()
     {
-        MutableRecord record = new MutableRecordImpl();
-        String key = "foo";
-        record.put(key, "bar");
+        MutableRecord record = newRecord(1);
+        record.put("foo", newRecord(2));
 
-        assertFalse(TemplateRecord.restoreItem(record, key));
-        Set<String> hidden = TemplateRecord.getHiddenKeys(record);
+        assertFalse(TemplateRecord.restoreItem(record, 2));
+        Set<Long> hidden = TemplateRecord.getHiddenHandles(record);
         assertEquals(0, hidden.size());
     }
 
@@ -156,13 +156,108 @@ public class TemplateRecordTest extends PulseTestCase
 
     public void testContainsKeyHidden()
     {
-        MutableRecord parentRecord = new MutableRecordImpl();
-        parentRecord.put("foo", "bar");
-        TemplateRecord parent = new TemplateRecord("parent", null, null, parentRecord);
+        MutableRecord parentRecord = newRecord(1);
+        parentRecord.put("foo", newRecord(2));
+        TemplateRecord parent = new TemplateRecord("parent", null, new MockType(), parentRecord);
         MutableRecordImpl childRecord = new MutableRecordImpl();
         TemplateRecord child = new TemplateRecord("child", parent, null, childRecord);
         assertTrue(child.containsKey("foo"));
-        TemplateRecord.hideItem(childRecord, "foo");
+        TemplateRecord.hideItem(childRecord, 2);
         assertFalse(child.containsKey("foo"));
+    }
+
+    private MutableRecord newRecord(long handle)
+    {
+        MutableRecord record = new MutableRecordImpl();
+        record.setHandle(handle);
+        return record;
+    }
+
+    private static class MockType implements ComplexType
+    {
+        public Type getTargetType()
+        {
+            throw new RuntimeException("Not implemented");
+        }
+
+        public Type getActualType(Object value)
+        {
+            throw new RuntimeException("Not implemented");           
+        }
+
+        public Class getClazz()
+        {
+            throw new RuntimeException("Not implemented");
+        }
+
+        public Object instantiate(Object data, Instantiator instantiator) throws TypeException
+        {
+            throw new RuntimeException("Not implemented");
+        }
+
+        public void initialise(Object instance, Object data, Instantiator instantiator)
+        {
+            throw new RuntimeException("Not implemented");
+        }
+
+        public Object unstantiate(Object instance) throws TypeException
+        {
+            throw new RuntimeException("Not implemented");
+        }
+
+        public Object toXmlRpc(Object data) throws TypeException
+        {
+            throw new RuntimeException("Not implemented");
+        }
+
+        public Object fromXmlRpc(Object data) throws TypeException
+        {
+            throw new RuntimeException("Not implemented");
+        }
+
+        public String getSymbolicName()
+        {
+            throw new RuntimeException("Not implemented");
+        }
+
+        public String getSavePath(String path, Record record)
+        {
+            throw new RuntimeException("Not implemented");
+        }
+
+        public String getInsertionPath(String path, Record record)
+        {
+            throw new RuntimeException("Not implemented");
+        }
+
+        public MutableRecord createNewRecord(boolean applyDefaults)
+        {
+            throw new RuntimeException("Not implemented");
+        }
+
+        public boolean isTemplated()
+        {
+            throw new RuntimeException("Not implemented");
+        }
+
+        public Type getDeclaredPropertyType(String propertyName)
+        {
+            throw new RuntimeException("Not implemented");
+        }
+
+        public Type getActualPropertyType(String propertyName, Object propertyValue)
+        {
+             return new MockType();
+        }
+
+        public boolean isValid(Object instance)
+        {
+            throw new RuntimeException("Not implemented");
+        }
+
+        public void forEachComplex(Object instance, GraphFunction<Object> f) throws TypeException
+        {
+            throw new RuntimeException("Not implemented");
+        }
     }
 }

@@ -56,12 +56,14 @@ public class CollectionUtils
         return result;
     }
 
-    public static <T, U> void map(Collection<T> in, Mapping<T, U> m, Collection<U> out)
+    public static <T, U, V extends Collection<U>> V map(Collection<T> in, Mapping<T, U> m, V out)
     {
         for(T t: in)
         {
             out.add(m.map(t));
         }
+
+        return out;
     }
 
     public static <T, U> List<U> map(T[] in, Mapping<T, U> m)
@@ -71,12 +73,14 @@ public class CollectionUtils
         return result;
     }
 
-    public static <T, U> void map(T[] in, Mapping<T, U> m, Collection<U> out)
+    public static <T, U, V extends Collection<U>> V map(T[] in, Mapping<T, U> m, V out)
     {
         for(T t: in)
         {
             out.add(m.map(t));
         }
+
+        return out;
     }
 
     public static <T, U> U[] mapToArray(Iterable<T> iterable, Mapping<T, U> m, U[] out)

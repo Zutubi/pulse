@@ -1658,7 +1658,8 @@ public class ConfigurationTemplateManager
                             // a collection item, and if so hide it.
                             if(parentRecord.isCollection())
                             {
-                                result = new HideRecordCleanupTask(path, false, recordManager);
+                                TemplateRecord hidden = (TemplateRecord) parentsTemplateParent.get(baseName);
+                                result = new HideRecordCleanupTask(hidden.getHandle(), path, false, recordManager);
                             }
                             else
                             {
@@ -1673,7 +1674,7 @@ public class ConfigurationTemplateManager
                     List<String> descendentPaths = getDescendentPaths(path, true, false, true);
                     for (String descendentPath : descendentPaths)
                     {
-                        result.addCascaded(getDescendentCleanupTask(descendentPath));
+                        result.addCascaded(getDescendentCleanupTask(record.getHandle(), descendentPath));
                     }
 
                     return result;
@@ -1690,7 +1691,7 @@ public class ConfigurationTemplateManager
         });
     }
 
-    private RecordCleanupTask getDescendentCleanupTask(String path)
+    private RecordCleanupTask getDescendentCleanupTask(Long handle, String path)
     {
         if(pathExists(path))
         {
@@ -1702,7 +1703,7 @@ public class ConfigurationTemplateManager
         {
             // It must be already hidden in the parent, clean up the hidden
             // key if it exists at this level.
-            return new CleanupHiddenKeyCleanupTask(path, recordManager);
+            return new CleanupHiddenKeyCleanupTask(handle, path, recordManager);
         }
     }
 
@@ -1842,7 +1843,9 @@ public class ConfigurationTemplateManager
                 }
 
                 MutableRecord parentCopy = parentRecord.getMoi().copy(false);
-                if(!(TemplateRecord.restoreItem(parentCopy, PathUtils.getBaseName(path))))
+                TemplateRecord templateParent = getTemplateParentRecord(pathElements);
+
+                if(templateParent == null || !(TemplateRecord.restoreItem(parentCopy, templateParent.getHandle())))
                 {
                     throw new IllegalArgumentException("Invalid path '" + path + "': not hidden");
                 }
@@ -1851,7 +1854,6 @@ public class ConfigurationTemplateManager
 
                 // Now we need to restore the skeletons at this path and all
                 // descendents.
-                TemplateRecord templateParent = getTemplateParentRecord(pathElements);
                 TemplateHierarchy templateHierarchy = getTemplateHierarchy(scope);
                 TemplateNode node = templateHierarchy.getNodeById(pathElements[1]);
                 addInheritedSkeletons(scope, PathUtils.getPath(2, pathElements), typeRegistry.getType(templateParent.getSymbolicName()), templateParent.getMoi(), node.getParent());
