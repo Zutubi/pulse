@@ -14,46 +14,22 @@ import java.util.Properties;
 /**
  * <class-comment/>
  */
-public class MigrateSchemaUpgradeTask implements DataSourceAware, PulseUpgradeTask
+public class MigrateSchemaUpgradeTask extends AbstractUpgradeTask implements DataSourceAware
 {
     private List<String> mappings = new LinkedList<String>();
 
-    private List<String> errors = new LinkedList<String>();
-
     protected DataSource dataSource;
-
-    private int buildNumber;
 
     private DatabaseConfig databaseConfig;
 
-    public int getBuildNumber()
-    {
-        return buildNumber;
-    }
-
-    public void setBuildNumber(int buildNumber)
-    {
-        this.buildNumber = buildNumber;
-    }
-
     public String getDescription()
     {
-        return "The schema upgrade associated with build " + buildNumber;
+        return "The schema upgrade associated with build " + getBuildNumber();
     }
 
     public String getName()
     {
         return "Schema upgrade (" + getBuildNumber() + ")";
-    }
-
-    public List<String> getErrors()
-    {
-        return errors;
-    }
-
-    public boolean hasFailed()
-    {
-        return getErrors().size() > 0;
     }
 
     public boolean haltOnFailure()
@@ -90,7 +66,7 @@ public class MigrateSchemaUpgradeTask implements DataSourceAware, PulseUpgradeTa
             List<Exception> exceptions = refactor.getExceptions();
             for (Exception e : exceptions)
             {
-                getErrors().add(e.getClass().getName() + ": Cause: " + e.getMessage());
+                addError(e.getClass().getName() + ": Cause: " + e.getMessage());
             }
         }
         catch (IOException e)

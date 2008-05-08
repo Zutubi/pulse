@@ -3,22 +3,16 @@ package com.zutubi.pulse.upgrade.tasks;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.upgrade.ConfigurationAware;
 import com.zutubi.pulse.upgrade.UpgradeException;
-import com.zutubi.pulse.upgrade.UpgradeTask;
 import com.zutubi.util.logging.Logger;
-
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * <class comment/>
  */
-public class BackupUpgradeTask implements PulseUpgradeTask, ConfigurationAware
+public class BackupUpgradeTask extends AbstractUpgradeTask implements ConfigurationAware
 {
     private static final Logger LOG = Logger.getLogger(BackupUpgradeTask.class);
     
     private MasterConfigurationManager configurationManager;
-
-    private List<String> errors = new LinkedList<String>();
 
     public String getName()
     {
@@ -45,23 +39,13 @@ public class BackupUpgradeTask implements PulseUpgradeTask, ConfigurationAware
         catch (Exception e)
         {
             LOG.severe(e);
-            errors.add(e.getMessage());
+            addError(e.getMessage());
         }
-    }
-
-    public List<String> getErrors()
-    {
-        return errors;
     }
 
     public boolean haltOnFailure()
     {
         return true;
-    }
-
-    public boolean hasFailed()
-    {
-        return errors.size() != 0;
     }
 
     public void setConfigurationManager(MasterConfigurationManager configurationManager)

@@ -3,8 +3,8 @@ package com.zutubi.pulse.upgrade.tasks;
 import com.zutubi.pulse.upgrade.DataSourceAware;
 import com.zutubi.pulse.upgrade.UpgradeException;
 import com.zutubi.pulse.util.JDBCUtils;
-import com.zutubi.util.logging.Logger;
 import com.zutubi.util.IOUtils;
+import com.zutubi.util.logging.Logger;
 
 import javax.sql.DataSource;
 import java.io.ByteArrayInputStream;
@@ -12,22 +12,22 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.sql.*;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
 /**
  * <class-comment/>
  */
-public abstract class DatabaseUpgradeTask implements PulseUpgradeTask, DataSourceAware
+public abstract class DatabaseUpgradeTask extends AbstractUpgradeTask implements DataSourceAware
 {
     private static final Logger LOG = Logger.getLogger(DatabaseUpgradeTask.class);
 
     protected DataSource dataSource;
-
-    protected List<String> errors = new LinkedList<String>();
-
-    protected int buildNumber;
 
     /**
      * Required resource.
@@ -37,21 +37,6 @@ public abstract class DatabaseUpgradeTask implements PulseUpgradeTask, DataSourc
     public void setDataSource(DataSource source)
     {
         this.dataSource = source;
-    }
-
-    public List<String> getErrors()
-    {
-        return errors;
-    }
-
-    public void setBuildNumber(int buildNumber)
-    {
-        this.buildNumber = buildNumber;
-    }
-
-    public int getBuildNumber()
-    {
-        return buildNumber;
     }
 
     public void execute() throws UpgradeException
@@ -65,22 +50,17 @@ public abstract class DatabaseUpgradeTask implements PulseUpgradeTask, DataSourc
         catch(IOException e)
         {
             LOG.error(e);
-            errors.add("IOException: " + e.getMessage() + ". Please see the log files for details.");            
+            addError("IOException: " + e.getMessage() + ". Please see the log files for details.");
         }
         catch (SQLException e)
         {
             LOG.error(e);
-            errors.add("SQLException: " + e.getMessage() + ". Please see the log files for details.");
+            addError("SQLException: " + e.getMessage() + ". Please see the log files for details.");
         }
         finally
         {
             JDBCUtils.close(connection);
         }
-    }
-
-    public boolean hasFailed()
-    {
-        return getErrors().size() > 0;
     }
 
     public abstract void execute(Connection con) throws IOException, SQLException;

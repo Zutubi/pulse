@@ -194,6 +194,11 @@ public class InMemoryRecordStore implements RecordStore
 
     private MutableRecord getChildRecord(MutableRecord record, String element)
     {
+        if (record == null)
+        {
+            return null;
+        }
+        
         Object obj = record.get(element);
         if (obj == null || !(obj instanceof MutableRecord))
         {
