@@ -435,4 +435,18 @@ public class XmlRpcHelper
             }
         }
     }
+
+    public static void main(String[] argv) throws Exception
+    {
+        XmlRpcHelper helper = new XmlRpcHelper(new URL("http://localhost:8080/xmlrpc"));
+        helper.loginAsAdmin();
+        try
+        {
+            helper.insertSimpleProject(argv[0], false);
+        }
+        finally
+        {
+            helper.logout();
+        }
+    }
 }
