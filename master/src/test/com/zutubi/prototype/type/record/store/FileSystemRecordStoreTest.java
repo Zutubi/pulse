@@ -117,11 +117,6 @@ public class FileSystemRecordStoreTest extends PulseTestCase
 
     }
 
-    public void testInsertWithTheLot()
-    {
-
-    }
-
     public void testUpdate()
     {
         MutableRecord sample = createSampleRecord();

@@ -2,13 +2,18 @@ package com.zutubi.pulse.restore;
 
 import com.zutubi.pulse.bootstrap.MasterUserPaths;
 import com.zutubi.pulse.bootstrap.SystemConfiguration;
-import com.zutubi.pulse.restore.feedback.Feedback;
-import com.zutubi.pulse.restore.feedback.FeedbackProvider;
+import com.zutubi.pulse.monitor.FeedbackAware;
+import com.zutubi.pulse.monitor.TaskFeedback;
 import com.zutubi.util.IOUtils;
 import com.zutubi.util.Pair;
 import com.zutubi.util.StringUtils;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,10 +21,10 @@ import java.util.Map;
  *
  *
  */
-public class ArtifactArchive extends AbstractArchivableComponent implements FeedbackProvider
+public class ArtifactArchive extends AbstractArchiveableComponent implements FeedbackAware
 {
     private MasterUserPaths paths;
-    private Feedback feedback;
+    private TaskFeedback feedback;
     private SystemConfiguration systemConfiguration;
 
     public String getName()
@@ -178,7 +183,8 @@ public class ArtifactArchive extends AbstractArchivableComponent implements Feed
         return mappings;
     }
 
-    public void setFeedback(Feedback feedback)
+
+    public void setFeedback(TaskFeedback feedback)
     {
         this.feedback = feedback;
     }

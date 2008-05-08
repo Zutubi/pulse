@@ -10,7 +10,7 @@ import java.io.IOException;
  *
  *
  */
-public class PluginsArchive extends AbstractArchivableComponent
+public class PluginsArchive extends AbstractArchiveableComponent
 {
     private PluginPaths pluginPaths;
 

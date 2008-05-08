@@ -2,7 +2,7 @@ package com.zutubi.pulse.webwork.interceptor;
 
 import com.opensymphony.xwork.ActionInvocation;
 import com.opensymphony.xwork.ActionProxy;
-import com.zutubi.pulse.restore.feedback.TaskMonitor;
+import com.zutubi.pulse.monitor.Monitor;
 import com.zutubi.pulse.web.restore.ExecuteRestoreAction;
 
 /**
@@ -19,7 +19,7 @@ public class ExecAndWaitInterceptor extends com.opensymphony.webwork.interceptor
 
         // should implement the 
 
-        TaskMonitor monitor = ((ExecuteRestoreAction)action).getMonitor();
+        Monitor monitor = ((ExecuteRestoreAction)action).getMonitor();
 
         if (monitor.isFinished())
         {

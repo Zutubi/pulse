@@ -1,9 +1,9 @@
 package com.zutubi.pulse.restore;
 
 import com.zutubi.pulse.bootstrap.Data;
-import com.zutubi.pulse.restore.feedback.Feedback;
-import com.zutubi.pulse.restore.feedback.FeedbackProvider;
-import com.zutubi.pulse.restore.feedback.TaskMonitor;
+import com.zutubi.pulse.monitor.JobRunner;
+import com.zutubi.pulse.monitor.Monitor;
+import com.zutubi.pulse.monitor.Task;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -18,9 +18,7 @@ import java.util.List;
  */
 public class DefaultArchiveManager implements ArchiveManager
 {
-    private TaskMonitor taskMonitor = new TaskMonitor();
-
-    private List<RestoreTask> tasks = new LinkedList<RestoreTask>();
+    private List<Task> tasks = new LinkedList<Task>();
 
     private File source;
     private Archive archive;
@@ -32,6 +30,8 @@ public class DefaultArchiveManager implements ArchiveManager
     private Data paths = null;
 
     private List<ArchiveableComponent> archiveableComponents = new LinkedList<ArchiveableComponent>();
+
+    private JobRunner jobRunner = new JobRunner();
 
     private static final Logger LOG = Logger.getLogger(DefaultArchiveManager.class);
 
@@ -45,9 +45,9 @@ public class DefaultArchiveManager implements ArchiveManager
         archiveableComponents = new LinkedList<ArchiveableComponent>(components);
     }
 
-    public TaskMonitor getTaskMonitor()
+    public Monitor getTaskMonitor()
     {
-        return taskMonitor;
+        return jobRunner.getMonitor();
     }
 
     public Archive prepareRestore(File source) throws ArchiveException
@@ -67,12 +67,6 @@ public class DefaultArchiveManager implements ArchiveManager
             // does it matter if this does not exist, do we need to process something regardless?
 
             RestoreComponentTask task = new RestoreComponentTask(component, archiveComponentBase);
-            final Feedback feedback = taskMonitor.add(task);
-            if (component instanceof FeedbackProvider)
-            {
-                ((FeedbackProvider) component).setFeedback(feedback);
-            }
-
             tasks.add(task);
         }
 
@@ -84,7 +78,7 @@ public class DefaultArchiveManager implements ArchiveManager
         return archive;
     }
 
-    public List<RestoreTask> previewRestore()
+    public List<Task> previewRestore()
     {
         // Check which of the restorable components is represented within the backup.
 
@@ -95,12 +89,16 @@ public class DefaultArchiveManager implements ArchiveManager
 
     public void restoreArchive()
     {
-        if (taskMonitor.isStarted())
+        Monitor monitor = getTaskMonitor();
+        if (monitor.isStarted())
         {
             LOG.warning("Attempted to execute an executing upgrade.  Request has been ignored.");
             return;
         }
 
+        jobRunner.run(tasks);
+
+/*
         taskMonitor.start();
 
         // this task listener is here to as part of the synchronisation process with the UpgradeManager.  They both
@@ -155,7 +153,7 @@ public class DefaultArchiveManager implements ArchiveManager
                         String message = "RestoreTask '" + task.getName() + "' is marked as failed. The " +
                                 "following errors were recorded:" + errors.toString();
                         feedback.setStatusMessage(message);
-                        
+
                         throw new ArchiveException(message);
                     }
 
@@ -180,10 +178,11 @@ public class DefaultArchiveManager implements ArchiveManager
                 LOG.severe(e);
             }
         }
-
         taskMonitor.finish();
+*/
 
-        if(taskMonitor.isSuccessful())
+
+        if(monitor.isSuccessful())
         {
             backupSourceFile();
         }

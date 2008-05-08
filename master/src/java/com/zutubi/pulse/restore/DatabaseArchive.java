@@ -1,8 +1,8 @@
 package com.zutubi.pulse.restore;
 
 import com.zutubi.pulse.database.DatabaseConfig;
-import com.zutubi.pulse.restore.feedback.Feedback;
-import com.zutubi.pulse.restore.feedback.FeedbackProvider;
+import com.zutubi.pulse.monitor.FeedbackAware;
+import com.zutubi.pulse.monitor.TaskFeedback;
 import com.zutubi.pulse.transfer.Table;
 import com.zutubi.pulse.transfer.TransferAPI;
 import com.zutubi.pulse.transfer.TransferException;
@@ -14,20 +14,28 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 import javax.sql.DataSource;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Date;
 import java.util.Properties;
 
 /**
  * An archive wrapper around the transfer api to enable backup and restore of database contents.
  */
-public class DatabaseArchive extends AbstractArchivableComponent implements FeedbackProvider
+public class DatabaseArchive extends AbstractArchiveableComponent implements FeedbackAware
 {
     private static final String EXPORT_FILENAME = "export.xml";
 
@@ -35,7 +43,7 @@ public class DatabaseArchive extends AbstractArchivableComponent implements Feed
 
     private DataSource dataSource = null;
 
-    private Feedback feedback;
+    private TaskFeedback feedback;
 
     private Properties hibernatePropeties;
 
@@ -238,7 +246,7 @@ public class DatabaseArchive extends AbstractArchivableComponent implements Feed
         this.dataSource = dataSource;
     }
 
-    public void setFeedback(Feedback feedback)
+    public void setFeedback(TaskFeedback feedback)
     {
         this.feedback = feedback;
     }
@@ -251,10 +259,10 @@ public class DatabaseArchive extends AbstractArchivableComponent implements Feed
         private long rowsCountedSoFar = 0;
 
         private Map<String, Long> tableSizes;
-        private Feedback feedback;
+        private TaskFeedback feedback;
         private long allTablesRowCount = 0;
 
-        public FeedbackTransferListener(Map<String, Long> tableSizes, Feedback feedback)
+        public FeedbackTransferListener(Map<String, Long> tableSizes, TaskFeedback feedback)
         {
             this.tableSizes = tableSizes;
             this.feedback = feedback;
@@ -280,17 +288,20 @@ public class DatabaseArchive extends AbstractArchivableComponent implements Feed
         {
             rowCount++;
             rowsCountedSoFar++;
-            feedback.setStatusMessage("" + currentTable + ": " + rowCount + "/" + tableRowCount);
-            int percentageComplete = (int) ((100 * rowsCountedSoFar) / allTablesRowCount);
-            if (percentageComplete < 100)
+            if (feedback != null)
             {
-                feedback.setPercetageComplete(percentageComplete);
-            }
-            else
-            {
-                // will leaving the feedback at 99 cause a problem?.. if so, we will need a hook to
-                // tell us when the processing is complete so that we can set it to 100.
-                feedback.setPercetageComplete(99);
+                feedback.setStatusMessage("" + currentTable + ": " + rowCount + "/" + tableRowCount);
+                int percentageComplete = (int) ((100 * rowsCountedSoFar) / allTablesRowCount);
+                if (percentageComplete < 100)
+                {
+                    feedback.setPercetageComplete(percentageComplete);
+                }
+                else
+                {
+                    // will leaving the feedback at 99 cause a problem?.. if so, we will need a hook to
+                    // tell us when the processing is complete so that we can set it to 100.
+                    feedback.setPercetageComplete(99);
+                }
             }
         }
 
@@ -302,7 +313,10 @@ public class DatabaseArchive extends AbstractArchivableComponent implements Feed
 
         public void end()
         {
-            feedback.setStatusMessage("finalizing database scheme, applying constraints.");
+            if (feedback != null)
+            {
+                feedback.setStatusMessage("finalizing database scheme, applying constraints.");
+            }
         }
     }
 

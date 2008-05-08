@@ -10,7 +10,7 @@ import java.io.IOException;
  *
  *
  */
-public class DataDirectoryArchive extends AbstractArchivableComponent
+public class DataDirectoryArchive extends AbstractArchiveableComponent
 {
     private MasterUserPaths paths;
 

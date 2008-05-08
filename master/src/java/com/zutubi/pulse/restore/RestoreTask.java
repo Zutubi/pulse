@@ -1,22 +1,12 @@
 package com.zutubi.pulse.restore;
 
+import com.zutubi.pulse.monitor.Task;
+
 /**
  *
  *
  */
-public interface RestoreTask
+public interface RestoreTask extends Task
 {
-    void execute() throws ArchiveException;
-
-    String getName();
-    
-    String getDescription();
-
-    boolean hasFailed();
-
-    String[] getErrors();
-
-    boolean haltOnFailure();
-
     ArchiveableComponent getComponent();
 }

@@ -359,6 +359,11 @@ public abstract class PulseTestCase extends TestCase
 
     protected void executeOnSeparateThreadAndWait(final Runnable r)
     {
+        executeOnSeparateThreadAndWait(r, -1);
+    }
+
+    protected void executeOnSeparateThreadAndWait(final Runnable r, long timeout)
+    {
         try
         {
             final AssertionFailedError[] afe = new AssertionFailedError[1];
@@ -377,7 +382,14 @@ public abstract class PulseTestCase extends TestCase
                 }
             });
             thread.start();
-            thread.join();
+            if (timeout == -1)
+            {
+                thread.join();
+            }
+            else
+            {
+                thread.join(timeout);
+            }
 
             if (afe[0] != null)
             {

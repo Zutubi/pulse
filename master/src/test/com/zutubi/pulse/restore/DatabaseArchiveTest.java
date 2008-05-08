@@ -1,6 +1,5 @@
 package com.zutubi.pulse.restore;
 
-import com.zutubi.pulse.restore.feedback.Feedback;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
 import com.zutubi.pulse.util.FileSystemUtils;
@@ -143,14 +142,16 @@ public class DatabaseArchiveTest extends PulseTestCase
         DatabaseArchive archive = new DatabaseArchive();
         archive.setDataSource(dataSource);
         archive.setMappings(Arrays.asList(mappings));
+/*
         final List<Integer> feedbackPercentages = new LinkedList<Integer>();
-        archive.setFeedback(new Feedback()
+        archive.setFeedback(new TaskFeedback()
         {
             public void setPercetageComplete(int percentage)
             {
                 feedbackPercentages.add(percentage);
             }
         });
+*/
         archive.setHibernateProperties(getHibernateProperties());
         archive.backup(tmpDir);
 
@@ -171,10 +172,12 @@ public class DatabaseArchiveTest extends PulseTestCase
         archive.setDataSource(dataSource);
         archive.restore(tmpDir);
 
+/*
         assertEquals(25, (int)feedbackPercentages.get(0));
         assertEquals(50, (int)feedbackPercentages.get(1));
         assertEquals(75, (int)feedbackPercentages.get(2));
         assertEquals(99, (int)feedbackPercentages.get(3));
+*/
 
         assertEquals(3, JDBCUtils.executeCount(dataSource, "select * from TYPES"));
         assertEquals(1, JDBCUtils.executeCount(dataSource, "select * from RELATED_TYPES"));

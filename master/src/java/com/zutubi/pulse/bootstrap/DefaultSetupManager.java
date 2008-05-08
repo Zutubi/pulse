@@ -1,7 +1,14 @@
 package com.zutubi.pulse.bootstrap;
 
 import com.opensymphony.xwork.spring.SpringObjectFactory;
-import com.zutubi.prototype.config.*;
+import com.zutubi.prototype.config.ConfigurationExtensionManager;
+import com.zutubi.prototype.config.ConfigurationPersistenceManager;
+import com.zutubi.prototype.config.ConfigurationProvider;
+import com.zutubi.prototype.config.ConfigurationReferenceManager;
+import com.zutubi.prototype.config.ConfigurationRegistry;
+import com.zutubi.prototype.config.ConfigurationStateManager;
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
+import com.zutubi.prototype.config.DefaultConfigurationProvider;
 import com.zutubi.prototype.type.record.DelegatingHandleAllocator;
 import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.pulse.Version;
@@ -14,11 +21,11 @@ import com.zutubi.pulse.events.DataDirectoryLocatedEvent;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.logging.LogConfigurationManager;
+import com.zutubi.pulse.monitor.Monitor;
 import com.zutubi.pulse.plugins.PluginManager;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.restore.ArchiveException;
 import com.zutubi.pulse.restore.ArchiveManager;
-import com.zutubi.pulse.restore.feedback.TaskMonitor;
 import com.zutubi.pulse.upgrade.UpgradeManager;
 import com.zutubi.pulse.util.DriverWrapper;
 import com.zutubi.util.IOUtils;
@@ -328,6 +335,11 @@ public class DefaultSetupManager implements SetupManager
 
     public void requestRestoreComplete(boolean restored)
     {
+        if (databaseConsole.isEmbedded())
+        {
+            printConsoleMessage("Compacting embedded database.  This may take some time.");
+        }
+
         databaseConsole.postRestoreHook(restored);
         
         linkUserTemplates();
@@ -664,7 +676,7 @@ public class DefaultSetupManager implements SetupManager
     // continue selected on the restoration preview page.
     public void doExecuteRestorationRequest()
     {
-        TaskMonitor monitor = archiveManager.getTaskMonitor();
+        Monitor monitor = archiveManager.getTaskMonitor();
         if (!monitor.isStarted())
         {
             archiveManager.restoreArchive();

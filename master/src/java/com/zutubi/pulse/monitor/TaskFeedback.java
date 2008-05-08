@@ -1,4 +1,4 @@
-package com.zutubi.pulse.restore.feedback;
+package com.zutubi.pulse.monitor;
 
 import com.zutubi.pulse.util.TimeStamps;
 
@@ -6,23 +6,35 @@ import com.zutubi.pulse.util.TimeStamps;
  *
  *
  */
-public class Feedback
+public class TaskFeedback
 {
     private static final int UNDEFINED = -1;
 
     private long startTime = UNDEFINED;
+
     private long finishTime = UNDEFINED;
 
     private int percentageComplete = UNDEFINED;
 
-    private TaskStatus status = TaskStatus.PENDING;
+    private Monitor monitor;
 
+    private Task task;
+
+    private TaskStatus status = TaskStatus.PENDING;
+    
     private String statusMessage;
 
-    public void start()
+    public TaskFeedback(Monitor monitor, Task task)
     {
-        startTime = System.currentTimeMillis();
+        this.monitor = monitor;
+        this.task = task;
+    }
+
+    public void markStarted()
+    {
         status = TaskStatus.IN_PROGRESS;
+        start();
+        monitor.start(task);
     }
 
     public boolean isStarted()
@@ -30,9 +42,50 @@ public class Feedback
         return status == TaskStatus.IN_PROGRESS;
     }
 
-    public long getStartTime()
+    public void markFailed()
     {
-        return startTime;
+        status = TaskStatus.FAILED;
+        finish();
+        monitor.finish(task);
+    }
+
+    public boolean isFailed()
+    {
+        return status == TaskStatus.FAILED;
+    }
+
+    public void markAborted()
+    {
+        finish();
+        status = TaskStatus.ABORTED;
+        monitor.finish(task);
+    }
+
+    public boolean isAborted()
+    {
+        return status == TaskStatus.ABORTED;
+    }
+
+    public void markSuccessful()
+    {
+        finish();
+        status = TaskStatus.SUCCESS;
+        monitor.finish(task);
+    }
+
+    public boolean isSuccessful()
+    {
+        return status == TaskStatus.SUCCESS;
+    }
+
+    public boolean isFinished()
+    {
+        return isAborted() || isSuccessful() || isFailed();
+    }
+
+    private void start()
+    {
+        startTime = System.currentTimeMillis();
     }
 
     private void finish()
@@ -42,71 +95,6 @@ public class Feedback
         {
             startTime = finishTime;
         }
-    }
-
-    public void completed()
-    {
-        finish();
-        status = TaskStatus.SUCCESS;
-    }
-
-    public void failed()
-    {
-        finish();
-        status = TaskStatus.FAILURE;
-    }
-
-    public boolean hasFailed()
-    {
-        return status == TaskStatus.FAILURE;
-    }
-
-    public TaskStatus getStatus()
-    {
-        return status;
-    }
-
-    public void errored()
-    {
-        finish();
-        status = TaskStatus.ERROR;
-    }
-
-    public void aborted()
-    {
-        finish();
-        status = TaskStatus.ABORTED;
-    }
-
-    public boolean isFinished()
-    {
-        return status != TaskStatus.PENDING && status != TaskStatus.IN_PROGRESS;
-    }
-
-    public long getFinishTime()
-    {
-        return finishTime;
-    }
-
-    public long getElapsedTime()
-    {
-        if (!isStarted())
-        {
-            return UNDEFINED;
-        }
-
-        if (!isFinished())
-        {
-            long currentTime = System.currentTimeMillis();
-            return currentTime - startTime;
-        }
-
-        return finishTime - startTime;
-    }
-
-    public String getElapsedTimePretty()
-    {
-        return TimeStamps.getPrettyElapsed(getElapsedTime());
     }
 
     public void setPercetageComplete(int percentage)
@@ -135,6 +123,16 @@ public class Feedback
         return percentageComplete;
     }
 
+    public String getPercentageCompletePretty()
+    {
+        int percentage = getPercentageComplete();
+        if (percentage == UNDEFINED)
+        {
+            return "unknown";
+        }
+        return Integer.toString(percentage);
+    }
+
     public int getPercentageRemaining()
     {
         int complete = getPercentageComplete();
@@ -155,14 +153,25 @@ public class Feedback
         return Integer.toString(percentage);
     }
 
-    public String getPercentageCompletePretty()
+    public long getElapsedTime()
     {
-        int percentage = getPercentageComplete();
-        if (percentage == UNDEFINED)
+        if (!isStarted())
         {
-            return "unknown";
+            return UNDEFINED;
         }
-        return Integer.toString(percentage);
+
+        if (!isFinished())
+        {
+            long currentTime = System.currentTimeMillis();
+            return currentTime - startTime;
+        }
+
+        return finishTime - startTime;
+    }
+
+    public String getElapsedTimePretty()
+    {
+        return TimeStamps.getPrettyElapsed(getElapsedTime());
     }
 
     public long getEstimatedTime()
@@ -187,7 +196,7 @@ public class Feedback
             return UNDEFINED;
         }
 
-        int percentageRemaining = (100 - percentageComplete);
+        long percentageRemaining = (100 - percentageComplete);
         return (elapsedTime / percentageComplete) * percentageRemaining;
     }
 
@@ -210,4 +219,5 @@ public class Feedback
     {
         this.statusMessage = statusMessage;
     }
+
 }

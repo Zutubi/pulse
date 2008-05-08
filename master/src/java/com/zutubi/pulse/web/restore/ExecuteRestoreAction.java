@@ -2,8 +2,8 @@ package com.zutubi.pulse.web.restore;
 
 import com.zutubi.pulse.bootstrap.DefaultSetupManager;
 import com.zutubi.pulse.bootstrap.SetupManager;
-import com.zutubi.pulse.restore.RestoreTask;
-import com.zutubi.pulse.restore.feedback.TaskMonitor;
+import com.zutubi.pulse.monitor.Monitor;
+import com.zutubi.pulse.monitor.Task;
 
 import java.io.File;
 import java.util.List;
@@ -27,12 +27,12 @@ public class ExecuteRestoreAction extends RestoreActionSupport
         return backedUpArchive;
     }
 
-    public List<RestoreTask> getTasks()
+    public List<Task> getTasks()
     {
         return archiveManager.previewRestore();
     }
     
-    public TaskMonitor getMonitor()
+    public Monitor getMonitor()
     {
         return archiveManager.getTaskMonitor();
     }
@@ -40,7 +40,7 @@ public class ExecuteRestoreAction extends RestoreActionSupport
     public String execute() throws Exception
     {
         // Ensure that we behave correctly if this action is triggered a second time.
-        TaskMonitor monitor = archiveManager.getTaskMonitor();
+        Monitor monitor = archiveManager.getTaskMonitor();
         if (monitor.isFinished())
         {
             return SUCCESS;

@@ -1,12 +1,12 @@
 package com.zutubi.pulse.restore;
 
-import com.zutubi.pulse.core.PulseException;
+import com.zutubi.pulse.monitor.TaskException;
 
 /**
  *
  *
  */
-public class ArchiveException extends PulseException
+public class ArchiveException extends TaskException
 {
     public ArchiveException()
     {

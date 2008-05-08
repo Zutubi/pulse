@@ -3,7 +3,6 @@ package com.zutubi.pulse.restore;
 import com.zutubi.prototype.type.record.RecordSerialiser;
 import com.zutubi.prototype.type.record.DefaultRecordSerialiser;
 import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.type.record.RecordHandler;
 import com.zutubi.prototype.type.record.NoopRecordHandler;
 import com.zutubi.prototype.type.record.store.RecordStore;
 
@@ -13,7 +12,7 @@ import java.io.File;
  * The records archive handles the backup and restoration of a record store.
  *
  */
-public class RecordsArchive extends AbstractArchivableComponent
+public class RecordsArchive extends AbstractArchiveableComponent
 {
     private RecordStore recordStore;
 
