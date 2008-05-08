@@ -8,21 +8,19 @@ import com.zutubi.prototype.type.record.TemplateRecord;
 import java.util.Set;
 
 /**
- * A reference cleanup task that hides an inherited record.  This is the same
+ * A reference cleanup task that hides an inherited record.  This is the smae
  * as deleting the record, but additionally adds the required hidden key to
  * the parent record.  Any tasks needed to cleanup references to the deleted
  * record will cascade off this.
  */
 public class HideRecordCleanupTask extends RecordCleanupTaskSupport
 {
-    private long handle;
     private boolean internal;
     private RecordManager recordManager;
 
-    public HideRecordCleanupTask(long handle, String path, boolean internal, RecordManager recordManager)
+    public HideRecordCleanupTask(String path, boolean internal, RecordManager recordManager)
     {
         super(path);
-        this.handle = handle;
         this.internal = internal;
         this.recordManager = recordManager;
     }
@@ -32,8 +30,10 @@ public class HideRecordCleanupTask extends RecordCleanupTaskSupport
         recordManager.delete(getAffectedPath());
 
         String parentPath = PathUtils.getParentPath(getAffectedPath());
+        String baseName = PathUtils.getBaseName(getAffectedPath());
         MutableRecord parent = recordManager.select(parentPath).copy(false);
-        TemplateRecord.hideItem(parent, handle);
+
+        TemplateRecord.hideItem(parent, baseName);
         recordManager.update(parentPath, parent);
     }
 

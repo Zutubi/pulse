@@ -564,27 +564,6 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertEquals("foo", movedProperty.get("name"));
     }
 
-    public void testRenameHidden()
-    {
-        // If we rename something that is hidden, then the hidden key needs
-        // to be updated to the new key.
-        insertGlobal();
-        insertChild();
-        String propertyPath = configurationTemplateManager.insertRecord("project/global/stages/default/properties", createProperty("foo", "bar"));
-
-        String inheritedPropertyPath = "project/child/stages/default/properties/foo";
-        configurationTemplateManager.delete(inheritedPropertyPath);
-        assertNull(configurationTemplateManager.getRecord(inheritedPropertyPath));
-        
-        MutableRecord property = configurationTemplateManager.getRecord(propertyPath).copy(true);
-        property.put("name", "newfoo");
-        configurationTemplateManager.saveRecord(propertyPath, property);
-        String newInheritedPropertyPath = "project/child/stages/default/properties/newfoo";
-        assertNull(configurationTemplateManager.getRecord(newInheritedPropertyPath));
-        configurationTemplateManager.restore(newInheritedPropertyPath);
-        assertNotNull(configurationTemplateManager.getRecord(newInheritedPropertyPath));
-    }
-
     public void testDelete()
     {
         insertGlobal();
@@ -1039,7 +1018,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         String stagesPath = PathUtils.getParentPath(stagePath);
         TemplateRecord parent = (TemplateRecord) configurationTemplateManager.getRecord(stagesPath);
         assertEquals(1, parent.size());
-        assertEquals(0, TemplateRecord.getHiddenHandles(parent).size());
+        assertEquals(0, TemplateRecord.getHiddenKeys(parent).size());
         TemplateRecord record = (TemplateRecord) parent.get("default");
         TemplateRecord properties = (TemplateRecord) record.get("properties");
         assertEquals(1, properties.size());
@@ -1052,9 +1031,9 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertTrue(configurationTemplateManager.pathExists(parentPath));
         TemplateRecord record = (TemplateRecord) configurationTemplateManager.getRecord(parentPath);
         assertEquals(0, record.keySet().size());
-        Set<Long> hidden = TemplateRecord.getHiddenHandles(record);
+        Set<String> hidden = TemplateRecord.getHiddenKeys(record);
         assertEquals(1, hidden.size());
-        assertTrue(hidden.contains(configurationTemplateManager.getTemplateParentRecord(path).getHandle()));
+        assertTrue(hidden.contains(PathUtils.getBaseName(path)));
     }
 
     private void assertDeletedStage(String stagePath)
@@ -1064,7 +1043,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertTrue(configurationTemplateManager.pathExists(stagesPath));
         TemplateRecord record = (TemplateRecord) configurationTemplateManager.getRecord(stagesPath);
         assertEquals(0, record.keySet().size());
-        Set<Long> hidden = TemplateRecord.getHiddenHandles(record);
+        Set<String> hidden = TemplateRecord.getHiddenKeys(record);
         assertEquals(0, hidden.size());
     }
 

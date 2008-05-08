@@ -6,11 +6,12 @@ import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
 import com.zutubi.util.StringUtils;
 
 import java.lang.annotation.Annotation;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  */
@@ -82,6 +83,11 @@ public class TemplateRecord extends AbstractRecord
     public Object get(String key)
     {
         // This is where magic happens.
+        if(getHiddenKeys().contains(key))
+        {
+            return null;
+        }
+
         Object value = moi.get(key);
         if (value == null)
         {
@@ -90,13 +96,7 @@ public class TemplateRecord extends AbstractRecord
         }
         else if (value instanceof Record)
         {
-            MutableRecord record = (MutableRecord) value;
-            if(getHiddenHandles().contains(record.getHandle()))
-            {
-                return null;
-            }
-
-            return new TemplateRecord(owner, (TemplateRecord) getInherited(key), (ComplexType) type.getActualPropertyType(key, value), record);
+            return new TemplateRecord(owner, (TemplateRecord) getInherited(key), (ComplexType) type.getActualPropertyType(key, value), (MutableRecord) value);
         }
         else
         {
@@ -162,18 +162,8 @@ public class TemplateRecord extends AbstractRecord
         {
             result.addAll(parent.keySet());
         }
-
-        Set<Long> hiddenHandles = getHiddenHandles();
-        Iterator<String> it = result.iterator();
-        while(it.hasNext())
-        {
-            Object value = get(it.next());
-            if(value instanceof Record && hiddenHandles.contains(((Record)value).getHandle()))
-            {
-                it.remove();
-            }
-        }
         
+        result.removeAll(getHiddenKeys());
         return result;
     }
 
@@ -311,7 +301,7 @@ public class TemplateRecord extends AbstractRecord
             }
         }
 
-        if(getHiddenHandles().size() > 0)
+        if(getHiddenKeys().size() > 0)
         {
             return false;
         }
@@ -332,78 +322,44 @@ public class TemplateRecord extends AbstractRecord
         return flatten();
     }
 
-    public Set<Long> getHiddenHandles()
+    public Set<String> getHiddenKeys()
     {
-        return getHiddenHandles(moi);
+        return getHiddenKeys(moi);
     }
 
-    public static boolean hideItem(MutableRecord record, long handle)
+    public static void hideItem(MutableRecord record, String key)
     {
-        Set<Long> hiddenHandles = getHiddenHandles(record);
-        boolean added = hiddenHandles.add(handle);
-        if (added)
-        {
-            saveHiddenHandles(hiddenHandles, record);
-        }
-
-        return added;
+        Set<String> hiddenKeys = getHiddenKeys(record);
+        hiddenKeys.add(key);
+        record.putMeta(HIDDEN_KEY, StringUtils.encodeAndJoin(SEPARATOR, hiddenKeys));
     }
 
-    public static boolean restoreItem(MutableRecord record, long handle)
+    public static boolean restoreItem(MutableRecord record, String key)
     {
-        Set<Long> hiddenHandles = getHiddenHandles(record);
-        boolean result = hiddenHandles.remove(handle);
-        if (result)
-        {
-            saveHiddenHandles(hiddenHandles, record);
-        }
-        return result;
-    }
-
-    private static void saveHiddenHandles(Set<Long> hiddenHandles, MutableRecord record)
-    {
-        if(hiddenHandles.size() == 0)
+        Set<String> hiddenKeys = getHiddenKeys(record);
+        boolean result = hiddenKeys.remove(key);
+        if(hiddenKeys.size() == 0)
         {
             record.removeMeta(HIDDEN_KEY);
         }
         else
         {
-            List<String> handles = CollectionUtils.map(hiddenHandles, new Mapping<Long, String>()
-            {
-                public String map(Long l)
-                {
-                    return l.toString();
-                }
-            });
-
-            record.putMeta(HIDDEN_KEY, StringUtils.encodeAndJoin(SEPARATOR, handles));
+            record.putMeta(HIDDEN_KEY, StringUtils.encodeAndJoin(SEPARATOR, hiddenKeys));
         }
+
+        return result;
     }
 
-    public static Set<Long> getHiddenHandles(Record record)
+    public static Set<String> getHiddenKeys(Record record)
     {
         String hidden = record.getMeta(HIDDEN_KEY);
         if(hidden == null)
         {
-            return new HashSet<Long>();
+            return new HashSet<String>();
         }
         else
         {
-            Collection<String> handles = StringUtils.splitAndDecode(SEPARATOR, hidden);
-            return CollectionUtils.map(handles, new Mapping<String, Long>()
-            {
-                public Long map(String s)
-                {
-                    try
-                    {
-                        return Long.parseLong(s);
-                    }
-                    catch (NumberFormatException e)
-                    {
-                        return 0L;
-                    }
-                }
-            },new HashSet<Long>());
+            return new HashSet<String>(StringUtils.splitAndDecode(SEPARATOR, hidden));
         }
     }
 }

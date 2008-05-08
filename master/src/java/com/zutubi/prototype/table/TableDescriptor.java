@@ -77,8 +77,7 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
 
         if (data != null)
         {
-            List<String> order = collectionType.getOrder(data);
-            for (String key : order)
+            for (String key : collectionType.getOrder(data))
             {
                 String itemPath = PathUtils.getPath(path, key);
                 Configuration instance = configurationProvider.get(itemPath, Configuration.class);
@@ -102,8 +101,7 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
                     String[] elements = PathUtils.getPathElements(path);
                     String parentPath = PathUtils.getPath(elements[0], parentId, PathUtils.getPath(2, elements));
 
-                    List<String> hiddenKeys = new LinkedList<String>(templateParent.keySet());
-                    hiddenKeys.removeAll(order);
+                    List<String> hiddenKeys = new LinkedList<String>(templateRecord.getHiddenKeys());
                     Collections.sort(hiddenKeys, collectionType.getKeyComparator(data));
                     for (String hidden : hiddenKeys)
                     {
