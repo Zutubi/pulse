@@ -127,14 +127,9 @@ public class SetType extends CollectionType
         throw new RuntimeException("Not implemented");
     }
 
-    public String getSavePath(String path, Record record)
+    public String getItemKey(String path, Record record)
     {
-        throw new RuntimeException("Not implemented");
-    }
-
-    public String getInsertionPath(String path, Record record)
-    {
-        throw new RuntimeException("Not implemented");
+        throw new RuntimeException("Method not yet implemented");
     }
 
     public boolean isValid(Object instance)

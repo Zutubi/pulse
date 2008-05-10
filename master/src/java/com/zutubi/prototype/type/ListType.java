@@ -228,9 +228,16 @@ public class ListType extends CollectionType
         }
     }
 
-    public String getInsertionPath(String path, Record record)
+    public String getItemKey(String path, Record record)
     {
-        return PathUtils.getPath(path, Long.toString(handleAllocator.allocateHandle()));
+        if(path == null)
+        {
+            return Long.toString(handleAllocator.allocateHandle());
+        }
+        else
+        {
+            return PathUtils.getBaseName(path);
+        }
     }
 
     public boolean isValid(Object instance)
@@ -275,11 +282,6 @@ public class ListType extends CollectionType
                 i++;
             }
         }
-    }
-
-    public String getSavePath(String path, Record record)
-    {
-        return path;
     }
 
     public Comparator<String> getKeyComparator(Record record)

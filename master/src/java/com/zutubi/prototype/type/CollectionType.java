@@ -3,6 +3,7 @@ package com.zutubi.prototype.type;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.util.StringUtils;
 
 import java.util.*;
@@ -15,6 +16,7 @@ public abstract class CollectionType extends AbstractType implements ComplexType
     public static final String ORDER_KEY  = "order";
 
     private static final char SEPARATOR = ',';
+    private static final String[] ITEM_REFERENCING_KEYS = { ORDER_KEY, TemplateRecord.HIDDEN_KEY };
 
     private Type collectionType;
     private boolean ordered = false;
@@ -89,6 +91,7 @@ public abstract class CollectionType extends AbstractType implements ComplexType
         record.putMeta(ORDER_KEY, StringUtils.encodeAndJoin(SEPARATOR, order));
     }
 
+    public abstract String getItemKey(String path, Record record);
     public abstract Comparator<String> getKeyComparator(Record record);
 
     @SuppressWarnings({"unchecked"})
@@ -120,5 +123,25 @@ public abstract class CollectionType extends AbstractType implements ComplexType
     public Type getActualPropertyType(String propertyName, Object propertyValue)
     {
         return collectionType.getActualType(propertyValue);
+    }
+
+    public boolean updateKeyReferences(MutableRecord record, String oldKey, String newKey)
+    {
+        boolean changes = false;
+        for(String metaKey: ITEM_REFERENCING_KEYS)
+        {
+            String value = record.getMeta(metaKey);
+            if(value != null)
+            {
+                List<String> keys = StringUtils.splitAndDecode(SEPARATOR, value);
+                if(Collections.replaceAll(keys, oldKey, newKey))
+                {
+                    record.putMeta(metaKey, StringUtils.encodeAndJoin(SEPARATOR, keys));
+                    changes = true;
+                }
+            }
+        }
+
+        return changes;
     }
 }

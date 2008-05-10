@@ -2,10 +2,12 @@ package com.zutubi.prototype.type;
 
 import com.zutubi.config.annotations.ID;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.core.config.ConfigurationMap;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
@@ -15,6 +17,7 @@ import java.util.Map;
 public class MapTypeTest extends TypeTestCase
 {
     private MapType mapType;
+    private MapType orderedMapType;
 
     private CompositeType mockAType;
 
@@ -23,8 +26,9 @@ public class MapTypeTest extends TypeTestCase
         super.setUp();
 
         mockAType = typeRegistry.register(MockA.class);
-
-        mapType = new MapType(typeRegistry.getType(MockA.class), typeRegistry);
+        mapType = new MapType(mockAType, typeRegistry);
+        orderedMapType = new MapType(mockAType, typeRegistry);
+        orderedMapType.setOrdered(true);
     }
 
     protected void tearDown() throws Exception
@@ -50,18 +54,16 @@ public class MapTypeTest extends TypeTestCase
         assertEquals(instance.get("keyB"), newInstance.get("keyB"));
     }
 
-    public void testInsertionPath() throws TypeException
+    public void testGetItemKeyNoPath() throws TypeException
     {
         Record record = mockAType.unstantiate(new MockA("valueA"));
-        assertEquals("coll/valueA", mapType.getInsertionPath("coll", record));
+        assertEquals("valueA", mapType.getItemKey(null, record));
     }
 
-    public void testSavePath() throws TypeException
+    public void testGetItemKeyPath() throws TypeException
     {
         Record record = mockAType.unstantiate(new MockA("valueA"));
-
-        assertEquals("coll/valueA", mapType.getInsertionPath("coll", record));
-        assertEquals("coll/valueA", mapType.getSavePath("coll/valueA", record));
+        assertEquals("valueA", mapType.getItemKey("coll/oldkey", record));
     }
 
     public void testToXmlRpcNull() throws TypeException
@@ -198,6 +200,27 @@ public class MapTypeTest extends TypeTestCase
         ConfigurationMap<MockA> map = new ConfigurationMap<MockA>();
         map.put("a", element);
         assertFalse(mapType.isValid(map));
+    }
+
+    public void testOrderPreserverOnUnstantiate() throws TypeException
+    {
+        ConfigurationMap<MockA> aMap = new ConfigurationMap<MockA>();
+        aMap.put("foo", new MockA("foo"));
+        aMap.put("bar", new MockA("bar"));
+        aMap.put("baz", new MockA("baz"));
+
+        MutableRecord record = orderedMapType.unstantiate(aMap);
+        assertEquals(Arrays.asList("foo", "bar", "baz"), orderedMapType.getOrder(record));
+
+        // Trying a second order gurantees wwe don't get lucky by matching
+        // whatever the unordered default is.
+        aMap.clear();
+        aMap.put("baz", new MockA("baz"));
+        aMap.put("foo", new MockA("foo"));
+        aMap.put("bar", new MockA("bar"));
+
+        record = orderedMapType.unstantiate(aMap);
+        assertEquals(Arrays.asList("baz", "foo", "bar"), orderedMapType.getOrder(record));
     }
 
     @SymbolicName("mockA")

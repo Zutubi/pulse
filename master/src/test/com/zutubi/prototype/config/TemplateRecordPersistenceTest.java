@@ -7,11 +7,14 @@ import com.zutubi.prototype.config.events.*;
 import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.PathUtils;
-import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
+import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.pulse.core.config.ConfigurationList;
+import com.zutubi.pulse.core.config.ConfigurationMap;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
 import com.zutubi.util.Predicate;
 
 import java.util.*;
@@ -562,6 +565,89 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
 
         TemplateRecord movedProperty = (TemplateRecord) configurationTemplateManager.getRecord("project/child/stages/newname/properties/foo");
         assertEquals("foo", movedProperty.get("name"));
+    }
+
+    public void testRenameHidden()
+    {
+        // If we rename something that is hidden, then the hidden key needs
+        // to be updated to the new key.
+        insertGlobal();
+        insertChild();
+        String propertyPath = configurationTemplateManager.insertRecord("project/global/stages/default/properties", createProperty("foo", "bar"));
+
+        String inheritedPropertyPath = "project/child/stages/default/properties/foo";
+        configurationTemplateManager.delete(inheritedPropertyPath);
+        assertNull(configurationTemplateManager.getRecord(inheritedPropertyPath));
+
+        MutableRecord property = configurationTemplateManager.getRecord(propertyPath).copy(true);
+        property.put("name", "newfoo");
+        configurationTemplateManager.saveRecord(propertyPath, property);
+        String newInheritedPropertyPath = "project/child/stages/default/properties/newfoo";
+        assertNull(configurationTemplateManager.getRecord(newInheritedPropertyPath));
+        configurationTemplateManager.restore(newInheritedPropertyPath);
+        assertNotNull(configurationTemplateManager.getRecord(newInheritedPropertyPath));
+    }
+
+    public void testRenameOrdered()
+    {
+        // If we rename something that is in an explicit order, then the
+        // order key needs to be updated to the new key.
+        insertGlobal();
+        String stagesPath = "project/global/stages";
+        configurationTemplateManager.insertRecord(stagesPath, createStage("another"));
+
+        // Reorder - independent of the default order (i.e. swap whatever the
+        // default is).
+        Project global = (Project) configurationTemplateManager.getInstance("project/global");
+        List<String> originalOrder = new LinkedList<String>(global.getStages().keySet());
+        List<String> newOrder = new LinkedList<String>(originalOrder);
+        Collections.reverse(newOrder);
+        configurationTemplateManager.setOrder(stagesPath, newOrder);
+
+        // Check new order
+        assertEquals(newOrder, getOrder(stagesPath));
+
+        // Rename the first property (if the order is not fixed this property
+        // will then fall to the end).
+        String firstStagePath = PathUtils.getPath(stagesPath, newOrder.get(0));
+        MutableRecord property = configurationTemplateManager.getRecord(firstStagePath).copy(true);
+        property.put("name", "renamed");
+        configurationTemplateManager.saveRecord(firstStagePath, property);
+
+        // Verify order is unchanged
+        Collections.replaceAll(newOrder, PathUtils.getBaseName(firstStagePath), "renamed");
+        assertEquals(newOrder, getOrder(stagesPath));
+    }
+
+    public void testRenameOrderedInDescendent()
+    {
+        insertGlobal();
+        insertChild();
+        String stagesPath = "project/global/stages";
+        configurationTemplateManager.insertRecord(stagesPath, createStage("another"));
+
+        // Reorder - independent of the default order (i.e. swap whatever the
+        // default is).
+        Project child = (Project) configurationTemplateManager.getInstance("project/child");
+        List<String> originalOrder = new LinkedList<String>(child.getStages().keySet());
+        List<String> newOrder = new LinkedList<String>(originalOrder);
+        Collections.reverse(newOrder);
+        String inheritedStagesPath = "project/child/stages";
+        configurationTemplateManager.setOrder(inheritedStagesPath, newOrder);
+
+        // Check new order
+        assertEquals(newOrder, getOrder(inheritedStagesPath));
+
+        // Rename the first property (if the order is not fixed this property
+        // will then fall to the end).
+        String firstStagePath = PathUtils.getPath(stagesPath, newOrder.get(0));
+        MutableRecord property = configurationTemplateManager.getRecord(firstStagePath).copy(true);
+        property.put("name", "renamed");
+        configurationTemplateManager.saveRecord(firstStagePath, property);
+
+        // Verify order is unchanged
+        Collections.replaceAll(newOrder, PathUtils.getBaseName(firstStagePath), "renamed");
+        assertEquals(newOrder, getOrder(inheritedStagesPath));
     }
 
     public void testDelete()
@@ -1351,9 +1437,30 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
 
     private List<String> getOrder(String path)
     {
+        // Determine the order by iterating over an instance - this verifies
+        // the full end-to-end application of ordering.
         CollectionType type = configurationTemplateManager.getType(path, CollectionType.class);
-        Record record = configurationTemplateManager.getRecord(path);
-        return type.getOrder(record);
+        if(type instanceof MapType)
+        {
+            ConfigurationMap instance = configurationTemplateManager.getInstance(path, ConfigurationMap.class);
+            return new LinkedList<String>(instance.keySet());
+        }
+        else if(type instanceof ListType)
+        {
+            ConfigurationList instance = configurationTemplateManager.getInstance(path, ConfigurationList.class);
+            return CollectionUtils.map(instance, new Mapping<Configuration, String>()
+            {
+                public String map(Configuration o)
+                {
+                    return PathUtils.getBaseName(o.getConfigurationPath());
+                }
+            });
+        }
+        else
+        {
+            fail();
+            return null;
+        }
     }
 
     private Listener registerListener()

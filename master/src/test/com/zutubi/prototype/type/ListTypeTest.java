@@ -55,17 +55,17 @@ public class ListTypeTest extends TypeTestCase
         assertTrue(newList.get(0) instanceof MockA);
     }
 
-    public void testInsertionPath() throws TypeException
+    public void testGetItemKeyNoPath() throws TypeException
     {
         long lastHandle = recordManager.allocateHandle();
         MutableRecord record = mockAType.unstantiate(new MockA("valueA"));
-        assertEquals("coll/" + Long.toString(lastHandle + 1), listType.getInsertionPath("coll", record));
+        assertEquals(Long.toString(lastHandle + 1), listType.getItemKey(null, record));
     }
 
-    public void testSavePath() throws TypeException
+    public void testGetItemKeyPath() throws TypeException
     {
         MutableRecord record = mockAType.unstantiate(new MockA("valueA"));
-        assertEquals("any/path", listType.getSavePath("any/path", record));
+        assertEquals("123", listType.getItemKey("any/123", record));
     }
 
     public void testToXmlRpcNull() throws TypeException

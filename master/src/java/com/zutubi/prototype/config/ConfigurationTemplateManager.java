@@ -330,17 +330,11 @@ public class ConfigurationTemplateManager
 
                 ComplexType type = getType(path);
 
-                // Determine the path at which the record will be inserted.  This is
-                // type-dependent.
-                String newPath = type.getInsertionPath(path, record);
-                if (pathExists(newPath))
-                {
-                    throw new IllegalArgumentException("Invalid insertion path '" + newPath + "': record already exists (use save to modify)");
-                }
-
+                String newPath = path;
                 Type expectedType;
                 if (type instanceof CollectionType)
                 {
+                    newPath = PathUtils.getPath(newPath, ((CollectionType)type).getItemKey(null, record));
                     expectedType = type.getTargetType();
                 }
                 else
@@ -350,6 +344,11 @@ public class ConfigurationTemplateManager
                     String parentPath = PathUtils.getParentPath(path);
                     CompositeType parentType = (CompositeType) configurationPersistenceManager.getType(parentPath);
                     expectedType = parentType.getDeclaredPropertyType(PathUtils.getBaseName(path));
+                }
+
+                if (pathExists(newPath))
+                {
+                    throw new IllegalArgumentException("Invalid insertion path '" + newPath + "': record already exists (use save to modify)");
                 }
 
                 CompositeType actualType = checkRecordType(expectedType, record);
@@ -1148,16 +1147,27 @@ public class ConfigurationTemplateManager
                     throw new IllegalArgumentException("Saved record has type '" + record.getSymbolicName() + "' which does not match existing type '" + existingRecord.getSymbolicName() + "'");
                 }
 
-                String newPath;
+                String newPath = path;
                 String parentPath = PathUtils.getParentPath(path);
-                if(parentPath == null)
-                {
-                    newPath = path;
-                }
-                else
+                if(parentPath != null)
                 {
                     ComplexType parentType = configurationPersistenceManager.getType(parentPath);
-                    newPath = parentType.getSavePath(path, record);
+                    if(parentType instanceof CollectionType)
+                    {
+                        String oldKey = PathUtils.getBaseName(path);
+                        CollectionType collectionType = (CollectionType) parentType;
+                        String newKey = collectionType.getItemKey(path, record);
+                        if(!newKey.equals(oldKey))
+                        {
+                            // References to the key in the parent record
+                            // (e.g. in a declared order) need to be updated.
+                            // Same goes for template descedents of the
+                            // parent.
+                            updateCollectionReferences(collectionType, parentPath, oldKey, newKey);
+                        }
+
+                        newPath = PathUtils.getPath(parentPath, newKey);
+                    }
                 }
 
                 CompositeType type = typeRegistry.getType(record.getSymbolicName());
@@ -1204,6 +1214,18 @@ public class ConfigurationTemplateManager
                 return newPath;
             }
         });
+    }
+
+    private void updateCollectionReferences(CollectionType collectionType, String collectionPath, String oldKey, String newKey)
+    {
+        for(String path: getDescendentPaths(collectionPath, false, false, false))
+        {
+            MutableRecord record = recordManager.select(path).copy(false);
+            if(collectionType.updateKeyReferences(record, oldKey, newKey))
+            {
+                recordManager.update(path, record);
+            }
+        }
     }
 
     private void raiseSaveEvents(String path)

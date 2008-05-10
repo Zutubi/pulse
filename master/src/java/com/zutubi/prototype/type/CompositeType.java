@@ -626,16 +626,6 @@ public class CompositeType extends AbstractType implements ComplexType
         }
     }
 
-    public String getSavePath(String path, Record record)
-    {
-        return path;
-    }
-
-    public String getInsertionPath(String path, Record record)
-    {
-        return path;
-    }
-
     public MutableRecord createNewRecord(boolean applyDefaults)
     {
         try

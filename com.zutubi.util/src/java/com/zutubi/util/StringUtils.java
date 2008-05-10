@@ -842,7 +842,7 @@ public class StringUtils
      * @return the pieces derived by splitting at the separator and decoding
      *         each piece
      */
-    public static Collection<String> splitAndDecode(char separator, String s)
+    public static List<String> splitAndDecode(char separator, String s)
     {
         String[] pieces = s.split(Character.toString(separator));
         List<String> result = new ArrayList<String>(pieces.length);

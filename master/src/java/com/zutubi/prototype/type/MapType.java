@@ -2,7 +2,6 @@ package com.zutubi.prototype.type;
 
 import com.zutubi.config.annotations.ID;
 import com.zutubi.prototype.type.record.MutableRecord;
-import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.config.ConfigurationMap;
@@ -12,10 +11,7 @@ import com.zutubi.util.Sort;
 import com.zutubi.util.logging.Logger;
 
 import java.beans.IntrospectionException;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Map;
+import java.util.*;
 
 /**
  *
@@ -93,7 +89,7 @@ public class MapType extends CollectionType
     private void covertFromRecord(Record record, Map result, FromRecord fromRecord)
     {
         Type defaultType = getCollectionType();
-        for (String key : record.keySet())
+        for (String key : getOrder(record))
         {
             Object child = record.get(key);
             Type type = defaultType;
@@ -120,7 +116,7 @@ public class MapType extends CollectionType
     }
 
     @SuppressWarnings({"unchecked"})
-    public Object unstantiate(Object instance) throws TypeException
+    public MutableRecord unstantiate(Object instance) throws TypeException
     {
         typeCheck(instance, Map.class);
         return convertToRecord((Map) instance, new UnstantiateToRecord());
@@ -151,7 +147,8 @@ public class MapType extends CollectionType
     {
         MutableRecord result = createNewRecord(true);
         copyMetaToRecord(instance, result);
-        
+
+        List<String> order = new LinkedList<String>();
         Type collectionType = getCollectionType();
         for(Object entry: instance.entrySet())
         {
@@ -165,6 +162,8 @@ public class MapType extends CollectionType
                 throw new TypeException("Map element has invalid key type: " + ex.getMessage(), ex);
             }
 
+            order.add((String) e.getKey());
+
             try
             {
                 result.put((String) e.getKey(), toRecord.convert(collectionType, e.getValue()));
@@ -175,6 +174,17 @@ public class MapType extends CollectionType
             }
         }
 
+        if(isOrdered() && order.size() > 0)
+        {
+            // Only set an explicit order when it is different from the
+            // default.  This prevents instance saves from unnecessarily
+            // adding an explicit order to a collection.
+            List<String> defaultOrder = getOrder(result);
+            if(!order.equals(defaultOrder))
+            {
+                setOrder(result, order);
+            }            
+        }
         return result;
     }
 
@@ -213,9 +223,14 @@ public class MapType extends CollectionType
         return keyProperty;
     }
 
-    public String getInsertionPath(String path, Record record)
+    public String getItemKey(String path, Record record)
     {
-        return PathUtils.getPath(path, (String) record.get(keyProperty));
+        String key = (String) record.get(keyProperty);
+        if( key == null)
+        {
+            throw new IllegalArgumentException("Record has no " + keyProperty);
+        }
+        return key;
     }
 
     public boolean isValid(Object instance)
@@ -251,16 +266,6 @@ public class MapType extends CollectionType
             collectionType.forEachComplex(entry.getValue(), f);
             f.pop();
         }
-    }
-
-    public String getSavePath(String path, Record record)
-    {
-        String name = (String) record.get(keyProperty);
-        if(name == null)
-        {
-            throw new IllegalArgumentException("Record has no " + keyProperty);
-        }
-        return PathUtils.getPath(PathUtils.getParentPath(path), name);
     }
 
     private static interface FromRecord
