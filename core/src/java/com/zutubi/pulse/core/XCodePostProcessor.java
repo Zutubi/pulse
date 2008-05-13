@@ -35,7 +35,7 @@ public class XCodePostProcessor extends PostProcessorGroup
         xcode.addWarningRegexs(warningRegexs);
 
         xcode.setLeadingContext(1);
-        xcode.setTrailingContext(6);
+        xcode.setTrailingContext(3);
         add(xcode);
     }
 
