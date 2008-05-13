@@ -38,15 +38,9 @@ public class XCodePostProcessorTest extends PostProcessorTestBase
                      "some warning: here\n" +
                      "buffer line\n" +
                      "buffer line\n" +
-                     "buffer line\n" +
-                     "buffer line\n" +
-                     "buffer line\n" +
                      "buffer line", features.get(0).getSummary());
         assertEquals("buffer line\n" +
                      "Uncaught exception: Blah\n" +
-                     "buffer line\n" +
-                     "buffer line\n" +
-                     "buffer line\n" +
                      "buffer line\n" +
                      "buffer line\n" +
                      "buffer line", features.get(1).getSummary());
@@ -54,12 +48,9 @@ public class XCodePostProcessorTest extends PostProcessorTestBase
                      "There was an Assertion failure\n" +
                      "buffer line\n" +
                      "buffer line\n" +
-                     "buffer line\n" +
-                     "buffer line\n" +
-                     "buffer line\n" +
                      "buffer line", features.get(2).getSummary());
     }
-
+    
     public void testSetContext() throws Exception
     {
         pp.setLeadingContext(0);
