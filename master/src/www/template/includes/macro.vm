@@ -1394,7 +1394,15 @@
     <li class="header">#wwtext("name=artifact") :: $!webwork.htmlEncode("$fileArtifact.path")
         #end
         <ul>
-        #foreach($feature in $fileArtifact.getFeatures($level))
+        #set($trimmedFileArtifactFeatures = false)
+        #set($fileArtifactFeatures = $fileArtifact.getFeatures($level))
+        #if($recipe.completed())  ## Not sure why we are using this, but it has the desired effect of only trimming when showing the summary.
+            #if($fileArtifactFeatures.size() > 100)
+                #set($fileArtifactFeatures = $fileArtifactFeatures.subList(0, 100))
+                #set($trimmedFileArtifactFeatures = true)
+            #end
+        #end
+        #foreach($feature in $fileArtifactFeatures)
             <li class="$level.toString().toLowerCase()">
             #if($feature.hasContext())
                 <span class="context">
@@ -1414,10 +1422,18 @@
                 $action.plainToHtml($feature.summary)<br/>
             #end
             #if($recipe.completed())
-                <a class="unadorned" href="$urls.commandArtifacts($build, $command)$fileArtifact.pathUrl/#$feature.lineNumber">
+                <a class="unadorned" href="viewArtifactt.action?id=$fileArtifact.id&amp;buildId=$build.id&amp;commandId=$command.id#$feature.lineNumber">
                     <span class="small">#wwtext("name=jump.to")</span> <img src="$base/images/go_small.gif"/>
                 </a>
             #end
+            </li>
+        #end
+        #if($trimmedFileArtifactFeatures)
+            <li>
+                #wwtext("name=trimmed.features")
+                <a class="unadorned" href="viewArtifactt.action?id=$fileArtifact.id&amp;buildId=$build.id&amp;commandId=$command.id">
+                      <span class="small">#wwtext("name=jump.to")</span> <img src="$base/images/go_small.gif"/>
+                </a>
             </li>
         #end
         </ul>
