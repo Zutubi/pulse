@@ -39,6 +39,17 @@ public class XCodePostProcessor extends PostProcessorGroup
         add(xcode);
     }
 
+    public void setJoinOverlapping(boolean b)
+    {
+        for(PostProcessor child: getProcessors())
+        {
+            if(child instanceof RegexPostProcessor)
+            {
+                ((RegexPostProcessor)child).setJoinOverlapping(b);
+            }
+        }
+    }
+
     public void setLeadingContext(int leadingContext)
     {
         for(PostProcessor child: getProcessors())
