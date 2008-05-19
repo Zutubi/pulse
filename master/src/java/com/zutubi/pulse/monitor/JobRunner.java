@@ -64,7 +64,6 @@ public class JobRunner
                         try
                         {
                             currentTask.execute();
-                            taskTracker.markSuccessful();
                         }
                         catch (TaskException e)
                         {
@@ -90,6 +89,10 @@ public class JobRunner
                                     "following errors were recorded:" + errors.toString();
 
                             throw new TaskException(message);
+                        }
+                        else
+                        {
+                            taskTracker.markSuccessful();
                         }
                     }
                     else

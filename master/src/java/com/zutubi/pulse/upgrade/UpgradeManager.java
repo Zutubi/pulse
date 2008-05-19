@@ -1,5 +1,7 @@
 package com.zutubi.pulse.upgrade;
 
+import com.zutubi.pulse.monitor.Monitor;
+
 import java.util.List;
 
 /**
@@ -40,5 +42,5 @@ public interface UpgradeManager
      *
      * @return a progress monitor for the currenly active upgrade, or null if no upgrade is in progress.
      */
-    UpgradeProgressMonitor getUpgradeMonitor();
+    Monitor getUpgradeMonitor();
 }

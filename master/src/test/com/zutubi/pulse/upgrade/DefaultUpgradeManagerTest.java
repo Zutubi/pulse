@@ -2,7 +2,6 @@ package com.zutubi.pulse.upgrade;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Arrays;
 
 /**
  * <class-comment/>
@@ -148,5 +147,50 @@ public class DefaultUpgradeManagerTest extends UpgradeTestCase
         List<UpgradeTaskGroup> preview = upgradeManager.previewUpgrade();
         assertEquals(1, preview.size());
         assertEquals(1, preview.get(0).getTasks().size());
+    }
+
+    public void testCompletedUpgradeComponentCallback()
+    {
+        List<UpgradeTaskAdapter> tasks = new LinkedList<UpgradeTaskAdapter>();
+        tasks.add(new UpgradeTaskAdapter());
+        UpgradeableComponentAdapter component = new UpgradeableComponentAdapter(tasks);
+
+        upgradeManager.add(new UpgradeableComponentSourceAdapter(component));
+        upgradeManager.prepareUpgrade();
+
+        upgradeManager.executeUpgrade();
+
+        assertTrue(component.wasStarted());
+        assertTrue(component.wasCompleted());
+    }
+
+    public void testAbortedUpgradeComponentCallback()
+    {
+        List<UpgradeTaskAdapter> tasks = new LinkedList<UpgradeTaskAdapter>();
+        tasks.add(new UpgradeTaskAdapter(true, true));
+        UpgradeableComponentAdapter component = new UpgradeableComponentAdapter(tasks);
+
+        upgradeManager.add(new UpgradeableComponentSourceAdapter(component));
+        upgradeManager.prepareUpgrade();
+
+        upgradeManager.executeUpgrade();
+
+        assertTrue(component.wasStarted());
+        assertTrue(component.wasAborted());
+    }
+
+    public void testUpgradeComponentCallbackReceivedByCorrectComponent()
+    {
+        List<UpgradeTaskAdapter> tasks = new LinkedList<UpgradeTaskAdapter>();
+        tasks.add(new UpgradeTaskAdapter());
+        upgradeManager.add(new UpgradeableComponentSourceAdapter(new UpgradeableComponentAdapter(tasks)));
+
+        List<UpgradeTaskAdapter> tasks2 = new LinkedList<UpgradeTaskAdapter>();
+        tasks2.add(new UpgradeTaskAdapter());
+        upgradeManager.add(new UpgradeableComponentAdapter(tasks2));
+        
+        upgradeManager.prepareUpgrade();
+
+        upgradeManager.executeUpgrade();
     }
 }

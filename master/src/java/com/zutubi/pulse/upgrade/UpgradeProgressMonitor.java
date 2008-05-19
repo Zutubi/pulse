@@ -14,14 +14,19 @@ import java.util.Map;
  */
 public class UpgradeProgressMonitor
 {
-    /**
+/*
+    */
+/**
      * The upgrade process start time.
      */
+/*
     private long startTimestamp;
 
-    /**
+    */
+/**
      * The upgrade process finish time
      */
+/*
     private long finishTimestamp;
 
     private int taskCount;
@@ -29,12 +34,16 @@ public class UpgradeProgressMonitor
 
     private int percentageComplete;
 
-    /**
+    private boolean error = false;
+
+    */
+/**
      * Implementation note:
      * <p/>
      * Use a list here to ensure that the order of the task progress entries
      * remain in the same order as was passed to this monitor.
      */
+/*
     private List<TaskGroupUpgradeProgress> orderedTaskGroups = new LinkedList<TaskGroupUpgradeProgress>();
 
     private Map<UpgradeTask, TaskUpgradeProgress> taskProgressLookupMap = new HashMap<UpgradeTask, TaskUpgradeProgress>();
@@ -50,11 +59,13 @@ public class UpgradeProgressMonitor
         finishTimestamp = System.currentTimeMillis();
     }
 
-    /**
+    */
+/**
      * Return the elapsed time.
      *
      * @return formatted string representing the elapsed time.
      */
+/*
     public String getElaspedTime()
     {
         // if start timestamp is zero, we have not started.
@@ -81,27 +92,26 @@ public class UpgradeProgressMonitor
         return taskProgressLookupMap.get(task);
     }
 
-    public TaskGroupUpgradeProgress getProgress(UpgradeTaskGroup group)
-    {
-        return groupProgressLookupMap.get(group);
-    }
-
-    /**
+    */
+/**
      * Notify the monitor that the specified upgrade task has started / is starting processing.
      *
      * @param task in question
      */
+/*
     public void started(UpgradeTask task)
     {
         TaskUpgradeProgress taskProgress = getProgress(task);
         taskProgress.setStatus(UpgradeStatus.IN_PROGRESS);
     }
 
-    /**
+    */
+/**
      * Notify the monitor that the specified upgrade task has been aborted.
      *
      * @param task
      */
+/*
     public void aborted(UpgradeTask task)
     {
         TaskUpgradeProgress taskProgress = getProgress(task);
@@ -110,11 +120,13 @@ public class UpgradeProgressMonitor
         tasksFinishedCount++;
     }
 
-    /**
+    */
+/**
      * Notify the monitor that the specified upgrade task has failed.
      *
      * @param task
      */
+/*
     public void failed(UpgradeTask task)
     {
         TaskUpgradeProgress taskProgress = getProgress(task);
@@ -124,11 +136,13 @@ public class UpgradeProgressMonitor
         error = true;
     }
 
-    /**
+    */
+/**
      * Notify the monitor that the specified upgrade task has completed successfully.
      *
      * @param task
      */
+/*
     public void completed(UpgradeTask task)
     {
         TaskUpgradeProgress taskProgress = getProgress(task);
@@ -154,12 +168,14 @@ public class UpgradeProgressMonitor
         }
     }
 
-    /**
+    */
+/**
      * Manually specify the percentage complete value. If not set, then the percentage complete will
      * be reported as the percentage of tasks finished.
      *
      * @param percentageComplete
      */
+/*
     public void setPercentageComplete(int percentageComplete)
     {
         this.percentageComplete = percentageComplete;
@@ -191,30 +207,10 @@ public class UpgradeProgressMonitor
         return orderedTaskGroups;
     }
 
-    public void started(UpgradeTaskGroup group)
-    {
-        TaskGroupUpgradeProgress groupProgress = getProgress(group);
-        groupProgress.setStatus(UpgradeStatus.IN_PROGRESS);
-    }
-
-    public void completed(UpgradeTaskGroup group)
-    {
-        TaskGroupUpgradeProgress groupProgress = getProgress(group);
-        groupProgress.setStatus(UpgradeStatus.COMPLETED);
-    }
-
-    public void aborted(UpgradeTaskGroup group)
-    {
-        TaskGroupUpgradeProgress groupProgress = getProgress(group);
-        groupProgress.setStatus(UpgradeStatus.ABORTED);
-    }
-
     public boolean isStarted()
     {
         return startTimestamp != 0;
     }
-
-    private boolean error = false;
 
     public boolean isSuccessful()
     {
@@ -225,4 +221,5 @@ public class UpgradeProgressMonitor
     {
         return error;
     }
+*/
 }

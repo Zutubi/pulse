@@ -1,11 +1,20 @@
 package com.zutubi.pulse.upgrade;
 
+import com.zutubi.pulse.monitor.Job;
+import com.zutubi.pulse.monitor.JobListener;
+import com.zutubi.pulse.monitor.JobRunner;
+import com.zutubi.pulse.monitor.Task;
+import com.zutubi.pulse.monitor.Monitor;
+import com.zutubi.pulse.monitor.TaskFeedback;
 import com.zutubi.util.logging.Logger;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Arrays;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * <class-comment/>
@@ -20,7 +29,7 @@ public class DefaultUpgradeManager implements UpgradeManager
 
     private List<UpgradeTaskGroup> groups = new LinkedList<UpgradeTaskGroup>();
 
-    private UpgradeProgressMonitor monitor;
+    private JobRunner runner;
 
     public boolean isUpgradeRequired()
     {
@@ -98,8 +107,7 @@ public class DefaultUpgradeManager implements UpgradeManager
             }
         }
 
-        monitor = new UpgradeProgressMonitor();
-        monitor.setTaskGroups(groups);
+        runner = new JobRunner();
     }
 
     public List<UpgradeTaskGroup> previewUpgrade()
@@ -109,6 +117,8 @@ public class DefaultUpgradeManager implements UpgradeManager
 
     public void executeUpgrade()
     {
+        Monitor monitor = runner.getMonitor();
+
         // CIB-1029: Refresh during upgrade causes tasks to be re-run
         // The upgrade manager handles a one-shot process.  At no stage should executeUpgrade be allowed
         // to proceed a second time.  Enforce this just in case the client gets it wrong.
@@ -118,116 +128,61 @@ public class DefaultUpgradeManager implements UpgradeManager
             return;
         }
 
-        monitor.start();
+        for (UpgradeTaskGroup group : groups)
+        {
+            group.getSource().upgradeStarted();
+        }
+
+        UpgradeTaskGroupJobAdapter job = new UpgradeTaskGroupJobAdapter(groups);
+        runner.getMonitor().add(job);
+        runner.run(job);
+
 
         for (UpgradeTaskGroup group : groups)
         {
-            monitor.started(group);
+            boolean abort = false;
+
+            for (UpgradeTask task : group.getTasks())
+            {
+                TaskFeedback progress = monitor.getProgress(task);
+                if (progress.isFailed() && task.haltOnFailure())
+                {
+                    abort = true;
+                    break;
+                }
+            }
 
             UpgradeableComponent source = group.getSource();
-
-            UpgradeListener listener = new DelegateUpgradeListener();
-            if (source instanceof UpgradeListener)
-            {
-                listener = new DelegateUpgradeListener((UpgradeListener) group.getSource());
-            }
-
-            source.upgradeStarted();
-
-            List<UpgradeTask> tasksToExecute = group.getTasks();
-
-            boolean abort = false;
-            for (UpgradeTask task : tasksToExecute)
-            {
-                try
-                {
-                    if (!abort)
-                    {
-                        monitor.started(task);
-                        try
-                        {
-                            LOG.info("Executing upgrade task: " + task.getName());
-                            task.execute();
-                        }
-                        catch (UpgradeException e)
-                        {
-                            throw e;
-                        }
-                        catch (Throwable t)
-                        {
-                            throw new UpgradeException(t);
-                        }
-
-                        if (task.hasFailed())
-                        {
-                            // use an exception to break out to the task failure handling.
-                            StringBuffer errors = new StringBuffer();
-                            String sep = "\n";
-                            for (String error : task.getErrors())
-                            {
-                                errors.append(sep);
-                                errors.append(error);
-                            }
-
-                            throw new UpgradeException("UpgradeTask '" + task.getName() + "' is marked as failed. " +
-                                    "The following errors were recorded:" + errors.toString());
-                        }
-
-                        monitor.completed(task);
-                        listener.taskCompleted(task);
-                    }
-                    else
-                    {
-                        monitor.aborted(task);
-                        listener.taskAborted(task);
-                    }
-                }
-                catch (UpgradeException e)
-                {
-                    monitor.failed(task);
-                    listener.taskFailed(task);
-                    if (task.haltOnFailure())
-                    {
-                        abort = true;
-                    }
-                    LOG.severe(e);
-                }
-            }
-
             if (abort)
             {
-                monitor.aborted(group);
                 source.upgradeAborted();
             }
             else
             {
-                monitor.completed(group);
                 source.upgradeCompleted();
             }
         }
-
-        monitor.finish();
     }
 
-    public UpgradeProgressMonitor getUpgradeMonitor()
+    public Monitor getUpgradeMonitor()
     {
-        return monitor;
+        return runner.getMonitor();
     }
 
-    private class DelegateUpgradeListener implements UpgradeListener
+    private class DelegateJobListener implements JobListener
     {
-        private UpgradeListener delegate;
+        private JobListener delegate;
 
-        public DelegateUpgradeListener()
+        public DelegateJobListener()
         {
         }
 
-        public DelegateUpgradeListener(UpgradeListener delegate)
+        public DelegateJobListener(JobListener delegate)
         {
             this.delegate = delegate;
         }
 
-        public void taskCompleted(UpgradeTask task)
+        public void taskCompleted(Task task)
         {
             if (delegate != null)
             {
@@ -235,7 +190,7 @@ public class DefaultUpgradeManager implements UpgradeManager
             }
         }
 
-        public void taskFailed(UpgradeTask task)
+        public void taskFailed(Task task)
         {
             if (delegate != null)
             {
@@ -243,12 +198,124 @@ public class DefaultUpgradeManager implements UpgradeManager
             }
         }
 
-        public void taskAborted(UpgradeTask task)
+        public void taskAborted(Task task)
         {
             if (delegate != null)
             {
                 delegate.taskAborted(task);
             }
+        }
+
+        public void taskStarted(Task task)
+        {
+            if (delegate != null)
+            {
+                delegate.taskStarted(task);
+            }
+        }
+    }
+
+    private class UpgradeTaskGroupJobAdapter implements Job, Iterator<Task>, JobListener
+    {
+        private Iterator<UpgradeTaskGroup> groups;
+
+        private Iterator<UpgradeTask> tasks;
+
+        private JobListener listener = new DelegateJobListener();
+
+        private Map<Task, JobListener> taskListeners = new HashMap<Task, JobListener>();
+
+        public UpgradeTaskGroupJobAdapter(List<UpgradeTaskGroup> groups)
+        {
+            this.groups = groups.iterator();
+
+            UpgradeTaskGroup currentGroup = this.groups.next();
+            UpgradeableComponent source = currentGroup.getSource();
+            if (source instanceof JobListener)
+            {
+                listener = new DelegateJobListener((JobListener) source);
+            }
+
+            this.tasks = currentGroup.getTasks().iterator();
+        }
+
+        public void taskStarted(Task task)
+        {
+            if (taskListeners.containsKey(task))
+            {
+                taskListeners.get(task).taskStarted(task);
+            }
+        }
+
+        public void taskCompleted(Task task)
+        {
+            if (taskListeners.containsKey(task))
+            {
+                taskListeners.get(task).taskCompleted(task);
+            }
+        }
+
+        public void taskFailed(Task task)
+        {
+            if (taskListeners.containsKey(task))
+            {
+                taskListeners.get(task).taskFailed(task);
+            }
+        }
+
+        public void taskAborted(Task task)
+        {
+            if (taskListeners.containsKey(task))
+            {
+                taskListeners.get(task).taskAborted(task);
+            }
+        }
+
+        public boolean hasNext()
+        {
+            return tasks.hasNext() || groups.hasNext();
+        }
+
+        public Task next()
+        {
+            if (tasks.hasNext())
+            {
+                UpgradeTask task = tasks.next();
+                taskListeners.put(task, listener);
+                return task;
+            }
+
+            if (groups.hasNext())
+            {
+                UpgradeTaskGroup currentGroup = groups.next();
+                UpgradeableComponent source = currentGroup.getSource();
+                if (source instanceof JobListener)
+                {
+                    listener = new DelegateJobListener((JobListener) source);
+                }
+                else
+                {
+                    listener = new DelegateJobListener();
+                }
+
+                tasks = currentGroup.getTasks().iterator();
+
+                Task task = tasks.next();
+                taskListeners.put(task, listener);
+                return task;
+            }
+            
+            throw new RuntimeException();
+        }
+
+        public void remove()
+        {
+            throw new RuntimeException("Remove not supported.");
+        }
+
+        public Iterator<Task> getTasks()
+        {
+            return this;
         }
     }
 }

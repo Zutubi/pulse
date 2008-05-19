@@ -75,12 +75,34 @@ public class Monitor
             throw new IllegalStateException();
         }
         currentTask = task;
+
+        for (JobListener listener : listeners)
+        {
+            listener.taskStarted(task);
+        }
     }
 
     public void finish(Task task)
     {
         currentTask = null;
         completedTasks++;
+
+        for (JobListener listener : listeners)
+        {
+            TaskFeedback feedback = getProgress(task);
+            if (feedback.isAborted())
+            {
+                listener.taskAborted(task);
+            }
+            else if (feedback.isFailed())
+            {
+                listener.taskFailed(task);
+            }
+            else
+            {
+                listener.taskCompleted(task);
+            }
+        }
     }
 
     public void markFailed()
@@ -95,6 +117,12 @@ public class Monitor
     public boolean isFailed()
     {
         return isFinished() && !successful;
+    }
+
+    // backwards compatibility with UI layer.
+    public boolean isError()
+    {
+        return isFailed();
     }
 
     public void markStarted()

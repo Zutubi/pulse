@@ -1,8 +1,8 @@
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.pulse.upgrade.UpgradeContext;
-import com.zutubi.pulse.upgrade.UpgradeException;
+import com.zutubi.pulse.monitor.TaskException;
 import com.zutubi.pulse.upgrade.UpgradeTask;
+import com.zutubi.pulse.upgrade.UpgradeException;
 
 import java.util.LinkedList;
 import java.util.List;

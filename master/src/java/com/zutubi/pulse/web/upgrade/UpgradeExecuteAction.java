@@ -1,22 +1,30 @@
 package com.zutubi.pulse.web.upgrade;
 
-import com.zutubi.pulse.upgrade.UpgradeProgressMonitor;
+import com.zutubi.pulse.monitor.Monitor;
+import com.zutubi.pulse.upgrade.UpgradeTaskGroup;
+
+import java.util.List;
 
 /**
  * <class-comment/>
  */
 public class UpgradeExecuteAction extends UpgradeActionSupport
 {
-    public UpgradeProgressMonitor getMonitor()
+    public Monitor getMonitor()
     {
         return upgradeManager.getUpgradeMonitor();
+    }
+
+    public List<UpgradeTaskGroup> getOrderedTaskGroups()
+    {
+        return upgradeManager.previewUpgrade();
     }
 
     public String execute()
     {
         // check if the upgrade is in progress... if a user refreshes the browser on the
         // execute action, we do not want the upgrade starting again.
-        UpgradeProgressMonitor progress = getMonitor();
+        Monitor progress = getMonitor();
 
         if (!progress.isStarted())
         {

@@ -1,23 +1,24 @@
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.bootstrap.Data;
 import com.zutubi.pulse.Version;
+import com.zutubi.pulse.bootstrap.Data;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.monitor.JobListener;
+import com.zutubi.pulse.monitor.Task;
 import com.zutubi.pulse.upgrade.ConfigurationAware;
 import com.zutubi.pulse.upgrade.UpgradeTask;
 import com.zutubi.pulse.upgrade.UpgradeableComponent;
-import com.zutubi.pulse.upgrade.UpgradeListener;
 
-import java.util.List;
-import java.util.LinkedList;
-import java.util.Collections;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
  *
  */
-public class PulseUpgradeableComponent implements UpgradeableComponent, UpgradeListener
+public class PulseUpgradeableComponent implements UpgradeableComponent, JobListener
 {
     /**
      * The registered upgrade tasks.
@@ -172,9 +173,9 @@ public class PulseUpgradeableComponent implements UpgradeableComponent, UpgradeL
 
     }
 
-    //--- UpgradeListener implementation --- 
+    //--- JobListener implementation --- 
 
-    public void taskCompleted(UpgradeTask task)
+    public void taskCompleted(Task task)
     {
         // record task completion, to ensure that it is not run a second time. Any task with a build
         // number less than zero are run during each upgrade and do not impact the target build number.
@@ -187,12 +188,17 @@ public class PulseUpgradeableComponent implements UpgradeableComponent, UpgradeL
         }
     }
 
-    public void taskFailed(UpgradeTask task)
+    public void taskFailed(Task task)
     {
         // noop
     }
 
-    public void taskAborted(UpgradeTask task)
+    public void taskAborted(Task task)
+    {
+        // noop
+    }
+
+    public void taskStarted(Task task)
     {
         // noop
     }

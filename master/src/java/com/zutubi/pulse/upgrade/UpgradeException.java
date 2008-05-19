@@ -1,11 +1,11 @@
 package com.zutubi.pulse.upgrade;
 
-import com.zutubi.pulse.core.PulseException;
+import com.zutubi.pulse.monitor.TaskException;
 
 /**
  * <class-comment/>
  */
-public class UpgradeException extends PulseException
+public class UpgradeException extends TaskException
 {
     public UpgradeException()
     {

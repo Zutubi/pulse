@@ -36,10 +36,10 @@
 
 </p>
 
-#if($monitor.orderedTaskGroups.size() > 0)
+#if($orderedTaskGroups.size() > 0)
 <p>
     To use this directory we will need to execute the following upgrade tasks.
-    #foreach($groupProgress in $monitor.orderedTaskGroups)
+    #foreach($groupProgress in $orderedTaskGroups)
     <table class="columns" width="40%">
         <tr>
             <td class="columns" width="90%">

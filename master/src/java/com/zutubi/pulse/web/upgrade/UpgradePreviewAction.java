@@ -13,8 +13,6 @@ import java.util.List;
  */
 public class UpgradePreviewAction extends UpgradeActionSupport
 {
-    private List<UpgradeTask> upgradePreview;
-
     /**
      * The version that is being upgraded.
      */
@@ -26,6 +24,7 @@ public class UpgradePreviewAction extends UpgradeActionSupport
     private Version newVersion;
 
     private MasterConfigurationManager configurationManager;
+
     private List<UpgradeTaskGroup> upgradeGroupPreview;
 
     /**
@@ -38,13 +37,6 @@ public class UpgradePreviewAction extends UpgradeActionSupport
         this.configurationManager = configurationManager;
     }
 
-/*
-    public List<UpgradeTask> getUpgradePreview()
-    {
-        return upgradePreview;
-    }
-
-*/
     public List<UpgradeTaskGroup> getUpgradeGroupPreview()
     {
         return upgradeGroupPreview;
