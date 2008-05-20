@@ -9,6 +9,7 @@ import com.zutubi.util.IOUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -298,6 +299,36 @@ public class RegexPostProcessorTest extends PulseTestCase
         assertEquals(2, features.size());
         assertEquals(Feature.Level.WARNING, features.get(0).getLevel());
         assertEquals(Feature.Level.ERROR, features.get(1).getLevel());
+    }
+
+    public void testSmileFace() throws FileLoadException, FileNotFoundException
+    {
+        RegexPostProcessor pp = createPostProcessor(":-\\)");
+
+        writeToArtifact("first line", ":-) blah blah blah", "last line");
+
+        simpleFeatures(pp, Feature.Level.ERROR, ":-) blah blah blah");
+    }
+
+    private void writeToArtifact(String... lines) throws FileNotFoundException
+    {
+        PrintWriter writer = null;
+        try
+        {
+            writer = new PrintWriter(tempFile.getAbsolutePath());
+
+            for (String line : lines)
+            {
+                writer.println(line);
+            }
+        }
+        finally
+        {
+            IOUtils.close(writer);
+        }
+
+        artifact = new StoredFileArtifact(tempFile.getName());
+
     }
 
     private void contextHelper(int leading, int trailing)
