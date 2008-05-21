@@ -492,22 +492,15 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         buildDetails.put("id", (int) build.getNumber());
         buildDetails.put("project", build.getProject().getName());
         buildDetails.put("specification", build.getBuildSpecification());
-        buildDetails.put("status", build.getState().getPrettyString());
         buildDetails.put("revision", getBuildRevision(build));
-        buildDetails.put("completed", build.completed());
-        buildDetails.put("succeeded", build.succeeded());
+        addResultFields(build, buildDetails);
 
-        TimeStamps timeStamps = build.getStamps();
-        buildDetails.put("startTime", new Date(timeStamps.getStartTime()));
-        buildDetails.put("endTime", new Date(timeStamps.getEndTime()));
-        if (timeStamps.hasEstimatedTimeRemaining())
+        Vector<Hashtable<String, Object>> stages = new Vector<Hashtable<String, Object>>();
+        for(RecipeResultNode rrn: build.getRoot().getChildren())
         {
-            buildDetails.put("progress", timeStamps.getEstimatedPercentComplete());
+            stages.add(convertStage(rrn));
         }
-        else
-        {
-            buildDetails.put("progress", -1);
-        }
+        buildDetails.put("stages", stages);
 
         return buildDetails;
     }
@@ -525,6 +518,34 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
         }
 
         return "";
+    }
+
+    private Hashtable<String, Object> convertStage(RecipeResultNode recipeResultNode)
+    {
+        Hashtable<String, Object> stage = new Hashtable<String, Object>();
+        stage.put("name", recipeResultNode.getStage());
+        stage.put("agent", recipeResultNode.getHostSafe());
+        addResultFields(recipeResultNode.getResult(), stage);
+        return stage;
+    }
+
+    private void addResultFields(Result result, Hashtable<String, Object> buildDetails)
+    {
+        buildDetails.put("status", result.getState().getPrettyString());
+        buildDetails.put("completed", result.completed());
+        buildDetails.put("succeeded", result.succeeded());
+
+        TimeStamps timeStamps = result.getStamps();
+        buildDetails.put("startTime", new Date(timeStamps.getStartTime()));
+        buildDetails.put("endTime", new Date(timeStamps.getEndTime()));
+        if (timeStamps.hasEstimatedTimeRemaining())
+        {
+            buildDetails.put("progress", timeStamps.getEstimatedPercentComplete());
+        }
+        else
+        {
+            buildDetails.put("progress", -1);
+        }
     }
 
     public Vector<Hashtable<String, Object>> getChangesInBuild(String token, String projectName, int id) throws AuthenticationException
