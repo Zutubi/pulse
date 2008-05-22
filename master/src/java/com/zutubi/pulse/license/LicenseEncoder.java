@@ -143,37 +143,7 @@ public class LicenseEncoder implements LicenseKeyFactory
 
             // setup some default supported entity values until they are added to the interface and we want to be
             // able to vary them.
-            if (license.getType() == LicenseType.ENTERPRISE)
-            {
-                license.setSupported(16, License.UNRESTRICTED, License.UNRESTRICTED);
-                license.setSupportedContactPoints(License.UNRESTRICTED);
-            }
-            else if (license.getType() == LicenseType.EVALUATION)
-            {
-                // keep default values of License.UNDEFINED.
-                license.setSupported(License.UNRESTRICTED, License.UNRESTRICTED, License.UNRESTRICTED);
-                license.setSupportedContactPoints(License.UNRESTRICTED);
-            }
-            else if (license.getType() == LicenseType.NON_PROFIT)
-            {
-                license.setSupported(5, 5, License.UNRESTRICTED);
-                license.setSupportedContactPoints(License.UNRESTRICTED);
-            }
-            else if (license.getType() == LicenseType.PROFESSIONAL)
-            {
-                license.setSupported(6, License.UNRESTRICTED, License.UNRESTRICTED);
-                license.setSupportedContactPoints(License.UNRESTRICTED);
-            }
-            else if (license.getType() == LicenseType.SMALL_TEAM)
-            {
-                license.setSupported(1, 2, 2);
-                license.setSupportedContactPoints(3);
-            }
-            else if (license.getType() == LicenseType.STANDARD)
-            {
-                license.setSupported(2, License.UNRESTRICTED, License.UNRESTRICTED);
-                license.setSupportedContactPoints(License.UNRESTRICTED);
-            }
+            configureLicenseBasedOnType(license);
 
             LicenseEncoder encoder = new LicenseEncoder();
             byte[] licenseKey = encoder.encode(license);
@@ -187,6 +157,41 @@ public class LicenseEncoder implements LicenseKeyFactory
         {
             e.printStackTrace();
             System.exit(1);
+        }
+    }
+
+    private static void configureLicenseBasedOnType(License license)
+    {
+        if (license.getType() == LicenseType.ENTERPRISE)
+        {
+            license.setSupported(16, License.UNRESTRICTED, License.UNRESTRICTED);
+            license.setSupportedContactPoints(License.UNRESTRICTED);
+        }
+        else if (license.getType() == LicenseType.EVALUATION)
+        {
+            // keep default values of License.UNDEFINED.
+            license.setSupported(License.UNRESTRICTED, License.UNRESTRICTED, License.UNRESTRICTED);
+            license.setSupportedContactPoints(License.UNRESTRICTED);
+        }
+        else if (license.getType() == LicenseType.NON_PROFIT)
+        {
+            license.setSupported(5, 5, License.UNRESTRICTED);
+            license.setSupportedContactPoints(License.UNRESTRICTED);
+        }
+        else if (license.getType() == LicenseType.PROFESSIONAL)
+        {
+            license.setSupported(6, License.UNRESTRICTED, License.UNRESTRICTED);
+            license.setSupportedContactPoints(License.UNRESTRICTED);
+        }
+        else if (license.getType() == LicenseType.SMALL_TEAM)
+        {
+            license.setSupported(1, 2, 2);
+            license.setSupportedContactPoints(3);
+        }
+        else if (license.getType() == LicenseType.STANDARD)
+        {
+            license.setSupported(2, License.UNRESTRICTED, License.UNRESTRICTED);
+            license.setSupportedContactPoints(License.UNRESTRICTED);
         }
     }
 
@@ -326,6 +331,29 @@ public class LicenseEncoder implements LicenseKeyFactory
             String licenseKey = "";
             System.out.println(new RenewLicense(licenseKey).renew());
         }
+    }
 
+    private static class UpgradeLicense
+    {
+        public static void main(String[] argv)
+        {
+            String licenseKey = "";
+
+            LicenseDecoder decoder = new LicenseDecoder();
+            License license = decoder.decode(licenseKey.getBytes());
+            license.setType(LicenseType.ENTERPRISE);
+            LicenseEncoder.configureLicenseBasedOnType(license);
+
+            System.out.println("Name: " + license.getHolder());
+            System.out.println("Type: " + license.getType());
+            System.out.println("Expiry: " + license.getExpiryDate());
+            System.out.println(" - projects: " + license.getSupportedProjects());
+            System.out.println(" - users: " + license.getSupportedUsers());
+            System.out.println(" - agents: " + license.getSupportedAgents());
+            System.out.println("");
+
+            LicenseEncoder encoder = new LicenseEncoder();
+            System.out.println(new String(encoder.encode(license)));
+        }
     }
 }

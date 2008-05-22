@@ -76,6 +76,11 @@ public final class License
         this.expiryDate = date;
     }
 
+    protected void setType(LicenseType type)
+    {
+        this.type = type;
+    }
+
     /**
      * Get the license holder string.
      *
