@@ -283,13 +283,28 @@ public class FileLoader
 
         if (text != null && typeHelper.hasSetText())
         {
-            if (predicate.resolveReferences(type, e))
-            {
-                text = VariableHelper.replaceVariables(text, scope, predicate.allowUnresolved(type, e));
-            }
-            
+            VariableHelper.ResolutionStrategy resolutionStrategy = getResolutionStrategy(predicate, type, e);
+
+            text = VariableHelper.replaceVariables(text, scope, resolutionStrategy);            
             typeHelper.setText(type, text);
         }
+    }
+
+    private VariableHelper.ResolutionStrategy getResolutionStrategy(TypeLoadPredicate predicate, Object type, Element e)
+    {
+        VariableHelper.ResolutionStrategy resolutionStrategy = VariableHelper.ResolutionStrategy.RESOLVE_NONE;
+        if (predicate.resolveReferences(type, e))
+        {
+            if(predicate.allowUnresolved(type, e))
+            {
+                resolutionStrategy = VariableHelper.ResolutionStrategy.RESOLVE_NON_STRICT;
+            }
+            else
+            {
+                resolutionStrategy = VariableHelper.ResolutionStrategy.RESOLVE_STRICT;
+            }
+        }
+        return resolutionStrategy;
     }
 
     private boolean handleInternalElement(Element element, Object type, Scope scope, IntrospectionHelper typeHelper, int depth, ResourceRepository resourceRepository, TypeLoadPredicate predicate) throws Exception
@@ -398,7 +413,10 @@ public class FileLoader
         }
 
         message.append(t.getMessage());
-        return new ParseException(line, column, message.toString());
+        
+        ParseException parseException = new ParseException(line, column, message.toString());
+        parseException.initCause(t);
+        return parseException;
     }
 
     private Object create(String name) throws FileLoadException
@@ -445,19 +463,19 @@ public class FileLoader
             try
             {
                 String propertyName = convertLocalNameToPropertyName(a.getLocalName());
-                helper.set(propertyName, target, a.getValue(), predicate.resolveReferences(target, source), predicate.allowUnresolved(target, source), scope);
+                helper.set(propertyName, target, a.getValue(), getResolutionStrategy(predicate, target, source), scope);
             }
             catch (InvocationTargetException e)
             {
-                throw new FileLoadException(e.getCause().getMessage());
+                throw new FileLoadException(e.getCause().getMessage(), e.getCause());
             }
             catch (UnknownAttributeException e)
             {
-                throw new FileLoadException("Unrecognised attribute '" + a.getLocalName() + "'.");
+                throw new FileLoadException("Unrecognised attribute '" + a.getLocalName() + "'.", e);
             }
             catch (Exception e)
             {
-                throw new FileLoadException(e.getMessage());
+                throw new FileLoadException(e.getMessage(), e);
             }
         }
     }

@@ -47,7 +47,7 @@ public class VariableHelperTest extends TestCase
 
     private void successSplitTest(String in, String... out) throws Exception
     {
-        List<String> result = VariableHelper.splitAndReplaceVariables(in, scope, false);
+        List<String> result = VariableHelper.splitAndReplaceVariables(in, scope, VariableHelper.ResolutionStrategy.RESOLVE_STRICT);
         assertEquals(Arrays.asList(out), result);
     }
 
@@ -56,7 +56,7 @@ public class VariableHelperTest extends TestCase
         List<String> result;
         try
         {
-            result = VariableHelper.splitAndReplaceVariables(input, scope, false);
+            result = VariableHelper.splitAndReplaceVariables(input, scope, VariableHelper.ResolutionStrategy.RESOLVE_STRICT);
             fail("Expected config exception, got '" + result + "'");
         }
         catch (PulseException e)

@@ -72,7 +72,7 @@ public class P4Server extends CachingSCMServer
                 Process p;
                 try
                 {
-                    List<String> command = VariableHelper.splitAndReplaceVariables(commandLine, scope, true);
+                    List<String> command = VariableHelper.splitAndReplaceVariables(commandLine, scope, VariableHelper.ResolutionStrategy.RESOLVE_NON_STRICT);
                     p = Runtime.getRuntime().exec(command.toArray(new String[command.size()]));
                 }
                 catch(Exception e)

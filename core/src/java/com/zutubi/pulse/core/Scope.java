@@ -2,7 +2,6 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.Property;
 import com.zutubi.pulse.core.model.ResourceProperty;
-import com.zutubi.pulse.util.Sort;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.File;
@@ -328,8 +327,8 @@ public class Scope
             if (p.getResolveVariables())
             {
                 try
-            {
-                value = VariableHelper.replaceVariables(p.getValue(), Scope.this, true);
+                {
+                    value = VariableHelper.replaceVariables(p.getValue(), Scope.this, VariableHelper.ResolutionStrategy.RESOLVE_NON_STRICT);
                 }
                 catch (FileLoadException e)
                 {

@@ -80,7 +80,7 @@ public class RunExecutablePostBuildAction extends PostBuildAction
     private void addArguments(List<String> commandLine, BuildResult build, RecipeResultNode recipe, List<ResourceProperty> properties) throws FileLoadException
     {
         Scope scope = getScope(build, recipe, properties, configurationManager);
-        commandLine.addAll(VariableHelper.splitAndReplaceVariables(arguments, scope, true));
+        commandLine.addAll(VariableHelper.splitAndReplaceVariables(arguments, scope, VariableHelper.ResolutionStrategy.RESOLVE_NON_STRICT));
     }
 
     public static Scope getScope(BuildResult result, RecipeResultNode recipe, List<ResourceProperty> properties, MasterConfigurationManager configurationManager)
