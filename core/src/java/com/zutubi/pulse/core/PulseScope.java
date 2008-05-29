@@ -349,7 +349,7 @@ public class PulseScope implements Scope
         {
             try
             {
-                value = VariableHelper.replaceVariables(value, this, true);
+                value = VariableHelper.replaceVariables(value, this, VariableHelper.ResolutionStrategy.RESOLVE_NON_STRICT);
             }
             catch (FileLoadException e)
             {

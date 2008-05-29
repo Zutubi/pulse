@@ -55,7 +55,7 @@ public class ServerRecipePaths implements RecipePaths
 
         try
         {
-            String path = VariableHelper.replaceVariables(pattern, scope, true);
+            String path = VariableHelper.replaceVariables(pattern, scope, VariableHelper.ResolutionStrategy.RESOLVE_STRICT);
             return new File(path);
         }
         catch (FileLoadException e)

@@ -94,7 +94,7 @@ public class RunExecutableTaskConfiguration extends AbstractConfiguration implem
         try
         {
             Scope scope = context.getScope();
-            List<String> resolvedArguments = VariableHelper.splitAndReplaceVariables(arguments, scope, true);
+            List<String> resolvedArguments = VariableHelper.splitAndReplaceVariables(arguments, scope, VariableHelper.ResolutionStrategy.RESOLVE_NON_STRICT);
             List<String> commandLine = new LinkedList<String>();
             commandLine.add(command);
             commandLine.addAll(resolvedArguments);

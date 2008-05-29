@@ -13,11 +13,7 @@ import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.RecipeResultNode;
-import com.zutubi.pulse.prototype.config.project.hooks.BuildHookTaskConfiguration;
-import com.zutubi.pulse.prototype.config.project.hooks.CompatibleHooks;
-import com.zutubi.pulse.prototype.config.project.hooks.ManualBuildHookConfiguration;
-import com.zutubi.pulse.prototype.config.project.hooks.PostBuildHookConfiguration;
-import com.zutubi.pulse.prototype.config.project.hooks.PostStageHookConfiguration;
+import com.zutubi.pulse.prototype.config.project.hooks.*;
 import com.zutubi.validation.annotations.Required;
 
 /**
@@ -66,7 +62,7 @@ public class TagTaskConfiguration extends AbstractConfiguration implements Build
         ScmClient client = null;
         try
         {
-            String tagName = VariableHelper.replaceVariables(tag, context.getScope(), false);
+            String tagName = VariableHelper.replaceVariables(tag, context.getScope(), VariableHelper.ResolutionStrategy.RESOLVE_STRICT);
             client = scmClientFactory.createClient(buildResult.getProject().getConfig().getScm());
             client.tag(revision, tagName, moveExisting);
         }

@@ -1,7 +1,5 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.util.StringUtils;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -195,7 +193,7 @@ public class IntrospectionHelper
      */
     private interface AttributeSetter
     {
-        void set(Object parent, String value, boolean resolveReferences, boolean allowUnresolved, ReferenceMap referenceMap)
+        void set(Object parent, String value, VariableHelper.ResolutionStrategy resolutionStrategy, ReferenceMap referenceMap)
                 throws InvocationTargetException, IllegalAccessException, FileLoadException;
     }
 
@@ -228,18 +226,17 @@ public class IntrospectionHelper
     {
         // Simplify things by treating primities like there wrapper classes.
         // Javas introspection does not mind.
-        final Class reflectedArg = PRIMITIVE_TYPE_MAP.containsKey(arg)
-                ? (Class) PRIMITIVE_TYPE_MAP.get(arg) : arg;
+        final Class reflectedArg = PRIMITIVE_TYPE_MAP.containsKey(arg) ? PRIMITIVE_TYPE_MAP.get(arg) : arg;
 
         if (String.class.equals(reflectedArg))
         {
             // String argument requires no conversion.
             return new AttributeSetter()
             {
-                public void set(Object parent, String value, boolean resolveReferences, boolean allowUnresolved, ReferenceMap referenceMap)
+                public void set(Object parent, String value, VariableHelper.ResolutionStrategy resolutionStrategy, ReferenceMap referenceMap)
                         throws InvocationTargetException, IllegalAccessException, FileLoadException
                 {
-                    method.invoke(parent, resolveReferences ? VariableHelper.replaceVariables(value, referenceMap, allowUnresolved) : value);
+                    method.invoke(parent, VariableHelper.replaceVariables(value, referenceMap, resolutionStrategy));
                 }
             };
         }
@@ -248,7 +245,7 @@ public class IntrospectionHelper
             // Boolean argument uses custom conversion.
             return new AttributeSetter()
             {
-                public void set(Object parent, String value, boolean resolveReferences, boolean allowUnresolved, ReferenceMap referenceMap)
+                public void set(Object parent, String value, VariableHelper.ResolutionStrategy resolutionStrategy, ReferenceMap referenceMap)
                         throws InvocationTargetException, IllegalAccessException
                 {
                     method.invoke(parent, toBoolean(value));
@@ -262,7 +259,7 @@ public class IntrospectionHelper
             // char and Character get special treatment - take the first character
             return new AttributeSetter()
             {
-                public void set(Object parent, String value, boolean resolveReferences, boolean allowUnresolved, ReferenceMap referenceMap)
+                public void set(Object parent, String value, VariableHelper.ResolutionStrategy resolutionStrategy, ReferenceMap referenceMap)
                         throws InvocationTargetException, IllegalAccessException
                 {
                     if (value.length() == 0)
@@ -279,7 +276,7 @@ public class IntrospectionHelper
             // Class argument uses Class.forName() conversion.
             return new AttributeSetter()
             {
-                public void set(Object parent, String value, boolean resolveReferences, boolean allowUnresolved, ReferenceMap referenceMap)
+                public void set(Object parent, String value, VariableHelper.ResolutionStrategy resolutionStrategy, ReferenceMap referenceMap)
                         throws InvocationTargetException, IllegalAccessException
                 {
                     try
@@ -296,7 +293,7 @@ public class IntrospectionHelper
         {
             return new AttributeSetter()
             {
-                public void set(Object parent, String value, boolean resolveReferences, boolean allowUnresolved, ReferenceMap referenceMap)
+                public void set(Object parent, String value, VariableHelper.ResolutionStrategy resolutionStrategy, ReferenceMap referenceMap)
                         throws InvocationTargetException, IllegalAccessException, FileLoadException
                 {
                     // lookup the type object within the projects references.
@@ -346,10 +343,10 @@ public class IntrospectionHelper
         {
             return new AttributeSetter()
             {
-                public void set(Object parent, String value, boolean resolveReferences, boolean allowUnresolved, ReferenceMap referenceMap)
+                public void set(Object parent, String value, VariableHelper.ResolutionStrategy resolutionStrategy, ReferenceMap referenceMap)
                         throws InvocationTargetException, IllegalAccessException, FileLoadException
                 {
-                    method.invoke(parent, resolveReferences ? VariableHelper.splitAndReplaceVariables(value, referenceMap, false) : StringUtils.split(value));
+                    method.invoke(parent, VariableHelper.splitAndReplaceVariables(value, referenceMap, resolutionStrategy));
                 }
             };
         }
@@ -363,11 +360,11 @@ public class IntrospectionHelper
 
                 return new AttributeSetter()
                 {
-                    public void set(Object parent, String value, boolean resolveReferences, boolean allowUnresolved, ReferenceMap referenceMap) throws InvocationTargetException, IllegalAccessException, FileLoadException
+                    public void set(Object parent, String value, VariableHelper.ResolutionStrategy resolutionStrategy, ReferenceMap referenceMap) throws InvocationTargetException, IllegalAccessException, FileLoadException
                     {
                         try
                         {
-                            Object attribute = c.newInstance(resolveReferences ? VariableHelper.replaceVariables(value, referenceMap, allowUnresolved) : value);
+                            Object attribute = c.newInstance(VariableHelper.replaceVariables(value, referenceMap, resolutionStrategy));
                             method.invoke(parent, attribute);
                         } catch (InstantiationException ie)
                         {
@@ -422,7 +419,7 @@ public class IntrospectionHelper
         return nestedCreators.get(name).create(parent);
     }
 
-    public void set(String name, Object parent, String value, boolean resolveReferences, boolean allowUnresolved, ReferenceMap referenceMap)
+    public void set(String name, Object parent, String value, VariableHelper.ResolutionStrategy resolutionStrategy, ReferenceMap referenceMap)
             throws IllegalAccessException, InvocationTargetException, ParseException, FileLoadException
     {
         AttributeSetter setter = attributeSetters.get(name);
@@ -430,7 +427,7 @@ public class IntrospectionHelper
         {
             throw new UnknownAttributeException("Unrecognised attribute '" + name + "'.");
         }
-        attributeSetters.get(name).set(parent, value, resolveReferences, allowUnresolved, referenceMap);
+        attributeSetters.get(name).set(parent, value, resolutionStrategy, referenceMap);
     }
     
     public void add(String name, Object parent, Object arg, Scope scope) throws IllegalAccessException, InvocationTargetException

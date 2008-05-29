@@ -4,16 +4,52 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * 
- *
+ * Handles the lexical analysis of variable references.
  */
 public class VariableHelper
 {
+    public enum ResolutionStrategy
+    {
+        /**
+         * Resolve all references, throwing an error for non-existant
+         * variables.
+         */
+        RESOLVE_STRICT
+        {
+            public boolean resolve()
+            {
+                return true;
+            }
+        },
+        /**
+         * Try to resolve all references but leave non-existant references
+         * as they are.
+         */
+        RESOLVE_NON_STRICT
+        {
+            public boolean resolve()
+            {
+                return true;
+            }
+        },
+        /**
+         * Don't resolve any references, just process the input (e.g.
+         * backslash escaping).
+         */
+        RESOLVE_NONE
+        {
+            public boolean resolve()
+            {
+                return false;
+            }
+        },
+        ;
 
-    // Handle the lexical analysis of variable references.
+        public abstract boolean resolve();
+    }
 
     /**
-     *
+     * Tokens identified by lexer.
      */
     private enum TokenType
     {
@@ -23,7 +59,8 @@ public class VariableHelper
     }
 
     /**
-     *
+     * The lexer is a hand-written state machine with the below states (plus
+     * modifiers).
      */
     private enum LexerState
     {
@@ -34,7 +71,7 @@ public class VariableHelper
     }
 
     /**
-     *
+     * A token produced by the lexer.
      */
     private static class Token
     {
@@ -253,10 +290,10 @@ public class VariableHelper
 
     public static String replaceVariables(String input, ReferenceMap properties) throws FileLoadException
     {
-        return replaceVariables(input, properties, false);
+        return replaceVariables(input, properties, ResolutionStrategy.RESOLVE_STRICT);
     }
 
-    public static String replaceVariables(String input, ReferenceMap properties, boolean allowUnresolved) throws FileLoadException
+    public static String replaceVariables(String input, ReferenceMap properties, ResolutionStrategy resolutionStrategy) throws FileLoadException
     {
         StringBuilder result = new StringBuilder();
 
@@ -273,7 +310,7 @@ public class VariableHelper
                 }
                 case VARIABLE_REFERENCE:
                 {
-                    result.append(resolveReference(properties, token, allowUnresolved));
+                    result.append(resolveReference(properties, token, resolutionStrategy));
                     break;
                 }
             }
@@ -281,7 +318,7 @@ public class VariableHelper
         return result.toString();
     }
 
-    public static List<String> splitAndReplaceVariables(String input, ReferenceMap properties, boolean allowUnresolved) throws FileLoadException
+    public static List<String> splitAndReplaceVariables(String input, ReferenceMap properties, ResolutionStrategy resolutionStrategy) throws FileLoadException
     {
         List<String> result = new LinkedList<String>();
         StringBuilder current = new StringBuilder();
@@ -311,7 +348,7 @@ public class VariableHelper
                 }
                 case VARIABLE_REFERENCE:
                 {
-                    String value = resolveReference(properties, token, allowUnresolved);
+                    String value = resolveReference(properties, token, resolutionStrategy);
                     if(value.length() > 0)
                     {
                         current.append(value);
@@ -330,26 +367,27 @@ public class VariableHelper
         return result;
     }
 
-    private static String resolveReference(ReferenceMap properties, Token token, boolean allowUnresolved) throws FileLoadException
+    private static String resolveReference(ReferenceMap properties, Token token, ResolutionStrategy resolutionStrategy) throws FileLoadException
     {
-        Reference reference = properties.getReference(token.value);
-        if (reference != null && reference.getValue() != null)
+        if(resolutionStrategy.resolve())
         {
-            Object obj = reference.getValue();
-            if (!(obj instanceof String))
+            Reference reference = properties.getReference(token.value);
+            if (reference != null && reference.getValue() != null)
             {
-                throw new FileLoadException("Reference to non string variable '" + token.value + "'");
+                Object obj = reference.getValue();
+                if (!(obj instanceof String))
+                {
+                    throw new FileLoadException("Reference to non string variable '" + token.value + "'");
+                }
+                return (String) obj;
             }
-            return obj.toString();
+            else if(resolutionStrategy == ResolutionStrategy.RESOLVE_STRICT)
+            {
+                throw new FileLoadException("Reference to unknown variable '" + token.value + "'");
+            }
         }
-        else if(allowUnresolved)
-        {
-            return "${" + token.value + "}";
-        }
-        else
-        {
-            throw new FileLoadException("Reference to unknown variable '" + token.value + "'");
-        }
+
+        return "${" + token.value + "}";
     }
 
 }

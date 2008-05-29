@@ -171,7 +171,7 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
 
             try
             {
-                return VariableHelper.replaceVariables(url, scope, true);
+                return VariableHelper.replaceVariables(url, scope, VariableHelper.ResolutionStrategy.RESOLVE_NON_STRICT);
             }
             catch (FileLoadException e)
             {
@@ -202,11 +202,11 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
             
             try
             {
-                return VariableHelper.replaceVariables(url, scope, true);
+                return VariableHelper.replaceVariables(url, scope, VariableHelper.ResolutionStrategy.RESOLVE_NON_STRICT);
             }
             catch (FileLoadException e)
             {
-                // Never happens with allowUnresolved set to true
+                // Never happens with non-strict resolution
             }
         }
 
