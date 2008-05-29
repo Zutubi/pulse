@@ -26,7 +26,8 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
 {
     private static final String PROJECT_NAME = "hook-test-project";
     private static final String PROJECT_PATH = PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, "hook-test-project");
-    private static final String HOOKS_PATH   = PathUtils.getPath(PROJECT_PATH, "buildHooks");
+    private static final String HOOKS_BASENAME = "buildHooks";
+    private static final String HOOKS_PATH   = PathUtils.getPath(PROJECT_PATH, HOOKS_BASENAME);
 
     private static final File DUMPENV_JAR = new File(TestUtils.getPulseRoot(), FileSystemUtils.composeFilename("acceptance", "src", "test", "misc", "dumpenv.jar"));
 
@@ -77,6 +78,24 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
 
         xmlRpcHelper.runBuild(PROJECT_NAME, 60000);
         assertArgs(PROJECT_NAME, "success");
+    }
+
+    public void testPostBuildHookCanAccessProjectProperty() throws Exception
+    {
+        xmlRpcHelper.insertSimpleProject(random, false);
+        xmlRpcHelper.insertProjectProperty(random, "some.property", "some.value");
+
+        chooseHookType(random, "zutubi.postBuildHookConfig");
+
+        ConfigurationForm hookForm = new ConfigurationForm(selenium, PostBuildHookConfiguration.class);
+        hookForm.waitFor();
+        hookForm.nextFormElements(random, "true", null, "false");
+
+        selectFromAllTasks();
+        addTask(random, "${project} ${some.property}");
+
+        xmlRpcHelper.runBuild(random, 60000);
+        assertArgs(random, "some.value");
     }
 
     public void testPostStageHook() throws Exception
@@ -154,7 +173,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         taskForm.waitFor();
         taskForm.finishFormElements("nosuchexe", null, tempDir.getAbsolutePath(), null, null);
 
-        waitForHook();
+        waitForHook(PROJECT_NAME);
         int buildNumber = xmlRpcHelper.runBuild(PROJECT_NAME, 60000);
         Hashtable<String,Object> build = xmlRpcHelper.getBuild(PROJECT_NAME, buildNumber);
         assertEquals("error", build.get("status"));
@@ -243,7 +262,12 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
 
     private SelectTypeState chooseHookType(String symbolicName)
     {
-        ListPage hooksPage = new ListPage(selenium, urls, HOOKS_PATH);
+        return chooseHookType(PROJECT_NAME, symbolicName);
+    }
+
+    private SelectTypeState chooseHookType(String projectName, String symbolicName)
+    {
+        ListPage hooksPage = new ListPage(selenium, urls, getHooksPath(projectName));
         hooksPage.goTo();
         hooksPage.clickAdd();
 
@@ -252,6 +276,11 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         assertEquals(Arrays.asList("zutubi.manualBuildHookConfig", "zutubi.postBuildHookConfig", "zutubi.postStageHookConfig", "zutubi.preBuildHookConfig"), hookType.getSortedOptionList());
         hookType.nextFormElements(symbolicName);
         return hookType;
+    }
+
+    private String getHooksPath(String projectName)
+    {
+        return PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, projectName, HOOKS_BASENAME);
     }
 
     private void selectFromAllTasks()
@@ -272,15 +301,20 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
 
     private CompositePage addTask(String arguments)
     {
+        return addTask(PROJECT_NAME, arguments);
+    }
+
+    private CompositePage addTask(String projectName, String arguments)
+    {
         ConfigurationForm taskForm = new ConfigurationForm(selenium, RunExecutableTaskConfiguration.class);
         taskForm.waitFor();
         taskForm.finishFormElements("java", "-jar " + DUMPENV_JAR.getAbsolutePath().replace('\\', '/') + " " + arguments, tempDir.getAbsolutePath(), null, null);
-        return waitForHook();
+        return waitForHook(projectName);
     }
 
-    private CompositePage waitForHook()
+    private CompositePage waitForHook(String projectName)
     {
-        CompositePage hookPage = new CompositePage(selenium, urls, PathUtils.getPath(HOOKS_PATH, random));
+        CompositePage hookPage = new CompositePage(selenium, urls, PathUtils.getPath(getHooksPath(projectName), random));
         hookPage.waitFor();
         return hookPage;
     }

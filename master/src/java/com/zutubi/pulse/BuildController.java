@@ -124,6 +124,7 @@ public class BuildController implements EventListener
         buildDir = paths.getBuildDir(buildResult);
 
         buildContext = new ExecutionContext();
+        addProjectProperties(buildContext, projectConfig);
         addBuildProperties(buildContext, buildResult, project, buildDir, MasterAgentService.constructMasterUrl(configurationProvider.get(GlobalConfiguration.class), configurationManager.getSystemConfig()));
 
         configure(root, buildResult.getRoot());

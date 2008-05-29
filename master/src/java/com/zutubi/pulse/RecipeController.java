@@ -152,8 +152,6 @@ public class RecipeController
         {
             BuildProperties.addResourceProperties(recipeContext, dispatchRequest.getResourceRequirements(), resourceRepository);
         }
-
-        MasterBuildProperties.addProjectProperties(recipeContext, dispatchRequest.getProject().getConfig());
     }
 
     private void handleRecipeCommenced(RecipeCommencedEvent event)
