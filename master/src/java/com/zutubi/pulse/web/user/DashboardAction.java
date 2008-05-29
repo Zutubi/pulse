@@ -7,6 +7,7 @@ import com.zutubi.pulse.prototype.config.user.DashboardConfiguration;
 import com.zutubi.pulse.prototype.config.user.contacts.ContactConfiguration;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.web.ActionSupport;
+import com.zutubi.util.logging.Logger;
 
 import java.util.*;
 
@@ -15,6 +16,8 @@ import java.util.*;
  */
 public class DashboardAction extends ActionSupport
 {
+    private static final Logger LOG = Logger.getLogger(DashboardAction.class);
+
     private User user;
     private DashboardConfiguration dashboardConfig;
     private List<BuildResult> myBuilds;
@@ -79,29 +82,41 @@ public class DashboardAction extends ActionSupport
 
     public List<BuildResult> getChangelistResults(Changelist changelist)
     {
-        Set<Long> ids = changelistDao.getAllAffectedResultIds(changelist);
-        List<BuildResult> buildResults = new LinkedList<BuildResult>();
-        for(Long id: ids)
+        try
         {
-            buildResults.add(buildManager.getBuildResult(id));
-        }
-
-        Collections.sort(buildResults, new Comparator<BuildResult>()
-        {
-            public int compare(BuildResult b1, BuildResult b2)
+            Set<Long> ids = changelistDao.getAllAffectedResultIds(changelist);
+            List<BuildResult> buildResults = new LinkedList<BuildResult>();
+            for(Long id: ids)
             {
-                NamedEntityComparator comparator = new NamedEntityComparator();
-                int result = comparator.compare(b1.getProject(), b2.getProject());
-                if(result == 0)
+                BuildResult buildResult = buildManager.getBuildResult(id);
+                if (buildResult != null)
                 {
-                    result = (int)(b1.getNumber() - b2.getNumber());
+                    buildResults.add(buildResult);
                 }
-
-                return result;
             }
-        });
 
-        return buildResults;
+            Collections.sort(buildResults, new Comparator<BuildResult>()
+            {
+                public int compare(BuildResult b1, BuildResult b2)
+                {
+                    NamedEntityComparator comparator = new NamedEntityComparator();
+                    int result = comparator.compare(b1.getProject(), b2.getProject());
+                    if(result == 0)
+                    {
+                        result = (int)(b1.getNumber() - b2.getNumber());
+                    }
+
+                    return result;
+                }
+            });
+
+            return buildResults;
+        }
+        catch (Exception e)
+        {
+            LOG.severe(e);
+            return Collections.EMPTY_LIST;
+        }
     }
         
     public boolean isContactError()
