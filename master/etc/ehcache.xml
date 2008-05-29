@@ -84,47 +84,47 @@
            overflowToDisk="false"/>
 
     <cache name="com.zutubi.pulse.model.Group.users"
-           maxElementsInMemory="100"
+           maxElementsInMemory="500"
            eternal="true"
            overflowToDisk="false"/>
 
     <cache name="com.zutubi.pulse.model.User"
-           maxElementsInMemory="100"
+           maxElementsInMemory="500"
            eternal="true"
            overflowToDisk="false"/>
 
     <cache name="com.zutubi.pulse.model.User.properties"
-           maxElementsInMemory="500"
+           maxElementsInMemory="2500"
            eternal="true"
            overflowToDisk="false"/>
 
     <cache name="com.zutubi.pulse.model.User.grantedAuthorities"
-           maxElementsInMemory="500"
+           maxElementsInMemory="2500"
            eternal="true"
            overflowToDisk="false"/>
 
     <cache name="com.zutubi.pulse.model.User.groups"
-           maxElementsInMemory="500"
+           maxElementsInMemory="2500"
            eternal="true"
            overflowToDisk="false"/>
 
     <cache name="com.zutubi.pulse.model.User.aliases"
-           maxElementsInMemory="100"
+           maxElementsInMemory="500"
            eternal="true"
            overflowToDisk="false"/>
 
     <cache name="com.zutubi.pulse.model.User.contactPoints"
-           maxElementsInMemory="100"
+           maxElementsInMemory="500"
            eternal="true"
            overflowToDisk="false"/>
 
     <cache name="com.zutubi.pulse.model.User.shownProjects"
-           maxElementsInMemory="100"
+           maxElementsInMemory="500"
            eternal="true"
            overflowToDisk="false"/>
 
     <cache name="com.zutubi.pulse.model.User.shownGroups"
-           maxElementsInMemory="100"
+           maxElementsInMemory="500"
            eternal="true"
            overflowToDisk="false"/>
 
