@@ -195,7 +195,7 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         hierarchyPage.goTo();
         hierarchyPage.clickClone();
 
-        CloneForm cloneForm = new CloneForm(selenium);
+        CloneForm cloneForm = new CloneForm(selenium, false);
         cloneForm.waitFor();
         cloneForm.cloneFormElements(random + "clone");
         cloneForm.waitFor();

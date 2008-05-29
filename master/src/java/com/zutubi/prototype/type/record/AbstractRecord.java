@@ -4,8 +4,8 @@ import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.GraphFunction;
 import com.zutubi.util.Predicate;
+import com.zutubi.util.StringUtils;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -48,11 +48,11 @@ public abstract class AbstractRecord implements Record
 
     public boolean shallowEquals(Record other)
     {
-        if(other == null)
-        {
-            return false;
-        }
+        return other != null && metaEquals(other) && simpleEquals(other);
+    }
 
+    public boolean metaEquals(Record other)
+    {
         Set<String> metaKeys = metaKeySet();
         Set<String> otherMetaKeys = other.metaKeySet();
         if(!metaKeys.equals(otherMetaKeys))
@@ -68,6 +68,11 @@ public abstract class AbstractRecord implements Record
             }
         }
 
+        return true;
+    }
+
+    public boolean simpleEquals(Record other)
+    {
         Set<String> simpleKeys = simpleKeySet();
         Set<String> otherSimpleKeys = other.simpleKeySet();
         if(!simpleKeys.equals(otherSimpleKeys))
@@ -77,36 +82,10 @@ public abstract class AbstractRecord implements Record
 
         for(String key: simpleKeys)
         {
-            if (!valuesEqual(get(key), other.get(key)))
+            if (!RecordUtils.valuesEqual(get(key), other.get(key)))
             {
                 return false;
             }
-        }
-
-        return true;
-    }
-
-    public boolean valuesEqual(Object value, Object otherValue)
-    {
-        if(value == null)
-        {
-            return otherValue == null;
-        }
-        else if(otherValue == null)
-        {
-            return false;
-        }
-
-        if(value instanceof Object[])
-        {
-            if(!(otherValue instanceof Object[]) || !Arrays.equals((Object[])value, (Object[])otherValue))
-            {
-                return false;
-            }
-        }
-        else if(otherValue instanceof Object[] || !value.equals(otherValue))
-        {
-            return false;
         }
 
         return true;
@@ -142,35 +121,32 @@ public abstract class AbstractRecord implements Record
         }
 
         AbstractRecord other = (AbstractRecord) obj;
-        if(getSymbolicName() == null && !(other.getSymbolicName() == null))
+        if(!StringUtils.equals(getSymbolicName(), other.getSymbolicName()))
         {
             return false;
         }
 
-        if(getSymbolicName() != null && !getSymbolicName().equals(other.getSymbolicName()))
+        Set<String> keySet = keySet();
+        if(keySet.size() != other.keySet().size())
         {
             return false;
         }
 
-        if(keySet().size() != other.keySet().size())
+        for(String key: keySet)
         {
-            return false;
-        }
-
-        for(String key: keySet())
-        {
-            if(!valuesEqual(get(key), other.get(key)))
+            if(!RecordUtils.valuesEqual(get(key), other.get(key)))
             {
                 return false;
             }
         }
 
-        if(metaKeySet().size() != other.metaKeySet().size())
+        Set<String> metaKeySet = metaKeySet();
+        if(metaKeySet.size() != other.metaKeySet().size())
         {
             return false;
         }
 
-        for(String key: metaKeySet())
+        for(String key: metaKeySet)
         {
             if(!getMeta(key).equals(other.getMeta(key)))
             {

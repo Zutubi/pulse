@@ -459,7 +459,7 @@ public class ConfigurationTemplateManager
         }, true);
     }
 
-    private Record createSkeletonRecord(ComplexType type, Record record)
+    Record createSkeletonRecord(ComplexType type, Record record)
     {
         MutableRecord result = type.createNewRecord(false);
         for (String key : record.nestedKeySet())
@@ -1216,7 +1216,7 @@ public class ConfigurationTemplateManager
         });
     }
 
-    private void updateCollectionReferences(CollectionType collectionType, String collectionPath, String oldKey, String newKey)
+    void updateCollectionReferences(CollectionType collectionType, String collectionPath, String oldKey, String newKey)
     {
         for(String path: getDescendentPaths(collectionPath, false, false, false))
         {
@@ -1374,7 +1374,7 @@ public class ConfigurationTemplateManager
             // specify what happens when removing using a key set iterator?
             for (String key : record.simpleKeySet())
             {
-                if (record.valuesEqual(record.get(key), emptyChild.get(key)))
+                if (RecordUtils.valuesEqual(record.get(key), emptyChild.get(key)))
                 {
                     dead.add(key);
                 }

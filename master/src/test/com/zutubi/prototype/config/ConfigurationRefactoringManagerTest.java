@@ -11,12 +11,14 @@ import static com.zutubi.prototype.type.record.PathUtils.getBaseName;
 import static com.zutubi.prototype.type.record.PathUtils.getPath;
 import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
+import com.zutubi.util.CollectionUtils;
 import static com.zutubi.util.CollectionUtils.asMap;
 import static com.zutubi.util.CollectionUtils.asPair;
+import com.zutubi.util.Mapping;
 import com.zutubi.validation.ValidationException;
 
-import static java.util.Arrays.asList;
 import java.util.*;
+import static java.util.Arrays.asList;
 
 /**
  */
@@ -346,6 +348,37 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         assertEquals(parentClone.getHandle(), configurationTemplateManager.getTemplateParentRecord(childClonePath).getHandle());
     }
 
+    public void testCanExtractParentTemplateInvalidParentPath()
+    {
+        assertFalse(configurationRefactoringManager.canExtractParentTemplate("nosuchscope/foo"));
+    }
+
+    public void testCanExtractParentTemplateParentPathNotAMap()
+    {
+        assertFalse(configurationRefactoringManager.canExtractParentTemplate(rootPath + "/foo"));
+    }
+
+    public void testCanExtractParentTemplateParentPathNotATemplatedScope()
+    {
+        assertFalse(configurationRefactoringManager.canExtractParentTemplate(SAMPLE_SCOPE + "/foo"));
+    }
+
+    public void testCanExtractParentTemplateInvalidItem()
+    {
+        assertFalse(configurationRefactoringManager.canExtractParentTemplate(TEMPLATE_SCOPE + "/nope"));
+    }
+
+    public void testCanExtractParentTemplateRootTemplate()
+    {
+        assertFalse(configurationRefactoringManager.canExtractParentTemplate(rootPath));
+    }
+
+    public void testCanExtractParentTemplate() throws TypeException
+    {
+        String aPath = insertTemplateAInstance(rootPath, createAInstance("a"), false);
+        assertTrue(configurationRefactoringManager.canExtractParentTemplate(aPath));
+    }
+
     public void testExtractParentTemplateInvalidParentPath()
     {
         extractParentTemplateErrorHelper("nosuchscope", Collections.EMPTY_LIST, "foo", "Invalid parent path 'nosuchscope': does not refer to a templated collection");
@@ -430,39 +463,63 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         assertAllValuesExtracted("a");
     }
 
-//    public void testExtractParentTemplateIdenticalSiblings() throws TypeException
-//    {
-//        String path1 = insertTemplateAInstance(rootPath, createAInstance("1"), false);
-//        String path2 = insertTemplateAInstance(rootPath, createAInstance("2"), false);
-//        String extractedPath = configurationRefactoringManager.extractParentTemplate(TEMPLATE_SCOPE, asList("1", "2"), "extracted");
-//
-//        // Ensure parent has all fields pulled up
-//        MockA extractedInstance = configurationTemplateManager.getInstance(extractedPath, MockA.class);
-//        assertAInstance(extractedInstance, "extracted");
-//        assertFalse(extractedInstance.isConcrete());
-//
-//        // And both children look good too
-//        MockA instance1 = configurationTemplateManager.getInstance(path1, MockA.class);
-//        assertAInstance(instance1, "1");
-//        assertTrue(instance1.isConcrete());
-//
-//        MockA instance2 = configurationTemplateManager.getInstance(path2, MockA.class);
-//        assertAInstance(instance1, "2");
-//        assertTrue(instance1.isConcrete());
-//
-//        // Assert the expected shape of the hierarchy
-//        TemplateNode node = configurationTemplateManager.getTemplateNode(extractedPath);
-//        assertNotNull(node);
-//        assertEquals("root/extracted", node.getTemplatePath());
-//
-//        assertEquals(2, node.getChildren().size());
-//        assertEquals("1", node.getChildren().get(0).getId());
-//        assertEquals("2", node.getChildren().get(0).getId());
-//
-//        // Now assert that the fields have really been pulled up.
-//        assertAllValuesExtracted("1");
-//        assertAllValuesExtracted("2");
-//    }
+    public void testExtractParentTemplateIdenticalSiblings() throws TypeException
+    {
+        String path1 = insertTemplateAInstance(rootPath, createAInstance("1"), false);
+        String path2 = insertTemplateAInstance(rootPath, createAInstance("2"), false);
+        String extractedPath = configurationRefactoringManager.extractParentTemplate(TEMPLATE_SCOPE, asList("1", "2"), "extracted");
+
+        // Ensure parent has all fields pulled up
+        MockA extractedInstance = configurationTemplateManager.getInstance(extractedPath, MockA.class);
+        assertAInstance(extractedInstance, "extracted");
+        assertFalse(extractedInstance.isConcrete());
+
+        // And both children look good too
+        MockA instance1 = configurationTemplateManager.getInstance(path1, MockA.class);
+        assertAInstance(instance1, "1");
+        assertTrue(instance1.isConcrete());
+
+        MockA instance2 = configurationTemplateManager.getInstance(path2, MockA.class);
+        assertAInstance(instance2, "2");
+        assertTrue(instance2.isConcrete());
+
+        // Assert the expected shape of the hierarchy
+        TemplateNode node = configurationTemplateManager.getTemplateNode(extractedPath);
+        assertNotNull(node);
+        assertEquals("root/extracted", node.getTemplatePath());
+
+        assertEquals(2, node.getChildren().size());
+        List<String> children = CollectionUtils.map(node.getChildren(), new Mapping<TemplateNode, String>()
+        {
+            public String map(TemplateNode templateNode)
+            {
+                return templateNode.getId();
+            }
+        });
+        Collections.sort(children);
+        assertEquals("1", children.get(0));
+        assertEquals("2", children.get(1));
+
+        // Now assert that the fields have really been pulled up.
+        assertAllValuesExtracted("1");
+        assertAllValuesExtracted("2");
+    }
+
+    public void testExtractParentTemplateReferenceToExtracted() throws TypeException
+    {
+        String refereePath = insertTemplateAInstance(rootPath, createAInstance("referee"), false);
+        MockA referee = configurationTemplateManager.getInstance(refereePath, MockA.class);
+        MockA referer = new MockA("referer");
+        referer.setRefToRef(referee.getRef());
+        String refererPath = insertTemplateAInstance(rootPath, referer, false);
+
+        configurationRefactoringManager.extractParentTemplate(TEMPLATE_SCOPE, Arrays.asList("referee"), "extracted");
+
+        referee = configurationTemplateManager.getInstance(refereePath, MockA.class);
+        referer = configurationTemplateManager.getInstance(refererPath, MockA.class);
+        assertSame(referee.getRef(), referer.getRefToRef());
+    }
+
 
     private void assertAllValuesExtracted(String key)
     {

@@ -9,11 +9,13 @@ import com.zutubi.pulse.acceptance.forms.SeleniumForm;
  */
 public class CloneForm extends SeleniumForm
 {
+    private boolean smart;
     private String[] descendents;
 
-    public CloneForm(Selenium selenium, String... descendents)
+    public CloneForm(Selenium selenium, boolean smart, String... descendents)
     {
         super(selenium);
+        this.smart = smart;
         this.descendents = descendents;
     }
 
@@ -24,12 +26,19 @@ public class CloneForm extends SeleniumForm
 
     public String[] getFieldNames()
     {
-        String[] fieldNames = new String[descendents.length * 2 + 1];
+        int offset = smart ? 2 : 1;
+        String[] fieldNames = new String[descendents.length * 2 + offset];
         fieldNames[0] = "cloneKey";
+
+        if(smart)
+        {
+            fieldNames[1] = "parentKey";
+        }
+
         for(int i = 0; i < descendents.length; i++)
         {
-            fieldNames[i * 2 + 1] = CloneAction.CHECK_FIELD_PREFIX + descendents[i];
-            fieldNames[i * 2 + 2] = CloneAction.KEY_FIELD_PREFIX + descendents[i];
+            fieldNames[i * 2 + offset] = CloneAction.CHECK_FIELD_PREFIX + descendents[i];
+            fieldNames[i * 2 + offset + 1] = CloneAction.KEY_FIELD_PREFIX + descendents[i];
         }
 
         return fieldNames;
@@ -37,18 +46,19 @@ public class CloneForm extends SeleniumForm
 
     public int[] getFieldTypes()
     {
-        int fieldTypes[] = new int[descendents.length * 2 + 1];
+        int offset = smart ? 2 : 1;
+        int fieldTypes[] = new int[descendents.length * 2 + offset];
         fieldTypes[0] = TEXTFIELD;
-        for(int i = 1; i < fieldTypes.length; i++)
+
+        if (smart)
         {
-            if((i % 2) == 0)
-            {
-                fieldTypes[i] = TEXTFIELD;
-            }
-            else
-            {
-                fieldTypes[i] = CHECKBOX;
-            }
+            fieldTypes[1] = TEXTFIELD;
+        }
+
+        for(int i = 0; i < descendents.length; i++)
+        {
+            fieldTypes[i * 2 + offset] = CHECKBOX;
+            fieldTypes[i * 2 + offset + 1] = TEXTFIELD;
         }
 
         return fieldTypes;

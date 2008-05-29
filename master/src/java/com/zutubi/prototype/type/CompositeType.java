@@ -6,10 +6,7 @@ import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.core.config.Configuration;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.GraphFunction;
-import com.zutubi.util.Mapping;
-import com.zutubi.util.Predicate;
+import com.zutubi.util.*;
 import com.zutubi.util.logging.Logger;
 
 import java.lang.annotation.Annotation;
@@ -682,6 +679,80 @@ public class CompositeType extends AbstractType implements ComplexType
         }
     }
 
+    public boolean deepValueEquals(Object data1, Object data2)
+    {
+        if(!(data1 instanceof Record))
+        {
+            throw new IllegalArgumentException("Expecting record, got '" + data1.getClass().getName() + "'");
+        }
+
+        if(!(data2 instanceof Record))
+        {
+            throw new IllegalArgumentException("Expecting record, got '" + data2.getClass().getName() + "'");
+        }
+
+        Record r1 = (Record) data1;
+        Record r2 = (Record) data2;
+
+        // Check the types match
+        String symbolicName = r1.getSymbolicName();
+        if(!StringUtils.equals(symbolicName, r2.getSymbolicName()))
+        {
+            return false;
+        }
+
+        // Check we are the actual type.
+        if(symbolicName == null)
+        {
+            throw new IllegalArgumentException("Record has no symbolic name");
+        }
+
+        if(!symbolicName.equals(getSymbolicName()))
+        {
+            // Defer to actual type.
+            CompositeType actualType = typeRegistry.getType(symbolicName);
+            if(actualType == null)
+            {
+                throw new IllegalArgumentException("Record has unrecognised type '" + symbolicName + "'");
+            }
+            
+            return actualType.deepValueEquals(r1, r2);
+        }
+
+        // Simple properties
+        if(!r1.simpleEquals(r2))
+        {
+            return false;
+        }
+
+        // Nested properties
+        List<String> nested1 = new ArrayList<String>(r1.nestedKeySet());
+        List<String> nested2 = new ArrayList<String>(r2.nestedKeySet());
+        Collections.sort(nested1);
+        Collections.sort(nested2);
+
+        if(!nested1.equals(nested2))
+        {
+            return false;
+        }
+
+        for(String key: nested1)
+        {
+            Type type = getDeclaredPropertyType(key);
+            if(type == null)
+            {
+                throw new IllegalArgumentException("Record has unrecognised key '" + key + "'");
+            }
+
+            if(!type.deepValueEquals(r1.get(key), r2.get(key)))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public Type getDeclaredPropertyType(String propertyName)
     {
         TypeProperty property = properties.get(propertyName);
@@ -755,6 +826,11 @@ public class CompositeType extends AbstractType implements ComplexType
                 throw new TypeException("Error getting value of property '" + propertyName + "': " + e.getMessage(), e);
             }
         }
+    }
+
+    public boolean hasSignificantKeys()
+    {
+        return true;
     }
 
     public Type getPropertyType(String key)

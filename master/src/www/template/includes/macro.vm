@@ -2706,7 +2706,14 @@
         });
         ${formName}.on('actionfailed', function(form, action)
         {
-            form.handleActionErrors(action.result.actionErrors);
+            if(action.failureType == Ext.form.Action.SERVER_INVALID)
+            {
+                form.handleActionErrors(action.result.actionErrors);
+            }
+            else
+            {
+                showStatus('unable to contact pulse server', 'failure');
+            }
         });
     </script>
 #end

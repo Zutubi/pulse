@@ -539,6 +539,13 @@
             <result name="success" type="flexjson">configurationResponse</result>
             <result name="input" type="flexjson">newPanel</result>
         </action>
+
+        <action name="smartclone" class="com.zutubi.prototype.webwork.CloneAction">
+            <param name="smart">true</param>
+            <result name="cancel" type="flexjson">configurationResponse</result>
+            <result name="success" type="flexjson">configurationResponse</result>
+            <result name="input" type="flexjson">newPanel</result>
+        </action>
     </package>
 
     <package name="templateAjax" namespace="/atemplate" extends="default">

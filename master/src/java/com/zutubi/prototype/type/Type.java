@@ -6,35 +6,16 @@ package com.zutubi.prototype.type;
  */
 public interface Type
 {
-    /**
-     * Retrieve a list of the annotations defined on this type.
-     *
-     * @return a list of annotations.
-     */
-//    List<Annotation> getAnnotations();
-
-//    List<Annotation> getAnnotations(Class annotationType);
-
-    /**
-     * Tests if this type is decorated with the given annotation.
-     *
-     * @param annotationType annotation to test for
-     * @return true if this type is decorated with the given annotation
-     */
-//    <T extends Annotation> boolean hasAnnotation(Class<T> annotationType);
-
-//    <T extends Annotation> T getAnnotation(Class<T> annotationType);
-
     Type getTargetType();
 
     Type getActualType(Object value);
 
     /**
-     * The underlying class represented by this type instance.
-     *
-     * @return
+     * @return the underlying class represented by this type instance
      */
     Class getClazz();
+
+    boolean deepValueEquals(Object data1, Object data2);
 
     /**
      * Returns an instance of the object defined by this type, based on the

@@ -3,12 +3,9 @@ package com.zutubi.prototype.config;
 import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.*;
 import static com.zutubi.prototype.type.record.PathUtils.getPath;
-import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.*;
 import static com.zutubi.util.CollectionUtils.asMap;
 import static com.zutubi.util.CollectionUtils.asPair;
-import com.zutubi.util.GraphFunction;
-import com.zutubi.util.StringUtils;
-import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.i18n.MessagesTextProvider;
@@ -145,6 +142,28 @@ public class ConfigurationRefactoringManager
     }
 
     /**
+     * Tests if the given path can have a template parent extracted from it.
+     * Parents can be extracted from items of templated collections,
+     * excepting the root of the template tree.
+     *
+     * @see #extractParentTemplate(String, java.util.List, String)
+     *
+     * @param path the path to test
+     * @return true iff a parent template may be extracted from the given
+     *         path
+     */
+    public boolean canExtractParentTemplate(final String path)
+    {
+        return configurationTemplateManager.executeInsideTransaction(new ConfigurationTemplateManager.Action<Boolean>()
+        {
+            public Boolean execute() throws Exception
+            {
+                return configurationTemplateManager.pathExists(path) && configurationTemplateManager.isTemplatedCollection(PathUtils.getParentPath(path)) && configurationTemplateManager.getTemplateParentRecord(path) != null;
+            }
+        });
+    }
+
+    /**
      * Extracts the common values from a set of siblings into a parent
      * template.  After the operation is complete, the final values of all
      * fields (in the deep sense) of each sibling is unchanged, but any value
@@ -156,16 +175,62 @@ public class ConfigurationRefactoringManager
      * @param keys               keys of the sibling items to extract the
      *                           parent from (all keys must refer to items
      *                           with the same template parent)
-     * @param parentTemplateName name for the new template parent
+     * @param parentTemplateKey  key for the new template parent
      * @return the path of the new template parent
      * @throws IllegalArgumentException if the the parent path is not a
      *         templated collection; if no keys are specified; if the keys do
      *         not share a common, non-null template parent; if the parent
      *         template name is invalid or in use
      */
-    public String extractParentTemplate(final String parentPath, final List<String> keys, final String parentTemplateName)
+    public String extractParentTemplate(final String parentPath, final List<String> keys, final String parentTemplateKey)
     {
-        return configurationTemplateManager.executeInsideTransaction(new ExtractParentTemplateAction(parentPath, parentTemplateName, keys));
+        return configurationTemplateManager.executeInsideTransaction(new ExtractParentTemplateAction(parentPath, parentTemplateKey, keys));
+    }
+
+    /**
+     * Tests if the given path may be 'smart' cloned.  As a smart clone is
+     * performed by extracting a parent template and then cloning, a path can
+     * be smart cloned if both of these operations are valid on the path.
+     *
+     * @see #smartClone(String, String, String, java.util.Map)
+     *
+     * @param path the path to test
+     * @return true iff the given path can be smart cloned
+     */
+    public boolean canSmartClone(final String path)
+    {
+        return configurationTemplateManager.executeInsideTransaction(new ConfigurationTemplateManager.Action<Boolean>()
+        {
+            public Boolean execute() throws Exception
+            {
+                return canExtractParentTemplate(path) && canClone(path);
+            }
+        });
+    }
+
+    /**
+     * Clones a templated map item by extracting its details into a parent
+     * template and adding a skeletal sibling (the clone).  The item's
+     * descendents may also optionally be cloned, although those clones
+     * themselves will not be 'smart'.
+     *
+     * @param parentPath            path to the templated collection that
+     *                              owns the item to clone
+     * @param rootKey               key of the item to smart clone
+     * @param parentKey             key to give to the newly-extracted parent
+     *                              template
+     * @param originalKeyToCloneKey a mapping from existing key to new key
+     *                              for all items to clone (must include at
+     *                              least a mapping for rootKey)
+     * @return the path of the smart clone
+     * @throws IllegalArgumentException if the parentPath is not a templated
+     *         collection; rootKey is not a member of the collection;
+     *         parentKey or any clone key is not unique in the collection;
+     *         originalKeyToCloneKey does not contain a mapping for rootKey
+     */
+    public String smartClone(String parentPath, String rootKey, String parentKey, Map<String, String> originalKeyToCloneKey)
+    {
+        return configurationTemplateManager.executeInsideTransaction(new SmartCloneAction(parentPath, rootKey, parentKey, originalKeyToCloneKey));
     }
 
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
@@ -430,6 +495,35 @@ public class ConfigurationRefactoringManager
         }
     }
 
+    private class SmartCloneAction implements ConfigurationTemplateManager.Action<String>
+    {
+        private final String parentPath;
+        private final String rootKey;
+        private final String parentKey;
+        private final Map<String, String> originalKeyToCloneKey;
+
+        public SmartCloneAction(String parentPath, String rootKey, String parentKey, Map<String, String> originalKeyToCloneKey)
+        {
+            this.parentPath = parentPath;
+            this.rootKey = rootKey;
+            this.parentKey = parentKey;
+            this.originalKeyToCloneKey = originalKeyToCloneKey;
+        }
+
+        public String execute() throws Exception
+        {
+            if(!originalKeyToCloneKey.containsKey(rootKey))
+            {
+                throw new IllegalArgumentException("Root key must be present in original to clone key map.");
+            }
+
+            extractParentTemplate(parentPath, Arrays.asList(rootKey), parentKey);
+            ConfigurationRefactoringManager.this.clone(parentPath, originalKeyToCloneKey);
+            return PathUtils.getPath(parentPath, originalKeyToCloneKey.get(rootKey));
+        }
+
+    }
+
     private class ExtractParentTemplateAction implements ConfigurationTemplateManager.Action<String>
     {
         private final String parentPath;
@@ -469,7 +563,7 @@ public class ConfigurationRefactoringManager
 
             // Check all keys are siblings, and get the records while we go.
             TemplateNode templateParentNode = null;
-            List<Record> records = new LinkedList<Record>();
+            List<Pair<String, Record>> records = new LinkedList<Pair<String, Record>>();
             for(String key: keys)
             {
                 String path = getPath(parentPath, key);
@@ -479,7 +573,7 @@ public class ConfigurationRefactoringManager
                     throw new IllegalArgumentException("Invalid child key '" + key + "': does not refer to an element of the templated collection");
                 }
 
-                records.add(((TemplateRecord) configurationTemplateManager.getRecord(path)).getMoi());
+                records.add(new Pair<String, Record>(path, ((TemplateRecord) configurationTemplateManager.getRecord(path)).getMoi()));
 
                 if(node.getParent() == null)
                 {
@@ -500,7 +594,8 @@ public class ConfigurationRefactoringManager
             assert templateParentNode != null;
 
             // Extract and save the new parent.
-            MutableRecord common = extractCommon(records);
+            MapType parentType = configurationTemplateManager.getType(parentPath, MapType.class);
+            MutableRecord common = extractCommon(records, parentPath, parentType.getTargetType());
             common.put(mapType.getKeyProperty(), parentTemplateName);
             configurationTemplateManager.markAsTemplate(common);
             configurationTemplateManager.setParentTemplate(common, configurationReferenceManager.getHandleForPath(templateParentNode.getPath()));
@@ -524,15 +619,16 @@ public class ConfigurationRefactoringManager
             return newParentTemplatePath;
         }
 
-        public MutableRecord extractCommon(List<Record> records)
+        public MutableRecord extractCommon(List<Pair<String, Record>> pathRecordPairs, String parentPath, ComplexType type)
         {
             Map<String, String> commonMeta = new HashMap<String, String>();
             Map<String, Object> commonSimple = new HashMap<String, Object>();
             Set<String> commonNestedKeySet = new HashSet<String>();
             boolean first = true;
             String symbolicName = null;
-            for(Record r: records)
+            for(Pair<String, Record> pair: pathRecordPairs)
             {
+                Record r = pair.second;
                 if(first)
                 {
                     first = false;
@@ -550,14 +646,6 @@ public class ConfigurationRefactoringManager
                 }
                 else
                 {
-                    // Be careful of the type of things: they need to be the same
-                    // type to be extracted.
-                    if(!StringUtils.equals(symbolicName, r.getSymbolicName()))
-                    {
-                       // Can't extract: mismatch of symbolic names.
-                        return null;
-                    }
-
                     CollectionUtils.retainAll(commonMeta, getMeta(r));
                     CollectionUtils.retainAll(commonSimple, getSimple(r));
                     commonNestedKeySet.retainAll(r.nestedKeySet());
@@ -577,22 +665,119 @@ public class ConfigurationRefactoringManager
                 result.put(entry.getKey(), entry.getValue());
             }
 
-            for(String key: commonNestedKeySet)
+            if (type.hasSignificantKeys())
             {
-                List<Record> allNested = new LinkedList<Record>();
-                for(Record r: records)
+                outer:
+                for (String key : commonNestedKeySet)
                 {
-                    allNested.add((Record) r.get(key));
-                }
+                    List<Pair<String, Record>> allNested = new LinkedList<Pair<String, Record>>();
+                    ComplexType nestedType = null;
+                    for (Pair<String, Record> pair : pathRecordPairs)
+                    {
+                        Record nested = (Record) pair.second.get(key);
+                        if (nestedType == null)
+                        {
+                            nestedType = (ComplexType) type.getActualPropertyType(key, nested);
+                        }
+                        else if (nestedType != type.getActualPropertyType(key, nested))
+                        {
+                            // Type mismatch, can't extract common for this key.
+                            break outer;
+                        }
 
-                MutableRecord common = extractCommon(allNested);
-                if(common != null)
-                {
-                    result.put(key, common);
+                        allNested.add(new Pair<String, Record>(PathUtils.getPath(pair.first, key), nested));
+                    }
+
+                    MutableRecord common = extractCommon(allNested, PathUtils.getPath(parentPath, key), nestedType);
+                    if (common != null)
+                    {
+                        result.put(key, common);
+                    }
                 }
+            }
+            else
+            {
+                extractCommonValues((CollectionType) type, pathRecordPairs, result);
             }
 
             return result;
+        }
+
+        private void extractCommonValues(CollectionType type, List<Pair<String, Record>> pathRecordPairs, MutableRecord result)
+        {
+            CompositeType childType = (CompositeType) type.getCollectionType();
+            int i = 0;
+            List<ValueInfo> commonValues = new LinkedList<ValueInfo>();
+            for(Pair<String, Record> pair: pathRecordPairs)
+            {
+                Record r = pair.second;
+                if(i == 0)
+                {
+                    // First time round, establish a base for the common
+                    // element set.
+                    for(String key: r.nestedKeySet())
+                    {
+                        ValueInfo info = new ValueInfo((Record) r.get(key), key);
+                        commonValues.add(info);
+                    }
+                }
+                else
+                {
+                    for(String key: r.nestedKeySet())
+                    {
+                        for(ValueInfo common: commonValues)
+                        {
+                            if(common.getCount() < i)
+                            {
+                                // Not yet matched, see if this value matches.
+                                Record value = (Record) r.get(key);
+                                if(childType.deepValueEquals(common.record, value))
+                                {
+                                    common.addKey(pair.first, key);
+                                }
+                            }
+                        }
+
+                        Iterator<ValueInfo> it = commonValues.iterator();
+                        while(it.hasNext())
+                        {
+                            if(it.next().getCount() < i)
+                            {
+                                // Not matched this time round, remove.
+                                it.remove();
+                            }
+                        }
+                    }
+                }
+
+                i++;
+            }
+
+            for(ValueInfo common: commonValues)
+            {
+                result.put(common.firstKey, common.record);
+
+                // All the other keys are essentially being renamed to the
+                // first one, meaning we need to update the parent and its
+                // template descendents.  We also need to skeletonise the
+                // list item manually as normal scrubbing cannot handle
+                // complex values.
+                ComplexType itemType = typeRegistry.getType(common.record.getSymbolicName());
+                Record skeleton = configurationTemplateManager.createSkeletonRecord(itemType, common.record);
+                for (Pair<String, String> pathKey: common.pathKeyPairs)
+                {
+                    if (!common.firstKey.equals(pathKey.second))
+                    {
+                        configurationTemplateManager.updateCollectionReferences(type, pathKey.first, pathKey.second, common.firstKey);
+                    }
+
+                    // Skeletonise the extracted list item.
+                    String oldPath = PathUtils.getPath(pathKey.first, pathKey.second);
+                    String newPath = PathUtils.getPath(pathKey.first, common.firstKey);
+                    recordManager.move(oldPath, newPath);
+                    skeleton.forEach(new DeepSkeletoniseFunction(newPath));
+                }
+            }
         }
 
         public Map<String, String> getMeta(Record r)
@@ -620,6 +805,29 @@ public class ConfigurationRefactoringManager
         }
     }
 
+    private static class ValueInfo
+    {
+        Record record;
+        String firstKey;
+        List<Pair<String, String>> pathKeyPairs = new LinkedList<Pair<String, String>>();
+
+        public ValueInfo(Record record, String firstKey)
+        {
+            this.firstKey = firstKey;
+            this.record = record;
+        }
+
+        public void addKey(String path, String key)
+        {
+            pathKeyPairs.add(new Pair<String, String>(path, key));
+        }
+
+        public int getCount()
+        {
+            return pathKeyPairs.size();
+        }
+    }
+
     private class DeepUpdateFunction implements GraphFunction<Record>
     {
         private String path;
@@ -639,6 +847,38 @@ public class ConfigurationRefactoringManager
             if(!record.shallowEquals(recordManager.select(path)))
             {
                 recordManager.update(path, record);
+                configurationTemplateManager.refreshCaches();
+            }
+        }
+
+        public void pop()
+        {
+            path = PathUtils.getParentPath(path);
+        }
+    }
+
+    private class DeepSkeletoniseFunction implements GraphFunction<Record>
+    {
+        private String path;
+
+        public DeepSkeletoniseFunction(String path)
+        {
+            this.path = path;
+        }
+
+        public void push(String edge)
+        {
+            path = PathUtils.getPath(path, edge);
+        }
+
+        public void process(Record record)
+        {
+            Record existing = recordManager.select(path);
+            if(!record.shallowEquals(existing))
+            {
+                MutableRecord r = record.copy(false);
+                r.setHandle(existing.getHandle());
+                recordManager.update(path, r);
                 configurationTemplateManager.refreshCaches();
             }
         }

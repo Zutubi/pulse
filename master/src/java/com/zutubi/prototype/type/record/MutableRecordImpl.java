@@ -16,7 +16,14 @@ public class MutableRecordImpl extends AbstractMutableRecord
 
     public void setSymbolicName(String name)
     {
-        getMeta().put(SYMBOLIC_NAME_KEY, name);
+        if (name == null)
+        {
+            getMeta().remove(SYMBOLIC_NAME_KEY);
+        }
+        else
+        {
+            getMeta().put(SYMBOLIC_NAME_KEY, name);
+        }
     }
 
     public String getSymbolicName()

@@ -137,7 +137,7 @@ public class PrimitiveType extends SimpleType implements Type
         {
             clazz = PRIMITIVE_CLASSES_MAP.get(clazz);
         }
-        
+
         if(CollectionUtils.contains(XML_RPC_SUPPORTED_TYPES, clazz))
         {
             typeCheck(data, clazz);

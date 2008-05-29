@@ -30,7 +30,12 @@ public class ConfigErrorHandlingInterceptor implements Interceptor
         {
             LOG.severe(e);
             ActionSupport action = (ActionSupport) invocation.getAction();
-            action.addActionError(e.getMessage());
+            String message = e.getMessage();
+            if(message == null)
+            {
+                message = e.getClass().getName();
+            }
+            action.addActionError(message);
             return Action.ERROR;
         }
     }

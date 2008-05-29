@@ -39,4 +39,6 @@ public interface ComplexType extends Type
      * @throws TypeException if an error occurs walking the graph
      */
     void forEachComplex(Object instance, GraphFunction<Object> f) throws TypeException;
+
+    boolean hasSignificantKeys();
 }

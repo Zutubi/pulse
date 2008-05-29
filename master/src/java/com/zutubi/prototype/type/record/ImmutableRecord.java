@@ -88,14 +88,19 @@ public class ImmutableRecord implements Record
         return delegate.isCollection();
     }
 
-    public boolean valuesEqual(Object v1, Object v2)
-    {
-        return delegate.valuesEqual(v1, v2);
-    }
-
     public boolean shallowEquals(Record other)
     {
         return delegate.shallowEquals(other);
+    }
+
+    public boolean metaEquals(Record other)
+    {
+        return delegate.metaEquals(other);
+    }
+
+    public boolean simpleEquals(Record other)
+    {
+        return delegate.simpleEquals(other);
     }
 
     public void forEach(GraphFunction<Record> f)

@@ -17,6 +17,7 @@ public class HierarchyPage extends ConfigurationPanePage
     public static final String LINK_CLONE = "clone";
     public static final String LINK_CONFIGURE = "configure";
     public static final String LINK_DELETE = "delete";
+    public static final String LINK_SMART_CLONE = "smartclone";
 
     protected String scope;
     protected String baseName;
@@ -108,6 +109,11 @@ public class HierarchyPage extends ConfigurationPanePage
     public void clickClone()
     {
         SeleniumUtils.waitAndClickId(selenium, LINK_CLONE);
+    }
+
+    public void clickSmartClone()
+    {
+        SeleniumUtils.waitAndClickId(selenium, LINK_SMART_CLONE);
     }
 
     public void setTemplate(boolean template)

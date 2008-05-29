@@ -14,7 +14,6 @@ import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.util.TextUtils;
-import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.i18n.MessagesTextProvider;
 import com.zutubi.validation.i18n.TextProvider;
@@ -35,15 +34,15 @@ public class CloneAction extends PrototypeSupport
     public static final String CHECK_FIELD_PREFIX = "cloneCheck_";
     public static final String KEY_FIELD_PREFIX   = "cloneKey_";
 
-    private static final Logger LOG = Logger.getLogger(CloneAction.class);
-
     private ConfigurationPanel newPanel;
     private Record record;
     private String parentPath;
     private MapType mapType;
     private boolean templatedCollection;
+    private boolean smart;
     private String formSource;
     private String cloneKey;
+    private String parentKey;
     private MasterConfigurationManager configurationManager;
     private ConfigurationRefactoringManager configurationRefactoringManager;
 
@@ -57,9 +56,24 @@ public class CloneAction extends PrototypeSupport
         return formSource;
     }
 
+    public boolean isSmart()
+    {
+        return smart;
+    }
+
+    public void setSmart(boolean smart)
+    {
+        this.smart = smart;
+    }
+
     public void setCloneKey(String cloneKey)
     {
         this.cloneKey = cloneKey;
+    }
+
+    public void setParentKey(String parentKey)
+    {
+        this.parentKey = parentKey;
     }
 
     public void doCancel()
@@ -88,7 +102,12 @@ public class CloneAction extends PrototypeSupport
 
         if(templatedCollection)
         {
-             getDescendents(keyMap, seenKeys, textProvider);
+            if(smart)
+            {
+                validateCloneKey("parentKey", parentKey, seenKeys, textProvider);
+            }
+
+            getDescendents(keyMap, seenKeys, textProvider);
         }
 
         if(hasErrors())
@@ -97,12 +116,24 @@ public class CloneAction extends PrototypeSupport
             return INPUT;
         }
 
-        configurationRefactoringManager.clone(parentPath, keyMap);
+        if (smart)
+        {
+            configurationRefactoringManager.smartClone(parentPath, PathUtils.getBaseName(path), parentKey, keyMap);
+        }
+        else
+        {
+            configurationRefactoringManager.clone(parentPath, keyMap);
+        }
 
         String templatePath = configurationTemplateManager.getTemplatePath(newPath);
         response = new ConfigurationResponse(newPath, templatePath);
         response.registerNewPathAdded(configurationTemplateManager, configurationSecurityManager);
-
+        if (smart)
+        {
+            String newParent = PathUtils.getPath(parentPath, parentKey);
+            response.addAddedFile(new ConfigurationResponse.Addition(newParent, parentKey, configurationTemplateManager.getTemplatePath(newParent), PrototypeUtils.getIconCls(newParent, configurationTemplateManager), false, false));
+            response.addRemovedPath(path);
+        }
         return SUCCESS;
     }
 
@@ -110,13 +141,13 @@ public class CloneAction extends PrototypeSupport
     {
         if(!TextUtils.stringSet(value))
         {
-            addFieldError(name, "clone name is required");
+            addFieldError(name, "name is required");
         }
         else
         {
             if(seenKeys.contains(value))
             {
-                addFieldError(name, "duplicate clone name, all clones must have unique names");
+                addFieldError(name, "duplicate name, all names must be unique");
             }
             else
             {
@@ -194,14 +225,22 @@ public class CloneAction extends PrototypeSupport
 
     private void renderForm() throws IOException, TemplateException
     {
-        Form form = new Form("form", "clone", PrototypeUtils.getConfigURL(path, "clone", null, "aconfig"));
+        Map parameters = ActionContext.getContext().getParameters();
+
+        Form form = new Form("form", "clone", PrototypeUtils.getConfigURL(path, smart ? "smartclone" : "clone", null, "aconfig"));
         Field field = new Field(FieldType.TEXT, "cloneKey");
         field.setLabel("clone name");
-        field.setValue(getValue("cloneKey", getKey(record), ActionContext.getContext().getParameters()));
+        field.setValue(getValue("cloneKey", getKey(record), parameters));
         form.add(field);
 
+        
         if(templatedCollection)
         {
+            if(smart)
+            {
+                addParentField(form, parameters);
+            }
+
             addDescendentFields(form);
         }
 
@@ -213,6 +252,23 @@ public class CloneAction extends PrototypeSupport
         formSource = writer.toString();
 
         newPanel = new ConfigurationPanel("aconfig/clone.vm");
+    }
+
+    private void addParentField(Form form, Map parameters)
+    {
+        Field field;
+        field = new Field(FieldType.TEXT, "parentKey");
+        field.setLabel("extracted parent name");
+        if (isInputSelected())
+        {
+            field.setValue(getKey(record) + " template");
+        }
+        else
+        {
+            field.setValue(getParameterValue(parameters, "parentKey"));
+        }
+
+        form.add(field);
     }
 
     private void addDescendentFields(final Form form)

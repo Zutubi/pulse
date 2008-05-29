@@ -24,6 +24,52 @@ public class ListType extends CollectionType
         this.handleAllocator = handleAllocator;
     }
 
+    public boolean deepValueEquals(Object data1, Object data2)
+    {
+        if(data1 instanceof Record)
+        {
+            if(!(data2 instanceof Record))
+            {
+                return false;
+            }
+
+            Record r1 = (Record) data1;
+            Record r2 = (Record) data2;
+
+            List<String> order1 = getOrder(r1);
+            List<String> order2 = getOrder(r2);
+
+            // Keys are not significant in lists, so we don't compare the key
+            // values.
+            if(order1.size() != order2.size())
+            {
+                return false;
+            }
+
+            Type collectionType = getCollectionType();
+            for (int i = 0; i < order1.size(); i++)
+            {
+                if(!collectionType.deepValueEquals(r1.get(order1.get(i)), r2.get(order2.get(i))))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+        else if(data1 instanceof String[])
+        {
+            if(!(data2 instanceof String[]))
+            {
+                return false;
+            }
+
+            return Arrays.equals((String[]) data1, (String[]) data2);
+        }
+
+        throw new IllegalArgumentException("Expecting record or string array, got '" + data1.getClass().getName() + "'");
+    }
+
     @SuppressWarnings({"unchecked"})
     public List<Object> instantiate(Object data, Instantiator instantiator) throws TypeException
     {
@@ -282,6 +328,11 @@ public class ListType extends CollectionType
                 i++;
             }
         }
+    }
+
+    public boolean hasSignificantKeys()
+    {
+        return false;
     }
 
     public Comparator<String> getKeyComparator(Record record)

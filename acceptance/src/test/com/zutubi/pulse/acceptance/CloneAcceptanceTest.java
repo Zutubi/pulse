@@ -22,9 +22,10 @@ import java.util.Hashtable;
  */
 public class CloneAcceptanceTest extends SeleniumTestBase
 {
-    private static final String TEST_PROPERTY_NAME  = "aprop";
-    private static final String TEST_PROPERTY_VALUE = "value";
-    private static final String CLONE_PROPERTY_NAME = "aclone";
+    private static final String TEST_PROPERTY_NAME   = "aprop";
+    private static final String TEST_PROPERTY_VALUE  = "value";
+    private static final String CLONE_PROPERTY_NAME  = "aclone";
+    private static final String PARENT_PROPERTY_NAME = "atemplate";
 
     protected void setUp() throws Exception
     {
@@ -129,7 +130,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
 
         cloneForm.cloneFormElements("");
         cloneForm.waitFor();
-        assertTextPresent("clone name is required");
+        assertTextPresent("name is required");
 
         cloneForm.cloneFormElements(TEST_PROPERTY_NAME);
         cloneForm.waitFor();
@@ -169,7 +170,7 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         hierarchyPage.goTo();
         hierarchyPage.clickClone();
 
-        CloneForm cloneForm = new CloneForm(selenium);
+        CloneForm cloneForm = new CloneForm(selenium, false);
         cloneForm.waitFor();
         cloneForm.cloneFormElements(random + CLONE_PROPERTY_NAME);
         
@@ -186,12 +187,12 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         hierarchyPage.goTo();
         hierarchyPage.clickClone();
 
-        CloneForm cloneForm = new CloneForm(selenium);
+        CloneForm cloneForm = new CloneForm(selenium, false);
         cloneForm.waitFor();
 
         cloneForm.cloneFormElements("");
         cloneForm.waitFor();
-        assertTextPresent("clone name is required");
+        assertTextPresent("name is required");
 
         cloneForm.cloneFormElements(random);
         cloneForm.waitFor();
@@ -202,9 +203,10 @@ public class CloneAcceptanceTest extends SeleniumTestBase
     {
         String parentName = random + "-parent";
         String childName = random + "-child";
-        setupHierarchy(parentName, childName);
+        ProjectHierarchyPage hierarchyPage = setupHierarchy(parentName, childName);
+        hierarchyPage.clickClone();
 
-        CloneForm cloneForm = new CloneForm(selenium, childName);
+        CloneForm cloneForm = new CloneForm(selenium, false, childName);
         cloneForm.waitFor();
         cloneForm.cloneFormElements(parentName + CLONE_PROPERTY_NAME, "false", null);
 
@@ -219,8 +221,9 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         String parentName = random + "-parent";
         String childName = random + "-child";
         ProjectHierarchyPage hierarchyPage = setupHierarchy(parentName, childName);
+        hierarchyPage.clickClone();
 
-        CloneForm cloneForm = new CloneForm(selenium, childName);
+        CloneForm cloneForm = new CloneForm(selenium, false, childName);
         cloneForm.waitFor();
         String parentCloneName = parentName + CLONE_PROPERTY_NAME;
         String childCloneName = childName + CLONE_PROPERTY_NAME;
@@ -241,14 +244,15 @@ public class CloneAcceptanceTest extends SeleniumTestBase
     {
         String parentName = random + "-parent";
         String childName = random + "-child";
-        setupHierarchy(parentName, childName);
+        ProjectHierarchyPage hierarchyPage = setupHierarchy(parentName, childName);
+        hierarchyPage.clickClone();
 
-        CloneForm cloneForm = new CloneForm(selenium, childName);
+        CloneForm cloneForm = new CloneForm(selenium, false, childName);
         cloneForm.waitFor();
         String parentCloneName = parentName + CLONE_PROPERTY_NAME;
         cloneForm.cloneFormElements(parentCloneName, "true", "");
         cloneForm.waitFor();
-        assertTextPresent("clone name is required");
+        assertTextPresent("name is required");
 
         cloneForm.cloneFormElements(parentCloneName, "true", parentName);
         cloneForm.waitFor();
@@ -256,7 +260,82 @@ public class CloneAcceptanceTest extends SeleniumTestBase
 
         cloneForm.cloneFormElements(random, "true", random);
         cloneForm.waitFor();
-        assertTextPresent("duplicate clone name, all clones must have unique names");
+        assertTextPresent("duplicate name, all names must be unique");
+    }
+
+    public void testSmartCloneProject() throws Exception
+    {
+        xmlRpcHelper.insertTrivialProject(random, false);
+
+        loginAsAdmin();
+        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, random, false);
+        hierarchyPage.goTo();
+        hierarchyPage.clickSmartClone();
+
+        CloneForm cloneForm = new CloneForm(selenium, true);
+        cloneForm.waitFor();
+        cloneForm.cloneFormElements(random + CLONE_PROPERTY_NAME, random + PARENT_PROPERTY_NAME);
+
+        ProjectHierarchyPage cloneHierarchyPage = new ProjectHierarchyPage(selenium, urls, random + CLONE_PROPERTY_NAME, false);
+        cloneHierarchyPage.waitFor();
+
+        assertTrue(cloneHierarchyPage.isTreeItemPresent(random + PARENT_PROPERTY_NAME));
+        assertTrue(cloneHierarchyPage.isTreeItemPresent(random + CLONE_PROPERTY_NAME));
+    }
+
+    public void testSmartCloneProjectValidation() throws Exception
+    {
+        xmlRpcHelper.insertTrivialProject(random, false);
+
+        loginAsAdmin();
+        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, random, false);
+        hierarchyPage.goTo();
+        hierarchyPage.clickSmartClone();
+
+        CloneForm cloneForm = new CloneForm(selenium, true);
+        cloneForm.waitFor();
+
+        cloneForm.cloneFormElements("", random + PARENT_PROPERTY_NAME);
+        cloneForm.waitFor();
+        assertTextPresent("name is required");
+
+        cloneForm.cloneFormElements(random + CLONE_PROPERTY_NAME, "");
+        cloneForm.waitFor();
+        assertTextPresent("name is required");
+
+        cloneForm.cloneFormElements(random, random + PARENT_PROPERTY_NAME);
+        cloneForm.waitFor();
+        assertTextPresent("name is already in use");
+
+        cloneForm.cloneFormElements(random + CLONE_PROPERTY_NAME, random);
+        cloneForm.waitFor();
+        assertTextPresent("name is already in use");
+    }
+
+    public void testSmartCloneProjectHierarchyWithChild() throws Exception
+    {
+        String parentName = random + "-parent";
+        String childName = random + "-child";
+        ProjectHierarchyPage hierarchyPage = setupHierarchy(parentName, childName);
+        hierarchyPage.clickSmartClone();
+
+        CloneForm cloneForm = new CloneForm(selenium, true, childName);
+        cloneForm.waitFor();
+        String parentTemplateName = parentName + PARENT_PROPERTY_NAME;
+        String parentCloneName = parentName + CLONE_PROPERTY_NAME;
+        String childCloneName = childName + CLONE_PROPERTY_NAME;
+        cloneForm.cloneFormElements(parentCloneName, parentTemplateName, "true", childCloneName);
+
+        ProjectHierarchyPage cloneHierarchyPage = new ProjectHierarchyPage(selenium, urls, parentCloneName, true);
+        cloneHierarchyPage.waitFor();
+
+        assertEquals(asList(childCloneName), xmlRpcHelper.getTemplateChildren(PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, parentCloneName)));
+
+        assertTrue(hierarchyPage.isTreeItemPresent(parentTemplateName));
+        assertTrue(hierarchyPage.isTreeItemPresent(parentCloneName));
+        assertFalse(hierarchyPage.isTreeItemPresent(childCloneName));
+        hierarchyPage.expandTreeItem(parentCloneName);
+        SeleniumUtils.waitForLocator(selenium, hierarchyPage.getTreeItemLocator(childCloneName));
     }
 
     private ProjectHierarchyPage setupHierarchy(String parentName, String childName) throws Exception
@@ -268,7 +347,6 @@ public class CloneAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, parentName, true);
         hierarchyPage.goTo();
-        hierarchyPage.clickClone();
         return hierarchyPage;
     }
 }

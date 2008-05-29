@@ -103,7 +103,7 @@ public class ListPage extends ConfigPage
     public CloneForm clickClone(String baseName)
     {
         clickAction(baseName, ACTION_CLONE);
-        return new CloneForm(selenium);
+        return new CloneForm(selenium, false);
     }
 
     public DeleteConfirmPage clickDelete(String baseName)

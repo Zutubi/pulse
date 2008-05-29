@@ -62,6 +62,41 @@ public class MapType extends CollectionType
         return (CompositeType) super.getTargetType();
     }
 
+    public boolean deepValueEquals(Object data1, Object data2)
+    {
+        if(!(data1 instanceof Record))
+        {
+            throw new IllegalArgumentException("Expecting record, got '" + data1.getClass().getName() + "'");
+        }
+
+        if(!(data2 instanceof Record))
+        {
+            throw new IllegalArgumentException("Expecting record, got '" + data2.getClass().getName() + "'");
+        }
+
+        Record r1 = (Record) data1;
+        Record r2 = (Record) data2;
+
+        // Compare nested values using their type
+        List<String> nested1 = getOrder(r1);
+        List<String> nested2 = getOrder(r2);
+        if(!nested1.equals(nested2))
+        {
+            return false;
+        }
+
+        Type collectionType = getCollectionType();
+        for (String key: nested1)
+        {
+            if(!collectionType.deepValueEquals(r1.get(key), r2.get(key)))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     @SuppressWarnings({"unchecked"})
     public Map instantiate(Object data, Instantiator instantiator) throws TypeException
     {
@@ -266,6 +301,11 @@ public class MapType extends CollectionType
             collectionType.forEachComplex(entry.getValue(), f);
             f.pop();
         }
+    }
+
+    public boolean hasSignificantKeys()
+    {
+        return true;
     }
 
     private static interface FromRecord

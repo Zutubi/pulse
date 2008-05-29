@@ -1,14 +1,7 @@
 package com.zutubi.pulse.bootstrap;
 
 import com.opensymphony.xwork.spring.SpringObjectFactory;
-import com.zutubi.prototype.config.ConfigurationExtensionManager;
-import com.zutubi.prototype.config.ConfigurationPersistenceManager;
-import com.zutubi.prototype.config.ConfigurationProvider;
-import com.zutubi.prototype.config.ConfigurationReferenceManager;
-import com.zutubi.prototype.config.ConfigurationRegistry;
-import com.zutubi.prototype.config.ConfigurationStateManager;
-import com.zutubi.prototype.config.ConfigurationTemplateManager;
-import com.zutubi.prototype.config.DefaultConfigurationProvider;
+import com.zutubi.prototype.config.*;
 import com.zutubi.prototype.type.record.DelegatingHandleAllocator;
 import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.pulse.Version;
@@ -409,6 +402,7 @@ public class DefaultSetupManager implements SetupManager
         ConfigurationPersistenceManager configurationPersistenceManager = ComponentContext.getBean("configurationPersistenceManager");
         ConfigurationReferenceManager configurationReferenceManager = ComponentContext.getBean("configurationReferenceManager");
         ConfigurationTemplateManager configurationTemplateManager = ComponentContext.getBean("configurationTemplateManager");
+        ConfigurationRefactoringManager configurationRefactoringManager = ComponentContext.getBean("configurationRefactoringManager");
         ConfigurationRegistry configurationRegistry = ComponentContext.getBean("configurationRegistry");
         ConfigurationExtensionManager configurationExtensionManager = ComponentContext.getBean("configurationExtensionManager");
         ConfigurationStateManager configurationStateManager = ComponentContext.getBean("configurationStateManager");
@@ -419,6 +413,7 @@ public class DefaultSetupManager implements SetupManager
         configurationPersistenceManager.setRecordManager(recordManager);
         configurationReferenceManager.setRecordManager(recordManager);
         configurationTemplateManager.setRecordManager(recordManager);
+        configurationRefactoringManager.setRecordManager(recordManager);
         configurationRegistry.init();
 
         configurationExtensionManager.setPluginManager(pluginManager);

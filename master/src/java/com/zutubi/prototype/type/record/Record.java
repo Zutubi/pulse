@@ -105,17 +105,6 @@ public interface Record
     boolean isCollection();
 
     /**
-     * Returns true if the two given simple values are equal.  This handles
-     * both nulls and the different types of object which may be present as
-     * simple values.
-     *
-     * @param v1 the first value
-     * @param v2 the second value
-     * @return true if the two values are equal
-     */
-    boolean valuesEqual(Object v1, Object v2);
-
-    /**
      * Returns true if the meta and simple keys and values in the given
      * record are the same as in this record.
      *
@@ -124,6 +113,9 @@ public interface Record
      *         record
      */
     boolean shallowEquals(Record other);
+
+    boolean metaEquals(Record other);
+    boolean simpleEquals(Record other);
 
     /**
      * Executes the given function over this and all nested records
