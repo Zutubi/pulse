@@ -207,7 +207,7 @@
 #if($loggedInUser)
                   #html($loggedInUser.config.name) [ <a id="prefs" href="$base/dashboard/preferences/">preferences</a>#if($canLogout) | <a id="logout" href="$base/logout.action">logout</a>#end ]
 #else
-                  <a id="login" href="$base/login.action">login</a>
+                  <a id="login" href="$base/login!input.action">login</a>
 #end
                   &nbsp;
 #if($helpPage)

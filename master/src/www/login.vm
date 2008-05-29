@@ -6,20 +6,17 @@
 <body>
     <img id="login-logo" style="margin-top: 30px; margin-bottom: 20px;" alt="pulse logo" src="$base/images/pulse-pagan-smallmedium.jpg"/>
 
-    #foreach($error in $action.actionErrors)
-        <h2 style="color:red">$error</h2>
-    #end
+    <div class="config-panel" style="width: 400px">
+        <h3 class="config-header">login</h3>
+        <div class="config-container">
+            #pform("path=$path" "action=j_acegi_security_check")
+        </div>
+    </div>
 
-    #wwcform("action=/j_acegi_security_check" "name=j_acegi_security_check" "heading=%{getText('login')}" "cssStyle=margin-bottom: 30px;" "method=post")
-        #wwtextfield("name=j_username" "label=%{getText('login.username')}" "size=30" "cssStyle=width: 15em" "tabindex=1")
-        #wwpassword("name=j_password" "label=%{getText('login.password')}" "size=30" "cssStyle=width: 15em" "tabindex=2")
-        #wwccheckbox("name=_acegi_security_remember_me" "label=%{getText('login.rememberme')}" "tabindex=3")
-
-        #openSubmit()
-            #wwsubmit("name=login" "value=%{getText('login.name')}" "tabindex=4")
-        #closeSubmit()
-    #end
-
+    <script type="text/javascript">
+        mainForm.on('render', function(form) { form.findField('zfid.j_username').focus(true); });
+    </script>
+    
     #if ($config.anonymousSignupEnabled)
     <p>
         Not a member? <a id="signup" href="signup!input.action">Signup</a> for an account.

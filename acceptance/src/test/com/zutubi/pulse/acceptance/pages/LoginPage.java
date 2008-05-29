@@ -22,9 +22,9 @@ public class LoginPage extends SeleniumPage
 
     public void login(String username, String password)
     {
-        selenium.type("j_username", username);
-        selenium.type("j_password", password);
-        selenium.click("login");
+        selenium.type("zfid.j_username", username);
+        selenium.type("zfid.j_password", password);
+        selenium.click("zfid.login");
         selenium.waitForPageToLoad("30000");
     }
 

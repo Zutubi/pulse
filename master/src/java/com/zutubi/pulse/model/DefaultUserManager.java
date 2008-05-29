@@ -4,6 +4,9 @@ import com.zutubi.prototype.config.*;
 import com.zutubi.prototype.config.events.ConfigurationEvent;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.pulse.license.LicenseManager;
 import com.zutubi.pulse.license.authorisation.AddUserAuthorisation;
 import com.zutubi.pulse.model.persistence.UserDao;
@@ -13,8 +16,7 @@ import com.zutubi.pulse.prototype.config.group.GroupConfiguration;
 import com.zutubi.pulse.prototype.config.user.DashboardConfiguration;
 import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 import com.zutubi.pulse.security.ldap.LdapManager;
-import com.zutubi.pulse.events.*;
-import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
+import com.zutubi.util.TextUtils;
 import org.acegisecurity.providers.encoding.PasswordEncoder;
 import org.acegisecurity.userdetails.UserDetails;
 import org.acegisecurity.userdetails.UsernameNotFoundException;
@@ -252,6 +254,11 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
      */
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, DataAccessException
     {
+        if (!TextUtils.stringSet(username))
+        {
+            throw new UsernameNotFoundException("User not set");
+        }
+        
         User user = getUser(username);
         if (user == null)
         {

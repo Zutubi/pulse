@@ -27,7 +27,7 @@ public class Urls
 
     public String login()
     {
-        return baseUrl + "/login.action";
+        return baseUrl + "/login!input.action";
     }
     
     public String dashboard()

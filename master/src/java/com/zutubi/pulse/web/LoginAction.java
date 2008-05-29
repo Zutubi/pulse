@@ -1,6 +1,8 @@
 package com.zutubi.pulse.web;
 
 import com.opensymphony.xwork.ActionContext;
+import com.zutubi.prototype.webwork.TransientAction;
+import com.zutubi.pulse.prototype.config.misc.LoginConfiguration;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.AuthenticationException;
 import org.acegisecurity.ui.AbstractProcessingFilter;
@@ -16,70 +18,44 @@ import java.util.Map;
  * 2) j_username and j_password are the credentials expected by acegi.
  * 3) If an authentication error occurs, the error string is set to true.
  */
-public class LoginAction extends ActionSupport
+public class LoginAction extends TransientAction<LoginConfiguration>
 {
     private static final Logger LOG = Logger.getLogger(LoginAction.class);
 
     private boolean authenticationError = false;
-    private String username;
-    private String password;
-    private String rememberMe;
+
+    protected LoginAction()
+    {
+        super("transient/login", false);
+    }
 
     public void setError(boolean error)
     {
         this.authenticationError = error;
     }
 
-    public String getJ_password()
+    protected LoginConfiguration initialise() throws Exception
     {
-        return password;
-    }
-
-    public void setJ_password(String password)
-    {
-        this.password = password;
-    }
-
-    public String getJ_username()
-    {
-        return username;
-    }
-
-    public void setJ_username(String username)
-    {
-        this.username = username;
-    }
-
-    public String get_acegi_security_remember_me()
-    {
-        return rememberMe;
-    }
-
-    public void set_acegi_security_remember_me(String rememberMe)
-    {
-        this.rememberMe = rememberMe;
-    }
-
-    public void validate()
-    {
+        LoginConfiguration result = new LoginConfiguration();
         Map session = ActionContext.getContext().getSession();
         if (authenticationError)
         {
             AuthenticationException ae = (AuthenticationException) session.get(AbstractProcessingFilter.ACEGI_SECURITY_LAST_EXCEPTION_KEY);
-            username = (String)ae.getAuthentication().getPrincipal();
-
-            LOG.info("Authentication failure: '" + username + "' " + ae.getMessage());
+            if (ae != null)
+            {
+                String username = (String)ae.getAuthentication().getPrincipal();
+                LOG.info("Authentication failure: '" + username + "': " + ae.getMessage());
+                result.setJ_username(username);
+            }
 
             addActionError(getText("login.badcredentials"));
         }
+
+        return result;
     }
 
-    public String execute()
+    protected String complete(LoginConfiguration instance) throws Exception
     {
-        if (authenticationError)
-        {
-            return INPUT;
-        }
         return SUCCESS;
     }
 }

@@ -81,7 +81,7 @@ The beans defined within the security subsystem need not be accessed by other co
             <ref local="authenticationManager"/>
         </property>
         <property name="authenticationFailureUrl">
-            <value>/login.action?error=true</value>
+            <value>/login!input.action?error=true</value>
         </property>
         <!-- this default is only used when the target url is not available via the session.-->
         <property name="defaultTargetUrl">
@@ -129,7 +129,7 @@ The beans defined within the security subsystem need not be accessed by other co
     <bean id="authenticationProcessingFilterEntryPoint"
           class="org.acegisecurity.ui.webapp.AuthenticationProcessingFilterEntryPoint">
         <property name="loginFormUrl">
-            <value>/login.action</value>
+            <value>/login!input.action</value>
         </property>
         <property name="forceHttps">
             <value>false</value>
@@ -284,7 +284,7 @@ The beans defined within the security subsystem need not be accessed by other co
                 /switchuser.vm=ROLE_ADMINISTRATOR
                 /j_acegi_switch_user=ROLE_ADMINISTRATOR
 -->
-                /login.action*=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER
+                /login*.action*=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER
                 /signup*.action*=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER
                 /logout.action=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER
                 /js/**=ROLE_ANONYMOUS,ROLE_GUEST,ROLE_USER

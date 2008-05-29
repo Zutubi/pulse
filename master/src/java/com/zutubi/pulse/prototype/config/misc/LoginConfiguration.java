@@ -3,35 +3,50 @@ package com.zutubi.pulse.prototype.config.misc;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.Password;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.Text;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 
 /**
+ * Transient configuration used for the login form.  The odd field names are
+ * to match Acegi expectations.
  */
-@Form(fieldOrder = { "login", "password" })
+@Form(fieldOrder = { "j_username", "j_password", "_acegi_security_remember_me" }, actions = { "login" })
 @SymbolicName("zutubi.transient.login")
 public class LoginConfiguration extends AbstractConfiguration
 {
-    private String login;
-    @Password
-    private String password;
+    @Text(size = 200)
+    private String j_username;
+    @Password(size = 200)
+    private String j_password;
+    private boolean _acegi_security_remember_me;
 
-    public String getLogin()
+    public String getJ_username()
     {
-        return login;
+        return j_username;
     }
 
-    public void setLogin(String login)
+    public void setJ_username(String j_username)
     {
-        this.login = login;
+        this.j_username = j_username;
     }
 
-    public String getPassword()
+    public String getJ_password()
     {
-        return password;
+        return j_password;
     }
 
-    public void setPassword(String password)
+    public void setJ_password(String j_password)
     {
-        this.password = password;
+        this.j_password = j_password;
+    }
+
+    public boolean is_acegi_security_remember_me()
+    {
+        return _acegi_security_remember_me;
+    }
+
+    public void set_acegi_security_remember_me(boolean _acegi_security_remember_me)
+    {
+        this._acegi_security_remember_me = _acegi_security_remember_me;
     }
 }
