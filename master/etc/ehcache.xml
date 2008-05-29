@@ -72,7 +72,7 @@
     <!-- Hibernate entities and associations -->
 
     <cache name="com.zutubi.pulse.model.User"
-           maxElementsInMemory="100"
+           maxElementsInMemory="500"
            eternal="true"
            overflowToDisk="false"/>
 
