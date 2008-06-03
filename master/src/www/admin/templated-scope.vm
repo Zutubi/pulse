@@ -6,9 +6,12 @@
 	<script type="text/javascript">
 	    var actionInProgress = false;
 
+        var tabPanel;
+        var configPanel;
         var configTree;
         var templateTree;
         var visibleTree;
+        var treesInitialised = false;
 
         // ------------------------------------------------------------------
 	    // Shared tree functions
@@ -57,16 +60,24 @@
 
         var createConfigTree = function(project, cls, iconCls)
         {
-            Ext.get('config-tree').update('');
+            if(configTree)
+            {
+                configPanel.remove(configTree, true);
+            }
 
+            tabPanel.el.createChild({tag: 'div', id: 'config-tree'});
             var loader = new ZUTUBI.ConfigTreeLoader('$base/aconfig');
 
-            configTree = new ZUTUBI.ConfigTree('config-tree', {
+            configTree = new ZUTUBI.ConfigTree({
+                el: 'config-tree',
                 pathPrefix: '${scope}',
                 animate: false,
                 loader: loader,
                 rootVisible: true,
-                title: 'configuration'
+                autoScroll: true,
+                border: false,
+                autoCreate: true,
+                bodyStyle: 'padding: 10px'
             });
 
             var root = new Ext.tree.AsyncTreeNode({
@@ -80,8 +91,10 @@
 
             configTree.setRootNode(root);
             configTree.getSelectionModel().on('selectionchange', onConfigSelect);
+            configPanel.add(configTree);
             configTree.render();
             root.expand();
+            configPanel.doLayout();
         }
 
         var clonePath = function(path)
@@ -95,7 +108,7 @@
 
         var onTemplateSelect = function(sm, node)
         {
-            if(node)
+            if(treesInitialised && node)
             {
                 Ext.get('detail-pane').load({
                     url: '$base/atemplate/$scope/' + node.id,
@@ -112,7 +125,7 @@
 
         var configureRecord = function(id)
         {
-            nestedLayout.getRegion('west').showPanel('config-tree');
+            tabPanel.activate('config-panel');
         }
 
         var selectTemplate = function(path)
@@ -127,7 +140,6 @@
 
         var Layout = function()
         {
-            var centerRegion;
 #if($path)
             var path = '$path';
 #else
@@ -137,26 +149,21 @@
             return {
                 init : function()
                 {
-                    centerRegion = nestedLayout.getRegion('center');
-                    var centerPanel = centerRegion.getPanel(0);
-                    centerPanel.setTitle('');
-                    centerPanel.getEl().setStyle('margin', '4px');
-
-                    nestedLayout.addRegion('west', {
-                        split:true,
-                        initialSize: 300,
-                        titlebar: false,
-                        collapsible: true,
-                        animate: true
-                    });
+                    var centerEl = Ext.get('center');
+                    centerEl.setStyle('margin', '4px');
 
                     var templateLoader = new ZUTUBI.ConfigTreeLoader('$base/atemplate/$scope');
 
-                    templateTree = new ZUTUBI.TemplateTree('$scope', 'template-tree', {
+                    templateTree = new ZUTUBI.TemplateTree('$scope', {
+                        el: 'template-tree',
+                        id: 'template-tree',
                         animate: false,
                         loader: templateLoader,
                         rootVisible: false,
-                        title: '${scope}s'
+                        autoScroll: true,
+                        border: false,
+                        title: 'hierarchy',
+                        bodyStyle: 'padding: 10px'
                     });
 
                     var templateRoot = new Ext.tree.AsyncTreeNode({
@@ -169,31 +176,53 @@
                     templateTree.setRootNode(templateRoot);
                     templateTree.getSelectionModel().on('selectionchange', onTemplateSelect);
 
-                    nestedLayout.beginUpdate();
-                    nestedLayout.add('west', new Ext.ContentPanel('template-tree', {title: 'hierarchy', autoScroll: true, fitToFrame: true}));
-                    nestedLayout.add('west', new Ext.ContentPanel('config-tree', {title: 'configuration', autoScroll: true, fitToFrame: true}));
-                    nestedLayout.endUpdate();
+                    configPanel = new Ext.Panel({
+                        layout: 'fit',
+                        border: false,
+                        id: 'config-panel',
+                        title: 'configuration'
+                    });
 
-                    nestedLayout.getRegion('west').on('panelactivated', function(region, panel) {
-                        if(panel.title == 'configuration')
-                        {
-                            var node = templateTree.getSelectionModel().getSelectedNode();
-                            if (!node)
-                            {
-                                node = templateTree.getRootNode();
-                            }
+                    var nestedWest = Ext.getCmp('nested-west');
+                    tabPanel = new Ext.TabPanel({
+                        border: false,
+                        tabPosition: 'bottom',
+                        defaults: {
+                            layout: 'fit',
+                            border: false
+                        },
+                        items: [templateTree, configPanel]
+                    });
 
-                            if(!configTree || configTree.getRootNode().id != node.id)
-                            {
-                                createConfigTree(node.id, node.attributes.cls, node.attributes.iconCls);
-                            }
 
-                            configTree.getSelectionModel().clearSelections();
-                            configTree.selectPath(node.id);
-                            visibleTree = configTree;
-                        }
-                        else
-                        {
+                    tabPanel.on('render', function() {
+                        tabPanel.el.createChild({tag: 'div', id: 'template-tree'});
+
+                        templateTree.render();
+                        nestedWest.doLayout();
+
+#if($configTreePath)
+                        templateTree.expandToPath('$templateTreePath', function(success, lastNode) {
+                            tabPanel.activate('template-tree');
+                            nestedWest.doLayout();
+                            lastNode.select();
+                            tabPanel.activate('config-panel');
+                            treesInitialised = true;
+                            configTree.selectConfigPath('$configTreePath');
+                        });
+#else
+                        templateRoot.expand(false, false, function() {
+                            templateRoot.firstChild.expand();
+                            treesInitialised = true;
+                            tabPanel.activate('template-tree');
+                            nestedWest.doLayout();
+                        });
+#end
+
+                        // Attach the activate handlers after the initial
+                        // render to avoid uneccessary panel loads during
+                        // initialisation.
+                        templateTree.on('activate', function() {
                             var node;
 
                             if(configTree)
@@ -210,22 +239,30 @@
                             templateTree.getSelectionModel().clearSelections();
                             node.select();
                             visibleTree = templateTree;
-                        }
+                        });
+
+                        configPanel.on('activate', function() {
+                            var node = templateTree.getSelectionModel().getSelectedNode();
+                            if (!node)
+                            {
+                                node = templateTree.getRootNode();
+                            }
+
+                            if(!configTree || configTree.getRootNode().id != node.id)
+                            {
+                                createConfigTree(node.id, node.attributes.cls, node.attributes.iconCls);
+                            }
+
+                            configTree.getSelectionModel().clearSelections();
+                            configTree.selectPath(node.id);
+                            visibleTree = configTree;
+                        });
                     });
 
-                    templateTree.render();
-
-#if($configTreePath)
-                    templateTree.expandToPath('$templateTreePath');
-                    createConfigTree('$owner', null, 'config-${configClassification}-icon');
-                    configTree.selectConfigPath('$configTreePath');
-                    visibleTree = configTree;
-#else
-                    templateRoot.expand(false, false, function() {
-                        templateRoot.firstChild.expand();
-                        nestedLayout.getRegion('west').showPanel('template-tree');
-                    });
-#end
+                    nestedWest.add(tabPanel);
+                    nestedWest.show();
+                    nestedWest.setWidth(300);
+                    Ext.getCmp('nested-layout').doLayout();
                 }
             }
         }();
@@ -235,12 +272,6 @@
 </head>
 <body>
     #adminTabs("${tab}")
-
-    <div id="template-tree" class="x-layout-inactive-content" style="padding: 10px">
-    </div>
-
-    <div id="config-tree" class="x-layout-inactive-content" style="padding: 10px">
-    </div>
 
     <div id="detail-pane" style="padding: 10px; min-height: 100%">
         #parse("/template/includes/actionerrors.vm")

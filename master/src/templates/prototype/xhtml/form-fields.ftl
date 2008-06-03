@@ -5,9 +5,6 @@ form.on('actionfailed', function() { window.formSubmitting = false; });
 </#if>
 
 var fieldConfig;
-var hiddenFields = [];
-
-hiddenFields.push({id: '${form.name?js_string}.submitField', name: 'submitField', value: ''});
 
 <#list form.fields as field>
     <#assign parameters=field.parameters>
@@ -49,18 +46,11 @@ Ext.onReady(function()
     Ext.Ajax.timeout = 60000;
 
     form.render('${form.id}');
-    form.el.dom.action = '${base}/${form.action}';
-    form.url = '${base}/${form.action}';
 
-    for(var i = 0; i < hiddenFields.length; i++)
-    {
-        var config = hiddenFields[i];
-        config.tag = 'input';
-        config.type = 'hidden';
-        Ext.DomHelper.append(form.el, config);
-    }
-
-    form.el.set({name: '${form.name}'});
+    var f = form.getForm();
+    f.el.dom.action = '${base}/${form.action}';
+    f.url = '${base}/${form.action}';
+    f.el.set({name: '${form.name}'});
 
     var errorMessage;
     if (!window.nextTabindex)
@@ -74,7 +64,7 @@ Ext.onReady(function()
     <#assign parameters=field.parameters>
     <#if fieldErrors?exists && fieldErrors[parameters.name]?exists>
     errorMessage = '<#list fieldErrors[parameters.name] as error>${error?i18n?js_string}<br/></#list>';
-    form.findField('${parameters.id}').markInvalid(errorMessage);
+    form.findById('${parameters.id}').markInvalid(errorMessage);
     </#if>
 
     var el = Ext.get('${field.id}');

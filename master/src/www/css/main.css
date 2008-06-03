@@ -875,16 +875,13 @@ table.template-actions
 /*
  * For Ext.
  */
-.x-layout-panel, .x-layout-nested-layout .x-layout-panel {
-    border: 0 none;
-}
 
 .x-tree ul {
     margin: 0;
     padding: 0;    
 }
 
-.x-tabs-strip a, .x-tree-node a
+.x-tab-strip a, .x-tree-node a
 {
     border-bottom: none;
     font-weight: normal;
@@ -895,19 +892,10 @@ table.template-actions
     vertical-align: middle;
 }
 
-.x-tabs-bottom .x-tabs-wrap {
-    border-top:1px solid #6593CF;
-}
-
 .x-tree-node
 {
     font-family: verdana;
     font-size: 10px;
-}
-
-.x-layout-split
-{
-    background-color: #3e4e6a;
 }
 
 /*

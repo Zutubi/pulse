@@ -6,6 +6,6 @@
 fieldConfig.width = 14;
 fieldConfig.autoCreate = { tag: 'input', type: 'checkbox', value: 'true', id: fieldConfig.id };
 form.add(new Ext.form.Checkbox(fieldConfig));
-hiddenFields.push({name: '${parameters.name}.default', value: 'false'});
+form.add(new Ext.form.Hidden({name: '${parameters.name}.default', value: 'false'}));
 
 <#include "/prototype/xhtml/controlfooter.ftl" />

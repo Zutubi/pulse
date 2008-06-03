@@ -8,10 +8,10 @@
 
     <#include "/prototype/xhtml/controlling-field.ftl" />
 
-    var checkbox = form.findField('${parameters.id}');
+    var checkbox = form.findById('${parameters.id}');
     checkbox.on('check', function(checkbox, checked) { setEnabledState(checkbox); });
     checkbox.on('disable', function(checkbox, checked) { setEnabledState(checkbox); });
     checkbox.on('enable', function(checkbox, checked) { setEnabledState(checkbox); });
 
-    form.on('render', function() { setEnabledState(checkbox) });
+    form.on('afterlayout', function() { setEnabledState(checkbox) }, form, {single: true});
 }());

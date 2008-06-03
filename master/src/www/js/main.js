@@ -506,7 +506,7 @@ var onSelectFailure = function(element, response)
 
 var onConfigSelect = function(sm, node)
 {
-    if(node)
+    if(treesInitialised && node)
     {
         Ext.get('detail-pane').load({
             url: configTree.loader.getNodePath(node),
@@ -585,7 +585,7 @@ var addToPath = function(path, template)
 
 var actionPath = function(path)
 {
-    var detailPane = Ext.get('detail-pane').getUpdateManager().defaultUrl;
+    var detailPane = Ext.get('detail-pane').getUpdater().defaultUrl;
     // trim the url prefix so that we are just left with the path.
     var oldPath = detailPane.substring(window.baseUrl + '/aconfig/'.length, detailPane.length);
     runAjaxRequest(window.baseUrl + '/aconfig/' + path + '=input&newPath=' + oldPath);

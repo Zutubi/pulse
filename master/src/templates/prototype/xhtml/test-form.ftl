@@ -3,21 +3,29 @@
 <script type="text/javascript">
     var ${form.name} = function()
     {
-        var form = new ZUTUBI.CheckForm(${mainFormName}, {
-            method: 'post',
+        var form = new ZUTUBI.CheckFormPanel(${mainFormName}, {
+            method: 'POST',
             formName: '${form.name?js_string}',
             labelAlign: 'right',
             labelWidth: 150,
-            waitMsgTarget: true
+            border: false,
+            waitMsgTarget: true,
+            items: [{
+                xtype: 'hidden',
+                id: '${form.name?js_string}.submitField',
+                name: 'submitField',
+                value: ''
+            }]
         });
 
         function submitForm()
         {
-            if(form.isValid())
+            var f = form.getForm();
+            if(f.isValid())
             {
-                form.clearInvalid();
+                f.clearInvalid();
                 window.formSubmitting = true;
-                form.submit({
+                f.submit({
                     clientValidation: false
                 });
             }

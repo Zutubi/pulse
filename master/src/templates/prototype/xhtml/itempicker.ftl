@@ -51,7 +51,7 @@
     form.add(picker);
     picker.on('change', updateButtons);
 
-    hiddenFields.push({name: '${parameters.name}.default', value: ''});
+    form.add(new Ext.form.Hidden({name: '${parameters.name}.default', value: ''}));
 }());
 
 <#include "/prototype/xhtml/controlfooter.ftl" />

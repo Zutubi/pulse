@@ -15,48 +15,57 @@ width of its contents.  Floating it works, but hurts other things.
         </td>
     </tr>
     <tr>
-        <td id="${form.id}"><td>
+        <td id="${form.id}"></td>
     </tr>
 </table>
 
 <#-- render form -->
 <script type="text/javascript">
     Ext.QuickTips.init();
-    Ext.QuickTips.tagConfig.width = 'qwidth';
+    Ext.QuickTips.getQuickTip().qwidth = 'qwidth';
 
     Ext.form.Field.prototype.msgTarget = 'under';
 
     var ${form.name} = function()
     {
-        var form = new ZUTUBI.Form({
-            method: 'post'
+        var form = new ZUTUBI.FormPanel({
+            method: 'POST'
             , formName: '${form.name?js_string}'
             , waitMsgTarget: 'center'
+            , border: false
+            , labelWidth: 'hello'
+            , items: [{
+                xtype: 'hidden',
+                id: '${form.name?js_string}.submitField',
+                name: 'submitField',
+                value: 'h'
+            }]
 <#if form.fileUpload>
             , fileUpload: true
-            , autoCreate: {tag: 'form', method: 'post', id: Ext.id(), enctype: 'multipart/form-data' }
 </#if>
         });
 
         function submitForm(value)
         {
+            var f = form.getForm();
+
             Ext.get('${form.name?js_string}.submitField').dom.value = value;
             if(value == 'cancel')
             {
-                Ext.DomHelper.append(form.el, {tag: 'input', type: 'hidden', name: 'cancel', value: 'true'});
+                Ext.DomHelper.append(f.el.parent(), {tag: 'input', type: 'hidden', name: 'cancel', value: 'true'});
             }
 
-            form.clearInvalid();
+            f.clearInvalid();
     <#if form.ajax>
             window.formSubmitting = true;
-            form.submit({
+            f.submit({
                 clientValidation: false,
                 waitMsg: 'Submitting...'
             });
     <#else>
-            if(value == 'cancel' || form.isValid())
+            if(value == 'cancel' || f.isValid())
             {
-                form.el.dom.submit();
+                f.el.dom.submit();
             }
     </#if>
         }

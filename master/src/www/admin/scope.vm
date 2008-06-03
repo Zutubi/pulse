@@ -6,6 +6,7 @@
 	<script type="text/javascript">
 	    var actionInProgress = false;
         var configTree;
+        var treesInitialised = false;
 
         var handleConfigurationResponse = function(result)
         {
@@ -39,35 +40,22 @@
             return {
                 init : function()
                 {
-                    centerRegion = nestedLayout.getRegion('center');
-                    var centerPanel = centerRegion.getPanel(0);
-                    centerPanel.setTitle('');
-                    centerPanel.getEl().setStyle('margin', '4px');
-
-                    nestedLayout.addRegion('north', {
-                        split: false,
-                        titlebar: false
-                    });
-
-                    nestedLayout.addRegion('west', {
-                        split: true,
-                        initialSize: 300,
-                        titlebar: false,
-                        collapsible: true,
-                        animate: true,
-                        tabPosition: 'bottom'
-                    });
+                    var centerEl = Ext.get('center');
+                    centerEl.setStyle('margin', '4px');
 
                     var loader = new ZUTUBI.ConfigTreeLoader('$base/aconfig');
-                    //loader.on('loadexception', function(loader, node, response) {  console.dir(response); });
 
-                    configTree = new ZUTUBI.ConfigTree('config-tree', {
+                    configTree = new ZUTUBI.ConfigTree({
 #if($prefixPath)
                         pathPrefix: '$prefixPath',
 #end
+                        el: 'config-tree',
+                        layout: 'fit',
+                        border: false,
                         animate: false,
                         loader: loader,
-                        title: 'config'
+                        autoScroll: true,
+                        bodyStyle: 'padding: 10px'
                     });
 
                     var root = new Ext.tree.AsyncTreeNode({
@@ -81,9 +69,8 @@
                     configTree.setRootNode(root);
                     configTree.getSelectionModel().on('selectionchange', onConfigSelect);
 
-                    nestedLayout.beginUpdate();
-                    nestedLayout.add('west', new Ext.ContentPanel('config-tree', {autoScroll: true, fitToFrame: true}));
-                    nestedLayout.endUpdate();
+                    var nestedWest = Ext.getCmp('nested-west');
+                    nestedWest.add(configTree);
 
                     configTree.render();
                     if (!path)
@@ -91,6 +78,11 @@
                         path = 'global';
                     }
 
+                    nestedWest.show();
+                    nestedWest.setWidth(300);
+                    viewport.doLayout();
+
+                    treesInitialised = true;
                     configTree.selectConfigPath(path);
                     root.expand();
                 }
@@ -107,7 +99,7 @@
     #dashboardTabs("${tab}")
 #end
 
-    <div id="config-tree" style="padding: 10px">
+    <div id="config-tree">
     </div>
 
     <div id="detail-pane" style="padding: 10px; min-height: 100%">

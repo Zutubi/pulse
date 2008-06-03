@@ -22,6 +22,4 @@
     </div>
 
     #buildColumnsPopup("project.history" "popup")    
-
-
 </html>

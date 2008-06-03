@@ -4,6 +4,6 @@ form.items.last().on('select', function(field)
     var port = ports[field.getValue()];
     if(port)
     {
-        form.findField('port').setValue(port);
+        form.findById('zfid.port').setValue(port);
     }
 });

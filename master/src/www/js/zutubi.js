@@ -54,15 +54,18 @@ Ext.extend(ZUTUBI.Select, Ext.form.Field, {
         if(!this.tpl){
             if(Ext.isIE || Ext.isIE7)
             {
-                this.tpl = '<div unselectable="on" class="x-select-item" tabindex="-1">{' + this.displayField + '}</div>';
+                this.tpl = '<tpl for="."><div unselectable="on" class="x-select-item" tabindex="-1">{' + this.displayField + '}</div></tpl>';
             }
             else
             {
-                this.tpl = '<div class="x-select-item  x-unselectable" tabindex="-1">{' + this.displayField + '}</div>';
+                this.tpl = '<tpl for="."><div class="x-select-item  x-unselectable" tabindex="-1">{' + this.displayField + '}</div></tpl>';
             }
         }
 
-        this.view = new Ext.View(this.el, this.tpl, {
+        this.view = new Ext.DataView({
+            renderTo: this.el,
+            tpl: this.tpl,
+            itemSelector: '.x-select-item',
             multiSelect :this.multiple,
             store: this.store,
             selectedClass: 'x-select-selected'
@@ -87,7 +90,7 @@ Ext.extend(ZUTUBI.Select, Ext.form.Field, {
 
         if(count > 0)
         {
-            this.entryHeight = this.el.child('div').getHeight() + 2;
+            this.entryHeight = this.el.child("div.x-select-item").getHeight() + 2;
         }
 
         this.el.setHeight(this.entryHeight * this.size);
@@ -240,9 +243,9 @@ Ext.extend(ZUTUBI.ConfigTreeLoader, Ext.tree.TreeLoader, {
 });
 
 
-ZUTUBI.ConfigTree = function(id, config)
+ZUTUBI.ConfigTree = function(config)
 {
-    ZUTUBI.ConfigTree.superclass.constructor.call(this, id, config);
+    ZUTUBI.ConfigTree.superclass.constructor.call(this, config);
     this.dead = false;
 }
 
@@ -306,9 +309,9 @@ Ext.extend(ZUTUBI.ConfigTree, Ext.tree.TreePanel, {
         this.selectPath(this.configPathToTreePath(configPath));
     },
 
-    expandToPath: function(path)
+    expandToPath: function(path, callback)
     {
-        this.expandPath(this.configPathToTreePath(path));        
+        this.expandPath(this.configPathToTreePath(path), false, callback);        
     },
 
     getNodeConfigPath: function(node)
@@ -424,11 +427,11 @@ Ext.extend(ZUTUBI.ConfigTree, Ext.tree.TreePanel, {
 });
 
 
-ZUTUBI.TemplateTree = function(scope, id, config)
+ZUTUBI.TemplateTree = function(scope, config)
 {
     this.scope = scope;
     this.dead = false;
-    ZUTUBI.TemplateTree.superclass.constructor.call(this, id, config);
+    ZUTUBI.TemplateTree.superclass.constructor.call(this, config);
 }
 
 Ext.extend(ZUTUBI.TemplateTree, ZUTUBI.ConfigTree, {
@@ -484,28 +487,96 @@ Ext.extend(ZUTUBI.TemplateTree, ZUTUBI.ConfigTree, {
 
 ZUTUBI.Form = function(config)
 {
-    var template = new Ext.Template('<tr id="x-form-row-{0}" class="x-form-row {5}">' +
+    ZUTUBI.Form.superclass.constructor.call(this, null, config);
+}
+
+Ext.extend(ZUTUBI.Form, Ext.form.BasicForm, {
+    clearInvalid: function()
+    {
+        ZUTUBI.Form.superclass.clearInvalid.call(this);
+        var statusEl = Ext.get(this.formName + '.status');
+        statusEl.update('');
+    },
+
+    handleActionErrors: function(errors)
+    {
+        var statusEl = Ext.get(this.formName + '.status');
+        statusEl.update('');
+
+        if(errors && errors.length > 0)
+        {
+            var listEl = statusEl.createChild({tag: 'ul', cls: 'validation-error'});
+            for(var i = 0; i < errors.length; i++)
+            {
+                listEl.createChild({tag: 'li', html: errors[i]});
+            }
+        }
+    }
+});
+
+ZUTUBI.FormLayout = function(config)
+{
+    if(!config.fieldTpl)
+    {
+        config.fieldTpl = new Ext.Template('<tr id="x-form-row-{0}" class="x-form-row {5}">' +
                                         '<td class="x-form-label"><label for="{0}" style="{2}">{1}</td>' +
                                         '<td class="x-form-label-annotation" id="x-form-label-annotation-{0}"></td>' +
                                         '<td class="x-form-separator">{4}</td>' +
                                         '<td><div id="x-form-el-{0}" class="x-form-element" style="{3}">' +
-                                        '</div></td>' +
+                                        '</div><div class="{6}"></div></td>' +
                                     '</tr>');
-    template.disableFormats = true;
-    template.compile();
+        config.fieldTpl.disableFormats = true;
+        config.fieldTpl.compile();
+    }
 
-    config.root = new Ext.form.Layout({
-        labelAlign: 'right',
-        fieldTpl: template,
-        autoCreate: { tag: 'table', cls: 'x-form-ct' }
-    });
+    config.labelAlign = 'right';
+    ZUTUBI.FormLayout.superclass.constructor.call(this, config);
+}
 
-    ZUTUBI.Form.superclass.constructor.call(this, config);
+Ext.extend(ZUTUBI.FormLayout, Ext.layout.FormLayout, {
+    renderItem: function(c, position, target)
+    {
+        if(c && !c.rendered && c.isFormField && c.inputType == 'hidden')
+        {
+            target = target.up('form');
+        }
+
+        ZUTUBI.FormLayout.superclass.renderItem.call(this, c, position, target);
+    },
+
+    setContainer: function(ct)
+    {
+        ZUTUBI.FormLayout.superclass.setContainer.call(this, ct);
+        // Forcibly override the behaviour of the default layout (adds
+        // padding to the element).
+        this.elementStyle = '';
+    }
+});
+
+ZUTUBI.FormPanel = function(config)
+{
+    config.layout = new ZUTUBI.FormLayout({})
+    ZUTUBI.FormPanel.superclass.constructor.call(this, config);
 };
 
-Ext.extend(ZUTUBI.Form, Ext.form.Form, {
+Ext.extend(ZUTUBI.FormPanel, Ext.form.FormPanel, {
     displayMode: false,
 
+    createForm: function(){
+        delete this.initialConfig.listeners;
+        return new ZUTUBI.Form(this.initialConfig);
+    },
+
+    onRender : function(ct, position){
+        ZUTUBI.FormPanel.superclass.onRender.call(this, ct, position);
+        this.layoutTarget = this.form.el.createChild({tag: 'table', cls: 'x-form'}).createChild({tag: 'tbody'});
+    },
+
+    getLayoutTarget: function()
+    {
+        return this.layoutTarget;
+    },
+    
     add : function()
     {
         var a = arguments;
@@ -514,7 +585,7 @@ Ext.extend(ZUTUBI.Form, Ext.form.Form, {
             a[i].form = this;
         }
         
-        ZUTUBI.Form.superclass.add.apply(this, a);
+        ZUTUBI.FormPanel.superclass.add.apply(this, a);
         return this;
     },
 
@@ -530,7 +601,7 @@ Ext.extend(ZUTUBI.Form, Ext.form.Form, {
 
     enableField: function(id)
     {
-        var field = this.findField(id);
+        var field = this.findById(id);
         if(field)
         {
             field.enable();
@@ -539,14 +610,14 @@ Ext.extend(ZUTUBI.Form, Ext.form.Form, {
             if (rowEl)
             {
                 Ext.get(rowEl).removeClass('x-item-disabled');
-            }
 
-            var actionDomEls = this.getFieldActionDomEls(id);
-            if (actionDomEls)
-            {
-                for(var i = 0; i < actionDomEls.length; i++)
+                var actionDomEls = this.getFieldActionDomEls(id);
+                if (actionDomEls)
                 {
-                    Ext.get(actionDomEls[i]).removeClass('x-item-disabled');
+                    for(var i = 0; i < actionDomEls.length; i++)
+                    {
+                        Ext.get(actionDomEls[i]).removeClass('x-item-disabled');
+                    }
                 }
             }
         }
@@ -554,7 +625,7 @@ Ext.extend(ZUTUBI.Form, Ext.form.Form, {
 
     disableField: function(id)
     {
-        var field = this.findField(id);
+        var field = this.findById(id);
         if(field)
         {
             field.clearInvalid();
@@ -564,35 +635,23 @@ Ext.extend(ZUTUBI.Form, Ext.form.Form, {
             if (rowEl)
             {
                 Ext.get(rowEl).addClass('x-item-disabled');
-            }
 
-            var actionDomEls = this.getFieldActionDomEls(id);
-            if (actionDomEls)
-            {
-                for(var i = 0; i < actionDomEls.length; i++)
+                var actionDomEls = this.getFieldActionDomEls(id);
+                if (actionDomEls)
                 {
-                    Ext.get(actionDomEls[i]).addClass('x-item-disabled');
+                    for(var i = 0; i < actionDomEls.length; i++)
+                    {
+                        Ext.get(actionDomEls[i]).addClass('x-item-disabled');
+                    }
                 }
             }
         }
-    },
-
-    getFieldLabelDomEl: function(id)
-    {
-        var rowEl = this.getFieldRowEl(id);
-        return Ext.query(">td[class*='x-form-label']", rowEl.dom)[0];
     },
 
     getFieldActionDomEls: function(id)
     {
         var rowEl = this.getFieldRowEl(id);
         return Ext.query("a[class*='field-action']", rowEl.dom);
-    },
-
-    getFieldRequiredDomEls: function(id)
-    {
-        var rowEl = this.getFieldRowEl(id);
-        return Ext.query("span[class*='required']", rowEl.dom);
     },
 
     getFieldRowEl: function(id)
@@ -615,10 +674,10 @@ Ext.extend(ZUTUBI.Form, Ext.form.Form, {
     {
         if(this.displayMode)
         {
-            var dirty = this.isDirty();
+            var dirty = this.form.isDirty();
             if(!dirty)
             {
-                this.clearInvalid();
+                this.form.clearInvalid();
             }
             
             for(var i = 0; i < this.buttons.length; i++)
@@ -633,28 +692,19 @@ Ext.extend(ZUTUBI.Form, Ext.form.Form, {
                 }
             }
         }
-    },
+    }
+});
 
-    handleActionErrors: function(errors)
-    {
-        var statusEl = Ext.get(this.formName + '.status');
-        statusEl.update('');
+ZUTUBI.CheckFormPanel = function(mainFormPanel, options)
+{
+    this.mainFormPanel = mainFormPanel;
+    ZUTUBI.CheckFormPanel.superclass.constructor.call(this, options);
+};
 
-        if(errors && errors.length > 0)
-        {
-            var listEl = statusEl.createChild({tag: 'ul', cls: 'validation-error'});
-            for(var i = 0; i < errors.length; i++)
-            {
-                listEl.createChild({tag: 'li', html: errors[i]});
-            }
-        }
-    },
-
-    clearInvalid: function()
-    {
-        ZUTUBI.Form.superclass.clearInvalid.call(this);
-        var statusEl = Ext.get(this.formName + '.status');
-        statusEl.update('');
+Ext.extend(ZUTUBI.CheckFormPanel, ZUTUBI.FormPanel, {
+    createForm: function() {
+        delete this.initialConfig.listeners;
+        return new ZUTUBI.CheckForm(this.mainFormPanel.getForm(), this.initialConfig);
     }
 });
 
@@ -689,6 +739,7 @@ Ext.extend(ZUTUBI.CheckForm, ZUTUBI.Form, {
             {
                 field = this.findField(id);
             }
+            
             if(field)
             {
                 field.markInvalid(fieldError.msg);
@@ -808,7 +859,6 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
         this.el.on('focus', this.onInputFocus, this);
         this.el.on('blur', this.onInputBlur, this);
 
-        var alignEl;
         if(this.optionStore)
         {
             var fieldConfig = {
@@ -826,19 +876,14 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
             this.combo = new Ext.form.ComboBox(fieldConfig);
             this.combo.render(this.wrap);
             this.choice = this.combo.getEl();
-            alignEl = this.combo.wrap;
+            this.alignEl = this.combo.wrap;
         }
         else
         {
             this.input = this.wrap.createChild({tag: 'input', type: 'text', cls: 'x-form-text', id: this.id + '.choice'});
             this.input.setWidth(this.width);
             this.choice = this.input;
-            alignEl = this.input;
-        }
-
-        if(Ext.isIE || Ext.isIE7)
-        {
-            alignEl.alignTo(this.el, 'tl-bl');
+            this.alignEl = this.input;
         }
 
         this.choice.on('focus', this.onInputFocus, this);
@@ -884,16 +929,21 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
         {
             if(Ext.isIE || Ext.isIE7)
             {
-                this.tpl = '<div unselectable="on" class="' + cls + '-item">{' + this.displayField + '}</div>';
+                this.tpl = '<tpl for="."><div unselectable="on" class="' + cls + '-item">{' + this.displayField + '}</div></tpl>';
             }
             else
             {
-                this.tpl = '<div class="' + cls + '-item  x-unselectable">{' + this.displayField + '}</div>';
+                this.tpl = '<tpl for="."><div class="' + cls + '-item  x-unselectable">{' + this.displayField + '}</div></tpl>';
             }
         }
 
-        this.view = new Ext.View(this.el, this.tpl, {
-            singleSelect:true, store: this.store, selectedClass: this.selectedClass
+        this.view = new Ext.DataView({
+            renderTo: this.el,
+            tpl: this.tpl,
+            itemSelector: '.x-item-picker-item',
+            singleSelect: true,
+            store: this.store,
+            selectedClass: this.selectedClass
         });
 
         this.ValueRecord = Ext.data.Record.create({name: 'text'}, {name: 'value'});
@@ -942,6 +992,10 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
 
     alignButtons: function()
     {
+        if(Ext.isIE)
+        {
+            this.alignEl.alignTo(this.el, 'tl-bl');
+        }
         this.addButton.getEl().alignTo(this.el, 'tl-br', [2, 0]);
         this.removeButton.getEl().alignTo(this.el, 'tl-tr', [2, 0]);
         this.upButton.getEl().alignTo(this.el, 'l-r', [2, 0]);
@@ -1194,7 +1248,8 @@ Ext.form.Checkbox.prototype.onResize = function()
     Ext.form.Checkbox.superclass.onResize.apply(this, arguments);
 }
 
-Ext.override(Ext.View, {
+/*
+Ext.override(Ext.DataView, {
     onClick : function(e)
     {
         if(this.disabled)
@@ -1356,3 +1411,4 @@ Ext.override(Ext.Element, {
         return this._mask;
     }
 });
+*/

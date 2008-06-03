@@ -52,13 +52,15 @@
         <link rel="shortcut icon" href="$base/favicon.ico"/>
         <link rel="icon" type="image/png" href="$base/favicon.png"/>
         <link rel="stylesheet" type="text/css" href="/css/ext-all.css"/>
+        <link rel="stylesheet" type="text/css" href="/css/xtheme-pagan.css"/>
         <link rel="stylesheet" type="text/css" href="$base/css/main.css" media="screen"/>
 		<link rel="stylesheet" type="text/css" href="$base/css/form.css" media="screen"/>
 #if ($rssEnabled && $projectId && $projectId != "0")
         <link rel="alternate" type="application/rss+xml" title="RSS" href="$base/rss.action?projectId=$projectId"/>
 #end
+        <script type="text/javascript" src="/js/Ext.js"></script>
         <script type="text/javascript" src="/js/ext-base.js"></script>
-        <script type="text/javascript" src="/js/ext-all.js"></script>
+        <script type="text/javascript" src="/js/ext-all-debug.js"></script>
         <script type="text/javascript" src="$base/js/main.js"></script>
         <script type="text/javascript" src="$base/js/zutubi.js"></script>
         <script type="text/javascript">
@@ -67,8 +69,7 @@
             window.formSubmitting = false;
             window.baseUrl = '$base';
             
-            var layout;
-            var nestedLayout;
+            var viewport;
             var statusAreaEl;
             var statusMessageEl;
 
@@ -83,47 +84,52 @@
                             north.appendChild(tabbar);
                         }
 
-                        layout = new Ext.BorderLayout(document.body, {
-                            hideOnLayout: true,
-                            north: {
-                                split: false,
-                                titlebar: false
+                        viewport = new Ext.Viewport({
+                            layout: 'border',
+                            defaults: {
+                                layout: 'fit',
+                                border: false
                             },
-                            south: {
-                                split: false,
-                                titlebar: false,
-                                collapsible: false,
-                                animate: true
-                            },
-                            center: {
-                               autoScroll: false
-                            }
-                        });
-
-                        nestedLayout = new Ext.BorderLayout('content', {
-                            hideOnLayout: true,
-                            north: {
+                            items: [{
+                                region: 'north',
+                                contentEl: 'north',
                                 split: false
-                            },
-                            center: {
-                                autoScroll: true
-                            }
+                            }, {
+                                region: 'south',
+                                contentEl: 'south',
+                                split: false
+                            }, {
+                                region: 'center',
+                                layout: 'border',
+                                id: 'nested-layout',
+                                autoScroll: false,
+                                defaults: {
+                                    layout: 'fit',
+                                    border: false
+                                },
+                                items: [{
+                                    region: 'north',
+                                    contentEl: 'status-area',
+                                    id: 'status-component',
+                                    split: false,
+                                    hidden: true
+                                }, {
+                                    region: 'center',
+                                    contentEl: 'center',
+                                    split: false,
+                                    autoScroll: true
+                                }, {
+                                    region: 'west',
+                                    id: 'nested-west',
+                                    split: true,
+                                    titlebar: false,
+                                    collapsible: true
+                                }]
+                            }]
                         });
-
-                        nestedLayout.beginUpdate();
-                        nestedLayout.add('north', new Ext.ContentPanel('status-area'));
-                        nestedLayout.add('center', new Ext.ContentPanel('center'));
-                        nestedLayout.endUpdate();
-
-                        layout.beginUpdate();
-                        layout.add('north', new Ext.ContentPanel('north', 'North'));
-                        layout.add('south', new Ext.ContentPanel('south', 'South'));
-                        layout.add('center', new Ext.NestedLayoutPanel(nestedLayout));
-                        layout.endUpdate();
-
+                        
                         statusAreaEl = Ext.get('status-area');
                         statusMessageEl = Ext.get('status-message');
-                        hideStatus();
                     }
                 }
             }();
@@ -132,18 +138,21 @@
 
             function hideStatus(animate)
             {
+                var component = Ext.getCmp('status-component');
                 if(animate)
                 {
                     statusAreaEl.setVisible(false, {
                         callback: function() {
-                            nestedLayout.getRegion('north').hide();
+                            component.hide();
+                            Ext.getCmp('nested-layout').doLayout();
                         }
                     });
                 }
                 else
                 {
                     statusAreaEl.setVisible(false, false);
-                    nestedLayout.getRegion('north').hide();
+                    component.hide();
+                    Ext.getCmp('nested-layout').doLayout();
                 }
             }
 
@@ -160,11 +169,11 @@
                     message = '<img src="${base}/images/' + imageMap[type] + '.gif" alt="' + type + '"/> ' + message;
                 }
 
-                var northRegion = nestedLayout.getRegion('north');
-                northRegion.show();
+                var component = Ext.getCmp('status-component');
+                component.show();
                 statusMessageEl.update(message);
                 statusAreaEl.setVisible(true, true);
-                northRegion.resizeTo(statusAreaEl.getHeight());
+                Ext.getCmp('nested-layout').doLayout();
             }
         </script>
 

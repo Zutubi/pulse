@@ -14,7 +14,7 @@
     </div>
 
     <script type="text/javascript">
-        mainForm.on('render', function(form) { form.findField('zfid.j_username').focus(true); });
+        mainForm.on('render', function(form) { form.findById('zfid.j_username').focus(true); });
     </script>
     
     #if ($config.anonymousSignupEnabled)

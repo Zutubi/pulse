@@ -18,10 +18,10 @@
 
     <#include "/prototype/xhtml/controlling-field.ftl" />
 
-    var select = form.findField('${parameters.id}');
+    var select = form.findById('${parameters.id}');
     select.on('select', setEnabledState);
     select.on('disable', setEnabledState);
     select.on('enable', setEnabledState);
 
-    form.on('render', function() { setEnabledState(select) });
+    form.on('afterlayout', function() { setEnabledState(select) }, form, {single: true});
 }());
