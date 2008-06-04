@@ -1982,17 +1982,13 @@
 ##
 #macro(updater $url $panelId $user)
     #if($refreshInterval || $user.preferences.refreshingEnabled)
-    var updater = new Ajax.PeriodicalUpdater(
-                      {success: "$panelId"},
-                      "$url",
-                      {
-                          method: 'get',
-#if($refreshInterval)
-                          frequency: $refreshInterval
-#else
-                          frequency: $user.preferences.refreshInterval
-#end
-                      });
+        Ext.onReady(function() {
+            var updater = new Ext.Updater('$panelId');
+            updater.showLoadIndicator = false;
+            updater.startAutoRefresh(#if($refreshInterval) $refreshInterval #else $user.preferences.refreshInterval #end , {
+                url: '$url'
+            });
+        });
     #end
 #end
 
@@ -2062,128 +2058,6 @@
 #end
 
 ##
-## Shows a testing message in the div with the given id
-##
-#macro(testInProgress $divid)
-    $("$divid").innerHTML = "<img src='$base/images/inprogress.gif'/> $action.getText('testing')";
-#end
-
-##
-## Function to report an ajax request error in the div with the given id
-##
-#macro(ajaxError $divid)
-    function reportError()
-    {
-        $("$divid").innerHTML = "<ul class='error'><li class='error'>$action.getText('request.failed')</li></ul>";
-    }
-#end
-
-##
-## A row in an SCM settings form with a link to test the settings
-##
-#macro(testSettingsRow)
-    <tr>
-        <td>
-            &nbsp;
-        </td>
-        <td style="padding: 6px; padding-top: 10px;">
-            <p>
-                <a href="#" onclick="testSettings(); return false;">#wwtext("name=settings.test")</a>
-            </p>
-            <div id="test-results">
-            </div>
-        </td>
-    </tr>
-#end
-
-##
-## Fragment of script to test a perforce connection
-##
-#macro(p4TestScript $form)
-    <script type="text/javascript">
-        function testSettings()
-        {
-            #testInProgress("test-results")
-
-            var port = escape($F("${form}_p4_port"));
-            var user = escape($F("${form}_p4_user"));
-            var password = escape($F("${form}_p4_password"));
-            var client = escape($F("${form}_p4_client"));
-            var params = "port=" + port + "&user=" + user + "&password=" + password + "&client=" + client;
-
-            var updater = new Ajax.Updater({success: 'test-results'},
-                                           "ajax/testP4.action",
-                                           {
-                                               method: 'get',
-                                               parameters: params,
-                                               onFailure: reportError
-                                           });
-
-            #ajaxError("test-results")
-        }
-
-    </script>
-#end
-
-##
-## Fragment of script to test a subversion connection
-##
-#macro(svnTestScript $form)
-    <script type="text/javascript">
-        function testSettings()
-        {
-            #testInProgress("test-results")
-
-            var username = escape($F("${form}_svn_username"));
-            var password = escape($F("${form}_svn_password"));
-            var url = $F("${form}_svn_url").replace("+", "%2B");
-            var keyfile = escape($F("${form}_svn_keyfile"));
-            var passphrase = escape($F("${form}_svn_passphrase"));
-            var params = "username=" + username + "&password=" + password + "&url=" + url + "&keyfile=" + keyfile + "&passphrase=" + passphrase;
-
-            var updater = new Ajax.Updater({success: 'test-results'},
-                                           "ajax/testSvn.action",
-                                           {
-                                               method: 'get',
-                                               parameters: params,
-                                               onFailure: reportError
-                                           });
-
-            #ajaxError("test-results")
-        }
-
-    </script>
-#end
-
-##
-## Fragment of script to test a CVS connection
-##
-#macro(cvsTestScript $form)
-    <script type="text/javascript">
-        function testSettings()
-        {
-            #testInProgress("test-results")
-
-            var root = escape($F("${form}_cvs_root"));
-            var module = escape($F("${form}_cvs_module"));
-            var password = escape($F("${form}_cvs_password"));
-            var params = "root=" + root + "&password=" + password + "&module=" + module;
-
-            var updater = new Ajax.Updater({success: 'test-results'},
-                                           "ajax/testCVS.action",
-                                           {
-                                               method: 'get',
-                                               parameters: params,
-                                               onFailure: reportError
-                                           });
-
-            #ajaxError("test-results")
-        }
-
-    </script>
-#end
-
-##
 ## Shows a server (log) message
 ##
 #macro(serverMessage $record)
@@ -2219,47 +2093,6 @@
         </tr>
     #end
     </table>
-#end
-
-##
-## Outputs javascript to help changing the contents of one select box based on another
-##
-#macro(tiedSelect $name $keyList $valueMap $currentValue $keyElement $valueElement)
-    var ${name}Arrays = new Array($keyList.size());
-
-    #foreach($key in $keyList)
-        #set($i = $velocityCount - 1)
-        #set($valueList = $valueMap.get($key))
-
-        ${name}Arrays[$i] = new Array($valueList.size());
-        #foreach($value in $valueList)
-            #set($j = $velocityCount - 1)
-            ${name}Arrays[$i][$j] = new Option('$value', '$value');
-            #if($value == $currentValue)
-                ${name}Arrays[$i][$j].selected = true;
-            #end
-        #end
-    #end
-
-    function ${name}Selected()
-    {
-        var index = getElement('$keyElement').selectedIndex;
-
-        if(index < 0)
-        {
-            index = 0;
-        }
-
-        var options = ${name}Arrays[index];
-        var element = getElement('$valueElement');
-        element.options.length = 0;
-        for(i = 0; i < options.length; i++)
-        {
-            element.options[i] = options[i];
-        }
-    }
-
-    ${name}Selected();
 #end
 
 ##
@@ -2487,126 +2320,6 @@
             </tr>
         </table>
     </div>
-#end
-
-##
-## A script to highlight errors when editing custom project details.
-##
-#macro(customErrorsScript $id $detailsHelper)
-    <script type="text/javascript">
-#if($detailsHelper.line && $detailsHelper.lineOffset >= 0)
-    #set($endOffset = $detailsHelper.lineOffset + $detailsHelper.line.length())
-        function select()
-        {
-            setSelectionRange("$id", $detailsHelper.lineOffset, $endOffset);
-        }
-
-        window.onload = select;
-#end
-    </script>
-#end
-
-##
-## Javascript for project subscription forms
-##
-#macro(subscriptionScript $formId)
-    <script type="text/javascript">
-        var conditionMap = { 'all'     : [],
-                             'simple'  : [ 'selectedConditions-1', 'selectedConditions-2', 'selectedConditions-3', 'selectedConditions-4' ],
-                             'repeated': [ '${formId}_repeatedX', '${formId}_repeatedUnits' ],
-                             'advanced': [ '${formId}_expression' ] };
-
-        function toggleConditions(name)
-        {
-            if(name)
-            {
-                for(key in conditionMap)
-                {
-                    var disable = key != name;
-                    var ids = conditionMap[key];
-                    for(i = 0; i < ids.length; i++)
-                    {
-                        getElement(ids[i]).disabled = disable;
-                    }
-                }
-            }
-        }
-
-        function getSelectedCondition()
-        {
-            for(key in conditionMap)
-            {
-                var r = getElement('conditionType' + key);
-                if(r.checked)
-                {
-                    return r.value;
-                }
-            }
-
-            return null;
-        }
-    </script>
-#end
-
-##
-## Outputs a subsection for the condition section of a project subcription form
-##
-#macro(conditionSection $name)
-    <tr>
-        <td class="field" colspan="2">
-            <input type="radio" name="conditionType" id="conditionType${name}" value="${name}" onclick="toggleConditions('$name');" #if($name == $conditionType) checked="checked" #end/>
-            <label for="conditionType${name}">#wwtext("name=subscription.condition.${name}")</label>
-        </td>
-    </tr>
-#end
-
-##
-## Common fields for the subscription forms
-##
-#macro(subscriptionCommonFields)
-    <tr><th class="form" colspan="2">#wwtext("name=subscription.projects")</th></tr>
-
-    #wwselect("name=projects" "label=%{getText('subscription.projects')}" "list=allProjects" "multiple=true" "tabindex=2")
-    #inlineHelp("subscription.projects.help")
-
-    <tr><th class="form" colspan="2">#wwtext("name=subscription.condition")</th></tr>
-
-    #conditionSection("all")
-    #conditionSection("simple")
-
-    #wwcheckboxlist("name=selectedConditions" "label=%{getText('conditions.builds.any.of')}" "multirow=true" "list=selectedOptions" "multiple=true" "tabindex=3")
-
-    #conditionSection("repeated")
-
-    #set($prefix = "")
-#if($fieldErrors.containsKey("repeatedX"))
-    #foreach($error in $fieldErrors.repeatedX)
-        <tr errorFor="subscription.create.project_repeatedX">
-            <th class="error-message" colspan="2">
-                <span class="errorMessage">$!webwork.htmlEncode($error)</span>
-            </th>
-        </tr>
-    #end
-
-    #set($prefix = "error-")
-#end
-    <tr>
-        <th class="${prefix}label">#wwtext("name=conditions.notify.after")</th>
-        <td class="${prefix}field">
-            #wwtextfield("theme=simple" "template=ctext" "name=repeatedX" "size=5" "onkeypress=return submitenter(this,event)" "tabindex=4")
-            #wwselect("theme=simple" "template=select" "name=repeatedUnits" "list={'builds', 'days'}" "tabindex=5")
-        </td>
-    </tr>
-    #inlineHelp("conditions.notify.after.help")
-
-    #conditionSection("advanced")
-
-    #wwtextfield("name=expression" "size=60" "label=%{getText('conditions.custom.expression')}" "tabindex=6")
-    #inlineHelp("conditions.custom.expression.help")
-
-    <tr><th class="form" colspan="2">#wwtext("name=subscription.template")</th></tr>
-
-    #wwselect("name=template" "label=%{getText('subscription.template')}" "list=availableTemplates" "tabindex=7")
 #end
 
 #macro(pluginStateImage $plugin)

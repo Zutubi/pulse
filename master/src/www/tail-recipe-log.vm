@@ -4,27 +4,79 @@
 <html>
 <head>
     <title>#wwtext("name=build") $buildResult.number :: #wwtext("name=build.stage") $h_stageName</title>
-    <script type="text/javascript" src="$base/js/prototype.js"></script>
     <script type="text/javascript">
-        <!--
         #updater("$base/ajax/tailRecipeLogPanel.action?projectName=${u_projectName}&buildVID=${buildResult.number}&stageName=${u_stageName}&maxLines=${maxLines}&refreshInterval=${refreshInterval}" "panel" $principle)
-        -->
+
+        Ext.onReady(function() {
+            var form = new Ext.form.FormPanel({
+                labelWidth: 200,
+                labelAlign: 'right',
+                method: 'POST',
+                border: false,
+                items: [{
+                    layout: 'column',
+                    border: false,
+                    items: [{
+                        layout: 'form',
+                        border: false,
+                        items: [{
+                            xtype: 'textfield',
+                            name: 'maxLines',
+                            fieldLabel: '$action.getText("stage.tail.max.lines")',
+                            value: '$maxLines',
+                            width: 50
+                        }],
+                    }, {
+                        layout: 'form',
+                        border: false,
+                        items: [{
+                            xtype: 'textfield',
+                            name: 'refreshInterval',
+                            fieldLabel: '$action.getText("stage.tail.refresh.interval")',
+                            value: '$refreshInterval',
+                            width: 50
+                        }],
+                    }, {
+                        xtype: 'panel',
+                        border: false,
+                        bodyStyle: 'padding-left: 20px',
+                        items: [{
+                            xtype: 'button',
+                            text: 'update',
+                            listeners: {
+                                click: function() {
+                                    form.getForm().el.dom.submit();
+                                }
+                            }
+                        }]
+                    }]
+                }]
+            });
+
+            form.on('afterlayout', function() {
+                this.getForm().el.dom.action = '${urls.stageLogs($buildResult, $recipeResultNode)}';
+
+                new Ext.KeyNav(this.getForm().getEl(), {
+                    'enter': function(e) {
+                        this.getForm().el.dom.submit();
+                    },
+                    'scope': this
+                });
+            }, form, {single: true});
+
+
+            form.render("params-form");
+        });
     </script>
 </head>
 <body>
     #buildTabs($buildResult "details")
 
-    #wwcform("action=/tailRecipeLog.action" "heading=%{getText('stage.tail.settings')}" "colspan=5" "width=100%" "method=get")
-        #wwhidden("name=projectName")
-        #wwhidden("name=buildVID")
-        #wwhidden("name=stageName")
-
-        <tr>
-        #wwtextfield("name=maxLines" "singleRow=true" "label=%{getText('stage.tail.max.lines')}" "size=4" "onchange=submit()" "tabindex=1")
-        #wwtextfield("name=refreshInterval" "singleRow=true" "label=%{getText('stage.tail.refresh.interval')}" "after= seconds" "size=4" "onchange=submit()" "tabindex=2")
-        <td>#wwsubmit("name=go" "value=%{getText('update')}" "tabindex=3")</td>
-        </tr>
-    #end
+    <div class="config-panel">
+        <h3 class="config-header config-header-small">$action.getText("stage.tail.settings")</h3>
+        <div class="config-container" id="params-form">
+        </div>
+    </div>
 
     <h3 class="heading">#wwtext("name=stage.tail.box") #if($logExists) &nbsp;<a href="$urls.stageLogs($buildResult, $recipeResultNode)raw/true/"><img alt="down" src="$base/images/arrow_down.gif"/>#wwtext("name=stage.full.log")</a> #end </h3>
     <div class="box">
