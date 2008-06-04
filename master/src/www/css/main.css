@@ -898,6 +898,11 @@ table.template-actions
     font-size: 10px;
 }
 
+.form-cell .x-panel-bwrap, .form-cell .x-panel-body 
+{
+    overflow: visible;
+}
+
 /*
  * Config pages
  */

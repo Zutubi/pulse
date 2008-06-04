@@ -15,7 +15,7 @@ width of its contents.  Floating it works, but hurts other things.
         </td>
     </tr>
     <tr>
-        <td id="${form.id}"></td>
+        <td class="form-cell" id="${form.id}"></td>
     </tr>
 </table>
 
