@@ -33,7 +33,7 @@ var DraggableHeader = function(id, popup, parentRow)
 
     this.popup = popup;
     this.parentRow = parentRow;
-    this.arrow = $("column-arrow-" + popup.suffix);
+    this.arrow = Ext.get("column-arrow-" + popup.suffix).dom;
 
     var s = this.getDragEl().style;
     s.borderColor = "transparent";
@@ -78,11 +78,17 @@ DraggableHeader.prototype.overColumn = function(e)
 {
     var posX = YAHOO.util.Event.getPageX(e);
 
-    return this.popup.buildColumnArray.find(function(columnHeader) {
-        // Are we to the left of the middle of this column
-        var mid = YAHOO.util.Dom.getX(columnHeader) + ( Math.floor(columnHeader.offsetWidth / 2));
-        return posX < mid;
+    var found = this.popup.buildColumnArray.first();
+    this.popup.buildColumnArray.each(function(col) {
+        var mid = col.getX() + (Math.floor(col.getWidth() / 2));
+        if(posX < mid)
+        {
+            found = col;
+            return false;
+        }
     });
+
+    return found.dom;
 }
 
 DraggableHeader.prototype.onDrag = function(e, id)
@@ -96,7 +102,7 @@ DraggableHeader.prototype.onDrag = function(e, id)
     }
     else
     {
-        var last = this.popup.buildColumnArray.last()
+        var last = this.popup.buildColumnArray.last().dom;
         arrowX = YAHOO.util.Dom.getX(last) + last.offsetWidth;
     }
 
@@ -115,9 +121,10 @@ BuildColumnPopup.prototype.popup = function()
 {
     this.createConfigureRow();
 
-    var popup = this.getColumnsPopup()
-    popup.style.display = "";
-    var link = $("columns-popup-link-" + this.suffix);
+    var popupEl = this.getColumnsPopup()
+    popupEl.show();
+    var popup = popupEl.dom;
+    var link = Ext.get("columns-popup-link-" + this.suffix).dom;
     YAHOO.util.Dom.setX(popup, Math.max(0, YAHOO.util.Dom.getX(link) - popup.offsetWidth));
     YAHOO.util.Dom.setY(popup, YAHOO.util.Dom.getY(link) + 16);
     var dd = new YAHOO.util.DD(popup);
@@ -126,21 +133,20 @@ BuildColumnPopup.prototype.popup = function()
 
 BuildColumnPopup.prototype.createConfigureRow = function()
 {
-    var currentHeaderRow = $("build-table-" + this.suffix);
-    var currentHeaders = $A(currentHeaderRow.getElementsByTagName("th"));
+    var currentHeaderRow = Ext.get("build-table-" + this.suffix);
+    var currentHeaders = currentHeaderRow.select(">th");
     var oldConfigureHeaderRow = this.getBuildConfigureRow();
 
     // Clear current state
-    var configureHeaderRow = oldConfigureHeaderRow.cloneNode(false);
-    oldConfigureHeaderRow.parentNode.replaceChild(configureHeaderRow, oldConfigureHeaderRow);
-    var checkboxes = $A(this.getColumnsPopup().getElementsByTagName("input"));
-    checkboxes.each(function(checkbox) { checkbox.checked = false; });
+    var configureHeaderRow = oldConfigureHeaderRow.dom.cloneNode(false);
+    oldConfigureHeaderRow.dom.parentNode.replaceChild(configureHeaderRow, oldConfigureHeaderRow.dom);
+    var checkboxes = this.getColumnsPopup().select(">input");
+    checkboxes.each(function(checkbox) { checkbox.dom.checked = false; });
 
     // Initialise configure headers based on current headers
-    for(i = 0; i < currentHeaders.length; i++)
-    {
+    currentHeaders.each(function(currentHeader) {
         // Extract id information
-        var parts = currentHeaders[i].id.split('-');
+        var parts = currentHeader.dom.id.split('-');
         var key = parts[2];
 
         // Add the configure header
@@ -150,14 +156,14 @@ BuildColumnPopup.prototype.createConfigureRow = function()
         var checkbox = this.getBuildColumnCheckbox(key);
         if(checkbox)
         {
-            checkbox.checked = true;
+            checkbox.dom.checked = true;
         }
-    }
+    }, this);
 }
 
 BuildColumnPopup.prototype.getBuildConfigureRow = function()
 {
-    return $("build-header-row-" + this.suffix);
+    return Ext.get("build-header-row-" + this.suffix);
 }
 
 BuildColumnPopup.prototype.getBuildColumnId = function(key)
@@ -167,7 +173,7 @@ BuildColumnPopup.prototype.getBuildColumnId = function(key)
 
 BuildColumnPopup.prototype.setBuildColumnArray = function()
 {
-    this.buildColumnArray = $A(this.getBuildConfigureRow().getElementsByTagName("th"));
+    this.buildColumnArray = this.getBuildConfigureRow().select(">th");
 }
 
 BuildColumnPopup.prototype.addBuildColumn = function(key)
@@ -183,7 +189,7 @@ BuildColumnPopup.prototype.addBuildColumn = function(key)
     configureHeaderRow.appendChild(configureHeader);
 
     // Enable drag'n'drop
-    new DraggableHeader(id, this, configureHeaderRow);
+    new DraggableHeader(id, this, configureHeaderRow.dom);
     new YAHOO.util.DDTarget(id);
 
     this.setBuildColumnArray();
@@ -192,20 +198,19 @@ BuildColumnPopup.prototype.addBuildColumn = function(key)
 
 BuildColumnPopup.prototype.removeBuildColumn = function(key)
 {
-    var configureHeaderRow = this.getBuildConfigureRow();
-    var configureHeader = $(this.getBuildColumnId(key));
-    configureHeaderRow.removeChild(configureHeader);
+    var configureHeader = Ext.get(this.getBuildColumnId(key));
+    configureHeader.remove();
     this.setBuildColumnArray();
 }
 
 BuildColumnPopup.prototype.getBuildColumnCheckbox = function(key)
 {
-    return $("build-column-" + key + "-" + this.suffix);
+    return Ext.get("build-column-" + key + "-" + this.suffix);
 }
 
 BuildColumnPopup.prototype.addRemoveBuildColumn = function(key)
 {
-    var add = this.getBuildColumnCheckbox(key).checked;
+    var add = this.getBuildColumnCheckbox(key).dom.checked;
     if(add)
     {
         this.addBuildColumn(key);
@@ -218,23 +223,22 @@ BuildColumnPopup.prototype.addRemoveBuildColumn = function(key)
 
 BuildColumnPopup.prototype.getColumnsPopup = function()
 {
-    return $("columns-popup-" + this.suffix);
+    return Ext.get("columns-popup-" + this.suffix);
 }
 
 BuildColumnPopup.prototype.getBuildColumns = function()
 {
     var configureHeaderRow = this.getBuildConfigureRow();
-    var headers = $A(configureHeaderRow.getElementsByTagName("th"));
+    var headers = configureHeaderRow.select(">th");
     var columns = "";
 
-    headers.each(function(header)
-    {
+    headers.each(function(header) {
         if(columns.length > 0)
         {
             columns += ",";
         }
 
-        var parts = header.id.split('-');
+        var parts = header.dom.id.split('-');
         columns += parts[1];
     });
 
@@ -243,20 +247,20 @@ BuildColumnPopup.prototype.getBuildColumns = function()
 
 BuildColumnPopup.prototype.getErrorEl = function()
 {
-    return $("columns-popup-error-" + this.suffix);
+    return Ext.get("columns-popup-error-" + this.suffix);
 }
 
 BuildColumnPopup.prototype.reportError = function(message)
 {
     var errorEl = this.getErrorEl();
-    errorEl.style.display = "";
-    errorEl.innerHTML = "<p>" + message + "</p>";
+    errorEl.show();
+    errorEl.update("<p>" + message + "</p>");
 }
 
 BuildColumnPopup.prototype.clearError = function()
 {
     var errorEl = this.getErrorEl();
-    errorEl.style.display = "none";
+    errorEl.hide();
 }
 
 BuildColumnPopup.prototype.applyBuildColumns = function()
@@ -270,28 +274,32 @@ BuildColumnPopup.prototype.applyBuildColumns = function()
         return;
     }
 
-    var req = new Ajax.Request(this.base + "/ajax/customiseBuildColumns.action",
-                               {
-                                   method: "get",
-                                   parameters: "suffix=" + this.suffix + "&columns=" + columns,
-                                   asynchronous: false
-                               });
-
-    if(req.responseIsSuccess())
-    {
-        var updater = new Ajax.Updater({ success: this.panel },
-                                       this.actionUrl,
-                                       { method: "get" });
-        this.getColumnsPopup().style.display = "none";
-    }
-    else
-    {
-        this.reportError("Unable to apply changes.");
-    }
+    var popup = this.getColumnsPopup();
+    popup.mask("Applying..");
+    var bcp = this;
+    Ext.Ajax.request({
+        url: this.base + "/ajax/customiseBuildColumns.action",
+        success: function() {
+            popup.unmask();
+            popup.hide();
+            Ext.get(bcp.panel).getUpdater().update({
+                url: bcp.actionUrl,
+                scripts: true
+            });
+        },
+        failure: function() {
+            popup.unmask();
+            bcp.reportError("Unable to apply changes");
+        },
+        params: {
+            suffix: this.suffix,
+            columns: columns
+        }
+    });
 }
 
 BuildColumnPopup.prototype.cancelBuildColumns = function()
 {
     this.clearError();
-    this.getColumnsPopup().style.display = "none";
+    this.getColumnsPopup().hide();
 }

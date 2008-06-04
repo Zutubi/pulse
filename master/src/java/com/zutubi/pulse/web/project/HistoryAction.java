@@ -6,7 +6,6 @@ import com.zutubi.pulse.prototype.config.user.UserPreferencesConfiguration;
 import com.zutubi.pulse.web.PagingSupport;
 import com.zutubi.pulse.xwork.interceptor.Preparable;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -17,7 +16,7 @@ public class HistoryAction extends ProjectActionBase implements Preparable
 {
     private static final int SURROUNDING_PAGES = 10;
 
-    private static final String STATE_ANY = "";
+    private static final String STATE_ANY = "[any]";
     private static final String STATE_FAILURE_OR_ERROR = "failure or error";
     private static final String STATE_FAILURE = "failure";
     private static final String STATE_ERROR = "error";
@@ -28,8 +27,6 @@ public class HistoryAction extends ProjectActionBase implements Preparable
 
     private Map<String, ResultState[]> nameToStates;
     private String stateFilter = STATE_ANY;
-    private List<String> stateFilters;
-    private Long spec = 0L;
     private BuildColumns columns;
 
     public void setStartPage(int page)
@@ -52,24 +49,9 @@ public class HistoryAction extends ProjectActionBase implements Preparable
         return stateFilter;
     }
 
-    public List<String> getStateFilters()
-    {
-        return stateFilters;
-    }
-
     public void setStateFilter(String stateFilter)
     {
         this.stateFilter = stateFilter;
-    }
-
-    public Long getSpec()
-    {
-        return spec;
-    }
-
-    public void setSpec(Long spec)
-    {
-        this.spec = spec;
     }
 
     public BuildColumns getColumns()
@@ -84,13 +66,6 @@ public class HistoryAction extends ProjectActionBase implements Preparable
 
     public void prepare() throws Exception
     {
-        stateFilters = new LinkedList<String>();
-        stateFilters.add(STATE_ANY);
-        stateFilters.add(STATE_FAILURE_OR_ERROR);
-        stateFilters.add(STATE_FAILURE);
-        stateFilters.add(STATE_ERROR);
-        stateFilters.add(STATE_SUCCESS);
-
         nameToStates = new TreeMap<String, ResultState[]>();
         nameToStates.put(STATE_ANY, ResultState.getCompletedStates());
         nameToStates.put(STATE_FAILURE_OR_ERROR, ResultState.getBrokenStates());
@@ -111,7 +86,7 @@ public class HistoryAction extends ProjectActionBase implements Preparable
 
         HistoryPage page = new HistoryPage(project, pagingSupport.getStartOffset(), pagingSupport.getItemsPerPage());
 
-        if (stateFilter.equals(STATE_ANY) && (spec == null || spec == 0L))
+        if (stateFilter.equals(STATE_ANY))
         {
             // Common case
             buildManager.fillHistoryPage(page);

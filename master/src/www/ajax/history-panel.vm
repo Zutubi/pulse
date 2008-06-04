@@ -1,15 +1,11 @@
     <table>
         <tr>
             <td>
-
-    #wwcform("action=$base/history.action" "heading=%{getText('quick.filters')}" "colspan=5" "width=100%" "method=get")
-        #wwhidden("name=projectName")
-
-        <tr>
-        #wwselect("name=stateFilter" "singleRow=true" "label=%{getText('filter.state')}" "list=stateFilters" "onchange=submit()" "tabindex=1")
-        <td><a href="$urls.projectHistory($u_projectName)">#wwtext("name=filter.clear")</a></td>
-        </tr>
-    #end
+                <div class="config-panel">
+                    <h3 class="config-header config-header-small">filter builds</h3>
+                    <div class="config-container" id="filter-form">
+                    </div>
+                </div>
             </td>
         </tr>
         <tr>
@@ -57,3 +53,10 @@
     </table>
 
 #buildTableColumns($columns "project.history")
+
+<script type="text/javascript">
+    if(!firstRender)
+    {
+        renderForm();
+    }
+</script>

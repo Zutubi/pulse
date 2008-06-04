@@ -1042,6 +1042,11 @@ table.template-actions
     background-color: #F6D0D0;
 }
 
+h3.config-header-small {
+    font-size: 1em;
+    padding:5px;
+}
+
 .config-description {
     padding:8px;
     margin:0;
