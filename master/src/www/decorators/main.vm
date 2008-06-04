@@ -122,7 +122,8 @@
                                     id: 'nested-west',
                                     split: true,
                                     titlebar: false,
-                                    collapsible: true
+                                    collapsible: true,
+                                    hidden: true
                                 }]
                             }]
                         });
