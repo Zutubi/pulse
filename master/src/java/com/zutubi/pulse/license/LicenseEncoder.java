@@ -337,12 +337,7 @@ public class LicenseEncoder implements LicenseKeyFactory
     {
         public static void main(String[] argv)
         {
-            String licenseKey = "AAAAOVBST0ZFU1NJT05BTApOQ1IgQ29ycAoyMDA4LT" +
-                    "A5LTIwIDEyOjAzOjM2IEVTVAo2Ci0xCi0xCi0xCjs1hmd" +
-                    "YK6YzFh+AgEU4R2PpqQA6hbBvHQp53jujvAgcBQ5PtPh" +
-                    "SbcirQK2MtPZhvEuPnQmVj3i5JV3X8U3IZoHu/CCVUzC" +
-                    "2B9IdAG8ll6b+JenTndT+NerXEJwqEzj3l1BM5IO146ehf2" +
-                    "lS9vhsUAMX5QkFcDoBYd1MGSlxKqGc";
+            String licenseKey = "";
 
             LicenseDecoder decoder = new LicenseDecoder();
             License license = decoder.decode(licenseKey.getBytes());
