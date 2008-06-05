@@ -1,6 +1,21 @@
 <html>
-<head></head>
+<head>
+    <script type="text/javascript">
+        Ext.onReady(function() {
+            var button = new Ext.Button({
+                text: 'continue',
+                renderTo: 'continue',
+                listeners: {
+                    click: function() {
+                        document.location = 'execute.action';
+                    }
+                }
+            });
 
+            button.render();
+        });
+    </script>
+</head>
 <body>
 <h1 id="upgrade.preview">Upgrade Preview</h1>
 
@@ -46,20 +61,18 @@
     #end
 </p>
 #end
-<p style="width:50%">
-    Please be aware that pulse can not continue without running these upgrade tasks.  If you do not wish to continue with
-    this upgrade, shutdown this installation of pulse.  Otherwise, please click continue to run the upgrade.
-</p>
-#wwform("action=execute" "method=post")
-#continue(1)
-#end
-<!--
-<p style="width:50%; color: red; font-size: 125%">
-   This is an experimental release of Pulse 2.0 that <strong>does not</strong> support
-   an upgrade path.  Please modify your config.properties file to use a fresh
-   data path.  <strong>DO NOT</strong> attempt to use this version of Pulse with
-   production data.
-</p>
--->
+
+<div style="width: 50%">
+    <p>
+        Please be aware that pulse cannot continue without running these upgrade tasks.  If you do not wish to continue with
+        this upgrade, shutdown this installation of pulse.  Otherwise, please click continue to run the upgrade.
+    </p>
+
+    <div style="text-align: center; margin-top: 20px">
+        <div id="continue" style="margin: 0 auto; width: 100px">
+        </div>
+    </div>
+</div>
+
 </body>
 </html>

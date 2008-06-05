@@ -7,7 +7,69 @@
 #end
 <html>
 <head>
-    <title>$!webwork.htmlEncode($project.name)</title>
+    <title>$h_projectName</title>
+    <script type="text/javascript">
+        Ext.onReady(function() {
+            var form = new Ext.form.FormPanel({
+                labelWidth: 150,
+                labelAlign: 'right',
+                method: 'POST',
+                border: false,
+                items: [{
+                    layout: 'column',
+                    border: false,
+                    items: [{
+                        columnWidth: .5,
+                        layout: 'form',
+                        border: false,
+                        items: [{
+                            xtype: 'combo',
+                            name: 'timeframe',
+                            fieldLabel: '$action.getText("chart.timeframe")',
+                            editable: false,
+                            forceSelection: true,
+                            triggerAction: 'all',
+                            store: ['15', '30', '45', '90'],
+                            value: '$timeframe'
+                        }]
+                    }, {
+                        columnWidth: .25,
+                        layout: 'form',
+                        border: false,
+                        items: [{
+                            xtype: 'checkbox',
+                            name: 'zoom',
+                            inputValue: 'true',
+                            width: 14,
+                            fieldLabel: '$action.getText("chart.zoom")'
+#if($zoom)
+                            , checked: true
+#end
+                        }]
+                    }, {
+                        columnWidth: .25,
+                        xtype: 'panel',
+                        border: false,
+                        items: [{
+                            xtype: 'button',
+                            text: '$action.getText("refresh.name")',
+                            anchor: '95%',
+                            listeners: {
+                                click: function() {
+                                    form.getForm().el.dom.submit();
+                                }
+                            }
+                        }]
+                    }]
+                }]
+            });
+
+            form.on('afterlayout', function() {
+                this.getForm().el.dom.action = '${urls.projectReports($u_projectName)}';
+            }, form, {single: true});
+            form.render('params-form');
+        });
+    </script>
 </head>
 <body>
     #projectTabs("reports")
@@ -31,16 +93,11 @@
     </tr>
     <tr>
         <td colspan="2" style="padding-left: 30px">
-            #wwcform("action=projectReports.action" "heading=%{getText('chart.parameters')}" "colspan=5" "width=100%" "method=post")
-                #wwhidden("name=projectName")
-                <tr>
-                    #wwselect("name=timeframe" "label=%{getText('chart.timeframe')}" "list=timeframes" "singleRow=true" "tabindex=1")
-                    #wwcheckbox("name=zoom" "label=%{getText('chart.zoom')}" "singleRow=true" "tabindex=2")
-                    <td>
-                        #wwsubmit("name=refresh" "value=%{getText('refresh.name')}" "tabindex=3")
-                    </td>
-                </tr>
-            #end
+            <div class="config-panel">
+                <h3 class="config-header config-header-small">$action.getText("chart.parameters")</h3>
+                <div class="config-container" id="params-form">
+                </div>
+            </div>
         </td>
     </tr>
 </table>

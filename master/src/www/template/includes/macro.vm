@@ -314,22 +314,6 @@
 #end
 
 ##
-## Outputs a heading row for a content table with an action
-##
-#macro(actionHeadingRow $key $span $actionKey $url $image $id)
-    <tr>
-        <th class="heading" colspan="$span">
-    #if($actionKey)
-            <span class="action">
-                <a #if($id != "")id="$id"#end href="$url"><img alt="$action.getText($actionKey)" src="$base/images/$image"/>#wwtext("name=$actionKey")</a>
-            </span>
-    #end
-            #wwtext("name=$key")
-        </th>
-    </tr>
-#end
-
-##
 ## Outputs a heading row for a content table with an action, restricted to specific roles
 ##
 #macro(restrictedHeadingRow $key $span $role $actionKey $url $image $id)
@@ -349,7 +333,11 @@
 ## Outputs a heading row for a content table
 ##
 #macro(headingRow $key $span)
-    #actionHeadingRow($key $span false false false "")
+    <tr>
+        <th class="heading" colspan="$span">
+            #wwtext("name=$key")
+        </th>
+    </tr>
 #end
 
 ##
@@ -358,32 +346,6 @@
 #macro(noteRow $key $span)
     <tr>
         <th class="note" colspan="$span">#wwtext("name=$key")</th>
-    </tr>
-#end
-
-##
-## Outputs a heading row with an edit action
-##
-#macro(editHeadingRow $key $span $url $id)
-    #actionHeadingRow($key $span "edit" $url "pencil.gif" $id)
-#end
-
-##
-## Outputs a heading row for a content table with a reset and edit action
-##
-#macro(adminHeadingRow $key $editUrl $editId $resetUrl $resetId)
-    <tr>
-        <th class="heading" colspan="2">
-            <span class="action">
-            #if($editUrl)
-                <a #if($editId != "")id="$editId"#end href="$editUrl"><img alt="$action.getText('edit')" src="$base/images/pencil.gif"/>#wwtext("name=edit")</a>
-            #end
-            #if($resetUrl)
-                <a #if($resetId != "")id="$resetId"#end href="$resetUrl"><img alt="$action.getText('reset')" src="$base/images/arrow_rotate_anticlockwise.gif"/>#wwtext("name=reset")</a>
-            #end
-            </span>
-            #wwtext("name=$key")
-        </th>
     </tr>
 #end
 
@@ -567,17 +529,6 @@
 #end
 
 ##
-## Outputs an enabled:disabled row based on the boolean value of the property.
-## ie: true is translated to enabled, false to disabled.
-##
-#macro(enabledDisabledRow $key $value)
-    <tr>
-        <th class="content-row" #if($span > 1) colspan="$span" #end>#wwtext("name=$key")</th>
-        <td class="content">#if($value)#wwtext("name=enabled")#else #wwtext("name=disabled")#end</td>
-    </tr>
-#end
-
-##
 ## Outputs a name:value pair row from a property; both name and value need to
 ## be escaped.
 ##
@@ -616,15 +567,6 @@
 #end
 
 ##
-## Outputs an action cell for a content table
-##
-#macro(actionCell2 $actionKey $url)
-    <td class="content">
-        <a href="$url">#wwtext("name=$actionKey")</a>
-    </td>
-#end
-
-##
 ## Outputs an action cell with an image, and link title but no text
 ##
 #macro(actionCellTitle $id $titleKey $url $image)
@@ -643,51 +585,10 @@
 #end
 
 ##
-## Outputs an edit cell for a content table
-##
-#macro(editCell $url $id)
-    #actionCellId("configure" $url "pencil.gif" $id false)
-#end
-
-##
 ## Outputs an edit cell for a content table with a  row span
 ##
 #macro(editCellSpan $url $id $span)
     #actionCellId("configure" $url "pencil.gif" $id $span)
-#end
-
-##
-## Outputs a delete cell for a content table, and uses the specified id for the link.
-##
-## $message: optional. If included, a javascript popup will display this message as a confirmation to continue with this action
-##
-#macro(deleteCell $id $url $message)
-    <td class="content">
-        #if ($message && $message.length() > 0)
-        <a href="#" id="$id" onclick="confirmUrl('$action.jsStringEncode($message)', '$url')"><img alt="$action.getText('delete')" src="$base/images/delete.gif"/> #wwtext("name=delete")</a>
-        #else
-        <a href="$url" id="$id"><img alt="$action.getText('delete')" src="$base/images/delete.gif"/> #wwtext("name=delete")</a>
-        #end
-    </td>
-#end
-
-##
-## Outputs a remove cell for a content table, and uses the specified id for the link.
-##
-#macro(removeCell $message $url $id)
-    <td class="content">
-        <a href="#" id="$id" onclick="confirmUrl('$action.jsStringEncode($message)', '$url')"><img alt="$action.getText('remove')" src="$base/images/delete.gif"/> #wwtext("name=remove")</a>
-    </td>
-#end
-
-##
-## Outputs a delete cell for a content table, and uses the specified id for
-## the link, with a row span.
-##
-#macro(deleteCellSpan $message $url $id $span)
-    <td class="content" rowspan="$span">
-        <a href="#" id="$id" onclick="confirmUrl('$action.jsStringEncode($message)', '$url')"><img alt="$action.getText('delete')" src="$base/images/delete.gif"/> #wwtext("name=delete")</a>
-    </td>
 #end
 
 ##
@@ -1025,247 +926,6 @@
             &nbsp;
         </td>
     #end
-#end
-
-
-##
-## Expands to the icon for the given type of SCM.
-##
-#macro(scmIcon $scm)
-    #if ($scm.class.name == 'com.zutubi.pulse.model.Svn')<img alt="svn" src="$base/images/svn_16.png"/>#end
-    #if ($scm.class.name == 'com.zutubi.pulse.model.Cvs')<img alt="cvs" src="$base/images/cvs_16.png"/>#end
-    #if ($scm.class.name == 'com.zutubi.pulse.model.P4')<img alt="p4" src="$base/images/p4_16.png"/>#end
-#end
-
-##
-## Expands to an SCM icon and name for the projects SCM.
-##
-#macro(scmDetail $project)
-    #scmIcon($project.scm)
-    #if ($project.scm.class.name == 'com.zutubi.pulse.model.Svn') subversion #end
-    #if ($project.scm.class.name == 'com.zutubi.pulse.model.Cvs') cvs #end
-    #if ($project.scm.class.name == 'com.zutubi.pulse.model.P4') perforce #end
-#end
-
-##
-## Outputs a row with SCM details
-##
-#macro(scmRow $project)
-    <tr>
-        #contentHeading("scm.type" 1)
-        <td class="content">#scmDetail($project)</td>
-    </tr>
-#end
-
-##
-## Outputs a heading for a box
-##
-#macro(boxHeading $key)
-    <h3 class="heading">#wwtext("name=$key")</h3>
-#end
-
-##
-## Outputs a table row with inline help text
-##
-#macro(inlineHelp $helpKey)
-    <tr>
-        <td>&nbsp;</td>
-        <td class="inline-help">#wwtext("name=$helpKey")</td>
-    </tr>
-#end
-
-##
-## Outputs a table row containing a message.
-##
-#macro(msgRow $msgKey $colspan)
-    <tr>
-        <td class="msg" colspan="$colspan" >#wwtext("name=$msgKey")</td>
-    </tr>
-#end
-
-##
-## Opens a row for submission buttons
-##
-#macro(openSubmit)
-    <tr>
-        <td class="submit" colspan="2">
-#end
-
-##
-## Closes a row for submission buttons
-##
-#macro(closeSubmit)
-        </td>
-    </tr>
-#end
-
-#macro(refresh $tabIndex)
-    #openSubmit()
-        #wwsubmit("name=refresh" "value=%{getText('refresh.name')}" "tabindex=$tabIndex")
-    #closeSubmit()
-#end
-
-##
-## Shows a standard Save or Cancel submit row, given the first tab index.
-##
-#macro(saveCancel $tabIndex)
-    #openSubmit()
-        #wwsubmit("name=save" "value=%{getText('save.name')}" "tabindex=$tabIndex")
-        #set($tabIndex = $tabIndex + 1)
-        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=$tabIndex")
-    #closeSubmit()
-#end
-
-##
-## Shows a standard Continue or Cancel submit row, given the first tab index.
-##
-#macro(continueCancel $tabIndex)
-    #openSubmit()
-        #wwsubmit("name=continue" "id=continue" "value=%{getText('continue.name')}" "tabindex=$tabIndex")
-        #set($tabIndex = $tabIndex + 1)
-        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=$tabIndex")
-    #closeSubmit()
-#end
-
-##
-## Shows a standard Continue submit row, given the first tab index.
-##
-#macro(continue $tabIndex)
-    #openSubmit()
-        #wwsubmit("name=continue" "value=%{getText('continue.name')}" "tabindex=$tabIndex")
-    #closeSubmit()
-#end
-
-##
-## Shows a standard Continue Skip submit row, given the first tab index.
-##
-    #macro(continueSkip $tabIndex)
-        #openSubmit()
-            #wwsubmit("name=continue" "value=%{getText('continue.name')}" "tabindex=$tabIndex")
-            #set($tabIndex = $tabIndex + 1)
-            #wwsubmit("name=skip" "value=%{getText('skip.name')}" "tabindex=$tabIndex")
-        #closeSubmit()
-    #end
-
-#macro(skip $tabIndex)
-    #openSubmit()
-        #wwsubmit("name=skip" "value=%{getText('skip.name')}" "tabindex=$tabIndex")
-    #closeSubmit()
-#end
-
-##
-## Shows a standard Upload submit row, given the first tab index.
-##
-#macro(upload $tabIndex)
-    #openSubmit()
-        #wwsubmit("name=upload" "id=upload" "value=%{getText('upload.name')}" "tabindex=$tabIndex")
-        #set($tabIndex = $tabIndex + 1)
-        #wwsubmit("name=cancel" "id=cancel" "value=%{getText('cancel.name')}" "tabindex=$tabIndex")
-    #closeSubmit()
-#end
-
-##
-## Shows a standard Install submit row, given the first tab index.
-##
-#macro(install $tabIndex)
-    #openSubmit()
-        #wwsubmit("name=install" "value=%{getText('install.name')}" "tabindex=$tabIndex")
-    #closeSubmit()
-#end
-
-##
-## Shows a standard Previous, Next or Cancel row, as used by wizards.
-## param: tabIndex, indicates the first tab index to be used by the row.
-##
-#macro(previousNextCancel $tabIndex)
-    #openSubmit()
-        #wwsubmit("name=previous" "value=%{getText('previous.name')}" "tabindex=$tabIndex")
-        #set($tabIndex = $tabIndex + 1)
-        #wwsubmit("name=next" "value=%{getText('next.name')}" "tabindex=$tabIndex")
-        #set($tabIndex = $tabIndex + 1)
-        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=$tabIndex")
-    #closeSubmit()
-#end
-
-##
-## Shows a standard Next or Cancel row, as used by wizards.
-## param: tabIndex, indicates the first tab index to be used by the row.
-##
-#macro(nextCancel $tabIndex)
-    #openSubmit()
-        #wwsubmit("name=next" "value=%{getText('next.name')}" "tabindex=$tabIndex")
-        #set($tabIndex = $tabIndex + 1)
-        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=$tabIndex")
-    #closeSubmit()
-#end
-
-##
-## Shows a standard Next row, as used by wizards.
-## param: tabIndex, indicates the first tab index to be used by the row.
-##
-#macro(next $tabIndex)
-    #openSubmit()
-        #wwsubmit("name=next" "value=%{getText('next.name')}" "tabindex=$tabIndex")
-    #closeSubmit()
-#end
-
-##
-## Shows a standard Create or Cancel row.
-## param: tabIndex, indicates the first tab index to be used by the row.
-##
-#macro(createCancel $tabIndex)
-    #openSubmit()
-        #wwsubmit("name=create" "value=%{getText('create.name')}" "tabindex=$tabIndex")
-        #set($tabIndex = $tabIndex + 1)
-        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=$tabIndex")
-    #closeSubmit()
-#end
-
-##
-## Shows a standard Create or Cancel row.
-## param: tabIndex, indicates the first tab index to be used by the row.
-##
-#macro(addCancel $tabIndex)
-    #openSubmit()
-        #wwsubmit("name=add" "value=%{getText('add.name')}" "tabindex=$tabIndex")
-        #set($tabIndex = $tabIndex + 1)
-        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=$tabIndex")
-    #closeSubmit()
-#end
-
-##
-## Shows a standard Previous, Finish or Cancel row, as used by wizards.
-## param: tabIndex, indicates the first tab index to be used by the row.
-##
-#macro(previousFinishCancel $tabIndex)
-    #openSubmit()
-        #wwsubmit("name=previous" "value=%{getText('previous.name')}" "tabindex=$tabIndex")
-        #set($tabIndex = $tabIndex + 1)
-        #wwsubmit("name=next" "value=%{getText('finish.name')}" "tabindex=$tabIndex")
-        #set($tabIndex = $tabIndex + 1)
-        #wwsubmit("name=cancel" "value=%{getText('cancel.name')}" "tabindex=$tabIndex")
-    #closeSubmit()
-#end
-
-##
-## Shows a standard Previous, Finish row, as used by wizards.
-## param: tabIndex, indicates the first tab index to be used by the row.
-##
-#macro(previousFinish $tabIndex)
-    #openSubmit()
-        #set($prevTabIndex = $tabIndex)
-        #set($finishTabIndex = $tabIndex + 1)
-        #wwsubmit("name=previous" "value=%{getText('previous.name')}" "tabindex=$prevTabIndex")
-        #wwsubmit("name=next" "value=%{getText('finish.name')}" "tabindex=$finishTabIndex")
-    #closeSubmit()
-#end
-
-##
-## Outputs a single row for a name-value pair table.  Used for basic entity
-## details.
-##
-#macro(detailrow $header $content)
-  <tr><th class="command-detail">$header</th><td class="command-detail">$content</td></tr>
 #end
 
 ##
