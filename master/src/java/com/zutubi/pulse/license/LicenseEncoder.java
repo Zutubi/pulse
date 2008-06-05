@@ -337,10 +337,24 @@ public class LicenseEncoder implements LicenseKeyFactory
     {
         public static void main(String[] argv)
         {
-            String licenseKey = "";
+            String licenseKey = "AAAAOVBST0ZFU1NJT05BTApOQ1IgQ29ycAoyMDA4LT" +
+                    "A5LTIwIDEyOjAzOjM2IEVTVAo2Ci0xCi0xCi0xCjs1hmd" +
+                    "YK6YzFh+AgEU4R2PpqQA6hbBvHQp53jujvAgcBQ5PtPh" +
+                    "SbcirQK2MtPZhvEuPnQmVj3i5JV3X8U3IZoHu/CCVUzC" +
+                    "2B9IdAG8ll6b+JenTndT+NerXEJwqEzj3l1BM5IO146ehf2" +
+                    "lS9vhsUAMX5QkFcDoBYd1MGSlxKqGc";
 
             LicenseDecoder decoder = new LicenseDecoder();
             License license = decoder.decode(licenseKey.getBytes());
+
+            System.out.println("Name: " + license.getHolder());
+            System.out.println("Type: " + license.getType());
+            System.out.println("Expiry: " + license.getExpiryDate());
+            System.out.println(" - projects: " + license.getSupportedProjects());
+            System.out.println(" - users: " + license.getSupportedUsers());
+            System.out.println(" - agents: " + license.getSupportedAgents());
+            System.out.println("");
+
             license.setType(LicenseType.ENTERPRISE);
             LicenseEncoder.configureLicenseBasedOnType(license);
 
@@ -354,6 +368,26 @@ public class LicenseEncoder implements LicenseKeyFactory
 
             LicenseEncoder encoder = new LicenseEncoder();
             System.out.println(new String(encoder.encode(license)));
+        }
+    }
+
+    private static class ReadLicense
+    {
+        public static void main(String argv[])
+        {
+            String key = "";
+
+            LicenseDecoder decoder = new LicenseDecoder();
+            License license = decoder.decode(key.getBytes());
+
+            System.out.println("Name: " + license.getHolder());
+            System.out.println("Type: " + license.getType());
+            System.out.println("Expiry: " + license.getExpiryDate());
+            System.out.println(" - projects: " + license.getSupportedProjects());
+            System.out.println(" - users: " + license.getSupportedUsers());
+            System.out.println(" - agents: " + license.getSupportedAgents());
+            System.out.println("");
+
         }
     }
 }
