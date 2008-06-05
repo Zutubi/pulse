@@ -17,6 +17,7 @@
                     layout: 'column',
                     border: false,
                     items: [{
+                        columnWidth: .4,
                         layout: 'form',
                         border: false,
                         items: [{
@@ -25,8 +26,9 @@
                             fieldLabel: '$action.getText("stage.tail.max.lines")',
                             value: '$maxLines',
                             width: 50
-                        }],
+                        }]
                     }, {
+                        columnWidth: .4,
                         layout: 'form',
                         border: false,
                         items: [{
@@ -35,11 +37,11 @@
                             fieldLabel: '$action.getText("stage.tail.refresh.interval")',
                             value: '$refreshInterval',
                             width: 50
-                        }],
+                        }]
                     }, {
+                        columnWidth: .2,
                         xtype: 'panel',
                         border: false,
-                        bodyStyle: 'padding-left: 20px',
                         items: [{
                             xtype: 'button',
                             text: 'update',
@@ -84,6 +86,4 @@
             #parse("ajax/tail-recipe-log-panel.vm")
         </div>
     </div>
-
-
 </html>

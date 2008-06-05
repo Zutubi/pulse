@@ -40,7 +40,7 @@
                                     form.getForm().getEl().dom.submit();
                                 }
                             }
-                        }],
+                        }]
                     }, {
                         columnWidth: .3,
                         xtype: 'panel',
