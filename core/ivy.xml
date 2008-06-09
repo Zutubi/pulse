@@ -35,6 +35,8 @@
 
         <dependency org="junit" name="junit" rev="3.8.1" conf="external,build->default"/>
 
+        <dependency org="mockito" name="mockito" rev="1.3" conf="external,build->default"/>
+
         <dependency org="netbeans" name="javacvs" rev="20070419" conf="external,build,release->default"/>
 
         <dependency org="opensymphony" name="xwork" rev="1.1.1" conf="external,build,release->minimal"/>

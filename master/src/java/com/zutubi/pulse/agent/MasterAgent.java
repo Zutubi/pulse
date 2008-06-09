@@ -106,19 +106,11 @@ public class MasterAgent implements Agent
         return "master";
     }
 
-    public static String constructMasterLocation(MasterConfiguration appConfig, SystemConfiguration systemConfig)
+    private String constructMasterLocation(MasterConfiguration appConfig, SystemConfiguration systemConfig)
     {
-        String url = appConfig.getAgentHost() + ":" + systemConfig.getServerPort() + systemConfig.getContextPath();
-        if(url.endsWith("/"))
-        {
-            url = url.substring(0, url.length() - 1);
-        }
-
-        return url;
-    }
-
-    public static String constructMasterUrl(MasterConfiguration appConfig, SystemConfiguration systemConfig)
-    {
-        return "http://" + constructMasterLocation(appConfig, systemConfig);
+        DefaultMasterLocationProvider provider = new DefaultMasterLocationProvider();
+        provider.setMasterConfiguration(appConfig);
+        provider.setSystemConfiguration(systemConfig);
+        return provider.getMasterLocation();
     }
 }

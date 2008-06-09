@@ -1,9 +1,6 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.agent.MasterAgent;
-import com.zutubi.pulse.bootstrap.MasterConfiguration;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.bootstrap.SystemConfiguration;
+import com.zutubi.pulse.agent.MasterLocationProvider;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.model.ResourceManager;
@@ -30,16 +27,16 @@ public class SlaveBuildService implements BuildService
 
     private SlaveService service;
     private Slave slave;
-    private MasterConfigurationManager configurationManager;
+    private MasterLocationProvider masterLocationProvider;
     private ResourceManager resourceManager;
     private ServiceTokenManager serviceTokenManager;
 
-    public SlaveBuildService(SlaveService service, ServiceTokenManager serviceTokenManager, Slave slave, MasterConfigurationManager configurationManager, ResourceManager resourceManager)
+    public SlaveBuildService(SlaveService service, ServiceTokenManager serviceTokenManager, Slave slave, MasterLocationProvider masterLocationProvider, ResourceManager resourceManager)
     {
         this.service = service;
         this.serviceTokenManager = serviceTokenManager;
         this.slave = slave;
-        this.configurationManager = configurationManager;
+        this.masterLocationProvider = masterLocationProvider;
         this.resourceManager = resourceManager;
     }
 
@@ -55,13 +52,9 @@ public class SlaveBuildService implements BuildService
 
     public boolean build(RecipeRequest request, BuildContext context)
     {
-        MasterConfiguration appConfig = configurationManager.getAppConfig();
-        SystemConfiguration systemConfig = configurationManager.getSystemConfig();
-        String masterUrl = MasterAgent.constructMasterUrl(appConfig, systemConfig);
-
         try
         {
-            return service.build(serviceTokenManager.getToken(), masterUrl, slave.getId(), request, context);
+            return service.build(serviceTokenManager.getToken(), masterLocationProvider.getMasterUrl(), slave.getId(), request, context);
         }
         catch (RuntimeException e)
         {
@@ -188,15 +181,5 @@ public class SlaveBuildService implements BuildService
         }
 
         return false;
-    }
-
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
-    {
-        this.configurationManager = configurationManager;
-    }
-
-    public void setResourceManager(ResourceManager resourceManager)
-    {
-        this.resourceManager = resourceManager;
     }
 }

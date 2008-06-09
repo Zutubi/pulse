@@ -2,7 +2,7 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.AgentManager;
-import com.zutubi.pulse.agent.MasterAgent;
+import com.zutubi.pulse.agent.MasterLocationProvider;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
@@ -84,8 +84,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
     private AgentManager agentManager;
     private EventManager eventManager;
-    private MasterConfigurationManager configurationManager;
-
+    private MasterLocationProvider masterLocationProvider;
 
     public ThreadedRecipeQueue()
     {
@@ -521,7 +520,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         context.addProperty("build.revision", buildRevision.getRevision().getRevisionString());
         context.addProperty("build.timestamp", BuildContext.PULSE_BUILD_TIMESTAMP_FORMAT.format(new Date(buildRevision.getTimestamp())));
         context.addProperty("build.timestamp.millis", Long.toString(buildRevision.getTimestamp()));
-        context.addProperty("master.url", MasterAgent.constructMasterUrl(configurationManager.getAppConfig(), configurationManager.getSystemConfig()));
+        context.addProperty("master.url", masterLocationProvider.getMasterUrl());
         context.addProperty("specification.build.count", Integer.toString(request.getBuildSpecification().getBuildCount()));
         context.addProperty("specification.success.count", Integer.toString(request.getBuildSpecification().getSuccessCount()));
         return context;
@@ -767,6 +766,8 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
+        // Cache the timeout value now: it is refreshed when changed by a
+        // call to setUnsatisfiableTimeout.
         long timeout = configurationManager.getAppConfig().getUnsatisfiableRecipeTimeout();
         if (timeout > 0)
         {
@@ -774,7 +775,11 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         }
 
         this.unsatisfiableTimeout = timeout;
-        this.configurationManager = configurationManager;
+    }
+
+    public void setMasterLocationProvider(MasterLocationProvider masterLocationProvider)
+    {
+        this.masterLocationProvider = masterLocationProvider;
     }
 
     private static class DispatchedRequest

@@ -1,9 +1,6 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.agent.Agent;
-import com.zutubi.pulse.agent.AgentManager;
-import com.zutubi.pulse.agent.SlaveAgent;
-import com.zutubi.pulse.agent.Status;
+import com.zutubi.pulse.agent.*;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.SimpleMasterConfigurationManager;
 import com.zutubi.pulse.core.BuildException;
@@ -72,13 +69,22 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         slave3000 = createSlave(3000);
         agentManager.addSlave(slave3000);
 
-        MasterConfigurationManager configurationManager = new SimpleMasterConfigurationManager();
-
         queue = new ThreadedRecipeQueue();
         queue.setEventManager(eventManager);
         queue.setAgentManager(agentManager);
+        queue.setMasterLocationProvider(new MasterLocationProvider()
+        {
+            public String getMasterLocation()
+            {
+                return "test";
+            }
+
+            public String getMasterUrl()
+            {
+                return "test";
+            }
+        });
         queue.setUnsatisfiableTimeout(-1);
-        queue.setConfigurationManager(configurationManager);
         queue.init();
 
         recipeErrors = new LinkedList<RecipeErrorEvent>();
