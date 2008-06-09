@@ -37,7 +37,7 @@ public class AgentPingService implements Stoppable
 
     public void init()
     {
-        threadPool = new ThreadPoolExecutor(4, 30, 1, TimeUnit.MINUTES, new LinkedBlockingQueue<Runnable>(), new ThreadFactory()
+        threadPool = new ThreadPoolExecutor(4, 30, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new ThreadFactory()
         {
             public Thread newThread(Runnable r)
             {
