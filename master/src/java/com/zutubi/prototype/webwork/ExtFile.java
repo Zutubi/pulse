@@ -9,6 +9,7 @@ import com.zutubi.pulse.web.vfs.FileObjectWrapper;
 public class ExtFile
 {
     private String id;
+    private String baseName;
     private String text;
     private boolean leaf;
     private String cls;
@@ -16,23 +17,22 @@ public class ExtFile
 
     public ExtFile(FileObjectWrapper fo)
     {
-        id = fo.getId();
+        id = fo.getUniqueId();
+        baseName = fo.getBaseName();
         text = fo.getName();
         leaf = !fo.isContainer();
         cls = fo.getCls();
         iconCls = fo.getIconCls();
     }
 
-    public ExtFile(String id, String text, boolean leaf)
-    {
-        this.id = id;
-        this.text = text;
-        this.leaf = leaf;
-    }
-
     public String getId()
     {
         return id;
+    }
+
+    public String getBaseName()
+    {
+        return baseName;
     }
 
     public String getText()

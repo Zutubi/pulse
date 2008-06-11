@@ -4,6 +4,7 @@ import com.zutubi.pulse.vfs.FileAction;
 import com.zutubi.pulse.vfs.pulse.AbstractPulseFileObject;
 import com.zutubi.pulse.vfs.pulse.AddressableFileObject;
 import com.zutubi.pulse.vfs.pulse.FileTypeConstants;
+import com.zutubi.pulse.vfs.pulse.UniquelyIdentified;
 import com.zutubi.util.logging.Logger;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
@@ -29,15 +30,17 @@ public class FileObjectWrapper
         this.base = base;
     }
 
-    /**
-     *
-     */
     public String getName()
     {
         if (fo instanceof AbstractPulseFileObject)
         {
             return ((AbstractPulseFileObject)fo).getDisplayName();
         }
+        return fo.getName().getBaseName();
+    }
+
+    public String getBaseName()
+    {
         return fo.getName().getBaseName();
     }
 
@@ -89,13 +92,23 @@ public class FileObjectWrapper
         }
     }
 
-    /**
-     *
-     */
     public String getId()
     {
         return fo.getName().getBaseName();
     }
+
+    public String getUniqueId()
+    {
+        if(fo instanceof UniquelyIdentified)
+        {
+            return ((UniquelyIdentified) fo).getUniqueId();
+        }
+        else
+        {
+            return null;
+        }
+    }
+
 
     public String getRelativeParentPath()
     {

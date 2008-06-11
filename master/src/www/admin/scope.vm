@@ -60,6 +60,7 @@
 
                     var root = new Ext.tree.AsyncTreeNode({
                         id: '${tab}',
+                        baseName: '${tab}',
                         text: '${tab}',
                         iconCls: 'config-${configClassification}-icon',
                         allowDrag: false,

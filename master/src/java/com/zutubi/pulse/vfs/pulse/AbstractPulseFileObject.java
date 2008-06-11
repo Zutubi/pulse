@@ -171,11 +171,20 @@ public abstract class AbstractPulseFileObject extends AbstractFileObject
         return null;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param objectFactory instance.
-     */
+    public String getFileType() throws FileSystemException
+    {
+        FileType type = getType();
+        if (type == FileType.FOLDER)
+        {
+            return FileTypeConstants.FOLDER;
+        }
+        if (type == FileType.FILE)
+        {
+            return FileTypeConstants.FILE;
+        }
+        return FileTypeConstants.UNKNOWN;
+    }
+
     public void setObjectFactory(ObjectFactory objectFactory)
     {
         this.objectFactory = objectFactory;
@@ -192,27 +201,8 @@ public abstract class AbstractPulseFileObject extends AbstractFileObject
         this.buildManager = buildManager;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param projectManager instance
-     */
     public void setProjectManager(ProjectManager projectManager)
     {
         this.projectManager = projectManager;
-    }
-
-    public String getFileType() throws FileSystemException
-    {
-        FileType type = getType();
-        if (type == FileType.FOLDER)
-        {
-            return FileTypeConstants.FOLDER;
-        }
-        if (type == FileType.FILE)
-        {
-            return FileTypeConstants.FILE;
-        }
-        return FileTypeConstants.UNKNOWN;
     }
 }
