@@ -82,6 +82,7 @@
 
             var root = new Ext.tree.AsyncTreeNode({
                 id: project,
+                baseName: project,
                 text: project,
                 cls: cls,
                 iconCls: iconCls,
@@ -131,7 +132,7 @@
         var selectTemplate = function(path)
         {
             templateTree.getSelectionModel().clearSelections();
-            templateTree.selectPath(templateTree.getRootNode().getPath() + '/' + path);
+            templateTree.selectPath(templateTree.getRootNode().getPath('baseName') + '/' + path, 'baseName');
         }
 
         // ------------------------------------------------------------------
@@ -168,6 +169,7 @@
 
                     var templateRoot = new Ext.tree.AsyncTreeNode({
                         id: 'x',
+                        baseName: 'x',
                         text: 'settings',
                         allowDrag: false,
                         allowDrop: false
@@ -211,7 +213,7 @@
                             configTree.selectConfigPath('$configTreePath');
                         });
 #else
-                        templateRoot.expand(false, false, function() {
+                        templateRoot.expand(false, 'baseName', function() {
                             templateRoot.firstChild.expand();
                             treesInitialised = true;
                             tabPanel.activate('template-tree');
@@ -248,13 +250,13 @@
                                 node = templateTree.getRootNode();
                             }
 
-                            if(!configTree || configTree.getRootNode().id != node.id)
+                            if(!configTree || configTree.getRootNode().attributes.baseName != node.attributes.baseName)
                             {
-                                createConfigTree(node.id, node.attributes.cls, node.attributes.iconCls);
+                                createConfigTree(node.attributes.baseName, node.attributes.cls, node.attributes.iconCls);
                             }
 
                             configTree.getSelectionModel().clearSelections();
-                            configTree.selectPath(node.id);
+                            configTree.selectPath(node.attributes.baseName, 'baseName');
                             visibleTree = configTree;
                         });
                     });
