@@ -1,11 +1,12 @@
 package com.zutubi.pulse.local;
 
+import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.util.ForkOutputStream;
-import com.zutubi.pulse.util.TimeStamps;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.build.*;
+import com.zutubi.pulse.util.ForkOutputStream;
+import com.zutubi.pulse.util.TimeStamps;
 
 import java.io.File;
 import java.io.OutputStream;
@@ -20,14 +21,18 @@ public class BuildStatusPrinter implements EventListener
 {
     private Indenter indenter;
     private String baseDir;
+    private File outputDir;
     private RecipeResult result;
     private Locale locale;
+    private int failureLimit;
 
-    public BuildStatusPrinter(File base, OutputStream logStream)
+    public BuildStatusPrinter(File base, File output, OutputStream logStream, int failureLimit)
     {
         ForkOutputStream fork = new ForkOutputStream(System.out, logStream);
         indenter = new Indenter(new PrintStream(fork), "  ");
         baseDir = base.getAbsolutePath() + File.separatorChar;
+        outputDir = output;
+        this.failureLimit = failureLimit;
         result = new RecipeResult();
         locale = Locale.getDefault();        
     }
@@ -202,6 +207,84 @@ public class BuildStatusPrinter implements EventListener
         complete();
     }
 
+    private void showTestResults()
+    {
+        TestResultSummary testSummary = result.getTestSummary();
+        if(testSummary.hasTests())
+        {
+            String message = "tests    : " + testSummary.getTotal() + " (";
+            if(testSummary.allPassed())
+            {
+                message += "all passed";
+            }
+            else
+            {
+                message += testSummary.getPassed() + " passed";
+                if(testSummary.getFailures() > 0)
+                {
+                    message += ", " + testSummary.getFailures() + " failed";
+                }
+                if(testSummary.getErrors() > 0)
+                {
+                    message += ", " + testSummary.getErrors() + " error" + (testSummary.getErrors() > 1 ? "s" : "");
+                }
+            }
+
+            message += ")";
+            indenter.println(message);
+
+            showtestFailures(testSummary);
+        }
+    }
+
+    private void showtestFailures(TestResultSummary testSummary)
+    {
+        if (!testSummary.allPassed() && failureLimit > 0)
+        {
+            indenter.indent();
+            if (testSummary.getBroken() > failureLimit)
+            {
+                indenter.println("NOTE: Test failure limit (" + failureLimit + ") reached, not all failures reported.");
+            }
+
+            TestSuitePersister persister = new TestSuitePersister();
+            try
+            {
+                TestSuiteResult failedTests = persister.read(null, new File(outputDir, RecipeResult.TEST_DIR), true, true, failureLimit);
+                showTestSuite(failedTests, "");
+            }
+            catch (Exception e)
+            {
+                indenter.println("Unable to load failed test results: " + e.getMessage());
+            }
+            indenter.dedent();
+        }
+    }
+
+    private void showTestSuite(TestSuiteResult suiteResult, String prefix)
+    {
+        if(suiteResult.getName() != null)
+        {
+            prefix += suiteResult.getName() + ".";
+        }
+
+        for(TestSuiteResult nested: suiteResult.getSuites())
+        {
+            showTestSuite(nested, prefix);
+        }
+
+        for(TestCaseResult caseResult: suiteResult.getCases())
+        {
+            String message = String.format("%s%-7s: %s", prefix, caseResult.getStatus().toString().toLowerCase(), caseResult.getName());
+            if(TextUtils.stringSet(caseResult.getMessage()))
+            {
+                message += ": " + caseResult.getMessage();
+            }
+            
+            indenter.println(message);
+        }
+    }
+
     private void complete()
     {
         result.complete();
@@ -211,6 +294,8 @@ public class BuildStatusPrinter implements EventListener
         indenter.println("result   : " + result.getState().getPrettyString());
 
         showMessages(result);
+
+        showTestResults();
 
         indenter.dedent();
     }

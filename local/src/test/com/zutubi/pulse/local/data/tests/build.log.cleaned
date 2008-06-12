@@ -1,0 +1,23 @@
+[<default>]
+  commenced:
+  [bootstrap]
+    commenced:
+    completed:
+    elapsed  :
+    result   : success
+
+  [run tests]
+    commenced:
+    completed:
+    elapsed  :
+    result   : success
+    artifacts:
+      * command output
+        * out/00000001-run tests/command output/output.txt
+      * test report
+        * out/00000001-run tests/test report/test-report.txt
+
+  completed:
+  elapsed  :
+  result   : success
+  tests    : 3 (all passed)

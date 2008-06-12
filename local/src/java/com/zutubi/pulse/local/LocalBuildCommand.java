@@ -49,6 +49,7 @@ public class LocalBuildCommand implements Command
         options.put("-p [--pulse-file] file",     "use specified pulse file [default: pulse.xml]");
         options.put("-o [--output-dir] dir",      "write output to directory [default: pulse.out]");
         options.put("-e [--resources-file] file", "use specified resources file [default: <none>]");
+        options.put("-l [--failure-limit] limit", "limit number of test failures shown [default: 50]");
         return options;
     }
 

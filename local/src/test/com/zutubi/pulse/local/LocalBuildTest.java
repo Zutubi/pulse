@@ -107,6 +107,27 @@ public class LocalBuildTest extends PulseTestCase
         simpleCase("commandFailure");
     }
 
+    public void testTests() throws IOException, PulseException, URISyntaxException
+    {
+        processTestsHelper("tests");
+    }
+
+    public void testTestFailures() throws IOException, PulseException, URISyntaxException
+    {
+        processTestsHelper("testfailures");
+    }
+
+    private void processTestsHelper(String name) throws IOException, URISyntaxException, PulseException
+    {
+        String pulseFile = copyFile("tests");
+        File testFile = new File(getInputURL(name, "txt").toURI());
+        File toFile = new File(tmpDir, "test-report.txt");
+        IOUtils.copyFile(testFile, toFile);
+
+        builder.runBuild(tmpDir, pulseFile, null, null, "out");
+        compareOutput(name);
+    }
+
     private void simpleCase(String name) throws IOException, PulseException, URISyntaxException
     {
         String pulseFile = copyFile(name);
@@ -178,7 +199,8 @@ public class LocalBuildTest extends PulseTestCase
             BufferedReader reader = new BufferedReader(new StringReader(IOUtils.fileToString(env)));
             for (int i = 0; i < 6; i++)
             {
-                cleanedContent.append(reader.readLine() + "\n");
+                cleanedContent.append(reader.readLine());
+                cleanedContent.append('\n');
             }
 
             FileOutputStream output = null;

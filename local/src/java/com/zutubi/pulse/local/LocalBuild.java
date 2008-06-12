@@ -16,6 +16,10 @@ import java.util.List;
  */
 public class LocalBuild
 {
+    private static final int DEFAULT_FAILURE_LIMIT = 50;
+
+    private int failureLimit = DEFAULT_FAILURE_LIMIT;
+
     @SuppressWarnings({ "ACCESS_STATIC_VIA_INSTANCE", "AccessStaticViaInstance" })
     public static void main(String argv[])
     {
@@ -42,8 +46,14 @@ public class LocalBuild
                 .hasArg()
                 .create('e'));
 
+        options.addOption(OptionBuilder.withLongOpt("failure-limit")
+                .hasArg()
+                .withType(Number.class)
+                .create('l'));
 
         CommandLineParser parser = new PosixParser();
+
+        LocalBuild b = new LocalBuild();
 
         try
         {
@@ -69,7 +79,11 @@ public class LocalBuild
                 outputDir = commandLine.getOptionValue('o');
             }
 
-            LocalBuild b = new LocalBuild();
+            if (commandLine.hasOption('l'))
+            {
+                b.setFailureLimit(((Number) commandLine.getOptionObject('l')).intValue());
+            }
+
             File baseDir = new File(System.getProperty("user.dir"));
             b.runBuild(baseDir, pulseFile, recipe, resourcesFile, outputDir);
         }
@@ -144,7 +158,7 @@ public class LocalBuild
             FileLoader fileLoader = new PulseFileLoader();
             fileLoader.setObjectFactory(objectFactory);
 
-            manager.register(new BuildStatusPrinter(paths.getBaseDir(), logStream));
+            manager.register(new BuildStatusPrinter(paths.getBaseDir(), paths.getOutputDir(), logStream, failureLimit));
 
             Bootstrapper bootstrapper = new LocalBootstrapper();
             RecipeProcessor processor = new RecipeProcessor();
@@ -226,5 +240,10 @@ public class LocalBuild
     {
         System.err.println(throwable.getMessage());
         System.exit(1);
+    }
+
+    public void setFailureLimit(int failureLimit)
+    {
+        this.failureLimit = failureLimit;
     }
 }
