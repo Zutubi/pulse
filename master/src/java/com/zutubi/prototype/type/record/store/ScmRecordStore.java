@@ -8,14 +8,12 @@ import com.zutubi.prototype.type.record.Record;
  */
 public class ScmRecordStore implements RecordStore
 {
-    public Record insert(String path, Record record)
+    public void insert(String path, Record record)
     {
-        return null;
     }
 
-    public Record update(String path, Record record)
+    public void update(String path, Record record)
     {
-        return null;
     }
 
     public Record delete(String path)

@@ -520,9 +520,9 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
 
     }
 
-    public Record insert(final String path, final Record record)
+    public void insert(final String path, final Record record)
     {
-        return execute(new Executable()
+        execute(new Executable()
         {
             public Record execute()
             {
@@ -530,21 +530,23 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
 
                 LOG.finest(Thread.currentThread().getId() + ": ("+journalEntry+")");
                 activeJournal.add(journalEntry);
-                return inMemoryDelegate.insert(path, record);
+                inMemoryDelegate.insert(path, record);
+                return null;
             }
         });
     }
 
-    public Record update(final String path, final Record record)
+    public void update(final String path, final Record record)
     {
-        return execute(new Executable()
+        execute(new Executable()
         {
             public Record execute()
             {
                 JournalEntry journalEntry = new JournalEntry(ACTION_UPDATE, path, record, nextJournalEntryId++);
                 LOG.finest(Thread.currentThread().getId() + ": ("+journalEntry+")");
                 activeJournal.add(journalEntry);
-                return inMemoryDelegate.update(path, record);
+                inMemoryDelegate.update(path, record);
+                return null;
             }
         });
     }

@@ -49,12 +49,12 @@ public class RecordManagerTest extends PulseTestCase
 
     public void testInsert()
     {
-        assertNotNull(recordManager.insert("hello", new MutableRecordImpl()));
+        recordManager.insert("hello", new MutableRecordImpl());
         assertNotNull(recordManager.select("hello"));
 
         MutableRecordImpl record = new MutableRecordImpl();
         record.put("key", "value");
-        assertNotNull(recordManager.insert("hello/world", record));
+        recordManager.insert("hello/world", record);
 
         assertNotNull(recordManager.select("hello/world"));
         assertNotNull(recordManager.select("hello").get("world"));
@@ -89,7 +89,8 @@ public class RecordManagerTest extends PulseTestCase
     public void testInsertCreatesHandle()
     {
         Record record = new MutableRecordImpl();
-        record = recordManager.insert("testpath", record);
+        recordManager.insert("testpath", record);
+        record = recordManager.select("testpath");
         assertEquals(1, record.getHandle());
 
         record = recordManager.select("testpath");
@@ -108,17 +109,21 @@ public class RecordManagerTest extends PulseTestCase
 
     public void testInsertCreatesUniqueHandles()
     {
-        Record r1 = recordManager.insert("r1", new MutableRecordImpl());
-        Record r2 = recordManager.insert("r2", new MutableRecordImpl());
+        recordManager.insert("r1", new MutableRecordImpl());
+        recordManager.insert("r2", new MutableRecordImpl());
+        Record r1 = recordManager.select("r1");
+        Record r2 = recordManager.select("r2");
         assertNotSame(r1.getHandle(), r2.getHandle());
     }
 
     public void testHandlesAllocatedOnInsert()
     {
         // reinserting an existing record with a handle will result in a new record with a new handle.
-        Record r1 = recordManager.insert("r1", new MutableRecordImpl());
+        recordManager.insert("r1", new MutableRecordImpl());
+        Record r1 = recordManager.select("r1");
         long h1 = r1.getHandle();
-        Record r2 = recordManager.insert("r2", r1);
+        recordManager.insert("r2", r1);
+        Record r2 = recordManager.select("r2");
         assertEquals(h1, r1.getHandle());
         assertNotSame(r1.getHandle(), r2.getHandle());
     }
@@ -127,16 +132,8 @@ public class RecordManagerTest extends PulseTestCase
     {
         MutableRecordImpl arg = new MutableRecordImpl();
         assertEquals(RecordManager.UNDEFINED, arg.getHandle());
-        assertNotNull(recordManager.insert("r1", arg));
+        recordManager.insert("r1", arg);
         assertEquals(RecordManager.UNDEFINED, arg.getHandle());
-    }
-
-    public void testRecordReturnedFromInsertCanBeModifiedWithoutChangingPersistedData()
-    {
-        Record r1 = recordManager.insert("r1", new MutableRecordImpl());
-
-        // ok, so we do return the actual data, but behind the Record interface.  So it is safe
-        // unless we purposefully decide to make a change by casing it to a MutableRecord.
     }
 
     public void testSelectByPath()
@@ -193,7 +190,8 @@ public class RecordManagerTest extends PulseTestCase
         record.put("key", "value");
         record.put("nested", record.copy(true));
 
-        Record original = recordManager.insert("sourcePath", record);
+        recordManager.insert("sourcePath", record);
+        Record original = recordManager.select("sourcePath");
         assertNull(recordManager.select("destinationPath"));
         recordManager.copy("sourcePath", "destinationPath");
 
@@ -456,7 +454,9 @@ public class RecordManagerTest extends PulseTestCase
 
     public void testHandleMapAfterMove()
     {
-        long handle = recordManager.insert("r1", new MutableRecordImpl()).getHandle();
+        recordManager.insert("r1", new MutableRecordImpl());
+        Record r = recordManager.select("r1");
+        long handle = r.getHandle();
         recordManager.move("r1", "r2");
         assertEquals("r2", recordManager.getPathForHandle(handle));
     }
@@ -492,7 +492,8 @@ public class RecordManagerTest extends PulseTestCase
     public void testMovePreservesHandle()
     {
         Record record = new MutableRecordImpl();
-        record = recordManager.insert("testpath", record);
+        recordManager.insert("testpath", record);
+        record = recordManager.select("testpath");
         long handle = record.getHandle();
         assertTrue(handle > 0);
 
@@ -511,7 +512,8 @@ public class RecordManagerTest extends PulseTestCase
         record.put("nested", nested);
         nested.put("prop", "nestedval");
 
-        Record inserted = recordManager.insert("testpath", record);
+        recordManager.insert("testpath", record);
+        Record inserted = recordManager.select("testpath");
         Record insertedNest = (Record) inserted.get("nested");
         assertTrue(insertedNest.getHandle() > 0);
 
@@ -533,12 +535,16 @@ public class RecordManagerTest extends PulseTestCase
         MutableRecord record = new MutableRecordImpl();
         record.put("foo", "bar");
 
-        record = (MutableRecord) recordManager.insert("path", record);
-
-        record.remove("foo");
-        recordManager.update("path", record);
+        recordManager.insert("path", record);
 
         Record loaded = recordManager.select("path");
+
+        record = new MutableRecordImpl();
+        record.setHandle(loaded.getHandle());
+
+        recordManager.update("path", record);
+
+        loaded = recordManager.select("path");
         assertEquals(0, loaded.size());
     }
 
@@ -548,14 +554,16 @@ public class RecordManagerTest extends PulseTestCase
         record.put("foo", "bar");
         record.put("quux", new MutableRecordImpl());
 
-        Record insertedRecord = recordManager.insert("path", record);
+        recordManager.insert("path", record);
 
-        record.clear();
-        record.setHandle(insertedRecord.getHandle());
+        Record loaded = recordManager.select("path");
+
+        record = new MutableRecordImpl();
+        record.setHandle(loaded.getHandle());
 
         recordManager.update("path", record);
 
-        Record loaded = recordManager.select("path");
+        loaded = recordManager.select("path");
         assertEquals(1, loaded.size());
         assertNotNull(loaded.get("quux"));
     }
@@ -590,7 +598,8 @@ public class RecordManagerTest extends PulseTestCase
         MutableRecord record = new MutableRecordImpl();
         record.put("foo", "bar");
 
-        final Record insertedRecord = recordManager.insert("path", record);
+        recordManager.insert("path", record);
+        final Record insertedRecord = recordManager.select("path");
 
         assertNotNull(recordManager.select("path"));
         executeOnSeparateThreadAndWait(new Runnable()
@@ -645,7 +654,9 @@ public class RecordManagerTest extends PulseTestCase
     {
         MutableRecord record = new MutableRecordImpl();
         record.put("foo", "bar");
-        final Record insertedRecord = recordManager.insert("path", record);
+
+        recordManager.insert("path", record);
+        final Record insertedRecord = recordManager.select("path");
 
         assertNotNull(recordManager.select("path"));
         executeOnSeparateThreadAndWait(new Runnable()

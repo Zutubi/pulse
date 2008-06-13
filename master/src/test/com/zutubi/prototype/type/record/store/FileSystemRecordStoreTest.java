@@ -8,24 +8,21 @@ import com.zutubi.prototype.type.record.DefaultRecordSerialiser;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.type.record.Record;
-import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Random;
 
 /**
  *
  *
  */
-public class FileSystemRecordStoreTest extends PulseTestCase
+public class FileSystemRecordStoreTest extends RecordStoreTestCase
 {
     private FileSystemRecordStore recordStore = null;
     private File persistentDirectory = null;
     private TransactionManager transactionManager;
-    private static final Random RAND = new Random(System.currentTimeMillis());
 
     protected void setUp() throws Exception
     {
@@ -55,16 +52,6 @@ public class FileSystemRecordStoreTest extends PulseTestCase
     }
 
     //---( a set of sanity checks of the basic functions. )---
-
-    public void testInsert()
-    {
-        MutableRecord sample = createSampleRecord();
-        sample.put("nested", createSampleRecord());
-        recordStore.insert("sample", sample);
-
-        Record stored = (Record) recordStore.select().get("sample");
-        assertRecordsEquals(sample, stored);
-    }
 
     public void testInsertPersistence() throws Exception
     {
@@ -117,23 +104,6 @@ public class FileSystemRecordStoreTest extends PulseTestCase
 
     }
 
-    public void testUpdate()
-    {
-        MutableRecord sample = createSampleRecord();
-        recordStore.insert("sample", sample);
-
-        sample.put("c", "c");
-
-        // ensure that updating the original sample does not update the internal record store.
-        Record stored = (Record) recordStore.select().get("sample");
-        assertNull(stored.get("c"));
-
-        // now update the record store.
-        recordStore.update("sample", sample);
-        stored = (Record) recordStore.select().get("sample");
-        assertRecordsEquals(sample, stored);
-    }
-
     public void testUpdatePersistence() throws Exception
     {
         MutableRecord sample = createSampleRecord();
@@ -148,15 +118,6 @@ public class FileSystemRecordStoreTest extends PulseTestCase
 
         Record stored = (Record) recordStore.select().get("sample");
         assertEquals(sample.get("c"), stored.get("c"));
-    }
-
-    public void testDelete()
-    {
-        Record sample = createSampleRecord();
-        recordStore.insert("sample", sample);
-
-        recordStore.delete("sample");
-        assertNull(recordStore.select().get("sample"));
     }
 
     public void testDeletePersistence() throws Exception
@@ -664,43 +625,5 @@ public class FileSystemRecordStoreTest extends PulseTestCase
         sample.put("a", "a");
         sample.put("b", "b");
         return sample;
-    }
-
-    private MutableRecord createRandomSampleRecord()
-    {
-        MutableRecord randomSample = new MutableRecordImpl();
-        for (int i = 0; i < RAND.nextInt(10); i++)
-        {
-            randomSample.put(Integer.toString(i), Integer.toString(RAND.nextInt(20)));
-        }
-        return randomSample;
-    }
-
-    private void assertRecordsEquals(Object expected, Object actual)
-    {
-        assertEquals((Record)expected, (Record)actual);
-    }
-
-    private void assertEquals(Record expected, Record actual)
-    {
-        assertEquals(expected.size(), actual.size());
-
-        assertEquals(expected.keySet(), actual.keySet());
-        for (String key : expected.keySet())
-        {
-            assertEquals(expected.get(key), actual.get(key));
-        }
-
-        assertEquals(expected.metaKeySet(), actual.metaKeySet());
-        for (String key : expected.metaKeySet())
-        {
-            assertEquals(expected.getMeta(key), actual.getMeta(key));
-        }
-
-        assertEquals(expected.nestedKeySet(), actual.nestedKeySet());
-        for (String key : expected.nestedKeySet())
-        {
-            assertEquals((Record) expected.get(key), (Record) actual.get(key));
-        }
     }
 }

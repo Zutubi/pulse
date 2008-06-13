@@ -205,7 +205,7 @@ public class RecordManager implements HandleAllocator
      * @param values a record holding new simple values to apply
      * @return the new record created by the update
      */
-    public synchronized Record update(final String path, final Record values)
+    public synchronized void update(final String path, final Record values)
     {
         checkPath(path);
 
@@ -220,11 +220,12 @@ public class RecordManager implements HandleAllocator
             }
         }
 
-        return (Record) stateWrapper.execute(new TransactionalWrapper.Action<RecordManagerState>()
+        stateWrapper.execute(new TransactionalWrapper.Action<RecordManagerState>()
         {
             public Object execute(RecordManagerState state)
             {
-                return recordStore.update(path, values);
+                recordStore.update(path, values);
+                return null;
             }
         });
     }
@@ -237,7 +238,7 @@ public class RecordManager implements HandleAllocator
      * @param record the record value to store
      * @return the newly-inserted record
      */
-    public synchronized Record insert(final String path, final Record record)
+    public synchronized void insert(final String path, final Record record)
     {
         checkPath(path);
 
@@ -249,13 +250,14 @@ public class RecordManager implements HandleAllocator
         // we copy first because we do not want to modify the argument.
         final Record copy = record.copy(true);
 
-        return (Record) stateWrapper.execute(new TransactionalWrapper.Action<RecordManagerState>()
+        stateWrapper.execute(new TransactionalWrapper.Action<RecordManagerState>()
         {
             public Object execute(RecordManagerState state)
             {
                 allocateHandles((MutableRecord) copy);
                 state.addToHandleMap(path, copy);
-                return recordStore.insert(path, copy);
+                recordStore.insert(path, copy);
+                return null;
             }
         });
     }
@@ -269,15 +271,15 @@ public class RecordManager implements HandleAllocator
      * @param record record values to store
      * @return the newly-stored record
      */
-    public synchronized Record insertOrUpdate(String path, Record record)
+    public synchronized void insertOrUpdate(String path, Record record)
     {
         if (containsRecord(path))
         {
-            return update(path, record);
+            update(path, record);
         }
         else
         {
-            return insert(path, record);
+            insert(path, record);
         }
     }
 
@@ -350,14 +352,16 @@ public class RecordManager implements HandleAllocator
         final Record record = delete(sourcePath);
         if (record != null)
         {
-            return (Record) stateWrapper.execute(new TransactionalWrapper.Action<RecordManagerState>()
+            stateWrapper.execute(new TransactionalWrapper.Action<RecordManagerState>()
             {
                 public Object execute(RecordManagerState state)
                 {
                     state.addToHandleMap(destinationPath, record);
-                    return recordStore.insert(destinationPath, record);
+                    recordStore.insert(destinationPath, record);
+                    return null;
                 }
             });
+            return record;
         }
         return null;
     }

@@ -2,7 +2,6 @@ package com.zutubi.prototype.type.record.store;
 
 import com.zutubi.prototype.transaction.TransactionManager;
 import com.zutubi.prototype.transaction.TransactionalWrapper;
-import com.zutubi.prototype.type.record.ImmutableRecord;
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.type.record.PathUtils;
@@ -27,33 +26,47 @@ public class InMemoryRecordStore implements RecordStore
         {
             base = new MutableRecordImpl();
         }
+
+        // use a default transaction manager.  This will not participate in any of the
+        // external transactions and as such act as a noop transaction manager.  Why use it then?
+        // To allow this record store to be used in the absence of an external transaction manager.
+
         wrapper = new MutableRecordTransactionalWrapper(base);
+        wrapper.setTransactionManager(new TransactionManager());
     }
 
-    public Record insert(final String path, final Record record)
+    public void insert(final String path, final Record record)
     {
-        return (Record) wrapper.execute(new TransactionalWrapper.Action<MutableRecord>()
+        // all methods that modify the internal structure of this memory store
+        // are wrapped.
+        wrapper.execute(new TransactionalWrapper.Action<MutableRecord>()
         {
             public Object execute(MutableRecord base)
             {
-                return insert(base, path, record);
+                insert(base, path, record);
+                return null;
             }
         });
     }
 
-    public Record update(final String path, final Record record)
+    public void update(final String path, final Record record)
     {
-        return (Record) wrapper.execute(new TransactionalWrapper.Action<MutableRecord>()
+        // all methods that modify the internal structure of this memory store
+        // are wrapped.
+        wrapper.execute(new TransactionalWrapper.Action<MutableRecord>()
         {
             public Object execute(MutableRecord base)
             {
-                return update(base, path, record);
+                update(base, path, record);
+                return null;
             }
         });
     }
 
     public Record delete(final String path)
     {
+        // all methods that modify the internal structure of this memory store
+        // are wrapped.
         return (Record) wrapper.execute(new TransactionalWrapper.Action<MutableRecord>()
         {
             public Object execute(MutableRecord base)
@@ -70,6 +83,8 @@ public class InMemoryRecordStore implements RecordStore
 
     public void importRecords(final Record r)
     {
+        // all methods that modify the internal structure of this memory store
+        // are wrapped.
         wrapper.execute(new TransactionalWrapper.Action<MutableRecord>()
         {
             public Object execute(MutableRecord base)
@@ -96,46 +111,60 @@ public class InMemoryRecordStore implements RecordStore
 
     private Record insert(MutableRecord base, String path, Record newRecord)
     {
-        MutableRecord record = newRecord.copy(true);
+        String[] parentPathElements = PathUtils.getParentPathElements(path);
+        String baseName = PathUtils.getBaseName(path);
 
-        String[] parentElements = PathUtils.getParentPathElements(path);
-        String basePath = PathUtils.getBaseName(path);
-
-        MutableRecord parent = getRecord(base, parentElements);
+        MutableRecord parent = getRecord(base, parentPathElements);
+        // we do not 'create the path' on insert.  Therefore, the parent must exist.
         if (parent == null)
         {
             throw new IllegalArgumentException("No parent record for path '" + path + "'");
         }
 
-        parent.put(basePath, record);
+        Object obj = parent.get(baseName);
+        if (obj != null)
+        {
+            throw new IllegalArgumentException("Can not insert a new record.  Value already exists at '"+path+"'.");
+        }
+
+        // The external client may hold on to a reference of the newRecord, and may change it.  To
+        // ensure the integrity of the internal datastructure of the record sture, we must run a
+        // deep copy prior to the insertion so that no external reference remains.
+        MutableRecord record = newRecord.copy(true);
+        
+        parent.put(baseName, record);
 
         return record;
     }
 
     public Record update(MutableRecord base, String path, Record updatedRecord)
     {
-        String[] parentElements = PathUtils.getParentPathElements(path);
-        String basePath = PathUtils.getBaseName(path);
+        String[] parentPathElements = PathUtils.getParentPathElements(path);
+        String baseName = PathUtils.getBaseName(path);
 
         // quick validation.
-        MutableRecord parentRecord = getRecord(base, parentElements);
+        MutableRecord parentRecord = getRecord(base, parentPathElements);
         if (parentRecord == null)
         {
-            throw new IllegalArgumentException("No parent record for path '" + path + "'");
+            throw new IllegalArgumentException("No record for path '" + path + "'");
         }
 
-        MutableRecord targetRecord = getChildRecord(parentRecord, basePath);
+        MutableRecord targetRecord = getChildRecord(parentRecord, baseName);
         if (targetRecord == null)
         {
-            throw new IllegalArgumentException("No record at path '" + path + "'");
+            throw new IllegalArgumentException("No record for path '" + path + "'");
         }
 
+/*
         // Create a new record to store the updates, and use it to replace the cached record.
         // The cached record is cut loose and will be collected when no longer in use.
         MutableRecord copy = targetRecord.copy(false);
+        // the targetRecord is an internal instance that will never be referenced externally
+        // Therefore, it does not need to be 'copied'.
+*/
         for (String key : updatedRecord.simpleKeySet())
         {
-            copy.put(key, updatedRecord.get(key));
+            targetRecord.put(key, updatedRecord.get(key));
         }
 
         // Remove simple values not present in the input
@@ -143,43 +172,49 @@ public class InMemoryRecordStore implements RecordStore
         {
             if (updatedRecord.get(key) == null)
             {
-                copy.remove(key);
+                targetRecord.remove(key);
             }
         }
 
         // do the same for the meta data.
         for (String key : updatedRecord.metaKeySet())
         {
-            copy.putMeta(key, updatedRecord.getMeta(key));
+            targetRecord.putMeta(key, updatedRecord.getMeta(key));
         }
         for (String key : targetRecord.metaKeySet())
         {
             if (updatedRecord.getMeta(key) == null)
             {
-                copy.removeMeta(key);
+                targetRecord.removeMeta(key);
             }
         }
 
-        parentRecord.put(basePath, copy);
-        return copy;
+//        parentRecord.put(baseName, copy);
+        return targetRecord;
     }
 
     public Record delete(MutableRecord base, String path)
     {
-        String[] parentPath = PathUtils.getParentPathElements(path);
-        String basePath = PathUtils.getBaseName(path);
+        String[] parentPathElements = PathUtils.getParentPathElements(path);
+        String baseName = PathUtils.getBaseName(path);
 
-        MutableRecord parentRecord = getRecord(base, parentPath);
+        MutableRecord parentRecord = getRecord(base, parentPathElements);
         if (parentRecord == null)
         {
-            throw new IllegalArgumentException("No parent record for path '" + path + "'");
+            // no record can exist at the specified path, so return null to
+            // indicate this.
+            return null;
         }
 
-        Object value = parentRecord.get(basePath);
-        if (value != null && value instanceof Record)
+        MutableRecord targetRecord = getChildRecord(parentRecord, baseName);
+        if (targetRecord != null)
         {
-            return (Record) parentRecord.remove(basePath);
+            return (Record) parentRecord.remove(baseName);
         }
+
+        // paths need to refer to records, not values within a record. Therefore,
+        // since value is not a record, the path does not refer to a record to be
+        // removed.
         return null;
     }
 
@@ -209,7 +244,13 @@ public class InMemoryRecordStore implements RecordStore
 
     public Record select()
     {
-        return new ImmutableRecord(wrapper.get());
+        // copy on select to ensure that the internal data structure of this record store
+        // retains its integrity by ensuring that it can not be accessed without going through
+        // the public interface of this class.
+        // This will slow things down to some degree.
+        // This copy on select also protects the client from changes to the structure they
+        // are holding when the internal data structure is modified.
+        return wrapper.get().copy(true);
     }
 
     private class MutableRecordTransactionalWrapper extends TransactionalWrapper<MutableRecord>

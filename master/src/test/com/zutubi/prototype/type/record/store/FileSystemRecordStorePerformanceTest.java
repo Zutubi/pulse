@@ -4,17 +4,18 @@ import com.zutubi.prototype.transaction.TransactionManager;
 import com.zutubi.prototype.transaction.UserTransaction;
 import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.type.record.Record;
-import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 
 import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
 /**
  *
  *
  */
-public class FileSystemRecordStorePerformanceTest extends PulseTestCase
+public class FileSystemRecordStorePerformanceTest extends RecordStoreTestCase
 {
 
     private RecordStore recordStore;
@@ -53,13 +54,21 @@ public class FileSystemRecordStorePerformanceTest extends PulseTestCase
 
     public void testPerformanceOfLargeRecordSetsOutsideTransaction()
     {
-        failAfterXTime(2500, new Runnable()
+        final List<Record> records = new LinkedList<Record>();
+        for (int i = 0; i < 50; i++)
+        {
+            records.add(createSampleRecord(3, 5));
+        }
+
+        failAfterXTime(1000, new Runnable()
         {
             public void run()
             {
-                for (int i = 0; i < 50; i++)
+                int i = 0;
+                for (Record record : records)
                 {
-                    recordStore.insert("path_" + i, createRandomRecord());
+                    recordStore.insert("path_" + i, record);
+                    i++;
                 }
             }
         });
@@ -67,21 +76,29 @@ public class FileSystemRecordStorePerformanceTest extends PulseTestCase
 
     public void testPerformanceOfLargeRecordSetsInsideTransaction()
     {
-        failAfterXTime(2500, new Runnable()
+        final List<Record> records = new LinkedList<Record>();
+        for (int i = 0; i < 300; i++)
+        {
+            records.add(createSampleRecord(3, 5));
+        }
+
+        failAfterXTime(1000, new Runnable()
         {
             public void run()
             {
                 transaction.begin();
-                for (int i = 0; i < 50; i++)
+                int i = 0;
+                for (Record record : records)
                 {
-                    recordStore.insert("path_" + i, createRandomRecord());
+                    recordStore.insert("path_" + i, record);
+                    i++;
                 }
                 transaction.commit();
             }
         });
     }
 
-    public void simplePerformanceTest() throws Exception
+    public void manualPerformanceTest() throws Exception
     {
         FileSystemRecordStore recordStore = new FileSystemRecordStore();
         recordStore.setTransactionManager(transactionManager);
@@ -135,14 +152,6 @@ public class FileSystemRecordStorePerformanceTest extends PulseTestCase
         return count;
     }
 
-    private void time(Runnable r)
-    {
-        long start = System.currentTimeMillis();
-        r.run();
-        long end = System.currentTimeMillis();
-        System.out.println("" + (end - start));
-    }
-
     private void failAfterXTime(long timeout, Runnable r)
     {
         long startTime = System.currentTimeMillis();
@@ -156,23 +165,5 @@ public class FileSystemRecordStorePerformanceTest extends PulseTestCase
         }
     }
 
-    private Record createRandomRecord()
-    {
-        Random rand = new Random(System.currentTimeMillis());
-        return createSampleRecord(rand.nextInt(6), rand.nextInt(10));
-    }
 
-    private Record createSampleRecord(int depth, int keys)
-    {
-        MutableRecordImpl random = new MutableRecordImpl();
-        for (int i = 0; i < keys; i++)
-        {
-            random.put("key" + i, "value");
-        }
-        for (int i = 0; i < depth; i++)
-        {
-            random.put("nested" + i, random.copy(true));
-        }
-        return random;
-    }
 }
