@@ -14,7 +14,7 @@ import java.util.TreeMap;
 /**
  * Here be resources.  Yar.
  */
-public class FileResourceRepository implements ResourceRepository
+public class FileResourceRepository implements ConfigurableResourceRepository
 {
     private static final Logger LOG = Logger.getLogger(FileResourceRepository.class);
 
@@ -28,7 +28,15 @@ public class FileResourceRepository implements ResourceRepository
 
     public void addResource(Resource r)
     {
-        resources.put(r.getName(), r);
+        addResource(r, true);
+    }
+
+    public void addResource(Resource r, boolean overwrite)
+    {
+        if(overwrite || !hasResource(r.getName()))
+        {
+            resources.put(r.getName(), r);
+        }
     }
 
     public boolean hasResource(String name, String version)

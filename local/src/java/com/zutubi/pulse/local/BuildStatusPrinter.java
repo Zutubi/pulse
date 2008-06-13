@@ -1,6 +1,5 @@
 package com.zutubi.pulse.local;
 
-import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
@@ -151,17 +150,7 @@ public class BuildStatusPrinter implements EventListener
             for (StoredFileArtifact fileArtifact : artifact.getChildren())
             {
                 indenter.println("* " + getFilePath(result, fileArtifact.getPath()));
-
-                for (Feature.Level level : Feature.Level.values())
-                {
-                    List<Feature> features = fileArtifact.getFeatures(level);
-                    if (features.size() > 0)
-                    {
-                        indenter.indent();
-                        showFeatures(level, features);
-                        indenter.dedent();
-                    }
-                }
+                PrintSupport.showFeatures(indenter, fileArtifact);
             }
 
             indenter.dedent();
@@ -182,19 +171,6 @@ public class BuildStatusPrinter implements EventListener
         return result;
     }
 
-    private void showFeatures(Feature.Level level, List<Feature> features)
-    {
-        indenter.println(level.toString().toLowerCase() + " features:");
-        indenter.indent();
-
-        for (Feature f : features)
-        {
-            indenter.println("* " + f.getSummary());
-        }
-
-        indenter.dedent();
-    }
-
     private void handleRecipeCompleted(RecipeCompletedEvent event)
     {
         result.update(event.getResult());
@@ -212,32 +188,12 @@ public class BuildStatusPrinter implements EventListener
         TestResultSummary testSummary = result.getTestSummary();
         if(testSummary.hasTests())
         {
-            String message = "tests    : " + testSummary.getTotal() + " (";
-            if(testSummary.allPassed())
-            {
-                message += "all passed";
-            }
-            else
-            {
-                message += testSummary.getPassed() + " passed";
-                if(testSummary.getFailures() > 0)
-                {
-                    message += ", " + testSummary.getFailures() + " failed";
-                }
-                if(testSummary.getErrors() > 0)
-                {
-                    message += ", " + testSummary.getErrors() + " error" + (testSummary.getErrors() > 1 ? "s" : "");
-                }
-            }
-
-            message += ")";
-            indenter.println(message);
-
-            showtestFailures(testSummary);
+            indenter.println("tests    : " + testSummary.getTotal() + " (" + PrintSupport.summariseTestCounts(testSummary) + ")");
+            showTestFailures(testSummary);
         }
     }
 
-    private void showtestFailures(TestResultSummary testSummary)
+    private void showTestFailures(TestResultSummary testSummary)
     {
         if (!testSummary.allPassed() && failureLimit > 0)
         {
@@ -251,37 +207,13 @@ public class BuildStatusPrinter implements EventListener
             try
             {
                 TestSuiteResult failedTests = persister.read(null, new File(outputDir, RecipeResult.TEST_DIR), true, true, failureLimit);
-                showTestSuite(failedTests, "");
+                PrintSupport.showTestSuite(indenter, failedTests);
             }
             catch (Exception e)
             {
                 indenter.println("Unable to load failed test results: " + e.getMessage());
             }
             indenter.dedent();
-        }
-    }
-
-    private void showTestSuite(TestSuiteResult suiteResult, String prefix)
-    {
-        if(suiteResult.getName() != null)
-        {
-            prefix += suiteResult.getName() + ".";
-        }
-
-        for(TestSuiteResult nested: suiteResult.getSuites())
-        {
-            showTestSuite(nested, prefix);
-        }
-
-        for(TestCaseResult caseResult: suiteResult.getCases())
-        {
-            String message = String.format("%s%-7s: %s", prefix, caseResult.getStatus().toString().toLowerCase(), caseResult.getName());
-            if(TextUtils.stringSet(caseResult.getMessage()))
-            {
-                message += ": " + caseResult.getMessage();
-            }
-            
-            indenter.println(message);
         }
     }
 

@@ -175,8 +175,30 @@ public abstract class PulseTestCase extends TestCase
      * @param file1 the first file to compare
      * @param file2 the second file to compare
      * @throws AssertionFailedError if the contents of the files differ
+     * @throws java.io.IOException if an error occurs reading either file
      */
     protected static void assertFilesEqual(File file1, File file2) throws IOException
+    {
+        assertFilesEqual(file1, file2, new LinePreprocessor()
+        {
+            public String processLine(String line)
+            {
+                return line;
+            }
+        });
+    }
+    
+    /**
+     * Asserts that the contents of the two given files is identical after
+     * applying custom processing to each line.
+     *
+     * @param file1 the first file to compare
+     * @param file2 the second file to compare
+     * @param preprocessor used to process lines before comparing them
+     * @throws AssertionFailedError if the contents of the files differ
+     * @throws java.io.IOException if an error occurs reading either file
+     */
+    protected static void assertFilesEqual(File file1, File file2, LinePreprocessor preprocessor) throws IOException
     {
         if (!file1.isFile())
         {
@@ -213,6 +235,9 @@ public abstract class PulseTestCase extends TestCase
                     {
                         throw new AssertionFailedError("Contents of '" + file1.getAbsolutePath() + " differs from contents of '" + file2.getAbsolutePath() + "'");
                     }
+
+                    line1 = preprocessor.processLine(line1);
+                    line2 = preprocessor.processLine(line2);
                     assertEquals(line1, line2);
                 }
             }

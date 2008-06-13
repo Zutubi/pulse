@@ -1,9 +1,10 @@
 package com.zutubi.pulse.resources;
 
+import com.zutubi.pulse.core.ConfigurableResourceRepository;
 import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.core.model.ResourceProperty;
-import com.zutubi.pulse.util.SystemUtils;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.util.SystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,6 +24,18 @@ public class ResourceDiscoverer
         discoverMaven2(result);
         discoverJava(result);
         return result;
+    }
+
+    public void discoverAndAdd(ConfigurableResourceRepository repository)
+    {
+        List<Resource> resources = discover();
+        for(Resource r: resources)
+        {
+            if(!repository.hasResource(r.getName()))
+            {
+                repository.addResource(r);
+            }
+        }
     }
 
     private List<ResourceConstructor> getConstructors()
