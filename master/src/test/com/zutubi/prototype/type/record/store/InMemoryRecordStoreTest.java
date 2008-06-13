@@ -197,4 +197,20 @@ public class InMemoryRecordStoreTest extends RecordStoreTestCase
         assertNotNull(selected.get("c"));
     }
 
+    public void testUpdateRemovesValueConcurrentModificationException()
+    {
+        MutableRecordImpl record = new MutableRecordImpl();
+        record.put("a", "b");
+        record.put("b", "b");
+        record.putMeta("c", "b");
+        record.putMeta("d", "b");
+        recordStore.insert("path", record);
+
+        Record stored = (Record) recordStore.select().get("path");
+
+        MutableRecordImpl update = new MutableRecordImpl();
+        update.setHandle(stored.getHandle());
+        
+        recordStore.update("path", update);
+    }
 }

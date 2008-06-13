@@ -7,6 +7,9 @@ import com.zutubi.prototype.type.record.MutableRecordImpl;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  *
  *
@@ -155,20 +158,14 @@ public class InMemoryRecordStore implements RecordStore
             throw new IllegalArgumentException("No record for path '" + path + "'");
         }
 
-/*
-        // Create a new record to store the updates, and use it to replace the cached record.
-        // The cached record is cut loose and will be collected when no longer in use.
-        MutableRecord copy = targetRecord.copy(false);
-        // the targetRecord is an internal instance that will never be referenced externally
-        // Therefore, it does not need to be 'copied'.
-*/
         for (String key : updatedRecord.simpleKeySet())
         {
             targetRecord.put(key, updatedRecord.get(key));
         }
 
         // Remove simple values not present in the input
-        for (String key : targetRecord.simpleKeySet())
+        Set<String> keys = new HashSet<String>(targetRecord.simpleKeySet());
+        for (String key : keys)
         {
             if (updatedRecord.get(key) == null)
             {
@@ -181,7 +178,8 @@ public class InMemoryRecordStore implements RecordStore
         {
             targetRecord.putMeta(key, updatedRecord.getMeta(key));
         }
-        for (String key : targetRecord.metaKeySet())
+        keys = new HashSet<String>(targetRecord.metaKeySet());
+        for (String key : keys)
         {
             if (updatedRecord.getMeta(key) == null)
             {
@@ -189,7 +187,6 @@ public class InMemoryRecordStore implements RecordStore
             }
         }
 
-//        parentRecord.put(baseName, copy);
         return targetRecord;
     }
 
