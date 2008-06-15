@@ -69,25 +69,6 @@ public class RecordManager implements HandleAllocator
         nextHandle.set(highest[0]);
     }
 
-    private void traverse(Record record, RecordHandler handler)
-    {
-        traverse("", record, handler);
-    }
-
-    private void traverse(String path, Record record, RecordHandler handler)
-    {
-        for (String key : record.keySet())
-        {
-            Object value = record.get(key);
-            if (value instanceof Record)
-            {
-                traverse(PathUtils.getPath(path, key), (Record) value, handler);
-            }
-        }
-
-        handler.handle(path, record);
-    }
-
     public long allocateHandle()
     {
         return nextHandle.incrementAndGet();
@@ -156,43 +137,6 @@ public class RecordManager implements HandleAllocator
         checkPath(path);
 
         return select(path) != null;
-    }
-
-    private RecordManagerState getState()
-    {
-        return stateWrapper.get();
-    }
-
-    private void clearHandles(MutableRecord record)
-    {
-        record.setHandle(UNDEFINED);
-        for (Object child : record.values())
-        {
-            if (child instanceof MutableRecord)
-            {
-                clearHandles((MutableRecord) child);
-            }
-        }
-    }
-
-    private void allocateHandles(MutableRecord record)
-    {
-        record.setHandle(allocateHandle());
-        for (Object child : record.values())
-        {
-            if (child instanceof MutableRecord)
-            {
-                allocateHandles((MutableRecord) child);
-            }
-        }
-    }
-
-    private void checkPath(String path)
-    {
-        if (path == null || path.equals(""))
-        {
-            throw new IllegalArgumentException("Invalid path '" + path + "'");
-        }
     }
 
     /**
@@ -366,14 +310,6 @@ public class RecordManager implements HandleAllocator
         return null;
     }
 
-    private void checkDoesNotExist(String destinationPath, String message)
-    {
-        if (containsRecord(destinationPath))
-        {
-            throw new IllegalArgumentException(message);
-        }
-    }
-
     public void setRecordStore(RecordStore recordStore)
     {
         this.recordStore = recordStore;
@@ -382,6 +318,70 @@ public class RecordManager implements HandleAllocator
     public void setTransactionManager(TransactionManager transactionManager)
     {
         this.transactionManager = transactionManager;
+    }
+
+    private RecordManagerState getState()
+    {
+        return stateWrapper.get();
+    }
+
+    private void clearHandles(MutableRecord record)
+    {
+        record.setHandle(UNDEFINED);
+        for (Object child : record.values())
+        {
+            if (child instanceof MutableRecord)
+            {
+                clearHandles((MutableRecord) child);
+            }
+        }
+    }
+
+    private void allocateHandles(MutableRecord record)
+    {
+        record.setHandle(allocateHandle());
+        for (Object child : record.values())
+        {
+            if (child instanceof MutableRecord)
+            {
+                allocateHandles((MutableRecord) child);
+            }
+        }
+    }
+
+    private void checkPath(String path)
+    {
+        if (path == null || path.equals(""))
+        {
+            throw new IllegalArgumentException("Invalid path '" + path + "'");
+        }
+    }
+
+    private void checkDoesNotExist(String destinationPath, String message)
+    {
+        if (containsRecord(destinationPath))
+        {
+            throw new IllegalArgumentException(message);
+        }
+    }
+
+    private void traverse(Record record, RecordHandler handler)
+    {
+        traverse("", record, handler);
+    }
+
+    private void traverse(String path, Record record, RecordHandler handler)
+    {
+        for (String key : record.keySet())
+        {
+            Object value = record.get(key);
+            if (value instanceof Record)
+            {
+                traverse(PathUtils.getPath(path, key), (Record) value, handler);
+            }
+        }
+
+        handler.handle(path, record);
     }
 
     /**

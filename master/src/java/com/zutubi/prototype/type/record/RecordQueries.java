@@ -32,24 +32,6 @@ public class RecordQueries
         return paths;
     }
 
-    private void getAllPaths(Record record, String[] elements, int pathIndex, String resolvedPath, List<String> paths)
-    {
-        if (pathIndex == elements.length)
-        {
-            paths.add(resolvedPath);
-        }
-        else
-        {
-            for (String key : record.nestedKeySet())
-            {
-                if (PathUtils.elementMatches(elements[pathIndex], key))
-                {
-                    getAllPaths((Record) record.get(key), elements, pathIndex + 1, PathUtils.getPath(resolvedPath, key), paths);
-                }
-            }
-        }
-    }
-
     public Record select(String path)
     {
         String[] elements = PathUtils.getPathElements(path);
@@ -74,7 +56,7 @@ public class RecordQueries
         return records;
     }
 
-    protected void selectAll(Record record, String[] elements, int pathIndex, String resolvedPath, Map<String, Record> records)
+    private void selectAll(Record record, String[] elements, int pathIndex, String resolvedPath, Map<String, Record> records)
     {
         if (pathIndex == elements.length)
         {
@@ -87,6 +69,24 @@ public class RecordQueries
             if (PathUtils.elementMatches(elements[pathIndex], key))
             {
                 selectAll((Record) record.get(key), elements, pathIndex + 1, PathUtils.getPath(resolvedPath, key), records);
+            }
+        }
+    }
+
+    private void getAllPaths(Record record, String[] elements, int pathIndex, String resolvedPath, List<String> paths)
+    {
+        if (pathIndex == elements.length)
+        {
+            paths.add(resolvedPath);
+        }
+        else
+        {
+            for (String key : record.nestedKeySet())
+            {
+                if (PathUtils.elementMatches(elements[pathIndex], key))
+                {
+                    getAllPaths((Record) record.get(key), elements, pathIndex + 1, PathUtils.getPath(resolvedPath, key), paths);
+                }
             }
         }
     }

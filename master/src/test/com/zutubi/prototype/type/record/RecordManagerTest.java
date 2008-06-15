@@ -368,7 +368,6 @@ public class RecordManagerTest extends PulseTestCase
         {
             newRecordManager();
             
-            userTransaction.begin();
             for (int j = 0; j < i; j++)
             {
                 String path = "i" + i + "j" + j;
@@ -377,7 +376,6 @@ public class RecordManagerTest extends PulseTestCase
                 assertNextHandle(nextHandle, handle);
                 handle = nextHandle;
             }
-            userTransaction.commit();
         }
     }
 
