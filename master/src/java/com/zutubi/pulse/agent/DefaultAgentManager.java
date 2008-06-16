@@ -283,7 +283,7 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
 
     public void setAgentState(AgentConfiguration agentConfig, AgentState.EnableState state)
     {
-        Agent agent = agents.get(agentConfig.getHandle());
+        Agent agent = getAgent(agentConfig);
         if (agent != null)
         {
             AgentState agentState = agentStateManager.getAgentState(agent.getId());
@@ -545,9 +545,14 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         }
     }
 
+    public Agent getAgent(AgentConfiguration agent)
+    {
+        return getAgent(agent.getHandle());
+    }
+
     public void pingAgent(AgentConfiguration agent, boolean inline)
     {
-        pingAgent(agents.get(agent.getHandle()), inline);
+        pingAgent(getAgent(agent), inline);
     }
 
     public void agentAdded(AgentConfiguration agentConfig)

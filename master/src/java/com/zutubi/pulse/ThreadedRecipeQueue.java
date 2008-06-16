@@ -337,7 +337,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
             long deadRecipe = 0;
             for (Map.Entry<Long, Agent> entry : executingAgents.entrySet())
             {
-                if (entry.getValue().getConfig().getHandle() == agent.getConfig().getHandle())
+                if (entry.getValue().getConfig().equals(agent.getConfig()))
                 {
                     // Agent dropped off while we were executing.
                     deadRecipe = entry.getKey();

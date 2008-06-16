@@ -148,7 +148,7 @@ public class BuildController implements EventListener
         for (BuildStageConfiguration stage : projectConfig.getStages().values())
         {
             RecipeResult recipeResult = new RecipeResult(stage.getRecipe());
-            RecipeResultNode childResultNode = new RecipeResultNode(stage.getName(), stage.getHandle(), recipeResult);
+            RecipeResultNode childResultNode = new RecipeResultNode(stage, recipeResult);
             resultNode.addChild(childResultNode);
             buildManager.save(resultNode);
 

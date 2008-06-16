@@ -82,7 +82,7 @@ public class SlaveAgentService implements AgentService
 
     public boolean hasResource(String resource, String version)
     {
-        return resourceManager.getAgentRepository(agentConfig.getHandle()).hasResource(resource, version);
+        return resourceManager.getAgentRepository(agentConfig).hasResource(resource, version);
     }
 
     public boolean build(RecipeRequest request)
@@ -221,7 +221,7 @@ public class SlaveAgentService implements AgentService
         if (obj instanceof SlaveAgentService)
         {
             SlaveAgentService other = (SlaveAgentService) obj;
-            return other.getAgentConfig().getHandle() == agentConfig.getHandle();
+            return other.getAgentConfig().equals(agentConfig);
         }
 
         return false;

@@ -1,6 +1,7 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.prototype.config.project.BuildStageConfiguration;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.UnaryProcedure;
 
@@ -22,6 +23,14 @@ public class RecipeResultNode extends Entity
     {
     }
 
+    public RecipeResultNode(BuildStageConfiguration stage, RecipeResult result)
+    {
+        this.stageName = stage.getName();
+        this.stageHandle = stage.getHandle();
+        this.result = result;
+        children = new LinkedList<RecipeResultNode>();
+    }
+    
     public RecipeResultNode(String stageName, long stageHandle, RecipeResult result)
     {
         this.stageName = stageName;

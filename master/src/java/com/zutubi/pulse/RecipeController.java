@@ -147,7 +147,7 @@ public class RecipeController
         recipeResultNode.setHost(agentService.getHostName());
         buildManager.save(recipeResultNode);
 
-        ResourceRepository resourceRepository = resourceManager.getAgentRepository(agent.getConfig().getHandle());
+        ResourceRepository resourceRepository = resourceManager.getAgentRepository(agent);
         if (resourceRepository != null)
         {
             BuildProperties.addResourceProperties(recipeContext, dispatchRequest.getResourceRequirements(), resourceRepository);

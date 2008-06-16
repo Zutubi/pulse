@@ -5,8 +5,13 @@ import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.agent.DefaultAgent;
 import com.zutubi.pulse.agent.Status;
-import com.zutubi.pulse.core.*;
+import com.zutubi.pulse.core.BuildException;
 import static com.zutubi.pulse.core.BuildProperties.*;
+import com.zutubi.pulse.core.BuildRevision;
+import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.FileResourceRepository;
+import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.Revision;
@@ -24,7 +29,11 @@ import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.pulse.logging.CustomLogRecord;
-import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.model.AgentState;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.ResourceManager;
+import com.zutubi.pulse.model.UnknownBuildReason;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
@@ -37,7 +46,11 @@ import com.zutubi.pulse.services.UpgradeStatus;
 import junit.framework.TestCase;
 
 import java.io.File;
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -106,6 +119,16 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             public ResourceRepository getAgentRepository(long handle)
             {
                 return new FileResourceRepository();
+            }
+
+            public ResourceRepository getAgentRepository(AgentConfiguration agent)
+            {
+                return getAgentRepository(agent.getHandle());
+            }
+
+            public ResourceRepository getAgentRepository(Agent agent)
+            {
+                return getAgentRepository(agent.getConfig());
             }
 
             public void addDiscoveredResources(String agentPath, List<Resource> resources)
@@ -709,7 +732,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
 
     private void sendOfflineEvent(AgentConfiguration agentConfig)
     {
-        Agent a = agentManager.getAgent(agentConfig.getHandle());
+        Agent a = agentManager.getAgent(agentConfig);
         a.updateStatus(new SlaveStatus(Status.OFFLINE, "oops"));
         AgentRemovedEvent event = new AgentRemovedEvent(this, a);
         queue.handleEvent(event);
@@ -832,6 +855,11 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         public Agent getAgent(long handle)
         {
             return onlineAgents.get(handle);
+        }
+
+        public Agent getAgent(AgentConfiguration agent)
+        {
+            return onlineAgents.get(agent.getHandle());
         }
 
         public void pingAgent(AgentConfiguration agentConfig, boolean inline)

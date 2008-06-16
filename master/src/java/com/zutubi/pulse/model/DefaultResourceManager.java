@@ -11,6 +11,7 @@ import com.zutubi.pulse.core.config.ResourceVersion;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.events.*;
 import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
+import com.zutubi.pulse.agent.Agent;
 import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.logging.Logger;
 
@@ -199,6 +200,16 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.pulse
     public ResourceRepository getAgentRepository(long handle)
     {
         return agentRepositories.get(handle);
+    }
+
+    public ResourceRepository getAgentRepository(AgentConfiguration agent)
+    {
+        return agentRepositories.get(agent.getHandle());
+    }
+
+    public ResourceRepository getAgentRepository(Agent agent)
+    {
+        return getAgentRepository(agent.getConfig());
     }
 
     public void addDiscoveredResources(final String agentPath, final List<Resource> discoveredResources)

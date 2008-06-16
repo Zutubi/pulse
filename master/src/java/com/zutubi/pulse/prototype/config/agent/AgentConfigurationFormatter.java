@@ -13,7 +13,7 @@ public class AgentConfigurationFormatter
 
     public String getLocation(AgentConfiguration configuration)
     {
-        Agent agentState = agentManager.getAgent(configuration.getHandle());
+        Agent agentState = agentManager.getAgent(configuration);
         return agentState.getLocation();
     }
 
@@ -21,7 +21,7 @@ public class AgentConfigurationFormatter
     {
         //TODO: make this I18N'ed
 
-        Agent agentState = agentManager.getAgent(configuration.getHandle());
+        Agent agentState = agentManager.getAgent(configuration);
         if (agentState.isEnabled())
         {
             return agentState.getStatus().getPrettyString();

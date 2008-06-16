@@ -15,12 +15,13 @@ import java.util.Set;
 public abstract class AbstractRecord implements Record
 {
     protected static final String SYMBOLIC_NAME_KEY = "symbolicName";
-
+    protected static final String HANDLE_KEY = Configuration.HANDLE_KEY;
+    protected static final String PERMANENT_KEY = Configuration.PERMANENT_KEY;
     protected static final long UNDEFINED = 0;
 
     public long getHandle()
     {
-        String idString = getMeta(Configuration.HANDLE_KEY);
+        String idString = getMeta(HANDLE_KEY);
         if (idString != null)
         {
             try
@@ -38,7 +39,7 @@ public abstract class AbstractRecord implements Record
 
     public boolean isPermanent()
     {
-        return Boolean.valueOf(getMeta(Configuration.PERMANENT_KEY));
+        return Boolean.valueOf(getMeta(PERMANENT_KEY));
     }
 
     public boolean isCollection()

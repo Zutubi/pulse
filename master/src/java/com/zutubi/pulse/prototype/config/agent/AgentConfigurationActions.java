@@ -25,7 +25,7 @@ public class AgentConfigurationActions
     {
         List<String> actions = new LinkedList<String>();
 
-        Agent agent = agentManager.getAgent(config.getHandle());
+        Agent agent = agentManager.getAgent(config);
         if (agent.isEnabled())
         {
             actions.add(ACTION_DISABLE);
@@ -60,7 +60,7 @@ public class AgentConfigurationActions
 
     public void doGc(AgentConfiguration config)
     {
-        Agent agent = agentManager.getAgent(config.getHandle());
+        Agent agent = agentManager.getAgent(config);
         if (agent != null)
         {
             agent.getService().garbageCollect();

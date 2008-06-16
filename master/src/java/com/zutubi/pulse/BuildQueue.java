@@ -72,7 +72,7 @@ public class BuildQueue
             // recipe is dispatched (CIB-701).
             for (AbstractBuildRequestEvent e : entityRequests)
             {
-                if (!e.getRevision().isFixed() && e.getProjectConfig().getHandle() == event.getProjectConfig().getHandle())
+                if (!e.getRevision().isFixed() && e.getProjectConfig().equals(event.getProjectConfig()))
                 {
                     // Existing floater, no need to remember this request.
                     return;

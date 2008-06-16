@@ -12,7 +12,7 @@ public class AgentConfigurationStateDisplay
 
     public String formatStatus(AgentConfiguration config)
     {
-        Agent agent = agentManager.getAgent(config.getHandle());
+        Agent agent = agentManager.getAgent(config);
         return agent.getStatus().getPrettyString();
     }
 

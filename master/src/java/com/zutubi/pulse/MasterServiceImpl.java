@@ -44,11 +44,11 @@ public class MasterServiceImpl implements MasterService
         }
     }
 
-    public Resource getResource(String token, long slaveId, String name) throws InvalidTokenException
+    public Resource getResource(String token, long agentHandle, String name) throws InvalidTokenException
     {
         if (validateToken(token))
         {
-            ResourceRepository repository = getResourceManager().getAgentRepository(slaveId);
+            ResourceRepository repository = getResourceManager().getAgentRepository(agentHandle);
             if (repository != null)
             {
                 return repository.getResource(name);
@@ -58,11 +58,11 @@ public class MasterServiceImpl implements MasterService
         return null;
     }
 
-    public List<String> getResourceNames(String token, long slaveId) throws InvalidTokenException
+    public List<String> getResourceNames(String token, long agentHandle) throws InvalidTokenException
     {
         if (validateToken(token))
         {
-            ResourceRepository repository = getResourceManager().getAgentRepository(slaveId);
+            ResourceRepository repository = getResourceManager().getAgentRepository(agentHandle);
             if (repository != null)
             {
                 return repository.getResourceNames();

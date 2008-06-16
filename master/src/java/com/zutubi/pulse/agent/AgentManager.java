@@ -23,6 +23,8 @@ public interface AgentManager
     @SecureResult
     Agent getAgent(long handle);
     @SecureResult
+    Agent getAgent(AgentConfiguration agent);
+    @SecureResult
     Agent getAgent(String name);
 
     @SecureParameter(parameterType = AgentConfiguration.class, action = AgentConfigurationActions.ACTION_PING)

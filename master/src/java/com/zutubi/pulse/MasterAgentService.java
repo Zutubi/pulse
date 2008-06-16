@@ -98,12 +98,12 @@ public class MasterAgentService implements AgentService
 
     public boolean hasResource(String resource, String version)
     {
-        return getResourceManager().getAgentRepository(agentConfig.getHandle()).hasResource(resource, version);
+        return getResourceManager().getAgentRepository(agentConfig).hasResource(resource, version);
     }
 
     public boolean build(RecipeRequest request)
     {
-        getMasterRecipeProcessor().processRecipe(request, getResourceManager().getAgentRepository(agentConfig.getHandle()));
+        getMasterRecipeProcessor().processRecipe(request, getResourceManager().getAgentRepository(agentConfig));
         return true;
     }
 
@@ -179,7 +179,7 @@ public class MasterAgentService implements AgentService
         if (obj instanceof MasterAgentService)
         {
             MasterAgentService other = (MasterAgentService) obj;
-            return other.agentConfig.getHandle() == agentConfig.getHandle();
+            return other.getAgentConfig().equals(agentConfig);
         }
 
         return false;

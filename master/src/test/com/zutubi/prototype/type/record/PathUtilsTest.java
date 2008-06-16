@@ -43,9 +43,4 @@ public class PathUtilsTest extends TestCase
         assertFalse(PathUtils.prefixMatchesPathPattern("simple", "simple/simple/simple"));
         assertFalse(PathUtils.prefixMatchesPathPattern("simple", "complex/complex/complex"));
     }
-
-    public void testPrefixMatchesWildcardChildren()
-    {
-
-    }
 }

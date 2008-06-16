@@ -21,7 +21,7 @@ public class TemplateRecord extends AbstractRecord
     public static final String PARENT_KEY    = "parentHandle";
     public static final String TEMPLATE_KEY  = "template";
 
-    public static final String[] NO_INHERIT_META_KEYS = { Configuration.HANDLE_KEY, HIDDEN_KEY, Configuration.PERMANENT_KEY, SYMBOLIC_NAME_KEY,
+    public static final String[] NO_INHERIT_META_KEYS = { HANDLE_KEY, HIDDEN_KEY, PERMANENT_KEY, SYMBOLIC_NAME_KEY,
                                                            PARENT_KEY,
                                                            TEMPLATE_KEY };
 
