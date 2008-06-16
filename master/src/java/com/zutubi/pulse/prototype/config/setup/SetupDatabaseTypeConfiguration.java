@@ -11,6 +11,7 @@ import com.zutubi.util.IOUtils;
 
 import java.io.IOException;
 import java.util.jar.JarFile;
+import java.util.Properties;
 
 /**
  * Used for the database type setup page: i.e. the second step in a normal
@@ -21,21 +22,27 @@ import java.util.jar.JarFile;
 @ConfigurationCheck("SetupDatabaseTypeConfigurationCheckHandler")
 public class SetupDatabaseTypeConfiguration extends AbstractConfiguration implements Validateable
 {
-    @ControllingSelect(enableSet = {"MYSQL", "POSTGRESQL"})
+    @ControllingSelect(enableSet = {"MYSQL", "POSTGRESQL", "RUBBISH"})
     @FieldScript
     private DatabaseType type = DatabaseType.EMBEDDED;
+
     @FieldAction(template = "SetupDatabaseTypeConfiguration.driverFile")
     @Required
     @File(verifyFile = true, verifyReadable = true)
     private String driverFile;
+
     @Required
     private String host = "localhost";
+
     @Numeric(min = 1)
     private int port;
+
     @Required
     private String database;
+
     @Required
     private String user;
+    
     private String password;
 
     public DatabaseType getType()
@@ -126,5 +133,11 @@ public class SetupDatabaseTypeConfiguration extends AbstractConfiguration implem
                 IOUtils.close(jar);
             }
         }
+    }
+
+    @Transient
+    public Properties getDatabaseProperties()
+    {
+        return getType().getDatabaseProperties(this);
     }
 }

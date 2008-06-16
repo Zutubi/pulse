@@ -44,6 +44,18 @@ public enum DatabaseType
             return getStandardProperties("org.postgresql.Driver", "jdbc:postgresql://" + config.getHost() + ":" + config.getPort() + "/" + config.getDatabase(), config.getUser(), config.getPassword(), "org.hibernate.dialect.PostgreSQLDialect");
         }
     },
+    RUBBISH
+    {
+        public boolean isEmbedded()
+        {
+            return false;
+        }
+
+        public Properties getDatabaseProperties(SetupDatabaseTypeConfiguration config)
+        {
+            return getStandardProperties("org.postgresql.Driver", "jdbc:postgresql://" + config.getHost() + ":" + config.getPort() + "/" + config.getDatabase(), config.getUser(), config.getPassword(), "org.hibernate.dialect.PostgreSQLDialect");
+        }
+    },
     ;
 
     public abstract boolean isEmbedded();

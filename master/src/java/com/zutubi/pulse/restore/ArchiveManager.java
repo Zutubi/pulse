@@ -24,7 +24,7 @@ public interface ArchiveManager
 
     Archive createArchive() throws ArchiveException;
 
-    //--( proposed interface, not yet implemented )---
+    //--( proposed interface to make this much more of a manager, not yet implemented )---
 /*
     void restoreArchive(Archive archive);
 

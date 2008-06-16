@@ -402,7 +402,7 @@ public abstract class PulseTestCase extends TestCase
         }
     }
 
-    protected void executeOnSeparateThread(final Runnable r)
+    protected Thread executeOnSeparateThread(final Runnable r)
     {
         Thread thread = new Thread(new Runnable()
         {
@@ -412,5 +412,6 @@ public abstract class PulseTestCase extends TestCase
             }
         });
         thread.start();
+        return thread;
     }
 }
