@@ -25,9 +25,9 @@ form.items.last().on('browse', function(field)
 
     var projectPath;
 <#if field.parameters.baseName?exists>
-     projectPath = findProjectPath('${field.parameters.parentPath}/${field.parameters.baseName}');
+     projectPath = 'c' + findProjectPath('${field.parameters.parentPath}/${field.parameters.baseName}');
 <#else>
-     projectPath = 'wizards/' + projectPath;
+     projectPath = 'wizards/${field.parameters.parentPath}';
 </#if>
 
     var prefix = 'scm';

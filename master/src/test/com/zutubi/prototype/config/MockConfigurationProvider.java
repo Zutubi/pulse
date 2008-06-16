@@ -54,6 +54,11 @@ public class MockConfigurationProvider implements ConfigurationProvider
         throw new RuntimeException("Method not yet implemented.");
     }
 
+    public boolean isDeeplyValid(String path)
+    {
+        throw new RuntimeException("Method not yet implemented");
+    }
+
     public void registerEventListener(ConfigurationEventListener listener, boolean synchronous, boolean includeChildPaths, String... paths)
     {
     }

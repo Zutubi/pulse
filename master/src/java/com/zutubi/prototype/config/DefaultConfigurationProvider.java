@@ -74,6 +74,11 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
         return configurationTemplateManager.getAncestorOfType(c, clazz);
     }
 
+    public boolean isDeeplyValid(String path)
+    {
+        return configurationTemplateManager.isDeeplyValid(path);
+    }
+
     public String insert(String parentPath, Object instance)
     {
         return configurationTemplateManager.insert(parentPath, instance);

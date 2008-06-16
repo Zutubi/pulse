@@ -23,6 +23,7 @@ public class RootFileObject extends AbstractPulseFileObject
         nodesDefinitions.put("config", ConfigFileObject.class);
         nodesDefinitions.put("plugins", PluginsFileObject.class);
         nodesDefinitions.put("projects", ProjectsFileObject.class);
+        nodesDefinitions.put("cprojects", ProjectConfigsFileObject.class);
         nodesDefinitions.put("templates", TemplateScopesFileObject.class);
         nodesDefinitions.put("wizards", WizardsFileObject.class);
     }

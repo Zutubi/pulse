@@ -71,6 +71,17 @@ public interface ConfigurationProvider
     <T extends Configuration> T getAncestorOfType(Configuration c, Class<T> clazz);
 
     /**
+     * Indicates if an instance and all instances reachable via its
+     * properties are valid.  For example, for a project, indicates if the
+     * entire project configuration (including the SCM, triggers etc) is
+     * valid.
+     *
+     * @param path the path to test
+     * @return true if all instances under the path are valid
+     */
+    boolean isDeeplyValid(String path);
+
+    /**
      * Register a configuration event listener.  This listener will receive events from configuration instances identified
      * by the defined paths.  If includeChildPaths is true, then changes to child configuration instances will also be
      * passed through to the registered listener.

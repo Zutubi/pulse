@@ -9,10 +9,6 @@ import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 import org.eclipse.core.runtime.dynamichelpers.IFilter;
 import org.osgi.framework.Bundle;
 
-import com.zutubi.pulse.plugins.PluginManager;
-import com.zutubi.pulse.plugins.Plugin;
-import com.zutubi.pulse.plugins.LocalPlugin;
-
 import java.util.LinkedList;
 import java.util.List;
 
@@ -122,14 +118,14 @@ public abstract class AbstractExtensionManager implements IExtensionChangeHandle
     }
 
     /**
-     * A helper that returns all <config> elements for configuration
+     * A helper that returns all &lt;config&gt; elements for configuration
      * extensions that are contributed by the same bundle as the given
      * extension.  This allows extension managers to correlate configuration
      * classes with other extensions (e.g. the ScmConfiguration related to an
      * Scm implementation).
      *
      * @param extension used to determine the contributing bundle
-     * @return all <config> elements for configuration extensions defined
+     * @return all &lt;config&gt; elements for configuration extensions defined
      *         within the same bundle as the given extension 
      */
     protected List<IConfigurationElement> getConfigElements(IExtension extension)

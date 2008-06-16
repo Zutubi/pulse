@@ -1,10 +1,12 @@
 package com.zutubi.pulse.vfs.pulse;
 
-import com.zutubi.pulse.model.Project;
+import com.zutubi.prototype.config.ConfigurationProvider;
+import com.zutubi.prototype.config.ConfigurationRegistry;
+import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.webwork.mapping.Urls;
+import com.zutubi.util.StringUtils;
 import org.apache.commons.vfs.FileName;
-import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
 
@@ -14,24 +16,18 @@ import java.util.Set;
 
 /**
  */
-public class ProjectFileObject extends AbstractPulseFileObject implements ProjectProvider, AddressableFileObject
+public class ProjectConfigFileObject extends AbstractPulseFileObject implements ProjectConfigProvider, AddressableFileObject
 {
     private static final Map<String, Class<? extends AbstractPulseFileObject>> nodesDefinitions = new HashMap<String, Class<? extends AbstractPulseFileObject>>();
     {
-        nodesDefinitions.put("builds", BuildsFileObject.class);
-        nodesDefinitions.put("latest", LatestBuildFileObject.class);
-        nodesDefinitions.put("successful", LatestSuccessfulBuildFileObject.class);
-        nodesDefinitions.put("latestsuccessful", LatestSuccessfulBuildFileObject.class);
         nodesDefinitions.put("scm", ScmRootFileObject.class);
     }
-    private String displayName;
 
-    private long projectId;
+    private ConfigurationProvider configurationProvider;
 
-    public ProjectFileObject(final FileName name, final long projectId, final AbstractFileSystem fs)
+    public ProjectConfigFileObject(final FileName name, final AbstractFileSystem fs)
     {
         super(name, fs);
-        this.projectId = projectId;
     }
 
     public AbstractPulseFileObject createFile(final FileName fileName) throws Exception
@@ -48,11 +44,6 @@ public class ProjectFileObject extends AbstractPulseFileObject implements Projec
         return null;
     }
 
-    protected void doAttach() throws Exception
-    {
-        displayName = getProjectConfig().getName();
-    }
-
     protected FileType doGetType() throws Exception
     {
         return FileType.FOLDER;
@@ -64,24 +55,9 @@ public class ProjectFileObject extends AbstractPulseFileObject implements Projec
         return children.toArray(new String[children.size()]);
     }
 
-    public String getDisplayName()
+    public ProjectConfiguration getProjectConfig()
     {
-        return displayName;
-    }
-
-    public ProjectConfiguration getProjectConfig() throws FileSystemException
-    {
-        return projectManager.getProjectConfig(projectId, false);
-    }
-
-    public Project getProject()
-    {
-        return projectManager.getProject(projectId, false);
-    }
-
-    public long getProjectId()
-    {
-        return projectId;
+        return configurationProvider.get(PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, getName().getBaseName()), ProjectConfiguration.class);
     }
 
     public boolean isLocal()
@@ -91,6 +67,11 @@ public class ProjectFileObject extends AbstractPulseFileObject implements Projec
 
     public String getUrlPath()
     {
-        return new Urls("").project(getProject());
+        return new Urls("").project(StringUtils.uriComponentEncode(getProjectConfig().getName()));
+    }
+
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    {
+        this.configurationProvider = configurationProvider;
     }
 }

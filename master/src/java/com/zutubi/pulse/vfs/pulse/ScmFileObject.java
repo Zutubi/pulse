@@ -140,8 +140,12 @@ public class ScmFileObject extends AbstractPulseFileObject
         {
             try
             {
-                long projectId = getAncestor(ProjectProvider.class).getProjectId();
-                return Arrays.asList(new FileAction("download", "/downloadSCMFile.action?projectId=" + projectId + "&path=" + StringUtils.formUrlEncode(scmFile.getPath())));
+                ProjectProvider projectProvider = getAncestor(ProjectProvider.class);
+                if (projectProvider != null)
+                {
+                    long projectId = projectProvider.getProjectId();
+                    return Arrays.asList(new FileAction("download", "/downloadSCMFile.action?projectId=" + projectId + "&path=" + StringUtils.formUrlEncode(scmFile.getPath())));
+                }
             }
             catch (FileSystemException e)
             {

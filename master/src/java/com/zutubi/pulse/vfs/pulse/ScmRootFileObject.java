@@ -1,6 +1,8 @@
 package com.zutubi.pulse.vfs.pulse;
 
+import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
+import com.zutubi.util.TextUtils;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
@@ -12,6 +14,8 @@ import org.apache.commons.vfs.provider.AbstractFileSystem;
  */
 public class ScmRootFileObject extends AbstractPulseFileObject implements ScmProvider
 {
+    private ConfigurationProvider configurationProvider;
+
     public ScmRootFileObject(final FileName name, final AbstractFileSystem fs)
     {
         super(name, fs);
@@ -36,7 +40,30 @@ public class ScmRootFileObject extends AbstractPulseFileObject implements ScmPro
 
     public ScmConfiguration getScm() throws FileSystemException
     {
-        ProjectProvider projectProvider = getAncestor(ProjectProvider.class);
-        return projectProvider.getProjectConfig().getScm();
+        ProjectConfigProvider projectConfigProvider = getAncestor(ProjectConfigProvider.class);
+        ScmConfiguration scmConfig = projectConfigProvider.getProjectConfig().getScm();
+        String scmPath = scmConfig.getConfigurationPath();
+        if(TextUtils.stringSet(scmPath))
+        {
+            if(!configurationProvider.isDeeplyValid(scmPath))
+            {
+                throw new FileSystemException("SCM configuration is invalid");
+            }
+        }
+        else
+        {
+            // No path - we are in a wizard.  We can still check the flat
+            // properties.
+            if(!scmConfig.isValid())
+            {
+                throw new FileSystemException("SCM configuration is invalid");
+            }
+        }
+        return scmConfig;
+    }
+
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    {
+        this.configurationProvider = configurationProvider;
     }
 }

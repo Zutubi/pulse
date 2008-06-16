@@ -1,7 +1,6 @@
 package com.zutubi.pulse.vfs.pulse;
 
 import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import org.apache.commons.vfs.FileSystemException;
 
 /**
@@ -9,11 +8,8 @@ import org.apache.commons.vfs.FileSystemException;
  *
  * @see com.zutubi.pulse.model.Project
  */
-public interface ProjectProvider
+public interface ProjectProvider extends ProjectConfigProvider
 {
-    ProjectConfiguration getProjectConfig() throws FileSystemException;
-
     Project getProject() throws FileSystemException;
-
     long getProjectId() throws FileSystemException;
 }

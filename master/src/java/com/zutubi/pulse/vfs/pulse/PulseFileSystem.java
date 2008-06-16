@@ -15,9 +15,8 @@ import java.io.File;
 import java.util.Collection;
 
 /**
- * The pulse file system provides access to the pulse via a file system style interface.
- *
- * 
+ * The pulse file system provides access to pulse via a file system style
+ * interface.
  */
 public class PulseFileSystem extends AbstractFileSystem
 {
@@ -97,23 +96,11 @@ public class PulseFileSystem extends AbstractFileSystem
         return paths.getBaseDir(result, recipeId);
     }
 
-    // The pulse file system provides the various file object implementations with access to the
-
-    /**
-     * Required resource.
-     *
-     * @param buildManager instance.
-     */
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param configurationManager instance.
-     */
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
@@ -124,11 +111,6 @@ public class PulseFileSystem extends AbstractFileSystem
         return configurationManager;
     }
 
-    /**
-     * Required resource.
-     * 
-     * @param objectFactory instance
-     */
     public void setObjectFactory(ObjectFactory objectFactory)
     {
         this.objectFactory = objectFactory;
