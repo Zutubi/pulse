@@ -30,7 +30,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * The TransferAPI is the entry point for the transfer package, providing methods that
+ * transfer data from jdbc -> xml file, xml file -> jdbc and jdbc -> jdbc.
  *
  */
 public class TransferAPI
@@ -109,6 +110,10 @@ public class TransferAPI
         TransferTarget target = null;
         try
         {
+            //TODO: in the same way that the dump verifies the configuration against the datasource,
+            //TODO: it would be good if we could verify the configuration against the input stream to catch
+            //TODO: any mismatches early.
+
             XMLTransferSource source = new XMLTransferSource();
             source.setSource(inputStream);
 
@@ -126,6 +131,17 @@ public class TransferAPI
         }
     }
 
+    /**
+     * Migrate the contents of the dataSource to the dataTarget.
+     *
+     * @param configuration of the source data.
+     *
+     * @param dataSource the source DataSource connection.
+     * @param dataTarget the target DataSource connection.
+     *
+     * @throws TransferException is thrown if there are any problems with the migration that would
+     * result in a difference in the source and target representations of the data.
+     */
     public void migrate(Configuration configuration, DataSource dataSource, DataSource dataTarget) throws TransferException
     {
         HibernateTransferTarget target = new HibernateTransferTarget();
@@ -146,6 +162,12 @@ public class TransferAPI
         }
     }
 
+    /**
+     * Add a transfer listener to the API to receive feedback on the processing of a dump, restore or migrate
+     * opperation.
+     *
+     * @param listener instance that will receive the callbacks.
+     */
     public void addListener(TransferListener listener)
     {
         if (listeners == null)
@@ -265,7 +287,8 @@ public class TransferAPI
     }
 
     /**
-     * 
+     * A delegating transfer target that is used to provide the necessary callbacks to the
+     * registered transfer listeners. 
      */
     private class InterceptorTransferTarget implements TransferTarget
     {
@@ -313,6 +336,9 @@ public class TransferAPI
             });
             delegate.row(row);
         }
+
+        //QUESTION: should the end and endTable callbacks happen before or after the
+        //          delegate.endTable and delegate.end calls?
 
         public void endTable() throws TransferException
         {

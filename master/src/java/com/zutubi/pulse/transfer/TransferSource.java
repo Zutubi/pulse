@@ -1,7 +1,7 @@
 package com.zutubi.pulse.transfer;
 
 /**
- *
+ * 
  *
  */
 public interface TransferSource

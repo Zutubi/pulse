@@ -54,12 +54,13 @@ public class TransferAPITest extends TestCase
     protected void tearDown() throws Exception
     {
         // cleanup the database.
+        JDBCUtils.execute(dataSource, "SHUTDOWN");
         ((BasicDataSource)dataSource).close();
 
         super.tearDown();
     }
 
-    public void testExamine() throws IOException, SQLException, ParsingException, TransferException
+    public void testSimpleDumpAndRestore() throws IOException, SQLException, ParsingException, TransferException
     {
         MutableConfiguration configuration = new MutableConfiguration();
 
@@ -96,6 +97,49 @@ public class TransferAPITest extends TestCase
 
         assertEquals(3, JDBCUtils.executeCount(dataSource, "select * from TYPES"));
         assertEquals(1, JDBCUtils.executeCount(dataSource, "select * from RELATED_TYPES"));
+    }
+
+    public void testSchemaConsistencyCheckOnRestore() throws IOException, SQLException, TransferException
+    {
+        MutableConfiguration configuration = new MutableConfiguration();
+
+        // CONFIGURE HIBERNATE.
+        List<Resource> mappings = getHibernateMappings();
+        for (Resource mapping : mappings)
+        {
+            configuration.addInputStream(mapping.getInputStream());
+        }
+        configuration.setProperties(getHibernateProperties());
+
+        // SETUP THE DATABASE SCHEMA FOR TESTING.
+        createSchema(dataSource, configuration);
+        createSchemaConstraints(dataSource, configuration);
+
+        // SETUP TEST DATA.
+        JDBCUtils.execute(dataSource, "insert into TYPES (ID, STRING_TYPE, BOOLEAN_TYPE) values (1, 'string', '1')");
+        JDBCUtils.execute(dataSource, "insert into TYPES (ID, STRING_TYPE, BOOLEAN_TYPE) values (2, '', '1')");
+        JDBCUtils.execute(dataSource, "insert into TYPES (ID, STRING_TYPE, BOOLEAN_TYPE) values (3, null, '1')");
+        JDBCUtils.execute(dataSource, "insert into RELATED_TYPES (ID, TYPE) values (1, 1)");
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        // setup the incompatible configuration.
+        configuration = new MutableConfiguration();
+        configuration.addInputStream(new ClassPathResource("com/zutubi/pulse/transfer/Schema_Animals.hbm.xml").getInputStream());
+        configuration.setProperties(getHibernateProperties());
+
+        TransferAPI transferAPI = new TransferAPI();
+        try
+        {
+            transferAPI.dump(configuration, dataSource, baos);
+            fail();
+        }
+        catch (TransferException e)
+        {
+            // expected
+            assertEquals("Schema export aborted due to schema / mapping mismatch", e.getMessage());
+        }
+
     }
 
     public void testMigrateDatabase() throws SQLException, IOException, TransferException
@@ -139,7 +183,6 @@ public class TransferAPITest extends TestCase
         {
             if (sql.startsWith("create"))
             {
-                System.out.println(sql);
                 JDBCUtils.execute(dataSource, sql);
             }
         }
@@ -153,7 +196,6 @@ public class TransferAPITest extends TestCase
         {
             if (sql.startsWith("alter"))
             {
-                System.out.println(sql);
                 JDBCUtils.execute(dataSource, sql);
             }
         }
