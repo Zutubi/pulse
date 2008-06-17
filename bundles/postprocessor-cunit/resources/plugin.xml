@@ -2,6 +2,7 @@
 <?eclipse version="3.2"?>
 <plugin>
     <extension point="com.zutubi.pulse.core.postprocessors">
-        <post-processor name="cunit.pp" class="com.zutubi.pulse.core.CUnitReportPostProcessor"/>
+        <post-processor name="cunit.pp" display-name="CUnit XML report processor"
+                        default-processor="true" class="com.zutubi.pulse.core.CUnitReportPostProcessor"/>
     </extension>
 </plugin>

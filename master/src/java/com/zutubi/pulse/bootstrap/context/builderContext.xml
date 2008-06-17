@@ -158,7 +158,7 @@
 
     <bean id="licenseMonitor" class="com.zutubi.pulse.license.LicenseMonitor" autowire="byName" init-method="init"/>
 
-    <bean id="postProcessorManager" class="com.zutubi.pulse.PostProcessorManager" autowire="byName"/>
+    <bean id="postProcessorManager" class="com.zutubi.pulse.DefaultPostProcessorManager" autowire="byName"/>
 
     <bean id="guestAccessManager" class="com.zutubi.pulse.GuestAccessManager" autowire="byName"/>
 

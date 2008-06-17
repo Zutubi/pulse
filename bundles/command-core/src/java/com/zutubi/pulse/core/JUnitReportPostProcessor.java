@@ -35,6 +35,11 @@ public class JUnitReportPostProcessor extends XMLReportPostProcessor
         super("JUnit");
     }
 
+    public JUnitReportPostProcessor(String reportType)
+    {
+        super(reportType);
+    }
+
     protected void processDocument(Document doc, TestSuiteResult tests)
     {
         Element root = doc.getRootElement();

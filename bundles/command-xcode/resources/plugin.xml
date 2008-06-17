@@ -5,6 +5,7 @@
         <command name="xcode" class="com.zutubi.pulse.core.XCodeCommand"/>
     </extension>
     <extension point="com.zutubi.pulse.core.postprocessors">
-        <post-processor name="xcode.pp" class="com.zutubi.pulse.core.XCodePostProcessor"/>
+        <post-processor name="xcode.pp" display-name="xcodebuild output processor"
+                        default-fragment="true" class="com.zutubi.pulse.core.XCodePostProcessor"/>
     </extension>
 </plugin>

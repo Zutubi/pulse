@@ -1,6 +1,9 @@
 package com.zutubi.pulse.model;
 
+import com.zutubi.pulse.PostProcessorManager;
+import com.zutubi.pulse.prototype.config.project.types.DefaultPostProcessorFragment;
 import com.zutubi.pulse.prototype.config.project.types.FileArtifactConfiguration;
+import com.zutubi.pulse.prototype.config.project.types.PostProcessorFragment;
 import com.zutubi.pulse.prototype.config.project.types.TemplateTypeConfiguration;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
@@ -10,6 +13,7 @@ import org.apache.velocity.app.VelocityEngine;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.Map;
 
 /**
  */
@@ -26,7 +30,20 @@ public abstract class TemplateTypeConfigurationTestBase extends PulseTestCase
         File pulseRoot = new File(getPulseRoot(), "master/src/templates");
         engine.setProperty("file.resource.loader.path", pulseRoot.getAbsolutePath());
         engine.init();
-        getType().setVelocityEngine(engine);
+        TemplateTypeConfiguration type = getType();
+        type.setVelocityEngine(engine);
+        type.setPostProcessorManager(new PostProcessorManager()
+        {
+            public PostProcessorFragment getProcessor(String name)
+            {
+                return new DefaultPostProcessorFragment(name, name);
+            }
+
+            public Map<String, PostProcessorFragment> getAvailableProcessors()
+            {
+                throw new RuntimeException("Method not yet implemented");
+            }
+        });
         tmpDir = FileSystemUtils.createTempDir(getClass().getName(), "");
     }
 

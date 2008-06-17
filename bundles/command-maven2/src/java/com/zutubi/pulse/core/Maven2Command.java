@@ -6,7 +6,6 @@ import com.zutubi.pulse.util.SystemUtils;
 import java.io.File;
 
 /**
- * <class-comment/>
  */
 public class Maven2Command extends ExecutableCommand
 {
@@ -27,7 +26,7 @@ public class Maven2Command extends ExecutableCommand
         }
 
         ProcessArtifact pa = createProcess();
-        pa.setProcessor(new Maven2PostProcessor("maven.pp"));
+        pa.setProcessor(pp);
 
         super.execute(context, cmdResult);
 

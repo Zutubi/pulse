@@ -1,12 +1,12 @@
 package com.zutubi.pulse.prototype.config.project.types;
 
 import com.zutubi.config.annotations.*;
+import com.zutubi.pulse.PostProcessorManager;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
-import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -30,8 +30,11 @@ public abstract class TemplateTypeConfiguration extends TypeConfiguration
     private List<String> postProcessors = new LinkedList<String>();
 
     private Map<String, ArtifactConfiguration> artifacts = new LinkedHashMap<String, ArtifactConfiguration>();
+
     @Transient
     private VelocityEngine velocityEngine;
+    @Transient
+    private PostProcessorManager postProcessorManager;
 
     public List<String> getPostProcessors()
     {
@@ -112,30 +115,35 @@ public abstract class TemplateTypeConfiguration extends TypeConfiguration
     private void addPostProcessors(VelocityContext context)
     {
         Set<String> includedProcessors = new TreeSet<String>();
-        List<String> templates = new LinkedList<String>();
+        List<String> fragments = new LinkedList<String>();
 
         for(String processor: postProcessors)
         {
-            addProcessor(includedProcessors, processor, templates);
+            addProcessor(includedProcessors, processor, fragments);
         }
 
         for(ArtifactConfiguration artifact: artifacts.values())
         {
             for(String processor: artifact.getPostprocessors())
             {
-                addProcessor(includedProcessors, processor, templates);
+                addProcessor(includedProcessors, processor, fragments);
             }
         }
 
-        context.put("postProcessorTemplates", templates);
+        context.put("postProcessorFragments", fragments);
     }
 
-    private void addProcessor(Set<String> includedProcessors, String processor, List<String> templates)
+    private void addProcessor(Set<String> includedProcessors, String processor, List<String> fragments)
     {
-        if(!includedProcessors.contains(processor))
+        PostProcessorFragment fragment = postProcessorManager.getProcessor(processor);
+        if(fragment != null && includedProcessors.add(processor))
         {
-            includedProcessors.add(processor);
-            templates.add(FileSystemUtils.composeFilename("pulse-file", "post-processors", processor + ".vm"));
+            fragments.add(fragment.getFragment());
         }
+    }
+
+    public void setPostProcessorManager(PostProcessorManager postProcessorManager)
+    {
+        this.postProcessorManager = postProcessorManager;
     }
 }

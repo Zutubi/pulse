@@ -10,9 +10,15 @@
     </extension>
     <extension point="com.zutubi.pulse.core.postprocessors">
         <post-processor name="post-processor" class="com.zutubi.pulse.core.PostProcessorGroup"/>
-        <post-processor name="junit.pp" class="com.zutubi.pulse.core.JUnitReportPostProcessor"/>
-        <post-processor name="junit.summary.pp" class="com.zutubi.pulse.core.JUnitSummaryPostProcessor"/>
-        <post-processor name="regex-test.pp" class="com.zutubi.pulse.core.RegexTestPostProcessor"/>
-        <post-processor name="regex.pp" class="com.zutubi.pulse.core.RegexPostProcessor"/>
+        <post-processor name="junit.pp" display-name="JUnit XML report processor"
+                        default-fragment="true" class="com.zutubi.pulse.core.JUnitReportPostProcessor"/>
+        <post-processor name="junitee.pp" display-name="JUnitEE XML report processor"
+                        default-fragment="true" class="com.zutubi.pulse.core.JUnitEEReportPostProcessor"/>
+        <post-processor name="junit-summary.pp" display-name="JUnit summary output processor"
+                        default-fragment="true" class="com.zutubi.pulse.core.JUnitSummaryPostProcessor"/>
+        <post-processor name="regex-test.pp" display-name="Regular expression test processor"
+                        default-fragment="false" class="com.zutubi.pulse.core.RegexTestPostProcessor"/>
+        <post-processor name="regex.pp" display-name="Regular expression processor"
+                        default-fragment="false" class="com.zutubi.pulse.core.RegexPostProcessor"/>
     </extension>
 </plugin>

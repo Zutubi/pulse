@@ -2,6 +2,7 @@
 <?eclipse version="3.2"?>
 <plugin>
     <extension point="com.zutubi.pulse.core.postprocessors">
-        <post-processor name="gcc.pp" class="com.zutubi.pulse.core.GccPostProcessor"/>
+        <post-processor name="gcc.pp" display-name="gcc output processor"
+                        default-fragment="true" class="com.zutubi.pulse.core.GccPostProcessor"/>
     </extension>
 </plugin>

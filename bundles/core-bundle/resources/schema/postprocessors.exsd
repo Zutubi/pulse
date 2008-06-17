@@ -39,14 +39,30 @@
 
     <element name="post-processor">
         <complexType>
-            <attribute name="name" type="string">
+            <attribute name="name" type="string" use="required">
                 <annotation>
                     <documentation>
                         The name of the post-processor.
                     </documentation>
                 </annotation>
             </attribute>
-            <attribute name="class" type="string">
+            <attribute name="display-name" type="string">
+                <annotation>
+                    <documentation>
+                        Descriptive name for the post-processor to be used in the UI.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="default-fragment" type="boolean">
+                <annotation>
+                    <documentation>
+                        Set to true if a default version of this post-processor should be
+                        available to built-in Pulse projects (only possible if the
+                        processor can work with no additional configuration).
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="class" type="string" use="required">
                 <annotation>
                     <documentation>
                         The specific class implementing the post-processor.
