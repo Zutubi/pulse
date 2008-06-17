@@ -17,7 +17,6 @@ import java.util.Random;
  */
 public class FileSystemRecordStorePerformanceTest extends RecordStoreTestCase
 {
-
     private RecordStore recordStore;
 
     private TransactionManager transactionManager;
@@ -77,7 +76,7 @@ public class FileSystemRecordStorePerformanceTest extends RecordStoreTestCase
     public void testPerformanceOfLargeRecordSetsInsideTransaction()
     {
         final List<Record> records = new LinkedList<Record>();
-        for (int i = 0; i < 300; i++)
+        for (int i = 0; i < 100; i++)
         {
             records.add(createSampleRecord(3, 5));
         }
