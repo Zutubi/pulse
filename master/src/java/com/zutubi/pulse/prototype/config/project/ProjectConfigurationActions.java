@@ -88,6 +88,16 @@ public class ProjectConfigurationActions
         return !configurationTemplateManager.existsInTemplateParent(typePath) && !configurationTemplateManager.isOverridden(typePath);
     }
 
+    public String customiseTrigger(ProjectConfiguration projectConfig)
+    {
+        if (projectConfig.getOptions().getPrompt())
+        {
+            return "editBuildProperties";
+        }
+
+        return null;
+    }
+
     @Permission(ACTION_TRIGGER)
     public void doTrigger(ProjectConfiguration projectConfig)
     {

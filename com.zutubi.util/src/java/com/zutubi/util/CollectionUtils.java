@@ -286,7 +286,7 @@ public class CollectionUtils
         return m;
     }
     
-    public static <T> void traverse(Collection<T> c, UnaryFunction<T> f)
+    public static <T> void traverse(Collection<T> c, UnaryProcedure<T> f)
     {
         for (T t : c)
         {

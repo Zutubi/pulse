@@ -99,6 +99,46 @@ public class ConfigurationActionsTest extends TestCase
         assertEquals(hasEnabledMethod, ca.hasEnabledMethod());
     }
 
+    public void testCustomiseNoArgNoReturn() throws Exception
+    {
+        assertCustomiseMethod("noArgNoReturn");
+    }
+
+    public void testCustomiseNoArg() throws Exception
+    {
+        assertCustomiseMethod("noArg");
+    }
+
+    public void testCustomiseNoReturn() throws Exception
+    {
+        assertCustomiseMethod("noReturn");
+    }
+
+    public void testCustomiseArgAndReturn() throws Exception
+    {
+        assertCustomiseMethod("argAndReturn");
+    }
+
+    public void testCustomiseArgWrongType() throws Exception
+    {
+        assertNoCustomiseMethod("argWrongType");
+    }
+
+    public void testCustomiseReturnWrongType() throws Exception
+    {
+        assertNoCustomiseMethod("returnWrongType");
+    }
+
+    private void assertCustomiseMethod(String actionName)
+    {
+        assertNotNull(getCustomiseMethod(actionName));
+    }
+
+    private void assertNoCustomiseMethod(String actionName)
+    {
+        assertNull(getCustomiseMethod(actionName));
+    }
+
     public void testPrepareNoArgNoReturn() throws Exception
     {
         assertPrepareMethod("noArgNoReturn");
@@ -152,6 +192,12 @@ public class ConfigurationActionsTest extends TestCase
     private void assertNoPrepareMethod(String actionName)
     {
         assertNull(getPrepareMethod(actionName));
+    }
+
+    private Method getCustomiseMethod(String actionName)
+    {
+        ConfigurationActions ca = new ConfigurationActions(T.class, CustomiseActions.class, objectFactory);
+        return ca.getAction(actionName).getCustomiseMethod();
     }
 
     private Method getPrepareMethod(String actionName)
@@ -279,6 +325,60 @@ public class ConfigurationActionsTest extends TestCase
         public void doActionWithArg(T t, ConfigType arg)
         {
             obj = arg;
+        }
+    }
+
+    public static class CustomiseActions
+    {
+        public void customiseNoArgNoReturn()
+        {
+        }
+
+        public void doNoArgNoReturn(T t)
+        {
+        }
+
+        public String customiseNoArg()
+        {
+            return "customiseNoArg";
+        }
+
+        public void doNoArg(T t, ConfigType c)
+        {
+        }
+
+        public void customiseNoReturn(T t)
+        {
+        }
+
+        public void doNoReturn(T t, ConfigType c)
+        {
+        }
+
+        public String customiseArgAndReturn(T t)
+        {
+            return "customiseArgAndReturn";
+        }
+
+        public void doArgAndReturn(T t, ConfigType c)
+        {
+        }
+
+        public void customiseArgWrongType(ConfigType t)
+        {
+        }
+
+        public void doArgWrongType(T t, ConfigType c)
+        {
+        }
+
+        public Long customiseReturnWrongType(T t)
+        {
+            return 0L;
+        }
+
+        public void doReturnWrongType(T t)
+        {
         }
     }
 

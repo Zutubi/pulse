@@ -1,27 +1,22 @@
 package com.zutubi.pulse.transfer;
 
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.transfer.xml.XMLTransferTarget;
-import com.zutubi.pulse.transfer.xml.XMLTransferSource;
+import com.zutubi.pulse.transfer.jdbc.HibernateTransferException;
 import com.zutubi.pulse.transfer.jdbc.HibernateTransferSource;
 import com.zutubi.pulse.transfer.jdbc.HibernateTransferTarget;
-import com.zutubi.pulse.transfer.jdbc.HibernateTransferException;
 import com.zutubi.pulse.transfer.jdbc.MappingUtils;
+import com.zutubi.pulse.transfer.xml.XMLTransferSource;
+import com.zutubi.pulse.transfer.xml.XMLTransferTarget;
 import com.zutubi.pulse.util.JDBCUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.IOUtils;
-import com.zutubi.util.UnaryFunction;
+import com.zutubi.util.UnaryProcedure;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.Table;
 
 import javax.sql.DataSource;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Iterator;
@@ -303,7 +298,7 @@ public class TransferAPI
 
         public void start() throws TransferException
         {
-            CollectionUtils.traverse(listeners, new UnaryFunction<TransferListener>()
+            CollectionUtils.traverse(listeners, new UnaryProcedure<TransferListener>()
             {
                 public void process(TransferListener transferListener)
                 {
@@ -315,7 +310,7 @@ public class TransferAPI
 
         public void startTable(final com.zutubi.pulse.transfer.Table table) throws TransferException
         {
-            CollectionUtils.traverse(listeners, new UnaryFunction<TransferListener>()
+            CollectionUtils.traverse(listeners, new UnaryProcedure<TransferListener>()
             {
                 public void process(TransferListener transferListener)
                 {
@@ -327,7 +322,7 @@ public class TransferAPI
 
         public void row(final Map<String, Object> row) throws TransferException
         {
-            CollectionUtils.traverse(listeners, new UnaryFunction<TransferListener>()
+            CollectionUtils.traverse(listeners, new UnaryProcedure<TransferListener>()
             {
                 public void process(TransferListener transferListener)
                 {
@@ -342,7 +337,7 @@ public class TransferAPI
 
         public void endTable() throws TransferException
         {
-            CollectionUtils.traverse(listeners, new UnaryFunction<TransferListener>()
+            CollectionUtils.traverse(listeners, new UnaryProcedure<TransferListener>()
             {
                 public void process(TransferListener transferListener)
                 {
@@ -354,7 +349,7 @@ public class TransferAPI
 
         public void end() throws TransferException
         {
-            CollectionUtils.traverse(listeners, new UnaryFunction<TransferListener>()
+            CollectionUtils.traverse(listeners, new UnaryProcedure<TransferListener>()
             {
                 public void process(TransferListener transferListener)
                 {

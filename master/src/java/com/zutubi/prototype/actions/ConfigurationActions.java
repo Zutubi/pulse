@@ -117,7 +117,7 @@ public class ConfigurationActions
 
                 // ok, we have an action here.
                 String action = methodToAction(methodName);
-                availableActions.put(action, new ConfigurationAction(action, getPermissionName(method), argumentType, getPrepareMethod(action, argumentType), method));
+                availableActions.put(action, new ConfigurationAction(action, getPermissionName(method), argumentType, getCustomiseMethod(action), getPrepareMethod(action, argumentType), method));
             }
         }
     }
@@ -145,9 +145,19 @@ public class ConfigurationActions
         return permissionName;
     }
 
+    private Method getCustomiseMethod(final String action)
+    {
+        return getMethodWithOptionalReturn(action, String.class, "customise");
+    }
+
     private Method getPrepareMethod(final String action, final Class argumentType)
     {
-        final String expectedName = "prepare" + action.substring(0, 1).toUpperCase() + action.substring(1);
+        return getMethodWithOptionalReturn(action, argumentType, "prepare");
+    }
+
+    private Method getMethodWithOptionalReturn(String action, final Class optionalReturnType, String prefix)
+    {
+        final String expectedName = prefix + action.substring(0, 1).toUpperCase() + action.substring(1);
         return CollectionUtils.find(actionHandlerClass.getMethods(), new Predicate<Method>()
         {
             public boolean satisfied(Method method)
@@ -163,7 +173,7 @@ public class ConfigurationActions
                 }
 
                 Class<?> returnType = method.getReturnType();
-                return  returnType == Void.TYPE || argumentType != null && argumentType.isAssignableFrom(returnType);
+                return  returnType == Void.TYPE || optionalReturnType != null && optionalReturnType.isAssignableFrom(returnType);
             }
         });
     }
@@ -255,6 +265,27 @@ public class ConfigurationActions
         }
 
         return actions;
+    }
+
+    public String customise(String name, Configuration configurationInstance) throws Exception
+    {
+        ConfigurationAction action = verifyAction(name, configurationInstance);
+        Method customiseMethod = action.getCustomiseMethod();
+        String result = null;
+        if(customiseMethod != null)
+        {
+            Object handlerInstance = objectFactory.buildBean(actionHandlerClass);
+            if(customiseMethod.getParameterTypes().length == 0)
+            {
+                result = (String) customiseMethod.invoke(handlerInstance);
+            }
+            else
+            {
+                result = (String) customiseMethod.invoke(handlerInstance, configurationInstance);
+            }
+        }
+
+        return result;
     }
 
     Configuration prepare(String name, Configuration configurationInstance) throws Exception

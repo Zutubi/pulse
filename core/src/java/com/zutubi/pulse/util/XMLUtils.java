@@ -1,12 +1,11 @@
 package com.zutubi.pulse.util;
 
+import com.opensymphony.util.TextUtils;
+import com.zutubi.util.IOUtils;
+import com.zutubi.util.UnaryProcedure;
 import nu.xom.*;
 
 import java.io.*;
-
-import com.zutubi.util.IOUtils;
-import com.zutubi.util.UnaryFunction;
-import com.opensymphony.util.TextUtils;
 
 /**
  */
@@ -205,7 +204,7 @@ public class XMLUtils
         return c <= 0xD7FF || c >= 0xE000 && (c <= 0xFFFD || c >= 0x10000 && c <= 0x10FFFF);
     }
 
-    public static void forEachChild(Element element, String name, UnaryFunction<Element> fn)
+    public static void forEachChild(Element element, String name, UnaryProcedure<Element> fn)
     {
         Elements elements = element.getChildElements(name);
         for(int i = 0; i < elements.size(); i++)

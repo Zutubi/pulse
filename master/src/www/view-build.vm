@@ -11,7 +11,6 @@
 <html>
 <head>
     <title>#wwtext("name=build") $result.number</title>
-    <script type="text/javascript" src="$base/js/prototype.js"></script>
     <script type="text/javascript">
         #updater("$base/ajax/viewBuildPanel.action?${ownerArg}&buildVID=$buildResult.number" "panel" $principle)
 
@@ -44,7 +43,7 @@
                     }
                 },
 
-                onFailure: function(transport, options)
+                failure: function(transport, options)
                 {
                     showStatus.update('Hook trigger failed.', 'failure');
                 }

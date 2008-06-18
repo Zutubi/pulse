@@ -532,6 +532,11 @@
             <result name="input" type="flexjson">newPanel</result>
             <result name="cancel" type="flexjson">configurationResponse</result>
             <result name="success" type="flexjson">configurationResponse</result>
+            <result name="chain" type="chain">
+                <param name="namespace">/aaction</param>
+                <param name="actionName">${customAction}</param>
+                <param name="method">input</param>
+            </result>
         </action>
         
         <action name="clone" class="com.zutubi.prototype.webwork.CloneAction">
@@ -545,6 +550,15 @@
             <result name="cancel" type="flexjson">configurationResponse</result>
             <result name="success" type="flexjson">configurationResponse</result>
             <result name="input" type="flexjson">newPanel</result>
+        </action>
+    </package>
+
+    <package name="actionAjax" namespace="/aaction" extends="configAjax">
+        <action name="editBuildProperties" class="com.zutubi.pulse.web.project.EditBuildPropertiesAction">
+            <param name="ajax">true</param>
+            <result name="input" type="flexjson">newPanel</result>
+            <result name="cancel" type="flexjson">configurationResponse</result>
+            <result name="success" type="flexjson">configurationResponse</result>
         </action>
     </package>
 

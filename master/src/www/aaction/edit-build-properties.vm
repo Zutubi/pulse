@@ -1,0 +1,7 @@
+<div class="config-panel">
+    <h3 class="config-header">#wwtext("name=build.properties.specify")</h3>
+    <div class="config-container">
+        $formSource
+    </div>
+    #standardFormEvents("form")
+</div>

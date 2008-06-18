@@ -1,15 +1,14 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.util.TextUtils;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
-import com.zutubi.pulse.core.model.Feature;
+import com.zutubi.pulse.committransformers.CommitMessageSupport;
 import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.pulse.web.LookupErrorException;
-import com.zutubi.pulse.committransformers.*;
-import com.zutubi.pulse.committransformers.CommitMessageSupport;
+import com.zutubi.util.TextUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,7 +22,7 @@ public class ProjectActionBase extends ActionSupport
     private Project project;
     private long projectId;
     protected BuildManager buildManager;
-    private ConfigurationTemplateManager configurationTemplateManager;
+    protected ConfigurationTemplateManager configurationTemplateManager;
 
     public String getProjectName()
     {

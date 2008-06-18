@@ -25,7 +25,13 @@ public class ConfigurationAction
      */
     private Class argumentClass;
     /**
-     * Optionally method to call before executing this action: e.g. to
+     * Optional method to call to determine if a custom interface should be
+     * presented for this action.  This can be used, for example, to tell the
+     * web UI to present a different page.
+     */
+    private Method customiseMethod;
+    /**
+     * Optional method to call before executing this action: e.g. to
      * prepare a default argument.
      */
     private Method prepareMethod;
@@ -40,11 +46,12 @@ public class ConfigurationAction
         this.method = method;
     }
 
-    public ConfigurationAction(String name, String permissionName, Class argumentClass, Method prepareMethod, Method method)
+    public ConfigurationAction(String name, String permissionName, Class argumentClass, Method customiseMethod, Method prepareMethod, Method method)
     {
         this.name = name;
         this.permissionName = permissionName;
         this.argumentClass = argumentClass;
+        this.customiseMethod = customiseMethod;
         this.prepareMethod = prepareMethod;
         this.method = method;
     }
@@ -67,6 +74,11 @@ public class ConfigurationAction
     public boolean hasArgument()
     {
         return argumentClass != null;
+    }
+
+    public Method getCustomiseMethod()
+    {
+        return customiseMethod;
     }
 
     public Method getPrepareMethod()

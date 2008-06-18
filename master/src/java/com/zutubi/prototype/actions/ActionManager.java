@@ -9,6 +9,7 @@ import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.util.UnaryFunctionE;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
@@ -85,34 +86,56 @@ public class ActionManager
         return result;
     }
 
-    public Configuration prepare(String actionName, Configuration configurationInstance)
+    public void ensurePermission(String path, String actionName)
     {
-        CompositeType type = getType(configurationInstance);
+        CompositeType type = configurationTemplateManager.getType(path, CompositeType.class);
         ConfigurationActions actions = getConfigurationActions(type);
         ConfigurationAction action = actions.getAction(actionName);
 
         if (action != null)
         {
-            configurationSecurityManager.ensurePermission(configurationInstance.getConfigurationPath(), action.getPermissionName());
-
-            try
-            {
-                return actions.prepare(actionName, configurationInstance);
-            }
-            catch (Exception e)
-            {
-                LOG.severe(e);
-                throw new RuntimeException(e);
-            }
+            configurationSecurityManager.ensurePermission(path, action.getPermissionName());
         }
         else
         {
-            LOG.warning("Request to prepare unrecognised action '" + actionName + "' on path '" + configurationInstance.getConfigurationPath() + "'");
-            return null;
+            LOG.warning("Permission check for unrecognised action '" + actionName + "' on path '" + path + "'");
         }
     }
 
-    public List<String> execute(String actionName, Configuration configurationInstance, Configuration argumentInstance)
+    public String getCustomiseName(final String actionName, final Configuration configurationInstance)
+    {
+        return processAction(actionName, configurationInstance, new UnaryFunctionE<ConfigurationActions, String>()
+        {
+            public String process(ConfigurationActions actions) throws Exception
+            {
+                return actions.customise(actionName, configurationInstance);
+            }
+        });
+    }
+
+    public Configuration prepare(final String actionName, final Configuration configurationInstance)
+    {
+        return processAction(actionName, configurationInstance, new UnaryFunctionE<ConfigurationActions, Configuration>()
+        {
+            public Configuration process(ConfigurationActions actions) throws Exception
+            {
+                return actions.prepare(actionName, configurationInstance);
+            }
+        });
+    }
+
+    public List<String> execute(final String actionName, final Configuration configurationInstance, final Configuration argumentInstance)
+    {
+        return processAction(actionName, configurationInstance, new UnaryFunctionE<ConfigurationActions, List<String>>()
+        {
+            public List<String> process(ConfigurationActions actions) throws Exception
+            {
+                return actions.execute(actionName, configurationInstance, argumentInstance);
+            }
+        });
+    }
+
+    private <T> T processAction(String actionName, Configuration configurationInstance, UnaryFunctionE<ConfigurationActions, T> f)
     {
         CompositeType type = getType(configurationInstance);
         ConfigurationActions actions = getConfigurationActions(type);
@@ -124,7 +147,7 @@ public class ActionManager
 
             try
             {
-                return actions.execute(actionName, configurationInstance, argumentInstance);
+                return f.process(actions);
             }
             catch (Exception e)
             {

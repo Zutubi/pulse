@@ -5,8 +5,12 @@ import static com.zutubi.config.annotations.FieldParameter.ACTIONS;
 import static com.zutubi.config.annotations.FieldParameter.SCRIPTS;
 import com.zutubi.config.annotations.FieldType;
 import com.zutubi.prototype.config.ConfigurationProvider;
+import com.zutubi.prototype.config.ConfigurationRegistry;
 import com.zutubi.prototype.model.Field;
 import com.zutubi.prototype.model.Form;
+import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.prototype.webwork.ConfigurationPanel;
+import com.zutubi.prototype.webwork.ConfigurationResponse;
 import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
@@ -39,10 +43,19 @@ public class EditBuildPropertiesAction extends ProjectActionBase
     private String formSource;
     private String revision;
     private List<ResourceProperty> properties;
+    private boolean ajax;
+    private ConfigurationPanel newPanel;
+    private ConfigurationResponse configurationResponse;
+    private String submitField;
 
     private ScmClientFactory<ScmConfiguration> scmClientFactory;
     private MasterConfigurationManager configurationManager;
     private ConfigurationProvider configurationProvider;
+
+    public boolean isCancelled()
+    {
+        return "cancel".equals(submitField);
+    }
 
     public String getFormSource()
     {
@@ -64,14 +77,43 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         this.revision = revision;
     }
 
+    public void setPath(String path)
+    {
+        String[] elements = PathUtils.getPathElements(path);
+        if(elements.length == 2 && elements[0].equals(ConfigurationRegistry.PROJECTS_SCOPE))
+        {
+            setProjectName(elements[1]);
+        }
+    }
+
+    public void setAjax(boolean ajax)
+    {
+        this.ajax = ajax;
+    }
+
+    public void setSubmitField(String submitField)
+    {
+        this.submitField = submitField;
+    }
+
+    public ConfigurationPanel getNewPanel()
+    {
+        return newPanel;
+    }
+
+    public ConfigurationResponse getConfigurationResponse()
+    {
+        return configurationResponse;
+    }
+
     private void renderForm() throws IOException, TemplateException
     {
         Project project = getRequiredProject();
         properties = new ArrayList<ResourceProperty>(project.getConfig().getProperties().values());
         Collections.sort(properties, new NamedConfigurationComparator());
 
-        Form form = new Form("form", "edit.build.properties", "editBuildProperties.action");
-        form.setAjax(false);
+        Form form = new Form("form", "edit.build.properties", (ajax ? "aaction/" : "") + "editBuildProperties.action");
+        form.setAjax(ajax);
 
         Field field = new Field(FieldType.HIDDEN, "projectName");
         field.setValue(getProjectName());
@@ -101,6 +143,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         StringWriter writer = new StringWriter();
         PrototypeUtils.renderForm(context, form, getClass(), writer, configurationManager);
         formSource = writer.toString();
+        newPanel = new ConfigurationPanel("aaction/edit-build-properties.vm");
     }
 
     private void addSubmit(Form form, String name)
@@ -116,11 +159,28 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         return INPUT;
     }
 
+    private String getPath()
+    {
+        return PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, getProjectName());
+    }
+
+    private void setupResponse()
+    {
+        String newPath = getPath();
+        configurationResponse = new ConfigurationResponse(newPath, configurationTemplateManager.getTemplatePath(newPath));
+    }
+
+    public void doCancel()
+    {
+        setupResponse();
+    }
+
     public String execute() throws IOException, TemplateException
     {
         Project project = getRequiredProject();
-        getProjectManager().checkWrite(project);
 
+        // Ensure we are allowed to change the project configuration.
+        getProjectManager().checkWrite(project);
         ProjectConfiguration projectConfig = configurationProvider.deepClone(project.getConfig());
         mapProperties(projectConfig);
         String path = configurationProvider.save(projectConfig);
@@ -183,6 +243,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
             // Empty
         }
 
+        setupResponse();
         return SUCCESS;
     }
 

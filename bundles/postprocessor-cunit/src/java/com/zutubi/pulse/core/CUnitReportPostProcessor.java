@@ -1,19 +1,14 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.model.TestSuiteResult;
 import com.zutubi.pulse.core.model.TestCaseResult;
-import com.zutubi.pulse.core.model.TestResult;
-import com.zutubi.pulse.core.model.Result;
+import com.zutubi.pulse.core.model.TestSuiteResult;
 import com.zutubi.pulse.util.XMLUtils;
-import com.zutubi.util.UnaryFunction;
+import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.logging.Logger;
-
-import java.util.Map;
-import java.util.TreeMap;
-
-import nu.xom.*;
-import org.xml.sax.SAXNotRecognizedException;
-import org.xml.sax.SAXNotSupportedException;
+import nu.xom.Builder;
+import nu.xom.Document;
+import nu.xom.Element;
+import nu.xom.XMLException;
 import org.xml.sax.SAXException;
 
 /**
@@ -61,15 +56,15 @@ public class CUnitReportPostProcessor extends XMLReportPostProcessor
     protected void processDocument(Document doc, final TestSuiteResult tests)
     {
         Element root = doc.getRootElement();
-        XMLUtils.forEachChild(root, ELEMENT_RESULT_LISTING, new UnaryFunction<Element>()
+        XMLUtils.forEachChild(root, ELEMENT_RESULT_LISTING, new UnaryProcedure<Element>()
         {
             public void process(Element element)
             {
-                XMLUtils.forEachChild(element, ELEMENT_RUN_SUITE, new UnaryFunction<Element>()
+                XMLUtils.forEachChild(element, ELEMENT_RUN_SUITE, new UnaryProcedure<Element>()
                 {
                     public void process(Element element)
                     {
-                        XMLUtils.forEachChild(element, ELEMENT_RUN_SUITE_SUCCESS, new UnaryFunction<Element>()
+                        XMLUtils.forEachChild(element, ELEMENT_RUN_SUITE_SUCCESS, new UnaryProcedure<Element>()
                         {
                             public void process(Element element)
                             {
@@ -77,7 +72,7 @@ public class CUnitReportPostProcessor extends XMLReportPostProcessor
                             }
                         });
 
-                        XMLUtils.forEachChild(element, ELEMENT_RUN_SUITE_FAILURE, new UnaryFunction<Element>()
+                        XMLUtils.forEachChild(element, ELEMENT_RUN_SUITE_FAILURE, new UnaryProcedure<Element>()
                         {
                             public void process(Element element)
                             {
@@ -96,7 +91,7 @@ public class CUnitReportPostProcessor extends XMLReportPostProcessor
         {
             String suiteName = XMLUtils.getRequiredChildText(element, ELEMENT_SUITE_NAME, true);
             final TestSuiteResult suite = new TestSuiteResult(suiteName);
-            XMLUtils.forEachChild(element, ELEMENT_RUN_TEST, new UnaryFunction<Element>()
+            XMLUtils.forEachChild(element, ELEMENT_RUN_TEST, new UnaryProcedure<Element>()
             {
                 public void process(Element element)
                 {

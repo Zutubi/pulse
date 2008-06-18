@@ -1,9 +1,9 @@
 package com.zutubi.util;
 
 /**
- * Generic unary function, used as a callback type.
+ * Generic unary function, takes one input and transforms it to one output.
  */
-public interface UnaryFunction<T>
+public interface UnaryFunction<T, U>
 {
-    void process(T t);
+    U process(T t);
 }

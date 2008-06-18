@@ -25,6 +25,7 @@ public class GenericAction extends PrototypeSupport
      * The action that should be executed.
      */
     private String actionName;
+    private String customAction;
     private String newPath;
     private ConfigurationPanel newPanel;
     private CompositeType configurationType;
@@ -37,6 +38,11 @@ public class GenericAction extends PrototypeSupport
     public void setActionName(String actionName)
     {
         this.actionName = actionName;
+    }
+
+    public String getCustomAction()
+    {
+        return customAction;
     }
 
     public String getNewPath()
@@ -102,6 +108,12 @@ public class GenericAction extends PrototypeSupport
 
         if (isInputSelected())
         {
+            customAction = actionManager.getCustomiseName(actionName, config);
+            if(TextUtils.stringSet(customAction))
+            {
+                return "chain";
+            }
+
             Configuration result = actionManager.prepare(actionName, config);
             if(result != null)
             {
