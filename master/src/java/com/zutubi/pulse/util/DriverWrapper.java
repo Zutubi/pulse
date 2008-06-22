@@ -50,4 +50,9 @@ public class DriverWrapper implements Driver
     {
         return this.delegate.jdbcCompliant();
     }
+
+    public Driver getDelegate()
+    {
+        return delegate;
+    }
 }
