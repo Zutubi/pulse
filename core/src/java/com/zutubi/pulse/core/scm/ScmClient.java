@@ -3,17 +3,17 @@ package com.zutubi.pulse.core.scm;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Closeable;
 import java.util.List;
 import java.util.Set;
 
 /**
  * An interface for interaction with SCM servers.
  */
-public interface ScmClient
+public interface ScmClient extends Closeable
 {
     /**
      * Must be called to release resources when this client is not longer
@@ -54,7 +54,7 @@ public interface ScmClient
     String getLocation() throws ScmException;
 
     /**
-     * Checks out a new working copy to the specified directory.
+     * Checks out a new working copy to the specified context.
      *
      * Required for all implementations.
      *
@@ -68,7 +68,7 @@ public interface ScmClient
     Revision checkout(ScmContext context, ScmEventHandler handler) throws ScmException;
 
     /**
-     * Update the working directory to the specified revision.
+     * Update the working directory to the specified context.
      *
      * @param context    defines the context for the checkout operation
      * @param handler    if not null, receives notifications of events during the
@@ -82,9 +82,10 @@ public interface ScmClient
     /**
      * Checks out the specified file at the given revision.
      *
-     * @param path          path defining the content to be retrieved.
-     * @param revision      the revision be checked out @return an input stream that 
-     *                      will return the contents of the requested file
+     * @param path      path defining the content to be retrieved.
+     * @param revision the revision be checked out (may be ignored by
+     *                 implementations that do not support {@link
+     *                 ScmCapability#CHANGESET}.
      *
      * @return input stream providing access to the requested content.
      *
@@ -130,6 +131,8 @@ public interface ScmClient
     /**
      * Returns a list of revisions occuring between the given revisions.
      * The from revision itself it NOT included in the result.
+     *
+     * Required for {@link ScmCapability#CHANGESET}.
      *
      * @param from      the revision before the first revision to return
      * @param to        the revision that defined the inclusive upper bound for this call.
