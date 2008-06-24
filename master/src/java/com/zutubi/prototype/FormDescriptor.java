@@ -7,6 +7,7 @@ import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.pulse.webwork.mapping.PulseActionMapper;
 import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
 import com.zutubi.util.Predicate;
 
 import java.util.Arrays;
@@ -112,6 +113,7 @@ public class FormDescriptor extends AbstractParameterised implements Descriptor
         form.setReadOnly(readOnly);
         form.setDisplayMode(displayMode);
         form.setAjax(ajax);
+        form.addParameter("path", path);
         form.addAll(getParameters());
         
         List<String> fieldOrder = evaluateFieldOrder();
@@ -167,21 +169,13 @@ public class FormDescriptor extends AbstractParameterised implements Descriptor
             ordered.addAll(Arrays.asList((String[])getParameter("fieldOrder")));
         }
 
-        // are we done?
-        if (ordered.size() == getFieldDescriptors().size())
+        return PrototypeUtils.evaluateFieldOrder(ordered, CollectionUtils.map(getFieldDescriptors(), new Mapping<FieldDescriptor, String>()
         {
-            return ordered;
-        }
-
-        // add those fields that we have missed to the end of the list.
-        for (FieldDescriptor fd : getFieldDescriptors())
-        {
-            if (!ordered.contains(fd.getName()))
+            public String map(FieldDescriptor fieldDescriptor)
             {
-                ordered.addLast(fd.getName());
+                return fieldDescriptor.getName();
             }
-        }
-        return ordered;
+        }));
     }
 
     public void setReadOnly(boolean readOnly)

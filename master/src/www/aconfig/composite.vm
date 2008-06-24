@@ -3,7 +3,10 @@
 
 #macro(renderform)
     <div class="config-panel">
-        <h3 class="config-header">${config.formHeading}</h3>
+        <h3 class="config-header">
+            ${config.formHeading}
+            <a href="#" class="unadorned" onclick="showHelp('$path'); return false"><img alt="show help" src="$base/images/help.gif"/></a>
+        </h3>
         ##<!-- add some space around the form so that it does not sit directly on the border. -->
         <div class="config-container">
             #pform("path=$path" "formName=mainform" "displayMode=$config.displayMode" "ajax=true" "namespace=aconfig")
@@ -80,7 +83,7 @@
             #if($action.action == "delete")
                             onclick="deletePath('${path}'); return false;"
             #else
-                            onclick="actionPath('${path}?${action.action}'); return false;"
+                            onclick="actionPath('${path}?${action.action}', false); return false;"
             #end
                         >
                             <img src="${base}/images/config/actions/${action.icon}.gif"/> ${action.label}
@@ -138,3 +141,7 @@
 #end
     </tr>
 </table>
+
+<script type="text/javascript">
+    detailPanel.setHelp('${path}');
+</script>

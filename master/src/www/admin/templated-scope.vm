@@ -12,7 +12,8 @@
         var templateTree;
         var visibleTree;
         var treesInitialised = false;
-
+        var detailPanel = new ZUTUBI.DetailPanel();
+        
         // ------------------------------------------------------------------
 	    // Shared tree functions
         // ------------------------------------------------------------------
@@ -23,7 +24,7 @@
             {
                 if (result.newPanel)
                 {
-                    Ext.get('detail-pane').update(result.newPanel, true);
+                    detailPanel.update(result.newPanel);
                 }
 
                 if (configTree)
@@ -111,7 +112,7 @@
         {
             if(treesInitialised && node)
             {
-                Ext.get('detail-pane').load({
+                detailPanel.load({
                     url: '$base/atemplate/$scope/' + node.id,
                     scripts: true,
                     callback: function(element, success, response) {
@@ -150,8 +151,8 @@
             return {
                 init : function()
                 {
-                    var centerEl = Ext.get('center');
-                    centerEl.setStyle('margin', '4px');
+                    var center = Ext.getCmp('nested-center');
+                    center.add(detailPanel);
 
                     var templateLoader = new ZUTUBI.ConfigTreeLoader('$base/atemplate/$scope');
 
@@ -264,6 +265,7 @@
                     nestedWest.add(tabPanel);
                     nestedWest.show();
                     nestedWest.setWidth(300);
+                    Ext.getCmp('nested-east').show()
                     Ext.getCmp('nested-layout').doLayout();
                 }
             }
@@ -274,9 +276,6 @@
 </head>
 <body>
     #adminTabs("${tab}")
-
-    <div id="detail-pane" style="padding: 10px; min-height: 100%">
-        #parse("/template/includes/actionerrors.vm")
     </div>
 </body>
 </html>

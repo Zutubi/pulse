@@ -358,6 +358,11 @@ public class ListType extends CollectionType
         };
     }
 
+    public String toString()
+    {
+        return "list[" + getCollectionType().toString() + "]";
+    }
+
     private static interface FromRecord
     {
         void handleFieldError(String key, String error);
@@ -420,3 +425,4 @@ public class ListType extends CollectionType
         }
     }
 }
+

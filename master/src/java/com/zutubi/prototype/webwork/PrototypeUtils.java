@@ -334,6 +334,63 @@ public class PrototypeUtils
         return result;
     }
 
+    /**
+     * Evaluates the order of fields for a form based on a possibly-
+     * incomplete declared field order.  Undeclared fields are added to the
+     * end of the result in no specific order.
+     *
+     * @param declaredOrder field ordering explicitly declared so far (may be
+     *                      null)
+     * @param allFields     all fields for the form
+     * @return the order that the forms should appear on a form - some
+     *         permutation of allFields.
+     */
+    public static List<String> evaluateFieldOrder(List<String> declaredOrder, List<String> allFields)
+    {
+        LinkedList<String> ordered = new LinkedList<String>();
+        if(declaredOrder != null)
+        {
+            ordered.addAll(declaredOrder);
+        }
+
+        if (ordered.size() != allFields.size())
+        {
+            // Add those fields that we have missed to the end of the list.
+            for (String field: allFields)
+            {
+                if (!ordered.contains(field))
+                {
+                    ordered.addLast(field);
+                }
+            }
+        }
+
+        return ordered;
+    }
+
+    /**
+     * Tests if the given property will appear on a form field for its parent
+     * type (as opposed to complex properties, which have their own forms).
+     *
+     * @param typeProperty the property to test
+     * @return true if this property is rendered as a single form field
+     */
+    public static boolean isFormField(TypeProperty typeProperty)
+    {
+        Type type = typeProperty.getType();
+        if(type instanceof SimpleType)
+        {
+            return true;
+        }
+
+        if(type instanceof CollectionType)
+        {
+            return ((CollectionType)type).getCollectionType() instanceof SimpleType;
+        }
+
+        return false;
+    }
+
     public static String getFormHeading(CompositeType type)
     {
         Messages messages = Messages.getInstance(type.getClazz());

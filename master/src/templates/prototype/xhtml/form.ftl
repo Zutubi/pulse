@@ -31,7 +31,7 @@ width of its contents.  Floating it works, but hurts other things.
         var form = new ZUTUBI.FormPanel({
             method: 'POST'
             , formName: '${form.name?js_string}'
-            , waitMsgTarget: 'center'
+            , waitMsgTarget: 'nested-layout'
             , border: false
             , labelWidth: 'hello'
             , items: [{

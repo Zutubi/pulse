@@ -32,6 +32,7 @@
     <bean id="configurationReferenceManager" class="com.zutubi.prototype.config.ConfigurationReferenceManager" autowire="byName"/>
     <bean id="configurationRefactoringManager" class="com.zutubi.prototype.config.ConfigurationRefactoringManager" autowire="byName"/>
     <bean id="configurationCleanupManager" class="com.zutubi.prototype.config.cleanup.ConfigurationCleanupManager" autowire="byName" init-method="init"/>
+    <bean id="configurationDocsManager" class="com.zutubi.prototype.config.docs.ConfigurationDocsManager" autowire="byName"/>
     <bean id="configurationStateManager" class="com.zutubi.prototype.config.ConfigurationStateManager" autowire="byName">
         <property name="transactionManager">
             <ref bean="pulseTransactionManager"/>

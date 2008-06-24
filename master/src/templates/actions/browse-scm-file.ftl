@@ -1,16 +1,5 @@
 form.items.last().on('browse', function(field)
 {
-    function getParentPath(path)
-    {
-        var index = path.lastIndexOf('/');
-        if(index >= 0)
-        {
-            return path.slice(0, index);
-        }
-
-        return null;
-    }
-
     function findProjectPath(path)
     {
         var parentPath = getParentPath(path);

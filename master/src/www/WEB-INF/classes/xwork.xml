@@ -481,6 +481,10 @@
             <result name="map" type="velocity">map.vm</result>
         </action>
 
+        <action name="help" class="com.zutubi.prototype.webwork.HelpAction">
+            <result name="success" type="velocity">help.vm</result>
+        </action>
+
         <action name="wizard" class="com.zutubi.prototype.wizard.webwork.AjaxEnabledConfigurationWizardAction">
             <interceptor-ref name="ajaxConfigWizardStack"/>
             <result name="step" type="flexjson">configurationPanel</result>

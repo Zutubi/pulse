@@ -60,7 +60,7 @@
 
         <dependency org="json" name="json" rev="1.0" conf="external,build,release->default"/>
 
-        <dependency org="flexjson" name="flexjson" rev="20070510" conf="external,build,release->default"/>
+        <dependency org="flexjson" name="flexjson" rev="1.6" conf="external,build,release->default"/>
 
         <dependency org="jwebunit" name="jwebunit" rev="1.2" conf="external,build->default"/>
 

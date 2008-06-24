@@ -21,7 +21,7 @@
 
                 return {
                     init : function() {
-                        var centerEl = Ext.get('center');
+                        var centerEl = Ext.get('nested-layout');
                         centerEl.setStyle('margin', '0');
                         
                         var nestedWest = Ext.getCmp('nested-west');

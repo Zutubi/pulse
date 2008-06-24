@@ -114,6 +114,7 @@
                                     hidden: true
                                 }, {
                                     region: 'center',
+                                    id: 'nested-center',
                                     contentEl: 'center',
                                     split: false,
                                     autoScroll: true
@@ -123,7 +124,20 @@
                                     split: true,
                                     titlebar: false,
                                     collapsible: true,
+                                    collapseMode:'mini',
                                     hidden: true
+                                }, {
+                                    region: 'east',
+                                    id: 'nested-east',
+                                    xtype: 'xzhelppanel',
+                                    split: true,
+                                    collapsible: true,
+                                    collapsed: true,
+                                    collapseMode:'mini',
+                                    width: 450,
+                                    hidden: true,
+                                    autoScroll: true,
+                                    bodyStyle: "padding: 10px"
                                 }]
                             }]
                         });

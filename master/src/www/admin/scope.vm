@@ -7,6 +7,7 @@
 	    var actionInProgress = false;
         var configTree;
         var treesInitialised = false;
+        var detailPanel = new ZUTUBI.DetailPanel();
 
         var handleConfigurationResponse = function(result)
         {
@@ -14,7 +15,7 @@
             {
                 if(result.newPanel)
                 {
-                    Ext.get('detail-pane').update(result.newPanel, true);
+                    detailPanel.update(result.newPanel);
                 }
                 configTree.handleResponse(result);
                 configTree.redirectToNewPath(result);
@@ -40,8 +41,8 @@
             return {
                 init : function()
                 {
-                    var centerEl = Ext.get('center');
-                    centerEl.setStyle('margin', '4px');
+                    var center = Ext.getCmp('nested-center');
+                    center.add(detailPanel);
 
                     var loader = new ZUTUBI.ConfigTreeLoader('$base/aconfig');
 
@@ -81,6 +82,7 @@
 
                     nestedWest.show();
                     nestedWest.setWidth(300);
+                    Ext.getCmp('nested-east').show()
                     viewport.doLayout();
 
                     treesInitialised = true;

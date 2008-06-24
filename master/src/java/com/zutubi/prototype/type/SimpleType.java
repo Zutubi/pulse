@@ -28,4 +28,9 @@ public abstract class SimpleType extends AbstractType
     }
 
     public abstract String fromXmlRpc(Object data) throws TypeException;
+
+    public String toString()
+    {
+        return getClazz().getSimpleName().toLowerCase();
+    }
 }

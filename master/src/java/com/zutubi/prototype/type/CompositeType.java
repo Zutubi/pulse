@@ -857,4 +857,9 @@ public class CompositeType extends AbstractType implements ComplexType
     {
         return getSymbolicName().hashCode();
     }
+
+    public String toString()
+    {
+        return getSymbolicName();
+    }
 }

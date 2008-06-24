@@ -1,13 +1,9 @@
 package com.zutubi.util.bean;
 
-import com.zutubi.util.bean.BeanException;
-import com.zutubi.util.bean.BeanPropertyException;
-import com.zutubi.util.bean.PropertyNotFoundException;
-
-import java.beans.PropertyDescriptor;
 import java.beans.BeanInfo;
-import java.beans.Introspector;
 import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 
 /**
@@ -24,7 +20,7 @@ public class BeanUtils
             Method writeMethod = descriptor.getWriteMethod();
             if (writeMethod == null)
             {
-                throw new BeanPropertyException();
+                throw new BeanPropertyException("No write method exists for property '" + propertyName + "'");
             }
 
             writeMethod.invoke(target, propertyValue);

@@ -687,6 +687,8 @@ Ext.extend(ZUTUBI.FormPanel, Ext.form.FormPanel, {
         {
             imageEl.dom.qtip = tooltip;
         }
+
+        return imageEl;
     },
 
     updateButtons: function()
@@ -1261,6 +1263,206 @@ Ext.extend(ZUTUBI.ItemPicker, Ext.form.Field, {
         this.view.disabled = false;
     }    
 });
+
+ZUTUBI.DetailPanel = function(config)
+{
+    ZUTUBI.DetailPanel.superclass.constructor.call(this, config);
+};
+
+Ext.extend(ZUTUBI.DetailPanel, Ext.Panel, {
+    helpPath: "",
+    helpType: "",
+
+    initComponent: function()
+    {
+        Ext.apply(this, {
+            layout: 'fit',
+            id: 'detail-panel',
+            contentEl: 'center',
+            border: false,
+            autoScroll: true,
+            bodyStyle: 'padding: 10px'
+        });
+
+        ZUTUBI.DetailPanel.superclass.initComponent.call(this);
+    },
+
+    clearHelp: function()
+    {
+        this.helpPath = "";
+        this.helpType = "";
+    },
+
+    getHelp: function()
+    {
+        return {path: this.helpPath, type: this.helpType};
+    },
+
+    setHelp: function(path, type)
+    {
+        this.helpPath = path;
+        this.helpType = type || "";
+    },
+    
+    load: function(o)
+    {
+        this.clearHelp();
+        this.body.load(o);
+    },
+
+    update: function(html)
+    {
+        this.clearHelp();
+        this.body.update(html, true);
+    }
+});
+
+ZUTUBI.HelpPanel = function(config)
+{
+    ZUTUBI.HelpPanel.superclass.constructor.call(this, config);
+};
+
+Ext.extend(ZUTUBI.HelpPanel, Ext.Panel, {
+    shownPath: "",
+
+    initComponent: function()
+    {
+        Ext.apply(this, {
+            tbar:  [{
+                icon: window.baseUrl + '/images/arrow_left_right.gif',
+                cls: 'x-btn-icon',
+                tooltip: 'synchronise help',
+                onClick: this.synchronise.createDelegate(this)
+            }, '-', {
+                icon: window.baseUrl + '/images/expand.gif',
+                cls: 'x-btn-icon',
+                tooltip: 'expand all',
+                onClick: this.expandAll.createDelegate(this)
+            }, {
+                icon: window.baseUrl + '/images/collapse.gif',
+                cls: 'x-btn-icon',
+                tooltip: 'collapse all',
+                onClick: this.collapseAll.createDelegate(this)
+            }, '->', {
+                icon: window.baseUrl + '/images/close.gif',
+                cls: 'x-btn-icon',
+                tooltip: 'hide help',
+                onClick: this.collapse.createDelegate(this)
+            }]
+        });
+
+        ZUTUBI.HelpPanel.superclass.initComponent.call(this);
+    },
+
+    synchronise: function()
+    {
+        showHelp(detailPanel.getHelp());    
+    },
+
+    showHelp: function(path, field)
+    {
+        if(this.collapsed)
+        {
+            this.expand(false);
+        }
+
+        if(path && path != this.shownPath)
+        {
+            this.loadPath(path, this.gotoField.createDelegate(this, [field]));
+        }
+        else
+        {
+            this.gotoField(field);
+        }
+    },
+
+    loadPath: function(path, cb)
+    {
+        var panel = this;
+        var type = '';
+        if(typeof path == 'object')
+        {
+            type = path.type;
+            path = path.path;
+        }
+
+        if(path)
+        {
+            this.body.load({
+                url: window.baseUrl + '/aconfig/' + path + '?help=' + type,
+                callback: function() {
+                    panel.shownPath = path;
+                    var helpEl = Ext.get('config-help');
+                    var fieldHeaders = helpEl.select('.field-expandable .field-header', true);
+                    fieldHeaders.on('click', function(e, el) {
+                        var expandableEl = Ext.fly(el).parent('.field-expandable');
+                        if(expandableEl)
+                        {
+                            expandableEl.toggleClass('field-expanded');
+                        }
+                    });
+
+                    fieldHeaders.addClassOnOver('field-highlighted');
+    
+                    if(cb)
+                    {
+                        cb();
+                    }
+                }
+            });
+        }
+        else
+        {
+            this.body.update('No help available.', false, cb);
+        }
+    },
+
+    gotoField: function(field)
+    {
+        if(field)
+        {
+            var rowEl = Ext.get('field-row-' + field);
+            if(rowEl)
+            {
+                if(rowEl.hasClass('field-expandable'))
+                {
+                    this.expandField(rowEl);
+                }
+
+                var top = (rowEl.getOffsetsTo(this.body)[1]) + this.body.dom.scrollTop;
+                this.body.scrollTo('top', top - 10);
+                rowEl.highlight();
+            }
+        }
+    },
+
+    expandField: function(el)
+    {
+        el.addClass('field-expanded');
+    },
+
+    expandAll: function()
+    {
+        this.expandField(this.selectExpandableFields());
+    },
+
+    collapseField: function(el)
+    {
+        el.removeClass('field-expanded');
+    },
+
+    collapseAll: function()
+    {
+        this.collapseField(this.selectExpandableFields());
+    },
+
+    selectExpandableFields: function()
+    {
+        return this.body.select('.field-expandable');
+    }
+});
+
+Ext.reg('xzhelppanel', ZUTUBI.HelpPanel);
 
 Ext.form.Checkbox.prototype.onResize = function()
 {

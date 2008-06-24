@@ -477,6 +477,17 @@ function setSelectionRange(id, start, end)
  * Functions used for configuration UI
  *=========================================================================*/
 
+var getParentPath = function(path)
+{
+    var index = path.lastIndexOf('/');
+    if(index >= 0)
+    {
+        return path.slice(0, index);
+    }
+
+    return null;
+}
+
 var onSelectFailure = function(element, response)
 {
     if(response.status == 0)
@@ -508,7 +519,7 @@ var onConfigSelect = function(sm, node)
 {
     if(treesInitialised && node)
     {
-        Ext.get('detail-pane').load({
+        detailPanel.load({
             url: configTree.loader.getNodePath(node),
             scripts: true,
             callback: function(element, success, response) {
@@ -561,7 +572,7 @@ var getAjaxCallback = function(maskedElement)
 
 var runAjaxRequest = function(url)
 {
-    var pane = Ext.get('center');
+    var pane = Ext.get('nested-layout');
     pane.mask('Please wait...');
     window.actionInProgress = true;
     Ext.lib.Ajax.request('get', url, getAjaxCallback(pane));
@@ -575,7 +586,7 @@ var selectPath = function(path)
 
 var editPath = function(path)
 {
-    Ext.get('detail-pane').load({url: window.baseUrl + '/aconfig/' + path, scripts:true});
+    detailPanel.load({url: window.baseUrl + '/aconfig/' + path, scripts:true});
 }
 
 var addToPath = function(path, template)
@@ -583,16 +594,23 @@ var addToPath = function(path, template)
     runAjaxRequest(window.baseUrl + '/aconfig/' + path + '?wizard' + (template ? '=template' : ''));
 }
 
-var actionPath = function(path)
+var actionPath = function(path, fromParent)
 {
-    var detailPane = Ext.get('detail-pane').getUpdater().defaultUrl;
-    // trim the url prefix so that we are just left with the path.
-    var oldPath = detailPane.substring(window.baseUrl + '/aconfig/'.length, detailPane.length);
-    runAjaxRequest(window.baseUrl + '/aconfig/' + path + '=input&newPath=' + oldPath);
+    var url = window.baseUrl + '/aconfig/' + path + '=input';
+    if(fromParent)
+    {
+        url += '&newPath=' + getParentPath(path);
+    }
+    runAjaxRequest(url);
 }
 
 var deletePath = function(path)
 {
     runAjaxRequest(window.baseUrl + '/aconfig/' + path + '?delete=confirm');
+}
+
+var showHelp = function(path, field)
+{
+    Ext.getCmp('nested-east').showHelp(path, field);
 }
         

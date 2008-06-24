@@ -16,14 +16,22 @@ import java.io.Writer;
  */
 public class FlexJsonResult extends WebWorkResultSupport
 {
+    private boolean deep;
+
+    public void setDeep(boolean deep)
+    {
+        this.deep = deep;
+    }
+
     protected void doExecute(String finalLocation, ActionInvocation ai) throws Exception
     {
         HttpServletResponse response = ServletActionContext.getResponse();
         OgnlValueStack stack = ai.getStack();
 
         JSONSerializer serializer = new JSONSerializer();
-        serializer.setStopClass(Object.class);
-        String json = serializer.serialize(stack.findValue(finalLocation));
+        serializer.exclude("*.class");
+        Object o = stack.findValue(finalLocation);
+        String json = deep ? serializer.deepSerialize(o) : serializer.serialize(o);
         Writer writer = new OutputStreamWriter(response.getOutputStream(), response.getCharacterEncoding());
         writer.write(json);
         response.setContentType("application/json"); // opera does not like this...

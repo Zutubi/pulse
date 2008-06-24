@@ -141,4 +141,9 @@ public class ReferenceType extends SimpleType implements Type
             return Long.toString(handle);
         }
     }
+
+    public String toString()
+    {
+        return "reference[" + referencedType.toString() + "]";
+    }
 }

@@ -308,6 +308,11 @@ public class MapType extends CollectionType
         return true;
     }
 
+    public String toString()
+    {
+        return "map[" + getCollectionType().toString() + "]";
+    }
+
     private static interface FromRecord
     {
         void handleFieldError(String key, String message);

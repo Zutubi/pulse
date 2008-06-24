@@ -2028,7 +2028,7 @@
             checkComplete = false;
             checkOK = true;
 
-            var frameEl = Ext.get('center');
+            var frameEl = Ext.get('nested-layout');
             var checkEl = Ext.get('check.result');
             checkEl.enableDisplayMode();
 

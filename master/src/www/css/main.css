@@ -906,6 +906,10 @@ table.template-actions
 /*
  * Config pages
  */
+.x-layout-collapsed {
+    background-color: #88a0b8;
+}
+
 .x-tree-node-collapsed .config-template-icon, .x-tree-node-expanded .config-template-icon, .x-tree-node-leaf .config-template-icon
 {
 	background-image: url(../images/bricks-mono.gif);
@@ -1142,4 +1146,97 @@ ul.config-links li {
 .item-hidden {
     opacity: 0.4;
     -moz-opacity: 0.4;
+}
+
+/*
+ * Configuration help panel
+ */
+
+#config-help h1 {
+    font-size: 150%;
+    margin-bottom: 10px;    
+}
+
+#config-help h3 {
+    font-size: 100%;
+    margin-top: 8px;
+    margin-bottom: 5px;
+}
+
+.type-details {
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
+.help-fields {
+    width: 100%;
+    border: solid 1px #ccc;
+}
+
+.help-fields th, .help-fields td {
+    border: solid 1px #ccc;
+}
+
+.help-fields th {
+    background-color: #E0E6F0;
+    border-bottom: none;
+    font-size: 120%;
+    padding: 8px;
+}
+
+.help-fields td {
+    border-top: none;
+    padding: 4px;
+}
+
+.field-header {
+    margin-bottom: 6px;
+    padding-left: 20px;
+    line-height: 18px;
+    border-bottom: dotted 1px #ccc;
+}
+
+.field-expandable .field-header {
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    background-image: url(../images/default/tree/elbow-plus-nl.gif);
+}
+
+.field-expandable .field-highlighted {
+    background-color: #eee;
+}
+
+.field-details {
+    margin-left: 20px;
+}
+
+.field-expanded .field-header {
+    background-image: url(../images/default/tree/elbow-minus-nl.gif);
+}
+
+.field-expanded .field-brief {
+    display: none;
+}
+
+.field-rest {
+    display: none;
+}
+
+.field-expanded .field-rest {
+    display: block;
+}
+
+.field-examples ul {
+    list-style: circle;
+}
+
+.field-examples li {
+    padding: 4px;
+}
+
+.example-value {
+    background: #ffffe8;
+    border: 1px dashed #ccc;
+    margin: 4px;
+    padding: 4px;
 }
