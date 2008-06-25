@@ -35,7 +35,7 @@ public class PulseActionMapper implements ActionMapper
     // Pure config namespaces only, no hybrids here!
     private static final Set<String> configNamespaces = new HashSet<String>();
     {
-        configNamespaces.add("/setupwizard");
+        configNamespaces.add("/setupconfig");
         configNamespaces.add("/aconfig");
         configNamespaces.add("/atemplate");
     }

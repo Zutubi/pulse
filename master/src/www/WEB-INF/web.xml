@@ -249,7 +249,7 @@
 
     <servlet-mapping>
         <servlet-name>webwork</servlet-name>
-        <url-pattern>/setupwizard/*</url-pattern>
+        <url-pattern>/setupconfig/*</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

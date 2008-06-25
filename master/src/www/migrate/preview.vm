@@ -49,7 +49,7 @@
         <div class="config-container">
             #pform("path=$path" "formName=mainform" "action=migrate/preview.action" "namespace=migrate")
         </div>
-        #checkForm($path $type "mainform" "migrate")
+        #checkForm($path $type "mainform" "setupconfig")
     </div>
 
 </div>

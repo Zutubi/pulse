@@ -19,7 +19,7 @@
             <div class="config-container">
                 #pform("path=$path" "formName=mainform" "action=setup/setupDatabaseType.action" "namespace=setup")
             </div>
-            #checkForm($path $type "mainform" "setupwizard")
+            #checkForm($path $type "mainform" "setupconfig")
         </div>
     </div>
 </body>

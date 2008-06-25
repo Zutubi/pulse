@@ -20,9 +20,9 @@
 
     <div id="leftcolumn">
         <div class="config-panel">
-            #pwizard("path=$action.path" "namespace=setupwizard")
+            #pwizard("path=$action.path" "namespace=setupconfig")
         #if($state.hasConfigurationCheck())
-            #checkForm($action.path $state.type "wizardForm" "setupwizard")
+            #checkForm($action.path $state.type "wizardForm" "setupconfig")
         #end
         </div>
     </div>

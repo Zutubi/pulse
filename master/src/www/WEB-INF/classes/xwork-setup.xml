@@ -28,7 +28,7 @@
             <result name="restore" type="redirect">/restore/preview.action</result>
             <result name="license" type="redirect">/setup/setupLicense!input.action</result>
             <result name="upgrade" type="redirect">/upgrade/preview.action</result>
-            <result name="setup" type="redirect">/setupwizard/init/?wizard</result>
+            <result name="setup" type="redirect">/setupconfig/init/?wizard</result>
             <result name="starting" type="redirect">/startup/starting.action</result>
             <result name="success" type="redirect">/</result>
         </action>
@@ -53,7 +53,7 @@
         </action>
     </package>
 
-    <package name="setupwizard" namespace="/setupwizard" extends="webwork-default-package">
+    <package name="setupconfig" namespace="/setupconfig" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
         <action name="wizard" class="com.zutubi.prototype.wizard.webwork.ConfigurationWizardAction">

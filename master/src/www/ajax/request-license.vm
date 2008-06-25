@@ -7,7 +7,7 @@
 <script type="text/javascript">
     requestForm.on('actioncomplete', function(requestForm, action)
     {
-        mainForm.findField('zfid.license').setValue(action.result.detail);
+        mainForm.findById('zfid.license').setValue(action.result.detail);
         var status = Ext.get('requestForm.status');
         status.setStyle('padding', '5px');
         status.setStyle('text-align', 'center');
