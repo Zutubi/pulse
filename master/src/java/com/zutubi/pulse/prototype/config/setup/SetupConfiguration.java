@@ -12,6 +12,7 @@ public class SetupConfiguration extends AbstractConfiguration
 {
     private SetupDataConfiguration data;
     private SetupDatabaseTypeConfiguration databaseType;
+    private MigrateDatabaseTypeConfiguration migrateDatabaseType;
     private SetupLicenseConfiguration license;
     private RequestLicenseConfiguration requestLicense;
     private AdminUserConfiguration admin;
@@ -35,6 +36,16 @@ public class SetupConfiguration extends AbstractConfiguration
     public void setDatabaseType(SetupDatabaseTypeConfiguration databaseType)
     {
         this.databaseType = databaseType;
+    }
+
+    public MigrateDatabaseTypeConfiguration getMigrateDatabaseType()
+    {
+        return migrateDatabaseType;
+    }
+
+    public void setMigrateDatabaseType(MigrateDatabaseTypeConfiguration migrateDatabaseType)
+    {
+        this.migrateDatabaseType = migrateDatabaseType;
     }
 
     public SetupLicenseConfiguration getLicense()

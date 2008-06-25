@@ -9,6 +9,11 @@
                 <value>classpath:/com/zutubi/pulse/bootstrap/context/transactionContext.xml</value>
             </list>
         </property>
+        <property name="migrationContext">
+            <list>
+                <value>classpath:/com/zutubi/pulse/bootstrap/context/migrationContext.xml</value>
+            </list>
+        </property>
         <property name="dataContexts">
             <list>
                 <value>classpath:/com/zutubi/pulse/bootstrap/context/databaseContext.xml</value>

@@ -1,9 +1,11 @@
 package com.zutubi.pulse.bootstrap;
 
 import com.zutubi.pulse.database.DatabaseConfig;
+import com.zutubi.pulse.database.DriverRegistry;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Properties;
 
 /**
  * 
@@ -24,5 +26,10 @@ public interface MasterConfigurationManager extends ConfigurationManager, DataRe
     File getHomeDirectory();
 
     File getDatabaseConfigFile();
+
+    void updateDatabaseConfig(Properties updatedProperties) throws IOException;
+
     DatabaseConfig getDatabaseConfig() throws IOException;
+
+    DriverRegistry getDriverRegistry();
 }

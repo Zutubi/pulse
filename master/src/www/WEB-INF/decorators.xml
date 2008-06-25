@@ -30,6 +30,7 @@
         <pattern>/setupwizard/*</pattern>
         <pattern>/upgrade/*</pattern>
         <pattern>/restore/*</pattern>
+        <pattern>/migrate/*</pattern>
         <pattern>/startup/*</pattern>
         <pattern>/shutdown/*</pattern>
     </decorator>

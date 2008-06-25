@@ -7,6 +7,7 @@ public enum SetupState
 {
     DATA,
     DATABASE,
+    MIGRATE,
     RESTORE,
     LICENSE,
     UPGRADE,

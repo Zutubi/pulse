@@ -64,6 +64,11 @@ public class HSQLDBUtils
         return false;
     }
 
+    public static boolean isHsqldb(String url)
+    {
+        return url.contains(":hsqldb:");
+    }
+
     public static void updateMaxSize(String url)
     {
         if (!url.startsWith("jdbc:hsqldb:"))

@@ -19,7 +19,6 @@ import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.TextUtils;
 
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -60,7 +59,7 @@ public class ConfigurationUIModel
 
     private List<String> displayFields = new LinkedList<String>();
 
-    private List<String> configuredDescendents = Collections.EMPTY_LIST;
+    private List<String> configuredDescendents = new LinkedList<String>();
 
     private boolean writable;
     private boolean embedded = false;

@@ -1,0 +1,16 @@
+<html>
+<head>
+    <meta http-equiv="refresh" content='5;url=#wwurl("includeParams=all")'/>
+    <link rel="stylesheet" type="text/css" href="/css/setup.css"></link>
+</head>
+<body>
+
+
+<div id="leftcolumn">
+    <h1 id="restore.progress">Migrate Progress</h1>
+
+    #taskProgressUI($monitor)
+    
+</div>
+</body>
+</html>

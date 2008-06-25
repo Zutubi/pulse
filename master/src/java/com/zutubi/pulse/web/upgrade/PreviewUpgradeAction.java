@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * <class-comment/>
  */
-public class UpgradePreviewAction extends UpgradeActionSupport
+public class PreviewUpgradeAction extends UpgradeActionSupport
 {
     /**
      * The version that is being upgraded.

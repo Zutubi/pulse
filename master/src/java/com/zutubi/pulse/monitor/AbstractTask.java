@@ -41,7 +41,7 @@ public abstract class AbstractTask implements Task
         return false;
     }
 
-    public void execute()
+    public void execute() throws TaskException
     {
 
     }

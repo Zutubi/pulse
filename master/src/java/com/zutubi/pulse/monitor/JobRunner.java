@@ -1,5 +1,7 @@
 package com.zutubi.pulse.monitor;
 
+import com.zutubi.util.logging.Logger;
+
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,6 +13,8 @@ import java.util.Arrays;
  */
 public class JobRunner
 {
+    private static final Logger LOG = Logger.getLogger(JobRunner.class);
+
     private Monitor monitor = null;
 
     public void run(List<Task> tasks)
@@ -103,6 +107,9 @@ public class JobRunner
                 catch (TaskException e)
                 {
                     taskTracker.markFailed();
+                    taskTracker.setStatusMessage("Failed. Cause: " + e.getMessage());
+                    LOG.warning(e);
+                    
                     if (currentTask.haltOnFailure())
                     {
                         abort = true;
@@ -138,33 +145,5 @@ public class JobRunner
         return monitor;
     }
 
-    private class ArrayJobWrapper implements Job
-    {
-        private Task[] tasks;
 
-        public ArrayJobWrapper(Task... tasks)
-        {
-            this.tasks = tasks;
-        }
-
-        public Iterator<Task> getTasks()
-        {
-            return Arrays.asList(tasks).iterator();
-        }
-    }
-
-    private class ListJobWrapper implements Job
-    {
-        private List<Task> tasks;
-
-        public ListJobWrapper(List<Task> tasks)
-        {
-            this.tasks = tasks;
-        }
-
-        public Iterator<Task> getTasks()
-        {
-            return tasks.iterator();
-        }
-    }
 }

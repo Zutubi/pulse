@@ -1,26 +1,34 @@
 package com.zutubi.pulse.bootstrap;
 
 import com.opensymphony.xwork.spring.SpringObjectFactory;
-import com.zutubi.prototype.config.*;
+import com.zutubi.prototype.config.ConfigurationExtensionManager;
+import com.zutubi.prototype.config.ConfigurationPersistenceManager;
+import com.zutubi.prototype.config.ConfigurationProvider;
+import com.zutubi.prototype.config.ConfigurationRefactoringManager;
+import com.zutubi.prototype.config.ConfigurationReferenceManager;
+import com.zutubi.prototype.config.ConfigurationRegistry;
+import com.zutubi.prototype.config.ConfigurationStateManager;
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
+import com.zutubi.prototype.config.DefaultConfigurationProvider;
 import com.zutubi.prototype.type.record.DelegatingHandleAllocator;
 import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.bootstrap.conf.EnvConfig;
 import com.zutubi.pulse.bootstrap.tasks.ProcessSetupStartupTask;
 import com.zutubi.pulse.config.PropertiesWriter;
-import com.zutubi.pulse.database.DatabaseConfig;
 import com.zutubi.pulse.database.DatabaseConsole;
+import com.zutubi.pulse.database.DriverRegistry;
 import com.zutubi.pulse.events.DataDirectoryLocatedEvent;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.logging.LogConfigurationManager;
+import com.zutubi.pulse.migrate.MigrationManager;
 import com.zutubi.pulse.monitor.Monitor;
 import com.zutubi.pulse.plugins.PluginManager;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.restore.ArchiveException;
 import com.zutubi.pulse.restore.ArchiveManager;
 import com.zutubi.pulse.upgrade.UpgradeManager;
-import com.zutubi.pulse.util.DriverWrapper;
 import com.zutubi.util.IOUtils;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
@@ -33,10 +41,6 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.sql.Driver;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.util.Date;
@@ -59,12 +63,15 @@ public class DefaultSetupManager implements SetupManager
 
     private MasterConfigurationManager configurationManager;
     private UpgradeManager upgradeManager;
+    private MigrationManager migrationManager;
     private EventManager eventManager;
 
     /**
      * Contexts for Stage A: the config subsystem.
      */
     private List<String> configContexts = new LinkedList<String>();
+
+    private List<String> migrationContext = new LinkedList<String>();
 
     /**
      * Contexts for Stage B: database
@@ -243,6 +250,8 @@ public class DefaultSetupManager implements SetupManager
 
     private void handleDbSetup()
     {
+        ensureEmbeddedDriverLoaded();
+        
         File databaseConfig = new File(configurationManager.getData().getUserConfigRoot(), "database.properties");
         if (!databaseConfig.exists())
         {
@@ -252,12 +261,40 @@ public class DefaultSetupManager implements SetupManager
             return;
         }
 
+        handleDbMigration();
+    }
+
+    public void handleDbMigration()
+    {
+        // if db migration is requested, trigger the flow.
+        loadContexts(migrationContext);
+
+        if (isDatabaseMigrationRequested())
+        {
+            printConsoleMessage("Database migration requested, requesting details via web UI.");
+            state = SetupState.MIGRATE;
+
+            showPrompt();
+            return;
+        }
+
+        requestDbComplete();
+    }
+
+    private boolean isDatabaseMigrationRequested()
+    {
+        return migrationManager.isRequested();
+    }
+
+    public void doCancelMigrationRequest()
+    {
         requestDbComplete();
     }
 
     public void requestDbComplete()
     {
-        loadDriver();
+        state = SetupState.STARTING;
+
         loadContexts(dataContexts);
 
         // create the database based on the hibernate configuration.
@@ -288,36 +325,17 @@ public class DefaultSetupManager implements SetupManager
         handleRestorationProcess();
     }
 
-    private void loadDriver()
+    private void ensureEmbeddedDriverLoaded()
     {
         try
         {
-            Class driverClass = null;
-            DatabaseConfig databaseConfig = configurationManager.getDatabaseConfig();
+            DriverRegistry driverRegistry = configurationManager.getDriverRegistry();
 
-            File driverDir = configurationManager.getData().getDriverRoot();
-            if (driverDir.isDirectory())
+            // ensure that the embedded driver is registered.
+            if (!driverRegistry.isRegistered("org.hsqldb.jdbcDriver"))
             {
-                File[] drivers = driverDir.listFiles();
-                if (drivers != null && drivers.length > 0)
-                {
-                    if (drivers.length > 1)
-                    {
-                        LOG.warning("Multiple driver jars found, choosing '" + drivers[0].getAbsolutePath() + "'");
-                    }
-
-                    URLClassLoader loader = new URLClassLoader(new URL[]{drivers[0].toURI().toURL()});
-                    driverClass = loader.loadClass(databaseConfig.getDriverClassName());
-                }
+                driverRegistry.register("org.hsqldb.jdbcDriver");
             }
-
-            if (driverClass == null)
-            {
-                driverClass = Class.forName(databaseConfig.getDriverClassName());
-            }
-
-            Driver driver = new DriverWrapper((Driver) driverClass.newInstance());
-            DriverManager.registerDriver(driver);
         }
         catch (Exception e)
         {
@@ -748,5 +766,15 @@ public class DefaultSetupManager implements SetupManager
     public void setArchiveManager(ArchiveManager archiveManager)
     {
         this.archiveManager = archiveManager;
+    }
+
+    public void setMigrationContext(List<String> migrationContext)
+    {
+        this.migrationContext = migrationContext;
+    }
+
+    public void setMigrationManager(MigrationManager migrationManager)
+    {
+        this.migrationManager = migrationManager;
     }
 }

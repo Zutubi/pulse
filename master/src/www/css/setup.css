@@ -82,3 +82,15 @@ li.task-inprogress {
 li.task-complete {
     background: url( ../images/accept.gif ) no-repeat 4px 6px;
 }
+
+li.task-successful {
+    background: url( ../images/accept.gif ) no-repeat 4px 6px;
+}
+
+li.task-failed {
+    background: url( ../images/exclamation.gif ) no-repeat 4px 6px;
+}
+
+li.task-aborted {
+    background: url( ../images/exclamation-bw.gif ) no-repeat 4px 6px;
+}

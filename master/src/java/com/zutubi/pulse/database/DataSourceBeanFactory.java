@@ -29,7 +29,7 @@ public class DataSourceBeanFactory implements FactoryBean
                     dataSource = createDataSource();
 
                     // handle some custom processing for embedded hsql databases.
-                    if (databaseConfig.getDriverClassName().contains(".hsqldb."))
+                    if (isHsqldb())
                     {
                         checkEmbeddedSizeRequirements();
                     }
@@ -39,11 +39,21 @@ public class DataSourceBeanFactory implements FactoryBean
         return dataSource;
     }
 
+    private boolean isHsqldb()
+    {
+        return databaseConfig.getUrl().contains(":hsqldb:");
+    }
+
+    private boolean isInMemoryHsqldb()
+    {
+        return databaseConfig.getUrl().contains(":hsqldb:mem:");
+    }
+
     private void checkEmbeddedSizeRequirements() throws IOException, SQLException
     {
         // are we dealing with the in memory version of hsql? If so, no changes to the
         // properties file are required.
-        if (databaseConfig.getUrl().startsWith("jdbc:hsqldb:mem:"))
+        if (isInMemoryHsqldb())
         {
             return;
         }
@@ -80,7 +90,7 @@ public class DataSourceBeanFactory implements FactoryBean
             String propertyName = (String) o;
             dataSource.addConnectionProperty(propertyName, connectionProperties.getProperty(propertyName));
         }
-        
+
         return dataSource;
     }
 

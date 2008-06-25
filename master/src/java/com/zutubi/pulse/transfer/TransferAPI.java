@@ -129,7 +129,8 @@ public class TransferAPI
     /**
      * Migrate the contents of the dataSource to the dataTarget.
      *
-     * @param configuration of the source data.
+     * @param sourceConfiguration of the source data.
+     * @param targetConfiguration of the target data.
      *
      * @param dataSource the source DataSource connection.
      * @param dataTarget the target DataSource connection.
@@ -137,19 +138,22 @@ public class TransferAPI
      * @throws TransferException is thrown if there are any problems with the migration that would
      * result in a difference in the source and target representations of the data.
      */
-    public void migrate(Configuration configuration, DataSource dataSource, DataSource dataTarget) throws TransferException
+    public void migrate(Configuration sourceConfiguration, DataSource dataSource, Configuration targetConfiguration, DataSource dataTarget) throws TransferException
     {
-        HibernateTransferTarget target = new HibernateTransferTarget();
-        target.setDataSource(dataTarget);
-        target.setConfiguration(configuration);
-
-        HibernateTransferSource source = new HibernateTransferSource();
-        source.setConfiguration(configuration);
-        source.setDataSource(dataSource);
-
+        TransferTarget target = null;
         try
         {
-            source.transferTo(target);
+            HibernateTransferTarget hibernateTarget = new HibernateTransferTarget();
+            hibernateTarget.setDataSource(dataTarget);
+            hibernateTarget.setConfiguration(targetConfiguration);
+
+            HibernateTransferSource hibernateSource = new HibernateTransferSource();
+            hibernateSource.setConfiguration(sourceConfiguration);
+            hibernateSource.setDataSource(dataSource);
+
+            target = wrapTargetIfNecessary(hibernateTarget);
+
+            hibernateSource.transferTo(target);
         }
         finally
         {

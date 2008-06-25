@@ -5,6 +5,9 @@ import com.zutubi.util.logging.Logger;
 
 import java.util.Properties;
 
+import org.apache.commons.dbcp.BasicDataSource;
+import org.hibernate.cfg.Environment;
+
 /**
  * The database configuration object represents all of the connection configuration details.
  *
@@ -17,7 +20,7 @@ public class DatabaseConfig
     public static final String JDBC_USERNAME          = "jdbc.username";
     public static final String JDBC_PASSWORD          = "jdbc.password";
 
-    public static final String HIBERNATE_DIALECT      = "hibernate.dialect";
+    public static final String HIBERNATE_DIALECT      = Environment.DIALECT;
 
     protected static final String POOL_INITIAL_SIZE = "pool.initialSize";
     protected static final String POOL_MAX_ACTIVE   = "pool.maxActive";
@@ -191,5 +194,32 @@ public class DatabaseConfig
     public void setUserPaths(MasterUserPaths userPaths)
     {
         this.userPaths = userPaths;
+    }
+
+    public BasicDataSource createDataSource()
+    {
+        BasicDataSource dataSource = new BasicDataSource();
+
+        dataSource.setDriverClassName(getDriverClassName());
+        dataSource.setUrl(getUrl());
+        dataSource.setUsername(getUsername());
+        dataSource.setPassword(getPassword());
+
+        dataSource.setInitialSize(getPoolInitialSize());
+        dataSource.setMaxActive(getPoolMaxActive());
+        dataSource.setMaxIdle(getPoolMaxIdle());
+        dataSource.setMinIdle(getPoolMinIdle());
+        dataSource.setMaxWait(getPoolMaxWait());
+
+        // configure the dataSource using the custom connection properties.
+        Properties connectionProperties = getConnectionProperties();
+        for (Object o : connectionProperties.keySet())
+        {
+            String propertyName = (String) o;
+            dataSource.addConnectionProperty(propertyName, connectionProperties.getProperty(propertyName));
+        }
+
+        return dataSource;
+
     }
 }

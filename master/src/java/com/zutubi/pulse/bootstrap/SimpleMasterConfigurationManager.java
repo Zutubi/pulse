@@ -5,6 +5,7 @@ import com.zutubi.pulse.bootstrap.conf.VolatileReadOnlyConfig;
 import com.zutubi.pulse.config.Config;
 import com.zutubi.pulse.config.FileConfig;
 import com.zutubi.pulse.database.DatabaseConfig;
+import com.zutubi.pulse.database.DriverRegistry;
 import com.zutubi.pulse.events.DataDirectoryChangedEvent;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.util.IOUtils;
@@ -20,6 +21,7 @@ public class SimpleMasterConfigurationManager extends AbstractConfigurationManag
 {
     private SystemConfiguration sysConfig;
     private DatabaseConfig dbConfig;
+    private DriverRegistry driverRegistry;
     private Data data;
 
     public SystemConfiguration getSystemConfig()
@@ -74,7 +76,12 @@ public class SimpleMasterConfigurationManager extends AbstractConfigurationManag
 
     public File getDatabaseConfigFile()
     {
-        return new File(getUserPaths().getUserConfigRoot(), "database.properties");
+        MasterUserPaths userPaths = getUserPaths();
+        if (userPaths != null)
+        {
+            return new File(userPaths.getUserConfigRoot(), "database.properties");
+        }
+        return null;
     }
 
     public DatabaseConfig getDatabaseConfig() throws IOException
@@ -102,6 +109,35 @@ public class SimpleMasterConfigurationManager extends AbstractConfigurationManag
             dbConfig.setUserPaths(getUserPaths());
         }
         return dbConfig;
+    }
+
+    public void updateDatabaseConfig(Properties updatedProperties) throws IOException
+    {
+        File configFile = getDatabaseConfigFile();
+        if (configFile != null)
+        {
+            IOUtils.write(updatedProperties, configFile);
+
+            // trigger a reload on the next get.
+            dbConfig = null;
+        }
+    }
+
+    public DriverRegistry getDriverRegistry()
+    {
+        if (driverRegistry == null)
+        {
+            synchronized(this)
+            {
+                if (driverRegistry == null)
+                {
+                    driverRegistry = new DriverRegistry();
+                    driverRegistry.setDriverDir(getData().getDriverRoot());
+                    driverRegistry.init();
+                }
+            }
+        }
+        return driverRegistry;
     }
 
     public Data getData()

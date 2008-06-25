@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * <class-comment/>
  */
-public class UpgradeExecuteAction extends UpgradeActionSupport
+public class ExecuteUpgradeAction extends UpgradeActionSupport
 {
     public Monitor getMonitor()
     {

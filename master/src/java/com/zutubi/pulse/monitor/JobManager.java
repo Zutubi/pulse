@@ -25,6 +25,16 @@ public class JobManager
         jobRunners.put(key, new JobRunner());
     }
 
+    public synchronized void register(String key, Task... tasks)
+    {
+        register(key, new ArrayJobWrapper(tasks));
+    }
+
+    public synchronized void register(String key, List<Task> tasks)
+    {
+        register(key, new ListJobWrapper(tasks));
+    }
+
     public synchronized Job getJob(String key)
     {
         return jobs.get(key);

@@ -58,7 +58,7 @@ public class EnumOptionProvider extends MapOptionProvider
      * @param e value to get the pretty name for
      * @return a user-firendly name for the value
      */
-    protected String getPrettyName(Enum e)
+    public static String getPrettyName(Enum e)
     {
         return e.toString().toLowerCase().replace('_', ' ');
     }

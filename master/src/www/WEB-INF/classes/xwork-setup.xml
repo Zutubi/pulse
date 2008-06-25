@@ -24,6 +24,7 @@
         <action name="setup" class="com.zutubi.pulse.web.setup.SetupWorkflowAction">
             <result name="data" type="redirect">/setup/setupData!input.action</result>
             <result name="database" type="redirect">/setup/setupDatabaseType!input.action</result>
+            <result name="migrate" type="redirect">/migrate/preview!input.action</result>
             <result name="restore" type="redirect">/restore/preview.action</result>
             <result name="license" type="redirect">/setup/setupLicense!input.action</result>
             <result name="upgrade" type="redirect">/upgrade/preview.action</result>
@@ -72,11 +73,11 @@
     <package name="upgrade" namespace="/upgrade" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
-        <action name="preview" class="com.zutubi.pulse.web.upgrade.UpgradePreviewAction">
+        <action name="preview" class="com.zutubi.pulse.web.upgrade.PreviewUpgradeAction">
             <result name="success" type="velocity">preview.vm</result>
         </action>
 
-        <action name="execute" class="com.zutubi.pulse.web.upgrade.UpgradeExecuteAction">
+        <action name="execute" class="com.zutubi.pulse.web.upgrade.ExecuteUpgradeAction">
             <interceptor-ref name="executeAndWaitStack"/>
             <result name="wait" type="velocity">status.vm</result>
             <result name="cancel" type="redirect">/setup/setup!input.action</result>
@@ -87,6 +88,33 @@
         <action name="continue" class="com.zutubi.pulse.web.upgrade.PostUpgradeAction">
             <result name="success" type="redirect">/</result>
         </action>
+    </package>
+
+    <package name="migrate" namespace="/migrate" extends="webwork-default-package">
+        <default-interceptor-ref name="completeStack"/>
+
+        <action name="preview" class="com.zutubi.pulse.web.migrate.PreviewMigrateAction">
+            <result name="input" type="velocity">preview.vm</result>
+            <result name="cancel" type="redirect">/migrate/abort.action</result>
+            <result name="success" type="redirect">/migrate/execute.action</result>
+        </action>
+
+        <action name="execute" class="com.zutubi.pulse.web.migrate.ExecuteMigrateAction">
+            <interceptor-ref name="executeAndWaitStack"/>
+            <result name="wait" type="velocity">status.vm</result>
+            <result name="cancel" type="redirect"></result>
+            <result name="success" type="velocity">complete.vm</result>
+            <result name="error" type="velocity">generic-error.vm</result>
+        </action>
+
+        <action name="continue" class="com.zutubi.pulse.web.migrate.PostMigrateAction">
+            <result name="success" type="redirect">/</result>
+        </action>
+
+        <action name="abort" class="com.zutubi.pulse.web.migrate.AbortMigrateAction">
+            <result name="success" type="redirect">/</result>
+        </action>
+
     </package>
 
     <package name="restore" namespace="/restore" extends="webwork-default-package">

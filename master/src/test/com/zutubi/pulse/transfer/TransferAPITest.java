@@ -1,13 +1,11 @@
 package com.zutubi.pulse.transfer;
 
+import com.zutubi.pulse.database.DatabaseConfig;
+import com.zutubi.pulse.upgrade.tasks.HibernateUtils;
 import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
 import com.zutubi.pulse.util.JDBCUtils;
 import junit.framework.TestCase;
 import nu.xom.ParsingException;
-import org.hibernate.dialect.Dialect;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.apache.commons.dbcp.BasicDataSource;
 
 import javax.sql.DataSource;
 import java.io.ByteArrayInputStream;
@@ -24,195 +22,168 @@ import java.util.Properties;
  */
 public class TransferAPITest extends TestCase
 {
-    private DataSource dataSource;
-
     protected void setUp() throws Exception
     {
         super.setUp();
 
-        // setup the database.
-        dataSource = createDataSource();
-    }
-
-    private DataSource createDataSource()
-    {
-        return createDataSource("testdb");
-    }
-
-    private DataSource createDataSource(String name)
-    {
-        BasicDataSource dataSource = new BasicDataSource();
-
-        dataSource.setDriverClassName("org.hsqldb.jdbcDriver");
-        dataSource.setUrl("jdbc:hsqldb:mem:" + name);
-        dataSource.setUsername("sa");
-        dataSource.setPassword("");
-
-        return dataSource;
     }
 
     protected void tearDown() throws Exception
     {
+/*
         // cleanup the database.
         JDBCUtils.execute(dataSource, "SHUTDOWN");
         ((BasicDataSource)dataSource).close();
+*/
 
         super.tearDown();
     }
 
     public void testSimpleDumpAndRestore() throws IOException, SQLException, ParsingException, TransferException
     {
-        MutableConfiguration configuration = new MutableConfiguration();
-
-        // CONFIGURE HIBERNATE.
-        List<Resource> mappings = getHibernateMappings();
-        for (Resource mapping : mappings)
-        {
-            configuration.addInputStream(mapping.getInputStream());
-        }
-        configuration.setProperties(getHibernateProperties());
-
-        // SETUP THE DATABASE SCHEMA FOR TESTING.
-        createSchema(dataSource, configuration);
-        createSchemaConstraints(dataSource, configuration);
-
-        // SETUP TEST DATA.
-        JDBCUtils.execute(dataSource, "insert into TYPES (ID, STRING_TYPE, BOOLEAN_TYPE) values (1, 'string', '1')");
-        JDBCUtils.execute(dataSource, "insert into TYPES (ID, STRING_TYPE, BOOLEAN_TYPE) values (2, '', '1')");
-        JDBCUtils.execute(dataSource, "insert into TYPES (ID, STRING_TYPE, BOOLEAN_TYPE) values (3, null, '1')");
-        JDBCUtils.execute(dataSource, "insert into RELATED_TYPES (ID, TYPE) values (1, 1)");
-
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
         TransferAPI transferAPI = new TransferAPI();
-        transferAPI.dump(configuration, dataSource, baos);
 
-        JDBCUtils.execute(dataSource, "SHUTDOWN");
+        Properties sourceDatabase = getDatabaseProperties("testdb");
 
-        dataSource = createDataSource();
+        List<String> mappings = getHibernateMappings();
+        MutableConfiguration configuration = HibernateUtils.createHibernateConfiguration(mappings, sourceDatabase);
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+        DataSource dataSource = null;
+        try
+        {
+            dataSource = createDataSource(sourceDatabase);
+            createTestData(dataSource, configuration);
 
-        transferAPI.restore(configuration, dataSource, bais);
+            transferAPI.dump(configuration, dataSource, baos);
+        }
+        finally
+        {
+            JDBCUtils.execute(dataSource, "SHUTDOWN");
+        }
 
-        assertEquals(3, JDBCUtils.executeCount(dataSource, "select * from TYPES"));
-        assertEquals(1, JDBCUtils.executeCount(dataSource, "select * from RELATED_TYPES"));
+        try
+        {
+            dataSource = createDataSource(sourceDatabase);
+
+            ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+
+            transferAPI.restore(configuration, dataSource, bais);
+
+            assertEquals(3, JDBCUtils.executeCount(dataSource, "select * from TYPES"));
+            assertEquals(1, JDBCUtils.executeCount(dataSource, "select * from RELATED_TYPES"));
+        }
+        finally
+        {
+            JDBCUtils.execute(dataSource, "SHUTDOWN");
+        }
     }
 
     public void testSchemaConsistencyCheckOnRestore() throws IOException, SQLException, TransferException
     {
-        MutableConfiguration configuration = new MutableConfiguration();
+        Properties sourceDatabase = getDatabaseProperties("testdb");
+        List<String> mappings = getHibernateMappings();
+        MutableConfiguration configuration = HibernateUtils.createHibernateConfiguration(mappings, sourceDatabase);
 
-        // CONFIGURE HIBERNATE.
-        List<Resource> mappings = getHibernateMappings();
-        for (Resource mapping : mappings)
-        {
-            configuration.addInputStream(mapping.getInputStream());
-        }
-        configuration.setProperties(getHibernateProperties());
-
-        // SETUP THE DATABASE SCHEMA FOR TESTING.
-        createSchema(dataSource, configuration);
-        createSchemaConstraints(dataSource, configuration);
-
-        // SETUP TEST DATA.
-        JDBCUtils.execute(dataSource, "insert into TYPES (ID, STRING_TYPE, BOOLEAN_TYPE) values (1, 'string', '1')");
-        JDBCUtils.execute(dataSource, "insert into TYPES (ID, STRING_TYPE, BOOLEAN_TYPE) values (2, '', '1')");
-        JDBCUtils.execute(dataSource, "insert into TYPES (ID, STRING_TYPE, BOOLEAN_TYPE) values (3, null, '1')");
-        JDBCUtils.execute(dataSource, "insert into RELATED_TYPES (ID, TYPE) values (1, 1)");
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-        // setup the incompatible configuration.
-        configuration = new MutableConfiguration();
-        configuration.addInputStream(new ClassPathResource("com/zutubi/pulse/transfer/Schema_Animals.hbm.xml").getInputStream());
-        configuration.setProperties(getHibernateProperties());
-
-        TransferAPI transferAPI = new TransferAPI();
+        DataSource dataSource = null;
         try
         {
-            transferAPI.dump(configuration, dataSource, baos);
-            fail();
-        }
-        catch (TransferException e)
-        {
-            // expected
-            assertEquals("Schema export aborted due to schema / mapping mismatch", e.getMessage());
-        }
+            dataSource = createDataSource(sourceDatabase);
+            createTestData(dataSource, configuration);
 
+            // setup the incompatible configuration.
+            List<String> incompatibleMappings = new LinkedList<String>();
+            incompatibleMappings.add("com/zutubi/pulse/transfer/Schema_Animals.hbm.xml");
+            MutableConfiguration incompatibleConfiguration = HibernateUtils.createHibernateConfiguration(incompatibleMappings, sourceDatabase);
+
+            TransferAPI transferAPI = new TransferAPI();
+            try
+            {
+                transferAPI.dump(incompatibleConfiguration, dataSource, new ByteArrayOutputStream());
+                fail();
+            }
+            catch (TransferException e)
+            {
+                // expected
+                assertEquals("Schema export aborted due to schema / mapping mismatch", e.getMessage());
+            }
+        }
+        finally
+        {
+            JDBCUtils.execute(dataSource, "SHUTDOWN");
+        }
     }
 
     public void testMigrateDatabase() throws SQLException, IOException, TransferException
     {
-        MutableConfiguration configuration = new MutableConfiguration();
+        Properties sourceDatabase = getDatabaseProperties("testdb");
+        Properties targetDatabase = getDatabaseProperties("target");
 
-        // CONFIGURE HIBERNATE.
-        List<Resource> mappings = getHibernateMappings();
-        for (Resource mapping : mappings)
+        List<String> mappings = getHibernateMappings();
+        MutableConfiguration configuration = HibernateUtils.createHibernateConfiguration(mappings, sourceDatabase);
+
+        DataSource dataSource = null;
+        DataSource dataTarget = null;
+        try
         {
-            configuration.addInputStream(mapping.getInputStream());
+            dataSource = createDataSource(sourceDatabase);
+            dataTarget = createDataSource(targetDatabase);
+
+            createTestData(dataSource, configuration);
+
+            TransferAPI transfer = new TransferAPI();
+            transfer.migrate(configuration, dataSource, configuration, dataTarget);
+
+            assertEquals(3, JDBCUtils.executeCount(dataTarget, "select * from TYPES"));
+            assertEquals(1, JDBCUtils.executeCount(dataTarget, "select * from RELATED_TYPES"));
         }
-        configuration.setProperties(getHibernateProperties());
+        finally
+        {
+            JDBCUtils.execute(dataSource, "SHUTDOWN");
+            JDBCUtils.execute(dataTarget, "SHUTDOWN");
+        }
+    }
 
-        DataSource dataSource = createDataSource("source");
-
+    private void createTestData(DataSource dataSource, MutableConfiguration configuration) throws SQLException
+    {
         // SETUP THE DATABASE SCHEMA FOR TESTING.
-        createSchema(dataSource, configuration);
-        createSchemaConstraints(dataSource, configuration);
+        HibernateUtils.createSchema(dataSource, configuration);
+        HibernateUtils.createSchemaConstraints(dataSource, configuration);
 
         // SETUP TEST DATA.
         JDBCUtils.execute(dataSource, "insert into TYPES (ID, STRING_TYPE, BOOLEAN_TYPE) values (1, 'string', '1')");
         JDBCUtils.execute(dataSource, "insert into TYPES (ID, STRING_TYPE, BOOLEAN_TYPE) values (2, '', '1')");
         JDBCUtils.execute(dataSource, "insert into TYPES (ID, STRING_TYPE, BOOLEAN_TYPE) values (3, null, '1')");
         JDBCUtils.execute(dataSource, "insert into RELATED_TYPES (ID, TYPE) values (1, 1)");
-
-        DataSource dataTarget = createDataSource("target");
-
-        TransferAPI transfer = new TransferAPI();
-        transfer.migrate(configuration, dataSource, dataTarget);
-
-        assertEquals(3, JDBCUtils.executeCount(dataTarget, "select * from TYPES"));
-        assertEquals(1, JDBCUtils.executeCount(dataTarget, "select * from RELATED_TYPES"));
     }
 
-    private void createSchema(DataSource dataSource, MutableConfiguration configuration) throws SQLException
+    private List<String> getHibernateMappings()
     {
-        Dialect dialect = Dialect.getDialect(configuration.getProperties());
-        String[] sqlCreate = configuration.generateSchemaCreationScript(dialect);
-        for (String sql : sqlCreate)
-        {
-            if (sql.startsWith("create"))
-            {
-                JDBCUtils.execute(dataSource, sql);
-            }
-        }
-    }
-
-    private void createSchemaConstraints(DataSource dataSource, MutableConfiguration configuration) throws SQLException
-    {
-        Dialect dialect = Dialect.getDialect(configuration.getProperties());
-        String[] sqlAlter = configuration.generateSchemaCreationScript(dialect);
-        for (String sql : sqlAlter)
-        {
-            if (sql.startsWith("alter"))
-            {
-                JDBCUtils.execute(dataSource, sql);
-            }
-        }
-    }
-
-    private List<Resource> getHibernateMappings()
-    {
-        List<Resource> mappings = new LinkedList<Resource>();
-        mappings.add(new ClassPathResource("com/zutubi/pulse/transfer/Schema.hbm.xml"));
+        List<String> mappings = new LinkedList<String>();
+        mappings.add("com/zutubi/pulse/transfer/Schema.hbm.xml");
         return mappings;
     }
 
-    private Properties getHibernateProperties()
+    /**
+     * Get the database properties for an in memory hsqldb instance of the given name.
+     *
+     * @param name of the database.
+     *
+     * @return properties that can be used to create a jdbc data source.
+     */
+    private Properties getDatabaseProperties(String name)
     {
-        Properties properties = new Properties();
-        properties.setProperty("hibernate.dialect", "org.hibernate.dialect.HSQLDialect");
-        return properties;
+        Properties props = new Properties();
+        props.put(DatabaseConfig.JDBC_DRIVER_CLASS_NAME, "org.hsqldb.jdbcDriver");
+        props.put(DatabaseConfig.JDBC_URL, "jdbc:hsqldb:mem:" + name);
+        props.put(DatabaseConfig.JDBC_USERNAME, "sa");
+        props.put(DatabaseConfig.JDBC_PASSWORD, "");
+        return props;
     }
 
+    private DataSource createDataSource(Properties jdbcProperties)
+    {
+        DatabaseConfig config = new DatabaseConfig(jdbcProperties);
+        return config.createDataSource();
+    }
 }

@@ -1,6 +1,7 @@
 package com.zutubi.pulse.prototype.config.setup;
 
 import static com.zutubi.pulse.database.DatabaseConfig.*;
+import com.zutubi.pulse.prototype.config.EnumOptionProvider;
 
 import java.util.Properties;
 
@@ -19,6 +20,81 @@ public enum DatabaseType
         {
             return getStandardProperties("org.hsqldb.jdbcDriver", "jdbc:hsqldb:DB_ROOT/db", "sa", "", "org.hibernate.dialect.HSQLDialect");
         }
+
+        public Properties getDatabaseProperties(MigrateDatabaseTypeConfiguration config)
+        {
+            return getStandardProperties(config.getDriver(), "jdbc:hsqldb:DB_ROOT/db", "sa", "", "org.hibernate.dialect.HSQLDialect");
+        }
+
+        public MigrateDatabaseTypeConfiguration getDatabaseConfiguration(Properties props)
+        {
+            MigrateDatabaseTypeConfiguration config = new MigrateDatabaseTypeConfiguration();
+            config.setDriver(props.getProperty(JDBC_DRIVER_CLASS_NAME));
+            config.setPassword(props.getProperty(JDBC_PASSWORD));
+            config.setUser(props.getProperty(JDBC_USERNAME));
+            String url = props.getProperty(JDBC_URL);
+            config.setDatabase(url.substring(12));
+            config.setType(this);
+            return config;
+        }
+    },
+    EMBEDDED_2
+    {
+        public boolean isEmbedded()
+        {
+            return true;
+        }
+
+        public Properties getDatabaseProperties(SetupDatabaseTypeConfiguration config)
+        {
+            return getStandardProperties("org.hsqldb.jdbcDriver", "jdbc:hsqldb:DB_ROOT/db2", "sa", "", "org.hibernate.dialect.HSQLDialect");
+        }
+
+        public Properties getDatabaseProperties(MigrateDatabaseTypeConfiguration config)
+        {
+            return getStandardProperties(config.getDriver(), "jdbc:hsqldb:DB_ROOT/db2", "sa", "", "org.hibernate.dialect.HSQLDialect");
+        }
+
+        public MigrateDatabaseTypeConfiguration getDatabaseConfiguration(Properties props)
+        {
+            MigrateDatabaseTypeConfiguration config = new MigrateDatabaseTypeConfiguration();
+            config.setDriver(props.getProperty(JDBC_DRIVER_CLASS_NAME));
+            config.setPassword(props.getProperty(JDBC_PASSWORD));
+            config.setUser(props.getProperty(JDBC_USERNAME));
+            config.setType(this);
+            String url = props.getProperty(JDBC_URL);
+            config.setDatabase(url.substring(12));
+            return config;
+        }
+    },
+    EMBEDDED_3
+    {
+        public boolean isEmbedded()
+        {
+            return true;
+        }
+
+        public Properties getDatabaseProperties(SetupDatabaseTypeConfiguration config)
+        {
+            return getStandardProperties("org.hsqldb.jdbcDriver", "jdbc:hsqldb:DB_ROOT/db3", "sa", "", "org.hibernate.dialect.HSQLDialect");
+        }
+
+        public Properties getDatabaseProperties(MigrateDatabaseTypeConfiguration config)
+        {
+            return getStandardProperties(config.getDriver(), "jdbc:hsqldb:DB_ROOT/db3", "sa", "", "org.hibernate.dialect.HSQLDialect");
+        }
+
+        public MigrateDatabaseTypeConfiguration getDatabaseConfiguration(Properties props)
+        {
+            MigrateDatabaseTypeConfiguration config = new MigrateDatabaseTypeConfiguration();
+            config.setDriver(props.getProperty(JDBC_DRIVER_CLASS_NAME));
+            config.setPassword(props.getProperty(JDBC_PASSWORD));
+            config.setUser(props.getProperty(JDBC_USERNAME));
+            config.setType(this);
+            String url = props.getProperty(JDBC_URL);
+            config.setDatabase(url.substring(12));
+            return config;
+        }
     },
     MYSQL
     {
@@ -30,6 +106,27 @@ public enum DatabaseType
         public Properties getDatabaseProperties(SetupDatabaseTypeConfiguration config)
         {
             return getStandardProperties("com.mysql.jdbc.Driver", "jdbc:mysql://" + config.getHost() + ":" + config.getPort() + "/" + config.getDatabase() + "?autoReconnect=true", config.getUser(), config.getPassword(), "org.hibernate.dialect.MySQLDialect");
+        }
+
+        public Properties getDatabaseProperties(MigrateDatabaseTypeConfiguration config)
+        {
+            return getStandardProperties(config.getDriver(), "jdbc:mysql://" + config.getHost() + ":" + config.getPort() + "/" + config.getDatabase() + "?autoReconnect=true", config.getUser(), config.getPassword(), "org.hibernate.dialect.MySQLDialect");
+        }
+
+        public MigrateDatabaseTypeConfiguration getDatabaseConfiguration(Properties props)
+        {
+            MigrateDatabaseTypeConfiguration config = new MigrateDatabaseTypeConfiguration();
+            config.setDriver(props.getProperty(JDBC_DRIVER_CLASS_NAME));
+            config.setPassword(props.getProperty(JDBC_PASSWORD));
+            config.setUser(props.getProperty(JDBC_USERNAME));
+            config.setType(this);
+
+            String url = props.getProperty(JDBC_URL);
+            config.setHost(url.substring(13, url.indexOf(':', 13)));
+            int indexOfColon = url.indexOf(':', 13) + 1;
+            config.setPort(Integer.valueOf(url.substring(indexOfColon, url.indexOf('/', indexOfColon))));
+            config.setDatabase(url.substring(url.indexOf('/', indexOfColon) + 1, url.indexOf('?', indexOfColon)));
+            return config;
         }
     },
     POSTGRESQL
@@ -43,30 +140,51 @@ public enum DatabaseType
         {
             return getStandardProperties("org.postgresql.Driver", "jdbc:postgresql://" + config.getHost() + ":" + config.getPort() + "/" + config.getDatabase(), config.getUser(), config.getPassword(), "org.hibernate.dialect.PostgreSQLDialect");
         }
-    },
-    RUBBISH
-    {
-        public boolean isEmbedded()
+
+        public Properties getDatabaseProperties(MigrateDatabaseTypeConfiguration config)
         {
-            return false;
+            return getStandardProperties(config.getDriver(), "jdbc:postgresql://" + config.getHost() + ":" + config.getPort() + "/" + config.getDatabase(), config.getUser(), config.getPassword(), "org.hibernate.dialect.PostgreSQLDialect");
         }
 
-        public Properties getDatabaseProperties(SetupDatabaseTypeConfiguration config)
+        public MigrateDatabaseTypeConfiguration getDatabaseConfiguration(Properties props)
         {
-            return getStandardProperties("org.postgresql.Driver", "jdbc:postgresql://" + config.getHost() + ":" + config.getPort() + "/" + config.getDatabase(), config.getUser(), config.getPassword(), "org.hibernate.dialect.PostgreSQLDialect");
+            MigrateDatabaseTypeConfiguration config = new MigrateDatabaseTypeConfiguration();
+            config.setDriver(props.getProperty(JDBC_DRIVER_CLASS_NAME));
+            config.setPassword(props.getProperty(JDBC_PASSWORD));
+            config.setUser(props.getProperty(JDBC_USERNAME));
+            config.setType(this);
+
+            String url = props.getProperty(JDBC_URL);
+            config.setHost(url.substring(13, url.indexOf(':', 13)));
+            int indexOfColon = url.indexOf(':', 13) + 1;
+            config.setPort(Integer.valueOf(url.substring(indexOfColon, url.indexOf('/', indexOfColon))));
+            config.setDatabase(url.substring(url.indexOf('/', indexOfColon) + 1, url.indexOf('?', indexOfColon)));
+            return config;
         }
-    },
+    }
     ;
 
     public abstract boolean isEmbedded();
     public abstract Properties getDatabaseProperties(SetupDatabaseTypeConfiguration config);
+    public abstract Properties getDatabaseProperties(MigrateDatabaseTypeConfiguration config);
+    public abstract MigrateDatabaseTypeConfiguration getDatabaseConfiguration(Properties props);
 
     public String getJDBCClassName(SetupDatabaseTypeConfiguration config)
     {
         return getDatabaseProperties(config).getProperty(JDBC_DRIVER_CLASS_NAME);
     }
 
+    public String getJDBCClassName(MigrateDatabaseTypeConfiguration config)
+    {
+        return config.getDriver();
+    }
+
     public String getJDBCUrl(SetupDatabaseTypeConfiguration configuration)
+    {
+        return getDatabaseProperties(configuration).getProperty(JDBC_URL);
+    }
+
+    public String getJDBCUrl(MigrateDatabaseTypeConfiguration configuration)
     {
         return getDatabaseProperties(configuration).getProperty(JDBC_URL);
     }
@@ -80,5 +198,10 @@ public enum DatabaseType
         result.put(JDBC_PASSWORD, jdbcPassword);
         result.put(HIBERNATE_DIALECT, hibernateDialect);
         return result;
+    }
+
+    public String getPrettyName()
+    {
+        return EnumOptionProvider.getPrettyName(this);
     }
 }

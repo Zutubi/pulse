@@ -28,69 +28,8 @@
 <div id="leftcolumn">
     <h1 id="restore.progress">Restore Progress</h1>
 
-    <table style="width: 540px; margin: 20px;">
-        <tr>
-            <!-- Task list (left side) -->
-            <td style="vertical-align: top;">
-                <ul id="restore-tasks">
-#foreach($task in $tasks)
-    #set($taskIndex = $velocityCount - 1)
-    #if($monitor.completedTasks > $taskIndex)
-        #set($taskClass = "task-complete")
-    #elseif($monitor.completedTasks == $taskIndex)
-        #set($taskClass = "task-inprogress")
-    #else
-        #set($taskClass = "task-pending")
-    #end
-                    <li class="$taskClass">$task.name</li>
-#end
-                </ul>
-            </td>
+    #taskProgressUI($monitor)
 
-            <!-- Current task progress (right side) -->
-
-    #set($currentTask = $monitor.currentTask)
-    #set($currentFeedback = $monitor.currentTaskProgress)
-    #set($percentageComplete = $currentFeedback.percentageComplete)
-    #set($percentageRemaining = 100 - $percentageComplete)
-
-            <td style="width: 100%; border: solid 1px #dde; padding: 10px;">
-                <table id="task-progress">
-                    <tr>
-                        <th>Task Progress:</th>
-                        <td class="stretch">
-                            <table width="100%">
-                                <tr>
-                                    #if ($percentageComplete > 0)
-                                        <td width="$percentageComplete%" class="okaybar">#if($percentageComplete >= 50) $percentageComplete% #else &nbsp; #end</td>
-                                    #end
-                                    #if ($percentageComplete < 100)
-                                        <td width="$percentageRemaining%" class="clearbar">#if($percentageComplete >= 0 && $percentageComplete < 50) $percentageComplete% #else &nbsp; #end</td>
-                                    #end
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Elapsed time:</th>
-                        <td class="stretch">$currentFeedback.elapsedTimePretty</td>
-                    </tr>
-                    <tr>
-                        <th>Estimated time:</th>
-                        <td class="stretch">$currentFeedback.estimatedTimePretty</td>
-                    </tr>
-                    <tr>
-                        <th>Status message:</th>
-                        <td class="stretch">$currentFeedback.statusMessage</td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
-
-    <p>
-        <strong>Total Elapsed Time</strong>: $monitor.elapsedTimePretty
-    </p>
 </div>
 </body>
 </html>

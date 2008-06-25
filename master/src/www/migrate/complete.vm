@@ -1,0 +1,19 @@
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="/css/setup.css"></link>
+</head>
+<body>
+
+
+<div id="leftcolumn">
+
+    <h1 id="restore.progress">Migrate Complete</h1>
+
+    #taskProgressUI($monitor)
+
+</div>
+
+<a href="$base/migrate/continue.action">continue.</a>
+
+</body>
+</html>
