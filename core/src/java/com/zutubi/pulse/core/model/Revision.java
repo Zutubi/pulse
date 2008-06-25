@@ -1,8 +1,10 @@
 package com.zutubi.pulse.core.model;
 
+import com.zutubi.pulse.util.TimeStamps;
 import com.zutubi.util.StringUtils;
 
 import java.util.Date;
+import java.util.Locale;
 
 /**
  *
@@ -23,6 +25,11 @@ public class Revision extends Entity implements Comparable<Revision>
 
     protected Revision()
     {
+    }
+
+    public Revision(long timestamp)
+    {
+        this(null, null, new Date(timestamp), TimeStamps.getPrettyDate(timestamp, Locale.getDefault()));
     }
 
     public Revision(String revisionString)

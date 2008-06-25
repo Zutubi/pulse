@@ -2,10 +2,10 @@ package com.zutubi.prototype;
 
 import com.zutubi.config.annotations.FieldType;
 import com.zutubi.config.annotations.Handler;
+import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.config.ConfigurationValidationContext;
 import com.zutubi.prototype.config.ConfigurationValidatorProvider;
-import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.handler.AnnotationHandler;
 import com.zutubi.prototype.handler.OptionAnnotationHandler;
 import com.zutubi.prototype.model.*;
@@ -268,12 +268,10 @@ public class FormDescriptorFactory
      * hierarchy, looking for annotations that have a handler mapped to them.
      * When found, the handler is run in the context of the annotation and
      * the descriptor.
-     * <p/>
-     * Note: This method will process all of the annotation's annotations as well.
      *
      * @param type        the composite type that has been annotated (or meta-annotated)
      * @param descriptor  the target that will be modified by these annotations.
-     * @param annotations the annotations that need to be processed.
+     * @param annotations the annotations that need to be processed (includes meta already).
      */
     private void handleAnnotations(CompositeType type, Descriptor descriptor, List<Annotation> annotations)
     {
@@ -285,9 +283,6 @@ public class FormDescriptorFactory
                 // ignore standard annotations.
                 continue;
             }
-
-            // recurse up the annotation hierarchy.
-            handleAnnotations(type, descriptor, Arrays.asList(annotationType.getAnnotations()));
 
             Handler handlerAnnotation = annotationType.getAnnotation(Handler.class);
             if (handlerAnnotation != null)

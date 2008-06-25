@@ -11,16 +11,13 @@ import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.core.*;
 import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_INTERNAL;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.scm.ScmClient;
-import com.zutubi.pulse.core.scm.ScmClientFactory;
-import com.zutubi.pulse.core.scm.ScmClientUtils;
-import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.scm.*;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.events.*;
 import com.zutubi.pulse.events.EventListener;
+import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.pulse.events.system.SystemStartedEvent;
-import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.model.ResourceManager;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
@@ -218,7 +215,8 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
             try
             {
                 client = scmClientFactory.createClient(scm);
-                Revision revision = client.getLatestRevision();
+                boolean supportsRevisions = client.getCapabilities().contains(ScmCapability.REVISIONS);
+                Revision revision = supportsRevisions ? client.getLatestRevision() : new Revision(System.currentTimeMillis());
 
                 // May throw a BuildException
                 updateRevision(dispatchRequest, revision);

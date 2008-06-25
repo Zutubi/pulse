@@ -12,7 +12,7 @@ import com.zutubi.pulse.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.config.ConfigurationCheckHandler;
 import com.zutubi.pulse.core.config.ConfigurationCreator;
-import com.zutubi.pulse.core.scm.config.ScmConfiguration;
+import com.zutubi.pulse.core.scm.config.PollableScmConfiguration;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.prototype.config.group.AbstractGroupConfiguration;
@@ -125,7 +125,7 @@ public class ConfigurationRegistry
             CompositeType projectConfig = registerConfigurationType(ProjectConfiguration.class);
 
             // scm configuration - registration of extensions occurs via plugins.
-            typeRegistry.getType(ScmConfiguration.class);
+            registerConfigurationType(PollableScmConfiguration.class);
 
             // Triggers
             CompositeType triggerConfig = registerConfigurationType(TriggerConfiguration.class);

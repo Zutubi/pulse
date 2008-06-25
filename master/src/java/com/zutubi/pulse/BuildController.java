@@ -554,14 +554,17 @@ public class BuildController implements EventListener
     private List<Changelist> getChangeSince(ScmClient client, Revision previousRevision, Revision revision) throws ScmException
     {
         List<Changelist> result = new LinkedList<Changelist>();
-        List<Changelist> scmChanges = client.getChanges(previousRevision, revision);
-
-        for (Changelist change : scmChanges)
+        if(client.getCapabilities().contains(ScmCapability.CHANGESETS))
         {
-            change.setProjectId(buildResult.getProject().getId());
-            change.setResultId(buildResult.getId());
-            buildManager.save(change);
-            result.add(change);
+            List<Changelist> scmChanges = client.getChanges(previousRevision, revision);
+
+            for (Changelist change : scmChanges)
+            {
+                change.setProjectId(buildResult.getProject().getId());
+                change.setResultId(buildResult.getId());
+                buildManager.save(change);
+                result.add(change);
+            }
         }
 
         return result;

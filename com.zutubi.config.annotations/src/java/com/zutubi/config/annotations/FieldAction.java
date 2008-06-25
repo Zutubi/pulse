@@ -20,10 +20,18 @@ public @interface FieldAction
      * @return the name of the template used to render the link's associated
      * code.
      */
-    public String template() default "";
+    String template() default "";
 
     /**
      * @return the i18n key for the link.
      */
-    public String actionKey() default "browse";
+    String actionKey() default "browse";
+
+    /**
+     * @return An optional class used to filter the presence of this action
+     *         based on context (by default the action is always shown).  The
+     *         class must implement
+     *         com.zutubi.prototype.handler.FieldActionPredicate.
+     */
+    String filterClass() default "";
 }

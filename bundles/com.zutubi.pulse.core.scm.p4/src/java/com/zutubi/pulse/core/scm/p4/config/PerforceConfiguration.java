@@ -3,17 +3,17 @@ package com.zutubi.pulse.core.scm.p4.config;
 import com.zutubi.config.annotations.ConfigurationCheck;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.pulse.core.scm.config.ScmConfiguration;
+import com.zutubi.pulse.core.scm.config.PollableScmConfiguration;
 import com.zutubi.pulse.core.scm.p4.PerforceClient;
 import com.zutubi.validation.annotations.Required;
 
 /**
  * Configures details of a Perforce depot and client.
  */
-@Form(fieldOrder = { "port", "user", "password", "spec", "monitor", "checkoutScheme", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod" })
+@Form(fieldOrder = { "port", "user", "password", "spec", "checkoutScheme", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod" })
 @ConfigurationCheck("PerforceConfigurationCheckHandler")
 @SymbolicName("zutubi.perforceConfig")
-public class PerforceConfiguration extends ScmConfiguration
+public class PerforceConfiguration extends PollableScmConfiguration
 {
     @Required
     private String port;

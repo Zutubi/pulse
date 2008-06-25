@@ -20,14 +20,16 @@ import com.zutubi.pulse.core.config.NamedConfigurationComparator;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.model.TestCaseIndex;
 import com.zutubi.pulse.core.scm.DelegateScmClientFactory;
+import com.zutubi.pulse.core.scm.ScmCapability;
+import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.pulse.events.build.BuildRequestEvent;
 import com.zutubi.pulse.events.build.PersonalBuildRequestEvent;
 import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
+import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.pulse.license.LicenseManager;
 import com.zutubi.pulse.license.authorisation.AddProjectAuthorisation;
 import com.zutubi.pulse.model.persistence.AgentStateDao;
@@ -379,10 +381,19 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 // outstanding revisions and if so create requests for each one.
                 try
                 {
-                    List<Revision> revisions = changelistIsolator.getRevisionsToRequest(projectConfig, project, force);
-                    for(Revision r: revisions)
+                    Set<ScmCapability> capabilities = ScmClientUtils.getCapabilities(projectConfig.getScm(), scmClientManager);
+                    if(capabilities.contains(ScmCapability.REVISIONS))
                     {
-                        requestBuildOfRevision(reason, project, r);
+                        List<Revision> revisions = changelistIsolator.getRevisionsToRequest(projectConfig, project, force);
+                        for(Revision r: revisions)
+                        {
+                            requestBuildOfRevision(reason, project, r);
+                        }
+                    }
+                    else
+                    {
+                        LOG.warning("Unable to use changelist isolation for project '" + projectConfig.getName() + "' as the SCM does not support revisions");
+                        requestBuildFloating(reason, project);
                     }
                 }
                 catch (ScmException e)
@@ -392,7 +403,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
             }
             else
             {
-                eventManager.publish(new BuildRequestEvent(this, reason, project, new BuildRevision()));
+                requestBuildFloating(reason, project);
             }
         }
         else
@@ -429,6 +440,11 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         project.setNextBuildNumber(number + 1);
         save(project);
         return number;
+    }
+
+    private void requestBuildFloating(BuildReason reason, Project project)
+    {
+        eventManager.publish(new BuildRequestEvent(this, reason, project, new BuildRevision()));
     }
 
     private void requestBuildOfRevision(BuildReason reason, Project project, Revision revision)

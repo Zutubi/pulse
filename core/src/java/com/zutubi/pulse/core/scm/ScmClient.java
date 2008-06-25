@@ -34,7 +34,9 @@ public interface ScmClient extends Closeable
     /**
      * Returns a string that uniquely identifies the server itself.  This may
      * include the server address and repository root, for example.  All
-     * SCMServer objects talking to the same SCM should return the same id.
+     * SCMClient objects talking to the same SCM should return the same id.
+     *
+     * Required for all implementations.
      *
      * @return a unique id for the SCM server
      * @throws ScmException on error
@@ -70,6 +72,9 @@ public interface ScmClient extends Closeable
     /**
      * Update the working directory to the specified context.
      *
+     * Required for all implementations.  If an incremental update is not
+     * possible then an update may be the same as a checkout.
+     *
      * @param context    defines the context for the checkout operation
      * @param handler    if not null, receives notifications of events during the
      *
@@ -82,10 +87,10 @@ public interface ScmClient extends Closeable
     /**
      * Checks out the specified file at the given revision.
      *
-     * @param path      path defining the content to be retrieved.
-     * @param revision the revision be checked out (may be ignored by
-     *                 implementations that do not support {@link
-     *                 ScmCapability#CHANGESET}.
+     * @param path     path defining the content to be retrieved.
+     * @param revision the revision be checked out or null for the latest
+     *                 revision (may be ignored by implementations that do
+     *                 not support {@link ScmCapability#REVISIONS}).
      *
      * @return input stream providing access to the requested content.
      *
@@ -100,7 +105,7 @@ public interface ScmClient extends Closeable
      * miscellaneous information the is useful to the user.  If there is no
      * additional information to store, this operation may be a no-op.
      *
-     * Required for all implementations.
+     * Required for all implementations (but may be a no-op).
      *
      * @param outputDir location to store files containing the connection
      *                  details
@@ -123,6 +128,9 @@ public interface ScmClient extends Closeable
     /**
      * Returns the latest repository revision.
      *
+     * Required for implementations that support
+     * {@link ScmCapability#REVISIONS}.
+     *
      * @return the latest revision in the repository
      * @throws ScmException on error
      */
@@ -132,7 +140,7 @@ public interface ScmClient extends Closeable
      * Returns a list of revisions occuring between the given revisions.
      * The from revision itself it NOT included in the result.
      *
-     * Required for {@link ScmCapability#CHANGESET}.
+     * Required for {@link ScmCapability#REVISIONS}.
      *
      * @param from      the revision before the first revision to return
      * @param to        the revision that defined the inclusive upper bound for this call.
@@ -147,7 +155,7 @@ public interface ScmClient extends Closeable
      * The changelist that created the from revision itself is NOT included in
      * the model.
      *
-     * Required for {@link ScmCapability#CHANGESET}.
+     * Required for {@link ScmCapability#CHANGESETS}.
      *
      * @param from  the revision before the first changelist to include in the model
      * @param to    the last revision to include in the model
@@ -165,7 +173,9 @@ public interface ScmClient extends Closeable
      *
      * @param path the path to list (relative to the root of the connection,
      *             i.e. an empty string is valid and means "list the root").
-     * @param revision
+     * @param revision revision at which to browse, or null for the latest
+     *                 revision (may be ignored by implementations that do not
+     *                 support {@link ScmCapability#REVISIONS}).
      * @return a list of files and directories contained within the given
      *         path
      * @throws ScmException on error
@@ -189,6 +199,8 @@ public interface ScmClient extends Closeable
      * Converts a string into a revision.  The string is input from the user,
      * and thus should be validated.  If it is invalid, an SCMException
      * should be thrown.
+     *
+     * Required for {@link ScmCapability#REVISIONS}.
      *
      * @param revision revision input string to be converted into an actual
      *                 revision

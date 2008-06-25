@@ -8,6 +8,7 @@ import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.pulse.core.scm.ScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.scm.config.Pollable;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
@@ -120,14 +121,14 @@ public class DefaultScmManager implements ScmManager, Stoppable
             public boolean satisfied(ProjectConfiguration project)
             {
                 ScmConfiguration scm = project.getScm();
-                // check a) sanity.
-                if (scm == null)
+                // check a) sanity and b) pollability.
+                if (scm == null || !(scm instanceof Pollable))
                 {
                     return false;
                 }
 
-                // check b) monitoring is enabled.
-                return project.getScm().getMonitor();
+                // check c) monitoring is enabled.
+                return ((Pollable) scm).isMonitor();
             }
         });
     }
@@ -167,7 +168,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
 
     private void process(ProjectConfiguration projectConfig)
     {
-        ScmConfiguration scm = projectConfig.getScm();
+        Pollable pollable = (Pollable) projectConfig.getScm();
         long projectId = projectConfig.getProjectId();
         Project project = projectManager.getProject(projectId, false);
         ScmClient client = null;
@@ -175,7 +176,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
         try
         {
             long now = System.currentTimeMillis();
-            if (!checkPollingInterval(project, scm, now))
+            if (!checkPollingInterval(project, pollable, now))
             {
                 // do not poll the scm just yet.
                 return;
@@ -186,7 +187,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
             projectManager.save(project);
 
             // when was the last time that we checked? if never, get the latest revision.
-            client = scmClientFactory.createClient(scm);
+            client = scmClientFactory.createClient(projectConfig.getScm());
             if (!latestRevisions.containsKey(projectId))
             {
                 latestRevisions.put(projectId, client.getLatestRevision());
@@ -202,7 +203,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
                 return;
             }
 
-            if (scm.isQuietPeriodEnabled())
+            if (pollable.isQuietPeriodEnabled())
             {
                 // are we waiting
                 if (waiting.containsKey(projectId))
@@ -215,7 +216,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
                         if (latest != null)
                         {
                             // there has been a commit during the 'quiet period', lets reset the timer.
-                            waiting.put(projectId, new Pair<Long, Revision>(System.currentTimeMillis() + scm.getQuietPeriod() * Constants.MINUTE, latest));
+                            waiting.put(projectId, new Pair<Long, Revision>(System.currentTimeMillis() + pollable.getQuietPeriod() * Constants.MINUTE, latest));
                         }
                         else
                         {
@@ -230,9 +231,9 @@ public class DefaultScmManager implements ScmManager, Stoppable
                     Revision latest = getLatestRevisionSince(previous, client);
                     if (latest != null)
                     {
-                        if (scm.getQuietPeriod() != 0)
+                        if (pollable.getQuietPeriod() != 0)
                         {
-                            waiting.put(projectId, new Pair<Long, Revision>(System.currentTimeMillis() + scm.getQuietPeriod() * Constants.MINUTE, latest));
+                            waiting.put(projectId, new Pair<Long, Revision>(System.currentTimeMillis() + pollable.getQuietPeriod() * Constants.MINUTE, latest));
                         }
                         else
                         {
@@ -282,7 +283,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
         latestRevisions.put(projectConfig.getProjectId(), latest);
     }
 
-    private boolean checkPollingInterval(Project project, ScmConfiguration scm, long now)
+    private boolean checkPollingInterval(Project project, Pollable scm, long now)
     {
         // A) is it time to poll this scm server?
         if (project.getLastPollTime() != null)

@@ -1,9 +1,11 @@
 package com.zutubi.pulse.web.ajax;
 
-import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.scm.ScmCapability;
 import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.pulse.core.scm.ScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
+import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.web.project.ProjectActionSupport;
 
 /**
@@ -45,7 +47,15 @@ public class GetLatestRevisionAction extends ProjectActionSupport
             try
             {
                 client = scmClientFactory.createClient(project.getConfig().getScm());
-                latestRevision = client.getLatestRevision().getRevisionString();
+                if(client.getCapabilities().contains(ScmCapability.REVISIONS))
+                {
+                    latestRevision = client.getLatestRevision().getRevisionString();
+                }
+                else
+                {
+                    latestRevision = new Revision(System.currentTimeMillis()).getRevisionString();
+                }
+
                 successful = true;
             }
             catch (Exception e)

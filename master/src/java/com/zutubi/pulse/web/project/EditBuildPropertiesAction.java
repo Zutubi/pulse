@@ -17,10 +17,7 @@ import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.config.NamedConfigurationComparator;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.scm.ScmClient;
-import com.zutubi.pulse.core.scm.ScmClientFactory;
-import com.zutubi.pulse.core.scm.ScmClientUtils;
-import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.scm.*;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.model.ManualTriggerBuildReason;
 import com.zutubi.pulse.model.Project;
@@ -122,8 +119,8 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         field = new Field(FieldType.TEXT, "revision");
         field.setLabel("revision");
         field.setValue(revision);
-        field.addParameter(ACTIONS, Arrays.asList("getlatest"));
-        field.addParameter(SCRIPTS, Arrays.asList("EditBuildPropertiesAction.getlatest"));
+        addLatestAction(field, project.getConfig().getScm());
+
         form.add(field);
 
         for(ResourceProperty property: properties)
@@ -144,6 +141,22 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         PrototypeUtils.renderForm(context, form, getClass(), writer, configurationManager);
         formSource = writer.toString();
         newPanel = new ConfigurationPanel("aaction/edit-build-properties.vm");
+    }
+
+    private void addLatestAction(Field field, ScmConfiguration scm)
+    {
+        try
+        {
+            if(ScmClientUtils.getCapabilities(scm, scmClientFactory).contains(ScmCapability.REVISIONS))
+            {
+                field.addParameter(ACTIONS, Arrays.asList("getlatest"));
+                field.addParameter(SCRIPTS, Arrays.asList("EditBuildPropertiesAction.getlatest"));
+            }
+        }
+        catch (ScmException e)
+        {
+            // Just don't add the action.
+        }
     }
 
     private void addSubmit(Form form, String name)

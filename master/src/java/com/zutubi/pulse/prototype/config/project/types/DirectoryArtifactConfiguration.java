@@ -1,10 +1,10 @@
 package com.zutubi.pulse.prototype.config.project.types;
 
-import com.zutubi.util.TextUtils;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Transient;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.TextUtils;
 
 import java.util.Collections;
 import java.util.List;

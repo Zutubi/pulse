@@ -9,17 +9,37 @@ package com.zutubi.pulse.core.scm;
 public enum ScmCapability
 {
     /**
-     * This defines whether or not the contents of the scm repository can be browsed / navigated.
+     * This defines whether or not the contents of the SCM repository can be browsed / navigated.
      * This involves being able obtain a listing of remote directories.
      */
     BROWSE,
 
     /**
-     * This scm capability defines whether or not the scm supports defining the changes that have occured
-     * at each revision.  This is used by pulse to provide extra information about what changes have
-     * occured in a build.
+     * The SCM supports the concept of revisions including the ability to get
+     * the latest revision and checkout at a specified revision.
+     *
+     * Required for the 'changelist isolation' build option to take effect.
      */
-    CHANGESET,
+    REVISIONS,
+
+    /**
+     * Defines whether the SCM supports defining the changes that have occured
+     * at each revision.  This is used by pulse to provide extra information
+     * about what changes have occured in a build.
+     *
+     * SCMs with this capability must also support {@link #REVISIONS}.
+     */
+    CHANGESETS,
+
+    /**
+     * Indicates that the SCM supports polling for new changes.
+     *
+     * SCMs with this capability must also support {@link #REVISIONS}.
+     *
+     * SCMs supporting this capabillity must have a configuration class which
+     * implements {@link com.zutubi.pulse.core.scm.config.Pollable}.
+     */
+    POLL,
 
     /**
      * This scm capability defines whether or not tagging of the scm server is supported.  Tagging of

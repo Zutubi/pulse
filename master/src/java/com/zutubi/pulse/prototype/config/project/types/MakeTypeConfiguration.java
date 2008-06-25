@@ -1,9 +1,9 @@
 package com.zutubi.pulse.prototype.config.project.types;
 
-import com.zutubi.config.annotations.FieldAction;
 import com.zutubi.config.annotations.Form;
-import com.zutubi.config.annotations.Parameter;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.pulse.prototype.config.project.BrowseScmDirAction;
+import com.zutubi.pulse.prototype.config.project.BrowseScmFileAction;
 import com.zutubi.util.TextUtils;
 import org.apache.velocity.VelocityContext;
 
@@ -12,17 +12,16 @@ import org.apache.velocity.VelocityContext;
  *
  */
 @SymbolicName("zutubi.makeTypeConfig")
-@Form(fieldOrder = {"workigDir", "makefile", "targets", "arguments", "postProcessors"})
+@Form(fieldOrder = {"workingDir", "makefile", "targets", "arguments", "postProcessors"})
 public class MakeTypeConfiguration extends TemplateTypeConfiguration
 {
     /**
      * Path relative to base.dir in which to execute the make.
      */
-    @FieldAction(template = "actions/browse-scm-dir")
+    @BrowseScmDirAction
     private String workingDir;
 
-    @FieldAction(template = "actions/browse-scm-file")
-    @Parameter(name = "baseDirField", value = "workingDir")
+    @BrowseScmFileAction(baseDirField = "workingDir")
     private String makefile;
     /**
      * Space-separated list of target names.

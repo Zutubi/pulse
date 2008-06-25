@@ -13,7 +13,6 @@ import com.zutubi.prototype.wizard.TypeWizardState;
 import com.zutubi.prototype.wizard.webwork.AbstractTypeWizard;
 import com.zutubi.prototype.wizard.webwork.ConfigurationWizardAction;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
-import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;
@@ -26,7 +25,7 @@ import java.util.Set;
 
 /**
  */
-public class ProjectWizardFileObject extends AbstractPulseFileObject implements ProjectProvider
+public class ProjectWizardFileObject extends AbstractPulseFileObject implements ProjectConfigProvider
 {
     private static final Map<String, Class<? extends AbstractPulseFileObject>> nodesDefinitions = new HashMap<String, Class<? extends AbstractPulseFileObject>>();
     {
@@ -94,18 +93,6 @@ public class ProjectWizardFileObject extends AbstractPulseFileObject implements 
         {
             throw new FileSystemException(e);
         }
-    }
-
-    public Project getProject() throws FileSystemException
-    {
-        Project project = new Project();
-        project.setConfig(getProjectConfig());
-        return project;
-    }
-
-    public long getProjectId() throws FileSystemException
-    {
-        return -1;
     }
 
     private AbstractTypeWizard getWizardInstance()

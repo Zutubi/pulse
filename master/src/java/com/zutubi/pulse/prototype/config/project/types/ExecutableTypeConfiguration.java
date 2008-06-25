@@ -1,8 +1,8 @@
 package com.zutubi.pulse.prototype.config.project.types;
 
-import com.zutubi.util.TextUtils;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.util.TextUtils;
 import org.apache.velocity.VelocityContext;
 
 /**

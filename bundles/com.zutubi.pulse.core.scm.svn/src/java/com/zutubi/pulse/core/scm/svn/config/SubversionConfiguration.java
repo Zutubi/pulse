@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.scm.svn.config;
 
 import com.zutubi.config.annotations.*;
-import com.zutubi.pulse.core.scm.config.ScmConfiguration;
+import com.zutubi.pulse.core.scm.config.PollableScmConfiguration;
 import com.zutubi.pulse.core.scm.svn.SubversionClient;
 import com.zutubi.validation.annotations.Constraint;
 import com.zutubi.validation.annotations.Required;
@@ -15,7 +15,7 @@ import java.util.List;
 @Form(fieldOrder = { "url", "username", "password", "keyfile", "keyfilePassphrase", "checkoutScheme", "filterPaths", "externalMonitorPaths", "verifyExternals", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod" })
 @ConfigurationCheck("SubversionConfigurationCheckHandler")
 @SymbolicName("zutubi.subversionConfig")
-public class SubversionConfiguration extends ScmConfiguration
+public class SubversionConfiguration extends PollableScmConfiguration
 {
     @Required
     @Constraint("SubversionUrlValidator")

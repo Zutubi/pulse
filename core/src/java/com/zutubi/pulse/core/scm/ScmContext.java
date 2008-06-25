@@ -37,7 +37,7 @@ public class ScmContext
     /**
      * @return he revision at which the operation should be performed.  May
      * be ignored by implementations that do not support {@link
-     * ScmCapability#CHANGESET}.
+     * ScmCapability#CHANGESETS}.
      */
     public Revision getRevision()
     {

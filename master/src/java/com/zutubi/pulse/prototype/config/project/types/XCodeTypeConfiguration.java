@@ -1,8 +1,8 @@
 package com.zutubi.pulse.prototype.config.project.types;
 
-import com.zutubi.config.annotations.FieldAction;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.pulse.prototype.config.project.BrowseScmDirAction;
 import com.zutubi.util.TextUtils;
 import org.apache.velocity.VelocityContext;
 
@@ -14,7 +14,7 @@ import org.apache.velocity.VelocityContext;
 @Form(fieldOrder = {"workingDir", "project", "configuration", "target", "action", "settings", "postProcessors"})
 public class XCodeTypeConfiguration extends TemplateTypeConfiguration
 {
-    @FieldAction(template = "actions/browse-scm-dir")
+    @BrowseScmDirAction
     private String workingDir = null;
     private String config = null;
     private String project = null;
