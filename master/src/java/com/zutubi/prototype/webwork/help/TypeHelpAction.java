@@ -1,12 +1,14 @@
-package com.zutubi.prototype.webwork;
+package com.zutubi.prototype.webwork.help;
 
 import com.zutubi.config.annotations.Form;
 import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.config.docs.ConfigurationDocsManager;
 import com.zutubi.prototype.config.docs.PropertyDocs;
 import com.zutubi.prototype.config.docs.TypeDocs;
+import com.zutubi.prototype.type.ComplexType;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeProperty;
+import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
@@ -19,10 +21,8 @@ import java.util.List;
 /**
  * Looks up the documentation for a type found by configuration path.
  */
-public class HelpAction extends ActionSupport
+public class TypeHelpAction extends ActionSupport
 {
-    private static final int TRIM_LIMIT = 40;
-    
     private String path;
     private ConfigurationDocsManager configurationDocsManager;
     private ConfigurationTemplateManager configurationTemplateManager;
@@ -51,7 +51,22 @@ public class HelpAction extends ActionSupport
 
     public String safeDetails(String s)
     {
-        return TextUtils.stringSet(s) ? s : "No details.";
+        return TextUtils.stringSet(s) ? sentencify(s) : "No details.";
+    }
+
+    private String sentencify(String s)
+    {
+        if(Character.isLowerCase(s.charAt(0)))
+        {
+            s = s.substring(0, 1).toUpperCase() + s.substring(1);
+        }
+
+        if(s.charAt(s.length() - 1) != '.')
+        {
+            s = s + '.';
+        }
+        
+        return s;
     }
 
     public boolean isExpandable(PropertyDocs docs)
@@ -71,12 +86,13 @@ public class HelpAction extends ActionSupport
 
     public String execute() throws Exception
     {
-        CompositeType type = configurationTemplateManager.getType(path, CompositeType.class);
-        typeDocs = configurationDocsManager.getDocs(type);
+        ComplexType type = configurationTemplateManager.getType(path, ComplexType.class);
+        CompositeType composite = (CompositeType) type.getTargetType();
+        typeDocs = configurationDocsManager.getDocs(composite);
 
         // Calculate the form field properties in order so the UI can display
         // them nicely alongside the form.
-        List<String> fields = CollectionUtils.map(CollectionUtils.filter(type.getProperties(),
+        List<String> fields = CollectionUtils.map(CollectionUtils.filter(composite.getProperties(),
                                                                          new Predicate<TypeProperty>()
                                                                          {
                                                                              public boolean satisfied(TypeProperty typeProperty)
@@ -92,7 +108,7 @@ public class HelpAction extends ActionSupport
                                                       }
                                                   });
 
-        Form annotation = type.getAnnotation(Form.class, true);
+        Form annotation = composite.getAnnotation(Form.class, true);
         List<String> declaredOrder = null;
         if(annotation != null)
         {

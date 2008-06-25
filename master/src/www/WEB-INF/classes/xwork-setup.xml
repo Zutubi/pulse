@@ -190,6 +190,16 @@
         </action>
     </package>
 
+    <package name="ahelp" namespace="/ahelp" extends="webwork-default-package">
+        <default-interceptor-ref name="ajaxStack"/>
+
+        <default-action-ref name="default"/>
+
+        <action name="default">
+            <result name="success" type="startupajax"/>
+        </action>
+    </package>
+
     <package name="aaction" namespace="/aaction" extends="webwork-default-package">
         <default-interceptor-ref name="ajaxStack"/>
 

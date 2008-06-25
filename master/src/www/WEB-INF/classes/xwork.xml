@@ -481,7 +481,7 @@
             <result name="map" type="velocity">map.vm</result>
         </action>
 
-        <action name="help" class="com.zutubi.prototype.webwork.HelpAction">
+        <action name="help" class="com.zutubi.prototype.webwork.help.TypeHelpAction">
             <result name="success" type="velocity">help.vm</result>
         </action>
 
@@ -554,6 +554,16 @@
             <result name="cancel" type="flexjson">configurationResponse</result>
             <result name="success" type="flexjson">configurationResponse</result>
             <result name="input" type="flexjson">newPanel</result>
+        </action>
+    </package>
+
+    <package name="helpAjax" namespace="/ahelp" extends="configAjax">
+        <action name="type" class="com.zutubi.prototype.webwork.help.TypeHelpAction">
+            <result name="success" type="velocity">type.vm</result>
+        </action>
+
+        <action name="template" class="com.zutubi.prototype.webwork.help.TemplateHelpAction">
+            <result name="success" type="velocity">template.vm</result>
         </action>
     </package>
 

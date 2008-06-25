@@ -37,6 +37,7 @@ public class PulseActionMapper implements ActionMapper
     {
         configNamespaces.add("/setupconfig");
         configNamespaces.add("/aconfig");
+        configNamespaces.add("/ahelp");
         configNamespaces.add("/atemplate");
     }
 

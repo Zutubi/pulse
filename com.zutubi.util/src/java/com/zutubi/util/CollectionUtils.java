@@ -259,6 +259,22 @@ public class CollectionUtils
         return result;
     }
 
+    public static <T, U> Map<T, U> asOrderedMap(Pair<? extends T, ? extends U>... pairs)
+    {
+        return asOrderedMap(Arrays.asList(pairs));
+    }
+
+    public static <T, U> Map<T, U> asOrderedMap(Collection<? extends Pair<? extends T, ? extends U>> pairs)
+    {
+        HashMap<T, U> result = new LinkedHashMap<T,U>(pairs.size());
+        for(Pair<? extends T, ? extends U> pair: pairs)
+        {
+            result.put(pair.first, pair.second);
+        }
+
+        return result;
+    }
+
     public static <T> Vector<T> asVector(T... ts)
     {
         Vector<T> result = new Vector<T>(ts.length);

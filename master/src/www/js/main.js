@@ -609,8 +609,8 @@ var deletePath = function(path)
     runAjaxRequest(window.baseUrl + '/aconfig/' + path + '?delete=confirm');
 }
 
-var showHelp = function(path, field)
+var showHelp = function(path, type, field)
 {
-    Ext.getCmp('nested-east').showHelp(path, field);
+    Ext.getCmp('nested-east').showHelp(path, type, field);
 }
         

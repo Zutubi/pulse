@@ -21,8 +21,6 @@ public class PropertyDocs implements Docs
     {
         this.name = name;
         this.type = type;
-        // By default, use the name as the label too.
-        label = name;
     }
 
     public String getName()

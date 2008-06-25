@@ -7,3 +7,7 @@
 <p>
     #table("path=$config.path" "ajax=true")
 </p>
+
+<script type="text/javascript">
+    detailPanel.setHelp('${path}', 'type');
+</script>

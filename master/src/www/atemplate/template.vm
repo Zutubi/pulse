@@ -4,9 +4,10 @@
 
 #macro(actionHeader $id $action $img $onclick)
     <th><img alt="$action" src="$base/images/${img}.gif"/> <a href="#" onclick="$onclick; return false" id="$id">$action</a></th>
+    <td style="width: 25px"><a href="#" class="unadorned" onclick="showHelp('$path', 'template', '$id'); return false"><img alt="show help" src="$base/images/help.gif"/></a></td>
 #end
 
-<table class="template-actions" cellspacing="5px">
+<table id="template-actions" class="template-actions" cellspacing="5px">
     <tr>
         #actionHeader("configure" "configure" "pencil" "configureRecord('$path')")
         <td>jump to the configuration for this #i18n("key=label") #if(!$concrete) template #end</td>

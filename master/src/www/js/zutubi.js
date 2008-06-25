@@ -1289,8 +1289,8 @@ Ext.extend(ZUTUBI.DetailPanel, Ext.Panel, {
 
     clearHelp: function()
     {
-        this.helpPath = "";
-        this.helpType = "";
+        this.helpPath = '';
+        this.helpType = '';
     },
 
     getHelp: function()
@@ -1301,7 +1301,7 @@ Ext.extend(ZUTUBI.DetailPanel, Ext.Panel, {
     setHelp: function(path, type)
     {
         this.helpPath = path;
-        this.helpType = type || "";
+        this.helpType = type || '';
     },
     
     load: function(o)
@@ -1324,6 +1324,8 @@ ZUTUBI.HelpPanel = function(config)
 
 Ext.extend(ZUTUBI.HelpPanel, Ext.Panel, {
     shownPath: "",
+    shownType: "",
+    syncOnExpand: true,
 
     initComponent: function()
     {
@@ -1352,68 +1354,89 @@ Ext.extend(ZUTUBI.HelpPanel, Ext.Panel, {
         });
 
         ZUTUBI.HelpPanel.superclass.initComponent.call(this);
+
+        this.on('expand', this.expanded.createDelegate(this));
     },
 
+    expanded: function()
+    {
+        if (this.syncOnExpand)
+        {
+            this.syncOnExpand = false;
+            this.synchronise();
+        }
+    },
+    
     synchronise: function()
     {
-        showHelp(detailPanel.getHelp());    
+        var location = detailPanel.getHelp();
+        showHelp(location.path, location.type);
     },
 
-    showHelp: function(path, field)
+    showHelp: function(path, type, field)
     {
         if(this.collapsed)
         {
+            this.syncOnExpand = false;
             this.expand(false);
         }
 
-        if(path && path != this.shownPath)
-        {
-            this.loadPath(path, this.gotoField.createDelegate(this, [field]));
-        }
-        else
-        {
-            this.gotoField(field);
-        }
+        this.loadPath(path, type, this.gotoField.createDelegate(this, [field]));
     },
 
-    loadPath: function(path, cb)
+    loadPath: function(path, type, cb)
     {
-        var panel = this;
-        var type = '';
-        if(typeof path == 'object')
+        if(!path)
         {
-            type = path.type;
-            path = path.path;
+            path = '';
         }
 
-        if(path)
+        if(!type)
         {
-            this.body.load({
-                url: window.baseUrl + '/aconfig/' + path + '?help=' + type,
-                callback: function() {
-                    panel.shownPath = path;
-                    var helpEl = Ext.get('config-help');
-                    var fieldHeaders = helpEl.select('.field-expandable .field-header', true);
-                    fieldHeaders.on('click', function(e, el) {
-                        var expandableEl = Ext.fly(el).parent('.field-expandable');
-                        if(expandableEl)
-                        {
-                            expandableEl.toggleClass('field-expanded');
-                        }
-                    });
+            type = '';
+        }
 
-                    fieldHeaders.addClassOnOver('field-highlighted');
-    
-                    if(cb)
-                    {
-                        cb();
+        if(path != this.shownPath || type != this.shownType)
+        {
+            if(path)
+            {
+                var panel = this;
+                this.body.load({
+                    url: window.baseUrl + '/ahelp/' + path + '?' + type + '=',
+                    scripts: true,
+                    callback: function() {
+                        panel.shownPath = path;
+                        panel.shownType = type;
+                        var helpEl = Ext.get('config-help');
+                        var fieldHeaders = helpEl.select('.field-expandable .field-header', true);
+                        fieldHeaders.on('click', function(e, el) {
+                            var expandableEl = Ext.fly(el).parent('.field-expandable');
+                            if(expandableEl)
+                            {
+                                expandableEl.toggleClass('field-expanded');
+                            }
+                        });
+
+                        fieldHeaders.addClassOnOver('field-highlighted');
+
+                        if(cb)
+                        {
+                            cb();
+                        }
                     }
-                }
-            });
+                });
+            }
+            else
+            {
+                this.body.update('No help available.', false, cb);                
+            }
         }
         else
         {
-            this.body.update('No help available.', false, cb);
+            if(cb)
+            {
+                cb();
+            }
         }
     },
 

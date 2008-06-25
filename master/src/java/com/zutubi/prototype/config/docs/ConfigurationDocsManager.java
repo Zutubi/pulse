@@ -3,7 +3,7 @@ package com.zutubi.prototype.config.docs;
 import com.zutubi.i18n.Messages;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeProperty;
-import static com.zutubi.util.CollectionUtils.asMap;
+import static com.zutubi.util.CollectionUtils.asOrderedMap;
 import static com.zutubi.util.CollectionUtils.asPair;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.TextUtils;
@@ -25,15 +25,16 @@ public class ConfigurationDocsManager
 {
     private static final Logger LOG = Logger.getLogger(ConfigurationDocsManager.class);
 
-    private static final Map<String, String> TYPE_KEY_MAP = asMap(asPair("label", "title"),
-                                                                           asPair("introduction", "brief"),
-                                                                           asPair("verbose", "verbose"));
+    private static final Map<String, String> TYPE_KEY_MAP = asOrderedMap(asPair("form.heading", "title"),
+                                                                         asPair("label", "title"),
+                                                                         asPair("introduction", "brief"),
+                                                                         asPair("verbose", "verbose"));
 
-    private static final Map<String, String> PROPERTY_KEY_MAP = asMap(asPair("label", "label"),
-                                                                      asPair("help", "brief"),
-                                                                      asPair("verbose", "verbose"));
+    private static final Map<String, String> PROPERTY_KEY_MAP = asOrderedMap(asPair("label", "label"),
+                                                                             asPair("help", "brief"),
+                                                                             asPair("verbose", "verbose"));
 
-    private static final Map<String, String> EXAMPLE_KEY_MAP = asMap(asPair("blurb", "blurb"));
+    private static final Map<String, String> EXAMPLE_KEY_MAP = asOrderedMap(asPair("blurb", "blurb"));
 
     private Map<String, TypeDocs> cache = new HashMap<String, TypeDocs>();
     private static final int TRIM_LIMIT = 100;
@@ -41,11 +42,11 @@ public class ConfigurationDocsManager
     public synchronized TypeDocs getDocs(CompositeType type)
     {
         TypeDocs result = cache.get(type.getSymbolicName());
-//        if(result == null)
-//        {
+        if(result == null)
+        {
             result = generateDocs(type);
             cache.put(type.getSymbolicName(), result);
-//        }
+        }
 
         return result;
     }
@@ -157,16 +158,17 @@ public class ConfigurationDocsManager
 
     private void setPropertyIfDefined(Messages messages, String key, Object target, String property)
     {
-        if(messages.isKeyDefined(key))
+        try
         {
-            try
+            String current = (String) BeanUtils.getProperty(property, target);
+            if(!TextUtils.stringSet(current) && messages.isKeyDefined(key))
             {
                 BeanUtils.setProperty(property, messages.format(key), target);
             }
-            catch (BeanException e)
-            {
-                LOG.warning(e);
-            }
+        }
+        catch (BeanException e)
+        {
+            LOG.warning(e);
         }
     }
 }
