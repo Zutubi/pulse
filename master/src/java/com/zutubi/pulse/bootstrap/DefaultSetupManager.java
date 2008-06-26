@@ -339,7 +339,7 @@ public class DefaultSetupManager implements SetupManager
             }
 
             // ensure backward compatibility with existing driver directories -
-            String driverClassName = databaseConsole.getConfig().getDriverClassName();
+            String driverClassName = configurationManager.getDatabaseConfig().getDriverClassName();
             if (!driverRegistry.isRegistered(driverClassName))
             {
                 File driverRoot = configurationManager.getData().getDriverRoot();
