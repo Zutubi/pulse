@@ -339,36 +339,42 @@ public class DefaultSetupManager implements SetupManager
             }
 
             // ensure backward compatibility with existing driver directories -
-            String driverClassName = configurationManager.getDatabaseConfig().getDriverClassName();
-            if (!driverRegistry.isRegistered(driverClassName))
+            // awkward startup timing here - if we call the getDatabaseConfig too early, the config object is initialised
+            // badly.  However, we need ot know if we can load that data, so check for the file.
+            //TODO: This needs to be resolved properly.
+            File databaseConfig = new File(configurationManager.getData().getUserConfigRoot(), "database.properties");
+            if (databaseConfig.isFile())
             {
-                File driverRoot = configurationManager.getData().getDriverRoot();
-                File[] driverJars = driverRoot.listFiles(new FilenameFilter()
-                {
-                    public boolean accept(File dir, String name)
-                    {
-                        return !name.equals(".registry");
-                    }
-                });
-
-                for (File driverJar : driverJars)
-                {
-                    try
-                    {
-                        driverRegistry.register(driverClassName, driverJar);
-                        break;
-                    }
-                    catch (IOException e)
-                    {
-                        // noop.
-                    }
-                }
+                String driverClassName = configurationManager.getDatabaseConfig().getDriverClassName();
                 if (!driverRegistry.isRegistered(driverClassName))
                 {
-                    LOG.warning("Failed to locate '" + driverClassName + "' from any of the jars in " + driverRoot.getCanonicalPath() +".");
+                    File driverRoot = configurationManager.getData().getDriverRoot();
+                    File[] driverJars = driverRoot.listFiles(new FilenameFilter()
+                    {
+                        public boolean accept(File dir, String name)
+                        {
+                            return !name.equals(".registry");
+                        }
+                    });
+
+                    for (File driverJar : driverJars)
+                    {
+                        try
+                        {
+                            driverRegistry.register(driverClassName, driverJar);
+                            break;
+                        }
+                        catch (IOException e)
+                        {
+                            // noop.
+                        }
+                    }
+                    if (!driverRegistry.isRegistered(driverClassName))
+                    {
+                        LOG.warning("Failed to locate '" + driverClassName + "' from any of the jars in " + driverRoot.getCanonicalPath() +".");
+                    }
                 }
             }
-
         }
         catch (Exception e)
         {
