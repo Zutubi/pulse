@@ -41,6 +41,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.FilenameFilter;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.util.Date;
@@ -250,7 +251,7 @@ public class DefaultSetupManager implements SetupManager
 
     private void handleDbSetup()
     {
-        ensureEmbeddedDriverLoaded();
+        ensureDriversRegisteredAndLoaded();
         
         File databaseConfig = new File(configurationManager.getData().getUserConfigRoot(), "database.properties");
         if (!databaseConfig.exists())
@@ -325,7 +326,7 @@ public class DefaultSetupManager implements SetupManager
         handleRestorationProcess();
     }
 
-    private void ensureEmbeddedDriverLoaded()
+    private void ensureDriversRegisteredAndLoaded()
     {
         try
         {
@@ -336,6 +337,38 @@ public class DefaultSetupManager implements SetupManager
             {
                 driverRegistry.register("org.hsqldb.jdbcDriver");
             }
+
+            // ensure backward compatibility with existing driver directories -
+            String driverClassName = databaseConsole.getConfig().getDriverClassName();
+            if (!driverRegistry.isRegistered(driverClassName))
+            {
+                File driverRoot = configurationManager.getData().getDriverRoot();
+                File[] driverJars = driverRoot.listFiles(new FilenameFilter()
+                {
+                    public boolean accept(File dir, String name)
+                    {
+                        return !name.equals(".registry");
+                    }
+                });
+
+                for (File driverJar : driverJars)
+                {
+                    try
+                    {
+                        driverRegistry.register(driverClassName, driverJar);
+                        break;
+                    }
+                    catch (IOException e)
+                    {
+                        // noop.
+                    }
+                }
+                if (!driverRegistry.isRegistered(driverClassName))
+                {
+                    LOG.warning("Failed to locate '" + driverClassName + "' from any of the jars in " + driverRoot.getCanonicalPath() +".");
+                }
+            }
+
         }
         catch (Exception e)
         {
