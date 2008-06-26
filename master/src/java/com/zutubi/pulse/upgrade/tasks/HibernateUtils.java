@@ -1,21 +1,19 @@
 package com.zutubi.pulse.upgrade.tasks;
 
 import com.zutubi.pulse.util.JDBCUtils;
+import org.hibernate.cfg.Environment;
+import org.hibernate.dialect.Dialect;
 
 import javax.sql.DataSource;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Properties;
-import java.util.Map;
 import java.util.HashMap;
-import java.io.IOException;
-
-import org.hibernate.dialect.Dialect;
-import org.hibernate.cfg.Environment;
-import org.springframework.core.io.ClassPathResource;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * <class-comment/>
@@ -140,10 +138,7 @@ public class HibernateUtils
     public static MutableConfiguration createHibernateConfiguration(List<String> mappings, Properties jdbcProperties) throws IOException
     {
         MutableConfiguration configuration = new MutableConfiguration();
-        for (String mapping : mappings)
-        {
-            configuration.addInputStream(new ClassPathResource(mapping).getInputStream());
-        }
+        configuration.addClassPathMappings(mappings);
 
         Properties hibernateProperties = new Properties();
         hibernateProperties.put(Environment.DIALECT, inferHibernateDialect(jdbcProperties));

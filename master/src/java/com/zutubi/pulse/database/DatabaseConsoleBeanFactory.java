@@ -3,8 +3,7 @@ package com.zutubi.pulse.database;
 import com.zutubi.pulse.upgrade.tasks.HackyConnectionProvider;
 import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
 import org.springframework.beans.factory.FactoryBean;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
+import org.hibernate.cfg.Environment;
 
 import javax.sql.DataSource;
 import java.util.List;
@@ -30,18 +29,13 @@ public class DatabaseConsoleBeanFactory implements FactoryBean
     {
         if (instance == null)
         {
-            MutableConfiguration config = new MutableConfiguration();
-
             Properties props = new Properties();
             props.putAll(databaseConfig.getProperties());
-            props.put("hibernate.connection.provider_class", "com.zutubi.pulse.upgrade.tasks.HackyConnectionProvider");
+            props.put(Environment.CONNECTION_PROVIDER, "com.zutubi.pulse.upgrade.tasks.HackyConnectionProvider");
 
             // a) retrieve hibernate mappings for schema generation.
-            for (String mapping : mappings)
-            {
-                Resource r = new ClassPathResource(mapping);
-                config.addInputStream(r.getInputStream());
-            }
+            MutableConfiguration config = new MutableConfiguration();
+            config.addClassPathMappings(mappings);
 
             // slight hack to provide hibernate with access to the configured datasource.
             HackyConnectionProvider.dataSource = dataSource;

@@ -1,15 +1,13 @@
 package com.zutubi.pulse.web.admin;
 
 import com.zutubi.pulse.database.DatabaseConfig;
+import com.zutubi.pulse.transfer.TransferAPI;
 import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
 import com.zutubi.pulse.web.ActionSupport;
-import com.zutubi.pulse.transfer.TransferAPI;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 
 import javax.sql.DataSource;
-import java.util.List;
 import java.io.File;
+import java.util.List;
 
 /**
  */
@@ -33,12 +31,7 @@ public class DumpDataAction extends ActionSupport
     public String execute() throws Exception
     {
         MutableConfiguration configuration = new MutableConfiguration();
-
-        for (String mapping : mappings)
-        {
-            Resource resource = new ClassPathResource(mapping);
-            configuration.addInputStream(resource.getInputStream());
-        }
+        configuration.addClassPathMappings(mappings);
 
         configuration.setProperties(databaseConfig.getHibernateProperties());
 

@@ -376,8 +376,6 @@ public class SchemaRefactor
 
     protected Table copyTable(Connection connection, Table fromTable, String toTableName) throws SQLException
     {
-        config.buildMappings();
-
         Table toTable = clone(fromTable);
         toTable.setName(toTableName);
 

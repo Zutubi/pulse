@@ -3,13 +3,14 @@ package com.zutubi.pulse.upgrade.tasks;
 import com.zutubi.pulse.database.DatabaseConfig;
 import com.zutubi.pulse.upgrade.DataSourceAware;
 import com.zutubi.pulse.upgrade.UpgradeException;
-import org.springframework.core.io.ClassPathResource;
 
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+
+import org.hibernate.cfg.Environment;
 
 /**
  * <class-comment/>
@@ -47,17 +48,13 @@ public class MigrateSchemaUpgradeTask extends AbstractUpgradeTask implements Dat
             // load these properties from the context, same place that all the other
             // properties are defined.
             Properties props = databaseConfig.getHibernateProperties();
-            props.put("hibernate.connection.provider_class", "com.zutubi.pulse.upgrade.tasks.HackyConnectionProvider");
+            props.put(Environment.CONNECTION_PROVIDER, "com.zutubi.pulse.upgrade.tasks.HackyConnectionProvider");
 
             // slight hack to provide hibernate with access to the configured datasource.
             HackyConnectionProvider.dataSource = dataSource;
 
             // use spring to help load the classpath resources. Rather useful actually.
-            for (String mapping : mappings)
-            {
-                ClassPathResource resource = new ClassPathResource(mapping);
-                config.addInputStream(resource.getInputStream());
-            }
+            config.addClassPathMappings(mappings);
 
             // run the schema update.
             SchemaRefactor refactor = new SchemaRefactor(config, props);

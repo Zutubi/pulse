@@ -7,15 +7,11 @@ import com.zutubi.pulse.util.JDBCUtils;
 import com.zutubi.util.IOUtils;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.hibernate.dialect.Dialect;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Properties;
 
 /**
@@ -64,18 +60,6 @@ public class DatabaseArchiveTest extends PulseTestCase
 
     private String[] mappings = new String[]{"com/zutubi/pulse/restore/schema/Schema.hbm.xml"};
 
-    private List<Resource> getHibernateMappings()
-    {
-        // hibernate mappings can come from a directory, or from the classpath.
-
-        List<Resource> resources = new LinkedList<Resource>();
-        for (String mapping : mappings)
-        {
-            resources.add(new ClassPathResource(mapping));
-        }
-        return resources;
-    }
-
     private Properties getHibernateProperties()
     {
         Properties properties = new Properties();
@@ -122,11 +106,7 @@ public class DatabaseArchiveTest extends PulseTestCase
         MutableConfiguration configuration = new MutableConfiguration();
 
         // CONFIGURE HIBERNATE.
-        List<Resource> resources = getHibernateMappings();
-        for (Resource resource : resources)
-        {
-            configuration.addInputStream(resource.getInputStream());
-        }
+        configuration.addClassPathMappings(Arrays.asList(mappings));
         configuration.setProperties(getHibernateProperties());
 
         // SETUP THE DATABASE SCHEMA FOR TESTING.

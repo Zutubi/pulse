@@ -1,15 +1,15 @@
 package com.zutubi.pulse.transfer;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
 import com.zutubi.pulse.transfer.jdbc.HibernateTransferSource;
 import com.zutubi.pulse.transfer.jdbc.HibernateTransferTarget;
+import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
 import junit.framework.TestCase;
 import org.apache.commons.dbcp.BasicDataSource;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
@@ -34,11 +34,7 @@ public class ExportImportSanityTest extends TestCase
         MutableConfiguration configuration = new MutableConfiguration();
 
         List<String> mappings = (List<String>) ComponentContext.getBean("hibernateMappings");
-        for (String mapping : mappings)
-        {
-            Resource resource = new ClassPathResource(mapping);
-            configuration.addInputStream(resource.getInputStream());
-        }
+        configuration.addClassPathMappings(mappings);
 
         Properties hibernateProperties = new Properties();
         hibernateProperties.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
@@ -74,11 +70,7 @@ public class ExportImportSanityTest extends TestCase
         MutableConfiguration configuration = new MutableConfiguration();
 
         List<String> mappings = (List<String>) ComponentContext.getBean("hibernateMappings");
-        for (String mapping : mappings)
-        {
-            Resource resource = new ClassPathResource(mapping);
-            configuration.addInputStream(resource.getInputStream());
-        }
+        configuration.addClassPathMappings(mappings);
 
         Properties hibernateProperties = new Properties();
         hibernateProperties.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");

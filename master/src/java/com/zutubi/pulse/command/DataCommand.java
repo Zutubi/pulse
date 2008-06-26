@@ -1,13 +1,20 @@
 package com.zutubi.pulse.command;
 
-import com.zutubi.pulse.bootstrap.*;
+import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.bootstrap.DefaultSetupManager;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.bootstrap.SystemBootstrapManager;
+import com.zutubi.pulse.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.bootstrap.conf.EnvConfig;
 import com.zutubi.pulse.database.DatabaseConfig;
 import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
 import com.zutubi.util.TextUtils;
-import org.apache.commons.cli.*;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.PosixParser;
 
 import javax.sql.DataSource;
 import java.io.File;
@@ -82,14 +89,10 @@ public abstract class DataCommand implements Command
 
         dataSource = (DataSource) ComponentContext.getBean("dataSource");
 
-        configuration = new MutableConfiguration();
-
         List<String> mappings = (List<String>) ComponentContext.getBean("hibernateMappings");
-        for (String mapping : mappings)
-        {
-            Resource resource = new ClassPathResource(mapping);
-            configuration.addInputStream(resource.getInputStream());
-        }
+
+        configuration = new MutableConfiguration();
+        configuration.addClassPathMappings(mappings);
 
         databaseConfig = configurationManager.getDatabaseConfig();
         configuration.setProperties(databaseConfig.getHibernateProperties());

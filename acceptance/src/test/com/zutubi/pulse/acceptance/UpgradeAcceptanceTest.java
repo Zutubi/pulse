@@ -13,8 +13,6 @@ import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.ZipUtils;
 import com.zutubi.util.IOUtils;
 import org.apache.commons.cli.ParseException;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
@@ -25,6 +23,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Properties;
 
 /**
@@ -127,7 +126,7 @@ public class UpgradeAcceptanceTest extends SeleniumTestBase
     {
         MutableConfiguration configuration = new MutableConfiguration();
         File mappingsDir = new File(buildDir, "mappings");
-        String[] mappings = mappingsDir.list(new FilenameFilter()
+        File[] mappings = mappingsDir.listFiles(new FilenameFilter()
         {
             public boolean accept(File dir, String name)
             {
@@ -135,13 +134,9 @@ public class UpgradeAcceptanceTest extends SeleniumTestBase
             }
         });
 
-        for (String mapping : mappings)
-        {
-            Resource resource = new FileSystemResource(new File(mappingsDir, mapping));
-            configuration.addInputStream(resource.getInputStream());
-        }
-
+        configuration.addFileSystemMappings(Arrays.asList(mappings));
         configuration.setProperty("hibernate.dialect", dialect);
+
         TransferAPI transferAPI = new TransferAPI();
         transferAPI.restore(configuration, new File(buildDir, "dump.xml"), dataSource);
     }
