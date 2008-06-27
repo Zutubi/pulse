@@ -28,7 +28,7 @@ public interface AgentManager
     Agent getAgent(String name);
 
     @SecureParameter(parameterType = AgentConfiguration.class, action = AgentConfigurationActions.ACTION_PING)
-    void pingAgent(AgentConfiguration agentConfig, boolean inline);
+    void pingAgent(AgentConfiguration agentConfig);
     void pingAgents();
 
     int getAgentCount();

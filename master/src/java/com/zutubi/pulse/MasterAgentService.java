@@ -1,18 +1,16 @@
 package com.zutubi.pulse;
 
-import com.zutubi.prototype.config.ConfigurationProvider;
+import com.zutubi.pulse.agent.MasterLocationProvider;
 import com.zutubi.pulse.agent.Status;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.StartupManager;
-import com.zutubi.pulse.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.logging.ServerMessagesHandler;
 import com.zutubi.pulse.model.ResourceManager;
-import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.resources.ResourceDiscoverer;
 import com.zutubi.pulse.services.SlaveStatus;
@@ -32,12 +30,11 @@ public class MasterAgentService implements AgentService
     private AgentConfiguration agentConfig;
 
     private MasterRecipeProcessor masterRecipeProcessor;
-    private ConfigurationProvider configurationProvider;
     private MasterConfigurationManager configurationManager;
     private ResourceManager resourceManager;
     private StartupManager startupManager;
     private ServerMessagesHandler serverMessagesHandler;
-
+    private MasterLocationProvider masterLocationProvider;
 
     public MasterAgentService(AgentConfiguration agentConfig)
     {
@@ -46,9 +43,7 @@ public class MasterAgentService implements AgentService
 
     public String getUrl()
     {
-        GlobalConfiguration globalConfig = configurationProvider.get(GlobalConfiguration.class);
-        SystemConfiguration systemConfig = configurationManager.getSystemConfig();
-        return constructMasterLocation(globalConfig, systemConfig);
+        return masterLocationProvider.getMasterUrl();
     }
 
     public int ping()
@@ -185,22 +180,6 @@ public class MasterAgentService implements AgentService
         return false;
     }
 
-    public static String constructMasterUrl(GlobalConfiguration globalConfig, SystemConfiguration systemConfig)
-    {
-        return "http://" + constructMasterLocation(globalConfig, systemConfig);
-    }
-
-    public static String constructMasterLocation(GlobalConfiguration globalConfig, SystemConfiguration systemConfig)
-    {
-        String url = globalConfig.getMasterHost() + ":" + systemConfig.getServerPort() + systemConfig.getContextPath();
-        if (url.endsWith("/"))
-        {
-            url = url.substring(0, url.length() - 1);
-        }
-
-        return url;
-    }
-
     private MasterRecipeProcessor getMasterRecipeProcessor()
     {
         if (masterRecipeProcessor == null)
@@ -234,11 +213,6 @@ public class MasterAgentService implements AgentService
         this.resourceManager = resourceManager;
     }
 
-    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
-    {
-        this.configurationProvider = configurationProvider;
-    }
-
     public void setStartupManager(StartupManager startupManager)
     {
         this.startupManager = startupManager;
@@ -247,5 +221,10 @@ public class MasterAgentService implements AgentService
     public void setServerMessagesHandler(ServerMessagesHandler serverMessagesHandler)
     {
         this.serverMessagesHandler = serverMessagesHandler;
+    }
+
+    public void setMasterLocationProvider(MasterLocationProvider masterLocationProvider)
+    {
+        this.masterLocationProvider = masterLocationProvider;
     }
 }

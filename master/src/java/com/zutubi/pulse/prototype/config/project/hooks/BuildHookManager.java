@@ -2,6 +2,7 @@ package com.zutubi.pulse.prototype.config.project.hooks;
 
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.MasterBuildProperties;
+import com.zutubi.pulse.agent.MasterLocationProvider;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.model.Feature;
@@ -30,7 +31,7 @@ public class BuildHookManager implements EventListener
     private ExecutorService executor = Executors.newSingleThreadExecutor();
 
     private MasterConfigurationManager configurationManager;
-    private ConfigurationProvider configurationProvider;
+    private MasterLocationProvider masterLocationProvider;
 
     public void handleEvent(Event event)
     {
@@ -62,7 +63,7 @@ public class BuildHookManager implements EventListener
             public void run()
             {
                 final ExecutionContext context = new ExecutionContext();
-                MasterBuildProperties.addAllBuildProperties(context, result, configurationProvider.get(GlobalConfiguration.class), configurationManager);
+                MasterBuildProperties.addAllBuildProperties(context, result, masterLocationProvider, configurationManager);
                 if (hook.appliesTo(result))
                 {
                     executeTask(hook, context, result, null, true);
@@ -127,8 +128,8 @@ public class BuildHookManager implements EventListener
         this.configurationManager = configurationManager;
     }
 
-    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    public void setMasterLocationProvider(MasterLocationProvider masterLocationProvider)
     {
-        this.configurationProvider = configurationProvider;
+        this.masterLocationProvider = masterLocationProvider;
     }
 }

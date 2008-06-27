@@ -1,14 +1,11 @@
 package com.zutubi.pulse;
 
-import com.zutubi.prototype.config.ConfigurationProvider;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.bootstrap.SystemConfiguration;
+import com.zutubi.pulse.agent.MasterLocationProvider;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.model.ResourceManager;
-import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.services.SlaveService;
@@ -34,10 +31,9 @@ public class SlaveAgentService implements AgentService
 
     private SlaveService service;
     private AgentConfiguration agentConfig;
-    private ConfigurationProvider configurationProvider;
-    private MasterConfigurationManager configurationManager;
     private ResourceManager resourceManager;
     private ServiceTokenManager serviceTokenManager;
+    private MasterLocationProvider masterLocationProvider;
 
     public SlaveAgentService(SlaveService service, AgentConfiguration agentConfig)
     {
@@ -87,13 +83,9 @@ public class SlaveAgentService implements AgentService
 
     public boolean build(RecipeRequest request)
     {
-        GlobalConfiguration globalConfiguration = configurationProvider.get(GlobalConfiguration.class);
-        SystemConfiguration systemConfig = configurationManager.getSystemConfig();
-        String masterUrl = "http://" + MasterAgentService.constructMasterLocation(globalConfiguration, systemConfig);
-
         try
         {
-            return service.build(serviceTokenManager.getToken(), masterUrl, agentConfig.getHandle(), request);
+            return service.build(serviceTokenManager.getToken(), masterLocationProvider.getMasterUrl(), agentConfig.getHandle(), request);
         }
         catch (RuntimeException e)
         {
@@ -227,16 +219,6 @@ public class SlaveAgentService implements AgentService
         return false;
     }
 
-    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
-    {
-        this.configurationProvider = configurationProvider;
-    }
-
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
-    {
-        this.configurationManager = configurationManager;
-    }
-
     public void setResourceManager(ResourceManager resourceManager)
     {
         this.resourceManager = resourceManager;
@@ -245,5 +227,10 @@ public class SlaveAgentService implements AgentService
     public void setServiceTokenManager(ServiceTokenManager serviceTokenManager)
     {
         this.serviceTokenManager = serviceTokenManager;
+    }
+
+    public void setMasterLocationProvider(MasterLocationProvider masterLocationProvider)
+    {
+        this.masterLocationProvider = masterLocationProvider;
     }
 }

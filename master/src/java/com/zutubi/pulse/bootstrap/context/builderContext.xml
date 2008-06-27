@@ -93,6 +93,10 @@
         </property>
     </bean>
 
+    <bean id="masterLocationProvider" class="com.zutubi.pulse.agent.DefaultMasterLocationProvider" autowire="byName"/>
+
+    <bean id="agentPingService" class="com.zutubi.pulse.agent.AgentPingService" autowire="byName" init-method="init"/>
+
     <bean id="recipeProcessor" class="com.zutubi.pulse.core.RecipeProcessor" autowire="byName" init-method="init"/>
 
     <bean id="fileLoaderFactory" class="com.zutubi.pulse.core.PulseFileLoaderFactory" autowire="byName"/>
@@ -100,6 +104,24 @@
     <bean id="masterRecipeProcessor" class="com.zutubi.pulse.MasterRecipeProcessor" autowire="byName"/>
 
     <bean id="buildResultRenderer" class="com.zutubi.pulse.renderer.FreemarkerBuildResultRenderer" autowire="byName"/>
+
+    <bean id="masterConfiguration" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+        <property name="targetBeanName">
+            <value>configurationManager</value>
+        </property>
+        <property name="propertyPath">
+            <value>appConfig</value>
+        </property>
+    </bean>
+
+    <bean id="systemConfiguration" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+        <property name="targetBeanName">
+            <value>configurationManager</value>
+        </property>
+        <property name="propertyPath">
+            <value>systemConfig</value>
+        </property>
+    </bean>
 
     <bean id="userConfigRoot" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
         <property name="targetBeanName">
@@ -136,6 +158,7 @@
                 <ref bean="fatController"/>
                 <ref bean="recipeQueue"/>
                 <ref bean="masterRecipeProcessor"/>
+                <ref bean="agentPingService"/>
                 <ref bean="agentManager"/>
                 <ref bean="jabberManager"/>
                 <ref bean="jettyManager"/>

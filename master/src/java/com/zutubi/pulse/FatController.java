@@ -1,8 +1,8 @@
 package com.zutubi.pulse;
 
-import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.pulse.agent.AgentManager;
+import com.zutubi.pulse.agent.MasterLocationProvider;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.model.Entity;
@@ -11,13 +11,13 @@ import com.zutubi.pulse.events.AsynchronousDelegatingListener;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.events.system.SystemStartedEvent;
 import com.zutubi.pulse.events.build.AbstractBuildRequestEvent;
 import com.zutubi.pulse.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.events.build.BuildTerminationRequestEvent;
 import com.zutubi.pulse.events.build.RecipeTimeoutEvent;
-import com.zutubi.pulse.license.LicenseHolder;
+import com.zutubi.pulse.events.system.SystemStartedEvent;
 import com.zutubi.pulse.license.License;
+import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.license.events.LicenseEvent;
 import com.zutubi.pulse.license.events.LicenseExpiredEvent;
 import com.zutubi.pulse.license.events.LicenseUpdateEvent;
@@ -72,7 +72,7 @@ public class FatController implements EventListener, Stoppable
     private ServiceTokenManager serviceTokenManager;
     private ThreadFactory threadFactory;
     private AccessManager accessManager;
-    private ConfigurationProvider configurationProvider;
+    private MasterLocationProvider masterLocationProvider;
     private ResourceManager resourceManager;
 
     /**
@@ -291,7 +291,7 @@ public class FatController implements EventListener, Stoppable
                 controller.setScmClientFactory(scmClientFactory);
                 controller.setUserManager(userManager);
                 controller.setConfigurationManager(configManager);
-                controller.setConfigurationProvider(configurationProvider);
+                controller.setMasterLocationProvider(masterLocationProvider);
                 controller.setThreadFactory(threadFactory);
                 controller.setResourceManager(resourceManager);
                 controller.init();
@@ -465,11 +465,6 @@ public class FatController implements EventListener, Stoppable
         this.accessManager = accessManager;
     }
 
-    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
-    {
-        this.configurationProvider = configurationProvider;
-    }
-
     public void setResourceManager(ResourceManager resourceManager)
     {
         this.resourceManager = resourceManager;
@@ -478,5 +473,10 @@ public class FatController implements EventListener, Stoppable
     public void setAgentManager(AgentManager agentManager)
     {
         this.agentManager = agentManager;
+    }
+
+    public void setMasterLocationProvider(MasterLocationProvider masterLocationProvider)
+    {
+        this.masterLocationProvider = masterLocationProvider;
     }
 }

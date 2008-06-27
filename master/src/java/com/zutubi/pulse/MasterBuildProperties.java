@@ -1,5 +1,6 @@
 package com.zutubi.pulse;
 
+import com.zutubi.pulse.agent.MasterLocationProvider;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.BuildProperties;
 import com.zutubi.pulse.core.BuildRevision;
@@ -10,7 +11,6 @@ import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.TestResultSummary;
 import com.zutubi.pulse.core.scm.CheckoutScheme;
 import com.zutubi.pulse.model.*;
-import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 
 import java.io.File;
@@ -31,10 +31,9 @@ public class MasterBuildProperties extends BuildProperties
         }
     }
 
-    public static void addAllBuildProperties(ExecutionContext context, BuildResult result, GlobalConfiguration globalConfiguration, MasterConfigurationManager configurationManager)
+    public static void addAllBuildProperties(ExecutionContext context, BuildResult result, MasterLocationProvider masterLocationProvider, MasterConfigurationManager configurationManager)
     {
-        String masterUrl = MasterAgentService.constructMasterUrl(globalConfiguration, configurationManager.getSystemConfig());
-        addBuildProperties(context, result, result.getProject(), result.getAbsoluteOutputDir(configurationManager.getDataDirectory()), masterUrl);
+        addBuildProperties(context, result, result.getProject(), result.getAbsoluteOutputDir(configurationManager.getDataDirectory()), masterLocationProvider.getMasterUrl());
         if(result.getRevision() != null)
         {
             context.addString(NAMESPACE_INTERNAL, PROPERTY_BUILD_REVISION, result.getRevision().getRevisionString());

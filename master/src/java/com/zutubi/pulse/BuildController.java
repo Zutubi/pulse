@@ -1,7 +1,7 @@
 package com.zutubi.pulse;
 
-import com.zutubi.prototype.config.ConfigurationProvider;
 import static com.zutubi.pulse.MasterBuildProperties.*;
+import com.zutubi.pulse.agent.MasterLocationProvider;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.model.*;
@@ -13,7 +13,6 @@ import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.model.*;
-import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.project.BuildOptionsConfiguration;
 import com.zutubi.pulse.prototype.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
@@ -55,7 +54,7 @@ public class BuildController implements EventListener
     private UserManager userManager;
     private BuildManager buildManager;
     private TestManager testManager;
-    private ConfigurationProvider configurationProvider;
+    private MasterLocationProvider masterLocationProvider;
     private MasterConfigurationManager configurationManager;
     private RecipeQueue queue;
     private RecipeResultCollector collector;
@@ -125,7 +124,7 @@ public class BuildController implements EventListener
 
         buildContext = new ExecutionContext();
         addProjectProperties(buildContext, projectConfig);
-        addBuildProperties(buildContext, buildResult, project, buildDir, MasterAgentService.constructMasterUrl(configurationProvider.get(GlobalConfiguration.class), configurationManager.getSystemConfig()));
+        addBuildProperties(buildContext, buildResult, project, buildDir, masterLocationProvider.getMasterUrl());
 
         configure(root, buildResult.getRoot());
 
@@ -686,11 +685,6 @@ public class BuildController implements EventListener
         return buildResult.getId();
     }
 
-    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
-    {
-        this.configurationProvider = configurationProvider;
-    }
-
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
         this.configurationManager = configurationManager;
@@ -754,6 +748,11 @@ public class BuildController implements EventListener
     public void setResourceManager(ResourceManager resourceManager)
     {
         this.resourceManager = resourceManager;
+    }
+
+    public void setMasterLocationProvider(MasterLocationProvider masterLocationProvider)
+    {
+        this.masterLocationProvider = masterLocationProvider;
     }
 
     private static interface BootstrapperCreator

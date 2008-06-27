@@ -12,7 +12,7 @@ import java.io.IOException;
 
 /**
  */
-public class ServiceTokenManager
+public class ServiceTokenManager implements TokenManager
 {
     private static final Logger LOG = Logger.getLogger(ServiceTokenManager.class);
 

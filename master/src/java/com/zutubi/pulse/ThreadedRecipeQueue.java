@@ -18,7 +18,6 @@ import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.pulse.events.system.SystemStartedEvent;
-import com.zutubi.pulse.model.ResourceManager;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.project.types.TypeConfiguration;
@@ -90,7 +89,6 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
     private AgentManager agentManager;
     private EventManager eventManager;
-    private ResourceManager resourceManager;
     private GlobalConfiguration globalConfiguration;
     private ScmClientFactory scmClientFactory;
     private ThreadFactory threadFactory;
@@ -790,15 +788,9 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     {
         this.scmClientFactory = scmClientFactory;
     }
-
     public void setThreadFactory(ThreadFactory threadFactory)
     {
         this.threadFactory = threadFactory;
-    }
-
-    public void setResourceManager(ResourceManager resourceManager)
-    {
-        this.resourceManager = resourceManager;
     }
 
     private static class DispatchedRequest

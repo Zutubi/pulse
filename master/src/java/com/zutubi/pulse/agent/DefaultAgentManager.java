@@ -24,7 +24,6 @@ import com.zutubi.pulse.model.AgentState;
 import com.zutubi.pulse.model.AgentStateManager;
 import com.zutubi.pulse.model.ResourceManager;
 import com.zutubi.pulse.model.UserManager;
-import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.agent.AgentAclConfiguration;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.prototype.config.group.AbstractGroupConfiguration;
@@ -34,9 +33,8 @@ import com.zutubi.pulse.services.UpgradeStatus;
 import com.zutubi.util.Sort;
 import com.zutubi.util.logging.Logger;
 
-import java.net.ConnectException;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -45,11 +43,7 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
 {
     private static final Logger LOG = Logger.getLogger(DefaultAgentManager.class);
 
-    // ping timeout in seconds.
-    private static final int PING_TIMEOUT = Integer.getInteger("pulse.agent.ping.timeout", 45);
     private static final int DEFAULT_AGENT_PORT = 8090;
-
-    private final int masterBuildNumber = Version.getVersion().getBuildNumberAsInt();
 
     private ReentrantLock lock = new ReentrantLock();
     private Map<Long, Agent> agents;
@@ -67,21 +61,10 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
     private ServerMessagesHandler serverMessagesHandler;
     private StartupManager startupManager;
     private ThreadFactory threadFactory;
+    private MasterLocationProvider masterLocationProvider;
+    private AgentPingService agentPingService;
 
     private LicenseManager licenseManager;
-    /**
-     * This pool is used to wait for the result of an agent ping, which can
-     * take up to the ping timeout to execute and so should not be done
-     * inline as they can hold up the calling thread.
-     */
-    private ExecutorService pingPool;
-    /**
-     * This pool is used to actually make the network calls to ping an agent.
-     * It is separate from the above pool as the network calls can take even
-     * longer to timeout, so these threads may dangle for a while on the
-     * network calls.
-     */
-    private ExecutorService pingerThreadPool;
 
     private Map<Long, AgentUpdater> updaters = new TreeMap<Long, AgentUpdater>();
     private ReentrantLock updatersLock = new ReentrantLock();
@@ -89,8 +72,6 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
     public void handleConfigurationSystemStarted(ConfigurationSystemStartedEvent event)
     {
         configurationProvider = event.getConfigurationProvider();
-        pingPool = Executors.newCachedThreadPool(threadFactory);
-        pingerThreadPool = Executors.newCachedThreadPool(threadFactory);
 
         TypeListener<AgentConfiguration> listener = new TypeAdapter<AgentConfiguration>(AgentConfiguration.class)
         {
@@ -216,7 +197,7 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
 
                 if (ping)
                 {
-                    pingAgent(agent, false);
+                    pingAgent(agent);
                 }
             }
             catch (Exception e)
@@ -233,8 +214,7 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
             // Object factory fails us here as some of these deps are in the
             // same context.
             SlaveAgentService agentService = new SlaveAgentService(slaveProxyFactory.createProxy(agentConfig), agentConfig);
-            agentService.setConfigurationManager(configurationManager);
-            agentService.setConfigurationProvider(configurationProvider);
+            agentService.setMasterLocationProvider(masterLocationProvider);
             agentService.setResourceManager(resourceManager);
             agentService.setServiceTokenManager(serviceTokenManager);
             return agentService;
@@ -246,7 +226,7 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
             // thus are not in the context atm :|).
             MasterAgentService agentService = new MasterAgentService(agentConfig);
             agentService.setConfigurationManager(configurationManager);
-            agentService.setConfigurationProvider(configurationProvider);
+            agentService.setMasterLocationProvider(masterLocationProvider);
             agentService.setMasterRecipeProcessor(masterRecipeProcessor);
             agentService.setResourceManager(resourceManager);
             agentService.setServerMessagesHandler(serverMessagesHandler);
@@ -272,7 +252,7 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         // pinging the slave agents may take a while, so lets do this outside the lock.
         for (Agent agent : copyOfAgents)
         {
-            pingAgent(agent, true);
+            pingAgent(agent);
         }
     }
 
@@ -293,104 +273,11 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         }
     }
 
-    private void pingAgent(final Agent agent, boolean inline)
+    private void pingAgent(final Agent agent)
     {
         if (agent.isEnabled())
         {
-            Runnable pingRunner = new Runnable()
-            {
-                public void run()
-                {
-                    Status oldStatus = agent.getStatus();
-
-                    FutureTask<SlaveStatus> future = new FutureTask<SlaveStatus>(new Pinger(agent));
-                    pingerThreadPool.execute(future);
-
-                    SlaveStatus status;
-
-                    try
-                    {
-                        status = future.get(PING_TIMEOUT, TimeUnit.SECONDS);
-                    }
-                    catch (TimeoutException e)
-                    {
-                        LOG.warning("Timed out pinging agent '" + agent.getConfig().getName() + "'", e);
-                        status = new SlaveStatus(Status.OFFLINE, "Agent ping timed out");
-                    }
-                    catch (Exception e)
-                    {
-                        String message = "Unexpected error pinging agent '" + agent.getConfig().getName() + "': " + e.getMessage();
-                        LOG.warning(message);
-                        LOG.debug(e);
-                        status = new SlaveStatus(Status.OFFLINE, message);
-                    }
-
-                    agent.updateStatus(status);
-
-                    // If the slave has just come online, run resource
-                    // discovery
-                    if (status.getStatus().isOnline())
-                    {
-                        if (oldStatus.isOnline() && status.isFirst())
-                        {
-                            // The agent bounced between pings.  Act like we saw it by
-                            // sending the offline event and setting old status to
-                            // offline.
-                            agent.setStatus(Status.OFFLINE);
-                            eventManager.publish(new AgentStatusEvent(this, oldStatus, agent));
-                            oldStatus = Status.OFFLINE;
-                            agent.updateStatus(status);
-                        }
-
-                        if (!oldStatus.isOnline())
-                        {
-                            if (status.getRecipeId() != 0)
-                            {
-                                // The agent appears to have just come online but is
-                                // building.  Snap it out of that.
-                                try
-                                {
-                                    agent.getService().terminateRecipe(status.getRecipeId());
-                                }
-                                catch (Exception e)
-                                {
-                                    LOG.severe("Unable to terminate unwanted recipe on agent '" + agent.getConfig().getName() + "': " + e.getMessage(), e);
-                                }
-                            }
-
-                            try
-                            {
-                                List<Resource> resources = agent.getService().discoverResources();
-                                resourceManager.addDiscoveredResources(agent.getConfig().getConfigurationPath(), resources);
-                            }
-                            catch (Exception e)
-                            {
-                                LOG.warning("Unable to discover resource for agent '" + agent.getConfig().getName() + "': " + e.getMessage(), e);
-                            }
-                        }
-                    }
-
-                    if (oldStatus != agent.getStatus())
-                    {
-                        eventManager.publish(new AgentStatusEvent(this, oldStatus, agent));
-
-                        if (status.getStatus() == Status.VERSION_MISMATCH)
-                        {
-                            // Try to update this agent.
-                            updateAgent(agent);
-                        }
-                    }
-                }
-            };
-
-            if(inline)
-            {
-                pingRunner.run();
-            }
-            else
-            {
-                pingPool.execute(pingRunner);
-            }
+            agentPingService.requestPing(agent, agent.getService());
         }
     }
 
@@ -401,8 +288,7 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         agentStateManager.save(agentState);
         agent.setAgentState(agentState);
 
-        String masterUrl = "http://" + MasterAgentService.constructMasterLocation(configurationProvider.get(GlobalConfiguration.class), configurationManager.getSystemConfig());
-        AgentUpdater updater = new AgentUpdater(agent, masterUrl, eventManager, configurationManager.getSystemPaths(), threadFactory);
+        AgentUpdater updater = new AgentUpdater(agent, masterLocationProvider.getMasterUrl(), eventManager, configurationManager.getSystemPaths(), threadFactory);
         updatersLock.lock();
 
         try
@@ -420,7 +306,6 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
     {
         if (force)
         {
-            pingerThreadPool.shutdownNow();
             updatersLock.lock();
             try
             {
@@ -434,13 +319,69 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
                 updatersLock.unlock();
             }
         }
-        else
+    }
+
+    private void handleAgentPing(Agent agent, SlaveStatus status)
+    {
+        Status oldStatus = agent.getStatus();
+        agent.updateStatus(status);
+
+        // If the slave has just come online, run resource
+        // discovery
+        if (status.getStatus().isOnline())
         {
-            pingerThreadPool.shutdown();
+            if (oldStatus.isOnline() && status.isFirst())
+            {
+                // The agent bounced between pings.  Act like we saw it by
+                // sending the offline event and setting old status to
+                // offline.
+                agent.setStatus(Status.OFFLINE);
+                eventManager.publish(new AgentStatusEvent(this, oldStatus, agent));
+                oldStatus = Status.OFFLINE;
+                agent.updateStatus(status);
+            }
+
+            if(!oldStatus.isOnline())
+            {
+                if(status.getRecipeId() != 0)
+                {
+                    // The agent appears to have just come online but is
+                    // building.  Snap it out of that.
+                    try
+                    {
+                        agent.getService().terminateRecipe(status.getRecipeId());
+                    }
+                    catch (Exception e)
+                    {
+                        LOG.severe("Unable to terminate unwanted recipe on agent '" + agent.getConfig().getName() + "': " + e.getMessage(), e);
+                    }
+                }
+
+                try
+                {
+                    List<Resource> resources = agent.getService().discoverResources();
+                    resourceManager.addDiscoveredResources(agent.getConfig().getConfigurationPath(), resources);
+                }
+                catch (Exception e)
+                {
+                    LOG.warning("Unable to discover resource for agent '" + agent.getConfig().getName() + "': " + e.getMessage(), e);
+                }
+            }
+        }
+
+        if (oldStatus != agent.getStatus())
+        {
+            eventManager.publish(new AgentStatusEvent(this, oldStatus, agent));
+
+            if (status.getStatus() == Status.VERSION_MISMATCH)
+            {
+                // Try to update this agent.
+                updateAgent(agent);
+            }
         }
     }
 
-    public void handleEvent(Event evt)
+    private void handleAgentUpgradeComplete(Event evt)
     {
         if (evt instanceof AgentUpgradeCompleteEvent)
         {
@@ -473,7 +414,7 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
             agentState.setEnableState(AgentState.EnableState.ENABLED);
             agentStateManager.save(agentState);
             agent.setAgentState(agentState);
-            pingAgent(suce.getAgent(), false);
+            pingAgent(suce.getAgent());
         }
         else
         {
@@ -483,9 +424,26 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         }
     }
 
+    public void handleEvent(Event evt)
+    {
+        if(evt instanceof AgentPingEvent)
+        {
+            AgentPingEvent ape = (AgentPingEvent) evt;
+            handleAgentPing(ape.getAgent(), ape.getPingStatus());
+        }
+        else if(evt instanceof AgentUpgradeCompleteEvent)
+        {
+            handleAgentUpgradeComplete(evt);
+        }
+        else
+        {
+            handleConfigurationSystemStarted((ConfigurationSystemStartedEvent) evt);
+        }
+    }
+
     public Class[] getHandledEvents()
     {
-        return new Class[]{AgentUpgradeCompleteEvent.class, ConfigurationSystemStartedEvent.class};
+        return new Class[] { AgentPingEvent.class, AgentUpgradeCompleteEvent.class, ConfigurationSystemStartedEvent.class };
     }
 
     public List<Agent> getAllAgents()
@@ -508,6 +466,11 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         {
             lock.unlock();
         }
+    }
+
+    public void setMasterLocationProvider(MasterLocationProvider masterLocationProvider)
+    {
+        this.masterLocationProvider = masterLocationProvider;
     }
 
     public List<Agent> getOnlineAgents()
@@ -550,9 +513,9 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         return getAgent(agent.getHandle());
     }
 
-    public void pingAgent(AgentConfiguration agent, boolean inline)
+    public void pingAgent(AgentConfiguration agent)
     {
-        pingAgent(getAgent(agent), inline);
+        pingAgent(getAgent(agent));
     }
 
     public void agentAdded(AgentConfiguration agentConfig)
@@ -728,49 +691,8 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         this.threadFactory = threadFactory;
     }
 
-    private class Pinger implements Callable<SlaveStatus>
+    public void setAgentPingService(AgentPingService agentPingService)
     {
-        private Agent agent;
-
-        public Pinger(Agent agent)
-        {
-            this.agent = agent;
-        }
-
-        public SlaveStatus call() throws Exception
-        {
-            SlaveStatus status;
-
-            try
-            {
-                int build = agent.getService().ping();
-                if (build == masterBuildNumber)
-                {
-                    status = agent.getService().getStatus("http://" + MasterAgentService.constructMasterLocation(configurationProvider.get(GlobalConfiguration.class), configurationManager.getSystemConfig()));
-                }
-                else
-                {
-                    status = new SlaveStatus(Status.VERSION_MISMATCH);
-                }
-            }
-            catch (Exception e)
-            {
-                Throwable cause = e.getCause();
-                // the most common cause of the exception is the Connect Exception.
-                if (cause instanceof ConnectException)
-                {
-                    status = new SlaveStatus(Status.OFFLINE, cause.getMessage());
-                }
-                else
-                {
-                    LOG.warning("Exception pinging agent '" + agent.getConfig().getName() + "': " + e.getMessage());
-                    LOG.debug(e);
-                    status = new SlaveStatus(Status.OFFLINE, "Exception: '" + e.getClass().getName() + "'. Reason: " + e.getMessage());
-                }
-            }
-
-            status.setPingTime(System.currentTimeMillis());
-            return status;
-        }
+        this.agentPingService = agentPingService;
     }
 }

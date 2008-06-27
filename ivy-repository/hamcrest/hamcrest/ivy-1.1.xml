@@ -1,0 +1,16 @@
+<ivy-module version="1.0">
+    <info organisation="hamcrest" module="hamcrest" revision="1.1" status="release">
+        <description homepage="http://code.google.com/p/hamcrest/">
+            library of matchers for building test expressions
+        </description>
+    </info>
+
+    <configurations>
+        <conf name="default"/>
+    </configurations>
+
+    <publications>
+        <artifact name="hamcrest-core" type="jar" conf="default"/>
+        <artifact name="hamcrest-core-license" type="txt" conf="default"/>
+    </publications>
+</ivy-module>

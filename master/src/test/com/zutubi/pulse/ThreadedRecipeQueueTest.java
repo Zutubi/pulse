@@ -9,9 +9,7 @@ import com.zutubi.pulse.core.BuildException;
 import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.ExecutionContext;
-import com.zutubi.pulse.core.FileResourceRepository;
 import com.zutubi.pulse.core.RecipeRequest;
-import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.Revision;
@@ -32,7 +30,6 @@ import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.model.AgentState;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.ResourceManager;
 import com.zutubi.pulse.model.UnknownBuildReason;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
@@ -46,7 +43,6 @@ import com.zutubi.pulse.services.UpgradeStatus;
 import junit.framework.TestCase;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -114,32 +110,6 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             }
         });
         queue.setThreadFactory(Executors.defaultThreadFactory());
-        queue.setResourceManager(new ResourceManager()
-        {
-            public ResourceRepository getAgentRepository(long handle)
-            {
-                return new FileResourceRepository();
-            }
-
-            public ResourceRepository getAgentRepository(AgentConfiguration agent)
-            {
-                return getAgentRepository(agent.getHandle());
-            }
-
-            public ResourceRepository getAgentRepository(Agent agent)
-            {
-                return getAgentRepository(agent.getConfig());
-            }
-
-            public void addDiscoveredResources(String agentPath, List<Resource> resources)
-            {
-            }
-
-            public Map<String, List<Resource>> findAll()
-            {
-                return Collections.EMPTY_MAP;
-            }
-        });
         queue.init();
 
         recipeErrors = new LinkedList<RecipeErrorEvent>();
@@ -862,7 +832,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             return onlineAgents.get(agent.getHandle());
         }
 
-        public void pingAgent(AgentConfiguration agentConfig, boolean inline)
+        public void pingAgent(AgentConfiguration agentConfig)
         {
             throw new RuntimeException("Method not yet implemented.");
         }
