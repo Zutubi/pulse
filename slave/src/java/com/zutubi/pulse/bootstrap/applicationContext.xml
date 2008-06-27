@@ -94,8 +94,6 @@
 
     <bean id="customSerialiserFactory" class="com.zutubi.pulse.hessian.CustomSerialiserFactory"/>
 
-    <bean id="hessianExtensionManager" class="com.zutubi.pulse.hessian.HessianConfigurationExtensionManager" init-method="init"/>
-
     <bean id="hessianProxyFactory" class="com.zutubi.pulse.hessian.CustomHessianProxyFactory" autowire="byName"/>
 
     <bean id="masterProxyFactory" class="com.zutubi.pulse.slave.MasterProxyFactory" autowire="byName"/>
