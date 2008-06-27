@@ -5,6 +5,8 @@ import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.dev.bootstrap.DevBootstrapManager;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.plugins.PluginManager;
+import com.zutubi.pulse.plugins.BasePluginSystemTestCase;
 import com.zutubi.util.IOUtils;
 
 import java.io.*;
@@ -17,7 +19,7 @@ public class LocalBuildTest extends PulseTestCase
 {
     File tmpDir;
     boolean generateMode = false;
-    LocalBuild builder;
+    static LocalBuild builder;
 
     @Override
     protected void setUp() throws Exception
@@ -25,9 +27,10 @@ public class LocalBuildTest extends PulseTestCase
         super.setUp();
         // Create a temporary base directory
         tmpDir = FileSystemUtils.createTempDir(LocalBuildTest.class.getName(), "");
-        System.setProperty("bootstrap", "com/zutubi/pulse/dev/bootstrap/context/ideaBootstrapContext.xml");
-        DevBootstrapManager.bootstrapAndLoadContexts("com/zutubi/pulse/local/bootstrap/context/applicationContext.xml");
-        builder = ComponentContext.getBean("localBuild");
+        if (builder == null)
+        {
+            builder = LocalBuild.bootstrap();
+        }
     }
 
     @Override
@@ -35,7 +38,6 @@ public class LocalBuildTest extends PulseTestCase
     {
         ComponentContext.closeAll();
         removeDirectory(tmpDir);
-
         super.tearDown();
     }
 
@@ -112,6 +114,27 @@ public class LocalBuildTest extends PulseTestCase
         simpleCase("commandFailure");
     }
 
+    public void testTests() throws IOException, PulseException, URISyntaxException
+    {
+        processTestsHelper("tests");
+    }
+
+    public void testTestFailures() throws IOException, PulseException, URISyntaxException
+    {
+        processTestsHelper("testfailures");
+    }
+
+    private void processTestsHelper(String name) throws IOException, URISyntaxException, PulseException
+    {
+        String pulseFile = copyFile("tests");
+        File testFile = new File(getInputURL(name, "txt").toURI());
+        File toFile = new File(tmpDir, "test-report.txt");
+        IOUtils.copyFile(testFile, toFile);
+
+        builder.runBuild(tmpDir, pulseFile, null, null, "out");
+        compareOutput(name);
+    }
+
     private void simpleCase(String name) throws IOException, PulseException, URISyntaxException
     {
         String pulseFile = copyFile(name);
@@ -183,7 +206,8 @@ public class LocalBuildTest extends PulseTestCase
             BufferedReader reader = new BufferedReader(new StringReader(IOUtils.fileToString(env)));
             for (int i = 0; i < 6; i++)
             {
-                cleanedContent.append(reader.readLine() + "\n");
+                cleanedContent.append(reader.readLine());
+                cleanedContent.append('\n');
             }
 
             FileOutputStream output = null;

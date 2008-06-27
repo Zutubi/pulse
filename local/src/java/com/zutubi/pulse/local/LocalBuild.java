@@ -19,6 +19,9 @@ import java.util.List;
  */
 public class LocalBuild
 {
+    private static final int DEFAULT_FAILURE_LIMIT = 50;
+
+    private int failureLimit = DEFAULT_FAILURE_LIMIT;
     private EventManager eventManager;
     private RecipeProcessor recipeProcessor;
 
@@ -48,11 +51,16 @@ public class LocalBuild
                 .hasArg()
                 .create('e'));
 
+        options.addOption(OptionBuilder.withLongOpt("failure-limit")
+                .hasArg()
+                .withType(Number.class)
+                .create('l'));
 
-        CommandLineParser parser = new PosixParser();
+        LocalBuild b = bootstrap();
 
         try
         {
+            CommandLineParser parser = new PosixParser();
             CommandLine commandLine = parser.parse(options, argv, true);
 
             if (commandLine.hasOption('p'))
@@ -75,12 +83,11 @@ public class LocalBuild
                 outputDir = commandLine.getOptionValue('o');
             }
 
-            DevBootstrapManager.bootstrapAndLoadContexts("com/zutubi/pulse/local/bootstrap/context/applicationContext.xml");
+            if (commandLine.hasOption('l'))
+            {
+                b.setFailureLimit(((Number) commandLine.getOptionObject('l')).intValue());
+            }
 
-            PluginManager pluginManager = ComponentContext.getBean("pluginManager");
-            pluginManager.initialiseExtensions();
-            
-            LocalBuild b = ComponentContext.getBean("localBuild");
             File baseDir = new File(System.getProperty("user.dir"));
             b.runBuild(baseDir, pulseFile, recipe, resourcesFile, outputDir);
         }
@@ -88,6 +95,14 @@ public class LocalBuild
         {
             fatal(e);
         }
+    }
+
+    public static LocalBuild bootstrap()
+    {
+        DevBootstrapManager.bootstrapAndLoadContexts("com/zutubi/pulse/local/bootstrap/context/applicationContext.xml");
+        PluginManager pluginManager = ComponentContext.getBean("pluginManager");
+        pluginManager.initialiseExtensions();
+        return ComponentContext.getBean("localBuild");
     }
 
     private FileResourceRepository createRepository(String resourcesFile) throws PulseException
@@ -149,7 +164,7 @@ public class LocalBuild
         {
             logStream = new FileOutputStream(logFile);
 
-            eventManager.register(new BuildStatusPrinter(paths.getBaseDir(), logStream));
+            eventManager.register(new BuildStatusPrinter(paths.getBaseDir(), paths.getOutputDir(), logStream, failureLimit));
 
             ExecutionContext context = new ExecutionContext();
             context.setWorkingDir(baseDir);
@@ -232,6 +247,11 @@ public class LocalBuild
     {
         System.err.println(throwable.getMessage());
         System.exit(1);
+    }
+
+    public void setFailureLimit(int failureLimit)
+    {
+        this.failureLimit = failureLimit;
     }
 
     public void setEventManager(EventManager eventManager)

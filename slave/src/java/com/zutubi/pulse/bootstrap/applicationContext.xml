@@ -80,7 +80,6 @@
     <bean id="consoleHandlerFactory" class="com.zutubi.pulse.logging.ConsoleHandlerFactory"/>
     <bean id="memoryHandlerFactory" class="com.zutubi.pulse.logging.MemoryHandlerFactory"/>
 
-
     <bean id="tokenManager" class="com.zutubi.pulse.api.AdminTokenManager" autowire="byName" init-method="init"/>
 
     <bean id="threadPool" class="com.zutubi.pulse.slave.SlaveThreadPool" autowire="byName"/>
@@ -94,6 +93,8 @@
     <bean id="fileLoaderFactory" class="com.zutubi.pulse.core.PulseFileLoaderFactory" autowire="byName"/>
 
     <bean id="customSerialiserFactory" class="com.zutubi.pulse.hessian.CustomSerialiserFactory"/>
+
+    <bean id="hessianExtensionManager" class="com.zutubi.pulse.hessian.HessianConfigurationExtensionManager" init-method="init"/>
 
     <bean id="hessianProxyFactory" class="com.zutubi.pulse.hessian.CustomHessianProxyFactory" autowire="byName"/>
 

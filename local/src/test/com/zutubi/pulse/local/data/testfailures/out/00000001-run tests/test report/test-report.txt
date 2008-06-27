@@ -1,0 +1,6 @@
+Test foo: passed
+Test bar: failed: detail message
+Test baz: error: this is a repetitive and therefore long detail message this is a repetitive and therefore long detail message this is a repetitive and therefore long detail message
+Test jim: passed
+Test bob: failed: another failure, sheesh!
+Test tom: passed

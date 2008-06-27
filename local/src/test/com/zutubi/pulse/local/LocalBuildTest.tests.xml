@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<project default-recipe="tests">
+    <regex-test.pp name="test.pp"
+                   name-group="1"
+                   status-group="2"
+                   details-group="3"
+                   pass-status="passed"
+                   failure-status="failed"
+                   error-status="error"
+                   regex="(.*?): (.*?)(?:: (.*))?"/>
+
+    <recipe name="tests">
+        <command name="run tests">
+            <print message="Pretending to run tests..."/>
+            <artifact name="test report" file="test-report.txt">
+                <process processor="${test.pp}"/>
+            </artifact>
+        </command>
+    </recipe>
+</project>

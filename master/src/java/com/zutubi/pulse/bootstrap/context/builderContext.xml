@@ -143,6 +143,8 @@
     
     <bean id="slaveProxyFactory" class="com.zutubi.pulse.SlaveProxyFactory" autowire="byName"/>
 
+    <bean id="hessianExtensionManager" class="com.zutubi.pulse.hessian.HessianConfigurationExtensionManager" init-method="init"/>
+    
     <bean id="hessianProxyFactory" class="com.zutubi.pulse.hessian.CustomHessianProxyFactory" autowire="byName"/>
 
     <bean id="fatController" class="com.zutubi.pulse.FatController" autowire="byName" init-method="init"/>
