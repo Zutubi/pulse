@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.PostProcessor;
 import com.zutubi.pulse.core.PulseFileLoaderFactory;
 import com.zutubi.pulse.plugins.AbstractExtensionManager;
 import com.zutubi.pulse.plugins.ConfigUtils;
+import com.zutubi.pulse.plugins.PluginManager;
 import com.zutubi.util.logging.Logger;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -52,7 +53,10 @@ public class PostProcessorExtensionManager extends AbstractExtensionManager
         boolean defaultTemplate = ConfigUtils.getBoolean(config, "default-fragment", false);
         PostProcessorDescriptor descriptor = new PostProcessorDescriptor(name, displayName, defaultTemplate);
 
-        System.out.printf("Adding Post-Processor: %s -> %s\n", name, cls);
+        if (PluginManager.VERBOSE_EXTENSIONS)
+        {
+            System.out.printf("Adding Post-Processor: %s -> %s\n", name, cls);
+        }
         info.put(name, descriptor);
         fileLoaderFactory.register(name, clazz);
         tracker.registerObject(extension, name, IExtensionTracker.REF_WEAK);

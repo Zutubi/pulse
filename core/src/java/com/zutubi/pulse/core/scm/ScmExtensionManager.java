@@ -2,6 +2,7 @@ package com.zutubi.pulse.core.scm;
 
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.plugins.AbstractExtensionManager;
+import com.zutubi.pulse.plugins.PluginManager;
 import com.zutubi.util.logging.Logger;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -56,8 +57,11 @@ public class ScmExtensionManager extends AbstractExtensionManager
         {
             String factoryClassName = config.getAttribute("factory-class");
             String wcClassName = config.getAttribute("working-copy-class");
-            System.out.println(String.format("Adding SCM: %s -> (%s, %s, %s)", name, configClassName, factoryClassName, wcClassName == null ? "<none>" : wcClassName));
-
+            if (PluginManager.VERBOSE_EXTENSIONS)
+            {
+                System.out.println(String.format("Adding SCM: %s -> (%s, %s, %s)", name, configClassName, factoryClassName, wcClassName == null ? "<none>" : wcClassName));
+            }
+            
             Class factoryClazz = loadClass(extension, factoryClassName);
             try
             {

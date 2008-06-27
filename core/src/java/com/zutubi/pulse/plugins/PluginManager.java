@@ -4,11 +4,7 @@ import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.plugins.osgi.Equinox;
 import com.zutubi.pulse.plugins.osgi.OSGiFramework;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.IOUtils;
-import com.zutubi.util.Mapping;
-import com.zutubi.util.Predicate;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.*;
 import com.zutubi.util.logging.Logger;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.RegistryFactory;
@@ -32,6 +28,8 @@ import java.util.Map;
  */
 public class PluginManager
 {
+    public static final boolean VERBOSE_EXTENSIONS = Boolean.getBoolean("pulse.verbose.extensions");
+
     public static final String CONFIG_EXTENSION_POINT = "com.zutubi.pulse.core.config";
 
     private static final Logger LOG = Logger.getLogger(PluginManager.class);

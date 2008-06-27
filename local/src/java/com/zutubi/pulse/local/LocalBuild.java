@@ -6,7 +6,6 @@ import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.dev.bootstrap.DevBootstrapManager;
 import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.plugins.PluginManager;
 import com.zutubi.pulse.resources.ResourceDiscoverer;
 import com.zutubi.util.IOUtils;
 import org.apache.commons.cli.*;
@@ -95,13 +94,15 @@ public class LocalBuild
         {
             fatal(e);
         }
+        finally
+        {
+            DevBootstrapManager.shutdown();
+        }
     }
 
     public static LocalBuild bootstrap()
     {
-        DevBootstrapManager.bootstrapAndLoadContexts("com/zutubi/pulse/local/bootstrap/context/applicationContext.xml");
-        PluginManager pluginManager = ComponentContext.getBean("pluginManager");
-        pluginManager.initialiseExtensions();
+        DevBootstrapManager.startup("com/zutubi/pulse/local/bootstrap/context/applicationContext.xml");
         return ComponentContext.getBean("localBuild");
     }
 

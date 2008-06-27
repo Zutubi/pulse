@@ -1,6 +1,7 @@
 package com.zutubi.pulse.dev.bootstrap;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.plugins.PluginManager;
 
 import java.io.File;
 
@@ -15,7 +16,7 @@ public class DevBootstrapManager
     /**
      * The default bootstrapContext file.
      */
-    public static final String DEFAULT_BOOTSTRAP_CONTEXT = "com/zutubi/pulse/dev/bootstrap/bootstrapContext.xml";
+    public static final String DEFAULT_BOOTSTRAP_CONTEXT = "com/zutubi/pulse/dev/bootstrap/context/bootstrapContext.xml";
 
     /**
      * The bootstrap context property.
@@ -27,7 +28,7 @@ public class DevBootstrapManager
      *
      * @param contexts additional contexts to load
      */
-    public static void bootstrapAndLoadContexts(String ...contexts)
+    public static void startup(String ...contexts)
     {
         // lookup bootstrap context via the system properties.
         loadContext(System.getProperty(BOOTSTRAP_CONTEXT_PROPERTY, DEFAULT_BOOTSTRAP_CONTEXT));
@@ -36,6 +37,9 @@ public class DevBootstrapManager
         {
             loadContext(context);
         }
+
+        PluginManager pluginManager = ComponentContext.getBean("pluginManager");
+        pluginManager.initialiseExtensions();
     }
 
     private static void loadContext(String contextName)
@@ -52,5 +56,10 @@ public class DevBootstrapManager
         {
             ComponentContext.addClassPathContextDefinitions(contextName);
         }
+    }
+
+    public static void shutdown()
+    {
+        ComponentContext.closeAll();
     }
 }

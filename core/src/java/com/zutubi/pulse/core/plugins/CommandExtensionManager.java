@@ -2,6 +2,7 @@ package com.zutubi.pulse.core.plugins;
 
 import com.zutubi.pulse.core.PulseFileLoaderFactory;
 import com.zutubi.pulse.plugins.AbstractExtensionManager;
+import com.zutubi.pulse.plugins.PluginManager;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
@@ -22,7 +23,10 @@ public class CommandExtensionManager extends AbstractExtensionManager
     {
         String name = config.getAttribute("name");
         String cls = config.getAttribute("class");
-        System.out.println(String.format("Adding Command: %s -> %s", name, cls));
+        if (PluginManager.VERBOSE_EXTENSIONS)
+        {
+            System.out.println(String.format("Adding Command: %s -> %s", name, cls));
+        }
 
         Class clazz = loadClass(extension, cls);
         if(clazz != null)

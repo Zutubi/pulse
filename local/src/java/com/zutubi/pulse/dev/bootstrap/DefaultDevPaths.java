@@ -1,6 +1,5 @@
 package com.zutubi.pulse.dev.bootstrap;
 
-import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.command.PulseCtl;
 
 import java.io.File;
@@ -12,11 +11,13 @@ public class DefaultDevPaths implements DevPaths
 {
     private File versionHome;
     private File userRoot;
+    private File systemRoot;
     private File systemPluginRoot;
     private File pluginConfigurationRoot;
     private File internalPluginRoot;
     private File prepackagedPluginRoot;
     private File userPluginRoot;
+    private File pluginWorkRoot;
 
     public DefaultDevPaths()
     {
@@ -39,17 +40,26 @@ public class DefaultDevPaths implements DevPaths
                 homeDir = new File(userHome);
             }
 
-            userRoot = new File(homeDir, ".pulse-dev");
+            userRoot = new File(homeDir, ".pulse2-dev");
         }
 
         return userRoot;
+    }
+
+    private File getSystemRoot()
+    {
+        if(systemRoot == null)
+        {
+            systemRoot = new File(versionHome, "system");
+        }
+        return systemRoot;
     }
 
     private File getSystemPluginRoot()
     {
         if(systemPluginRoot == null)
         {
-            systemPluginRoot = new File(versionHome, FileSystemUtils.composeFilename("system", "plugins"));
+            systemPluginRoot = new File(getSystemRoot(), "plugins");
         }
         return systemPluginRoot;
     }
@@ -97,7 +107,15 @@ public class DefaultDevPaths implements DevPaths
 
     public File getPluginWorkDir()
     {
-        // not sure where this should point? just need some scratch space. Any temp directory would suit.
-        return null;
+        if(pluginWorkRoot == null)
+        {
+            pluginWorkRoot = new File(getSystemRoot(), "tmp");
+            if(!pluginWorkRoot.isDirectory())
+            {
+                pluginWorkRoot.mkdirs();
+            }
+        }
+
+        return pluginWorkRoot;
     }
 }

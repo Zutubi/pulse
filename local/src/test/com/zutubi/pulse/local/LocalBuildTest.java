@@ -2,11 +2,8 @@ package com.zutubi.pulse.local;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.PulseException;
-import com.zutubi.pulse.dev.bootstrap.DevBootstrapManager;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.plugins.PluginManager;
-import com.zutubi.pulse.plugins.BasePluginSystemTestCase;
 import com.zutubi.util.IOUtils;
 
 import java.io.*;
