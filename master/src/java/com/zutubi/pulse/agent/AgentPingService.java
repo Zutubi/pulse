@@ -32,18 +32,11 @@ public class AgentPingService implements Stoppable
     private Set<Long> inProgress = new HashSet<Long>();
     private EventManager eventManager;
     private MasterLocationProvider masterLocationProvider;
+    private ThreadFactory threadFactory;
 
     public void init()
     {
-        threadPool = new ThreadPoolExecutor(4, 30, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new ThreadFactory()
-        {
-            public Thread newThread(Runnable r)
-            {
-                Thread t = new Thread(r);
-                t.setDaemon(true);
-                return t;
-            }
-        });
+        threadPool = new ThreadPoolExecutor(4, 30, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), threadFactory);
     }
 
     public void stop(boolean force)
@@ -159,5 +152,10 @@ public class AgentPingService implements Stoppable
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
+    }
+
+    public void setThreadFactory(ThreadFactory threadFactory)
+    {
+        this.threadFactory = threadFactory;
     }
 }
