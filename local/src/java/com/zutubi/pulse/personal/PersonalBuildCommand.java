@@ -7,6 +7,7 @@ import com.zutubi.pulse.config.CompositeConfig;
 import com.zutubi.pulse.config.PropertiesConfig;
 import com.zutubi.pulse.core.scm.WorkingCopy;
 import com.zutubi.pulse.core.scm.WorkingCopyStatus;
+import com.zutubi.pulse.dev.bootstrap.DevBootstrapManager;
 import org.apache.commons.cli.*;
 
 import java.io.File;
@@ -174,12 +175,20 @@ public class PersonalBuildCommand implements Command
     {
         processArguments(argv);
 
-        CompositeConfig uiConfig = new CompositeConfig(switchConfig, defineConfig);
-        PersonalBuildConfig config = new PersonalBuildConfig(base, uiConfig);
-        PersonalBuildClient client = new PersonalBuildClient(config);
-        client.setUI(console);
+        DevBootstrapManager.startup("com/zutubi/pulse/personal/bootstrap/context/applicationContext.xml");
+        try
+        {
+            CompositeConfig uiConfig = new CompositeConfig(switchConfig, defineConfig);
+            PersonalBuildConfig config = new PersonalBuildConfig(base, uiConfig);
+            PersonalBuildClient client = new PersonalBuildClient(config);
+            client.setUI(console);
 
-        return execute(client);
+            return execute(client);
+        }
+        finally
+        {
+            DevBootstrapManager.shutdown();
+        }
     }
 
     public int execute(BootContext context) throws ParseException

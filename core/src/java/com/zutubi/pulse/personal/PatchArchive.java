@@ -119,7 +119,6 @@ public class PatchArchive
         os.putNextEntry(entry);
         XStream xstream = createXStream();
         xstream.toXML(status, os);
-        xstream.toXML(status, System.out);
     }
 
     private XStream createXStream()
