@@ -10,7 +10,6 @@ import freemarker.cache.MultiTemplateLoader;
 import freemarker.cache.TemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
-import freemarker.template.TemplateModelException;
 import org.springframework.beans.factory.FactoryBean;
 
 import java.io.File;
@@ -33,52 +32,48 @@ public class FreemarkerConfigurationFactoryBean implements FactoryBean
             {
                 if (FREEMARKER_CONFIGURATION == null)
                 {
-                    FREEMARKER_CONFIGURATION = createConfiguration(getConfigurationManager());
+                    MasterConfigurationManager configurationManager = getConfigurationManager();
+
+                    Configuration configuration = new Configuration();
+                    configuration.setTemplateLoader(getMultiLoader(configurationManager.getSystemPaths().getTemplateRoots()));
+                    configuration.setObjectWrapper(new DefaultObjectWrapper());
+                    configuration.addAutoInclude("macro.ftl");
+                    String base = configurationManager.getSystemConfig().getContextPathNormalised();
+                    configuration.setSharedVariable("base", base);
+                    configuration.setSharedVariable("urls", new Urls(base));
+
+                    FREEMARKER_CONFIGURATION = configuration;
                 }
             }
         }
         return FREEMARKER_CONFIGURATION;
     }
 
-    public static Configuration createConfiguration(MasterConfigurationManager configurationManager) throws TemplateModelException
+    public static Configuration addClassTemplateLoader(Class clazz, Configuration configuration)
     {
-        Configuration configuration = new Configuration();
-        configuration.setTemplateLoader(getMultiLoader(configurationManager));
-        configuration.setObjectWrapper(new DefaultObjectWrapper());
-        configuration.addAutoInclude("macro.ftl");
-        String base = configurationManager.getSystemConfig().getContextPathNormalised();
-        configuration.setSharedVariable("base", base);
-        configuration.setSharedVariable("urls", new Urls(base));
-        return configuration;
-    }
-
-    public static Configuration createConfiguration(Class clazz, MasterConfigurationManager configurationManager) throws TemplateModelException
-    {
-        Configuration configuration = createConfiguration(configurationManager);
+        Configuration newConfig = (Configuration) configuration.clone();
         TemplateLoader currentLoader = configuration.getTemplateLoader();
         TemplateLoader classLoader = new ClassTemplateLoader(clazz, "");
         MultiTemplateLoader loader = new MultiTemplateLoader(new TemplateLoader[]{ classLoader, currentLoader });
-        configuration.setTemplateLoader(loader);
-        return configuration;
+        newConfig.setTemplateLoader(loader);
+        return newConfig;
     }
 
-    private static TemplateLoader getMultiLoader(MasterConfigurationManager configurationManager)
+    private static TemplateLoader getMultiLoader(List<File> paths)
     {
-        List<File> templateRoots = configurationManager.getSystemPaths().getTemplateRoots();
-        FileTemplateLoader loaders[] = new FileTemplateLoader[templateRoots.size()];
+        FileTemplateLoader loaders[] = new FileTemplateLoader[paths.size()];
 
         for (int i = 0; i < loaders.length; i++)
         {
             try
             {
-                loaders[i] = new FileTemplateLoader(templateRoots.get(i));
+                loaders[i] = new FileTemplateLoader(paths.get(i));
             }
             catch (IOException e)
             {
                 LOG.severe("Unable to add template root to freemarker configuration: " + e.getMessage(), e);
             }
         }
-
         return new MultiTemplateLoader(loaders);
     }
 

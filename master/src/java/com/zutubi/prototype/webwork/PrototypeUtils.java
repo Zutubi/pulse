@@ -17,7 +17,6 @@ import com.zutubi.prototype.model.Form;
 import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.prototype.type.*;
 import com.zutubi.prototype.type.record.*;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.SystemPaths;
 import com.zutubi.pulse.bootstrap.freemarker.FreemarkerConfigurationFactoryBean;
 import com.zutubi.pulse.core.config.Configuration;
@@ -568,12 +567,17 @@ public class PrototypeUtils
         return context;
     }
 
-    public static void renderForm(Map<String, Object> context, Form form, Class i18nClazz, Writer writer, MasterConfigurationManager configurationManager) throws TemplateException, IOException
+    public static void renderForm(Form form, Class i18nClazz, Writer writer, freemarker.template.Configuration configuration) throws IOException, TemplateException
+    {
+        renderForm(new HashMap<String, Object>(), form, i18nClazz, writer, configuration);    
+    }
+
+    public static void renderForm(Map<String, Object> context, Form form, Class i18nClazz, Writer writer, freemarker.template.Configuration configuration) throws TemplateException, IOException
     {
         populateContext(i18nClazz, context);
         context.put("form", form);
-        freemarker.template.Configuration configuration = FreemarkerConfigurationFactoryBean.createConfiguration(i18nClazz, configurationManager);
-        Template template = configuration.getTemplate("prototype/xhtml/form.ftl");
+        freemarker.template.Configuration config = FreemarkerConfigurationFactoryBean.addClassTemplateLoader(i18nClazz, configuration);
+        Template template = config.getTemplate("prototype/xhtml/form.ftl");
         template.process(context, writer);
     }
 }

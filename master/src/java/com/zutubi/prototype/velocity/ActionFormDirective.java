@@ -7,12 +7,8 @@ import com.zutubi.prototype.model.HiddenFieldDescriptor;
 import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.webwork.PrototypeUtils;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.freemarker.FreemarkerConfigurationFactoryBean;
 import com.zutubi.util.logging.Logger;
-import freemarker.cache.ClassTemplateLoader;
-import freemarker.cache.MultiTemplateLoader;
-import freemarker.cache.TemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -38,7 +34,7 @@ public class ActionFormDirective extends PrototypeDirective
     private String formName = "actionForm";
     private String namespace;
 
-    private MasterConfigurationManager configurationManager;
+    private Configuration configuration = null;
 
     /**
      * @return the name of this velocity directive.
@@ -98,12 +94,8 @@ public class ActionFormDirective extends PrototypeDirective
 
             // Get our own configuration so that we can mess with the
             // template loader
-            Configuration configuration = FreemarkerConfigurationFactoryBean.createConfiguration(configurationManager);
-            TemplateLoader currentLoader = configuration.getTemplateLoader();
-            TemplateLoader classLoader = new ClassTemplateLoader(argumentType.getClazz(), "");
-            MultiTemplateLoader loader = new MultiTemplateLoader(new TemplateLoader[]{ classLoader, currentLoader });
-            configuration.setTemplateLoader(loader);
 
+            Configuration configuration = FreemarkerConfigurationFactoryBean.addClassTemplateLoader(argumentType.getClazz(), this.configuration);
             try
             {
                 Template template = configuration.getTemplate("prototype/xhtml/form.ftl");
@@ -130,8 +122,8 @@ public class ActionFormDirective extends PrototypeDirective
         this.formDescriptorFactory = formDescriptorFactory;
     }
 
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    public void setFreemarkerConfiguration(Configuration configuration)
     {
-        this.configurationManager = configurationManager;
+        this.configuration = configuration;
     }
 }

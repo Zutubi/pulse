@@ -2,16 +2,15 @@ package com.zutubi.prototype.handler;
 
 import com.zutubi.prototype.Descriptor;
 import com.zutubi.prototype.OptionProvider;
-import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.model.OptionFieldDescriptor;
 import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.prototype.type.EnumType;
+import com.zutubi.prototype.type.TypeProperty;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.core.config.Configuration;
-import com.zutubi.pulse.prototype.config.EnumOptionProvider;
 import com.zutubi.pulse.prototype.config.EmptyOptionProvider;
+import com.zutubi.pulse.prototype.config.EnumOptionProvider;
 import com.zutubi.util.ClassLoaderUtils;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.bean.ObjectFactory;

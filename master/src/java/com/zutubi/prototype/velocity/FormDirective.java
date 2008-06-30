@@ -13,9 +13,9 @@ import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
 import com.zutubi.prototype.type.record.TemplateRecord;
 import com.zutubi.prototype.webwork.PrototypeUtils;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
+import freemarker.template.Configuration;
 import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
@@ -23,7 +23,6 @@ import org.apache.velocity.runtime.parser.node.Node;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -41,9 +40,9 @@ public class FormDirective extends PrototypeDirective
     private boolean ajax = false;
     private String namespace;
 
-    private MasterConfigurationManager configurationManager;
     private ConfigurationSecurityManager configurationSecurityManager;
     private ConfigurationTemplateManager configurationTemplateManager;
+    private Configuration configuration;
 
     /**
      * The name of this velocity directive.
@@ -136,7 +135,7 @@ public class FormDirective extends PrototypeDirective
                 form.setAction(action);
             }
 
-            PrototypeUtils.renderForm(new HashMap<String, Object>(), form, clazz, writer, configurationManager);
+            PrototypeUtils.renderForm(form, clazz, writer, configuration);
 
             return true;
         }
@@ -153,11 +152,6 @@ public class FormDirective extends PrototypeDirective
         this.formDescriptorFactory = formDescriptorFactory;
     }
 
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
-    {
-        this.configurationManager = configurationManager;
-    }
-
     public void setConfigurationSecurityManager(ConfigurationSecurityManager configurationSecurityManager)
     {
         this.configurationSecurityManager = configurationSecurityManager;
@@ -166,6 +160,11 @@ public class FormDirective extends PrototypeDirective
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
         this.configurationTemplateManager = configurationTemplateManager;
+    }
+
+    public void setFreemarkerConfiguration(Configuration configuration)
+    {
+        this.configuration = configuration;
     }
 }
 

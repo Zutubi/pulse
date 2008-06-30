@@ -13,7 +13,6 @@ import com.zutubi.prototype.webwork.ConfigurationPanel;
 import com.zutubi.prototype.webwork.ConfigurationResponse;
 import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.config.NamedConfigurationComparator;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Revision;
@@ -25,6 +24,7 @@ import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.prototype.config.project.types.TypeConfiguration;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
+import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
 
 import java.io.IOException;
@@ -46,8 +46,8 @@ public class EditBuildPropertiesAction extends ProjectActionBase
     private String submitField;
 
     private ScmClientFactory<ScmConfiguration> scmClientFactory;
-    private MasterConfigurationManager configurationManager;
     private ConfigurationProvider configurationProvider;
+    private Configuration configuration;
 
     public boolean isCancelled()
     {
@@ -138,7 +138,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         context.put("projectId", project.getId());
 
         StringWriter writer = new StringWriter();
-        PrototypeUtils.renderForm(context, form, getClass(), writer, configurationManager);
+        PrototypeUtils.renderForm(context, form, getClass(), writer, configuration);
         formSource = writer.toString();
         newPanel = new ConfigurationPanel("aaction/edit-build-properties.vm");
     }
@@ -291,13 +291,13 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         this.scmClientFactory = scmClientFactory;
     }
 
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
-    {
-        this.configurationManager = configurationManager;
-    }
-
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)
     {
         this.configurationProvider = configurationProvider;
+    }
+
+    public void setFreemarkerConfiguration(Configuration configuration)
+    {
+        this.configuration = configuration;
     }
 }

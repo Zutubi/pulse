@@ -12,7 +12,6 @@ import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.wizard.TypeWizardState;
 import com.zutubi.prototype.wizard.webwork.AbstractTypeWizard;
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.freemarker.FreemarkerConfigurationFactoryBean;
 import com.zutubi.pulse.velocity.AbstractDirective;
 import freemarker.core.DelegateBuiltin;
@@ -45,8 +44,8 @@ public class WizardDirective extends AbstractDirective
     private String namespace;
 
     private FormDescriptorFactory formDescriptorFactory;
-    private MasterConfigurationManager configurationManager;
     private AbstractTypeWizard wizardInstance;
+    private Configuration configuration;
 
     public WizardDirective()
     {
@@ -123,7 +122,7 @@ public class WizardDirective extends AbstractDirective
 
             // provide wizard specific rendering, that includes details about all of the steps, the current step
             // index, and much much more.
-            Configuration configuration = FreemarkerConfigurationFactoryBean.createConfiguration(wizardInstance.getCurrentState().getType().getClazz(), configurationManager);
+            Configuration configuration = FreemarkerConfigurationFactoryBean.addClassTemplateLoader(wizardInstance.getCurrentState().getType().getClazz(), this.configuration);
             Template template = configuration.getTemplate("prototype/xhtml/wizard.ftl");
             template.process(context, writer);
 
@@ -175,8 +174,8 @@ public class WizardDirective extends AbstractDirective
         }
     }
 
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    public void setFreemarkerConfiguration(Configuration configuration)
     {
-        this.configurationManager = configurationManager;
+        this.configuration = configuration;
     }
 }

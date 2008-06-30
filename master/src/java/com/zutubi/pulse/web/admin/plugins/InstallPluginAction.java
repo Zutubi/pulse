@@ -8,9 +8,9 @@ import com.zutubi.config.annotations.FieldType;
 import com.zutubi.prototype.model.Field;
 import com.zutubi.prototype.model.Form;
 import com.zutubi.prototype.webwork.PrototypeUtils;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
+import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,8 +19,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * An action to install a plugin from an uploaded file.
@@ -33,7 +31,7 @@ public class InstallPluginAction extends PluginActionSupport
     private String uploadFormSource;
     private String localFormSource;
 
-    private MasterConfigurationManager configurationManager;
+    private Configuration configuration;
 
     public String getPluginPath()
     {
@@ -100,9 +98,8 @@ public class InstallPluginAction extends PluginActionSupport
         cancelButton.setValue("cancel");
         uploadForm.add(cancelButton);
 
-        Map<String, Object> context = new HashMap<String, Object>();
         StringWriter writer = new StringWriter();
-        PrototypeUtils.renderForm(context, uploadForm, getClass(), writer, configurationManager);
+        PrototypeUtils.renderForm(uploadForm, getClass(), writer, configuration);
         uploadFormSource = writer.toString();
 
         Form localForm = new Form("localForm", "localForm", "admin/plugins?install=local");
@@ -123,9 +120,8 @@ public class InstallPluginAction extends PluginActionSupport
         localForm.add(continueButton);
         localForm.add(cancelButton);
 
-        context = new HashMap<String, Object>();
         writer = new StringWriter();
-        PrototypeUtils.renderForm(context, localForm, getClass(), writer, configurationManager);
+        PrototypeUtils.renderForm(localForm, getClass(), writer, configuration);
         localFormSource = writer.toString();
     }
 
@@ -164,11 +160,7 @@ public class InstallPluginAction extends PluginActionSupport
 
         try
         {
-//<<<<<<< .mine
             pluginManager.install(files[0].toURI(), fileNames[0], true);
-//=======
-//            pluginManager.installPlugin(fileNames[0], files[0].toURI().toURL());
-//>>>>>>> .r3997
         }
         catch (Exception e)
         {
@@ -204,11 +196,7 @@ public class InstallPluginAction extends PluginActionSupport
 
         try
         {
-//<<<<<<< .mine
             pluginManager.install(pluginFile.toURI());
-//=======
-//            pluginManager.installPlugin(pluginFile.toURI().toURL());
-//>>>>>>> .r3997
         }
         catch (Exception e)
         {
@@ -220,8 +208,8 @@ public class InstallPluginAction extends PluginActionSupport
         return SUCCESS;
     }
 
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    public void setFreemarkerConfiguration(Configuration configuration)
     {
-        this.configurationManager = configurationManager;
+        this.configuration = configuration;
     }
 }

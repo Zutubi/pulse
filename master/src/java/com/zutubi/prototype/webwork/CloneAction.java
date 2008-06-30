@@ -12,11 +12,11 @@ import com.zutubi.prototype.type.MapType;
 import com.zutubi.prototype.type.Type;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.prototype.type.record.Record;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.util.TextUtils;
 import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.i18n.MessagesTextProvider;
 import com.zutubi.validation.i18n.TextProvider;
+import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
 
 import java.io.IOException;
@@ -43,8 +43,9 @@ public class CloneAction extends PrototypeSupport
     private String formSource;
     private String cloneKey;
     private String parentKey;
-    private MasterConfigurationManager configurationManager;
+
     private ConfigurationRefactoringManager configurationRefactoringManager;
+    private Configuration freemarkerConfiguration;
 
     public ConfigurationPanel getNewPanel()
     {
@@ -248,7 +249,7 @@ public class CloneAction extends PrototypeSupport
         addSubmit(form, "cancel", false);
 
         StringWriter writer = new StringWriter();
-        PrototypeUtils.renderForm(new HashMap<String, Object>(), form, getClass(), writer, configurationManager);
+        PrototypeUtils.renderForm(form, getClass(), writer, freemarkerConfiguration);
         formSource = writer.toString();
 
         newPanel = new ConfigurationPanel("aconfig/clone.vm");
@@ -345,13 +346,13 @@ public class CloneAction extends PrototypeSupport
         return (String) record.get(mapType.getKeyProperty());
     }
 
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
-    {
-        this.configurationManager = configurationManager;
-    }
-
     public void setConfigurationRefactoringManager(ConfigurationRefactoringManager configurationRefactoringManager)
     {
         this.configurationRefactoringManager = configurationRefactoringManager;
+    }
+
+    public void setFreemarkerConfiguration(Configuration configuration)
+    {
+        this.freemarkerConfiguration = configuration;
     }
 }
