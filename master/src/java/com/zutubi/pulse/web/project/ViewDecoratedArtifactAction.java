@@ -13,11 +13,10 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * @deprecated
  */
-public class TemporaryViewArtifactAction extends FileArtifactActionBase
+public class ViewDecoratedArtifactAction extends FileArtifactActionBase
 {
-    private static final Logger LOG = Logger.getLogger(ViewArtifactAction.class);
+    private static final Logger LOG = Logger.getLogger(ViewDecoratedArtifactAction.class);
 
     private BufferedReader reader;
     private Map<Long, Feature.Level> lineLevels;

@@ -13,7 +13,6 @@
         <pattern>/view/*</pattern>
         <pattern>/file/*</pattern>
         <pattern>/viewArtifact.action*</pattern>
-        <pattern>/viewArtifactt.action*</pattern>
         <pattern>/selenium/*</pattern>
     </excludes>
 

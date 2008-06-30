@@ -1082,7 +1082,7 @@
                 $action.plainToHtml($feature.summary)<br/>
             #end
             #if($recipe.completed())
-                <a class="unadorned" href="viewArtifactt.action?id=$fileArtifact.id&amp;buildId=$build.id&amp;commandId=$command.id#$feature.lineNumber">
+                <a class="unadorned" href="$urls.commandArtifacts($build, $command)${fileArtifact.pathUrl}#${feature.lineNumber}">
                     <span class="small">#wwtext("name=jump.to")</span> <img src="$base/images/go_small.gif"/>
                 </a>
             #end
@@ -1091,7 +1091,7 @@
         #if($trimmedFileArtifactFeatures)
             <li>
                 #wwtext("name=trimmed.features")
-                <a class="unadorned" href="viewArtifactt.action?id=$fileArtifact.id&amp;buildId=$build.id&amp;commandId=$command.id">
+                <a class="unadorned" href="$urls.commandArtifacts($build, $command)${fileArtifact.pathUrl}">
                       <span class="small">#wwtext("name=jump.to")</span> <img src="$base/images/go_small.gif"/>
                 </a>
             </li>

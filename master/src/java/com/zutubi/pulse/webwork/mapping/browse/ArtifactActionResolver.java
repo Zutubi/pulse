@@ -16,6 +16,6 @@ public class ArtifactActionResolver extends ActionResolverSupport
 
     public ActionResolver getChild(String name)
     {
-        return new PathConsumingActionResolver("viewArtifactt", "path", name);
+        return new PathConsumingActionResolver("viewArtifact", "path", name);
     }
 }

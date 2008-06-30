@@ -187,12 +187,7 @@
             <result name="cancel" type="redirect">/browse/projects/${u_projectName}/</result>
         </action>
 
-        <action name="viewArtifact" class="com.zutubi.pulse.web.project.ViewArtifactAction">
-            <interceptor-ref name="completeReadOnlyStack"/>
-            <result name="success" type="velocity">/view-artifact.vm</result>
-        </action>
-
-        <action name="viewArtifactt" class="com.zutubi.pulse.web.project.TemporaryViewArtifactAction">
+        <action name="viewArtifact" class="com.zutubi.pulse.web.project.ViewDecoratedArtifactAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">/view-artifact.vm</result>
         </action>
