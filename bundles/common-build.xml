@@ -38,9 +38,7 @@
         <package-src name="${ivy.module}-src.jar" pathref="src.export.selection"/>
 
         <if>
-            <not>
-                <isset property="no.tests"/>
-            </not>
+            <not><isset property="no.tests"/></not>
             <then>
                 <jar file="build/${ivy.module}-test.jar">
                     <fileset dir="${test.classes.dir}"/>

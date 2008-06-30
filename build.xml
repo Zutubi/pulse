@@ -39,7 +39,10 @@
         <taskdef name="copyright" classname="com.zutubi.pulse.CopyrightTask" classpathref="custom.task.path"/>
         <taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="custom.task.path"/>
         <taskdef uri="antlib:com.zutubi.ant" resource="com/zutubi/ant/antlib.xml" classpathref="custom.task.path"/>
-	<taskdef name="ideamodule" classname="configurator.task.IdeaJavaModuleTask" classpathref="custom.task.path"/>
+    	<taskdef name="ideamodule" classname="configurator.task.IdeaJavaModuleTask" classpathref="custom.task.path"/>
+
+        <load-ivy-taskdef/>
+
     </target>
 
     <target name="clean" depends="clean.all"/>
@@ -571,7 +574,10 @@
         <echo message=""/>
         <echo message="====================================================================="/>
         <echo message="IMPORTANT:"/>
-        <echo message="   Now run the bundles/build.xml idea.prepare.prepackaged ant target"/>
+        <echo message="   Now run the following:"/>
+        <echo message="   1)  ant package.master -Dskip.tests=true"/>
+        <echo message="   2)  bundles/build.xml idea.prepare.prepackaged ant target"/>
+        <echo message="   3)  remember to compile the plugins modules in idea into the plugins directory"/>
 
     </target>
 

@@ -9,4 +9,28 @@
             <ivy:retrieve pattern="@{dest}/[artifact]-[revision].[ext]" useOrigin="true" validate="true" conf="@{conf}"/>
         </sequential>
     </macrodef>
+
+    <macrodef name="load-ivy-taskdef">
+        <sequential>
+            <if>
+                <typefound uri="antlib:fr.jayasoft.ivy.ant" name="info"/>
+                <then>
+                    <echo>Ivy already loaded, either by a previous call to load-ivy-taskdef or from ant.lib</echo>
+                </then>
+            </if>
+            <if>
+                <not>
+                    <typefound uri="antlib:fr.jayasoft.ivy.ant" name="info"/>
+                </not>
+                <then>
+                    <echo>Loading ivy from project.root/etc</echo>
+                    <path id="ivy.task.path">
+                        <fileset dir="${project.root.dir}/etc" includes="ivy-*.jar"/>
+                    </path>
+                    <taskdef uri="antlib:fr.jayasoft.ivy.ant" resource="fr/jayasoft/ivy/ant/antlib.xml" classpathref="ivy.task.path"/>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
 </project>

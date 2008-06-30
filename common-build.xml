@@ -19,6 +19,8 @@
         <taskdef name="copyright" classname="com.zutubi.pulse.CopyrightTask" classpathref="custom.task.path"/>
         <taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="custom.task.path"/>
 
+        <load-ivy-taskdef/>
+
         <!-- load the modules properties first to allow them to override the default root level properties. -->
         <property file="build.properties"/>
         <property file="${project.root.dir}/build.properties"/>
@@ -46,6 +48,17 @@
 
         <property name="project.repository" value="${project.root.dir}/build/repository"/>
 
+        <!-- resources / properties definition-->
+        <patternset id="resources">
+            <include name="**/*.properties"/>
+            <include name="**/*.gif"/>
+            <include name="**/*.png"/>
+            <include name="**/*.html"/>
+            <include name="**/*.xml"/>
+            <include name="**/*.txt"/>
+            <include name="**/*.zip"/>
+        </patternset>
+
         <condition property="no.tests">
             <not>
                 <available file="src/test"/>
@@ -63,7 +76,7 @@
                 <include name="**/*.jar"/>
             </fileset>
         </path>
-        
+
         <!-- Define source paths -->
         <path id="src.paths">
             <pathelement path="src/java"/>
@@ -71,7 +84,7 @@
 
         <path id="src.resources">
             <fileset dir="src/java">
-                <exclude name="**/*.java"/>
+                <patternset refid="resources"/>
             </fileset>
         </path>
 
@@ -88,7 +101,7 @@
 
         <path id="test.resources">
             <fileset dir="src/test">
-                <exclude name="**/*.java"/>
+                <patternset refid="resources"/>
             </fileset>
         </path>
 
@@ -115,17 +128,6 @@
         <!-- ivy configuration -->
         <property file="${project.root.dir}/ivy.properties"/>
         <ivy:configure file="${project.root.dir}/ivyconf.xml"/>
-
-        <!-- resources / properties definition-->
-        <patternset id="resources">
-            <include name="**/*.properties"/>
-            <include name="**/*.gif"/>
-            <include name="**/*.png"/>
-            <include name="**/*.html"/>
-            <include name="**/*.xml"/>
-            <include name="**/*.txt"/>
-            <include name="**/*.zip"/>
-        </patternset>
 
         <patternset id="release.excludes">
             <exclude name="**/LicenseEncoder*"/>
@@ -167,6 +169,7 @@
     </target>
 
     <target name="prepare-dependencies" unless="skip.dependencies">
+
         <ivy:buildlist reference="build.path.${ivy.module}" root="${ivy.module}" excluderoot="true" skipbuildwithoutivy="true">
             <fileset dir="${project.root.dir}" includes="*/build.xml"/>
             <fileset dir="${project.root.dir}/bundles" includes="*/build.xml"/>
@@ -176,6 +179,7 @@
             <property name="skip.tests" value="true"/>
             <property name="skip.dependencies" value="true"/>
         </subant>
+        
     </target>
 
     <!-- perform the actual build -->
@@ -207,7 +211,7 @@
                     <classpath location="${classes.dir}"/>
                     <src refid="test.paths"/>
                 </javac>
-        	
+
                 <copy todir="${test.classes.dir}" overwrite="true">
                     <path refid="test.resources"/>
                 </copy>
@@ -274,7 +278,7 @@
                 <jar file="build/${ivy.module}-test.jar" basedir="${test.classes.dir}">
                     <patternset refid="release.excludes"/>
                 </jar>
-    
+
                 <package-src name="${ivy.module}-test-src.jar" pathref="test.export.selection"/>
             </then>
         </if>
