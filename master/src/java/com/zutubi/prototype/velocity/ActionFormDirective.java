@@ -34,7 +34,7 @@ public class ActionFormDirective extends PrototypeDirective
     private String formName = "actionForm";
     private String namespace;
 
-    private Configuration configuration = null;
+    private Configuration configuration;
 
     /**
      * @return the name of this velocity directive.
