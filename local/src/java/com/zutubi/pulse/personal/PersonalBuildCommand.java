@@ -47,6 +47,9 @@ public class PersonalBuildCommand implements Command
                 .create('f'));
         options.addOption(OptionBuilder.withLongOpt("no-request")
                 .create('n'));
+        options.addOption(OptionBuilder.withLongOpt("base-dir")
+                .hasArg()
+                .create('b'));
 
         addPropertyOption(options, 's', "server", PersonalBuildConfig.PROPERTY_PULSE_URL);
         addPropertyOption(options, 'u', "user", PersonalBuildConfig.PROPERTY_PULSE_USER);
@@ -83,9 +86,23 @@ public class PersonalBuildCommand implements Command
             patchFilename = commandLine.getOptionValue('f');
         }
 
+        if(commandLine.hasOption('b'))
+        {
+            String baseName = commandLine.getOptionValue('b');
+            base = new File(baseName);
+            if (!base.isDirectory())
+            {
+                System.err.println("Base directory specified '" + baseName + "' is not a directory");
+                System.exit(1);
+            }
+        }
+        else
+        {
+            base = new File(System.getProperty("user.dir"));
+        }
+
         switchConfig.setCommandLine(commandLine);
         defineConfig = new PropertiesConfig(defines);
-        base = new File(System.getProperty("user.dir"));
         files = commandLine.getArgs();
     }
 
@@ -229,6 +246,7 @@ public class PersonalBuildCommand implements Command
         options.put("-s [--server] url", "set pulse server url");
         options.put("-u [--user] name", "set pulse user name");
         options.put("-p [--password] password", "set pulse password");
+        options.put("-b [--base-dir] dir", "set base directory of working copy");
         options.put("-f [--file] filename", "set patch file name");
         options.put("-d [--define] name=value", "set named property to given value");
         options.put("-q [--quiet]", "suppress unnecessary output");

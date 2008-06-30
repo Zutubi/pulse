@@ -130,7 +130,7 @@ public class ConfigCommand implements Command
     {
         return "Configures the Pulse server and project details used for personal builds.\n" +
                 "You will be prompted to enter the required details, and they will be stored\n" +
-                "in $HOME/.pulse.properties (server details) and ./.pulse.properties (project\n" +
+                "in $HOME/.pulse2.properties (server details) and ./.pulse2.properties (project\n" +
                 "details).  You should run this command from the base directory of a working\n" +
                 "copy for your project.  You can set up additional working copies for other\n" +
                 "projects using the -p flag, which indicates that you do not wish to\n" +

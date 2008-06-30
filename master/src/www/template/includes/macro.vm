@@ -849,7 +849,7 @@
     #if($rr.personal)
         <td class="$cssClass">
             <img alt="personal" src="$base/images/user.gif"/>
-            $!webwork.htmlEncode($rr.owner.login)
+            $!webwork.htmlEncode($rr.owner.config.login)
         </td>
     #else
         <td class="$cssClass">

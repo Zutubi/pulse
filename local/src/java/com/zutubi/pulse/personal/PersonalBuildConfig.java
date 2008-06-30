@@ -9,7 +9,7 @@ import java.io.File;
  */
 public class PersonalBuildConfig implements Config
 {
-    public static final String PROPERTIES_FILENAME = ".pulse.properties";
+    public static final String PROPERTIES_FILENAME = ".pulse2.properties";
     
     public static final String PROPERTY_PULSE_URL = "pulse.url";
     public static final String PROPERTY_PULSE_USER = "pulse.user";

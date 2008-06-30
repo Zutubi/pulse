@@ -57,7 +57,7 @@ public class CvsWorkingCopy extends PersonalBuildSupport implements WorkingCopy
             else
             {
                 throw new PersonalBuildException("Failed to determine the cvs root. You can work around this problem by adding " +
-                        "the cvs.root property to the .pulse.properties file.");
+                        "the cvs.root property to the .pulse2.properties file.");
             }
         }
         catch (Exception e)

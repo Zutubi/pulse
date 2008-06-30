@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans default-autowire="byName">
-
     <bean id="pluginManager" class="com.zutubi.pulse.plugins.PluginManager" init-method="init" destroy-method="destroy"/>
 
     <bean id="commandExtensionManager" class="com.zutubi.pulse.core.plugins.CommandExtensionManager" init-method="init"/>
@@ -9,5 +8,4 @@
     <bean id="scmExtensionManager" class="com.zutubi.pulse.core.scm.ScmExtensionManager" init-method="init"/>
     <bean id="scmClientFactory" class="com.zutubi.pulse.core.scm.DelegateScmClientFactory"/>
     <bean id="hessianExtensionManager" class="com.zutubi.pulse.hessian.HessianConfigurationExtensionManager" init-method="init"/>
-
 </beans>
