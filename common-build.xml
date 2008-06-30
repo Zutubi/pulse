@@ -50,13 +50,7 @@
 
         <!-- resources / properties definition-->
         <patternset id="resources">
-            <include name="**/*.properties"/>
-            <include name="**/*.gif"/>
-            <include name="**/*.png"/>
-            <include name="**/*.html"/>
-            <include name="**/*.xml"/>
-            <include name="**/*.txt"/>
-            <include name="**/*.zip"/>
+            <exclude name="**/*.java"/>
         </patternset>
 
         <condition property="no.tests">
