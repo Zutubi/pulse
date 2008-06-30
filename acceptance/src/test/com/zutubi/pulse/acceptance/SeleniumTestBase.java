@@ -22,6 +22,13 @@ import java.util.Vector;
  */
 public class SeleniumTestBase extends TestCase
 {
+    /**
+     * Shared agent used for simple single-agent builds.  Makes it easier to
+     * run these tests in development environments (just manually run one
+     * agent on port 8890).
+     */
+    protected static final String AGENT_NAME = "localhost";
+
     protected Selenium selenium;
     protected Urls urls;
     protected String port;

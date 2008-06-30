@@ -39,9 +39,9 @@ public class PatchBootstrapper implements Bootstrapper
         delegate.bootstrap(context);
         try
         {
-            // apply a patch prefix to the if one is specified. Used to work around a cvs issue.
             FileRepository fileRepository = context.getValue(NAMESPACE_INTERNAL, PROPERTY_FILE_REPOSITORY, FileRepository.class);
             PatchArchive patch = new PatchArchive(fileRepository.getPatchFile(userId, number));
+            // apply a patch prefix to the if one is specified. Used to work around a cvs issue.
             patch.apply(getBaseBuildDir(context), localEOL);
         }
         catch(PulseException e)

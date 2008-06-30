@@ -126,10 +126,6 @@ public class PatchArchive
         XStream xstream = new XStream(new DomDriver());
         xstream.alias("status", WorkingCopyStatus.class);
         xstream.alias("revision", Revision.class);
-/*
-        xstream.alias("numerical", NumericalRevision.class);
-        xstream.alias("cvs", CvsRevision.class);
-*/
         xstream.omitField(Entity.class, "id");
         xstream.alias("fileStatus", FileStatus.class);
         xstream.addImplicitCollection(WorkingCopyStatus.class, "changes");

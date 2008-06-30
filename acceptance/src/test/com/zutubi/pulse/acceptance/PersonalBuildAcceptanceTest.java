@@ -1,6 +1,9 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.prototype.config.ConfigurationRegistry;
+import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.acceptance.pages.dashboard.*;
+import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.core.scm.WorkingCopyFactory;
 import com.zutubi.pulse.core.scm.svn.SubversionWorkingCopy;
 import com.zutubi.pulse.personal.PersonalBuildClient;
@@ -19,6 +22,7 @@ import org.tmatesoft.svn.core.wc.SVNWCUtil;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -57,18 +61,45 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
 
     public void testPersonalBuild() throws Exception
     {
+        makeChange();
+        createConfigFile();
+        loginAsAdmin();
+        ensureProject(PROJECT_NAME);
+        editStageToRunOnAgent(AgentManager.MASTER_AGENT_NAME);
+        long buildNumber = runPersonalBuild();
+        verifyPersonalBuildTabs(buildNumber, AgentManager.MASTER_AGENT_NAME);
+    }
+
+    public void testPersonalBuildOnAgent() throws Exception
+    {
+        makeChange();
+        createConfigFile();
+        loginAsAdmin();
+        ensureProject(PROJECT_NAME);
+        editStageToRunOnAgent(AGENT_NAME);
+        long buildNumber = runPersonalBuild();
+        verifyPersonalBuildTabs(buildNumber, AGENT_NAME);
+    }
+
+    private void makeChange() throws IOException
+    {
         // Edit the build.xml file so we have an outstanding change
         File buildFile = new File(workingCopyDir, "build.xml");
         String fileContents = IOUtils.fileToString(buildFile);
         fileContents = fileContents.replaceAll("sleep", "nosuchcommand");
         FileSystemUtils.createFile(buildFile, fileContents);
+    }
 
-        createConfigFile();
+    private void editStageToRunOnAgent(String agent) throws Exception
+    {
+        String stagePath = PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, PROJECT_NAME, "stages", "default");
+        Hashtable<String, Object> stage = xmlRpcHelper.getConfig(stagePath);
+        stage.put("agent", PathUtils.getPath(ConfigurationRegistry.AGENTS_SCOPE, agent));
+        xmlRpcHelper.saveConfig(stagePath, stage, false);
+    }
 
-        loginAsAdmin();
-        goTo(urls.adminProjects());
-        ensureProject(PROJECT_NAME);
-
+    private long runPersonalBuild()
+    {
         // Request the build and wait for it to complete
         TestPersonalBuildUI ui = requestPersonalBuild();
 
@@ -83,44 +114,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         assertElementPresent(MyBuildsPage.getBuildNumberId(buildNumber));
         assertElementNotPresent(MyBuildsPage.getBuildNumberId(buildNumber + 1));
         SeleniumUtils.refreshUntilText(selenium, MyBuildsPage.getBuildStatusId(buildNumber), "failure");
-
-        // Verify each tab in turn
-        PersonalBuildSummaryPage summaryPage = new PersonalBuildSummaryPage(selenium, urls, buildNumber);
-        summaryPage.goTo();
-        assertTextPresent("nosuchcommand");
-
-        selenium.click(IDs.buildDetailsTab());
-        PersonalBuildDetailedViewPage detailedViewPage = new PersonalBuildDetailedViewPage(selenium, urls, buildNumber);
-        detailedViewPage.waitFor();
-        detailedViewPage.clickCommand("default", "build");
-        assertTextPresent("nosuchcommand");
-
-        selenium.click(IDs.buildChangesTab());
-        PersonalBuildChangesPage changesPage = new PersonalBuildChangesPage(selenium, urls, buildNumber);
-        changesPage.waitFor();
-        assertEquals("1", changesPage.getCheckedOutRevision());
-        assertEquals("build.xml", changesPage.getChangedFile(0));
-
-        selenium.click(IDs.buildTestsTab());
-        PersonalBuildTestsPage testsPage = new PersonalBuildTestsPage(selenium, urls, buildNumber);
-        testsPage.waitFor();
-        assertTrue(testsPage.isBuildComplete());
-        assertFalse(testsPage.hasTests());
-
-        selenium.click(IDs.buildFileTab());
-        PersonalBuildFilePage filePage = new PersonalBuildFilePage(selenium, urls, buildNumber);
-        filePage.waitFor();
-        assertTrue(filePage.isHighlightedFilePresent());
-        assertTextPresent("ant build");
-
-        PersonalBuildArtifactsPage artifactsPage = new PersonalBuildArtifactsPage(selenium, urls, buildNumber);
-        artifactsPage.goTo();
-        SeleniumUtils.waitForLocator(selenium, artifactsPage.getCommandLocator("build"));
-
-        selenium.click(IDs.buildWorkingCopyTab());
-        PersonalBuildWorkingCopyPage wcPage = new PersonalBuildWorkingCopyPage(selenium, urls, buildNumber);
-        wcPage.waitFor();
-        assertTrue(wcPage.isWorkingCopyNotPresent());
+        return buildNumber;
     }
 
     private void createConfigFile() throws IOException
@@ -155,6 +149,48 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         command.execute(client);
 
         return ui;
+    }
+
+    private void verifyPersonalBuildTabs(long buildNumber, String agent)
+    {
+        // Verify each tab in turn
+        PersonalBuildSummaryPage summaryPage = new PersonalBuildSummaryPage(selenium, urls, buildNumber);
+        summaryPage.goTo();
+        assertTextPresent("nosuchcommand");
+        SeleniumUtils.assertText(selenium, IDs.stageAgentCell(PROJECT_NAME, buildNumber, "default"), agent);
+
+        selenium.click(IDs.buildDetailsTab());
+        PersonalBuildDetailedViewPage detailedViewPage = new PersonalBuildDetailedViewPage(selenium, urls, buildNumber);
+        detailedViewPage.waitFor();
+        detailedViewPage.clickCommand("default", "build");
+        assertTextPresent("nosuchcommand");
+
+        selenium.click(IDs.buildChangesTab());
+        PersonalBuildChangesPage changesPage = new PersonalBuildChangesPage(selenium, urls, buildNumber);
+        changesPage.waitFor();
+        assertEquals("1", changesPage.getCheckedOutRevision());
+        assertEquals("build.xml", changesPage.getChangedFile(0));
+
+        selenium.click(IDs.buildTestsTab());
+        PersonalBuildTestsPage testsPage = new PersonalBuildTestsPage(selenium, urls, buildNumber);
+        testsPage.waitFor();
+        assertTrue(testsPage.isBuildComplete());
+        assertFalse(testsPage.hasTests());
+
+        selenium.click(IDs.buildFileTab());
+        PersonalBuildFilePage filePage = new PersonalBuildFilePage(selenium, urls, buildNumber);
+        filePage.waitFor();
+        assertTrue(filePage.isHighlightedFilePresent());
+        assertTextPresent("ant build");
+
+        PersonalBuildArtifactsPage artifactsPage = new PersonalBuildArtifactsPage(selenium, urls, buildNumber);
+        artifactsPage.goTo();
+        SeleniumUtils.waitForLocator(selenium, artifactsPage.getCommandLocator("build"));
+
+        selenium.click(IDs.buildWorkingCopyTab());
+        PersonalBuildWorkingCopyPage wcPage = new PersonalBuildWorkingCopyPage(selenium, urls, buildNumber);
+        wcPage.waitFor();
+        assertTrue(wcPage.isWorkingCopyNotPresent());
     }
 
     private static class TestPersonalBuildUI implements PersonalBuildUI

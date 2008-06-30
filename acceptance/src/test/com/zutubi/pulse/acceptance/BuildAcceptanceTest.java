@@ -20,7 +20,6 @@ import java.util.Hashtable;
  */
 public class BuildAcceptanceTest extends SeleniumTestBase
 {
-    private static final String AGENT_NAME   = "localhost";
     private static final String PROJECT_NAME = "BuildAcceptanceTest-Project";
 
     protected void setUp() throws Exception
