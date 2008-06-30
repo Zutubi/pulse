@@ -1,5 +1,7 @@
 package com.zutubi.pulse.core;
 
+import com.zutubi.pulse.core.postprocessors.PostProcessorTestBase;
+
 import java.io.IOException;
 
 /**

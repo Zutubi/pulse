@@ -3,6 +3,7 @@ package com.zutubi.pulse.core;
 import com.zutubi.pulse.core.model.TestCaseResult;
 import com.zutubi.pulse.core.model.TestResult;
 import com.zutubi.pulse.core.model.TestSuiteResult;
+import com.zutubi.pulse.core.postprocessors.XMLTestReportPostProcessorSupport;
 import com.zutubi.pulse.util.XMLUtils;
 import nu.xom.Document;
 import nu.xom.Element;
@@ -13,7 +14,7 @@ import java.util.TreeMap;
 
 /**
  */
-public class CppUnitReportPostProcessor extends XMLReportPostProcessor
+public class CppUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
 {
     private static final String ELEMENT_SUCCESSFUL_TESTS = "SuccessfulTests";
     private static final String ELEMENT_TEST = "Test";

@@ -1,7 +1,8 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.postprocessors;
 
 import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.BuildProperties.PROPERTY_OUTPUT_DIR;
+import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
@@ -15,7 +16,7 @@ import java.net.URL;
 import java.util.List;
 
 /**
- * Tests for RegexPostProcessor.
+ * Helper base for post-processor tests.
  */
 public abstract class PostProcessorTestBase extends PulseTestCase
 {

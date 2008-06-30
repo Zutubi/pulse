@@ -1,15 +1,13 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.postprocessors;
 
-import static com.zutubi.pulse.core.BuildProperties.*;
-import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.model.StoredFileArtifact;
+import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.core.model.TestSuiteResult;
 
 import java.io.File;
 
 /**
  */
-public abstract class TestReportPostProcessor extends SelfReference implements PostProcessor
+public abstract class TestReportPostProcessorSupport extends PostProcessorSupport
 {
     private String suite;
     private boolean failOnFailure = true;
@@ -29,14 +27,12 @@ public abstract class TestReportPostProcessor extends SelfReference implements P
         this.failOnFailure = failOnFailure;
     }
 
-    public void process(StoredFileArtifact artifact, CommandResult result, ExecutionContext context)
+    protected void process(File artifactFile, PostProcessorContext ppContext)
     {
-        TestSuiteResult testResults = context.getValue(NAMESPACE_INTERNAL, PROPERTY_TEST_RESULTS, TestSuiteResult.class);
-        File outputDir = context.getFile(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR);
+        TestSuiteResult testResults = ppContext.getTestSuite();
         int brokenBefore = testResults.getSummary().getBroken();
 
-        File file = new File(outputDir, artifact.getPath());
-        if(file.isFile())
+        if(artifactFile.isFile())
         {
             TestSuiteResult parentSuite;
             if(suite == null)
@@ -48,23 +44,24 @@ public abstract class TestReportPostProcessor extends SelfReference implements P
                 parentSuite = new TestSuiteResult(suite);
             }
 
-            internalProcess(result, file, parentSuite);
+            process(artifactFile, parentSuite, ppContext);
 
             if(suite != null)
             {
                 testResults.add(parentSuite);
             }
-            
-            if(failOnFailure && !result.failed() && !result.errored())
+
+            ResultState state = ppContext.getResultState();
+            if(failOnFailure && state != ResultState.ERROR && state != ResultState.FAILURE)
             {
                 int brokenAfter = testResults.getSummary().getBroken();
                 if(brokenAfter > brokenBefore)
                 {
-                    result.failure("One or more test cases failed.");
+                    ppContext.failCommand("One or more test cases failed.");
                 }
             }
         }
     }
 
-    protected abstract void internalProcess(CommandResult result, File file, TestSuiteResult suite);
+    protected abstract void process(File file, TestSuiteResult suite, PostProcessorContext ppContext);
 }

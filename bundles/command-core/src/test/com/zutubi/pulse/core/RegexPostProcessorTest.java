@@ -7,9 +7,9 @@ import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.util.IOUtils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -146,7 +146,7 @@ public class RegexPostProcessorTest extends PulseTestCase
     public void testNoFailOnWarning()
     {
         RegexPostProcessor pp = createPostProcessor(".*", Feature.Level.WARNING);
-        assertFalse(pp.getFailOnWarning());
+        assertFalse(pp.isFailOnWarning());
         CommandResult result = simpleFeatures(pp, Feature.Level.WARNING, LINES);
         assertFalse(result.failed());
     }
@@ -403,12 +403,12 @@ public class RegexPostProcessorTest extends PulseTestCase
 
         if (features.size() > 0)
         {
-            if (level == Feature.Level.ERROR && pp.getFailOnError())
+            if (level == Feature.Level.ERROR && pp.isFailOnError())
             {
                 assertTrue(result.failed());
                 assertEquals("Error features detected", getFailureMessage(result));
             }
-            else if (level == Feature.Level.WARNING && pp.getFailOnWarning())
+            else if (level == Feature.Level.WARNING && pp.isFailOnWarning())
             {
                 assertTrue(result.failed());
                 assertEquals("Warning features detected", getFailureMessage(result));
@@ -433,8 +433,8 @@ public class RegexPostProcessorTest extends PulseTestCase
     private void simpleErrors(String expression, String... lines)
     {
         RegexPostProcessor pp = createPostProcessor(expression);
-        assertTrue(pp.getFailOnError());
-        assertFalse(pp.getFailOnWarning());
+        assertTrue(pp.isFailOnError());
+        assertFalse(pp.isFailOnWarning());
         simpleErrors(pp, lines);
     }
 

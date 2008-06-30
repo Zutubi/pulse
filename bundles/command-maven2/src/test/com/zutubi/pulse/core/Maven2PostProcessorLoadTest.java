@@ -21,7 +21,7 @@ public class Maven2PostProcessorLoadTest extends FileLoaderTestBase
     {
         Maven2PostProcessor pp = referenceHelper("fail");
         assertEquals(3, pp.size());
-        assertTrue(((RegexPostProcessor)pp.get(1)).getFailOnError());
-        assertTrue(((RegexPostProcessor)pp.get(2)).getFailOnError());
+        assertTrue(((RegexPostProcessor)pp.get(1)).isFailOnError());
+        assertTrue(((RegexPostProcessor)pp.get(2)).isFailOnError());
     }
 }

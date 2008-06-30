@@ -2,6 +2,7 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.TestCaseResult;
 import com.zutubi.pulse.core.model.TestSuiteResult;
+import com.zutubi.pulse.core.postprocessors.XMLTestReportPostProcessorSupport;
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Elements;
@@ -11,7 +12,7 @@ import java.util.TreeMap;
 
 /**
  */
-public class UnitTestPlusPlusReportPostProcessor extends XMLReportPostProcessor
+public class UnitTestPlusPlusReportPostProcessor extends XMLTestReportPostProcessorSupport
 {
     private static final String ELEMENT_TEST = "test";
     private static final String ELEMENT_FAILURE = "failure";

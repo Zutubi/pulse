@@ -1,8 +1,9 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.TestCaseResult;
 import com.zutubi.pulse.core.model.TestSuiteResult;
+import com.zutubi.pulse.core.postprocessors.PostProcessorContext;
+import com.zutubi.pulse.core.postprocessors.TestReportPostProcessorSupport;
 import com.zutubi.util.IOUtils;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
@@ -19,7 +20,7 @@ import java.util.regex.Pattern;
 /**
  * <class comment/>
  */
-public class RegexTestPostProcessor extends TestReportPostProcessor
+public class RegexTestPostProcessor extends TestReportPostProcessorSupport
 {
     enum Resolution
     {
@@ -58,7 +59,7 @@ public class RegexTestPostProcessor extends TestReportPostProcessor
         setName(name);
     }
 
-    public void internalProcess(CommandResult result, File file, TestSuiteResult suite)
+    public void process(File file, TestSuiteResult suite, PostProcessorContext ppContext)
     {
         // clean up any whitespace from the regex which may have been added via the setText()
         if (trim)

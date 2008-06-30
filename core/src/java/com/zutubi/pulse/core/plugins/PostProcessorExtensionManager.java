@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.plugins;
 
-import com.zutubi.pulse.core.PostProcessor;
 import com.zutubi.pulse.core.PulseFileLoaderFactory;
+import com.zutubi.pulse.core.postprocessors.PostProcessor;
 import com.zutubi.pulse.plugins.AbstractExtensionManager;
 import com.zutubi.pulse.plugins.ConfigUtils;
 import com.zutubi.pulse.plugins.PluginManager;

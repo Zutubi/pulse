@@ -150,7 +150,11 @@ public abstract class Result extends Entity
     public void addFeature(Feature.Level level, String message)
     {
         Feature feature = new Feature(level, message);
+        addFeature(feature);
+    }
 
+    public void addFeature(Feature feature)
+    {
         // Eliminate duplicates
         for (Feature f : features)
         {

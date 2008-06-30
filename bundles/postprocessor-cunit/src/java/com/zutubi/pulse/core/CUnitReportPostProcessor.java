@@ -2,6 +2,7 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.TestCaseResult;
 import com.zutubi.pulse.core.model.TestSuiteResult;
+import com.zutubi.pulse.core.postprocessors.XMLTestReportPostProcessorSupport;
 import com.zutubi.pulse.util.XMLUtils;
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.logging.Logger;
@@ -15,7 +16,7 @@ import org.xml.sax.SAXException;
  * Post-processor for CUnit version 2 (and compatible) XML reports.  See:
  * http://cunit.sourceforge.net/.
  */
-public class CUnitReportPostProcessor extends XMLReportPostProcessor
+public class CUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
 {
     private static final Logger LOG = Logger.getLogger(CUnitReportPostProcessor.class);
 

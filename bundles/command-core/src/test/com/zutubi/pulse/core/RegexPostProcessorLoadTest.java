@@ -17,24 +17,24 @@ public class RegexPostProcessorLoadTest extends FileLoaderTestBase
     public void testEmpty() throws PulseException
     {
         RegexPostProcessor pp = referenceHelper("empty");
-        assertTrue(pp.getFailOnError());
-        assertFalse(pp.getFailOnWarning());
+        assertTrue(pp.isFailOnError());
+        assertFalse(pp.isFailOnWarning());
         assertEquals(0, pp.getPatterns().size());
     }
 
     public void testFailOnWarning() throws PulseException
     {
         RegexPostProcessor pp = referenceHelper("failOnWarning");
-        assertTrue(pp.getFailOnError());
-        assertTrue(pp.getFailOnWarning());
+        assertTrue(pp.isFailOnError());
+        assertTrue(pp.isFailOnWarning());
         assertEquals(0, pp.getPatterns().size());
     }
 
     public void testNoFailOnError() throws PulseException
     {
         RegexPostProcessor pp = referenceHelper("noFailOnError");
-        assertFalse(pp.getFailOnError());
-        assertFalse(pp.getFailOnWarning());
+        assertFalse(pp.isFailOnError());
+        assertFalse(pp.isFailOnWarning());
         assertEquals(0, pp.getPatterns().size());
     }
 

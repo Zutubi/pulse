@@ -25,7 +25,7 @@ public class MakePostProcessorLoadTest extends FileLoaderTestBase
     public void testBasic() throws PulseException
     {
         MakePostProcessor pp = helper("basic");
-        assertEquals(true, pp.getFailOnError());
+        assertEquals(true, pp.isFailOnError());
         assertEquals(4, pp.getLeadingContext());
         assertEquals(5, pp.getTrailingContext());
     }

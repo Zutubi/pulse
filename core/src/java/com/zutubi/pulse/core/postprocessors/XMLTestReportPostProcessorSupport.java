@@ -1,6 +1,6 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.postprocessors;
 
-import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.TestSuiteResult;
 import com.zutubi.util.IOUtils;
 import nu.xom.Builder;
@@ -13,16 +13,16 @@ import java.io.IOException;
 
 /**
  */
-public abstract class XMLReportPostProcessor extends TestReportPostProcessor
+public abstract class XMLTestReportPostProcessorSupport extends TestReportPostProcessorSupport
 {
     private String reportType;
 
-    protected XMLReportPostProcessor(String reportType)
+    protected XMLTestReportPostProcessorSupport(String reportType)
     {
         this.reportType = reportType;
     }
 
-    protected void internalProcess(CommandResult result, File file, TestSuiteResult suite)
+    protected void process(File file, TestSuiteResult suite, PostProcessorContext ppContext)
     {
         FileInputStream input = null;
 
@@ -42,7 +42,7 @@ public abstract class XMLReportPostProcessor extends TestReportPostProcessor
                 message += ": " + pex.getMessage();
             }
 
-            result.warning(message);
+            ppContext.addFeatureToCommand(new Feature(Feature.Level.WARNING, message));
         }
         catch (IOException e)
         {
@@ -51,7 +51,7 @@ public abstract class XMLReportPostProcessor extends TestReportPostProcessor
             {
                 message += ": " + e.getMessage();
             }
-            result.warning(message);
+            ppContext.addFeatureToCommand(new Feature(Feature.Level.WARNING, message));
         }
         finally
         {
@@ -65,5 +65,4 @@ public abstract class XMLReportPostProcessor extends TestReportPostProcessor
     }
 
     protected abstract void processDocument(Document doc, TestSuiteResult tests);
-
 }

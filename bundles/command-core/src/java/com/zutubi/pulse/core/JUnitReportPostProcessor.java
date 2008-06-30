@@ -3,11 +3,12 @@ package com.zutubi.pulse.core;
 import com.zutubi.pulse.core.model.TestCaseResult;
 import com.zutubi.pulse.core.model.TestResult;
 import com.zutubi.pulse.core.model.TestSuiteResult;
+import com.zutubi.pulse.core.postprocessors.XMLTestReportPostProcessorSupport;
 import nu.xom.*;
 
 /**
  */
-public class JUnitReportPostProcessor extends XMLReportPostProcessor
+public class JUnitReportPostProcessor extends XMLTestReportPostProcessorSupport
 {
     private static final String ELEMENT_SUITE   = "testsuite";
     private static final String ELEMENT_CASE    = "testcase";

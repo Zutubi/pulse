@@ -3,6 +3,7 @@ package com.zutubi.pulse.core;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
+import com.zutubi.pulse.core.postprocessors.PostProcessorTestBase;
 import com.zutubi.util.Constants;
 
 import java.io.File;

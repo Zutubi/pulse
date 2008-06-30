@@ -2,6 +2,7 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.TestCaseResult;
 import com.zutubi.pulse.core.model.TestSuiteResult;
+import com.zutubi.pulse.core.postprocessors.XMLReportPostProcessorTestBase;
 
 import java.io.File;
 import java.net.URL;

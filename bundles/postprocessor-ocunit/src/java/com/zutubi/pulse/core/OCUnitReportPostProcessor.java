@@ -1,8 +1,9 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.TestCaseResult;
 import com.zutubi.pulse.core.model.TestSuiteResult;
+import com.zutubi.pulse.core.postprocessors.PostProcessorContext;
+import com.zutubi.pulse.core.postprocessors.TestReportPostProcessorSupport;
 import com.zutubi.util.IOUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -16,7 +17,7 @@ import java.util.regex.Pattern;
 /**
  * <class-comment/>
  */
-public class OCUnitReportPostProcessor extends TestReportPostProcessor
+public class OCUnitReportPostProcessor extends TestReportPostProcessorSupport
 {
     private static final Logger LOG = Logger.getLogger(OCUnitReportPostProcessor.class);
 
@@ -38,7 +39,7 @@ public class OCUnitReportPostProcessor extends TestReportPostProcessor
         setName(name);
     }
     
-    protected void internalProcess(CommandResult result, File file, TestSuiteResult suite)
+    protected void process(File file, TestSuiteResult suite, PostProcessorContext ppContext)
     {
         try
         {

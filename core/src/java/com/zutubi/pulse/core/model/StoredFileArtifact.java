@@ -33,6 +33,10 @@ public class StoredFileArtifact extends Entity
         this.type = type;
     }
 
+    /**
+     * @return the path of the artifact file, relative to the output
+     *         directory for the command
+     */
     public String getPath()
     {
         return path;

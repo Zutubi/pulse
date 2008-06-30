@@ -1,6 +1,7 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.postprocessors;
 
 import static com.zutubi.pulse.core.BuildProperties.*;
+import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.test.PulseTestCase;
 
@@ -10,9 +11,9 @@ import java.io.File;
  */
 public abstract class XMLReportPostProcessorTestBase extends PulseTestCase
 {
-    protected XMLReportPostProcessor pp;
+    protected XMLTestReportPostProcessorSupport pp;
 
-    protected XMLReportPostProcessorTestBase(XMLReportPostProcessor pp)
+    protected XMLReportPostProcessorTestBase(XMLTestReportPostProcessorSupport pp)
     {
         this.pp = pp;
     }
