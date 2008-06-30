@@ -2,14 +2,14 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.TestCaseResult;
 import com.zutubi.pulse.core.model.TestSuiteResult;
-import com.zutubi.pulse.core.postprocessors.XMLReportPostProcessorTestBase;
+import com.zutubi.pulse.core.postprocessors.XMLTestReportPostProcessorTestBase;
 
 import java.io.File;
 import java.net.URL;
 
 /**
  */
-public class BoostRegressionPostProcessorTest extends XMLReportPostProcessorTestBase
+public class BoostRegressionPostProcessorTest extends XMLTestReportPostProcessorTestBase
 {
     public BoostRegressionPostProcessorTest()
     {

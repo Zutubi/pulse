@@ -26,6 +26,12 @@ import com.zutubi.pulse.core.model.StoredFileArtifact;
  * one of the various support classes where possible.  These classes simplify
  * common cases and reduce coupling to implementation details.
  * </p>
+ *
+ * @see PostProcessorSupport
+ * @see TestReportPostProcessorSupport
+ * @see XMLTestReportPostProcessorSupport
+ * @see TextFilePostProcessorSupport
+ * @see LineBasedPostProcessorSupport
  */
 public interface PostProcessor extends Reference
 {

@@ -2,14 +2,14 @@ package com.zutubi.pulse.core;
 
 import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.core.postprocessors.XMLReportPostProcessorTestBase;
+import com.zutubi.pulse.core.postprocessors.XMLTestReportPostProcessorTestBase;
 
 import java.io.File;
 import java.net.URL;
 
 /**
  */
-public class JUnitReportPostProcessorTest extends XMLReportPostProcessorTestBase
+public class JUnitReportPostProcessorTest extends XMLTestReportPostProcessorTestBase
 {
     public JUnitReportPostProcessorTest()
     {

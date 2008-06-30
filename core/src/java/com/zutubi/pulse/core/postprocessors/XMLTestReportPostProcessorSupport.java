@@ -12,11 +12,24 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 /**
+ * Helper base class for post processors that find test results in XML files.
+ * This class handles XML parsing, passing in a document for implementations
+ * to walk.  <a href="http://www.xom.nu/">XOM</a> is used for parsing as it
+ * has a convenient document API.
+ *
+ * @see com.zutubi.pulse.util.XMLUtils
  */
 public abstract class XMLTestReportPostProcessorSupport extends TestReportPostProcessorSupport
 {
+    /** @see #XMLTestReportPostProcessorSupport(String) */
     private String reportType;
 
+    /**
+     * Creates a new XML report processor for the given report type.
+     *
+     * @param reportType human-readable name of the type of report being
+     *                   processed (e.g. JUnit)
+     */
     protected XMLTestReportPostProcessorSupport(String reportType)
     {
         this.reportType = reportType;
@@ -64,5 +77,13 @@ public abstract class XMLTestReportPostProcessorSupport extends TestReportPostPr
         return new Builder();
     }
 
+    /**
+     * Called once for each XML document to be processed by this processor to
+     * find test results.  Discovered results should be added to the given
+     * suite.  Nested suites are supported.
+     *
+     * @param doc   XML document to post process
+     * @param tests suite to add all discovered test results to
+     */
     protected abstract void processDocument(Document doc, TestSuiteResult tests);
 }

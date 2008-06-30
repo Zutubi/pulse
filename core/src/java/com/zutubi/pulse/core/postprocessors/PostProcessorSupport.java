@@ -22,28 +22,53 @@ import java.io.File;
  * process and adding features.
  * </p>
  *
- * @see com.zutubi.pulse.core.postprocessors.TestReportPostProcessorSupport
+ * @see TestReportPostProcessorSupport
+ * @see XMLTestReportPostProcessorSupport
+ * @see TextFilePostProcessorSupport
+ * @see LineBasedPostProcessorSupport
  */
 public abstract class PostProcessorSupport extends SelfReference implements PostProcessor
 {
+    /** @see #setFailOnError(boolean) */
     private boolean failOnError = true;
+    /** @see #setFailOnWarning(boolean) */
     private boolean failOnWarning = false;
 
+    /**
+     * @see #setFailOnError(boolean)
+     * @return current value of the fail on error flag
+     */
     public boolean isFailOnError()
     {
         return failOnError;
     }
 
+    /**
+     * If set to true, the command (and thus build) will be failed when this
+     * processor detects an error feature.  This flag is true by default.
+     *
+     * @param failOnError true to fail the build on error
+     */
     public void setFailOnError(boolean failOnError)
     {
         this.failOnError = failOnError;
     }
 
+    /**
+     * @see #setFailOnWarning(boolean)
+     * @return current value of the fail on warning flag
+     */
     public boolean isFailOnWarning()
     {
         return failOnWarning;
     }
 
+    /**
+     * If set to true, the command (and thus build) will be failed when this
+     * processor detects a warning feature.  This flag is false by default.
+     *
+     * @param failOnWarning true to fail the build on error
+     */
     public void setFailOnWarning(boolean failOnWarning)
     {
         this.failOnWarning = failOnWarning;
@@ -56,5 +81,12 @@ public abstract class PostProcessorSupport extends SelfReference implements Post
         process(new File(outputDir, artifact.getPath()), ppContext);
     }
 
+    /**
+     * Called once for each artifact file to process.  Details discovered by
+     * processing should be added via the given context.
+     *
+     * @param artifactFile the file to post process
+     * @param ppContext    context in which the post processing is executing
+     */
     protected abstract void process(File artifactFile, PostProcessorContext ppContext);
 }

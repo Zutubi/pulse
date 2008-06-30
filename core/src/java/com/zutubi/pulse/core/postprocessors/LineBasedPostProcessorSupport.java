@@ -12,26 +12,20 @@ import java.io.StringReader;
 import java.util.List;
 
 /**
- * A post processor that does line-by-line processing with option content capturing.
+ * A support base class for post processors that process text files
+ * line-by-line.  Supports capturing of leading and trailing context lines
+ * and optional joining of overlapping features.
  */
 public abstract class LineBasedPostProcessorSupport extends TextFilePostProcessorSupport implements Validateable
 {
-    /**
-     * Number of lines of leading context to capture with the summary.
-     */
+    /** @see #setLeadingContext(int) */
     private int leadingContext = 0;
-    /**
-     * Number of lines of trailing context to capture with the summary.
-     */
+    /** @see #setTrailingContext(int) */
     private int trailingContext = 0;
-    /**
-     * If true, overlapping features (as determined by the first and last
-     * lines) will be joined into a single feature.
-     */
+    /** @see #setJoinOverlapping(boolean) */
     private boolean joinOverlapping = true;
 
-
-    public void process(BufferedReader reader, PostProcessorContext ppContext) throws IOException
+    protected void process(BufferedReader reader, PostProcessorContext ppContext) throws IOException
     {
         LineBasedPostProcessorContext lineContext = new LineBasedPostProcessorContext(ppContext);
         if (leadingContext == 0 && trailingContext == 0)
@@ -190,26 +184,53 @@ public abstract class LineBasedPostProcessorSupport extends TextFilePostProcesso
         }
     }
 
+    /**
+     * @see #setLeadingContext(int)
+     * @return the number of lines of leading context to capture
+     */
     public int getLeadingContext()
     {
         return leadingContext;
     }
 
+    /**
+     * Sets the number of lines of leading context to capture with any
+     * discovered feature (zero by default).
+     *
+     * @param leadingContext the number of lines to capture (may be zero)
+     */
     public void setLeadingContext(int leadingContext)
     {
         this.leadingContext = leadingContext;
     }
 
+    /**
+     * @see #setTrailingContext(int)
+     * @return the number of lines of trailing context to capture
+     */
     public int getTrailingContext()
     {
         return trailingContext;
     }
 
+    /**
+     * Sets the number of lines of trailing context to capture with any
+     * discovered feature (zero by default).
+     *
+     * @param trailingContext the number of lines to capture (may be zero)
+     */
     public void setTrailingContext(int trailingContext)
     {
         this.trailingContext = trailingContext;
     }
 
+    /**
+     * If set to true, overlapping features (as determined by the first and
+     * last lines captured - context included) will be joined into a single
+     * feature.
+     *
+     * @param joinOverlapping true to join overlapping features
+     */
     public void setJoinOverlapping(boolean joinOverlapping)
     {
         this.joinOverlapping = joinOverlapping;
@@ -228,5 +249,13 @@ public abstract class LineBasedPostProcessorSupport extends TextFilePostProcesso
         }
     }
 
+    /**
+     * Called once for each line to post-process.  This method should return
+     * the features found in the line.  This implementation will then take
+     * care of additional logic before adding features to the build.
+     *
+     * @param line the line to process
+     * @return any features found in the line
+     */
     protected abstract List<Feature> findFeatures(String line);
 }

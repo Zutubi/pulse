@@ -9,11 +9,11 @@ import java.io.File;
 
 /**
  */
-public abstract class XMLReportPostProcessorTestBase extends PulseTestCase
+public abstract class XMLTestReportPostProcessorTestBase extends PulseTestCase
 {
     protected XMLTestReportPostProcessorSupport pp;
 
-    protected XMLReportPostProcessorTestBase(XMLTestReportPostProcessorSupport pp)
+    protected XMLTestReportPostProcessorTestBase(XMLTestReportPostProcessorSupport pp)
     {
         this.pp = pp;
     }

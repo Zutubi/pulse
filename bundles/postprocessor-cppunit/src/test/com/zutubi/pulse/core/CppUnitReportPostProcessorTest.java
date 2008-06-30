@@ -2,7 +2,7 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.TestCaseResult;
 import com.zutubi.pulse.core.model.TestSuiteResult;
-import com.zutubi.pulse.core.postprocessors.XMLReportPostProcessorTestBase;
+import com.zutubi.pulse.core.postprocessors.XMLTestReportPostProcessorTestBase;
 
 import java.io.File;
 import java.net.URL;
@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  */
-public class CppUnitReportPostProcessorTest extends XMLReportPostProcessorTestBase
+public class CppUnitReportPostProcessorTest extends XMLTestReportPostProcessorTestBase
 {
     public CppUnitReportPostProcessorTest()
     {
