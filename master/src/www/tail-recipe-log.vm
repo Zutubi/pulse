@@ -5,7 +5,7 @@
 <head>
     <title>#wwtext("name=build") $buildResult.number :: #wwtext("name=build.stage") $h_stageName</title>
     <script type="text/javascript">
-        #updater("$base/ajax/tailRecipeLogPanel.action?projectName=${u_projectName}&buildVID=${buildResult.number}&stageName=${u_stageName}&maxLines=${maxLines}&refreshInterval=${refreshInterval}" "panel" $principle)
+        #updater("$base/ajax/tailRecipeLogPanel.action?projectName=${u_projectName}&buildVID=${buildResult.number}&stageName=${u_stageName}&maxLines=${maxLines}&refreshInterval=${refreshInterval}&personal=$personal" "panel" $principle)
 
         Ext.onReady(function() {
             var form = new Ext.form.FormPanel({
