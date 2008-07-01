@@ -7,7 +7,7 @@ import com.zutubi.pulse.events.DataDirectoryChangedEvent;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
+import com.zutubi.pulse.events.system.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.license.authorisation.Authorisation;
 import com.zutubi.pulse.license.events.LicenseUpdateEvent;
 import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
@@ -79,7 +79,7 @@ public class LicenseManager
 
             public Class[] getHandledEvents()
             {
-                return new Class[]{DataDirectoryChangedEvent.class, ConfigurationSystemStartedEvent.class};
+                return new Class[]{DataDirectoryChangedEvent.class, ConfigurationEventSystemStartedEvent.class};
             }
         });
 

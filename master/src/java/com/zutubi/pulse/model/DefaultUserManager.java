@@ -6,6 +6,7 @@ import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.system.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.pulse.license.LicenseManager;
 import com.zutubi.pulse.license.authorisation.AddUserAuthorisation;
@@ -49,17 +50,9 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
     private Map<Long, UserConfiguration> userConfigsById = new HashMap<Long, UserConfiguration>();
     private BuiltinGroupConfiguration allUsersGroup;
 
-    public void init(ConfigurationProvider configurationProvider)
+    private void registerConfigListeners(ConfigurationProvider configurationProvider)
     {
         this.configurationProvider = configurationProvider;
-
-        // register the canAddUser license authorisation
-        AddUserAuthorisation addUserAuthorisation = new AddUserAuthorisation();
-        addUserAuthorisation.setUserManager(this);
-        licenseManager.addAuthorisation(addUserAuthorisation);
-
-        initGroupsByUser();
-        initUsersById();
 
         configurationProvider.registerEventListener(new ConfigurationEventListener()
         {
@@ -94,6 +87,17 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
             }
         };
         userListener.register(configurationProvider, true);
+    }
+
+    public void init()
+    {
+        // register the canAddUser license authorisation
+        AddUserAuthorisation addUserAuthorisation = new AddUserAuthorisation();
+        addUserAuthorisation.setUserManager(this);
+        licenseManager.addAuthorisation(addUserAuthorisation);
+
+        initGroupsByUser();
+        initUsersById();
     }
 
     public long createState(UserConfiguration instance)
@@ -279,12 +283,19 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
 
     public void handleEvent(Event event)
     {
-        init(((ConfigurationSystemStartedEvent)event).getConfigurationProvider());
+        if(event instanceof ConfigurationEventSystemStartedEvent)
+        {
+            registerConfigListeners(((ConfigurationEventSystemStartedEvent)event).getConfigurationProvider());
+        }
+        else
+        {
+            init();
+        }
     }
 
     public Class[] getHandledEvents()
     {
-        return new Class[]{ ConfigurationSystemStartedEvent.class };
+        return new Class[]{ConfigurationEventSystemStartedEvent.class, ConfigurationSystemStartedEvent.class };
     }
 
     public void setPasswordEncoder(PasswordEncoder passwordEncoder)

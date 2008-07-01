@@ -29,6 +29,7 @@ import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.BuildRequestEvent;
 import com.zutubi.pulse.events.build.PersonalBuildRequestEvent;
 import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
+import com.zutubi.pulse.events.system.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.pulse.license.LicenseManager;
 import com.zutubi.pulse.license.authorisation.AddProjectAuthorisation;
@@ -80,17 +81,9 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     private List<ProjectConfiguration> validConfigs = new LinkedList<ProjectConfiguration>();
     private Map<String, Set<ProjectConfiguration>> labelToConfigs = new HashMap<String, Set<ProjectConfiguration>>();
 
-    public void initialise(ConfigurationProvider configurationProvider)
+    private void registerConfigListener(ConfigurationProvider configurationProvider)
     {
         this.configurationProvider = configurationProvider;
-        changelistIsolator = new ChangelistIsolator(buildManager);
-        changelistIsolator.setScmClientFactory(scmClientManager);
-
-        // register the canAddProject authorisation with the license manager.
-        AddProjectAuthorisation addProjectAuthorisation = new AddProjectAuthorisation();
-        addProjectAuthorisation.setProjectManager(this);
-        licenseManager.addAuthorisation(addProjectAuthorisation);
-
         TypeListener<ProjectConfiguration> listener = new TypeAdapter<ProjectConfiguration>(ProjectConfiguration.class)
         {
             public void postInsert(ProjectConfiguration instance)
@@ -121,6 +114,18 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
             }
         };
         listener.register(configurationProvider, true);
+    }
+
+    private void initialise()
+    {
+        changelistIsolator = new ChangelistIsolator(buildManager);
+        changelistIsolator.setScmClientFactory(scmClientManager);
+
+        // register the canAddProject authorisation with the license manager.
+        AddProjectAuthorisation addProjectAuthorisation = new AddProjectAuthorisation();
+        addProjectAuthorisation.setProjectManager(this);
+        licenseManager.addAuthorisation(addProjectAuthorisation);
+
         updateProjects();
 
         // create default project if it is required.
@@ -652,16 +657,20 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                 }
             }
         }
+        else if(evt instanceof ConfigurationEventSystemStartedEvent)
+        {
+            ConfigurationEventSystemStartedEvent cesse = (ConfigurationEventSystemStartedEvent) evt;
+            registerConfigListener(cesse.getConfigurationProvider());
+        }
         else
         {
-            ConfigurationSystemStartedEvent csse = (ConfigurationSystemStartedEvent) evt;
-            initialise(csse.getConfigurationProvider());
+            initialise();
         }
     }
 
     public Class[] getHandledEvents()
     {
-        return new Class[] { RecipeDispatchedEvent.class, ConfigurationSystemStartedEvent.class };
+        return new Class[] { RecipeDispatchedEvent.class, ConfigurationEventSystemStartedEvent.class, ConfigurationSystemStartedEvent.class };
     }
 
     public void setLicenseManager(LicenseManager licenseManager)

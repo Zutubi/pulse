@@ -16,6 +16,7 @@ import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.events.*;
 import com.zutubi.pulse.events.EventListener;
+import com.zutubi.pulse.events.system.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.pulse.license.LicenseManager;
 import com.zutubi.pulse.license.authorisation.AddAgentAuthorisation;
@@ -69,10 +70,9 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
     private Map<Long, AgentUpdater> updaters = new TreeMap<Long, AgentUpdater>();
     private ReentrantLock updatersLock = new ReentrantLock();
 
-    public void handleConfigurationSystemStarted(ConfigurationSystemStartedEvent event)
+    private void handleConfigurationEventSystemStarted(ConfigurationEventSystemStartedEvent event)
     {
         configurationProvider = event.getConfigurationProvider();
-
         TypeListener<AgentConfiguration> listener = new TypeAdapter<AgentConfiguration>(AgentConfiguration.class)
         {
             public void postInsert(AgentConfiguration instance)
@@ -91,7 +91,10 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
             }
         };
         listener.register(configurationProvider, true);
+    }
 
+    public void handleConfigurationSystemStarted(ConfigurationSystemStartedEvent event)
+    {
         refreshAgents();
 
         // register the canAddAgent license authorisation.
@@ -435,6 +438,10 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         {
             handleAgentUpgradeComplete(evt);
         }
+        else if(evt instanceof ConfigurationEventSystemStartedEvent)
+        {
+            handleConfigurationEventSystemStarted((ConfigurationEventSystemStartedEvent) evt);
+        }
         else
         {
             handleConfigurationSystemStarted((ConfigurationSystemStartedEvent) evt);
@@ -443,7 +450,12 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
 
     public Class[] getHandledEvents()
     {
-        return new Class[] { AgentPingEvent.class, AgentUpgradeCompleteEvent.class, ConfigurationSystemStartedEvent.class };
+        return new Class[] {
+                AgentPingEvent.class,
+                AgentUpgradeCompleteEvent.class,
+                ConfigurationEventSystemStartedEvent.class,
+                ConfigurationSystemStartedEvent.class
+        };
     }
 
     public List<Agent> getAllAgents()

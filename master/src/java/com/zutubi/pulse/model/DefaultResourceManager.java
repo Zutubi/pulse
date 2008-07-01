@@ -4,14 +4,16 @@ import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.config.TypeAdapter;
 import com.zutubi.prototype.config.TypeListener;
 import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceVersion;
-import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
-import com.zutubi.pulse.events.*;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.system.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
-import com.zutubi.pulse.agent.Agent;
+import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.logging.Logger;
 
@@ -28,7 +30,7 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.pulse
     private Map<Long, Resource> resourcesByHandle = new HashMap<Long, Resource>();
     private Map<Long, ResourceVersion> resourceVersionsByHandle = new HashMap<Long, ResourceVersion>();
 
-    public void init(ConfigurationProvider configurationProvider)
+    private void registerConfigListeners(ConfigurationProvider configurationProvider)
     {
         this.configurationProvider = configurationProvider;
         TypeListener<AgentConfiguration> agentListener = new TypeAdapter<AgentConfiguration>(AgentConfiguration.class)
@@ -109,7 +111,10 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.pulse
             }
         };
         resourceVersionListener.register(configurationProvider, true);
+    }
 
+    public void init()
+    {
         for (Resource resource : configurationProvider.getAll(Resource.class))
         {
             addResource(resource);
@@ -303,12 +308,19 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.pulse
 
     public void handleEvent(Event event)
     {
-        init(((ConfigurationSystemStartedEvent)event).getConfigurationProvider());
+        if(event instanceof ConfigurationEventSystemStartedEvent)
+        {
+            registerConfigListeners(((ConfigurationEventSystemStartedEvent)event).getConfigurationProvider());
+        }
+        else
+        {
+            init();
+        }
     }
 
     public Class[] getHandledEvents()
     {
-        return new Class[]{ ConfigurationSystemStartedEvent.class };
+        return new Class[]{ ConfigurationEventSystemStartedEvent.class, ConfigurationSystemStartedEvent.class };
     }
 
     public void setEventManager(EventManager eventManager)

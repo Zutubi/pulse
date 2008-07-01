@@ -3,13 +3,13 @@ package com.zutubi.pulse.security;
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.security.AuthorityProvider;
 import com.zutubi.prototype.security.DefaultAccessManager;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.EventListener;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.system.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.model.GrantedAuthority;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.group.ServerPermission;
-import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.events.EventListener;
-import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -55,11 +55,11 @@ public class GlobalAuthorityProvider implements AuthorityProvider<Object>, Event
 
     public void handleEvent(Event event)
     {
-        this.configurationProvider = ((ConfigurationSystemStartedEvent)event).getConfigurationProvider();
+        this.configurationProvider = ((ConfigurationEventSystemStartedEvent)event).getConfigurationProvider();
     }
 
     public Class[] getHandledEvents()
     {
-        return new Class[]{ ConfigurationSystemStartedEvent.class };
+        return new Class[]{ ConfigurationEventSystemStartedEvent.class };
     }
 }

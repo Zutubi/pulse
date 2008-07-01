@@ -5,11 +5,11 @@ import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.config.events.ConfigurationEvent;
 import com.zutubi.prototype.config.events.PostSaveEvent;
 import com.zutubi.pulse.core.Stoppable;
-import com.zutubi.pulse.jabber.config.JabberConfiguration;
-import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
+import com.zutubi.pulse.events.system.ConfigurationEventSystemStartedEvent;
+import com.zutubi.pulse.jabber.config.JabberConfiguration;
 import com.zutubi.util.Constants;
 import com.zutubi.util.logging.Logger;
 import org.jivesoftware.smack.*;
@@ -216,13 +216,13 @@ public class JabberManager implements Stoppable, PacketListener, ConfigurationEv
 
     public void handleEvent(Event event)
     {
-        configurationProvider = ((ConfigurationSystemStartedEvent)event).getConfigurationProvider();
+        configurationProvider = ((ConfigurationEventSystemStartedEvent)event).getConfigurationProvider();
         init();
     }
 
     public Class[] getHandledEvents()
     {
-        return new Class[]{ConfigurationSystemStartedEvent.class};
+        return new Class[]{ ConfigurationEventSystemStartedEvent.class };
     }
 
     public void setEventManager(EventManager eventManager)

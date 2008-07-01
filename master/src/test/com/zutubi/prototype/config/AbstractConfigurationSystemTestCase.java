@@ -13,7 +13,6 @@ import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.prototype.type.record.store.InMemoryRecordStore;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.events.DefaultEventManager;
-import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.security.GlobalAuthorityProvider;
 import com.zutubi.pulse.security.PulseThreadFactory;
@@ -106,10 +105,12 @@ public abstract class AbstractConfigurationSystemTestCase extends PulseTestCase
         configurationSecurityManager = new ConfigurationSecurityManager();
         configurationSecurityManager.setAccessManager(accessManager);
         configurationSecurityManager.setConfigurationTemplateManager(configurationTemplateManager);
+        configurationSecurityManager.setEventManager(eventManager);
 
         configurationCleanupManager = new ConfigurationCleanupManager();
         configurationCleanupManager.setObjectFactory(objectFactory);
         configurationCleanupManager.setThreadFactory(threadFactory);
+        configurationCleanupManager.setEventManager(eventManager);
 
         configurationStateManager = new ConfigurationStateManager();
         configurationStateManager.setRecordManager(recordManager);
@@ -131,10 +132,10 @@ public abstract class AbstractConfigurationSystemTestCase extends PulseTestCase
         configurationTemplateManager.init();
         configurationCleanupManager.init();
         configurationProvider.init();
-
-        ConfigurationSystemStartedEvent event = new ConfigurationSystemStartedEvent(configurationProvider);
-        configurationCleanupManager.handleEvent(event);
-        configurationSecurityManager.handleEvent(event);
+// FIXME events
+//        ConfigurationSystemStartedEvent event = new ConfigurationSystemStartedEvent(configurationProvider);
+//        configurationCleanupManager.handleEvent(event);
+//        configurationSecurityManager.handleEvent(event);
 
         typeRegistry.setConfigurationReferenceManager(configurationReferenceManager);
         typeRegistry.setHandleAllocator(recordManager);

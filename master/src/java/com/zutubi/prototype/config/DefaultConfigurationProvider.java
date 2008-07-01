@@ -5,6 +5,7 @@ import com.zutubi.prototype.type.CompositeType;
 import com.zutubi.prototype.type.TypeRegistry;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.events.*;
+import com.zutubi.pulse.events.system.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.Predicate;
@@ -30,6 +31,8 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
 
     public void init()
     {
+        eventManager.publish(new ConfigurationEventSystemStartedEvent(this));
+
         syncMux = new MultiplexingListener(ConfigurationEvent.class);
         eventManager.register(syncMux);
 
@@ -39,6 +42,10 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
 
         configurationTemplateManager.refreshCaches();
 
+        // Two events as the first is used to tie in listeners so that
+        // handlers of the second are free to make changes (which will then
+        // be visible to said listeners).
+        eventManager.publish(new ConfigurationEventSystemStartedEvent(this));
         eventManager.publish(new ConfigurationSystemStartedEvent(this));
     }
 

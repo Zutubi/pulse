@@ -3,12 +3,12 @@ package com.zutubi.prototype.config.cleanup;
 import com.zutubi.prototype.ConventionSupport;
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.EventListener;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.system.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.security.PulseThreadFactory;
-import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.events.EventListener;
-import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
@@ -96,12 +96,12 @@ public class ConfigurationCleanupManager implements EventListener
 
     public void handleEvent(Event event)
     {
-        configurationProvider = ((ConfigurationSystemStartedEvent)event).getConfigurationProvider();
+        configurationProvider = ((ConfigurationEventSystemStartedEvent)event).getConfigurationProvider();
     }
 
     public Class[] getHandledEvents()
     {
-        return new Class[]{ ConfigurationSystemStartedEvent.class };
+        return new Class[]{ ConfigurationEventSystemStartedEvent.class };
     }
 
     public void setObjectFactory(ObjectFactory objectFactory)

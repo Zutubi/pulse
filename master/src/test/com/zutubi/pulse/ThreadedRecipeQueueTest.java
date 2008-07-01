@@ -25,6 +25,7 @@ import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.build.RecipeCompletedEvent;
 import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
+import com.zutubi.pulse.events.system.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.model.AgentState;
@@ -100,6 +101,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         queue.setEventManager(eventManager);
         queue.setAgentManager(agentManager);
         queue.setUnsatisfiableTimeout(-1);
+        queue.handleEvent(new ConfigurationEventSystemStartedEvent(configurationProvider));
         queue.handleEvent(new ConfigurationSystemStartedEvent(configurationProvider));
         queue.setScmClientFactory(new DelegateScmClientFactory()
         {

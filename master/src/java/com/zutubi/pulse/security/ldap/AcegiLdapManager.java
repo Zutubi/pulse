@@ -1,11 +1,14 @@
 package com.zutubi.pulse.security.ldap;
 
-import com.zutubi.util.TextUtils;
 import com.zutubi.prototype.config.ConfigurationEventListener;
 import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.prototype.config.events.ConfigurationEvent;
 import com.zutubi.prototype.config.events.PostSaveEvent;
 import com.zutubi.prototype.type.record.PathUtils;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.system.ConfigurationEventSystemStartedEvent;
+import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.model.AcegiUser;
 import com.zutubi.pulse.model.UserManager;
@@ -14,8 +17,7 @@ import com.zutubi.pulse.prototype.config.group.GroupConfiguration;
 import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 import com.zutubi.pulse.prototype.config.user.UserPreferencesConfiguration;
 import com.zutubi.pulse.prototype.config.user.contacts.EmailContactConfiguration;
-import com.zutubi.pulse.events.*;
-import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
+import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.BadCredentialsException;
 import org.acegisecurity.GrantedAuthority;
@@ -51,13 +53,10 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
     private UserManager userManager;
     private Map<String, LdapUserDetails> detailsMap = new HashMap<String, LdapUserDetails>();
 
-    public void init(ConfigurationProvider configurationProvider)
+    private void registerConfigListeners(ConfigurationProvider configurationProvider)
     {
         this.configurationProvider = configurationProvider;
         configurationProvider.registerEventListener(this, false, false, LDAPConfiguration.class);
-        LDAPConfiguration ldapConfiguration = configurationProvider.get(LDAPConfiguration.class);
-
-        init(ldapConfiguration);
     }
 
     private synchronized void init(LDAPConfiguration ldapConfiguration)
@@ -387,12 +386,19 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
 
     public void handleEvent(Event event)
     {
-        init(((ConfigurationSystemStartedEvent)event).getConfigurationProvider());
+        if (event instanceof ConfigurationEventSystemStartedEvent)
+        {
+            registerConfigListeners(((ConfigurationEventSystemStartedEvent)event).getConfigurationProvider());
+        }
+        else
+        {
+            init(configurationProvider.get(LDAPConfiguration.class));
+        }
     }
 
     public Class[] getHandledEvents()
     {
-        return new Class[]{ ConfigurationSystemStartedEvent.class };
+        return new Class[]{ ConfigurationEventSystemStartedEvent.class, ConfigurationSystemStartedEvent.class };
     }
 
     public void setUserManager(UserManager userManager)

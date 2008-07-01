@@ -16,7 +16,7 @@ import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.events.*;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.build.*;
-import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
+import com.zutubi.pulse.events.system.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.events.system.SystemStartedEvent;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
@@ -596,9 +596,9 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         {
             handleScmChange((ScmChangeEvent) evt);
         }
-        else if (evt instanceof ConfigurationSystemStartedEvent)
+        else if (evt instanceof ConfigurationEventSystemStartedEvent)
         {
-            ConfigurationProvider configurationProvider = ((ConfigurationSystemStartedEvent)evt).getConfigurationProvider();
+            ConfigurationProvider configurationProvider = ((ConfigurationEventSystemStartedEvent)evt).getConfigurationProvider();
             globalConfiguration = configurationProvider.get(GlobalConfiguration.class);
             updateTimeout(globalConfiguration);
             configurationProvider.registerEventListener(this, false, false, GlobalConfiguration.class);
@@ -740,7 +740,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
     public Class[] getHandledEvents()
     {
-        return new Class[]{RecipeCompletedEvent.class, RecipeErrorEvent.class, ScmChangeEvent.class, AgentEvent.class, ConfigurationSystemStartedEvent.class, SystemStartedEvent.class };
+        return new Class[]{RecipeCompletedEvent.class, RecipeErrorEvent.class, ScmChangeEvent.class, AgentEvent.class, ConfigurationEventSystemStartedEvent.class, SystemStartedEvent.class };
     }
 
     public void handleConfigurationEvent(ConfigurationEvent event)
