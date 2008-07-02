@@ -2,6 +2,7 @@ package com.zutubi.pulse.upgrade.tasks;
 
 import org.hibernate.MappingException;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.cfg.Environment;
 import org.hibernate.engine.Mapping;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
@@ -13,8 +14,13 @@ import org.springframework.core.io.Resource;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ByteArrayInputStream;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 
 /**
  *
@@ -22,6 +28,7 @@ import java.util.List;
  */
 public class MutableConfiguration extends Configuration
 {
+
     public void addTable(Table table)
     {
         String key = getTableKey(table);
@@ -114,5 +121,28 @@ public class MutableConfiguration extends Configuration
         {
             addInputStream(resource.getInputStream());
         }
+    }
+
+    public MutableConfiguration copy()
+    {
+        // copy via serialisation... seems easiest way to go..
+        try
+        {
+            ByteArrayOutputStream raw = new ByteArrayOutputStream();
+            ObjectOutputStream out = new ObjectOutputStream(raw);
+            out.writeObject(this);
+            ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(raw.toByteArray()));
+            return (MutableConfiguration)in.readObject();
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void setHibernateDialect(Properties jdbc)
+    {
+        String dialect = HibernateUtils.inferHibernateDialect(jdbc);
+        setProperty(Environment.DIALECT, dialect);
     }
 }
