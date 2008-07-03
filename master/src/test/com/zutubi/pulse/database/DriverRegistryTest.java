@@ -2,16 +2,16 @@ package com.zutubi.pulse.database;
 
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.DriverWrapper;
 import com.zutubi.util.IOUtils;
+import org.springframework.core.io.ClassPathResource;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.sql.DriverManager;
 import java.sql.Driver;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Enumeration;
-import java.util.Properties;
 
 /**
  *
@@ -21,26 +21,42 @@ public class DriverRegistryTest extends PulseTestCase
 {
     private File tmp;
     private DriverRegistry registry;
+
     private static final String EMBEDDED_DRIVER = "org.hsqldb.jdbcDriver";
+    private static final String POSTGRESQL_DRIVER = "org.postgresql.Driver";
+
+    private File postgresqlJar;
+    private File driverDir;
 
     protected void setUp() throws Exception
     {
         super.setUp();
 
         tmp = FileSystemUtils.createTempDir();
+        driverDir = new File(tmp, "drivers");
+
+        // copy the postgresql jar from the classpath into the temporary directory.
+        ClassPathResource resource = new ClassPathResource("com/zutubi/pulse/database/lib/postgresql.jar");
+        postgresqlJar = new File(tmp, "postgresql.jar");
+        
+        IOUtils.joinStreams(resource.getInputStream(), new FileOutputStream(postgresqlJar));
 
         registry = new DriverRegistry();
-        registry.setDriverDir(tmp);
+        registry.setDriverDir(driverDir);
         registry.init();
     }
 
     protected void tearDown() throws Exception
     {
-        removeDirectory(tmp);
+        unregisterAllDriversFromDriverManager();
 
         registry = null;
 
-        unregisterAllDriversFromDriverManager();
+        if (!FileSystemUtils.rmdir(tmp))
+        {
+            // By loading the classfile from the postgresql jar, we cause problems with the deletion of that file
+            // Someone keeps an open file handle.
+        }
 
         super.tearDown();
     }
@@ -50,8 +66,26 @@ public class DriverRegistryTest extends PulseTestCase
         Enumeration<Driver> drivers = DriverManager.getDrivers();
         while (drivers.hasMoreElements())
         {
-            DriverManager.deregisterDriver(drivers.nextElement());    
+            DriverManager.deregisterDriver(drivers.nextElement());
         }
+    }
+
+    public void testRegisterExternalDriver() throws IOException
+    {
+        registry.register(POSTGRESQL_DRIVER, postgresqlJar);
+
+        assertTrue(registry.isRegistered(POSTGRESQL_DRIVER));
+
+        // verify that we can use the driver as expected.
+        try
+        {
+            DriverManager.getDriver("jdbc:postgresql://localhost:5432/blah");
+        }
+        catch (SQLException e)
+        {
+            assertFalse(e.getMessage().contains("No suitable driver"));
+        }
+
     }
 
     public void testRegisterEmbeddedDriver() throws IOException
@@ -59,18 +93,28 @@ public class DriverRegistryTest extends PulseTestCase
         registry.register(EMBEDDED_DRIVER);
 
         assertTrue(registry.isRegistered(EMBEDDED_DRIVER));
+
+        try
+        {
+            DriverManager.getDriver("jdbc:hsqldb:C:/some/path/to/db");
+        }
+        catch (SQLException e)
+        {
+            assertFalse(e.getMessage().contains("No suitable driver"));
+        }
     }
 
-    public void testRegistryFile() throws IOException
+    public void testRegistryFileContents() throws IOException
     {
-        registry.register(EMBEDDED_DRIVER);
-
         // check file is there.
-        File expectedRegistryFile = new File(tmp, ".registry");
+        File expectedRegistryFile = new File(driverDir, ".registry");
         assertTrue(expectedRegistryFile.isFile());
 
-        Properties registryFileContents = IOUtils.read(expectedRegistryFile);
-        assertTrue(registryFileContents.containsKey(EMBEDDED_DRIVER));
+        assertFalse(IOUtils.read(expectedRegistryFile).containsKey(EMBEDDED_DRIVER));
+
+        registry.register(EMBEDDED_DRIVER);
+
+        assertTrue(IOUtils.read(expectedRegistryFile).containsKey(EMBEDDED_DRIVER));
     }
 
     public void testBadDriver() throws IOException
@@ -82,47 +126,46 @@ public class DriverRegistryTest extends PulseTestCase
         }
         catch (IOException e)
         {
-            // expected.
-            e.printStackTrace();
+            assertEquals("Unable to load database driver: org.unknown.jdbcDriver", e.getMessage());
         }
-
     }
 
     public void testInit() throws IOException, SQLException
     {
         registry.register(EMBEDDED_DRIVER);
+
+        restartDriverRegistry();
+        
         assertTrue(registry.isRegistered(EMBEDDED_DRIVER));
+    }
 
-        unregisterAllDriversFromDriverManager();
+    public void testRegisterWithDriverManager() throws IOException
+    {
+        assertFalse(DriverManager.getDrivers().hasMoreElements());
 
-        registry = new DriverRegistry();
-        registry.setDriverDir(tmp);
-        registry.init();
-        assertTrue(registry.isRegistered(EMBEDDED_DRIVER));
+        registry.register(EMBEDDED_DRIVER);
 
-        Enumeration<Driver> drivers = DriverManager.getDrivers();
-        assertTrue(drivers.hasMoreElements());
-
-        Driver driver = drivers.nextElement();
-        assertTrue(driver instanceof DriverWrapper);
-        assertEquals(EMBEDDED_DRIVER, ((DriverWrapper)driver).getDelegate().getClass().getCanonicalName());
+        assertTrue(DriverManager.getDrivers().hasMoreElements());
     }
 
     public void testUnregisterOnRestart() throws IOException, SQLException
     {
         registry.register(EMBEDDED_DRIVER);
-        assertTrue(registry.isRegistered(EMBEDDED_DRIVER));
 
         registry.unregisterOnRestart(EMBEDDED_DRIVER);
-        assertTrue(registry.isRegistered(EMBEDDED_DRIVER));
 
+        restartDriverRegistry();
+
+        assertFalse(registry.isRegistered(EMBEDDED_DRIVER));
+        assertFalse(DriverManager.getDrivers().hasMoreElements());
+    }
+
+    private void restartDriverRegistry() throws SQLException
+    {
         unregisterAllDriversFromDriverManager();
 
         registry = new DriverRegistry();
-        registry.setDriverDir(tmp);
+        registry.setDriverDir(driverDir);
         registry.init();
-        
-        assertFalse(registry.isRegistered(EMBEDDED_DRIVER));
-        assertFalse(DriverManager.getDrivers().hasMoreElements());
     }
 }
