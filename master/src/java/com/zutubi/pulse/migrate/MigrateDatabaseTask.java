@@ -1,6 +1,5 @@
 package com.zutubi.pulse.migrate;
 
-import com.zutubi.pulse.bootstrap.MasterUserPaths;
 import com.zutubi.pulse.database.DatabaseConfig;
 import com.zutubi.pulse.monitor.AbstractTask;
 import com.zutubi.pulse.monitor.FeedbackAware;
@@ -10,21 +9,18 @@ import com.zutubi.pulse.transfer.Table;
 import com.zutubi.pulse.transfer.TransferAPI;
 import com.zutubi.pulse.transfer.TransferException;
 import com.zutubi.pulse.transfer.TransferListener;
-import com.zutubi.pulse.upgrade.tasks.HibernateUtils;
+import com.zutubi.pulse.transfer.jdbc.HibernateUniqueKeyTable;
 import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
 import com.zutubi.pulse.util.JDBCUtils;
 import org.hibernate.cfg.Configuration;
 
 import javax.sql.DataSource;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -34,15 +30,13 @@ import java.util.Properties;
  */
 public class MigrateDatabaseTask extends AbstractTask implements FeedbackAware
 {
-    private List<String> mappings = new LinkedList<String>();
-
-    private MasterUserPaths userPaths = null;
-
     private Properties sourceJdbcProperties;
 
     private Properties targetJdbcProperties;
 
     private TaskFeedback feedback;
+
+    private MutableConfiguration hibernateConfiguration;
 
     protected MigrateDatabaseTask(String name)
     {
@@ -69,15 +63,16 @@ public class MigrateDatabaseTask extends AbstractTask implements FeedbackAware
         try
         {
             DatabaseConfig sourceDatabaseConfig = new DatabaseConfig(sourceJdbcProperties);
-            sourceDatabaseConfig.setUserPaths(userPaths);
             DataSource source = sourceDatabaseConfig.createDataSource();
 
             DatabaseConfig targetDatabaseConfig = new DatabaseConfig(targetJdbcProperties);
-            targetDatabaseConfig.setUserPaths(userPaths);
             DataSource target = targetDatabaseConfig.createDataSource();
 
-            MutableConfiguration sourceConfiguration = HibernateUtils.createHibernateConfiguration(mappings, sourceJdbcProperties);
-            MutableConfiguration targetConfiguration = HibernateUtils.createHibernateConfiguration(mappings, targetJdbcProperties);
+            MutableConfiguration sourceConfiguration = hibernateConfiguration.copy();
+            sourceConfiguration.setHibernateDialect(sourceJdbcProperties);
+
+            MutableConfiguration targetConfiguration = hibernateConfiguration.copy();
+            targetConfiguration.setHibernateDialect(targetJdbcProperties);
 
             TransferAPI transfer = new TransferAPI();
 
@@ -96,10 +91,6 @@ public class MigrateDatabaseTask extends AbstractTask implements FeedbackAware
         {
             throw new TaskException(e);
         }
-        catch (IOException e)
-        {
-            throw new TaskException(e);
-        }
         catch (SQLException e)
         {
             throw new TaskException(e);
@@ -113,7 +104,6 @@ public class MigrateDatabaseTask extends AbstractTask implements FeedbackAware
         Connection con = null;
         try
         {
-
             con = dataSource.getConnection();
 
             Iterator tables = configuration.getTableMappings();
@@ -121,17 +111,11 @@ public class MigrateDatabaseTask extends AbstractTask implements FeedbackAware
             {
                 org.hibernate.mapping.Table table = (org.hibernate.mapping.Table) tables.next();
 
-                PreparedStatement ps = con.prepareStatement(String.format("SELECT count(*) FROM %s", table.getName()));
-                ResultSet rs = ps.executeQuery();
-                if (rs.next())
-                {
-                    tableSizes.put(table.getName(), rs.getLong(1));
-                }
-                else
-                {
-                    tableSizes.put(table.getName(), 0L);
-                }
+                tableSizes.put(table.getName(), countTableSize(table, con));
             }
+
+            org.hibernate.mapping.Table table = HibernateUniqueKeyTable.getMapping();
+            tableSizes.put(table.getName(), countTableSize(table, con));
         }
         finally
         {
@@ -141,9 +125,23 @@ public class MigrateDatabaseTask extends AbstractTask implements FeedbackAware
         return tableSizes;
     }
 
-    public void setMappings(List<String> mappings)
+    private long countTableSize(org.hibernate.mapping.Table table, Connection con) throws SQLException
     {
-        this.mappings = mappings;
+        PreparedStatement ps = con.prepareStatement(String.format("SELECT count(*) FROM %s", table.getName()));
+        ResultSet rs = ps.executeQuery();
+        if (rs.next())
+        {
+            return rs.getLong(1);
+        }
+        else
+        {
+            return 0L;
+        }
+    }
+
+    public void setHibernateConfiguration(MutableConfiguration configuration)
+    {
+        this.hibernateConfiguration = configuration;
     }
 
     public void setSourceJdbcProperties(Properties properties)
@@ -154,11 +152,6 @@ public class MigrateDatabaseTask extends AbstractTask implements FeedbackAware
     public void setTargetJdbcProperties(Properties properties)
     {
         this.targetJdbcProperties = properties;
-    }
-
-    public void setUserPaths(MasterUserPaths userPaths)
-    {
-        this.userPaths = userPaths;
     }
 
     private class MigrateTransferListener implements TransferListener

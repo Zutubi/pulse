@@ -1,10 +1,10 @@
 package com.zutubi.pulse.migrate;
 
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.bootstrap.MasterUserPaths;
 import com.zutubi.pulse.database.DatabaseConfig;
 import com.zutubi.pulse.monitor.JobManager;
 import com.zutubi.pulse.monitor.Monitor;
+import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
 
 import java.io.IOException;
 import java.util.List;
@@ -22,21 +22,40 @@ public class MigrationManager
 
     private JobManager jobManager = null;
 
-    private DatabaseConfig currentDatabaseConfig;
+    private MutableConfiguration hibernateConfiguration = null;
 
-    private MasterUserPaths userPaths;
-
-    private List<String> hibernateMappings = null;
+    private Properties jdbcProperties;
 
     private MasterConfigurationManager configurationManager;
 
+    private List<String> mappings;
+
     public void scheduleMigration(Properties databaseProperties) throws IOException
     {
+        if (hibernateConfiguration == null)
+        {
+            hibernateConfiguration = new MutableConfiguration();
+            hibernateConfiguration.addClassPathMappings(mappings);
+            Properties hibernateProperties = configurationManager.getDatabaseConfig().getHibernateProperties();
+            hibernateConfiguration.setProperties(hibernateProperties);
+        }
+
+        // since we are (/may be) dealing with dynamically loaded drivers, these jdbc properties
+        // should not contain direct jdbc classname references.  The drivers will be looked up via the URLs.
+
+        // make copies so as not to change the originals.
+        Properties source = new Properties();
+        source.putAll(jdbcProperties);
+        source.remove(DatabaseConfig.JDBC_DRIVER_CLASS_NAME);
+
+        Properties target = new Properties();
+        target.putAll(databaseProperties);
+        target.remove(DatabaseConfig.JDBC_DRIVER_CLASS_NAME);
+        
         MigrateDatabaseTask migrateTask = new MigrateDatabaseTask("Migrate database");
-        migrateTask.setTargetJdbcProperties(databaseProperties);
-        migrateTask.setSourceJdbcProperties(currentDatabaseConfig.getProperties());
-        migrateTask.setUserPaths(userPaths);
-        migrateTask.setMappings(hibernateMappings);
+        migrateTask.setTargetJdbcProperties(target);
+        migrateTask.setSourceJdbcProperties(source);
+        migrateTask.setHibernateConfiguration(hibernateConfiguration);
 
         UpdateDatabaseConfigurationFileTask updateTask = new UpdateDatabaseConfigurationFileTask("Update configuration");
         updateTask.setConfigurationManager(configurationManager);
@@ -53,9 +72,6 @@ public class MigrationManager
     public void runMigration()
     {
         jobManager.start(MIGRATE_JOB_KEY);
-
-        // somewhere here we need to update the configured database properties.
-
     }
 
     public boolean isRequested()
@@ -66,13 +82,7 @@ public class MigrationManager
     public void setConfigurationManager(MasterConfigurationManager configurationManager) throws IOException
     {
         setDatabaseConfig(configurationManager.getDatabaseConfig());
-        setUserPaths(configurationManager.getUserPaths());
         this.configurationManager = configurationManager;
-    }
-
-    public void setHibernateMappings(List<String> hibernateMappings)
-    {
-        this.hibernateMappings = hibernateMappings;
     }
 
     public void setJobManager(JobManager jobManager)
@@ -86,13 +96,28 @@ public class MigrationManager
 
     }
 
-    public void setDatabaseConfig(DatabaseConfig currentDatabaseConfig)
+    public void setDatabaseProperties(Properties props)
     {
-        this.currentDatabaseConfig = currentDatabaseConfig;
+        this.jdbcProperties = props;
     }
 
-    public void setUserPaths(MasterUserPaths userPaths)
+    public void setDatabaseConfig(DatabaseConfig currentDatabaseConfig)
     {
-        this.userPaths = userPaths;
+        Properties props = new Properties();
+        props.putAll(currentDatabaseConfig.getProperties());
+        // ensure that the url is resolved if needed.
+        props.setProperty(DatabaseConfig.JDBC_URL, currentDatabaseConfig.getUrl());
+
+        setDatabaseProperties(props);
+    }
+
+    public void setHibernateConfiguration(MutableConfiguration hibernateConfiguration)
+    {
+        this.hibernateConfiguration = hibernateConfiguration;
+    }
+
+    public void setHibernateMappings(List<String> mappings)
+    {
+        this.mappings = mappings;
     }
 }

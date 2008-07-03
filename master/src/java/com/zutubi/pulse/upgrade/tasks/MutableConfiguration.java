@@ -14,10 +14,6 @@ import org.springframework.core.io.Resource;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ByteArrayInputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -28,6 +24,9 @@ import java.util.Properties;
  */
 public class MutableConfiguration extends Configuration
 {
+    private List<Resource> resources = new LinkedList<Resource>();
+    private Properties properties = new Properties();
+    private List<Table> tabs = new LinkedList<Table>();
 
     public void addTable(Table table)
     {
@@ -36,6 +35,8 @@ public class MutableConfiguration extends Configuration
         {
             throw new IllegalArgumentException();
         }
+        tabs.add(table);
+        
         tables.put(key, table);
     }
 
@@ -117,15 +118,31 @@ public class MutableConfiguration extends Configuration
 
     public void addMappings(List<Resource> mappings) throws IOException
     {
+        resources.addAll(mappings);
         for (Resource resource : mappings)
         {
             addInputStream(resource.getInputStream());
         }
     }
 
+    public Configuration setProperties(Properties properties)
+    {
+        properties.putAll(properties);
+        return super.setProperties(properties);
+    }
+
+    public Configuration setProperty(String string, String string1)
+    {
+        properties.setProperty(string, string1);
+
+        return super.setProperty(string, string1);
+    }
+
     public MutableConfiguration copy()
     {
         // copy via serialisation... seems easiest way to go..
+        // serialization has problems with transient dependencies on other packages.
+/*
         try
         {
             ByteArrayOutputStream raw = new ByteArrayOutputStream();
@@ -138,6 +155,28 @@ public class MutableConfiguration extends Configuration
         {
             throw new RuntimeException(e);
         }
+*/
+        // try a manual reconstruction instead.
+        MutableConfiguration copy = new MutableConfiguration();
+        copy.setProperties(properties);
+        for (Resource resource : resources)
+        {
+            try
+            {
+                copy.addInputStream(resource.getInputStream());
+            }
+            catch (IOException e)
+            {
+                // noop. any errors here would have happened on the original, so we ignore them.
+            }
+        }
+
+        for (Table tab : tabs)
+        {
+            tables.put(getTableKey(tab), tab);
+        }
+
+        return copy;
     }
 
     public void setHibernateDialect(Properties jdbc)

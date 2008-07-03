@@ -5,8 +5,9 @@ import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.database.DatabaseConfig;
 import com.zutubi.pulse.database.DriverRegistry;
 import com.zutubi.pulse.migrate.MigrationManager;
+import com.zutubi.pulse.migrate.MigrateDatabaseTypeConfiguration;
 import com.zutubi.pulse.prototype.config.setup.DatabaseType;
-import com.zutubi.pulse.prototype.config.setup.MigrateDatabaseTypeConfiguration;
+import com.opensymphony.util.TextUtils;
 
 import java.io.File;
 import java.util.Properties;
@@ -71,7 +72,7 @@ public class PreviewMigrateAction extends TransientAction<MigrateDatabaseTypeCon
 
         if (!instance.getType().isEmbedded())
         {
-            if (instance.getDriverFile() != null)
+            if (TextUtils.stringSet(instance.getDriverFile()))
             {
                 // install the driver... this should be handled elsewhere...
                 DriverRegistry driverRegistry = configurationManager.getDriverRegistry();

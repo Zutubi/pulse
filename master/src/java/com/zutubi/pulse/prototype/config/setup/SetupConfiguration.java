@@ -2,6 +2,7 @@ package com.zutubi.pulse.prototype.config.setup;
 
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
+import com.zutubi.pulse.migrate.MigrateDatabaseTypeConfiguration;
 
 /**
  *

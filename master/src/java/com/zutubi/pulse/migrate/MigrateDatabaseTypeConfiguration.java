@@ -1,4 +1,4 @@
-package com.zutubi.pulse.prototype.config.setup;
+package com.zutubi.pulse.migrate;
 
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Form;
@@ -8,6 +8,7 @@ import com.zutubi.config.annotations.FieldScript;
 import com.zutubi.config.annotations.FieldAction;
 import com.zutubi.config.annotations.Transient;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
+import com.zutubi.pulse.prototype.config.setup.DatabaseType;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.annotations.File;
@@ -137,7 +138,7 @@ public class MigrateDatabaseTypeConfiguration extends AbstractConfiguration impl
 
     public void validate(ValidationContext context)
     {
-        if (type != DatabaseType.EMBEDDED && type != DatabaseType.EMBEDDED_2 && type != DatabaseType.EMBEDDED_3)
+        if (type != DatabaseType.EMBEDDED)
         {
             JarFile jar = null;
             try

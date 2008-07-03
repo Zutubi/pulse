@@ -1,20 +1,19 @@
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.database.DatabaseConsole;
 import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.pulse.database.DatabaseConsoleBeanFactory;
 import com.zutubi.pulse.database.DatabaseConfig;
+import com.zutubi.pulse.database.DatabaseConsole;
+import com.zutubi.pulse.database.DatabaseConsoleBeanFactory;
+import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.util.JDBCUtils;
+import org.apache.commons.dbcp.BasicDataSource;
+import org.hsqldb.jdbcDriver;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.util.List;
-import java.util.LinkedList;
-import java.sql.Driver;
 import java.sql.DriverManager;
-
-import org.apache.commons.dbcp.BasicDataSource;
-import org.hsqldb.jdbcDriver;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * <class-comment/>
@@ -55,6 +54,7 @@ public abstract class BaseUpgradeTaskTestCase extends PulseTestCase
 
     protected void tearDown() throws Exception
     {
+        JDBCUtils.execute(dataSource, "SHUTDOWN");
         dataSource.close();
         databaseConsole.stop(false);
         databaseConsole = null;

@@ -1,13 +1,11 @@
 package com.zutubi.pulse.transfer.jdbc;
 
-import com.zutubi.pulse.util.JDBCUtils;
-import com.zutubi.pulse.util.JDBCTypes;
-import com.zutubi.pulse.transfer.TransferTarget;
+import com.zutubi.pulse.transfer.Column;
 import com.zutubi.pulse.transfer.Table;
 import com.zutubi.pulse.transfer.TransferException;
-import com.zutubi.pulse.transfer.Column;
-import com.zutubi.pulse.transfer.jdbc.MappingUtils;
-import com.zutubi.pulse.transfer.jdbc.HibernateUniqueKeyTable;
+import com.zutubi.pulse.transfer.TransferTarget;
+import com.zutubi.pulse.util.JDBCTypes;
+import com.zutubi.pulse.util.JDBCUtils;
 import com.zutubi.util.logging.Logger;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;

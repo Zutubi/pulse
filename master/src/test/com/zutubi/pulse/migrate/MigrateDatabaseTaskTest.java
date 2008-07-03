@@ -57,7 +57,7 @@ public class MigrateDatabaseTaskTest extends PulseTestCase
         JDBCUtils.execute(sourceDataSource, "insert into RELATED_TYPES (ID, TYPE) values (1, 1)");
 
         MigrateDatabaseTask task = new MigrateDatabaseTask("Migrate");
-        task.setMappings(mappings);
+        task.setHibernateConfiguration(sourceHibernateConfiguration);
         task.setSourceJdbcProperties(sourceDatabase);
         task.setTargetJdbcProperties(targetDatabase);
 

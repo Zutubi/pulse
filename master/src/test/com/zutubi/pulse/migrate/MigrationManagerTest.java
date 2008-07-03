@@ -1,10 +1,30 @@
 package com.zutubi.pulse.migrate;
 
-import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.bootstrap.Data;
+import com.zutubi.pulse.bootstrap.MasterUserPaths;
+import com.zutubi.pulse.bootstrap.SimpleMasterConfigurationManager;
+import com.zutubi.pulse.database.DatabaseConfig;
 import com.zutubi.pulse.monitor.JobManager;
+import com.zutubi.pulse.monitor.Monitor;
+import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.upgrade.tasks.HackyConnectionProvider;
+import com.zutubi.pulse.upgrade.tasks.HibernateUtils;
+import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
+import com.zutubi.pulse.upgrade.tasks.SchemaRefactor;
+import com.zutubi.pulse.util.JDBCUtils;
+import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.util.RandomUtils;
+import com.zutubi.util.IOUtils;
+import org.apache.commons.dbcp.BasicDataSource;
+import org.hibernate.cfg.Environment;
 
-import java.util.Properties;
+import javax.sql.DataSource;
+import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
 
 /**
  *
@@ -16,25 +36,67 @@ public class MigrationManagerTest extends PulseTestCase
 
     private JobManager jobManager;
 
+    private TestDatabase sourceDatabase;
+    private TestDatabase targetDatabase;
+
+    private File tmp;
+
+    private SimpleMasterConfigurationManager configurationManager;
+
     protected void setUp() throws Exception
     {
         super.setUp();
 
-        System.clearProperty(MigrationManager.REQUEST_MIGRATE_SYSTEM_KEY);
+        tmp = FileSystemUtils.createTempDir();
 
         jobManager = new JobManager();
         
         migrationManager = new MigrationManager();
         migrationManager.setJobManager(jobManager);
-/*
-        migrationManager.setDatabaseConfig();
-        migrationManager.setUserPaths();
-*/
+
+        List<String> mappings = new LinkedList<String>();
+        mappings.add("com/zutubi/pulse/migrate/schema/Schema.hbm.xml");
+
+        sourceDatabase = new TestDatabase();
+        sourceDatabase.setMappings(mappings);
+        sourceDatabase.init();
+
+        targetDatabase = new TestDatabase();
+        targetDatabase.init();
+
+        configurationManager = new SimpleMasterConfigurationManager()
+        {
+            public File getDataDirectory()
+            {
+                return new File(tmp, "test");
+            }
+
+            public MasterUserPaths getUserPaths()
+            {
+                return new Data(getDataDirectory());
+            }
+        };
+        File dbConfig = configurationManager.getDatabaseConfigFile();
+        assertTrue(dbConfig.getParentFile().mkdirs());
+        assertTrue(dbConfig.createNewFile());
+        IOUtils.write(sourceDatabase.getJdbcProperties(), dbConfig);
+        
+        migrationManager.setConfigurationManager(configurationManager);
     }
 
     protected void tearDown() throws Exception
     {
         System.clearProperty(MigrationManager.REQUEST_MIGRATE_SYSTEM_KEY);
+
+        sourceDatabase.shutdown();
+        targetDatabase.shutdown();
+
+        configurationManager = null;
+
+        removeDirectory(tmp);
+        tmp = null;
+
+        jobManager = null;
 
         super.tearDown();
     }
@@ -48,17 +110,115 @@ public class MigrationManagerTest extends PulseTestCase
         assertTrue(migrationManager.isRequested());
     }
 
-/*
-    public void testScheduleMigration() throws IOException
+    public void testSampleMigrationFromAToB() throws IOException
     {
-        assertEquals(0, jobManager.getJobKeys().size());
+        // want to migrate from database (A) to database (B).
 
-        migrationManager.scheduleMigration(new Properties());
+        // need configurations for
+        // - database A
 
-        assertEquals(1, jobManager.getJobKeys().size());
-        assertNotNull(jobManager.getJob(MigrationManager.MIGRATE_JOB_KEY));
+        // - hibernate configuration for migration
+        migrationManager.setHibernateConfiguration(sourceDatabase.getHibernateConfig());
+
+        // should have a running database now, using the above details.
+
+        // - database B
+        // database B properties are specified by the user via the UI.
+        Properties databaseB = targetDatabase.getJdbcProperties();
+
+        // migration is a long running task
+        // - migration manager provides a unified view of the migration process, even
+        //   though it is delegated to the job manager.
+
+        migrationManager.scheduleMigration(databaseB);
+        migrationManager.runMigration();
+
+        Monitor monitor = migrationManager.getMonitor();
+        assertTrue(monitor.isSuccessful());
+
+        DatabaseConfig migratedConfig = configurationManager.getDatabaseConfig();
+        assertEquals(databaseB.getProperty(DatabaseConfig.JDBC_URL), migratedConfig.getUrl());
     }
-*/
 
+    private static class TestDatabase
+    {
+        private Properties jdbcProperties;
 
+        private List<String> mappings = new LinkedList<String>();
+
+        private DataSource dataSource;
+        private MutableConfiguration hibernateConfig;
+
+        public TestDatabase()
+        {
+        }
+
+        public void init() throws SQLException, IOException
+        {
+            String databaseName = RandomUtils.randomString(6);
+
+            jdbcProperties = new Properties();
+            jdbcProperties.setProperty(DatabaseConfig.JDBC_URL, "jdbc:hsqldb:mem:" + databaseName);
+            jdbcProperties.setProperty(DatabaseConfig.JDBC_USERNAME, "sa");
+            jdbcProperties.setProperty(DatabaseConfig.JDBC_PASSWORD, "");
+
+            // create the database.
+
+            hibernateConfig = new MutableConfiguration();
+            hibernateConfig.addClassPathMappings(mappings);
+
+            Properties hibernateProperties = new Properties();
+            hibernateProperties.setProperty(DatabaseConfig.HIBERNATE_DIALECT, HibernateUtils.inferHibernateDialect(jdbcProperties));
+            hibernateProperties.put(Environment.CONNECTION_PROVIDER, "com.zutubi.pulse.upgrade.tasks.HackyConnectionProvider");
+
+            HackyConnectionProvider.dataSource = getDataSource();
+
+            SchemaRefactor refactor = new SchemaRefactor(hibernateConfig, hibernateProperties);
+            refactor.createSchema();
+        }
+
+        public Properties getJdbcProperties()
+        {
+            return jdbcProperties;
+        }
+
+        public MutableConfiguration getHibernateConfig()
+        {
+            return hibernateConfig;
+        }
+
+        public void setMappings(List<String> mappings)
+        {
+            this.mappings = mappings;
+        }
+
+        public DataSource getDataSource()
+        {
+            if (dataSource == null)
+            {
+                synchronized(this)
+                {
+                    if (dataSource == null)
+                    {
+                        BasicDataSource dataSource = new BasicDataSource();
+                        dataSource.setDriverClassName("org.hsqldb.jdbcDriver");
+                        dataSource.setUrl(getJdbcProperties().getProperty(DatabaseConfig.JDBC_URL));
+                        dataSource.setPassword(getJdbcProperties().getProperty(DatabaseConfig.JDBC_PASSWORD));
+                        dataSource.setUsername(getJdbcProperties().getProperty(DatabaseConfig.JDBC_USERNAME));
+
+                        this.dataSource = dataSource;
+                    }
+                }
+            }
+            return dataSource;
+        }
+
+        public void shutdown() throws SQLException
+        {
+            if (dataSource != null)
+            {
+                JDBCUtils.execute(dataSource, "SHUTDOWN COMPACT");
+            }
+        }
+    }
 }

@@ -1,6 +1,7 @@
 package com.zutubi.pulse.prototype.config.setup;
 
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.migrate.MigrateDatabaseTypeConfiguration;
 
 import java.util.Properties;
 

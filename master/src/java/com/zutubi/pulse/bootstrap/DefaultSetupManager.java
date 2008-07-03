@@ -346,7 +346,7 @@ public class DefaultSetupManager implements SetupManager
             if (databaseConfig.isFile())
             {
                 String driverClassName = configurationManager.getDatabaseConfig().getDriverClassName();
-                if (!driverRegistry.isRegistered(driverClassName))
+                if (TextUtils.stringSet(driverClassName) && !driverRegistry.isRegistered(driverClassName))
                 {
                     File driverRoot = configurationManager.getData().getDriverRoot();
                     File[] driverJars = driverRoot.listFiles(new FilenameFilter()

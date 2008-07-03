@@ -43,7 +43,7 @@ public class DatabaseConsoleBeanFactory implements FactoryBean
             // awkard... having the console know about the hibernate mappings means we can not use it 
             // as easily for tasks that do not require mappings.
 
-            if (databaseConfig.getDriverClassName().contains(".hsqldb."))
+            if (databaseConfig.getUrl().contains(".hsqldb."))
             {
                 EmbeddedHSQLDBConsole console = new EmbeddedHSQLDBConsole(databaseConfig);
                 console.setDataSource(dataSource);

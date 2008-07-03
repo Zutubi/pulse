@@ -93,7 +93,10 @@ public class DriverRegistry
                 String uniqueFilename = jar.getName() + RandomUtils.randomString(5);
 
                 FileSystemUtils.copy(driverDir, jar);
-                FileSystemUtils.rename(new File(driverDir, jar.getName()), new File(driverDir, uniqueFilename));
+                if (!FileSystemUtils.rename(new File(driverDir, jar.getName()), new File(driverDir, uniqueFilename)))
+                {
+                    LOG.warning("Rename failed?");
+                }
                 
                 jar = new File(driverDir, uniqueFilename);
             }

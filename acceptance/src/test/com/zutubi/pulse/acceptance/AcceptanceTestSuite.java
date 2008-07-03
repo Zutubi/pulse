@@ -42,7 +42,7 @@ public class AcceptanceTestSuite
         suite.addTestSuite(PersonalBuildAcceptanceTest.class);
 
         //---( other acceptance tests )---
-//        suite.addTestSuite(StartupShutdownAcceptanceTest.class);
+//        suite.addTestSuite(StartupShutdownAcceptanceTest.class); - tries to launch pulse inline, does not work.
         return suite;
     }
 }

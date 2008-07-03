@@ -2,6 +2,7 @@ package com.zutubi.pulse.prototype.config.setup;
 
 import static com.zutubi.pulse.database.DatabaseConfig.*;
 import com.zutubi.pulse.prototype.config.EnumOptionProvider;
+import com.zutubi.pulse.migrate.MigrateDatabaseTypeConfiguration;
 
 import java.util.Properties;
 
@@ -35,64 +36,6 @@ public enum DatabaseType
             String url = props.getProperty(JDBC_URL);
             config.setDatabase(url.substring(12));
             config.setType(this);
-            return config;
-        }
-    },
-    EMBEDDED_2
-    {
-        public boolean isEmbedded()
-        {
-            return true;
-        }
-
-        public Properties getDatabaseProperties(SetupDatabaseTypeConfiguration config)
-        {
-            return getStandardProperties("org.hsqldb.jdbcDriver", "jdbc:hsqldb:DB_ROOT/db2", "sa", "", "org.hibernate.dialect.HSQLDialect");
-        }
-
-        public Properties getDatabaseProperties(MigrateDatabaseTypeConfiguration config)
-        {
-            return getStandardProperties(config.getDriver(), "jdbc:hsqldb:DB_ROOT/db2", "sa", "", "org.hibernate.dialect.HSQLDialect");
-        }
-
-        public MigrateDatabaseTypeConfiguration getDatabaseConfiguration(Properties props)
-        {
-            MigrateDatabaseTypeConfiguration config = new MigrateDatabaseTypeConfiguration();
-            config.setDriver(props.getProperty(JDBC_DRIVER_CLASS_NAME));
-            config.setPassword(props.getProperty(JDBC_PASSWORD));
-            config.setUser(props.getProperty(JDBC_USERNAME));
-            config.setType(this);
-            String url = props.getProperty(JDBC_URL);
-            config.setDatabase(url.substring(12));
-            return config;
-        }
-    },
-    EMBEDDED_3
-    {
-        public boolean isEmbedded()
-        {
-            return true;
-        }
-
-        public Properties getDatabaseProperties(SetupDatabaseTypeConfiguration config)
-        {
-            return getStandardProperties("org.hsqldb.jdbcDriver", "jdbc:hsqldb:DB_ROOT/db3", "sa", "", "org.hibernate.dialect.HSQLDialect");
-        }
-
-        public Properties getDatabaseProperties(MigrateDatabaseTypeConfiguration config)
-        {
-            return getStandardProperties(config.getDriver(), "jdbc:hsqldb:DB_ROOT/db3", "sa", "", "org.hibernate.dialect.HSQLDialect");
-        }
-
-        public MigrateDatabaseTypeConfiguration getDatabaseConfiguration(Properties props)
-        {
-            MigrateDatabaseTypeConfiguration config = new MigrateDatabaseTypeConfiguration();
-            config.setDriver(props.getProperty(JDBC_DRIVER_CLASS_NAME));
-            config.setPassword(props.getProperty(JDBC_PASSWORD));
-            config.setUser(props.getProperty(JDBC_USERNAME));
-            config.setType(this);
-            String url = props.getProperty(JDBC_URL);
-            config.setDatabase(url.substring(12));
             return config;
         }
     },
@@ -155,10 +98,13 @@ public enum DatabaseType
             config.setType(this);
 
             String url = props.getProperty(JDBC_URL);
-            config.setHost(url.substring(13, url.indexOf(':', 13)));
-            int indexOfColon = url.indexOf(':', 13) + 1;
-            config.setPort(Integer.valueOf(url.substring(indexOfColon, url.indexOf('/', indexOfColon))));
-            config.setDatabase(url.substring(url.indexOf('/', indexOfColon) + 1, url.indexOf('?', indexOfColon)));
+            // trim the front.
+            url = url.substring(18);
+            config.setHost(url.substring(0, url.indexOf(':')));
+            url = url.substring(url.indexOf(":") + 1);
+            config.setPort(Integer.valueOf(url.substring(0, url.indexOf("/"))));
+            url = url.substring(url.indexOf("/") + 1);
+            config.setDatabase(url);
             return config;
         }
     }
