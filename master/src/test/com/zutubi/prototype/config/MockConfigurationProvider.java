@@ -20,7 +20,7 @@ public class MockConfigurationProvider implements ConfigurationProvider
     private MultiplexingListener syncMux;
     private MultiplexingListener asyncMux;
 
-    public void init()
+    public MockConfigurationProvider()
     {
         syncMux = new MultiplexingListener(ConfigurationEvent.class);
         asyncMux = new MultiplexingListener(ConfigurationEvent.class);

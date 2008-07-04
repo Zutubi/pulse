@@ -40,7 +40,6 @@ public class BackupManagerTest extends PulseTestCase
         scheduler.start();
 
         configurationProvider = new MockConfigurationProvider();
-        configurationProvider.init();
         configurationProvider.insert("admin/settings/backup", new BackupConfiguration());
 
         archiveManager = new DefaultArchiveManager();
