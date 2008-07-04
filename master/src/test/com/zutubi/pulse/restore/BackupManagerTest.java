@@ -62,6 +62,9 @@ public class BackupManagerTest extends PulseTestCase
 
     public void testBackupManagerInit()
     {
+        BackupConfiguration config = configurationProvider.get(BackupConfiguration.class);
+        config.setEnabled(true);
+
         BackupManager manager = new BackupManager();
         manager.setScheduler(scheduler);
         manager.setConfigurationProvider(configurationProvider);
@@ -95,6 +98,18 @@ public class BackupManagerTest extends PulseTestCase
 
         // is this much more than a simple delegation to the archiveManager?.  Maybe we want to place the
         // archive in a special location / file name format?.
+    }
+
+    public void testScheduleOnlyOnEnabled()
+    {
+        BackupManager manager = new BackupManager();
+        manager.setScheduler(scheduler);
+        manager.setConfigurationProvider(configurationProvider);
+        manager.init();
+
+        // Ensure that the init of the backup manager registers the expected trigger.
+        CronTrigger trigger = (CronTrigger) scheduler.getTrigger(BackupManager.TRIGGER_NAME, BackupManager.TRIGGER_GROUP);
+        assertNull(trigger);
     }
 
     public void testConfigurationChange()

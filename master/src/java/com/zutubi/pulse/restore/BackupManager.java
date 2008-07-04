@@ -35,21 +35,24 @@ public class BackupManager
         // load the persistence configuration.
         BackupConfiguration persistent = configurationProvider.get(BackupConfiguration.class);
 
-        // check if the trigger exists. if not, create and schedule.
-        Trigger trigger = scheduler.getTrigger(TRIGGER_NAME, TRIGGER_GROUP);
-        if (trigger == null)
+        if (persistent.isEnabled())
         {
-            // initialise the trigger.
-            trigger = new CronTrigger(persistent.getCronSchedule(), TRIGGER_NAME, TRIGGER_GROUP);
-            trigger.setTaskClass(AutomatedBackupTask.class);
+            // check if the trigger exists. if not, create and schedule.
+            Trigger trigger = scheduler.getTrigger(TRIGGER_NAME, TRIGGER_GROUP);
+            if (trigger == null)
+            {
+                // initialise the trigger.
+                trigger = new CronTrigger(persistent.getCronSchedule(), TRIGGER_NAME, TRIGGER_GROUP);
+                trigger.setTaskClass(AutomatedBackupTask.class);
 
-            try
-            {
-                scheduler.schedule(trigger);
-            }
-            catch (SchedulingException e)
-            {
-                LOG.severe(e);
+                try
+                {
+                    scheduler.schedule(trigger);
+                }
+                catch (SchedulingException e)
+                {
+                    LOG.severe(e);
+                }
             }
         }
 
