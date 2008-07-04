@@ -30,8 +30,8 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class CleanupManager
 {
-    private static final String CLEANUP_NAME = "cleanup";
-    private static final String CLEANUP_GROUP = "services";
+    private static final String TRIGGER_NAME = "cleanup";
+    private static final String TRIGGER_GROUP = "services";
 
     private static final long CLEANUP_FREQUENCY = Constants.HOUR;
 
@@ -62,11 +62,11 @@ public class CleanupManager
         eventManager.register(eventListener);
         
         // register for scheduled callbacks.
-        Trigger trigger = scheduler.getTrigger(CLEANUP_NAME, CLEANUP_GROUP);
+        Trigger trigger = scheduler.getTrigger(TRIGGER_NAME, TRIGGER_GROUP);
         if (trigger == null)
         {
             // initialise the trigger.
-            trigger = new SimpleTrigger(CLEANUP_NAME, CLEANUP_GROUP, CLEANUP_FREQUENCY);
+            trigger = new SimpleTrigger(TRIGGER_NAME, TRIGGER_GROUP, CLEANUP_FREQUENCY);
             trigger.setTaskClass(CleanupBuilds.class);
 
             try

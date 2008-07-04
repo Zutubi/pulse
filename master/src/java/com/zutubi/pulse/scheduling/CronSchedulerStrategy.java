@@ -1,15 +1,17 @@
 package com.zutubi.pulse.scheduling;
 
 import java.text.ParseException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * <class-comment/>
  */
 public class CronSchedulerStrategy extends QuartzSchedulerStrategy
 {
-    public String canHandle()
+    public List<String> canHandle()
     {
-        return CronTrigger.TYPE;
+        return Arrays.asList(CronTrigger.TYPE);
     }
 
     public boolean dependsOnProject(Trigger trigger, long projectId)

@@ -97,6 +97,8 @@ public class DefaultSchedulerTest extends TestCase
 
     /**
      * CIB-1264: renaming paused trigger re-enables it.
+     *
+     * @throws SchedulingException if an error occurs.
      */
     public void testUpdatePausedTriggerRemainsPaused() throws SchedulingException
     {

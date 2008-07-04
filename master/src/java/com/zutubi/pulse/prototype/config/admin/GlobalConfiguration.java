@@ -7,6 +7,7 @@ import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.jabber.config.JabberConfiguration;
 import com.zutubi.pulse.license.config.LicenseConfiguration;
+import com.zutubi.pulse.restore.BackupConfiguration;
 import com.zutubi.util.TextUtils;
 
 /**
@@ -36,6 +37,7 @@ public class GlobalConfiguration extends AbstractConfiguration
     private LDAPConfiguration ldap = new LDAPConfiguration();
     private JabberConfiguration jabber = new JabberConfiguration();
     private LicenseConfiguration license = new LicenseConfiguration();
+    private BackupConfiguration backup = new BackupConfiguration();
 
     public String getBaseUrl()
     {
@@ -170,6 +172,16 @@ public class GlobalConfiguration extends AbstractConfiguration
     public void setJabber(JabberConfiguration jabber)
     {
         this.jabber = jabber;
+    }
+
+    public BackupConfiguration getBackup()
+    {
+        return backup;
+    }
+
+    public void setBackup(BackupConfiguration backup)
+    {
+        this.backup = backup;
     }
 
     public LicenseConfiguration getLicense()

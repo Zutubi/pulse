@@ -1,14 +1,17 @@
 package com.zutubi.pulse.scheduling;
 
+import java.util.List;
+import java.util.Arrays;
+
 /**
  * Startegy for scheduling simple triggers, by creating Quartz SimpleTrigger
  * instances.
  */
 public class SimpleSchedulerStrategy extends QuartzSchedulerStrategy
 {
-    public String canHandle()
+    public List<String> canHandle()
     {
-        return SimpleTrigger.TYPE;
+        return Arrays.asList(SimpleTrigger.TYPE);
     }
 
     protected org.quartz.Trigger createTrigger(Trigger trigger) throws SchedulingException

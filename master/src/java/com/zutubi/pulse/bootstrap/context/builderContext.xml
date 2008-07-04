@@ -204,4 +204,7 @@
     <bean id="buildHookManager" class="com.zutubi.pulse.prototype.config.project.hooks.BuildHookManager" autowire="byName"/>
 
     <bean id="configurationProvider" class="com.zutubi.prototype.config.DefaultConfigurationProvider" autowire="byName"/>
+
+    <bean id="backupManager" class="com.zutubi.pulse.restore.BackupManager" autowire="byName" init-method="init"/>
+
 </beans>

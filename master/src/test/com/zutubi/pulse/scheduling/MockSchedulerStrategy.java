@@ -6,11 +6,11 @@ import java.util.Arrays;
 /**
  * <class-comment/>
  */
-public class NoopSchedulerStrategy implements SchedulerStrategy
+public class MockSchedulerStrategy implements SchedulerStrategy
 {
     public List<String> canHandle()
     {
-        return Arrays.asList(NoopTrigger.TYPE);
+        return Arrays.asList(CronTrigger.TYPE,SimpleTrigger.TYPE,EventTrigger.TYPE,OneShotTrigger.TYPE,NoopTrigger.TYPE );
     }
 
     public void init(Trigger trigger) throws SchedulingException

@@ -8,6 +8,8 @@ import com.zutubi.util.logging.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.Arrays;
 
 /**
  * <class-comment/>
@@ -24,9 +26,9 @@ public class EventSchedulerStrategy implements SchedulerStrategy
 
     private ObjectFactory objectFactory;
 
-    public String canHandle()
+    public List<String> canHandle()
     {
-        return EventTrigger.TYPE;
+        return Arrays.asList(EventTrigger.TYPE);
     }
 
     public void init(Trigger trigger) throws SchedulingException

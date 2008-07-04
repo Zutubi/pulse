@@ -10,6 +10,7 @@ import com.zutubi.util.logging.Logger;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.Arrays;
 
 /**
  * <class-comment/>
@@ -33,10 +34,18 @@ public class DefaultScheduler implements Scheduler, EventListener
      */
     public void register(SchedulerStrategy strategy)
     {
-        strategies.put(strategy.canHandle(), strategy);
+        for (String key : strategy.canHandle())
+        {
+            strategies.put(key, strategy);
+        }
         strategy.setTriggerHandler(triggerHandler);
     }
 
+    public void setStrategies(SchedulerStrategy... schedulerStrategies)
+    {
+        setStrategies(Arrays.asList(schedulerStrategies));
+    }
+    
     public void setStrategies(List<SchedulerStrategy> schedulerStrategies)
     {
         strategies.clear();
@@ -46,7 +55,7 @@ public class DefaultScheduler implements Scheduler, EventListener
         }
     }
 
-    protected void start()
+    public void start()
     {
         try
         {

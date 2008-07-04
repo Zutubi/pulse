@@ -2,12 +2,14 @@ package com.zutubi.pulse.scheduling;
 
 import com.zutubi.pulse.core.Stoppable;
 
+import java.util.List;
+
 /**
  * <class-comment/>
  */
 public interface SchedulerStrategy extends Stoppable
 {
-    String canHandle();
+    List<String> canHandle();
 
     void init(Trigger trigger) throws SchedulingException;
 
