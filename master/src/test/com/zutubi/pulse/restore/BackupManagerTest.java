@@ -1,6 +1,7 @@
 package com.zutubi.pulse.restore;
 
 import com.zutubi.prototype.config.MockConfigurationProvider;
+import com.zutubi.prototype.config.events.PostSaveEvent;
 import com.zutubi.pulse.bootstrap.Data;
 import com.zutubi.pulse.model.persistence.mock.MockTriggerDao;
 import com.zutubi.pulse.prototype.config.project.triggers.CronExpressionValidator;
@@ -9,6 +10,9 @@ import com.zutubi.pulse.scheduling.DefaultScheduler;
 import com.zutubi.pulse.scheduling.MockSchedulerStrategy;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.DefaultEventManager;
+import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.validation.MockValidationContext;
 import com.zutubi.validation.ValidationException;
 
@@ -25,6 +29,8 @@ public class BackupManagerTest extends PulseTestCase
     private DefaultArchiveManager archiveManager;
 
     private MockConfigurationProvider configurationProvider;
+
+    private EventManager eventManager;
 
     private File tmp;
 
@@ -44,6 +50,8 @@ public class BackupManagerTest extends PulseTestCase
 
         archiveManager = new DefaultArchiveManager();
         archiveManager.setPaths(new Data(tmp));
+
+        eventManager = new DefaultEventManager();
     }
 
     protected void tearDown() throws Exception
@@ -65,9 +73,13 @@ public class BackupManagerTest extends PulseTestCase
         config.setEnabled(true);
 
         BackupManager manager = new BackupManager();
+        manager.setEventManager(eventManager);
         manager.setScheduler(scheduler);
         manager.setConfigurationProvider(configurationProvider);
         manager.init();
+
+        // send the system started event.
+        eventManager.publish(new ConfigurationSystemStartedEvent(configurationProvider));
 
         // Ensure that the init of the backup manager registers the expected trigger.
         CronTrigger trigger = (CronTrigger) scheduler.getTrigger(BackupManager.TRIGGER_NAME, BackupManager.TRIGGER_GROUP);
@@ -103,8 +115,12 @@ public class BackupManagerTest extends PulseTestCase
     {
         BackupManager manager = new BackupManager();
         manager.setScheduler(scheduler);
+        manager.setEventManager(eventManager);
         manager.setConfigurationProvider(configurationProvider);
         manager.init();
+
+        // send the system started event.
+        eventManager.publish(new ConfigurationSystemStartedEvent(configurationProvider));
 
         // Ensure that the init of the backup manager registers the expected trigger.
         CronTrigger trigger = (CronTrigger) scheduler.getTrigger(BackupManager.TRIGGER_NAME, BackupManager.TRIGGER_GROUP);
@@ -113,15 +129,21 @@ public class BackupManagerTest extends PulseTestCase
 
     public void testConfigurationChange()
     {
-/*
+        BackupConfiguration config = configurationProvider.get(BackupConfiguration.class);
+        config.setEnabled(true);
+
         // when the backup configuration is changed, we need to ensure that the trigger remains in sync.
         BackupManager manager = new BackupManager();
         manager.setScheduler(scheduler);
+        manager.setEventManager(eventManager);
         manager.setConfigurationProvider(configurationProvider);
         manager.init();
 
+        // send the system started event.
+        eventManager.publish(new ConfigurationSystemStartedEvent(configurationProvider));
+
         // make a change to the configuration, triggering a save.
-        BackupConfiguration config = new BackupConfiguration();
+        config = new BackupConfiguration();
         config.setCronSchedule("0 0 0 * * ?");
         PostSaveEvent evt = new PostSaveEvent(null, config);
         configurationProvider.sendEvent(evt);
@@ -129,6 +151,5 @@ public class BackupManagerTest extends PulseTestCase
         CronTrigger trigger = (CronTrigger) scheduler.getTrigger(BackupManager.TRIGGER_NAME, BackupManager.TRIGGER_GROUP);
         assertNotNull(trigger);
         assertEquals("0 0 0 * * ?", trigger.getCron());
-*/
     }
 }

@@ -1,10 +1,16 @@
 package com.zutubi.pulse.restore;
 
 import com.zutubi.prototype.config.ConfigurationProvider;
+import com.zutubi.prototype.config.TypeAdapter;
+import com.zutubi.prototype.config.TypeListener;
 import com.zutubi.pulse.scheduling.CronTrigger;
 import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.scheduling.SchedulingException;
 import com.zutubi.pulse.scheduling.Trigger;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.EventListener;
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.util.logging.Logger;
 
 /**
@@ -28,13 +34,34 @@ public class BackupManager
 
     private Scheduler scheduler;
 
+    private EventManager eventManager;
+
     public void init()
+    {
+        // all initialisation occurs on the event callbacks. We do this to ensure that each of the required
+        // components has been initialised.
+        eventManager.register(new EventListener()
+        {
+            public Class[] getHandledEvents()
+            {
+                return new Class[]{ConfigurationSystemStartedEvent.class};
+            }
+
+            public void handleEvent(Event event)
+            {
+                initialiseManager();
+            }
+        });
+
+    }
+
+    protected void initialiseManager()
     {
         // initialise the automated backups with the scheduler
 
         // load the persistence configuration.
-        BackupConfiguration persistent = configurationProvider.get(BackupConfiguration.class);
 
+        BackupConfiguration persistent = configurationProvider.get(BackupConfiguration.class);
         if (persistent.isEnabled())
         {
             // check if the trigger exists. if not, create and schedule.
@@ -57,7 +84,6 @@ public class BackupManager
         }
 
         // register the configuration listener.
-/*
         TypeListener<BackupConfiguration> listener = new TypeAdapter<BackupConfiguration>(BackupConfiguration.class)
         {
             public void postSave(BackupConfiguration instance, boolean nested)
@@ -76,7 +102,6 @@ public class BackupManager
             }
         };
         listener.register(configurationProvider, false);
-*/
     }
 
     public void triggerBackup()
@@ -111,5 +136,10 @@ public class BackupManager
     public void setArchiveManager(ArchiveManager archiveManager)
     {
         this.archiveManager = archiveManager;
+    }
+
+    public void setEventManager(EventManager eventManager)
+    {
+        this.eventManager = eventManager;
     }
 }
