@@ -62,7 +62,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
     public void testGetConfigListingComposite() throws Exception
     {
         Vector<String> listing = call("getConfigListing", "settings");
-        assertSortedEquals(listing, "email", "jabber", "ldap", "license", "logging");
+        assertSortedEquals(listing, "backup", "email", "jabber", "ldap", "license", "logging");
     }
 
     public void testGetConfigListingCollection() throws Exception
