@@ -27,7 +27,7 @@ import com.zutubi.pulse.monitor.Monitor;
 import com.zutubi.pulse.plugins.PluginManager;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.restore.ArchiveException;
-import com.zutubi.pulse.restore.ArchiveManager;
+import com.zutubi.pulse.restore.RestoreManager;
 import com.zutubi.pulse.upgrade.UpgradeManager;
 import com.zutubi.util.IOUtils;
 import com.zutubi.util.TextUtils;
@@ -627,7 +627,7 @@ public class DefaultSetupManager implements SetupManager
     //---( workflow for the restoration process.  Should probably shift this out of the manager...,
     // all this manager is interested in are co-ordinating the various steps, not the workflow of each step.  )---
 
-    private ArchiveManager archiveManager;
+    private RestoreManager restoreManager;
 
     private boolean isRestoreRequested()
     {
@@ -709,7 +709,7 @@ public class DefaultSetupManager implements SetupManager
 
             try
             {
-                archiveManager.prepareRestore(backup);
+                restoreManager.prepareRestore(backup);
             }
             catch (ArchiveException e)
             {
@@ -728,10 +728,10 @@ public class DefaultSetupManager implements SetupManager
     // continue selected on the restoration preview page.
     public void doExecuteRestorationRequest()
     {
-        Monitor monitor = archiveManager.getTaskMonitor();
+        Monitor monitor = restoreManager.getTaskMonitor();
         if (!monitor.isStarted())
         {
-            archiveManager.restoreArchive();
+            restoreManager.restoreArchive();
         }
     }
 
@@ -802,9 +802,9 @@ public class DefaultSetupManager implements SetupManager
         this.eventManager = eventManager;
     }
 
-    public void setArchiveManager(ArchiveManager archiveManager)
+    public void setArchiveManager(RestoreManager restoreManager)
     {
-        this.archiveManager = archiveManager;
+        this.restoreManager = restoreManager;
     }
 
     public void setMigrationContext(List<String> migrationContext)

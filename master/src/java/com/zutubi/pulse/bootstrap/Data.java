@@ -359,7 +359,7 @@ public class Data implements MasterUserPaths
     {
         if (backupRoot == null)
         {
-            backupRoot = new File(pulseData, "backups");
+            backupRoot = new File(pulseData, "archives");
         }
         return backupRoot;
     }

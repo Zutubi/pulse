@@ -4,6 +4,8 @@ import com.zutubi.config.annotations.ControllingCheckbox;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
+import com.zutubi.validation.annotations.Required;
+import com.zutubi.validation.annotations.Constraint;
 
 /**
  *
@@ -15,6 +17,8 @@ public class BackupConfiguration extends AbstractConfiguration
 {
     private static final String DEFAULT_CRON_SCHEDULE = "0 0 5 * * ?";
 
+    @Required
+    @Constraint("com.zutubi.pulse.prototype.config.project.triggers.CronExpressionValidator")
     private String cronSchedule = DEFAULT_CRON_SCHEDULE;
 
     @ControllingCheckbox

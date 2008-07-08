@@ -10,7 +10,7 @@ import java.util.List;
  *
  *
  */
-public interface ArchiveManager
+public interface RestoreManager
 {
     Monitor getTaskMonitor();
 

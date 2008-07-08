@@ -24,14 +24,9 @@ public class ArchiveFactory
     private static final String MANIFEST_FILENAME = "manifest.properties";
 
     /**
-     * Exported archive directory.
-     */
-    private File archiveDirectory;
-
-    /**
      * Imported/new archive directory.
      */
-    private File tmpDirectory;
+    private File tmp;
 
     private static final SimpleDateFormat CREATED_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
 
@@ -48,17 +43,7 @@ public class ArchiveFactory
      */
     public Archive createArchive() throws ArchiveException
     {
-        File archiveBase = new File(tmpDirectory, RandomUtils.randomString(10));
-        while (archiveBase.exists())
-        {
-            archiveBase = new File(tmpDirectory, RandomUtils.randomString(10));
-        }
-
-        if (!archiveBase.mkdirs())
-        {
-            // failed to create the archive file.
-            throw new ArchiveException("Failed to create directory '" + archiveBase.getAbsolutePath() + "'");
-        }
+        File archiveBase = createNewArchiveBaseDirectory();
 
         // mostly for information at this stage, so that archives can be distinguished.  Will be used
         // for processing at some stage no doubt.
@@ -84,33 +69,26 @@ public class ArchiveFactory
 
     /**
      * Exporting an archive zips up that archives directories and copies the zip file to the
-     * exported archives directory
+     * specified export directory
      *
      * @param archive to be zipped.
+     * @param exportDir directory into which the archive zip file will be written to.
      * @return the file reference to the zip file.
      *
      * @throws ArchiveException if there is a problem zipping or copying the archive to the
      * export directory. Typically, problems would include disk space shortages or a failure to zip
      * the archive directory.
      */
-    public File exportArchive(Archive archive) throws ArchiveException
+    public File exportArchive(Archive archive, File exportDir) throws ArchiveException
     {
         File exportZipFile = null;
         try
         {
-            String baseArchiveName = nameGenerator.newName(archiveDirectory);
+            String baseArchiveName = nameGenerator.newName(exportDir);
 
             String archiveName = baseArchiveName + ".zip";
-            File candidateArchiveFile = new File(archiveDirectory, archiveName);
-            int i = 0;
-            while (candidateArchiveFile.exists())
-            {
-                i++;
-                archiveName = baseArchiveName + "_" + i + ".zip";
-                candidateArchiveFile = new File(archiveDirectory, archiveName);
-            }
 
-            exportZipFile = new File(archiveDirectory, archiveName);
+            exportZipFile = new File(exportDir, archiveName);
 
             ZipUtils.createZip(exportZipFile, archive.getBase(), null);
 
@@ -125,23 +103,16 @@ public class ArchiveFactory
 
     public Archive importArchive(File archive) throws ArchiveException
     {
-        File archiveBase = new File(tmpDirectory, RandomUtils.randomString(10));
-        while (archiveBase.exists())
-        {
-            archiveBase = new File(tmpDirectory, RandomUtils.randomString(10));
-        }
-
-        if (!archiveBase.mkdirs())
-        {
-            throw new ArchiveException();
-        }
+        File archiveBase = createNewArchiveBaseDirectory();
 
         try
         {
+            // if the archive is a zip file, then unzip it into our base directory.
             if (archive.isFile() && archive.getName().endsWith(".zip"))
             {
                 ZipUtils.extractZip(archive, archiveBase);
             }
+            // if the arhive is a directory, then copy the contents into our base directory (expanded archive).
             else if (archive.isDirectory())
             {
                 FileSystemUtils.copy(archiveBase, archive);
@@ -174,14 +145,25 @@ public class ArchiveFactory
         return new Archive(archive, archiveBase, manifest);
     }
 
-    public void setTmpDirectory(File tmpDirectory)
+    private File createNewArchiveBaseDirectory() throws ArchiveException
     {
-        this.tmpDirectory = tmpDirectory;
+        File archiveBase = new File(tmp, RandomUtils.randomString(10));
+        while (archiveBase.exists())
+        {
+            archiveBase = new File(tmp, RandomUtils.randomString(10));
+        }
+
+        if (!archiveBase.mkdirs())
+        {
+            // failed to create the archive file.
+            throw new ArchiveException("Failed to create directory '" + archiveBase.getAbsolutePath() + "'");
+        }
+        return archiveBase;
     }
 
-    public void setArchiveDirectory(File archiveDirectory)
+    public void setTmpDirectory(File tmpDirectory)
     {
-        this.archiveDirectory = archiveDirectory;
+        this.tmp = tmpDirectory;
     }
 
     public void setArchiveNameGenerator(ArchiveNameGenerator nameGenerator)

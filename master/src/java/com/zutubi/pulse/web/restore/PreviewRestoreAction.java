@@ -1,15 +1,8 @@
 package com.zutubi.pulse.web.restore;
 
-import com.zutubi.pulse.bootstrap.Data;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.bootstrap.SetupManager;
-import com.zutubi.pulse.bootstrap.DefaultSetupManager;
 import com.zutubi.pulse.restore.Archive;
-import com.zutubi.pulse.restore.RestoreTaskGroup;
-import com.zutubi.pulse.restore.RestoreTask;
 import com.zutubi.pulse.monitor.Task;
 
-import java.io.File;
 import java.util.List;
 
 /**
@@ -22,7 +15,7 @@ public class PreviewRestoreAction extends RestoreActionSupport
 
     public List<Task> getTasks()
     {
-        return archiveManager.previewRestore();
+        return restoreManager.previewRestore();
     }
 
     public Archive getInfo()
@@ -32,7 +25,7 @@ public class PreviewRestoreAction extends RestoreActionSupport
 
     public String execute() throws Exception
     {
-        archive = archiveManager.getArchive();
+        archive = restoreManager.getArchive();
 
         return SUCCESS;
     }

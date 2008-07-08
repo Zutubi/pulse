@@ -6,10 +6,6 @@
     <package name="default" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
-        <action name="archive" class="com.zutubi.pulse.web.restore.ExecuteArchiveAction">
-            <result name="success" type="velocity">undefined.vm</result>
-        </action>
-
         <action name="default" class="com.zutubi.pulse.web.DefaultAction">
             <result name="dashboard" type="redirect">/dashboard/home/</result>
             <result name="welcome" type="velocity">/welcome.vm</result>

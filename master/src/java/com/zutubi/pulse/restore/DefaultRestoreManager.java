@@ -1,7 +1,7 @@
 package com.zutubi.pulse.restore;
 
 import com.zutubi.pulse.bootstrap.Data;
-import com.zutubi.pulse.monitor.JobRunner;
+import com.zutubi.pulse.monitor.JobManager;
 import com.zutubi.pulse.monitor.Monitor;
 import com.zutubi.pulse.monitor.Task;
 import com.zutubi.pulse.util.FileSystemUtils;
@@ -16,8 +16,12 @@ import java.util.List;
  *
  *
  */
-public class DefaultArchiveManager implements ArchiveManager
+public class DefaultRestoreManager implements RestoreManager
 {
+    public static final String ARCHIVE_JOB_KEY = "archive";
+
+    private static final Logger LOG = Logger.getLogger(DefaultRestoreManager.class);
+
     private List<Task> tasks = new LinkedList<Task>();
 
     private File source;
@@ -31,9 +35,7 @@ public class DefaultArchiveManager implements ArchiveManager
 
     private List<ArchiveableComponent> archiveableComponents = new LinkedList<ArchiveableComponent>();
 
-    private JobRunner jobRunner = new JobRunner();
-
-    private static final Logger LOG = Logger.getLogger(DefaultArchiveManager.class);
+    private JobManager jobManager = null;
 
     public void add(ArchiveableComponent component)
     {
@@ -47,7 +49,7 @@ public class DefaultArchiveManager implements ArchiveManager
 
     public Monitor getTaskMonitor()
     {
-        return jobRunner.getMonitor();
+        return jobManager.getMonitor(ARCHIVE_JOB_KEY);
     }
 
     public Archive prepareRestore(File source) throws ArchiveException
@@ -70,6 +72,8 @@ public class DefaultArchiveManager implements ArchiveManager
             tasks.add(task);
         }
 
+        jobManager.register(ARCHIVE_JOB_KEY, tasks);
+
         return archive;
     }
 
@@ -89,14 +93,14 @@ public class DefaultArchiveManager implements ArchiveManager
 
     public void restoreArchive()
     {
-        Monitor monitor = getTaskMonitor();
+        Monitor monitor = jobManager.getMonitor(ARCHIVE_JOB_KEY);
         if (monitor.isStarted())
         {
             LOG.warning("Attempted to execute an executing upgrade.  Request has been ignored.");
             return;
         }
 
-        jobRunner.run(tasks);
+        jobManager.start(ARCHIVE_JOB_KEY);
 
         if(monitor.isSuccessful())
         {
@@ -147,7 +151,6 @@ public class DefaultArchiveManager implements ArchiveManager
     {
         File archiveDirectory = new File(paths.getData(), "archives");
         ArchiveFactory factory = new ArchiveFactory();
-        factory.setArchiveDirectory(archiveDirectory);
         factory.setTmpDirectory(tmpDirectory);
 
         Archive archive = factory.createArchive();
@@ -160,9 +163,14 @@ public class DefaultArchiveManager implements ArchiveManager
             component.backup(archiveComponentBase);
         }
 
-        factory.exportArchive(archive);
+        factory.exportArchive(archive, archiveDirectory);
 
         return archive;
+    }
+
+    public void setJobManager(JobManager jobManager)
+    {
+        this.jobManager = jobManager;
     }
 
     public void setTmpDirectory(File tmpDirectory)

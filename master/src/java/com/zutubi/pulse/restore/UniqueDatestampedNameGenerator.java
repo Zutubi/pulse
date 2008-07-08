@@ -22,6 +22,14 @@ public class UniqueDatestampedNameGenerator implements ArchiveNameGenerator
     public String newName(File target)
     {
         //TODO: internationalise the 'archive' string and the calendar locale.
-        return "archive-" + DATE_FORMAT.format(Calendar.getInstance().getTime());
+        String candidateName = "archive-" + DATE_FORMAT.format(Calendar.getInstance().getTime());
+        File candidate = new File(target, candidateName);
+        int i = 1;
+        while (candidate.isFile())
+        {
+            candidate = new File(target, candidate + "_" + i);
+            i++;
+        }
+        return candidate.getName();
     }
 }

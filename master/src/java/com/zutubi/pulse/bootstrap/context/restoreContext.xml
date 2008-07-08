@@ -5,7 +5,16 @@
 -->
 <beans default-autowire="byName">
 
-    <bean id="archiveManager" class="com.zutubi.pulse.restore.DefaultArchiveManager">
+    <bean id="userPaths" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+        <property name="targetBeanName">
+            <value>configurationManager</value>
+        </property>
+        <property name="propertyPath">
+            <value>userPaths</value>
+        </property>
+    </bean>
+
+    <bean id="archiveManager" class="com.zutubi.pulse.restore.DefaultRestoreManager">
         <property name="tmpDirectory">
             <bean id="tmpRoot" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
                 <property name="targetBeanName">
@@ -17,14 +26,7 @@
             </bean>
         </property>
         <property name="paths">
-            <bean class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
-                <property name="targetBeanName">
-                    <value>configurationManager</value>
-                </property>
-                <property name="propertyPath">
-                    <value>userPaths</value>
-                </property>
-            </bean>
+            <ref local="userPaths"/>
         </property>
         <property name="restorableComponents">
             <list>
@@ -32,6 +34,25 @@
                 <ref local="databaseArchive"/>
                 <ref local="dataDirectoryArchive"/>
                 <ref local="artifactArchive"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="backupManager" class="com.zutubi.pulse.restore.BackupManager" autowire="byName" init-method="init">
+        <property name="backupDir">
+            <bean class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+                <property name="targetBeanName">
+                    <value>userPaths</value>
+                </property>
+                <property name="propertyPath">
+                    <value>backupRoot</value>
+                </property>
+            </bean>
+        </property>
+        <property name="backupableComponents">
+            <list>
+                <ref local="recordsArchive"/>
+                <ref local="dataDirectoryArchive"/>
             </list>
         </property>
     </bean>
@@ -46,27 +67,13 @@
 
     <bean id="dataDirectoryArchive" class="com.zutubi.pulse.restore.DataDirectoryArchive">
         <property name="userPaths">
-            <bean class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
-                <property name="targetBeanName">
-                    <value>configurationManager</value>
-                </property>
-                <property name="propertyPath">
-                    <value>userPaths</value>
-                </property>
-            </bean>
+            <ref local="userPaths"/>
         </property>
     </bean>
 
     <bean id="artifactArchive" class="com.zutubi.pulse.restore.ArtifactArchive">
         <property name="userPaths">
-            <bean class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
-                <property name="targetBeanName">
-                    <value>configurationManager</value>
-                </property>
-                <property name="propertyPath">
-                    <value>userPaths</value>
-                </property>
-            </bean>
+            <ref local="userPaths"/>
         </property>
         <property name="systemConfiguration">
             <bean class="org.springframework.beans.factory.config.PropertyPathFactoryBean">

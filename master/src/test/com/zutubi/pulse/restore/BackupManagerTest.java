@@ -8,6 +8,7 @@ import com.zutubi.pulse.prototype.config.project.triggers.CronExpressionValidato
 import com.zutubi.pulse.scheduling.CronTrigger;
 import com.zutubi.pulse.scheduling.DefaultScheduler;
 import com.zutubi.pulse.scheduling.MockSchedulerStrategy;
+import com.zutubi.pulse.scheduling.Trigger;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.events.EventManager;
@@ -26,7 +27,7 @@ public class BackupManagerTest extends PulseTestCase
 {
     private DefaultScheduler scheduler;
 
-    private DefaultArchiveManager archiveManager;
+    private DefaultRestoreManager restoreManager;
 
     private MockConfigurationProvider configurationProvider;
 
@@ -48,15 +49,15 @@ public class BackupManagerTest extends PulseTestCase
         configurationProvider = new MockConfigurationProvider();
         configurationProvider.insert("admin/settings/backup", new BackupConfiguration());
 
-        archiveManager = new DefaultArchiveManager();
-        archiveManager.setPaths(new Data(tmp));
+        restoreManager = new DefaultRestoreManager();
+        restoreManager.setPaths(new Data(tmp));
 
         eventManager = new DefaultEventManager();
     }
 
     protected void tearDown() throws Exception
     {
-        archiveManager = null;
+        restoreManager = null;
         configurationProvider = null;
         scheduler.stop(true);
         scheduler = null;
@@ -72,14 +73,7 @@ public class BackupManagerTest extends PulseTestCase
         BackupConfiguration config = configurationProvider.get(BackupConfiguration.class);
         config.setEnabled(true);
 
-        BackupManager manager = new BackupManager();
-        manager.setEventManager(eventManager);
-        manager.setScheduler(scheduler);
-        manager.setConfigurationProvider(configurationProvider);
-        manager.init();
-
-        // send the system started event.
-        eventManager.publish(new ConfigurationSystemStartedEvent(configurationProvider));
+        BackupManager manager = createAndStartBackupManager();
 
         // Ensure that the init of the backup manager registers the expected trigger.
         CronTrigger trigger = (CronTrigger) scheduler.getTrigger(BackupManager.TRIGGER_NAME, BackupManager.TRIGGER_GROUP);
@@ -102,25 +96,17 @@ public class BackupManagerTest extends PulseTestCase
 
     public void testBackupCreation()
     {
-        BackupManager manager = new BackupManager();
-        manager.setArchiveManager(archiveManager);
+        BackupManager manager = createAndStartBackupManager();
         
         manager.triggerBackup();
 
-        // is this much more than a simple delegation to the archiveManager?.  Maybe we want to place the
+        // is this much more than a simple delegation to the restoreManager?.  Maybe we want to place the
         // archive in a special location / file name format?.
     }
 
     public void testScheduleOnlyOnEnabled()
     {
-        BackupManager manager = new BackupManager();
-        manager.setScheduler(scheduler);
-        manager.setEventManager(eventManager);
-        manager.setConfigurationProvider(configurationProvider);
-        manager.init();
-
-        // send the system started event.
-        eventManager.publish(new ConfigurationSystemStartedEvent(configurationProvider));
+        BackupManager manager = createAndStartBackupManager();
 
         // Ensure that the init of the backup manager registers the expected trigger.
         CronTrigger trigger = (CronTrigger) scheduler.getTrigger(BackupManager.TRIGGER_NAME, BackupManager.TRIGGER_GROUP);
@@ -133,23 +119,60 @@ public class BackupManagerTest extends PulseTestCase
         config.setEnabled(true);
 
         // when the backup configuration is changed, we need to ensure that the trigger remains in sync.
-        BackupManager manager = new BackupManager();
-        manager.setScheduler(scheduler);
-        manager.setEventManager(eventManager);
-        manager.setConfigurationProvider(configurationProvider);
-        manager.init();
-
-        // send the system started event.
-        eventManager.publish(new ConfigurationSystemStartedEvent(configurationProvider));
+        BackupManager manager = createAndStartBackupManager();
 
         // make a change to the configuration, triggering a save.
-        config = new BackupConfiguration();
         config.setCronSchedule("0 0 0 * * ?");
-        PostSaveEvent evt = new PostSaveEvent(null, config);
-        configurationProvider.sendEvent(evt);
+        saveConfigurationChange(config);
 
         CronTrigger trigger = (CronTrigger) scheduler.getTrigger(BackupManager.TRIGGER_NAME, BackupManager.TRIGGER_GROUP);
         assertNotNull(trigger);
         assertEquals("0 0 0 * * ?", trigger.getCron());
     }
+
+    public void testEnableDisable()
+    {
+        // when the backup configuration is changed, we need to ensure that the trigger remains in sync.
+        createAndStartBackupManager();
+
+        Trigger trigger = scheduler.getTrigger(BackupManager.TRIGGER_NAME, BackupManager.TRIGGER_GROUP);
+        assertNull(trigger);
+
+        BackupConfiguration config = new BackupConfiguration();
+        config.setEnabled(true);
+
+        saveConfigurationChange(config);
+
+        trigger = scheduler.getTrigger(BackupManager.TRIGGER_NAME, BackupManager.TRIGGER_GROUP);
+        assertNotNull(trigger);
+
+        config.setEnabled(false);
+        saveConfigurationChange(config);
+
+        trigger = scheduler.getTrigger(BackupManager.TRIGGER_NAME, BackupManager.TRIGGER_GROUP);
+        assertNull(trigger);
+    }
+
+    private void saveConfigurationChange(BackupConfiguration config)
+    {
+        PostSaveEvent evt = new PostSaveEvent(null, config);
+        configurationProvider.sendEvent(evt);
+    }
+
+    private BackupManager createAndStartBackupManager()
+    {
+        BackupManager manager = new BackupManager();
+        manager.setScheduler(scheduler);
+        manager.setEventManager(eventManager);
+        manager.setConfigurationProvider(configurationProvider);
+        manager.setBackupDir(new File(tmp, "backup"));
+        manager.add(new NoopArchiveableComponent());
+        manager.init();
+
+        // send the system started event.
+        eventManager.publish(new ConfigurationSystemStartedEvent(configurationProvider));
+        
+        return manager;
+    }
+
 }

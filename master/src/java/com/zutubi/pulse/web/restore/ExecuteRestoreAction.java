@@ -29,18 +29,18 @@ public class ExecuteRestoreAction extends RestoreActionSupport
 
     public List<Task> getTasks()
     {
-        return archiveManager.previewRestore();
+        return restoreManager.previewRestore();
     }
     
     public Monitor getMonitor()
     {
-        return archiveManager.getTaskMonitor();
+        return restoreManager.getTaskMonitor();
     }
 
     public String execute() throws Exception
     {
         // Ensure that we behave correctly if this action is triggered a second time.
-        Monitor monitor = archiveManager.getTaskMonitor();
+        Monitor monitor = restoreManager.getTaskMonitor();
         if (monitor.isFinished())
         {
             return SUCCESS;
@@ -52,7 +52,7 @@ public class ExecuteRestoreAction extends RestoreActionSupport
         }
         
         ((DefaultSetupManager)setupManager).doExecuteRestorationRequest();
-        backedUpArchive = archiveManager.postRestore();
+        backedUpArchive = restoreManager.postRestore();
 
         return SUCCESS;
     }

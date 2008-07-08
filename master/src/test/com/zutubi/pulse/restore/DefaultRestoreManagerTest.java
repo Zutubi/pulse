@@ -4,6 +4,7 @@ import com.zutubi.pulse.bootstrap.Data;
 import com.zutubi.pulse.monitor.Monitor;
 import com.zutubi.pulse.monitor.Task;
 import com.zutubi.pulse.monitor.TaskFeedback;
+import com.zutubi.pulse.monitor.JobManager;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 
@@ -14,10 +15,10 @@ import java.util.List;
  *
  *
  */
-public class DefaultArchiveManagerTest extends PulseTestCase
+public class DefaultRestoreManagerTest extends PulseTestCase
 {
-    private DefaultArchiveManager manager;
-
+    private DefaultRestoreManager manager;
+    private JobManager jobManager;
     private File tmpDir;
     private ArchiveFactory factory;
 
@@ -27,17 +28,21 @@ public class DefaultArchiveManagerTest extends PulseTestCase
 
         tmpDir = FileSystemUtils.createTempDir();
 
-        manager = new DefaultArchiveManager();
+        jobManager = new JobManager();
+
+        manager = new DefaultRestoreManager();
         manager.setPaths(new Data(new File(tmpDir, "data")));
+        manager.setJobManager(jobManager);
 
         factory = new ArchiveFactory();
         factory.setTmpDirectory(new File(tmpDir, "tmp"));
-        factory.setArchiveDirectory(new File(tmpDir, "archive"));
     }
 
     protected void tearDown() throws Exception
     {
         manager = null;
+        jobManager = null;
+        factory = null;
 
         removeDirectory(tmpDir);
 
@@ -48,16 +53,16 @@ public class DefaultArchiveManagerTest extends PulseTestCase
     {
         Archive archive = factory.createArchive();
         
-        File archiveFile = factory.exportArchive(archive);
+        File archiveFile = factory.exportArchive(archive, new File(tmpDir, "export"));
 
         manager.add(new NoopArchiveableComponent());
-
-        Monitor monitor = manager.getTaskMonitor();
-        assertFalse(monitor.isStarted());
 
         Archive preparedArchive = manager.prepareRestore(archiveFile);
         List<Task> tasks = manager.previewRestore();
         assertEquals(1, tasks.size());
+
+        Monitor monitor = manager.getTaskMonitor();
+        assertFalse(monitor.isStarted());
 
         Task task = tasks.get(0);
 
@@ -73,18 +78,18 @@ public class DefaultArchiveManagerTest extends PulseTestCase
     {
         Archive archive = factory.createArchive();
 
-        File archiveFile = factory.exportArchive(archive);
+        File archiveFile = factory.exportArchive(archive, new File(tmpDir, "export"));
 
         manager.add(new FailingArchiveableComponent());
-
-        Monitor monitor = manager.getTaskMonitor();
-        assertFalse(monitor.isStarted());
 
         Archive preparedArchive = manager.prepareRestore(archiveFile);
         List<Task> tasks = manager.previewRestore();
         assertEquals(1, tasks.size());
 
         Task task = tasks.get(0);
+
+        Monitor monitor = manager.getTaskMonitor();
+        assertFalse(monitor.isStarted());
 
         manager.restoreArchive();
 
