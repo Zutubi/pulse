@@ -1,0 +1,113 @@
+package com.zutubi.pulse.restore;
+
+import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.util.FileSystemUtils;
+
+import java.io.File;
+import java.io.IOException;
+
+/**
+ *
+ *
+ */
+public class KeepMostRecentXCleanupStrategyTest extends PulseTestCase
+{
+    private File tmp;
+
+    private long i;
+
+    protected void setUp() throws Exception
+    {
+        super.setUp();
+
+        tmp = FileSystemUtils.createTempDir();
+    }
+
+    protected void tearDown() throws Exception
+    {
+        removeDirectory(tmp);
+
+        super.tearDown();
+    }
+
+    public void testEmptyCandidateList()
+    {
+        BackupCleanupStrategy strategy = new KeepMostRecentXCleanupStrategy(10);
+        File[] targets = strategy.getCleanupTargets(null);
+        assertNotNull(targets);
+        assertEquals(0, targets.length);
+
+        targets = strategy.getCleanupTargets(new File[0]);
+        assertNotNull(targets);
+        assertEquals(0, targets.length);
+    }
+
+    public void testCandidateListLessThanX() throws IOException
+    {
+        createCandidateFiles(2);
+
+        BackupCleanupStrategy strategy = new KeepMostRecentXCleanupStrategy(10);
+        File[] targets = strategy.getCleanupTargets(tmp.listFiles());
+        assertNotNull(targets);
+        assertEquals(0, targets.length);
+    }
+
+    public void testCandidateListEqualToX() throws IOException
+    {
+        createCandidateFiles(2);
+
+        BackupCleanupStrategy strategy = new KeepMostRecentXCleanupStrategy(2);
+        File[] targets = strategy.getCleanupTargets(tmp.listFiles());
+        assertNotNull(targets);
+        assertEquals(0, targets.length);
+    }
+
+    public void testCandidateListGreaterThanX() throws IOException
+    {
+        createCandidateFiles(3);
+
+        BackupCleanupStrategy strategy = new KeepMostRecentXCleanupStrategy(2);
+        File[] targets = strategy.getCleanupTargets(tmp.listFiles());
+        assertNotNull(targets);
+        assertEquals(1, targets.length);
+    }
+
+    public void testXEqualsZero() throws IOException
+    {
+        createCandidateFiles(2);
+
+        BackupCleanupStrategy strategy = new KeepMostRecentXCleanupStrategy(0);
+        File[] targets = strategy.getCleanupTargets(tmp.listFiles());
+        assertNotNull(targets);
+        assertEquals(2, targets.length);
+    }
+
+    public void testMostRecentReturned() throws IOException
+    {
+        createCandidateFiles(5);
+
+        BackupCleanupStrategy strategy = new KeepMostRecentXCleanupStrategy(3);
+        File[] targets = strategy.getCleanupTargets(tmp.listFiles());
+        assertNotNull(targets);
+        assertEquals(2, targets.length);
+        assertEquals("backup-0", targets[0].getName());
+        assertEquals("backup-1", targets[1].getName());
+    }
+
+    private void createCandidateFiles(int x) throws IOException
+    {
+        for (int i = 0; i < x; i++)
+        {
+            createTmpFile("backup-" + i);
+        }
+    }
+
+    private void createTmpFile(String fileName) throws IOException
+    {
+        File f = new File(tmp, fileName);
+        f.createNewFile();
+        f.setLastModified(i * 100000);
+        i++;
+    }
+
+}
