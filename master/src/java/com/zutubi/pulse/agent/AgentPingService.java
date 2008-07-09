@@ -23,7 +23,8 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class AgentPingService implements Stoppable
 {
-    public static final String PPROPERTY_AGENT_PING_TIMEOUT = "pulse.agent.ping.timeout";
+    public static final String PROPERTY_AGENT_PING_TIMEOUT = "pulse.agent.ping.timeout";
+    public static final String PROPERTY_AGENT_LOG_TIMEOUTS = "pulse.agent.log.timeouts";
 
     private static final Logger LOG = Logger.getLogger(AgentPingService.class);
 
@@ -131,11 +132,15 @@ public class AgentPingService implements Stoppable
                 SlaveStatus status;
                 try
                 {
-                    status = future.get(Integer.getInteger(PPROPERTY_AGENT_PING_TIMEOUT, 45), TimeUnit.SECONDS);
+                    status = future.get(Integer.getInteger(PROPERTY_AGENT_PING_TIMEOUT, 45), TimeUnit.SECONDS);
                 }
                 catch (TimeoutException e)
                 {
-                    LOG.warning("Timed out pinging agent '" + agent.getName() + "'", e);
+                    if (Boolean.getBoolean(PROPERTY_AGENT_LOG_TIMEOUTS))
+                    {
+                        LOG.warning("Timed out pinging agent '" + agent.getName() + "'", e);
+                    }
+                    
                     status = new SlaveStatus(Status.OFFLINE, "Agent ping timed out");
                 }
                 catch (Exception e)

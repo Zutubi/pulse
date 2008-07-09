@@ -1,27 +1,27 @@
 package com.zutubi.pulse.agent;
 
-import com.zutubi.pulse.events.*;
-import com.zutubi.pulse.services.SlaveService;
-import com.zutubi.pulse.services.SlaveStatus;
-import com.zutubi.pulse.services.TokenManager;
-import com.zutubi.pulse.services.InvalidTokenException;
-import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.core.RecipeRequest;
-import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.BuildContext;
 import com.zutubi.pulse.SystemInfo;
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.resources.ResourceConstructor;
+import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.core.model.Resource;
+import com.zutubi.pulse.events.*;
 import com.zutubi.pulse.filesystem.FileInfo;
 import com.zutubi.pulse.logging.CustomLogRecord;
+import com.zutubi.pulse.resources.ResourceConstructor;
+import com.zutubi.pulse.services.InvalidTokenException;
+import com.zutubi.pulse.services.SlaveService;
+import com.zutubi.pulse.services.SlaveStatus;
+import com.zutubi.pulse.services.TokenManager;
+import com.zutubi.pulse.test.PulseTestCase;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.stub;
 
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.Semaphore;
-import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  */
@@ -139,7 +139,7 @@ public class AgentPingServiceTest extends PulseTestCase
 
     public void testTimeout() throws InterruptedException
     {
-        System.setProperty(AgentPingService.PPROPERTY_AGENT_PING_TIMEOUT, "1");
+        System.setProperty(AgentPingService.PROPERTY_AGENT_PING_TIMEOUT, "1");
 
         Agent agent = createAgent(1);
 
