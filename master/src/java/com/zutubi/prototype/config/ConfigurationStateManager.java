@@ -1,6 +1,5 @@
 package com.zutubi.prototype.config;
 
-import com.zutubi.prototype.transaction.Transaction;
 import com.zutubi.prototype.transaction.TransactionManager;
 import com.zutubi.prototype.transaction.TransactionResource;
 import com.zutubi.prototype.type.CompositeType;
@@ -14,6 +13,8 @@ import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.util.logging.Logger;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -44,61 +45,49 @@ public class ConfigurationStateManager
         managers.put(clazz, manager);
     }
 
-    public void instanceInserted(Configuration instance)
+    public List<Class<? extends Configuration>> getStatefulConfigurationTypes()
+    {
+        return new LinkedList<Class<? extends Configuration>>(managers.keySet());
+    }
+
+    public void createAndAssignStateIfRequired(final Configuration instance)
     {
         Class<? extends Configuration> clazz = instance.getClass();
         final ExternalStateManager manager = getManager(clazz);
         if (manager != null)
         {
-            CompositeType type = typeRegistry.getType(instance.getClass());
-            Transaction txn = transactionManager.getTransaction();
-            try
+            final long[] hax = {-1};
+            transactionManager.runInTransaction(new TransactionManager.Executable()
             {
-                final long id = manager.createState(instance);
-
-                // Make sure state is cleaned up if transaction fails.
-                txn.enlistResource(new TransactionResource()
+                public Object execute()
                 {
-                    public boolean prepare()
-                    {
-                        return true;
-                    }
+                    CompositeType type = typeRegistry.getType(instance.getClass());
 
-                    public void commit()
-                    {
-                        // Nothing to do.
-                    }
+                    hax[0] = manager.createState(instance);
+                    updateProperty(type, instance, hax[0]);
 
-                    public void rollback()
-                    {
-                        manager.rollbackState(id);
-                    }
-                });
+                    return null;
+                }
 
-                updateProperty(type, instance, id);
-            }
-            catch (Exception e)
+            },
+            new TransactionResource()
             {
-                LOG.severe(e);
-
-                // Make sure the commit does not go ahead.
-                txn.enlistResource(new TransactionResource()
+                public boolean prepare()
                 {
-                    public boolean prepare()
-                    {
-                        return false;
-                    }
+                    return true;
+                }
 
-                    public void commit()
-                    {
-                    }
+                public void commit()
+                {
 
-                    public void rollback()
-                    {
-                    }
-                });
-            }
+                }
 
+                public void rollback()
+                {
+                    manager.rollbackState(hax[0]);
+                }
+
+            });
         }
     }
 
@@ -137,6 +126,32 @@ public class ConfigurationStateManager
         {
             LOG.severe(e);
         }
+    }
+
+    public long getExternalStateId(Configuration instance)
+    {
+        CompositeType type = typeRegistry.getType(instance.getClass());
+        TypeProperty property = type.getExternalStateProperty();
+        if (property == null)
+        {
+            throw new IllegalArgumentException("Type " + instance.getClass() + " does not have an external state.");
+        }
+        try
+        {
+            Object value = property.getValue(instance);
+            return (Long)value;
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException("Failed to retrieve external state id.");
+        }
+    }
+
+    public Object getExternalState(Configuration instance)
+    {
+        long id = getExternalStateId(instance);
+        ExternalStateManager stateManager = getManager(instance.getClass());
+        return stateManager.getState(id);
     }
 
 //    public void instanceDelete(Configuration instance)
@@ -192,4 +207,5 @@ public class ConfigurationStateManager
     {
         this.recordManager = recordManager;
     }
+
 }

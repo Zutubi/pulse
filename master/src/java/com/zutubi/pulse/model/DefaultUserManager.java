@@ -104,6 +104,10 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
     {
         User user = new User();
         userDao.save(user);
+
+        // this seems to be as good a place as any for handling this.  NOTE: When the configuration instance is an existing
+        // instance and the state has to be 're-created', non of the other hooks that maintain the userConfigsById map are triggered.
+        userConfigsById.put(user.getId(), instance);
         return user.getId();
     }
 
@@ -114,6 +118,11 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
         {
             userDao.delete(user);
         }
+    }
+
+    public Object getState(long id)
+    {
+        return userDao.findById(id);
     }
 
     private void initGroupsByUser()

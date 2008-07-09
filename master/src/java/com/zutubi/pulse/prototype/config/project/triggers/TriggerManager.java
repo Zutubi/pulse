@@ -86,6 +86,11 @@ public class TriggerManager implements ExternalStateManager<TriggerConfiguration
         delete(id);
     }
 
+    public Object getState(long id)
+    {
+        return scheduler.getTrigger(id);
+    }
+
     public void handleEvent(Event event)
     {
         registerConfigListeners(((ConfigurationSystemStartedEvent)event).getConfigurationProvider());

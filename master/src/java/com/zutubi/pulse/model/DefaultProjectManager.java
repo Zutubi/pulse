@@ -182,6 +182,10 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     {
         Project project = new Project();
         save(project);
+
+        // this seems to be as good a place as any for handling this.  NOTE: When the configuration instance is an existing
+        // instance and the state has to be 're-created', non of the other hooks that maintain the idToConfig map are triggered.
+        idToConfig.put(project.getId(), instance);
         return project.getId();
     }
 
@@ -192,6 +196,11 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         {
             projectDao.delete(project);
         }
+    }
+
+    public Object getState(long id)
+    {
+        return projectDao.findById(id);
     }
 
     @SuppressWarnings({"unchecked"})

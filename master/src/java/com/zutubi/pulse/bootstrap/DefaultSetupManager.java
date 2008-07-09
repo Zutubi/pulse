@@ -16,6 +16,7 @@ import com.zutubi.pulse.Version;
 import com.zutubi.pulse.bootstrap.conf.EnvConfig;
 import com.zutubi.pulse.bootstrap.tasks.ProcessSetupStartupTask;
 import com.zutubi.pulse.config.PropertiesWriter;
+import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.database.DatabaseConsole;
 import com.zutubi.pulse.database.DriverRegistry;
 import com.zutubi.pulse.events.DataDirectoryLocatedEvent;
@@ -35,15 +36,15 @@ import com.zutubi.util.logging.Logger;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;
 import freemarker.cache.TemplateLoader;
-import freemarker.template.Configuration;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.text.DateFormat;
+import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -416,7 +417,7 @@ public class DefaultSetupManager implements SetupManager
         File userTemplateRoot = configurationManager.getUserPaths().getUserTemplateRoot();
         if (userTemplateRoot.isDirectory())
         {
-            Configuration freemarkerConfiguration = ComponentContext.getBean("freemarkerConfiguration");
+            freemarker.template.Configuration freemarkerConfiguration = ComponentContext.getBean("freemarkerConfiguration");
             TemplateLoader existingLoader = freemarkerConfiguration.getTemplateLoader();
             try
             {
@@ -528,7 +529,35 @@ public class DefaultSetupManager implements SetupManager
         configurationProvider.init();
         this.configurationProvider = configurationProvider;
 
+        // the last thing we want to do during setup is to ensure that we have state objects that match all of our
+        // configuration objects.  These may be out of sync due to
+        // a) a restore from a backup that does not contain database export
+        // b) a restart after an external database issue resulted in a rollback
+        // c) any number of other options.
+        ensureDatabaseStateIsInSyncWithConfiguration();
+
         setupCallback.finaliseSetup();
+    }
+
+    private void ensureDatabaseStateIsInSyncWithConfiguration()
+    {
+        ConfigurationStateManager stateManager = ComponentContext.getBean("configurationStateManager");
+
+        // do we want to wrap this process in a transaction?
+
+        List<Class<? extends Configuration>> statefulTypes = stateManager.getStatefulConfigurationTypes();
+        for (Class<? extends Configuration> clazz : statefulTypes)
+        {
+            Collection<? extends Configuration> configs = configurationProvider.getAll(clazz);
+            for (Configuration config : configs)
+            {
+                Object externalState = stateManager.getExternalState(config);
+                if (externalState == null)
+                {
+                    stateManager.createAndAssignStateIfRequired(config);
+                }
+            }
+        }
     }
 
     private void loadContexts(List<String> contexts)
@@ -691,7 +720,6 @@ public class DefaultSetupManager implements SetupManager
 
     public void handleRestorationProcess()
     {
-        //TODO: only need to load restoreContexts if restore is requested? maybe load these statically...
         loadContexts(restoreContexts);
 
         if (isRestoreRequested())

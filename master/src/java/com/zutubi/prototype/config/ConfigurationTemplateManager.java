@@ -489,7 +489,7 @@ public class ConfigurationTemplateManager
                     InsertEvent insertEvent = new InsertEvent(this, configuration, cascaded);
                     publishEvent(insertEvent);
                     state.pendingEvents.add(new PostInsertEvent(this, configuration, cascaded));
-                    configurationStateManager.instanceInserted(configuration);
+                    configurationStateManager.createAndAssignStateIfRequired(configuration);
                 }
             }
         }

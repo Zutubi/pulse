@@ -522,9 +522,9 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
 
     public void insert(final String path, final Record record)
     {
-        execute(new Executable()
+        transactionManager.runInTransaction(new TransactionManager.Executable()
         {
-            public Record execute()
+            public Object execute()
             {
                 JournalEntry journalEntry = new JournalEntry(ACTION_INSERT, path, record, nextJournalEntryId++);
 
@@ -533,14 +533,14 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
                 inMemoryDelegate.insert(path, record);
                 return null;
             }
-        });
+        }, this);
     }
 
     public void update(final String path, final Record record)
     {
-        execute(new Executable()
+        transactionManager.runInTransaction(new TransactionManager.Executable()
         {
-            public Record execute()
+            public Object execute()
             {
                 JournalEntry journalEntry = new JournalEntry(ACTION_UPDATE, path, record, nextJournalEntryId++);
                 LOG.finest(Thread.currentThread().getId() + ": ("+journalEntry+")");
@@ -548,21 +548,21 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
                 inMemoryDelegate.update(path, record);
                 return null;
             }
-        });
+        }, this);
     }
 
     public Record delete(final String path)
     {
-        return execute(new Executable()
+        return (Record) transactionManager.runInTransaction(new TransactionManager.Executable()
         {
-            public Record execute()
+            public Object execute()
             {
                 JournalEntry journalEntry = new JournalEntry(ACTION_DELETE, path, nextJournalEntryId++);
                 LOG.finest(Thread.currentThread().getId() + ": ("+journalEntry+")");
                 activeJournal.add(journalEntry);
                 return inMemoryDelegate.delete(path);
             }
-        });
+        }, this);
     }
 
     public Record select()
@@ -577,15 +577,15 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
 
     public void importRecords(final Record record)
     {
-        execute(new Executable()
+        transactionManager.runInTransaction(new TransactionManager.Executable()
         {
-            public Record execute()
+            public Object execute()
             {
                 activeJournal.add(new JournalEntry(ACTION_IMPORT, "", record, nextJournalEntryId++));
                 inMemoryDelegate.importRecords(record);
                 return null;
             }
-        });
+        }, this);
     }
 
     public void setPersistenceDirectory(File persistentDir)
@@ -596,34 +596,6 @@ public class FileSystemRecordStore implements RecordStore, TransactionResource
     public void setTransactionManager(TransactionManager transactionManager)
     {
         this.transactionManager = transactionManager;
-    }
-
-    private static interface Executable
-    {
-        Record execute();
-    }
-
-    private Record execute(Executable action)
-    {
-        // ensure that we are part of the transaction.
-        boolean activeTransaction = transactionManager.getTransaction() != null;
-        if (activeTransaction)
-        {
-            transactionManager.getTransaction().enlistResource(this);
-        }
-        else
-        {
-            transactionManager.begin();
-            transactionManager.getTransaction().enlistResource(this);
-        }
-
-        Record result = action.execute();
-
-        if (!activeTransaction)
-        {
-            transactionManager.commit();
-        }
-        return result;
     }
 
     private boolean writeRecord(File file, Record record) throws IOException

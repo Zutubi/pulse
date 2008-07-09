@@ -235,4 +235,62 @@ public class TransactionManager
         }
         return activeTransaction.getStatus();
     }
+
+    public Object runInTransaction(Executable action, TransactionResource resource)
+    {
+        // ensure that we are part of the transaction.
+        boolean activeTransaction = getTransaction() != null;
+        if (!activeTransaction)
+        {
+            // execute a manual transaction.
+            begin();
+        }
+
+        getTransaction().enlistResource(resource);
+
+        if (!activeTransaction)
+        {
+            try
+            {
+                Object result = action.execute();
+
+                // execute a manual transaction.
+                commit();
+
+                return result;
+            }
+            catch (RuntimeException e)
+            {
+                rollback();
+                throw e;
+            }
+            catch (Throwable t)
+            {
+                rollback();
+                throw new RuntimeException(t);
+            }
+        }
+        else
+        {
+            try
+            {
+                return action.execute();
+            }
+            catch (RuntimeException e)
+            {
+                setRollbackOnly();
+                throw e;
+            }
+            catch (Throwable t)
+            {
+                setRollbackOnly();
+                throw new RuntimeException(t);
+            }
+        }
+    }
+
+    public static interface Executable
+    {
+        Object execute();
+    }
 }

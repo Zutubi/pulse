@@ -162,6 +162,11 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         agentStateManager.delete(id);
     }
 
+    public Object getState(long id)
+    {
+        return agentStateManager.getAgentState(id);
+    }
+
     private void refreshAgents()
     {
         lock.lock();
