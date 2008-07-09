@@ -7,8 +7,8 @@ import com.zutubi.pulse.monitor.TaskException;
 import com.zutubi.pulse.monitor.TaskFeedback;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.transfer.TransferException;
-import com.zutubi.pulse.upgrade.tasks.HibernateUtils;
-import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
+import com.zutubi.pulse.hibernate.HibernateUtils;
+import com.zutubi.pulse.hibernate.MutableConfiguration;
 import com.zutubi.pulse.util.JDBCUtils;
 import nu.xom.ParsingException;
 

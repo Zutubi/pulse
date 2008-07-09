@@ -2,7 +2,7 @@ package com.zutubi.pulse.web.admin;
 
 import com.zutubi.pulse.database.DatabaseConfig;
 import com.zutubi.pulse.transfer.TransferAPI;
-import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
+import com.zutubi.pulse.hibernate.MutableConfiguration;
 import com.zutubi.pulse.web.ActionSupport;
 
 import javax.sql.DataSource;

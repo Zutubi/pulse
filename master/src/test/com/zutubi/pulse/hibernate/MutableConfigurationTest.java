@@ -1,4 +1,4 @@
-package com.zutubi.pulse.upgrade.tasks;
+package com.zutubi.pulse.hibernate;
 
 import com.zutubi.pulse.test.PulseTestCase;
 

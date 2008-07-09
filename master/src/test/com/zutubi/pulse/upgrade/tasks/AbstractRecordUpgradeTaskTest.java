@@ -41,7 +41,6 @@ public class AbstractRecordUpgradeTaskTest extends PulseTestCase
         // set up sample data.
         InMemoryRecordStore store = new InMemoryRecordStore();
         store.setTransactionManager(new TransactionManager());
-        store.insert("hello", new MutableRecordImpl());
         store.insert("path", new MutableRecordImpl());
         store.insert("path/to", new MutableRecordImpl());
         store.insert("path/to/record", new MutableRecordImpl());
@@ -56,7 +55,6 @@ public class AbstractRecordUpgradeTaskTest extends PulseTestCase
         store.importRecords(serialiser.deserialise(""));
 
         RecordQueries queries = RecordQueries.getQueries(store);
-        assertTrue(queries.select("hello").containsKey("visited"));
         assertTrue(queries.select("path").containsKey("visited"));
         assertTrue(queries.select("path/to").containsKey("visited"));
         assertTrue(queries.select("path/to/record").containsKey("visited"));
@@ -64,6 +62,21 @@ public class AbstractRecordUpgradeTaskTest extends PulseTestCase
 
     private class MarkEachRecordUpgradeTask extends AbstractRecordUpgradeTask
     {
+        public String getName()
+        {
+            return "test";
+        }
+
+        public String getDescription()
+        {
+            return "test";
+        }
+
+        public boolean haltOnFailure()
+        {
+            return false;
+        }
+
         public void doUpgrade(MutableRecord record)
         {
             record.put("visited", "true");

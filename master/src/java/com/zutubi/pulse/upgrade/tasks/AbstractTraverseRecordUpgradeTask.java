@@ -1,0 +1,28 @@
+package com.zutubi.pulse.upgrade.tasks;
+
+import com.zutubi.prototype.type.record.MutableRecord;
+
+/**
+ *
+ *
+ */
+public abstract class AbstractTraverseRecordUpgradeTask extends AbstractUpgradeTask
+{
+    protected void traverse(MutableRecord record)
+    {
+        doUpgrade(record);
+
+        // traverse nested children in a depth first traversal.
+        for (String key : record.keySet())
+        {
+            Object value = record.get(key);
+            if (value instanceof MutableRecord)
+            {
+                MutableRecord nestedRecord = (MutableRecord) value;
+                traverse(nestedRecord);
+            }
+        }
+    }
+
+    public abstract void doUpgrade(MutableRecord record);
+}

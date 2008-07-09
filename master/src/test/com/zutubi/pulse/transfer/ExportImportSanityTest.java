@@ -3,7 +3,7 @@ package com.zutubi.pulse.transfer;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.transfer.jdbc.HibernateTransferSource;
 import com.zutubi.pulse.transfer.jdbc.HibernateTransferTarget;
-import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
+import com.zutubi.pulse.hibernate.MutableConfiguration;
 import junit.framework.TestCase;
 import org.apache.commons.dbcp.BasicDataSource;
 

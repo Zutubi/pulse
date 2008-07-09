@@ -1,12 +1,13 @@
 package com.zutubi.pulse.restore;
 
 import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
+import com.zutubi.pulse.hibernate.MutableConfiguration;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.JDBCUtils;
 import com.zutubi.util.IOUtils;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.hibernate.dialect.Dialect;
+import org.hibernate.cfg.Environment;
 
 import java.io.File;
 import java.io.IOException;
@@ -68,7 +69,7 @@ public class DatabaseArchiveTest extends PulseTestCase
 
         // if we want to work through hibernates API, then we need to tell it where to get the
         // datasource from.
-        properties.put("hibernate.connection.provider_class", "com.zutubi.pulse.upgrade.tasks.HackyConnectionProvider");
+        properties.put(Environment.CONNECTION_PROVIDER, "com.zutubi.pulse.hibernate.HackyConnectionProvider");
 
 //        HackyConnectionProvider.dataSource = dataSource;
         

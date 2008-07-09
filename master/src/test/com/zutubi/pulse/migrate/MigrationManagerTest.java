@@ -7,9 +7,9 @@ import com.zutubi.pulse.database.DatabaseConfig;
 import com.zutubi.pulse.monitor.JobManager;
 import com.zutubi.pulse.monitor.Monitor;
 import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.upgrade.tasks.HackyConnectionProvider;
-import com.zutubi.pulse.upgrade.tasks.HibernateUtils;
-import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
+import com.zutubi.pulse.hibernate.HackyConnectionProvider;
+import com.zutubi.pulse.hibernate.HibernateUtils;
+import com.zutubi.pulse.hibernate.MutableConfiguration;
 import com.zutubi.pulse.upgrade.tasks.SchemaRefactor;
 import com.zutubi.pulse.util.JDBCUtils;
 import com.zutubi.pulse.util.FileSystemUtils;
@@ -169,7 +169,7 @@ public class MigrationManagerTest extends PulseTestCase
 
             Properties hibernateProperties = new Properties();
             hibernateProperties.setProperty(DatabaseConfig.HIBERNATE_DIALECT, HibernateUtils.inferHibernateDialect(jdbcProperties));
-            hibernateProperties.put(Environment.CONNECTION_PROVIDER, "com.zutubi.pulse.upgrade.tasks.HackyConnectionProvider");
+            hibernateProperties.put(Environment.CONNECTION_PROVIDER, "com.zutubi.pulse.hibernate.HackyConnectionProvider");
 
             HackyConnectionProvider.dataSource = getDataSource();
 

@@ -8,7 +8,7 @@ import com.zutubi.pulse.test.LicenseHelper;
 import com.zutubi.pulse.test.TestUtils;
 import com.zutubi.pulse.transfer.TransferAPI;
 import com.zutubi.pulse.transfer.TransferException;
-import com.zutubi.pulse.upgrade.tasks.MutableConfiguration;
+import com.zutubi.pulse.hibernate.MutableConfiguration;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.ZipUtils;
 import com.zutubi.util.IOUtils;

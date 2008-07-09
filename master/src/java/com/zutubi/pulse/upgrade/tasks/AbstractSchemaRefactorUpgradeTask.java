@@ -1,6 +1,8 @@
 package com.zutubi.pulse.upgrade.tasks;
 
 import com.zutubi.pulse.database.DatabaseConsole;
+import com.zutubi.pulse.hibernate.MutableConfiguration;
+import com.zutubi.pulse.hibernate.HackyConnectionProvider;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -31,7 +33,7 @@ public abstract class AbstractSchemaRefactorUpgradeTask extends DatabaseUpgradeT
         // load these properties from the context, same place that all the other
         // properties are defined.
         Properties props = databaseConsole.getConfig().getHibernateProperties();
-        props.put(Environment.CONNECTION_PROVIDER, "com.zutubi.pulse.upgrade.tasks.HackyConnectionProvider");
+        props.put(Environment.CONNECTION_PROVIDER, "com.zutubi.pulse.hibernate.HackyConnectionProvider");
 
         // slight hack to provide hibernate with access to the configured datasource.
         HackyConnectionProvider.dataSource = dataSource;
