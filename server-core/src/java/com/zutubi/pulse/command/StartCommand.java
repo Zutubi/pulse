@@ -51,6 +51,8 @@ public class StartCommand implements Command
 
     private String restoreArtifacts = null;
 
+    private boolean migrateRequested = false;
+
     /**
      * Specify the port to which pulse will bind its web user interface.
      *
@@ -95,6 +97,11 @@ public class StartCommand implements Command
         this.restoreFile = optionValue;
     }
 
+    private void setMigrateRequested(boolean b)
+    {
+        this.migrateRequested = b;
+    }
+
     @SuppressWarnings({ "ACCESS_STATIC_VIA_INSTANCE", "AccessStaticViaInstance" })
     private void parse(String... argv) throws ParseException
     {
@@ -127,6 +134,9 @@ public class StartCommand implements Command
                 .hasArg()
                 .create('a'));
 
+        options.addOption(OptionBuilder.withLongOpt("migrate")
+                .create('m'));
+
         CommandLineParser parser = new PosixParser();
         CommandLine commandLine = parser.parse(options, argv, true);
 
@@ -157,6 +167,10 @@ public class StartCommand implements Command
         if (commandLine.hasOption('a'))
         {
             setRestoreArtifacts(commandLine.getOptionValue('a'));
+        }
+        if (commandLine.hasOption('m'))
+        {
+            setMigrateRequested(true);
         }
     }
 
@@ -219,6 +233,11 @@ public class StartCommand implements Command
                 System.setProperty(SystemConfiguration.RESTORE_ARTIFACTS, restoreArtifacts);
             }
 
+            if (migrateRequested)
+            {
+                System.setProperty("migrate.database", Boolean.TRUE.toString());
+            }
+
             SystemBootstrapManager bootstrap = new SystemBootstrapManager();
             bootstrap.bootstrapSystem();
             return 0;
@@ -261,6 +280,7 @@ public class StartCommand implements Command
         options.put("-f [--config] file", "specify an alternate config file");
         options.put("-r [--restore] file", "restore this pulse installation from the specified archive");
         options.put("-a [--restore-artifacts] dir", "restore the artifacts from the specified directory");
+        options.put("-m [--migrate]", "trigger the database migration process on server startup");
         return options;
     }
 

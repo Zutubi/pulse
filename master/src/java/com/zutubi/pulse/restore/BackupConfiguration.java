@@ -15,14 +15,14 @@ import com.zutubi.validation.annotations.Constraint;
 @Form(fieldOrder = {"enabled", "cronSchedule"})
 public class BackupConfiguration extends AbstractConfiguration
 {
-    private static final String DEFAULT_CRON_SCHEDULE = "0 0 5 * * ?";
+    public static final String DEFAULT_CRON_SCHEDULE = "0 0 5 * * ?";
 
     @Required
     @Constraint("com.zutubi.pulse.prototype.config.project.triggers.CronExpressionValidator")
     private String cronSchedule = DEFAULT_CRON_SCHEDULE;
 
     @ControllingCheckbox(dependentFields = {"cronSchedule"})
-    private boolean enabled = false;
+    private boolean enabled = true;
 
     public boolean isEnabled()
     {
