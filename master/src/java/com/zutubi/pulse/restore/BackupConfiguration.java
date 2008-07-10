@@ -21,7 +21,7 @@ public class BackupConfiguration extends AbstractConfiguration
     @Constraint("com.zutubi.pulse.prototype.config.project.triggers.CronExpressionValidator")
     private String cronSchedule = DEFAULT_CRON_SCHEDULE;
 
-    @ControllingCheckbox
+    @ControllingCheckbox(dependentFields = {"cronSchedule"})
     private boolean enabled = false;
 
     public boolean isEnabled()
