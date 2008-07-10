@@ -105,10 +105,10 @@ public class JobRunner
                 }
                 catch (TaskException e)
                 {
+                    LOG.warning(e);
                     taskTracker.markFailed();
                     taskTracker.setStatusMessage("Failed. Cause: " + e.getMessage());
-                    LOG.warning(e);
-                    
+
                     if (currentTask.haltOnFailure())
                     {
                         abort = true;

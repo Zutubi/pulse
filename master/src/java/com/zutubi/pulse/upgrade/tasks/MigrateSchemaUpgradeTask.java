@@ -5,6 +5,7 @@ import com.zutubi.pulse.upgrade.DataSourceAware;
 import com.zutubi.pulse.upgrade.UpgradeException;
 import com.zutubi.pulse.hibernate.MutableConfiguration;
 import com.zutubi.pulse.hibernate.HackyConnectionProvider;
+import com.zutubi.pulse.hibernate.SchemaRefactor;
 
 import javax.sql.DataSource;
 import java.io.IOException;

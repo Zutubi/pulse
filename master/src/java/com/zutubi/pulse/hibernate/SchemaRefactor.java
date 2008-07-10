@@ -1,7 +1,6 @@
-package com.zutubi.pulse.upgrade.tasks;
+package com.zutubi.pulse.hibernate;
 
 import com.zutubi.pulse.util.JDBCUtils;
-import com.zutubi.pulse.hibernate.MutableConfiguration;
 import com.zutubi.util.logging.Logger;
 import org.hibernate.cfg.Environment;
 import org.hibernate.connection.ConnectionProvider;
@@ -17,9 +16,9 @@ import org.hibernate.tool.hbm2ddl.TableMetadata;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
-import java.util.LinkedList;
 
 /**
  *

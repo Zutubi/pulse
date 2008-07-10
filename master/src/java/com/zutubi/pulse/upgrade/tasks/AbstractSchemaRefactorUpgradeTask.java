@@ -3,6 +3,7 @@ package com.zutubi.pulse.upgrade.tasks;
 import com.zutubi.pulse.database.DatabaseConsole;
 import com.zutubi.pulse.hibernate.MutableConfiguration;
 import com.zutubi.pulse.hibernate.HackyConnectionProvider;
+import com.zutubi.pulse.hibernate.SchemaRefactor;
 
 import java.io.IOException;
 import java.sql.Connection;

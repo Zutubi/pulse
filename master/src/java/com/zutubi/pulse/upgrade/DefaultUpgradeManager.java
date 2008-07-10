@@ -81,7 +81,7 @@ public class DefaultUpgradeManager implements UpgradeManager
         this.upgradeableSources = Arrays.asList(componentSources);
     }
 
-    public void prepareUpgrade()
+    public List<UpgradeTaskGroup> prepareUpgrade()
     {
         groups = new LinkedList<UpgradeTaskGroup>();
 
@@ -108,6 +108,8 @@ public class DefaultUpgradeManager implements UpgradeManager
         }
 
         runner = new JobRunner();
+
+        return Collections.unmodifiableList(groups);
     }
 
     public List<UpgradeTaskGroup> previewUpgrade()

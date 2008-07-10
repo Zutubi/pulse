@@ -166,6 +166,7 @@ public class BackupManagerTest extends PulseTestCase
         manager.setEventManager(eventManager);
         manager.setConfigurationProvider(configurationProvider);
         manager.setBackupDir(new File(tmp, "backup"));
+        manager.setTmpDirectory(new File(tmp, "tmp"));
         manager.add(new NoopArchiveableComponent());
         manager.init();
 

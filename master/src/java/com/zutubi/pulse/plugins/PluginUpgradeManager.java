@@ -26,6 +26,7 @@ public class PluginUpgradeManager implements UpgradeableComponentSource
 
     private PluginManager pluginManager;
     private ObjectFactory objectFactory;
+    
     private IExtensionRegistry extensionRegistry;
 
     private boolean upgradeRequired = false;

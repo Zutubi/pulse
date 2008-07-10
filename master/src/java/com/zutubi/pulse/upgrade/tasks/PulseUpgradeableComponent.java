@@ -60,7 +60,7 @@ public class PulseUpgradeableComponent implements UpgradeableComponent, JobListe
      */
     public void setTasks(PulseUpgradeTask... tasks)
     {
-        this.upgradeTasks = Arrays.asList(tasks);
+        setTasks(Arrays.asList(tasks));
     }
 
     /**
@@ -127,21 +127,26 @@ public class PulseUpgradeableComponent implements UpgradeableComponent, JobListe
 
     public boolean isUpgradeRequired()
     {
-        Version from = configurationManager.getData().getVersion();
+        Version from = getDataVersion();
         Version to = Version.getVersion();
 
         return isUpgradeRequired(from.getBuildNumberAsInt(), to.getBuildNumberAsInt());
     }
 
+    private Version getDataVersion()
+    {
+        return configurationManager.getData().getVersion();
+    }
+
     public List<UpgradeTask> getUpgradeTasks()
     {
-        Version from = configurationManager.getData().getVersion();
+        Version from = getDataVersion();
         Version to = Version.getVersion();
 
         List<PulseUpgradeTask> tasks = new LinkedList<PulseUpgradeTask>();
-        tasks.addAll(systemTasks);
-        tasks.addAll(determineRequiredUpgradeTasks(from.getBuildNumberAsInt(), to.getBuildNumberAsInt()));
 
+        List<PulseUpgradeTask> requiredUpgradeTasks = determineRequiredUpgradeTasks(from.getBuildNumberAsInt(), to.getBuildNumberAsInt());
+        tasks.addAll(requiredUpgradeTasks);
 
         //HAXORZ: need do some manual wiring here since the timing of the startup is awkward.
         for (UpgradeTask task : tasks)
@@ -151,6 +156,8 @@ public class PulseUpgradeableComponent implements UpgradeableComponent, JobListe
                 ((ConfigurationAware) task).setConfigurationManager(configurationManager);
             }
         }
+
+        tasks.addAll(systemTasks);
 
         Collections.sort(tasks, new PulseUpgradeTaskComparator());
 

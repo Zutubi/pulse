@@ -44,7 +44,6 @@ public class PluginUpgradeManagerTest extends BasePluginSystemTestCase
 
     public void testDetectingUpgrade() throws Exception
     {
-/*
         // install the equinox registry plugins to enable all of the registry goodness.
         installPulseInternalBundles();
 
@@ -61,6 +60,7 @@ public class PluginUpgradeManagerTest extends BasePluginSystemTestCase
 
         shutdownPluginCore();
 
+        // replace 2.0.0 with 3.0.0
         FileSystemUtils.delete(new File(paths.getPluginStorageDir(), producer2.getName()));
         FileSystemUtils.copy(paths.getPluginStorageDir(), producer3);
 
@@ -83,6 +83,9 @@ public class PluginUpgradeManagerTest extends BasePluginSystemTestCase
         List<UpgradeTask> upgradeTasks = upgradeableComponent.getUpgradeTasks();
         assertNotNull(upgradeTasks);
         assertEquals(1, upgradeTasks.size());
-*/
+
+        UpgradeTask upgradeTask = upgradeTasks.get(0);
+        assertEquals("com.zutubi.bundles.producer.ProducerUpgradeTask", upgradeTask.getClass().getName());
     }
+
 }

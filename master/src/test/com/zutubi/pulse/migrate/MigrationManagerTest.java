@@ -10,7 +10,7 @@ import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.hibernate.HackyConnectionProvider;
 import com.zutubi.pulse.hibernate.HibernateUtils;
 import com.zutubi.pulse.hibernate.MutableConfiguration;
-import com.zutubi.pulse.upgrade.tasks.SchemaRefactor;
+import com.zutubi.pulse.hibernate.SchemaRefactor;
 import com.zutubi.pulse.util.JDBCUtils;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.RandomUtils;

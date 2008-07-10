@@ -19,11 +19,12 @@ public interface UpgradeManager
     /**
      * Prepare upgrade is the first step for the upgrade processing.
      *
+     * @return the list of upgrade task groups that make up the prepared upgrade.
      */
-    void prepareUpgrade();
+    List<UpgradeTaskGroup> prepareUpgrade();
 
     /**
-     * Preview the prepared upgrade.
+     * Preview the prepared upgrade.  This returns the same list as returned by the prepareUpgrade call.
      *
      * @return a list of upgrade tasks that will be executed if execute upgrade is called.
      *

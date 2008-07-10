@@ -2,6 +2,7 @@ package com.zutubi.pulse.upgrade;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Arrays;
 
 /**
  * <class-comment/>
@@ -56,7 +57,9 @@ public class DefaultUpgradeManagerTest extends UpgradeTestCase
         upgradeManager.prepareUpgrade();
         upgrades = upgradeManager.previewUpgrade();
         assertEquals(1, upgrades.size());
-        assertEquals(2, upgrades.get(0).getTasks().size());
+
+        UpgradeTaskGroup taskGroup = upgrades.get(0);
+        assertEquals(2, taskGroup.getTasks().size());
     }
 
     public void testExecuteUpgrade() throws UpgradeException
@@ -192,5 +195,29 @@ public class DefaultUpgradeManagerTest extends UpgradeTestCase
         upgradeManager.prepareUpgrade();
 
         upgradeManager.executeUpgrade();
+    }
+
+    public void testAbortOnFailureAcrossComponents()
+    {
+        // group 1 fails.
+        List<UpgradeTaskAdapter> taskGroupA = Arrays.asList(new UpgradeTaskAdapter(true, true), new UpgradeTaskAdapter());
+        UpgradeableComponentAdapter componentA = new UpgradeableComponentAdapter(taskGroupA);
+        upgradeManager.add(componentA);
+
+        // group 2 succeeds.
+        List<UpgradeTaskAdapter> taskGroupB = Arrays.asList(new UpgradeTaskAdapter(), new UpgradeTaskAdapter());
+        UpgradeableComponentAdapter componentB = new UpgradeableComponentAdapter(taskGroupB);
+        upgradeManager.add(componentB);
+
+        upgradeManager.prepareUpgrade();
+        upgradeManager.executeUpgrade();
+
+        assertTrue(componentA.wasStarted());
+        assertFalse(componentA.wasCompleted());
+        assertTrue(componentA.wasAborted());
+
+        assertTrue(componentB.wasStarted());
+        assertTrue(componentB.wasCompleted());
+        assertFalse(componentB.wasAborted());
     }
 }

@@ -5,10 +5,8 @@ import java.util.List;
 /**
  * An upgrade component represents part of the system that can be upgraded.
  *
- * Each upgradeable component is asked whether or not an upgrade is required.  If so,
- * it receives a callback to the prepare upgrade method, followed later by a request for
- * the upgrade tasks that need to be executed for this upgrade.  These upgrade tasks are
- * in turn executed.
+ * Each upgradeable component is asked whether or not an upgrade is required.  
+ *
  */
 public interface UpgradeableComponent
 {
@@ -27,9 +25,18 @@ public interface UpgradeableComponent
      */
     List<UpgradeTask> getUpgradeTasks();
 
+    /**
+     * Callback triggered at the start of the execution of the upgrade tasks associated with this component.
+     */
     void upgradeStarted();
 
+    /**
+     * Callback triggered when the execution of the upgrade tasks associated with this component are completed.
+     */
     void upgradeCompleted();
 
+    /**
+     * Callback triggered when the execution of the upgrade tasks associated with this component are aborted.
+     */
     void upgradeAborted();
 }
