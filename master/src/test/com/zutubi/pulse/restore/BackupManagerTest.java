@@ -106,6 +106,9 @@ public class BackupManagerTest extends PulseTestCase
 
     public void testScheduleOnlyOnEnabled()
     {
+        BackupConfiguration config = configurationProvider.get(BackupConfiguration.class);
+        config.setEnabled(false);
+
         BackupManager manager = createAndStartBackupManager();
 
         // Ensure that the init of the backup manager registers the expected trigger.
@@ -132,13 +135,15 @@ public class BackupManagerTest extends PulseTestCase
 
     public void testEnableDisable()
     {
+        BackupConfiguration config = configurationProvider.get(BackupConfiguration.class);
+        config.setEnabled(false);
+
         // when the backup configuration is changed, we need to ensure that the trigger remains in sync.
         createAndStartBackupManager();
 
         Trigger trigger = scheduler.getTrigger(BackupManager.TRIGGER_NAME, BackupManager.TRIGGER_GROUP);
         assertNull(trigger);
 
-        BackupConfiguration config = new BackupConfiguration();
         config.setEnabled(true);
 
         saveConfigurationChange(config);
