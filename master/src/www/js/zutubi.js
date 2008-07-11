@@ -4,6 +4,143 @@ var ZUTUBI = window.ZUTUBI || {};
 // if it is already defined, great, otherwise create it.
 ZUTUBI.widget = ZUTUBI.widget || {};
 
+ZUTUBI.FloatManager = function() {
+    var listener = false;
+    var idByCategory = {};
+    var displayedCategories = 0;
+    var showTime = new Date();
+    var initialised = false;
+
+    function initialise()
+    {
+        Ext.getDoc().addKeyListener(27, function() {
+            if(displayedCategories > 0)
+            {
+                hideAll();
+            }
+        });
+    }
+
+    function unpress(id)
+    {
+        var buttonEl = Ext.get(id + '_button');
+        if(buttonEl)
+        {
+            buttonEl.removeClass('popdown-pressed');
+        }
+    }
+
+    function press(id)
+    {
+        var buttonEl = Ext.get(id + '_button');
+        if(buttonEl)
+        {
+            buttonEl.addClass('popdown-pressed');
+        }
+    }
+
+    function onMouseDown(e)
+    {
+        if(showTime.getElapsed() > 50 && displayedCategories > 0 && !e.getTarget(".floating-widget"))
+        {
+            hideAll();
+        }
+    }
+
+    function hideAll()
+    {
+        for (var category in idByCategory)
+        {
+            unpress(idByCategory[category]);
+            Ext.get(getWindowId(category)).setDisplayed(false);
+        }
+
+        idByCategory = {};
+        displayedCategories = 0;
+        Ext.getDoc().un('mousedown', onMouseDown);
+    }
+
+    function getWindowId(category)
+    {
+        return category + '-window';
+    }
+
+    return {
+        showHideFloat: function(category, id, align)
+        {
+            if(!initialised)
+            {
+                initialise();
+            }
+            
+            showTime = new Date();
+
+            var windowId = getWindowId(category);
+            var windowEl = Ext.get(windowId);
+            var displayedId = idByCategory[category];
+            if(windowEl && displayedId == id)
+            {
+                unpress(id);
+                windowEl.setDisplayed(false);
+                delete idByCategory[category];
+                if (--displayedCategories == 0)
+                {
+                    Ext.getDoc().un('mousedown', onMouseDown);
+                }
+            }
+            else
+            {
+                var contentId = category + '-window-content';
+                if(!windowEl)
+                {
+                    windowEl = Ext.DomHelper.append(document.body, '<div id="' + windowId + '" class="floating floating-widget" style="display: none;"><div id="' + contentId + '"></div></div>', true);
+                }
+                else if(windowEl.isDisplayed())
+                {
+                    unpress(displayedId);
+                }
+
+                idByCategory[category] = id;
+                if (++displayedCategories == 1)
+                {
+                    Ext.getDoc().on('mousedown', onMouseDown);
+                }
+                
+                getElement(contentId).innerHTML = getElement(id).innerHTML;
+
+                press(id);
+                if (!windowEl.isDisplayed())
+                {
+                    windowEl.setDisplayed(true);
+                }
+
+                var linkEl = Ext.get(id + "_link");
+                windowEl.anchorTo(linkEl, align);
+            }
+        }
+    }
+}();
+
+/**
+ * Function to show or hide a small floating window.  Used to popup full
+ * comments from summaries and lists of build results.  Note that it is
+ * critical that the element being popped up is a direct child of the
+ * document body (Ext.anchorTo requires this).
+ *
+ * The category is used to differentiate popups of different purposes.  If
+ * the user requests a popup of category X, and a popup is already showing of
+ * the same category, then this latter popup will be reused and moved.
+ */
+function showHideFloat(category, id, align)
+{
+    if (!align)
+    {
+        align = 'tr-br?';
+    }
+
+    ZUTUBI.FloatManager.showHideFloat(category, id, align);
+}
+
 /**
  * @class ZUTUBI.Select
  * @extends Ext.form.Field
@@ -1490,4 +1627,104 @@ Ext.reg('xzhelppanel', ZUTUBI.HelpPanel);
 Ext.form.Checkbox.prototype.onResize = function()
 {
     Ext.form.Checkbox.superclass.onResize.apply(this, arguments);
+}
+
+ZUTUBI.ProjectModel = function(key) {
+    this.key = key;
+    this.collapsed = false;
+    this.hidden = false;
+    this.children = [];
+    this.rowCount = 1;
+}
+
+ZUTUBI.ProjectModel.prototype = {
+    addChild: function(child) {
+        this.children.push(child);
+    },
+
+    getEl: function() {
+        return Ext.get(this.key);
+    },
+
+    toggle: function() {
+        if(this.collapsed)
+        {
+            this.expand();
+        }
+        else
+        {
+            this.collapse();
+        }
+    },
+    
+    collapse: function() {
+        if(!this.collapsed)
+        {
+            this.hideDescendents();
+            this.collapsed = true;
+            this.getEl().addClass('project-collapsed');
+        }
+    },
+
+    setRowDisplay: function(display) {
+        Ext.get(this.key).setStyle('display', display);
+        if(this.rowCount > 1)
+        {
+            for(var i = 2; i <= this.rowCount; i++)
+            {
+                Ext.get('b' + i + '.' + this.key).setStyle('display', display);
+            }
+        }
+    },
+
+    hide: function() {
+        if(!this.hidden)
+        {
+            this.setRowDisplay('none');
+            this.hidden = true;
+        }
+
+        if(!this.collapsed)
+        {
+            this.hideDescendents();
+        }
+    },
+
+    hideDescendents: function() {
+        for(var i = 0; i < this.children.length; i++)
+        {
+            var child = this.children[i];
+            child.hide();
+        }
+    },
+
+    expand: function() {
+        if(this.collapsed)
+        {
+            this.showDescendents();
+            this.collapsed = false;
+            this.getEl().removeClass('project-collapsed');
+        }
+    },
+
+    show: function() {
+        if(this.hidden)
+        {
+            this.setRowDisplay('');
+            this.hidden = false;
+        }
+
+        if(!this.collapsed)
+        {
+            this.showDescendents();
+        }
+    },
+
+    showDescendents: function() {
+        for(var i = 0; i < this.children.length; i++)
+        {
+            var child = this.children[i];
+            child.show();
+        }
+    }
 }

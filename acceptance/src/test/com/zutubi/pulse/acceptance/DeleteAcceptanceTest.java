@@ -4,7 +4,7 @@ import com.zutubi.prototype.config.ConfigurationRegistry;
 import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.acceptance.pages.admin.*;
-import com.zutubi.pulse.acceptance.pages.browse.ProjectsPage;
+import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
 import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.model.ResourceRequirement;
@@ -105,9 +105,9 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
         global.waitFor();
         assertElementNotPresent("link=" + random);
 
-        ProjectsPage projectsPage = new ProjectsPage(selenium, urls);
-        projectsPage.goTo();
-        projectsPage.assertProjectNotPresent(null, random);
+        BrowsePage browsePage = new BrowsePage(selenium, urls);
+        browsePage.goTo();
+        browsePage.assertProjectNotPresent(null, random);
     }
 
     public void testDeleteProjectWithReference() throws Exception

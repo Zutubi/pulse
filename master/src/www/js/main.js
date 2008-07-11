@@ -414,46 +414,6 @@ function openDebugAlert(obj)
     }
 }
 
-/**
- * Function to show or hide a small floating window.  Used to popup full
- * comments from summaries and lists of build results.  Note that it is
- * critical that the element being popped up is a direct child of the
- * document body (Ext.anchorTo requires this).
- *
- * The category is used to differentiate popups of different purposes.  If
- * the user requests a popup of category X, and a popup is already showing of
- * the same category, then this latter popup will be reused and moved.
- */
-function showHideFloat(category, id)
-{
-    var windowId = category + '-window';
-    var contentId = category + '-window-content';
-
-    var windowEl = Ext.get(windowId);
-    if(windowEl && windowEl.isDisplayed() && windowEl.displayedId == id)
-    {
-        windowEl.setDisplayed(false);
-    }
-    else
-    {
-        if(!windowEl)
-        {
-            windowEl = Ext.DomHelper.append(document.body, '<div id="' + windowId + '" class="floating" style="display: none;"><div id="' + contentId + '"></div></div>', true);
-        }
-
-        windowEl.displayedId = id;
-        getElement(contentId).innerHTML = getElement(id).innerHTML;
-
-        if (!windowEl.isDisplayed())
-        {
-            windowEl.setDisplayed(true);
-        }
-
-        var linkEl = Ext.get(id + "_link");
-        windowEl.anchorTo(linkEl, 'tr-br?');
-    }
-}
-
 // Selects the given range of text in a text area
 function setSelectionRange(id, start, end)
 {

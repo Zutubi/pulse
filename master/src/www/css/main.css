@@ -137,7 +137,6 @@ pre {
 
 #center {
     clear: both;
-    margin: 16px;
 }
 
     /*------------------------------
@@ -481,9 +480,146 @@ th.right {
     text-align: right;
 }
 
-    /*------------------------------
-    Boxes
-    */
+/*------------------------------
+Browse view
+*/
+
+.project-group {
+    width: 98%;
+    border-collapse: collapse;
+}
+
+.project-group td {
+    padding: 4px;
+}
+
+td.group-header {
+    border-top: solid 1px #bbb;
+    border-bottom: solid 1px #bbb;
+    padding: 6px;
+    background-color: #f2f2ff;
+    font-weight: bold;
+}
+
+.project-row td {
+    vertical-align: top;
+    border-bottom: dotted 1px #bbb;
+}
+
+.project-group-spacer td {
+    line-height: 18px;
+    border-top: solid 1px #bbb;
+    border-bottom: none
+}
+
+.project-group-last td {
+    line-height: 1px;
+    border-top: solid 1px #bbb;
+    border-bottom: none
+}
+
+th.fit-width, td.fit-width {
+    width: 1%;
+    white-space: nowrap;
+}
+
+.project-name, .group-name {
+    padding-left: 20px;
+    background-repeat: no-repeat;
+}
+
+.project-name, .group-name {
+    background-position: 0 -2px;
+}
+
+.project-expandable .project-name, .project-expandable .group-name {
+    background-image: url(../images/default/tree/elbow-minus-nl.gif);
+}
+
+.project-collapsed .project-name, .project-collapsed .group-name {
+    background-image: url(../images/default/tree/elbow-plus-nl.gif);
+}
+
+.actions-menu {
+    width: 16px;
+}
+
+.project-actions, .project-template {
+    border-right: dotted 1px #bbb;
+}
+
+.understated {
+    color: #999;
+}
+
+td.health-unknown, td.health-ok, td.health-broken, td.health-warnings {
+    padding-left: 20px;
+    background-repeat: no-repeat;
+    background-position: 2px 4px;
+}
+
+td.group-header {
+    background-position: 2px 6px;
+}
+
+td.health-unknown {
+    background-image: url(../images/health/unknown.gif);
+}
+
+td.health-ok {
+    background-image: url(../images/health/ok.gif);
+}
+
+td.health-broken {
+    background-image: url(../images/health/broken.gif);
+    color: #822;
+}
+
+td.health-warnings {
+    background-image: url(../images/health/warnings.gif);
+    color: #960;
+}
+
+.health-broken a {
+    color: #822;
+    border-color: #822;
+}
+
+.health-warnings a {
+    color: #960;
+    border-color: #960;
+}
+
+.project-highlighted, .project-highlighted td {
+    background-color: #ffffe0;
+}
+
+.build-details {
+    text-align: right;
+}
+
+ul.actions {
+    padding: 0;
+    margin: 0;
+}
+
+.actions li {
+    padding: 3px;
+}
+
+img.popdown {
+    width: 16px;
+    height: 16px;
+    background: 0 0 no-repeat url(../images/popdown.gif);
+}
+
+img.popdown-pressed {
+    background: 0 0 no-repeat url(../images/popdown-pressed.gif);
+}
+
+/*------------------------------
+Boxes
+*/
 
 h3.heading {
     margin: 0;
@@ -1014,6 +1150,12 @@ table.template-actions
 .x-tree-node-collapsed .config-favourite-icon, .x-tree-node-expanded .config-favourite-icon, .x-tree-node-leaf .config-favourite-icon
 {
 	background-image: url(../images/star.gif);
+    width: 20px;
+}
+
+.x-tree-node-collapsed .config-browse-icon, .x-tree-node-expanded .config-browse-icon, .x-tree-node-leaf .config-browse-icon
+{
+    background-image: url(../images/layout_edit.gif);
     width: 20px;
 }
 

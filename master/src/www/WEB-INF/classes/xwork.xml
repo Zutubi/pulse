@@ -81,7 +81,7 @@
             <result name="error" type="velocity">/404.vm</result>
         </action>
 
-        <action name="viewProjects" class="com.zutubi.pulse.web.project.ViewProjectsAction">
+        <action name="viewProjects" class="com.zutubi.pulse.web.project.BrowseAction">
             <interceptor-ref name="ajaxReadOnlyStack"/>
             <result name="success" type="velocity">/view-projects.vm</result>
         </action>
@@ -403,7 +403,7 @@
             <result name="error" type="redirect">/</result>
         </action>
 
-        <action name="viewProjectsPanel" class="com.zutubi.pulse.web.project.ViewProjectsAction">
+        <action name="viewProjectsPanel" class="com.zutubi.pulse.web.project.BrowseAction">
             <result name="success" type="velocity">view-projects-panel.vm</result>
         </action>
 

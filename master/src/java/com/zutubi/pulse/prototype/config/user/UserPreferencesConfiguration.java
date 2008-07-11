@@ -18,7 +18,7 @@ import java.util.Map;
  */
 @SymbolicName("zutubi.userPreferencesConfig")
 @Classification(single = "settings")
-@Listing(order = {"dashboard", "contacts", "subscriptions"})
+@Listing(order = {"dashboard", "browseView", "contacts", "subscriptions"})
 @Form(labelWidth = 250, fieldOrder = {"aliases", "defaultAction", "myBuildsCount", "refreshingEnabled", "refreshInterval", "tailLines", "tailRefreshInterval"})
 public class UserPreferencesConfiguration extends AbstractConfiguration
 {
@@ -46,8 +46,6 @@ public class UserPreferencesConfiguration extends AbstractConfiguration
     @Internal
     private String myProjectsColumns = defaultProjectColumns();
     @Internal
-    private String allProjectsColumns = defaultAllProjectsColumns();
-    @Internal
     private String projectSummaryColumns = defaultProjectColumns();
     @Internal
     private String projectRecentColumns = defaultProjectColumns();
@@ -57,6 +55,7 @@ public class UserPreferencesConfiguration extends AbstractConfiguration
     private Map<String, ContactConfiguration> contacts = new HashMap<String, ContactConfiguration>();
     private Map<String, SubscriptionConfiguration> subscriptions = new HashMap<String, SubscriptionConfiguration>();
     private DashboardConfiguration dashboard = new DashboardConfiguration();
+    private BrowseViewConfiguration browseView = new BrowseViewConfiguration();
 
     public UserPreferencesConfiguration()
     {
@@ -153,16 +152,6 @@ public class UserPreferencesConfiguration extends AbstractConfiguration
         this.myProjectsColumns = myProjectsColumns;
     }
 
-    public String getAllProjectsColumns()
-    {
-        return allProjectsColumns;
-    }
-
-    public void setAllProjectsColumns(String allProjectsColumns)
-    {
-        this.allProjectsColumns = allProjectsColumns;
-    }
-
     public String getProjectSummaryColumns()
     {
         return projectSummaryColumns;
@@ -223,12 +212,17 @@ public class UserPreferencesConfiguration extends AbstractConfiguration
         this.dashboard = dashboard;
     }
 
-    public static String defaultProjectColumns()
+    public BrowseViewConfiguration getBrowseView()
     {
-        return StringUtils.join(",", BuildColumns.KEY_ID, BuildColumns.KEY_STATUS, BuildColumns.KEY_REASON, BuildColumns.KEY_TESTS, BuildColumns.KEY_WHEN, BuildColumns.KEY_ELAPSED, BuildColumns.KEY_ACTIONS);
+        return browseView;
     }
 
-    public static String defaultAllProjectsColumns()
+    public void setBrowseView(BrowseViewConfiguration browseView)
+    {
+        this.browseView = browseView;
+    }
+
+    public static String defaultProjectColumns()
     {
         return StringUtils.join(",", BuildColumns.KEY_ID, BuildColumns.KEY_STATUS, BuildColumns.KEY_REASON, BuildColumns.KEY_TESTS, BuildColumns.KEY_WHEN, BuildColumns.KEY_ELAPSED, BuildColumns.KEY_ACTIONS);
     }

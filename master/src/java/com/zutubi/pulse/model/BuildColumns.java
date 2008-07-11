@@ -1,5 +1,8 @@
 package com.zutubi.pulse.model;
 
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
+
 /**
  */
 public class BuildColumns
@@ -27,6 +30,11 @@ public class BuildColumns
         this.projectManager = projectManager;
     }
 
+    public int getCount()
+    {
+        return columns.length;
+    }
+    
     public String[] getColumns()
     {
         return columns;
@@ -88,5 +96,24 @@ public class BuildColumns
     public static String[] getAllColumns()
     {
         return new String[] { KEY_ACTIONS, KEY_ELAPSED, KEY_ID, KEY_OWNER, KEY_PROJECT, KEY_REASON, KEY_REVISION, KEY_STATUS, KEY_TESTS, KEY_VERSION, KEY_WHEN, KEY_WARNINGS };
+    }
+
+    public void removeAll(final String... keys)
+    {
+        columns = CollectionUtils.filterToArray(columns,  new Predicate<String>()
+        {
+            public boolean satisfied(String s)
+            {
+                for(String key: keys)
+                {
+                    if(s.equals(key))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        });
     }
 }

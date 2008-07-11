@@ -6,12 +6,12 @@ import com.zutubi.pulse.acceptance.pages.SeleniumPage;
 import com.zutubi.pulse.webwork.mapping.Urls;
 
 /**
- * The projects page is the default in the browse section and shows a list of
- * projects, including the latest build result of each.
+ * The browse page is the default in the browse section and shows a list of
+ * projects, including the latest build results of each.
  */
-public class ProjectsPage extends SeleniumPage
+public class BrowsePage extends SeleniumPage
 {
-    public ProjectsPage(Selenium selenium, Urls urls)
+    public BrowsePage(Selenium selenium, Urls urls)
     {
         super(selenium, urls, "projects", "projects");
     }
@@ -54,14 +54,27 @@ public class ProjectsPage extends SeleniumPage
     {
         if(group == null)
         {
-            group = "_ungrouped";
+            return "group.ungrouped.projects";
         }
-        return "group." + group;
+        else
+        {
+            return "group." + group;
+        }
     }
 
     private String getProjectRowId(String group, String name)
     {
-        return getGroupId(group) + ".project." + name;
+        String prefix;
+        if(group == null)
+        {
+            prefix = "ungrouped.ungrouped.projects";
+        }
+        else
+        {
+            prefix = "grouped." + group;
+        }
+
+        return prefix + "." + name;
     }
 
     public void triggerProject(String name)

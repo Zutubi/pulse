@@ -28,6 +28,7 @@
         <property name="tasks">
             <list>
                 <ref local="addBackupConfiguration"/>
+                <ref local="addBrowseViewConfiguration"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -43,5 +44,7 @@
         <property name="buildNumber" value="200070001"/>
     </bean>
 
-
+    <bean id="addBrowseViewConfiguration" class="com.zutubi.pulse.upgrade.tasks.AddBrowseViewConfigurationUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="200070002"/>
+    </bean>
 </beans>

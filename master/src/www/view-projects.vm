@@ -5,37 +5,24 @@
 <head>
     <title>#wwtext("name=projects")</title>
     <script type="text/javascript" src="/js/yahoo/utilities.js"></script>
-    <script type="text/javascript" src="$base/js/prototype.js"></script>
     <script type="text/javascript" src="$base/js/buildcolumns.js"></script>
     <script type="text/javascript">
-    //<![CDATA[
         #updater("$base/ajax/viewProjectsPanel.action" "projects" $principle)
 
         var popup;
-        YAHOO.util.Event.addListener(window, "load", function() { popup = new BuildColumnPopup("all.projects", "$base", "$base/ajax/viewProjectsPanel.action", "projects"); });
-    //]]>
+        Ext.onReady(function() { popup = new BuildColumnPopup("all.projects", "$base", "$base/ajax/viewProjectsPanel.action", "projects"); });
+
+        var modelMap = {};
+        
+        var toggleModel = function(key) {
+            modelMap[key].toggle();
+        }
     </script>
     #if ($rssEnabled)
         <link rel="alternate" type="application/rss+xml" title="RSS" href="rss.action"/>
     #end
 </head>
 <body>
-    <table width="98%">
-        <tr>
-            <td>
-                <h1 style="margin-top: 0">:: #wwtext("name=projects") ::</h1>
-            </td>
-            <td class="right">
-#if($loggedInUser)
-                <a class="unadorned" href="#" id="columns-popup-link-all.projects" onclick="popup.popup(); return false"><img src="$base/images/text_columns.gif"/></a>
-#end
-#if($rssEnabled)
-                <a class="unadorned" id="rss.builds" href="rss.action"><img alt="$action.getText('rss')" src="$base/images/feed-icon-16x16.gif"/></a>
-#end
-            </td>
-        </tr>
-    </table>
-
     <div id="projects">
         #parse("ajax/view-projects-panel.vm")
     </div>

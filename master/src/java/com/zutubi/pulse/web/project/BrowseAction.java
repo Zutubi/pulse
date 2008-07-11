@@ -1,0 +1,170 @@
+package com.zutubi.pulse.web.project;
+
+import com.zutubi.prototype.config.ConfigurationRegistry;
+import com.zutubi.prototype.config.ConfigurationTemplateManager;
+import com.zutubi.prototype.config.TemplateHierarchy;
+import com.zutubi.prototype.config.TemplateNode;
+import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.ProjectGroup;
+import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.prototype.config.user.BrowseViewConfiguration;
+import com.zutubi.util.Sort;
+
+import java.util.*;
+
+/**
+ */
+public class BrowseAction extends ProjectActionSupport
+{
+    private BrowseViewConfiguration browseConfig = new BrowseViewConfiguration();
+    private List<ProjectsModel> models = new LinkedList<ProjectsModel>();
+
+    private ConfigurationTemplateManager configurationTemplateManager;
+
+    public List<ProjectsModel> getModels()
+    {
+        return models;
+    }
+
+    public BrowseViewConfiguration getBrowseConfig()
+    {
+        return browseConfig;
+    }
+
+    public ResultState getStateInProgress()
+    {
+        return ResultState.IN_PROGRESS;
+    }
+
+    public String execute() throws Exception
+    {
+        User user = getLoggedInUser();
+        if(user != null)
+        {
+            browseConfig = user.getPreferences().getBrowseView();
+        }
+
+        TemplateHierarchy hierarchy = configurationTemplateManager.getTemplateHierarchy(ConfigurationRegistry.PROJECTS_SCOPE);
+
+        final Comparator<String> comp = new Sort.StringComparator();
+        List<Project> projects = projectManager.getProjects(false);
+        if (browseConfig.isGroupsShown())
+        {
+            // Create a model for each group, and for the ungrouped projects.
+            List<ProjectGroup> groups = new ArrayList(projectManager.getAllProjectGroups());
+            Collections.sort(groups, new Comparator<ProjectGroup>()
+            {
+                public int compare(ProjectGroup o1, ProjectGroup o2)
+                {
+                    return comp.compare(o1.getName(), o2.getName());
+                }
+            });
+
+            for (ProjectGroup group : groups)
+            {
+                addModel(group.getName(), true, group.getProjects(), hierarchy);
+                projects.removeAll(group.getProjects());
+            }
+        }
+
+        if (projects.size() > 0)
+        {
+            Collections.sort(projects, new Comparator<Project>()
+            {
+                public int compare(Project o1, Project o2)
+                {
+                    return comp.compare(o1.getName(), o2.getName());
+                }
+            });
+
+            addModel(browseConfig.isGroupsShown() ? "ungrouped projects" : "all projects", false, projects, hierarchy);
+        }
+
+        return SUCCESS;
+    }
+
+    private void addModel(String name, boolean labelled, Collection<Project> projects, TemplateHierarchy hierarchy)
+    {
+        ProjectsModel model = new ProjectsModel(name, labelled);
+        if(browseConfig.isHierarchyShown())
+        {
+            // The group can display all concrete projects plus all of their
+            // ancestors (which may overlap).  The ancestors may not define the
+            // label, but are included to prevent "holes" in the hierarchy.
+            Set<String> includedInGroup = new HashSet<String>();
+            for(Project p: projects)
+            {
+                TemplateNode node = hierarchy.getNodeById(p.getName());
+                while(node != null)
+                {
+                    includedInGroup.add(node.getId());
+                    node = node.getParent();
+                }
+            }
+
+            processLevel(model, model.getRoot(), Arrays.asList(hierarchy.getRoot()), 0, includedInGroup);
+        }
+        else
+        {
+            for(Project p: projects)
+            {
+                model.getRoot().addChild(new ConcreteProjectModel(model, p, model.getRoot(), getBuilds(p), browseConfig.getBuildsPerProject()));
+            }
+        }
+
+        models.add(model);
+    }
+
+    private void processLevel(ProjectsModel group, TemplateProjectModel parentModel, List<TemplateNode> nodes, int depth, Set<String> includedInGroup)
+    {
+        for (TemplateNode node : nodes)
+        {
+            if (node.isConcrete() || depth >= browseConfig.getHiddenHierarchyLevels())
+            {
+                if (includedInGroup.contains(node.getId()))
+                {
+                    ProjectModel model;
+                    String name = node.getId();
+                    if (node.isConcrete())
+                    {
+                        Project project = projectManager.getProject(name, true);
+                        if (project == null)
+                        {
+                            System.out.println("name = " + name);
+                            continue;
+                        }
+                        List<BuildResult> builds = getBuilds(project);
+                        model = new ConcreteProjectModel(group, project, parentModel, builds, browseConfig.getBuildsPerProject());
+                    }
+                    else
+                    {
+                        TemplateProjectModel template = new TemplateProjectModel(group, name, parentModel);
+                        processLevel(group, template, node.getChildren(), depth + 1, includedInGroup);
+                        model = template;
+                    }
+
+                    parentModel.addChild(model);
+                }
+            }
+            else
+            {
+                processLevel(group, parentModel, node.getChildren(), depth + 1, includedInGroup);
+            }
+        }
+    }
+
+    private List<BuildResult> getBuilds(Project project)
+    {
+        // We need to retrieve at least 2 to determine the health when the
+        // latest build is in progress (this assumes one in progress build
+        // per project).
+        return buildManager.getLatestBuildResultsForProject(project, Math.max(2, browseConfig.getBuildsPerProject()));
+    }
+
+    public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
+    {
+        this.configurationTemplateManager = configurationTemplateManager;
+    }
+}

@@ -1,75 +1,181 @@
-##
-## Shows a list of recent builds for the given list of projects
-##
-#macro(recentBuilds $group $projects)
-    #set($fullSpan = $columns.totalSpan + 6)
-#if($group)
-    #set($groupId = $group.name)
-#else
-    #set($groupId = "_ungrouped")
+#macro(healthImage $health)
+    <img alt="health: $health.toString().toLowerCase()" src="$base/images/health/${health.toString().toLowerCase()}.gif"/>
 #end
 
-    <table class="content" id='#id("group.$groupId")'>
-        <tr>
-            <th class="group" colspan="$fullSpan">
-#if($group)
-    #if($rssEnabled)
-                <span class="action">
-                    <a class="unadorned" id="rss.builds.#id($group.name)" href="rss.action?groupName=#uce($group.name)"><img alt="$action.getText('rss')" src="$base/images/feed-icon-16x16.gif"/></a>
-                </span>
-    #end
-                #html($group.name)
-#else
-                #wwtext("name=projects")
+#macro(actionLink $id $titleKey $url $image)
+    <a id="$id" class="unadorned" href="$url" title="$action.getText($titleKey)"><img alt="$action.getText($titleKey)" src="$base/images/$image"/> $action.getText($titleKey)</a>
 #end
-            </th>
-        </tr>
-        <tr>
-            <th class="heading" colspan="6">#wwtext("name=project")</th>
-            <th class="heading" colspan="$columns.totalSpan">
-                #wwtext("name=latest.build")
-            </th>
-        </tr>
-        <tr>
-            #contentHeading("project.name" 1)
-            #contentHeading("project.actions" 5)
-            #buildTableHeaders($columns false)
-        </tr>
-    #foreach($project in $projects)
-        #set($lastResult = false)
-        #set($lastResult = $action.getLatestBuild($project))
-        #set($health = $action.getHealth($project))
-            <tr id='#id("group.${groupId}.project.${project.name}")'>
-                <td class="content">
-                    <img alt="health: $health" src="$base/images/health/${health}.gif"/>
-                    <a href="$urls.projectHome($project)" id="#uce($project.name)">$!webwork.htmlEncode($project.name)</a>
-                </td>
-                #actionCellTitle("home-#uce($project.name)" "home.tab" "$urls.projectHome($project)" "house.gif")
-                #actionCellTitle("reports-#uce($project.name)" "reporting.tab" "$urls.projectReports($project)" "chart_bar.gif")
-                #actionCellTitle("history-#uce($project.name)" "history.tab" "$urls.projectHistory($project)" "time.gif")
-                #actionCellTitle("config-#uce($project.name)" "configuration.tab" "$base/admin/projects/#uce($project.name)/" "pencil.gif")
+
+#macro(summary $model)
+    #foreach($health in $model.summaryHealths)
+        #healthImage($health) $health.toString().toLowerCase(): $model.getCount($health)
+    #end
+#end
+
+#macro(showChildren $model $groupKey $indent)
+    #set($totalCount = $model.children.size())
+    #foreach($child in $model.children)
+        <tr id="$child.id" class="project-row #if(!$child.leaf) project-expandable #end #if($child.leaf && $velocityCount == $totalCount) project-last #end">
+            <td #if($child.concrete) rowspan="$child.buildRows" #else colspan="2" #end class="fit-width health-$child.health.toString().toLowerCase() #if($child.concrete) project-concrete #else project-template #end">
+                ${indent}<span class="project-name">#if($child.concrete)<a href="$urls.projectHome($child.project)">#end#html($child.name)#if($child.concrete)</a>#end</span>
+            </td>
+        #if($child.concrete)
+            <td rowspan="$child.buildRows" class="actions-menu project-actions">
+            #set($project = $child.project)
+                #showHideButton("actions" "${child.id}_actions" "tl-bl?")
+                <div id="${child.id}_actions" style="display: none">
+                    <ul class="actions">
+                        <li>#actionLink("home-#uce($project.name)" "home.tab" "$urls.projectHome($project)" "house.gif")</li>
+                        <li>#actionLink("reports-#uce($project.name)" "reports.tab" "$urls.projectReports($project)" "chart_bar.gif")</li>
+                        <li>#actionLink("history-#uce($project.name)" "history.tab" "$urls.projectHistory($project)" "time.gif")</li>
+                        <li>#actionLink("config-#uce($project.name)" "configuration.tab" "$base/admin/projects/#uce($project.name)/" "pencil.gif")</li>
             #if($action.hasPermission("trigger", $project))
-                #actionCellTitle("trigger-#uce($project.name)" "project.trigger" "/triggerBuild.action?projectName=#uce($project.name)" "lightning.gif")
-            #else
-                <td class="content">&nbsp;</td>
+                        <li>#actionLink("trigger-#uce($project.name)" "project.trigger" "/triggerBuild.action?projectName=#uce($project.name)" "lightning.gif")</li>
             #end
-        #if($lastResult)
-                #buildTableCells($lastResult $columns true)
-        #else
-                <td class="content" colspan="$columns.totalSpan">#wwtext("name=never.built")
+                    </ul>
+                </div>
+            </td>
         #end
-            </tr>
+        #if($child.concrete)
+            #if($child.built)
+                #foreach($buildResult in $child.builds)
+                    #if($velocityCount > 1)
+        </tr>
+        <tr id="b${velocityCount}.${child.id}" class="project-row">
+                    #end
+            <td class="build-id fit-width">
+                #buildColumnValue($buildResult "id")
+            </td>
+            <td class="actions-menu">
+                #showHideButton("actions" "b${velocityCount}.${child.id}_bactions" "tl-bl?")
+                <div id="b${velocityCount}.${child.id}_bactions" style="display: none">
+                    <ul class="actions">
+                        <li>#actionLink("summary-#uce($project.name)-${build.number}" "summary.tab" $urls.build($buildResult) "information.gif")</li>
+                        <li>#actionLink("details-#uce($project.name)-${build.number}" "details.tab" $urls.buildDetails($buildResult) "magnifier.gif")</li>
+                        <li>#actionLink("changes-#uce($project.name)-${build.number}" "changes.tab" $urls.buildChanges($buildResult) "page_code.gif")</li>
+                        <li>#actionLink("artifacts-#uce($project.name)-${build.number}" "artifacts.tab" $urls.buildArtifacts($buildResult) "folder_page.gif")</li>
+                    #if($action.hasPermission("view source", $project))
+                        <li>#actionLink("wc-#uce($project.name)-${build.number}" "wc.tab" $urls.buildWorkingCopy($buildResult) "page_gear.gif")</li>
+                    #end
+                    </ul>
+                </div>            
+            </td>
+            <td class="fit-width">
+                ::
+                #buildColumnValue($buildResult "status")
+            </td>
+            <td class="build-details">
+                    #foreach($column in $browseConfig.columns)
+                #buildColumnValue($buildResult $column)
+                        #if($velocityCount < $browseConfig.columns.size())
+                <span class="understated">//</span>
+                        #end
+                    #end
+            </td>
+                #end
+            #else
+            <td colspan="4" class="understated">
+                #wwtext("name=never.built")
+            </td>
+            #end
+        #else
+            <td colspan="3" class="fit-width">
+            #set($building = $child.getCount($action.stateInProgress))
+            #if($building == 0)
+                #wwtext("name=builds.inprogress.none")
+            #elseif($building == 1)
+                <img alt="in progress" src="$base/images/cog.gif"/>
+                #wwtext("name=builds.inprogress.one")
+            #else
+                <img alt="in progress" src="$base/images/cog.gif"/>
+                $action.getText("builds.inprogress", [$building])
+            #end
+            </td>
+            <td class="build-details">
+                #wwtext("name=template.summary") ::
+                #summary($child)
+            </td>
+        #end
+        </tr>
+        #if(!$child.leaf)
+            #showChildren($child $groupKey "${indent}&nbsp;&nbsp;&nbsp;")
+        #end
     #end
-        </table>
 #end
 
-#if($totalProjectCount > 0)
-    #foreach($group in $groups)
-        #recentBuilds($group $group.projects)
+#if($models.size() > 0)
+    <table class="project-group">
+    #foreach($projectsModel in $models)
+        #if($projectsModel.labelled)
+            #set($groupKey = "group.${projectsModel.groupName}")
+        #else
+            #set($groupKey = "ungrouped.")
+        #end
+        <tr id="$projectsModel.id" class="project-row #if(!$projectsModel.root.leaf) project-expandable #end">
+            <td colspan="5" class="group-header health-$projectsModel.root.health.toString().toLowerCase()">
+                <span class="group-name">
+                    #html($projectsModel.groupName)
+                </span>
+            </td>
+            <td class="group-header build-details">
+                #summary($projectsModel.root)
+        #if($rssEnabled && $projectsModel.labelled)
+                &nbsp;<a class="unadorned" id="rss.builds.#id($projectsModel.groupName)" href="/rss.action?groupName=#uce($projectsModel.groupName)"><img alt="$action.getText('rss')" src="$base/images/feed-icon-16x16.gif"/></a>
+        #end
+            </td>
+        </tr>
+        #showChildren($projectsModel.root $groupKey "")
+        <tr class="project-group-spacer #if($velocityCount == $models.size()) project-group-last #end"><td colspan="6">&nbsp;</td></tr>
     #end
-    #if($projects.size() > 0)
-        #recentBuilds(false $projects)
-    #end
+    </table>
+
+    <script type="text/javascript">
+        var groupModel;
+        var model;
+        var toCollapse = [];
+
+        function addModel(model)
+        {
+            oldModel = modelMap[model.key];
+            if(oldModel && oldModel.collapsed)
+            {
+                toCollapse.push(model);
+            }
+
+            modelMap[model.key] = model;
+        }
+
+        #foreach($projectsModel in $models)
+            groupModel = new ZUTUBI.ProjectModel('#jss($projectsModel.id)');
+            addModel(groupModel);
+            #foreach($projectModel in $projectsModel.flattened)
+                model = new ZUTUBI.ProjectModel('#jss($projectModel.id)');
+                #if($projectModel.concrete && $projectModel.buildRows > 1)
+                    model.rowCount = $projectModel.buildRows;
+                #end
+                addModel(model);
+                #if($projectModel.parent.name)
+                modelMap['#jss($projectModel.parent.id)'].addChild(model);
+                #else
+                groupModel.addChild(model);
+                #end
+            #end
+        #end
+
+        for(var i = 0; i < toCollapse.length; i++)
+        {
+            toCollapse[i].collapse();
+        }
+
+        var projectsEl = Ext.get('projects');
+        var projectRows = projectsEl.select('.project-expandable', true);
+        projectRows.on('click', function(e, el) {
+            var rowEl = Ext.fly(el).parent('.project-expandable');
+            toggleModel(rowEl.dom.id);
+        });
+
+        projectRows.addClassOnOver('project-highlighted');
+    </script>
 #else
     <p>
         No projects found.
@@ -78,5 +184,3 @@
     #end
     </p>
 #end
-
-#buildTableColumns($columns "all.projects")

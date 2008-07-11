@@ -4,7 +4,7 @@ import com.zutubi.pulse.acceptance.forms.SignupForm;
 import com.zutubi.pulse.acceptance.pages.LoginPage;
 import com.zutubi.pulse.acceptance.pages.WelcomePage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
-import com.zutubi.pulse.acceptance.pages.browse.ProjectsPage;
+import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
 import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.prototype.config.group.ServerPermission;
@@ -113,8 +113,8 @@ public class AnonymousAccessAcceptanceTest extends SeleniumTestBase
         ensureSetting(KEY_ANONYMOUS_ACCESS, true);
         goTo(urls.projects());
 
-        ProjectsPage projectsPage = new ProjectsPage(selenium, urls);
-        projectsPage.assertPresent();
+        BrowsePage browsePage = new BrowsePage(selenium, urls);
+        browsePage.assertPresent();
         assertElementPresent(ID_LOGIN);
 
         // No dashboard tab, user info or logout link for anonymous users

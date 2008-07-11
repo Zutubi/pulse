@@ -45,10 +45,6 @@ public class CustomiseBuildColumnsAction extends UserActionSupport
         {
             preferences.setMyProjectsColumns(columns);
         }
-        else if(suffix.equals("all.projects"))
-        {
-            preferences.setAllProjectsColumns(columns);
-        }
         else if(suffix.equals("project.summary"))
         {
             preferences.setProjectSummaryColumns(columns);
