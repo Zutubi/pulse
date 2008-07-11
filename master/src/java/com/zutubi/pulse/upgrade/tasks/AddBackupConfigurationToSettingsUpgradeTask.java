@@ -33,6 +33,12 @@ public class AddBackupConfigurationToSettingsUpgradeTask extends AbstractUpgrade
             // this is unexpected - we must have the path wrong.
         }
 
+        if (globalSettings.containsKey("backup"))
+        {
+            // we already have a backup record? ok, in that case, we do not need to insert one.
+            return;
+        }
+
         // ok, we need to add a new record for the backup configuration here.
         MutableRecord newRecord = new MutableRecordImpl();
         newRecord.setSymbolicName("zutubi.backupConfig");

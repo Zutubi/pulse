@@ -1,95 +1,28 @@
 <html>
 <head>
-
+    <link rel="stylesheet" type="text/css" href="/css/setup.css"></link>
 </head>
-
 <body>
 
-<h1 id="upgrade.complete">Upgrade#if ($monitor.isSuccessful()) Complete #else Failed #end</h1>
+<div id="leftcolumn">
 
-<p>
-    The upgrade has been#if ($monitor.isSuccessful()) successful.#else unsuccessful#end
-</p>
+    <h1 id="upgrade.complete">Upgrade#if ($monitor.isSuccessful()) Complete #else Failed #end</h1>
 
-<p>
-    <table width=500>
-        <tr width="40%">
-            #if ($monitor.isSuccessful())
-                #set($styleClass = "okaybar")
-            #elseif($monitor.isError())
-                #set($styleClass = "errorbar")
-            #else
-                #set($styleClass = "clearbar")
-            #end
-            <td width="100%" class="$styleClass">&nbsp;</td>
-        </tr>
-    </table>
-</p>
+    <p>
+        The upgrade has been#if ($monitor.isSuccessful()) successful.#else unsuccessful#end
+    </p>
 
-#if($monitor.orderedTaskGroups.size() > 0)
-<p>
-    To use this directory we will need to execute the following upgrade tasks.
-    #foreach($groupProgress in $monitor.orderedTaskGroups)
-    <table class="columns" width="40%">
-        <tr>
-            <td class="columns" width="90%">
-                <table id="upgrade.task.details" class="fill-content">
-                    #foreach($task in $groupProgress.tasks)
-                    #dynamicRow($task.name $task.status)
-                    #if($task.hasFailed())
-                    <tr>
-                        <td colspan="2"><b>Cause of failure:</b> $task.message</td>
-                    </tr>
-                </table>
+    #taskProgressUI($monitor)
 
-                <table class="fill-content">
-                        #end
-                    #end
-                </table>
-            </td>
-        </tr>
-    </table>
+    <p>
+    #if ($monitor.isSuccessful())
+        The upgrade has completed. <a id="continue" href="continue.action">continue</a>.
+    #else
+        The upgrade has failed. Please report this failure to <a href="mailto:support@zutubi.com">zutubi support</a>,
+        including a screenshot of this page and your server log files.
     #end
-</p>
-#end
+    </p>
+</div>
 
-<!--
-#if($monitor.taskProgress.size() > 0)
-<p>
-    The following upgrade tasks were executed with the status indicated.
-    <table class="columns" width="40%">
-        <tr>
-            <td class="columns" width="90%">
-                <table id="upgrade.task.details" class="fill-content">
-                    #foreach($task in $monitor.taskProgress)
-                        #dynamicRow($task.name $task.status)
-                        #if($task.hasFailed())
-                        <tr>
-                            <td colspan="2"><b>Cause of failure:</b> $task.message</td>
-                        </tr>
-                </table>
-
-                <table class="fill-content">
-                        #end
-                    #end
-                </table>
-            </td>
-        </tr>
-    </table>
-</p>
-#end
--->
-
-<p>
-    Total time: $monitor.getElaspedTime()
-</p>
-<p>
-#if ($monitor.isSuccessful())
-    The upgrade has completed. <a id="continue" href="continue.action">continue</a>.
-#else
-    The upgrade has failed. Please report this failure to <a href="mailto:support@zutubi.com">zutubi support</a>,
-    including a screenshot of this page and your server log files.
-#end
-</p>
 </body>
 </html>
