@@ -42,10 +42,16 @@ public class PluginUpgradeManagerTest extends BasePluginSystemTestCase
         super.tearDown();
     }
 
-    public void testDetectingUpgrade() throws Exception
+    public void testNoop()
     {
-/*
+
+    }
+
+    public void disabledTestDetectingUpgrade() throws Exception
+    {
         // install the equinox registry plugins to enable all of the registry goodness.
+        // ok, this step needs some work since via acceptance tests, this is not so easy to define - we need another way
+        // to get hold of these resources that are part of the build/runtime environment.
         installPulseInternalBundles();
 
         FileSystemUtils.copy(paths.getPluginStorageDir(), producer2);
@@ -87,7 +93,12 @@ public class PluginUpgradeManagerTest extends BasePluginSystemTestCase
 
         UpgradeTask upgradeTask = upgradeTasks.get(0);
         assertEquals("com.zutubi.bundles.producer.ProducerUpgradeTask", upgradeTask.getClass().getName());
-*/
+
+        // execute upgrade.
+
+        // restart plugin core
+
+        // verify that no up grade is required.
     }
 
 }

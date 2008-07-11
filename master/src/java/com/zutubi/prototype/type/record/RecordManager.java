@@ -110,6 +110,11 @@ public class RecordManager implements HandleAllocator
         return queries.select(path);
     }
 
+    public synchronized Record select()
+    {
+        return recordStore.select();
+    }
+
     /**
      * Loads all records whose paths match the given path.  The path may
      * include wildcards.

@@ -5,4 +5,16 @@
     <target name="module-pre-init">
         <dirname property="project.root.dir" file="../build.xml"/>
     </target>
+
+<!--  need to do more than this to get the plugin manager tests going, since we also need the pulse internal core plugins to be deployed.  In particular, the upgrade extension point.
+    <target name="module-pre-test">
+
+        <delete dir="${project.root.dir}/plugins/internal"/>
+        <property file="${project.root.dir}/ivy.properties"/>
+        <ivy:configure/>
+        <retrieve-dependencies ivyfile="${project.root.dir}/package/core/ivy.xml" conf="equinox-bundles" dest="${project.root.dir}/plugins/internal"/>
+
+    </target>
+-->
+
 </project>

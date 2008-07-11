@@ -4,6 +4,7 @@ import com.zutubi.pulse.upgrade.UpgradeableComponent;
 import com.zutubi.pulse.upgrade.UpgradeableComponentSource;
 import com.zutubi.pulse.upgrade.UpgradeTask;
 import com.zutubi.util.bean.ObjectFactory;
+import com.zutubi.util.logging.Logger;
 
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,8 @@ import org.eclipse.core.runtime.IContributor;
  */
 public class PluginUpgradeManager implements UpgradeableComponentSource
 {
+    private static final Logger LOG = Logger.getLogger(PluginUpgradeManager.class);
+
     private static final String EXTENSION_POINT_ID = "com.zutubi.pulse.core.upgrade";
 
     private PluginManager pluginManager;
@@ -39,6 +42,12 @@ public class PluginUpgradeManager implements UpgradeableComponentSource
         extensionRegistry = pluginManager.getExtensionRegistry();
 
         IExtensionPoint extensionPoint = extensionRegistry.getExtensionPoint(EXTENSION_POINT_ID);
+
+        if (extensionPoint == null)
+        {
+            LOG.error("Failed to locate the plugin upgrade extension point.  Please ensure that the pulse core bundle is deployed.");
+            return;
+        }
 
         if (pluginManager.isVersionChangeDetected())
         {
@@ -175,7 +184,9 @@ public class PluginUpgradeManager implements UpgradeableComponentSource
     private static class PluginUpgradeableComponent implements UpgradeableComponent
     {
         private PluginUpgradeManager pluginUpgradeManager;
+
         private List<UpgradeTask> upgradeTasks;
+
         private Plugin plugin;
 
         public PluginUpgradeableComponent(PluginUpgradeManager pluginUpgradeManager, Plugin plugin, List<UpgradeTask> tasks)
@@ -203,6 +214,8 @@ public class PluginUpgradeManager implements UpgradeableComponentSource
         public void upgradeCompleted()
         {
             // callback
+            // should be recording the new version of the plugin to which we just upgraded.
+            
         }
 
         public void upgradeAborted()

@@ -2,14 +2,19 @@ package com.zutubi.pulse.upgrade.tasks;
 
 import com.zutubi.prototype.type.record.MutableRecord;
 import com.zutubi.prototype.type.record.MutableRecordImpl;
+import com.zutubi.prototype.type.record.Record;
+import com.zutubi.prototype.type.record.RecordManager;
+import com.zutubi.pulse.monitor.TaskException;
 import com.zutubi.pulse.restore.BackupConfiguration;
 
 /**
  *
  *
  */
-public class AddBackupConfigurationToSettingsUpgradeTask extends AbstractRecordUpgradeTask
+public class AddBackupConfigurationToSettingsUpgradeTask extends AbstractUpgradeTask
 {
+    private RecordManager recordManager;
+
     public String getName()
     {
         return "Backup Configuration";
@@ -20,33 +25,30 @@ public class AddBackupConfigurationToSettingsUpgradeTask extends AbstractRecordU
         return "Add a new configuration record for the newly added backup configuration.";
     }
 
-    public void doUpgrade(MutableRecord record)
+    public void execute() throws TaskException
     {
-        // looking for the settings record.
-        // zutubi.globalConfig
-        if ("zutubi.globalConfig".equals(record.getSymbolicName()))
+        Record globalSettings = recordManager.select("settings");
+        if (!"zutubi.globalConfig".equals(globalSettings.getSymbolicName()))
         {
-            // we do not expect anything to be in the 'backup' field.
-            if (record.containsKey("backup"))
-            {
-                addError("Unexpected data in the backup field.");
-                return;
-            }
-
-            // ok, we need to add a new record for the backup configuration here.
-            MutableRecord newRecord = new MutableRecordImpl();
-            newRecord.setSymbolicName("zutubi.backupConfig");
-            newRecord.put("enabled", Boolean.TRUE.toString());
-            newRecord.put("cronSchedule", BackupConfiguration.DEFAULT_CRON_SCHEDULE);
-
-            // do we need to add a handle to this record?..
-
-            record.put("backup", newRecord);
+            // this is unexpected - we must have the path wrong.
         }
+
+        // ok, we need to add a new record for the backup configuration here.
+        MutableRecord newRecord = new MutableRecordImpl();
+        newRecord.setSymbolicName("zutubi.backupConfig");
+        newRecord.put("enabled", Boolean.TRUE.toString());
+        newRecord.put("cronSchedule", BackupConfiguration.DEFAULT_CRON_SCHEDULE);
+
+        recordManager.insert("settings/backup", newRecord);
     }
 
     public boolean haltOnFailure()
     {
         return false;
+    }
+
+    public void setRecordManager(RecordManager recordManager)
+    {
+        this.recordManager = recordManager;
     }
 }
