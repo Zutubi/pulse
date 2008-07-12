@@ -154,45 +154,6 @@ public class ConfigurationStateManager
         return stateManager.getState(id);
     }
 
-//    public void instanceDelete(Configuration instance)
-//    {
-//        final ExternalStateManager manager = managers.get(instance.getClass());
-//        if (manager != null)
-//        {
-//            CompositeType type = typeRegistry.getType(instance.getClass());
-//            TypeProperty property = type.getExternalStateProperty();
-//            try
-//            {
-//                final Long id = (Long) property.getValue(instance);
-//                if (id != null)
-//                {
-//                    Transaction txn = transactionManager.getTransaction();
-//                    txn.enlistResource(new TransactionResource()
-//                    {
-//                        public boolean prepare()
-//                        {
-//                            return true;
-//                        }
-//
-//                        public void commit()
-//                        {
-//                            manager.cleanupState(id);
-//                        }
-//
-//                        public void rollback()
-//                        {
-//                            // Do nothing.
-//                        }
-//                    });
-//                }
-//            }
-//            catch (Exception e)
-//            {
-//                LOG.severe(e);
-//            }
-//        }
-//    }
-
     public void setTransactionManager(TransactionManager transactionManager)
     {
         this.transactionManager = transactionManager;

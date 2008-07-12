@@ -680,6 +680,35 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         assertTrue(xmlRpcHelper.isConfigPermanent(PathUtils.getPath(path, "preferences")));
     }
 
+    public void testGetConfigDoesntReturnExternalState() throws Exception
+    {
+        String projectPath = insertSimpleProject(randomName());
+        Hashtable<String, Object> project = call("getConfig", projectPath);
+        assertNull(project.get("projectId"));
+    }
+
+    public void testSaveConfigPreservesState() throws Exception
+    {
+        // CIB-1542: check that a normal save does not touch the projectId
+        // external state field.
+        String name = randomName();
+        String projectPath = insertSimpleProject(name);
+        Hashtable<String, Object> project = call("getConfig", projectPath);
+        project.put("url", "http://i.feel.like.a.change.com");
+        call("saveConfig", projectPath, project, false);
+
+        assertEquals("idle", call("getProjectState", name));
+    }
+
+    public void testSaveConfigConfigChangeExternalState() throws Exception
+    {
+        String name = randomName();
+        String projectPath = insertSimpleProject(name);
+        Hashtable<String, Object> project = call("getConfig", projectPath);
+        project.put("projectId", "1");
+        callAndExpectError("Unrecognised property 'projectId'", "saveConfig", projectPath, project, false);
+    }
+
     private void assertSortedEquals(Collection<String> got, String... expected)
     {
         assertEquals(expected.length, got.size());

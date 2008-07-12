@@ -565,7 +565,16 @@ public class CompositeType extends AbstractType implements ComplexType
                 }
             }
 
+            // Values not specified get default values.
             MutableRecord result = createNewRecord(true);
+
+            // Internal properties may not be set this way, so strip them
+            // from the default config.
+            for (TypeProperty property: internalProperties.values())
+            {
+                result.remove(property.getName());
+            }
+            
             for (TypeProperty property : properties.values())
             {
                 propertyFromXmlRpc(property, rpcForm, result);

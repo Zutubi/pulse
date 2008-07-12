@@ -130,11 +130,6 @@ public class BrowseAction extends ProjectActionSupport
                     if (node.isConcrete())
                     {
                         Project project = projectManager.getProject(name, true);
-                        if (project == null)
-                        {
-                            System.out.println("name = " + name);
-                            continue;
-                        }
                         List<BuildResult> builds = getBuilds(project);
                         model = new ConcreteProjectModel(group, project, parentModel, builds, browseConfig.getBuildsPerProject());
                     }
