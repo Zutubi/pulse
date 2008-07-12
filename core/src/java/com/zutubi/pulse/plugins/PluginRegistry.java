@@ -63,6 +63,11 @@ public class PluginRegistry
      */
     public Map<String, String> register(String id)
     {
+        if (id == null)
+        {
+            throw new IllegalArgumentException("Plugin ID can not be null.");
+        }
+        
         if (!isRegistered(id))
         {
             entries.put(id, new HashMap<String, String>());

@@ -489,7 +489,7 @@ public class ConfigurationTemplateManager
                     InsertEvent insertEvent = new InsertEvent(this, configuration, cascaded);
                     publishEvent(insertEvent);
                     state.pendingEvents.add(new PostInsertEvent(this, configuration, cascaded));
-                    configurationStateManager.createAndAssignStateIfRequired(configuration);
+                    configurationStateManager.createAndAssignState(configuration);
                 }
             }
         }
@@ -545,7 +545,7 @@ public class ConfigurationTemplateManager
         return gotType;
     }
 
-    void refreshCaches()
+    public void refreshCaches()
     {
         configurationReferenceManager.clear();
         stateWrapper.execute(new TransactionalWrapper.Action<State>()
@@ -2070,7 +2070,7 @@ public class ConfigurationTemplateManager
     }
 
     @SuppressWarnings({"unchecked"})
-    <T extends Configuration> Collection<T> getAllInstances(Class<T> clazz)
+    public <T extends Configuration> Collection<T> getAllInstances(Class<T> clazz)
     {
         CompositeType type = typeRegistry.getType(clazz);
         if (type == null)

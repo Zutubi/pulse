@@ -50,7 +50,7 @@ public class ConfigurationStateManager
         return new LinkedList<Class<? extends Configuration>>(managers.keySet());
     }
 
-    public void createAndAssignStateIfRequired(final Configuration instance)
+    public void createAndAssignState(final Configuration instance)
     {
         Class<? extends Configuration> clazz = instance.getClass();
         final ExternalStateManager manager = getManager(clazz);

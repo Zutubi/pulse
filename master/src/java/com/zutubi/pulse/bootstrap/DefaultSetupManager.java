@@ -525,10 +525,6 @@ public class DefaultSetupManager implements SetupManager
         loadContexts(startupContexts);
         loadContexts(postStartupContexts);
 
-        DefaultConfigurationProvider configurationProvider = ComponentContext.getBean("configurationProvider");
-        configurationProvider.init();
-        this.configurationProvider = configurationProvider;
-
         // the last thing we want to do during setup is to ensure that we have state objects that match all of our
         // configuration objects.  These may be out of sync due to
         // a) a restore from a backup that does not contain database export
@@ -536,25 +532,34 @@ public class DefaultSetupManager implements SetupManager
         // c) any number of other options.
         ensureDatabaseStateIsInSyncWithConfiguration();
 
+        DefaultConfigurationProvider configurationProvider = ComponentContext.getBean("configurationProvider");
+        configurationProvider.init();
+        this.configurationProvider = configurationProvider;
+
         setupCallback.finaliseSetup();
     }
 
     private void ensureDatabaseStateIsInSyncWithConfiguration()
     {
         ConfigurationStateManager stateManager = ComponentContext.getBean("configurationStateManager");
+        ConfigurationTemplateManager templateManager = ComponentContext.getBean("configurationTemplateManager");
+
+        // need to refresh the caches now else no data will be available. (this is also done in the configuration provider init..)
+        templateManager.refreshCaches();
 
         // do we want to wrap this process in a transaction?
 
         List<Class<? extends Configuration>> statefulTypes = stateManager.getStatefulConfigurationTypes();
         for (Class<? extends Configuration> clazz : statefulTypes)
         {
-            Collection<? extends Configuration> configs = configurationProvider.getAll(clazz);
+            // configuration provider is not available at this state of proceedings, so go directly to the ctm.
+            Collection<? extends Configuration> configs = templateManager.getAllInstances(clazz);
             for (Configuration config : configs)
             {
                 Object externalState = stateManager.getExternalState(config);
-                if (externalState == null)
+                if (externalState == null && config.isConcrete())
                 {
-                    stateManager.createAndAssignStateIfRequired(config);
+                    stateManager.createAndAssignState(config);
                 }
             }
         }
