@@ -1,18 +1,18 @@
-package com.zutubi.pulse.prototype.squeezer.squeezers;
+package com.zutubi.tove.squeezer.squeezers;
 
-import com.zutubi.pulse.prototype.squeezer.SqueezeException;
+import com.zutubi.tove.squeezer.SqueezeException;
 import junit.framework.TestCase;
 
 /**
  */
-public class ShortSqueezerTest extends TestCase
+public class DoubleSqueezerTest extends TestCase
 {
-    private ShortSqueezer squeezer;
+    private DoubleSqueezer squeezer;
 
     protected void setUp() throws Exception
     {
         super.setUp();
-        squeezer = new ShortSqueezer();
+        squeezer = new DoubleSqueezer();
     }
 
     protected void tearDown() throws Exception
@@ -26,22 +26,22 @@ public class ShortSqueezerTest extends TestCase
         assertEquals("", squeezer.squeeze(null));
     }
 
-    public void testShortToString() throws SqueezeException
+    public void testDoubleToString() throws SqueezeException
     {
-        assertEquals("25", squeezer.squeeze(new Short((short) 25)));
+        assertEquals("1.0", squeezer.squeeze(new Double(1.0d)));
     }
 
     public void testPrimitiveToString() throws SqueezeException
     {
-        assertEquals("15", squeezer.squeeze((short)15));
+        assertEquals("0.015", squeezer.squeeze(0.015d));
     }
 
-    public void testStringToShort() throws SqueezeException
+    public void testStringToDouble() throws SqueezeException
     {
-        assertEquals((short)15, squeezer.unsqueeze("15"));
+        assertEquals(1.5d, squeezer.unsqueeze("1.5"));
     }
 
-    public void testEmptyStringToShort() throws SqueezeException
+    public void testEmptyStringToDouble() throws SqueezeException
     {
         assertNull(squeezer.unsqueeze(""));
     }
@@ -55,7 +55,7 @@ public class ShortSqueezerTest extends TestCase
         }
         catch (SqueezeException e)
         {
-            assertEquals("'a' is not a valid short", e.getMessage());
+            assertEquals("'a' is not a valid double", e.getMessage());
         }
     }
 }

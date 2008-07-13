@@ -1,18 +1,18 @@
-package com.zutubi.pulse.prototype.squeezer.squeezers;
+package com.zutubi.tove.squeezer.squeezers;
 
-import com.zutubi.pulse.prototype.squeezer.SqueezeException;
+import com.zutubi.tove.squeezer.SqueezeException;
 import junit.framework.TestCase;
 
 /**
  */
-public class FloatSqueezerTest extends TestCase
+public class LongSqueezerTest extends TestCase
 {
-    private FloatSqueezer squeezer;
+    private LongSqueezer squeezer;
 
     protected void setUp() throws Exception
     {
         super.setUp();
-        squeezer = new FloatSqueezer();
+        squeezer = new LongSqueezer();
     }
 
     protected void tearDown() throws Exception
@@ -26,22 +26,22 @@ public class FloatSqueezerTest extends TestCase
         assertEquals("", squeezer.squeeze(null));
     }
 
-    public void testFloatToString() throws SqueezeException
+    public void testLongToString() throws SqueezeException
     {
-        assertEquals("1.0", squeezer.squeeze(new Float(1.0)));
+        assertEquals("25", squeezer.squeeze(new Long(25L)));
     }
 
     public void testPrimitiveToString() throws SqueezeException
     {
-        assertEquals("0.015", squeezer.squeeze(0.015f));
+        assertEquals("15", squeezer.squeeze(15L));
     }
 
-    public void testStringToFloat() throws SqueezeException
+    public void testStringToLong() throws SqueezeException
     {
-        assertEquals(1.5f, squeezer.unsqueeze("1.5"));
+        assertEquals(15L, squeezer.unsqueeze("15"));
     }
 
-    public void testEmptyStringToFloat() throws SqueezeException
+    public void testEmptyStringToLong() throws SqueezeException
     {
         assertNull(squeezer.unsqueeze(""));
     }
@@ -55,7 +55,7 @@ public class FloatSqueezerTest extends TestCase
         }
         catch (SqueezeException e)
         {
-            assertEquals("'a' is not a valid float", e.getMessage());
+            assertEquals("'a' is not a valid long", e.getMessage());
         }
     }
 }

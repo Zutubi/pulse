@@ -1,18 +1,18 @@
-package com.zutubi.pulse.prototype.squeezer.squeezers;
+package com.zutubi.tove.squeezer.squeezers;
 
-import com.zutubi.pulse.prototype.squeezer.SqueezeException;
+import com.zutubi.tove.squeezer.SqueezeException;
 import junit.framework.TestCase;
 
 /**
  */
-public class LongSqueezerTest extends TestCase
+public class ByteSqueezerTest extends TestCase
 {
-    private LongSqueezer squeezer;
+    private ByteSqueezer squeezer;
 
     protected void setUp() throws Exception
     {
         super.setUp();
-        squeezer = new LongSqueezer();
+        squeezer = new ByteSqueezer();
     }
 
     protected void tearDown() throws Exception
@@ -26,22 +26,22 @@ public class LongSqueezerTest extends TestCase
         assertEquals("", squeezer.squeeze(null));
     }
 
-    public void testLongToString() throws SqueezeException
+    public void testByteToString() throws SqueezeException
     {
-        assertEquals("25", squeezer.squeeze(new Long(25L)));
+        assertEquals("25", squeezer.squeeze(new Byte((byte) 25)));
     }
 
     public void testPrimitiveToString() throws SqueezeException
     {
-        assertEquals("15", squeezer.squeeze(15L));
+        assertEquals("15", squeezer.squeeze((byte)15));
     }
 
-    public void testStringToLong() throws SqueezeException
+    public void testStringToByte() throws SqueezeException
     {
-        assertEquals(15L, squeezer.unsqueeze("15"));
+        assertEquals((byte)15, squeezer.unsqueeze("15"));
     }
 
-    public void testEmptyStringToLong() throws SqueezeException
+    public void testEmptyStringToByte() throws SqueezeException
     {
         assertNull(squeezer.unsqueeze(""));
     }
@@ -55,7 +55,7 @@ public class LongSqueezerTest extends TestCase
         }
         catch (SqueezeException e)
         {
-            assertEquals("'a' is not a valid long", e.getMessage());
+            assertEquals("'a' is not a valid byte value", e.getMessage());
         }
     }
 }
