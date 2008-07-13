@@ -1,10 +1,10 @@
 package com.zutubi.pulse.web.setup;
 
-import com.zutubi.prototype.webwork.TransientAction;
 import com.zutubi.pulse.bootstrap.SetupManager;
 import com.zutubi.pulse.license.LicenseManager;
-import com.zutubi.pulse.prototype.config.setup.SetupLicenseConfiguration;
 import com.zutubi.pulse.security.AcegiUtils;
+import com.zutubi.pulse.tove.config.setup.SetupLicenseConfiguration;
+import com.zutubi.tove.webwork.TransientAction;
 
 /**
  */

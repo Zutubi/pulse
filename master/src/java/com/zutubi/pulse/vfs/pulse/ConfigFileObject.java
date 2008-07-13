@@ -1,13 +1,13 @@
 package com.zutubi.pulse.vfs.pulse;
 
-import com.zutubi.prototype.config.ConfigurationSecurityManager;
-import com.zutubi.prototype.config.ConfigurationTemplateManager;
-import com.zutubi.prototype.type.ComplexType;
-import com.zutubi.prototype.type.Type;
-import com.zutubi.prototype.type.record.PathUtils;
-import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.webwork.PrototypeUtils;
 import com.zutubi.pulse.filesystem.FileSystemException;
+import com.zutubi.tove.config.ConfigurationSecurityManager;
+import com.zutubi.tove.config.ConfigurationTemplateManager;
+import com.zutubi.tove.type.ComplexType;
+import com.zutubi.tove.type.Type;
+import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.tove.type.record.Record;
+import com.zutubi.tove.webwork.ToveUtils;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileType;
@@ -77,12 +77,12 @@ public class ConfigFileObject extends AbstractPulseFileObject implements Compara
 
     public String getDisplayName()
     {
-        return PrototypeUtils.getDisplayName(path, type, parentType, value);
+        return ToveUtils.getDisplayName(path, type, parentType, value);
     }
 
     protected FileType doGetType() throws Exception
     {
-        if(type == null || PrototypeUtils.isFolder(path, configurationTemplateManager, configurationSecurityManager))
+        if(type == null || ToveUtils.isFolder(path, configurationTemplateManager, configurationSecurityManager))
         {
             return FileType.FOLDER;
         }
@@ -106,12 +106,12 @@ public class ConfigFileObject extends AbstractPulseFileObject implements Compara
 
     public String getIconCls()
     {
-        return PrototypeUtils.getIconCls(type);
+        return ToveUtils.getIconCls(type);
     }
 
     protected String[] doListChildren() throws Exception
     {
-        List<String> listing = PrototypeUtils.getPathListing(path, type, configurationTemplateManager, configurationSecurityManager);
+        List<String> listing = ToveUtils.getPathListing(path, type, configurationTemplateManager, configurationSecurityManager);
         return listing.toArray(new String[listing.size()]);
     }
 

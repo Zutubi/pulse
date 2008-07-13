@@ -6,8 +6,8 @@ import com.zutubi.pulse.acceptance.pages.WelcomePage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
 import com.zutubi.pulse.model.ProjectManager;
-import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
-import com.zutubi.pulse.prototype.config.group.ServerPermission;
+import com.zutubi.pulse.tove.config.admin.GlobalConfiguration;
+import com.zutubi.pulse.tove.config.group.ServerPermission;
 
 import java.util.Arrays;
 import java.util.Hashtable;

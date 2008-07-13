@@ -1,7 +1,5 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.prototype.config.ConfigurationRegistry;
-import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.acceptance.pages.dashboard.*;
 import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.core.scm.WorkingCopyFactory;
@@ -11,6 +9,8 @@ import com.zutubi.pulse.personal.PersonalBuildCommand;
 import com.zutubi.pulse.personal.PersonalBuildConfig;
 import com.zutubi.pulse.personal.PersonalBuildUI;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.tove.config.ConfigurationRegistry;
+import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.IOUtils;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;

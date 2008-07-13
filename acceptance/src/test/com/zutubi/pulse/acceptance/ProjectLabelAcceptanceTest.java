@@ -1,8 +1,8 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
-import com.zutubi.pulse.prototype.config.LabelConfiguration;
+import com.zutubi.pulse.tove.config.LabelConfiguration;
+import com.zutubi.tove.type.record.PathUtils;
 
 import java.util.Hashtable;
 

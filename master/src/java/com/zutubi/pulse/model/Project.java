@@ -1,8 +1,7 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.core.model.Entity;
-import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
+import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 import org.acegisecurity.acl.basic.AclObjectIdentity;

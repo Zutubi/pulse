@@ -7,9 +7,9 @@ import com.zutubi.pulse.core.model.TestSuiteResult;
 import com.zutubi.pulse.model.BuildColumns;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
-import com.zutubi.pulse.prototype.config.project.hooks.BuildHookConfiguration;
-import com.zutubi.pulse.prototype.config.user.UserPreferencesConfiguration;
+import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.tove.config.project.hooks.BuildHookConfiguration;
+import com.zutubi.pulse.tove.config.user.UserPreferencesConfiguration;
 import com.zutubi.util.logging.Logger;
 
 import java.util.Collections;

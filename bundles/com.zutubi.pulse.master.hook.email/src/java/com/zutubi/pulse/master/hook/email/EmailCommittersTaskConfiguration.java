@@ -4,7 +4,6 @@ import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.Select;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Wire;
-import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.ResultNotifier;
 import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.PulseException;
@@ -14,14 +13,15 @@ import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.RecipeResultNode;
 import com.zutubi.pulse.model.UserManager;
-import com.zutubi.pulse.prototype.config.admin.EmailConfiguration;
-import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
-import com.zutubi.pulse.prototype.config.project.hooks.BuildHookTaskConfiguration;
-import com.zutubi.pulse.prototype.config.project.hooks.CompatibleHooks;
-import com.zutubi.pulse.prototype.config.project.hooks.ManualBuildHookConfiguration;
-import com.zutubi.pulse.prototype.config.project.hooks.PostBuildHookConfiguration;
-import com.zutubi.pulse.prototype.config.user.contacts.EmailContactConfiguration;
 import com.zutubi.pulse.renderer.BuildResultRenderer;
+import com.zutubi.pulse.tove.config.admin.EmailConfiguration;
+import com.zutubi.pulse.tove.config.admin.GlobalConfiguration;
+import com.zutubi.pulse.tove.config.project.hooks.BuildHookTaskConfiguration;
+import com.zutubi.pulse.tove.config.project.hooks.CompatibleHooks;
+import com.zutubi.pulse.tove.config.project.hooks.ManualBuildHookConfiguration;
+import com.zutubi.pulse.tove.config.project.hooks.PostBuildHookConfiguration;
+import com.zutubi.pulse.tove.config.user.contacts.EmailContactConfiguration;
+import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.TextUtils;
 import com.zutubi.validation.annotations.Required;
@@ -41,7 +41,7 @@ public class EmailCommittersTaskConfiguration extends AbstractConfiguration impl
 {
     @Required
     private String emailDomain;
-    @Select(optionProvider = "com.zutubi.pulse.prototype.config.user.SubscriptionTemplateOptionProvider")
+    @Select(optionProvider = "com.zutubi.pulse.tove.config.user.SubscriptionTemplateOptionProvider")
     private String template;
     private boolean ignorePulseUsers;
 

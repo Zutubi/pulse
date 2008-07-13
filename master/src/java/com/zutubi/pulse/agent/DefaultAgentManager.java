@@ -1,13 +1,5 @@
 package com.zutubi.pulse.agent;
 
-import com.zutubi.prototype.config.*;
-import com.zutubi.prototype.security.AccessManager;
-import com.zutubi.prototype.type.CompositeType;
-import com.zutubi.prototype.type.TypeException;
-import com.zutubi.prototype.type.TypeRegistry;
-import com.zutubi.prototype.type.record.MutableRecord;
-import com.zutubi.prototype.type.record.PathUtils;
-import com.zutubi.prototype.type.record.Record;
 import com.zutubi.pulse.*;
 import com.zutubi.pulse.bootstrap.DefaultSetupManager;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
@@ -25,12 +17,20 @@ import com.zutubi.pulse.model.AgentState;
 import com.zutubi.pulse.model.AgentStateManager;
 import com.zutubi.pulse.model.ResourceManager;
 import com.zutubi.pulse.model.UserManager;
-import com.zutubi.pulse.prototype.config.agent.AgentAclConfiguration;
-import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
-import com.zutubi.pulse.prototype.config.group.AbstractGroupConfiguration;
 import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.services.UpgradeStatus;
+import com.zutubi.pulse.tove.config.agent.AgentAclConfiguration;
+import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
+import com.zutubi.pulse.tove.config.group.AbstractGroupConfiguration;
+import com.zutubi.tove.config.*;
+import com.zutubi.tove.security.AccessManager;
+import com.zutubi.tove.type.CompositeType;
+import com.zutubi.tove.type.TypeException;
+import com.zutubi.tove.type.TypeRegistry;
+import com.zutubi.tove.type.record.MutableRecord;
+import com.zutubi.tove.type.record.PathUtils;
+import com.zutubi.tove.type.record.Record;
 import com.zutubi.util.Sort;
 import com.zutubi.util.logging.Logger;
 

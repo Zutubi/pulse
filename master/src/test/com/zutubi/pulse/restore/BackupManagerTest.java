@@ -1,19 +1,19 @@
 package com.zutubi.pulse.restore;
 
-import com.zutubi.prototype.config.MockConfigurationProvider;
-import com.zutubi.prototype.config.events.PostSaveEvent;
 import com.zutubi.pulse.bootstrap.Data;
+import com.zutubi.pulse.events.DefaultEventManager;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.pulse.model.persistence.mock.MockTriggerDao;
-import com.zutubi.pulse.prototype.config.project.triggers.CronExpressionValidator;
 import com.zutubi.pulse.scheduling.CronTrigger;
 import com.zutubi.pulse.scheduling.DefaultScheduler;
 import com.zutubi.pulse.scheduling.MockSchedulerStrategy;
 import com.zutubi.pulse.scheduling.Trigger;
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.tove.config.project.triggers.CronExpressionValidator;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.events.DefaultEventManager;
-import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
+import com.zutubi.tove.config.MockConfigurationProvider;
+import com.zutubi.tove.config.events.PostSaveEvent;
 import com.zutubi.validation.MockValidationContext;
 import com.zutubi.validation.ValidationException;
 

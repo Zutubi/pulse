@@ -1,10 +1,10 @@
 package com.zutubi.pulse.security;
 
-import com.zutubi.prototype.security.Actor;
 import com.zutubi.pulse.model.AcegiUser;
 import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.prototype.config.group.ServerPermission;
-import com.zutubi.pulse.prototype.config.user.UserConfiguration;
+import com.zutubi.pulse.tove.config.group.ServerPermission;
+import com.zutubi.pulse.tove.config.user.UserConfiguration;
+import com.zutubi.tove.security.Actor;
 import org.acegisecurity.Authentication;
 import org.acegisecurity.context.SecurityContextHolder;
 import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;

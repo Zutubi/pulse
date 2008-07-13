@@ -1,6 +1,6 @@
 package com.zutubi.pulse.security;
 
-import com.zutubi.prototype.security.AccessManager;
+import com.zutubi.tove.security.AccessManager;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

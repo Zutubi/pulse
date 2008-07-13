@@ -1,9 +1,5 @@
 package com.zutubi.pulse;
 
-import com.zutubi.prototype.config.ConfigurationEventListener;
-import com.zutubi.prototype.config.ConfigurationProvider;
-import com.zutubi.prototype.config.events.ConfigurationEvent;
-import com.zutubi.prototype.config.events.PostSaveEvent;
 import static com.zutubi.pulse.MasterBuildProperties.PROPERTY_CLEAN_BUILD;
 import static com.zutubi.pulse.MasterBuildProperties.addRevisionProperties;
 import com.zutubi.pulse.agent.Agent;
@@ -18,10 +14,14 @@ import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.events.system.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.events.system.SystemStartedEvent;
-import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
-import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
-import com.zutubi.pulse.prototype.config.project.types.TypeConfiguration;
 import com.zutubi.pulse.scm.ScmChangeEvent;
+import com.zutubi.pulse.tove.config.admin.GlobalConfiguration;
+import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.tove.config.project.types.TypeConfiguration;
+import com.zutubi.tove.config.ConfigurationEventListener;
+import com.zutubi.tove.config.ConfigurationProvider;
+import com.zutubi.tove.config.events.ConfigurationEvent;
+import com.zutubi.tove.config.events.PostSaveEvent;
 import com.zutubi.util.Constants;
 import com.zutubi.util.logging.Logger;
 

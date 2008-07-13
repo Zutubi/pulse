@@ -6,7 +6,7 @@ import com.zutubi.pulse.model.BuildColumns;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.prototype.config.user.UserPreferencesConfiguration;
+import com.zutubi.pulse.tove.config.user.UserPreferencesConfiguration;
 
 import java.util.List;
 

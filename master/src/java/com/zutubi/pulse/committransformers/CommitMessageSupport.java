@@ -1,6 +1,6 @@
 package com.zutubi.pulse.committransformers;
 
-import com.zutubi.pulse.prototype.config.project.commit.CommitMessageTransformerConfiguration;
+import com.zutubi.pulse.tove.config.project.commit.CommitMessageTransformerConfiguration;
 import com.zutubi.util.logging.Logger;
 
 import java.util.Collection;

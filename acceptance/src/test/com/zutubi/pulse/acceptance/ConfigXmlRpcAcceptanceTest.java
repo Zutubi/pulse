@@ -1,12 +1,12 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.prototype.config.ConfigurationRegistry;
-import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.model.ProjectManager;
-import com.zutubi.pulse.prototype.config.agent.AgentConfigurationActions;
-import com.zutubi.pulse.prototype.config.user.SetPasswordConfiguration;
-import com.zutubi.pulse.prototype.config.user.UserConfiguration;
-import com.zutubi.pulse.prototype.config.user.UserConfigurationActions;
+import com.zutubi.pulse.tove.config.agent.AgentConfigurationActions;
+import com.zutubi.pulse.tove.config.user.SetPasswordConfiguration;
+import com.zutubi.pulse.tove.config.user.UserConfiguration;
+import com.zutubi.pulse.tove.config.user.UserConfigurationActions;
+import com.zutubi.tove.config.ConfigurationRegistry;
+import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.Sort;
 
 import java.util.*;
@@ -202,7 +202,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         ensureProject(TEST_PROJECT_NAME);
         Hashtable<String, Object> config = new Hashtable<String, Object>();
         config.put(SYMBOLIC_NAME_KEY, "zutubi.emailConfig");
-        callAndExpectError("Expected type: class com.zutubi.pulse.prototype.config.project.BuildStageConfiguration", "insertConfig", TEST_PROJECT_PATH + "/stages", config);
+        callAndExpectError("Expected type: class com.zutubi.pulse.tove.config.project.BuildStageConfiguration", "insertConfig", TEST_PROJECT_PATH + "/stages", config);
     }
 
     public void testInsertConfigValidates() throws Exception
@@ -659,7 +659,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         }
         catch(Exception e)
         {
-            assertEquals("java.lang.Exception: java.lang.RuntimeException: java.lang.IllegalArgumentException: Invoking action 'setPassword' of type 'com.zutubi.pulse.prototype.config.user.UserConfiguration': argument instance is of wrong type: expecting 'com.zutubi.pulse.prototype.config.user.SetPasswordConfiguration', got 'com.zutubi.pulse.prototype.config.user.UserConfiguration'",
+            assertEquals("java.lang.Exception: java.lang.RuntimeException: java.lang.IllegalArgumentException: Invoking action 'setPassword' of type 'com.zutubi.pulse.tove.config.user.UserConfiguration': argument instance is of wrong type: expecting 'com.zutubi.pulse.tove.config.user.SetPasswordConfiguration', got 'com.zutubi.pulse.tove.config.user.UserConfiguration'",
                          e.getMessage());
         }
         finally

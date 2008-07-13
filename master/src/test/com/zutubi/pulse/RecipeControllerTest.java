@@ -20,12 +20,12 @@ import com.zutubi.pulse.events.DefaultEventManager;
 import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.model.*;
-import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
-import com.zutubi.pulse.prototype.config.project.AnyCapableAgentRequirements;
-import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.services.UpgradeState;
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
+import com.zutubi.pulse.tove.config.project.AnyCapableAgentRequirements;
+import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.util.FileSystemUtils;
 
 import java.io.File;

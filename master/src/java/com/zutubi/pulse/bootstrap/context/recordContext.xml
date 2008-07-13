@@ -11,19 +11,19 @@
         </property>
     </bean>
 
-    <bean id="recordSerialiser" class="com.zutubi.prototype.type.record.DefaultRecordSerialiser">
+    <bean id="recordSerialiser" class="com.zutubi.tove.type.record.DefaultRecordSerialiser">
         <constructor-arg index="0">
             <ref local="recordRoot"/>
         </constructor-arg>
     </bean>
     
-    <bean id="recordManager" class="com.zutubi.prototype.type.record.RecordManager">
+    <bean id="recordManager" class="com.zutubi.tove.type.record.RecordManager">
         <property name="transactionManager">
             <ref bean="pulseTransactionManager"/>
         </property>
     </bean>
 
-    <bean id="recordStore" class="com.zutubi.prototype.type.record.store.FileSystemRecordStore" init-method="initAndStartAutoCompaction" destroy-method="stopAutoCompaction">
+    <bean id="recordStore" class="com.zutubi.tove.type.record.store.FileSystemRecordStore" init-method="initAndStartAutoCompaction" destroy-method="stopAutoCompaction">
         <property name="persistenceDirectory">
             <ref local="recordRoot"/>
         </property>

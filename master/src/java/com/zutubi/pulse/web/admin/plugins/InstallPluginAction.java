@@ -5,9 +5,9 @@ import com.opensymphony.webwork.dispatcher.multipart.MultiPartRequestWrapper;
 import static com.zutubi.config.annotations.FieldParameter.ACTIONS;
 import static com.zutubi.config.annotations.FieldParameter.SCRIPTS;
 import com.zutubi.config.annotations.FieldType;
-import com.zutubi.prototype.model.Field;
-import com.zutubi.prototype.model.Form;
-import com.zutubi.prototype.webwork.PrototypeUtils;
+import com.zutubi.tove.model.Field;
+import com.zutubi.tove.model.Form;
+import com.zutubi.tove.webwork.ToveUtils;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 import freemarker.template.Configuration;
@@ -99,7 +99,7 @@ public class InstallPluginAction extends PluginActionSupport
         uploadForm.add(cancelButton);
 
         StringWriter writer = new StringWriter();
-        PrototypeUtils.renderForm(uploadForm, getClass(), writer, configuration);
+        ToveUtils.renderForm(uploadForm, getClass(), writer, configuration);
         uploadFormSource = writer.toString();
 
         Form localForm = new Form("localForm", "localForm", "admin/plugins?install=local");
@@ -121,7 +121,7 @@ public class InstallPluginAction extends PluginActionSupport
         localForm.add(cancelButton);
 
         writer = new StringWriter();
-        PrototypeUtils.renderForm(localForm, getClass(), writer, configuration);
+        ToveUtils.renderForm(localForm, getClass(), writer, configuration);
         localFormSource = writer.toString();
     }
 

@@ -1,15 +1,15 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.prototype.config.ConfigurationRegistry;
-import com.zutubi.prototype.config.ConfigurationTemplateManager;
-import com.zutubi.prototype.config.TemplateHierarchy;
-import com.zutubi.prototype.config.TemplateNode;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.ProjectGroup;
 import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.prototype.config.user.BrowseViewConfiguration;
+import com.zutubi.pulse.tove.config.user.BrowseViewConfiguration;
+import com.zutubi.tove.config.ConfigurationRegistry;
+import com.zutubi.tove.config.ConfigurationTemplateManager;
+import com.zutubi.tove.config.TemplateHierarchy;
+import com.zutubi.tove.config.TemplateNode;
 import com.zutubi.util.Sort;
 
 import java.util.*;

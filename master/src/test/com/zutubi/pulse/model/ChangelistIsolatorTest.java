@@ -8,9 +8,9 @@ import com.zutubi.pulse.core.scm.DelegateScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
-import com.zutubi.pulse.prototype.config.project.BuildOptionsConfiguration;
-import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.tove.config.project.BuildOptionsConfiguration;
+import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 
 import java.util.Arrays;
 import java.util.LinkedList;

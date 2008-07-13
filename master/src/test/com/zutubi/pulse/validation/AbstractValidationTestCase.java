@@ -1,10 +1,10 @@
 package com.zutubi.pulse.validation;
 
-import com.zutubi.prototype.actions.ActionManager;
-import com.zutubi.prototype.config.AbstractConfigurationSystemTestCase;
-import com.zutubi.prototype.config.ConfigurationRegistry;
-import com.zutubi.prototype.type.TypeException;
 import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.tove.actions.ActionManager;
+import com.zutubi.tove.config.AbstractConfigurationSystemTestCase;
+import com.zutubi.tove.config.ConfigurationRegistry;
+import com.zutubi.tove.type.TypeException;
 
 import java.util.List;
 

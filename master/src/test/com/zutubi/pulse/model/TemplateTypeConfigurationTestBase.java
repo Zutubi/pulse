@@ -1,11 +1,11 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.PostProcessorManager;
-import com.zutubi.pulse.prototype.config.project.types.DefaultPostProcessorFragment;
-import com.zutubi.pulse.prototype.config.project.types.FileArtifactConfiguration;
-import com.zutubi.pulse.prototype.config.project.types.PostProcessorFragment;
-import com.zutubi.pulse.prototype.config.project.types.TemplateTypeConfiguration;
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.tove.config.project.types.DefaultPostProcessorFragment;
+import com.zutubi.pulse.tove.config.project.types.FileArtifactConfiguration;
+import com.zutubi.pulse.tove.config.project.types.PostProcessorFragment;
+import com.zutubi.pulse.tove.config.project.types.TemplateTypeConfiguration;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.IOUtils;
 import org.apache.velocity.app.VelocityEngine;

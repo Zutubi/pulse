@@ -1,7 +1,7 @@
 package com.zutubi.pulse.acceptance.forms;
 
 import com.thoughtworks.selenium.Selenium;
-import com.zutubi.pulse.prototype.config.user.SignupUserConfiguration;
+import com.zutubi.pulse.tove.config.user.SignupUserConfiguration;
 
 /**
  * Anonymous self-signup form.

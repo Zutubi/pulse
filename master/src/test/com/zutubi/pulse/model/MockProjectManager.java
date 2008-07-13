@@ -2,10 +2,8 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.personal.PatchArchive;
-import com.zutubi.pulse.prototype.config.project.AgentRequirements;
-import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
-import com.zutubi.pulse.security.SecureParameter;
-import com.zutubi.prototype.security.AccessManager;
+import com.zutubi.pulse.tove.config.project.AgentRequirements;
+import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 
 import java.util.*;
 

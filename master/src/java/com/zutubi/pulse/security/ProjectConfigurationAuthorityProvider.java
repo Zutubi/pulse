@@ -1,10 +1,10 @@
 package com.zutubi.pulse.security;
 
-import com.zutubi.prototype.security.AccessManager;
-import com.zutubi.prototype.security.AuthorityProvider;
-import com.zutubi.prototype.security.DefaultAccessManager;
-import com.zutubi.pulse.prototype.config.project.ProjectAclConfiguration;
-import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
+import com.zutubi.pulse.tove.config.project.ProjectAclConfiguration;
+import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
+import com.zutubi.tove.security.AccessManager;
+import com.zutubi.tove.security.AuthorityProvider;
+import com.zutubi.tove.security.DefaultAccessManager;
 
 import java.util.HashSet;
 import java.util.List;

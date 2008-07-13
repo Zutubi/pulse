@@ -8,12 +8,12 @@ import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
-import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.scheduling.SchedulingException;
 import com.zutubi.pulse.scheduling.SimpleTrigger;
 import com.zutubi.pulse.scheduling.Trigger;
 import com.zutubi.pulse.security.PulseThreadFactory;
+import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.Constants;
 import com.zutubi.util.logging.Logger;
 

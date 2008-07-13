@@ -14,7 +14,7 @@ import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.RecipeResultNode;
-import com.zutubi.pulse.prototype.config.project.hooks.*;
+import com.zutubi.pulse.tove.config.project.hooks.*;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.annotations.Required;
 

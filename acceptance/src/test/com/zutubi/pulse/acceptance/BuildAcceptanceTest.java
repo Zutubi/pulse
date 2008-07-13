@@ -1,7 +1,5 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.prototype.config.ConfigurationRegistry;
-import static com.zutubi.prototype.type.record.PathUtils.getPath;
 import com.zutubi.pulse.acceptance.forms.admin.BuildStageForm;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
@@ -11,6 +9,8 @@ import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
 import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.model.ResourceRequirement;
+import com.zutubi.tove.config.ConfigurationRegistry;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 
 import java.util.Hashtable;
 

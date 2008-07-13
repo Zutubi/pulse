@@ -1,11 +1,11 @@
 package com.zutubi.pulse.velocity;
 
-import com.zutubi.util.TextUtils;
 import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.xwork.util.OgnlValueStack;
-import com.zutubi.prototype.config.ConfigurationSecurityManager;
-import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.tove.config.ConfigurationSecurityManager;
+import com.zutubi.tove.security.AccessManager;
+import com.zutubi.util.TextUtils;
 import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;

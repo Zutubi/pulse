@@ -1,10 +1,10 @@
 package com.zutubi.pulse.model;
 
+import com.zutubi.pulse.tove.config.project.types.AntTypeConfiguration;
+import com.zutubi.pulse.tove.config.project.types.DirectoryArtifactConfiguration;
+import com.zutubi.pulse.tove.config.project.types.FileArtifactConfiguration;
+import com.zutubi.pulse.tove.config.project.types.TemplateTypeConfiguration;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.prototype.config.project.types.TemplateTypeConfiguration;
-import com.zutubi.pulse.prototype.config.project.types.AntTypeConfiguration;
-import com.zutubi.pulse.prototype.config.project.types.FileArtifactConfiguration;
-import com.zutubi.pulse.prototype.config.project.types.DirectoryArtifactConfiguration;
 
 /**
  */

@@ -1,9 +1,9 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceVersion;
 import com.zutubi.pulse.model.ResourceRequirement;
+import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.RandomUtils;
 
 import java.util.Hashtable;

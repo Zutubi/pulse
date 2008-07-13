@@ -1,10 +1,10 @@
 package com.zutubi.pulse.vfs.pulse;
 
-import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
-import com.zutubi.pulse.prototype.config.project.ProjectConfigurationActions;
+import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.tove.config.project.ProjectConfigurationActions;
+import com.zutubi.tove.security.AccessManager;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;

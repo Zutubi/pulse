@@ -8,11 +8,11 @@ import com.zutubi.pulse.bootstrap.DefaultSystemPaths;
 import com.zutubi.pulse.bootstrap.SystemPaths;
 import com.zutubi.pulse.events.*;
 import com.zutubi.pulse.model.AgentState;
-import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.services.UpgradeState;
 import com.zutubi.pulse.services.UpgradeStatus;
 import com.zutubi.pulse.servlet.DownloadPackageServlet;
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.util.FileSystemUtils;
 
 import java.io.File;

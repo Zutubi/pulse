@@ -1,8 +1,5 @@
 package com.zutubi.pulse.restore;
 
-import com.zutubi.prototype.config.ConfigurationProvider;
-import com.zutubi.prototype.config.TypeAdapter;
-import com.zutubi.prototype.config.TypeListener;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
@@ -12,6 +9,9 @@ import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.scheduling.SchedulingException;
 import com.zutubi.pulse.scheduling.Trigger;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.tove.config.ConfigurationProvider;
+import com.zutubi.tove.config.TypeAdapter;
+import com.zutubi.tove.config.TypeListener;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;

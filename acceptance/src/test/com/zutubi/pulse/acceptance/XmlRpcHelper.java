@@ -1,16 +1,16 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.prototype.config.ConfigurationRegistry;
-import static com.zutubi.prototype.type.record.PathUtils.getPath;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.model.ProjectManager;
-import com.zutubi.pulse.prototype.config.group.GroupConfiguration;
-import com.zutubi.pulse.prototype.config.project.BuildStageConfiguration;
-import com.zutubi.pulse.prototype.config.project.ProjectAclConfiguration;
-import com.zutubi.pulse.prototype.config.user.SetPasswordConfiguration;
-import com.zutubi.pulse.prototype.config.user.UserConfiguration;
+import com.zutubi.pulse.tove.config.group.GroupConfiguration;
+import com.zutubi.pulse.tove.config.project.BuildStageConfiguration;
+import com.zutubi.pulse.tove.config.project.ProjectAclConfiguration;
+import com.zutubi.pulse.tove.config.user.SetPasswordConfiguration;
+import com.zutubi.pulse.tove.config.user.UserConfiguration;
+import com.zutubi.tove.config.ConfigurationRegistry;
+import static com.zutubi.tove.type.record.PathUtils.getPath;
 import org.apache.xmlrpc.XmlRpcClient;
 
 import java.net.URL;

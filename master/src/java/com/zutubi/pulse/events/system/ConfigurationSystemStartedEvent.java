@@ -1,6 +1,6 @@
 package com.zutubi.pulse.events.system;
 
-import com.zutubi.prototype.config.ConfigurationProvider;
+import com.zutubi.tove.config.ConfigurationProvider;
 
 /**
  * An event raised when the configuration system is completely available.

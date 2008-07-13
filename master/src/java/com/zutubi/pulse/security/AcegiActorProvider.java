@@ -1,7 +1,7 @@
 package com.zutubi.pulse.security;
 
-import com.zutubi.prototype.security.Actor;
-import com.zutubi.prototype.security.ActorProvider;
+import com.zutubi.tove.security.Actor;
+import com.zutubi.tove.security.ActorProvider;
 
 /**
  * Adapts from Acegi logged-in users to the config systems ActorProvider

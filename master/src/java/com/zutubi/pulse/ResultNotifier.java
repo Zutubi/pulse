@@ -1,6 +1,5 @@
 package com.zutubi.pulse;
 
-import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.condition.UnsuccessfulCountBuildsValue;
 import com.zutubi.pulse.condition.UnsuccessfulCountDaysValue;
@@ -12,12 +11,13 @@ import com.zutubi.pulse.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
-import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
-import com.zutubi.pulse.prototype.config.user.SubscriptionConfiguration;
-import com.zutubi.pulse.prototype.config.user.contacts.ContactConfiguration;
 import com.zutubi.pulse.renderer.BuildResultRenderer;
+import com.zutubi.pulse.tove.config.admin.GlobalConfiguration;
+import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.tove.config.user.SubscriptionConfiguration;
+import com.zutubi.pulse.tove.config.user.contacts.ContactConfiguration;
 import com.zutubi.pulse.webwork.mapping.Urls;
+import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.util.logging.Logger;
 
 import java.io.StringWriter;

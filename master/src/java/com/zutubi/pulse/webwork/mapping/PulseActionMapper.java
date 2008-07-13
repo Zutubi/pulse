@@ -4,11 +4,11 @@ import com.opensymphony.webwork.dispatcher.mapper.ActionMapper;
 import com.opensymphony.webwork.dispatcher.mapper.ActionMapping;
 import com.opensymphony.webwork.dispatcher.mapper.DefaultActionMapper;
 import com.opensymphony.xwork.ActionProxyFactory;
-import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.webwork.mapping.agents.AgentsActionResolver;
 import com.zutubi.pulse.webwork.mapping.browse.BrowseActionResolver;
 import com.zutubi.pulse.webwork.mapping.dashboard.MyBuildsActionResolver;
 import com.zutubi.pulse.webwork.mapping.server.ServerActionResolver;
+import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.TextUtils;
 
 import javax.servlet.http.HttpServletRequest;

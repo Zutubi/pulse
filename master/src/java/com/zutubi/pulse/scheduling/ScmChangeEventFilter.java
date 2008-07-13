@@ -2,8 +2,8 @@ package com.zutubi.pulse.scheduling;
 
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.model.ProjectManager;
-import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.scm.ScmChangeEvent;
+import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 
 /**
  * A filter to ensure a trigger only fires for the SCM of the matching

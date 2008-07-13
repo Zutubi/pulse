@@ -1,6 +1,5 @@
 package com.zutubi.pulse.license;
 
-import com.zutubi.prototype.config.events.InsertEvent;
 import com.zutubi.pulse.bootstrap.DataResolver;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.events.DataDirectoryChangedEvent;
@@ -10,9 +9,10 @@ import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.system.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.license.authorisation.Authorisation;
 import com.zutubi.pulse.license.events.LicenseUpdateEvent;
-import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
-import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
-import com.zutubi.pulse.prototype.config.user.UserConfiguration;
+import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
+import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.tove.config.user.UserConfiguration;
+import com.zutubi.tove.config.events.InsertEvent;
 import com.zutubi.util.logging.Logger;
 
 import java.util.Arrays;

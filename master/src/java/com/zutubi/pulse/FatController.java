@@ -1,6 +1,5 @@
 package com.zutubi.pulse;
 
-import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.agent.MasterLocationProvider;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
@@ -24,6 +23,7 @@ import com.zutubi.pulse.license.events.LicenseUpdateEvent;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.scheduling.quartz.TimeoutRecipeJob;
 import com.zutubi.pulse.services.ServiceTokenManager;
+import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.logging.Logger;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;

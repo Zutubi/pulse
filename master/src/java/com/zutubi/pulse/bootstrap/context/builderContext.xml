@@ -199,10 +199,10 @@
 
     <bean id="cleanupManager" class="com.zutubi.pulse.cleanup.CleanupManager" autowire="byName" init-method="init"/>
 
-    <bean id="triggerManager" class="com.zutubi.pulse.prototype.config.project.triggers.TriggerManager" autowire="byName"/>
+    <bean id="triggerManager" class="com.zutubi.pulse.tove.config.project.triggers.TriggerManager" autowire="byName"/>
 
-    <bean id="buildHookManager" class="com.zutubi.pulse.prototype.config.project.hooks.BuildHookManager" autowire="byName"/>
+    <bean id="buildHookManager" class="com.zutubi.pulse.tove.config.project.hooks.BuildHookManager" autowire="byName"/>
 
-    <bean id="configurationProvider" class="com.zutubi.prototype.config.DefaultConfigurationProvider" autowire="byName"/>
+    <bean id="configurationProvider" class="com.zutubi.tove.config.DefaultConfigurationProvider" autowire="byName"/>
 
 </beans>

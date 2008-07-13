@@ -1,9 +1,9 @@
 package com.zutubi.pulse.web.agents;
 
-import com.zutubi.util.TextUtils;
-import com.zutubi.prototype.actions.ActionManager;
-import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
+import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.webwork.mapping.Urls;
+import com.zutubi.tove.actions.ActionManager;
+import com.zutubi.util.TextUtils;
 
 /**
  * Used to execute a named config action with/on an agent.

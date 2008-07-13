@@ -1,8 +1,8 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.acceptance.pages.dashboard.DashboardPage;
-import com.zutubi.pulse.prototype.config.LabelConfiguration;
+import com.zutubi.pulse.tove.config.LabelConfiguration;
+import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.util.CollectionUtils.asPair;
 import static com.zutubi.util.CollectionUtils.asVector;
 import com.zutubi.util.Pair;

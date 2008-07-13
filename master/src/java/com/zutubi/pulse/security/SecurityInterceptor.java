@@ -1,6 +1,6 @@
 package com.zutubi.pulse.security;
 
-import com.zutubi.prototype.security.AccessManager;
+import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.AccessDeniedException;
 import org.aopalliance.intercept.MethodInterceptor;

@@ -373,7 +373,7 @@
             <result name="cancel" type="redirect">/admin/plugins/</result>
         </action>
 
-        <action name="display" class="com.zutubi.prototype.webwork.DisplayScopeAction">
+        <action name="display" class="com.zutubi.tove.webwork.DisplayScopeAction">
             <interceptor-ref name="defaultReadOnlyStack"/>
             <result name="config" type="velocity">scope.vm</result>
             <result name="template" type="velocity">templated-scope.vm</result>
@@ -467,16 +467,16 @@
             <result name="error" type="flexjson">configurationErrors</result>
         </global-results>
 
-        <action name="display" class="com.zutubi.prototype.webwork.DisplayAction">
+        <action name="display" class="com.zutubi.tove.webwork.DisplayAction">
             <result name="composite" type="velocity">composite.vm</result>
             <result name="map" type="velocity">map.vm</result>
         </action>
 
-        <action name="help" class="com.zutubi.prototype.webwork.help.TypeHelpAction">
+        <action name="help" class="com.zutubi.tove.webwork.help.TypeHelpAction">
             <result name="success" type="velocity">help.vm</result>
         </action>
 
-        <action name="wizard" class="com.zutubi.prototype.wizard.webwork.AjaxEnabledConfigurationWizardAction">
+        <action name="wizard" class="com.zutubi.tove.wizard.webwork.AjaxEnabledConfigurationWizardAction">
             <interceptor-ref name="ajaxConfigWizardStack"/>
             <result name="step" type="flexjson">configurationPanel</result>
             <result name="input" type="flexjson">configurationErrors</result>
@@ -484,46 +484,46 @@
             <result name="success" type="flexjson">configurationResponse</result>
         </action>
 
-        <action name="save" class="com.zutubi.prototype.webwork.SaveAction">
+        <action name="save" class="com.zutubi.tove.webwork.SaveAction">
             <result name="composite" type="flexjson">configurationResponse</result>
             <result name="map" type="flexjson">configurationResponse</result>
             <result name="input" type="flexjson">configurationErrors</result>
             <result name="cancel" type="flexjson">configurationResponse</result>
         </action>
 
-        <action name="delete" class="com.zutubi.prototype.webwork.DeleteAction">
+        <action name="delete" class="com.zutubi.tove.webwork.DeleteAction">
             <result name="confirm" type="flexjson">newPanel</result>
             <result name="success" type="flexjson">configurationResponse</result>
             <result name="cancel" type="flexjson">configurationResponse</result>
         </action>
 
-        <action name="restore" class="com.zutubi.prototype.webwork.RestoreAction">
+        <action name="restore" class="com.zutubi.tove.webwork.RestoreAction">
             <result name="success" type="flexjson">configurationResponse</result>
             <result name="cancel" type="flexjson">configurationResponse</result>
         </action>
 
-        <action name="up" class="com.zutubi.prototype.webwork.OrderAction">
+        <action name="up" class="com.zutubi.tove.webwork.OrderAction">
             <param name="moveUp">true</param>
             <result name="success" type="flexjson">configurationResponse</result>
         </action>
 
-        <action name="down" class="com.zutubi.prototype.webwork.OrderAction">
+        <action name="down" class="com.zutubi.tove.webwork.OrderAction">
             <param name="moveUp">false</param>
             <result name="success" type="flexjson">configurationResponse</result>
         </action>
 
-        <action name="ls" class="com.zutubi.prototype.webwork.LsAction">
+        <action name="ls" class="com.zutubi.tove.webwork.LsAction">
             <param name="basePath">config</param>
             <result name="success" type="flexjson">listing</result>
             <result name="error" type="json">/ajax/error.xml</result>
         </action>
 
-        <action name="check" class="com.zutubi.prototype.webwork.CheckAction">
+        <action name="check" class="com.zutubi.tove.webwork.CheckAction">
             <result name="input" type="flexjson">configurationErrors</result>
             <result name="success" type="flexjson">checkResponse</result>
         </action>
 
-        <action name="generic" class="com.zutubi.prototype.webwork.GenericAction">
+        <action name="generic" class="com.zutubi.tove.webwork.GenericAction">
             <result name="input" type="flexjson">newPanel</result>
             <result name="cancel" type="flexjson">configurationResponse</result>
             <result name="success" type="flexjson">configurationResponse</result>
@@ -534,13 +534,13 @@
             </result>
         </action>
         
-        <action name="clone" class="com.zutubi.prototype.webwork.CloneAction">
+        <action name="clone" class="com.zutubi.tove.webwork.CloneAction">
             <result name="cancel" type="flexjson">configurationResponse</result>
             <result name="success" type="flexjson">configurationResponse</result>
             <result name="input" type="flexjson">newPanel</result>
         </action>
 
-        <action name="smartclone" class="com.zutubi.prototype.webwork.CloneAction">
+        <action name="smartclone" class="com.zutubi.tove.webwork.CloneAction">
             <param name="smart">true</param>
             <result name="cancel" type="flexjson">configurationResponse</result>
             <result name="success" type="flexjson">configurationResponse</result>
@@ -549,11 +549,11 @@
     </package>
 
     <package name="helpAjax" namespace="/ahelp" extends="configAjax">
-        <action name="type" class="com.zutubi.prototype.webwork.help.TypeHelpAction">
+        <action name="type" class="com.zutubi.tove.webwork.help.TypeHelpAction">
             <result name="success" type="velocity">type.vm</result>
         </action>
 
-        <action name="template" class="com.zutubi.prototype.webwork.help.TemplateHelpAction">
+        <action name="template" class="com.zutubi.tove.webwork.help.TemplateHelpAction">
             <result name="success" type="velocity">template.vm</result>
         </action>
     </package>
@@ -570,13 +570,13 @@
     <package name="templateAjax" namespace="/atemplate" extends="default">
         <default-interceptor-ref name="ajaxStack"/>
 
-        <action name="ls" class="com.zutubi.prototype.webwork.LsAction">
+        <action name="ls" class="com.zutubi.tove.webwork.LsAction">
             <param name="basePath">templates</param>
             <result name="success" type="flexjson">listing</result>
             <result name="error" type="json">/ajax/error.xml</result>
         </action>
 
-        <action name="display" class="com.zutubi.prototype.webwork.DisplayTemplateAction">
+        <action name="display" class="com.zutubi.tove.webwork.DisplayTemplateAction">
             <result name="success" type="velocity">template.vm</result>
         </action>
     </package>

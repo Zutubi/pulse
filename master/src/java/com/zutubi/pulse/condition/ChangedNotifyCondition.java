@@ -3,7 +3,7 @@ package com.zutubi.pulse.condition;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.prototype.config.user.UserConfiguration;
+import com.zutubi.pulse.tove.config.user.UserConfiguration;
 
 import java.util.List;
 

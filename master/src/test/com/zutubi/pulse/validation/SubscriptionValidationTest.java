@@ -1,11 +1,11 @@
 package com.zutubi.pulse.validation;
 
-import com.zutubi.prototype.config.ConfigurationRegistry;
-import com.zutubi.prototype.type.TypeException;
-import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.condition.NotifyConditionFactory;
-import com.zutubi.pulse.prototype.config.user.*;
-import com.zutubi.pulse.prototype.config.user.contacts.EmailContactConfiguration;
+import com.zutubi.pulse.tove.config.user.*;
+import com.zutubi.pulse.tove.config.user.contacts.EmailContactConfiguration;
+import com.zutubi.tove.config.ConfigurationRegistry;
+import com.zutubi.tove.type.TypeException;
+import com.zutubi.tove.type.record.PathUtils;
 
 /**
  */

@@ -1,11 +1,11 @@
 package com.zutubi.pulse.acceptance.pages.admin;
 
 import com.thoughtworks.selenium.Selenium;
-import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.acceptance.IDs;
 import com.zutubi.pulse.acceptance.SeleniumUtils;
 import com.zutubi.pulse.acceptance.forms.admin.CloneForm;
 import com.zutubi.pulse.webwork.mapping.Urls;
+import com.zutubi.tove.type.record.PathUtils;
 
 /**
  * A page in the admin UI that displays a list of composites.  The list is

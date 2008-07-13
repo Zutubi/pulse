@@ -5,6 +5,6 @@
     <!--
     Need to be careful with name of the bean so that it does not clash with the 'other' transaction manager.
     -->
-    <bean id="pulseTransactionManager" class="com.zutubi.prototype.transaction.TransactionManager"/>
+    <bean id="pulseTransactionManager" class="com.zutubi.tove.transaction.TransactionManager"/>
 
 </beans>

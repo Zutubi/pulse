@@ -1,9 +1,9 @@
 package com.zutubi.pulse;
 
-import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.events.build.AbstractBuildRequestEvent;
-import com.zutubi.pulse.prototype.config.project.ProjectConfigurationActions;
+import com.zutubi.pulse.tove.config.project.ProjectConfigurationActions;
+import com.zutubi.tove.security.AccessManager;
 
 import java.util.*;
 

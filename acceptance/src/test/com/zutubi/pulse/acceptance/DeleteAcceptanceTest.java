@@ -1,18 +1,18 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.prototype.config.ConfigurationRegistry;
-import com.zutubi.prototype.security.AccessManager;
-import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.acceptance.pages.admin.*;
 import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
 import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.model.ResourceRequirement;
-import com.zutubi.pulse.prototype.config.LabelConfiguration;
-import com.zutubi.pulse.prototype.config.group.ServerPermission;
-import com.zutubi.pulse.prototype.config.project.BuildStageConfiguration;
-import com.zutubi.pulse.prototype.config.project.triggers.BuildCompletedTriggerConfiguration;
-import com.zutubi.pulse.prototype.config.user.UserConfigurationActions;
+import com.zutubi.pulse.tove.config.LabelConfiguration;
+import com.zutubi.pulse.tove.config.group.ServerPermission;
+import com.zutubi.pulse.tove.config.project.BuildStageConfiguration;
+import com.zutubi.pulse.tove.config.project.triggers.BuildCompletedTriggerConfiguration;
+import com.zutubi.pulse.tove.config.user.UserConfigurationActions;
+import com.zutubi.tove.config.ConfigurationRegistry;
+import com.zutubi.tove.security.AccessManager;
+import com.zutubi.tove.type.record.PathUtils;
 
 import java.util.Arrays;
 import java.util.Hashtable;

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.prototype.type.record.MutableRecord;
+import com.zutubi.tove.type.record.MutableRecord;
 
 /**
  *

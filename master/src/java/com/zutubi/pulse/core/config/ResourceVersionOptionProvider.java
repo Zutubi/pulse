@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.config;
 
-import com.zutubi.prototype.MapOptionProvider;
-import com.zutubi.prototype.MapOption;
-import com.zutubi.prototype.type.TypeProperty;
+import com.zutubi.tove.MapOption;
+import com.zutubi.tove.MapOptionProvider;
+import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.util.Sort;
 
 import java.util.*;

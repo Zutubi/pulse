@@ -1,8 +1,8 @@
 package com.zutubi.pulse.web;
 
 import com.opensymphony.xwork.ActionContext;
-import com.zutubi.prototype.webwork.TransientAction;
-import com.zutubi.pulse.prototype.config.misc.LoginConfiguration;
+import com.zutubi.pulse.tove.config.misc.LoginConfiguration;
+import com.zutubi.tove.webwork.TransientAction;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.AuthenticationException;
 import org.acegisecurity.ui.AbstractProcessingFilter;

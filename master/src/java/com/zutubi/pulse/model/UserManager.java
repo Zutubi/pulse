@@ -1,7 +1,7 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.prototype.config.group.GroupConfiguration;
-import com.zutubi.pulse.prototype.config.user.UserConfiguration;
+import com.zutubi.pulse.tove.config.group.GroupConfiguration;
+import com.zutubi.pulse.tove.config.user.UserConfiguration;
 import org.acegisecurity.userdetails.UserDetailsService;
 
 import java.util.List;

@@ -1,11 +1,11 @@
 package com.zutubi.pulse.web.setup;
 
-import com.zutubi.prototype.webwork.TransientAction;
 import com.zutubi.pulse.bootstrap.Data;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.SetupManager;
 import com.zutubi.pulse.database.DriverRegistry;
-import com.zutubi.pulse.prototype.config.setup.SetupDatabaseTypeConfiguration;
+import com.zutubi.pulse.tove.config.setup.SetupDatabaseTypeConfiguration;
+import com.zutubi.tove.webwork.TransientAction;
 import com.zutubi.util.IOUtils;
 
 import java.io.File;

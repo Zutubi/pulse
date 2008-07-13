@@ -1,9 +1,9 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.prototype.security.Actor;
-import com.zutubi.pulse.prototype.config.group.AbstractGroupConfiguration;
-import com.zutubi.pulse.prototype.config.group.GroupConfiguration;
-import com.zutubi.pulse.prototype.config.user.UserConfiguration;
+import com.zutubi.pulse.tove.config.group.AbstractGroupConfiguration;
+import com.zutubi.pulse.tove.config.group.GroupConfiguration;
+import com.zutubi.pulse.tove.config.user.UserConfiguration;
+import com.zutubi.tove.security.Actor;
 import org.acegisecurity.userdetails.UserDetails;
 
 import java.util.HashSet;

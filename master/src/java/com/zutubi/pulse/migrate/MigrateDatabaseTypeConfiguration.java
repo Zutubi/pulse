@@ -1,25 +1,19 @@
 package com.zutubi.pulse.migrate;
 
-import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.Form;
-import com.zutubi.config.annotations.ConfigurationCheck;
-import com.zutubi.config.annotations.ControllingSelect;
-import com.zutubi.config.annotations.FieldScript;
-import com.zutubi.config.annotations.FieldAction;
-import com.zutubi.config.annotations.Transient;
+import com.zutubi.config.annotations.*;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
-import com.zutubi.pulse.prototype.config.setup.DatabaseType;
+import com.zutubi.pulse.tove.config.setup.DatabaseType;
+import com.zutubi.util.IOUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.annotations.File;
-import com.zutubi.validation.annotations.Required;
 import com.zutubi.validation.annotations.Numeric;
-import com.zutubi.util.TextUtils;
-import com.zutubi.util.IOUtils;
+import com.zutubi.validation.annotations.Required;
 
-import java.util.jar.JarFile;
-import java.util.Properties;
 import java.io.IOException;
+import java.util.Properties;
+import java.util.jar.JarFile;
 
 /**
  * Used for the database type setup page: i.e. the second step in a normal

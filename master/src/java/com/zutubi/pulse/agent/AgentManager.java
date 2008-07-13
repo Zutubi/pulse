@@ -1,11 +1,11 @@
 package com.zutubi.pulse.agent;
 
 import com.zutubi.pulse.model.AgentState;
-import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
-import com.zutubi.pulse.prototype.config.agent.AgentConfigurationActions;
 import com.zutubi.pulse.security.SecureParameter;
 import com.zutubi.pulse.security.SecureResult;
 import com.zutubi.pulse.services.UpgradeStatus;
+import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
+import com.zutubi.pulse.tove.config.agent.AgentConfigurationActions;
 
 import java.util.List;
 

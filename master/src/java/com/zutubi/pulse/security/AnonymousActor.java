@@ -1,6 +1,6 @@
 package com.zutubi.pulse.security;
 
-import com.zutubi.prototype.security.Actor;
+import com.zutubi.tove.security.Actor;
 import org.acegisecurity.Authentication;
 import org.acegisecurity.GrantedAuthority;
 

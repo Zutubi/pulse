@@ -1,6 +1,6 @@
 package com.zutubi.pulse.cleanup.config;
 
-import com.zutubi.prototype.ConfigurationFormatter;
+import com.zutubi.tove.ConfigurationFormatter;
 
 /**
  *

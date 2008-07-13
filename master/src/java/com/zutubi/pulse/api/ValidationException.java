@@ -1,8 +1,8 @@
 package com.zutubi.pulse.api;
 
-import com.zutubi.prototype.type.ComplexType;
-import com.zutubi.prototype.type.TypeException;
 import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.tove.type.ComplexType;
+import com.zutubi.tove.type.TypeException;
 import com.zutubi.util.GraphFunction;
 import com.zutubi.util.logging.Logger;
 

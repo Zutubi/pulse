@@ -1,6 +1,5 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.ShutdownManager;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.model.Revision;
@@ -11,14 +10,15 @@ import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.config.Pollable;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
-import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.scheduling.SchedulingException;
 import com.zutubi.pulse.scheduling.SimpleTrigger;
 import com.zutubi.pulse.scheduling.Trigger;
 import com.zutubi.pulse.scm.MonitorScms;
 import com.zutubi.pulse.scm.ScmChangeEvent;
+import com.zutubi.pulse.tove.config.admin.GlobalConfiguration;
+import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
+import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Constants;
 import com.zutubi.util.Pair;

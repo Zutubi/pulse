@@ -1,7 +1,7 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.prototype.config.project.BuildStageConfiguration;
+import com.zutubi.pulse.tove.config.project.BuildStageConfiguration;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.UnaryProcedure;
 

@@ -1,10 +1,10 @@
 package com.zutubi.pulse.vfs.pulse;
 
-import com.zutubi.prototype.config.ConfigurationProvider;
-import com.zutubi.prototype.config.ConfigurationRegistry;
-import com.zutubi.prototype.type.record.PathUtils;
-import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
+import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.webwork.mapping.Urls;
+import com.zutubi.tove.config.ConfigurationProvider;
+import com.zutubi.tove.config.ConfigurationRegistry;
+import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.StringUtils;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;

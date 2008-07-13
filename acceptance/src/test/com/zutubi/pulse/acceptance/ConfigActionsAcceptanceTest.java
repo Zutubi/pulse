@@ -1,7 +1,5 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.prototype.config.ConfigurationRegistry;
-import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.acceptance.forms.admin.AntTypeForm;
 import com.zutubi.pulse.acceptance.forms.admin.CustomTypeForm;
 import com.zutubi.pulse.acceptance.forms.admin.SetPasswordForm;
@@ -11,8 +9,10 @@ import com.zutubi.pulse.acceptance.pages.admin.AgentConfigPage;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
 import com.zutubi.pulse.agent.AgentManager;
-import com.zutubi.pulse.prototype.config.agent.AgentConfigurationActions;
-import com.zutubi.pulse.prototype.config.project.ProjectConfigurationActions;
+import com.zutubi.pulse.tove.config.agent.AgentConfigurationActions;
+import com.zutubi.pulse.tove.config.project.ProjectConfigurationActions;
+import com.zutubi.tove.config.ConfigurationRegistry;
+import com.zutubi.tove.type.record.PathUtils;
 
 import java.util.Hashtable;
 

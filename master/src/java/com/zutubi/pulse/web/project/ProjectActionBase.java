@@ -1,6 +1,5 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.prototype.config.ConfigurationTemplateManager;
 import com.zutubi.pulse.committransformers.CommitMessageSupport;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Feature;
@@ -8,6 +7,7 @@ import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.pulse.web.LookupErrorException;
+import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.util.TextUtils;
 
 import java.util.Arrays;

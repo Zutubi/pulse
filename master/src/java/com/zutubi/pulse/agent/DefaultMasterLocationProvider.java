@@ -1,8 +1,8 @@
 package com.zutubi.pulse.agent;
 
 import com.zutubi.pulse.bootstrap.SystemConfiguration;
-import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
-import com.zutubi.prototype.config.ConfigurationProvider;
+import com.zutubi.pulse.tove.config.admin.GlobalConfiguration;
+import com.zutubi.tove.config.ConfigurationProvider;
 
 /**
  */

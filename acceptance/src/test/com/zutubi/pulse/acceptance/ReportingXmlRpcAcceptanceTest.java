@@ -1,9 +1,9 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.model.ProjectManager;
-import com.zutubi.pulse.prototype.config.LabelConfiguration;
+import com.zutubi.pulse.tove.config.LabelConfiguration;
+import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.Sort;
 
 import java.util.Arrays;

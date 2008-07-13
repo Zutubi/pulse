@@ -1,7 +1,7 @@
 package com.zutubi.pulse.cleanup.config;
 
-import com.zutubi.prototype.ColumnFormatter;
 import com.zutubi.i18n.Messages;
+import com.zutubi.tove.ColumnFormatter;
 
 /**
  *

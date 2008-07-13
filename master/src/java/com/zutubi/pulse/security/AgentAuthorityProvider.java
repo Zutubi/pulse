@@ -1,8 +1,8 @@
 package com.zutubi.pulse.security;
 
-import com.zutubi.prototype.security.AuthorityProvider;
-import com.zutubi.prototype.security.DefaultAccessManager;
 import com.zutubi.pulse.agent.Agent;
+import com.zutubi.tove.security.AuthorityProvider;
+import com.zutubi.tove.security.DefaultAccessManager;
 
 import java.util.Set;
 

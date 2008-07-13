@@ -42,7 +42,7 @@
             <interceptor name="taskExecAndWait" class="com.zutubi.pulse.webwork.interceptor.ExecAndWaitInterceptor"/>
             <interceptor name="prepare" class="com.zutubi.pulse.xwork.interceptor.PrepareInterceptor"/>
             <interceptor name="cancel" class="com.zutubi.pulse.xwork.interceptor.CancelWorkflowInterceptor"/>
-            <interceptor name="prototypeWizard" class="com.zutubi.prototype.wizard.webwork.ConfigurationWizardInterceptor"/>
+            <interceptor name="prototypeWizard" class="com.zutubi.tove.wizard.webwork.ConfigurationWizardInterceptor"/>
             <interceptor name="ajax" class="com.zutubi.pulse.xwork.interceptor.AjaxInterceptor"/>
             <interceptor name="errorHanding" class="com.zutubi.pulse.xwork.interceptor.ErrorHandlingInterceptor"/>
             <interceptor name="configErrorHandling" class="com.zutubi.pulse.xwork.interceptor.ConfigErrorHandlingInterceptor"/>

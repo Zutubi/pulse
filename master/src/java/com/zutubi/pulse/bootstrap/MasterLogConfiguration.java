@@ -2,11 +2,11 @@ package com.zutubi.pulse.bootstrap;
 
 import com.zutubi.pulse.logging.LogConfiguration;
 import com.zutubi.pulse.logging.LogConfigurationManager;
-import com.zutubi.pulse.prototype.config.admin.LoggingConfiguration;
-import com.zutubi.prototype.config.ConfigurationProvider;
-import com.zutubi.prototype.config.ConfigurationEventListener;
-import com.zutubi.prototype.config.events.ConfigurationEvent;
-import com.zutubi.prototype.config.events.PostSaveEvent;
+import com.zutubi.pulse.tove.config.admin.LoggingConfiguration;
+import com.zutubi.tove.config.ConfigurationEventListener;
+import com.zutubi.tove.config.ConfigurationProvider;
+import com.zutubi.tove.config.events.ConfigurationEvent;
+import com.zutubi.tove.config.events.PostSaveEvent;
 
 /**
  * Master implementation of the log configuration interface, which is just a

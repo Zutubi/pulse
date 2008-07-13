@@ -1,8 +1,8 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.prototype.actions.ActionManager;
-import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
+import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.webwork.mapping.Urls;
+import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.util.TextUtils;
 
 /**

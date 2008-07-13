@@ -2,7 +2,7 @@ package com.zutubi.pulse.acceptance.forms.setup;
 
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.forms.SeleniumForm;
-import com.zutubi.pulse.prototype.config.setup.ServerSettingsConfiguration;
+import com.zutubi.pulse.tove.config.setup.ServerSettingsConfiguration;
 
 /**
  */

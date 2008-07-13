@@ -2,10 +2,10 @@ package com.zutubi.pulse.restore;
 
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.prototype.type.record.store.InMemoryRecordStore;
-import com.zutubi.prototype.type.record.MutableRecordImpl;
-import com.zutubi.prototype.type.record.RecordQueries;
-import com.zutubi.prototype.transaction.TransactionManager;
+import com.zutubi.tove.transaction.TransactionManager;
+import com.zutubi.tove.type.record.MutableRecordImpl;
+import com.zutubi.tove.type.record.RecordQueries;
+import com.zutubi.tove.type.record.store.InMemoryRecordStore;
 
 import java.io.File;
 

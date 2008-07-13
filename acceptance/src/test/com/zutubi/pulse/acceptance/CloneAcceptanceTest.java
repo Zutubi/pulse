@@ -1,16 +1,16 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.prototype.config.ConfigurationRegistry;
-import com.zutubi.prototype.security.AccessManager;
-import com.zutubi.prototype.type.record.PathUtils;
-import static com.zutubi.prototype.type.record.PathUtils.getParentPath;
 import com.zutubi.pulse.acceptance.forms.admin.CloneForm;
 import com.zutubi.pulse.acceptance.forms.admin.ResourcePropertyForm;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.model.ProjectManager;
-import com.zutubi.pulse.prototype.config.LabelConfiguration;
-import com.zutubi.pulse.prototype.config.group.ServerPermission;
+import com.zutubi.pulse.tove.config.LabelConfiguration;
+import com.zutubi.pulse.tove.config.group.ServerPermission;
+import com.zutubi.tove.config.ConfigurationRegistry;
+import com.zutubi.tove.security.AccessManager;
+import com.zutubi.tove.type.record.PathUtils;
+import static com.zutubi.tove.type.record.PathUtils.getParentPath;
 
 import java.util.ArrayList;
 import static java.util.Arrays.asList;

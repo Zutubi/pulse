@@ -8,7 +8,7 @@ import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.prototype.config.project.ProjectConfigurationActions;
+import com.zutubi.pulse.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.web.ActionSupport;
 
 import java.util.*;

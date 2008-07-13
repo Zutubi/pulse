@@ -1,9 +1,9 @@
 package com.zutubi.pulse.security;
 
-import com.zutubi.prototype.security.AuthorityProvider;
-import com.zutubi.prototype.security.DefaultAccessManager;
 import com.zutubi.pulse.events.build.AbstractBuildRequestEvent;
 import com.zutubi.pulse.model.User;
+import com.zutubi.tove.security.AuthorityProvider;
+import com.zutubi.tove.security.DefaultAccessManager;
 
 import java.util.HashSet;
 import java.util.Set;

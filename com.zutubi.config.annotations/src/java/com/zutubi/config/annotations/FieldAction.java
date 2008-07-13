@@ -31,7 +31,7 @@ public @interface FieldAction
      * @return An optional class used to filter the presence of this action
      *         based on context (by default the action is always shown).  The
      *         class must implement
-     *         com.zutubi.prototype.handler.FieldActionPredicate.
+     *         com.zutubi.tove.handler.FieldActionPredicate.
      */
     String filterClass() default "";
 }

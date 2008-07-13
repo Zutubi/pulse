@@ -1,15 +1,15 @@
 package com.zutubi.pulse.security;
 
-import com.zutubi.prototype.config.ConfigurationProvider;
-import com.zutubi.prototype.security.AuthorityProvider;
-import com.zutubi.prototype.security.DefaultAccessManager;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.system.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.model.GrantedAuthority;
-import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
-import com.zutubi.pulse.prototype.config.group.ServerPermission;
+import com.zutubi.pulse.tove.config.admin.GlobalConfiguration;
+import com.zutubi.pulse.tove.config.group.ServerPermission;
+import com.zutubi.tove.config.ConfigurationProvider;
+import com.zutubi.tove.security.AuthorityProvider;
+import com.zutubi.tove.security.DefaultAccessManager;
 
 import java.util.HashSet;
 import java.util.Set;

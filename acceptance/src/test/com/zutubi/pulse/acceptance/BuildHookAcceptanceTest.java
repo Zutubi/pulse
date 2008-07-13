@@ -1,16 +1,16 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.prototype.config.ConfigurationRegistry;
-import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.acceptance.forms.ConfigurationForm;
 import com.zutubi.pulse.acceptance.forms.admin.SelectTypeState;
 import com.zutubi.pulse.acceptance.pages.admin.CompositePage;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.browse.BuildSummaryPage;
-import com.zutubi.pulse.prototype.config.project.BuildSelectorConfiguration;
-import com.zutubi.pulse.prototype.config.project.hooks.*;
 import com.zutubi.pulse.test.TestUtils;
+import com.zutubi.pulse.tove.config.project.BuildSelectorConfiguration;
+import com.zutubi.pulse.tove.config.project.hooks.*;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.tove.config.ConfigurationRegistry;
+import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.IOUtils;
 
 import java.io.File;

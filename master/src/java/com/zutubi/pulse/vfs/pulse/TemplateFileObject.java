@@ -1,10 +1,10 @@
 package com.zutubi.pulse.vfs.pulse;
 
-import com.zutubi.prototype.config.ConfigurationSecurityManager;
-import com.zutubi.prototype.config.ConfigurationTemplateManager;
-import com.zutubi.prototype.config.TemplateHierarchy;
-import com.zutubi.prototype.config.TemplateNode;
-import com.zutubi.prototype.security.AccessManager;
+import com.zutubi.tove.config.ConfigurationSecurityManager;
+import com.zutubi.tove.config.ConfigurationTemplateManager;
+import com.zutubi.tove.config.TemplateHierarchy;
+import com.zutubi.tove.config.TemplateNode;
+import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Predicate;

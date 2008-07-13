@@ -12,7 +12,7 @@
 
     <bean id="annotationValidatorProvider" class="com.zutubi.validation.providers.AnnotationValidatorProvider"/>
     <bean id="reflectionValidatorProvider" class="com.zutubi.validation.providers.ReflectionValidatorProvider"/>
-    <bean id="configurationValidatorProvider" class="com.zutubi.prototype.config.ConfigurationValidatorProvider">
+    <bean id="configurationValidatorProvider" class="com.zutubi.tove.config.ConfigurationValidatorProvider">
         <property name="delegates">
             <list>
                 <ref local="annotationValidatorProvider"/>
@@ -22,37 +22,37 @@
     </bean>
 
     <!-- Config system -->
-    <bean id="recordTransactionManager" class="com.zutubi.prototype.transaction.TransactionManager" autowire="byName"/>
+    <bean id="recordTransactionManager" class="com.zutubi.tove.transaction.TransactionManager" autowire="byName"/>
 
-    <bean id="handleAllocator" class="com.zutubi.prototype.type.record.DelegatingHandleAllocator"/>
-    <bean id="typeRegistry" class="com.zutubi.prototype.type.TypeRegistry" autowire="byName"/>
-    <bean id="configurationRegistry" class="com.zutubi.prototype.config.ConfigurationRegistry" autowire="byName"/>
-    <bean id="configurationExtensionManager" class="com.zutubi.prototype.config.ConfigurationExtensionManager" autowire="byName"/>
-    <bean id="configurationPersistenceManager" class="com.zutubi.prototype.config.ConfigurationPersistenceManager" autowire="byName"/>
-    <bean id="configurationReferenceManager" class="com.zutubi.prototype.config.ConfigurationReferenceManager" autowire="byName"/>
-    <bean id="configurationRefactoringManager" class="com.zutubi.prototype.config.ConfigurationRefactoringManager" autowire="byName"/>
-    <bean id="configurationCleanupManager" class="com.zutubi.prototype.config.cleanup.ConfigurationCleanupManager" autowire="byName" init-method="init"/>
-    <bean id="configurationDocsManager" class="com.zutubi.prototype.config.docs.ConfigurationDocsManager" autowire="byName"/>
-    <bean id="configurationStateManager" class="com.zutubi.prototype.config.ConfigurationStateManager" autowire="byName">
+    <bean id="handleAllocator" class="com.zutubi.tove.type.record.DelegatingHandleAllocator"/>
+    <bean id="typeRegistry" class="com.zutubi.tove.type.TypeRegistry" autowire="byName"/>
+    <bean id="configurationRegistry" class="com.zutubi.tove.config.ConfigurationRegistry" autowire="byName"/>
+    <bean id="configurationExtensionManager" class="com.zutubi.tove.config.ConfigurationExtensionManager" autowire="byName"/>
+    <bean id="configurationPersistenceManager" class="com.zutubi.tove.config.ConfigurationPersistenceManager" autowire="byName"/>
+    <bean id="configurationReferenceManager" class="com.zutubi.tove.config.ConfigurationReferenceManager" autowire="byName"/>
+    <bean id="configurationRefactoringManager" class="com.zutubi.tove.config.ConfigurationRefactoringManager" autowire="byName"/>
+    <bean id="configurationCleanupManager" class="com.zutubi.tove.config.cleanup.ConfigurationCleanupManager" autowire="byName" init-method="init"/>
+    <bean id="configurationDocsManager" class="com.zutubi.tove.config.docs.ConfigurationDocsManager" autowire="byName"/>
+    <bean id="configurationStateManager" class="com.zutubi.tove.config.ConfigurationStateManager" autowire="byName">
         <property name="transactionManager">
             <ref bean="pulseTransactionManager"/>
         </property>
     </bean>
-    <bean id="configurationTemplateManager" class="com.zutubi.prototype.config.ConfigurationTemplateManager" autowire="byName">
+    <bean id="configurationTemplateManager" class="com.zutubi.tove.config.ConfigurationTemplateManager" autowire="byName">
         <property name="transactionManager">
             <ref bean="pulseTransactionManager"/>
         </property>
     </bean>
-    <bean id="actionManager" class="com.zutubi.prototype.actions.ActionManager" autowire="byName"/>
-    <bean id="stateDisplayManager" class="com.zutubi.prototype.format.StateDisplayManager" autowire="byName"/>
+    <bean id="actionManager" class="com.zutubi.tove.actions.ActionManager" autowire="byName"/>
+    <bean id="stateDisplayManager" class="com.zutubi.tove.format.StateDisplayManager" autowire="byName"/>
 
-    <bean id="formDescriptorFactory" class="com.zutubi.prototype.FormDescriptorFactory" autowire="byName" init-method="init"/>
+    <bean id="formDescriptorFactory" class="com.zutubi.tove.FormDescriptorFactory" autowire="byName" init-method="init"/>
     <bean id="freemarkerConfiguration" class="com.zutubi.pulse.bootstrap.freemarker.FreemarkerConfigurationFactoryBean" autowire="byName"/>
     <bean id="xworkObjectFactory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>
 
     <!-- Security system -->
-    <bean id="configurationSecurityManager" class="com.zutubi.prototype.config.ConfigurationSecurityManager" autowire="byName"/>
-    <bean id="accessManager" class="com.zutubi.prototype.security.DefaultAccessManager" autowire="byName"/>
+    <bean id="configurationSecurityManager" class="com.zutubi.tove.config.ConfigurationSecurityManager" autowire="byName"/>
+    <bean id="accessManager" class="com.zutubi.tove.security.DefaultAccessManager" autowire="byName"/>
     <bean id="actorProvider" class="com.zutubi.pulse.security.AcegiActorProvider" autowire="byName"/>
     <bean id="globalAuthorityProvider" class="com.zutubi.pulse.security.GlobalAuthorityProvider" autowire="byName"/>
     <bean id="projectConfigurationAuthorityProvider" class="com.zutubi.pulse.security.ProjectConfigurationAuthorityProvider" autowire="byName"/>

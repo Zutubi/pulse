@@ -1,12 +1,12 @@
 package com.zutubi.pulse.security;
 
-import com.zutubi.prototype.config.ConfigurationProvider;
-import com.zutubi.prototype.config.ConfigurationRegistry;
 import com.zutubi.pulse.model.AcegiUser;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.UserManager;
-import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 import com.zutubi.pulse.security.ldap.LdapManager;
+import com.zutubi.pulse.tove.config.user.UserConfiguration;
+import com.zutubi.tove.config.ConfigurationProvider;
+import com.zutubi.tove.config.ConfigurationRegistry;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.Authentication;
 import org.acegisecurity.AuthenticationException;

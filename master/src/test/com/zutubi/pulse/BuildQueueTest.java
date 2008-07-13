@@ -4,8 +4,8 @@ import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.events.build.BuildRequestEvent;
 import com.zutubi.pulse.model.BuildReason;
 import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 
 /**
  */

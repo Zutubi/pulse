@@ -11,9 +11,9 @@ import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.logging.ServerMessagesHandler;
 import com.zutubi.pulse.model.ResourceManager;
-import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.resources.ResourceDiscoverer;
 import com.zutubi.pulse.services.SlaveStatus;
+import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 

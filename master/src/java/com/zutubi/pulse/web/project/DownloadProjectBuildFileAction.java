@@ -2,8 +2,8 @@ package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.core.BuildException;
-import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
-import com.zutubi.pulse.prototype.config.project.types.TypeConfiguration;
+import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.tove.config.project.types.TypeConfiguration;
 import com.zutubi.pulse.util.XMLUtils;
 import org.hsqldb.lib.StringInputStream;
 

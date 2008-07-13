@@ -1,6 +1,5 @@
 package com.zutubi.pulse;
 
-import com.zutubi.prototype.config.MockConfigurationProvider;
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.agent.DefaultAgent;
@@ -33,14 +32,15 @@ import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.UnknownBuildReason;
 import com.zutubi.pulse.personal.PatchArchive;
-import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
-import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
-import com.zutubi.pulse.prototype.config.project.AgentRequirements;
-import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
-import com.zutubi.pulse.prototype.config.project.types.CustomTypeConfiguration;
 import com.zutubi.pulse.scm.ScmChangeEvent;
 import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.services.UpgradeStatus;
+import com.zutubi.pulse.tove.config.admin.GlobalConfiguration;
+import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
+import com.zutubi.pulse.tove.config.project.AgentRequirements;
+import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.tove.config.project.types.CustomTypeConfiguration;
+import com.zutubi.tove.config.MockConfigurationProvider;
 import junit.framework.TestCase;
 
 import java.io.File;

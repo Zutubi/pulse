@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint("com.zutubi.prototype.validation.EssentialValidator")
+@Constraint("com.zutubi.tove.validation.EssentialValidator")
 public @interface Essential
 {
     static final String DEFAULT_defaultKeySuffix = "";

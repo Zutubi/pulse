@@ -1,10 +1,5 @@
 package com.zutubi.pulse.api;
 
-import com.zutubi.prototype.actions.ActionManager;
-import com.zutubi.prototype.config.*;
-import com.zutubi.prototype.security.AccessManager;
-import com.zutubi.prototype.type.*;
-import com.zutubi.prototype.type.record.*;
 import com.zutubi.pulse.ShutdownManager;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.agent.Agent;
@@ -19,8 +14,13 @@ import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.system.SystemStartedEvent;
 import com.zutubi.pulse.model.*;
-import com.zutubi.pulse.prototype.config.group.ServerPermission;
+import com.zutubi.pulse.tove.config.group.ServerPermission;
 import com.zutubi.pulse.util.TimeStamps;
+import com.zutubi.tove.actions.ActionManager;
+import com.zutubi.tove.config.*;
+import com.zutubi.tove.security.AccessManager;
+import com.zutubi.tove.type.*;
+import com.zutubi.tove.type.record.*;
 import com.zutubi.util.*;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.AccessDeniedException;

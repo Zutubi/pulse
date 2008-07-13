@@ -1,10 +1,9 @@
 package com.zutubi.pulse.web.ajax;
 
-import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.persistence.hibernate.HibernateBuildResultDao;
-import com.zutubi.pulse.prototype.config.project.hooks.BuildHookConfiguration;
-import com.zutubi.pulse.prototype.config.project.hooks.BuildHookManager;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.tove.config.project.hooks.BuildHookConfiguration;
+import com.zutubi.pulse.tove.config.project.hooks.BuildHookManager;
 import com.zutubi.pulse.web.LookupErrorException;
 import com.zutubi.pulse.web.project.BuildActionBase;
 import com.zutubi.util.CollectionUtils;

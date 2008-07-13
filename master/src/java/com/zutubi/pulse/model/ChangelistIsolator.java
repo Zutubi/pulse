@@ -1,11 +1,11 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
 import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.pulse.core.scm.ScmClientFactory;
-import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
+import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 
 import java.util.Arrays;
 import java.util.List;

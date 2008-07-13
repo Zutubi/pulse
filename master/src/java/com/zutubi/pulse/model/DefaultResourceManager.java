@@ -1,9 +1,5 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.prototype.config.ConfigurationProvider;
-import com.zutubi.prototype.config.TypeAdapter;
-import com.zutubi.prototype.config.TypeListener;
-import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.core.ResourceRepository;
@@ -13,7 +9,11 @@ import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.system.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
-import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
+import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
+import com.zutubi.tove.config.ConfigurationProvider;
+import com.zutubi.tove.config.TypeAdapter;
+import com.zutubi.tove.config.TypeListener;
+import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.NullaryFunction;
 import com.zutubi.util.logging.Logger;
 

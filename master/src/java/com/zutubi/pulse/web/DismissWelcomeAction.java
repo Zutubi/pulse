@@ -1,9 +1,9 @@
 package com.zutubi.pulse.web;
 
-import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.prototype.config.user.UserPreferencesConfiguration;
 import com.zutubi.pulse.security.AcegiUtils;
+import com.zutubi.pulse.tove.config.user.UserPreferencesConfiguration;
+import com.zutubi.tove.config.ConfigurationProvider;
 
 /**
  * An action to change the users default page to their dashboard once they

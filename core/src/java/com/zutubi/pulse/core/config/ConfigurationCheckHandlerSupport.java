@@ -8,11 +8,11 @@ public abstract class ConfigurationCheckHandlerSupport<T extends Configuration> 
 {
     public String getSuccessTemplate()
     {
-        return "prototype/check/success.ftl";
+        return "tove/check/success.ftl";
     }
 
     public String getFailureTemplate()
     {
-        return "prototype/check/failure.ftl";
+        return "tove/check/failure.ftl";
     }
 }

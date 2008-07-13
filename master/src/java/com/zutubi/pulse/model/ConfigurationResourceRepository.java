@@ -2,7 +2,7 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.core.config.Resource;
-import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
+import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
 import com.zutubi.util.TextUtils;
 
 import java.util.LinkedList;

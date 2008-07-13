@@ -1,9 +1,9 @@
 package com.zutubi.pulse.security.ldap;
 
 import com.zutubi.pulse.model.AcegiUser;
-import com.zutubi.pulse.prototype.config.admin.LDAPConfiguration;
-import com.zutubi.pulse.prototype.config.group.GroupConfiguration;
-import com.zutubi.pulse.prototype.config.user.UserConfiguration;
+import com.zutubi.pulse.tove.config.admin.LDAPConfiguration;
+import com.zutubi.pulse.tove.config.group.GroupConfiguration;
+import com.zutubi.pulse.tove.config.user.UserConfiguration;
 
 import java.util.List;
 

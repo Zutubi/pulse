@@ -1,7 +1,7 @@
 package com.zutubi.pulse.vfs.pulse;
 
-import com.zutubi.prototype.config.ConfigurationTemplateManager;
-import com.zutubi.prototype.config.TemplateHierarchy;
+import com.zutubi.tove.config.ConfigurationTemplateManager;
+import com.zutubi.tove.config.TemplateHierarchy;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;

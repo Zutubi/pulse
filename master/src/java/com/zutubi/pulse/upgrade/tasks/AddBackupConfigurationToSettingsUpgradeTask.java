@@ -1,11 +1,11 @@
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.prototype.type.record.MutableRecord;
-import com.zutubi.prototype.type.record.MutableRecordImpl;
-import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.pulse.monitor.TaskException;
 import com.zutubi.pulse.restore.BackupConfiguration;
+import com.zutubi.tove.type.record.MutableRecord;
+import com.zutubi.tove.type.record.MutableRecordImpl;
+import com.zutubi.tove.type.record.Record;
+import com.zutubi.tove.type.record.RecordManager;
 
 /**
  *

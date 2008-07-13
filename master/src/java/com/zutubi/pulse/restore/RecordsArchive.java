@@ -1,10 +1,10 @@
 package com.zutubi.pulse.restore;
 
-import com.zutubi.prototype.type.record.RecordSerialiser;
-import com.zutubi.prototype.type.record.DefaultRecordSerialiser;
-import com.zutubi.prototype.type.record.Record;
-import com.zutubi.prototype.type.record.NoopRecordHandler;
-import com.zutubi.prototype.type.record.store.RecordStore;
+import com.zutubi.tove.type.record.DefaultRecordSerialiser;
+import com.zutubi.tove.type.record.NoopRecordHandler;
+import com.zutubi.tove.type.record.Record;
+import com.zutubi.tove.type.record.RecordSerialiser;
+import com.zutubi.tove.type.record.store.RecordStore;
 
 import java.io.File;
 

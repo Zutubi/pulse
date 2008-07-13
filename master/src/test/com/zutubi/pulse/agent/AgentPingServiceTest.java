@@ -7,10 +7,10 @@ import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.events.*;
 import com.zutubi.pulse.logging.CustomLogRecord;
-import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.security.PulseThreadFactory;
 import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.stub;
 

@@ -1,8 +1,8 @@
 package com.zutubi.pulse.model;
 
+import com.zutubi.pulse.tove.config.project.types.Maven2TypeConfiguration;
+import com.zutubi.pulse.tove.config.project.types.TemplateTypeConfiguration;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.prototype.config.project.types.TemplateTypeConfiguration;
-import com.zutubi.pulse.prototype.config.project.types.Maven2TypeConfiguration;
 
 /**
  */

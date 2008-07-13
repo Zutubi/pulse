@@ -1,14 +1,14 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.prototype.config.ConfigurationRegistry;
-import com.zutubi.prototype.type.record.PathUtils;
 import com.zutubi.pulse.acceptance.forms.admin.*;
 import com.zutubi.pulse.acceptance.pages.admin.*;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.model.ProjectManager;
-import com.zutubi.pulse.prototype.config.LabelConfiguration;
-import com.zutubi.pulse.prototype.config.project.changeviewer.CustomChangeViewerConfiguration;
-import com.zutubi.pulse.prototype.config.project.triggers.ScmBuildTriggerConfiguration;
+import com.zutubi.pulse.tove.config.LabelConfiguration;
+import com.zutubi.pulse.tove.config.project.changeviewer.CustomChangeViewerConfiguration;
+import com.zutubi.pulse.tove.config.project.triggers.ScmBuildTriggerConfiguration;
+import com.zutubi.tove.config.ConfigurationRegistry;
+import com.zutubi.tove.type.record.PathUtils;
 
 import java.util.Hashtable;
 

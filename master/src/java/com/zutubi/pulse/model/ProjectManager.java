@@ -1,13 +1,13 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.prototype.security.AccessManager;
 import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.personal.PatchArchive;
-import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
-import com.zutubi.pulse.prototype.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.security.SecureParameter;
 import com.zutubi.pulse.security.SecureResult;
+import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.tove.config.project.ProjectConfigurationActions;
+import com.zutubi.tove.security.AccessManager;
 
 import java.util.Collection;
 import java.util.List;

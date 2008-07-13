@@ -1,6 +1,6 @@
 package com.zutubi.pulse.vfs.pulse;
 
-import com.zutubi.pulse.prototype.config.project.ProjectConfiguration;
+import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.webwork.mapping.Urls;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;

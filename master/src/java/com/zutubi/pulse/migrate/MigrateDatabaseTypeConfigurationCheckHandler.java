@@ -1,20 +1,20 @@
 package com.zutubi.pulse.migrate;
 
+import com.opensymphony.util.TextUtils;
 import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.pulse.core.config.ConfigurationCheckHandlerSupport;
 import com.zutubi.pulse.core.PulseException;
+import com.zutubi.pulse.core.config.ConfigurationCheckHandlerSupport;
+import com.zutubi.pulse.tove.config.setup.DatabaseType;
 import com.zutubi.pulse.util.DriverWrapper;
 import com.zutubi.pulse.util.JDBCUtils;
-import com.zutubi.pulse.prototype.config.setup.DatabaseType;
 import com.zutubi.util.logging.Logger;
-import com.opensymphony.util.TextUtils;
 
 import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
-import java.sql.Connection;
 import java.sql.SQLException;
 
 /**

@@ -1,13 +1,13 @@
 package com.zutubi.pulse.web.migrate;
 
-import com.zutubi.prototype.webwork.TransientAction;
+import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.database.DatabaseConfig;
 import com.zutubi.pulse.database.DriverRegistry;
-import com.zutubi.pulse.migrate.MigrationManager;
 import com.zutubi.pulse.migrate.MigrateDatabaseTypeConfiguration;
-import com.zutubi.pulse.prototype.config.setup.DatabaseType;
-import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.migrate.MigrationManager;
+import com.zutubi.pulse.tove.config.setup.DatabaseType;
+import com.zutubi.tove.webwork.TransientAction;
 
 import java.io.File;
 import java.util.Properties;

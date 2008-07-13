@@ -1,7 +1,7 @@
 package com.zutubi.pulse.cleanup.config;
 
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.prototype.ColumnFormatter;
+import com.zutubi.tove.ColumnFormatter;
 
 import java.util.List;
 

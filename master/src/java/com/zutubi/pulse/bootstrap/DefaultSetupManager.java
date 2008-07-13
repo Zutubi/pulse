@@ -1,17 +1,6 @@
 package com.zutubi.pulse.bootstrap;
 
 import com.opensymphony.xwork.spring.SpringObjectFactory;
-import com.zutubi.prototype.config.ConfigurationExtensionManager;
-import com.zutubi.prototype.config.ConfigurationPersistenceManager;
-import com.zutubi.prototype.config.ConfigurationProvider;
-import com.zutubi.prototype.config.ConfigurationRefactoringManager;
-import com.zutubi.prototype.config.ConfigurationReferenceManager;
-import com.zutubi.prototype.config.ConfigurationRegistry;
-import com.zutubi.prototype.config.ConfigurationStateManager;
-import com.zutubi.prototype.config.ConfigurationTemplateManager;
-import com.zutubi.prototype.config.DefaultConfigurationProvider;
-import com.zutubi.prototype.type.record.DelegatingHandleAllocator;
-import com.zutubi.prototype.type.record.RecordManager;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.bootstrap.conf.EnvConfig;
 import com.zutubi.pulse.bootstrap.tasks.ProcessSetupStartupTask;
@@ -26,10 +15,13 @@ import com.zutubi.pulse.logging.LogConfigurationManager;
 import com.zutubi.pulse.migrate.MigrationManager;
 import com.zutubi.pulse.monitor.Monitor;
 import com.zutubi.pulse.plugins.PluginManager;
-import com.zutubi.pulse.prototype.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.restore.ArchiveException;
 import com.zutubi.pulse.restore.RestoreManager;
+import com.zutubi.pulse.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.upgrade.UpgradeManager;
+import com.zutubi.tove.config.*;
+import com.zutubi.tove.type.record.DelegatingHandleAllocator;
+import com.zutubi.tove.type.record.RecordManager;
 import com.zutubi.util.IOUtils;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
@@ -37,18 +29,10 @@ import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;
 import freemarker.cache.TemplateLoader;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
+import java.io.*;
 import java.sql.SQLException;
 import java.text.DateFormat;
-import java.util.Collection;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Works through the setup process, gradually starting Pulse as more bits and

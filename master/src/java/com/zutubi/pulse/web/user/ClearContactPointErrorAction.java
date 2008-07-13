@@ -1,8 +1,8 @@
 package com.zutubi.pulse.web.user;
 
-import com.zutubi.prototype.config.ConfigurationProvider;
-import com.zutubi.pulse.prototype.config.user.contacts.ContactConfiguration;
+import com.zutubi.pulse.tove.config.user.contacts.ContactConfiguration;
 import com.zutubi.pulse.web.ActionSupport;
+import com.zutubi.tove.config.ConfigurationProvider;
 
 /**
  * An action to clear an error from a contact point.

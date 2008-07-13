@@ -1,12 +1,12 @@
 package com.zutubi.pulse.web.setup;
 
-import com.zutubi.util.TextUtils;
-import com.zutubi.prototype.webwork.TransientAction;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.SetupManager;
 import com.zutubi.pulse.bootstrap.conf.EnvConfig;
-import com.zutubi.pulse.prototype.config.setup.SetupDataConfiguration;
+import com.zutubi.pulse.tove.config.setup.SetupDataConfiguration;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.tove.webwork.TransientAction;
+import com.zutubi.util.TextUtils;
 
 import java.io.File;
 

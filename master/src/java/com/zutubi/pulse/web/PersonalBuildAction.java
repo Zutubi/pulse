@@ -8,7 +8,7 @@ import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.personal.PatchArchive;
-import com.zutubi.pulse.prototype.config.group.ServerPermission;
+import com.zutubi.pulse.tove.config.group.ServerPermission;
 import com.zutubi.util.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.AccessDeniedException;

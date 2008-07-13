@@ -1,7 +1,7 @@
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.prototype.type.record.*;
 import com.zutubi.pulse.monitor.TaskException;
+import com.zutubi.tove.type.record.*;
 
 import java.util.Map;
 

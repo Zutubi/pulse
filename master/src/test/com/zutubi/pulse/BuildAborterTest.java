@@ -2,11 +2,11 @@ package com.zutubi.pulse;
 
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
+import com.zutubi.pulse.bootstrap.tasks.BuildAborterStartupTask;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.model.*;
-import com.zutubi.pulse.prototype.config.user.UserConfiguration;
 import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.bootstrap.tasks.BuildAborterStartupTask;
+import com.zutubi.pulse.tove.config.user.UserConfiguration;
 
 import java.util.ArrayList;
 import java.util.Arrays;

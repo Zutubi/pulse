@@ -1,10 +1,10 @@
 package com.zutubi.pulse.web.user;
 
-import com.zutubi.prototype.config.ConfigurationProvider;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.prototype.config.user.DashboardConfiguration;
 import com.zutubi.pulse.security.AcegiUtils;
+import com.zutubi.pulse.tove.config.user.DashboardConfiguration;
+import com.zutubi.tove.config.ConfigurationProvider;
 
 /**
  * Action allowing a user to hide a chosen project from their dashboard.

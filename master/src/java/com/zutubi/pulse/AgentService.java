@@ -3,8 +3,8 @@ package com.zutubi.pulse;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.logging.CustomLogRecord;
-import com.zutubi.pulse.prototype.config.agent.AgentConfiguration;
 import com.zutubi.pulse.services.SlaveStatus;
+import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
 
 import java.io.File;
 import java.util.List;
