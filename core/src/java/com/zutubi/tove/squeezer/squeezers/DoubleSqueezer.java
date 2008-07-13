@@ -1,13 +1,13 @@
-package com.zutubi.pulse.prototype.squeezer.squeezers;
+package com.zutubi.tove.squeezer.squeezers;
 
-import com.zutubi.pulse.prototype.squeezer.TypeSqueezer;
-import com.zutubi.pulse.prototype.squeezer.SqueezeException;
+import com.zutubi.tove.squeezer.SqueezeException;
+import com.zutubi.tove.squeezer.TypeSqueezer;
 import com.zutubi.util.TextUtils;
 
 /**
  * <class-comment/>
  */
-public class FloatSqueezer implements TypeSqueezer
+public class DoubleSqueezer implements TypeSqueezer
 {
     public String squeeze(Object obj) throws SqueezeException
     {
@@ -27,11 +27,11 @@ public class FloatSqueezer implements TypeSqueezer
         }
         try
         {
-            return Float.parseFloat(s);
+            return Double.parseDouble(s);
         }
         catch (NumberFormatException e)
         {
-            throw new SqueezeException(String.format("'%s' is not a valid float", s));
+            throw new SqueezeException(String.format("'%s' is not a valid double", s));
         }
     }
 }

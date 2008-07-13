@@ -1,4 +1,4 @@
-package com.zutubi.pulse.prototype.squeezer;
+package com.zutubi.tove.squeezer;
 
 /**
  * <class-comment/>

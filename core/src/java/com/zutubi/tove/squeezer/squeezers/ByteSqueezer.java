@@ -1,8 +1,8 @@
-package com.zutubi.pulse.prototype.squeezer.squeezers;
+package com.zutubi.tove.squeezer.squeezers;
 
+import com.zutubi.tove.squeezer.SqueezeException;
+import com.zutubi.tove.squeezer.TypeSqueezer;
 import com.zutubi.util.TextUtils;
-import com.zutubi.pulse.prototype.squeezer.SqueezeException;
-import com.zutubi.pulse.prototype.squeezer.TypeSqueezer;
 
 /**
  * <class-comment/>

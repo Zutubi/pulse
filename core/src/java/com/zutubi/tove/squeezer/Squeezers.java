@@ -1,6 +1,6 @@
-package com.zutubi.pulse.prototype.squeezer;
+package com.zutubi.tove.squeezer;
 
-import com.zutubi.pulse.prototype.squeezer.squeezers.*;
+import com.zutubi.tove.squeezer.squeezers.*;
 
 import java.util.HashMap;
 import java.util.Map;

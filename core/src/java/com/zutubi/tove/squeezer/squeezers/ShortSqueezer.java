@@ -1,13 +1,13 @@
-package com.zutubi.pulse.prototype.squeezer.squeezers;
+package com.zutubi.tove.squeezer.squeezers;
 
-import com.zutubi.pulse.prototype.squeezer.TypeSqueezer;
-import com.zutubi.pulse.prototype.squeezer.SqueezeException;
+import com.zutubi.tove.squeezer.SqueezeException;
+import com.zutubi.tove.squeezer.TypeSqueezer;
 import com.zutubi.util.TextUtils;
 
 /**
  * <class-comment/>
  */
-public class IntegerSqueezer implements TypeSqueezer
+public class ShortSqueezer implements TypeSqueezer
 {
     public String squeeze(Object obj) throws SqueezeException
     {
@@ -27,11 +27,11 @@ public class IntegerSqueezer implements TypeSqueezer
         }
         try
         {
-            return Integer.parseInt(s);
+            return Short.parseShort(s);
         }
         catch (NumberFormatException e)
         {
-            throw new SqueezeException(String.format("'%s' is not a valid integer", s));
+            throw new SqueezeException(String.format("'%s' is not a valid short", s));
         }
     }
 }
