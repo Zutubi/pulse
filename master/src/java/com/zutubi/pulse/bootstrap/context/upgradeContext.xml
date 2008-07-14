@@ -41,10 +41,10 @@
     <bean id="backup" class="com.zutubi.pulse.upgrade.tasks.BackupUpgradeTask" autowire="byName"/>
 
     <bean id="addBackupConfiguration" class="com.zutubi.pulse.upgrade.tasks.AddBackupConfigurationToSettingsUpgradeTask" autowire="byName">
-        <property name="buildNumber" value="20007001"/>
+        <property name="buildNumber" value="200007001"/>
     </bean>
 
     <bean id="addBrowseViewConfiguration" class="com.zutubi.pulse.upgrade.tasks.AddBrowseViewConfigurationUpgradeTask" autowire="byName">
-        <property name="buildNumber" value="20007002"/>
+        <property name="buildNumber" value="200007002"/>
     </bean>
 </beans>
