@@ -1728,3 +1728,116 @@ ZUTUBI.ProjectModel.prototype = {
         }
     }
 }
+
+ZUTUBI.EventPatch = function() {
+    var docReadyEvent, docReadyProcId, docReadyState = false;
+    var E = Ext.lib.Event;
+    var D = Ext.lib.Dom;
+
+    function fireDocReady()
+    {
+         if (!docReadyState)
+        {
+            docReadyState = Ext.isReady = true;
+            if (Ext.isGecko || Ext.isOpera)
+            {
+                document.removeEventListener("DOMContentLoaded", fireDocReady, false);
+            }
+        }
+
+        if (docReadyProcId)
+        {
+            clearInterval(docReadyProcId);
+            docReadyProcId = null;
+        }
+
+        if (docReadyEvent)
+        {
+            docReadyEvent.fire();
+            docReadyEvent.clearListeners();
+        }
+
+    };
+
+    function initDocReady()
+    {
+        docReadyEvent = new Ext.util.Event();
+        if (Ext.isReady)
+        {
+            return;
+        }
+
+        E.on(window, "load", fireDocReady);
+        if (Ext.isGecko || Ext.isOpera)
+        {
+            document.addEventListener("DOMContentLoaded", fireDocReady, false);
+        }
+        else if (Ext.isIE)
+        {
+            docReadyProcId = setInterval(function()
+            {
+                try
+                {
+                    // throws errors until DOM is ready
+                    if(!Ext.isReady)
+                    {
+                        document.documentElement.doScroll('left');
+                    }
+                }
+                catch (e)
+                {
+                    return;
+                }
+
+                // no errors, fire
+                fireDocReady();
+            }, 5);
+
+            document.onreadystatechange = function()
+            {
+                if (document.readyState == 'complete')
+                {
+                    document.onreadystatechange = null;
+                    fireDocReady();
+                }
+            };
+        }
+        else if (Ext.isSafari)
+        {
+            docReadyProcId = setInterval(function()
+            {
+                var rs = document.readyState;
+                if (rs == "complete")
+                {
+                    fireDocReady();
+                }
+            }, 10);
+        }
+    };
+
+    return {
+        onDocumentReady: function (fn, scope, options)
+        {
+            if (!docReadyEvent)
+            {
+                initDocReady();
+            }
+
+            if (docReadyState || Ext.isReady)
+            {
+                // if it already fired
+                if (!options)
+                {
+                    options = {};
+                }
+                fn.defer(options.delay || 0, scope);
+            }
+            else
+            {
+                docReadyEvent.addListener(fn, scope, options);
+            }
+        }
+    }
+}();
+
+Ext.onReady = Ext.EventManager.onDocumentReady = ZUTUBI.EventPatch.onDocumentReady;
