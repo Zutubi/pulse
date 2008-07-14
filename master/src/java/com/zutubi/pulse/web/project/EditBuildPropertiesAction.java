@@ -197,7 +197,11 @@ public class EditBuildPropertiesAction extends ProjectActionBase
         ProjectConfiguration projectConfig = configurationProvider.deepClone(project.getConfig());
         mapProperties(projectConfig);
         String path = configurationProvider.save(projectConfig);
+
+        // Look up the config again with the change, and also rewire it to
+        // the state.
         projectConfig = configurationProvider.get(path, ProjectConfiguration.class);
+        project.setConfig(projectConfig);
 
         Revision r = null;
         if(TextUtils.stringSet(revision))

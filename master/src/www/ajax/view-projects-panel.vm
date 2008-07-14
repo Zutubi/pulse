@@ -30,7 +30,7 @@
                         <li>#actionLink("history-#uce($project.name)" "history.tab" "$urls.projectHistory($project)" "time.gif")</li>
                         <li>#actionLink("config-#uce($project.name)" "configuration.tab" "$base/admin/projects/#uce($project.name)/" "pencil.gif")</li>
             #if($action.hasPermission("trigger", $project))
-                        <li>#actionLink("trigger-#uce($project.name)" "project.trigger" "/triggerBuild.action?projectName=#uce($project.name)" "lightning.gif")</li>
+                        <li>#actionLink("trigger-#uce($project.name)" "project.trigger" "$base/triggerBuild.action?projectName=#uce($project.name)" "lightning.gif")</li>
             #end
                     </ul>
                 </div>
@@ -112,7 +112,7 @@
             #set($groupKey = "ungrouped.")
         #end
         <tr id="$projectsModel.id" class="project-row #if(!$projectsModel.root.leaf) project-expandable #end">
-            <td colspan="5" class="group-header health-$projectsModel.root.health.toString().toLowerCase()">
+            <td colspan="5" class="group-header fit-width health-$projectsModel.root.health.toString().toLowerCase()">
                 <span class="group-name">
                     #html($projectsModel.groupName)
                 </span>

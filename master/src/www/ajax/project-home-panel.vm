@@ -131,7 +131,7 @@
             #if($project.url && $project.url.length() > 0)
                 #dynamicLinkRow("project.url" "homepage" $project.url)
             #end
-            #set($candidateActions = [["write", "pencil", "$base/admin/projects/#uce($project.name)/", "configure"], ["trigger", "lightning", "$urls.projectAction($u_projectName, 'trigger')tab/home/", "trigger"]])
+            #set($candidateActions = [["write", "pencil", "$base/admin/projects/#uce($project.name)/", "configure"], ["trigger", "lightning", "$base/triggerBuild.action?projectName=$u_projectName", "trigger"]])
             #set($actionCount = 0)
             #foreach($actionSpec in $candidateActions)
                 #if($action.hasPermission($actionSpec.get(0), $project))
