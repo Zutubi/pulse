@@ -4,8 +4,8 @@ import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.tove.MapOption;
 import com.zutubi.tove.MapOptionProvider;
 import com.zutubi.tove.config.ConfigurationReferenceManager;
+import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.security.AccessManager;
-import com.zutubi.tove.security.Actor;
 import com.zutubi.tove.type.ReferenceType;
 import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.util.bean.BeanException;
@@ -25,7 +25,7 @@ public class DefaultReferenceOptionProvider extends MapOptionProvider
     private static final Logger LOG = Logger.getLogger(DefaultReferenceOptionProvider.class);
 
     private ConfigurationReferenceManager configurationReferenceManager;
-    private AccessManager accessManager;
+    private ConfigurationSecurityManager configurationSecurityManager;
 
     public MapOption getEmptyOption(Object instance, String parentPath, TypeProperty property)
     {
@@ -39,10 +39,9 @@ public class DefaultReferenceOptionProvider extends MapOptionProvider
         Collection<Configuration> referencable = configurationReferenceManager.getReferencableInstances(referenceType.getReferencedType(), path);
         Map<String, String> options = new LinkedHashMap<String, String>();
 
-        Actor actor = accessManager.getActor();
         for (Configuration r : referencable)
         {
-            if (accessManager.hasPermission(actor, AccessManager.ACTION_VIEW, r))
+            if (configurationSecurityManager.hasPermission(r.getConfigurationPath(), AccessManager.ACTION_VIEW))
             {
                 try
                 {
@@ -63,8 +62,8 @@ public class DefaultReferenceOptionProvider extends MapOptionProvider
         this.configurationReferenceManager = configurationReferenceManager;
     }
 
-    public void setAccessManager(AccessManager accessManager)
+    public void setConfigurationSecurityManager(ConfigurationSecurityManager configurationSecurityManager)
     {
-        this.accessManager = accessManager;
+        this.configurationSecurityManager = configurationSecurityManager;
     }
 }
