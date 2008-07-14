@@ -1730,7 +1730,7 @@ ZUTUBI.ProjectModel.prototype = {
 }
 
 ZUTUBI.EventPatch = function() {
-    var docReadyEvent, docReadyProcId, docReadyState = false;
+    var docReadyEvent, docReadyProcId, docReadyState, allClear = false;
     var E = Ext.lib.Event;
     var D = Ext.lib.Dom;
 
@@ -1776,22 +1776,28 @@ ZUTUBI.EventPatch = function() {
         {
             docReadyProcId = setInterval(function()
             {
-                try
+                if(allClear)
                 {
-                    // throws errors until DOM is ready
-                    if(!Ext.isReady)
+                    // No errors last time
+                    fireDocReady();
+                }
+                else
+                {
+                    try
                     {
-                        document.documentElement.doScroll('left');
+                        // throws errors until DOM is ready
+                        if(!Ext.isReady)
+                        {
+                            document.documentElement.doScroll('left');
+                        }
+                        allClear = true;
+                    }
+                    catch (e)
+                    {
+                        // Leave allClear false.
                     }
                 }
-                catch (e)
-                {
-                    return;
-                }
-
-                // no errors, fire
-                fireDocReady();
-            }, 5);
+            }, 50);
 
             document.onreadystatechange = function()
             {

@@ -9,7 +9,7 @@
     <script type="text/javascript" src="$base/js/yahoo/utilities.js"></script>
     <script type="text/javascript" src="$base/js/yahoo/treeview.js"></script>
     <script type="text/javascript" src="$base/js/widget/treeview.js"></script>
-	<script type="text/javascript">
+    <script type="text/javascript">
         Layout = function() {
                 var tree;
                 var centerRegion;
@@ -148,7 +148,7 @@
         {
             Layout.selectNode(id);
         }
-	</script>
+    </script>
 </head>
 <body>
     #adminTabs("plugins")

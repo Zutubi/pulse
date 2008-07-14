@@ -571,6 +571,11 @@ var deletePath = function(path)
 
 var showHelp = function(path, type, field)
 {
-    Ext.getCmp('nested-east').showHelp(path, type, field);
+    var helpPanel = Ext.getCmp('nested-east');
+    // Only show help when there is a panel for it (there is none during
+    // setup, for example).
+    if(helpPanel)
+    {
+        helpPanel.showHelp(path, type, field);
+    }
 }
-        
