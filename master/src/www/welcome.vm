@@ -86,7 +86,7 @@
         Major changes include:
     </p>
     <p>
-        <table class="template-actions" cellspacing="5px">
+        <table class="template-actions" cellspacing="5px" style="margin-bottom: 10px;">
             <tr>
                 <th class="category" colspan="2">new in 2.0</th>
             </tr>
@@ -121,6 +121,27 @@
                 <td>
                     Support for various tools is being extracted into plugins.  Further, the new configuration UI
                     is generated: so plugin authors do not need to write any UI code!
+                </td>
+            </tr>
+            <tr>
+                #actionHeader("browse.ui" "browse ui" "accept" false)
+                <td>
+                    The browse UI has been revamped to take advantage of the new project hierarchy and labelling
+                    schemes.  The new UI is both cleaner and more functional.
+                </td>
+            </tr>
+            <tr>
+                #actionHeader("external.databases" "external databases" "accept" false)
+                <td>
+                    Support for using external databases has been vastly improved.  Both setting up and migrating
+                    to a new database can be done directly via the web UI.
+                </td>
+            </tr>
+            <tr>
+                #actionHeader("auto.backups" "automated backups" "accept" false)
+                <td>
+                    Pulse will now automatically backup your configuration for you.  Coupled with improved
+                    restoration capabilities, your data is safer than ever!
                 </td>
             </tr>
             <tr>
