@@ -5,6 +5,7 @@ import com.caucho.hessian.io.AbstractHessianInput;
 import com.caucho.hessian.io.HessianOutput;
 import com.caucho.hessian.io.HessianProtocolException;
 import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.util.StringUtils;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.io.FileNotFoundException;
@@ -16,6 +17,8 @@ import java.lang.reflect.Proxy;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  */
@@ -23,7 +26,11 @@ public class CustomHessianProxy extends HessianProxy
 {
     private static final Logger LOG = Logger.getLogger(CustomHessianProxy.class);
 
+    private static final String PROPERTY_HESSIAN_SUPPRESSED_ERRORS = "pulse.hessian.suppressed.errors";
+    private static final String DEFAULT_HESSIAN_SUPPRESSED_ERRORS = "ping";
+
     private HessianProxyFactory factory;
+    private Set<String> suppressedMethods = null;
 
     public CustomHessianProxy(HessianProxyFactory factory, URL url)
     {
@@ -115,7 +122,10 @@ public class CustomHessianProxy extends HessianProxy
                 }
                 catch (Exception e)
                 {
-                    LOG.severe(e);
+                    if (!methodErrorsSupressed(methodName))
+                    {
+                        LOG.severe(e);
+                    }
                 }
 
                 if (code != 200)
@@ -152,7 +162,10 @@ public class CustomHessianProxy extends HessianProxy
                     }
                     catch (IOException e)
                     {
-                        LOG.severe(e);
+                        if (!methodErrorsSupressed(methodName))
+                        {
+                            LOG.severe(e);
+                        }
                     }
 
                     if (is != null)
@@ -172,7 +185,10 @@ public class CustomHessianProxy extends HessianProxy
         }
         catch (HessianProtocolException e)
         {
-            LOG.severe(e);
+            if (!methodErrorsSupressed(methodName))
+            {
+                LOG.severe(e);
+            }
             throw new HessianRuntimeException(e);
         }
         finally
@@ -191,6 +207,16 @@ public class CustomHessianProxy extends HessianProxy
                 // Empty
             }
         }
+    }
+
+    private boolean methodErrorsSupressed(String methodName)
+    {
+        if(suppressedMethods == null)
+        {
+            suppressedMethods = new HashSet<String>(StringUtils.split(System.getProperty(PROPERTY_HESSIAN_SUPPRESSED_ERRORS, DEFAULT_HESSIAN_SUPPRESSED_ERRORS)));
+        }
+
+        return suppressedMethods.contains(methodName);
     }
 
 }
