@@ -180,8 +180,7 @@ public class SubversionClient implements ScmClient
      */
     public SubversionClient(String url, final String username, final String password, final String privateKeyFile) throws ScmException
     {
-        authenticationManager = SVNWCUtil.createDefaultAuthenticationManager(username, password);
-        authenticationManager.setAuthenticationProvider(new SVNSSHAuthenticationProvider(username, privateKeyFile, null));
+        authenticationManager = SVNWCUtil.createDefaultAuthenticationManager(null, username, password, new File(privateKeyFile), null, getStoreFlag());
         initialiseRepository(url);
     }
 
@@ -198,9 +197,14 @@ public class SubversionClient implements ScmClient
      */
     public SubversionClient(String url, final String username, final String password, final String privateKeyFile, final String passphrase) throws ScmException
     {
-        authenticationManager = SVNWCUtil.createDefaultAuthenticationManager(username, password);
-        authenticationManager.setAuthenticationProvider(new SVNSSHAuthenticationProvider(username, privateKeyFile, passphrase));
+        authenticationManager = SVNWCUtil.createDefaultAuthenticationManager(null, username, password, new File(privateKeyFile), passphrase, getStoreFlag());
         initialiseRepository(url);
+    }
+
+    private boolean getStoreFlag()
+    {
+        ISVNOptions options = SVNWCUtil.createDefaultOptions(null, true);
+        return options.isAuthStorageEnabled();
     }
 
     public void setExcludedPaths(List<String> excludedPaths)

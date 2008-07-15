@@ -29,6 +29,6 @@
     <dependencies>
         <dependency org="zutubi" name="com.zutubi.pulse.core" rev="latest.integration" conf="build->@"/>
 
-        <dependency org="svnkit" name="svnkit" rev="1.1.7" conf="external,build,release,bundled_3rd_party->default"/>
+        <dependency org="svnkit" name="svnkit" rev="1.1.8" conf="external,build,release,bundled_3rd_party->default"/>
     </dependencies>
 </ivy-module>
