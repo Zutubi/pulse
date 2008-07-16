@@ -40,7 +40,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         // When configuring a template and a single select is shown, that
         // single select should have an empty option added.
         loginAsAdmin();
-        addProject(random, true, ProjectManager.GLOBAL_PROJECT_NAME);
+        addProject(random, true, ProjectManager.GLOBAL_PROJECT_NAME, false);
         goTo(urls.adminProject(random) + "scm/");
         SubversionForm form = new SubversionForm(selenium);
         form.waitFor();
@@ -557,9 +557,9 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
     public void testDefaultProjectConfigCreated()
     {
+        addProject(random, true);
+
         loginAsAdmin();
-        goTo(urls.adminProjects());
-        addProject(random);
 
         ListPage listPage = new ListPage(selenium, urls, PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, random, "stages"));
         listPage.goTo();
@@ -575,8 +575,9 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         String parentName = random + "-parent";
         String childName = random + "-child";
 
+        addProject(parentName, true, ProjectManager.GLOBAL_PROJECT_NAME, true);
+
         loginAsAdmin();
-        addProject(parentName, true, ProjectManager.GLOBAL_PROJECT_NAME);
         addInheritingProject(parentName, childName);
 
         ListPage listPage = new ListPage(selenium, urls, PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, childName, "stages"));

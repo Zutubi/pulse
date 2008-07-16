@@ -37,8 +37,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
     public void testSimpleBuild() throws Exception
     {
         loginAsAdmin();
-        goTo(urls.adminProjects());
-        addProject(random);
+        addProject(random, true);
 
         triggerSuccessfulBuild(random, AgentManager.MASTER_AGENT_NAME);
     }
@@ -51,8 +50,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         ensureAgent(AGENT_NAME);
         agentHandle = xmlRpcHelper.getConfigHandle("agents/" + AGENT_NAME);
 
-        goTo(urls.adminProjects());
-        addProject(random);
+        addProject(random, true);
         ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, random, false);
         hierarchyPage.assertPresent();
         ProjectConfigPage configPage = hierarchyPage.clickConfigure();

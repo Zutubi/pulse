@@ -8,6 +8,7 @@ import com.zutubi.pulse.acceptance.pages.LoginPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.util.SystemUtils;
 import com.zutubi.pulse.webwork.mapping.Urls;
+import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.util.ExceptionWrappingRunnable;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.StringUtils;
@@ -159,18 +160,32 @@ public class SeleniumTestBase extends TestCase
         assertTrue(text.contains(message));        
     }
 
-    protected void addProject(String name)
+    protected void addProject(String name, boolean useAPI)
     {
-        addProject(name, false, "global project template");
+        addProject(name, false, ProjectManager.GLOBAL_PROJECT_NAME, useAPI);
     }
 
-    protected void addProject(String name, boolean template, String parentName)
+    protected void addProject(String name, boolean template, String parentName, boolean useAPI)
     {
-        runProjectWizard(name, template, parentName);
+        if (useAPI)
+        {
+            try
+            {
+                xmlRpcHelper.insertSimpleProject(name, parentName, template);
+            }
+            catch (Exception e)
+            {
+                throw new RuntimeException(e);
+            }
+        }
+        else
+        {
+            runProjectWizard(name, template, parentName);
 
-        ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, name, template);
-        hierarchyPage.waitFor();
-        hierarchyPage.assertPresent();
+            ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, name, template);
+            hierarchyPage.waitFor();
+            hierarchyPage.assertPresent();
+        }
     }
 
     protected AddProjectWizard.AntState runProjectWizard(String name, boolean template, String parentName)

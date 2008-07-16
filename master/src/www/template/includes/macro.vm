@@ -1493,7 +1493,7 @@
     <td class="test-failure">
         #wwtext("name=$key")
         #if($test.wasBrokenPreviously())
-            <br/>(<a href="$urls.build($buildResult)">#wwtext("name=test.broken.since") $test.brokenNumber</a>)
+            <br/>(<a href="$urls.build($buildResult.project, $test.brokenNumber.toString())">#wwtext("name=test.broken.since") $test.brokenNumber</a>)
         #end
     </td>
 #end
