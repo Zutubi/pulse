@@ -129,7 +129,7 @@ public class AgentPingServiceTest extends PulseTestCase
 
     public void testTimeout() throws InterruptedException
     {
-        System.setProperty(AgentPingService.PPROPERTY_AGENT_PING_TIMEOUT, "1");
+        System.setProperty(AgentPingService.PROPERTY_AGENT_PING_TIMEOUT, "1");
 
         Agent agent = createAgent(1);
 

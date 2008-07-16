@@ -6,6 +6,7 @@ import com.caucho.hessian.io.SerializerFactory;
 import com.caucho.hessian.server.HessianSkeleton;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.util.bean.ObjectFactory;
+import com.zutubi.util.logging.Logger;
 import com.zutubi.pulse.spring.SpringObjectFactory;
 import com.zutubi.pulse.plugins.PluginManager;
 
@@ -21,6 +22,8 @@ import java.io.IOException;
  */
 public class CustomHessianServlet extends GenericServlet
 {
+    private static final Logger LOG = Logger.getLogger(CustomHessianServlet.class);
+
     HessianSkeleton skeleton;
     SerializerFactory factory;
     private ObjectFactory objectFactory = new SpringObjectFactory();
@@ -106,14 +109,17 @@ public class CustomHessianServlet extends GenericServlet
         }
         catch (RuntimeException e)
         {
+            LOG.severe(e);
             throw e;
         }
         catch (ServletException e)
         {
+            LOG.severe(e);
             throw e;
         }
         catch (Throwable e)
         {
+            LOG.severe(e);
             ServletException se = new ServletException(e.getMessage());
             se.initCause(e);
             throw se;
