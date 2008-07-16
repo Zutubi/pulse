@@ -1797,7 +1797,7 @@ ZUTUBI.EventPatch = function() {
                         // Leave allClear false.
                     }
                 }
-            }, 250);
+            }, 500);
 
             document.onreadystatechange = function()
             {

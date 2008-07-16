@@ -44,15 +44,15 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
     public void testAgentBuild() throws Exception
     {
+        addProject(random, true);
         loginAsAdmin();
 
         String agentHandle;
         ensureAgent(AGENT_NAME);
         agentHandle = xmlRpcHelper.getConfigHandle("agents/" + AGENT_NAME);
 
-        addProject(random, true);
         ProjectHierarchyPage hierarchyPage = new ProjectHierarchyPage(selenium, urls, random, false);
-        hierarchyPage.assertPresent();
+        hierarchyPage.goTo();
         ProjectConfigPage configPage = hierarchyPage.clickConfigure();
         configPage.waitFor();
         ListPage stagesPage = configPage.clickCollection(ProjectConfigPage.BUILD_STAGES_BASE, ProjectConfigPage.BUILD_STAGES_DISPLAY);

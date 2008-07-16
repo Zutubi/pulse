@@ -557,9 +557,8 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
 
     public void testDefaultProjectConfigCreated()
     {
-        addProject(random, true);
-
         loginAsAdmin();
+        addProject(random, false);
 
         ListPage listPage = new ListPage(selenium, urls, PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, random, "stages"));
         listPage.goTo();
@@ -575,9 +574,8 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         String parentName = random + "-parent";
         String childName = random + "-child";
 
-        addProject(parentName, true, ProjectManager.GLOBAL_PROJECT_NAME, true);
-
         loginAsAdmin();
+        addProject(parentName, true, ProjectManager.GLOBAL_PROJECT_NAME, false);
         addInheritingProject(parentName, childName);
 
         ListPage listPage = new ListPage(selenium, urls, PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, childName, "stages"));
