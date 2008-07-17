@@ -68,7 +68,7 @@ public class SelectedBuildsConditionConfiguration extends SubscriptionConditionC
         List<String> expressions = determineExpressions();
         if(expressions.size() > 0)
         {
-            return StringUtils.join("or", expressions);
+            return StringUtils.join(" or ", expressions);
         }
         else
         {
