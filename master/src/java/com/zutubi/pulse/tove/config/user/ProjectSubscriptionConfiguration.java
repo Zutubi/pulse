@@ -101,7 +101,7 @@ public class ProjectSubscriptionConfiguration extends SubscriptionConfiguration
             }
             catch (Exception e)
             {
-                LOG.severe("Unable to parse subscription condition '" + condition + "'");
+                LOG.severe("Unable to parse subscription condition '" + condition.getExpression() + "'");
                 notifyCondition = new FalseNotifyCondition();
             }
         }

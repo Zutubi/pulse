@@ -79,7 +79,9 @@ public class BrowseAction extends ProjectActionSupport
                 }
             });
 
-            addModel(browseConfig.isGroupsShown() ? "ungrouped projects" : "all projects", false, projects, hierarchy);
+            // CIB-1550: Only label as ungrouped is there are some other
+            // groups.
+            addModel(models.size() > 0 ? "ungrouped projects" : "all projects", false, projects, hierarchy);
         }
 
         return SUCCESS;

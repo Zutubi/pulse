@@ -296,23 +296,11 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     public Project getProject(long id, boolean allowInvalid)
     {
         Project project = projectDao.findById(id);
-        if (project == null)
-        {
-            return null;
-        }
-        if (project.getConfig() == null)
-        {
-            // no confg instance, this is likely a template.  templates do not have states, so return null.
-            return null;
-        }
-        if (allowInvalid)
+        if (allowInvalid || project != null && configurationTemplateManager.isDeeplyValid(project.getConfig().getConfigurationPath()))
         {
             return project;
         }
-        if (configurationTemplateManager.isDeeplyValid(project.getConfig().getConfigurationPath()))
-        {
-            return project;
-        }
+
         return null;
     }
 
