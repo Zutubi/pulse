@@ -278,7 +278,7 @@ public class ConfigurationTemplateManager
         catch (Throwable t)
         {
             userTransaction.rollback();
-            throw new ConfigRuntimeException(t);
+            throw new ToveRuntimeException(t);
         }
     }
 
@@ -312,7 +312,7 @@ public class ConfigurationTemplateManager
         }
         catch (TypeException e)
         {
-            throw new ConfigRuntimeException(e);
+            throw new ToveRuntimeException(e);
         }
     }
 
@@ -1076,7 +1076,7 @@ public class ConfigurationTemplateManager
         }
         catch (TypeException e)
         {
-            throw new ConfigRuntimeException(e);
+            throw new ToveRuntimeException(e);
         }
 
     }

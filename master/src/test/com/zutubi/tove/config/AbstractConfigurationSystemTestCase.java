@@ -109,7 +109,6 @@ public abstract class AbstractConfigurationSystemTestCase extends PulseTestCase
 
         configurationCleanupManager = new ConfigurationCleanupManager();
         configurationCleanupManager.setObjectFactory(objectFactory);
-        configurationCleanupManager.setThreadFactory(threadFactory);
         configurationCleanupManager.setEventManager(eventManager);
 
         configurationStateManager = new ConfigurationStateManager();
@@ -130,12 +129,7 @@ public abstract class AbstractConfigurationSystemTestCase extends PulseTestCase
         configurationProvider.setThreadFactory(threadFactory);
 
         configurationTemplateManager.init();
-        configurationCleanupManager.init();
         configurationProvider.init();
-// FIXME events
-//        ConfigurationSystemStartedEvent event = new ConfigurationSystemStartedEvent(configurationProvider);
-//        configurationCleanupManager.handleEvent(event);
-//        configurationSecurityManager.handleEvent(event);
 
         typeRegistry.setConfigurationReferenceManager(configurationReferenceManager);
         typeRegistry.setHandleAllocator(recordManager);

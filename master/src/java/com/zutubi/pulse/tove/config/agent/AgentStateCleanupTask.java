@@ -1,30 +1,26 @@
 package com.zutubi.pulse.tove.config.agent;
 
 import com.zutubi.pulse.model.AgentStateManager;
-import com.zutubi.tove.config.cleanup.RecordCleanupTaskSupport;
+import com.zutubi.pulse.model.BuildManager;
+import com.zutubi.pulse.tove.config.DatabaseStateCleanupTaskSupport;
 
 /**
  * Cleans up the state associated with a deleted agent.
  */
-public class AgentStateCleanupTask extends RecordCleanupTaskSupport
+public class AgentStateCleanupTask extends DatabaseStateCleanupTaskSupport
 {
     private AgentConfiguration agentConfig;
     private AgentStateManager agentStateManager;
 
-    public AgentStateCleanupTask(AgentConfiguration agentConfig, AgentStateManager agentStateManager)
+    public AgentStateCleanupTask(AgentConfiguration agentConfig, AgentStateManager agentStateManager, BuildManager buildManager)
     {
-        super(agentConfig.getConfigurationPath());
+        super(agentConfig.getConfigurationPath(), buildManager);
         this.agentConfig = agentConfig;
         this.agentStateManager = agentStateManager;
     }
 
-    public void run()
+    public void cleanupState()
     {
         agentStateManager.delete(agentConfig.getAgentStateId());
-    }
-
-    public boolean isAsynchronous()
-    {
-        return true;
     }
 }

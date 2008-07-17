@@ -12,8 +12,6 @@ import com.zutubi.tove.type.record.PathUtils;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
 
 /**
  */
@@ -82,23 +80,6 @@ public class ConfigurationCleanupManagerTest extends AbstractConfigurationSystem
         assertTrue(root.isComplete());
         assertTrue(cascaded.isComplete());
         assertTrue(casCascaded.isComplete());
-    }
-
-    public void testAsynchronousExecution() throws InterruptedException
-    {
-        Semaphore flag = new Semaphore(0);
-        CustomCleanupTask root = new CustomCleanupTask("root");
-        AsyncCleanupTask async = new AsyncCleanupTask("async", flag);
-        root.addCascaded(async);
-
-        configurationCleanupManager.runCleanupTasks(root);
-
-        assertTrue(root.isComplete());
-        assertSame(root.executingThread, Thread.currentThread());
-
-        flag.tryAcquire(10, TimeUnit.SECONDS);
-        assertNotNull(async.executingThread);
-        assertNotSame(async.executingThread, Thread.currentThread());
     }
 
     public void testReferenceCleanupTask()
@@ -245,29 +226,6 @@ public class ConfigurationCleanupManagerTest extends AbstractConfigurationSystem
         public boolean isComplete()
         {
             return executingThread != null;
-        }
-    }
-
-    public static class AsyncCleanupTask extends RecordCleanupTaskSupport
-    {
-        private Thread executingThread = null;
-        private Semaphore flag;
-
-        public AsyncCleanupTask(String path, Semaphore flag)
-        {
-            super(path);
-            this.flag = flag;
-        }
-
-        public boolean isAsynchronous()
-        {
-            return true;
-        }
-
-        public void run()
-        {
-            executingThread = Thread.currentThread();
-            flag.release();
         }
     }
 }

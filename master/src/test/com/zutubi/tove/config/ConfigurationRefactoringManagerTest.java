@@ -167,7 +167,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         {
             assertEquals(expectedError, e.getMessage());
         }
-        catch (ConfigRuntimeException e)
+        catch (ToveRuntimeException e)
         {
             Throwable cause = e.getCause();
             assertTrue(cause instanceof IllegalArgumentException);
@@ -592,7 +592,7 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
         {
             assertEquals(expectedError, e.getMessage());            
         }
-        catch(ConfigRuntimeException e)
+        catch(ToveRuntimeException e)
         {
             Throwable cause = e.getCause();
             assertTrue(cause instanceof ValidationException);

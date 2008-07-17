@@ -1,26 +1,27 @@
 package com.zutubi.pulse.tove.config.project;
 
-import com.zutubi.pulse.core.PulseRuntimeException;
+import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.ProjectManager;
-import com.zutubi.tove.config.cleanup.RecordCleanupTaskSupport;
+import com.zutubi.pulse.tove.config.DatabaseStateCleanupTaskSupport;
+import com.zutubi.tove.config.ToveRuntimeException;
 
 /**
  * Cleans up the state associated with a deleted project.
  */
-class ProjectStateCleanupTask extends RecordCleanupTaskSupport
+class ProjectStateCleanupTask extends DatabaseStateCleanupTaskSupport
 {
     private ProjectConfiguration instance;
     private ProjectManager projectManager;
 
-    public ProjectStateCleanupTask(ProjectConfiguration instance, ProjectManager projectManager)
+    public ProjectStateCleanupTask(ProjectConfiguration instance, ProjectManager projectManager, BuildManager buildManager)
     {
-        super(instance.getConfigurationPath());
+        super(instance.getConfigurationPath(), buildManager);
         this.projectManager = projectManager;
         this.instance = instance;
     }
 
-    public void run()
+    public void cleanupState()
     {
         Project project = projectManager.getProject(instance.getProjectId(), true);
         if (project != null)
@@ -28,29 +29,12 @@ class ProjectStateCleanupTask extends RecordCleanupTaskSupport
             // We need to make sure that the project is not building first,
             // so pause it and wait for the state to become paused.
             project = projectManager.pauseProject(project);
-            while(project != null && project.getState() != Project.State.PAUSED)
+            if(project.getState() != Project.State.PAUSED)
             {
-                try
-                {
-                    Thread.sleep(60000);
-                }
-                catch (InterruptedException e)
-                {
-                    throw new PulseRuntimeException(e);
-                }
-
-                project = projectManager.getProject(instance.getProjectId(), true);
+                throw new ToveRuntimeException("Unable to delete project as a build is running.  The project may be deleted when the build completes (consider pausing the project).");
             }
 
-            if(project != null)
-            {
-                projectManager.delete(project);
-            }
+            projectManager.delete(project);
         }
-    }
-
-    public boolean isAsynchronous()
-    {
-        return true;
     }
 }

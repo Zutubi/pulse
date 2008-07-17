@@ -6,7 +6,6 @@ import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.system.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.security.AcegiUtils;
-import com.zutubi.pulse.security.PulseThreadFactory;
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.util.bean.ObjectFactory;
@@ -15,8 +14,6 @@ import com.zutubi.util.logging.Logger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 /**
  */
@@ -25,15 +22,8 @@ public class ConfigurationCleanupManager implements EventListener
     private static final Logger LOG = Logger.getLogger(ConfigurationCleanupManager.class);
 
     private Map<Class, ConfigurationCleanupTaskFinder> findersByType = new HashMap<Class, ConfigurationCleanupTaskFinder>();
-    private Executor executor;
     private ConfigurationProvider configurationProvider;
     private ObjectFactory objectFactory;
-    private PulseThreadFactory threadFactory;
-
-    public void init()
-    {
-        executor = Executors.newCachedThreadPool(threadFactory);
-    }
 
     public void addCustomCleanupTasks(RecordCleanupTaskSupport topTask)
     {
@@ -60,21 +50,7 @@ public class ConfigurationCleanupManager implements EventListener
 
     public void runCleanupTasks(RecordCleanupTask task)
     {
-        try
-        {
-            if (task.isAsynchronous())
-            {
-                executor.execute(task);
-            }
-            else
-            {
-                AcegiUtils.runAsSystem(task);
-            }
-        }
-        catch (Exception e)
-        {
-            LOG.severe("Unable to run cleanup task on path '" + task.getAffectedPath() + "': " + e.getMessage(), e);
-        }
+        AcegiUtils.runAsSystem(task);
 
         for (RecordCleanupTask subTask : task.getCascaded())
         {
@@ -108,12 +84,6 @@ public class ConfigurationCleanupManager implements EventListener
     {
         this.objectFactory = objectFactory;
     }
-
-    public void setThreadFactory(PulseThreadFactory threadFactory)
-    {
-        this.threadFactory = threadFactory;
-    }
-
     public void setEventManager(EventManager eventManager)
     {
         eventManager.register(this);

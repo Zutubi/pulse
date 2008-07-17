@@ -36,11 +36,6 @@ public abstract class RecordCleanupTaskSupport implements RecordCleanupTask
         }
     }
 
-    public boolean isAsynchronous()
-    {
-        return false;
-    }
-
     public boolean isInternal()
     {
         return false;

@@ -31,7 +31,7 @@
     <bean id="configurationPersistenceManager" class="com.zutubi.tove.config.ConfigurationPersistenceManager" autowire="byName"/>
     <bean id="configurationReferenceManager" class="com.zutubi.tove.config.ConfigurationReferenceManager" autowire="byName"/>
     <bean id="configurationRefactoringManager" class="com.zutubi.tove.config.ConfigurationRefactoringManager" autowire="byName"/>
-    <bean id="configurationCleanupManager" class="com.zutubi.tove.config.cleanup.ConfigurationCleanupManager" autowire="byName" init-method="init"/>
+    <bean id="configurationCleanupManager" class="com.zutubi.tove.config.cleanup.ConfigurationCleanupManager" autowire="byName"/>
     <bean id="configurationDocsManager" class="com.zutubi.tove.config.docs.ConfigurationDocsManager" autowire="byName"/>
     <bean id="configurationStateManager" class="com.zutubi.tove.config.ConfigurationStateManager" autowire="byName">
         <property name="transactionManager">
