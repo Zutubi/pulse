@@ -99,8 +99,6 @@ public class BuildController implements EventListener
         buildResult.queue();
         buildManager.save(buildResult);
 
-        eventManager.publish(new PreBuildEvent(this, buildResult, buildContext));
-        
         // We handle this event ourselves: this ensures that all processing of
         // the build from this point forth is handled by the single thread in
         // our async listener.  Basically, given events could be coming from
@@ -236,6 +234,8 @@ public class BuildController implements EventListener
 
     private void handleBuildCommenced()
     {
+        eventManager.publish(new PreBuildEvent(this, buildResult, buildContext));
+
         // It is important that this directory is created *after* the build
         // result is commenced and saved to the database, so that the
         // database knows of the possibility of some other persistent

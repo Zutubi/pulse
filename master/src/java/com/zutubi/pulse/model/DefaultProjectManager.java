@@ -306,7 +306,13 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
     public List<Project> getProjects(boolean allowInvalid)
     {
-        return filterValidProjects(projectDao.findAll());
+        List<Project> result = projectDao.findAll();
+        if (!allowInvalid)
+        {
+            result = filterValidProjects(result);
+        }
+
+        return result;
     }
 
     private List<Project> filterValidProjects(List<Project> projects)
