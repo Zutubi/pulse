@@ -832,7 +832,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
 
     public Vector<String> getMyProjectNames(String token) throws AuthenticationException
     {
-        User user = tokenManager.loginUser(token);
+        User user = tokenManager.loginAndReturnUser(token);
         try
         {
             List<Project> projects = new LinkedList<Project>();
@@ -1149,7 +1149,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
     {
         Vector<Hashtable<String, Object>> result = new Vector<Hashtable<String, Object>>(1);
 
-        User user = tokenManager.loginUser(token);
+        User user = tokenManager.loginAndReturnUser(token);
         try
         {
             BuildResult build = buildManager.getByUserAndNumber(user, id);
@@ -1169,7 +1169,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
 
     public Vector<Hashtable<String, Object>> getLatestPersonalBuilds(String token, boolean completedOnly, int maxResults) throws AuthenticationException
     {
-        User user = tokenManager.loginUser(token);
+        User user = tokenManager.loginAndReturnUser(token);
         try
         {
             List<BuildResult> builds = buildManager.getPersonalBuilds(user);
@@ -1600,7 +1600,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
 
     public Hashtable<String, String> preparePersonalBuild(String token, String projectName) throws AuthenticationException, ScmException
     {
-        User user = tokenManager.loginUser(token);
+        User user = tokenManager.loginAndReturnUser(token);
         try
         {
             if(!accessManager.hasPermission(userManager.getPrinciple(user), ServerPermission.PERSONAL_BUILD.toString(), null))

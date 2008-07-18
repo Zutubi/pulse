@@ -12,13 +12,15 @@ public interface TokenManager
 
     boolean logout(String token);
 
-    User verifyAdmin(String token) throws AuthenticationException;
+    void verifyAdmin(String token) throws AuthenticationException;
 
-    User verifyUser(String token) throws AuthenticationException;
+    void verifyUser(String token) throws AuthenticationException;
 
-    User verifyRoleIn(String token, String... allowedAuthorities) throws AuthenticationException;
+    void verifyRoleIn(String token, String... allowedAuthorities) throws AuthenticationException;
 
-    User loginUser(String token) throws AuthenticationException;
+    void loginUser(String token) throws AuthenticationException;
+
+    User loginAndReturnUser(String token) throws AuthenticationException;
 
     void logoutUser();
 }

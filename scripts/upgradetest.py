@@ -63,13 +63,14 @@ def testNormalUpgrade(agent, master, build):
     log('Checking agent build...')
     agentProxy = agent.getServerProxy()
     agentBuild = agentProxy.RemoteApi.getBuildNumber(agent.getAdminToken())
-    if agentBuild != 101999000:
+    if agentBuild != 200000000:
         raise Exception('Unexpected agent build "' + agentBuild + '"')
     log('Agent build OK')
     
     log('Adding agent...')
     masterProxy = master.getServerProxy()
-    if not masterProxy.RemoteApi.createAgent(master.getAdminToken(), 'upgrade-agent', 'localhost', AGENT_PORT):
+    agentConfig = {'meta.symbolicName': 'zutubi.agentConfig', 'name': 'upgrade-agent', 'host': 'localhost', 'port': AGENT_PORT}
+    if not masterProxy.RemoteApi.insertTemplatedConfig(master.getAdminToken(), 'agents/global agent template', agentConfig, False):
         raise Exception('Unable to add agent')
     log('Agent added')
     
@@ -105,7 +106,7 @@ def upgradeTest(version, build, service):
     if not os.path.isfile(masterPackageFile):
         raise Exception('Master package file "' + masterPackageFile + '" does not exist')
 
-    oldAgentPackageFile = os.path.join('acceptance', 'src', 'test', 'data', 'pulse-agent-1.1.999.tar.gz')
+    oldAgentPackageFile = os.path.join('acceptance', 'src', 'test', 'data', 'pulse-agent-2.0.0.tar.gz')
     if not os.path.isfile(oldAgentPackageFile):
         raise Exception('Old agent package "' + oldAgentPackageFile + '" does not exist')
 

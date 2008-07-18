@@ -42,12 +42,15 @@ public class AdminTokenManager
     {
         if (token.equals(adminToken))
         {
-            // Matches the sigle-use admin token.  Allow login and generate a
-            // new token.
+            // Matches the single-use admin token.  Allow login and generate
+            // a new token.
+            System.out.println("accepting token = " + token);
             newRandomToken();
+            System.out.println("new token = " + adminToken);
             return true;
         }
-
+        System.out.println("rejecting token = " + token);
+        System.out.println("our token = " + adminToken);
         return false;
     }
 

@@ -8,7 +8,6 @@ import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.tove.config.group.ServerPermission;
 import com.zutubi.util.Constants;
 import org.acegisecurity.AuthenticationManager;
-import org.acegisecurity.context.SecurityContextHolder;
 import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 
 import java.util.LinkedList;
@@ -85,22 +84,22 @@ public class DefaultTokenManager implements TokenManager
         return true;
     }
 
-    public User verifyAdmin(String token) throws AuthenticationException
+    public void verifyAdmin(String token) throws AuthenticationException
     {
-        return verifyRoleIn(token, ServerPermission.ADMINISTER.toString());
+        verifyRoleIn(token, ServerPermission.ADMINISTER.toString());
     }
 
-    public User verifyUser(String token) throws AuthenticationException
+    public void verifyUser(String token) throws AuthenticationException
     {
-        return verifyRoleIn(token, GrantedAuthority.USER);
+        verifyRoleIn(token, GrantedAuthority.USER);
     }
 
-    public User verifyRoleIn(String token, String... allowedAuthorities) throws AuthenticationException
+    public void verifyRoleIn(String token, String... allowedAuthorities) throws AuthenticationException
     {
         // if the token is the admin token, then we are happy.
         if(checkAdminToken(token))
         {
-            return null;
+            return;
         }
 
         User user = verifyToken(token);
@@ -111,7 +110,7 @@ public class DefaultTokenManager implements TokenManager
             {
                 if (authority.getAuthority().equals(allowedAuthority))
                 {
-                    return user;
+                    return;
                 }
             }
         }
@@ -124,7 +123,19 @@ public class DefaultTokenManager implements TokenManager
         return adminTokenManager != null && adminTokenManager.checkAdminToken(token);
     }
 
-    public User loginUser(String token) throws AuthenticationException
+    public void loginUser(String token) throws AuthenticationException
+    {
+        if (checkAdminToken(token))
+        {
+            AcegiUtils.loginAsSystem();
+        }
+        else
+        {
+            loginAndReturnUser(token);
+        }
+    }
+
+    public User loginAndReturnUser(String token) throws AuthenticationException
     {
         User user = verifyToken(token);
         AcegiUser principle = userManager.getPrinciple(user);
@@ -134,7 +145,7 @@ public class DefaultTokenManager implements TokenManager
 
     public void logoutUser()
     {
-        SecurityContextHolder.getContext().setAuthentication(null);
+        AcegiUtils.logout();
     }
 
     private synchronized User verifyToken(String token) throws AuthenticationException

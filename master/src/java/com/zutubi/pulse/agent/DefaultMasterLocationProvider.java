@@ -24,7 +24,13 @@ public class DefaultMasterLocationProvider implements MasterLocationProvider
 
     public String getMasterUrl()
     {
-        return "http://" + getMasterLocation();
+        String protocol = "http://";
+        if(systemConfiguration.isSslEnabled())
+        {
+            protocol = "https://";
+        }
+        
+        return protocol + getMasterLocation();
     }
 
     public void setSystemConfiguration(SystemConfiguration systemConfiguration)

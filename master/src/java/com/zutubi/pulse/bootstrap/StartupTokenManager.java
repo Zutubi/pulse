@@ -26,27 +26,30 @@ public class StartupTokenManager implements TokenManager
         return false;
     }
 
-    public User verifyAdmin(String token) throws AuthenticationException
+    public void verifyAdmin(String token) throws AuthenticationException
     {
         if (!adminTokenManager.checkAdminToken(token))
         {
             throw new AuthenticationException("Invalid token");
         }
-
-        return null;
     }
 
-    public User verifyUser(String token) throws AuthenticationException
+    public void verifyUser(String token) throws AuthenticationException
     {
         throw new AuthenticationException("System startup in progress");
     }
 
-    public User verifyRoleIn(String token, String... allowedAuthorities) throws AuthenticationException
+    public void verifyRoleIn(String token, String... allowedAuthorities) throws AuthenticationException
     {
         throw new AuthenticationException("System startup in progress");
     }
 
-    public User loginUser(String token) throws AuthenticationException
+    public void loginUser(String token) throws AuthenticationException
+    {
+        throw new AuthenticationException("System startup in progress");
+    }
+
+    public User loginAndReturnUser(String token) throws AuthenticationException
     {
         throw new AuthenticationException("System startup in progress");
     }

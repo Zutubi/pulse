@@ -18,7 +18,7 @@ import java.io.File;
 public class DefaultSlaveConfiguration implements SlaveConfiguration, SystemConfiguration
 {
     private static final String PROPERTIES_FILE = "pulse-agent.properties";
-    private static final String CONFIG_DIR = ".pulse-agent";
+    private static final String CONFIG_DIR = ".pulse2-agent";
     private static final String LOGGING_CONFIG = "log.config";
     private static final String LOG_EVENTS = "log.events";
 

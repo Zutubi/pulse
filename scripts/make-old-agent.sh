@@ -6,6 +6,6 @@ base="$(dirname $0)"
 top="$base/.."
 
 cd "$top"
-ant -Dpulse.version=1.1.999 -Dpulse.build=0101999000 -Dskip.tests=true package.slave
-cp build/pulse-agent-1.1.999.tar.gz acceptance/src/test/data
+ant -Dpulse.version=2.0.0 -Dpulse.build=0200000000 -Dskip.tests=true clean.all package.slave
+cp build/pulse-agent-2.0.0.tar.gz acceptance/src/test/data
 exit 0
