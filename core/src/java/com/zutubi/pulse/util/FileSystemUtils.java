@@ -204,7 +204,9 @@ public class FileSystemUtils
         
         if(exception != null)
         {
-            throw new IOException(exception);
+            IOException e = new IOException(exception.getMessage());
+            e.initCause(exception);
+            throw e;
         }
 
         assert(file != null);
