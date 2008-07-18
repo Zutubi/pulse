@@ -175,7 +175,39 @@ public class FileSystemUtils
         {
             throw new IOException("Failed to create temporary directory. Base directory does not exist: " + base.getAbsolutePath());
         }
-        File file = File.createTempFile(prefix, suffix, base);
+        
+        File file = null;
+        IOException exception = null;
+        int retries = SystemUtils.IS_WINDOWS ? 3 : 0;
+        do
+        {
+            try
+            {
+                file = File.createTempFile(prefix, suffix, base);
+                break;
+            }
+            catch (IOException e)
+            {
+                exception = e;
+            }
+
+            try
+            {
+                Thread.sleep(50);
+            }
+            catch (InterruptedException e)
+            {
+                // Ignore
+            }
+        }
+        while(retries-- > 0);
+        
+        if(exception != null)
+        {
+            throw new IOException(exception);
+        }
+
+        assert(file != null);
         if (!file.exists())
         {
             throw new IOException("Failed to create temporary directory. Reason: File.createTempFile failed.");
