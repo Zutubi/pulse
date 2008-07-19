@@ -465,6 +465,14 @@
         </subant>
     </target>
 
+<target name="h">
+  <exec executable="bash">
+    <arg line="fail.sh"/>
+  </exec>
+<fail message="bail"/>
+  <echo message="still ran"/>
+</target>
+
     <target name="run.accept.master" depends="build.acceptance, init">
         <property name="build.dir" value="acceptance/build"/>
         <property name="report.dir" value="build/reports/junit"/>
@@ -493,7 +501,8 @@
         </exec>
 
         <echo message="Start acceptance test suite."/>
-        <junit printsummary="yes" fork="on" forkmode="once" maxmemory="512m" failureProperty="test.failed" errorProperty="test.failed">
+        <junit printsummary="yes" fork="on" forkmode="once" maxmemory="512m"
+	       failureProperty="test.failed" errorProperty="test.failed">
             <sysproperty key="pulse.port" value="8889"/>
             <sysproperty key="bootstrap" value="com/zutubi/pulse/bootstrap/bootstrapContext.xml"/>
             <classpath>
@@ -524,6 +533,10 @@
               if="test.failed"/>
 
         <antcall target="test.agent.upgrade"/>
+
+        <exec executable="bash">
+            <arg line="scripts/teardown-services.sh"/>
+        </exec>
     </target>
 
     <target name="test.agent.upgrade">

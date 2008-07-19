@@ -12,8 +12,6 @@ fi
 
 version=$1
 
-"$scripts/teardown-services.sh"
-
 # Kill pulse agent and master
 pushd "$working/pulse-accept"
 export PULSE_HOME=
