@@ -8,8 +8,8 @@
     <link rel="stylesheet" type="text/css" href="$base/css/ext-all.css"/>
 
     <script type="text/javascript" src="$base/js/prototype.js"></script>
-    <script type="text/javascript" src="/js/ext-base.js"></script>
-    <script type="text/javascript" src="/js/ext-all.js"></script>
+    <script type="text/javascript" src="$base/js/ext-base.js"></script>
+    <script type="text/javascript" src="$base/js/ext-all.js"></script>
     <script type="text/javascript" src="$base/js/zutubi.js"></script>
     <script type="text/javascript" src="$base/js/yahoo/utilities.js"></script>
     <script type="text/javascript" src="$base/js/yahoo/yahoo.js"></script>

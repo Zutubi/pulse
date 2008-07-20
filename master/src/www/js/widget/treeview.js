@@ -491,7 +491,7 @@ YAHOO.extend(ZUTUBI.widget.FileNode, YAHOO.widget.TextNode, {
         // depth rendering.
         for (i=0;i<this.depth;++i)
         {
-            sb[sb.length] = '<td class="' + this.getDepthStyle(i) + '"><img width="17" height="22" src="/images/transparent.gif"/></td>';
+            sb[sb.length] = '<td class="' + this.getDepthStyle(i) + '"><img width="17" height="22" src="$base/images/transparent.gif"/></td>';
         }
 
         var getNode = 'YAHOO.widget.TreeView.getNode(\'' + this.tree.id + '\',' + this.index + ')';
@@ -508,7 +508,7 @@ YAHOO.extend(ZUTUBI.widget.FileNode, YAHOO.widget.TextNode, {
         }
         sb[sb.length] = ' onclick="javascript:' + this.getToggleLink() + '">';
 
-        sb[sb.length] = '<img width="17" height="22" src="/images/transparent.gif"/>';
+        sb[sb.length] = '<img width="17" height="22" src="$base/images/transparent.gif"/>';
 
         sb[sb.length] = '</td>';
 
@@ -526,7 +526,7 @@ YAHOO.extend(ZUTUBI.widget.FileNode, YAHOO.widget.TextNode, {
             sb[sb.length] = this.getToggleElId() + '\').className=';
             sb[sb.length] = getNode + '.getStyle()"';
         }
-        sb[sb.length] = '><img width="16" height="22" src="/images/transparent.gif"/>';
+        sb[sb.length] = '><img width="16" height="22" src="$base/images/transparent.gif"/>';
         sb[sb.length] = '</td>';
 
         // label rendering.
