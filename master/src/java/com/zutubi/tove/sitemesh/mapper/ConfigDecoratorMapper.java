@@ -46,14 +46,11 @@ public class ConfigDecoratorMapper extends AbstractDecoratorMapper
     {
         String thisPath = request.getServletPath();
 
-/*
         // getServletPath() returns null unless the mapping corresponds to a servlet
         if (thisPath == null)
         {
-*/
             String requestURI = request.getRequestURI();
-        thisPath = requestURI;
-/*
+            thisPath = requestURI;
             if (request.getPathInfo() != null)
             {
                 // strip the pathInfo from the requestURI
@@ -69,7 +66,6 @@ public class ConfigDecoratorMapper extends AbstractDecoratorMapper
         {
             thisPath = request.getRequestURI();
         }
-*/
 
         String name = null;
         try

@@ -120,7 +120,7 @@
             <td class="group-header build-details">
                 #summary($projectsModel.root)
         #if($rssEnabled && $projectsModel.labelled)
-                &nbsp;<a class="unadorned" id="rss.builds.#id($projectsModel.groupName)" href="/rss.action?groupName=#uce($projectsModel.groupName)"><img alt="$action.getText('rss')" src="$base/images/feed-icon-16x16.gif"/></a>
+                &nbsp;<a class="unadorned" id="rss.builds.#id($projectsModel.groupName)" href="$base/rss.action?groupName=#uce($projectsModel.groupName)"><img alt="$action.getText('rss')" src="$base/images/feed-icon-16x16.gif"/></a>
         #end
             </td>
         </tr>
