@@ -1504,10 +1504,10 @@ Ext.extend(ZUTUBI.HelpPanel, Ext.Panel, {
         }
     },
     
-    synchronise: function()
+    synchronise: function(field)
     {
         var location = detailPanel.getHelp();
-        showHelp(location.path, location.type);
+        this.showHelp(location.path, location.type, field);
     },
 
     showHelp: function(path, type, field)
@@ -1533,7 +1533,7 @@ Ext.extend(ZUTUBI.HelpPanel, Ext.Panel, {
             type = '';
         }
 
-        if(path != this.shownPath || type != this.shownType)
+        if(path != this.shownPath || type != this.shownType || type == 'wizard')
         {
             if(path)
             {

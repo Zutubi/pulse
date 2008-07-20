@@ -569,13 +569,24 @@ var deletePath = function(path)
     runAjaxRequest(window.baseUrl + '/aconfig/' + path + '?delete=confirm');
 }
 
-var showHelp = function(path, type, field)
+var showHelp = function(path, type)
 {
     var helpPanel = Ext.getCmp('nested-east');
     // Only show help when there is a panel for it (there is none during
     // setup, for example).
     if(helpPanel)
     {
-        helpPanel.showHelp(path, type, field);
+        helpPanel.showHelp(path, type);
+    }
+}
+
+var showFieldHelp = function(field)
+{
+    var helpPanel = Ext.getCmp('nested-east');
+    // Only show help when there is a panel for it (there is none during
+    // setup, for example).
+    if(helpPanel)
+    {
+        helpPanel.synchronise(field);
     }
 }

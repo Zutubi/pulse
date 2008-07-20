@@ -5,3 +5,6 @@
 #end
 </div>
 #standardFormEvents("wizardForm")
+<script type="text/javascript">
+    detailPanel.setHelp('#jss(${path})', 'wizard');
+</script>

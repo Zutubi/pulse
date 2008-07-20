@@ -28,7 +28,7 @@ form.items.last().on('render', function(field)
 <#assign helpmsg>${helpkey?i18n}</#assign>
 <#if helpmsg?exists && helpkey != helpmsg>
     var helpEl = form.annotateField('${parameters.id}', 'help', '${base}/images/help.gif', '${helpmsg?js_string}');
-    helpEl.on('click', function() { showHelp('${form.parameters.path?js_string}', 'type', '${parameters.name}'); });
+    helpEl.on('click', function() { showFieldHelp('${parameters.name?js_string}'); });
 </#if>
 });
 

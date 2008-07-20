@@ -5,7 +5,7 @@
     <div class="config-panel">
         <h3 class="config-header">
             ${config.formHeading}
-            <a href="#" class="unadorned" onclick="showHelp('$path', 'type'); return false"><img alt="show help" src="$base/images/help.gif"/></a>
+            <a href="#" class="unadorned" onclick="showHelp('#jss($path)', 'type'); return false"><img alt="show help" src="$base/images/help.gif"/></a>
         </h3>
         ##<!-- add some space around the form so that it does not sit directly on the border. -->
         <div class="config-container">
@@ -143,5 +143,5 @@
 </table>
 
 <script type="text/javascript">
-    detailPanel.setHelp('${path}', 'type');
+    detailPanel.setHelp('#jss(${path})', 'type');
 </script>

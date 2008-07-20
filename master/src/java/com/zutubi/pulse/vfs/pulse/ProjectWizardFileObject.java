@@ -1,6 +1,5 @@
 package com.zutubi.pulse.vfs.pulse;
 
-import com.opensymphony.xwork.ActionContext;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 import com.zutubi.tove.config.ConfigurationReferenceManager;
@@ -98,8 +97,7 @@ public class ProjectWizardFileObject extends AbstractPulseFileObject implements 
     private AbstractTypeWizard getWizardInstance()
     {
         String path = PathUtils.getPath(ConfigurationRegistry.PROJECTS_SCOPE, getName().getBaseName());
-        Map session = ActionContext.getContext().getSession();
-        return (AbstractTypeWizard) session.get(ConfigurationWizardAction.getSessionKey(path));
+        return (AbstractTypeWizard) ConfigurationWizardAction.getWizardInstance(path);
     }
 
     public boolean isLocal()

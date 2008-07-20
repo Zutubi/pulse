@@ -11,8 +11,7 @@ import com.zutubi.tove.type.record.Record;
 import java.util.Map;
 
 /**
- *
- *
+ * Interface for all states of {@link Wizard}s.
  */
 public interface WizardState
 {
@@ -43,11 +42,22 @@ public interface WizardState
      */
     void updateRecord(Map parameters);
 
+    /**
+     * Retrieves i18n messages for this state.
+     *
+     * @return a context for i18n for this state
+     */
     Messages getMessages();
 
     FormDescriptor createFormDescriptor(FormDescriptorFactory formDescriptorFactory, String path, String name);
 
     boolean validate(ValidationAware validationCallback) throws TypeException;
 
+    /**
+     * Returns the following state, which may change depending on the
+     * decisions the user has made in this state.
+     *
+     * @return the next state, or null if there are no more
+     */
     WizardState getNextState();
 }

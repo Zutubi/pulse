@@ -4,7 +4,7 @@
 
 #macro(actionHeader $id $action $img $onclick)
     <th><img alt="$action" src="$base/images/${img}.gif"/> <a href="#" onclick="$onclick; return false" id="$id">$action</a></th>
-    <td style="width: 25px"><a href="#" class="unadorned" onclick="showHelp('$path', 'template', '$id'); return false"><img alt="show help" src="$base/images/help.gif"/></a></td>
+    <td style="width: 25px"><a href="#" class="unadorned" onclick="showFieldHelp('$id'); return false"><img alt="show help" src="$base/images/help.gif"/></a></td>
 #end
 
 <table id="template-actions" class="template-actions" cellspacing="5px">
@@ -45,3 +45,7 @@
 #end
 #end
 </table>
+
+<script type="text/javascript">
+    detailPanel.setHelp('#jss(${path})', 'template');
+</script>

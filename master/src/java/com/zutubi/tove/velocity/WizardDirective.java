@@ -11,9 +11,9 @@ import com.zutubi.tove.WizardDescriptor;
 import com.zutubi.tove.freemarker.GetTextMethod;
 import com.zutubi.tove.i18n.WizardContext;
 import com.zutubi.tove.i18n.WizardContextResolver;
-import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.wizard.TypeWizardState;
 import com.zutubi.tove.wizard.webwork.AbstractTypeWizard;
+import com.zutubi.tove.wizard.webwork.ConfigurationWizardAction;
 import freemarker.core.DelegateBuiltin;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -68,8 +68,7 @@ public class WizardDirective extends AbstractDirective
         Map params = createPropertyMap(context, node);
         wireParams(params);
 
-        String sessionKey = PathUtils.normalizePath(path);
-        wizardInstance = (AbstractTypeWizard) ActionContext.getContext().getSession().get(sessionKey);
+        wizardInstance = (AbstractTypeWizard) ConfigurationWizardAction.getWizardInstance(path);
         if (wizardInstance == null)
         {
             return false;
@@ -110,6 +109,7 @@ public class WizardDirective extends AbstractDirective
             Messages messages = Messages.getInstance(new WizardContext(wizardInstance));
 
             context.put("i18nText", new GetTextMethod(messages));
+            context.put("path", path);
             context.put("wizard", wizardDescriptor.instantiate(path, state.getRenderRecord()));
 
             // validation support:

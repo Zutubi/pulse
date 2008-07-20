@@ -556,6 +556,20 @@
         <action name="template" class="com.zutubi.tove.webwork.help.TemplateHelpAction">
             <result name="success" type="velocity">template.vm</result>
         </action>
+
+        <action name="wizard" class="com.zutubi.tove.webwork.help.WizardHelpAction">
+            <result name="type" type="chain">wizardType</result>
+            <result name="select" type="chain">wizardSelect</result>
+            <result name="none" type="velocity">none.vm</result>
+        </action>
+
+        <action name="wizardType" class="com.zutubi.tove.webwork.help.WizardTypeHelpAction">
+            <result name="success" type="velocity">type.vm</result>
+        </action>
+
+        <action name="wizardSelect" class="com.zutubi.tove.webwork.help.WizardSelectHelpAction">
+            <result name="success" type="velocity">select.vm</result>            
+        </action>
     </package>
 
     <package name="actionAjax" namespace="/aaction" extends="configAjax">

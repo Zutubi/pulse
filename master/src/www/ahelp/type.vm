@@ -1,5 +1,5 @@
 <div id="config-help">
-    <h1 id="help-title">#html($typeDocs.title)</h1>
+    <h1 id="help-title">$typeDocs.title</h1>
 #if($typeDocs.brief)
     <div class="type-details">
         $typeDocs.brief
@@ -13,7 +13,7 @@
         <tr id="field-row-$docs.name" class="field-row #if($action.isExpandable($docs)) field-expandable #end ">
             <td>
                 <div id="field-title-$docs.name" class="field-header">
-                    <strong>#html($docs.label)</strong>
+                    <strong>$docs.label</strong>
                 </div>
                 <div class="field-details">
                     <div class="field-brief">

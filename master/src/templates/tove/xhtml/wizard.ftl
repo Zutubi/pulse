@@ -1,4 +1,7 @@
-<h3 class="config-header">${"label"?i18n}</h3>
+<h3 class="config-header">
+    ${"label"?i18n}
+    <a href="#" class="unadorned" onclick="showHelp('${path?js_string}', 'wizard'); return false"><img alt="show help" src="${base}/images/help.gif"/></a>
+</h3>
 <div class="config-container">
     <p class="introduction">
         ${"introduction"?i18n}

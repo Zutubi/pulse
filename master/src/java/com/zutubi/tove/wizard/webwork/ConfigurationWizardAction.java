@@ -235,8 +235,7 @@ public class ConfigurationWizardAction extends com.opensymphony.xwork.ActionSupp
 
     private void removeWizard()
     {
-        String sessionKey = PathUtils.normalizePath(this.path);
-        ActionContext.getContext().getSession().remove(sessionKey);
+        ActionContext.getContext().getSession().remove(getSessionKey(this.path));
     }
 
     @SuppressWarnings({ "unchecked" })
@@ -244,16 +243,13 @@ public class ConfigurationWizardAction extends com.opensymphony.xwork.ActionSupp
     {
         try
         {
-            // normalise the path by stripping leading and trailing '/' chars
-            String sessionKey = getSessionKey(this.path);
-
-            Map<String, Object> session = ActionContext.getContext().getSession();
-            if (!session.containsKey(sessionKey))
+            Wizard wizard = getWizardInstance(this.path);
+            if (wizard == null)
             {
-                Wizard wizardInstance = doCreateWizard();
-                session.put(sessionKey, wizardInstance);
+                wizard = doCreateWizard();
+                ActionContext.getContext().getSession().put(getSessionKey(this.path), wizard);
             }
-            return (Wizard) session.get(sessionKey);
+            return wizard;
         }
         catch (Exception e)
         {
@@ -265,6 +261,12 @@ public class ConfigurationWizardAction extends com.opensymphony.xwork.ActionSupp
     public static String getSessionKey(String path)
     {
         return PathUtils.normalizePath(path);
+    }
+
+    public static Wizard getWizardInstance(String path)
+    {
+        Map session = ActionContext.getContext().getSession();
+        return (Wizard) session.get(getSessionKey(path));
     }
 
     @SuppressWarnings({ "unchecked" })

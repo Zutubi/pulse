@@ -347,15 +347,21 @@ public abstract class AbstractTypeWizard implements Wizard
             Iterator<FieldDescriptor> fieldIt = descriptor.getFieldDescriptors().iterator();
             while(fieldIt.hasNext())
             {
-                TypeProperty property = type.getProperty(fieldIt.next().getName());
-                if(property != null && property.getAnnotation(com.zutubi.config.annotations.Wizard.Ignore.class) != null)
+                String fieldName = fieldIt.next().getName();
+                if(!includesField(type, fieldName))
                 {
-                    ignoredFields.add(property.getName());
+                    ignoredFields.add(fieldName);
                     fieldIt.remove();
                 }
             }
 
             return descriptor;
+        }
+
+        public boolean includesField(CompositeType type, String name)
+        {
+            TypeProperty property = type.getProperty(name);
+            return !(property != null && property.getAnnotation(com.zutubi.config.annotations.Wizard.Ignore.class) != null);
         }
 
         public boolean validate(ValidationAware validationCallback)

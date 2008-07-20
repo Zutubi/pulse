@@ -336,7 +336,9 @@ public class ToveUtils
     /**
      * Evaluates the order of fields for a form based on a possibly-
      * incomplete declared field order.  Undeclared fields are added to the
-     * end of the result in no specific order.
+     * end of the result in no specific order.  Declared fields not in
+     * allFields are ignored (this can happen, for example, in a wizard where
+     * some fields are ignored).
      *
      * @param declaredOrder field ordering explicitly declared so far (may be
      *                      null)
@@ -347,9 +349,15 @@ public class ToveUtils
     public static List<String> evaluateFieldOrder(List<String> declaredOrder, List<String> allFields)
     {
         LinkedList<String> ordered = new LinkedList<String>();
-        if(declaredOrder != null)
+        if (declaredOrder != null)
         {
-            ordered.addAll(declaredOrder);
+            for (String declared: declaredOrder)
+            {
+                if (allFields.contains(declared))
+                {
+                    ordered.add(declared);
+                }
+            }
         }
 
         if (ordered.size() != allFields.size())
