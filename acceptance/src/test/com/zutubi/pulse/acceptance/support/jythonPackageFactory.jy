@@ -1,0 +1,420 @@
+# Utility functions for launching and stopping pulse servers and agents.
+
+import os
+import socket
+import subprocess
+import sys
+import time
+import xmlrpclib
+import string
+
+import com.zutubi.pulse.acceptance.support
+from java import io
+from java import lang
+
+# The following doesnt really work..
+WINDOWS = os.name == "nt"
+LINUX = sys.platform.startswith("linux")
+
+def isWindows():
+    """ when this script is being run within a the jvm (jython), the reported os is java """
+
+    if os.name == "java":
+        if lang.System.getenv("OS").endswith("NT"):
+            return True
+        else:
+            return False
+    else:
+        if os.name == "nt":
+            return True
+        else:
+            return False
+
+
+def getcwd():
+    """ the os.getcwd call does not appear to be supported by jython """
+    if os.name == "java":
+        return io.File('.').getCanonicalPath()
+    else:
+        return os.getcwdu()
+
+
+class PulsePackage(com.zutubi.pulse.acceptance.support.PulsePackage):
+
+    def __init__(self, packageFile):
+        self.packageFile = packageFile
+
+    def extractTo(self, destDir):
+
+        if not os.path.exists(destDir):
+            os.makedirs(destDir)
+
+        var = {'destDir':destDir, 'packageFile':self.packageFile}
+        if self.packageFile.endswith('.zip'):
+            subprocess.call(['unzip', '-qd', destDir, self.packageFile])
+        else:
+            subprocess.call(['tar', '-zxC', destDir, '-f', self.packageFile])
+
+        return Pulse(os.path.join(destDir, self.getBasename()))
+
+
+    def getFilename(self):
+        return os.path.split(self.packageFile)[1]
+
+    def getBasename(self):
+        f = self.getFilename()
+        max = 1
+        if f.endswith(".tar.gz"):
+            # Evil two part extensions be damned!
+            max = 2
+
+        v = f.split(".")
+        return string.join(v[0:-max], '.')
+
+class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
+
+    def __init__(self, baseDir):
+        self.baseDir = os.path.abspath(baseDir)
+        self._port = None
+        self._dataDir = None
+        self._configFile = None
+        self._context = None
+        self._userHome = None
+        self._defaultPort = 8080
+
+    def setConfigFile(self, configFile):
+        self._configFile = configFile
+
+    def setContext(self, context):
+        self._context = context
+
+    def setPort(self, port):
+        self._port = port
+
+    def setDataDir(self, path):
+        self._dataDir = path
+
+    def setUserHome(self, path):
+        self._userHome = path
+
+    def getEnv(self):
+        env = dict(os.environ)
+        env['PULSE_CONFIG'] = os.path.join(self.baseDir, 'bin', 'config.properties')
+        env['PULSE_HOME'] = self.baseDir
+        env['PULSE_USER'] = os.getenv('USER')
+        env['USER'] = os.getenv('USER')
+        env['PULSE_PID'] = os.path.join(self.baseDir, 'pulse.pid')
+        env['JAVA_HOME'] = os.getenv('JAVA_HOME')
+        return env
+
+    def getRoot(self):
+        return self.baseDir
+
+    def getPluginRoot(self):
+        """ todo: use the java paths interface here - more generally useful. """
+        versionDir = self.getActiveVersionDirectory()
+        return os.path.join(versionDir, 'system', 'plugins')
+
+    def getScript(self):
+        """ Return the primary pulse script. In the case when a custom user home is
+            specified, we need to modify the script slightly to pass through the new user.home
+            setting. In this case, the modified script is returned. """
+
+        if isWindows():
+            scriptFilename = 'pulse.bat'
+            commonFilename = 'common.bat'
+        else:
+            scriptFilename = 'pulse'
+            commonFilename = 'common.sh'
+
+        if self._userHome is None:
+            return scriptFilename
+
+        modifiedScriptFilename = 'modified-' + scriptFilename
+        modifiedCommonFilename = 'modified-' + commonFilename
+
+        """ A) redirect the pulse script to the modified common script. """
+        if not os.path.exists(os.path.join(self.baseDir, 'bin', modifiedScriptFilename)):
+            scriptFile = open(os.path.join(self.baseDir, 'bin', scriptFilename), 'r')
+            modifiedScriptFile = open(os.path.join(self.baseDir, 'bin', modifiedScriptFilename), 'w')
+            try:
+
+                for line in scriptFile:
+                    if line.count(commonFilename):
+                        line = string.replace(line, commonFilename, modifiedCommonFilename)
+                    modifiedScriptFile.write(line)
+
+            finally:
+                scriptFile.close()
+                modifiedScriptFile.close()
+
+        """ B) modify the common script with the added -Duser.home flag """
+        if not os.path.exists(os.path.join(self.baseDir, 'bin', modifiedCommonFilename)):
+            commonFile = open(os.path.join(self.baseDir, 'bin', commonFilename), 'r')
+            modifiedCommonFile = open(os.path.join(self.baseDir, 'bin', modifiedCommonFilename), 'w')
+            try:
+
+                if isWindows():
+                    tag = '"%_JAVACMD%" %JAVA_OPTS%'
+
+                else:
+                    tag = '"$JAVACMD" $JAVA_OPTS'
+
+                for line in commonFile:
+                    index = line.find(tag)
+                    if index != -1:
+                        modifiedCommonFile.write('echo "Using modified user.home setting: '+self._userHome+'"\n')
+                        line = line[:index + len(tag)] + ' -Duser.home="' + self._userHome + '" ' + line[index + len(tag) + 1:]
+
+                    modifiedCommonFile.write(line)
+
+            finally:
+                commonFile.close()
+                modifiedCommonFile.close()
+
+        return modifiedScriptFilename
+
+
+    def start(self, wait=True, service=False):
+        """Starts this pulse server.  A local properties file
+        is used if necessary, output is captured to baseDir/stdout.txt and baseDir/stderr.txt.
+        If wait is True, this function will wait for Pulse to start listening on the
+        given port before returning.  If the server cannot be started successfully,
+        an exception is thrown carrying the reason."""
+
+        if service:
+            configFile = open('config.properties', 'w')
+            configFile.writelines(['webapp.port=%d\n' % self._port])
+            if self._dataDir is not None:
+                configFile.writelines(['pulse.data=%s\n' % self._dataDir])
+            configFile.close()
+            command = [os.path.join(self.basedir, 'bin', 'init.sh'), 'start']
+            print 'Starting pulse: ' + str(command)
+            ret = subprocess.call(command, env=self.getEnv())
+            if ret != 0:
+                raise Exception('init script exited with code %d' % ret)
+            self.pop = True
+        else:
+        
+            self.stdout = open('stdout.txt', 'w')
+            self.stderr = open('stderr.txt', 'w')
+
+            command = [os.path.join(self.baseDir, 'bin', self.getScript()), 'start']
+
+            if self._port is not None:
+                command += ['-p', str(self._port)]
+            if self._dataDir is not None:
+                command += ['-d', self._dataDir]
+            if self._configFile is not None:
+                command += ['-f', self._configFile]
+            if self._context is not None:
+                command += ['-c', self._context]
+
+            print 'Starting pulse: ' + str(command)
+            self.pop = subprocess.Popen(command, stdout=self.stdout, stderr=self.stderr)
+
+            if self.pop is None:
+                print 'Hmm, subprocess.Popen returned None.'
+
+        if wait:
+            if not self.waitFor():
+                raise Exception('Timed out waiting for server to start')
+
+# would prefer to return the return value of the executed command, and let the calling system handle the result.
+
+        return 0
+
+
+    def waitFor(self, timeout=60):
+        """Waits for this server to start listening.  If a connection
+        can be made to the port before the specified timeout (in seconds) elapses,
+        this function returns True.  Otherwise, False is returned."""
+        endTime = time.time() + timeout
+        while time.time() < endTime:
+            try:
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                
+                port = self.getServerPort()
+                print 'Waiting for process at port: ' + str(port)
+                s.connect(('127.0.0.1', int(port)))
+                s.close()
+                # Sleep a little longer just to be sure
+                time.sleep(3)
+                return True
+            except Exception, e:
+                print e
+                time.sleep(1)
+
+        return False
+
+
+    def cleanup(self, service=False):
+        ret = 0
+        if self.pop is not None:
+            if service:
+                command = [os.path.join(self.baseDir, 'bin', 'init.sh'), 'stop']
+                ret = subprocess.call(command, env=self.getEnv())
+                self.pop=None
+            else:
+            
+                command = [os.path.join(self.baseDir, 'bin', self.getScript()), 'shutdown']
+                if self._port is not None:
+                    command += ['-p', str(self._port)]
+                if self._dataDir is not None:
+                    command += ['-d', self._dataDir]
+                if self._configFile is not None:
+                    command += ['-f', self._configFile]
+                if self._context is not None:
+                    command += ['-c', self._context]
+
+                print 'Shutting down pulse: ' + str(command)
+                ret = subprocess.call(command)
+
+        return ret
+
+
+    def stop(self, timeout=60, service=False):
+        """Stops this running pulse server using a shutdown script.  Failure for
+        the process to exit in the given timeout (in seconds) will result in an
+        exception being thrown."""
+
+        ret = self.cleanup(service)
+        if ret != 0:
+            raise Exception('Shutdown scripted exited with code ' + str(ret))
+        if not service:
+            endTime = time.time() + timeout
+            while time.time() < endTime:
+                ret = self.pop.poll()
+                if ret is None:
+                    time.sleep(1)
+                else:
+                    self.stdout.close()
+                    self.stderr.close()
+                    self.pop = None
+                    return 0
+            raise Exception('Timed out waiting for pulse process "' + str(self.pop.pid) + '" to exit')
+
+        return 0
+
+    def getActiveVersionDirectory(self):
+
+        activeFilename = os.path.join(self.baseDir, 'active-version.txt')
+        activeFile = open(activeFilename)
+        activeVersion = activeFile.read()
+        activeFile.close()
+
+        return os.path.join(self.baseDir, 'versions', activeVersion)
+
+
+    def getAdminToken(self):
+
+        versionDir = self.getActiveVersionDirectory()
+
+        tokenFilename = os.path.join(versionDir, 'system', 'config', 'admin.token')
+        tokenFile = open(tokenFilename)
+        token = tokenFile.read()
+        tokenFile.close()
+
+        return token
+
+
+    def getServerProxy(self):
+
+        url = self.getServerUrl()
+        if url.endswith('/'):
+            url = url + 'xmlrpc'
+        else:
+            url = url + '/xmlrpc'
+
+        print 'Connecting to pulse xmlrpc at: ' + url
+
+        return xmlrpclib.ServerProxy(url)
+
+    def getServerUrl(self):
+        """ construct the server url based on the command line properties, config files and user home. """
+
+        port = self.getServerPort()
+        context = self.getServerContext()
+
+        url = 'http://localhost'
+        if port is not None:
+            url = url + ':' + str(port)
+        if context is not None:
+            url = url + context
+
+        return url
+
+    def getServerPort(self):
+
+        port = self._port
+
+        if port is None:
+            if self._configFile is not None:
+                port = self.readFromConfig('webapp.port', self._configFile)
+                if port is not None:
+                    port = port.strip()
+
+        if port is None:
+            if self._userHome is not None:
+                port = self.readFromConfig('webapp.port', os.path.join(self._userHome, '.pulse2', 'config.properties'))
+                if port is not None:
+                    port = port.strip()
+
+        if port is None:
+            port = self._defaultPort
+
+        return int(port)
+
+    def getServerContext(self):
+        context = self._context
+
+        if context is None:
+            if self._configFile is not None:
+                context = self.readFromConfig('webapp.contextPath', self._configFile)
+                if context is not None:
+                    context = context.strip()
+
+        if context is None:
+            if self._userHome is not None:
+                context = self.readFromConfig('webapp.contextPath', os.path.join(self._userHome, '.pulse2', 'config.properties'))
+                if context is not None:
+                    context = context.strip()
+
+        return context
+
+    def readFromConfig(self, property, file):
+
+        if not os.path.exists(file):
+            return None
+
+        configFile = open(file, 'r')
+
+        try:
+
+            for line in configFile:
+                if line.startswith(property):
+                    return line[line.index('=') + 1:]
+
+            return None
+            
+        finally:
+            configFile.close()
+
+
+
+    def ping(self):
+        """ should be using the command line interface for this ping to ensure that the bundled
+            ping actually works, well at least when that ping is implemented. """
+            
+        proxy = self.getServerProxy()
+        try:
+            proxy.RemoteApi.ping()
+            return True
+        except Exception, e:
+            print e
+            return False
+
+
+def createPackage(packageFile):
+    return PulsePackage(packageFile)
+

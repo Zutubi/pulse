@@ -4,27 +4,27 @@ import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.forms.setup.PulseLicenseForm;
 import com.zutubi.pulse.acceptance.forms.setup.SetPulseDataForm;
+import com.zutubi.pulse.acceptance.forms.setup.SetupDatabaseTypeForm;
+import com.zutubi.pulse.acceptance.support.JythonPackageFactory;
+import com.zutubi.pulse.acceptance.support.PackageFactory;
+import com.zutubi.pulse.acceptance.support.Pulse;
+import com.zutubi.pulse.acceptance.support.PulsePackage;
 import com.zutubi.pulse.bootstrap.SystemConfiguration;
-import com.zutubi.pulse.command.PingServerCommand;
-import com.zutubi.pulse.command.ShutdownCommand;
-import com.zutubi.pulse.command.StartCommand;
 import com.zutubi.pulse.config.Config;
 import com.zutubi.pulse.config.FileConfig;
+import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.TextUtils;
-import junit.framework.TestCase;
 import org.apache.commons.cli.ParseException;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
 
 /**
  * <class-comment/>
  */
-public class StartupShutdownAcceptanceTest extends TestCase
+public class StartupShutdownAcceptanceTest extends PulseTestCase
 {
     private File tmpDir;
     private File dataDir;
@@ -32,53 +32,68 @@ public class StartupShutdownAcceptanceTest extends TestCase
     private File configFile;
     private File defaultConfigFile;
 
-    private Properties sys;
+    private Pulse pulse;
+    private DefaultSelenium selenium;
 
     protected void setUp() throws Exception
     {
-        // This system property is only required when running these tests within intelliJ
-        // So, if this property has been set, leave it. If not, set it. This means that we need to set this property
-        // when running accept.master.
-        if (!System.getProperties().containsKey("bootstrap"))
-        {
-            System.setProperty("bootstrap", "com/zutubi/pulse/bootstrap/ideaBootstrapContext.xml");
-        }
-        sys = new Properties();
-        sys.putAll(System.getProperties());
-
         // create a temporary user home.
-        tmpDir = FileSystemUtils.createTempDir(getClass().getSimpleName() + ".", "." + getName());
+        tmpDir = FileSystemUtils.createTempDir("SSAT" + ".", "." + getName());
         dataDir = new File(tmpDir, "data");
         configFile = new File(tmpDir, "crazy.config.file.name");
 
+        // jvm is no longer embedded - this does not work.
         File userHome = new File(tmpDir, "home");
-        defaultDataDir = new File(userHome, "data");
-        defaultConfigFile = new File(userHome, FileSystemUtils.composeFilename(".pulse", "config.properties"));
+//        System.setProperty("user.home", userHome.getAbsolutePath());
 
-        System.setProperty("user.home", userHome.getAbsolutePath());
+        defaultDataDir = new File(userHome, ".pulse2/data");
+        defaultConfigFile = new File(userHome, FileSystemUtils.composeFilename(".pulse2", "config.properties"));
+
+        // this test is part of a larger suite of tests, the package to be tested is defined there.
+        String testPackagePath = System.getProperty("test.package");
+        if (testPackagePath != null)
+        {
+            File testPackage = new File(testPackagePath);
+            
+        }
+
+        String packageDirectoryName = StringUtils.join(File.pathSeparator, "testing-packages");
+        File packagesDir = new File(getPulseRoot(), packageDirectoryName);
+
+        PackageFactory factory = new JythonPackageFactory();
+        PulsePackage pkg = factory.createPackage(new File(packagesDir, "pulse-2.0.9.zip"));
+        pulse = pkg.extractTo(tmpDir.getCanonicalPath());
+        pulse.setUserHome(userHome.getCanonicalPath());
     }
 
     protected void tearDown() throws Exception
     {
-        assertTrue(FileSystemUtils.rmdir(tmpDir));
-        tmpDir = null;
-        dataDir = null;
-        defaultDataDir = null;
-        configFile = null;
-        defaultConfigFile = null;
+        //assertTrue(FileSystemUtils.rmdir(tmpDir));
+        try
+        {
+            if (selenium != null)
+            {
+                selenium.stop();
+                selenium = null;
+            }
+            tmpDir = null;
+            dataDir = null;
+            defaultDataDir = null;
+            configFile = null;
+            defaultConfigFile = null;
 
-        resetSystemProperties();
+            if (pulse.ping())
+            {
+                pulse.stop();
+            }
+            pulse = null;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
-    private void resetSystemProperties()
-    {
-        System.getProperties().clear();
-        System.getProperties().putAll(sys);
-    }
-
-    /**
-     * check that pulse starts up and shutdowns down correctly using pulses internal defaults.
-     */
     public void testDefaultFirstTimeStartup() throws Exception
     {
         // we are using the default runtime context.
@@ -154,7 +169,6 @@ public class StartupShutdownAcceptanceTest extends TestCase
      */
     private void assertFirstTimeStartup(RuntimeContext commandline, RuntimeContext file, RuntimeContext expected) throws Exception
     {
-        assertServerNotAvailable(expected);
         assertExternalConfigNotAvailable(expected);
 
         assertStartServer(commandline);
@@ -162,7 +176,7 @@ public class StartupShutdownAcceptanceTest extends TestCase
 
         if (TextUtils.stringSet(commandline.getConfiguredDataDirectory()))
         {
-            assertPromptForLicense(expected);
+            assertPromptForDatabase(expected);
         }
         else
         {
@@ -172,9 +186,6 @@ public class StartupShutdownAcceptanceTest extends TestCase
         // verify that the pulse config file is written to the user home.
         assertExternalConfigAvailable(expected.getExternalConfigFile());
         assertExternalConfigContents(expected.getExternalConfigFile(), file);
-
-        // ensure the command line (system properties) is cleaned up.
-        resetSystemProperties();
 
         // now lets shutdown the server.
         assertShutdownServer(commandline);
@@ -272,8 +283,6 @@ public class StartupShutdownAcceptanceTest extends TestCase
         assertStartServer(startupCommandLine);
         assertServerAvailable(startupCommandLine);
 
-        resetSystemProperties();
-
         // now lets shutdown the server using the default context. This checks
         // that the runtime context is remembered and used for admin functions.
         RuntimeContext shutdownCommandLine = new RuntimeContext();
@@ -298,8 +307,6 @@ public class StartupShutdownAcceptanceTest extends TestCase
         assertServerNotAvailable(startupCommandLine);
         assertStartServer(startupCommandLine);
         assertServerAvailable(startupCommandLine);
-
-        resetSystemProperties();
 
         // now we set the new startup configuration while the server is still
         // running.
@@ -336,7 +343,7 @@ public class StartupShutdownAcceptanceTest extends TestCase
         assertServerAvailable(expected);
 
         // always expected a license prompt, never a data prompt since the data directory is located in the config file.
-        assertPromptForLicense(expected);
+        assertPromptForDatabase(expected);
 
         // verify that the pulse config file is written to the user home.
         assertExternalConfigAvailable(expected.getExternalConfigFile());
@@ -357,9 +364,17 @@ public class StartupShutdownAcceptanceTest extends TestCase
         String dataDir = form.getFormValues()[0];
 
         // set the data directory
-        form.nextFormElements("data");
+        form.nextFormElements(expected.getConfiguredDataDirectory());
 
         return dataDir;
+    }
+
+    private void assertPromptForDatabase(RuntimeContext expected)
+    {
+        Selenium selenium = expected.initSelenium();
+
+        SetupDatabaseTypeForm form = new SetupDatabaseTypeForm(selenium);
+        form.assertFormPresent();
     }
 
     private void assertPromptForLicense(RuntimeContext expected)
@@ -372,70 +387,41 @@ public class StartupShutdownAcceptanceTest extends TestCase
 
     private void assertServerNotAvailable(RuntimeContext ctx)
     {
-        PingServerCommand ping = new PingServerCommand();
-        ping.setBaseUrl(ctx.getBaseUrl());
-        assertEquals(2, ping.execute());
+        assertFalse(pulse.ping());
     }
 
     private void assertServerAvailable(RuntimeContext ctx)
     {
-        PingServerCommand ping = new PingServerCommand();
-        ping.setBaseUrl(ctx.getBaseUrl());
-        assertEquals(0, ping.execute());
+        assertTrue(pulse.ping());
     }
 
     private void assertStartServer(RuntimeContext commandline) throws ParseException
     {
-        StartCommand start = new StartCommand();
-        List<String> args = new LinkedList<String>();
-
         if (TextUtils.stringSet(commandline.getPort()))
         {
-            args.add("-p");
-            args.add(commandline.getPort());
+            pulse.setPort(Long.valueOf(commandline.getPort()));
         }
         if (TextUtils.stringSet(commandline.getContextPath()))
         {
-            args.add("-c");
-            args.add(commandline.getContextPath());
+            pulse.setContext(commandline.getContextPath());
         }
         if (TextUtils.stringSet(commandline.getConfiguredDataDirectory()))
         {
-            args.add("-d");
-            args.add(commandline.getConfiguredDataDirectory());
+            pulse.setDataDir(commandline.getConfiguredDataDirectory());
         }
         if (TextUtils.stringSet(commandline.getExternalConfig()))
         {
-            args.add("-f");
-            args.add(commandline.getExternalConfig());
+            pulse.setConfigFile(commandline.getExternalConfig());
         }
-        assertEquals(0, start.execute(args.toArray(new String[args.size()])));
+        assertFalse(pulse.ping());
+        assertEquals(0, pulse.start());
+        assertTrue(pulse.ping());
     }
 
     private void assertShutdownServer(RuntimeContext commandline) throws ParseException, InterruptedException, IOException
     {
-        ShutdownCommand shutdown = new ShutdownCommand();
-        List<String> args = new LinkedList<String>();
-        args.add("shutdown");
-        if (TextUtils.stringSet(commandline.getPort()))
-        {
-            args.add("-p");
-            args.add(commandline.getPort());
-        }
-        if (TextUtils.stringSet(commandline.getContextPath()))
-        {
-            args.add("-c");
-            args.add(commandline.getContextPath());
-        }
-        if (TextUtils.stringSet(commandline.getExternalConfig()))
-        {
-            args.add("-f");
-            args.add(commandline.getExternalConfig());
-        }
-        shutdown.setExitJvm(false);
-        assertEquals(0, shutdown.execute(args.toArray(new String[args.size()])));
-
-        Thread.sleep(2000); // give pulse a chance to shutdown.
+        pulse.stop();
+        assertFalse(pulse.ping());
     }
 
     private void assertExternalConfigNotAvailable(RuntimeContext ctx)
@@ -459,8 +445,19 @@ public class StartupShutdownAcceptanceTest extends TestCase
         // If the file was already there (updated by the user), then these values may vary.
         assertEquals(expected.getPort(), config.getProperty(SystemConfiguration.WEBAPP_PORT));
         assertEquals(expected.getContextPath(), config.getProperty(SystemConfiguration.CONTEXT_PATH));
+        assertEqualPaths(expected.getConfiguredDataDirectory(), config.getProperty(SystemConfiguration.PULSE_DATA));
+    }
 
-        assertEquals(expected.getConfiguredDataDirectory(), config.getProperty(SystemConfiguration.PULSE_DATA));
+    private static void assertEqualPaths(String a, String b)
+    {
+        try
+        {
+            assertEquals(new File(a).getCanonicalPath(), new File(b).getCanonicalPath());
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -533,16 +530,11 @@ public class StartupShutdownAcceptanceTest extends TestCase
             return configuredDataDirectory;
         }
 
-        public String getBaseUrl()
-        {
-            return "http://localhost:" + getPort() + getContextPath();
-        }
-
         public Selenium initSelenium()
         {
-            Selenium selenium = new DefaultSelenium("localhost", 4444, "*firefox", getBaseUrl());
+            selenium = new DefaultSelenium("localhost", 4446, "*firefox", "http://localhost:" + getPort());
             selenium.start();
-            selenium.open("/");
+            selenium.open((getContextPath() != null ? getContextPath() : ""));
             return selenium;
         }
     }
