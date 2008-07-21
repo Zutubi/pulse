@@ -159,9 +159,12 @@ public abstract class AbstractExtensionManager implements IExtensionChangeHandle
         for (Plugin plugin : pluginManager.getPlugins())
         {
             LocalPlugin localPlugin = (LocalPlugin) plugin;
-            if (localPlugin.bundle.getBundleId() == requiredBundleId)
+            if (localPlugin.getBundle() != null)
             {
-                return plugin;
+                if (localPlugin.getBundle().getBundleId() == requiredBundleId)
+                {
+                    return plugin;
+                }
             }
         }
         return null;

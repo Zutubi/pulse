@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.LinkedList;
 import java.util.HashMap;
+import java.io.IOException;
 
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IExtensionPoint;
@@ -98,7 +99,7 @@ public class PluginUpgradeManager implements UpgradeableComponentSource
                 Version registryVersion = new Version(registry.getEntry(plugin.getId()).get(PluginManager.PLUGIN_VERSION_KEY));
 
                 List<UpgradeTaskHolder> tasks = definedUpgradeTasks.get(plugin.getId());
-                if (tasks != null)
+                if (tasks != null && tasks.size() > 0)
                 {
                     requiredUpgradeTasks.put(plugin.getId(), new LinkedList<UpgradeTaskHolder>());
                     List<UpgradeTaskHolder> requiredPluginUpgradeTasks = requiredUpgradeTasks.get(plugin.getId());
@@ -149,7 +150,7 @@ public class PluginUpgradeManager implements UpgradeableComponentSource
                         }
                     }
 
-                    upgradeableComponents.add(new PluginUpgradeableComponent(this, plugin, upgradeTasks));
+                    upgradeableComponents.add(new PluginUpgradeableComponent(registry, plugin, upgradeTasks));
                 }
             }
         }
@@ -183,15 +184,15 @@ public class PluginUpgradeManager implements UpgradeableComponentSource
 
     private static class PluginUpgradeableComponent implements UpgradeableComponent
     {
-        private PluginUpgradeManager pluginUpgradeManager;
-
         private List<UpgradeTask> upgradeTasks;
 
         private Plugin plugin;
 
-        public PluginUpgradeableComponent(PluginUpgradeManager pluginUpgradeManager, Plugin plugin, List<UpgradeTask> tasks)
+        private PluginRegistry pluginRegistry;
+
+        public PluginUpgradeableComponent(PluginRegistry pluginRegistry, Plugin plugin, List<UpgradeTask> tasks)
         {
-            this.pluginUpgradeManager = pluginUpgradeManager;
+            this.pluginRegistry = pluginRegistry;
             this.plugin = plugin;
             this.upgradeTasks = tasks;
         }
@@ -213,9 +214,24 @@ public class PluginUpgradeManager implements UpgradeableComponentSource
 
         public void upgradeCompleted()
         {
-            // callback
-            // should be recording the new version of the plugin to which we just upgraded.
-            
+            try
+            {
+// callback
+                // should be recording the new version of the plugin to which we just upgraded.
+                Map<String, String> entry = pluginRegistry.getEntry(plugin.getId());
+
+                Version oldVersion = new Version(entry.get(PluginManager.PLUGIN_VERSION_KEY));
+                Version newVersion = plugin.getVersion();
+
+                // log that we have upgraded from oldversion -> newversion.
+
+                entry.put(PluginManager.PLUGIN_VERSION_KEY, newVersion.toString());
+                pluginRegistry.flush();
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
         }
 
         public void upgradeAborted()

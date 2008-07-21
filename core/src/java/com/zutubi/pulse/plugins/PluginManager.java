@@ -175,8 +175,8 @@ public class PluginManager
                 }
             }
 
-            plugin.bundle = equinox.install(plugin.getSource());
-            plugin.bundleDescription = equinox.getBundleDescription(plugin.getId(), plugin.getVersion().toString());
+            plugin.setBundle(equinox.install(plugin.getSource()));
+            plugin.setBundleDescription(equinox.getBundleDescription(plugin.getId(), plugin.getVersion().toString()));
         }
 
         //NOTE: the extension works with resolved plugins, so we need to get a plugin to resolved before it can be upgrades. 
@@ -191,15 +191,15 @@ public class PluginManager
         List<LocalPlugin> resolvedPlugins = new LinkedList<LocalPlugin>();
         for (LocalPlugin plugin : installedPlugins)
         {
-            switch (plugin.bundle.getState())
+            switch (plugin.getBundle().getState())
             {
                 case Bundle.INSTALLED:
                     // resolve failed.
                     try
                     {
-                        plugin.bundle.uninstall();
-                        plugin.bundle = null;
-                        plugin.bundleDescription = null;
+                        plugin.getBundle().uninstall();
+                        plugin.setBundle(null);
+                        plugin.setBundleDescription(null);
                         plugin.setState(Plugin.State.DISABLED);
                         plugin.setErrorMessage("Failed to resolve bundle.");
                     }
@@ -213,7 +213,7 @@ public class PluginManager
                     resolvedPlugins.add(plugin);
                     break;
                 default:
-                    LOG.warning("Unexpected plugin state; plugin: " + plugin.getName() + "(" + plugin.getId() + "), state: " + plugin.bundle.getState());
+                    LOG.warning("Unexpected plugin state; plugin: " + plugin.getName() + "(" + plugin.getId() + "), state: " + plugin.getBundle().getState());
             }
         }
 
@@ -229,7 +229,7 @@ public class PluginManager
                 {
                     try
                     {
-                        plugin.bundle.start(Bundle.START_TRANSIENT);
+                        plugin.getBundle().start(Bundle.START_TRANSIENT);
                         Map<String, String> entry = registry.getEntry(plugin.getId());
                         entry.put(PLUGIN_VERSION_KEY, plugin.getVersion().toString());
                         saveRegistry();
@@ -238,9 +238,9 @@ public class PluginManager
                     }
                     catch (BundleException e)
                     {
-                        plugin.bundle.uninstall();
-                        plugin.bundle = null;
-                        plugin.bundleDescription = null;
+                        plugin.getBundle().uninstall();
+                        plugin.setBundle(null);
+                        plugin.setBundleDescription(null);
                         plugin.setState(Plugin.State.DISABLED);
                         plugin.setErrorMessage(e.getMessage());
                     }
@@ -255,15 +255,15 @@ public class PluginManager
         for(File file : paths.getInternalPluginStorageDir().listFiles())
         {
             LocalPlugin internalPlugin = createPluginHandle(file.toURI(), Plugin.Type.INTERNAL);
-            internalPlugin.bundle = equinox.install(internalPlugin.getSource());
-            internalPlugin.bundleDescription = equinox.getBundleDescription(internalPlugin.getId(), internalPlugin.getVersion().toString());
+            internalPlugin.setBundle(equinox.install(internalPlugin.getSource()));
+            internalPlugin.setBundleDescription(equinox.getBundleDescription(internalPlugin.getId(), internalPlugin.getVersion().toString()));
             internalPlugins.add(internalPlugin);
         }
         equinox.resolveBundles();
         internalPlugins = sortPlugins(internalPlugins);
         for (LocalPlugin plugin : internalPlugins)
         {
-            plugin.bundle.start(Bundle.START_TRANSIENT);
+            plugin.getBundle().start(Bundle.START_TRANSIENT);
             plugin.setState(Plugin.State.ENABLED);
         }
     }
@@ -656,14 +656,14 @@ public class PluginManager
             if (plugin.getState() == Plugin.State.VERSION_CHANGE)
             {
                 // install only.
-                plugin.bundle = equinox.resolve(plugin.getSource());
-                plugin.bundleDescription = equinox.getBundleDescription(plugin.getId(), plugin.getVersion().toString());
+                plugin.setBundle(equinox.resolve(plugin.getSource()));
+                plugin.setBundleDescription(equinox.getBundleDescription(plugin.getId(), plugin.getVersion().toString()));
             }
             else
             {
                 // fully activate the plugin.
-                plugin.bundle = equinox.activate(plugin.getSource());
-                plugin.bundleDescription = equinox.getBundleDescription(plugin.getId(), plugin.getVersion().toString());
+                plugin.setBundle(equinox.activate(plugin.getSource()));
+                plugin.setBundleDescription(equinox.getBundleDescription(plugin.getId(), plugin.getVersion().toString()));
 
                 entry.put(PLUGIN_VERSION_KEY, plugin.getVersion().toString());
                 saveRegistry();
@@ -674,9 +674,9 @@ public class PluginManager
         {
             try
             {
-                if (plugin.bundle != null)
+                if (plugin.getBundle() != null)
                 {
-                    plugin.bundle.uninstall();
+                    plugin.getBundle().uninstall();
                 }
             }
             catch (BundleException e1)
@@ -684,8 +684,8 @@ public class PluginManager
                 LOG.warning(e1);
             }
 
-            plugin.bundle = null;
-            plugin.bundleDescription = null;
+            plugin.setBundle(null);
+            plugin.setBundleDescription(null);
             plugin.setState(Plugin.State.DISABLED);
             plugin.setErrorMessage(e.getMessage());
         }
@@ -780,7 +780,7 @@ public class PluginManager
         try
         {
             // fully activate the plugin.
-            plugin.bundle.start(Bundle.START_TRANSIENT);
+            plugin.getBundle().start(Bundle.START_TRANSIENT);
             Map<String, String> registryEntry = registry.getEntry(plugin.getId());
             registryEntry.put(PLUGIN_VERSION_KEY, plugin.getVersion().toString());
             plugin.setState(Plugin.State.ENABLED);
@@ -890,7 +890,7 @@ public class PluginManager
 
     public List<PluginRequirement> getRequiredPlugins(LocalPlugin plugin)
     {
-        BundleDescription description = plugin.bundleDescription;
+        BundleDescription description = plugin.getBundleDescription();
         if (description == null)
         {
             // It is the bundles description that tells us about the bundles requirements.
@@ -1054,7 +1054,7 @@ public class PluginManager
 
     private void addDependentPlugins(LocalPlugin plugin, List<LocalPlugin> plugins, boolean transitive, List<LocalPlugin> result)
     {
-        BundleDescription description = plugin.bundleDescription;
+        BundleDescription description = plugin.getBundleDescription();
         if (description != null)
         {
             BundleDescription[] required = description.getDependents();

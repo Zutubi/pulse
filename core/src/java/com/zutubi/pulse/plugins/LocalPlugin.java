@@ -27,8 +27,9 @@ public abstract class LocalPlugin implements Plugin
 
     protected PluginManager manager;
 
-    public Bundle bundle;
-    protected BundleDescription bundleDescription;
+    private Bundle bundle;
+
+    private BundleDescription bundleDescription;
 
     private String errorMessage;
 
@@ -287,9 +288,33 @@ public abstract class LocalPlugin implements Plugin
 
     public Class<?> loadClass(String type) throws ClassNotFoundException
     {
-        return bundle.loadClass(type);
+        if (getBundle() == null)
+        {
+            throw new IllegalStateException("Can not load a class from plugin: " + getName() + ". No bundle " +
+                    "has been loaded.  Plugin state: " + getState());
+        }
+        return getBundle().loadClass(type);
     }
 
     protected abstract Headers loadPluginManifest(File pluginFile);
 
+    public Bundle getBundle()
+    {
+        return bundle;
+    }
+
+    public void setBundle(Bundle bundle)
+    {
+        this.bundle = bundle;
+    }
+
+    public BundleDescription getBundleDescription()
+    {
+        return bundleDescription;
+    }
+
+    public void setBundleDescription(BundleDescription bundleDescription)
+    {
+        this.bundleDescription = bundleDescription;
+    }
 }
