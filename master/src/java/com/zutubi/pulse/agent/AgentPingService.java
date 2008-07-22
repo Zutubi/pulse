@@ -23,11 +23,11 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class AgentPingService implements Stoppable
 {
+    public static final String PROPERTY_AGENT_PING_INTERVAL = "pulse.agent.ping.interval";
     public static final String PROPERTY_AGENT_PING_TIMEOUT = "pulse.agent.ping.timeout";
     public static final String PROPERTY_AGENT_LOG_TIMEOUTS = "pulse.agent.log.timeouts";
 
     private static final Logger LOG = Logger.getLogger(AgentPingService.class);
-
     private final int masterBuildNumber = Version.getVersion().getBuildNumberAsInt();
     private ExecutorService threadPool;
     private TokenManager serviceTokenManager;
@@ -35,6 +35,16 @@ public class AgentPingService implements Stoppable
     private Set<Long> inProgress = new HashSet<Long>();
     private EventManager eventManager;
     private MasterLocationProvider masterLocationProvider;
+
+    public static int getAgentPingInterval()
+    {
+        return Integer.getInteger(PROPERTY_AGENT_PING_INTERVAL, 60);
+    }
+
+    public static int getAgentPingTimeout()
+    {
+        return Integer.getInteger(PROPERTY_AGENT_PING_TIMEOUT, 45);
+    }
 
     public void init()
     {
@@ -132,7 +142,7 @@ public class AgentPingService implements Stoppable
                 SlaveStatus status;
                 try
                 {
-                    status = future.get(Integer.getInteger(PROPERTY_AGENT_PING_TIMEOUT, 45), TimeUnit.SECONDS);
+                    status = future.get(getAgentPingTimeout(), TimeUnit.SECONDS);
                 }
                 catch (TimeoutException e)
                 {
@@ -141,7 +151,7 @@ public class AgentPingService implements Stoppable
                         LOG.warning("Timed out pinging agent '" + agent.getName() + "'", e);
                     }
                     
-                    status = new SlaveStatus(Status.OFFLINE, "Agent ping timed out");
+                    status = new SlaveStatus(PingStatus.OFFLINE, "Agent ping timed out");
                 }
                 catch (Exception e)
                 {
@@ -149,7 +159,7 @@ public class AgentPingService implements Stoppable
 
                     String message = "Unexpected error pinging agent '" + agent.getName() + "': " + e.getMessage();
                     LOG.warning(message);
-                    status = new SlaveStatus(Status.OFFLINE, message);
+                    status = new SlaveStatus(PingStatus.OFFLINE, message);
                 }
 
                 pingCompleted(agent);

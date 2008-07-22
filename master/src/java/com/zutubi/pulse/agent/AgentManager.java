@@ -12,6 +12,7 @@ public interface AgentManager
 {
     List<Agent> getAllAgents();
     List<Agent> getOnlineAgents();
+    List<Agent> getAvailableAgents();
     Agent getAgent(Slave slave);
 
     void pingSlave(Slave slave);
@@ -20,9 +21,6 @@ public interface AgentManager
     int getAgentCount();
 
     void addSlave(Slave slave) throws LicenseException;
-    void enableSlave(long slaveId);
-    void disableSlave(long slaveId);
-    void setSlaveState(long slaveId, Slave.EnableState state);
 
     void slaveAdded(long id);
     void slaveChanged(long id);
@@ -34,7 +32,4 @@ public interface AgentManager
 
     Agent getAgent(String name);
 
-    void enableMasterAgent();
-
-    void disableMasterAgent();
 }

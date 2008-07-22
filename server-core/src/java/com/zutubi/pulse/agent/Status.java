@@ -13,6 +13,38 @@ public enum Status
                 {
                     return false;
                 }
+
+                public boolean isBusy()
+                {
+                    return false;
+                }
+
+                public boolean ignorePings()
+                {
+                    return true;
+                }
+            },
+    INITIAL
+            {
+                public String getPrettyString()
+                {
+                    return "initial";
+                }
+
+                public boolean isOnline()
+                {
+                    return false;
+                }
+
+                public boolean isBusy()
+                {
+                    return false;
+                }
+
+                public boolean ignorePings()
+                {
+                    return false;
+                }
             },
     OFFLINE
             {
@@ -22,6 +54,16 @@ public enum Status
                 }
 
                 public boolean isOnline()
+                {
+                    return false;
+                }
+
+                public boolean isBusy()
+                {
+                    return false;
+                }
+
+                public boolean ignorePings()
                 {
                     return false;
                 }
@@ -37,6 +79,16 @@ public enum Status
                 {
                     return false;
                 }
+
+                public boolean isBusy()
+                {
+                    return false;
+                }
+
+                public boolean ignorePings()
+                {
+                    return false;
+                }
             },
     TOKEN_MISMATCH
             {
@@ -46,6 +98,16 @@ public enum Status
                 }
 
                 public boolean isOnline()
+                {
+                    return false;
+                }
+
+                public boolean isBusy()
+                {
+                    return false;
+                }
+
+                public boolean ignorePings()
                 {
                     return false;
                 }
@@ -61,6 +123,38 @@ public enum Status
                 {
                     return false;
                 }
+
+                public boolean isBusy()
+                {
+                    return false;
+                }
+
+                public boolean ignorePings()
+                {
+                    return false;
+                }
+            },
+    RECIPE_DISPATCHED
+            {
+                public String getPrettyString()
+                {
+                    return "recipe dispatched";
+                }
+
+                public boolean isOnline()
+                {
+                    return true;
+                }
+
+                public boolean isBusy()
+                {
+                    return true;
+                }
+
+                public boolean ignorePings()
+                {
+                    return false;
+                }
             },
     BUILDING
             {
@@ -72,6 +166,82 @@ public enum Status
                 public boolean isOnline()
                 {
                     return true;
+                }
+
+                public boolean isBusy()
+                {
+                    return true;
+                }
+
+                public boolean ignorePings()
+                {
+                    return false;
+                }
+            },
+    POST_RECIPE
+            {
+                public String getPrettyString()
+                {
+                    return "post recipe";
+                }
+
+                public boolean isOnline()
+                {
+                    return true;
+                }
+
+                public boolean isBusy()
+                {
+                    return true;
+                }
+
+                public boolean ignorePings()
+                {
+                    return true;
+                }
+            },
+    AWAITING_PING
+            {
+                public String getPrettyString()
+                {
+                    return "awaiting ping";
+                }
+
+                public boolean isOnline()
+                {
+                    return true;
+                }
+
+                public boolean isBusy()
+                {
+                    return true;
+                }
+
+                public boolean ignorePings()
+                {
+                    return false;
+                }
+            },
+    BUILDING_INVALID
+            {
+                public String getPrettyString()
+                {
+                    return "building";
+                }
+
+                public boolean isOnline()
+                {
+                    return true;
+                }
+
+                public boolean isBusy()
+                {
+                    return true;
+                }
+
+                public boolean ignorePings()
+                {
+                    return false;
                 }
             },
     IDLE
@@ -85,9 +255,21 @@ public enum Status
                 {
                     return true;
                 }
+
+                public boolean isBusy()
+                {
+                    return false;
+                }
+
+                public boolean ignorePings()
+                {
+                    return false;
+                }
             };
 
     public abstract String getPrettyString();
-
     public abstract boolean isOnline();
+    public abstract boolean isBusy();
+    public abstract boolean ignorePings();
+    
 }

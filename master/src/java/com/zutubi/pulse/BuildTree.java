@@ -35,17 +35,6 @@ public class BuildTree implements Iterable<RecipeController>
         });
     }
 
-    public void cleanup(final BuildResult buildResult)
-    {
-        apply(new TreeNodeOperation<RecipeController>()
-        {
-            public void apply(TreeNode<RecipeController> node)
-            {
-                node.getData().cleanup(buildResult);
-            }
-        });
-    }
-
     public void apply(TreeNodeOperation<RecipeController> op)
     {
         apply(op, root);

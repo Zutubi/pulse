@@ -1,5 +1,6 @@
 package com.zutubi.pulse.model;
 
+import com.zutubi.pulse.agent.AgentPingService;
 import com.zutubi.pulse.model.persistence.BuildSpecificationDao;
 import com.zutubi.pulse.model.persistence.SlaveDao;
 import com.zutubi.pulse.scheduling.Scheduler;
@@ -26,7 +27,6 @@ public class DefaultSlaveManager implements SlaveManager
 
     private static final String PING_NAME = "ping";
     private static final String PING_GROUP = "services";
-    private static final long PING_FREQUENCY = Long.getLong("pulse.agent.ping.interval", 60);
 
     public void init()
     {
@@ -39,7 +39,7 @@ public class DefaultSlaveManager implements SlaveManager
         }
 
         // initialise the trigger.
-        trigger = new SimpleTrigger(PING_NAME, PING_GROUP, PING_FREQUENCY * Constants.SECOND);
+        trigger = new SimpleTrigger(PING_NAME, PING_GROUP, AgentPingService.getAgentPingInterval() * Constants.SECOND);
         trigger.setTaskClass(PingSlaves.class);
 
         try

@@ -13,12 +13,13 @@ public class Slave extends Entity
     /**
      * Persistent slave states.  The minimum we need to remember even across
      * restarts to ensure disabled slaves stay that way and failed (or
-     * interrupted) upgrades are not retried with user intervention.
+     * interrupted) upgrades are not retried without user intervention.
      */
     public enum EnableState
     {
         ENABLED,
         DISABLED,
+        DISABLING,
         UPGRADING,
         FAILED_UPGRADE
     }

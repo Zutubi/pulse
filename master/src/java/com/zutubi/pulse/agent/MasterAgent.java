@@ -9,6 +9,7 @@ import com.zutubi.pulse.bootstrap.StartupManager;
 import com.zutubi.pulse.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.logging.ServerMessagesHandler;
+import com.zutubi.pulse.model.Slave;
 
 import java.util.List;
 
@@ -16,6 +17,7 @@ import java.util.List;
  */
 public class MasterAgent implements Agent
 {
+    private Status status;
     private MasterBuildService service;
     private MasterConfigurationManager configurationManager;
     private StartupManager startupManager;
@@ -27,6 +29,15 @@ public class MasterAgent implements Agent
         this.configurationManager = configurationManager;
         this.startupManager = startupManager;
         this.serverMessagesHandler = serverMessagesHandler;
+
+        if(getEnableState() == Slave.EnableState.ENABLED)
+        {
+            status = Status.IDLE;
+        }
+        else
+        {
+            status = Status.DISABLED;
+        }
     }
 
     public long getId()
@@ -37,6 +48,11 @@ public class MasterAgent implements Agent
     public BuildService getBuildService()
     {
         return service;
+    }
+
+    public long getRecipeId()
+    {
+        return service.getBuildingRecipe();
     }
 
     public SystemInfo getSystemInfo()
@@ -51,43 +67,28 @@ public class MasterAgent implements Agent
 
     public boolean isOnline()
     {
-        return isEnabled();
+        return getStatus().isOnline();
+    }
+
+    public Slave.EnableState getEnableState()
+    {
+        MasterConfiguration masterConfig = configurationManager.getAppConfig();
+        return masterConfig.getMasterEnableState();
     }
 
     public boolean isEnabled()
     {
-        MasterConfiguration masterConfig = configurationManager.getAppConfig();
-        return masterConfig.isMasterEnabled();
+        return getEnableState() == Slave.EnableState.ENABLED;
     }
 
     public Status getStatus()
     {
-        if (!isEnabled())
-        {
-            return Status.DISABLED;
-        }
-        
-        if(service.getBuildingRecipe() == 0)
-        {
-            return Status.IDLE;
-        }
-        else
-        {
-            return Status.BUILDING;
-        }
+        return status;
     }
 
-    public void setStatus(Status status)
+    public void updateStatus(Status status)
     {
-        MasterConfiguration masterConfig = configurationManager.getAppConfig();
-        if (status == Status.DISABLED)
-        {
-            masterConfig.setMasterEnabled(false);
-        }
-        else
-        {
-            masterConfig.setMasterEnabled(true);
-        }
+        this.status = status;
     }
 
     public String getLocation()
@@ -99,6 +100,11 @@ public class MasterAgent implements Agent
     public boolean isSlave()
     {
         return false;
+    }
+
+    public boolean isDisabling()
+    {
+        return getEnableState() == Slave.EnableState.DISABLING;
     }
 
     public String getName()

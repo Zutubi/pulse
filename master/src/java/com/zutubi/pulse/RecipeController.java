@@ -238,15 +238,6 @@ public class RecipeController
         recipeResult.complete();
         recipeResult.abortUnfinishedCommands();
 
-        if (!personal)
-        {
-            for(PostBuildAction action: specNode.getPostActions())
-            {
-                ComponentContext.autowire(action);
-                action.execute(buildResult, recipeResultNode, buildProperties);
-            }
-        }
-
         buildManager.save(recipeResult);
         logger.complete(recipeResult);
         finished = true;
@@ -282,11 +273,43 @@ public class RecipeController
     {
         try
         {
+            logger.cleaning();
             collector.cleanup(buildResult, recipeResult.getId(), incremental, buildService);
         }
         catch (Exception e)
         {
             LOG.warning("Unable to clean up recipe '" + recipeResult.getId() + "'", e);
+        }
+        finally
+        {
+            logger.cleaningComplete();
+        }
+    }
+
+    public void runPostStageActions()
+    {
+        try
+        {
+            if (!personal)
+            {
+                logger.actions();
+                try
+                {
+                    for(PostBuildAction action: specNode.getPostActions())
+                    {
+                        ComponentContext.autowire(action);
+                        action.execute(buildResult, recipeResultNode, buildProperties);
+                    }
+                }
+                finally
+                {
+                    logger.actionsComplete();
+                }
+            }
+        }
+        finally
+        {
+            logger.done();
         }
     }
 

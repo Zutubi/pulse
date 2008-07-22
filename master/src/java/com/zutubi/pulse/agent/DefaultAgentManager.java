@@ -21,8 +21,8 @@ import com.zutubi.pulse.model.Slave;
 import com.zutubi.pulse.model.SlaveManager;
 import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.services.SlaveService;
-import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.services.UpgradeStatus;
+import com.zutubi.pulse.util.Predicate;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.util.*;
@@ -38,6 +38,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 
     private ReentrantLock lock = new ReentrantLock();
     private Map<Long, SlaveAgent> slaveAgents;
+    private AgentStatusManager agentStatusManager;
 
     private SlaveManager slaveManager;
     private MasterRecipeProcessor masterRecipeProcessor;
@@ -61,12 +62,17 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         MasterBuildService masterService = new MasterBuildService(masterRecipeProcessor, masterLocationProvider, configurationManager.getUserPaths().getData(), resourceManager);
         masterAgent = new MasterAgent(masterService, configurationManager, startupManager, serverMessagesHandler);
 
+        // Create this prior to refreshing the slaves so it can pick up the
+        // slave added events.
+        agentStatusManager = new AgentStatusManager(masterAgent, eventManager);
+
         refreshSlaveAgents();
 
         // register the canAddAgent license authorisation.
         AddAgentAuthorisation addAgentAuthorisation = new AddAgentAuthorisation();
         addAgentAuthorisation.setAgentManager(this);
         licenseManager.addAuthorisation(addAgentAuthorisation);
+
     }
 
     private void refreshSlaveAgents()
@@ -77,7 +83,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
             slaveAgents = new TreeMap<Long, SlaveAgent>();
             for (Slave slave : slaveManager.getAll())
             {
-                addSlaveAgent(slave, false);
+                addSlaveAgent(slave, false, false);
             }
         }
         finally
@@ -86,7 +92,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         }
     }
 
-    private void addSlaveAgent(Slave slave, boolean ping)
+    private void addSlaveAgent(Slave slave, boolean ping, boolean changedExisting)
     {
         SlaveService service = slaveProxyFactory.createProxy(slave);
         SlaveBuildService buildService = new SlaveBuildService(service, serviceTokenManager, slave, masterLocationProvider, resourceManager);
@@ -98,9 +104,22 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
             slave.setEnableState(Slave.EnableState.FAILED_UPGRADE);
             slaveManager.save(slave);
         }
-
+        else if(slave.getEnableState() == Slave.EnableState.DISABLING)
+        {
+            slave.setEnableState(Slave.EnableState.DISABLED);
+            slaveManager.save(slave);
+        }
+        
         SlaveAgent agent = new SlaveAgent(slave, service, serviceTokenManager, buildService);
         slaveAgents.put(slave.getId(), agent);
+        if (changedExisting)
+        {
+            eventManager.publish(new AgentChangedEvent(this, agent));
+        }
+        else
+        {
+            eventManager.publish(new AgentAddedEvent(this, agent));
+        }
 
         if (ping)
         {
@@ -142,50 +161,11 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         slaveAdded(slave.getId());
     }
 
-    public void enableSlave(long slaveId)
-    {
-        setSlaveState(slaveId, Slave.EnableState.ENABLED);
-    }
-
-    public void disableSlave(long slaveId)
-    {
-        setSlaveState(slaveId, Slave.EnableState.DISABLED);
-    }
-
-    public void setSlaveState(long slaveId, Slave.EnableState state)
-    {
-        Slave slave = slaveManager.getSlave(slaveId);
-        slave.setEnableState(state);
-        slaveManager.save(slave);
-        slaveChanged(slave.getId());
-    }
-
     private void pingSlave(SlaveAgent agent)
     {
         if (agent.isEnabled())
         {
             agentPingService.requestPing(agent, agent.getSlaveService());
-        }
-    }
-
-    private void updateAgent(SlaveAgent agent)
-    {
-        Slave slave = slaveManager.getSlave(agent.getId());
-        slave.setEnableState(Slave.EnableState.UPGRADING);
-        slaveManager.save(slave);
-        agent.setSlave(slave);
-
-        AgentUpdater updater = new AgentUpdater(agent, serviceTokenManager.getToken(), masterLocationProvider.getMasterUrl(), eventManager, configurationManager.getSystemPaths());
-        updatersLock.lock();
-
-        try
-        {
-            updaters.put(agent.getId(), updater);
-            updater.start();
-        }
-        finally
-        {
-            updatersLock.unlock();
         }
     }
 
@@ -208,63 +188,57 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         }
     }
 
-    private void handleAgentPing(SlaveAgent agent, SlaveStatus status)
+    private void handleAgentEnableStateRequired(AgentEnableStateRequiredEvent event)
     {
-        Status oldStatus = agent.getStatus();
-        agent.updateStatus(status);
-
-        // If the slave has just come online, run resource
-        // discovery
-        if (status.getStatus().isOnline())
+        if(event.getAgent().isSlave())
         {
-            if (oldStatus.isOnline() && status.isFirst())
+            Slave slave = slaveManager.getSlave(event.getAgent().getId());
+            slave.setEnableState(event.getState());
+            slaveManager.save(slave);
+            slaveChanged(slave.getId());
+        }
+        else
+        {
+            configurationManager.getAppConfig().setMasterEnableState(event.getState());
+        }
+    }
+
+    private void handleAgentOnline(AgentOnlineEvent event)
+    {
+        Agent agent = event.getAgent();
+        if (agent.isSlave())
+        {
+            try
             {
-                // The agent bounced between pings.  Act like we saw it by
-                // sending the offline event and setting old status to
-                // offline.
-                agent.setStatus(Status.OFFLINE);
-                eventManager.publish(new AgentStatusEvent(this, oldStatus, agent));
-                oldStatus = Status.OFFLINE;
-                agent.updateStatus(status);
+                List<Resource> resources = ((SlaveAgent) agent).getSlaveService().discoverResources(serviceTokenManager.getToken());
+                resourceManager.addDiscoveredResources(slaveManager.getSlave(agent.getId()), resources);
             }
-
-            if(!oldStatus.isOnline())
+            catch (Exception e)
             {
-                if(status.getRecipeId() != 0)
-                {
-                    // The agent appears to have just come online but is
-                    // building.  Snap it out of that.
-                    try
-                    {
-                        agent.getBuildService().terminateRecipe(status.getRecipeId());
-                    }
-                    catch (Exception e)
-                    {
-                        LOG.severe("Unable to terminate unwanted recipe on agent '" + agent.getName() + "': " + e.getMessage(), e);
-                    }
-                }
-
-                try
-                {
-                    List<Resource> resources = agent.getSlaveService().discoverResources(serviceTokenManager.getToken());
-                    resourceManager.addDiscoveredResources(slaveManager.getSlave(agent.getId()), resources);
-                }
-                catch (Exception e)
-                {
-                    LOG.warning("Unable to discover resource for agent '" + agent.getName() + "': " + e.getMessage(), e);
-                }
+                LOG.warning("Unable to discover resource for agent '" + agent.getName() + "': " + e.getMessage(), e);
             }
         }
+    }
 
-        if (oldStatus != agent.getStatus())
+    private void handleUpgradeRequired(AgentUpgradeRequiredEvent event)
+    {
+        SlaveAgent agent = (SlaveAgent) event.getAgent();
+        Slave slave = slaveManager.getSlave(agent.getId());
+        slave.setEnableState(Slave.EnableState.UPGRADING);
+        slaveManager.save(slave);
+        agent.setSlave(slave);
+
+        AgentUpdater updater = new AgentUpdater(agent, serviceTokenManager.getToken(), masterLocationProvider.getMasterUrl(), eventManager, configurationManager.getSystemPaths());
+        updatersLock.lock();
+
+        try
         {
-            eventManager.publish(new AgentStatusEvent(this, oldStatus, agent));
-
-            if (status.getStatus() == Status.VERSION_MISMATCH)
-            {
-                // Try to update this agent.
-                updateAgent(agent);
-            }
+            updaters.put(agent.getId(), updater);
+            updater.start();
+        }
+        finally
+        {
+            updatersLock.unlock();
         }
     }
 
@@ -276,17 +250,17 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 
         updatersLock.lock();
         try
-            {
-                updaters.remove(slave.getId());
-            }
-            finally
-            {
-                updatersLock.unlock();
-            }
+        {
+            updaters.remove(slave.getId());
+        }
+        finally
+        {
+            updatersLock.unlock();
+        }
 
         if (suce.isSuccessful())
         {
-            agent.setStatus(Status.OFFLINE);
+            agent.updateStatus(Status.INITIAL);
             slave.setEnableState(Slave.EnableState.ENABLED);
             slaveManager.save(slave);
             agent.setSlave(slave);
@@ -302,10 +276,17 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 
     public void handleEvent(Event evt)
     {
-        if(evt instanceof AgentPingEvent)
+        if(evt instanceof AgentEnableStateRequiredEvent)
         {
-            AgentPingEvent ape = (AgentPingEvent) evt;
-            handleAgentPing((SlaveAgent) ape.getAgent(), ape.getPingStatus());
+            handleAgentEnableStateRequired((AgentEnableStateRequiredEvent) evt);
+        }
+        else if(evt instanceof AgentOnlineEvent)
+        {
+            handleAgentOnline((AgentOnlineEvent)evt);
+        }
+        else if(evt instanceof AgentUpgradeRequiredEvent)
+        {
+            handleUpgradeRequired((AgentUpgradeRequiredEvent) evt);
         }
         else
         {
@@ -315,44 +296,12 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 
     public Class[] getHandledEvents()
     {
-        return new Class[] { AgentPingEvent.class, SlaveUpgradeCompleteEvent.class };
+        return new Class[] { AgentEnableStateRequiredEvent.class, AgentOnlineEvent.class, AgentUpgradeRequiredEvent.class, SlaveUpgradeCompleteEvent.class };
     }
 
     public void setMasterLocationProvider(MasterLocationProvider masterLocationProvider)
     {
         this.masterLocationProvider = masterLocationProvider;
-    }
-
-    public void enableMasterAgent()
-    {
-        if (masterAgent.isEnabled())
-        {
-            // No need to go through all of the formalities. 
-            return;
-        }
-
-        // generate a master agent status change event.
-        AgentStatusEvent statusEvent = new AgentStatusEvent(this, masterAgent.getStatus(), masterAgent);
-
-        masterAgent.setStatus(Status.IDLE);
-
-        eventManager.publish(statusEvent);
-    }
-
-    public void disableMasterAgent()
-    {
-        if (!masterAgent.isEnabled())
-        {
-            // No need to go through all of the formalities.
-            return;
-        }
-
-        // generate a master agent status change event.
-        AgentStatusEvent statusEvent = new AgentStatusEvent(this, masterAgent.getStatus(), masterAgent);
-
-        masterAgent.setStatus(Status.DISABLED);
-
-        eventManager.publish(statusEvent);
     }
 
     public List<Agent> getAllAgents()
@@ -374,29 +323,24 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 
     public List<Agent> getOnlineAgents()
     {
-        lock.lock();
-        try
+        return agentStatusManager.getAgentsByStatusPredicate(new Predicate<Status>()
         {
-            List<Agent> online = new LinkedList<Agent>();
-            if (masterAgent.isEnabled())
+            public boolean satisfied(Status status)
             {
-                online.add(masterAgent);
+                return status.isOnline();
             }
+        });
+    }
 
-            for (SlaveAgent a : slaveAgents.values())
-            {
-                if (a.isOnline())
-                {
-                    online.add(a);
-                }
-            }
-
-            return online;
-        }
-        finally
+    public List<Agent> getAvailableAgents()
+    {
+        return agentStatusManager.getAgentsByStatusPredicate(new Predicate<Status>()
         {
-            lock.unlock();
-        }
+            public boolean satisfied(Status status)
+            {
+                return status.isOnline() && !status.isBusy();
+            }
+        });
     }
 
     public Agent getAgent(Slave slave)
@@ -432,8 +376,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
             lock.lock();
             try
             {
-                addSlaveAgent(slave, true);
-
+                addSlaveAgent(slave, true, false);
                 licenseManager.refreshAuthorisations();
             }
             finally
@@ -451,8 +394,9 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
             lock.lock();
             try
             {
-                removeSlaveAgent(id);
-                addSlaveAgent(slave, true);
+                removeSlaveAgent(id, true);
+                addSlaveAgent(slave, true, true);
+
             }
             finally
             {
@@ -466,8 +410,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         lock.lock();
         try
         {
-            removeSlaveAgent(id);
-
+            removeSlaveAgent(id, false);
             licenseManager.refreshAuthorisations();
         }
         finally
@@ -528,10 +471,13 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         return null;
     }
 
-    private void removeSlaveAgent(long id)
+    private void removeSlaveAgent(long id, boolean changedExisting)
     {
         SlaveAgent agent = slaveAgents.remove(id);
-        eventManager.publish(new SlaveAgentRemovedEvent(this, agent));
+        if (!changedExisting)
+        {
+            eventManager.publish(new AgentRemovedEvent(this, agent));
+        }
     }
 
     public void setSlaveManager(SlaveManager slaveManager)

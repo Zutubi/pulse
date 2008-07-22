@@ -9,6 +9,8 @@ import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.committransformers.CommitMessageTransformerManager;
 import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.events.AgentDisableRequestedEvent;
+import com.zutubi.pulse.events.AgentEnableRequestedEvent;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.system.SystemStartedEvent;
@@ -965,15 +967,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
             throw new IllegalArgumentException("Unknown agent '" + name + "'");
         }
 
-        if(agent.isSlave())
-        {
-            agentManager.enableSlave(agent.getId());
-        }
-        else
-        {
-            agentManager.enableMasterAgent();
-        }
-
+        eventManager.publish(new AgentEnableRequestedEvent(this, agent));
         return true;
     }
 
@@ -987,15 +981,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
             throw new IllegalArgumentException("Unknown agent '" + name + "'");
         }
 
-        if(agent.isSlave())
-        {
-            agentManager.disableSlave(agent.getId());
-        }
-        else
-        {
-            agentManager.disableMasterAgent();
-        }
-
+        eventManager.publish(new AgentDisableRequestedEvent(this, agent));
         return true;
     }
 

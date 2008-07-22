@@ -1,6 +1,7 @@
 package com.zutubi.pulse.bootstrap;
 
 import com.zutubi.pulse.logging.LogConfiguration;
+import com.zutubi.pulse.model.Slave;
 
 /**
  * 
@@ -234,7 +235,7 @@ public interface MasterConfiguration extends LogConfiguration
 
     void setUnsatisfiableRecipeTimeout(Long timeout);
 
-    boolean isMasterEnabled();
+    Slave.EnableState getMasterEnableState();
 
-    void setMasterEnabled(Boolean b);
+    void setMasterEnableState(Slave.EnableState state);
 }

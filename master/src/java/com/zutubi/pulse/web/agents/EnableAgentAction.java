@@ -1,5 +1,8 @@
 package com.zutubi.pulse.web.agents;
 
+import com.zutubi.pulse.events.AgentDisableRequestedEvent;
+import com.zutubi.pulse.events.AgentEnableRequestedEvent;
+import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.model.Slave;
 
 /**
@@ -7,6 +10,7 @@ import com.zutubi.pulse.model.Slave;
 public class EnableAgentAction extends AgentActionSupport
 {
     private String enable;
+    private EventManager eventManager;
 
     public void setEnable(String enable)
     {
@@ -18,16 +22,21 @@ public class EnableAgentAction extends AgentActionSupport
         lookupSlave();
         if(slave != null)
         {
-            try
+            if (Slave.EnableState.ENABLED.toString().equals(enable))
             {
-                getAgentManager().setSlaveState(slave.getId(), Slave.EnableState.valueOf(enable));
+                eventManager.publish(new AgentEnableRequestedEvent(this, getAgent()));
             }
-            catch(IllegalArgumentException e)
+            else
             {
-                // Ignore invalid requests
+                eventManager.publish(new AgentDisableRequestedEvent(this, getAgent()));
             }
         }
 
         return SUCCESS;
+    }
+
+    public void setEventManager(EventManager eventManager)
+    {
+        this.eventManager = eventManager;
     }
 }

@@ -360,6 +360,11 @@ public class RecipeControllerTest extends PulseTestCase
             return service;
         }
 
+        public long getRecipeId()
+        {
+            return 0;
+        }
+
         public SystemInfo getSystemInfo()
         {
             throw new RuntimeException("Method not implemented.");
@@ -380,6 +385,11 @@ public class RecipeControllerTest extends PulseTestCase
             return Status.IDLE;
         }
 
+        public void updateStatus(Status status)
+        {
+            // do nothin
+        }
+
         public String getLocation()
         {
             return "mock";
@@ -388,6 +398,21 @@ public class RecipeControllerTest extends PulseTestCase
         public boolean isSlave()
         {
             return true;
+        }
+
+        public Slave.EnableState getEnableState()
+        {
+            return Slave.EnableState.ENABLED;
+        }
+
+        public boolean isEnabled()
+        {
+            return true;
+        }
+
+        public boolean isDisabling()
+        {
+            return false;
         }
 
         public String getName()
@@ -481,6 +506,26 @@ public class RecipeControllerTest extends PulseTestCase
         }
 
         public void collectionComplete()
+        {
+        }
+
+        public void cleaning()
+        {
+        }
+
+        public void cleaningComplete()
+        {
+        }
+
+        public void actions()
+        {
+        }
+
+        public void actionsComplete()
+        {
+        }
+
+        public void done()
         {
         }
     }

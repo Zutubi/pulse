@@ -26,6 +26,7 @@ public class SlaveAgent implements Agent
     private Slave slave;
     private Status status;
     private long lastPingTime = 0;
+    private long recipeId = -1;
     private SlaveService slaveService;
     private ServiceTokenManager serviceTokenManager;
     private BuildService buildService;
@@ -48,9 +49,10 @@ public class SlaveAgent implements Agent
         switch(slave.getEnableState())
         {
             case ENABLED:
-                status = Status.OFFLINE;
+                status = Status.INITIAL;
                 break;
             case DISABLED:
+            case DISABLING:
             case UPGRADING:
                 status = Status.DISABLED;
                 break;
@@ -106,11 +108,6 @@ public class SlaveAgent implements Agent
         return true;
     }
 
-    public void setStatus(Status status)
-    {
-        this.status = status;
-    }
-
     public long getLastPingTime()
     {
         return lastPingTime;
@@ -143,6 +140,16 @@ public class SlaveAgent implements Agent
         lastPingTime = time;
     }
 
+    public long getRecipeId()
+    {
+        return recipeId;
+    }
+
+    public void setRecipeId(long recipeId)
+    {
+        this.recipeId = recipeId;
+    }
+
     public String getPingError()
     {
         return pingError;
@@ -156,6 +163,11 @@ public class SlaveAgent implements Agent
     public boolean isEnabled()
     {
         return slave.isEnabled();
+    }
+
+    public boolean isDisabling()
+    {
+        return slave.getEnableState() == Slave.EnableState.DISABLING;
     }
 
     public boolean isUpgrading()
@@ -176,8 +188,21 @@ public class SlaveAgent implements Agent
     public void updateStatus(SlaveStatus status)
     {
         lastPingTime = status.getPingTime();
-        this.status = status.getStatus();
+        this.status = Status.valueOf(status.getStatus().name());
         pingError = status.getMessage();
+        recipeId = status.getRecipeId();
+    }
+
+    public void updateStatus(Status status)
+    {
+        updateStatus(status, -1);
+    }
+
+    public void updateStatus(Status status, long recipeId)
+    {
+        lastPingTime = System.currentTimeMillis();
+        this.status = status;
+        this.recipeId = recipeId;
     }
 
     public void upgradeStatus(UpgradeState state, int progress, String message)
@@ -185,6 +210,17 @@ public class SlaveAgent implements Agent
         upgradeState = state;
         upgradeProgress = progress;
         upgradeMessage = message;
+    }
+
+    public void copyStatus(SlaveAgent existingAgent)
+    {
+        status = existingAgent.status;
+        lastPingTime = existingAgent.lastPingTime;
+        recipeId = existingAgent.recipeId;
+        pingError = existingAgent.pingError;
+        upgradeState = existingAgent.upgradeState;
+        upgradeProgress = existingAgent.upgradeProgress;
+        upgradeMessage = existingAgent.upgradeMessage;
     }
 
     public UpgradeState getUpgradeState()

@@ -4,6 +4,7 @@ import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.config.CompositeConfig;
 import com.zutubi.pulse.config.Config;
 import com.zutubi.pulse.config.ConfigSupport;
+import com.zutubi.pulse.model.Slave;
 
 import java.net.InetAddress;
 import java.net.MalformedURLException;
@@ -450,13 +451,37 @@ public class MasterConfigurationSupport extends ConfigSupport implements MasterC
         setLong(UNSATISFIABLE_RECIPE_TIMEOUT, timeout);
     }
 
-    public boolean isMasterEnabled()
+    public Slave.EnableState getMasterEnableState()
     {
-        return getBooleanProperty(MASTER_ENABLED, Boolean.TRUE);
+        // For compatibility accept true and false as possible values.
+        String property = getProperty(MASTER_ENABLED);
+        if(!TextUtils.stringSet(property))
+        {
+            return Slave.EnableState.ENABLED;
+        }
+        else if(property.toLowerCase().equals("true"))
+        {
+            return Slave.EnableState.ENABLED;
+        }
+        else if(property.toLowerCase().equals("false"))
+        {
+            return Slave.EnableState.DISABLED;
+        }
+        else
+        {
+            try
+            {
+                return Slave.EnableState.valueOf(property);
+            }
+            catch(IllegalArgumentException e)
+            {
+                return Slave.EnableState.ENABLED;
+            }
+        }
     }
 
-    public void setMasterEnabled(Boolean b)
+    public void setMasterEnableState(Slave.EnableState state)
     {
-        setBooleanProperty(MASTER_ENABLED, b);
+        setProperty(MASTER_ENABLED, state.toString());
     }
 }

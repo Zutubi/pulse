@@ -1,12 +1,11 @@
 package com.zutubi.pulse.agent;
 
-import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.services.SlaveService;
+import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.util.logging.Logger;
-import com.zutubi.pulse.util.Pair;
 
-import java.util.concurrent.Callable;
 import java.net.ConnectException;
+import java.util.concurrent.Callable;
 
 /**
  * A callable task that pings an agent and returns its status.
@@ -43,7 +42,7 @@ class AgentPing implements Callable<SlaveStatus>
             }
             else
             {
-                status = new SlaveStatus(Status.VERSION_MISMATCH);
+                status = new SlaveStatus(PingStatus.VERSION_MISMATCH);
             }
         }
         catch (Exception e)
@@ -54,12 +53,12 @@ class AgentPing implements Callable<SlaveStatus>
             // the most common cause of the exception is the Connect Exception.
             if (cause instanceof ConnectException)
             {
-                status = new SlaveStatus(Status.OFFLINE, cause.getMessage());
+                status = new SlaveStatus(PingStatus.OFFLINE, cause.getMessage());
             }
             else
             {
                 LOG.warning("Exception pinging agent '" + agent.getName() + "': " + e.getMessage());
-                status = new SlaveStatus(Status.OFFLINE, "Exception: '" + e.getClass().getName() + "'. Reason: " + e.getMessage());
+                status = new SlaveStatus(PingStatus.OFFLINE, "Exception: '" + e.getClass().getName() + "'. Reason: " + e.getMessage());
             }
         }
 
