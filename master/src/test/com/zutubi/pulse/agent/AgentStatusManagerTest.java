@@ -356,8 +356,8 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
         // What happens if the terminate failed and the wretched thing is
         // still building the wrong recipe?
         sendRecipeCollected(1000);
-        assertNoEvents();
         assertEquals(Status.AWAITING_PING, agent.getStatus());
+        assertEvents(new AgentPingRequestedEvent(this, agent));
         sendPing(agent, new SlaveStatus(PingStatus.BUILDING, 2000, false));
         assertEquals(Status.BUILDING_INVALID, agent.getStatus());
         assertTerminatedRecipe(2000);
@@ -958,9 +958,10 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
     private void collectRecipe(SlaveAgent agent, int recipeId)
     {
         sendRecipeCollected(recipeId);
-        assertNoEvents();
         assertEquals(Status.AWAITING_PING, agent.getStatus());
-        sendPing((SlaveAgent) agent, new SlaveStatus(PingStatus.IDLE));
+        assertEvents(new AgentPingRequestedEvent(this, agent));
+        assertNoEvents();
+        sendPing(agent, new SlaveStatus(PingStatus.IDLE));
         assertEvents(new AgentAvailableEvent(this, agent));
         assertEquals(Status.IDLE, agent.getStatus());
 

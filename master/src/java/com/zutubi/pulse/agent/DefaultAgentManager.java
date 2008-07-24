@@ -276,11 +276,15 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 
     public void handleEvent(Event evt)
     {
-        if(evt instanceof AgentOnlineEvent)
+        if (evt instanceof AgentPingRequestedEvent)
+        {
+            pingSlave(((AgentPingRequestedEvent) evt).getSlaveAgent());
+        }
+        else if (evt instanceof AgentOnlineEvent)
         {
             handleAgentOnline((AgentOnlineEvent)evt);
         }
-        else if(evt instanceof AgentUpgradeRequiredEvent)
+        else if (evt instanceof AgentUpgradeRequiredEvent)
         {
             handleUpgradeRequired((AgentUpgradeRequiredEvent) evt);
         }
@@ -292,7 +296,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 
     public Class[] getHandledEvents()
     {
-        return new Class[] { AgentOnlineEvent.class, AgentUpgradeRequiredEvent.class, SlaveUpgradeCompleteEvent.class };
+        return new Class[] { AgentPingRequestedEvent.class, AgentOnlineEvent.class, AgentUpgradeRequiredEvent.class, SlaveUpgradeCompleteEvent.class };
     }
 
     public void setMasterLocationProvider(MasterLocationProvider masterLocationProvider)

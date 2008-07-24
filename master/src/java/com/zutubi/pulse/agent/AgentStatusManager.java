@@ -342,6 +342,9 @@ public class AgentStatusManager implements EventListener
                 {
                     SlaveAgent slaveAgent = ((SlaveAgent) agent);
                     slaveAgent.updateStatus(Status.AWAITING_PING, event.getRecipeId());
+
+                    // Request a ping immediately so no time is wasted
+                    events.add(new AgentPingRequestedEvent(this, slaveAgent));
                 }
                 else
                 {
