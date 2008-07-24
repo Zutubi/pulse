@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  */
-public interface AgentManager
+public interface AgentManager extends AgentPersistentStatusManager
 {
     List<Agent> getAllAgents();
     List<Agent> getOnlineAgents();

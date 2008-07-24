@@ -82,7 +82,7 @@ public class Slave extends Entity
 
     public boolean isEnabled()
     {
-        return enableState == EnableState.ENABLED;
+        return enableState == EnableState.ENABLED || enableState == EnableState.DISABLING;
     }
 
     public EnableState getEnableState()

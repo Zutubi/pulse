@@ -948,6 +948,11 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             SlaveAgent agent = new SlaveAgent(slave, null, null, new MockBuildService(slave.getId()));
             slaveAgents.put(slave.getId(), agent);
         }
+
+        public void setEnableState(Agent agent, Slave.EnableState state)
+        {
+            throw new RuntimeException("Not implemented");
+        }
     }
 
     class MockBuildService implements BuildService

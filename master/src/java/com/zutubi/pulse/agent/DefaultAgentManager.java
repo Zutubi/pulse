@@ -64,7 +64,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 
         // Create this prior to refreshing the slaves so it can pick up the
         // slave added events.
-        agentStatusManager = new AgentStatusManager(masterAgent, eventManager);
+        agentStatusManager = new AgentStatusManager(masterAgent, this, eventManager);
 
         refreshSlaveAgents();
 
@@ -188,18 +188,18 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         }
     }
 
-    private void handleAgentEnableStateRequired(AgentEnableStateRequiredEvent event)
+    public void setEnableState(Agent agent, Slave.EnableState state)
     {
-        if(event.getAgent().isSlave())
+        if(agent.isSlave())
         {
-            Slave slave = slaveManager.getSlave(event.getAgent().getId());
-            slave.setEnableState(event.getState());
+            Slave slave = slaveManager.getSlave(agent.getId());
+            slave.setEnableState(state);
             slaveManager.save(slave);
-            slaveChanged(slave.getId());
+            ((SlaveAgent) agent).setSlave(slave);
         }
         else
         {
-            configurationManager.getAppConfig().setMasterEnableState(event.getState());
+            configurationManager.getAppConfig().setMasterEnableState(state);
         }
     }
 
@@ -276,11 +276,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 
     public void handleEvent(Event evt)
     {
-        if(evt instanceof AgentEnableStateRequiredEvent)
-        {
-            handleAgentEnableStateRequired((AgentEnableStateRequiredEvent) evt);
-        }
-        else if(evt instanceof AgentOnlineEvent)
+        if(evt instanceof AgentOnlineEvent)
         {
             handleAgentOnline((AgentOnlineEvent)evt);
         }
@@ -296,7 +292,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 
     public Class[] getHandledEvents()
     {
-        return new Class[] { AgentEnableStateRequiredEvent.class, AgentOnlineEvent.class, AgentUpgradeRequiredEvent.class, SlaveUpgradeCompleteEvent.class };
+        return new Class[] { AgentOnlineEvent.class, AgentUpgradeRequiredEvent.class, SlaveUpgradeCompleteEvent.class };
     }
 
     public void setMasterLocationProvider(MasterLocationProvider masterLocationProvider)
@@ -396,7 +392,6 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
             {
                 removeSlaveAgent(id, true);
                 addSlaveAgent(slave, true, true);
-
             }
             finally
             {

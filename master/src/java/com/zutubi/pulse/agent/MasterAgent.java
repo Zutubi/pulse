@@ -78,7 +78,8 @@ public class MasterAgent implements Agent
 
     public boolean isEnabled()
     {
-        return getEnableState() == Slave.EnableState.ENABLED;
+        final Slave.EnableState enableState = getEnableState();
+        return enableState == Slave.EnableState.ENABLED || enableState == Slave.EnableState.DISABLING;
     }
 
     public Status getStatus()
