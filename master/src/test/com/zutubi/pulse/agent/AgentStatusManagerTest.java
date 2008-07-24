@@ -31,7 +31,6 @@ import java.util.Properties;
 public class AgentStatusManagerTest extends PulseTestCase implements EventListener
 {
     private MasterAgent masterAgent;
-    private MasterBuildService mockMasterBuildService;
     private EventManager eventManager;
     private AgentStatusManager agentStatusManager;
     private List<Event> receivedEvents = new LinkedList<Event>();
@@ -66,10 +65,10 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
         };
 
         MasterConfigurationManager mockMCM = mock(MasterConfigurationManager.class);
-        mockMasterBuildService = mock(MasterBuildService.class);
+        MasterBuildService mocmMBS = mock(MasterBuildService.class);
 
         stub(mockMCM.getAppConfig()).toReturn(masterConfig);
-        masterAgent = new MasterAgent(mockMasterBuildService, mockMCM, null, null);
+        masterAgent = new MasterAgent(mocmMBS, mockMCM, null, null);
         agentStatusManager = new AgentStatusManager(masterAgent, agentPersistentStatusManager, eventManager);
 
         setTimeout(60);
@@ -625,6 +624,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
         SlaveAgent agent = addAgentAndDisable(1);
         sendEnableRequest(agent);
         assertEquals(Status.INITIAL, agent.getStatus());
+        assertEvents(new AgentPingRequestedEvent(this, agent));
         assertEnableState(agent, Slave.EnableState.ENABLED);
 
         onComplete();
@@ -651,9 +651,51 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
         sendEnableRequest(agent);
         assertEquals(Status.INITIAL, agent.getStatus());
         assertEnableState(agent, Slave.EnableState.ENABLED);
+        assertEvents(new AgentPingRequestedEvent(this, agent));
 
         sendPing(agent, new SlaveStatus(PingStatus.IDLE));
         assertOfflineToAvailableEvents(agent);
+
+        onComplete();
+    }
+
+    public void testEnableDisabling()
+    {
+        SlaveAgent agent = addAgentAndDispatchRecipe(1, 1000);
+        sendPing(agent, new SlaveStatus(PingStatus.BUILDING, 1000, false));
+
+        sendDisableRequest(agent);
+        assertEquals(Status.BUILDING, agent.getStatus());
+        assertEnableState(agent, Slave.EnableState.DISABLING);
+        assertNoEvents();
+
+        sendEnableRequest(agent);
+        assertEquals(Status.BUILDING, agent.getStatus());
+        assertEnableState(agent, Slave.EnableState.ENABLED);
+        assertNoEvents();
+
+        completeAndCollectRecipe(agent, 1000);
+
+        onComplete();
+    }
+
+    public void testEnableDisablingMaster()
+    {
+        sendRecipeDispatched(masterAgent, 1000);
+        clearEvents();
+
+        sendDisableRequest(masterAgent);
+        assertEnableState(masterAgent, Slave.EnableState.DISABLING);
+
+        sendEnableRequest(masterAgent);
+        assertEquals(Status.BUILDING,  masterAgent.getStatus());
+        assertEnableState(masterAgent, Slave.EnableState.ENABLED);
+        assertNoEvents();
+
+        sendRecipeCompleted(1000);
+        assertEquals(Status.POST_RECIPE, masterAgent.getStatus());
+        sendRecipeCollected(1000);
+        assertEvents(new AgentAvailableEvent(this, masterAgent));
 
         onComplete();
     }

@@ -17,13 +17,23 @@
         #staticCell($agent.location)
 
         #if($agent.enabled)
-            #staticCell($agent.status.prettyString)
+            #if($agent.disabling)
+                #contentCell("agent.disabling")
 #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
-            #linkCell("agent.ping.$agent.name" "agent.ping" "$base/admin/pingAgent.action?agentId=$agent.id")
-            #linkCell("agent.enable.$agent.name" "agent.disable" "$base/admin/enableAgent.action?agentId=$agent.id&amp;enable=DISABLED")
-            #editCell("$base/admin/editAgent!input.action?id=$agent.id" "edit_$!webwork.htmlEncode($agent.name)")
-            #deleteCell("delete_$!webwork.htmlEncode($agent.name)" "$base/admin/deleteAgent.action?id=$agent.id" $confirmMessage)
+                #linkCell("agent.enable.$agent.name" "agent.enable" "$base/admin/enableAgent.action?agentId=$agent.id&amp;enable=ENABLED")
+                #linkCell("agent.disable.$agent.name" "agent.disable.now" "$base/admin/enableAgent.action?agentId=$agent.id&amp;enable=DISABLED")
+                #editCell("$base/admin/editAgent!input.action?id=$agent.id" "edit_$!webwork.htmlEncode($agent.name)")
+                #deleteCell("delete_$!webwork.htmlEncode($agent.name)" "$base/admin/deleteAgent.action?id=$agent.id" $confirmMessage)
 #end
+            #else
+                #staticCell($agent.status.prettyString)
+#authorize("ifAllGranted=ROLE_ADMINISTRATOR")
+                #linkCell("agent.ping.$agent.name" "agent.ping" "$base/admin/pingAgent.action?agentId=$agent.id")
+                #linkCell("agent.enable.$agent.name" "agent.disable" "$base/admin/enableAgent.action?agentId=$agent.id&amp;enable=DISABLED")
+                #editCell("$base/admin/editAgent!input.action?id=$agent.id" "edit_$!webwork.htmlEncode($agent.name)")
+                #deleteCell("delete_$!webwork.htmlEncode($agent.name)" "$base/admin/deleteAgent.action?id=$agent.id" $confirmMessage)
+#end
+            #end
         #else
             #if($action.upgrading($agent))
                 #set($status = "$action.getText('agent.upgrading') [$agent.upgradeState.toString().toLowerCase()]")
@@ -53,18 +63,26 @@
     #else
         #dynamicLinkCell($agent.name "viewAgentStatus.action")
         #staticCell($agent.location)
-        #staticCell($agent.status.prettyString)
+        #if($agent.disabling)
+            #contentCell("agent.disabling")
+        #else
+            #staticCell($agent.status.prettyString)
+        #end
 #authorize("ifAllGranted=ROLE_ADMINISTRATOR")
-        #contentCell("empty.cell")
-    #if($agent.status.toString() == "DISABLED")
-        #linkCell("agent.enable.master" "agent.enable" "$base/admin/enableMaster.action?enable=true")
-    #else
-        #linkCell("agent.disable.master" "agent.disable" "$base/admin/enableMaster.action?enable=false")
-    #end
+        #if($agent.disabling)
+            #linkCell("agent.enable.master" "agent.enable" "$base/admin/enableMaster.action?enable=true")
+            #linkCell("agent.disable.master" "agent.disable.now" "$base/admin/enableMaster.action?enable=false")
+        #elseif($agent.enabled)
+            #contentCell("empty.cell")
+            #linkCell("agent.disable.master" "agent.disable" "$base/admin/enableMaster.action?enable=false")
+        #else
+            #contentCell("empty.cell")
+            #linkCell("agent.enable.master" "agent.enable" "$base/admin/enableMaster.action?enable=true")
+        #end
         #editCell("$base/admin/editMasterAgent!input.action" "edit_$!webwork.htmlEncode($agent.name)")
         #contentCell("empty.cell")
-#end
     #end
+#end
     </tr>
 #end
 #authorize("ifAllGranted=ROLE_ADMINISTRATOR")

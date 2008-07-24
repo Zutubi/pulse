@@ -416,12 +416,18 @@ public class AgentStatusManager implements EventListener
     {
         switch(agent.getEnableState())
         {
-            case DISABLED:
             case DISABLING:
+                // Cancel disable-on-idle.
+                agentPersistentStatusManager.setEnableState(agent, Slave.EnableState.ENABLED);
+                break;
+
+            case DISABLED:
             case FAILED_UPGRADE:
                 if (agent.isSlave())
                 {
                     agent.updateStatus(Status.INITIAL);
+                    // Request a ping now to save time
+                    events.add(new AgentPingRequestedEvent(this, (SlaveAgent) agent));
                 }
                 else
                 {

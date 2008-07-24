@@ -7,6 +7,7 @@ import com.zutubi.pulse.core.Scope;
 import com.zutubi.pulse.core.VariableHelper;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.util.IOUtils;
+import com.zutubi.pulse.util.logging.Logger;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -16,6 +17,8 @@ import java.util.List;
  */
 public class RunExecutablePostBuildAction extends PostBuildAction
 {
+    private static final Logger LOG = Logger.getLogger(RunExecutablePostBuildAction.class);
+    
     private String command;
     private String arguments;
     private MasterConfigurationManager configurationManager;
@@ -51,6 +54,7 @@ public class RunExecutablePostBuildAction extends PostBuildAction
         }
         catch (Exception e)
         {
+            LOG.warning(e);
             addError(e.getMessage());
         }
         finally
@@ -179,7 +183,10 @@ public class RunExecutablePostBuildAction extends PostBuildAction
         prefix += "command." + commandName + ".";
 
         scope.add(new Property(prefix + "status", commandResult.getState().getString()));
-        scope.add(new Property(prefix + "dir", commandResult.getAbsoluteOutputDir(configurationManager.getDataDirectory()).getAbsolutePath()));
+        if (commandResult.getOutputDir() != null)
+        {
+            scope.add(new Property(prefix + "dir", commandResult.getAbsoluteOutputDir(configurationManager.getDataDirectory()).getAbsolutePath()));
+        }
     }
 
     public String getCommand()
