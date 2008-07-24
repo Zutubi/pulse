@@ -16,14 +16,23 @@ import com.zutubi.util.Constants;
 import java.util.Date;
 import java.util.Hashtable;
 
+/*
+import org.testng.annotations.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterMethod;
+*/
+
 /**
  * Test for managing the server license and ensuring the licenses are
  * enforced.
  */
+// the xmlrpc tests create the project/user/agent data we need for these tests to work, so lets depend on them.
+//@Test(dependsOnGroups = {"init.*"})//, ".*xmlrpc.*"})
 public class LicenseAcceptanceTest extends SeleniumTestBase
 {
     private static final String LICENSE_PATH = "settings/license";
 
+//    @BeforeMethod
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -31,6 +40,7 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
     }
 
+//    @AfterMethod
     protected void tearDown() throws Exception
     {
         try
@@ -236,6 +246,7 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
 
     private void assertExceeded() throws Exception
     {
+        Thread.sleep(1000);
         goTo("/");
         waitForElement("license-exceeded");
         assertTextPresent("Your license limits have been exceeded.");
