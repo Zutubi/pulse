@@ -3,7 +3,9 @@ package com.zutubi.pulse.tove.config.agent;
 import com.zutubi.config.annotations.Permission;
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.AgentManager;
-import com.zutubi.pulse.model.AgentState;
+import com.zutubi.pulse.events.AgentDisableRequestedEvent;
+import com.zutubi.pulse.events.AgentEnableRequestedEvent;
+import com.zutubi.pulse.events.EventManager;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -15,11 +17,13 @@ import java.util.List;
 public class AgentConfigurationActions
 {
     public static final String ACTION_DISABLE = "disable";
+    public static final String ACTION_DISABLE_NOW = "disableNow";
     public static final String ACTION_ENABLE = "enable";
     public static final String ACTION_GC = "gc";
     public static final String ACTION_PING = "ping";
 
     private AgentManager agentManager;
+    private EventManager eventManager;
 
     public List<String> getActions(AgentConfiguration config)
     {
@@ -28,7 +32,15 @@ public class AgentConfigurationActions
         Agent agent = agentManager.getAgent(config);
         if (agent.isEnabled())
         {
-            actions.add(ACTION_DISABLE);
+            if (agent.isDisabling())
+            {
+                actions.add(ACTION_ENABLE);
+                actions.add(ACTION_DISABLE_NOW);
+            }
+            else
+            {
+                actions.add(ACTION_DISABLE);
+            }
             actions.add(ACTION_PING);
             actions.add(ACTION_GC);
         }
@@ -43,13 +55,27 @@ public class AgentConfigurationActions
     @Permission(ACTION_DISABLE)
     public void doDisable(AgentConfiguration config)
     {
-        agentManager.setAgentState(config, AgentState.EnableState.DISABLED);
+        Agent agent = agentManager.getAgent(config);
+        if (agent != null)
+        {
+            eventManager.publish(new AgentDisableRequestedEvent(this, agent));
+        }
+    }
+
+    @Permission(ACTION_DISABLE)
+    public void doDisableNow(AgentConfiguration config)
+    {
+        doDisable(config);
     }
 
     @Permission(ACTION_DISABLE)
     public void doEnable(AgentConfiguration config)
     {
-        agentManager.setAgentState(config, AgentState.EnableState.ENABLED);
+        Agent agent = agentManager.getAgent(config);
+        if (agent != null)
+        {
+            eventManager.publish(new AgentEnableRequestedEvent(this, agent));
+        }
     }
 
     @Permission(ACTION_PING)
@@ -70,5 +96,10 @@ public class AgentConfigurationActions
     public void setAgentManager(AgentManager agentManager)
     {
         this.agentManager = agentManager;
+    }
+
+    public void setEventManager(EventManager eventManager)
+    {
+        this.eventManager = eventManager;
     }
 }

@@ -2,9 +2,6 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.model.Entity;
 
-import java.util.LinkedList;
-import java.util.List;
-
 /**
  * Represents a slave server that builds may be farmed out to.
  */
@@ -19,6 +16,7 @@ public class AgentState extends Entity
     {
         ENABLED,
         DISABLED,
+        DISABLING,
         UPGRADING,
         FAILED_UPGRADE
     }
@@ -35,9 +33,14 @@ public class AgentState extends Entity
         return enableState == EnableState.DISABLED;
     }
 
+    public boolean isDisabling()
+    {
+        return enableState == EnableState.DISABLING;
+    }
+
     public boolean isEnabled()
     {
-        return enableState == EnableState.ENABLED;
+        return enableState == EnableState.ENABLED || enableState == EnableState.DISABLING;
     }
 
     public EnableState getEnableState()

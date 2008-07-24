@@ -25,7 +25,7 @@ public class AgentPingTest extends PulseTestCase
 
     public void testSuccessfulPing() throws Exception
     {
-        SlaveStatus status = new SlaveStatus(Status.IDLE, 12, true);
+        SlaveStatus status = new SlaveStatus(PingStatus.IDLE, 12, true);
         mockService.expectAndReturn("ping", buildNumber);
         mockService.expectAndReturn("getStatus", C.args(C.eq(masterLocation)), status);
 
@@ -40,7 +40,7 @@ public class AgentPingTest extends PulseTestCase
         mockAgent.expectAndReturn("getConfig", getConfig());
 
         AgentPing ping = new AgentPing((Agent) mockAgent.proxy(), (AgentService) mockService.proxy(), buildNumber, masterLocation);
-        assertEquals(new SlaveStatus(Status.OFFLINE, "Exception: 'java.lang.RuntimeException'. Reason: bang"), ping.call());
+        assertEquals(new SlaveStatus(PingStatus.OFFLINE, "Exception: 'java.lang.RuntimeException'. Reason: bang"), ping.call());
         verify();
     }
 
@@ -51,7 +51,7 @@ public class AgentPingTest extends PulseTestCase
         mockAgent.expectAndReturn("getConfig", getConfig());
         
         AgentPing ping = new AgentPing((Agent) mockAgent.proxy(), (AgentService) mockService.proxy(), buildNumber, masterLocation);
-        assertEquals(new SlaveStatus(Status.OFFLINE, "Exception: 'java.lang.RuntimeException'. Reason: oops"), ping.call());
+        assertEquals(new SlaveStatus(PingStatus.OFFLINE, "Exception: 'java.lang.RuntimeException'. Reason: oops"), ping.call());
         verify();
     }
 
@@ -60,7 +60,7 @@ public class AgentPingTest extends PulseTestCase
         mockService.expectAndReturn("ping", buildNumber - 1);
 
         AgentPing ping = new AgentPing((Agent) mockAgent.proxy(), (AgentService) mockService.proxy(), buildNumber, masterLocation);
-        assertEquals(new SlaveStatus(Status.VERSION_MISMATCH), ping.call());
+        assertEquals(new SlaveStatus(PingStatus.VERSION_MISMATCH), ping.call());
         verify();
     }
 

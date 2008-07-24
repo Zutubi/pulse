@@ -244,7 +244,6 @@ public class RecipeController
         recipeResult.abortUnfinishedCommands();
 
         MasterBuildProperties.addStageProperties(recipeContext, buildResult, recipeResultNode, configurationManager, false);
-        eventManager.publish(new PostStageEvent(this, buildResult, recipeResultNode, recipeContext));
 
         buildManager.save(recipeResult);
         logger.complete(recipeResult);
@@ -281,11 +280,36 @@ public class RecipeController
     {
         try
         {
+            logger.cleaning();
             collector.cleanup(buildResult, recipeResult.getId(), recipeContext.getBoolean(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BUILD, false), agentService);
         }
         catch (Exception e)
         {
             LOG.warning("Unable to clean up recipe '" + recipeResult.getId() + "'", e);
+        }
+        finally
+        {
+            logger.cleaningComplete();
+        }
+    }
+
+    public void sendPostStageEvent()
+    {
+        try
+        {
+            logger.postStage();
+            try
+            {
+                eventManager.publish(new PostStageEvent(this, buildResult, recipeResultNode, recipeContext));
+            }
+            finally
+            {
+                logger.postStageComplete();
+            }
+        }
+        finally
+        {
+            logger.done();
         }
     }
 

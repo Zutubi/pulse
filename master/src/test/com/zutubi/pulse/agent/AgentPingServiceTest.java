@@ -139,16 +139,16 @@ public class AgentPingServiceTest extends PulseTestCase
         Thread.sleep(2000);
         service.release();
 
-        assertEvent(agent, Status.OFFLINE, "Agent ping timed out");
+        assertEvent(agent, PingStatus.OFFLINE, "Agent ping timed out");
         assertNoMoreEvents();
     }
 
     private void assertEvent(Agent agent)
     {
-        assertEvent(agent, Status.IDLE, null);
+        assertEvent(agent, PingStatus.IDLE, null);
     }
 
-    private void assertEvent(Agent agent, Status status, String message)
+    private void assertEvent(Agent agent, PingStatus status, String message)
     {
         try
         {
@@ -176,7 +176,7 @@ public class AgentPingServiceTest extends PulseTestCase
     {
         AgentService mockService = mock(AgentService.class);
         stub(mockService.ping()).toReturn(BUILD_NUMBER);
-        stub(mockService.getStatus(TEST_MASTER_URL)).toReturn(new SlaveStatus(Status.IDLE));
+        stub(mockService.getStatus(TEST_MASTER_URL)).toReturn(new SlaveStatus(PingStatus.IDLE));
         return mockService;
     }
 
@@ -220,7 +220,7 @@ public class AgentPingServiceTest extends PulseTestCase
 
         public SlaveStatus getStatus(String masterLocation)
         {
-            return new SlaveStatus(Status.IDLE);
+            return new SlaveStatus(PingStatus.IDLE);
         }
 
         public boolean updateVersion(String masterBuild, String masterUrl, long handle, String packageUrl, long packageSize)

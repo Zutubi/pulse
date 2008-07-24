@@ -3,19 +3,18 @@ package com.zutubi.pulse.events;
 import com.zutubi.pulse.agent.Agent;
 
 /**
- * Raised when an Agent is removed (not the configuration, the transient
- * state object).
+ * Raised when the user has requested that an agent be enabled.
  */
-public class AgentRemovedEvent extends AgentEvent
+public class AgentEnableRequestedEvent extends AgentEvent
 {
-    public AgentRemovedEvent(Object source, Agent agent)
+    public AgentEnableRequestedEvent(Object source, Agent agent)
     {
         super(source, agent);
     }
 
     public String toString()
     {
-        StringBuffer buff = new StringBuffer("Agent Removed Event");
+        StringBuffer buff = new StringBuffer("Agent Enable Requested Event");
         if (getAgent() != null)
         {
             buff.append(": ").append(getAgent().getConfig().getName());

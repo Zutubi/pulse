@@ -143,6 +143,30 @@ public class DefaultRecipeLogger implements RecipeLogger
     public void collectionComplete()
     {
         logMarker("Collection complete");
+    }
+
+    public void cleaning()
+    {
+        logMarker("Cleaning up agent work area...");
+    }
+
+    public void cleaningComplete()
+    {
+        logMarker("Clean up complete.");
+    }
+
+    public void postStage()
+    {
+        logMarker("Running post stage hooks...");
+    }
+
+    public void postStageComplete()
+    {
+        logMarker("Post stage hooks complete.");
+    }
+
+    public void done()
+    {
         IOUtils.close(writer);
     }
 

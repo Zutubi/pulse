@@ -24,4 +24,12 @@ public interface RecipeLogger
 
     void collecting(RecipeResult recipeResult, boolean collectWorkingCopy);
     void collectionComplete();
+
+    void cleaning();
+    void cleaningComplete();
+
+    void postStage();
+    void postStageComplete();
+
+    void done();
 }

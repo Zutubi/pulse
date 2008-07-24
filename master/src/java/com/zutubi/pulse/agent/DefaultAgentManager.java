@@ -18,7 +18,6 @@ import com.zutubi.pulse.model.AgentStateManager;
 import com.zutubi.pulse.model.ResourceManager;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.services.ServiceTokenManager;
-import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.services.UpgradeStatus;
 import com.zutubi.pulse.tove.config.agent.AgentAclConfiguration;
 import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
@@ -31,6 +30,7 @@ import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
+import com.zutubi.util.Predicate;
 import com.zutubi.util.Sort;
 import com.zutubi.util.logging.Logger;
 
@@ -49,6 +49,7 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
     private ReentrantLock lock = new ReentrantLock();
     private Map<Long, Agent> agents;
 
+    private AgentStatusManager agentStatusManager;
     private AgentStateManager agentStateManager;
     private MasterConfigurationManager configurationManager;
     private ConfigurationProvider configurationProvider;
@@ -72,6 +73,9 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
 
     private void handleConfigurationEventSystemStarted(ConfigurationEventSystemStartedEvent event)
     {
+        // Create prior to any AgentAddedEvents being fired.
+        agentStatusManager = new AgentStatusManager(this, eventManager);
+
         configurationProvider = event.getConfigurationProvider();
         TypeListener<AgentConfiguration> listener = new TypeAdapter<AgentConfiguration>(AgentConfiguration.class)
         {
@@ -175,7 +179,7 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
             agents = new TreeMap<Long, Agent>();
             for (AgentConfiguration agentConfig : configurationProvider.getAll(AgentConfiguration.class))
             {
-                addAgent(agentConfig, false);
+                addAgent(agentConfig, false, false);
             }
         }
         finally
@@ -184,7 +188,7 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         }
     }
 
-    private void addAgent(AgentConfiguration agentConfig, boolean ping)
+    private void addAgent(AgentConfiguration agentConfig, boolean ping, boolean changeExisting)
     {
         if (configurationTemplateManager.isDeeplyValid(agentConfig.getConfigurationPath()))
         {
@@ -199,9 +203,23 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
                     agentState.setEnableState(AgentState.EnableState.FAILED_UPGRADE);
                     agentStateManager.save(agentState);
                 }
+                else if (agentState.getEnableState() == AgentState.EnableState.DISABLING)
+                {
+                    agentState.setEnableState(AgentState.EnableState.DISABLED);
+                    agentStateManager.save(agentState);
+                }
 
                 DefaultAgent agent = new DefaultAgent(agentConfig, agentState, agentService);
                 agents.put(agentConfig.getHandle(), agent);
+
+                if (changeExisting)
+                {
+                    eventManager.publish(new AgentChangedEvent(this, agent));
+                }
+                else
+                {
+                    eventManager.publish(new AgentAddedEvent(this, agent));
+                }
 
                 if (ping)
                 {
@@ -269,44 +287,19 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         return agents.size();
     }
 
-    public void setAgentState(AgentConfiguration agentConfig, AgentState.EnableState state)
+    public void setEnableState(Agent agent, AgentState.EnableState state)
     {
-        Agent agent = getAgent(agentConfig);
-        if (agent != null)
-        {
-            AgentState agentState = agentStateManager.getAgentState(agent.getId());
-            agentState.setEnableState(state);
-            agentStateManager.save(agentState);
-            agentChanged(agent.getConfig());
-        }
+        AgentState agentState = agentStateManager.getAgentState(agent.getId());
+        agentState.setEnableState(state);
+        agentStateManager.save(agentState);
+        agent.setAgentState(agentState);
     }
-
+    
     private void pingAgent(final Agent agent)
     {
         if (agent.isEnabled())
         {
             agentPingService.requestPing(agent, agent.getService());
-        }
-    }
-
-    private void updateAgent(Agent agent)
-    {
-        AgentState agentState = agentStateManager.getAgentState(agent.getId());
-        agentState.setEnableState(AgentState.EnableState.UPGRADING);
-        agentStateManager.save(agentState);
-        agent.setAgentState(agentState);
-
-        AgentUpdater updater = new AgentUpdater(agent, masterLocationProvider.getMasterUrl(), eventManager, configurationManager.getSystemPaths(), threadFactory);
-        updatersLock.lock();
-
-        try
-        {
-            updaters.put(agent.getConfig().getHandle(), updater);
-            updater.start();
-        }
-        finally
-        {
-            updatersLock.unlock();
         }
     }
 
@@ -329,75 +322,40 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         }
     }
 
-    private void handleAgentPing(Agent agent, SlaveStatus status)
+    private void handleAgentOnline(AgentOnlineEvent event)
     {
-        Status oldStatus = agent.getStatus();
-        agent.updateStatus(status);
-
-        // If the slave has just come online, run resource
-        // discovery
-        if (status.getStatus().isOnline())
+        // The agent has just come online, run resource discovery
+        Agent agent = event.getAgent();
+        try
         {
-            if (oldStatus.isOnline() && status.isFirst())
-            {
-                // The agent bounced between pings.  Act like we saw it by
-                // sending the offline event and setting old status to
-                // offline.
-                agent.setStatus(Status.OFFLINE);
-                eventManager.publish(new AgentStatusEvent(this, oldStatus, agent));
-                oldStatus = Status.OFFLINE;
-                agent.updateStatus(status);
-            }
-
-            if(!oldStatus.isOnline())
-            {
-                if(status.getRecipeId() != 0)
-                {
-                    // The agent appears to have just come online but is
-                    // building.  Snap it out of that.
-                    try
-                    {
-                        agent.getService().terminateRecipe(status.getRecipeId());
-                    }
-                    catch (Exception e)
-                    {
-                        LOG.severe("Unable to terminate unwanted recipe on agent '" + agent.getConfig().getName() + "': " + e.getMessage(), e);
-                    }
-                }
-
-                try
-                {
-                    List<Resource> resources = agent.getService().discoverResources();
-                    resourceManager.addDiscoveredResources(agent.getConfig().getConfigurationPath(), resources);
-                }
-                catch (Exception e)
-                {
-                    LOG.warning("Unable to discover resource for agent '" + agent.getConfig().getName() + "': " + e.getMessage(), e);
-                }
-            }
+            List<Resource> resources = agent.getService().discoverResources();
+            resourceManager.addDiscoveredResources(agent.getConfig().getConfigurationPath(), resources);
         }
-
-        if (oldStatus != agent.getStatus())
+        catch (Exception e)
         {
-            eventManager.publish(new AgentStatusEvent(this, oldStatus, agent));
-
-            if (status.getStatus() == Status.VERSION_MISMATCH)
-            {
-                // Try to update this agent.
-                updateAgent(agent);
-            }
+            LOG.warning("Unable to discover resource for agent '" + agent.getConfig().getName() + "': " + e.getMessage(), e);
         }
     }
 
-    private void handleAgentUpgradeComplete(Event evt)
+    private void handleAgentUpgradeRequired(AgentUpgradeRequiredEvent event)
     {
-        if (evt instanceof AgentUpgradeCompleteEvent)
+        Agent agent = event.getAgent();
+        AgentState agentState = agentStateManager.getAgentState(agent.getId());
+        agentState.setEnableState(AgentState.EnableState.UPGRADING);
+        agentStateManager.save(agentState);
+        agent.setAgentState(agentState);
+
+        AgentUpdater updater = new AgentUpdater(agent, masterLocationProvider.getMasterUrl(), eventManager, configurationManager.getSystemPaths(), threadFactory);
+        updatersLock.lock();
+
+        try
         {
-            handleAgentUpgradeComplete((AgentUpgradeCompleteEvent) evt);
+            updaters.put(agent.getConfig().getHandle(), updater);
+            updater.start();
         }
-        else
+        finally
         {
-            handleConfigurationSystemStarted((ConfigurationSystemStartedEvent) evt);
+            updatersLock.unlock();
         }
     }
 
@@ -418,7 +376,7 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
 
         if (suce.isSuccessful())
         {
-            suce.getAgent().setStatus(Status.OFFLINE);
+            suce.getAgent().updateStatus(Status.OFFLINE);
             agentState.setEnableState(AgentState.EnableState.ENABLED);
             agentStateManager.save(agentState);
             agent.setAgentState(agentState);
@@ -434,14 +392,21 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
 
     public void handleEvent(Event evt)
     {
-        if(evt instanceof AgentPingEvent)
+        if(evt instanceof AgentPingRequestedEvent)
         {
-            AgentPingEvent ape = (AgentPingEvent) evt;
-            handleAgentPing(ape.getAgent(), ape.getPingStatus());
+            pingAgent(((AgentPingRequestedEvent) evt).getAgent());
+        }
+        else if(evt instanceof AgentOnlineEvent)
+        {
+            handleAgentOnline((AgentOnlineEvent) evt);
+        }
+        else if(evt instanceof AgentUpgradeRequiredEvent)
+        {
+            handleAgentUpgradeRequired((AgentUpgradeRequiredEvent) evt);
         }
         else if(evt instanceof AgentUpgradeCompleteEvent)
         {
-            handleAgentUpgradeComplete(evt);
+            handleAgentUpgradeComplete((AgentUpgradeCompleteEvent) evt);
         }
         else if(evt instanceof ConfigurationEventSystemStartedEvent)
         {
@@ -456,7 +421,9 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
     public Class[] getHandledEvents()
     {
         return new Class[] {
-                AgentPingEvent.class,
+                AgentPingRequestedEvent.class,
+                AgentOnlineEvent.class,
+                AgentUpgradeRequiredEvent.class,
                 AgentUpgradeCompleteEvent.class,
                 ConfigurationEventSystemStartedEvent.class,
                 ConfigurationSystemStartedEvent.class
@@ -492,24 +459,24 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
 
     public List<Agent> getOnlineAgents()
     {
-        lock.lock();
-        try
+        return agentStatusManager.getAgentsByStatusPredicate(new Predicate<Status>()
         {
-            List<Agent> online = new LinkedList<Agent>();
-            for (Agent a : agents.values())
+            public boolean satisfied(Status status)
             {
-                if (a.isOnline())
-                {
-                    online.add(a);
-                }
+                return status.isOnline();
             }
+        });
+    }
 
-            return online;
-        }
-        finally
+    public List<Agent> getAvailableAgents()
+    {
+        return agentStatusManager.getAgentsByStatusPredicate(new Predicate<Status>()
         {
-            lock.unlock();
-        }
+            public boolean satisfied(Status status)
+            {
+                return status.isOnline() && !status.isBusy();
+            }
+        });
     }
 
     public Agent getAgent(long handle)
@@ -543,7 +510,7 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
             lock.lock();
             try
             {
-                addAgent(agentConfig, true);
+                addAgent(agentConfig, true, false);
 
                 licenseManager.refreshAuthorisations();
             }
@@ -562,8 +529,8 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
             lock.lock();
             try
             {
-                removeAgent(agentConfig.getHandle());
-                addAgent(agentConfig, true);
+                removeAgent(agentConfig.getHandle(), true);
+                addAgent(agentConfig, true, true);
             }
             finally
             {
@@ -577,7 +544,7 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         lock.lock();
         try
         {
-            removeAgent(agentConfig.getHandle());
+            removeAgent(agentConfig.getHandle(), false);
             licenseManager.refreshAuthorisations();
         }
         finally
@@ -586,10 +553,10 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         }
     }
 
-    private void removeAgent(long handle)
+    private void removeAgent(long handle, boolean changeExisting)
     {
         Agent agent = agents.remove(handle);
-        if (agent != null)
+        if (agent != null && !changeExisting)
         {
             eventManager.publish(new AgentRemovedEvent(this, agent));
         }

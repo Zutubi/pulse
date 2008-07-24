@@ -324,7 +324,7 @@ public class BuildController implements EventListener
                 {
                     RecipeController controller = controllerNode.getData();
                     controller.terminateRecipe(event.isTimeout());
-                    if (controller.isFinished())
+                    if (checkControllerStatus(controller, false))
                     {
                         completedNodes.add(controllerNode);
                     }
@@ -358,7 +358,7 @@ public class BuildController implements EventListener
         {
             RecipeController controller = found.getData();
             controller.terminateRecipe(true);
-            if (controller.isFinished())
+            if (checkControllerStatus(controller, false))
             {
                 executingControllers.remove(found);
                 if (executingControllers.size() == 0)
@@ -590,13 +590,30 @@ public class BuildController implements EventListener
         }
     }
 
+    private boolean checkControllerStatus(RecipeController controller, boolean collect)
+    {
+        if (controller.isFinished())
+        {
+            if (collect)
+            {
+                controller.collect(buildResult, projectConfig.getOptions().getRetainWorkingCopy());
+            }
+
+            controller.cleanup(buildResult);
+            controller.sendPostStageEvent();
+
+            eventManager.publish(new RecipeCollectedEvent(this, controller.getResult().getId()));
+            return true;
+        }
+
+        return false;
+    }
+
     private void checkNodeStatus(TreeNode<RecipeController> node)
     {
         final RecipeController controller = node.getData();
-
-        if (controller.isFinished())
+        if (checkControllerStatus(controller, true))
         {
-            controller.collect(buildResult, projectConfig.getOptions().getRetainWorkingCopy());
             executingControllers.remove(node);
 
             RecipeResult result = controller.getResult();
@@ -662,8 +679,6 @@ public class BuildController implements EventListener
             }
 
             buildManager.save(buildResult);
-
-            tree.cleanup(buildResult);
         }
         catch (Exception e)
         {

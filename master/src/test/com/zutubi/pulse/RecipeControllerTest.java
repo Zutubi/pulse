@@ -397,6 +397,21 @@ public class RecipeControllerTest extends PulseTestCase
             return service;
         }
 
+        public long getSecondsSincePing()
+        {
+            throw new RuntimeException("Not implemented");
+        }
+
+        public long getRecipeId()
+        {
+            throw new RuntimeException("Not implemented");
+        }
+
+        public void setRecipeId(long recipeId)
+        {
+            throw new RuntimeException("Not implemented");
+        }
+
         public boolean isOnline()
         {
             return true;
@@ -405,6 +420,11 @@ public class RecipeControllerTest extends PulseTestCase
         public boolean isEnabled()
         {
             throw new RuntimeException("Method not yet implemented.");
+        }
+
+        public boolean isDisabling()
+        {
+            throw new RuntimeException("Not implemented");
         }
 
         public boolean isDisabled()
@@ -450,6 +470,21 @@ public class RecipeControllerTest extends PulseTestCase
         public void updateStatus(SlaveStatus status)
         {
             throw new RuntimeException("Method not yet implemented.");
+        }
+
+        public void updateStatus(Status status)
+        {
+            throw new RuntimeException("Not implemented");
+        }
+
+        public void updateStatus(Status status, long recipeId)
+        {
+            throw new RuntimeException("Not implemented");
+        }
+
+        public void copyStatus(Agent agent)
+        {
+            throw new RuntimeException("Not implemented");
         }
 
         public void setStatus(Status status)
@@ -604,6 +639,31 @@ public class RecipeControllerTest extends PulseTestCase
 
         public void collectionComplete()
         {
+        }
+
+        public void cleaning()
+        {
+            throw new RuntimeException("Not implemented");
+        }
+
+        public void cleaningComplete()
+        {
+            throw new RuntimeException("Not implemented");
+        }
+
+        public void postStage()
+        {
+            throw new RuntimeException("Not implemented");
+        }
+
+        public void postStageComplete()
+        {
+            throw new RuntimeException("Not implemented");
+        }
+
+        public void done()
+        {
+            throw new RuntimeException("Not implemented");
         }
     }
 }

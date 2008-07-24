@@ -21,6 +21,7 @@ public class DefaultAgent implements Agent
     private AgentState agentState;
     private Status status;
     private long lastPingTime = 0;
+    private long recipeId = -1;
     private AgentService agentService;
     private String pingError = null;
     /**
@@ -40,9 +41,10 @@ public class DefaultAgent implements Agent
         switch(agentState.getEnableState())
         {
             case ENABLED:
-                status = Status.OFFLINE;
+                status = Status.INITIAL;
                 break;
             case DISABLED:
+            case DISABLING:
             case UPGRADING:
                 status = Status.DISABLED;
                 break;
@@ -80,11 +82,6 @@ public class DefaultAgent implements Agent
         return agentState.getId();
     }
 
-    public void setStatus(Status status)
-    {
-        this.status = status;
-    }
-
     public AgentConfiguration getConfig()
     {
         return agentConfig;
@@ -117,6 +114,16 @@ public class DefaultAgent implements Agent
         return (System.currentTimeMillis() - lastPingTime) / 1000;
     }
 
+    public long getRecipeId()
+    {
+        return recipeId;
+    }
+
+    public void setRecipeId(long recipeId)
+    {
+        this.recipeId = recipeId;
+    }
+
     public String getPingError()
     {
         return pingError;
@@ -130,6 +137,11 @@ public class DefaultAgent implements Agent
     public boolean isEnabled()
     {
         return agentState.isEnabled();
+    }
+
+    public boolean isDisabling()
+    {
+        return agentState.isDisabling();
     }
 
     public boolean isDisabled()
@@ -155,8 +167,33 @@ public class DefaultAgent implements Agent
     public void updateStatus(SlaveStatus status)
     {
         lastPingTime = status.getPingTime();
-        this.status = status.getStatus();
+        this.status = Status.valueOf(status.getStatus().toString());
         pingError = status.getMessage();
+        recipeId = status.getRecipeId();
+    }
+
+    public void updateStatus(Status status)
+    {
+        updateStatus(status, -1);
+    }
+
+    public void updateStatus(Status status, long recipeId)
+    {
+        lastPingTime = System.currentTimeMillis();
+        this.status = status;
+        this.recipeId = recipeId;
+    }
+
+    public void copyStatus(Agent agent)
+    {
+        DefaultAgent existingAgent = (DefaultAgent) agent;
+        status = existingAgent.status;
+ 	    lastPingTime = existingAgent.lastPingTime;
+ 	    recipeId = existingAgent.recipeId;
+ 	    pingError = existingAgent.pingError;
+ 	    upgradeState = existingAgent.upgradeState;
+ 	    upgradeProgress = existingAgent.upgradeProgress;
+ 	    upgradeMessage = existingAgent.upgradeMessage;
     }
 
     public void upgradeStatus(UpgradeState state, int progress, String message)

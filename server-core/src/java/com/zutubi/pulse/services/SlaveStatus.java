@@ -1,6 +1,6 @@
 package com.zutubi.pulse.services;
 
-import com.zutubi.pulse.agent.Status;
+import com.zutubi.pulse.agent.PingStatus;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -13,7 +13,7 @@ public class SlaveStatus
     /**
      *  The agent status, as reported by the slave itself.
      */
-    private Status status;
+    private PingStatus status;
     /**
      * Id of the recipe that the slave is building, or 0 if it is not
      * currently executing a build.
@@ -31,25 +31,25 @@ public class SlaveStatus
 
     private long pingTime;
 
-    public SlaveStatus(Status status, long recipeId, boolean first)
+    public SlaveStatus(PingStatus status, long recipeId, boolean first)
     {
         this.status = status;
         this.recipeId = recipeId;
         this.first = first;
     }
 
-    public SlaveStatus(Status status, String message)
+    public SlaveStatus(PingStatus status, String message)
     {
         this.status = status;
         this.message = message;
     }
 
-    public SlaveStatus(Status status)
+    public SlaveStatus(PingStatus status)
     {
         this.status = status;
     }
 
-    public Status getStatus()
+    public PingStatus getStatus()
     {
         return status;
     }

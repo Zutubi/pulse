@@ -17,14 +17,24 @@ public interface Agent
     long getId();
 
     void updateStatus(SlaveStatus status);
-    void setStatus(Status status);
+    void updateStatus(Status status);
+    void updateStatus(Status status, long recipeId);
+
+    void copyStatus(Agent agent);
+
     void upgradeStatus(UpgradeState state, int progress, String message);
 
     AgentConfiguration getConfig();
     AgentService getService();
 
+    long getSecondsSincePing();
+
+    long getRecipeId();
+    void setRecipeId(long recipeId);
+
     boolean isOnline();
     boolean isEnabled();
+    boolean isDisabling();
     boolean isDisabled();
     boolean isUpgrading();
     boolean isFailedUpgrade();

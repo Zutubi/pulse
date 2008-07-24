@@ -1,5 +1,6 @@
 package com.zutubi.pulse.model;
 
+import com.zutubi.pulse.agent.AgentPingService;
 import com.zutubi.pulse.model.persistence.AgentStateDao;
 import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.scheduling.SchedulingException;
@@ -19,7 +20,6 @@ public class DefaultAgentStateManager implements AgentStateManager
 
     private static final String PING_NAME = "ping";
     private static final String PING_GROUP = "services";
-    private static final long PING_FREQUENCY = Long.getLong("pulse.agent.ping.interval", 60);
 
     private AgentStateDao agentStateDao;
     private Scheduler scheduler;
@@ -36,7 +36,7 @@ public class DefaultAgentStateManager implements AgentStateManager
         }
 
         // initialise the trigger.
-        trigger = new SimpleTrigger(PING_NAME, PING_GROUP, PING_FREQUENCY * Constants.SECOND);
+        trigger = new SimpleTrigger(PING_NAME, PING_GROUP, AgentPingService.getAgentPingInterval() * Constants.SECOND);
         trigger.setTaskClass(PingSlaves.class);
 
         try

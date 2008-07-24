@@ -2,7 +2,7 @@ package com.zutubi.pulse.slave;
 
 import com.zutubi.pulse.SystemInfo;
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.agent.Status;
+import com.zutubi.pulse.agent.PingStatus;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.StartupManager;
 import com.zutubi.pulse.core.RecipeRequest;
@@ -80,7 +80,7 @@ public class SlaveServiceImpl implements SlaveService
         catch (InvalidTokenException e)
         {
             // Respond as status
-            return new SlaveStatus(Status.TOKEN_MISMATCH);
+            return new SlaveStatus(PingStatus.TOKEN_MISMATCH);
         }
 
         // Pong the master (CIB-825)
@@ -91,7 +91,7 @@ public class SlaveServiceImpl implements SlaveService
         catch(Exception e)
         {
             LOG.severe(e);
-            return new SlaveStatus(Status.INVALID_MASTER, "Unable to contact master at location '" + master + "': " + e.getMessage());
+            return new SlaveStatus(PingStatus.INVALID_MASTER, "Unable to contact master at location '" + master + "': " + e.getMessage());
         }
 
         boolean first = false;
@@ -104,11 +104,11 @@ public class SlaveServiceImpl implements SlaveService
         long recipe = slaveRecipeProcessor.getBuildingRecipe();
         if (recipe != 0)
         {
-            return new SlaveStatus(Status.BUILDING, recipe, first);
+            return new SlaveStatus(PingStatus.BUILDING, recipe, first);
         }
         else
         {
-            return new SlaveStatus(Status.IDLE, 0, first);
+            return new SlaveStatus(PingStatus.IDLE, 0, first);
         }
     }
 

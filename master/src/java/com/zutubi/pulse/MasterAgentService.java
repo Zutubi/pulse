@@ -1,7 +1,7 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.agent.MasterLocationProvider;
-import com.zutubi.pulse.agent.Status;
+import com.zutubi.pulse.agent.PingStatus;
 import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.StartupManager;
@@ -56,11 +56,11 @@ public class MasterAgentService implements AgentService
         long recipeId = getMasterRecipeProcessor().getBuildingRecipe();
         if (recipeId == 0)
         {
-            return new SlaveStatus(Status.IDLE);
+            return new SlaveStatus(PingStatus.IDLE);
         }
         else
         {
-            return new SlaveStatus(Status.BUILDING, recipeId, false);
+            return new SlaveStatus(PingStatus.BUILDING, recipeId, false);
         }
     }
 

@@ -40,7 +40,7 @@ class AgentPing implements Callable<SlaveStatus>
             }
             else
             {
-                status = new SlaveStatus(Status.VERSION_MISMATCH);
+                status = new SlaveStatus(PingStatus.VERSION_MISMATCH);
             }
         }
         catch (Exception e)
@@ -51,12 +51,12 @@ class AgentPing implements Callable<SlaveStatus>
             // the most common cause of the exception is the Connect Exception.
             if (cause instanceof ConnectException)
             {
-                status = new SlaveStatus(Status.OFFLINE, cause.getMessage());
+                status = new SlaveStatus(PingStatus.OFFLINE, cause.getMessage());
             }
             else
             {
                 LOG.warning("Exception pinging agent '" + agent.getConfig().getName() + "': " + e.getMessage());
-                status = new SlaveStatus(Status.OFFLINE, "Exception: '" + e.getClass().getName() + "'. Reason: " + e.getMessage());
+                status = new SlaveStatus(PingStatus.OFFLINE, "Exception: '" + e.getClass().getName() + "'. Reason: " + e.getMessage());
             }
         }
 
