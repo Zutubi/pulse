@@ -3,7 +3,7 @@ package com.zutubi.pulse.events;
 import com.zutubi.pulse.agent.Agent;
 
 /**
- * Raised when an agent comes online.
+ * Raised when an agent becomes unavailable for builds.
  */
 public class AgentUnavailableEvent extends AgentAvailabilityEvent
 {
@@ -14,6 +14,6 @@ public class AgentUnavailableEvent extends AgentAvailabilityEvent
 
     public String toString()
     {
-        return ("Agent Available Event: " + getAgent().getName());
+        return ("Agent Unavailable Event: " + getAgent().getName());
     }
 }

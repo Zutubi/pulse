@@ -3,7 +3,7 @@ package com.zutubi.pulse.events;
 import com.zutubi.pulse.agent.Agent;
 
 /**
- * Raised when an agent comes online.
+ * Raised when an agent becomes available to accept builds.
  */
 public class AgentAvailableEvent extends AgentAvailabilityEvent
 {
