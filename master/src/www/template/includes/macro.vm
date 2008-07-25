@@ -2261,7 +2261,7 @@
         ${name}Arrays[$i] = new Array($valueList.size());
         #foreach($value in $valueList)
             #set($j = $velocityCount - 1)
-            ${name}Arrays[$i][$j] = new Option('$value', '$value');
+            ${name}Arrays[$i][$j] = new Option('#jss($value)', '#jss($value)');
             #if($value == $currentValue)
                 ${name}Arrays[$i][$j].selected = true;
             #end
@@ -2270,7 +2270,7 @@
 
     function ${name}Selected()
     {
-        var index = getElement('$keyElement').selectedIndex;
+        var index = getElement('#jss($keyElement)').selectedIndex;
 
         if(index < 0)
         {
@@ -2278,7 +2278,7 @@
         }
 
         var options = ${name}Arrays[index];
-        var element = getElement('$valueElement');
+        var element = getElement('#jss($valueElement)');
         element.options.length = 0;
         for(i = 0; i < options.length; i++)
         {
