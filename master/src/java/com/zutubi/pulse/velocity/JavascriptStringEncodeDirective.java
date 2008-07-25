@@ -30,7 +30,7 @@ public class JavascriptStringEncodeDirective extends Directive
     public boolean render(InternalContextAdapter context, Writer writer, Node node) throws IOException, ResourceNotFoundException, ParseErrorException, MethodInvocationException
     {
         String in = String.valueOf(node.jjtGetChild(0).value(context));
-        writer.write(StringUtil.javaStringEnc(in));
+        writer.write(StringUtil.javaScriptStringEnc(in));
         return true;
     }
 }

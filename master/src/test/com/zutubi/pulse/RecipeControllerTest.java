@@ -467,6 +467,11 @@ public class RecipeControllerTest extends PulseTestCase
             return "mock";
         }
 
+        public UpgradeState getUpgradeState()
+        {
+            throw new RuntimeException("Not implemented");
+        }
+
         public void updateStatus(SlaveStatus status)
         {
             throw new RuntimeException("Method not yet implemented.");

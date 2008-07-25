@@ -14,7 +14,11 @@
         #dynamicRow("agent.location" $agent.location)
 
     #if($agent.isEnabled() && $agent.hasBeenPinged())
-        #dynamicRow("agent.status" $agent.status.prettyString)
+        #if($agent.isDisabling())
+            #dynamicRow("agent.status" "diabling on idle")
+        #else
+            #dynamicRow("agent.status" $agent.status.prettyString)
+        #end
         #dynamicRow("agent.last.ping" $action.getPrettyDate($agent.lastPingTime))
         #dynamicRow("agent.since.last.ping" "$agent.secondsSincePing seconds")
         #if($agent.pingError)

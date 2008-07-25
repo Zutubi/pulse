@@ -493,7 +493,7 @@ public class AgentStatusManager implements EventListener
             }
             else if(event instanceof RecipeCollectedEvent)
             {
-                handleRecipeCollected((RecipeCollectedEvent )event, events);
+                handleRecipeCollected((RecipeCollectedEvent) event, events);
             }
             else if(event instanceof AgentDisableRequestedEvent)
             {

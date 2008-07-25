@@ -40,9 +40,9 @@
     #showTask($task "")
     <tr>
         <td class="submit" colspan="2">
-            <img src="$base/images/delete.gif" alt="delete"/> <a href="#" id="confirm.delete" onclick="runAjaxRequest('$base/aconfig/$path?delete=delete'); return false;"/>$label</a>
+            <img src="$base/images/delete.gif" alt="delete"/> <a href="#" id="confirm.delete" onclick="runAjaxRequest('$base/aconfig/#jss($path)?delete=delete'); return false;"/>$label</a>
             &nbsp;&nbsp;
-            <img src="$base/images/cancel.gif" alt="cancel"/> <a href="#" id="cancel.delete" onclick="runAjaxRequest('$base/aconfig/$path?delete=cancel'); return false;"/>cancel</a>
+            <img src="$base/images/cancel.gif" alt="cancel"/> <a href="#" id="cancel.delete" onclick="runAjaxRequest('$base/aconfig/#jss($path)?delete=cancel'); return false;"/>cancel</a>
         </td>
     </tr>
 </table>

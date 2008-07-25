@@ -13,6 +13,7 @@ public interface Agent
 {
     Status getStatus();
     String getLocation();
+    UpgradeState getUpgradeState();
 
     long getId();
 
@@ -43,4 +44,5 @@ public interface Agent
     AgentState.EnableState getEnableState();
 
     void setAgentState(AgentState agentState);
+
 }

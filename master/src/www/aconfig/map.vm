@@ -9,5 +9,5 @@
 </p>
 
 <script type="text/javascript">
-    detailPanel.setHelp('${path}', 'type');
+    detailPanel.setHelp('#jss(${path})', 'type');
 </script>

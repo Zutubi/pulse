@@ -9,7 +9,7 @@
 
 <table id="template-actions" class="template-actions" cellspacing="5px">
     <tr>
-        #actionHeader("configure" "configure" "pencil" "configureRecord('$path')")
+        #actionHeader("configure" "configure" "pencil" "configureRecord('#jss($path)')")
         <td>jump to the configuration for this #i18n("key=label") #if(!$concrete) template #end</td>
     </tr>
 #if(!$rootTemplate)
@@ -27,11 +27,11 @@
 #if(!$concrete)
 #auth("path=$path" "action=create")
     <tr>
-        #actionHeader("add.new" "add new" "add" "addToPath('$path', false)")
+        #actionHeader("add.new" "add new" "add" "addToPath('#jss($path)', false)")
         <td>add a new #i18n("key=label") as a child of this template</td>
     </tr>
     <tr>
-        #actionHeader("add.template" "add new template" "add" "addToPath('$path', true)")
+        #actionHeader("add.template" "add new template" "add" "addToPath('#jss($path)', true)")
         <td>add a new #i18n("key=label") template as a child of this template</td>
     </tr>
 #end
@@ -39,7 +39,7 @@
 #if(!$permanent && $node.children.size() == 0)
 #auth("path=$path" "action=delete")
     <tr>
-        #actionHeader("delete" "delete" "delete" "deletePath('$path')")
+        #actionHeader("delete" "delete" "delete" "deletePath('#jss($path)')")
         <td>delete this #i18n("key=label") #if(!$concrete) template #end</td>
     </tr>
 #end

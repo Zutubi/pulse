@@ -78,15 +78,15 @@ width of its contents.  Floating it works, but hurts other things.
             <#if submitField.parameters.default?exists>
                 defaultSubmit = function()
                 {
-                    submitForm('${submitField.value}');
+                    submitForm('${submitField.value?js_string}');
                 }
             </#if>
 
-            buttonConfig = { text: '${submitField.value}' };
+            buttonConfig = { text: '${submitField.value?js_string}' };
             <#if form.displayMode?default(false)>
                 buttonConfig.disabled = true;
             </#if>
-            form.addButton(buttonConfig, function() { submitForm('${submitField.value}'); });
+            form.addButton(buttonConfig, function() { submitForm('${submitField.value?js_string}'); });
         </#list>
     </#if>
     

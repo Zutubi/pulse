@@ -45,12 +45,12 @@ Ext.onReady(function()
 {
     Ext.Ajax.timeout = 60000;
 
-    form.render('${form.id}');
+    form.render('${form.id?js_string}');
 
     var f = form.getForm();
-    f.el.dom.action = '${base}/${form.action}';
-    f.url = '${base}/${form.action}';
-    f.el.set({name: '${form.name}'});
+    f.el.dom.action = '${base}/${form.action?js_string}';
+    f.url = '${base}/${form.action?js_string}';
+    f.el.set({name: '${form.name?js_string}'});
 
     var errorMessage;
     if (!window.nextTabindex)
@@ -64,7 +64,7 @@ Ext.onReady(function()
     <#assign parameters=field.parameters>
     <#if fieldErrors?exists && fieldErrors[parameters.name]?exists>
     errorMessage = '<#list fieldErrors[parameters.name] as error>${error?i18n?js_string}<br/></#list>';
-    form.findById('${parameters.id}').markInvalid(errorMessage);
+    form.findById('${parameters.id?js_string}').markInvalid(errorMessage);
     </#if>
 
     var el = Ext.get('${field.id}');
@@ -84,7 +84,7 @@ Ext.onReady(function()
     <#list form.submitFields as submitField>
         buttonEl = form.buttons[${submitField_index}].el.child('button:first');
         buttonEl.set({tabindex: window.nextTabindex++ });
-        buttonEl.dom.id = buttonEl.id = 'zfid.${submitField.value}';
+        buttonEl.dom.id = buttonEl.id = 'zfid.${submitField.value?js_string}';
     </#list>
 </#if>
     form.rendered = true;

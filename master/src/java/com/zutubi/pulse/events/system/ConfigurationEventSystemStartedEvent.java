@@ -31,6 +31,6 @@ public class ConfigurationEventSystemStartedEvent extends SystemEvent
 
     public String toString()
     {
-        return "Configuration System Starting Event";
+        return "Configuration Event System Started Event";
     }
 }

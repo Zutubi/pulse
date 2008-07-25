@@ -143,7 +143,7 @@
         var Layout = function()
         {
 #if($path)
-            var path = '$path';
+            var path = '#jss($path)';
 #else
             var path = '';
 #end
@@ -205,13 +205,13 @@
                         nestedWest.doLayout();
 
 #if($configTreePath)
-                        templateTree.expandToPath('$templateTreePath', function(success, lastNode) {
+                        templateTree.expandToPath('#jss($templateTreePath)', function(success, lastNode) {
                             tabPanel.activate('template-tree');
                             nestedWest.doLayout();
                             lastNode.select();
                             tabPanel.activate('config-panel');
                             treesInitialised = true;
-                            configTree.selectConfigPath('$configTreePath');
+                            configTree.selectConfigPath('#jss($configTreePath)');
                         });
 #else
                         templateRoot.expand(false, 'baseName', function() {

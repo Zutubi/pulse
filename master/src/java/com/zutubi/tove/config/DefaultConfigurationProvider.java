@@ -31,8 +31,6 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
 
     public void init()
     {
-        eventManager.publish(new ConfigurationEventSystemStartedEvent(this));
-
         syncMux = new MultiplexingListener(ConfigurationEvent.class);
         eventManager.register(syncMux);
 

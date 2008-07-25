@@ -209,6 +209,10 @@ public class BuildController implements EventListener
             {
                 handleRecipeTimeout((RecipeTimeoutEvent) evt);
             }
+            else if (evt instanceof RecipeCollectedEvent)
+            {
+                // Ignore these.
+            }
             else if (evt instanceof RecipeEvent)
             {
                 RecipeEvent e = (RecipeEvent) evt;

@@ -81,9 +81,9 @@
                     <li>
                         <a href="#" id='#id("action.${action.action}")' class="unadorned"
             #if($action.action == "delete")
-                            onclick="deletePath('${path}'); return false;"
+                            onclick="deletePath('#jss(${path})'); return false;"
             #else
-                            onclick="actionPath('${path}?${action.action}', false); return false;"
+                            onclick="actionPath('#jss(${path})?${action.action}', false); return false;"
             #end
                         >
                             <img src="${base}/images/config/actions/${action.icon}.gif"/> ${action.label}
@@ -101,7 +101,7 @@
             <div class="config-container">
             <ul class="config-links">
         #foreach($prop in $config.nestedProperties)
-                    <li><a href="#" onclick="selectPath('${path}/${prop}'); return false;">#displayname("path=${path}/${prop}")</a></li>
+                    <li><a href="#" onclick="selectPath('#jss(${path})/${prop}'); return false;">#displayname("path=${path}/${prop}")</a></li>
         #end
             </ul>
             </div>
@@ -116,7 +116,7 @@
             #if($config.configuredDescendents.size() == 0)
     <table class="template-actions" cellspacing="5px">
         <tr>
-            <th><a href="#" class="unadorned" onclick="addToPath('${path}'); return false"><img alt="configure" src="$base/images/pencil.gif"/></a> <a href="#" id="configure" onclick="addToPath('${path}'); return false">configure</a></th>
+            <th><a href="#" class="unadorned" onclick="addToPath('#jss(${path})'); return false"><img alt="configure" src="$base/images/pencil.gif"/></a> <a href="#" id="configure" onclick="addToPath('${path}'); return false">configure</a></th>
             <td>configure a #i18n("key=label") using the wizard</td>
         </tr>
     </table>

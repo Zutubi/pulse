@@ -1,12 +1,17 @@
 package com.zutubi.pulse.web.agents;
 
+import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.AgentManager;
-import com.zutubi.pulse.agent.DefaultAgent;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.model.AgentState;
+import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.web.ActionSupport;
+import com.zutubi.tove.actions.ActionManager;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
+import com.zutubi.util.Sort;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -15,43 +20,66 @@ import java.util.List;
  */
 public class ViewAgentsAction extends ActionSupport
 {
-    private List<Agent> agents;
-    private MasterConfigurationManager configurationManager;
+    private List<AgentModel> models;
     private AgentManager agentManager;
+    private ActionManager actionManager;
 
-    public List<Agent> getAgents()
+    public List<AgentModel> getModels()
     {
-        return agents;
-    }
-
-    public int getServerPort()
-    {
-        return configurationManager.getSystemConfig().getServerPort();
-    }
-
-    public boolean upgrading(DefaultAgent agent)
-    {
-        return agent.getEnableState() == AgentState.EnableState.UPGRADING;
-    }
-
-    public boolean failedUpgrade(DefaultAgent agent)
-    {
-        return agent.getEnableState() == AgentState.EnableState.FAILED_UPGRADE;
+        return models;
     }
 
     public String execute() throws Exception
     {
-        agents = agentManager.getAllAgents();
-        return SUCCESS;
-    }
+        List<Agent> agents = agentManager.getAllAgents();
+        models = CollectionUtils.map(agents, new Mapping<Agent, AgentModel>()
+        {
+            public AgentModel map(Agent agent)
+            {
+                String status;
+                if(agent.isDisabling())
+                {
+                    status = "disabling on idle";
+                }
+                else if(agent.isUpgrading())
+                {
+                    status = "upgrading [" + agent.getUpgradeState().toString().toLowerCase() + "]";
+                }
+                else
+                {
+                    status = agent.getStatus().getPrettyString();
+                }
 
-    public void setConfigurationManager(MasterConfigurationManager configurationManager)
-    {
-        this.configurationManager = configurationManager;
+                AgentModel model = new AgentModel(agent, agent.getConfig().getName(), agent.getLocation(), status);
+
+                Messages messages = Messages.getInstance(AgentConfiguration.class);
+                for(String actionName: actionManager.getActions(agent.getConfig(), false))
+                {
+                    model.addAction(new AgentActionLink(actionName, messages.format(actionName + ".label")));
+                }
+
+                return model;
+            }
+        });
+
+        final Comparator<String> c = new Sort.StringComparator();
+        Collections.sort(models, new Comparator<AgentModel>()
+        {
+            public int compare(AgentModel o1, AgentModel o2)
+            {
+                return c.compare(o1.getName(), o2.getName());
+            }
+        });
+        return SUCCESS;
     }
 
     public void setAgentManager(AgentManager agentManager)
     {
         this.agentManager = agentManager;
+    }
+
+    public void setActionManager(ActionManager actionManager)
+    {
+        this.actionManager = actionManager;
     }
 }

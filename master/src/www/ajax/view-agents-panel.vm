@@ -1,63 +1,29 @@
 <table class="content">
-    #headingRow("agents" 7)
+    #headingRow("agents" 5)
     <tr>
         #contentHeading("agent.name" 1)
         #contentHeading("agent.location" 1)
         #contentHeading("agent.status" 1)
-        #contentHeading("actions" 3)
+        #contentHeading("actions" 1)
+        #contentHeading("edit" 1)
     </tr>
-#foreach($agent in $agents)
-    #set($span = 3)
-#auth("resource=agent" "action=ping")
-    #set($span = $span - 1)
-#end
-#auth("resource=agent" "action=disable")
-    #set($span = $span - 1)
-#end
-
+#foreach($model in $models)
     <tr>
-        #set($h_agentName = $!webwork.htmlEncode($agent.config.name))
-        #dynamicLinkCell($h_agentName "$urls.agentStatus($agent)")
-        #staticCell($agent.location)
-        #if($agent.enabled)
-            #staticCell($agent.status.prettyString)
-#auth("resource=agent" "action=ping")
-            #linkCell("agent.ping.$agent.config.name" "agent.ping" "$urls.agentAction($agent, 'ping')")
-#end
-#auth("resource=agent" "action=disable")
-            #linkCell("agent.disable.$agent.config.name" "agent.disable" "$urls.agentAction($agent, 'disable')")
-#end
-        #else
-            #if($action.upgrading($agent))
-                #set($status = "$action.getText('agent.upgrading') [$agent.upgradeState.toString().toLowerCase()]")
-
-                #staticCell($status)
-#auth("resource=agent" "action=ping")
-                #contentCell("agent.ping")
-#end
-#auth("resource=agent" "action=disable")
-                #contentCell("agent.enable")
-#end
-            #elseif($action.failedUpgrade($agent))
-                #contentCell("agent.failed.upgrade")
-#auth("resource=agent" "action=ping")
-                #contentCell("agent.ping")
-#end
-#auth("resource=agent" "action=enable")
-                #linkCell("agent.enable.$agent.config.name" "agent.enable" "$urls.agentAction($agent, 'enable')")
-#end
-            #else
-                ## Just plain disabled
-                #contentCell("agent.disabled")
-#auth("resource=agent" "action=ping")
-                #contentCell("agent.ping")
-#end
-#auth("resource=agent" "action=disable")
-                #linkCell("agent.enable.$agent.config.name" "agent.enable" "$urls.agentAction($agent, 'enable')")
-#end
+        #set($h_agentName = $!webwork.htmlEncode($model.name))
+        #dynamicLinkCell($h_agentName "$urls.agentStatus($model.agent)")
+        #staticCell($model.location)
+        #staticCell($model.status)
+        <td class="content">
+    #if($model.hasActions())
+        #foreach($action in $model.actions)
+            <a id='#id("agent.${model.name}.action.${action.action}")' href="$urls.agentAction($model.agent, $action.action)">$action.label</a>
+            #if($velocityCount < $model.actions.size())
+            <span class="understated">//</span>
             #end
         #end
-        #editCellSpan("$base/admin/${agent.config.configurationPath}/" "edit_$h_agentName" $span)
+    #end
+        </td>
+        #editCellSpan("$base/admin/${model.agent.config.configurationPath}/" "edit_$h_agentName" 1)
     </tr>
 #end
 </table>
