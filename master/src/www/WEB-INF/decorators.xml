@@ -28,6 +28,7 @@
     <decorator name="basic" page="basic.vm">
         <pattern>/setup/*</pattern>
         <pattern>/setupconfig/*</pattern>
+        <pattern>/setupconfig</pattern>
         <pattern>/upgrade/*</pattern>
         <pattern>/restore/*</pattern>
         <pattern>/migrate/*</pattern>
