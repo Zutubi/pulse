@@ -39,7 +39,7 @@
         <taskdef name="copyright" classname="com.zutubi.pulse.CopyrightTask" classpathref="custom.task.path"/>
         <taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="custom.task.path"/>
         <taskdef uri="antlib:com.zutubi.ant" resource="com/zutubi/ant/antlib.xml" classpathref="custom.task.path"/>
-    	<taskdef name="ideamodule" classname="configurator.task.IdeaJavaModuleTask" classpathref="custom.task.path"/>
+        <taskdef name="ideamodule" classname="configurator.task.IdeaJavaModuleTask" classpathref="custom.task.path"/>
 
         <load-ivy-taskdef/>
 
@@ -328,9 +328,9 @@
 
     <target name="package.master" depends="init">
         <!-- Check that all plugins will be included in some package -->
-	<exec executable="python" failonerror="true">
+        <exec executable="python" failonerror="true">
             <arg line="scripts/check-plugins.py"/>
-	</exec>
+        </exec>
 
         <build-package-deps module="master"/>
 
@@ -465,14 +465,6 @@
         </subant>
     </target>
 
-<target name="h">
-  <exec executable="bash">
-    <arg line="fail.sh"/>
-  </exec>
-<fail message="bail"/>
-  <echo message="still ran"/>
-</target>
-
     <target name="run.accept.master" depends="build.acceptance, init">
         <property name="build.dir" value="acceptance/build"/>
         <property name="report.dir" value="build/reports/junit"/>
@@ -502,7 +494,7 @@
 
         <echo message="Start acceptance test suite."/>
         <junit printsummary="yes" fork="on" forkmode="once" maxmemory="512m"
-	       failureProperty="test.failed" errorProperty="test.failed">
+               failureProperty="test.failed" errorProperty="test.failed">
             <sysproperty key="pulse.port" value="8889"/>
             <sysproperty key="bootstrap" value="com/zutubi/pulse/bootstrap/bootstrapContext.xml"/>
             <classpath>
@@ -531,6 +523,14 @@
         </exec>
         <fail message="One or more acceptance tests failed.  See the reports (${report.dir}) for details."
               if="test.failed"/>
+
+        <exec executable="bash" spawn="true">
+            <arg line="scripts/setup-services.sh"/>
+        </exec>
+
+        <waitfor maxwait="2" maxwaitunit="minute">
+            <socket server="localhost" port="3088"/>
+        </waitfor>
 
         <antcall target="test.agent.upgrade"/>
 
@@ -568,9 +568,9 @@
     <target name="idea" depends="build.all">
         <zutubi:ivytoidea conf="build" projectFile="pulse.ipr" propertiesFile="build.properties">
             <fileset dir="${project.root.dir}/">
-	        <include name="*/ivy.xml"/>
-	        <include name="bundles/*/ivy.xml"/>
-	    </fileset>
+                <include name="*/ivy.xml"/>
+                <include name="bundles/*/ivy.xml"/>
+            </fileset>
         </zutubi:ivytoidea>
     </target>
 
@@ -599,10 +599,10 @@
         <sequential>
             <ivy:buildlist reference="build.path.@{module}" root="pulse-@{module}-package" ivyfilepath="ivy.xml" excluderoot="true" skipbuildwithoutivy="true">
                 <fileset dir="${project.root.dir}/">
-	            <include name="*/build.xml"/>
-	            <include name="bundles/*/build.xml"/>
-	            <include name="package/*/build.xml"/>
-	        </fileset>
+                    <include name="*/build.xml"/>
+                    <include name="bundles/*/build.xml"/>
+                    <include name="package/*/build.xml"/>
+                </fileset>
             </ivy:buildlist>
 
             <subant inheritAll="false" target="build.module" buildpathref="build.path.@{module}">
