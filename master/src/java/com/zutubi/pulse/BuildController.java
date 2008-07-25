@@ -161,7 +161,7 @@ public class BuildController implements EventListener
             RecipeRequest recipeRequest = new RecipeRequest(new ExecutionContext(recipeContext));
             List<ResourceRequirement> resourceRequirements = getResourceRequirements(stage);
             recipeRequest.addAllResourceRequirements(resourceRequirements);
-//            recipeRequest.addAllProperties(projectConfig.getProperties().values());
+            recipeRequest.addAllProperties(projectConfig.getProperties().values());
             recipeRequest.addAllProperties(stage.getProperties().values());
 
             RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(project, stage.getAgentRequirements(), resourceRequirements, request.getRevision(), recipeRequest, buildResult);
