@@ -11,6 +11,7 @@ import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.TestResultSummary;
 import com.zutubi.pulse.core.scm.CheckoutScheme;
 import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 
 import java.io.File;
@@ -122,6 +123,15 @@ public class MasterBuildProperties extends BuildProperties
         }
         else
         {
+            BuildStageConfiguration stage = result.getProject().getConfig().getStage(node.getStageName());
+            if (stage != null)
+            {
+                for(ResourceProperty property: stage.getProperties().values())
+                {
+                    context.add(property);
+                }
+            }
+
             context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE, recipeResult.getRecipeNameSafe());
             context.addString(NAMESPACE_INTERNAL, PROPERTY_STAGE, node.getStageName());
             context.addString(NAMESPACE_INTERNAL, PROPERTY_STATUS, recipeResult.getState().getString());

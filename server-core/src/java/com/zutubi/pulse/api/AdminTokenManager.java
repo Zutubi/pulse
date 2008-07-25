@@ -1,7 +1,7 @@
 package com.zutubi.pulse.api;
 
-import com.zutubi.util.RandomUtils;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.util.RandomUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
@@ -44,13 +44,9 @@ public class AdminTokenManager
         {
             // Matches the single-use admin token.  Allow login and generate
             // a new token.
-            System.out.println("accepting token = " + token);
             newRandomToken();
-            System.out.println("new token = " + adminToken);
             return true;
         }
-        System.out.println("rejecting token = " + token);
-        System.out.println("our token = " + adminToken);
         return false;
     }
 
