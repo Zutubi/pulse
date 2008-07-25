@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
+<ivy-module version="1.1">
+    <info organisation="testng" module="testng" revision="5.8" status="release">
+
+    </info>
+
+    <publications>
+        <artifact name="testng-jdk15" type="jar"/>
+    </publications>
+    
+</ivy-module>
