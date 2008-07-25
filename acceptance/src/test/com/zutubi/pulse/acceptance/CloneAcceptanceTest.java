@@ -16,10 +16,15 @@ import java.util.ArrayList;
 import static java.util.Arrays.asList;
 import java.util.Hashtable;
 
+import org.testng.annotations.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterMethod;
+
 /**
  * Tests for cloning both of top-level template collection items and of
  * normal map elements.
  */
+@Test(dependsOnGroups = {"init.*"})
 public class CloneAcceptanceTest extends SeleniumTestBase
 {
     private static final String TEST_PROPERTY_NAME   = "aprop";
@@ -27,12 +32,14 @@ public class CloneAcceptanceTest extends SeleniumTestBase
     private static final String CLONE_PROPERTY_NAME  = "aclone";
     private static final String PARENT_PROPERTY_NAME = "atemplate";
 
+    @BeforeMethod
     protected void setUp() throws Exception
     {
         super.setUp();
         xmlRpcHelper.loginAsAdmin();
     }
 
+    @AfterMethod
     protected void tearDown() throws Exception
     {
         xmlRpcHelper.logout();

@@ -10,9 +10,14 @@ import com.zutubi.util.RandomUtils;
 
 import java.util.Hashtable;
 
+import org.testng.annotations.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterMethod;
+
 /**
  * Acceptance tests for the users dashboard view.
  */
+@Test(dependsOnGroups = {"init.*"})
 public class DashboardAcceptanceTest extends SeleniumTestBase
 {
     private static final String SHOW_ALL_GROUPS   = "showAllGroups";
@@ -22,6 +27,7 @@ public class DashboardAcceptanceTest extends SeleniumTestBase
 
     private String userPath;
 
+    @BeforeMethod
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -32,6 +38,7 @@ public class DashboardAcceptanceTest extends SeleniumTestBase
         login(user, "");
     }
 
+    @AfterMethod
     protected void tearDown() throws Exception
     {
         xmlRpcHelper.logout();

@@ -44,7 +44,6 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
 
         // jvm is no longer embedded - this does not work.
         File userHome = new File(tmpDir, "home");
-//        System.setProperty("user.home", userHome.getAbsolutePath());
 
         defaultDataDir = new File(userHome, ".pulse2/data");
         defaultConfigFile = new File(userHome, FileSystemUtils.composeFilename(".pulse2", "config.properties"));

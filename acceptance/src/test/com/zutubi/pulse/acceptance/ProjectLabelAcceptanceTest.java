@@ -6,17 +6,24 @@ import com.zutubi.tove.type.record.PathUtils;
 
 import java.util.Hashtable;
 
+import org.testng.annotations.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterMethod;
+
 /**
  * Acceptance tests that verify categorisation of projects using labels.
  */
+@Test(dependsOnGroups = {"init.*"})
 public class ProjectLabelAcceptanceTest extends SeleniumTestBase
 {
+    @BeforeMethod
     protected void setUp() throws Exception
     {
         super.setUp();
         xmlRpcHelper.loginAsAdmin();
     }
 
+    @AfterMethod
     protected void tearDown() throws Exception
     {
         xmlRpcHelper.logout();

@@ -3,12 +3,28 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.pages.server.ServerActivityPage;
 import com.zutubi.pulse.acceptance.pages.server.ServerInfoPage;
 import com.zutubi.pulse.acceptance.pages.server.ServerMessagesPage;
+import org.testng.annotations.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterMethod;
 
 /**
  * Acceptance tests for the server section of the reporting UI.
  */
+@Test(dependsOnGroups = {"init.*"})
 public class ServerSectionAcceptanceTest extends SeleniumTestBase
 {
+    @BeforeMethod
+    protected void setUp() throws Exception
+    {
+        super.setUp();
+    }
+
+    @AfterMethod
+    protected void tearDown() throws Exception
+    {
+        super.tearDown();
+    }
+
     public void testServerActivity() throws Exception
     {
         loginAsAdmin();

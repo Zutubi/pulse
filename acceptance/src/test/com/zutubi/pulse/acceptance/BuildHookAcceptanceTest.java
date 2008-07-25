@@ -18,10 +18,15 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Hashtable;
 
+import org.testng.annotations.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterMethod;
+
 /**
  * Tests for build hooks, both configuration and ensuring they are executed
  * when expected.
  */
+@Test(dependsOnGroups = {"init.*"})
 public class BuildHookAcceptanceTest extends SeleniumTestBase
 {
     private static final String PROJECT_NAME = "hook-test-project";
@@ -33,6 +38,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
 
     private File tempDir;
 
+    @BeforeMethod
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -43,6 +49,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
     }
 
+    @AfterMethod
     protected void tearDown() throws Exception
     {
         logout();

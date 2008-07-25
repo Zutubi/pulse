@@ -8,14 +8,20 @@ import com.zutubi.util.RandomUtils;
 
 import java.util.Hashtable;
 
+import org.testng.annotations.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterMethod;
+
 /**
  * Test for agent resources and project resource requirements.
  */
-public class ResourceAcceptanceTest extends BaseXmlRpcAcceptanceTest
+@Test(dependsOnGroups = "init.*", groups = "xmlrpc")
+public class ResourceXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 {
     private String random;
     private String resourcesPath;
 
+    @BeforeMethod
     public void setUp() throws Exception
     {
         super.setUp();
@@ -25,6 +31,7 @@ public class ResourceAcceptanceTest extends BaseXmlRpcAcceptanceTest
         resourcesPath = PathUtils.getPath(agentPath, "resources");
     }
 
+    @AfterMethod
     protected void tearDown() throws Exception
     {
         xmlRpcHelper.logout();

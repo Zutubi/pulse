@@ -48,25 +48,25 @@ public class JythonPackageFactoryTest extends PulseTestCase
 
     public void disabledTestExtractPackage() throws IOException
     {
-        PulsePackage pkg = factory.createPackage(new File(packagesDir, "pulse-2.0.0.zip"));
+        PulsePackage pkg = factory.createPackage(new File(packagesDir, "pulse-2.0.9.zip"));
 
         Pulse pulse = pkg.extractTo(tmp.getCanonicalPath());
         assertNotNull(pulse);
 
         // ensure that pulse is extracted as expected.
-        File expectedRoot = new File(tmp, "pulse-2.0.0");
+        File expectedRoot = new File(tmp, "pulse-2.0.9");
         assertTrue(expectedRoot.isDirectory());
 
         // normalise the paths before we compare them.
         assertEquals(expectedRoot.getCanonicalPath(), new File(pulse.getRoot()).getCanonicalPath());
 
-        File expectedPluginRoot = new File(expectedRoot, "versions/0200000000/system/plugins");
+        File expectedPluginRoot = new File(expectedRoot, "versions/0200009000/system/plugins");
         assertEquals(expectedPluginRoot.getCanonicalPath(), new File(pulse.getPluginRoot()).getCanonicalPath());
     }
 
     public void disabledTestStartAndStopPulse() throws IOException
     {
-        PulsePackage pkg = factory.createPackage(new File(packagesDir, "pulse-2.0.0.zip"));
+        PulsePackage pkg = factory.createPackage(new File(packagesDir, "pulse-2.0.9.zip"));
         Pulse pulse = pkg.extractTo(tmp.getCanonicalPath());
 
         assertFalse(pulse.ping());
@@ -80,7 +80,7 @@ public class JythonPackageFactoryTest extends PulseTestCase
 
     public void disabledTestAddingJavaOpts() throws Exception
     {
-        PulsePackage pkg = factory.createPackage(new File(packagesDir, "pulse-2.0.0.zip"));
+        PulsePackage pkg = factory.createPackage(new File(packagesDir, "pulse-2.0.9.zip"));
         Pulse pulse = pkg.extractTo(tmp.getCanonicalPath());
 
         File alternateUserHome = new File(tmp, "user_home");

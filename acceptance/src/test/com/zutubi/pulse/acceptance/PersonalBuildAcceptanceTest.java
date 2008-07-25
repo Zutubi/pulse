@@ -18,6 +18,9 @@ import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 import org.tmatesoft.svn.core.wc.SVNUpdateClient;
 import org.tmatesoft.svn.core.wc.SVNWCUtil;
+import org.testng.annotations.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterMethod;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -30,18 +33,20 @@ import java.util.Properties;
 /**
  * Simple sanity checks for personal builds.
  */
+@Test(dependsOnGroups = {"init.*"})
 public class PersonalBuildAcceptanceTest extends SeleniumTestBase
 {
     private static final String PROJECT_NAME = "PersonalBuildAcceptanceTest-Project";
 
     private File workingCopyDir;
 
+    @BeforeMethod
     protected void setUp() throws Exception
     {
         super.setUp();
 
         WorkingCopyFactory.registerType("svn", SubversionWorkingCopy.class);
-        workingCopyDir = FileSystemUtils.createTempDir(getName(), "");
+        workingCopyDir = FileSystemUtils.createTempDir("PersonalBuildAcceptanceTest", "");
 
         DAVRepositoryFactory.setup();
         SVNRepositoryFactoryImpl.setup();
@@ -51,6 +56,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         xmlRpcHelper.loginAsAdmin();
     }
 
+    @AfterMethod
     protected void tearDown() throws Exception
     {
         xmlRpcHelper.logout();

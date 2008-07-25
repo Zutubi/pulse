@@ -14,20 +14,27 @@ import static com.zutubi.tove.type.record.PathUtils.getPath;
 
 import java.util.Hashtable;
 
+import org.testng.annotations.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterMethod;
+
 /**
  * An acceptance test that adds a very simple project and runs a build as a
  * sanity test.
  */
+@Test(dependsOnGroups = {"init.*"})
 public class BuildAcceptanceTest extends SeleniumTestBase
 {
     private static final String PROJECT_NAME = "BuildAcceptanceTest-Project";
 
+    @BeforeMethod
     protected void setUp() throws Exception
     {
         super.setUp();
         xmlRpcHelper.loginAsAdmin();
     }
 
+    @AfterMethod
     protected void tearDown() throws Exception
     {
         xmlRpcHelper.logout();

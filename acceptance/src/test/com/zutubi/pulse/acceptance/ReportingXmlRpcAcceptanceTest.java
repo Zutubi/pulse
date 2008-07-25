@@ -11,18 +11,25 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import org.testng.annotations.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterMethod;
+
 /**
  * Tests for the remote API, primarily the reporting functionality.
  * Configration functions are tested in {@link ConfigXmlRpcAcceptanceTest}.
  */
+@Test(dependsOnGroups = "init.*", groups = "xmlrpc")
 public class ReportingXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 {
+    @BeforeMethod
     protected void setUp() throws Exception
     {
         super.setUp();
         loginAsAdmin();
     }
 
+    @AfterMethod
     protected void tearDown() throws Exception
     {
         logout();

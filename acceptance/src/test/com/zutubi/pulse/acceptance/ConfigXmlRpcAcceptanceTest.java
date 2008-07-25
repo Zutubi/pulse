@@ -11,22 +11,29 @@ import com.zutubi.util.Sort;
 
 import java.util.*;
 
+import org.testng.annotations.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterMethod;
+
 /**
  * Tests for the remote API functions dealing with configuration.  Other
  * tests deal with specific configuration types, this test just concentrates
  * on the general capabilities and boundaries of the config functions.
  */
+@Test(dependsOnGroups = "init.*", groups = "xmlrpc")
 public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 {
     private static final String TEST_PROJECT_NAME = "config-xml-rpc";
     private static final String TEST_PROJECT_PATH = "projects/config-xml-rpc";
 
+    @BeforeMethod
     protected void setUp() throws Exception
     {
         super.setUp();
         loginAsAdmin();
     }
 
+    @AfterMethod
     protected void tearDown() throws Exception
     {
         logout();

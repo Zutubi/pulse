@@ -8,12 +8,29 @@ import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.tove.config.group.ServerPermission;
 import com.zutubi.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.type.record.PathUtils;
+import org.testng.annotations.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterMethod;
 
 /**
  * Test for user groups.
  */
+@Test(dependsOnGroups = {"init.*"})
 public class GroupAcceptanceTest extends SeleniumTestBase
 {
+
+    @BeforeMethod
+    protected void setUp() throws Exception
+    {
+        super.setUp();
+    }
+
+    @AfterMethod
+    protected void tearDown() throws Exception
+    {
+        super.tearDown();
+    }
+
     public void testCreateEmptyGroup()
     {
         loginAsAdmin();

@@ -12,10 +12,15 @@ import com.zutubi.tove.type.record.PathUtils;
 
 import java.util.Hashtable;
 
+import org.testng.annotations.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterMethod;
+
 /**
  * Acceptance tests that verify operation of the configuration UI by trying
  * some real cases against a running server.
  */
+@Test(dependsOnGroups = {"init.*"})
 public class ConfigUIAcceptanceTest extends SeleniumTestBase
 {
     private static final String CHECK_PROJECT = "config-check-project";
@@ -23,12 +28,14 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
     private static final String ACTION_DOWN = "down";
     private static final String ACTION_UP   = "up";
 
+    @BeforeMethod
     protected void setUp() throws Exception
     {
         super.setUp();
         xmlRpcHelper.loginAsAdmin();
     }
 
+    @AfterMethod
     protected void tearDown() throws Exception
     {
         xmlRpcHelper.logout();

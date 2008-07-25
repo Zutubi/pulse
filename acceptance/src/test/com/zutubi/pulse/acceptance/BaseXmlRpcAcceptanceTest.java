@@ -6,6 +6,9 @@ import junit.framework.TestCase;
 import java.net.URL;
 import java.util.Vector;
 
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterMethod;
+
 /**
  * Helper base class for test cases that call the remote api.  Provides
  * simple functions for logging in and out and calling the API with a

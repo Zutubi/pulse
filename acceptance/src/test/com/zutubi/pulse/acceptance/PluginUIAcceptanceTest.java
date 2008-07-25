@@ -11,9 +11,14 @@ import com.zutubi.util.IOUtils;
 import java.io.File;
 import java.io.IOException;
 
+import org.testng.annotations.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterMethod;
+
 /**
  * Tests for the plugin management UI.
  */
+@Test(dependsOnGroups = {"init.*"})
 public class PluginUIAcceptanceTest extends SeleniumTestBase
 {
     private static final String STATE_ENABLED      = "enabled";
@@ -29,7 +34,13 @@ public class PluginUIAcceptanceTest extends SeleniumTestBase
 
     private File tmpDir = null;
 
+    @BeforeMethod
+    protected void setUp() throws Exception
+    {
+        super.setUp();
+    }
 
+    @AfterMethod
     protected void tearDown() throws Exception
     {
         if(tmpDir != null)
@@ -148,7 +159,7 @@ public class PluginUIAcceptanceTest extends SeleniumTestBase
     private File makeTestPlugin(String id, String name) throws IOException
     {
         File testPlugin = new File(TestUtils.getPulseRoot(), FileSystemUtils.composeFilename("acceptance", "src", "test", "misc", ID_TEST + ".jar"));
-        tmpDir = FileSystemUtils.createTempDir(getName(), "");
+        tmpDir = FileSystemUtils.createTempDir("PluginUIAcceptanceTest", "");
         File unzipDir = new File(tmpDir, "unzip");
         ZipUtils.extractZip(testPlugin, unzipDir);
 

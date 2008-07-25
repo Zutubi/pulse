@@ -4,6 +4,9 @@ import com.zutubi.pulse.acceptance.forms.setup.*;
 import com.zutubi.pulse.license.LicenseType;
 import com.zutubi.pulse.test.LicenseHelper;
 import org.xml.sax.SAXException;
+import org.testng.annotations.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterMethod;
 
 import java.io.IOException;
 
@@ -15,12 +18,14 @@ import java.io.IOException;
  * having multiple test methods, there is one testSetupProcess method that is breaks up the setup
  * process and handles all of the validation testing as it goes.
  */
+@Test(groups = "init.setup")
 public class SetupAcceptanceTest extends SeleniumTestBase
 {
     public String licenseKey;
     public String expiredLicenseKey;
     public String invalidLicenseKey;
 
+    @BeforeMethod
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -30,6 +35,7 @@ public class SetupAcceptanceTest extends SeleniumTestBase
         invalidLicenseKey = LicenseHelper.newInvalidLicenseKey(LicenseType.EVALUATION, "S. O. MeBody");
     }
 
+    @AfterMethod
     protected void tearDown() throws Exception
     {
         super.tearDown();
@@ -69,19 +75,33 @@ public class SetupAcceptanceTest extends SeleniumTestBase
 
     private void checkSetPulseData()
     {
+        assertPulseTabsNotVisible();
+
         SetPulseDataForm form = new SetPulseDataForm(selenium);
         form.assertFormPresent();
         assertFormFieldNotEmpty("zfid.data");
+
+        String defaultDataDir = form.getFormValues()[0];
 
         form.nextFormElements("");
         assertTextPresent("pulse data directory requires a value");
         form.assertFormPresent();
 
-        form.nextFormElements("data");
+        form.nextFormElements(defaultDataDir);
+    }
+
+    private void assertPulseTabsNotVisible()
+    {
+        assertElementNotPresent("tab.projects");
+        assertElementNotPresent("tab.queues");
+        assertElementNotPresent("tab.agents");
+        assertElementNotPresent("tab.administration");              
     }
 
     private void checkSetupDatabase()
     {
+        assertPulseTabsNotVisible();
+
         SetupDatabaseTypeForm form = new SetupDatabaseTypeForm(selenium);
         form.assertFormPresent();
         form.nextFormElements("EMBEDDED", null, null, null, null, null, null);
@@ -89,6 +109,8 @@ public class SetupAcceptanceTest extends SeleniumTestBase
 
     private void checkLicenseDetails()
     {
+        assertPulseTabsNotVisible();
+
         PulseLicenseForm licenseForm = new PulseLicenseForm(selenium);
 
         licenseForm.assertFormPresent();
@@ -118,6 +140,8 @@ public class SetupAcceptanceTest extends SeleniumTestBase
 
     private void checkCreateAdmin()
     {
+        assertPulseTabsNotVisible();
+
         CreateAdminForm createAdminForm = new CreateAdminForm(selenium);
 
         // create admin.
@@ -127,6 +151,8 @@ public class SetupAcceptanceTest extends SeleniumTestBase
 
     private void checkServerSettings()
     {
+        assertPulseTabsNotVisible();
+
         ServerSettingsForm settingsForm = new ServerSettingsForm(selenium);
         settingsForm.assertFormPresent();
         settingsForm.finishFormElements("http://localhost:8080", "some.smtp.host.com", "true", "Setup <from@localhost.com>", "username", "password", "prefix", "true", "123");

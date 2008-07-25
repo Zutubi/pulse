@@ -18,9 +18,14 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import org.testng.annotations.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterMethod;
+
 /**
  * Tests for deletion of various things: an area that is notorious for bugs!
  */
+@Test(dependsOnGroups = {"init.*"})
 public class DeleteAcceptanceTest extends SeleniumTestBase
 {
     private static final String ACTION_DELETE_RECORD = "delete record";
@@ -29,12 +34,14 @@ public class DeleteAcceptanceTest extends SeleniumTestBase
 
     private static final String ACTION_RESTORE       = "restore";
 
+    @BeforeMethod
     protected void setUp() throws Exception
     {
         super.setUp();
         xmlRpcHelper.loginAsAdmin();
     }
 
+    @AfterMethod
     protected void tearDown() throws Exception
     {
         xmlRpcHelper.logout();

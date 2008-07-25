@@ -1,11 +1,16 @@
 package com.zutubi.pulse.acceptance;
 
+import org.testng.annotations.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterMethod;
+
 import java.util.Hashtable;
 import java.util.Vector;
 
 /**
  * Tests configuration of projects via the remote API.
  */
+@Test(dependsOnGroups = "init.*", groups = "xmlrpc")
 public class ProjectXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
 {
     public ProjectXmlRpcAcceptanceTest()
@@ -17,12 +22,14 @@ public class ProjectXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         super(testName);
     }
 
+    @BeforeMethod
     protected void setUp() throws Exception
     {
         super.setUp();
         loginAsAdmin();
     }
 
+    @AfterMethod
     protected void tearDown() throws Exception
     {
         logout();
