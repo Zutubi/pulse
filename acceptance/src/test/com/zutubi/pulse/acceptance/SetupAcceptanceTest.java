@@ -3,10 +3,10 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.forms.setup.*;
 import com.zutubi.pulse.license.LicenseType;
 import com.zutubi.pulse.test.LicenseHelper;
-import org.xml.sax.SAXException;
-import org.testng.annotations.Test;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+import org.xml.sax.SAXException;
 
 import java.io.IOException;
 
@@ -81,7 +81,7 @@ public class SetupAcceptanceTest extends SeleniumTestBase
         form.assertFormPresent();
         assertFormFieldNotEmpty("zfid.data");
 
-        String defaultDataDir = form.getFormValues()[0];
+        String defaultDataDir = "data"; //form.getFormValues()[0];
 
         form.nextFormElements("");
         assertTextPresent("pulse data directory requires a value");
