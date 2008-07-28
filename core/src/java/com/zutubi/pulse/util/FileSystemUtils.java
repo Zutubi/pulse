@@ -602,6 +602,11 @@ public class FileSystemUtils
         return new File(result);
     }
 
+    public static String join(String... parts)
+    {
+        return FileSystemUtils.composeFilename(parts);
+    }
+
     public static String composeFilename(String... parts)
     {
         return StringUtils.join(File.separator, parts);

@@ -159,6 +159,11 @@ public class XmlRpcHelper
         return call("insertConfig", path, config);
     }
 
+    public String insertTemplatedConfig(String path, Hashtable<String, Object> config, boolean template) throws Exception
+    {
+        return call("insertTemplatedConfig", path, config, template);
+    }
+
     public String saveConfig(String path, Hashtable<String, Object> config, boolean deep) throws Exception
     {
         return call("saveConfig", path, config, deep);
@@ -237,6 +242,11 @@ public class XmlRpcHelper
     public int getAgentCount() throws Exception
     {
         return (Integer) call("getAgentCount");
+    }
+
+    public Object getAgentStatus(String name) throws Exception
+    {
+        return call("getAgentStatus", name);
     }
 
     public Vector<String> getAllAgentNames() throws Exception
@@ -449,4 +459,5 @@ public class XmlRpcHelper
             helper.logout();
         }
     }
+
 }

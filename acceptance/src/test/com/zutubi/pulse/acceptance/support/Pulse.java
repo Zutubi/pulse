@@ -30,4 +30,7 @@ public interface Pulse
 
     String getPluginRoot();
 
+    String getServerUrl();
+
+    String getAdminToken();
 }
