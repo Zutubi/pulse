@@ -218,8 +218,8 @@ public class PerforceCore
         clientSpec = clientSpec.replaceAll("(\nOptions:.*) locked(.*)", "$1$2");
         clientSpec = clientSpec.replaceAll("\nRoot:.*", Matcher.quoteReplacement("\nRoot: " + toDirectory.getAbsolutePath()));
         clientSpec = clientSpec.replaceAll("\nHost:.*", Matcher.quoteReplacement("\nHost: "));
-        clientSpec = clientSpec.replaceAll("\nClient:.*" + templateClient, Matcher.quoteReplacement("\nClient: " + clientName));
-        clientSpec = clientSpec.replaceAll("//" + templateClient + "/", Matcher.quoteReplacement("//" + clientName + "/"));
+        clientSpec = clientSpec.replaceAll("\nClient:.*" + Pattern.quote(templateClient), Matcher.quoteReplacement("\nClient: " + clientName));
+        clientSpec = clientSpec.replaceAll("//" + Pattern.quote(templateClient) + "/", Matcher.quoteReplacement("//" + clientName + "/"));
         runP4(clientSpec, getP4Command(COMMAND_CLIENT), COMMAND_CLIENT, FLAG_INPUT);
     }
 
