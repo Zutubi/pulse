@@ -3,6 +3,9 @@ package com.zutubi.pulse.acceptance.support;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,13 +14,15 @@ import java.io.IOException;
  *
  *
  */
+@Test
 public class JythonPackageFactoryTest extends PulseTestCase
 {
     private PackageFactory factory;
 
     private File tmp;
-    private File packagesDir;
+    private File pkgFile;
 
+    @BeforeMethod
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -26,29 +31,33 @@ public class JythonPackageFactoryTest extends PulseTestCase
 
         factory = new JythonPackageFactory();
 
-        String packageDirectoryName = StringUtils.join(File.pathSeparator, "testing-packages");
-        packagesDir = new File(getPulseRoot(), packageDirectoryName);
+        pkgFile = getPulsePackage();
+/*
+        if (pkgFile == null)
+        {
+            String packageDirectoryName = StringUtils.join(File.pathSeparator, "test-packages");
+            File packagesDir = new File(getPulseRoot(), packageDirectoryName);
+
+            pkgFile = new File(packagesDir, "pulse-2.0.9.zip");
+            assertTrue(pkgFile.isFile());
+        }
+*/
     }
 
+    @AfterMethod
     protected void tearDown() throws Exception
     {
         factory.close();
+        factory = null;
 
-        try
-        {
-            removeDirectory(tmp);
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
+        removeDirectory(tmp);
 
         super.tearDown();
     }
 
-    public void disabledTestExtractPackage() throws IOException
+    public void testExtractPackage() throws IOException
     {
-        PulsePackage pkg = factory.createPackage(new File(packagesDir, "pulse-2.0.9.zip"));
+        PulsePackage pkg = factory.createPackage(pkgFile);
 
         Pulse pulse = pkg.extractTo(tmp.getCanonicalPath());
         assertNotNull(pulse);
@@ -58,15 +67,15 @@ public class JythonPackageFactoryTest extends PulseTestCase
         assertTrue(expectedRoot.isDirectory());
 
         // normalise the paths before we compare them.
-        assertEquals(expectedRoot.getCanonicalPath(), new File(pulse.getRoot()).getCanonicalPath());
+        assertEquals(expectedRoot.getCanonicalPath(), new File(pulse.getPulseHome()).getCanonicalPath());
 
         File expectedPluginRoot = new File(expectedRoot, "versions/0200009000/system/plugins");
         assertEquals(expectedPluginRoot.getCanonicalPath(), new File(pulse.getPluginRoot()).getCanonicalPath());
     }
 
-    public void disabledTestStartAndStopPulse() throws IOException
+    public void testStartAndStopPulse() throws IOException
     {
-        PulsePackage pkg = factory.createPackage(new File(packagesDir, "pulse-2.0.9.zip"));
+        PulsePackage pkg = factory.createPackage(pkgFile);
         Pulse pulse = pkg.extractTo(tmp.getCanonicalPath());
 
         assertFalse(pulse.ping());
@@ -78,9 +87,9 @@ public class JythonPackageFactoryTest extends PulseTestCase
         assertFalse(pulse.ping());
     }
 
-    public void disabledTestAddingJavaOpts() throws Exception
+    public void testAddingJavaOpts() throws Exception
     {
-        PulsePackage pkg = factory.createPackage(new File(packagesDir, "pulse-2.0.9.zip"));
+        PulsePackage pkg = factory.createPackage(pkgFile);
         Pulse pulse = pkg.extractTo(tmp.getCanonicalPath());
 
         File alternateUserHome = new File(tmp, "user_home");

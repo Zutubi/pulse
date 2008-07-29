@@ -81,6 +81,7 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
         self._context = None
         self._userHome = None
         self._defaultPort = 8080
+        self._verbose = False
 
     def setConfigFile(self, configFile):
         self._configFile = configFile
@@ -97,6 +98,9 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
     def setUserHome(self, path):
         self._userHome = path
 
+    def setVerbose(self, verbose):
+        self._verbose = verbose
+
     def getEnv(self):
         env = dict(os.environ)
         env['PULSE_CONFIG'] = os.path.join(self.baseDir, 'bin', 'config.properties')
@@ -107,11 +111,11 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
         env['JAVA_HOME'] = os.getenv('JAVA_HOME')
         return env
 
-    def getRoot(self):
+    def getPulseHome(self):
         return self.baseDir
 
     def getPluginRoot(self):
-        """ todo: use the java paths interface here - more generally useful. """
+        """ todo: somehow use the java paths interface here - more generally useful. """
         versionDir = self.getActiveVersionDirectory()
         return os.path.join(versionDir, 'system', 'plugins')
 
@@ -163,7 +167,8 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
                 for line in commonFile:
                     index = line.find(tag)
                     if index != -1:
-                        modifiedCommonFile.write('echo "Using modified user.home setting: '+self._userHome+'"\n')
+                        if self._verbose:
+                            modifiedCommonFile.write('echo "Using modified user.home setting: '+self._userHome+'"\n')
                         line = line[:index + len(tag)] + ' -Duser.home="' + self._userHome + '" ' + line[index + len(tag) + 1:]
 
                     modifiedCommonFile.write(line)
@@ -189,7 +194,8 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
                 configFile.writelines(['pulse.data=%s\n' % self._dataDir])
             configFile.close()
             command = [os.path.join(self.basedir, 'bin', 'init.sh'), 'start']
-            print 'Starting pulse: ' + str(command)
+            if self._verbose:
+                print 'Starting pulse: ' + str(command)
             ret = subprocess.call(command, env=self.getEnv())
             if ret != 0:
                 raise Exception('init script exited with code %d' % ret)
@@ -210,11 +216,9 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
             if self._context is not None:
                 command += ['-c', self._context]
 
-            print 'Starting pulse: ' + str(command)
+            if self._verbose:
+                print 'Starting pulse: ' + str(command)
             self.pop = subprocess.Popen(command, stdout=self.stdout, stderr=self.stderr)
-
-            if self.pop is None:
-                print 'Hmm, subprocess.Popen returned None.'
 
         if wait:
             if not self.waitFor():
@@ -235,14 +239,16 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 
                 port = self.getServerPort()
-                print 'Waiting for process at port: ' + str(port)
+                if self._verbose:
+                    print 'Waiting for process at port: ' + str(port)
                 s.connect(('127.0.0.1', int(port)))
                 s.close()
                 # Sleep a little longer just to be sure
                 time.sleep(3)
                 return True
             except Exception, e:
-                print e
+                if self._verbose:
+                    print e
                 time.sleep(1)
 
         return False
@@ -253,6 +259,8 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
         if self.pop is not None:
             if service:
                 command = [os.path.join(self.baseDir, 'bin', 'init.sh'), 'stop']
+                if self._verbose:
+                    print 'Shutting down pulse: ' + str(command)
                 ret = subprocess.call(command, env=self.getEnv())
                 self.pop=None
             else:
@@ -267,7 +275,8 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
                 if self._context is not None:
                     command += ['-c', self._context]
 
-                print 'Shutting down pulse: ' + str(command)
+                if self._verbose:
+                    print 'Shutting down pulse: ' + str(command)
                 ret = subprocess.call(command)
 
         return ret
@@ -321,12 +330,10 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
     def getServerProxy(self):
 
         url = self.getServerUrl()
-        if url.endswith('/'):
-            url = url + 'xmlrpc'
-        else:
-            url = url + '/xmlrpc'
+        url = url + '/xmlrpc'
 
-        print 'Connecting to pulse xmlrpc at: ' + url
+        if self._verbose:
+            print 'Connecting to pulse xmlrpc at: ' + url
 
         return xmlrpclib.ServerProxy(url)
 
@@ -341,6 +348,9 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
             url = url + ':' + str(port)
         if context is not None:
             url = url + context
+
+        if url.endswith('/'):
+            url = url[:-1]
 
         return url
 
@@ -411,7 +421,8 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
             proxy.RemoteApi.ping()
             return True
         except Exception, e:
-            print e
+            if self._verbose:
+                print e
             return False
 
 

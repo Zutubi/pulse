@@ -1,23 +1,25 @@
 package com.zutubi.pulse.acceptance;
 
+import com.zutubi.pulse.acceptance.support.JythonPackageFactory;
+import com.zutubi.pulse.acceptance.support.PackageFactory;
+import com.zutubi.pulse.acceptance.support.Pulse;
+import com.zutubi.pulse.acceptance.support.PulsePackage;
 import com.zutubi.pulse.plugins.ConfigurablePluginPaths;
 import com.zutubi.pulse.plugins.PluginException;
 import com.zutubi.pulse.plugins.PluginManager;
 import com.zutubi.pulse.plugins.PluginManagerTest;
 import com.zutubi.pulse.plugins.PluginUpgradeManager;
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.upgrade.DefaultUpgradeManager;
 import com.zutubi.pulse.upgrade.UpgradeTask;
 import com.zutubi.pulse.upgrade.UpgradeableComponent;
-import com.zutubi.pulse.upgrade.DefaultUpgradeManager;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.acceptance.support.PackageFactory;
-import com.zutubi.pulse.acceptance.support.JythonPackageFactory;
-import com.zutubi.pulse.acceptance.support.PulsePackage;
-import com.zutubi.pulse.acceptance.support.Pulse;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.bean.ObjectFactory;
-import com.zutubi.util.StringUtils;
 import org.eclipse.core.internal.registry.osgi.OSGIUtils;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+import org.testng.annotations.AfterMethod;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -29,6 +31,7 @@ import java.util.List;
  *
  *
  */
+@Test
 public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
 {
     private PluginUpgradeManager pluginUpgradeManager;
@@ -41,15 +44,14 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
     private ConfigurablePluginPaths paths;
 
     protected PluginManager manager;
-    private File packagesDir;
 
+    @BeforeMethod
     protected void setUp() throws Exception
     {
-        String packageDirectoryName = StringUtils.join(File.pathSeparator, "testing-packages");
-        packagesDir = new File(getPulseRoot(), packageDirectoryName);
+        File pkgFile = getPulsePackage();
 
         PackageFactory factory = new JythonPackageFactory();
-        PulsePackage pkg = factory.createPackage(new File(packagesDir, "pulse-2.0.0.zip"));
+        PulsePackage pkg = factory.createPackage(pkgFile);
 
         // base directory will be cleaned up at the end of the test.
         tmpDir = FileSystemUtils.createTempDir(PluginManagerTest.class.getName(), "");
@@ -86,6 +88,7 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
         objectFactory = new DefaultObjectFactory();
     }
 
+    @AfterMethod
     protected void tearDown() throws Exception
     {
         pluginUpgradeManager = null;
@@ -94,12 +97,7 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
         super.tearDown();
     }
 
-    public void testNoop()
-    {
-
-    }
-
-    public void disabledTestDetectingUpgrade() throws Exception
+    public void testDetectingUpgrade() throws Exception
     {
 
         FileSystemUtils.copy(paths.getPluginStorageDir(), producer2);
@@ -162,13 +160,13 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
         assertFalse(pluginUpgradeManager.isUpgradeRequired());
     }
 
-    protected void restartPluginCore() throws Exception
+    private void restartPluginCore() throws Exception
     {
         shutdownPluginCore();
         startupPluginCore();
     }
 
-    protected void startupPluginCore() throws PluginException
+    private void startupPluginCore() throws PluginException
     {
         try
         {

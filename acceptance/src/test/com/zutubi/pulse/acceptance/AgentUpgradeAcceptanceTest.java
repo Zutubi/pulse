@@ -12,31 +12,36 @@ import java.io.File;
 import java.net.URL;
 import java.util.Hashtable;
 
+import org.testng.annotations.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterMethod;
+
 /**
  *
  *
  */
+@Test
 public class AgentUpgradeAcceptanceTest extends PulseTestCase
 {
     private File tmp = null;
 
     private PackageFactory packageFactory = null;
 
+    @BeforeMethod
     protected void setUp() throws Exception
     {
         super.setUp();
 
         tmp = createTempDir();
         packageFactory = new JythonPackageFactory();
-        
     }
 
+    @AfterMethod
     protected void tearDown() throws Exception
     {
-        if (!rmdir(tmp))
-        {
-            // is something still running in this directory?.  This is likely to indicate a problem.
-        }
+        packageFactory = null;
+        removeDirectory(tmp);
+        tmp = null;
 
         super.tearDown();
     }
@@ -48,10 +53,8 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
 
         try
         {
-
             // get package details.
-//        File pulsePackage = new File(System.getProperty("pulse.package"));
-            File pulsePackage = new File(getPulseRoot(), join("test-packages", "pulse-2.0.9.zip"));
+            File pulsePackage = getPulsePackage();
 
             // get old agent package that we are upgrading from.
             // a) start with a predefined package, later move to a range of older packages that we can test from.
@@ -94,26 +97,20 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
                 if (e.getMessage().equals("Could not contact Selenium Server; have you started it?"))
                 {
                     // missing resources.
-                    e.printStackTrace();
-                    return;
+                    fail("Could not contact Selenium Server");
                 }
-
+                fail(e.getMessage());
             }
             catch (Exception e)
             {
-                e.printStackTrace();
-                return;
+                fail(e.getMessage());
             }
 
             // test
             // a) check that the agent build number is as expected.
 
             String agentUrl = agent.getServerUrl();
-            if (!agentUrl.endsWith("/"))
-            {
-                agentUrl = agentUrl + "/";
-            }
-            agentUrl = agentUrl + "xmlrpc";
+            agentUrl = agentUrl + "/xmlrpc";
 
             XmlRpcHelper agentXmlRpc = new XmlRpcHelper(new URL(agentUrl));
             String agentAdminToken = agent.getAdminToken();
@@ -128,11 +125,7 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
             agentConfig.put("port", 7689);
 
             String masterUrl = master.getServerUrl();
-            if (!masterUrl.endsWith("/"))
-            {
-                masterUrl = masterUrl + "/";
-            }
-            masterUrl = masterUrl + "xmlrpc";
+            masterUrl = masterUrl + "/xmlrpc";
             XmlRpcHelper masterXmlRpc = new XmlRpcHelper(new URL(masterUrl));
             masterXmlRpc.loginAsAdmin();
 
@@ -153,9 +146,7 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
                     return;
                 }
             }
-
             fail("Failed to upgrade agent.");
-
         }
         finally
         {

@@ -2,7 +2,6 @@ package com.zutubi.pulse.acceptance;
 
 import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.Selenium;
-import com.zutubi.pulse.acceptance.forms.setup.PulseLicenseForm;
 import com.zutubi.pulse.acceptance.forms.setup.SetPulseDataForm;
 import com.zutubi.pulse.acceptance.forms.setup.SetupDatabaseTypeForm;
 import com.zutubi.pulse.acceptance.support.JythonPackageFactory;
@@ -14,9 +13,11 @@ import com.zutubi.pulse.config.Config;
 import com.zutubi.pulse.config.FileConfig;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.util.StringUtils;
 import com.zutubi.util.TextUtils;
 import org.apache.commons.cli.ParseException;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,73 +25,71 @@ import java.io.IOException;
 /**
  * <class-comment/>
  */
+@Test
 public class StartupShutdownAcceptanceTest extends PulseTestCase
 {
     private File tmpDir;
     private File dataDir;
     private File defaultDataDir;
-    private File configFile;
     private File defaultConfigFile;
 
     private Pulse pulse;
     private DefaultSelenium selenium;
 
+    @BeforeMethod
     protected void setUp() throws Exception
     {
         // create a temporary user home.
-        tmpDir = FileSystemUtils.createTempDir("SSAT" + ".", "." + getName());
+        tmpDir = FileSystemUtils.createTempDir();
+
         dataDir = new File(tmpDir, "data");
-        configFile = new File(tmpDir, "crazy.config.file.name");
 
-        // jvm is no longer embedded - this does not work.
-        File userHome = new File(tmpDir, "home");
-
+        File userHome = new File(tmpDir, "user_home");
         defaultDataDir = new File(userHome, ".pulse2/data");
-        defaultConfigFile = new File(userHome, FileSystemUtils.composeFilename(".pulse2", "config.properties"));
+        defaultConfigFile = new File(userHome, FileSystemUtils.join(".pulse2", "config.properties"));
 
-        // this test is part of a larger suite of tests, the package to be tested is defined there.
-        String testPackagePath = System.getProperty("test.package");
-        if (testPackagePath != null)
-        {
-            File testPackage = new File(testPackagePath);
-            
-        }
-
-        String packageDirectoryName = StringUtils.join(File.pathSeparator, "testing-packages");
-        File packagesDir = new File(getPulseRoot(), packageDirectoryName);
-
+        File pkgFile = getPulsePackage();
+        
         PackageFactory factory = new JythonPackageFactory();
-        PulsePackage pkg = factory.createPackage(new File(packagesDir, "pulse-2.0.9.zip"));
+        PulsePackage pkg = factory.createPackage(pkgFile);
+
         pulse = pkg.extractTo(tmpDir.getCanonicalPath());
         pulse.setUserHome(userHome.getCanonicalPath());
     }
 
+    @AfterMethod
     protected void tearDown() throws Exception
     {
-        //assertTrue(FileSystemUtils.rmdir(tmpDir));
         try
         {
+            // cleanup selenium if it was used.
             if (selenium != null)
             {
                 selenium.stop();
                 selenium = null;
             }
-            tmpDir = null;
-            dataDir = null;
-            defaultDataDir = null;
-            configFile = null;
-            defaultConfigFile = null;
 
-            if (pulse.ping())
+            // cleanup the pulse instance if it was used.
+            if (pulse != null)
             {
-                pulse.stop();
+                if (pulse.ping()) // if it is running
+                {
+                    pulse.stop();
+                }
+                pulse = null;
             }
-            pulse = null;
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
+
+        removeDirectory(tmpDir);
+
+        tmpDir = null;
+        dataDir = null;
+        defaultDataDir = null;
+        defaultConfigFile = null;
     }
 
     public void testDefaultFirstTimeStartup() throws Exception
@@ -145,16 +144,18 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
 
     public void testFirstTimeStartupWithEverythingSpecified() throws Exception
     {
+        File externalConfigFile = new File(tmpDir, "crazy.config.file.name");
+
         RuntimeContext commandline = new RuntimeContext("8083", "/some/sort/of/crazy/context/path");
         commandline.setDataDirectory(dataDir.getAbsolutePath());
-        commandline.setExternalConfig(configFile.getAbsolutePath());
+        commandline.setExternalConfig(externalConfigFile.getAbsolutePath());
 
         RuntimeContext file = new RuntimeContext("8080", "/");
         file.setDataDirectory(dataDir.getAbsolutePath());
 
         RuntimeContext expected = new RuntimeContext("8083", "/some/sort/of/crazy/context/path");
         expected.setDataDirectory(dataDir.getAbsolutePath());
-        expected.setExternalConfig(configFile.getAbsolutePath());
+        expected.setExternalConfig(externalConfigFile.getAbsolutePath());
 
         assertFirstTimeStartup(commandline, file, expected);
     }
@@ -163,8 +164,8 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
      * Here, a first time startup assumes that the external config file does not exist.
      *
      * @param commandline is the command line context. This is what should be used to run a command.
-     * @param file is the expected context stored in the file.
-     * @param expected is the actual server context. This is what is used to communicate with the server.
+     * @param file        is the expected context stored in the file.
+     * @param expected    is the actual server context. This is what is used to communicate with the server.
      */
     private void assertFirstTimeStartup(RuntimeContext commandline, RuntimeContext file, RuntimeContext expected) throws Exception
     {
@@ -173,13 +174,14 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
         assertStartServer(commandline);
         assertServerAvailable(expected);
 
+        selenium = initSelenium(expected);
         if (TextUtils.stringSet(commandline.getConfiguredDataDirectory()))
         {
-            assertPromptForDatabase(expected);
+            assertPromptForDatabase(expected, selenium);
         }
         else
         {
-            file.setDataDirectory(assertPromptForPulseDataDirectory(expected));
+            file.setDataDirectory(assertPromptForPulseDataDirectory(expected, selenium));
         }
 
         // verify that the pulse config file is written to the user home.
@@ -244,18 +246,20 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
 
     public void testSecondTimeStartupWithCustomEditedConfig() throws Exception
     {
+        File externalConfigFile = new File(tmpDir, "crazy.config.file.name");
+
         RuntimeContext commandline = new RuntimeContext();
-        commandline.setExternalConfig(configFile.getAbsolutePath());
+        commandline.setExternalConfig(externalConfigFile.getAbsolutePath());
 
         // the file runtime context should mirror the config file.
         RuntimeContext file = new RuntimeContext("8086", "/domain/name/anyone");
         file.setDataDirectory(dataDir.getAbsolutePath());
-        writeToConfigFile(configFile, file);
+        writeToConfigFile(externalConfigFile, file);
 
         // the actual runtime context.
         RuntimeContext expected = new RuntimeContext("8086", "/domain/name/anyone");
         expected.setDataDirectory(dataDir.getAbsolutePath());
-        expected.setExternalConfig(configFile.getAbsolutePath());
+        expected.setExternalConfig(externalConfigFile.getAbsolutePath());
 
         assertSecondTimeStartup(commandline, file, expected);
     }
@@ -265,7 +269,7 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
     /**
      * Test that the shutdown command is able to shutdown a server configured
      * to run on non-standard port and context path.
-     *
+     * <p/>
      * This is more a test of the AdminCommand being able to accurately locate
      * the running server than the shutdown command being able to shutdown a
      * server.
@@ -274,9 +278,11 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
      */
     public void testThatShutdownWorksForNonStandardDeployment() throws Exception
     {
+        File externalConfigFile = new File(tmpDir, "crazy.config.file.name");
+
         RuntimeContext startupCommandLine = new RuntimeContext("8083", "/some/sort/of/crazy/context/path");
         startupCommandLine.setDataDirectory(dataDir.getAbsolutePath());
-        startupCommandLine.setExternalConfig(configFile.getAbsolutePath());
+        startupCommandLine.setExternalConfig(externalConfigFile.getAbsolutePath());
 
         assertServerNotAvailable(startupCommandLine);
         assertStartServer(startupCommandLine);
@@ -286,7 +292,7 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
         // that the runtime context is remembered and used for admin functions.
         RuntimeContext shutdownCommandLine = new RuntimeContext();
         assertShutdownServer(shutdownCommandLine);
-        
+
         assertServerNotAvailable(startupCommandLine);
     }
 
@@ -299,9 +305,11 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
      */
     public void testShutdownWorksForIncorrectFileConfig() throws Exception
     {
+        File externalConfigFile = new File(tmpDir, "crazy.config.file.name");
+
         RuntimeContext startupCommandLine = new RuntimeContext("8083", "/some/sort/of/crazy/context/path");
         startupCommandLine.setDataDirectory(dataDir.getAbsolutePath());
-        startupCommandLine.setExternalConfig(configFile.getAbsolutePath());
+        startupCommandLine.setExternalConfig(externalConfigFile.getAbsolutePath());
 
         assertServerNotAvailable(startupCommandLine);
         assertStartServer(startupCommandLine);
@@ -311,7 +319,7 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
         // running.
         RuntimeContext file = new RuntimeContext("8086", "/domain/name/anyone");
         file.setDataDirectory(dataDir.getAbsolutePath());
-        writeToConfigFile(configFile, file);
+        writeToConfigFile(externalConfigFile, file);
 
         // test that the shutdown command is still able to shutdown the runnign server.
         RuntimeContext shutdownCommandLine = new RuntimeContext();
@@ -330,10 +338,9 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
     }
 
     /**
-     *
      * @throws Exception if an unexpected error occurs.
      */
-    public void assertSecondTimeStartup(RuntimeContext commandline, RuntimeContext file, RuntimeContext expected) throws Exception
+    private void assertSecondTimeStartup(RuntimeContext commandline, RuntimeContext file, RuntimeContext expected) throws Exception
     {
         assertExternalConfigAvailable(expected.getExternalConfigFile());
         assertServerNotAvailable(expected);
@@ -342,7 +349,8 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
         assertServerAvailable(expected);
 
         // always expected a license prompt, never a data prompt since the data directory is located in the config file.
-        assertPromptForDatabase(expected);
+        selenium = initSelenium(expected);
+        assertPromptForDatabase(expected, selenium);
 
         // verify that the pulse config file is written to the user home.
         assertExternalConfigAvailable(expected.getExternalConfigFile());
@@ -353,10 +361,8 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
         assertServerNotAvailable(expected);
     }
 
-    private String assertPromptForPulseDataDirectory(RuntimeContext expected)
+    private String assertPromptForPulseDataDirectory(RuntimeContext expected, Selenium selenium)
     {
-        Selenium selenium = expected.initSelenium();
-
         SetPulseDataForm form = new SetPulseDataForm(selenium);
         form.assertFormPresent();
 
@@ -368,19 +374,9 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
         return dataDir;
     }
 
-    private void assertPromptForDatabase(RuntimeContext expected)
+    private void assertPromptForDatabase(RuntimeContext expected, Selenium selenium)
     {
-        Selenium selenium = expected.initSelenium();
-
         SetupDatabaseTypeForm form = new SetupDatabaseTypeForm(selenium);
-        form.assertFormPresent();
-    }
-
-    private void assertPromptForLicense(RuntimeContext expected)
-    {
-        Selenium selenium = expected.initSelenium();
-
-        PulseLicenseForm form = new PulseLicenseForm(selenium);
         form.assertFormPresent();
     }
 
@@ -462,7 +458,6 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
     /**
      * The runtime context object defines the variables used by pulse when starting up to determine
      * its runtime configuration.
-     * 
      */
     private class RuntimeContext
     {
@@ -528,13 +523,14 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
         {
             return configuredDataDirectory;
         }
-
-        public Selenium initSelenium()
-        {
-            selenium = new DefaultSelenium("localhost", 4446, "*firefox", "http://localhost:" + getPort());
-            selenium.start();
-            selenium.open((getContextPath() != null ? getContextPath() : ""));
-            return selenium;
-        }
     }
+
+    private DefaultSelenium initSelenium(RuntimeContext context)
+    {
+        DefaultSelenium selenium = new DefaultSelenium("localhost", 4446, "*firefox", "http://localhost:" + context.getPort());
+        selenium.start();
+        selenium.open((context.getContextPath() != null ? context.getContextPath() : ""));
+        return selenium;
+    }
+
 }

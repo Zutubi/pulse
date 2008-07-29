@@ -23,10 +23,12 @@ public interface Pulse
     void setContext(String context);
 
     void setUserHome(String path);
-    
+
+    void setVerbose(boolean verbose);
+
     boolean ping();
 
-    String getRoot();
+    String getPulseHome();
 
     String getPluginRoot();
 

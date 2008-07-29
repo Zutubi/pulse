@@ -2,6 +2,7 @@ package com.zutubi.pulse.test;
 
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.IOUtils;
+import com.zutubi.util.TextUtils;
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
@@ -303,7 +304,7 @@ public abstract class PulseTestCase extends TestCase
         return TestUtils.getPulseRoot();
     }
 
-    protected void removeDirectory(File dir) throws IOException
+    public static void removeDirectory(File dir) throws IOException
     {
         if (!FileSystemUtils.rmdir(dir))
         {
@@ -413,5 +414,26 @@ public abstract class PulseTestCase extends TestCase
         });
         thread.start();
         return thread;
+    }
+
+    /**
+     * For use by the acceptance tests.  The pulse.package system variable will reference the
+     * Pulse package that is being tested.
+     * 
+     * @return file reference to the pulse package, or null.
+     */
+    public static File getPulsePackage()
+    {
+        String pulsePackage = System.getProperty("pulse.package");
+        if (!TextUtils.stringSet(pulsePackage))
+        {
+            return null;
+        }
+        File pkg = new File(pulsePackage);
+        if (!pkg.isFile())
+        {
+            throw new IllegalStateException("Unexpected invalid pulse.package: " + pulsePackage + " does not reference a file.");
+        }
+        return pkg;
     }
 }
