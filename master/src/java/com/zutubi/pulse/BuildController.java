@@ -354,7 +354,7 @@ public class BuildController implements EventListener
             controller.terminateRecipe(true);
             if (checkControllerStatus(controller, false))
             {
-                executingControllers.remove(controller);
+                executingControllers.remove(found);
                 if (executingControllers.size() == 0)
                 {
                     completeBuild();
