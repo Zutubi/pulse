@@ -1,29 +1,17 @@
 package com.zutubi.pulse.webwork.mapping.dashboard;
 
 import com.zutubi.pulse.webwork.mapping.ActionResolver;
+import com.zutubi.pulse.webwork.mapping.ActionResolverSupport;
 import com.zutubi.pulse.webwork.mapping.browse.BuildActionResolver;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  */
-public class MyBuildsActionResolver implements ActionResolver
+public class MyBuildsActionResolver extends ActionResolverSupport
 {
-    private static final Map<String, String> PARAMETER_MAP = new HashMap<String, String>(1);
-    static
+    public MyBuildsActionResolver()
     {
-        PARAMETER_MAP.put("personal", "true");
-    }
-    
-    public String getAction()
-    {
-        return "my";
-    }
-
-    public Map<String, String> getParameters()
-    {
-        return PARAMETER_MAP;
+        super("my");
+        addParameter("personal", "true");
     }
 
     public ActionResolver getChild(String name)

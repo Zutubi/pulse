@@ -55,6 +55,10 @@ public class PulseActionMapper implements ActionMapper
         {
             mapping = getConfigMapping(namespace, path, request.getQueryString());
         }
+        else if("/".equals(namespace))
+        {
+            mapping = new ActionMapping("default", namespace, null, new HashMap());
+        }
         else if(DASHBOARD_NAMESPACE.equals(namespace))
         {
             // Urls in this space currently have no parameters, just the

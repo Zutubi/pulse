@@ -1,22 +1,15 @@
 package com.zutubi.pulse.webwork.mapping.browse;
 
 import com.zutubi.pulse.webwork.mapping.ActionResolver;
-
-import java.util.Collections;
-import java.util.Map;
+import com.zutubi.pulse.webwork.mapping.ActionResolverSupport;
 
 /**
  */
-public class ProjectBuildsActionResolver implements ActionResolver
+public class ProjectBuildsActionResolver extends ActionResolverSupport
 {
-    public String getAction()
+    public ProjectBuildsActionResolver()
     {
-        return null;
-    }
-
-    public Map<String, String> getParameters()
-    {
-        return Collections.EMPTY_MAP;
+        super(null);
     }
 
     public ActionResolver getChild(String name)

@@ -50,7 +50,6 @@ public class ConfigDecoratorMapper extends AbstractDecoratorMapper
         if (thisPath == null)
         {
             String requestURI = request.getRequestURI();
-            thisPath = requestURI;
             if (request.getPathInfo() != null)
             {
                 // strip the pathInfo from the requestURI

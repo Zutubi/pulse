@@ -12,7 +12,13 @@
         <pattern>/popups/*</pattern>
         <pattern>/view/*</pattern>
         <pattern>/file/*</pattern>
-        <pattern>/viewArtifact.action*</pattern>
+        <!--
+            Decorated artifact view: potentially too big for sitemesh parsing, and our JavaScript layout
+            messes with anchors:
+
+            /browse/projects/<project>/builds/<build id>/artifacts/<stage>/<command>/<artifact>/<path>
+        -->
+        <pattern>/browse/projects/*/builds/*/artifacts/*/*/*/?*</pattern>
         <pattern>/selenium/*</pattern>
     </excludes>
 
