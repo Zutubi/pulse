@@ -244,7 +244,6 @@ public class LicenseAcceptanceTest extends SeleniumTestBase
 
     private void assertExceeded() throws Exception
     {
-        Thread.sleep(1000);
         goTo("/");
         waitForElement("license-exceeded");
         assertTextPresent("Your license limits have been exceeded.");
