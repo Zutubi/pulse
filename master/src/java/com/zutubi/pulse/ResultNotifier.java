@@ -4,6 +4,7 @@ import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.condition.UnsuccessfulCountBuildsValue;
 import com.zutubi.pulse.condition.UnsuccessfulCountDaysValue;
 import com.zutubi.pulse.core.model.Feature;
+import com.zutubi.pulse.events.AsynchronousDelegatingListener;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
@@ -22,9 +23,14 @@ import com.zutubi.util.logging.Logger;
 
 import java.io.StringWriter;
 import java.util.*;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
- *
+ * When a build completes, notifies subscribed contact points of the results.
+ * Handles formatting of notification messages, ensuring that the result is
+ * only rendered once per template required for all subscriptions.
  */
 public class ResultNotifier implements EventListener
 {
@@ -33,22 +39,33 @@ public class ResultNotifier implements EventListener
 
     private static final Logger LOG = Logger.getLogger(ResultNotifier.class);
 
+    private Map<Long, String> contactPointErrors = new HashMap<Long, String>();
+    private Lock contactPointErrorsLock = new ReentrantLock();
+
     private MasterConfigurationManager configurationManager;
     private ConfigurationProvider configurationProvider;
     private BuildResultRenderer buildResultRenderer;
+    private EventManager eventManager;
     private BuildManager buildManager;
+    private ThreadFactory threadFactory;
+
+    public void init()
+    {
+        AsynchronousDelegatingListener listener = new AsynchronousDelegatingListener(this, threadFactory);
+        eventManager.register(listener);
+    }
 
     public static int getFailureLimit()
     {
         int limit = DEFAULT_FAILURE_LIMIT;
         String property = System.getProperty(FAILURE_LIMIT_PROPERTY);
-        if(property != null)
+        if (property != null)
         {
             try
             {
                 limit = Integer.parseInt(property);
             }
-            catch(NumberFormatException e)
+            catch (NumberFormatException e)
             {
                 LOG.warning(e);
             }
@@ -84,11 +101,72 @@ public class ResultNotifier implements EventListener
                 String templateName = subscription.getTemplate();
                 RenderedResult rendered = renderResult(buildResult, dataMap, buildResultRenderer, templateName, renderCache);
                 notifiedContactPoints.add(contactPoint.getHandle());
-                contactPoint.notify(buildResult, rendered.subject, rendered.content, buildResultRenderer.getTemplateInfo(templateName, buildResult.isPersonal()).getMimeType());
-                
-                // Contact point may be modified: e.g. error may be set.
-                configurationProvider.save(contactPoint);
+
+                notifyContactPoint(contactPoint, buildResult, rendered, buildResultRenderer.getTemplateInfo(templateName, buildResult.isPersonal()).getMimeType());
             }
+        }
+    }
+
+    private void notifyContactPoint(ContactConfiguration contactPoint, BuildResult buildResult, RenderedResult rendered, String mimeType)
+    {
+        clearError(contactPoint);
+        try
+        {
+            contactPoint.notify(buildResult, rendered.subject, rendered.content, mimeType);
+        }
+        catch (Exception e)
+        {
+            String message = e.getClass().getName();
+            if (e.getMessage() != null)
+            {
+                message += ": " + e.getMessage();
+            }
+
+            setError(contactPoint, message);
+        }
+    }
+
+    public boolean hasError(ContactConfiguration contactPoint)
+    {
+        return getError(contactPoint) != null;
+    }
+
+    public String getError(ContactConfiguration contactPoint)
+    {
+        contactPointErrorsLock.lock();
+        try
+        {
+            return contactPointErrors.get(contactPoint.getHandle());
+        }
+        finally
+        {
+            contactPointErrorsLock.unlock();
+        }
+    }
+
+    public void clearError(ContactConfiguration contactPoint)
+    {
+        contactPointErrorsLock.lock();
+        try
+        {
+            contactPointErrors.remove(contactPoint.getHandle());
+        }
+        finally
+        {
+            contactPointErrorsLock.unlock();
+        }
+    }
+
+    private void setError(ContactConfiguration contactPoint, String message)
+    {
+        contactPointErrorsLock.lock();
+        try
+        {
+            contactPointErrors.put(contactPoint.getHandle(), message);
+        }
+        finally
+        {
+            contactPointErrorsLock.unlock();
         }
     }
 
@@ -108,14 +186,14 @@ public class ResultNotifier implements EventListener
         dataMap.put("errorLevel", Feature.Level.ERROR);
         dataMap.put("warningLevel", Feature.Level.WARNING);
 
-        if(!result.succeeded())
+        if (!result.succeeded())
         {
             BuildResult lastSuccess = buildManager.getLatestSuccessfulBuildResult();
             if (lastSuccess != null)
             {
                 dataMap.put("lastSuccess", lastSuccess);
             }
-            
+
             dataMap.put("unsuccessfulBuilds", UnsuccessfulCountBuildsValue.getValueForBuild(result, buildManager));
             dataMap.put("unsuccessfulDays", UnsuccessfulCountDaysValue.getValueForBuild(result, buildManager));
         }
@@ -132,7 +210,7 @@ public class ResultNotifier implements EventListener
     private static RenderedResult renderResult(BuildResult result, Map<String, Object> dataMap, BuildResultRenderer buildResultRenderer, String template, Map<String, RenderedResult> cache)
     {
         RenderedResult rendered = cache == null ? null : cache.get(template);
-        if(rendered == null)
+        if (rendered == null)
         {
             StringWriter w = new StringWriter();
             buildResultRenderer.render(result, dataMap, template, w);
@@ -140,7 +218,7 @@ public class ResultNotifier implements EventListener
 
             String subject;
             String subjectTemplate = template + "-subject";
-            if(buildResultRenderer.hasTemplate(subjectTemplate, result.isPersonal()))
+            if (buildResultRenderer.hasTemplate(subjectTemplate, result.isPersonal()))
             {
                 w = new StringWriter();
                 buildResultRenderer.render(result, dataMap, subjectTemplate, w);
@@ -175,7 +253,7 @@ public class ResultNotifier implements EventListener
 
     public void setEventManager(EventManager eventManager)
     {
-        eventManager.register(this);
+        this.eventManager = eventManager;
     }
 
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
@@ -196,6 +274,11 @@ public class ResultNotifier implements EventListener
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)
     {
         this.configurationProvider = configurationProvider;
+    }
+
+    public void setThreadFactory(ThreadFactory threadFactory)
+    {
+        this.threadFactory = threadFactory;
     }
 
     public static class RenderedResult

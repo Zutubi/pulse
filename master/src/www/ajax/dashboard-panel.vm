@@ -68,9 +68,9 @@
     </table>
 #end
 
-#if($contactError)
+#foreach($contact in $contactPointsWithErrors)
 <p class="note">
-    One or more of your contact points has caused a notification error. View your <a href="$base/dashboard/preferences/">preferences</a> for details.
+    Your contact point '#html($contact)' has caused a notification error. View its <a href="$base/dashboard/preferences/contacts/#uce($contact)/">configuration</a> for details.
 </p>
 #end
 

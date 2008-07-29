@@ -1,5 +1,6 @@
 package com.zutubi.pulse.web.user;
 
+import com.zutubi.pulse.ResultNotifier;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.ChangelistComparator;
 import com.zutubi.pulse.model.*;
@@ -28,8 +29,10 @@ public class DashboardAction extends ActionSupport
 
     private BuildManager buildManager;
 
-    private boolean contactError = false;
+    private List<String> contactPointsWithErrors = new LinkedList<String>();
     private BuildColumns columns;
+
+    private ResultNotifier resultNotifier;
 
     public User getUser()
     {
@@ -80,6 +83,7 @@ public class DashboardAction extends ActionSupport
         return projectChangelists;
     }
 
+    @SuppressWarnings({"unchecked"})
     public List<BuildResult> getChangelistResults(Changelist changelist)
     {
         try
@@ -118,10 +122,10 @@ public class DashboardAction extends ActionSupport
             return Collections.EMPTY_LIST;
         }
     }
-        
-    public boolean isContactError()
+
+    public List<String> getContactPointsWithErrors()
     {
-        return contactError;
+        return contactPointsWithErrors;
     }
 
     public String execute() throws Exception
@@ -184,9 +188,9 @@ public class DashboardAction extends ActionSupport
 
         for(ContactConfiguration contact: user.getConfig().getPreferences().getContacts().values())
         {
-            if(contact.hasError())
+            if(resultNotifier.hasError(contact))
             {
-                contactError = true;
+                contactPointsWithErrors.add(contact.getName());
             }
         }
 
@@ -224,5 +228,10 @@ public class DashboardAction extends ActionSupport
     public void setBuildManager(BuildManager buildManager)
     {
         this.buildManager = buildManager;
+    }
+
+    public void setResultNotifier(ResultNotifier resultNotifier)
+    {
+        this.resultNotifier = resultNotifier;
     }
 }

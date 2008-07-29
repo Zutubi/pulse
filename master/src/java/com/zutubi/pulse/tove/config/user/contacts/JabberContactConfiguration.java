@@ -45,7 +45,7 @@ public class JabberContactConfiguration extends ContactConfiguration
         return getUsername();
     }
 
-    protected void internalNotify(BuildResult buildResult, String subject, String content, String mimeType) throws Exception
+    public void notify(BuildResult buildResult, String subject, String content, String mimeType) throws Exception
     {
         if (!jabberManager.isConfigured())
         {

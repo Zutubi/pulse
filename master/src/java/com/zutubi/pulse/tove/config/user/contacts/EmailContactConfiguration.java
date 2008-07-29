@@ -62,7 +62,7 @@ public class EmailContactConfiguration extends ContactConfiguration
         return getAddress();
     }
 
-    public void internalNotify(BuildResult result, String subject, String rendered, String mimeType) throws Exception
+    public void notify(BuildResult result, String subject, String rendered, String mimeType) throws Exception
     {
         EmailConfiguration config = configurationProvider.get(EmailConfiguration.class);
 

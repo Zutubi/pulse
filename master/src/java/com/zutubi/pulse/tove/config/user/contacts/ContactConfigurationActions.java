@@ -1,0 +1,38 @@
+package com.zutubi.pulse.tove.config.user.contacts;
+
+import com.zutubi.pulse.ResultNotifier;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+/**
+ * Action processing for {@link com.zutubi.pulse.tove.config.user.contacts.ContactConfiguration}'s.
+ */
+public class ContactConfigurationActions
+{
+    private ResultNotifier resultNotifier;
+
+    @SuppressWarnings({"unchecked"})
+    public List<String> getActions(ContactConfiguration contactConfiguration)
+    {
+        if(resultNotifier.hasError(contactConfiguration))
+        {
+            return Arrays.asList("clearError");
+        }
+        else
+        {
+            return Collections.EMPTY_LIST;
+        }
+    }
+
+    public void doClearError(ContactConfiguration contactConfiguration)
+    {
+        resultNotifier.clearError(contactConfiguration);
+    }
+
+    public void setResultNotifier(ResultNotifier resultNotifier)
+    {
+        this.resultNotifier = resultNotifier;
+    }
+}
