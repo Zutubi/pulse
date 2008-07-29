@@ -4,6 +4,7 @@ import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.system.ConfigurationEventSystemStartedEvent;
+import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.pulse.model.GrantedAuthority;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.tove.config.admin.GlobalConfiguration;
@@ -62,14 +63,21 @@ public class GuestAccessManager implements ConfigurationEventListener, EventList
 
     public void handleEvent(Event event)
     {
-        configurationProvider = ((ConfigurationEventSystemStartedEvent)event).getConfigurationProvider();
-        configurationProvider.registerEventListener(this, true, false, GlobalConfiguration.class);
-        configurationProvider.registerEventListener(this, true, true, AbstractGroupConfiguration.class);
+        if (event instanceof ConfigurationEventSystemStartedEvent)
+        {
+            configurationProvider = ((ConfigurationEventSystemStartedEvent)event).getConfigurationProvider();
+            configurationProvider.registerEventListener(this, true, false, GlobalConfiguration.class);
+            configurationProvider.registerEventListener(this, true, true, AbstractGroupConfiguration.class);
+        }
+        else
+        {
+            init();
+        }
     }
 
     public Class[] getHandledEvents()
     {
-        return new Class[]{ ConfigurationEventSystemStartedEvent.class };
+        return new Class[]{ ConfigurationEventSystemStartedEvent.class, ConfigurationSystemStartedEvent.class };
     }
 
     public void setAnonymousProcessingFilter(AnonymousProcessingFilter anonymousProcessingFilter)
