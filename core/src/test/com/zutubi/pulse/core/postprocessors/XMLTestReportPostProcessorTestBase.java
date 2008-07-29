@@ -36,6 +36,11 @@ public abstract class XMLTestReportPostProcessorTestBase extends PulseTestCase
         for(String name: names)
         {
             StoredFileArtifact artifact = getArtifact(name);
+
+            File artifactFile = new File(outputDir.getAbsolutePath(), artifact.getPath());
+            // not much point running a test if the artifact being processed does not exist.
+            assertTrue("File " + artifactFile.getAbsolutePath() + " does not exist.", artifactFile.exists());
+
             pp.process(artifact, new CommandResult("test"), context);
         }
         
