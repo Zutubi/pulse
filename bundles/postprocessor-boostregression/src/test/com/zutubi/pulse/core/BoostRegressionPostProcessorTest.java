@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.model.TestSuiteResult;
 import com.zutubi.pulse.core.postprocessors.XMLTestReportPostProcessorTestBase;
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 /**
@@ -16,30 +17,30 @@ public class BoostRegressionPostProcessorTest extends XMLTestReportPostProcessor
         super(new BoostRegressionPostProcessor());
     }
 
-    protected File getOutputDir()
+    protected File getOutputDir() throws URISyntaxException
     {
         URL resource = getClass().getResource("BoostRegressionPostProcessorTest.run.xml");
-        return new File(resource.getPath()).getParentFile();
+        return new File(resource.toURI()).getParentFile();
     }
 
-    public void testBasic()
+    public void testBasic() throws Exception
     {
         singleLogHelper("compilefail", "iterator", "interoperable_fail", TestCaseResult.Status.PASS, null);
     }
 
-    public void testRun()
+    public void testRun() throws Exception
     {
         singleLogHelper("run", "statechart", "InvalidResultCopyTestRelaxed", TestCaseResult.Status.PASS, null);
     }
 
-    public void testBroken()
+    public void testBroken() throws Exception
     {
         singleLogHelper("broken", "statechart", "InvalidResultCopyTestRelaxed", TestCaseResult.Status.FAILURE, "============================[ compile output below ]============================\n" +
                 "    compiler error here\n" +
                 "============================[ compile output above ]============================\n");
     }
 
-    public void testNested()
+    public void testNested() throws Exception
     {
         TestSuiteResult tests = runProcessor("nested");
         assertEquals(1, tests.getSuites().size());
@@ -51,7 +52,7 @@ public class BoostRegressionPostProcessorTest extends XMLTestReportPostProcessor
         checkCase(suite.getCase("minmax"), "minmax", TestCaseResult.Status.PASS, TestCaseResult.UNKNOWN_DURATION, null);
     }
 
-    private void singleLogHelper(String testName, String suiteName, String caseName, TestCaseResult.Status status, String message)
+    private void singleLogHelper(String testName, String suiteName, String caseName, TestCaseResult.Status status, String message) throws Exception
     {
         TestSuiteResult tests = runProcessor(testName);
         assertEquals(1, tests.getSuites().size());

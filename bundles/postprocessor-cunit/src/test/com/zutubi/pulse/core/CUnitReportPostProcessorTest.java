@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.model.TestSuiteResult;
 import com.zutubi.pulse.core.postprocessors.XMLTestReportPostProcessorTestBase;
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 /**
@@ -15,10 +16,10 @@ public class CUnitReportPostProcessorTest extends XMLTestReportPostProcessorTest
         super(new CUnitReportPostProcessor());
     }
 
-    protected File getOutputDir()
+    protected File getOutputDir() throws URISyntaxException
     {
         URL resource = getClass().getResource("CUnitReportPostProcessorTest.basic.xml");
-        return new File(resource.getPath()).getParentFile();
+        return new File(resource.toURI()).getParentFile();
     }
 
     public void tearDown() throws Exception
@@ -26,14 +27,14 @@ public class CUnitReportPostProcessorTest extends XMLTestReportPostProcessorTest
         super.tearDown();
     }
 
-    public void testBasic()
+    public void testBasic() throws Exception
     {
         TestSuiteResult tests = runProcessor("basic");
         assertEquals(1, tests.getSuites().size());
         assertFirstSuite(tests.getSuites().get(0));
     }
 
-    public void testMulti()
+    public void testMulti() throws Exception
     {
         TestSuiteResult tests = runProcessor("multi");
         assertEquals(3, tests.getSuites().size());

@@ -16,13 +16,13 @@ public class JUnitReportPostProcessorTest extends XMLTestReportPostProcessorTest
         super(new JUnitReportPostProcessor());
     }
 
-    protected File getOutputDir()
+    protected File getOutputDir() throws Exception
     {
         URL resource = getClass().getResource("JUnitReportPostProcessorTest.simple.xml");
-        return new File(resource.getPath()).getParentFile();
+        return new File(resource.toURI()).getParentFile();
     }
 
-    public void testSimple()
+    public void testSimple() throws Exception
     {
         TestSuiteResult tests = runProcessor("simple");
 
@@ -44,20 +44,20 @@ public class JUnitReportPostProcessorTest extends XMLTestReportPostProcessorTest
                 "\tat com.zutubi.pulse.junit.SimpleTest.testThrowException(Unknown Source)");
     }
 
-    public void testSingle()
+    public void testSingle() throws Exception
     {
         TestSuiteResult tests = runProcessor("single");
         assertSingleSuite(tests);
     }
 
-    public void testSuite()
+    public void testSuite() throws Exception
     {
         TestSuiteResult tests = runProcessor("suite");
         assertEquals(274, tests.getTotal());
         assertNotNull(tests.getSuite("com.zutubi.pulse.acceptance.AcceptanceTestSuite").getCase("com.zutubi.pulse.acceptance.LicenseAuthorisationAcceptanceTest.testAddProjectLinkOnlyAvailableWhenLicensed"));
     }
 
-    public void testCustom()
+    public void testCustom() throws Exception
     {
         JUnitReportPostProcessor pp = (JUnitReportPostProcessor) this.pp;
         pp.setSuiteElement("customtestsuite");
@@ -90,7 +90,7 @@ public class JUnitReportPostProcessorTest extends XMLTestReportPostProcessorTest
                         "\tat com.zutubi.pulse.core.JUnitReportPostProcessorTest.testError(JUnitReportPostProcessorTest.java:68)");
     }
 
-    public void testFailOnFailure()
+    public void testFailOnFailure() throws Exception
     {
         CommandResult result = new CommandResult("test");
         result.commence();
@@ -100,7 +100,7 @@ public class JUnitReportPostProcessorTest extends XMLTestReportPostProcessorTest
         assertEquals("One or more test cases failed.", result.getFeatures().get(0).getSummary());
     }
 
-    public void testFailOnFailureNotSet()
+    public void testFailOnFailureNotSet() throws Exception
     {
         CommandResult result = new CommandResult("test");
         result.commence();
@@ -111,7 +111,7 @@ public class JUnitReportPostProcessorTest extends XMLTestReportPostProcessorTest
         assertEquals(0, result.getFeatures().size());
     }
 
-    public void testFailOnFailureAlreadyFailed()
+    public void testFailOnFailureAlreadyFailed() throws Exception
     {
         CommandResult result = new CommandResult("test");
         result.commence();
@@ -123,7 +123,7 @@ public class JUnitReportPostProcessorTest extends XMLTestReportPostProcessorTest
         assertEquals("bogosity", result.getFeatures().get(0).getSummary());
     }
 
-    public void testNoMessage()
+    public void testNoMessage() throws Exception
     {
         TestSuiteResult tests = runProcessor("nomessage");
         TestSuiteResult suite = tests.getSuite("com.zutubi.pulse.junit.NoMessages");
@@ -132,7 +132,7 @@ public class JUnitReportPostProcessorTest extends XMLTestReportPostProcessorTest
         checkFailureCase(suite, "testFailureMessageInAttribute", "this message only");
     }
 
-    public void testNested()
+    public void testNested() throws Exception
     {
         TestSuiteResult tests = runProcessor("nested");
         TestSuiteResult suite = tests.getSuite("Outer");
@@ -159,7 +159,7 @@ public class JUnitReportPostProcessorTest extends XMLTestReportPostProcessorTest
         assertTrue(caseResult.getMessage().contains(contents));
     }
 
-    private void failOnFailureHelper(CommandResult result)
+    private void failOnFailureHelper(CommandResult result) throws Exception
     {
         File outputDir = getOutputDir();
         StoredFileArtifact artifact = getArtifact("simple");

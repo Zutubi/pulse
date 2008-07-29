@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.model.TestSuiteResult;
 import com.zutubi.pulse.core.postprocessors.XMLTestReportPostProcessorTestBase;
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
@@ -17,13 +18,13 @@ public class CppUnitReportPostProcessorTest extends XMLTestReportPostProcessorTe
         super(new CppUnitReportPostProcessor());
     }
 
-    protected File getOutputDir()
+    protected File getOutputDir() throws URISyntaxException
     {
         URL resource = getClass().getResource("CppUnitReportPostProcessorTest.basic.xml");
-        return new File(resource.getPath()).getParentFile();
+        return new File(resource.toURI()).getParentFile();
     }
 
-    public void testBasic()
+    public void testBasic() throws Exception
     {
         TestSuiteResult tests = runProcessor("basic");
 
@@ -36,7 +37,7 @@ public class CppUnitReportPostProcessorTest extends XMLTestReportPostProcessorTe
         assertTest(suite, "Test");
     }
 
-    public void testTwoReports()
+    public void testTwoReports() throws Exception
     {
         TestSuiteResult tests = runProcessor("basic", "second");
 
@@ -52,7 +53,7 @@ public class CppUnitReportPostProcessorTest extends XMLTestReportPostProcessorTe
         assertTest(suite, "Test");
     }
 
-    public void testEmptyTags()
+    public void testEmptyTags() throws Exception
     {
         TestSuiteResult tests = runProcessor("emptytags");
 
@@ -67,7 +68,7 @@ public class CppUnitReportPostProcessorTest extends XMLTestReportPostProcessorTe
         assertEquals(1, caseResult.getErrors());
     }
 
-    public void testParentSuite()
+    public void testParentSuite() throws Exception
     {
         pp.setSuite("parent");
         TestSuiteResult tests = runProcessor("basic");

@@ -18,14 +18,14 @@ public abstract class XMLTestReportPostProcessorTestBase extends PulseTestCase
         this.pp = pp;
     }
 
-    protected abstract File getOutputDir();
+    protected abstract File getOutputDir() throws Exception;
 
     protected StoredFileArtifact getArtifact(String name)
     {
         return new StoredFileArtifact(getClass().getSimpleName() + "." + name + ".xml");
     }
 
-    protected TestSuiteResult runProcessor(String... names)
+    protected TestSuiteResult runProcessor(String... names) throws Exception
     {
         File outputDir = getOutputDir();
         TestSuiteResult testResults = new TestSuiteResult();
