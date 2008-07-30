@@ -8,6 +8,7 @@ import com.zutubi.pulse.acceptance.support.Pulse;
 import com.zutubi.pulse.acceptance.support.JythonPackageFactory;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.util.TextUtils;
 
 import javax.script.ScriptException;
 import java.io.File;
@@ -23,7 +24,8 @@ import junit.extensions.TestSetup;
 public class AcceptanceTestSuiteSetupTeardown extends TestSetup
 {
     private Pulse pulse;
-    private File tmp;
+    private Pulse agent;
+//    private File tmp;
 
     public AcceptanceTestSuiteSetupTeardown(junit.framework.Test test)
     {
@@ -39,21 +41,69 @@ public class AcceptanceTestSuiteSetupTeardown extends TestSetup
 
         File pulsePackage = PulseTestCase.getPulsePackage();
 
-        tmp = FileSystemUtils.createTempDir();
+        File dir = new File(System.getProperty("work.dir"));
 
         PulsePackage pkg = factory.createPackage(pulsePackage);
-        pulse = pkg.extractTo(tmp.getCanonicalPath());
+        pulse = pkg.extractTo(new File(dir, "master").getCanonicalPath());
+        pulse.setVerbose(true);
         pulse.setPort(port);
-        pulse.setUserHome(new File(tmp, "user.home").getCanonicalPath());
-        pulse.start(true);
+        pulse.setUserHome(new File(dir, "user.home").getCanonicalPath());
+        pulse.start();
+
+        // start up an agent as well.  port 8890
+        File agentPackage = getAgentPackage();
+        PulsePackage agentPkg = factory.createPackage(agentPackage);
+        agent = agentPkg.extractTo(new File(dir, "agent").getCanonicalPath());
+        agent.setPort(8890);
+        agent.setUserHome(new File(dir, "user.home").getCanonicalPath());
+        agent.start();
     }
 
     @AfterSuite
     public void tearDown() throws IOException
     {
-        pulse.stop();
+        try
+        {
+            if (pulse != null)
+            {
+                pulse.stop();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
         pulse = null;
-        
-        PulseTestCase.removeDirectory(tmp);
+
+        try
+        {
+            if (agent != null)
+            {
+                agent.stop();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        agent = null;
+
+//        PulseTestCase.removeDirectory(tmp);
     }
+
+    public static File getAgentPackage()
+    {
+        String agentPackage = System.getProperty("agent.package");
+        if (!TextUtils.stringSet(agentPackage))
+        {
+            return null;
+        }
+        File pkg = new File(agentPackage);
+        if (!pkg.isFile())
+        {
+            throw new IllegalStateException("Unexpected invalid agent.package: " + agentPackage + " does not reference a file.");
+        }
+        return pkg;
+    }
+
 }

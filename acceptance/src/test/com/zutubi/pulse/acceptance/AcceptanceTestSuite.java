@@ -44,13 +44,24 @@ public class AcceptanceTestSuite
 
         //---( other acceptance tests )---
 //        suite.addTestSuite(StartupShutdownAcceptanceTest.class); - tries to launch pulse inline, does not work.
-        return suite;
+
+        return new AcceptanceTestSuiteSetupTeardown(suite);
+/*
+        TestSuite agentSuite = new TestSuite();
+        agentSuite.addTestSuite(AgentUpgradeAcceptanceTest.class);
+
+        TestSuite main = new TestSuite();
+        main.addTest(new AcceptanceTestSuiteSetupTeardown(suite));
+        main.addTest(agentSuite);
+
+        return main;
+*/
     }
 
     public static Test otherSuite()
     {
         TestSuite suite = new TestSuite();
-        // need to run this one first as it runs through the installation setup.
+        // need to run this one first as it runs through the iJnstallation setup.
         suite.addTestSuite(SetupAcceptanceTest.class);
 
         // now we can run the rest of the tests.

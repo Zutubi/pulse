@@ -40,6 +40,7 @@
         <taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="custom.task.path"/>
         <taskdef uri="antlib:com.zutubi.ant" resource="com/zutubi/ant/antlib.xml" classpathref="custom.task.path"/>
         <taskdef name="ideamodule" classname="configurator.task.IdeaJavaModuleTask" classpathref="custom.task.path"/>
+        <taskdef resource="testngtasks" classpathref="custom.task.path"/>
 
         <load-ivy-taskdef/>
 
@@ -99,15 +100,16 @@
         <delete file="slave/etc/runtime.properties"/>
 
         <!-- clean out the script/test playground. -->
-        <delete dir="working/pulse-accept"/>
+        <delete dir="working"/>
 
         <!-- clean out the user.home/.pulse/* directory -->
-        <delete dir="${user.home}/.pulse"/>        
-        <delete dir="${user.home}/.pulse2"/>        
+        <delete dir="${user.home}/.pulse"/>
+        <delete dir="${user.home}/.pulse2"/>
         <delete dir="${user.home}/.pulse-agent"/>
 
         <delete file="plugins/plugins-registry.xml"/>
 
+        <!-- the following should be cleaned out by calls to the respective module/clean targets. -->
         <delete dir="package/core/build"/>
         <delete dir="package/local/build"/>
         <delete dir="package/server-core/build"/>
@@ -118,7 +120,7 @@
     <!--
         FIXME: these targets do not currently work.  Use: ant -f [module]/build.xml instead.
     -->
-    
+
     <target name="build.core">
         <ant inheritAll="false" dir="core" antfile="build.xml" target="build.module"/>
     </target>
@@ -169,7 +171,7 @@
         <fixcrlf srcdir="${package.root.local}/bin" eol="lf" eof="remove" includes="**/*.sh"/>
         <chmod perm="755" dir="${package.root.local}/bin" includes="**/*.sh"/>
 
-        <retrieve-package-deps module="local" dest="${version.root.local}"/>        
+        <retrieve-package-deps module="local" dest="${version.root.local}"/>
 
         <copy todir="${version.root.local}/lib">
             <fileset dir="core/etc" includes="*.dll"/>
@@ -267,7 +269,7 @@
         <copy todir="${version.root.slave}/system/www">
             <fileset dir="slave/src/www" includes="**/*"/>
         </copy>
-        
+
         <copy todir="${version.root.slave}/lib">
             <fileset dir="core/etc" includes="*.dll"/>
             <fileset dir="slave/etc" includes="*.xml"/>
@@ -483,20 +485,19 @@
             <os family="unix"/>
         </condition>
 
-        <echo message="Extract and start pulse-${pulse.version}.${extension}"/>
+        <echo message="Startup services."/>
         <exec executable="bash" spawn="true">
-            <arg line="scripts/acceptance-test-prep.sh build/pulse-${pulse.version}.${extension}"/>
-        </exec>
-
-        <exec executable="bash">
-            <arg line="scripts/acceptance-test-wait.sh"/>
+            <arg line="scripts/setup-services.sh"/>
         </exec>
 
         <echo message="Start acceptance test suite."/>
         <junit printsummary="yes" fork="on" forkmode="once" maxmemory="512m"
                failureProperty="test.failed" errorProperty="test.failed">
             <sysproperty key="pulse.port" value="8889"/>
+            <sysproperty key="pulse.package" value="build/pulse-${pulse.version}.${extension}"/>
+            <sysproperty key="agent.package" value="build/pulse-agent-${pulse.version}.${extension}"/>
             <sysproperty key="bootstrap" value="com/zutubi/pulse/bootstrap/bootstrapContext.xml"/>
+            <sysproperty key="work.dir" value="working"/>
             <classpath>
                 <pathelement location="${build.dir}/classes"/>
                 <pathelement location="${build.dir}/test.classes"/>
@@ -518,12 +519,17 @@
             </fileset>
             <report format="frames" todir="${report.dir}/html"/>
         </junitreport>
+
+        <echo message="Shutdown services."/>
+        
         <exec executable="bash">
-            <arg line="scripts/acceptance-test-post.sh ${pulse.version}"/>
+            <arg line="scripts/teardown-services.sh"/>
         </exec>
+
         <fail message="One or more acceptance tests failed.  See the reports (${report.dir}) for details."
               if="test.failed"/>
 
+<!--
         <exec executable="bash" spawn="true">
             <arg line="scripts/setup-services.sh"/>
         </exec>
@@ -537,6 +543,7 @@
         <exec executable="bash">
             <arg line="scripts/teardown-services.sh"/>
         </exec>
+-->
     </target>
 
     <target name="test.agent.upgrade">
@@ -544,7 +551,7 @@
             <arg line="scripts/upgradetest.py ${pulse.version} ${pulse.build} both"/>
         </exec>
     </target>
-    
+
     <target name="setup.master" depends="init">
         <property name="build.dir" value="acceptance/build"/>
         <junit>
@@ -564,7 +571,7 @@
             </batchtest>
         </junit>
     </target>
-    
+
     <target name="idea" depends="build.all">
         <zutubi:ivytoidea conf="build" projectFile="pulse.ipr" propertiesFile="build.properties">
             <fileset dir="${project.root.dir}/">
@@ -581,7 +588,7 @@
         <!-- use the default ivy configuration properties. -->
         <property file="ivy.properties"/>
         <ivy:configure/>
-        
+
         <retrieve-dependencies ivyfile="package/core/ivy.xml" conf="equinox-bundles" dest="plugins/internal"/>
 
         <echo message=""/>
@@ -615,9 +622,9 @@
         <attribute name="module"/>
         <attribute name="dest"/>
         <sequential>
-            <retrieve-dependencies ivyfile="package/@{module}/ivy.xml" conf="release" dest="@{dest}/lib"/>        
+            <retrieve-dependencies ivyfile="package/@{module}/ivy.xml" conf="release" dest="@{dest}/lib"/>
             <retrieve-dependencies ivyfile="package/@{module}/ivy.xml" conf="internal-bundles" dest="@{dest}/system/plugins/internal"/>
-            <retrieve-dependencies ivyfile="package/@{module}/ivy.xml" conf="prepackaged-bundles" dest="@{dest}/system/plugins/prepackaged"/>        
+            <retrieve-dependencies ivyfile="package/@{module}/ivy.xml" conf="prepackaged-bundles" dest="@{dest}/system/plugins/prepackaged"/>
 
             <copy todir="@{dest}/system/plugins/config">
                 <fileset dir="master/etc/osgi" includes="config.ini"/>
@@ -628,4 +635,6 @@
             </move>
         </sequential>
     </macrodef>
+
+
 </project>
