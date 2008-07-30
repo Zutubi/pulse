@@ -1,22 +1,21 @@
 package com.zutubi.pulse.plugins;
 
+import com.zutubi.pulse.upgrade.UpgradeTask;
 import com.zutubi.pulse.upgrade.UpgradeableComponent;
 import com.zutubi.pulse.upgrade.UpgradeableComponentSource;
-import com.zutubi.pulse.upgrade.UpgradeTask;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
-
-import java.util.List;
-import java.util.Map;
-import java.util.LinkedList;
-import java.util.HashMap;
-import java.io.IOException;
-
-import org.eclipse.core.runtime.IExtensionRegistry;
-import org.eclipse.core.runtime.IExtensionPoint;
-import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IContributor;
+import org.eclipse.core.runtime.IExtension;
+import org.eclipse.core.runtime.IExtensionPoint;
+import org.eclipse.core.runtime.IExtensionRegistry;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -52,23 +51,21 @@ public class PluginUpgradeManager implements UpgradeableComponentSource
 
         if (pluginManager.isVersionChangeDetected())
         {
-            // now i need the plugins with version changes, the current registry version, and the version of the plugin.
+            // Get a list of the plugins for which the version has changed.
             List<Plugin> upgradedPlugins = new LinkedList<Plugin>();
 
             PluginRegistry registry = pluginManager.getPluginRegistry();
             for (Plugin plugin : pluginManager.getPlugins())
             {
-                Map<String, String> entry = registry.getEntry(plugin.getId());
-                if (entry.containsKey(PluginManager.PLUGIN_VERSION_KEY))
+                if (plugin.getState() == Plugin.State.VERSION_CHANGE)
                 {
-                    Version registryVersion = new Version(entry.get(PluginManager.PLUGIN_VERSION_KEY));
-                    if (registryVersion.compareTo(plugin.getVersion()) < 0) 
-                    {
-                        upgradedPlugins.add(plugin);
-                    }
+                    upgradedPlugins.add(plugin);
                 }
             }
 
+            // Construct a map of all of the existing upgrade tasks registered via the upgrade extension point.
+            // side note: The registration of these extensions occurs during the resolution of the plugins by
+            //            the plugin manager.  There is a strong temporal association here.
             Map<String, List<UpgradeTaskHolder>> definedUpgradeTasks = new HashMap<String, List<UpgradeTaskHolder>>();
 
             IExtension[] extensions = extensionPoint.getExtensions();
@@ -80,15 +77,13 @@ public class PluginUpgradeManager implements UpgradeableComponentSource
                 {
                     definedUpgradeTasks.put(contributor.getName(), new LinkedList<UpgradeTaskHolder>());
                 }
+                
                 List<UpgradeTaskHolder> tasks = definedUpgradeTasks.get(contributor.getName());
 
                 IConfigurationElement[] configElements = extension.getConfigurationElements();
                 for (IConfigurationElement config : configElements)
                 {
-                    UpgradeTaskHolder holder = new UpgradeTaskHolder();
-                    holder.version = config.getAttribute("version");
-                    holder.clazz = config.getAttribute("class");
-                    tasks.add(holder);
+                    tasks.add(new UpgradeTaskHolder(config));
                 }
             }
 
@@ -107,7 +102,7 @@ public class PluginUpgradeManager implements UpgradeableComponentSource
                     {
                         // > registry
                         // <= installed
-                        Version taskVersion = new Version(task.version);
+                        Version taskVersion = new Version(task.getVersion());
                         if (registryVersion.compareTo(taskVersion) < 0 && taskVersion.compareTo(installedVersion) <= 0)
                         {
                             // need to execute this upgrade task.
@@ -116,7 +111,28 @@ public class PluginUpgradeManager implements UpgradeableComponentSource
                     }
                     if (requiredPluginUpgradeTasks.size() == 0)
                     {
+                        // no upgrade tasks are required.  So we can upgrade the plugins registry version now and
+                        // clear the version changed state.
                         requiredUpgradeTasks.remove(plugin.getId());
+                        try
+                        {
+                            registerVersionUpgrade(plugin);
+                        }
+                        catch (IOException e)
+                        {
+                            LOG.error(e);
+                        }
+                    }
+                }
+                else
+                {
+                    try
+                    {
+                        registerVersionUpgrade(plugin);
+                    }
+                    catch (IOException e)
+                    {
+                        LOG.error(e);
                     }
                 }
             }
@@ -139,7 +155,7 @@ public class PluginUpgradeManager implements UpgradeableComponentSource
                         try
                         {
                             // instantiate the tasks.
-                            Class<UpgradeTask> upgradeClazz = (Class<UpgradeTask>) plugin.loadClass(holder.clazz);
+                            Class<UpgradeTask> upgradeClazz = (Class<UpgradeTask>) plugin.loadClass(holder.getClazz());
                             
                             // create the upgradeableComponent.
                             upgradeTasks.add(objectFactory.buildBean(upgradeClazz));
@@ -154,6 +170,22 @@ public class PluginUpgradeManager implements UpgradeableComponentSource
                 }
             }
         }
+    }
+
+    private void registerVersionUpgrade(Plugin plugin) throws IOException
+    {
+        PluginRegistry pluginRegistry = pluginManager.getPluginRegistry();
+        
+        // should be recording the new version of the plugin to which we just upgraded.
+        Map<String, String> entry = pluginRegistry.getEntry(plugin.getId());
+
+        Version oldVersion = new Version(entry.get(PluginManager.PLUGIN_VERSION_KEY));
+        Version newVersion = plugin.getVersion();
+
+        // log that we have upgraded from oldversion -> newversion.
+        LOG.info("Plugin '"+plugin.getId()+"' has been upgraded from " + oldVersion + " to " + newVersion + ".");
+        entry.put(PluginManager.PLUGIN_VERSION_KEY, newVersion.toString());
+        pluginRegistry.flush();
     }
 
     public boolean isUpgradeRequired()
@@ -178,21 +210,32 @@ public class PluginUpgradeManager implements UpgradeableComponentSource
 
     private static class UpgradeTaskHolder
     {
-        String version;
-        String clazz;
+        private IConfigurationElement configElement;
+
+        public UpgradeTaskHolder(IConfigurationElement configElement)
+        {
+            this.configElement = configElement;
+        }
+
+        private String getVersion()
+        {
+            return configElement.getAttribute("version");
+        }
+
+        private String getClazz()
+        {
+            return configElement.getAttribute("class");
+        }
     }
 
-    private static class PluginUpgradeableComponent implements UpgradeableComponent
+    private class PluginUpgradeableComponent implements UpgradeableComponent
     {
         private List<UpgradeTask> upgradeTasks;
 
         private Plugin plugin;
 
-        private PluginRegistry pluginRegistry;
-
         public PluginUpgradeableComponent(PluginRegistry pluginRegistry, Plugin plugin, List<UpgradeTask> tasks)
         {
-            this.pluginRegistry = pluginRegistry;
             this.plugin = plugin;
             this.upgradeTasks = tasks;
         }
@@ -216,21 +259,11 @@ public class PluginUpgradeManager implements UpgradeableComponentSource
         {
             try
             {
-// callback
-                // should be recording the new version of the plugin to which we just upgraded.
-                Map<String, String> entry = pluginRegistry.getEntry(plugin.getId());
-
-                Version oldVersion = new Version(entry.get(PluginManager.PLUGIN_VERSION_KEY));
-                Version newVersion = plugin.getVersion();
-
-                // log that we have upgraded from oldversion -> newversion.
-
-                entry.put(PluginManager.PLUGIN_VERSION_KEY, newVersion.toString());
-                pluginRegistry.flush();
+                registerVersionUpgrade(plugin);
             }
             catch (IOException e)
             {
-                e.printStackTrace();
+                LOG.error(e);
             }
         }
 
