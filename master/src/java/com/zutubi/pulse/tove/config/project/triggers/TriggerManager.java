@@ -6,7 +6,6 @@ import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.system.ConfigurationEventSystemStartedEvent;
-import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.scheduling.SchedulingException;
 import com.zutubi.pulse.scheduling.Trigger;
@@ -93,7 +92,7 @@ public class TriggerManager implements ExternalStateManager<TriggerConfiguration
 
     public void handleEvent(Event event)
     {
-        registerConfigListeners(((ConfigurationSystemStartedEvent)event).getConfigurationProvider());
+        registerConfigListeners(((ConfigurationEventSystemStartedEvent)event).getConfigurationProvider());
     }
 
     public Class[] getHandledEvents()
