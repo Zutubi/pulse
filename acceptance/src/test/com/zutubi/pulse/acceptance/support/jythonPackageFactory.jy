@@ -91,10 +91,14 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
 
     def getEnv(self, service):
         env = dict(os.environ)
+
         if service:
             env['PULSE_CONFIG'] = os.path.join(self.baseDir, 'bin', 'config.properties')
+
+        if env.has_key('USER'):
+            env['PULSE_USER'] = env['USER']
+
         env['PULSE_HOME'] = self.baseDir
-        env['PULSE_USER'] = env['USER']
         env['PULSE_PID'] = os.path.join(self.baseDir, 'pulse.pid')
         return env
 
