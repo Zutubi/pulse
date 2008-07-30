@@ -207,6 +207,7 @@ public class CommitMessageBuilder
         int splitOption = -1;
         int currentLineLength = 0;
         int lineStart = 0;
+        int visiblePastSplit = 0;
 
         StringBuilder modifiedMessage = new StringBuilder();
 
@@ -220,7 +221,23 @@ public class CommitMessageBuilder
             char c = message.charAt(i);
             if (Character.isWhitespace(c))
             {
+                if (c == '\n')
+                {
+                    modifiedMessage.append(message.substring(lineStart, i + 1));
+
+                    currentLineLength = 0;
+                    visiblePastSplit = 0;
+                    lineStart = i + 1;
+                    splitOption = -1;
+                    continue;
+                }
+
                 splitOption = i;
+                visiblePastSplit = 0;
+            }
+            else
+            {
+                visiblePastSplit++;
             }
 
             currentLineLength++;
@@ -231,9 +248,10 @@ public class CommitMessageBuilder
                 modifiedMessage.append(message.substring(lineStart, splitOption));
                 modifiedMessage.append("\n");
 
+                currentLineLength = visiblePastSplit;
+                visiblePastSplit = 0;
                 lineStart = splitOption + 1;
                 splitOption = -1;
-                currentLineLength = 0;
             }
         }
 

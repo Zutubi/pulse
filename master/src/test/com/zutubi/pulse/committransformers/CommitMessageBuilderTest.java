@@ -144,13 +144,42 @@ public class CommitMessageBuilderTest extends TestCase
         CommitMessageBuilder buffer = new CommitMessageBuilder("this is a very fine multiline example");
         assertEquals("this is a\nvery fine\nmultiline\nexample", buffer.wrap(9));
     }
-/*
-    public void testWrapNoSpace()
+
+    public void testWrapMultilineLotsOfWhitespace()
     {
-        CommitMessageBuilder buffer = new CommitMessageBuilder("1234567890");
-        assertEquals("12345\n67890", buffer.wrap(5));
+        CommitMessageBuilder buffer = new CommitMessageBuilder("1 2 3 4 5 6 7 8 9 0");
+        assertEquals("1 2 3\n4 5 6\n7 8 9\n0", buffer.wrap(5));
     }
-*/
+
+    public void testWrapMultilineLotsOfWhitespace2()
+    {
+        CommitMessageBuilder buffer = new CommitMessageBuilder("1 2 3 4 5 6 7 8 9 0");
+        assertEquals("1 2 3\n4 5 6\n7 8 9\n0", buffer.wrap(6));
+    }
+
+    public void testWrapExistingLinebreaks()
+    {
+        // CIB-1583
+        CommitMessageBuilder buffer = new CommitMessageBuilder("1 2\n3 4 5 6 7 8 9 0");
+        assertEquals("1 2\n3 4 5\n6 7 8\n9 0", buffer.wrap(6));
+    }
+
+    public void testWrapMultipleExistingLinebreaks()
+    {
+        // CIB-1583
+        CommitMessageBuilder buffer = new CommitMessageBuilder("1 2\n3 4 5 6 7\n8 9 0");
+        assertEquals("1 2\n3 4 5\n6 7\n8 9 0", buffer.wrap(5));
+    }
+
+    public void testWrapMultipleExistingTags()
+    {
+        // CIB-1583
+        CommitMessageBuilder buffer = new CommitMessageBuilder("1 2\n3 4 5 6 7\n8 9 0");
+        buffer.replace("1", "<a href=\"yay\">$0</a>", false);
+        buffer.replace("5", "<b>$0</b>", false);
+        assertEquals("<a href=\"yay\">1</a> 2\n3 4 <b>5</b>\n6 7\n8 9 0", buffer.wrap(5));
+    }
+
     public void testWrapWithTags()
     {
         CommitMessageBuilder buffer = new CommitMessageBuilder("This is a string");
