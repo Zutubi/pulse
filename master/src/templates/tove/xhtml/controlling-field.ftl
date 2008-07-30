@@ -6,7 +6,7 @@
             return;
         }
 
-        var enabled = shouldEnable(controllingField)
+        var enabled = shouldEnable(controllingField);
 
     <#if parameters.dependentFields?exists && parameters.dependentFields?size &gt; 0>
         if(enabled)

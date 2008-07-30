@@ -79,7 +79,7 @@ width of its contents.  Floating it works, but hurts other things.
                 defaultSubmit = function()
                 {
                     submitForm('${submitField.value?js_string}');
-                }
+                };
             </#if>
 
             buttonConfig = { text: '${submitField.value?js_string}' };

@@ -23,5 +23,5 @@
     select.on('disable', setEnabledState);
     select.on('enable', setEnabledState);
 
-    form.on('afterlayout', function() { setEnabledState(select) }, form, {single: true});
+    form.on('afterlayout', function() { setEnabledState(select); }, form, {single: true});
 }());

@@ -13,5 +13,5 @@
     checkbox.on('disable', function(checkbox, checked) { setEnabledState(checkbox); });
     checkbox.on('enable', function(checkbox, checked) { setEnabledState(checkbox); });
 
-    form.on('afterlayout', function() { setEnabledState(checkbox) }, form, {single: true});
+    form.on('afterlayout', function() { setEnabledState(checkbox); }, form, {single: true});
 }());
