@@ -17,7 +17,7 @@ def isWindows():
     if os.name == "java":
         return lang.System.getProperty("os.name").lower.startswith("win")
     else:
-        return os.name == "nt":
+        return os.name == "nt"
 
 
 def getcwd():
