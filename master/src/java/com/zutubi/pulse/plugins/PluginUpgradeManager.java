@@ -177,9 +177,9 @@ public class PluginUpgradeManager implements UpgradeableComponentSource
         PluginRegistry pluginRegistry = pluginManager.getPluginRegistry();
         
         // should be recording the new version of the plugin to which we just upgraded.
-        Map<String, String> entry = pluginRegistry.getEntry(plugin.getId());
+        PluginRegistryEntry entry = pluginRegistry.getEntry(plugin.getId());
 
-        Version oldVersion = new Version(entry.get(PluginManager.PLUGIN_VERSION_KEY));
+        Version oldVersion = entry.getVersion();
         Version newVersion = plugin.getVersion();
 
         // log that we have upgraded from oldversion -> newversion.
