@@ -6,6 +6,7 @@ import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.IOUtils;
 
 import java.io.*;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
@@ -107,7 +108,7 @@ public class Maven2CommandTest extends ExecutableCommandTestBase
         assertOutputContains(features.get(0).getSummary(), "Running com.zutubi.maven2.test.AppTest", "Tests run: 1, Failures: 1, Errors: 0,");
     }
 
-    private void prepareBaseDir(String name) throws IOException
+    private void prepareBaseDir(String name) throws Exception
     {
         try
         {
@@ -144,10 +145,11 @@ public class Maven2CommandTest extends ExecutableCommandTestBase
         }
     }
 
-    private File getSource(String name)
+    private File getSource(String name) throws URISyntaxException
     {
         URL resource = getClass().getResource("Maven2CommandLoadTest.basic.xml");
-        File moduleDir = new File(resource.getPath().replaceFirst("command-maven2.*", "command-maven2"));
+        File resourceFile = new File(resource.toURI());
+        File moduleDir = new File(resourceFile.getAbsolutePath().replaceFirst("command-maven2.*", "command-maven2"));
 
         return new File(moduleDir, FileSystemUtils.composeFilename("src", "test", "com", "zutubi", "pulse", "core", getClass().getSimpleName() + "." + name));
     }

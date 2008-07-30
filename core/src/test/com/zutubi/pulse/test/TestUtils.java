@@ -4,6 +4,7 @@ import com.zutubi.pulse.Version;
 import com.zutubi.util.TextUtils;
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 /**
@@ -39,7 +40,16 @@ public class TestUtils
 
         // OK, maybe we can find indirectly via the classpath
         URL resource = Version.class.getResource("version.properties");
-        System.out.println("Version.properties path: " + resource.getPath());
-        return new File(resource.getPath().replaceFirst("core/classes/.*", ""));
+        try
+        {
+            File resourceFile = new File(resource.toURI());
+            return new File(resourceFile.getAbsolutePath().replaceFirst("core/classes/.*", ""));
+        }
+        catch (URISyntaxException e)
+        {
+            // Not possible.
+            e.printStackTrace();
+            return null;
+        }
     }
 }

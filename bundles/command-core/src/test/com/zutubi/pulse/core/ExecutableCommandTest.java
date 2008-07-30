@@ -11,6 +11,7 @@ import com.zutubi.util.IOUtils;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
@@ -422,13 +423,12 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
         return null;
     }
 
-    protected File getTestDataFile(String testName, String extension)
+    protected File getTestDataFile(String testName, String extension) throws URISyntaxException
     {
         URL resource = getClass().getResource("ExecutableCommandLoaderTest.testExecutableArgs.xml");
-        File moduleDir = new File(resource.getPath().substring(0, resource.getPath().lastIndexOf("command-core") + 12));
-        File dataFile = new File(moduleDir, FileSystemUtils.composeFilename("src", "test", getClass().getName().replace('.', File.separatorChar) + "." + testName + "." + extension));
-        System.out.println(dataFile.getAbsolutePath() + " : exists: " + dataFile.exists());
-        return dataFile;
+        String resourcePath = new File(resource.toURI()).getAbsolutePath();
+        File moduleDir = new File(resourcePath.substring(0, resourcePath.lastIndexOf("command-core") + 12));
+        return new File(moduleDir, FileSystemUtils.composeFilename("src", "test", getClass().getName().replace('.', File.separatorChar) + "." + testName + "." + extension));
     }
 
     protected void checkEnv(CommandResult commandResult, String ...contents) throws IOException
