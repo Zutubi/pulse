@@ -106,6 +106,7 @@
         <delete dir="${user.home}/.pulse"/>
         <delete dir="${user.home}/.pulse2"/>
         <delete dir="${user.home}/.pulse-agent"/>
+        <delete dir="${user.home}/.pulse2-agent"/>
 
         <delete file="plugins/plugins-registry.xml"/>
 
