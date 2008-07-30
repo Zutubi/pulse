@@ -131,9 +131,23 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
         assertEquals("2.0.0", manager.getPluginRegistry().getEntry("com.zutubi.bundles.producer").get(PluginManager.PLUGIN_VERSION_KEY));
     }
 
-    public void testPluginDetectUpgradeRequired()
+    public void testPluginDetectUpgradeRequired() throws Exception
     {
-        
+        FileSystemUtils.copy(paths.getPluginStorageDir(), producer2);
+
+        startupPluginCore();
+
+        assertEquals("2.0.0", manager.getPluginRegistry().getEntry("com.zutubi.bundles.producer").get(PluginManager.PLUGIN_VERSION_KEY));
+
+        shutdownPluginCore();
+
+        FileSystemUtils.delete(new File(paths.getPluginStorageDir(), producer2.getName()));
+        FileSystemUtils.copy(paths.getPluginStorageDir(), producer3);
+
+        startupPluginCore();
+
+        assertTrue(pluginUpgradeManager.isUpgradeRequired());
+        assertEquals("2.0.0", manager.getPluginRegistry().getEntry("com.zutubi.bundles.producer").get(PluginManager.PLUGIN_VERSION_KEY));
     }
 
     public void testPluginUpgradeSanityCheck() throws Exception

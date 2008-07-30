@@ -4,7 +4,11 @@ import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.plugins.osgi.Equinox;
 import com.zutubi.pulse.plugins.osgi.OSGiFramework;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.util.*;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.IOUtils;
+import com.zutubi.util.Mapping;
+import com.zutubi.util.Predicate;
+import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.RegistryFactory;
@@ -15,12 +19,15 @@ import org.eclipse.osgi.service.resolver.BundleSpecification;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 /**
  *
@@ -123,7 +130,7 @@ public class PluginManager
         //TODO: create handles for all plugins - enabled and disabled.
         for (String id : registry.getRegistrations())
         {
-            Map<String, String> entry = registry.getEntry(id);
+            PluginRegistryEntry entry = registry.getEntry(id);
 
             // initialise the installed plugins.
             if (entry.containsKey(PLUGIN_SOURCE_KEY))
@@ -154,20 +161,21 @@ public class PluginManager
         }
 
         // enable all of the installed plugins - enable in batch.
-        // - this processing is exactly the same as that done during the enable, except on a bulk
+        // - this processing is exactly the same as that done during the enable, except on in bulk
         versionChangeDetected = false;
         for (LocalPlugin plugin : installedPlugins)
         {
-            Map<String, String> entry = registry.getEntry(plugin.getId());
+            PluginRegistryEntry entry = registry.getEntry(plugin.getId());
             if (entry.containsKey(PLUGIN_VERSION_KEY))
             {
-                String registryVersionString = entry.get(PLUGIN_VERSION_KEY);
-                if (!TextUtils.stringSet(registryVersionString))
+                Version registryVersion = entry.getVersion();
+                if (registryVersion == null)
                 {
                     LOG.warning("Unexpected null version string in plugin registry for " + plugin.getId() + ".");
                     continue;
                 }
-                Version registryVersion = new Version(registryVersionString);
+                // we should check for older versions here... can we go back?, and if we do, what happens to the
+                // registry version.
                 if (registryVersion.compareTo(plugin.getVersion()) != 0)
                 {
                     plugin.setState(Plugin.State.VERSION_CHANGE);
@@ -179,7 +187,7 @@ public class PluginManager
             plugin.setBundleDescription(equinox.getBundleDescription(plugin.getId(), plugin.getVersion().toString()));
         }
 
-        //NOTE: the extension works with resolved plugins, so we need to get a plugin to resolved before it can be upgrades. 
+        //NOTE: the extension works with resolved plugins, so we need to get a plugin to resolved before it can be upgraded. 
 
         // resolve them all.
         equinox.resolveBundles();
@@ -205,6 +213,7 @@ public class PluginManager
                     }
                     catch (BundleException e)
                     {
+                        //TODO: do we need to do more here?.
                         LOG.warning("Failed to uninstall bundle. Disabling plugin '" + plugin.getId() + "'. Cause: " + e.getMessage(), e);
                     }
                     break;
@@ -230,8 +239,8 @@ public class PluginManager
                     try
                     {
                         plugin.getBundle().start(Bundle.START_TRANSIENT);
-                        Map<String, String> entry = registry.getEntry(plugin.getId());
-                        entry.put(PLUGIN_VERSION_KEY, plugin.getVersion().toString());
+                        PluginRegistryEntry entry = registry.getEntry(plugin.getId());
+                        entry.setVersion(plugin.getVersion());
                         saveRegistry();
 
                         plugin.setState(Plugin.State.ENABLED);
@@ -252,14 +261,19 @@ public class PluginManager
 
     private void startupInternalPlugins() throws PluginException, BundleException
     {
-        for(File file : paths.getInternalPluginStorageDir().listFiles())
+        // A) load and install each of the plugins located in the internal storage location.
+        for(File file : paths.getInternalPluginStorageDir().listFiles(PLUGIN_FILTER))
         {
             LocalPlugin internalPlugin = createPluginHandle(file.toURI(), Plugin.Type.INTERNAL);
             internalPlugin.setBundle(equinox.install(internalPlugin.getSource()));
             internalPlugin.setBundleDescription(equinox.getBundleDescription(internalPlugin.getId(), internalPlugin.getVersion().toString()));
             internalPlugins.add(internalPlugin);
         }
+
+        // B) Resolve all bundles, in this case all of the internal bundles.
         equinox.resolveBundles();
+
+        // C) Start each of the internal plugins, ensuring that we do so in the order of there dependencies.
         internalPlugins = sortPlugins(internalPlugins);
         for (LocalPlugin plugin : internalPlugins)
         {
@@ -284,7 +298,7 @@ public class PluginManager
         {
             try
             {
-                Map<String, String> entry = registry.getEntry(id);
+                PluginRegistryEntry entry = registry.getEntry(id);
 
                 // check for manually uninstalled plugins.
                 if (entry.containsKey(PLUGIN_SOURCE_KEY))
@@ -318,7 +332,7 @@ public class PluginManager
         {
             for (String id : registry.getRegistrations())
             {
-                Map<String, String> entry = registry.getEntry(id);
+                PluginRegistryEntry entry = registry.getEntry(id);
                 try
                 {
                     // process the pending actions.
@@ -377,7 +391,7 @@ public class PluginManager
     private void upgradePluginSource(String id, URI newSource) throws URISyntaxException, IOException, PluginException
     {
         // replace the old plugin, install and register the new source
-        Map<String, String> entry = registry.getEntry(id);
+        PluginRegistryEntry entry = registry.getEntry(id);
 
         // delete the old
         File pluginFile = new File(new URI(entry.get(PLUGIN_SOURCE_KEY)));
@@ -427,7 +441,7 @@ public class PluginManager
                 }
                 else
                 {
-                    Map<String, String> entry = registry.getEntry(plugin.getId());
+                    PluginRegistryEntry entry = registry.getEntry(plugin.getId());
 
                     State state = State.valueOf(entry.get(PLUGIN_STATE_KEY));
                     if (state == State.UNINSTALLED)
@@ -482,7 +496,7 @@ public class PluginManager
                 }
                 else
                 {
-                    Map<String, String> registryEntry = registry.getEntry(plugin.getId());
+                    PluginRegistryEntry registryEntry = registry.getEntry(plugin.getId());
 
                     // is the current file the same as the registered file?
                     URI registryURI = new URI(registryEntry.get(PLUGIN_SOURCE_KEY));
@@ -520,17 +534,38 @@ public class PluginManager
 
     public Plugin install(URI uri, String filename, boolean autostart) throws PluginException
     {
-        //TODO: check that the uri defines a valid plugin.
         //TODO: check that the plugin we download does not already exist.  We do not want to install the same plugin twice.
 
         // copy it into the internal plugin storage directory
-
         URI installedSource = downloadPlugin(uri, filename, paths.getPluginStorageDir());
 
-        LocalPlugin installedPlugin = createPluginHandle(installedSource, Plugin.Type.USER);
+        File file = new File(installedSource);
 
-        // register the plugin with the registry
-        registerPlugin(installedPlugin);
+        LocalPlugin installedPlugin;
+        try
+        {
+            if (!PLUGIN_FILTER.accept(file))
+            {
+                throw new PluginException("'" + uri + "' does not define a valid plugin.");
+            }
+
+            installedPlugin = createPluginHandle(installedSource, Plugin.Type.USER);
+            // register the plugin with the registry
+            registerPlugin(installedPlugin);
+        }
+        catch (PluginException e)
+        {
+            try
+            {
+                FileSystemUtils.delete(file);
+            }
+            catch (IOException e1)
+            {
+                LOG.error(e1);
+            }
+            throw e;
+        }
+
         installedPlugin.setState(Plugin.State.INSTALLED);
         plugins.add(installedPlugin);
 
@@ -555,7 +590,7 @@ public class PluginManager
         // assumption: we can disable
 
         // process the disable.  this is the same thing that is done if PENDING_DISABLE is encountered.
-        Map<String, String> entry = registry.getEntry(plugin.getId());
+        PluginRegistryEntry entry = registry.getEntry(plugin.getId());
         entry.put(PLUGIN_STATE_KEY, State.DISABLED.toString());
         saveRegistry();
         plugin.setState(Plugin.State.DISABLED);
@@ -564,7 +599,7 @@ public class PluginManager
     void requestDisable(LocalPlugin plugin) throws PluginException
     {
         // the plugin is currently enabled, so we need to request a pending action.
-        Map<String, String> entry = registry.getEntry(plugin.getId());
+        PluginRegistryEntry entry = registry.getEntry(plugin.getId());
         entry.put(PLUGIN_PENDING_KEY, DISABLE_PENDING_ACTION);
         saveRegistry();
         plugin.setState(Plugin.State.DISABLING);
@@ -574,7 +609,7 @@ public class PluginManager
     {
         try
         {
-            Map<String, String> entry = registry.getEntry(plugin.getId());
+            PluginRegistryEntry entry = registry.getEntry(plugin.getId());
             if (entry.containsKey(PLUGIN_SOURCE_KEY))
             {
                 String source = entry.get(PLUGIN_SOURCE_KEY);
@@ -615,7 +650,7 @@ public class PluginManager
     void requestUninstall(LocalPlugin plugin) throws PluginException
     {
         // the plugin is currently enabled, so we need to request a pending action.
-        Map<String, String> entry = registry.getEntry(plugin.getId());
+        PluginRegistryEntry entry = registry.getEntry(plugin.getId());
         entry.put(PLUGIN_PENDING_KEY, UNINSTALL_PENDING_ACTION);
         saveRegistry();
 
@@ -626,7 +661,7 @@ public class PluginManager
     {
         // assumption: we can enable
 
-        Map<String, String> entry = registry.getEntry(plugin.getId());
+        PluginRegistryEntry entry = registry.getEntry(plugin.getId());
         entry.put(PLUGIN_STATE_KEY, State.ENABLED.toString());
         saveRegistry();
 
@@ -715,7 +750,7 @@ public class PluginManager
             LocalPlugin installedPlugin = createPluginHandle(installedSource, Plugin.Type.USER);
 
             // register the plugin with the registry
-            Map<String, String> registryEntry = registry.register(installedPlugin);
+            PluginRegistryEntry registryEntry = registry.register(installedPlugin);
             registryEntry.put(PLUGIN_SOURCE_KEY, installedSource.toString());
             saveRegistry();
 
@@ -734,7 +769,7 @@ public class PluginManager
     {
         try
         {
-            Map<String, String> entry = registry.getEntry(plugin.getId());
+            PluginRegistryEntry entry = registry.getEntry(plugin.getId());
 
             File pluginFile = new File(new URI(entry.get(UPGRADE_SOURCE_KEY)));
             if (pluginFile.isDirectory())
@@ -766,7 +801,7 @@ public class PluginManager
         URI installedSource = downloadPlugin(newSource, paths.getPluginWorkDir());
 
         // the plugin is currently enabled, so we need to request a pending action.
-        Map<String, String> registryEntry = registry.getEntry(plugin.getId());
+        PluginRegistryEntry registryEntry = registry.getEntry(plugin.getId());
         registryEntry.put(PLUGIN_PENDING_KEY, UPGRADE_PENDING_ACTION);
         registryEntry.put(UPGRADE_SOURCE_KEY, installedSource.toString());
         saveRegistry();
@@ -781,7 +816,7 @@ public class PluginManager
         {
             // fully activate the plugin.
             plugin.getBundle().start(Bundle.START_TRANSIENT);
-            Map<String, String> registryEntry = registry.getEntry(plugin.getId());
+            PluginRegistryEntry registryEntry = registry.getEntry(plugin.getId());
             registryEntry.put(PLUGIN_VERSION_KEY, plugin.getVersion().toString());
             plugin.setState(Plugin.State.ENABLED);
         }
@@ -850,11 +885,11 @@ public class PluginManager
         equinox.checkInstallAndResolve(plugin.manifest, plugin.source);
     }
 
-    private Map<String, String> registerPlugin(Plugin plugin) throws PluginException
+    private PluginRegistryEntry registerPlugin(Plugin plugin) throws PluginException
     {
         try
         {
-            Map<String, String> registryEntry = registry.register(plugin);
+            PluginRegistryEntry registryEntry = registry.register(plugin);
             registryEntry.put(PLUGIN_SOURCE_KEY, plugin.getSource().toString());
             registryEntry.put(PLUGIN_STATE_KEY, State.ENABLED.toString());
             registryEntry.put(PLUGIN_TYPE_KEY, plugin.getType().toString());
@@ -1018,8 +1053,32 @@ public class PluginManager
         });
     }
 
+    /**
+     * Sort the list of plugins according to there defined dependencies.  This sorting does not occur inplace.
+     *
+     * This only works for installed plugins as only these have the bundle descriptions available.
+     *
+     * @param plugins list to be sorted.
+     *
+     * @return the sorted list of plugins.
+     */
     private List<LocalPlugin> sortPlugins(final List<LocalPlugin> plugins)
     {
+        List<LocalPlugin> unsortable = CollectionUtils.filter(plugins, new Predicate<LocalPlugin>()
+        {
+            public boolean satisfied(LocalPlugin plugin)
+            {
+                return plugin.getBundleDescription() == null;
+            }
+        });
+        if (unsortable.size() > 0)
+        {
+            // we have plugins with no bundle descriptions.  These may be sorted as though they have no
+            // dependencies, but is that correct?.  The problem here is really that all plugins should
+            // already have there bundle descriptions.  If not, they will need to be installed.
+            throw new IllegalStateException("Can not sort plugins that have not been installed.");
+        }
+
         // A normal sort will not work as there is no ordering relationship
         // between plugins that have no dependency relationship.
         List<LocalPlugin> sorted = new LinkedList<LocalPlugin>();
@@ -1038,7 +1097,6 @@ public class PluginManager
                     break;
                 }
             }
-
             sorted.add(i, plugin);
         }
 
@@ -1055,8 +1113,10 @@ public class PluginManager
     private void addDependentPlugins(LocalPlugin plugin, List<LocalPlugin> plugins, boolean transitive, List<LocalPlugin> result)
     {
         BundleDescription description = plugin.getBundleDescription();
+/*
         if (description != null)
         {
+*/
             BundleDescription[] required = description.getDependents();
             if (required != null)
             {
@@ -1073,7 +1133,9 @@ public class PluginManager
                     }
                 }
             }
+/*
         }
+*/
     }
 
     public PluginRegistry getPluginRegistry()

@@ -41,7 +41,7 @@ public class PluginRegistry
      */
     private File registry;
 
-    private Map<String, Map<String, String>> entries = new HashMap<String, Map<String, String>>();
+    private Map<String, PluginRegistryEntry> entries = new HashMap<String, PluginRegistryEntry>();
 
     private Map<String, String> baseEntry = new HashMap<String, String>();
 
@@ -61,7 +61,7 @@ public class PluginRegistry
      *
      * @param id uniquely identifying the plugin
      */
-    public Map<String, String> register(String id)
+    public PluginRegistryEntry register(String id)
     {
         if (id == null)
         {
@@ -70,12 +70,12 @@ public class PluginRegistry
         
         if (!isRegistered(id))
         {
-            entries.put(id, new HashMap<String, String>());
+            entries.put(id, new PluginRegistryEntry());
         }
         return entries.get(id);
     }
 
-    public Map<String, String> register(Plugin plugin)
+    public PluginRegistryEntry register(Plugin plugin)
     {
         return register(plugin.getId());
     }
@@ -106,7 +106,7 @@ public class PluginRegistry
         return entries.containsKey(id);
     }
 
-    public Map<String, String> getEntry(String id)
+    public PluginRegistryEntry getEntry(String id)
     {
         return entries.get(id);
     }
@@ -130,7 +130,7 @@ public class PluginRegistry
             Element element = new Element(ELEMENT_PLUGIN);
             element.addAttribute(new Attribute(ATTRIBUTE_ID, id));
 
-            Map<String, String> entry = entries.get(id);
+            PluginRegistryEntry entry = entries.get(id);
             for (String key : entry.keySet())
             {
                 Element e = new Element(key);
@@ -245,7 +245,7 @@ public class PluginRegistry
                     continue;
                 }
 
-                HashMap<String, String> entry = new HashMap<String, String>();
+                PluginRegistryEntry entry = new PluginRegistryEntry();
 
                 Elements children = pluginEntry.getChildElements();
                 for (int j = 0; j < children.size(); j++)

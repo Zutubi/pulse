@@ -20,6 +20,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
     private File producer2;
     private File producer3;
     private File consumer1;
+    private File bad;
 
     protected void setUp() throws Exception
     {
@@ -31,6 +32,9 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         producer2 = new File(bundleDir, "com.zutubi.bundles.producer_2.0.0.jar");
         producer3 = new File(bundleDir, "com.zutubi.bundles.producer_3.0.0.jar");
         consumer1 = new File(bundleDir, "com.zutubi.bundles.consumer_1.0.0.jar");
+
+        // should rename this - this is an empty file..
+        bad = new File(bundleDir, "bad.jar");
     }
 
     protected void tearDown() throws Exception
@@ -576,37 +580,53 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         // ensure that upgrade is required.
     }
 
-    public void testDependencyCheckMessages()
+    public void testDependencyCheckMessagesOnInstall() throws PluginException
     {
-        // install the plugin with the missing dependency,
-        // check that the missing dependency is correctly identified
-        // check that error message when
-        //      a) installing into a running system
-        //      b) starting up the system
+        startupPluginCore();
+
+        Plugin consumer = manager.install(consumer1.toURI());
+        assertEquals("Failed to resolve bundle dependencies.", consumer.getErrorMessage());
+        assertEquals(Plugin.State.DISABLED, consumer.getState());
+
+        //TODO: should be identifying the missing dependency
+    }
+
+    public void testDependencyCheckMessagesOnStartup() throws PluginException, IOException
+    {
+        FileSystemUtils.copy(paths.getPluginStorageDir(), consumer1);
+
+        startupPluginCore();
+
+        Plugin consumer = manager.getPlugin("com.zutubi.bundles.consumer");
+        assertEquals("Failed to resolve bundle.", consumer.getErrorMessage());
+        assertEquals(Plugin.State.DISABLED, consumer.getState());
+
+        //TODO: should be identifying the missing dependency
+    }
+
+    public void testInstallingZeroLengthJarFile() throws Exception
+    {
+        startupPluginCore();
+
+        try
+        {
+            manager.install(bad.toURI());
+            fail();
+        }
+        catch (PluginException e)
+        {
+            // exception expected.  Not sure if this is the best response to this type of error.
+        }
+
+        // ensure that it is not left behind.
+        File storage = paths.getPluginStorageDir();
+        assertEquals(0, storage.list().length);
     }
 
     public void testPluginThatFailsOnStartupWillRetryStartupOnNextSystemStartup()
     {
         // failures on startup should not force a manual 're-enable' of the plugin by the user.
     }
-
-    public void testRegistry() throws Exception
-    {
-        //TODO: temp disable until internal plugins can be consistently accessed.
-/*
-
-        // install the equinox registry plugins to enable all of the registry goodness.
-        installPulseInternalBundles();
-
-        FileSystemUtils.copy(paths.getPluginStorageDir(), producer3);
-
-        startupPluginCore();
-
-        assertNotNull(manager.getExtensionRegistry());
-        assertNotNull(manager.getExtensionTracker());
-*/
-    }
-
 
     private void assertPlugin(Plugin plugin, String expectedId, String expectedVersion, Plugin.State expectedState)
     {
