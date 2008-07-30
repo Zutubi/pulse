@@ -89,14 +89,13 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
     def setVerbose(self, verbose):
         self._verbose = verbose
 
-    def getEnv(self):
+    def getEnv(self, service):
         env = dict(os.environ)
-        env['PULSE_CONFIG'] = os.path.join(self.baseDir, 'bin', 'config.properties')
+        if service:
+            env['PULSE_CONFIG'] = os.path.join(self.baseDir, 'bin', 'config.properties')
         env['PULSE_HOME'] = self.baseDir
-        env['PULSE_USER'] = os.getenv('USER')
-        env['USER'] = os.getenv('USER')
+        env['PULSE_USER'] = env['USER']
         env['PULSE_PID'] = os.path.join(self.baseDir, 'pulse.pid')
-        env['JAVA_HOME'] = os.getenv('JAVA_HOME')
         return env
 
     def getPulseHome(self):
@@ -191,7 +190,7 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
             command = [os.path.join(self.baseDir, 'bin', 'init.sh'), 'start']
             if self._verbose:
                 print 'Starting pulse: ' + str(command)
-            ret = subprocess.call(command, env=self.getEnv())
+            ret = subprocess.call(command, env=self.getEnv(True))
             if ret != 0:
                 raise Exception('init script exited with code %d' % ret)
             self.pop = True
@@ -213,7 +212,7 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
 
             if self._verbose:
                 print 'Starting pulse: ' + str(command)
-            self.pop = subprocess.Popen(command, stdout=self.stdout, stderr=self.stderr)
+            self.pop = subprocess.Popen(command, stdout=self.stdout, stderr=self.stderr, env=self.getEnv(False))
 
         if wait:
             if not self.waitFor():
@@ -256,7 +255,7 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
                 command = [os.path.join(self.baseDir, 'bin', 'init.sh'), 'stop']
                 if self._verbose:
                     print 'Shutting down pulse: ' + str(command)
-                ret = subprocess.call(command, env=self.getEnv())
+                ret = subprocess.call(command, env=self.getEnv(True))
                 self.pop=None
             else:
             
@@ -272,7 +271,7 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
 
                 if self._verbose:
                     print 'Shutting down pulse: ' + str(command)
-                ret = subprocess.call(command)
+                ret = subprocess.call(command, env=self.getEnv(True))
 
         return ret
 
