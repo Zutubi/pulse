@@ -12,23 +12,12 @@ import com.zutubi.pulse.acceptance.support
 from java import io
 from java import lang
 
-# The following doesnt really work..
-WINDOWS = os.name == "nt"
-LINUX = sys.platform.startswith("linux")
-
 def isWindows():
     """ when this script is being run within a the jvm (jython), the reported os is java """
-
     if os.name == "java":
-        if lang.System.getenv("OS").endswith("NT"):
-            return True
-        else:
-            return False
+        return lang.System.getProperty("os.name").lower.startswith("win")
     else:
-        if os.name == "nt":
-            return True
-        else:
-            return False
+        return os.name == "nt":
 
 
 def getcwd():
