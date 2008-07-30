@@ -15,7 +15,7 @@ from java import lang
 def isWindows():
     """ when this script is being run within a the jvm (jython), the reported os is java """
     if os.name == "java":
-        return lang.System.getProperty("os.name").lower.startswith("win")
+        return lang.System.getProperty("os.name").lower().startswith("win")
     else:
         return os.name == "nt"
 
