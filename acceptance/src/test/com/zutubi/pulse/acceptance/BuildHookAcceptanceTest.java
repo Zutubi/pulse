@@ -12,15 +12,14 @@ import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.IOUtils;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Hashtable;
-
-import org.testng.annotations.Test;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.AfterMethod;
 
 /**
  * Tests for build hooks, both configuration and ensuring they are executed
@@ -315,7 +314,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
     {
         ConfigurationForm taskForm = new ConfigurationForm(selenium, RunExecutableTaskConfiguration.class);
         taskForm.waitFor();
-        taskForm.finishFormElements("java", "-jar " + DUMPENV_JAR.getAbsolutePath().replace('\\', '/') + " " + arguments, tempDir.getAbsolutePath(), null, null);
+        taskForm.finishFormElements("java", "-jar \"" + DUMPENV_JAR.getAbsolutePath().replace('\\', '/') + "\" " + arguments, tempDir.getAbsolutePath(), null, null);
         return waitForHook(projectName);
     }
 
