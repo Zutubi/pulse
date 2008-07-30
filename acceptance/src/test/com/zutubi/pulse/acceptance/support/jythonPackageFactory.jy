@@ -38,7 +38,6 @@ class PulsePackage(com.zutubi.pulse.acceptance.support.PulsePackage):
         if not os.path.exists(destDir):
             os.makedirs(destDir)
 
-        var = {'destDir':destDir, 'packageFile':self.packageFile}
         if self.packageFile.endswith('.zip'):
             subprocess.call(['unzip', '-qd', destDir, self.packageFile])
         else:
@@ -121,15 +120,17 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
             commonFilename = 'common.sh'
 
         if self._userHome is None:
-            return scriptFilename
+            return os.path.join(self.baseDir, 'bin', scriptFilename)
 
         modifiedScriptFilename = 'modified-' + scriptFilename
         modifiedCommonFilename = 'modified-' + commonFilename
+        modifiedScriptPath = os.path.join(self.baseDir, 'bin', modifiedScriptFilename)
+        modifiedCommonPath = os.path.join(self.baseDir, 'bin', modifiedCommonFilename)
 
-        """ A) redirect the pulse script to the modified common script. """
-        if not os.path.exists(os.path.join(self.baseDir, 'bin', modifiedScriptFilename)):
+        # A) redirect the pulse script to the modified common script.
+        if not os.path.exists(modifiedScriptPath):
             scriptFile = open(os.path.join(self.baseDir, 'bin', scriptFilename), 'r')
-            modifiedScriptFile = open(os.path.join(self.baseDir, 'bin', modifiedScriptFilename), 'w')
+            modifiedScriptFile = open(modifiedScriptPath, 'w')
             try:
 
                 for line in scriptFile:
@@ -141,10 +142,10 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
                 scriptFile.close()
                 modifiedScriptFile.close()
 
-        """ B) modify the common script with the added -Duser.home flag """
-        if not os.path.exists(os.path.join(self.baseDir, 'bin', modifiedCommonFilename)):
+        # B) modify the common script with the added -Duser.home flag
+        if not os.path.exists(modifiedCommonPath):
             commonFile = open(os.path.join(self.baseDir, 'bin', commonFilename), 'r')
-            modifiedCommonFile = open(os.path.join(self.baseDir, 'bin', modifiedCommonFilename), 'w')
+            modifiedCommonFile = open(modifiedCommonPath, 'w')
             try:
 
                 if isWindows():
@@ -166,7 +167,12 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
                 commonFile.close()
                 modifiedCommonFile.close()
 
-        return modifiedScriptFilename
+        if not isWindows():
+            # Sadly no os.chmod in Jython, so call out to the chmod command.
+            subprocess.call(['chmod', '+x', modifiedScriptPath]);
+            subprocess.call(['chmod', '+x', modifiedCommonPath]);
+
+        return modifiedScriptPath
 
 
     def start(self, wait=True, service=False):
@@ -182,7 +188,7 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
             if self._dataDir is not None:
                 configFile.writelines(['pulse.data=%s\n' % self._dataDir])
             configFile.close()
-            command = [os.path.join(self.basedir, 'bin', 'init.sh'), 'start']
+            command = [os.path.join(self.baseDir, 'bin', 'init.sh'), 'start']
             if self._verbose:
                 print 'Starting pulse: ' + str(command)
             ret = subprocess.call(command, env=self.getEnv())
@@ -190,11 +196,11 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
                 raise Exception('init script exited with code %d' % ret)
             self.pop = True
         else:
-        
-            self.stdout = open('stdout.txt', 'w')
-            self.stderr = open('stderr.txt', 'w')
+            parentDir = os.path.dirname(self.baseDir)
+            self.stdout = open(os.path.join(parentDir, 'stdout.txt'), 'w')
+            self.stderr = open(os.path.join(parentDir, 'stderr.txt'), 'w')
 
-            command = [os.path.join(self.baseDir, 'bin', self.getScript()), 'start']
+            command = [self.getScript(), 'start']
 
             if self._port is not None:
                 command += ['-p', str(self._port)]
@@ -254,7 +260,7 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
                 self.pop=None
             else:
             
-                command = [os.path.join(self.baseDir, 'bin', self.getScript()), 'shutdown']
+                command = [self.getScript(), 'shutdown']
                 if self._port is not None:
                     command += ['-p', str(self._port)]
                 if self._dataDir is not None:
