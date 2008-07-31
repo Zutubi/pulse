@@ -204,7 +204,7 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
         catch (Exception e)
         {
             LOG.severe(e);
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
     }
 

@@ -270,7 +270,6 @@ public class MockBuildManager implements BuildManager
         buildResults.remove(result.getId());
     }
 
-    @SuppressWarnings({ "unchecked" })
     public List<BuildResult> abortUnfinishedBuilds(Project project, String message)
     {
         BuildResult result = getLatestBuildResult(project);
@@ -281,7 +280,7 @@ public class MockBuildManager implements BuildManager
             return Arrays.asList(result);
         }
 
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     public void abortUnfinishedBuilds(User user, String message)

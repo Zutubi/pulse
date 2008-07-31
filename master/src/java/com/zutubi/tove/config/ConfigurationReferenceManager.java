@@ -130,7 +130,7 @@ public class ConfigurationReferenceManager implements ReferenceResolver
         
         for (String path : configurationPersistenceManager.getOwningPaths(type, owningScope))
         {
-            configurationTemplateManager.getAllInstances(path, instances, allowTemplated);
+            configurationTemplateManager.getAllInstances(path, Configuration.class, instances, allowTemplated);
         }
 
         return instances;

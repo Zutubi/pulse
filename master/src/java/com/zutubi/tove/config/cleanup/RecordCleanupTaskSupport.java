@@ -27,7 +27,6 @@ public abstract class RecordCleanupTaskSupport implements RecordCleanupTask
         return cascaded;
     }
 
-    @SuppressWarnings({"unchecked"})
     public void getInvalidatedPaths(Set<String> paths)
     {
         for(RecordCleanupTask cascade: cascaded)

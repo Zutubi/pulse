@@ -51,7 +51,7 @@ public class CompositeType extends AbstractType implements ComplexType
     private Map<Class, List<String>> propertiesByClass = new HashMap<Class, List<String>>();
 
 
-    public CompositeType(Class type, String symbolicName) throws TypeException
+    public CompositeType(Class<? extends Configuration> type, String symbolicName) throws TypeException
     {
         super(type, symbolicName);
         if (!Modifier.isAbstract(type.getModifiers()))
@@ -65,6 +65,12 @@ public class CompositeType extends AbstractType implements ComplexType
                 throw new TypeException("Cannot instantiate class '" + type.getName() + "' (is there a public default constructor): " + e.getMessage(), e);
             }
         }
+    }
+
+    @SuppressWarnings({"unchecked"})
+    public Class<? extends Configuration> getClazz()
+    {
+        return (Class<? extends Configuration>) super.getClazz();
     }
 
     public void addProperty(TypeProperty property) throws TypeException
@@ -294,13 +300,13 @@ public class CompositeType extends AbstractType implements ComplexType
 
     public <T extends Annotation> T getAnnotation(final Class<T> annotationType, boolean includeInherited)
     {
-        T result = (T) CollectionUtils.find(annotations, new Predicate<Annotation>()
+        T result = annotationType.cast(CollectionUtils.find(annotations, new Predicate<Annotation>()
         {
             public boolean satisfied(Annotation annotation)
             {
                 return annotation.annotationType().equals(annotationType);
             }
-        });
+        }));
 
         if(result == null && includeInherited)
         {
@@ -398,7 +404,7 @@ public class CompositeType extends AbstractType implements ComplexType
             {
                 try
                 {
-                    instance = (Configuration) getClazz().newInstance();
+                    instance = getClazz().newInstance();
                 }
                 catch (Exception e)
                 {

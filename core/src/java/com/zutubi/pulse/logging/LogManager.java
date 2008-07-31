@@ -2,12 +2,12 @@ package com.zutubi.pulse.logging;
 
 import com.zutubi.util.IOUtils;
 
-import java.util.*;
-import java.util.logging.Handler;
-import java.util.logging.Logger;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.*;
+import java.util.logging.Handler;
+import java.util.logging.Logger;
 
 /**
  * <class-comment/>
@@ -101,10 +101,10 @@ public class LogManager
         }
 
         // read the rest of the configuration file, setting up the components as necessary.
-        Enumeration<String> propertyNames = (Enumeration<String>) config.propertyNames();
+        Enumeration<?> propertyNames = config.propertyNames();
         while (propertyNames.hasMoreElements())
         {
-            String propertyName = propertyNames.nextElement();
+            String propertyName = (String) propertyNames.nextElement();
             if (propertyName.compareTo("handlers") == 0)
             {
                 continue;
@@ -120,7 +120,7 @@ public class LogManager
             {
                 String name = propertyName.substring(0, propertyName.length() - 8);
                 Logger l = Logger.getLogger(name);
-                List<String> names = LogUtils.getList(config, propertyName, Collections.EMPTY_LIST);
+                List<String> names = LogUtils.getList(config, propertyName, Collections.<String>emptyList());
                 for (String n : names)
                 {
                     Handler h = handlers.get(n);

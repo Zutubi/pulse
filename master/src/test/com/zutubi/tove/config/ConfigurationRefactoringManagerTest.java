@@ -381,17 +381,17 @@ public class ConfigurationRefactoringManagerTest extends AbstractConfigurationSy
 
     public void testExtractParentTemplateInvalidParentPath()
     {
-        extractParentTemplateErrorHelper("nosuchscope", Collections.EMPTY_LIST, "foo", "Invalid parent path 'nosuchscope': does not refer to a templated collection");
+        extractParentTemplateErrorHelper("nosuchscope", Collections.<String>emptyList(), "foo", "Invalid parent path 'nosuchscope': does not refer to a templated collection");
     }
 
     public void testExtractParentTemplateParentPathNotAMap()
     {
-        extractParentTemplateErrorHelper(rootPath, Collections.EMPTY_LIST, "foo", "Invalid parent path '" + rootPath + "': does not refer to a templated collection");
+        extractParentTemplateErrorHelper(rootPath, Collections.<String>emptyList(), "foo", "Invalid parent path '" + rootPath + "': does not refer to a templated collection");
     }
 
     public void testExtractParentTemplateParentPathNotATemplatedScope()
     {
-        extractParentTemplateErrorHelper(SAMPLE_SCOPE, Collections.EMPTY_LIST, "foo", "Invalid parent path '" + SAMPLE_SCOPE + "': does not refer to a templated collection");
+        extractParentTemplateErrorHelper(SAMPLE_SCOPE, Collections.<String>emptyList(), "foo", "Invalid parent path '" + SAMPLE_SCOPE + "': does not refer to a templated collection");
     }
 
     public void testExtractParentTemplateInvalidChildKey()

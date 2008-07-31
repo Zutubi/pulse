@@ -13,7 +13,6 @@ public class ContactConfigurationActions
 {
     private ResultNotifier resultNotifier;
 
-    @SuppressWarnings({"unchecked"})
     public List<String> getActions(ContactConfiguration contactConfiguration)
     {
         if(resultNotifier.hasError(contactConfiguration))
@@ -22,7 +21,7 @@ public class ContactConfigurationActions
         }
         else
         {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
     }
 

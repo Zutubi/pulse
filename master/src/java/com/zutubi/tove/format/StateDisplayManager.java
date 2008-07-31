@@ -38,7 +38,7 @@ public class StateDisplayManager
             }
         }
 
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     public Object format(String fieldName, Configuration configurationInstance)
@@ -80,7 +80,7 @@ public class StateDisplayManager
         StateDisplayFields fields = fieldsByType.get(type);
         if (fields == null)
         {
-            Class configurationClass = type.getClazz();
+            Class<? extends Configuration> configurationClass = type.getClazz();
             fields = new StateDisplayFields(configurationClass, ConventionSupport.getStateDisplay(configurationClass), objectFactory);
             fieldsByType.put(type, fields);
         }

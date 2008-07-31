@@ -17,6 +17,7 @@ public interface InstanceCache extends InstanceSource
     Collection<Configuration> getAllDescendents(String path, boolean allowIncomplete);
 
     void getAllMatchingPathPattern(String path, Collection<Configuration> result, boolean allowIncomplete);
+    <T extends Configuration> void getAllMatchingPathPattern(String path, Class<T> clazz, Collection<T> result, boolean allowIncomplete);
 
     void put(String path, Configuration instance, boolean complete);
 

@@ -316,7 +316,6 @@ public class ConfigurationTemplateManager
         }
     }
 
-    @SuppressWarnings({"unchecked"})
     public String insertRecord(final String path, final MutableRecord r)
     {
         checkPersistent(path);
@@ -890,8 +889,8 @@ public class ConfigurationTemplateManager
     /**
      * @see #validate(String, String, com.zutubi.tove.type.record.Record, boolean, boolean, java.util.Set)
      */
-    @SuppressWarnings({"unchecked"})
-    public <T> T validate(String parentPath, String baseName, Record subject, boolean concrete, boolean deep) throws TypeException
+    @SuppressWarnings({"JavaDoc", "unchecked"})
+    public <T extends Configuration> T validate(String parentPath, String baseName, Record subject, boolean concrete, boolean deep) throws TypeException
     {
         return (T) validate(parentPath, baseName, subject, concrete, deep, null);
     }
@@ -918,8 +917,7 @@ public class ConfigurationTemplateManager
      *          if an error prevents creation of the instance: this is more
      *          fatal than a normal validation problem
      */
-    @SuppressWarnings({"unchecked"})
-    public <T> T validate(String parentPath, String baseName, Record subject, boolean concrete, boolean deep, Set<String> ignoredFields) throws TypeException
+    public <T extends Configuration> T validate(String parentPath, String baseName, Record subject, boolean concrete, boolean deep, Set<String> ignoredFields) throws TypeException
     {
         // The type we are validating against.
         CompositeType type = typeRegistry.getType(subject.getSymbolicName());
@@ -930,12 +928,12 @@ public class ConfigurationTemplateManager
 
         // Create an instance of the object represented by the record.  It is
         // during the instantiation that type conversion errors are detected.
-        Configuration instance;
         SimpleInstantiator instantiator = new SimpleInstantiator(configurationReferenceManager, this);
-        instance = (Configuration) instantiator.instantiate(type, subject);
+        @SuppressWarnings({"unchecked"})
+        T instance = (T) instantiator.instantiate(type, subject);
 
         validateInstance(type, instance, parentPath, baseName, concrete, false, deep, ignoredFields);
-        return (T) instance;
+        return instance;
     }
 
     /**
@@ -950,6 +948,8 @@ public class ConfigurationTemplateManager
      *                       a new instance
      * @param concrete       if true, the validation will check for
      *                       completeness
+     * @param checkEssential if true, validation will check for essential
+     *                       complex fields
      */
     public void validateInstance(CompositeType type, Configuration instance, String parentPath, String baseName, boolean concrete, boolean checkEssential)
     {
@@ -1018,6 +1018,7 @@ public class ConfigurationTemplateManager
                 }
                 else if (nestedType instanceof MapType)
                 {
+                    @SuppressWarnings({"unchecked"})
                     ConfigurationMap<Configuration> map = (ConfigurationMap) nestedInstance;
                     for (Map.Entry<String, Configuration> entry : map.entrySet())
                     {
@@ -1439,7 +1440,6 @@ public class ConfigurationTemplateManager
         return null;
     }
 
-    @SuppressWarnings({"unchecked"})
     public List<String> getDescendentPaths(String path, boolean strict, final boolean concreteOnly, final boolean includeHidden)
     {
         String[] elements = PathUtils.getPathElements(path);
@@ -1482,7 +1482,7 @@ public class ConfigurationTemplateManager
         // We get here for non-templated scopes.
         if (strict)
         {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
         else
         {
@@ -2027,7 +2027,6 @@ public class ConfigurationTemplateManager
      * @param clazz defines the required type of the instance to be retrieved
      * @return instance
      */
-    @SuppressWarnings({"unchecked"})
     <T extends Configuration> T getInstance(String path, Class<T> clazz)
     {
         Configuration instance = getInstance(path);
@@ -2041,7 +2040,7 @@ public class ConfigurationTemplateManager
             throw new IllegalArgumentException("Path '" + path + "' does not reference an instance of type '" + clazz.getName() + "'");
         }
 
-        return (T) instance;
+        return clazz.cast(instance);
     }
 
     <T extends Configuration> T getCloneOfInstance(String path, Class<T> clazz)
@@ -2058,24 +2057,22 @@ public class ConfigurationTemplateManager
     <T extends Configuration> Collection<T> getAllInstances(String path, Class<T> clazz, boolean allowIncomplete)
     {
         List<T> result = new LinkedList<T>();
-        getAllInstances(path, result, allowIncomplete);
+        getAllInstances(path, clazz, result, allowIncomplete);
         return result;
     }
 
-    @SuppressWarnings({"unchecked"})
-    <T extends Configuration> void getAllInstances(String path, Collection<T> result, boolean allowIncomplete)
+    <T extends Configuration> void getAllInstances(String path, Class<T> clazz, Collection<T> result, boolean allowIncomplete)
     {
         State state = getState();
-        state.instances.getAllMatchingPathPattern(path, (Collection<Configuration>) result, allowIncomplete);
+        state.instances.getAllMatchingPathPattern(path, clazz, result, allowIncomplete);
     }
 
-    @SuppressWarnings({"unchecked"})
     public <T extends Configuration> Collection<T> getAllInstances(Class<T> clazz)
     {
         CompositeType type = typeRegistry.getType(clazz);
         if (type == null)
         {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
         List<T> result = new LinkedList<T>();
@@ -2085,14 +2082,13 @@ public class ConfigurationTemplateManager
             State state = getState();
             for (String path : paths)
             {
-                state.instances.getAllMatchingPathPattern(path, (Collection<Configuration>) result, false);
+                state.instances.getAllMatchingPathPattern(path, clazz, result, false);
             }
         }
 
         return result;
     }
 
-    @SuppressWarnings({"unchecked"})
     <T extends Configuration> T getAncestorOfType(Configuration c, Class<T> clazz)
     {
         CompositeType type = typeRegistry.getType(clazz);
@@ -2104,7 +2100,7 @@ public class ConfigurationTemplateManager
                 Type pathType = configurationPersistenceManager.getType(path);
                 if (pathType.equals(type))
                 {
-                    return (T) getInstance(path);
+                    return clazz.cast(getInstance(path));
                 }
 
                 path = PathUtils.getParentPath(path);
@@ -2193,7 +2189,6 @@ public class ConfigurationTemplateManager
      * @throws IllegalArgumentException if the given path is not valid or
      *         does not match the expected type
      */
-    @SuppressWarnings({"unchecked"})
     public <T extends Type> T getType(String path, Class<T> typeClass)
     {
         Type type = getType(path);
@@ -2207,7 +2202,7 @@ public class ConfigurationTemplateManager
             throw new IllegalArgumentException("Invalid path '" + path + "': references incompatible type (expected '" + typeClass.getName() + "', found '" + type.getClass().getName() + "')");
         }
 
-        return (T) type;
+        return typeClass.cast(type);
     }
 
     public ComplexType getType(String path)
@@ -2293,12 +2288,7 @@ public class ConfigurationTemplateManager
         else
         {
             String[] elements = PathUtils.getPathElements(path);
-            if (configurationPersistenceManager.getScopeInfo(elements[0]) == null)
-            {
-                return false;
-            }
-
-            return getRecord(path) != null;
+            return configurationPersistenceManager.getScopeInfo(elements[0]) != null && getRecord(path) != null;
         }
     }
 

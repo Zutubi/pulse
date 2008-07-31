@@ -97,7 +97,6 @@ public class MapType extends CollectionType
         return true;
     }
 
-    @SuppressWarnings({"unchecked"})
     public Map instantiate(Object data, Instantiator instantiator) throws TypeException
     {
         Map instance = null;
@@ -114,13 +113,14 @@ public class MapType extends CollectionType
         return instance;
     }
 
-    @SuppressWarnings({ "unchecked" })
     public void initialise(Object instance, Object data, Instantiator instantiator)
     {
+        @SuppressWarnings({ "unchecked" })
         ConfigurationMap<Configuration> map = (ConfigurationMap<Configuration>) instance;
         covertFromRecord((Record) data, map, new InstantiateFromRecord(map, instantiator));
     }
 
+    @SuppressWarnings({ "unchecked" })
     private void covertFromRecord(Record record, Map result, FromRecord fromRecord)
     {
         Type defaultType = getCollectionType();
@@ -150,7 +150,6 @@ public class MapType extends CollectionType
         }
     }
 
-    @SuppressWarnings({"unchecked"})
     public MutableRecord unstantiate(Object instance) throws TypeException
     {
         typeCheck(instance, Map.class);
@@ -289,11 +288,11 @@ public class MapType extends CollectionType
         return true;
     }
 
-    @SuppressWarnings({ "unchecked" })
     public void forEachComplex(Object instance, GraphFunction<Object> f) throws TypeException
     {
         f.process(instance);
         CompositeType collectionType = (CompositeType) getCollectionType();
+        @SuppressWarnings({ "unchecked" })
         Map<String, Object> map = ((Map<String, Object>) instance);
         for(Map.Entry<String, Object> entry: map.entrySet())
         {

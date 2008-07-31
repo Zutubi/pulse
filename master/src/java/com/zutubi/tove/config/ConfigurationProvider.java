@@ -110,7 +110,7 @@ public interface ConfigurationProvider
 
     // should these methods be here or somewhere else?
     <T extends Configuration> T deepClone(T instance);
-    String insert(String path, Object instance);
+    String insert(String path, Configuration instance);
     String save(Configuration instance);
     void delete(String path);
     <T> T executeInsideTransaction(NullaryFunction<T> f);

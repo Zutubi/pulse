@@ -200,7 +200,6 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         return projectDao.findById(id);
     }
 
-    @SuppressWarnings({"unchecked"})
     private void updateProjects()
     {
         for(ProjectConfiguration config: configurationProvider.getAll(ProjectConfiguration.class))

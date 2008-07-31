@@ -73,7 +73,6 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
         return configurationTemplateManager.getAllInstances(clazz);
     }
 
-    @SuppressWarnings({"unchecked"})
     public <T extends Configuration> T getAncestorOfType(Configuration c, Class<T> clazz)
     {
         return configurationTemplateManager.getAncestorOfType(c, clazz);
@@ -84,7 +83,7 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
         return configurationTemplateManager.isDeeplyValid(path);
     }
 
-    public String insert(String parentPath, Object instance)
+    public String insert(String parentPath, Configuration instance)
     {
         return configurationTemplateManager.insert(parentPath, instance);
     }

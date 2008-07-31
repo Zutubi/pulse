@@ -91,14 +91,19 @@ class DefaultInstanceCache implements InstanceCache
 
     public void getAllMatchingPathPattern(String path, Collection<Configuration> result, boolean allowIncomplete)
     {
-        getAll(root, PathUtils.getPathElements(path), 0, result, allowIncomplete);
+        getAllMatchingPathPattern(path, Configuration.class, result, allowIncomplete);
     }
 
-    private void getAll(Entry entry, String[] elements, int index, Collection<Configuration> result, boolean allowIncomplete)
+    public <T extends Configuration> void getAllMatchingPathPattern(String path, Class<T> clazz, Collection<T> result, boolean allowIncomplete)
+    {
+        getAll(root, PathUtils.getPathElements(path), 0, clazz, result, allowIncomplete);
+    }
+
+    private <T extends Configuration> void getAll(Entry entry, String[] elements, int index, Class<T> clazz, Collection<T> result, boolean allowIncomplete)
     {
         if (index == elements.length)
         {
-            Configuration instance = entry.getInstance();
+            T instance = clazz.cast(entry.getInstance());
             if (instance != null && (entry.isComplete() || allowIncomplete))
             {
                 result.add(instance);
@@ -115,7 +120,7 @@ class DefaultInstanceCache implements InstanceCache
             {
                 if (PathUtils.elementMatches(pattern, child.getKey()))
                 {
-                    getAll(child.getValue(), elements, index + 1, result, allowIncomplete);
+                    getAll(child.getValue(), elements, index + 1, clazz, result, allowIncomplete);
                 }
             }
         }

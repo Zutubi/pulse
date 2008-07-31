@@ -94,7 +94,6 @@ public abstract class CollectionType extends AbstractType implements ComplexType
     public abstract String getItemKey(String path, Record record);
     public abstract Comparator<String> getKeyComparator(Record record);
 
-    @SuppressWarnings({"unchecked"})
     public MutableRecord createNewRecord(boolean applyDefaults)
     {
         return new MutableRecordImpl();

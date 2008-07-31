@@ -12,7 +12,6 @@ import java.util.*;
  *
  *
  */
-@SuppressWarnings({"unchecked"})
 public class ConfigurationPersistenceManager
 {
     private TypeRegistry typeRegistry;

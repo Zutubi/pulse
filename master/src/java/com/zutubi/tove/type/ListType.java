@@ -70,7 +70,6 @@ public class ListType extends CollectionType
         throw new IllegalArgumentException("Expecting record or string array, got '" + data1.getClass().getName() + "'");
     }
 
-    @SuppressWarnings({"unchecked"})
     public List<Object> instantiate(Object data, Instantiator instantiator) throws TypeException
     {
         if(data == null)
@@ -99,18 +98,18 @@ public class ListType extends CollectionType
         }
     }
 
-    @SuppressWarnings({ "unchecked" })
     public void initialise(Object instance, Object data, Instantiator instantiator)
     {
         if (data instanceof Record)
         {
+            @SuppressWarnings({ "unchecked" })
             ConfigurationList<Object> list = (ConfigurationList<Object>) instance;
             FromRecord adder = new InstantiateFromRecord(list, instantiator);
             convertFromRecord((Record) data, list, adder);
         }
     }
 
-    private void convertFromRecord(Record record, Collection collection, FromRecord fromRecord)
+    private void convertFromRecord(Record record, Collection<Object> collection, FromRecord fromRecord)
     {
         Collection<String> keys = getOrder(record);
         Type defaultType = getCollectionType();

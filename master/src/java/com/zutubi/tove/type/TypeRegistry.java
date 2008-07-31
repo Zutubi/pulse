@@ -65,7 +65,6 @@ public class TypeRegistry
         return register(clazz, null);
     }
 
-    @SuppressWarnings({"unchecked"})
     public <T extends Configuration> CompositeType register(Class<T> clazz, TypeHandler handler) throws TypeException
     {
         SymbolicName symbolicName = clazz.getAnnotation(SymbolicName.class);
@@ -243,7 +242,7 @@ public class TypeRegistry
                         Class clazz = (Class) parameterizedType.getRawType();
 
                         Class valueClass;
-                        CollectionType propertyType = null;
+                        CollectionType propertyType;
                         Type collectionType;
                         if (List.class.isAssignableFrom(clazz))
                         {

@@ -44,7 +44,6 @@ import java.util.Map;
 /**
  * Registers the Pulse built-in configuration types.
  */
-@SuppressWarnings({"unchecked"})
 public class ConfigurationRegistry
 {
     private static final Logger LOG = Logger.getLogger(ConfigurationRegistry.class);
@@ -203,6 +202,7 @@ public class ConfigurationRegistry
 
     public void registerTransientConfiguration(String propertyName, Class clazz) throws TypeException
     {
+        @SuppressWarnings({"unchecked"})
         CompositeType type = registerConfigurationType(clazz);
         transientConfig.addProperty(new ExtensionTypeProperty(propertyName, type));
     }
@@ -210,6 +210,7 @@ public class ConfigurationRegistry
     private void registerProjectMapExtension(String name, Class clazz) throws TypeException
     {
         // register the new type.
+        @SuppressWarnings({"unchecked"})
         CompositeType type = registerConfigurationType(clazz);
 
         // create the map type.
@@ -252,13 +253,14 @@ public class ConfigurationRegistry
                         throw new TypeException("Check type '" + checkClassName + "' does not implement ConfigurationCheckHandler");
                     }
 
+                    @SuppressWarnings({"unchecked"})
                     CompositeType checkType = typeRegistry.register(checkClass);
 
                     // TODO should verify that everything in the check type would land in one form
                     checkTypeMapping.put(type, checkType);
                 }
 
-                Class creatorClass = ConventionSupport.getCreator(type);
+                Class<? extends Configuration> creatorClass = ConventionSupport.getCreator(type);
                 if(creatorClass != null)
                 {
                     if(!ConfigurationCreator.class.isAssignableFrom(creatorClass))

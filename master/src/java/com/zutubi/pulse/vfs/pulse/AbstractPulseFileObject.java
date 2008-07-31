@@ -73,10 +73,9 @@ public abstract class AbstractPulseFileObject extends AbstractFileObject
      *
      * @return a list of action names.
      */
-    @SuppressWarnings({"unchecked"})
     public List<FileAction> getActions()
     {
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     /**
@@ -131,16 +130,15 @@ public abstract class AbstractPulseFileObject extends AbstractFileObject
      *
      * @throws FileSystemException if there are any problems that prevent searching the hierarchy.
      */
-    @SuppressWarnings({"unchecked"})
     public <T> T getAncestor(Class<T> type) throws FileSystemException
     {
         for(AbstractPulseFileObject ancestor = this;
             ancestor != null;
             ancestor = (AbstractPulseFileObject) ancestor.getParent())
         {
-            if (type.isAssignableFrom(ancestor.getClass()))
+            if (type.isInstance(ancestor))
             {
-                return (T) ancestor;
+                return type.cast(ancestor);
             }
         }
 

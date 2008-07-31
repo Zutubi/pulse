@@ -228,7 +228,6 @@ public class AnnotationUtils
         return findAnnotation(from, clazz);
     }
 
-    @SuppressWarnings({"unchecked"})
     public static <T extends Annotation> T findAnnotation(List<Annotation> from, Class<T> clazz)
     {
         Set<Class<? extends Annotation>> seenTypes = new HashSet<Class<? extends Annotation>>();
@@ -246,7 +245,7 @@ public class AnnotationUtils
             Annotation a = toProcess.remove();
             if (clazz.isInstance(a))
             {
-                return (T) a;
+                return clazz.cast(a);
             }
 
             Class<? extends Annotation> type = a.annotationType();

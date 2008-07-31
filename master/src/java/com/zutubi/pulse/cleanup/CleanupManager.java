@@ -78,24 +78,6 @@ public class CleanupManager
                 LOG.severe(e);
             }
         }
-
-//        TypeListener<ProjectConfiguration> listener = new TypeAdapter<ProjectConfiguration>(ProjectConfiguration.class)
-//        {
-//            public void postInsert(ProjectConfiguration instance)
-//            {
-                // FIXME: need to actually contribute to the global project
-                // This breaks the inserted project as it causes an instance
-                // refresh while handling insert events which is a Bad Thing.
-                // The CTM should either support or protect against this.
-//                CleanupConfiguration cleanupConfiguration = new CleanupConfiguration();
-//                cleanupConfiguration.setName("default");
-//                cleanupConfiguration.setWhat(CleanupWhat.WORKING_DIRECTORIES_ONLY);
-//                cleanupConfiguration.setRetain(10);
-//                cleanupConfiguration.setUnit(CleanupUnit.BUILDS);
-//                configurationProvider.insert(PathUtils.getPath(instance.getConfigurationPath(), "cleanup"), cleanupConfiguration);
-//            }
-//        };
-//        listener.register(configurationProvider, false);
         
         Thread cleanupThread = threadFactory.newThread(new Runnable()
         {
@@ -183,10 +165,10 @@ public class CleanupManager
      *
      * @param project   the project to be cleaned up.
      */
-    @SuppressWarnings({"unchecked"})
     private void cleanupBuilds(Project project)
     {
         ProjectConfiguration projectConfig = project.getConfig();
+        @SuppressWarnings({"unchecked"})
         Map<String, CleanupConfiguration> cleanupConfigs = (Map<String, CleanupConfiguration>) projectConfig.getExtensions().get("cleanup");
 
         if (cleanupConfigs != null)

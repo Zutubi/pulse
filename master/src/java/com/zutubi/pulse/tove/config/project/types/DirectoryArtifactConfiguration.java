@@ -102,7 +102,6 @@ public class DirectoryArtifactConfiguration extends ArtifactConfiguration
         return splitPatterns(excludes);
     }
 
-    @SuppressWarnings({"unchecked"})
     private List<String> splitPatterns(String patterns)
     {
         if(TextUtils.stringSet(patterns))
@@ -111,7 +110,7 @@ public class DirectoryArtifactConfiguration extends ArtifactConfiguration
         }
         else
         {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
     }
 

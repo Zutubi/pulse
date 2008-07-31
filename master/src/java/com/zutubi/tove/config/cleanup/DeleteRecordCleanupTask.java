@@ -30,7 +30,6 @@ public class DeleteRecordCleanupTask extends RecordCleanupTaskSupport
         return internal;
     }
 
-    @SuppressWarnings({"unchecked"})
     public void getInvalidatedPaths(Set<String> paths)
     {
         super.getInvalidatedPaths(paths);

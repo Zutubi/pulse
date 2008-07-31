@@ -13,7 +13,6 @@ public class ContactConfigurationStateDisplay
 {
     private ResultNotifier resultNotifier;
 
-    @SuppressWarnings({"unchecked"})
     public List<String> getFields(ContactConfiguration contactConfiguration)
     {
         if (resultNotifier.hasError(contactConfiguration))
@@ -22,7 +21,7 @@ public class ContactConfigurationStateDisplay
         }
         else
         {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
     }
 

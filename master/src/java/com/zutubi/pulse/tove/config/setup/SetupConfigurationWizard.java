@@ -85,7 +85,7 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
             // we know the user has no external authorities
             User user = new User();
             user.setConfig(adminUser);
-            AcegiUtils.loginAs(new AcegiUser(user, Collections.EMPTY_LIST));
+            AcegiUtils.loginAs(new AcegiUser(user, Collections.<GroupConfiguration>emptyList()));
 
             try
             {

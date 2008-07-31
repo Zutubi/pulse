@@ -199,7 +199,7 @@ public class PulseScope implements Scope
             return null;
         }
 
-        return (T) r.getValue();
+        return type.cast(r.getValue());
     }
 
     public void addUnique(Reference reference) throws IllegalArgumentException

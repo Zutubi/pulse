@@ -152,14 +152,13 @@ public class FileObjectWrapper
         return File.separator;
     }
 
-    @SuppressWarnings({"unchecked"})
     public List<FileAction> getActions()
     {
         if (fo instanceof AbstractPulseFileObject)
         {
             return ((AbstractPulseFileObject)fo).getActions();
         }
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     public String getCls()

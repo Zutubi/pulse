@@ -13,7 +13,6 @@ import java.util.*;
  * A simple implementation of the config provider for testing.  Does not yet
  * support all functionality (add as necessary).
  */
-@SuppressWarnings({ "unchecked" })
 public class MockConfigurationProvider implements ConfigurationProvider
 {
     private Map<String, Configuration> instancesByPath = new HashMap<String, Configuration>();
@@ -30,7 +29,7 @@ public class MockConfigurationProvider implements ConfigurationProvider
 
     public <T extends Configuration> T get(String path, Class<T> clazz)
     {
-        return (T) instancesByPath.get(path);
+        return clazz.cast(instancesByPath.get(path));
     }
 
     public <T extends Configuration> T get(Class<T> clazz)
@@ -48,14 +47,14 @@ public class MockConfigurationProvider implements ConfigurationProvider
         List<Configuration> found = instancesByClass.get(clazz);
         if(found == null)
         {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
         else
         {
             LinkedList<T> result = new LinkedList<T>();
             for(Configuration c: found)
             {
-                result.add((T) c);
+                result.add(clazz.cast(c));
             }
 
             return result;
@@ -115,11 +114,11 @@ public class MockConfigurationProvider implements ConfigurationProvider
         throw new RuntimeException("Method not yet implemented.");
     }
 
-    public String insert(String path, Object instance)
+    public String insert(String path, Configuration instance)
     {
-        instancesByPath.put(path, (Configuration) instance);
+        instancesByPath.put(path, instance);
 
-        Class<? extends Configuration> clazz = (Class<? extends Configuration>) instance.getClass();
+        Class<? extends Configuration> clazz = instance.getClass();
         List<Configuration> configs = instancesByClass.get(clazz);
         if(configs == null)
         {
@@ -127,7 +126,7 @@ public class MockConfigurationProvider implements ConfigurationProvider
             instancesByClass.put(clazz, configs);
         }
 
-        configs.add((Configuration) instance);
+        configs.add(instance);
         return path;
     }
 

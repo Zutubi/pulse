@@ -30,14 +30,15 @@ public class ConfigurationErrors
     @JSON
     public String[] getActionErrors()
     {
-        Collection actionErrors = aware.getActionErrors();
-        return (String[]) actionErrors.toArray(new String[actionErrors.size()]);
+        @SuppressWarnings({"unchecked"})
+        Collection<String> actionErrors = aware.getActionErrors();
+        return actionErrors.toArray(new String[actionErrors.size()]);
     }
 
     @JSON
-    @SuppressWarnings({"unchecked"})
     public FieldError[] getErrors()
     {
+        @SuppressWarnings({"unchecked"})
         Set<Map.Entry<String,List<String>>> entries = aware.getFieldErrors().entrySet();
         FieldError[] result = new FieldError[entries.size()];
         int i = 0;

@@ -19,7 +19,7 @@ public class UserConfigurationActions
     {
         if(user.isAuthenticatedViaLdap())
         {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
         else
         {

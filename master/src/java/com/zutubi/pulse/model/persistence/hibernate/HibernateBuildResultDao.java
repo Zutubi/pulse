@@ -429,7 +429,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
             });
         }
 
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     public List<BuildResult> getOldestBuilds(Project project, ResultState[] states, Boolean hasWorkDir, int limit)
@@ -441,7 +441,7 @@ public class HibernateBuildResultDao extends HibernateEntityDao<BuildResult> imp
             return queryBuilds(new Project[] { project }, states, 0, 0, hasWorkDir, 0, total - limit, false);
         }
 
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     public RecipeResultNode findResultNodeByResultId(long id)

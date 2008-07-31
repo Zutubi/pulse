@@ -32,7 +32,6 @@ public class ExtensionOptionProvider extends MapOptionProvider
         return null;
     }
 
-    @SuppressWarnings({"unchecked"})
     protected Map<String, String> getMap(Object instance, String parentPath, TypeProperty property)
     {
         List<CompositeType> extensions;
@@ -45,7 +44,7 @@ public class ExtensionOptionProvider extends MapOptionProvider
             Type propertyType = property.getType();
             if (!(propertyType instanceof CompositeType))
             {
-                extensions = Collections.EMPTY_LIST;
+                extensions = Collections.emptyList();
             }
             else
             {

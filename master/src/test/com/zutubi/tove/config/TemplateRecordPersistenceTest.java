@@ -1147,24 +1147,24 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
 
     public void testSetOrderEmptyPath()
     {
-        failedSetOrderHelper("", Collections.EMPTY_LIST, "Invalid path: path is empty");
+        failedSetOrderHelper("", Collections.<String>emptyList(), "Invalid path: path is empty");
     }
 
     public void testSetOrderNoSuchPath()
     {
-        failedSetOrderHelper("project/path", Collections.EMPTY_LIST, "Invalid path 'project/path': references unknown child 'path' of collection");
+        failedSetOrderHelper("project/path", Collections.<String>emptyList(), "Invalid path 'project/path': references unknown child 'path' of collection");
     }
 
     public void testSetOrderNotACollection()
     {
         insertGlobal();
-        failedSetOrderHelper("project/global/property", Collections.EMPTY_LIST, "Invalid path 'project/global/property': does not refer to a collection");
+        failedSetOrderHelper("project/global/property", Collections.<String>emptyList(), "Invalid path 'project/global/property': does not refer to a collection");
     }
 
     public void testSetOrderNonOrderedCollection()
     {
         insertGlobal();
-        failedSetOrderHelper("project/global/properties", Collections.EMPTY_LIST, "Invalid path 'project/global/properties': collection is not ordered");
+        failedSetOrderHelper("project/global/properties", Collections.<String>emptyList(), "Invalid path 'project/global/properties': collection is not ordered");
     }
 
     public void testSetOrderInvalidKey()
@@ -1448,7 +1448,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         else if(type instanceof ListType)
         {
             ConfigurationList instance = configurationTemplateManager.getInstance(path, ConfigurationList.class);
-            return CollectionUtils.map(instance, new Mapping<Configuration, String>()
+            return CollectionUtils.<Configuration, String>map(instance, new Mapping<Configuration, String>()
             {
                 public String map(Configuration o)
                 {

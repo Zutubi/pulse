@@ -481,10 +481,10 @@ public class BuildResultsRssAction extends ProjectActionSupport
         }
     }
 
-    @SuppressWarnings({"unchecked"})
     private List<SyndEntry> fetch(String key, List<Long> ids, SyndFeedEntryFactory factory)
     {
         Cache cache = cacheManager.getCache("BuildResultsRss");
+        @SuppressWarnings({"unchecked"})
         LinkedList<CacheEntry> entries = (LinkedList<CacheEntry>) cache.get(key);
         if (entries == null)
         {

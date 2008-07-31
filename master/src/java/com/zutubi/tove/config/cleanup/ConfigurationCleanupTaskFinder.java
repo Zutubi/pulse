@@ -49,15 +49,16 @@ public class ConfigurationCleanupTaskFinder
         }
     }
 
+    @SuppressWarnings({"unchecked"})
     public List<RecordCleanupTask> getCleanupTasks(Configuration instance) throws Exception
     {
         if(taskListingMethod == null)
         {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
         else
         {
-            Object tasksInstance = objectFactory.buildBean(cleanupTasksClass);
+            Object tasksInstance = objectFactory.<Object>buildBean(cleanupTasksClass);
             if(taskListingMethod.getParameterTypes().length == 0)
             {
                 return (List<RecordCleanupTask>) taskListingMethod.invoke(tasksInstance);

@@ -38,7 +38,6 @@ public class CleanupHiddenKeyCleanupTask extends RecordCleanupTaskSupport
         return true;
     }
 
-    @SuppressWarnings({"unchecked"})
     public void getInvalidatedPaths(Set<String> paths)
     {
         super.getInvalidatedPaths(paths);

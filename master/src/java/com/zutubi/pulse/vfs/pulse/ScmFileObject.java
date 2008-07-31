@@ -132,8 +132,6 @@ public class ScmFileObject extends AbstractPulseFileObject
         }
     }
 
-
-    @SuppressWarnings({"unchecked"})
     public List<FileAction> getActions()
     {
         if (scmFile.isFile())
@@ -153,7 +151,7 @@ public class ScmFileObject extends AbstractPulseFileObject
             }
         }
 
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     public void setScmClientFactory(ScmClientFactory scmClientFactory)

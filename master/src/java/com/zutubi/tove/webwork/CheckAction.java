@@ -42,12 +42,12 @@ public class CheckAction extends ToveActionSupport
         return checkResponse;
     }
 
-    @SuppressWarnings({"unchecked"})
     public String execute() throws Exception
     {
         // first, gather all of the parameters (both those being checked and those used by the checking) so that
         // we have something to display back to the user.
 
+        @SuppressWarnings({"unchecked"})
         Map<String, String[]> parameters = ActionContext.getContext().getParameters();
 
         // The form being processed:

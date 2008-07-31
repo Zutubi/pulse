@@ -362,7 +362,7 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
         }
         else
         {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
     }
 

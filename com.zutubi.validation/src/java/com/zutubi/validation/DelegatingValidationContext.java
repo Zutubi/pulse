@@ -105,8 +105,7 @@ public class DelegatingValidationContext implements ValidationContext
         return validationAware.hasFieldError(field);
     }
 
-    @SuppressWarnings({"unchecked"})
-    public Map getFieldErrors()
+    public Map<String, List<String>> getFieldErrors()
     {
         return validationAware.getFieldErrors();
     }

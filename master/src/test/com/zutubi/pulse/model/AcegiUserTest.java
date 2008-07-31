@@ -39,7 +39,7 @@ public class AcegiUserTest extends PulseTestCase
     public void testAuthoritiesTransient()
     {
         User u = newUser("a", "b");
-        AcegiUser a = new AcegiUser(u, Collections.EMPTY_LIST);
+        AcegiUser a = new AcegiUser(u, Collections.<GroupConfiguration>emptyList());
         a.addGroup(new BuiltinGroupConfiguration("test", "tran"));
         assertAuthorities(a, "tran");
     }
@@ -65,7 +65,7 @@ public class AcegiUserTest extends PulseTestCase
 
     private void assertAuthorities(User u, String... expected)
     {
-        AcegiUser acegiUser = new AcegiUser(u, Collections.EMPTY_LIST);
+        AcegiUser acegiUser = new AcegiUser(u, Collections.<GroupConfiguration>emptyList());
         assertAuthorities(acegiUser, expected);
     }
 

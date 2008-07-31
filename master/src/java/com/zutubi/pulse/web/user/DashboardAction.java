@@ -83,7 +83,6 @@ public class DashboardAction extends ActionSupport
         return projectChangelists;
     }
 
-    @SuppressWarnings({"unchecked"})
     public List<BuildResult> getChangelistResults(Changelist changelist)
     {
         try
@@ -119,7 +118,7 @@ public class DashboardAction extends ActionSupport
         catch (Exception e)
         {
             LOG.severe(e);
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
     }
 

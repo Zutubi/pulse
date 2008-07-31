@@ -25,7 +25,7 @@ public class ActionResolverSupport implements ActionResolver
     {
         if (parameters == null)
         {
-            return Collections.EMPTY_MAP;
+            return Collections.emptyMap();
         }
         else
         {

@@ -34,7 +34,8 @@ public class ConventionSupport
         return loadClass(clazz, "StateDisplay");
     }
 
-    public static Class getCreator(Type type)
+    @SuppressWarnings({"unchecked"})
+    public static Class<? extends Configuration> getCreator(Type type)
     {
         return loadClass(type, "Creator");
     }

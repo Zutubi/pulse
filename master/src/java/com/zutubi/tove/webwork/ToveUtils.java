@@ -134,10 +134,9 @@ public class ToveUtils
         return !isFolder(path, configurationTemplateManager, configurationSecurityManager);
     }
 
-    @SuppressWarnings({"unchecked"})
     public static List<String> getPathListing(String path, Type type, ConfigurationTemplateManager configurationTemplateManager, ConfigurationSecurityManager configurationSecurityManager)
     {
-        List<String> listing = Collections.EMPTY_LIST;
+        List<String> listing = Collections.emptyList();
 
         if (path.length() == 0)
         {
