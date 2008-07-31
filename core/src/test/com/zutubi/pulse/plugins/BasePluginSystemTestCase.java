@@ -2,15 +2,14 @@ package com.zutubi.pulse.plugins;
 
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
+import org.eclipse.core.internal.registry.osgi.OSGIUtils;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Field;
-
-import org.eclipse.core.internal.registry.osgi.OSGIUtils;
 
 /**
  *
@@ -104,6 +103,15 @@ public abstract class BasePluginSystemTestCase extends PulseTestCase
 
     protected void shutdownPluginCore() throws Exception
     {
+        try
+        {
+            OSGIUtilsAccessor.reset();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        
         if (manager != null)
         {
             try
@@ -114,7 +122,6 @@ public abstract class BasePluginSystemTestCase extends PulseTestCase
             {
                 fail(e.getMessage());
             }
-            OSGIUtilsAccessor.reset();
             manager = null;
         }
     }
