@@ -21,6 +21,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
     private File producer3;
     private File consumer1;
     private File bad;
+    private File failonstartup;
 
     protected void setUp() throws Exception
     {
@@ -32,6 +33,8 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         producer2 = new File(bundleDir, "com.zutubi.bundles.producer_2.0.0.jar");
         producer3 = new File(bundleDir, "com.zutubi.bundles.producer_3.0.0.jar");
         consumer1 = new File(bundleDir, "com.zutubi.bundles.consumer_1.0.0.jar");
+
+        failonstartup = new File(bundleDir, "com.zutubi.bundles.failonstartup_1.0.0.jar");
 
         // should rename this - this is an empty file..
         bad = new File(bundleDir, "bad.jar");
@@ -623,9 +626,39 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         assertEquals(0, storage.list().length);
     }
 
-    public void testPluginThatFailsOnStartupWillRetryStartupOnNextSystemStartup()
+    public void testPluginThatFailsOnStartup() throws PluginException
     {
-        // failures on startup should not force a manual 're-enable' of the plugin by the user.
+        startupPluginCore();
+
+        Plugin plugin = manager.install(failonstartup.toURI());
+        assertEquals(Plugin.State.DISABLED, plugin.getState());
+        assertNotNull(plugin.getErrorMessage());
+    }
+
+    public void testPluginThatFailsOnStartup_ManualInstall() throws IOException, PluginException
+    {
+        FileSystemUtils.copy(paths.getPluginStorageDir(), failonstartup);
+
+        startupPluginCore();
+
+        Plugin plugin = manager.getPlugin("com.zutubi.bundles.error.ErrorOnStartup");
+        assertEquals(Plugin.State.DISABLED, plugin.getState());
+        assertNotNull(plugin.getErrorMessage());
+    }
+
+    public void testPluginThatFailsOnStartupWillRetryStartupOnNextSystemStartup() throws Exception
+    {
+        FileSystemUtils.copy(paths.getPluginStorageDir(), failonstartup);
+
+        startupPluginCore();
+
+        Plugin plugin = manager.getPlugin("com.zutubi.bundles.error.ErrorOnStartup");
+        assertEquals(Plugin.State.DISABLED, plugin.getState());
+
+        restartPluginCore();
+
+        plugin = manager.getPlugin("com.zutubi.bundles.error.ErrorOnStartup");
+        assertEquals(Plugin.State.DISABLED, plugin.getState());
     }
 
     private void assertPlugin(Plugin plugin, String expectedId, String expectedVersion, Plugin.State expectedState)
