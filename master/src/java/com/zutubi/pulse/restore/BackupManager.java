@@ -1,9 +1,10 @@
 package com.zutubi.pulse.restore;
 
+import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
+import com.zutubi.pulse.events.system.SystemStartedEvent;
 import com.zutubi.pulse.scheduling.CronTrigger;
 import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.scheduling.SchedulingException;
@@ -40,7 +41,6 @@ public class BackupManager
     private Scheduler scheduler;
 
     private EventManager eventManager;
-
     private File backupDir;
 
     private List<ArchiveableComponent> backupableComponents = new LinkedList<ArchiveableComponent>();
@@ -49,17 +49,27 @@ public class BackupManager
 
     public void init()
     {
-        // all initialisation occurs on the event callbacks. We do this to ensure that each of the required
-        // components has been initialised.
+        // all initialisation occurs on the system started event as we need
+        // to be sure the scheduler is available
         eventManager.register(new EventListener()
         {
             public Class[] getHandledEvents()
             {
-                return new Class[]{ConfigurationSystemStartedEvent.class};
+                return new Class[]{SystemStartedEvent.class};
             }
 
             public void handleEvent(Event event)
             {
+                if (scheduler == null)
+                {
+                    scheduler = ComponentContext.getBean("scheduler");
+                }
+
+                if (configurationProvider == null)
+                {
+                    configurationProvider = ComponentContext.getBean("configurationProvider");
+                }
+
                 initialiseManager();
             }
         });
@@ -69,10 +79,7 @@ public class BackupManager
     protected void initialiseManager()
     {
         // initialise the automated backups with the scheduler
-
-        // load the persistence configuration.
-
-        BackupConfiguration instance = configurationProvider.get(BackupConfiguration.class);
+       BackupConfiguration instance = configurationProvider.get(BackupConfiguration.class);
         if (instance.isEnabled())
         {
             // check if the trigger exists. if not, create and schedule.
@@ -95,7 +102,6 @@ public class BackupManager
             else
             {
                 // if any changes have been made to the record, then sync the trigger with that data.
-                
                 CronTrigger cronTrigger = (CronTrigger) trigger;
                 String existingCronString = cronTrigger.getCron();
                 if (!existingCronString.equals(instance.getCronSchedule()))

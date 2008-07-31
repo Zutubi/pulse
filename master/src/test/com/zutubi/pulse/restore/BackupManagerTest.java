@@ -3,7 +3,7 @@ package com.zutubi.pulse.restore;
 import com.zutubi.pulse.bootstrap.Data;
 import com.zutubi.pulse.events.DefaultEventManager;
 import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
+import com.zutubi.pulse.events.system.SystemStartedEvent;
 import com.zutubi.pulse.model.persistence.mock.MockTriggerDao;
 import com.zutubi.pulse.scheduling.CronTrigger;
 import com.zutubi.pulse.scheduling.DefaultScheduler;
@@ -109,7 +109,7 @@ public class BackupManagerTest extends PulseTestCase
         BackupConfiguration config = configurationProvider.get(BackupConfiguration.class);
         config.setEnabled(false);
 
-        BackupManager manager = createAndStartBackupManager();
+        createAndStartBackupManager();
 
         // Ensure that the init of the backup manager registers the expected trigger.
         CronTrigger trigger = (CronTrigger) scheduler.getTrigger(BackupManager.TRIGGER_NAME, BackupManager.TRIGGER_GROUP);
@@ -122,7 +122,7 @@ public class BackupManagerTest extends PulseTestCase
         config.setEnabled(true);
 
         // when the backup configuration is changed, we need to ensure that the trigger remains in sync.
-        BackupManager manager = createAndStartBackupManager();
+        createAndStartBackupManager();
 
         // make a change to the configuration, triggering a save.
         config.setCronSchedule("0 0 0 * * ?");
@@ -176,7 +176,7 @@ public class BackupManagerTest extends PulseTestCase
         manager.init();
 
         // send the system started event.
-        eventManager.publish(new ConfigurationSystemStartedEvent(configurationProvider));
+        eventManager.publish(new SystemStartedEvent(this));
         
         return manager;
     }
