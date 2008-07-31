@@ -30,7 +30,7 @@ public class JythonPackageFactoryTest extends PulseTestCase
 
         factory = new JythonPackageFactory();
 
-        System.setProperty("pulse.package", "test-packages/pulse-2.0.9.zip");
+//        System.setProperty("pulse.package", "test-packages/pulse-2.0.9.zip");
 
         pkgFile = getPulsePackage();
     }
