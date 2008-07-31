@@ -109,12 +109,13 @@ public abstract class BasePluginSystemTestCase extends PulseTestCase
             try
             {
                 manager.destroy();
-                OSGIUtilsAccessor.reset();
             }
             catch (Exception e)
             {
-                e.printStackTrace();
+                fail(e.getMessage());
             }
+            OSGIUtilsAccessor.reset();
+            manager = null;
         }
     }
 

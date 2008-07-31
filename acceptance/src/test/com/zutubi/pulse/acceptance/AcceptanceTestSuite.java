@@ -53,8 +53,12 @@ public class AcceptanceTestSuite
         TestSuite pythonSuite = new TestSuite();
         pythonSuite.addTestSuite(JythonPackageFactoryTest.class);
 
+        TestSuite pluginSuite = new TestSuite();
+        pluginSuite.addTestSuite(PluginUpgradeManagerAcceptanceTest.class);
+
         TestSuite main = new TestSuite();
         main.addTest(pythonSuite); // check the support code works before running the acceptance test suite.
+        main.addTest(pluginSuite);
         main.addTest(new AcceptanceTestSuiteSetupTeardown(suite));
 //        main.addTest(agentSuite);
 

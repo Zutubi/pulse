@@ -321,11 +321,13 @@ class Pulse(com.zutubi.pulse.acceptance.support.Pulse):
         versionDir = self.getActiveVersionDirectory()
 
         tokenFilename = os.path.join(versionDir, 'system', 'config', 'admin.token')
-        tokenFile = open(tokenFilename)
-        token = tokenFile.read()
-        tokenFile.close()
-
-        return token
+        if os.path.exists(tokenFilename):
+            tokenFile = open(tokenFilename)
+            token = tokenFile.read()
+            tokenFile.close()
+            return token
+        else:
+            return None
 
 
     def getServerProxy(self):

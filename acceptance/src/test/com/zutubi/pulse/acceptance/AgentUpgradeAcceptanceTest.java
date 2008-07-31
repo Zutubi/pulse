@@ -150,14 +150,23 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
         }
         finally
         {
-            // is started checks needed..
-            if (agent != null)
+            shutdown(agent);
+            shutdown(master);
+        }
+    }
+
+    private void shutdown(Pulse instance)
+    {
+        if (instance != null)
+        {
+            try
             {
-                agent.stop();
+                instance.stop();
             }
-            if (master != null)
+            catch (Exception e)
             {
-                master.stop();
+                System.out.println("Failed to shutdown pulse instance: " + e.getMessage());
+                e.printStackTrace();
             }
         }
     }

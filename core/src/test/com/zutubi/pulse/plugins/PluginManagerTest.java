@@ -22,6 +22,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
     private File consumer1;
     private File bad;
     private File failonstartup;
+    private File failonshutdown;
 
     protected void setUp() throws Exception
     {
@@ -35,6 +36,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         consumer1 = new File(bundleDir, "com.zutubi.bundles.consumer_1.0.0.jar");
 
         failonstartup = new File(bundleDir, "com.zutubi.bundles.failonstartup_1.0.0.jar");
+        failonshutdown = new File(bundleDir, "com.zutubi.bundles.failonshutdown_1.0.0.jar");
 
         // should rename this - this is an empty file..
         bad = new File(bundleDir, "bad.jar");
@@ -658,6 +660,30 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         restartPluginCore();
 
         plugin = manager.getPlugin("com.zutubi.bundles.error.ErrorOnStartup");
+        assertEquals(Plugin.State.DISABLED, plugin.getState());
+    }
+
+    public void testPluginThatFailsOnShutdown() throws Exception
+    {
+        startupPluginCore();
+
+        Plugin plugin = manager.install(failonshutdown.toURI());
+        assertEquals(Plugin.State.ENABLED, plugin.getState());
+
+        shutdownPluginCore();
+    }
+
+    public void testPluginThatFailsOnDisable() throws Exception
+    {
+        startupPluginCore();
+
+        Plugin plugin = manager.install(failonshutdown.toURI());
+        assertEquals(Plugin.State.ENABLED, plugin.getState());
+        plugin.disable();
+
+        restartPluginCore();
+
+        plugin = manager.getPlugin("com.zutubi.bundles.error.ErrorOnShutdown");
         assertEquals(Plugin.State.DISABLED, plugin.getState());
     }
 

@@ -30,7 +30,7 @@ public class JythonPackageFactoryTest extends PulseTestCase
 
         factory = new JythonPackageFactory();
 
-//        System.setProperty("pulse.package", "test-packages/pulse-2.0.9.zip");
+        System.setProperty("pulse.package", "test-packages/pulse-2.0.9.zip");
 
         pkgFile = getPulsePackage();
     }
@@ -81,9 +81,11 @@ public class JythonPackageFactoryTest extends PulseTestCase
 
         File activeBase = installedVersions[0];
         assertEquals(new File(activeBase, "system/plugins").getCanonicalPath(), new File(pulse.getPluginRoot()).getCanonicalPath());
+
+        assertNull(pulse.getAdminToken());
     }
 
-    public void testStartAndStopPulse() throws IOException
+    public void disabledTestStartAndStopPulse() throws IOException
     {
         PulsePackage pkg = factory.createPackage(pkgFile);
         Pulse pulse = pkg.extractTo(tmp.getCanonicalPath());
@@ -97,7 +99,7 @@ public class JythonPackageFactoryTest extends PulseTestCase
         assertFalse(pulse.ping());
     }
 
-    public void testSettingAlternateUserHome() throws Exception
+    public void disabledTestSettingAlternateUserHome() throws Exception
     {
         PulsePackage pkg = factory.createPackage(pkgFile);
         Pulse pulse = pkg.extractTo(tmp.getCanonicalPath());
