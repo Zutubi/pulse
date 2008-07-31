@@ -27,6 +27,7 @@ public interface Task
     /**
      * The list of errors that this task encountered during execution.
      *
+     * @return a list of error messages
      */
     List<String> getErrors();
 
@@ -37,6 +38,8 @@ public interface Task
      * For example: If this upgrade task requires a database connection and non is available
      * for whatever reason, then halt on failure should be true. Once the connection is available
      * then we can continue.
+     *
+     * @return boolean indicating whether or not to halt processing on task failure.
      */
     boolean haltOnFailure();
 
@@ -50,7 +53,7 @@ public interface Task
     /**
      * Run this upgrade task.
      *
-     * @throws TaskException
+     * @throws TaskException if a problem occured during task execution.
      */
     void execute() throws TaskException;
 }

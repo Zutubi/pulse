@@ -39,9 +39,12 @@ class PulsePackage(com.zutubi.pulse.acceptance.support.PulsePackage):
             os.makedirs(destDir)
 
         if self.packageFile.endswith('.zip'):
-            subprocess.call(['unzip', '-qd', destDir, self.packageFile])
+            ret = subprocess.call(['unzip', '-qd', destDir, self.packageFile])
         else:
-            subprocess.call(['tar', '-zxC', destDir, '-f', self.packageFile])
+            ret = subprocess.call(['tar', '-zxC', destDir, '-f', self.packageFile])
+
+        if ret != 0:
+            raise Exception('Extract process exited with code %d' % ret)
 
         return Pulse(os.path.join(destDir, self.getBasename()))
 

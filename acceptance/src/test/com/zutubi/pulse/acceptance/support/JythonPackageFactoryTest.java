@@ -2,7 +2,6 @@ package com.zutubi.pulse.acceptance.support;
 
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.util.StringUtils;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -31,17 +30,9 @@ public class JythonPackageFactoryTest extends PulseTestCase
 
         factory = new JythonPackageFactory();
 
-        pkgFile = getPulsePackage();
-/*
-        if (pkgFile == null)
-        {
-            String packageDirectoryName = StringUtils.join(File.pathSeparator, "test-packages");
-            File packagesDir = new File(getPulseRoot(), packageDirectoryName);
+        System.setProperty("pulse.package", "test-packages/pulse-2.0.9.zip");
 
-            pkgFile = new File(packagesDir, "pulse-2.0.9.zip");
-            assertTrue(pkgFile.isFile());
-        }
-*/
+        pkgFile = getPulsePackage();
     }
 
     @AfterMethod
@@ -63,14 +54,33 @@ public class JythonPackageFactoryTest extends PulseTestCase
         assertNotNull(pulse);
 
         // ensure that pulse is extracted as expected.
-        File expectedRoot = new File(tmp, "pulse-2.0.9");
+
+        String pkgFileName = pkgFile.getName();
+        String pkgName;
+        if (pkgFileName.endsWith(".tar.gz"))
+        {
+            pkgName = pkgFileName.substring(0, pkgFileName.length() - 7);
+        }
+        else
+        {
+            pkgName = pkgFileName.substring(0, pkgFileName.lastIndexOf('.'));
+        }
+
+        File expectedRoot = new File(tmp, pkgName);
         assertTrue(expectedRoot.isDirectory());
 
         // normalise the paths before we compare them.
         assertEquals(expectedRoot.getCanonicalPath(), new File(pulse.getPulseHome()).getCanonicalPath());
 
-        File expectedPluginRoot = new File(expectedRoot, "versions/0200009000/system/plugins");
-        assertEquals(expectedPluginRoot.getCanonicalPath(), new File(pulse.getPluginRoot()).getCanonicalPath());
+        assertTrue(new File(expectedRoot, "active-version.txt").isFile());
+        File versionsDir = new File(expectedRoot, "versions");
+        assertTrue(versionsDir.isDirectory());
+
+        File[] installedVersions = versionsDir.listFiles();
+        assertEquals(1, installedVersions.length);
+
+        File activeBase = installedVersions[0];
+        assertEquals(new File(activeBase, "system/plugins").getCanonicalPath(), new File(pulse.getPluginRoot()).getCanonicalPath());
     }
 
     public void testStartAndStopPulse() throws IOException
@@ -87,7 +97,7 @@ public class JythonPackageFactoryTest extends PulseTestCase
         assertFalse(pulse.ping());
     }
 
-    public void testAddingJavaOpts() throws Exception
+    public void testSettingAlternateUserHome() throws Exception
     {
         PulsePackage pkg = factory.createPackage(pkgFile);
         Pulse pulse = pkg.extractTo(tmp.getCanonicalPath());
@@ -96,6 +106,7 @@ public class JythonPackageFactoryTest extends PulseTestCase
         pulse.setUserHome(alternateUserHome.getCanonicalPath());
         pulse.start();
 
+        // by default, the .pulse2 directory will be created in the user home on Pulse startup.
         assertTrue(new File(alternateUserHome, ".pulse2").exists());
 
         pulse.stop();
