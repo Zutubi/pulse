@@ -24,9 +24,9 @@ public class DefaultAction extends ActionSupport
     public static final String DASHBOARD_ACTION = "dashboard";
 
     /**
-     * The projects dashboard result. See xwork config for details.
+     * The browse view result. See xwork config for details.
      */
-    public static final String PROJECT_DASHBOARD_ACTION = "projects";
+    public static final String BROWSE_ACTION = "browse";
 
     /**
      * The setup result. See the xwork config for details.
@@ -43,7 +43,7 @@ public class DefaultAction extends ActionSupport
         String login = AcegiUtils.getLoggedInUsername();
         if(login == null)
         {
-            return PROJECT_DASHBOARD_ACTION;
+            return BROWSE_ACTION;
         }
         else
         {

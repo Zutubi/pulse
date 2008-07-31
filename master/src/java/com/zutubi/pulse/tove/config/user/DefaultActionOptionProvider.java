@@ -1,5 +1,6 @@
 package com.zutubi.pulse.tove.config.user;
 
+import com.zutubi.pulse.web.DefaultAction;
 import com.zutubi.tove.ListOptionProvider;
 import com.zutubi.tove.type.TypeProperty;
 
@@ -16,9 +17,9 @@ public class DefaultActionOptionProvider extends ListOptionProvider
 
     static
     {
-        options.add("welcome");
-        options.add("dashboard");
-        options.add("projects");
+        options.add(DefaultAction.WELCOME_ACTION);
+        options.add(DefaultAction.DASHBOARD_ACTION);
+        options.add(DefaultAction.BROWSE_ACTION);
     }
 
     public String getEmptyOption(Object instance, String parentPath, TypeProperty property)

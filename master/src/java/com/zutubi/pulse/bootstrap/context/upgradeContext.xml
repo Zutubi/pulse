@@ -29,6 +29,7 @@
             <list>
                 <ref local="addBackupConfiguration"/>
                 <ref local="addBrowseViewConfiguration"/>
+                <ref local="updateDefaultAction"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -46,5 +47,9 @@
 
     <bean id="addBrowseViewConfiguration" class="com.zutubi.pulse.upgrade.tasks.AddBrowseViewConfigurationUpgradeTask" autowire="byName">
         <property name="buildNumber" value="200007002"/>
+    </bean>
+
+    <bean id="updateDefaultAction" class="com.zutubi.pulse.upgrade.tasks.UpdateDefaultActionUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="200009001"/>
     </bean>
 </beans>

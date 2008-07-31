@@ -9,7 +9,7 @@
         <action name="default" class="com.zutubi.pulse.web.DefaultAction">
             <result name="dashboard" type="redirect">/dashboard/home/</result>
             <result name="welcome" type="velocity">/welcome.vm</result>
-            <result name="projects" type="redirect">/browse/</result>
+            <result name="browse" type="redirect">/browse/</result>
         </action>
 
         <action name="login" class="com.zutubi.pulse.web.LoginAction">
