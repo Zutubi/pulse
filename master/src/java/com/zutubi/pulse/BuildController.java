@@ -199,20 +199,18 @@ public class BuildController implements EventListener
         // that we are dealing with. Q: How do we identify our events..
         try
         {
-            // this needs to be done after the buildCommencedEvent is processed, as the processing
-            // is what prepares the buildLogger.  This is a little awkward in timing, but necessary to
-            // delay the creation of the build directory until the last possible moment.
-            if (evt instanceof BuildEvent && !(evt instanceof BuildCommencedEvent))
+            if (!(evt instanceof BuildCommencedEvent))
             {
-                buildLogger.log((BuildEvent)evt);
+                buildLogger.log(evt);
             }
-
+            
             if (evt instanceof BuildCommencedEvent)
             {
                 BuildCommencedEvent e = (BuildCommencedEvent) evt;
                 if (e.getBuildResult() == buildResult)
                 {
                     handleBuildCommenced();
+                    buildLogger.log(evt);
                 }
             }
             else if (evt instanceof BuildTerminationRequestEvent)

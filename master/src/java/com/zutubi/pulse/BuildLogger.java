@@ -1,6 +1,6 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.events.build.BuildEvent;
+import com.zutubi.pulse.events.Event;
 
 /**
  *
@@ -14,7 +14,7 @@ public interface BuildLogger
      */
     void prepare();
 
-    void log(BuildEvent event);
+    void log(Event event);
 
     /**
      * Close any held resources.  This method will be called after the final logging

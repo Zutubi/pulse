@@ -1,6 +1,6 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.events.build.BuildEvent;
+import com.zutubi.pulse.events.Event;
 
 import java.io.File;
 
@@ -20,7 +20,7 @@ public class DefaultBuildLogger extends AbstractFileLogger implements BuildLogge
         openWriter();
     }
 
-    public void log(BuildEvent event)
+    public void log(Event event)
     {
         logMarker(event.toString());
     }
