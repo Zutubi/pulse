@@ -12,11 +12,11 @@ import java.util.Map;
 /**
  * A resource repository backed by the configuration subsystem.
  */
-public class ConfigurationResourceRepository implements ResourceRepository
+public class AgentResourceRepository implements ResourceRepository
 {
     private AgentConfiguration agentConfig;
 
-    public ConfigurationResourceRepository(AgentConfiguration agentConfig)
+    public AgentResourceRepository(AgentConfiguration agentConfig)
     {
         this.agentConfig = agentConfig;
     }
@@ -29,7 +29,17 @@ public class ConfigurationResourceRepository implements ResourceRepository
     public boolean hasResource(String name, String version)
     {
         Resource r = getResource(name);
-        return r != null && (!TextUtils.stringSet(version) || r.hasVersion(version));
+        if (r == null)
+        {
+            return false;
+        }
+        if (TextUtils.stringSet(version))
+        {
+            // do we have the specifically requested version?
+            return r.hasVersion(version);
+        }
+        // no specific version is requested, so yes, we have this resource.
+        return true;
     }
 
     public boolean hasResource(String name)

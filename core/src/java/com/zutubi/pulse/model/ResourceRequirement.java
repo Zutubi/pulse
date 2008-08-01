@@ -37,6 +37,11 @@ public class ResourceRequirement extends AbstractConfiguration
         this.resource = resource;
     }
 
+    public boolean isDefaultVersion()
+    {
+        return !TextUtils.stringSet(version);
+    }
+
     public String getVersion()
     {
         return version;

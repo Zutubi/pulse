@@ -25,7 +25,7 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.pulse
 {
     private static final Logger LOG = Logger.getLogger(DefaultResourceManager.class);
 
-    private Map<Long, ConfigurationResourceRepository> agentRepositories = new TreeMap<Long, ConfigurationResourceRepository>();
+    private Map<Long, AgentResourceRepository> agentRepositories = new TreeMap<Long, AgentResourceRepository>();
     private ConfigurationProvider configurationProvider;
     private Map<Long, Resource> resourcesByHandle = new HashMap<Long, Resource>();
     private Map<Long, ResourceVersion> resourceVersionsByHandle = new HashMap<Long, ResourceVersion>();
@@ -199,7 +199,7 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.pulse
 
     private void addAgentRepo(AgentConfiguration agentConfiguration)
     {
-        agentRepositories.put(agentConfiguration.getHandle(), new ConfigurationResourceRepository(agentConfiguration));
+        agentRepositories.put(agentConfiguration.getHandle(), new AgentResourceRepository(agentConfiguration));
     }
 
     public ResourceRepository getAgentRepository(long handle)
@@ -298,7 +298,7 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.pulse
     public Map<String, List<Resource>> findAll()
     {
         Map<String, List<Resource>> allResources = new HashMap<String, List<Resource>>();
-        for (ConfigurationResourceRepository repo : agentRepositories.values())
+        for (AgentResourceRepository repo : agentRepositories.values())
         {
             allResources.put(repo.getAgentConfig().getName(), new LinkedList<Resource>(repo.getAll().values()));
         }

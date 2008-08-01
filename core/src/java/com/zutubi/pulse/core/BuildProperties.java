@@ -81,7 +81,7 @@ public class BuildProperties
                 }
 
                 String importVersion = requirement.getVersion();
-                if(!TextUtils.stringSet(importVersion))
+                if(requirement.isDefaultVersion())
                 {
                     importVersion = resource.getDefaultVersion();
                 }
