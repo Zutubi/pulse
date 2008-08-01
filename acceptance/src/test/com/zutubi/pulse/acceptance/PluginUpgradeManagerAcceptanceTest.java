@@ -49,7 +49,7 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
     @BeforeMethod
     protected void setUp() throws Exception
     {
-        File pkgFile = /*new File("test-packages/pulse-2.0.9.zip");*/getPulsePackage();
+        File pkgFile = new File("test-packages/pulse-2.0.9.zip");/*getPulsePackage();*/
 
         PackageFactory factory = new JythonPackageFactory();
         PulsePackage pkg = factory.createPackage(pkgFile);
@@ -92,6 +92,7 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
     @AfterMethod
     protected void tearDown() throws Exception
     {
+        shutdownPluginCore();
         pluginUpgradeManager = null;
         objectFactory = null;
 
