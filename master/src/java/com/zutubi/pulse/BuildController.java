@@ -73,6 +73,8 @@ public class BuildController implements EventListener
     private ThreadFactory threadFactory;
     private ResourceManager resourceManager;
 
+    private DefaultBuildLogger buildLogger;
+
     public BuildController(AbstractBuildRequestEvent event)
     {
         this.request = event;
@@ -83,6 +85,7 @@ public class BuildController implements EventListener
         this.projectConfig = request.getProjectConfig();
         this.project = projectManager.getProject(projectConfig.getProjectId(), false);
         this.asyncListener = new AsynchronousDelegatingListener(this, threadFactory);
+
     }
 
     public void run()
@@ -119,6 +122,8 @@ public class BuildController implements EventListener
 
         MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
         buildDir = paths.getBuildDir(buildResult);
+
+        buildLogger = new DefaultBuildLogger(new File(buildDir, "build.log"));
 
         buildContext = new ExecutionContext();
         addProjectProperties(buildContext, projectConfig);
@@ -194,6 +199,14 @@ public class BuildController implements EventListener
         // that we are dealing with. Q: How do we identify our events..
         try
         {
+            // this needs to be done after the buildCommencedEvent is processed, as the processing
+            // is what prepares the buildLogger.  This is a little awkward in timing, but necessary to
+            // delay the creation of the build directory until the last possible moment.
+            if (evt instanceof BuildEvent && !(evt instanceof BuildCommencedEvent))
+            {
+                buildLogger.log((BuildEvent)evt);
+            }
+
             if (evt instanceof BuildCommencedEvent)
             {
                 BuildCommencedEvent e = (BuildCommencedEvent) evt;
@@ -250,6 +263,8 @@ public class BuildController implements EventListener
         {
             throw new BuildException("Unable to create build directory '" + buildDir.getAbsolutePath() + "'");
         }
+
+        buildLogger.prepare();
 
         if (!buildManager.isSpaceAvailableForBuild())
         {
@@ -692,6 +707,9 @@ public class BuildController implements EventListener
 
         eventManager.unregister(asyncListener);
         eventManager.publish(new BuildCompletedEvent(this, buildResult, buildContext));
+
+        buildLogger.done();
+        
         asyncListener.stop(true);
     }
 
