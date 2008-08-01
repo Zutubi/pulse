@@ -50,12 +50,12 @@
                 #showHideButton("actions" "b${velocityCount}.${child.id}_bactions" "tl-bl?")
                 <div id="b${velocityCount}.${child.id}_bactions" style="display: none">
                     <ul class="actions">
-                        <li>#actionLink("summary-#uce($project.name)-${build.number}" "summary.tab" $urls.build($buildResult) "information.gif")</li>
-                        <li>#actionLink("details-#uce($project.name)-${build.number}" "details.tab" $urls.buildDetails($buildResult) "magnifier.gif")</li>
-                        <li>#actionLink("changes-#uce($project.name)-${build.number}" "changes.tab" $urls.buildChanges($buildResult) "page_code.gif")</li>
-                        <li>#actionLink("artifacts-#uce($project.name)-${build.number}" "artifacts.tab" $urls.buildArtifacts($buildResult) "folder_page.gif")</li>
+                        <li>#actionLink("summary-#uce($project.name)-${buildResult.number}" "summary.tab" $urls.build($buildResult) "information.gif")</li>
+                        <li>#actionLink("details-#uce($project.name)-${buildResult.number}" "details.tab" $urls.buildDetails($buildResult) "magnifier.gif")</li>
+                        <li>#actionLink("changes-#uce($project.name)-${buildResult.number}" "changes.tab" $urls.buildChanges($buildResult) "page_code.gif")</li>
+                        <li>#actionLink("artifacts-#uce($project.name)-${buildResult.number}" "artifacts.tab" $urls.buildArtifacts($buildResult) "folder_page.gif")</li>
                     #if($action.hasPermission("view source", $project))
-                        <li>#actionLink("wc-#uce($project.name)-${build.number}" "wc.tab" $urls.buildWorkingCopy($buildResult) "page_gear.gif")</li>
+                        <li>#actionLink("wc-#uce($project.name)-${buildResult.number}" "wc.tab" $urls.buildWorkingCopy($buildResult) "page_gear.gif")</li>
                     #end
                     </ul>
                 </div>            

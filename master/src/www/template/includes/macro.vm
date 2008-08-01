@@ -1948,7 +1948,7 @@
         #else
             #set($statusClass ="$buildResult.state.string")
         #end
-        <span id='#id("${result.ownerName}.build.${result.number}.status")' class="$statusClass">
+        <span id='#id("${buildResult.ownerName}.build.${buildResult.number}.status")' class="$statusClass">
             #statusImage($buildResult true)
             #if($buildResult.inProgress())
                 #elapsedValue($buildResult)
