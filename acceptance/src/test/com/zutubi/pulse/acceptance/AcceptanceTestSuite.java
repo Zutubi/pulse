@@ -58,7 +58,7 @@ public class AcceptanceTestSuite
 
         TestSuite main = new TestSuite();
         main.addTest(pythonSuite); // check the support code works before running the acceptance test suite.
-        main.addTest(pluginSuite);
+//        main.addTest(pluginSuite);
         main.addTest(new AcceptanceTestSuiteSetupTeardown(suite));
 //        main.addTest(agentSuite);
 
