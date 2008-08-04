@@ -13,7 +13,7 @@ public class ProjectsModel
     private String groupName;
     private boolean labelled;
 
-    private TemplateProjectModel root = new TemplateProjectModel(this, null, null);
+    private TemplateProjectModel root = new TemplateProjectModel(this, null);
 
     public ProjectsModel(String name, boolean labelled)
     {
@@ -41,6 +41,27 @@ public class ProjectsModel
         return root;
     }
 
+    public int getMaxDepth()
+    {
+        final int[] maxDepth = new int[]{0};
+        root.forEach(new UnaryProcedure<ProjectModel>()
+        {
+            public void process(ProjectModel projectModel)
+            {
+                if (projectModel.isLeaf())
+                {
+                    int depth = projectModel.getDepth();
+                    if (depth > maxDepth[0])
+                    {
+                        maxDepth[0] = depth;
+                    }
+                }
+            }
+        });
+
+        return maxDepth[0];
+    }
+    
     public List<ProjectModel> getFlattened()
     {
         final List<ProjectModel> result = new LinkedList<ProjectModel>();

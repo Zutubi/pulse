@@ -18,9 +18,9 @@ public class TemplateProjectModel extends ProjectModel
 
     private List<ProjectModel> children = new LinkedList<ProjectModel>();
 
-    public TemplateProjectModel(ProjectsModel group, String name, ProjectModel parent)
+    public TemplateProjectModel(ProjectsModel group, String name)
     {
-        super(group, name, parent);
+        super(group, name);
     }
 
     public List<ProjectModel> getChildren()
@@ -31,6 +31,7 @@ public class TemplateProjectModel extends ProjectModel
     public void addChild(ProjectModel child)
     {
         children.add(child);
+        child.setParent(this);
         Collections.sort(children, CHILD_COMPARATOR);
     }
 

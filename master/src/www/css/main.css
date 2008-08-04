@@ -399,7 +399,7 @@ p.note {
     border-bottom: solid 1px #c0c0c0;
 }
 
-td.content, td.content-nowrap {
+td.content, td.content-nowrap, .nowrap {
     white-space: nowrap;
 }
 
@@ -496,7 +496,7 @@ Browse view
 td.group-header {
     border-top: solid 1px #bbb;
     border-bottom: solid 1px #bbb;
-    padding: 6px;
+    padding: 6px 4px;
     background-color: #f2f2ff;
     font-weight: bold;
 }
@@ -523,13 +523,13 @@ th.fit-width, td.fit-width {
     white-space: nowrap;
 }
 
-.project-name, .group-name {
-    padding-left: 20px;
+.project-indent, .project-name, .group-name {
+    width: 12px;
     background-repeat: no-repeat;
 }
 
 .project-name, .group-name {
-    background-position: 0 -2px;
+    background-position: -3px -2px;
 }
 
 .project-expandable .project-name, .project-expandable .group-name {
@@ -544,7 +544,7 @@ th.fit-width, td.fit-width {
     width: 16px;
 }
 
-.project-actions, .project-template {
+.project-actions, .project-template-actions {
     border-right: dotted 1px #bbb;
 }
 
@@ -553,13 +553,13 @@ th.fit-width, td.fit-width {
 }
 
 td.health-unknown, td.health-ok, td.health-broken, td.health-warnings {
-    padding-left: 20px;
+    width: 10px;
     background-repeat: no-repeat;
-    background-position: 2px 4px;
+    background-position: 1px 4px;
 }
 
 td.group-header {
-    background-position: 2px 6px;
+    background-position: 1px 6px;
 }
 
 td.health-unknown {

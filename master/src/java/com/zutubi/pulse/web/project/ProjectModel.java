@@ -12,11 +12,10 @@ public abstract class ProjectModel
     private String name;
     private ProjectModel parent;
 
-    protected ProjectModel(ProjectsModel group, String name, ProjectModel parent)
+    protected ProjectModel(ProjectsModel group, String name)
     {
         this.group = group;
         this.name = name;
-        this.parent = parent;
     }
 
     public String getName()
@@ -29,10 +28,27 @@ public abstract class ProjectModel
         return parent;
     }
 
+    protected void setParent(ProjectModel parent)
+    {
+        this.parent = parent;
+    }
+
     public String getId()
     {
         String groupPrefix = group.isLabelled() ? "grouped." : "ungrouped.";
         return StringUtils.toValidHtmlName(groupPrefix + group.getGroupName() + "." + name);
+    }
+
+    public int getDepth()
+    {
+        if (parent == null)
+        {
+            return 0;
+        }
+        else
+        {
+            return parent.getDepth() + 1;
+        }
     }
 
     public abstract boolean isConcrete();

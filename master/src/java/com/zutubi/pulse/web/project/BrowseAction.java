@@ -112,7 +112,7 @@ public class BrowseAction extends ProjectActionSupport
         {
             for(Project p: projects)
             {
-                model.getRoot().addChild(new ConcreteProjectModel(model, p, model.getRoot(), getBuilds(p), browseConfig.getBuildsPerProject()));
+                model.getRoot().addChild(new ConcreteProjectModel(model, p, getBuilds(p), browseConfig.getBuildsPerProject()));
             }
         }
 
@@ -133,11 +133,11 @@ public class BrowseAction extends ProjectActionSupport
                     {
                         Project project = projectManager.getProject(name, true);
                         List<BuildResult> builds = getBuilds(project);
-                        model = new ConcreteProjectModel(group, project, parentModel, builds, browseConfig.getBuildsPerProject());
+                        model = new ConcreteProjectModel(group, project, builds, browseConfig.getBuildsPerProject());
                     }
                     else
                     {
-                        TemplateProjectModel template = new TemplateProjectModel(group, name, parentModel);
+                        TemplateProjectModel template = new TemplateProjectModel(group, name);
                         processLevel(group, template, node.getChildren(), depth + 1, includedInGroup);
                         model = template;
                     }

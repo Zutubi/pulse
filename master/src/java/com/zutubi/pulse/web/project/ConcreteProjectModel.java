@@ -15,9 +15,9 @@ public class ConcreteProjectModel extends ProjectModel
     private List<BuildResult> latestBuilds;
     private int buildRows;
 
-    public ConcreteProjectModel(ProjectsModel group, Project project, ProjectModel parent, List<BuildResult> latestBuilds, int buildRows)
+    public ConcreteProjectModel(ProjectsModel group, Project project, List<BuildResult> latestBuilds, int buildRows)
     {
-        super(group, project.getName(), parent);
+        super(group, project.getName());
         this.project = project;
         this.latestBuilds = latestBuilds;
         this.buildRows = buildRows;
