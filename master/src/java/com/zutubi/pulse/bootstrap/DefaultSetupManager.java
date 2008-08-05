@@ -5,7 +5,6 @@ import com.zutubi.pulse.Version;
 import com.zutubi.pulse.bootstrap.conf.EnvConfig;
 import com.zutubi.pulse.bootstrap.tasks.ProcessSetupStartupTask;
 import com.zutubi.pulse.config.PropertiesWriter;
-import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.database.DatabaseConsole;
 import com.zutubi.pulse.database.DriverRegistry;
 import com.zutubi.pulse.events.DataDirectoryLocatedEvent;
@@ -32,7 +31,10 @@ import freemarker.cache.TemplateLoader;
 import java.io.*;
 import java.sql.SQLException;
 import java.text.DateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * Works through the setup process, gradually starting Pulse as more bits and
@@ -85,11 +87,6 @@ public class DefaultSetupManager implements SetupManager
      * Contexts for Stage F: application startup.
      */
     private List<String> startupContexts = new LinkedList<String>();
-
-    /**
-     * Contexts for Stage G: post-startup.
-     */
-    private List<String> postStartupContexts = new LinkedList<String>();
 
     private SetupState state = SetupState.STARTING;
 
@@ -502,51 +499,23 @@ public class DefaultSetupManager implements SetupManager
 
         state = SetupState.STARTING;
 
-        // load the remaining contexts.
-        // The user contexts are separate as otherwise there is a cycle in
-        // dependencies that confuses spring and then me (as spring gives a
-        // useless error message).
+        // Load the remaining contexts.  Note that the subsystems created
+        // within should generally wait for the configuration system to
+        // start (by listening for an appropriate event).
         loadContexts(startupContexts);
-        loadContexts(postStartupContexts);
 
-        // the last thing we want to do during setup is to ensure that we have state objects that match all of our
-        // configuration objects.  These may be out of sync due to
-        // a) a restore from a backup that does not contain database export
-        // b) a restart after an external database issue resulted in a rollback
-        // c) any number of other options.
-        ensureDatabaseStateIsInSyncWithConfiguration();
+        // Fire up the extension managers.  These need most systems available
+        // (e.g. the command extension manager requires the file loader), but
+        // must come before the final init of the configuration as they are
+        // required when instantiating config objects.
+        PluginManager pluginManager = ComponentContext.getBean("pluginManager");
+        pluginManager.initialiseExtensions();
 
         DefaultConfigurationProvider configurationProvider = ComponentContext.getBean("configurationProvider");
         configurationProvider.init();
         this.configurationProvider = configurationProvider;
 
         setupCallback.finaliseSetup();
-    }
-
-    private void ensureDatabaseStateIsInSyncWithConfiguration()
-    {
-        ConfigurationStateManager stateManager = ComponentContext.getBean("configurationStateManager");
-        ConfigurationTemplateManager templateManager = ComponentContext.getBean("configurationTemplateManager");
-
-        // need to refresh the caches now else no data will be available. (this is also done in the configuration provider init..)
-        templateManager.refreshCaches();
-
-        // do we want to wrap this process in a transaction?
-
-        List<Class<? extends Configuration>> statefulTypes = stateManager.getStatefulConfigurationTypes();
-        for (Class<? extends Configuration> clazz : statefulTypes)
-        {
-            // configuration provider is not available at this state of proceedings, so go directly to the ctm.
-            Collection<? extends Configuration> configs = templateManager.getAllInstances(clazz);
-            for (Configuration config : configs)
-            {
-                Object externalState = stateManager.getExternalState(config);
-                if (externalState == null && config.isConcrete())
-                {
-                    stateManager.createAndAssignState(config);
-                }
-            }
-        }
     }
 
     private void loadContexts(List<String> contexts)
@@ -802,11 +771,6 @@ public class DefaultSetupManager implements SetupManager
     public void setStartupContexts(List<String> startupContexts)
     {
         this.startupContexts = startupContexts;
-    }
-
-    public void setPostStartupContexts(List<String> postStartupContexts)
-    {
-        this.postStartupContexts = postStartupContexts;
     }
 
     public void setUpgradeContexts(List<String> upgradeContexts)

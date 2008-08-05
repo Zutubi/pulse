@@ -13,7 +13,6 @@
         </property>
         <property name="postStartupTasks">
             <list>
-                <value>com.zutubi.pulse.bootstrap.tasks.InitialiseExtensionsStartupTask</value>
                 <value>com.zutubi.pulse.bootstrap.tasks.SystemStartedMessageStartupTask</value>
             </list>
         </property>

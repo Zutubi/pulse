@@ -29,6 +29,7 @@ public class DefaultConfigurationProviderTest extends AbstractConfigurationSyste
         provider.setTypeRegistry(typeRegistry);
         provider.setConfigurationPersistenceManager(configurationPersistenceManager);
         provider.setConfigurationTemplateManager(configurationTemplateManager);
+        provider.setConfigurationStateManager(configurationStateManager);
         provider.setThreadFactory(Executors.defaultThreadFactory());
         provider.init();
         

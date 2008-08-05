@@ -544,7 +544,7 @@ public class ConfigurationTemplateManager
         return gotType;
     }
 
-    public void refreshCaches()
+    void refreshCaches()
     {
         configurationReferenceManager.clear();
         stateWrapper.execute(new TransactionalWrapper.Action<State>()

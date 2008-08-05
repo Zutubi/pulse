@@ -24,6 +24,7 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
     private TypeRegistry typeRegistry;
     private ConfigurationPersistenceManager configurationPersistenceManager;
     private ConfigurationTemplateManager configurationTemplateManager;
+    private ConfigurationStateManager configurationStateManager;
     private EventManager eventManager;
     private ThreadFactory threadFactory;
     private MultiplexingListener syncMux;
@@ -38,13 +39,43 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
         AsynchronousDelegatingListener asych = new AsynchronousDelegatingListener(asyncMux, threadFactory);
         eventManager.register(asych);
 
+        // The following initialisation steps, along with some of the
+        // initialisation now living in the setup manager, should be
+        // refactored into a separate high-level configuration manager.
         configurationTemplateManager.refreshCaches();
+
+        // The last thing we want to do during init is to ensure that we have
+        // state objects that match all of our configuration objects.  These
+        // may be out of sync due to:
+        // a) a restore from a backup that does not contain database export
+        // b) a restart after an external database issue resulted in a rollback
+        // c) any number of other options.
+        ensureExternalStateIsInSyncWithConfiguration();
 
         // Two events as the first is used to tie in listeners so that
         // handlers of the second are free to make changes (which will then
         // be visible to said listeners).
         eventManager.publish(new ConfigurationEventSystemStartedEvent(this));
         eventManager.publish(new ConfigurationSystemStartedEvent(this));
+    }
+
+    private void ensureExternalStateIsInSyncWithConfiguration()
+    {
+        // do we want to wrap this process in a transaction?
+        List<Class<? extends Configuration>> statefulTypes = configurationStateManager.getStatefulConfigurationTypes();
+        for (Class<? extends Configuration> clazz : statefulTypes)
+        {
+            // configuration provider is not available at this state of proceedings, so go directly to the ctm.
+            Collection<? extends Configuration> configs = configurationTemplateManager.getAllInstances(clazz);
+            for (Configuration config : configs)
+            {
+                Object externalState = configurationStateManager.getExternalState(config);
+                if (externalState == null && config.isConcrete())
+                {
+                    configurationStateManager.createAndAssignState(config);
+                }
+            }
+        }
     }
 
     public <T extends Configuration> T get(String path, Class<T> clazz)
@@ -193,6 +224,11 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
     public void setThreadFactory(ThreadFactory threadFactory)
     {
         this.threadFactory = threadFactory;
+    }
+
+    public void setConfigurationStateManager(ConfigurationStateManager configurationStateManager)
+    {
+        this.configurationStateManager = configurationStateManager;
     }
 
     private static class Listener implements EventListener

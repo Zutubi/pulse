@@ -15,7 +15,6 @@
                 <value>com.zutubi.pulse.bootstrap.tasks.ProcessSetupStartupTask</value>
                 <value>com.zutubi.pulse.bootstrap.tasks.BuildAborterStartupTask</value>
                 <value>com.zutubi.pulse.bootstrap.tasks.NextBuildNumberAdjusterStartupTask</value>
-                <value>com.zutubi.pulse.bootstrap.tasks.InitialiseExtensionsStartupTask</value>
             </list>
         </property>
         <property name="postStartupTasks">

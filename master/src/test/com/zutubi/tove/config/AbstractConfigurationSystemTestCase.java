@@ -126,6 +126,7 @@ public abstract class AbstractConfigurationSystemTestCase extends PulseTestCase
         configurationProvider.setTypeRegistry(typeRegistry);
         configurationProvider.setConfigurationPersistenceManager(configurationPersistenceManager);
         configurationProvider.setConfigurationTemplateManager(configurationTemplateManager);
+        configurationProvider.setConfigurationStateManager(configurationStateManager);
         configurationProvider.setThreadFactory(threadFactory);
 
         configurationTemplateManager.init();

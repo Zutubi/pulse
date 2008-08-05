@@ -50,10 +50,6 @@
                 <value>classpath:/com/zutubi/pulse/bootstrap/context/securityContext.xml</value>
             </list>
         </property>
-        <property name="postStartupContexts">
-            <list>
-            </list>
-        </property>
     </bean>
 
     <!--
