@@ -1,8 +1,5 @@
 package com.zutubi.pulse.plugins;
 
-import com.zutubi.pulse.plugins.PluginException;
-import com.zutubi.pulse.plugins.Version;
-
 import java.net.URI;
 import java.util.List;
 
@@ -132,7 +129,7 @@ public interface Plugin
 
     void resolve() throws PluginException;
 
-    List<PluginRequirement> getRequiredPlugins();
+    List<PluginDependency> getRequiredPlugins();
 
     List<Plugin> getDependentPlugins();
 

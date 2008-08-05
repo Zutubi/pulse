@@ -4,11 +4,7 @@ import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.plugins.osgi.Equinox;
 import com.zutubi.pulse.plugins.osgi.OSGiFramework;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.IOUtils;
-import com.zutubi.util.Mapping;
-import com.zutubi.util.Predicate;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.*;
 import com.zutubi.util.logging.Logger;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.RegistryFactory;
@@ -19,11 +15,7 @@ import org.eclipse.osgi.service.resolver.BundleSpecification;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.LinkedList;
@@ -923,7 +915,7 @@ public class PluginManager
         return new LinkedList<Plugin>(getDependentPlugins(plugin, plugins, false));
     }
 
-    public List<PluginRequirement> getRequiredPlugins(LocalPlugin plugin)
+    public List<PluginDependency> getRequiredPlugins(LocalPlugin plugin)
     {
         BundleDescription description = plugin.getBundleDescription();
         if (description == null)
@@ -931,15 +923,15 @@ public class PluginManager
             // It is the bundles description that tells us about the bundles requirements.
             // No description == no requirement information.  The plugin does have requirements,
             // but to get at them, we would need to read the raw bundle description outselves.
-            return new LinkedList<PluginRequirement>();
+            return new LinkedList<PluginDependency>();
         }
 
         BundleSpecification[] requiredBundles = description.getRequiredBundles();
-        return CollectionUtils.map(requiredBundles, new Mapping<BundleSpecification, PluginRequirement>()
+        return CollectionUtils.map(requiredBundles, new Mapping<BundleSpecification, PluginDependency>()
         {
-            public PluginRequirement map(BundleSpecification bundleSpecification)
+            public PluginDependency map(BundleSpecification bundleSpecification)
             {
-                return new PluginRequirement(bundleSpecification.getName(),
+                return new PluginDependency(bundleSpecification.getName(),
                         convertVersionRange(bundleSpecification.getVersionRange()),
                         getPlugin(bundleSpecification.getName()));
             }

@@ -1,18 +1,16 @@
 package com.zutubi.pulse.plugins;
 
-import com.zutubi.pulse.plugins.VersionRange;
-
 /**
  * Stores information about a dependency requirement of a plugin on another
  * plugin.
  */
-public class PluginRequirement
+public class PluginDependency
 {
     private String id;
     private VersionRange versionRange;
     private Plugin supplier;
 
-    public PluginRequirement(String id, VersionRange versionRange, Plugin supplier)
+    public PluginDependency(String id, VersionRange versionRange, Plugin supplier)
     {
         this.id = id;
         this.versionRange = versionRange;

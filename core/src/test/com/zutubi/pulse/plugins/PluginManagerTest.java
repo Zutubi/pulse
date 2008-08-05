@@ -536,11 +536,11 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         Plugin producer = manager.install(producer1.toURI());
         Plugin consumer = manager.install(consumer1.toURI());
 
-        List<PluginRequirement> pluginRequirements = consumer.getRequiredPlugins();
-        assertEquals(1, pluginRequirements.size());
-        assertEquals(PRODUCER_ID, pluginRequirements.get(0).getId());
-        assertEquals("[1.0.0, 2.0.0)", pluginRequirements.get(0).getVersionRange().toString());
-        assertEquals(producer, pluginRequirements.get(0).getSupplier());
+        List<PluginDependency> pluginDependencies = consumer.getRequiredPlugins();
+        assertEquals(1, pluginDependencies.size());
+        assertEquals(PRODUCER_ID, pluginDependencies.get(0).getId());
+        assertEquals("[1.0.0, 2.0.0)", pluginDependencies.get(0).getVersionRange().toString());
+        assertEquals(producer, pluginDependencies.get(0).getSupplier());
     }
 
     public void testInternalPluginsAreNotRegistered() throws IOException, PluginException

@@ -215,7 +215,7 @@ public abstract class LocalPlugin implements Plugin
         }
     }
 
-    public List<PluginRequirement> getRequiredPlugins()
+    public List<PluginDependency> getRequiredPlugins()
     {
         return manager.getRequiredPlugins(this);
     }

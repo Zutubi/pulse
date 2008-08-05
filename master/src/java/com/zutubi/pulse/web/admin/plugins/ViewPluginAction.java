@@ -1,8 +1,8 @@
 package com.zutubi.pulse.web.admin.plugins;
 
-import com.zutubi.pulse.plugins.Plugin;
-import com.zutubi.pulse.plugins.PluginRequirement;
 import com.zutubi.pulse.plugins.LocalPlugin;
+import com.zutubi.pulse.plugins.Plugin;
+import com.zutubi.pulse.plugins.PluginDependency;
 import com.zutubi.pulse.web.LookupErrorException;
 
 import java.util.List;
@@ -29,7 +29,7 @@ public class ViewPluginAction extends PluginActionSupport
         return plugin;
     }
 
-    public List<PluginRequirement> getRequiredPlugins()
+    public List<PluginDependency> getRequiredPlugins()
     {
         // this only works for installed plugins.
         LocalPlugin installedPlugin = (LocalPlugin) plugin;
