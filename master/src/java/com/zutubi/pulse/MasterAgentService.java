@@ -11,6 +11,7 @@ import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.logging.ServerMessagesHandler;
 import com.zutubi.pulse.model.ResourceManager;
+import com.zutubi.pulse.model.ResourceRequirement;
 import com.zutubi.pulse.resources.ResourceDiscoverer;
 import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
@@ -91,9 +92,9 @@ public class MasterAgentService implements AgentService
         return agentConfig;
     }
 
-    public boolean hasResource(String resource, String version)
+    public boolean hasResource(ResourceRequirement requirement)
     {
-        return getResourceManager().getAgentRepository(agentConfig).hasResource(resource, version);
+        return getResourceManager().getAgentRepository(agentConfig).hasResource(requirement);
     }
 
     public boolean build(RecipeRequest request)

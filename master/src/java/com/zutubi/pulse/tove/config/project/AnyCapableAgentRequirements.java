@@ -29,7 +29,7 @@ public class AnyCapableAgentRequirements implements AgentRequirements
         List<ResourceRequirement> requirements = request.getResourceRequirements();
         for(ResourceRequirement requirement: requirements)
         {
-            if(!service.hasResource(requirement.getResource(), requirement.getVersion()))
+            if(!service.hasResource(requirement))
             {
                 return false;
             }
@@ -41,7 +41,7 @@ public class AnyCapableAgentRequirements implements AgentRequirements
             requirements = fileLoader.loadRequiredResources(request.getRevision().getPulseFile(), request.getRequest().getRecipeName());
             for(ResourceRequirement requirement: requirements)
             {
-                if(!service.hasResource(requirement.getResource(), requirement.getVersion()))
+                if(!service.hasResource(requirement))
                 {
                     return false;
                 }

@@ -555,7 +555,7 @@ public class RecipeControllerTest extends PulseTestCase
             throw new RuntimeException("Method not yet implemented.");
         }
 
-        public boolean hasResource(String resource, String version)
+        public boolean hasResource(ResourceRequirement requirement)
         {
             throw new RuntimeException("Method not implemented.");
         }

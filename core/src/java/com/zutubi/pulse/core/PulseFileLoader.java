@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.model.ResourceRequirement;
+import com.zutubi.util.TextUtils;
 
 import java.io.ByteArrayInputStream;
 import java.util.LinkedList;
@@ -32,7 +33,15 @@ public class PulseFileLoader extends FileLoader
         {
             if(reference.isRequired())
             {
-                requirements.add(new ResourceRequirement(reference.getName(), reference.getVersion()));
+                // if a version is specified, then we want that version, otherwise the default is fine.
+                if (TextUtils.stringSet(reference.getVersion()))
+                {
+                    requirements.add(new ResourceRequirement(reference.getName(), reference.getVersion(), false));
+                }
+                else
+                {
+                    requirements.add(new ResourceRequirement(reference.getName(), reference.getVersion(), true));
+                }
             }
         }
 

@@ -138,9 +138,10 @@ function openBrowseWindow(contextPath, selectDir, elementId, extraArgs)
 // Function for opening a resource browse window used on several forms.
 //   - resourceId: ID of textbox to receive the resource name
 //   - versionId: ID of textbox to receive the resource version
-function openResourceBrowser(contextPath, resourceId, versionId)
+//   - defaultVersionId: ID of textbox to receive the resource default version flag.
+function openResourceBrowser(contextPath, resourceId, versionId, defaultVersionId)
 {
-    var browseWindow = window.open(contextPath + "/popups/browseResources.action?resourceId=" + resourceId + "&versionId=" + versionId, "resources", 'status=yes,resizable=yes,top=100,left=100,width=600,height=600,scrollbars=yes');
+    var browseWindow = window.open(contextPath + "/popups/browseResources.action?resourceId=" + resourceId + "&versionId=" + versionId + "&defaultVersionId=" + defaultVersionId, "resources", 'status=yes,resizable=yes,top=100,left=100,width=600,height=600,scrollbars=yes');
     browseWindow.opener = self;
     browseWindow.focus();
 }

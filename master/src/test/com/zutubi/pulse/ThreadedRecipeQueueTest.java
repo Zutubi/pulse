@@ -26,6 +26,7 @@ import com.zutubi.pulse.model.AgentState;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.UnknownBuildReason;
+import com.zutubi.pulse.model.ResourceRequirement;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.scm.ScmChangeEvent;
 import com.zutubi.pulse.services.SlaveStatus;
@@ -867,7 +868,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             throw new RuntimeException("Method not yet implemented.");
         }
 
-        public boolean hasResource(String resource, String version)
+        public boolean hasResource(ResourceRequirement requirement)
         {
             throw new RuntimeException("Method not implemented.");
         }

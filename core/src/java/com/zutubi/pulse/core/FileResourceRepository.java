@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.config.Resource;
+import com.zutubi.pulse.model.ResourceRequirement;
 import com.zutubi.util.IOUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -31,10 +32,18 @@ public class FileResourceRepository implements ResourceRepository
         resources.put(r.getName(), r);
     }
 
-    public boolean hasResource(String name, String version)
+    public boolean hasResource(ResourceRequirement requirement)
     {
+        String name = requirement.getResource();
+        String version = requirement.getVersion();
+
         Resource r = getResource(name);
-        return r != null && (version == null || r.hasVersion(version));        
+        if (r == null)
+        {
+            return false;
+        }
+
+        return requirement.isDefaultVersion() || r.getVersion(version) != null;
     }
 
     public boolean hasResource(String name)

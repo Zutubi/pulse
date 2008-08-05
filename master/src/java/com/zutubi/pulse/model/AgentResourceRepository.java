@@ -3,7 +3,6 @@ package com.zutubi.pulse.model;
 import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
-import com.zutubi.util.TextUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -26,20 +25,18 @@ public class AgentResourceRepository implements ResourceRepository
         return agentConfig;
     }
 
-    public boolean hasResource(String name, String version)
+    public boolean hasResource(ResourceRequirement requirement)
     {
+        String name = requirement.getResource();
+        String version = requirement.getVersion();
+
         Resource r = getResource(name);
         if (r == null)
         {
             return false;
         }
-        if (TextUtils.stringSet(version))
-        {
-            // do we have the specifically requested version?
-            return r.hasVersion(version);
-        }
-        // no specific version is requested, so yes, we have this resource.
-        return true;
+
+        return requirement.isDefaultVersion() || r.getVersion(version) != null;
     }
 
     public boolean hasResource(String name)

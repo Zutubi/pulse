@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.config.ResourceVersion;
 import com.zutubi.pulse.model.ResourceRequirement;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.RandomUtils;
+import com.zutubi.util.TextUtils;
 
 import java.util.Hashtable;
 
@@ -109,9 +110,10 @@ public class ResourceXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         String requirementsPath = PathUtils.getPath(projectPath, "requirements");
         Hashtable<String, Object> requirement = xmlRpcHelper.createDefaultConfig(ResourceRequirement.class);
         requirement.put("resource", resourceName);
-        if(version != null)
+        if (TextUtils.stringSet(version))
         {
             requirement.put("version", version);
+            requirement.put("defaultVersion", false);
         }
         return xmlRpcHelper.insertConfig(requirementsPath, requirement);
     }

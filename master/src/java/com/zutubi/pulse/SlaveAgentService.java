@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.model.ResourceManager;
+import com.zutubi.pulse.model.ResourceRequirement;
 import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.services.SlaveService;
 import com.zutubi.pulse.services.SlaveStatus;
@@ -76,9 +77,9 @@ public class SlaveAgentService implements AgentService
         return service.getRecentMessages(serviceTokenManager.getToken());
     }
 
-    public boolean hasResource(String resource, String version)
+    public boolean hasResource(ResourceRequirement requirement)
     {
-        return resourceManager.getAgentRepository(agentConfig).hasResource(resource, version);
+        return resourceManager.getAgentRepository(agentConfig).hasResource(requirement);
     }
 
     public boolean build(RecipeRequest request)

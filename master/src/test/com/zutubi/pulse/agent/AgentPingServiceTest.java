@@ -3,6 +3,7 @@ package com.zutubi.pulse.agent;
 import com.zutubi.pulse.AgentService;
 import com.zutubi.pulse.SystemInfo;
 import com.zutubi.pulse.Version;
+import com.zutubi.pulse.model.ResourceRequirement;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.events.*;
@@ -248,7 +249,7 @@ public class AgentPingServiceTest extends PulseTestCase
             return getConfig();
         }
 
-        public boolean hasResource(String resource, String version)
+        public boolean hasResource(ResourceRequirement requirement)
         {
             throw new RuntimeException("Not implemented");
         }

@@ -84,4 +84,19 @@ public class FormDescriptorFactoryTest extends TestCase
             this.password = password;
         }
     }
+
+    public static class MockWithReadOnlyField extends AbstractConfiguration
+    {
+        private String field;
+
+        public String getField()
+        {
+            return field;
+        }
+
+        public void setField(String field)
+        {
+            this.field = field;
+        }
+    }
 }

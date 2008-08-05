@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
+import com.zutubi.pulse.model.ResourceRequirement;
 
 import java.io.File;
 import java.util.List;
@@ -27,12 +28,11 @@ public interface AgentService extends RemoteService
      * Returns true iff the service has the given version of the given
      * resource.
      *
-     * @param resource the name of the required resource
-     * @param version  the required version, or null if no specific version
-     *                 is required
+     * @param requirement the resource requirement
+     *
      * @return true iff this service has the give resource version
      */
-    boolean hasResource(String resource, String version);
+    boolean hasResource(ResourceRequirement requirement);
 
     boolean build(RecipeRequest request);
 

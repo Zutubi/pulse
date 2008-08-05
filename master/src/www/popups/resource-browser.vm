@@ -3,13 +3,15 @@
     <title>#wwtext("name=resource.browser")</title>
     <link href="$base/css/main.css" rel="stylesheet" type="text/css" media="screen"/>
     <script type="text/javascript">
-        function select(resource, version)
+        function select(resource, version, isDefault)
         {
             var field = opener.Ext.getCmp("$resourceId");
 		    field.setValue(resource);
             field = opener.Ext.getCmp("$versionId");
 	        field.setValue(version);
-	        field.form.updateButtons();
+            field = opener.Ext.getCmp("$defaultVersionId");
+            field.setValue(isDefault);
+            field.form.updateButtons();
 		    window.close();
         }
     </script>
@@ -38,11 +40,11 @@
             #set($firstRow = false)
             #dynamicCellSpan($resource.key $resource.value.size())
             <td class="content">
-                <a href="#" onclick="select('$resource.key', ''); return false">[default]</a>
+                <a href="#" onclick="select('$resource.key', '', 'true'); return false">[default]</a>
             </td>
         #else
             <td class="content">
-                <a href="#" onclick="select('$resource.key', '$versionEntry.key'); return false">$!webwork.htmlEncode($versionEntry.key)</a>
+                <a href="#" onclick="select('$resource.key', '$versionEntry.key', 'false'); return false">$!webwork.htmlEncode($versionEntry.key)</a>
             </td>
         #end
             <td class="content">

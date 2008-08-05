@@ -11,6 +11,7 @@ import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.model.ResourceRequirement;
 import com.zutubi.tove.config.ConfigurationRegistry;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
+import com.zutubi.util.TextUtils;
 
 import java.util.Hashtable;
 
@@ -233,9 +234,10 @@ public class BuildAcceptanceTest extends SeleniumTestBase
     {
         Hashtable<String, Object> requirement = xmlRpcHelper.createDefaultConfig(ResourceRequirement.class);
         requirement.put("resource", resource);
-        if (version != null)
+        if (TextUtils.stringSet(version))
         {
             requirement.put("version", version);
+            requirement.put("defaultVersion", false);
         }
 
         return requirement;

@@ -8,6 +8,7 @@ import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.model.CustomProjectValidationPredicate;
+import com.zutubi.pulse.model.ResourceRequirement;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.StringUtils;
@@ -98,7 +99,7 @@ public class CustomTypeConfiguration extends TypeConfiguration implements Valida
 
     private static class EmptyResourceRepository implements ResourceRepository
     {
-        public boolean hasResource(String name, String version)
+        public boolean hasResource(ResourceRequirement requirement)
         {
             return false;
         }

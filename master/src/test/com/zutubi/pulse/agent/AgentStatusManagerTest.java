@@ -15,6 +15,7 @@ import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.model.AgentState;
+import com.zutubi.pulse.model.ResourceRequirement;
 import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
@@ -1042,7 +1043,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
                 throw new RuntimeException("Not implemented");
             }
 
-            public boolean hasResource(String resource, String version)
+            public boolean hasResource(ResourceRequirement requirement)
             {
                 throw new RuntimeException("Not implemented");
             }

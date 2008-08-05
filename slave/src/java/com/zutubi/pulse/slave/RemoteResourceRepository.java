@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.services.MasterService;
 import com.zutubi.pulse.services.ServiceTokenManager;
+import com.zutubi.pulse.model.ResourceRequirement;
 import com.zutubi.util.logging.Logger;
 
 import java.util.List;
@@ -26,10 +27,18 @@ public class RemoteResourceRepository implements ResourceRepository
         this.serviceTokenManager = serviceTokenManager;
     }
 
-    public boolean hasResource(String name, String version)
+    public boolean hasResource(ResourceRequirement requirement)
     {
+        String name = requirement.getResource();
+        String version = requirement.getVersion();
+        
         Resource r = getResource(name);
-        return r != null && r.getVersion(version) != null;
+        if (r == null)
+        {
+            return false;
+        }
+
+        return requirement.isDefaultVersion() || r.getVersion(version) != null;
     }
 
     public boolean hasResource(String name)
