@@ -11,6 +11,8 @@ import com.zutubi.util.Pair;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -179,6 +181,8 @@ public class Recipe extends SelfReference
             {
                 Pair<Command, Scope> pair = commands.get(i);
                 Command command = pair.first;
+                Scope scope = pair.second;
+
                 if (success || command.isForce())
                 {
                     CommandResult result = new CommandResult(command.getName());
@@ -189,7 +193,7 @@ public class Recipe extends SelfReference
                         throw new BuildException("Could not create command output directory '" + commandOutput.getAbsolutePath() + "'");
                     }
 
-                    pushCommandContext(context, pair.second, commandOutput);
+                    pushCommandContext(context, scope, commandOutput);
                     boolean recipeTerminated = !executeCommand(context, commandOutput, result, command);
                     context.popTo(LABEL_EXECUTE);
 
@@ -223,6 +227,20 @@ public class Recipe extends SelfReference
         // a) we do not have an id for the command model
         // b) for local builds, this is a lot friendlier for the developer
         return String.format("%08d-%s", i, result.getCommandName());
+    }
+
+    private void pushCommandContext(ExecutionContext context, Scope scope, File commandOutput)
+    {
+        context.push();
+        context.addString(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, commandOutput.getAbsolutePath());
+
+        if (scope != null)
+        {
+            for (Reference reference : scope.getReferences())
+            {
+                context.add(reference);
+            }
+        }
     }
 
     private boolean executeCommand(ExecutionContext context, File commandOutput, CommandResult commandResult, Command command)
@@ -261,6 +279,7 @@ public class Recipe extends SelfReference
             runningCommand = null;
             runningLock.unlock();
 
+            flushOutput(context);
             commandResult.complete();
             eventManager.publish(new CommandCompletedEvent(this, recipeId, commandResult));
         }
@@ -281,16 +300,18 @@ public class Recipe extends SelfReference
         }
     }
 
-    private void pushCommandContext(ExecutionContext context, Scope scope, File commandOutput)
+    private void flushOutput(ExecutionContext context)
     {
-        context.push();
-        context.addString(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR, commandOutput.getAbsolutePath());
-
-        if (scope != null)
+        OutputStream outputStream = context.getOutputStream();
+        if(outputStream != null)
         {
-            for (Reference reference : scope.getReferences())
+            try
             {
-                context.add(reference);
+                outputStream.flush();
+            }
+            catch (IOException e)
+            {
+                LOG.severe(e);
             }
         }
     }

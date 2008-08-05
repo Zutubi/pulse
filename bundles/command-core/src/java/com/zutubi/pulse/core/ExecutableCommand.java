@@ -6,10 +6,7 @@ import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.jni.ProcessControl;
 import com.zutubi.pulse.util.SystemUtils;
-import com.zutubi.util.Constants;
-import com.zutubi.util.ForkOutputStream;
-import com.zutubi.util.IOUtils;
-import com.zutubi.util.TextUtils;
+import com.zutubi.util.*;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;
 
@@ -258,16 +255,18 @@ public class ExecutableCommand extends CommandSupport implements Validateable
         List<OutputStream> outputs = new ArrayList<OutputStream>(3);
         outputs.add(new FileOutputStream(outputArtifact));
 
-        if(context.getOutputStream() != null)
+        if (context.getOutputStream() != null)
         {
-            outputs.add(context.getOutputStream());
+            // Wrap in an ignore close stream as we don't own this stream and
+            // thus don't want to close it with the rest when done.
+            outputs.add(new IgnoreCloseOutputStream(context.getOutputStream()));
         }
 
-        if(TextUtils.stringSet(outputFile))
+        if (TextUtils.stringSet(outputFile))
+        {
+            try
             {
-                try
-                {
-                    outputs.add(new FileOutputStream(new File(workingDir, outputFile)));
+                outputs.add(new FileOutputStream(new File(workingDir, outputFile)));
             }
             catch (FileNotFoundException e)
             {

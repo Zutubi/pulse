@@ -6,7 +6,6 @@ import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.CommandOutputEvent;
 import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.core.model.CommandResult;
 
 import java.io.IOException;
 import java.util.LinkedList;
