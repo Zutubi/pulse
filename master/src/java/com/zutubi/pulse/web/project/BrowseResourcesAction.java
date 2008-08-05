@@ -13,6 +13,8 @@ public class BrowseResourcesAction extends ActionSupport
 {
     private String resourceId;
     private String versionId;
+    private String defaultVersionId;
+
     private ResourceManager resourceManager;
     /**
      * Maps from resource name to a map from version value to agents that
@@ -43,6 +45,16 @@ public class BrowseResourcesAction extends ActionSupport
     public Map<String,Map<String,Set<String>>> getAllResources()
     {
         return allResources;
+    }
+
+    public String getDefaultVersionId()
+    {
+        return defaultVersionId;
+    }
+
+    public void setDefaultVersionId(String defaultVersionId)
+    {
+        this.defaultVersionId = defaultVersionId;
     }
 
     public String execute() throws Exception
