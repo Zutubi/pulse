@@ -40,7 +40,7 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
     protected void tearDown() throws Exception
     {
         packageFactory = null;
-//        removeDirectory(tmp);
+        removeDirectory(tmp);
         tmp = null;
 
         super.tearDown();
