@@ -43,24 +43,12 @@ public class AcceptanceTestSuite
         suite.addTestSuite(PersonalBuildAcceptanceTest.class);
 
         //---( other acceptance tests )---
-//        suite.addTestSuite(StartupShutdownAcceptanceTest.class); - tries to launch pulse inline, does not work.
-
-/*
-        TestSuite agentSuite = new TestSuite();
-        agentSuite.addTestSuite(AgentUpgradeAcceptanceTest.class);
-*/
-
-        TestSuite pythonSuite = new TestSuite();
-        pythonSuite.addTestSuite(JythonPackageFactoryTest.class);
-
-        TestSuite pluginSuite = new TestSuite();
-        pluginSuite.addTestSuite(PluginUpgradeManagerAcceptanceTest.class);
 
         TestSuite main = new TestSuite();
-        main.addTest(pythonSuite); // check the support code works before running the acceptance test suite.
-//        main.addTest(pluginSuite);
+        main.addTestSuite(JythonPackageFactoryTest.class); // check the support code works before running the acceptance test suite.
         main.addTest(new AcceptanceTestSuiteSetupTeardown(suite));
-//        main.addTest(agentSuite);
+        main.addTestSuite(AgentUpgradeAcceptanceTest.class);
+        main.addTestSuite(StartupShutdownAcceptanceTest.class);
 
         return main;
     }

@@ -148,7 +148,7 @@ public class JobManagerTest extends PulseTestCase
                 }
                 catch (InterruptedException e)
                 {
-                    throw new RuntimeException("Thread interrupted.");
+                    return;
                 }
             }
         }

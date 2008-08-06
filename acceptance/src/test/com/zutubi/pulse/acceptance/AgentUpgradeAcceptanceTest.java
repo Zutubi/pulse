@@ -40,7 +40,7 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
     protected void tearDown() throws Exception
     {
         packageFactory = null;
-        removeDirectory(tmp);
+//        removeDirectory(tmp);
         tmp = null;
 
         super.tearDown();
@@ -89,17 +89,13 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
                 System.setProperty("pulse.port", "7688");
                 SetupAcceptanceTest setup = new SetupAcceptanceTest();
                 setup.setUp();
-                setup.testSetupProcess();
+                // we can not run the usual test since that attempts to specify the data directory.
+                setup.checkPostPulseData();
                 setup.tearDown();
             }
             catch (RuntimeException e)
             {
-                if (e.getMessage().equals("Could not contact Selenium Server; have you started it?"))
-                {
-                    // missing resources.
-                    fail("Could not contact Selenium Server");
-                }
-                fail(e.getMessage());
+                fail("Could not contact Selenium Server");
             }
             catch (Exception e)
             {
@@ -113,8 +109,7 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
             agentUrl = agentUrl + "/xmlrpc";
 
             XmlRpcHelper agentXmlRpc = new XmlRpcHelper(new URL(agentUrl));
-            String agentAdminToken = agent.getAdminToken();
-            Integer agentBuild = agentXmlRpc.callWithoutToken("getBuildNumber", agentAdminToken);
+            Integer agentBuild = agentXmlRpc.callWithoutToken("getBuildNumber", agent.getAdminToken());
             assertEquals(200000000, agentBuild.intValue());
 
             // b) add agent to master.
@@ -141,7 +136,7 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
                 if ("idle".equals(status))
                 {
                     // success.
-                    agentBuild = agentXmlRpc.callWithoutToken("getBuildNumber", agentAdminToken);
+                    agentBuild = agentXmlRpc.callWithoutToken("getBuildNumber", agent.getAdminToken());
                     assertFalse(200000000 == agentBuild.intValue());
                     return;
                 }

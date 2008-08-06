@@ -49,6 +49,21 @@ public class SetupAcceptanceTest extends SeleniumTestBase
         // step one. setting the pulse home variable.
         checkSetPulseData();
 
+        _checkPostPulseData();
+
+        // lets also take this opportunity to verify that what was set during the setup wizard
+        // was actually persisted.
+    }
+
+
+    protected void checkPostPulseData()
+    {
+        goTo("/");
+        _checkPostPulseData();
+    }
+
+    protected void _checkPostPulseData()
+    {
         // step two. setting up the database
         checkSetupDatabase();
 
@@ -63,14 +78,11 @@ public class SetupAcceptanceTest extends SeleniumTestBase
 
         assertTextPresent("system setup");
         waitForElement("welcome.heading", 60000);
-        
+
         // one complete, we should see the home page, and it should contain the following:
         assertTextPresent(":: welcome ::");
         assertTextPresent("A. D. Ministrator");
         assertLinkPresent("logout");
-
-        // lets also take this opportunity to verify that what was set during the setup wizard
-        // was actually persisted.
     }
 
     private void checkSetPulseData()
@@ -95,7 +107,7 @@ public class SetupAcceptanceTest extends SeleniumTestBase
         assertElementNotPresent("tab.projects");
         assertElementNotPresent("tab.queues");
         assertElementNotPresent("tab.agents");
-        assertElementNotPresent("tab.administration");              
+        assertElementNotPresent("tab.administration");
     }
 
     private void checkSetupDatabase()
