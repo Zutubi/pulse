@@ -22,7 +22,7 @@ public class UpdateListener extends CVSAdapter
 
     private final ScmEventHandler handler;
 
-    private final File workingDirectory;
+    private final String workingDirectory;
 
     public UpdateListener(ScmEventHandler handler, File workingDirectory)
     {
@@ -35,7 +35,14 @@ public class UpdateListener extends CVSAdapter
             throw new IllegalArgumentException("working directory is a required argument.");
         }
         this.handler = handler;
-        this.workingDirectory = workingDirectory;
+        try
+        {
+            this.workingDirectory = workingDirectory.getCanonicalPath();
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     public void fileRemoved(FileRemovedEvent e)
@@ -78,7 +85,11 @@ public class UpdateListener extends CVSAdapter
      */
     private String relativePath(File file) throws IOException
     {
-        String path = file.getCanonicalPath().substring(workingDirectory.getCanonicalPath().length());
+        String path = file.getCanonicalPath();
+        if (path.startsWith(workingDirectory))
+        {
+            path = path.substring(workingDirectory.length());
+        }
         path = ScmFile.normalizePath(path);
         return path;
     }

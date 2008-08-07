@@ -112,11 +112,14 @@ public class CvsCore
                 // strip the relative repo path from the working directory to determine the relative repository root.
                 String path = FileSystemUtils.normaliseSeparators(workingDirectory.getCanonicalPath());
                 String repoPath = readRespositoryPath(workingDirectory);
-                if (!path.endsWith(repoPath))
+                if (repoPath != null)
                 {
-                    // ??
+                    if (!path.endsWith(repoPath))
+                    {
+                        LOG.warning("Expected path '" + path + "' to end with '" + repoPath + "'");
+                        path = path.substring(0, path.lastIndexOf(repoPath));
+                    }
                 }
-                path = path.substring(0, path.lastIndexOf(repoPath));
 
                 listener = new UpdateListener(handler, new File(path));
             }
@@ -132,11 +135,18 @@ public class CvsCore
     {
         try
         {
-            return IOUtils.fileToString(new File(dir, "CVS/Repository"));
+            File repositoryFile = new File(dir, FileSystemUtils.join("CVS", "Repository"));
+            if (!repositoryFile.isFile())
+            {
+                // ... the named directory is not part of a CVS repository checkout? ...
+                LOG.error(repositoryFile.getCanonicalPath() + " does not exist.");
+                return null;
+            }
+            return IOUtils.fileToString(repositoryFile);
         }
         catch (IOException e)
         {
-            e.printStackTrace();
+            LOG.error(e);
             return null;
         }
     }
