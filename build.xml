@@ -46,7 +46,7 @@
 
     </target>
 
-    <target name="clean" depends="clean.all"/>
+    <target name="clean" depends="clean.all, clean.dev"/>
 
     <target name="buildlist" depends="init">
         <ivy:buildlist reference="build.path" skipbuildwithoutivy="true">
@@ -81,7 +81,7 @@
         </junitreport>
     </target>
 
-    <target name="clean.dev" description="Cleanup data created during development.">
+    <target name="clean.dev" description="Cleans up data created during development.">
         <delete dir="data"/>
 
         <!-- clean up this annoying log file. -->
@@ -102,13 +102,19 @@
         <!-- clean out the script/test playground. -->
         <delete dir="working"/>
 
-        <!-- clean out the user.home/.pulse/* directory -->
+        <!-- clean out the user.home/.pulse2?/* directory -->
         <delete dir="${user.home}/.pulse"/>
         <delete dir="${user.home}/.pulse2"/>
         <delete dir="${user.home}/.pulse-agent"/>
         <delete dir="${user.home}/.pulse2-agent"/>
 
-        <delete file="plugins/plugins-registry.xml"/>
+        <!-- goodbye plugin registry -->
+        <delete file="plugins/plugin-registry.xml"/>
+
+        <!-- can the testing plugins -->
+        <delete>
+            <fileset dir="plugins/prepackaged" includes="com.zutubi.pulse.core.postprocessors.test.*.jar"/>
+        </delete>
 
         <!-- the following should be cleaned out by calls to the respective module/clean targets. -->
         <delete dir="package/core/build"/>
@@ -116,34 +122,6 @@
         <delete dir="package/server-core/build"/>
         <delete dir="package/slave/build"/>
         <delete dir="package/master/build"/>
-    </target>
-
-    <!--
-        FIXME: these targets do not currently work.  Use: ant -f [module]/build.xml instead.
-    -->
-
-    <target name="build.core">
-        <ant inheritAll="false" dir="core" antfile="build.xml" target="build.module"/>
-    </target>
-
-    <target name="build.server-core">
-        <ant inheritAll="false" dir="server-core" antfile="build.xml" target="build.module"/>
-    </target>
-
-    <target name="build.bundles">
-        <ant inheritAll="false" dir="bundles" antfile="build.xml"/>
-    </target>
-
-    <target name="build.local">
-        <ant inheritAll="false" dir="local" antfile="build.xml" target="build.module"/>
-    </target>
-
-    <target name="build.master">
-        <ant inheritAll="false" dir="master" antfile="build.xml" target="build.module"/>
-    </target>
-
-    <target name="build.slave">
-        <ant inheritAll="false" dir="slave" antfile="build.xml" target="build.module"/>
     </target>
 
     <target name="package.local" depends="init">
@@ -573,7 +551,8 @@
         </junit>
     </target>
 
-    <target name="idea" depends="build.all">
+    <target name="idea" depends="build.all"
+            description="Adds modules to an IDEA project file (pulse.ipr) for all Pulse modules and plugins.">
         <zutubi:ivytoidea conf="build" projectFile="pulse.ipr" propertiesFile="build.properties">
             <fileset dir="${project.root.dir}/">
                 <include name="*/ivy.xml"/>
@@ -582,25 +561,27 @@
         </zutubi:ivytoidea>
     </target>
 
-    <target name="refresh.plugins" depends="init">
-        <!-- retrieve the internal plugins -->
-        <delete dir="plugins/internal"/>
+    <target name="clean.plugins" depends="init"
+            description="Removes all traces of plugins from your dev environment.">
+        <delete dir="plugins"/>
+    </target>
 
+    <target name="refresh.plugins" depends="clean.plugins,build.all"
+            description="Removes current plugins, reloads the jars for internal plugins and explodes third party dependencies of plugins.">
+        <!-- retrieve the internal plugins -->
         <!-- use the default ivy configuration properties. -->
         <property file="ivy.properties"/>
         <ivy:configure/>
 
         <retrieve-dependencies ivyfile="package/core/ivy.xml" conf="equinox-bundles" dest="plugins/internal"/>
-
+        <subant buildpath="bundles" target="explode.prepackaged.deps"/>
         <echo message=""/>
-        <echo message="====================================================================="/>
-        <echo message="IMPORTANT:"/>
-        <echo message="   Now run the following:"/>
-        <echo message="   1)  ant package.master -Dskip.tests=true"/>
-        <echo message="   2)  bundles/build.xml idea.prepare.prepackaged ant target"/>
-        <echo message="   3)  remember to compile the plugins modules in idea into the plugins directory"/>
-
+        <echo message="IMPORTANT: The plugin modules must now be compiled in your IDE before the plugins can be used."/>
+        <echo message=""/>
     </target>
+
+    <target name="setup.dev" depends="idea,refresh.plugins"
+            description="Sets up a dev environment from a clean checkout."/>
 
     <macrodef name="build-package-deps">
         <attribute name="module"/>

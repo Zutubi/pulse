@@ -50,12 +50,8 @@
         </if>
     </target>
 
-    <!-- DEPLOYMENT OF BUNDLES IN DEVELOPMENT ENVIRONMENT.
-    copy and extract the 3rd party packages for each bundle into the plugin/prepackages/<pluginId>
-    directory so that the plugins will successfully deploy when pulse is run via IDEA.
-    -->
-    <target name="idea.prepare.prepackaged" depends="init">
-        
+    <target name="explode.prepackaged.deps" depends="init"
+            description="Copy and extract the third party packages for the bundle into the plugin/prepackages/&lt;pluginId&gt; directory.">
         <property name="3rd.party.extracted" value="${current.dir}/build/3rdparty/extracted"/>
         <property name="3rd.party.jars" value="${current.dir}/build/3rdparty/jars"/>
 
@@ -70,19 +66,15 @@
             </fileset>
         </unzip>
 
-        <property name="idea.prepare.output.dir" value="${project.root.dir}/plugins/prepackaged/${ivy.module}"/>
-
-        <copy todir="${idea.prepare.output.dir}">
+        <copy todir="${project.root.dir}/plugins/prepackaged/${ivy.module}">
             <fileset dir="${3rd.party.extracted}">
-                <exclude name="META-INF"/>
+                <exclude name="META-INF/MANIFEST.MF"/>
             </fileset>
             <!-- include license text files. -->
             <fileset dir="${3rd.party.jars}">
                 <exclude name="*.jar"/>
             </fileset>
-            <fileset dir="resources" excludes="resources/META-INF/MANIFEST.MF"/>
         </copy>
-
     </target>
 
 </project>
