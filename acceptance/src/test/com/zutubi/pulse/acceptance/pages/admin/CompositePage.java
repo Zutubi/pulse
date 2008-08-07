@@ -93,10 +93,10 @@ public class CompositePage extends ConfigPage
 
     public String getErrorsId()
     {
-        return "instance-errors";
+        return "nested-errors";
     }
 
-    public boolean areErrorsPresent()
+    public boolean areNestedErrorsPresent()
     {
         return selenium.isElementPresent(getErrorsId());
     }

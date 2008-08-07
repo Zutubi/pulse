@@ -52,8 +52,8 @@
 #if($config.record || !$config.type.extendable)
         <td id="left-column">
     #if($config.nestedPropertyErrors.size() > 0)
-            <div id="instance-errors" class="config-panel">
-            <h3 class="config-error-header">errors</h3>
+            <div id="nested-errors" class="config-panel">
+            <h3 class="config-error-header">nested errors</h3>
             <div class="config-container">
             <ul class="config-errors">
         #foreach($error in $config.nestedPropertyErrors)

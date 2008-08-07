@@ -9,12 +9,11 @@ import com.zutubi.pulse.tove.config.project.changeviewer.CustomChangeViewerConfi
 import com.zutubi.pulse.tove.config.project.triggers.ScmBuildTriggerConfiguration;
 import com.zutubi.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.type.record.PathUtils;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import java.util.Hashtable;
-
-import org.testng.annotations.Test;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.AfterMethod;
 
 /**
  * Acceptance tests that verify operation of the configuration UI by trying
@@ -742,7 +741,6 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         loginAsAdmin();
         CompositePage compositePage = new CompositePage(selenium, urls, projectPath);
         compositePage.goTo();
-        assertTrue(compositePage.areErrorsPresent());
         assertTextPresent("An SCM must be configured to complete this project.");
     }
 
