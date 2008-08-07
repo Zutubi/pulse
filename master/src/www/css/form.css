@@ -167,7 +167,7 @@ td.x-form-annotation
 
 .x-form-focus
 {
-	border: 1px solid #7eadd9;
+    border: 1px solid #7eadd9;
 }
 
 .x-form-item
@@ -175,6 +175,11 @@ td.x-form-annotation
     font-family: verdana;
     font-size: 12px;
 }
+
+/*.x-form-check-wrap*/
+/*{*/
+    /*padding: 0;*/
+/*}*/
 
 .field-no-override, textarea.field-no-override
 {

@@ -21,9 +21,6 @@ width of its contents.  Floating it works, but hurts other things.
 
 <#-- render form -->
 <script type="text/javascript">
-    Ext.QuickTips.init();
-    Ext.QuickTips.getQuickTip().qwidth = 'qwidth';
-
     Ext.form.Field.prototype.msgTarget = 'under';
 
     var ${form.name} = function()
