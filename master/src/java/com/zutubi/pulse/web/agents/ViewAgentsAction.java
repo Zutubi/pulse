@@ -3,13 +3,16 @@ package com.zutubi.pulse.web.agents;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.AgentManager;
+import com.zutubi.pulse.bootstrap.SystemPaths;
 import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.tove.actions.ActionManager;
+import com.zutubi.tove.webwork.ToveUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Sort;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -23,6 +26,7 @@ public class ViewAgentsAction extends ActionSupport
     private List<AgentModel> models;
     private AgentManager agentManager;
     private ActionManager actionManager;
+    private SystemPaths systemPaths;
 
     public List<AgentModel> getModels()
     {
@@ -53,9 +57,10 @@ public class ViewAgentsAction extends ActionSupport
                 AgentModel model = new AgentModel(agent, agent.getConfig().getName(), agent.getLocation(), status);
 
                 Messages messages = Messages.getInstance(AgentConfiguration.class);
+                File contentRoot = systemPaths.getContentRoot();
                 for(String actionName: actionManager.getActions(agent.getConfig(), false))
                 {
-                    model.addAction(new AgentActionLink(actionName, messages.format(actionName + ".label")));
+                    model.addAction(ToveUtils.getActionLink(actionName, messages, contentRoot));
                 }
 
                 return model;
@@ -81,5 +86,10 @@ public class ViewAgentsAction extends ActionSupport
     public void setActionManager(ActionManager actionManager)
     {
         this.actionManager = actionManager;
+    }
+
+    public void setSystemPaths(SystemPaths systemPaths)
+    {
+        this.systemPaths = systemPaths;
     }
 }

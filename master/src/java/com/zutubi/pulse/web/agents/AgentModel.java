@@ -1,6 +1,7 @@
 package com.zutubi.pulse.web.agents;
 
 import com.zutubi.pulse.agent.Agent;
+import com.zutubi.tove.model.ActionLink;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -14,7 +15,7 @@ public class AgentModel
     private String name;
     private String location;
     private String status;
-    private List<AgentActionLink> actions = new LinkedList<AgentActionLink>();
+    private List<ActionLink> actions = new LinkedList<ActionLink>();
 
     public AgentModel(Agent agent, String name, String location, String status)
     {
@@ -64,12 +65,12 @@ public class AgentModel
         return actions.size() > 0;
     }
     
-    public List<AgentActionLink> getActions()
+    public List<ActionLink> getActions()
     {
         return actions;
     }
 
-    public void addAction(AgentActionLink action)
+    public void addAction(ActionLink action)
     {
         actions.add(action);
     }

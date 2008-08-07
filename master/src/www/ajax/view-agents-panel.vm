@@ -16,6 +16,7 @@
         <td class="content">
     #if($model.hasActions())
         #foreach($action in $model.actions)
+            #if($action.icon)<img alt="${action.label}" src="${base}/images/config/actions/${action.icon}.gif"/>#end
             <a id='#id("agent.${model.name}.action.${action.action}")' href="$urls.agentAction($model.agent, $action.action)">$action.label</a>
             #if($velocityCount < $model.actions.size())
             <span class="understated">//</span>

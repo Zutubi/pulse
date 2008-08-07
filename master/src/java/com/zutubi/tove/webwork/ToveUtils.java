@@ -535,7 +535,19 @@ public class ToveUtils
             }
         }
 
-        File iconFile = new File(systemPaths.getContentRoot(), FileSystemUtils.composeFilename("images", "config", "actions", actionName + ".gif"));
+        File contentRoot = systemPaths.getContentRoot();
+        return getActionLink(action, actionName, messages, contentRoot);
+    }
+
+    public static ActionLink getActionLink(String action, Messages messages, File contentRoot)
+    {
+        File iconFile = new File(contentRoot, FileSystemUtils.composeFilename("images", "config", "actions", action + ".gif"));
+        return new ActionLink(action, format(messages, action + ".label"), iconFile.exists() ? action : "generic");
+    }
+
+    private static ActionLink getActionLink(String action, String actionName, Messages messages, File contentRoot)
+    {
+        File iconFile = new File(contentRoot, FileSystemUtils.composeFilename("images", "config", "actions", actionName + ".gif"));
         return new ActionLink(action, format(messages, actionName + ".label"), iconFile.exists() ? actionName : "generic");
     }
 
