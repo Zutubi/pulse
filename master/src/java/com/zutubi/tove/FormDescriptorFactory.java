@@ -143,11 +143,11 @@ public class FormDescriptorFactory
         List<Validator> validators;
         try
         {
-            Configuration dummyInstance = (Configuration) type.getClazz().newInstance();
+            Configuration dummyInstance = type.getClazz().newInstance();
             ConfigurationValidationContext validationContext = new ConfigurationValidationContext(dummyInstance, null, parentPath, baseName, !concrete, false, configurationTemplateManager);
             validators = configurationValidatorProvider.getValidators(dummyInstance, validationContext);
         }
-        catch (Exception e)
+        catch (Throwable e)
         {
             // Not ideal, but we can soldier on regardless.
             LOG.warning("Unable to get validators for type '" + type.getSymbolicName() + "': " + e.getMessage(), e);

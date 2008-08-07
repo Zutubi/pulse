@@ -56,6 +56,15 @@ public class ConfigFileObject extends AbstractPulseFileObject implements Compara
         Type childType = configurationTemplateManager.getType(childPath);
         if(!(childType instanceof ComplexType))
         {
+            if (childType == null)
+            {
+                // Could be a type that is not registered (missing plugin?).
+                return objectFactory.buildBean(ConfigErrorFileObject.class,
+                        new Class[]{FileName.class, AbstractFileSystem.class, String.class, ComplexType.class, ComplexType.class, Record.class, String.class},
+                        new Object[]{fileName, pfs, childPath, type, null, null, "Path does not have a type: perhaps it is from a missing plugin?"}
+                );
+            }
+
             throw new FileSystemException("Illegal path '" + childPath + "': does not refer to a valid type");
         }
 

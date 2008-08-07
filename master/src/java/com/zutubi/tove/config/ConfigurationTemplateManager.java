@@ -973,6 +973,18 @@ public class ConfigurationTemplateManager
         {
             instance.addInstanceError(e.getMessage());
         }
+        catch (Throwable e)
+        {
+            LOG.severe(e);
+
+            String message = "Unexpected error during validation: " + e.getClass().getName();
+            if (e.getMessage() != null)
+            {
+                message += ": " + e.getMessage();
+            }
+
+            instance.addInstanceError(message);
+        }
 
         if (deep)
         {

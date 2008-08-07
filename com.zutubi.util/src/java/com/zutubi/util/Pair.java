@@ -14,6 +14,16 @@ public class Pair<T, U>
         this.second = second;
     }
 
+    public T getFirst()
+    {
+        return first;
+    }
+
+    public U getSecond()
+    {
+        return second;
+    }
+
     public boolean equals(Object o)
     {
         if (this == o)

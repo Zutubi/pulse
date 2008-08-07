@@ -309,7 +309,7 @@ public class ToveUtils
                 {
                     result = messages.format(key);
                 }
-                else
+                else if(type != null)
                 {
                     if (type instanceof CollectionType)
                     {

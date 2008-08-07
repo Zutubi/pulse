@@ -1159,6 +1159,12 @@ table.template-actions
     width: 20px;
 }
 
+.x-tree-node-collapsed .config-error-icon, .x-tree-node-expanded .config-error-icon, .x-tree-node-leaf .config-error-icon
+{
+    background-image: url(../images/error.gif);
+    width: 20px;
+}
+
 .config-panel
 {
     border-bottom-style:dotted;

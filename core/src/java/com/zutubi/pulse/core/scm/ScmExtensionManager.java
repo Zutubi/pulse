@@ -43,7 +43,7 @@ public class ScmExtensionManager extends AbstractExtensionManager
                     break;
                 }
             }
-            catch (Exception e)
+            catch (Throwable e)
             {
                 LOG.warning(e);
             }
@@ -73,12 +73,7 @@ public class ScmExtensionManager extends AbstractExtensionManager
                     WorkingCopyFactory.registerType(name, wcClazz);
                 }
             }
-            catch (Exception e)
-            {
-                LOG.severe(e);
-                handleExtensionError(extension, e);
-            }
-            catch (NoClassDefFoundError e)
+            catch (Throwable e)
             {
                 LOG.severe(e);
                 handleExtensionError(extension, e);

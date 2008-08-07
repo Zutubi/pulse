@@ -470,6 +470,7 @@
         <action name="display" class="com.zutubi.tove.webwork.DisplayAction">
             <result name="composite" type="velocity">composite.vm</result>
             <result name="map" type="velocity">map.vm</result>
+            <result name="error" type="velocity">/ajax/generic-error-panel.vm</result>
         </action>
 
         <action name="help" class="com.zutubi.tove.webwork.help.TypeHelpAction">

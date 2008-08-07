@@ -414,6 +414,11 @@ public class CompositeType extends AbstractType implements ComplexType
             else
             {
                 CompositeType type = typeRegistry.getType(record.getSymbolicName());
+                if (type == null)
+                {
+                    throw new TypeException("Record has unrecognised symbolic name '" + record.getSymbolicName() + "': this could be caused by a missing plugin");
+                }
+                
                 instance = type.instantiate(data, instantiator);
             }
         }

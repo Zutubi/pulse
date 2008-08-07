@@ -51,13 +51,13 @@
     <tr>
 #if($config.record || !$config.type.extendable)
         <td id="left-column">
-    #if($config.instance.instanceErrors.size() > 0)
+    #if($config.nestedPropertyErrors.size() > 0)
             <div id="instance-errors" class="config-panel">
             <h3 class="config-error-header">errors</h3>
             <div class="config-container">
             <ul class="config-errors">
-        #foreach($error in $config.instance.instanceErrors)
-                <li>#html($error)</li>
+        #foreach($error in $config.nestedPropertyErrors)
+                <li>#displayname("path=${path}/${error.first}") : #html($error.second)</li>
         #end
             </ul>
             </div>

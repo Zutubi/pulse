@@ -15,8 +15,10 @@ import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.Type;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
+import com.zutubi.tove.type.record.RecordManager;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
+import com.zutubi.util.Pair;
 import com.zutubi.util.TextUtils;
 
 import java.util.LinkedList;
@@ -28,6 +30,7 @@ import java.util.List;
  */
 public class ConfigurationUIModel
 {
+    private RecordManager recordManager;
     private ConfigurationPersistenceManager configurationPersistenceManager;
     private ConfigurationTemplateManager configurationTemplateManager;
     private ConfigurationSecurityManager configurationSecurityManager;
@@ -53,6 +56,8 @@ public class ConfigurationUIModel
 
     private List<String> simpleProperties;
     private List<String> nestedProperties;
+    private List<Pair<String, String>> nestedPropertyErrors = new LinkedList<Pair<String, String>>();
+
     private List<String> extensions = new LinkedList<String>();
 
     private List<ActionLink> actions = new LinkedList<ActionLink>();
@@ -107,6 +112,27 @@ public class ConfigurationUIModel
         }
 
         type = configurationTemplateManager.getType(path);
+        if (type == null)
+        {
+            // Could be a missing plugin, so try and provide a symbolic name
+            // in that case to help diagnose.
+            String message = "No type found for path '" + path + "', this could be due to a missing plugin.";
+            try
+            {
+                Record value = recordManager.select(path);
+                if (value != null)
+                {
+                    message += "  Path has symbolic name '" + value.getSymbolicName() + "'.";
+                }
+            }
+            catch (Throwable e)
+            {
+                // Oh well, we tried.
+            }
+            
+            throw new IllegalArgumentException(message);
+        }
+
         targetType = type.getTargetType();
 
         nestedProperties = ToveUtils.getPathListing(path, type, configurationTemplateManager, configurationSecurityManager);
@@ -134,6 +160,17 @@ public class ConfigurationUIModel
         {
             record = configurationTemplateManager.getRecord(path);
             instance = configurationProvider.get(path, Configuration.class);
+
+            if (instance != null)
+            {
+                for (String nested: nestedProperties)
+                {
+                    for(String error: instance.getFieldErrors(nested))
+                    {
+                        nestedPropertyErrors.add(new Pair<String, String>(nested, error));
+                    }
+                }
+            }
         }
 
         if (!(type instanceof CollectionType))
@@ -245,6 +282,11 @@ public class ConfigurationUIModel
         return nestedProperties;
     }
 
+    public List<Pair<String, String>> getNestedPropertyErrors()
+    {
+        return nestedPropertyErrors;
+    }
+
     public List<String> getExtensions()
     {
         return extensions;
@@ -323,5 +365,10 @@ public class ConfigurationUIModel
     public void setConfigurationProvider(ConfigurationProvider configurationProvider)
     {
         this.configurationProvider = configurationProvider;
+    }
+
+    public void setRecordManager(RecordManager recordManager)
+    {
+        this.recordManager = recordManager;
     }
 }

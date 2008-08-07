@@ -48,7 +48,15 @@ public abstract class AbstractExtensionManager implements IExtensionChangeHandle
         IExtension[] extensions = extensionPoint.getExtensions();
         for (IExtension extension : extensions)
         {
-            addExtension(tracker, extension);
+            try
+            {
+                addExtension(tracker, extension);
+            }
+            catch (Throwable e)
+            {
+                LOG.severe("Error while adding extension at point '" + getExtensionPointId() + "' for plugin '" + extension.getContributor().getName() + "': " + e.getMessage(), e);
+                handleExtensionError(extension, e);
+            }
         }
     }
 
