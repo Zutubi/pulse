@@ -14,7 +14,6 @@
 
 #macro(showChildren $model $groupKey)
     #set($totalCount = $model.children.size())
-    #set($depth = $model.depth + 1)
     #foreach($child in $model.children)
         #if($child.concrete)
             #set($rowspan = $child.buildRows)
@@ -25,8 +24,8 @@
         <tr id="$child.id" class="project-row #if(!$child.leaf) project-expandable #end #if($child.leaf && $velocityCount == $totalCount) project-last #end">
             <td class="health-$child.health.toString().toLowerCase()" rowspan="$rowspan">&nbsp;</td>
             <td rowspan="$rowspan" class="fit-width">
-        #foreach($i in [1..$depth])
-                <img class="project-indent #if($i == $depth) project-name #end" src="$base/images/default/s.gif" alt="-"/>
+        #foreach($i in [1..$child.depth])
+                <img class="project-indent #if($i == $child.depth) project-name #end" src="$base/images/default/s.gif" alt="-"/>
         #end
                 <span class="nowrap">
                     #if($child.concrete)<a href="$urls.projectHome($child.project)">#end#html($child.name)#if($child.concrete)</a>#end
