@@ -9,10 +9,7 @@ import com.zutubi.tove.config.*;
 import com.zutubi.tove.format.StateDisplayManager;
 import com.zutubi.tove.model.ActionLink;
 import com.zutubi.tove.security.AccessManager;
-import com.zutubi.tove.type.CollectionType;
-import com.zutubi.tove.type.ComplexType;
-import com.zutubi.tove.type.CompositeType;
-import com.zutubi.tove.type.Type;
+import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
@@ -101,9 +98,10 @@ public class ConfigurationUIModel
         currentPath = pathElements[pathElements.length - 1];
 
         parentPath = PathUtils.getParentPath(path);
+        ComplexType parentType = null;
         if (parentPath != null)
         {
-            ComplexType parentType = configurationTemplateManager.getType(parentPath);
+            parentType = configurationTemplateManager.getType(parentPath);
             if (ToveUtils.isEmbeddedCollection(parentType))
             {
                 embedded = true;
@@ -180,11 +178,18 @@ public class ConfigurationUIModel
             List<String> actionNames = actionManager.getActions(instance, true);
             actionNames.remove(AccessManager.ACTION_VIEW);
             actionNames.remove(AccessManager.ACTION_CLONE);
+
+            final String[] key = new String[]{ null };
+            if (parentType != null && parentType instanceof MapType)
+            {
+                key[0] = PathUtils.getBaseName(path);
+            }
+
             actions = CollectionUtils.map(actionNames, new Mapping<String, ActionLink>()
             {
                 public ActionLink map(String actionName)
                 {
-                    return ToveUtils.getActionLink(actionName, record, null, messages, systemPaths);
+                    return ToveUtils.getActionLink(actionName, record, key[0], messages, systemPaths);
                 }
             });
 

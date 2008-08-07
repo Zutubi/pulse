@@ -178,16 +178,6 @@ public class TableDescriptor extends AbstractParameterised implements Descriptor
         }
     }
 
-//    private void transformDeleteAction(Row row, String action, Messages messages)
-//    {
-//        RowAction deleteAction = row.getAction(AccessManager.ACTION_DELETE);
-//        if (deleteAction != null)
-//        {
-//            deleteAction.setLabel(format(messages, action + ".label"));
-//            deleteAction.setIcon(action);
-//        }
-//    }
-
     private List<ActionLink> getActions(Object instance, final Record data, final String key, final Messages messages)
     {
         try
