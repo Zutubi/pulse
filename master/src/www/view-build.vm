@@ -54,42 +54,6 @@
 <body>
     #buildTabs($buildResult "summary")
 
-    <div id='#id("${result.ownerName}-build-${result.number}-summary")'></div>
-
-#if($result.completed())
-#auth("resource=project" "action=write")
-    <div id="action-column" style="margin-left: 20px; float: right;">
-        <table width="150" class="content">
-            <tr>
-                <th class="heading">actions</th>
-            </tr>
-        #set($confirm = $action.getText("build.delete.confirm", [$buildResult.number]))
-            <tr>
-                <td class="content">
-                    <img alt="delete" src="$base/images/delete.gif"/>
-                    <a href="#" onclick="confirmUrl('$confirm', '$base/deleteBuild.action?${ownerArg}&amp;buildVID=$buildResult.number')">#wwtext("name=build.delete")</a>
-                </td>
-            </tr>
-        </table>
-
-    #if(!$personal && $hooks.size() > 0)
-        <table width="150" class="content">
-            <tr>
-                <th class="heading">hooks</th>
-            </tr>
-        #foreach($hook in $hooks)
-            <tr>
-                <td class="content">
-                    <img alt="trigger" src="$base/images/lightning.gif"/>
-                    <a id='#id("hook.${hook.name}")' href="#" onclick="triggerHook('$hook.handle'); return false">#html($hook.name)</a>
-                </td>
-            </tr>
-        #end
-        </table>
-    #end
-    </div>
-#end
-#end
     <div id="panel">
         #parse("ajax/view-build-panel.vm")
     </div>

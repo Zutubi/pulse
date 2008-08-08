@@ -8,8 +8,10 @@ import com.zutubi.pulse.model.BuildColumns;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.tove.config.project.hooks.BuildHookConfiguration;
 import com.zutubi.pulse.tove.config.user.UserPreferencesConfiguration;
+import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.logging.Logger;
 
 import java.util.Collections;
@@ -36,6 +38,8 @@ public class ViewBuildAction extends CommandActionBase
      * Insanity to work around lack of locals in velocity.
      */
     private Stack<String> pathStack = new Stack<String>();
+    private boolean cancelAvailable;
+    private boolean deleteAvailable;
     private List<BuildHookConfiguration> hooks;
 
     public boolean haveRecipeResultNode()
@@ -88,24 +92,50 @@ public class ViewBuildAction extends CommandActionBase
         return hooks;
     }
 
-    public void validate()
+    public boolean isCancelAvailable()
     {
+        return cancelAvailable;
+    }
 
+    public boolean isDeleteAvailable()
+    {
+        return deleteAvailable;
+    }
+
+    public boolean hasActions()
+    {
+        return cancelAvailable || deleteAvailable;
     }
 
     public String execute()
     {
-        if (!isPersonal())
+        BuildResult result = getRequiredBuildResult();
+        boolean canWrite = accessManager.hasPermission(AccessManager.ACTION_WRITE, result.getProject());
+        if (!isPersonal() && canWrite)
         {
             ProjectConfiguration projectConfig = getRequiredProject().getConfig();
             hooks = new LinkedList<BuildHookConfiguration>(projectConfig.getBuildHooks().values());
             Collections.sort(hooks, new NamedConfigurationComparator());
         }
+        else
+        {
+            hooks = Collections.emptyList();
+        }
+
+        if (result.completed())
+        {
+            cancelAvailable = false;
+            deleteAvailable = canWrite;
+        }
+        else
+        {
+            cancelAvailable = accessManager.hasPermission(ProjectConfigurationActions.ACTION_CANCEL_BUILD, result);
+            deleteAvailable = false;
+        }
 
         // Initialise detail down to the command level (optional)
         getCommandResult();
 
-        BuildResult result = getRequiredBuildResult();
         result.loadFeatures(configurationManager.getDataDirectory());
 
         if(result.completed())

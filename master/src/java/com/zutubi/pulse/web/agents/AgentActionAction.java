@@ -36,6 +36,7 @@ public class AgentActionAction extends AgentActionBase
             return urls.agents();
         }
     }
+
     public String execute() throws Exception
     {
         AgentConfiguration config = getRequiredAgent().getConfig();

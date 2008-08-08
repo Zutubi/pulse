@@ -47,7 +47,7 @@
         </action>
 
         <action name="cancelBuild" class="com.zutubi.pulse.web.server.CancelBuildAction">
-            <result name="success" type="redirect">/server/activity/</result>
+            <result name="success" type="redirect">${redirect}</result>
         </action>
 
         <action name="cancelQueuedBuild" class="com.zutubi.pulse.web.server.CancelQueuedBuildAction">
