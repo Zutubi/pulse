@@ -222,6 +222,8 @@ public abstract class LocalPlugin implements Plugin
 
     public List<Plugin> getDependentPlugins()
     {
+        // logically, the code for dependent plugins should be in the plugin.  However, for now we
+        // just delegate.
         return manager.getDependentPlugins(this);
     }
 

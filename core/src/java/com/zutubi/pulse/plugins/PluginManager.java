@@ -912,7 +912,12 @@ public class PluginManager
 
     public List<Plugin> getDependentPlugins(LocalPlugin plugin)
     {
-        return new LinkedList<Plugin>(getDependentPlugins(plugin, plugins, false));
+        List<Plugin> dependents = new LinkedList<Plugin>();
+        if (plugin.getBundleDescription() != null)
+        {
+            dependents.addAll(getDependentPlugins(plugin, plugins, false));
+        }
+        return dependents;
     }
 
     public List<PluginDependency> getRequiredPlugins(LocalPlugin plugin)

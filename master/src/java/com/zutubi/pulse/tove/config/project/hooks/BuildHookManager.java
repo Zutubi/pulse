@@ -3,9 +3,8 @@ package com.zutubi.pulse.tove.config.project.hooks;
 import com.zutubi.pulse.MasterBuildProperties;
 import com.zutubi.pulse.agent.MasterLocationProvider;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.core.CommandEventOutputStream;
-import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.BuildEventOutputStream;
+import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.Result;
 import com.zutubi.pulse.core.model.ResultState;
@@ -22,7 +21,6 @@ import com.zutubi.util.IOUtils;
 import com.zutubi.util.UnaryProcedure;
 
 import java.io.OutputStream;
-import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 

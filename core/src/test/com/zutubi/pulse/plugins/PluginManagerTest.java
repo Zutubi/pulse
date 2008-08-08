@@ -522,11 +522,57 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         Plugin producer = manager.install(producer1.toURI());
         Plugin consumer = manager.install(consumer1.toURI());
 
-        restartPluginCore();
-
         List<Plugin> dependentPlugins = producer.getDependentPlugins();
         assertEquals(1, dependentPlugins.size());
         assertEquals(consumer, dependentPlugins.get(0));
+
+        restartPluginCore();
+
+        // refresh.
+        producer = manager.getPlugin(producer.getId());
+
+        dependentPlugins = producer.getDependentPlugins();
+        assertEquals(1, dependentPlugins.size());
+        assertEquals(consumer, dependentPlugins.get(0));
+    }
+
+    public void testPluginDependenciesForDisabledPlugin() throws Exception
+    {
+        startupPluginCore();
+
+        // this differs from the previous in that we install and then restart the plugin manager.  This
+        // better tests the init processing.
+        Plugin producer = manager.install(producer1.toURI());
+        Plugin consumer = manager.install(consumer1.toURI());
+
+        producer.disable();
+
+        assertEquals(1, producer.getDependentPlugins().size());
+
+        restartPluginCore();
+
+        // refresh.
+        producer = manager.getPlugin(producer.getId());
+
+        assertEquals(0, producer.getDependentPlugins().size());
+    }
+
+    public void testPluginDependenciesForUninstallingPlugin() throws Exception
+    {
+        startupPluginCore();
+
+        // this differs from the previous in that we install and then restart the plugin manager.  This
+        // better tests the init processing.
+        Plugin producer = manager.install(producer1.toURI());
+        Plugin consumer = manager.install(consumer1.toURI());
+
+        producer.uninstall();
+
+        assertEquals(1, producer.getDependentPlugins().size());
+
+        restartPluginCore();
+
+        assertNull(manager.getPlugin(producer.getId()));
     }
 
     public void testGetRequiredPlugins() throws PluginException
