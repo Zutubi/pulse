@@ -70,13 +70,13 @@ public class SlaveRecipeProcessor
             request.setBootstrapper(new ChainBootstrapper(new ServerBootstrapper(), requestBootstrapper));
 
             context.push();
-            CommandOutputStream outputStream = null;
+            EventOutputStream outputStream = null;
             try
             {
                 context.addValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, processorPaths);
                 context.addValue(NAMESPACE_INTERNAL, PROPERTY_RESOURCE_REPOSITORY, repo);
                 context.addValue(NAMESPACE_INTERNAL, PROPERTY_FILE_REPOSITORY, new SlaveFileRepository(processorPaths.getRecipeRoot(), master, serviceTokenManager));
-                outputStream = new CommandOutputStream(eventManager, request.getId(), true);
+                outputStream = new CommandEventOutputStream(eventManager, request.getId(), true);
                 context.setOutputStream(outputStream);
                 context.setWorkingDir(processorPaths.getBaseDir());
                 recipeProcessor.build(request);

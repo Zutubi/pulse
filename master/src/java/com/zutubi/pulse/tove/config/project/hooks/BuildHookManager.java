@@ -3,7 +3,9 @@ package com.zutubi.pulse.tove.config.project.hooks;
 import com.zutubi.pulse.MasterBuildProperties;
 import com.zutubi.pulse.agent.MasterLocationProvider;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.core.CommandEventOutputStream;
 import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.BuildEventOutputStream;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.Result;
 import com.zutubi.pulse.core.model.ResultState;
@@ -13,10 +15,14 @@ import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.BuildEvent;
 import com.zutubi.pulse.events.build.StageEvent;
 import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.RecipeResultNode;
 import com.zutubi.pulse.model.persistence.hibernate.HibernateBuildResultDao;
+import com.zutubi.util.IOUtils;
 import com.zutubi.util.UnaryProcedure;
 
+import java.io.OutputStream;
+import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -31,23 +37,40 @@ public class BuildHookManager implements EventListener
     private MasterConfigurationManager configurationManager;
     private MasterLocationProvider masterLocationProvider;
 
+    private EventManager eventManager;
+
     public void handleEvent(Event event)
     {
-        BuildEvent be = (BuildEvent) event;
+        final BuildEvent be = (BuildEvent) event;
         BuildResult buildResult = be.getBuildResult();
         if (!buildResult.isPersonal())
         {
+            // generate the execution context.
             ExecutionContext context = new ExecutionContext(be.getContext());
-            for(BuildHookConfiguration hook: buildResult.getProject().getConfig().getBuildHooks().values())
+            Project project = buildResult.getProject();
+            for (BuildHookConfiguration hook : project.getConfig().getBuildHooks().values())
             {
-                if(hook.enabled() && hook.triggeredBy(be))
+                if (hook.enabled() && hook.triggeredBy(be))
                 {
                     RecipeResultNode resultNode = null;
-                    if(be instanceof StageEvent)
+                    if (be instanceof StageEvent)
                     {
-                        resultNode = ((StageEvent)be).getStageNode();
+                        resultNode = ((StageEvent) be).getStageNode();
                     }
-                    executeTask(hook, context, be.getBuildResult(), resultNode, false);
+
+                    OutputStream out = null;
+                    try
+                    {
+                        // stream the output to whoever is listening.
+                        out = new BuildEventOutputStream(eventManager, true);
+                        context.setOutputStream(out);
+
+                        executeTask(hook, context, be.getBuildResult(), resultNode, false);
+                    }
+                    finally
+                    {
+                        IOUtils.close(out);
+                    }
                 }
             }
         }
@@ -71,7 +94,7 @@ public class BuildHookManager implements EventListener
                 {
                     public void process(RecipeResultNode recipeResultNode)
                     {
-                        if(hook.appliesTo(recipeResultNode))
+                        if (hook.appliesTo(recipeResultNode))
                         {
                             context.push();
                             try
@@ -99,7 +122,7 @@ public class BuildHookManager implements EventListener
         }
         catch (Exception e)
         {
-            if(!manual)
+            if (!manual)
             {
                 Result result = resultNode == null ? buildResult : resultNode.getResult();
                 result.addFeature(Feature.Level.ERROR, "Error executing task for hook '" + hook.getName() + "': " + e.getMessage());
@@ -118,6 +141,7 @@ public class BuildHookManager implements EventListener
 
     public void setEventManager(EventManager eventManager)
     {
+        this.eventManager = eventManager;
         eventManager.register(this);
     }
 

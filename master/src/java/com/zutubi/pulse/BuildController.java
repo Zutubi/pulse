@@ -199,18 +199,12 @@ public class BuildController implements EventListener
         // that we are dealing with. Q: How do we identify our events..
         try
         {
-            if (!(evt instanceof BuildCommencedEvent))
-            {
-                buildLogger.log(evt);
-            }
-            
             if (evt instanceof BuildCommencedEvent)
             {
                 BuildCommencedEvent e = (BuildCommencedEvent) evt;
                 if (e.getBuildResult() == buildResult)
                 {
                     handleBuildCommenced();
-                    buildLogger.log(evt);
                 }
             }
             else if (evt instanceof BuildTerminationRequestEvent)
@@ -262,12 +256,13 @@ public class BuildController implements EventListener
             throw new BuildException("Unable to create build directory '" + buildDir.getAbsolutePath() + "'");
         }
 
-        buildLogger.prepare();
-
         if (!buildManager.isSpaceAvailableForBuild())
         {
             throw new BuildException("Insufficient database space to run build.  Consider adding more cleanup rules to remove old build information");
         }
+
+        buildLogger.prepare();
+        eventManager.register(buildLogger);
 
         tree.prepare(buildResult);
 
@@ -706,8 +701,11 @@ public class BuildController implements EventListener
         eventManager.unregister(asyncListener);
         eventManager.publish(new BuildCompletedEvent(this, buildResult, buildContext));
 
+        eventManager.unregister(buildLogger);
         buildLogger.done();
-        
+
+        // this must be last since we are in fact stopping the thread running this method.., we are
+        // after all responding to an event on this listener.
         asyncListener.stop(true);
     }
 

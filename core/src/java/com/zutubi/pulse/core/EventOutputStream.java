@@ -9,7 +9,7 @@ import java.io.OutputStream;
 /**
  *
  */
-public class CommandOutputStream extends OutputStream implements Runnable
+public abstract class EventOutputStream extends OutputStream implements Runnable
 {
     /**
      * Minimum number of bytes we will transmit, if there are fewer then the
@@ -19,10 +19,9 @@ public class CommandOutputStream extends OutputStream implements Runnable
      */
     public static int MINIMUM_SIZE = 1024;
 
-    private EventManager eventManager;
-    private long recipeId;
+    protected EventManager eventManager;
     private byte[] buffer;
-    private int offset;
+    protected int offset;
 
     /**
      * The default auto flush interval. When auto flushing is enabled, the output stream
@@ -30,10 +29,9 @@ public class CommandOutputStream extends OutputStream implements Runnable
      */
     private static final int AUTO_FLUSH_INTERVAL = 5000;
 
-    public CommandOutputStream(EventManager eventManager, long recipeId, boolean autoflush)
+    public EventOutputStream(EventManager eventManager, boolean autoflush)
     {
         this.eventManager = eventManager;
-        this.recipeId = recipeId;
         buffer = new byte[MINIMUM_SIZE];
         offset = 0;
 
@@ -108,12 +106,7 @@ public class CommandOutputStream extends OutputStream implements Runnable
         sendEvent(sendBuffer);
     }
 
-    private void sendEvent(byte[] sendBuffer)
-    {
-        CommandOutputEvent event = new CommandOutputEvent(this, recipeId, sendBuffer);
-        eventManager.publish(event);
-        offset = 0;
-    }
+    protected abstract void sendEvent(byte[] sendBuffer);
 
     public void run()
     {

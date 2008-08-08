@@ -13,7 +13,6 @@ import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.AbstractBuildRequestEvent;
 import com.zutubi.pulse.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.events.build.BuildTerminationRequestEvent;
-import com.zutubi.pulse.events.build.RecipeTimeoutEvent;
 import com.zutubi.pulse.events.system.SystemStartedEvent;
 import com.zutubi.pulse.license.License;
 import com.zutubi.pulse.license.LicenseHolder;
@@ -359,7 +358,6 @@ public class FatController implements EventListener, Stoppable
     {
         return new Class[]{AbstractBuildRequestEvent.class,
                 BuildCompletedEvent.class,
-                RecipeTimeoutEvent.class,
                 LicenseExpiredEvent.class,
                 LicenseUpdateEvent.class,
                 SystemStartedEvent.class

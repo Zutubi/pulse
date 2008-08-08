@@ -39,14 +39,14 @@ public class MasterRecipeRunner implements Runnable
         ExecutionContext context = request.getContext();
         ServerRecipePaths recipePaths = new ServerRecipePaths(request.getProject(), request.getId(), configurationManager.getUserPaths().getData(), context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_INCREMENTAL_BUILD, false));
 
-        CommandOutputStream outputStream = null;
+        EventOutputStream outputStream = null;
         context.push();
         try
         {
             context.addValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, recipePaths);
             context.addValue(NAMESPACE_INTERNAL, PROPERTY_RESOURCE_REPOSITORY, resourceRepository);
             context.addValue(NAMESPACE_INTERNAL, PROPERTY_FILE_REPOSITORY, new MasterFileRepository(configurationManager));
-            outputStream = new CommandOutputStream(eventManager, request.getId(), true);
+            outputStream = new CommandEventOutputStream(eventManager, request.getId(), true);
             context.setOutputStream(outputStream);
             context.setWorkingDir(recipePaths.getBaseDir());
 
