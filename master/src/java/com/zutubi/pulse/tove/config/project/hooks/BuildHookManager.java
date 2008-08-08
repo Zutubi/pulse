@@ -13,6 +13,8 @@ import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.BuildEvent;
 import com.zutubi.pulse.events.build.StageEvent;
+import com.zutubi.pulse.events.build.BuildOutputCommencedEvent;
+import com.zutubi.pulse.events.build.BuildOutputCompletedEvent;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.RecipeResultNode;
@@ -56,19 +58,20 @@ public class BuildHookManager implements EventListener
                         resultNode = ((StageEvent) be).getStageNode();
                     }
 
+                    eventManager.publish(new BuildOutputCommencedEvent(this));
                     OutputStream out = null;
                     try
                     {
                         // stream the output to whoever is listening.
                         out = new BuildEventOutputStream(eventManager, true);
                         context.setOutputStream(out);
-
                         executeTask(hook, context, be.getBuildResult(), resultNode, false);
                     }
                     finally
                     {
                         IOUtils.close(out);
                     }
+                    eventManager.publish(new BuildOutputCompletedEvent(this));
                 }
             }
         }

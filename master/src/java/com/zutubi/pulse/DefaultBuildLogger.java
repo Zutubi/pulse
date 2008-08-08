@@ -4,6 +4,8 @@ import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.build.BuildEvent;
 import com.zutubi.pulse.events.build.OutputEvent;
+import com.zutubi.pulse.events.build.BuildOutputCommencedEvent;
+import com.zutubi.pulse.events.build.BuildOutputCompletedEvent;
 
 import java.io.File;
 
@@ -13,6 +15,9 @@ import java.io.File;
  */
 public class DefaultBuildLogger extends AbstractFileLogger implements BuildLogger, EventListener
 {
+    private static final String PRE_MARKER = "============================[ task output below ]============================";
+    private static final String POST_MARKER = "============================[ task output above ]============================";
+
     public DefaultBuildLogger(File logFile)
     {
         super(logFile);
@@ -27,7 +32,23 @@ public class DefaultBuildLogger extends AbstractFileLogger implements BuildLogge
     {
         if (event instanceof OutputEvent)
         {
-            log((OutputEvent)event);
+            log((OutputEvent) event);
+        }
+        else if (event instanceof BuildOutputCommencedEvent)
+        {
+            if (writer != null)
+            {
+                writer.println(PRE_MARKER);
+                writer.flush();
+            }
+        }
+        else if (event instanceof BuildOutputCompletedEvent)
+        {
+            if (writer != null)
+            {
+                writer.println(POST_MARKER);
+                writer.flush();
+            }
         }
         else
         {
@@ -37,7 +58,11 @@ public class DefaultBuildLogger extends AbstractFileLogger implements BuildLogge
 
     public void log(OutputEvent evt)
     {
-        logMarker(new String(evt.getData()));
+        if (writer != null)
+        {
+            writer.print(new String(evt.getData()));
+            writer.flush();
+        }
     }
 
     public void done()

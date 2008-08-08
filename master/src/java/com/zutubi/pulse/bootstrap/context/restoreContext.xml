@@ -49,6 +49,16 @@
                 </property>
             </bean>
         </property>
+        <property name="tmpDirectory">
+            <bean class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+                <property name="targetBeanName">
+                    <value>systemPaths</value>
+                </property>
+                <property name="propertyPath">
+                    <value>tmpRoot</value>
+                </property>
+            </bean>
+        </property>
         <property name="backupableComponents">
             <list>
                 <ref local="recordsArchive"/>
