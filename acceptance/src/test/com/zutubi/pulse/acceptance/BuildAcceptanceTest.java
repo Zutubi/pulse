@@ -10,14 +10,15 @@ import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.model.ResourceRequirement;
 import com.zutubi.tove.config.ConfigurationRegistry;
+import com.zutubi.tove.type.record.PathUtils;
 import static com.zutubi.tove.type.record.PathUtils.getPath;
 import com.zutubi.util.TextUtils;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import java.util.Hashtable;
-
-import org.testng.annotations.Test;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.AfterMethod;
+import java.util.Vector;
 
 /**
  * An acceptance test that adds a very simple project and runs a build as a
@@ -33,6 +34,15 @@ public class BuildAcceptanceTest extends SeleniumTestBase
     {
         super.setUp();
         xmlRpcHelper.loginAsAdmin();
+
+        Vector<String> agents = xmlRpcHelper.getConfigListing(ConfigurationRegistry.AGENTS_SCOPE);
+        for(String agent: agents)
+        {
+            if(!agent.equals(AgentManager.GLOBAL_AGENT_NAME) && !agent.equals(AgentManager.MASTER_AGENT_NAME))
+            {
+                xmlRpcHelper.deleteConfig(PathUtils.getPath(ConfigurationRegistry.AGENTS_SCOPE, agent));
+            }
+        }
     }
 
     @AfterMethod

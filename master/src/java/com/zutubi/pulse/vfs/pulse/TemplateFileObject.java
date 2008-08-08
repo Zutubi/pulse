@@ -24,7 +24,7 @@ import java.util.List;
  *
  * @see TemplateScopesFileObject
  */
-public class TemplateFileObject extends AbstractPulseFileObject implements ComparatorProvider, UniquelyIdentified
+public class TemplateFileObject extends AbstractPulseFileObject implements ComparatorProvider
 {
     private TemplateNode node;
     private ConfigurationTemplateManager configurationTemplateManager;
@@ -126,11 +126,6 @@ public class TemplateFileObject extends AbstractPulseFileObject implements Compa
                 return c.compare(tfo1.getDisplayName(), tfo2.getDisplayName());
             }
         };
-    }
-
-    public String getUniqueId()
-    {
-        return getName().getBaseName();
     }
 
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)

@@ -82,7 +82,6 @@
             });
 
             var root = new Ext.tree.AsyncTreeNode({
-                id: project,
                 baseName: project,
                 text: project,
                 cls: cls,
@@ -113,7 +112,7 @@
             if(treesInitialised && node)
             {
                 detailPanel.load({
-                    url: '$base/atemplate/$scope/' + node.id,
+                    url: '$base/atemplate/$scope/' + node.attributes.baseName,
                     scripts: true,
                     callback: function(element, success, response) {
                         if(!success)
@@ -169,7 +168,6 @@
                     });
 
                     var templateRoot = new Ext.tree.AsyncTreeNode({
-                        id: 'x',
                         baseName: 'x',
                         text: 'settings',
                         allowDrag: false,
@@ -230,8 +228,8 @@
 
                             if(configTree)
                             {
-                                var configId = configTree.getRootNode().id;
-                                node = templateTree.getNodeById(configId);
+                                var configBaseName = configTree.getRootNode().attributes.baseName;
+                                node = templateTree.findNodeByAttribute('baseName', configBaseName);
                             }
 
                             if(!node)

@@ -557,14 +557,6 @@ Ext.extend(ZUTUBI.ConfigTree, Ext.tree.TreePanel, {
                 }
             }
         }
-    },
-
-    setNodeId: function(node, id)
-    {
-        this.unregisterNode(node);
-        node.id = id;
-        node.attributes.id = id;
-        this.registerNode(node);
     }
 });
 
@@ -586,7 +578,7 @@ Ext.extend(ZUTUBI.TemplateTree, ZUTUBI.ConfigTree, {
             each(response.addedFiles, function(addition) {
                 if (addition.parentTemplatePath && addition.parentPath == tree.scope)
                 {
-                    tree.addNode(addition.parentTemplatePath, {id: addition.baseName, baseName: addition.baseName, text: addition.displayName, iconCls: addition.iconCls, leaf: addition.templateLeaf});
+                    tree.addNode(addition.parentTemplatePath, { baseName: addition.baseName, text: addition.displayName, iconCls: addition.iconCls, leaf: addition.templateLeaf});
                 }
             });
         }
@@ -610,13 +602,34 @@ Ext.extend(ZUTUBI.TemplateTree, ZUTUBI.ConfigTree, {
         }
     },
 
+    findNodeByAttribute: function(attribute, value, node)
+    {
+        node = node || this.root;
+        if (node.attributes[attribute] == value)
+        {
+            return node;
+        }
+
+        var cs = node.childNodes;
+        for(var i = 0, len = cs.length; i < len; i++)
+        {
+            var found = this.findNodeByAttribute(attribute, value, cs[i]);
+            if (found)
+            {
+                return found;
+            }
+        }
+
+        return null;
+    },
+
     translatePath: function(path)
     {
         var pieces = path.split(this.pathSeparator);
         if (pieces.length == 2 && pieces[0] == this.scope)
         {
-            var id = pieces[1];
-            var node = this.getNodeById(id);
+            var baseName = pieces[1];
+            var node = this.findNodeByAttribute('baseName', baseName);
             if (node)
             {
                 return this.getNodeConfigPath(node);
@@ -624,20 +637,6 @@ Ext.extend(ZUTUBI.TemplateTree, ZUTUBI.ConfigTree, {
         }
         
         return null;
-    },
-
-    renameNode: function(oldPath, newName, newDisplayName)
-    {
-        if(oldPath)
-        {
-            var node = this.getNodeByConfigPath(oldPath);
-            if(node)
-            {
-                this.setNodeId(node, newName);
-                node.attributes.baseName = newName;
-                node.setText(newDisplayName);
-            }
-        }
     }
 });
 
