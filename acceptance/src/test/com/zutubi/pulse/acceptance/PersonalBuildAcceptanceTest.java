@@ -12,15 +12,15 @@ import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.IOUtils;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
 import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 import org.tmatesoft.svn.core.wc.SVNUpdateClient;
 import org.tmatesoft.svn.core.wc.SVNWCUtil;
-import org.testng.annotations.Test;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.AfterMethod;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -81,6 +81,7 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
         makeChange();
         createConfigFile();
         loginAsAdmin();
+        ensureAgent(AGENT_NAME);
         ensureProject(PROJECT_NAME);
         editStageToRunOnAgent(AGENT_NAME);
         long buildNumber = runPersonalBuild();
