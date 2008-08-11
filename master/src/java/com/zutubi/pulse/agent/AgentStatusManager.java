@@ -142,9 +142,6 @@ public class AgentStatusManager implements EventListener
 
         if(slaveAgent.getStatus().isOnline())
         {
-            // It is important that the agent online event comes before the
-            // available event as the online event may trigger some extra
-            // updates to the agent (e.g. resource discovery).
             if(!oldStatus.isOnline())
             {
                 publishEvent(new AgentOnlineEvent(this, slaveAgent));

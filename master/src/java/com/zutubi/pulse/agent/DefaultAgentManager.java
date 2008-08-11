@@ -7,7 +7,6 @@ import com.zutubi.pulse.SlaveProxyFactory;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.StartupManager;
 import com.zutubi.pulse.core.Stoppable;
-import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.events.*;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.license.LicenseException;
@@ -82,7 +81,6 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         AddAgentAuthorisation addAgentAuthorisation = new AddAgentAuthorisation();
         addAgentAuthorisation.setAgentManager(this);
         licenseManager.addAuthorisation(addAgentAuthorisation);
-
     }
 
     private void refreshSlaveAgents()
@@ -213,23 +211,6 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         }
     }
 
-    private void handleAgentOnline(AgentOnlineEvent event)
-    {
-        Agent agent = event.getAgent();
-        if (agent.isSlave())
-        {
-            try
-            {
-                List<Resource> resources = ((SlaveAgent) agent).getSlaveService().discoverResources(serviceTokenManager.getToken());
-                resourceManager.addDiscoveredResources(slaveManager.getSlave(agent.getId()), resources);
-            }
-            catch (Exception e)
-            {
-                LOG.warning("Unable to discover resource for agent '" + agent.getName() + "': " + e.getMessage(), e);
-            }
-        }
-    }
-
     private void handleUpgradeRequired(AgentUpgradeRequiredEvent event)
     {
         SlaveAgent agent = (SlaveAgent) event.getAgent();
@@ -290,10 +271,6 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
         {
             pingSlave(((AgentPingRequestedEvent) evt).getSlaveAgent());
         }
-        else if (evt instanceof AgentOnlineEvent)
-        {
-            handleAgentOnline((AgentOnlineEvent)evt);
-        }
         else if (evt instanceof AgentUpgradeRequiredEvent)
         {
             handleUpgradeRequired((AgentUpgradeRequiredEvent) evt);
@@ -306,7 +283,7 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 
     public Class[] getHandledEvents()
     {
-        return new Class[] { AgentPingRequestedEvent.class, AgentOnlineEvent.class, AgentUpgradeRequiredEvent.class, SlaveUpgradeCompleteEvent.class };
+        return new Class[] { AgentPingRequestedEvent.class, AgentUpgradeRequiredEvent.class, SlaveUpgradeCompleteEvent.class };
     }
 
     public void setMasterLocationProvider(MasterLocationProvider masterLocationProvider)

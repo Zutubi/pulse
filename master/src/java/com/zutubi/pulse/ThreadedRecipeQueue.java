@@ -81,7 +81,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
             // Get all agents
             for (Agent a : agentManager.getOnlineAgents())
             {
-                online(a);
+                updateTimeoutsForAgent(a);
             }
 
             eventManager.register(this);
@@ -245,7 +245,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         return removed;
     }
 
-    void online(Agent agent)
+    void updateTimeoutsForAgent(Agent agent)
     {
         lock.lock();
         try
@@ -532,6 +532,10 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         {
             handleConnectivityEvent((AgentConnectivityEvent) evt);
         }
+        else if (evt instanceof AgentResourcesDiscoveredEvent)
+        {
+            updateTimeoutsForAgent(((AgentResourcesDiscoveredEvent) evt).getAgent());
+        }
         else if (evt instanceof SCMChangeEvent)
         {
             handleScmChange((SCMChangeEvent) evt);
@@ -555,7 +559,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     {
         if (event instanceof AgentOnlineEvent)
         {
-            online(event.getAgent());
+            updateTimeoutsForAgent(event.getAgent());
         }
         else if (event instanceof AgentOfflineEvent)
         {
@@ -646,6 +650,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         return new Class[]{
                 AgentAvailableEvent.class,
                 AgentConnectivityEvent.class,
+                AgentResourcesDiscoveredEvent.class,
                 SCMChangeEvent.class
         };
     }
