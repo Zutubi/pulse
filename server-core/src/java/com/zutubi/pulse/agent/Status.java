@@ -226,7 +226,7 @@ public enum Status
             {
                 public String getPrettyString()
                 {
-                    return "building";
+                    return "building invalid";
                 }
 
                 public boolean isOnline()

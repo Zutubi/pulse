@@ -26,6 +26,8 @@ import com.zutubi.pulse.util.Predicate;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -64,7 +66,15 @@ public class DefaultAgentManager implements AgentManager, EventListener, Stoppab
 
         // Create this prior to refreshing the slaves so it can pick up the
         // slave added events.
-        agentStatusManager = new AgentStatusManager(masterAgent, this, eventManager);
+        agentStatusManager = new AgentStatusManager(masterAgent, this, Executors.newSingleThreadExecutor(new ThreadFactory()
+        {
+            public Thread newThread(Runnable r)
+            {
+                Thread t = new Thread(r);
+                t.setName("Agent Status Manager Event Pump");
+                return t;
+            }
+        }), eventManager);
 
         refreshSlaveAgents();
 

@@ -187,10 +187,7 @@ public class SlaveAgent implements Agent
 
     public void updateStatus(SlaveStatus status)
     {
-        lastPingTime = status.getPingTime();
-        this.status = Status.valueOf(status.getStatus().name());
-        pingError = status.getMessage();
-        recipeId = status.getRecipeId();
+        updateStatus(Status.valueOf(status.getStatus().name()), status.getRecipeId(), status.getMessage());
     }
 
     public void updateStatus(Status status)
@@ -200,9 +197,15 @@ public class SlaveAgent implements Agent
 
     public void updateStatus(Status status, long recipeId)
     {
+        updateStatus(status, recipeId, null);
+    }
+
+    public void updateStatus(Status status, long recipeId, String pingError)
+    {
         lastPingTime = System.currentTimeMillis();
         this.status = status;
         this.recipeId = recipeId;
+        this.pingError = pingError;
     }
 
     public void upgradeStatus(UpgradeState state, int progress, String message)

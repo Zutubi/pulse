@@ -28,7 +28,7 @@ public class RecipeTimeoutEvent extends Event<Object>
 
     public String toString()
     {
-        StringBuffer buff = new StringBuffer("Build Recipe Timeout Event");
+        StringBuffer buff = new StringBuffer("Recipe Timeout Event");
         buff.append(": ").append(getRecipeId());
         return buff.toString();
     }    

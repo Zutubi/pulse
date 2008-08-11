@@ -2,9 +2,6 @@ package com.zutubi.pulse.services;
 
 import com.zutubi.pulse.agent.PingStatus;
 
-import java.text.DateFormat;
-import java.util.Date;
-
 /**
  * Encapsulates the state of a slave agent.
  */
@@ -28,8 +25,6 @@ public class SlaveStatus
      * If an error occured, a detail message.
      */
     private String message = null;
-
-    private long pingTime;
 
     public SlaveStatus(PingStatus status, long recipeId, boolean first)
     {
@@ -67,16 +62,6 @@ public class SlaveStatus
     public String getMessage()
     {
         return message;
-    }
-
-    public long getPingTime()
-    {
-        return pingTime;
-    }
-
-    public void setPingTime(long pingTime)
-    {
-        this.pingTime = pingTime;
     }
 
     public boolean equals(Object o)
@@ -124,7 +109,7 @@ public class SlaveStatus
 
     public String toString()
     {
-        String result = "[" + DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG).format(new Date(pingTime)) + "]: " + status.getPrettyString();
+        String result = status.getPrettyString();
         if(recipeId != 0)
         {
             result += ", building " + recipeId;

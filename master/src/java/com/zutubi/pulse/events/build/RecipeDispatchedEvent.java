@@ -1,7 +1,7 @@
 package com.zutubi.pulse.events.build;
 
-import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.agent.Agent;
+import com.zutubi.pulse.core.RecipeRequest;
 
 /**
  * Raised when a recipe has been dispatched to a build host.
@@ -37,7 +37,7 @@ public class RecipeDispatchedEvent extends RecipeEvent
 
     public String toString()
     {
-        StringBuffer buff = new StringBuffer("Build Recipe Dispatched Event");
+        StringBuffer buff = new StringBuffer("Recipe Dispatched Event");
         buff.append(": ").append(getRecipeId());
         if (getAgent() != null)
         {
