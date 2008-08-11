@@ -132,6 +132,7 @@ public class AgentPingServiceTest extends PulseTestCase
         agentPingService.requestPing(agent, service);
 
         service.release();
+        service.release();
 
         assertEvent(agent);
         assertNoMoreEvents();
