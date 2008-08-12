@@ -215,7 +215,7 @@ public class BuildController implements EventListener
             {
                 handleRecipeTimeout((RecipeTimeoutEvent) evt);
             }
-            else if (evt instanceof RecipeCollectedEvent)
+            else if (evt instanceof RecipeCollectingEvent || evt instanceof RecipeCollectedEvent)
             {
                 // Ignore these.
             }
@@ -607,6 +607,8 @@ public class BuildController implements EventListener
     {
         if (controller.isFinished())
         {
+            eventManager.publish(new RecipeCollectingEvent(this, controller.getResult().getId()));
+
             if (collect)
             {
                 controller.collect(buildResult, projectConfig.getOptions().getRetainWorkingCopy());

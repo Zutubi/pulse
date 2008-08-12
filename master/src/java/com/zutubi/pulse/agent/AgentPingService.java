@@ -11,6 +11,7 @@ import com.zutubi.util.logging.Logger;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -28,6 +29,7 @@ public class AgentPingService implements Stoppable
 
     private static final Logger LOG = Logger.getLogger(AgentPingService.class);
     private final int masterBuildNumber = Version.getVersion().getBuildNumberAsInt();
+    private final AtomicInteger nextId = new AtomicInteger(1);
     private ExecutorService threadPool;
     private Lock inProgressLock = new ReentrantLock();
     private Set<Long> inProgress = new HashSet<Long>();
@@ -47,7 +49,16 @@ public class AgentPingService implements Stoppable
 
     public void init()
     {
-        threadPool = new ThreadPoolExecutor(4, 30, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), threadFactory);
+        threadPool = new ThreadPoolExecutor(4, 30, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new ThreadFactory()
+        {
+            public Thread newThread(Runnable r)
+            {
+                Thread t = threadFactory.newThread(r);
+                t.setDaemon(true);
+                t.setName("Agent ping service worker " + nextId.getAndIncrement());
+                return t;
+            }
+        });
     }
 
     public void stop(boolean force)

@@ -166,10 +166,7 @@ public class DefaultAgent implements Agent
 
     public void updateStatus(SlaveStatus status)
     {
-        lastPingTime = status.getPingTime();
-        this.status = Status.valueOf(status.getStatus().toString());
-        pingError = status.getMessage();
-        recipeId = status.getRecipeId();
+        updateStatus(Status.valueOf(status.getStatus().toString()), status.getRecipeId(), status.getMessage());
     }
 
     public void updateStatus(Status status)
@@ -179,21 +176,27 @@ public class DefaultAgent implements Agent
 
     public void updateStatus(Status status, long recipeId)
     {
+        updateStatus(status, recipeId, null);
+    }
+
+    public void updateStatus(Status status, long recipeId, String pingError)
+    {
         lastPingTime = System.currentTimeMillis();
         this.status = status;
         this.recipeId = recipeId;
+        this.pingError = pingError;
     }
 
     public void copyStatus(Agent agent)
     {
         DefaultAgent existingAgent = (DefaultAgent) agent;
         status = existingAgent.status;
- 	    lastPingTime = existingAgent.lastPingTime;
- 	    recipeId = existingAgent.recipeId;
- 	    pingError = existingAgent.pingError;
- 	    upgradeState = existingAgent.upgradeState;
- 	    upgradeProgress = existingAgent.upgradeProgress;
- 	    upgradeMessage = existingAgent.upgradeMessage;
+        lastPingTime = existingAgent.lastPingTime;
+        recipeId = existingAgent.recipeId;
+        pingError = existingAgent.pingError;
+        upgradeState = existingAgent.upgradeState;
+        upgradeProgress = existingAgent.upgradeProgress;
+        upgradeMessage = existingAgent.upgradeMessage;
     }
 
     public void upgradeStatus(UpgradeState state, int progress, String message)

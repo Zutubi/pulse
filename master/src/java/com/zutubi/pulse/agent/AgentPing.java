@@ -60,7 +60,6 @@ class AgentPing implements Callable<SlaveStatus>
             }
         }
 
-        status.setPingTime(System.currentTimeMillis());
         return status;
     }
 }

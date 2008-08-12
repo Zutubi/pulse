@@ -35,6 +35,7 @@ import com.zutubi.util.Sort;
 import com.zutubi.util.logging.Logger;
 
 import java.util.*;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -74,7 +75,15 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
     private void handleConfigurationEventSystemStarted(ConfigurationEventSystemStartedEvent event)
     {
         // Create prior to any AgentAddedEvents being fired.
-        agentStatusManager = new AgentStatusManager(this, eventManager);
+        agentStatusManager = new AgentStatusManager(this, Executors.newSingleThreadExecutor(new ThreadFactory()
+        {
+            public Thread newThread(Runnable r)
+            {
+                Thread t = threadFactory.newThread(r);
+                t.setName("Agent Status Manager Event Pump");
+                return t;
+            }
+        }), eventManager);
 
         configurationProvider = event.getConfigurationProvider();
         TypeListener<AgentConfiguration> listener = new TypeAdapter<AgentConfiguration>(AgentConfiguration.class)

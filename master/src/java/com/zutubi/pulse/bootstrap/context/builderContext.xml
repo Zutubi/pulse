@@ -97,6 +97,8 @@
 
     <bean id="agentPingService" class="com.zutubi.pulse.agent.AgentPingService" autowire="byName" init-method="init"/>
 
+    <bean id="recipeTerminationService" class="com.zutubi.pulse.agent.RecipeTerminationService" autowire="byName" init-method="init"/>
+
     <bean id="recipeProcessor" class="com.zutubi.pulse.core.RecipeProcessor" autowire="byName" init-method="init"/>
 
     <bean id="fileLoaderFactory" class="com.zutubi.pulse.core.PulseFileLoaderFactory" autowire="byName"/>
