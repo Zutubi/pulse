@@ -23,7 +23,7 @@
                         items: [{
                             xtype: 'textfield',
                             name: 'maxLines',
-                            fieldLabel: '$action.getText("stage.tail.max.lines")',
+                            fieldLabel: '$action.getText("tail.max.lines")',
                             value: '$maxLines',
                             width: 50
                         }]
@@ -34,7 +34,7 @@
                         items: [{
                             xtype: 'textfield',
                             name: 'refreshInterval',
-                            fieldLabel: '$action.getText("stage.tail.refresh.interval")',
+                            fieldLabel: '$action.getText("tail.refresh.interval")',
                             value: '$refreshInterval',
                             width: 50
                         }]
@@ -75,7 +75,7 @@
     #buildTabs($buildResult "details")
 
     <div class="config-panel">
-        <h3 class="config-header config-header-small">$action.getText("stage.tail.settings")</h3>
+        <h3 class="config-header config-header-small">$action.getText("tail.settings")</h3>
         <div class="config-container" id="params-form">
         </div>
     </div>
@@ -83,7 +83,7 @@
     <h3 class="heading">#wwtext("name=stage.tail.box") #if($logExists) &nbsp;<a href="$urls.stageLogs($buildResult, $recipeResultNode)raw/true/"><img alt="down" src="$base/images/arrow_down.gif"/>#wwtext("name=stage.full.log")</a> #end </h3>
     <div class="box">
         <div id="panel">
-            #parse("ajax/tail-recipe-log-panel.vm")
+            #parse("ajax/tail-log-panel.vm")
         </div>
     </div>
 </html>

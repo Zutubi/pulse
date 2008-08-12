@@ -885,7 +885,7 @@
 ##
 #macro(viewCell $project $result)
     <td class="content">
-        <a href="$urls.build($result)" class="unadorned" title="view summary"><img alt="view summary" src="$base/images/information.gif"/></a>
+        <a id="summary-#uce($project.name)-${result.number}" href="$urls.build($result)" class="unadorned" title="view summary"><img alt="view summary" src="$base/images/information.gif"/></a>
     </td>
 #end
 
@@ -894,7 +894,16 @@
 ##
 #macro(logCell $project $result)
     <td class="content">
-        <a href="$urls.buildDetails($result)" class="unadorned" title="view details"><img alt="view details" src="$base/images/magnifier.gif"/></a>
+        <a id="details-#uce($project.name)-${result.number}" href="$urls.buildDetails($result)" class="unadorned" title="view details"><img alt="view details" src="$base/images/magnifier.gif"/></a>
+    </td>
+#end
+
+##
+## Outputs an action cell for viewing the details for a build
+##
+#macro(buildLogCell $project $result)
+    <td class="content">
+        <a id="log-#uce($project.name)-${result.number}" href="$urls.buildLog($result)" class="unadorned" title="view log"><img alt="view log" src="$base/images/script.gif"/> #wwtext("name=log") </a>
     </td>
 #end
 
@@ -904,7 +913,7 @@
 #macro(changesCell $project $result)
     #set($url = "$urls.buildChanges($result)")
     <td class="content">
-        <a href="$url" class="unadorned" title="view changes"><img alt="view changes" src="$base/images/page_code.gif"/></a>
+        <a id="changes-#uce($project.name)-${result.number}" href="$url" class="unadorned" title="view changes"><img alt="view changes" src="$base/images/page_code.gif"/></a>
     </td>
 #end
 
@@ -913,7 +922,7 @@
 ##
 #macro(artifactsCell $project $result)
     <td class="content">
-        <a href="$urls.buildArtifacts($result)" class="unadorned" title="view artifacts"><img alt="view artifacts" src="$base/images/folder_page.gif"/></a>
+        <a id="artifacts-#uce($project.name)-${result.number}" href="$urls.buildArtifacts($result)" class="unadorned" title="view artifacts"><img alt="view artifacts" src="$base/images/folder_page.gif"/></a>
     </td>
 #end
 
@@ -1909,6 +1918,7 @@
         #changesCell($project $buildResult)
         #artifactsCell($project $buildResult)
         #workingCopyCell($project $buildResult $multiProject)
+        #buildLogCell($project $buildResult)
     #elseif($key == "warnings")
         #rightClassCell($buildResult.warningFeatureCount)
     #elseif($key == "errors")

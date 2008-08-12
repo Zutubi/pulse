@@ -215,6 +215,26 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         assertTextNotPresent(suppressedValue);
     }
 
+    public void testBuildLogAvailable() throws Exception
+    {
+        loginAsAdmin();
+        ensureBuild();
+
+        BuildDetailedViewPage detailedViewPage = new BuildDetailedViewPage(selenium, urls, PROJECT_NAME, 1);
+        detailedViewPage.goTo();
+
+        String logLinkId = "log-" + PROJECT_NAME + "-1";
+
+        SeleniumUtils.assertLinkPresent(selenium, logLinkId);
+
+        selenium.getAllLinks();
+
+        selenium.click("id=" + logLinkId);
+        selenium.waitForPageToLoad("10000");
+
+        assertTextPresent("tail of build log");        
+    }
+
     private void assertEnvironment(String projectName, int buildId, String... envs)
     {
         goToEnv(projectName, buildId);

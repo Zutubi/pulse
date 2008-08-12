@@ -71,6 +71,7 @@
                     #if($action.hasPermission("view source", $project))
                         <li>#actionLink("wc-#uce($project.name)-${buildResult.number}" "wc.tab" $urls.buildWorkingCopy($buildResult) "page_gear.gif")</li>
                     #end
+                        <li>#actionLink("log-#uce($project.name)-${buildResult.number}" "log" $urls.buildLog($buildResult) "script.gif")</li>
                     </ul>
                 </div>            
             </td>

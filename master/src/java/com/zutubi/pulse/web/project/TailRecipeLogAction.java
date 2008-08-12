@@ -1,33 +1,30 @@
 package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.MasterBuildPaths;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.model.RecipeResult;
+import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.RecipeResultNode;
 import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.RecipeResultNode;
 import com.zutubi.pulse.tove.config.user.UserPreferencesConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
-import com.zutubi.util.CircularBuffer;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 
 /**
  */
 public class TailRecipeLogAction extends StageActionBase
 {
     private static final int LINE_COUNT = 30;
-    private static final int MAX_BYTES = 500 * LINE_COUNT;
 
-    private boolean raw = false;
+    protected boolean raw = false;
     private int maxLines = -1;
     private int refreshInterval = -1;
     private String tail = "";
-    private MasterConfigurationManager configurationManager;
-    private boolean logExists;
+    protected MasterConfigurationManager configurationManager;
+    protected boolean logExists;
     private FileInputStream inputStream;
     private ConfigurationProvider configurationProvider;
 
@@ -99,7 +96,7 @@ public class TailRecipeLogAction extends StageActionBase
         return "tail";
     }
 
-    private String getRaw(File recipeLog)
+    protected String getRaw(File recipeLog)
     {
         try
         {
@@ -114,60 +111,26 @@ public class TailRecipeLogAction extends StageActionBase
         return "raw";
     }
 
-    private String getTail(File recipeLog) throws IOException
+    protected String getTail(File recipeLog) throws IOException
     {
-        RandomAccessFile file = null;
-
         try
         {
-            file = new RandomAccessFile(recipeLog, "r");
-            long length = file.length();
-            if (length > 0)
-            {
-                if (length > MAX_BYTES)
-                {
-                    file.seek(length - MAX_BYTES);
-                    length = MAX_BYTES;
+            Tail tail = new Tail();
+            tail.setFile(recipeLog);
+            tail.setMaxLines(maxLines);
 
-                    // Discard the next (possibly partial) line
-                    file.readLine();
-                }
-
-                CircularBuffer<String> buffer = new CircularBuffer<String>(maxLines);
-                String line = file.readLine();
-                while (line != null)
-                {
-                    buffer.append(line);
-                    line = file.readLine();
-                }
-
-                StringBuilder builder = new StringBuilder((int) length);
-                for (String l : buffer)
-                {
-                    builder.append(l);
-                    builder.append('\n');
-                }
-
-                tail = builder.toString();
-            }
+            this.tail = tail.getTail();
         }
         catch (IOException e)
         {
             addActionError("Error tailing log '" + recipeLog.getAbsolutePath() + "': " + e.getMessage());
             return ERROR;
         }
-        finally
-        {
-            if (file != null)
-            {
-                file.close();
-            }
-        }
 
         return "tail";
     }
 
-    private void initialiseProperties()
+    protected void initialiseProperties()
     {
         Object principle = getPrinciple();
         if (principle != null)

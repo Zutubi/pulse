@@ -206,6 +206,7 @@ public class PulseActionMapper implements ActionMapper
         //     builds/                - (history)
         //       <build id>/          - build tabs
         //         summary/           - (default)
+        //         log/               - build log.
         //         detailed/
         //           <stage>/         - select stage on detailed tab
         //             log/           - log for stage

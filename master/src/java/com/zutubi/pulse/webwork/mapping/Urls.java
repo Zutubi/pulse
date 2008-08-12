@@ -215,6 +215,11 @@ public class Urls
         return build(build) + "logs/";
     }
 
+    public String buildLog(BuildResult build)
+    {
+        return build(build) + "log/";
+    }
+
     public String stageLogs(BuildResult build, RecipeResultNode node)
     {
         return buildLogs(build) + getStageComponent(node);

@@ -55,18 +55,18 @@ public class BuildColumns
         {
             if (project == null)
             {
-                return 5;
+                return 6;
             }
             else
             {
                 try
                 {
                     projectManager.checkWrite(project);
-                    return 5;
+                    return 6;
                 }
                 catch (Exception e)
                 {
-                    return 4;
+                    return 5;
                 }
             }
         }

@@ -163,6 +163,15 @@
             </result>
         </action>
 
+        <action name="tailBuildLog" class="com.zutubi.pulse.web.project.TailBuildLogAction">
+            <interceptor-ref name="completeStack"/>
+            <result name="tail" type="velocity">/tail-build-log.vm</result>
+            <result name="raw" type="stream">
+                <param name="contentType">text/plain</param>
+                <param name="contentDisposition">filename="build.log"</param>
+            </result>
+        </action>
+
         <action name="viewChangelist" class="com.zutubi.pulse.web.project.ViewChangelistAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">/view-changelist.vm</result>
@@ -416,7 +425,11 @@
         </action>
 
         <action name="tailRecipeLogPanel" class="com.zutubi.pulse.web.project.TailRecipeLogAction">
-            <result name="tail" type="velocity">tail-recipe-log-panel.vm</result>
+            <result name="tail" type="velocity">tail-log-panel.vm</result>
+        </action>
+
+        <action name="tailBuildLogPanel" class="com.zutubi.pulse.web.project.TailBuildLogAction">
+            <result name="tail" type="velocity">tail-log-panel.vm</result>
         </action>
 
         <action name="historyPanel" class="com.zutubi.pulse.web.project.HistoryAction">
