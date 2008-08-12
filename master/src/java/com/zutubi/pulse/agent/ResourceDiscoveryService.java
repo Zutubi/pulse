@@ -1,27 +1,28 @@
 package com.zutubi.pulse.agent;
 
-import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.events.EventListener;
-import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.events.build.RecipeTerminateRequestEvent;
+import com.zutubi.pulse.core.config.Resource;
+import com.zutubi.pulse.events.*;
+import com.zutubi.pulse.model.ResourceManager;
 import com.zutubi.util.logging.Logger;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Simple service for requesting recipes to terminate.  As this involves a
+ * Service for running resource discovery on agents.  As this involves a
  * network call to the agent, it is not desirable to do it inline.
  */
-public class RecipeTerminationService implements EventListener
+public class ResourceDiscoveryService implements EventListener
 {
-    private static final Logger LOG = Logger.getLogger(RecipeTerminationService.class);
+    private static final Logger LOG = Logger.getLogger(ResourceDiscoveryService.class);
 
     private AtomicInteger id = new AtomicInteger(1);
     private ExecutorService executorService;
     private EventManager eventManager;
+    private ResourceManager resourceManager;
     private ThreadFactory threadFactory;
 
     public void init()
@@ -32,7 +33,7 @@ public class RecipeTerminationService implements EventListener
             {
                 Thread t = threadFactory.newThread(r);
                 t.setDaemon(true);
-                t.setName("Recipe Termination Service Worker " + id.getAndIncrement());
+                t.setName("Resource Discovery Worker " + id.getAndIncrement());
                 return t;
             }
         });
@@ -40,20 +41,24 @@ public class RecipeTerminationService implements EventListener
         eventManager.register(this);
     }
 
-    public void handleEvent(final Event e)
+    public void handleEvent(Event e)
     {
+        final AgentOnlineEvent event = (AgentOnlineEvent) e;
+
         executorService.execute(new Runnable()
         {
             public void run()
             {
-                RecipeTerminateRequestEvent rtr = (RecipeTerminateRequestEvent) e;
+                Agent agent = event.getAgent();
                 try
                 {
-                    rtr.getService().terminateRecipe(rtr.getRecipeId());
+                    List<Resource> resources = agent.getService().discoverResources();
+                    resourceManager.addDiscoveredResources(agent.getConfig().getConfigurationPath(), resources);
+                    eventManager.publish(new AgentResourcesDiscoveredEvent(this, agent));
                 }
                 catch (Exception e)
                 {
-                    LOG.warning("Unable to terminate recipe '" + rtr.getRecipeId() + "': " + e.getMessage(), e);
+                    LOG.warning("Unable to discover resource for agent '" + agent.getConfig().getName() + "': " + e.getMessage(), e);
                 }
             }
         });
@@ -61,12 +66,17 @@ public class RecipeTerminationService implements EventListener
 
     public Class[] getHandledEvents()
     {
-        return new Class[] { RecipeTerminateRequestEvent.class };
+        return new Class[] { AgentOnlineEvent.class };
     }
 
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
+    }
+
+    public void setResourceManager(ResourceManager resourceManager)
+    {
+        this.resourceManager = resourceManager;
     }
 public void setThreadFactory(ThreadFactory threadFactory)
     {

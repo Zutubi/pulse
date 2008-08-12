@@ -5,7 +5,6 @@ import com.zutubi.pulse.bootstrap.DefaultSetupManager;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.StartupManager;
 import com.zutubi.pulse.core.Stoppable;
-import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.events.*;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.system.ConfigurationEventSystemStartedEvent;
@@ -331,21 +330,6 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         }
     }
 
-    private void handleAgentOnline(AgentOnlineEvent event)
-    {
-        // The agent has just come online, run resource discovery
-        Agent agent = event.getAgent();
-        try
-        {
-            List<Resource> resources = agent.getService().discoverResources();
-            resourceManager.addDiscoveredResources(agent.getConfig().getConfigurationPath(), resources);
-        }
-        catch (Exception e)
-        {
-            LOG.warning("Unable to discover resource for agent '" + agent.getConfig().getName() + "': " + e.getMessage(), e);
-        }
-    }
-
     private void handleAgentUpgradeRequired(AgentUpgradeRequiredEvent event)
     {
         Agent agent = event.getAgent();
@@ -405,10 +389,6 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         {
             pingAgent(((AgentPingRequestedEvent) evt).getAgent());
         }
-        else if(evt instanceof AgentOnlineEvent)
-        {
-            handleAgentOnline((AgentOnlineEvent) evt);
-        }
         else if(evt instanceof AgentUpgradeRequiredEvent)
         {
             handleAgentUpgradeRequired((AgentUpgradeRequiredEvent) evt);
@@ -431,7 +411,6 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
     {
         return new Class[] {
                 AgentPingRequestedEvent.class,
-                AgentOnlineEvent.class,
                 AgentUpgradeRequiredEvent.class,
                 AgentUpgradeCompleteEvent.class,
                 ConfigurationEventSystemStartedEvent.class,
