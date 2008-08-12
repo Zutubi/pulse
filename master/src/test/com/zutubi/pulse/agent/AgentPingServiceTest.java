@@ -3,11 +3,11 @@ package com.zutubi.pulse.agent;
 import com.zutubi.pulse.AgentService;
 import com.zutubi.pulse.SystemInfo;
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.model.ResourceRequirement;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.events.*;
 import com.zutubi.pulse.logging.CustomLogRecord;
+import com.zutubi.pulse.model.ResourceRequirement;
 import com.zutubi.pulse.security.PulseThreadFactory;
 import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.test.PulseTestCase;
@@ -122,6 +122,7 @@ public class AgentPingServiceTest extends PulseTestCase
         agentPingService.requestPing(agent, service);
         agentPingService.requestPing(agent, service);
 
+        service.release();
         service.release();
 
         assertEvent(agent);

@@ -88,6 +88,7 @@ public class AgentPingService implements Stoppable
             }
             else
             {
+                pingStarted(agent);
                 enqueueRequest(agent, agentService);
                 return true;
             }
@@ -101,6 +102,11 @@ public class AgentPingService implements Stoppable
     private boolean isPingInProgress(Agent agent)
     {
         return inProgress.contains(agent.getId());
+    }
+
+    private void pingStarted(Agent agent)
+    {
+        inProgress.add(agent.getId());
     }
 
     private void pingCompleted(Agent agent)
