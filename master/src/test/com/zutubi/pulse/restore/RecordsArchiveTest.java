@@ -42,6 +42,9 @@ public class RecordsArchiveTest extends PulseTestCase
         recordStoreArchive = null;
         recordStore = null;
         txnManager = null;
+
+        removeDirectory(tmp);
+        tmp = null;
         
         super.tearDown();
     }

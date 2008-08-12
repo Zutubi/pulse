@@ -17,6 +17,7 @@ public class RecipeTest extends PulseTestCase
     private DefaultEventManager eventManager;
     private RecipePaths paths;
     private ExecutionContext context;
+    private File tmpDir;
 
     public RecipeTest()
     {
@@ -36,8 +37,9 @@ public class RecipeTest extends PulseTestCase
         recipe = new Recipe();
         recipe.setEventManager(eventManager);
 
-        File baseDir = FileSystemUtils.createTempDir(getClass().getName(), ".base");
-        File outputDir = FileSystemUtils.createTempDir(getClass().getName(), ".out");
+        tmpDir = FileSystemUtils.createTempDir(getClass().getName(), ".tmp");
+        File baseDir = new File(tmpDir, "base");
+        File outputDir = new File(tmpDir, "out");
         paths = new SimpleRecipePaths(baseDir, outputDir);
 
         context = new ExecutionContext();
@@ -51,6 +53,9 @@ public class RecipeTest extends PulseTestCase
         recipe = null;
         paths = null;
         context = null;
+
+        removeDirectory(tmpDir);
+        tmpDir = null;
 
         super.tearDown();
     }
