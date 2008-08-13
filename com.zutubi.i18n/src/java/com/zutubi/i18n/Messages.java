@@ -19,6 +19,18 @@ public class Messages
         this.context = context;
     }
 
+    private static ContextCache getContextCache()
+    {
+        if (Boolean.getBoolean("com.zutubi.i18n.disable.cache"))
+        {
+            return new EmptyContextCache();
+        }
+        else
+        {
+            return new DefaultContextCache();
+        }
+    }
+
     private static synchronized MessageHandler getHandler()
     {
         if (handler == null)
@@ -28,7 +40,7 @@ public class Messages
             DefaultBundleManager bundleManager = new DefaultBundleManager();
             bundleManager.addResolver(new ExtendedClassContextResolver());
             bundleManager.addResolver(packages);
-            bundleManager.setContextCache(new DefaultContextCache());
+            bundleManager.setContextCache(getContextCache());
             handler = new DefaultMessageHandler(bundleManager);
         }
         return handler;

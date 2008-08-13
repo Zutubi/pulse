@@ -73,8 +73,8 @@ public class ConfigurationWizardAction extends com.opensymphony.xwork.ActionSupp
     public boolean isInitialised()
     {
         // ensure that the wizard instance is available / instantiated.
-        getWizardInstance();
-        return !wizardRequiresLazyInitialisation;
+        Wizard wizard = getWizardInstance();
+        return !wizardRequiresLazyInitialisation && wizard.getCurrentState() != null;
     }
 
     public boolean isSelected(String value)
@@ -215,7 +215,7 @@ public class ConfigurationWizardAction extends com.opensymphony.xwork.ActionSupp
         try
         {
             Wizard wizard = getWizardInstance();
-            if (wizardRequiresLazyInitialisation)
+            if (wizardRequiresLazyInitialisation || wizard.getCurrentState() == null)
             {
                 wizard.initialise();
                 wizardRequiresLazyInitialisation = false;

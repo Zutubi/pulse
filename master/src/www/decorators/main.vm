@@ -75,6 +75,8 @@
             var PageLayout = function() {
                 return {
                     init: function() {
+                        Ext.QuickTips.init();
+                        
                         // If there is a tab bar, drop it in to the north div.
                         var tabbar = Ext.get('tabbar');
                         if(tabbar)

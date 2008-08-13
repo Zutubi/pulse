@@ -1,6 +1,10 @@
 <div id="config-help">
     <h1 id="help-title">$typeDocs.title</h1>
-#if($typeDocs.brief)
+#if($typeDocs.verbose)
+    <div class="type-details">
+        $typeDocs.verbose
+    </div>
+#elseif($typeDocs.brief)
     <div class="type-details">
         $typeDocs.brief
     </div>

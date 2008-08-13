@@ -41,14 +41,26 @@ public class ConfigurationDocsManager
 
     public synchronized TypeDocs getDocs(CompositeType type)
     {
-        TypeDocs result = cache.get(type.getSymbolicName());
-        if(result == null)
+        if (useCache())
         {
-            result = generateDocs(type);
-            cache.put(type.getSymbolicName(), result);
-        }
+            TypeDocs result = cache.get(type.getSymbolicName());
+            if(result == null)
+            {
+                result = generateDocs(type);
+                cache.put(type.getSymbolicName(), result);
+            }
 
-        return result;
+            return result;
+        }
+        else
+        {
+            return generateDocs(type);
+        }
+    }
+
+    private boolean useCache()
+    {
+        return !Boolean.getBoolean("com.zutubi.tove.docs.disable.cache");
     }
 
     private TypeDocs generateDocs(CompositeType type)
