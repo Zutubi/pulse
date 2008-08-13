@@ -1328,6 +1328,14 @@ ul.config-links li {
     margin: 5px 0 5px 0;
 }
 
+#config-help .code {
+    margin: 5px 20px 5px 20px;
+    padding: 4px;
+    border: 1px dotted #aaa;
+    background-color: #e8e8e8;
+    white-space: pre;
+}
+
 .type-details {
     margin-top: 10px;
     margin-bottom: 15px;
