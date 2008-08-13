@@ -42,7 +42,7 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
         // The following initialisation steps, along with some of the
         // initialisation now living in the setup manager, should be
         // refactored into a separate high-level configuration manager.
-        configurationTemplateManager.refreshCaches();
+        configurationTemplateManager.initSecondPhase();
 
         // The last thing we want to do during init is to ensure that we have
         // state objects that match all of our configuration objects.  These

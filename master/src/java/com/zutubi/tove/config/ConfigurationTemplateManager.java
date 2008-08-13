@@ -48,6 +48,7 @@ public class ConfigurationTemplateManager
 
     private ValidationManager validationManager;
     private int refreshCount = 0;
+    private boolean validationEnabled = false;
 
     public void init()
     {
@@ -55,6 +56,12 @@ public class ConfigurationTemplateManager
         stateWrapper.setTransactionManager(transactionManager);
 
         userTransaction = new UserTransaction(transactionManager);
+    }
+
+    public void initSecondPhase()
+    {
+        validationEnabled = true;
+        refreshCaches();
     }
 
     private void checkPersistent(String path)
@@ -626,7 +633,10 @@ public class ConfigurationTemplateManager
             }
         }
 
-        validateInstances(instances);
+        if (validationEnabled)
+        {
+            validateInstances(instances);
+        }
     }
 
     private void validateInstances(final InstanceCache instances)
