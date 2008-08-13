@@ -60,17 +60,25 @@ Ext.onReady(function()
         window.nextTabindex = 100;
     }
 
+    var field;
 <#list form.fields as field>
     <#assign parameters=field.parameters>
+    field = form.findById('${parameters.id?js_string}');
     <#if fieldErrors?exists && fieldErrors[parameters.name]?exists>
     errorMessage = '<#list fieldErrors[parameters.name] as error>${error?i18n?js_string}<br/></#list>';
-    form.findById('${parameters.id?js_string}').markInvalid(errorMessage);
+    field.markInvalid(errorMessage);
     </#if>
 
     var el = Ext.get('${field.id}');
     if(el)
     {
+        if (field.getXType() == 'checkbox')
+        {
+            el = field.innerWrap;
+        }
+
         el.set({tabindex: window.nextTabindex++ });
+
     <#if parameters.submitOnEnter?default(true)>
         el.on('keypress', function(event){ return handleKeypress(event); });
     </#if>
