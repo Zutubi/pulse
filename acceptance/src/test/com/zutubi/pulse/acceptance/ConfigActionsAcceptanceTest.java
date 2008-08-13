@@ -13,12 +13,11 @@ import com.zutubi.pulse.tove.config.agent.AgentConfigurationActions;
 import com.zutubi.pulse.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.type.record.PathUtils;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import java.util.Hashtable;
-
-import org.testng.annotations.Test;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.AfterMethod;
 
 /**
  * Acceptance tests for actions that may be executed on configuration
@@ -111,8 +110,8 @@ public class ConfigActionsAcceptanceTest extends SeleniumTestBase
         form.saveFormElements(new String[]{null});
 
         projectPage.waitFor();
-        SeleniumUtils.waitForLocator(selenium, projectPage.getTreeLinkLocator("pulse file"));
-        projectPage.clickComposite("type", "pulse file");
+        SeleniumUtils.waitForLocator(selenium, projectPage.getTreeLinkLocator("custom pulse file"));
+        projectPage.clickComposite("type", "custom pulse file");
 
         form.waitFor();
         assertTrue(form.getFieldValue("pulseFileString").contains("pull in the ant resource"));

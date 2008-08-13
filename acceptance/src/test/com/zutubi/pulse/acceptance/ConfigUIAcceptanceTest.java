@@ -633,7 +633,7 @@ public class ConfigUIAcceptanceTest extends SeleniumTestBase
         assertTrue(projectState.isMarkedRequired("name"));
         projectState.nextFormElements("", "", "");
         projectState.assertFormPresent();
-        assertTextPresent("the projects name is a required field");
+        assertTextPresent("the project's name is a required field");
         projectState.nextFormElements(random, "", "");
 
         SelectTypeState scmTypeState = new SelectTypeState(selenium);

@@ -1311,13 +1311,20 @@ ul.config-links li {
     margin-bottom: 5px;
 }
 
-#config-help ol {
-    list-style: decimal outside;
+#config-help ol, #config-help ul {
     margin-left: 10px;
     padding-left: 15px;
 }
 
-#config-help ol li {
+#config-help ol {
+    list-style: decimal outside;
+}
+
+#config-help ul {
+    list-style: disc outside;
+}
+
+#config-help li {
     margin: 5px 0 5px 0;
 }
 
