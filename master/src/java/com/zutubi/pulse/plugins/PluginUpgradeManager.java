@@ -162,7 +162,7 @@ public class PluginUpgradeManager implements UpgradeableComponentSource
                         }
                         catch (Exception e)
                         {
-                            e.printStackTrace();
+                            LOG.error(e);
                         }
                     }
 
@@ -172,7 +172,7 @@ public class PluginUpgradeManager implements UpgradeableComponentSource
         }
     }
 
-    private void registerVersionUpgrade(Plugin plugin) throws IOException
+    private void registerVersionUpgrade(Plugin plugin) throws IOException, PluginException
     {
         PluginRegistry pluginRegistry = pluginManager.getPluginRegistry();
         
@@ -186,6 +186,7 @@ public class PluginUpgradeManager implements UpgradeableComponentSource
         LOG.info("Plugin '"+plugin.getId()+"' has been upgraded from " + oldVersion + " to " + newVersion + ".");
         entry.put(PluginManager.PLUGIN_VERSION_KEY, newVersion.toString());
         pluginRegistry.flush();
+        plugin.resolve();
     }
 
     public boolean isUpgradeRequired()
@@ -261,7 +262,7 @@ public class PluginUpgradeManager implements UpgradeableComponentSource
             {
                 registerVersionUpgrade(plugin);
             }
-            catch (IOException e)
+            catch (Exception e)
             {
                 LOG.error(e);
             }
@@ -270,6 +271,7 @@ public class PluginUpgradeManager implements UpgradeableComponentSource
         public void upgradeAborted()
         {
             // callback
+            // upgrade aborted?.. what happens to any version_change plugins... disable? - at least temporarily..
         }
     }
 }
