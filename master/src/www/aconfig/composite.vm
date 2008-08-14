@@ -101,7 +101,7 @@
             <div class="config-container">
             <ul class="config-links">
         #foreach($prop in $config.nestedProperties)
-                    <li><a href="#" onclick="selectPath('#jss(${path})/${prop}'); return false;">#displayname("path=${path}/${prop}")</a></li>
+                    <li #if($config.isPropertyInvalid($prop)) class="invalid-property" #end><a href="#" onclick="selectPath('#jss(${path})/${prop}'); return false;">#displayname("path=${path}/${prop}")</a></li>
         #end
             </ul>
             </div>

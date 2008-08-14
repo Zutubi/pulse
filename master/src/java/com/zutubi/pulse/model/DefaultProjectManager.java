@@ -314,13 +314,18 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         return result;
     }
 
+    public boolean isProjectValid(Project project)
+    {
+        return project.getConfig() != null && configurationTemplateManager.isDeeplyValid(project.getConfig().getConfigurationPath());
+    }
+
     private List<Project> filterValidProjects(List<Project> projects)
     {
         return CollectionUtils.filter(projects, new Predicate<Project>()
         {
             public boolean satisfied(Project project)
             {
-                return project.getConfig() != null && configurationTemplateManager.isDeeplyValid(project.getConfig().getConfigurationPath());
+                return isProjectValid(project);
             }
         });
     }

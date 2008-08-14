@@ -2076,7 +2076,7 @@ public class ConfigurationTemplateManager
         return deepClone(instance);
     }
 
-    <T extends Configuration> Collection<T> getAllInstances(String path, Class<T> clazz, boolean allowIncomplete)
+    public <T extends Configuration> Collection<T> getAllInstances(String path, Class<T> clazz, boolean allowIncomplete)
     {
         List<T> result = new LinkedList<T>();
         getAllInstances(path, clazz, result, allowIncomplete);

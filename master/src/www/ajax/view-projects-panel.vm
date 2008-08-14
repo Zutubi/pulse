@@ -118,6 +118,24 @@
     #end
 #end
 
+#if($invalidProjects.size() > 0)
+    <div class="invalid-configs">
+        The following projects have invalid configuration, and cannot be used
+        for building or reporting until rectified:
+        <ul>
+    #foreach($project in $invalidProjects)
+            <li>
+        #if($project.name)
+                <a href="$urls.adminProject($project)">#html($project.name)</a>
+        #else
+                [project has no name]
+        #end
+            </li>
+    #end
+        </ul>
+    </div>
+#end
+
 #if($models.size() > 0)
     #set($groupSpan = 5)
     #set($spacerSpan = 6)

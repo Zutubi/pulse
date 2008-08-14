@@ -287,6 +287,12 @@ public class ConfigurationUIModel
         return nestedProperties;
     }
 
+    public boolean isPropertyInvalid(String property)
+    {
+        String propertyPath = PathUtils.getPath(path, property);
+        return configurationTemplateManager.pathExists(propertyPath) && !configurationTemplateManager.isDeeplyValid(propertyPath);
+    }
+
     public List<Pair<String, String>> getNestedPropertyErrors()
     {
         return nestedPropertyErrors;

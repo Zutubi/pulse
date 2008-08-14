@@ -624,6 +624,23 @@ img.popdown-pressed {
     background: 0 0 no-repeat url(../images/popdown-pressed.gif);
 }
 
+.invalid-configs {
+    margin: 20px;
+    padding: 10px;
+    border: 1px dashed #a33;
+    background: #fee;
+}
+
+.invalid-configs ul {
+    margin: 6px;
+    padding-left: 20px;
+    list-style-type: disc;
+}
+
+.invalid-configs li {
+    margin: 4px 0 4px 0;
+}
+
 /*------------------------------
 Boxes
 */
@@ -1296,6 +1313,19 @@ ul.config-errors li {
 ul.config-links li {
     padding-left: 20px;
     background: url(../images/bullet_go.gif) no-repeat 0 2px;
+}
+
+ul.config-links li.invalid-property {
+    background: url(../images/exclamation.gif) no-repeat 0 2px;
+}
+
+ul.config-links li.invalid-property a {
+    color: #a33;
+    border-bottom: 2px dashed #a33;
+}
+
+ul.config-links li.invalid-property a:hover {
+    border-bottom-style: solid;
 }
 
 .item-hidden {

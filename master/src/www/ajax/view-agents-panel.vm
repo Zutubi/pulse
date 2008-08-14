@@ -1,3 +1,21 @@
+#if($invalidAgents.size() > 0)
+    <div class="invalid-configs" style="margin-top: 0;">
+        The following agents have invalid configuration, and cannot be used
+        for building or reporting until rectified:
+        <ul>
+    #foreach($agent in $invalidAgents)
+            <li>
+        #if($agent.name)
+                <a href="$urls.adminAgent($agent)">#html($agent.name)</a>
+        #else
+                [agent has no name]
+        #end
+            </li>
+    #end
+        </ul>
+    </div>
+#end
+
 <table class="content">
     #headingRow("agents" 5)
     <tr>

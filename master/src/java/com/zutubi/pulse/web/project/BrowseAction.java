@@ -18,14 +18,20 @@ import java.util.*;
  */
 public class BrowseAction extends ProjectActionSupport
 {
-    private BrowseViewConfiguration browseConfig = new BrowseViewConfiguration();
     private List<ProjectsModel> models = new LinkedList<ProjectsModel>();
+    private List<Project> invalidProjects = new LinkedList<Project>();
+    private BrowseViewConfiguration browseConfig = new BrowseViewConfiguration();
 
     private ConfigurationTemplateManager configurationTemplateManager;
 
     public List<ProjectsModel> getModels()
     {
         return models;
+    }
+
+    public List<Project> getInvalidProjects()
+    {
+        return invalidProjects;
     }
 
     public BrowseViewConfiguration getBrowseConfig()
@@ -49,11 +55,24 @@ public class BrowseAction extends ProjectActionSupport
         TemplateHierarchy hierarchy = configurationTemplateManager.getTemplateHierarchy(ConfigurationRegistry.PROJECTS_SCOPE);
 
         final Comparator<String> comp = new Sort.StringComparator();
-        List<Project> projects = projectManager.getProjects(false);
+        List<Project> projects = projectManager.getProjects(true);
+
+        // Filter invalid projects into a separate list.
+        for (Project project: projects)
+        {
+            if (!projectManager.isProjectValid(project))
+            {
+                invalidProjects.add(project);
+            }
+        }
+
+        projects.removeAll(invalidProjects);
+        Collections.sort(invalidProjects, new ProjectComparator(comp));
+
         if (browseConfig.isGroupsShown())
         {
             // Create a model for each group, and for the ungrouped projects.
-            List<ProjectGroup> groups = new ArrayList(projectManager.getAllProjectGroups());
+            List<ProjectGroup> groups = new ArrayList<ProjectGroup>(projectManager.getAllProjectGroups());
             Collections.sort(groups, new Comparator<ProjectGroup>()
             {
                 public int compare(ProjectGroup o1, ProjectGroup o2)
@@ -71,13 +90,7 @@ public class BrowseAction extends ProjectActionSupport
 
         if (projects.size() > 0)
         {
-            Collections.sort(projects, new Comparator<Project>()
-            {
-                public int compare(Project o1, Project o2)
-                {
-                    return comp.compare(o1.getName(), o2.getName());
-                }
-            });
+            Collections.sort(projects, new ProjectComparator(comp));
 
             // CIB-1550: Only label as ungrouped is there are some other
             // groups.
@@ -163,5 +176,30 @@ public class BrowseAction extends ProjectActionSupport
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
     {
         this.configurationTemplateManager = configurationTemplateManager;
+    }
+
+    private static class ProjectComparator implements Comparator<Project>
+    {
+        private final Comparator<String> comp;
+
+        public ProjectComparator(Comparator<String> comp)
+        {
+            this.comp = comp;
+        }
+
+        public int compare(Project o1, Project o2)
+        {
+            if (o1.getName() == null)
+            {
+                return -1;
+            }
+
+            if (o2.getName() == null)
+            {
+                return 1;
+            }
+
+            return comp.compare(o1.getName(), o2.getName());
+        }
     }
 }

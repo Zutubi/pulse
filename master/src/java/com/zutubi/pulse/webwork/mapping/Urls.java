@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.RecipeResultNode;
+import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
 import com.zutubi.util.StringUtils;
 
 /**
@@ -95,9 +96,9 @@ public class Urls
         return browse() + "projects/";
     }
 
-    public String project(Object project)
+    private String getEncodedProjectName(Object project)
     {
-        String encodedName;
+        String encodedName = null;
         if(project instanceof String)
         {
             // Should be pre-encoded name.
@@ -107,7 +108,14 @@ public class Urls
         {
             encodedName = StringUtils.uriComponentEncode(((Project)project).getName());
         }
-        else
+
+        return encodedName;
+    }
+
+    public String project(Object project)
+    {
+        String encodedName = getEncodedProjectName(project);
+        if (encodedName == null)
         {
             return projects();
         }
@@ -331,9 +339,9 @@ public class Urls
         return baseUrl + "/agents/";
     }
 
-    public String agent(Object agent)
+    private String getEncodedAgentName(Object agent)
     {
-        String encodedName;
+        String encodedName = null;
         if(agent instanceof String)
         {
             // Should be pre-encoded name.
@@ -343,7 +351,17 @@ public class Urls
         {
             encodedName = StringUtils.uriComponentEncode(((Agent)agent).getConfig().getName());
         }
-        else
+        else if (agent instanceof AgentConfiguration)
+        {
+            encodedName = StringUtils.uriComponentEncode(((AgentConfiguration) agent).getName());
+        }
+        return encodedName;
+    }
+
+    public String agent(Object agent)
+    {
+        String encodedName = getEncodedAgentName(agent);
+        if (encodedName == null)
         {
             return agents();
         }
@@ -386,9 +404,9 @@ public class Urls
         return admin() + "projects/";
     }
 
-    public String adminProject(String project)
+    public String adminProject(Object project)
     {
-        return adminProjects() + project + "/";
+        return adminProjects() + getEncodedProjectName(project) + "/";
     }
 
     public String adminAgents()
@@ -396,9 +414,9 @@ public class Urls
         return admin() + "agents/";
     }
 
-    public String adminAgent(String agent)
+    public String adminAgent(Object agent)
     {
-        return adminAgents() + agent + "/";
+        return adminAgents() + getEncodedAgentName(agent) + "/";
     }
 
     public String adminSettings()

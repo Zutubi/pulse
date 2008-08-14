@@ -44,6 +44,11 @@ public class MockProjectManager implements ProjectManager
         return new LinkedList<Project>(projects.values());
     }
 
+    public boolean isProjectValid(Project project)
+    {
+        throw new RuntimeException("Not implemented");
+    }
+
     public int getProjectCount()
     {
         throw new RuntimeException("Method not implemented.");

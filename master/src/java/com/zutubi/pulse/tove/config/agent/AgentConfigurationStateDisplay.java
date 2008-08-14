@@ -13,7 +13,14 @@ public class AgentConfigurationStateDisplay
     public String formatStatus(AgentConfiguration config)
     {
         Agent agent = agentManager.getAgent(config);
-        return agent.getStatus().getPrettyString();
+        if (agent == null)
+        {
+            return "[invalid agent]";
+        }
+        else
+        {
+            return agent.getStatus().getPrettyString();
+        }
     }
 
     public void setAgentManager(AgentManager agentManager)

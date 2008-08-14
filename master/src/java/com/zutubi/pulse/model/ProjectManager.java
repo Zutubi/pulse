@@ -36,6 +36,8 @@ public interface ProjectManager extends EntityManager<Project>
     @SecureResult
     List<Project> getProjects(boolean allowInvalid);
 
+    boolean isProjectValid(Project project);
+
     int getProjectCount();
 
     void buildCommenced(long projectId);
