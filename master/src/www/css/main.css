@@ -1311,23 +1311,6 @@ ul.config-links li {
     margin-bottom: 5px;
 }
 
-#config-help ol, #config-help ul {
-    margin-left: 10px;
-    padding-left: 15px;
-}
-
-#config-help ol {
-    list-style: decimal outside;
-}
-
-#config-help ul {
-    list-style: disc outside;
-}
-
-#config-help li {
-    margin: 5px 0 5px 0;
-}
-
 #config-help .code {
     margin: 5px 20px 5px 20px;
     padding: 4px;
@@ -1412,4 +1395,31 @@ ul.config-links li {
     border: 1px dashed #ccc;
     margin: 4px;
     padding: 4px;
+}
+
+#config-help ol, #config-help ul {
+    margin-left: 10px;
+    padding-left: 15px;
+}
+
+#config-help ol {
+    list-style: decimal outside;
+}
+
+#config-help ul {
+    list-style: disc outside;
+}
+
+#config-help li {
+    margin: 5px 0 5px 0;
+}
+
+.docs th, .docs td {
+    border: solid 1px #ccc;
+    padding: 4px;
+}
+
+.docs th {
+    background-color: #eee;
+    font-size: 100%;
 }
