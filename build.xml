@@ -113,7 +113,7 @@
 
         <!-- can the testing plugins -->
         <delete>
-            <fileset dir="plugins/prepackaged" includes="com.zutubi.pulse.core.postprocessors.test.*.jar"/>
+            <fileset dir="plugins/prepackaged" erroronmissingdir="false" includes="com.zutubi.pulse.core.postprocessors.test.*.jar"/>
         </delete>
 
         <!-- the following should be cleaned out by calls to the respective module/clean targets. -->
