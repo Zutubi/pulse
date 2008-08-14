@@ -16,7 +16,6 @@ import com.zutubi.tove.config.ConfigurationEventListener;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.events.ConfigurationEvent;
 import com.zutubi.tove.config.events.PostSaveEvent;
-import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.BadCredentialsException;
@@ -201,7 +200,7 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
         }
     }
 
-    public synchronized UserConfiguration authenticate(String username, String password)
+    public synchronized UserConfiguration authenticate(String username, String password, boolean addContact)
     {
         if (enabled && initialised)
         {
@@ -218,9 +217,10 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
                 if(user == null)
                 {
                     user = new UserConfiguration(username, name);
+                    user.setAuthenticatedViaLdap(true);
                 }
 
-                if (TextUtils.stringSet(emailAttribute))
+                if (addContact && TextUtils.stringSet(emailAttribute))
                 {
                     addContact(user, details);
                 }
@@ -294,7 +294,7 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
     private void addContact(UserConfiguration user, LdapUserDetails details)
     {
         UserPreferencesConfiguration prefs = user.getPreferences();
-        if (prefs.getContacts().containsKey(EMAIL_CONTACT_NAME))
+        if (!prefs.getContacts().containsKey(EMAIL_CONTACT_NAME))
         {
             String email = getStringAttribute(details, emailAttribute, user.getLogin());
             if (email != null)
@@ -305,8 +305,7 @@ public class AcegiLdapManager implements LdapManager, ConfigurationEventListener
                     EmailContactConfiguration contact = new EmailContactConfiguration();
                     contact.setName(EMAIL_CONTACT_NAME);
                     contact.setAddress(email);
-                    // FIXME USERS check what happens when users are being auto-added
-                    configurationProvider.insert(PathUtils.getPath(user.getConfigurationPath(), "contacts"), contact);
+                    prefs.getContacts().put(EMAIL_CONTACT_NAME, contact);
                 }
                 catch (AddressException e)
                 {

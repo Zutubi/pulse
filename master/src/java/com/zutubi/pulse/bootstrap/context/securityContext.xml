@@ -29,6 +29,9 @@ The beans defined within the security subsystem need not be accessed by other co
         <property name="userManager">
             <ref bean="userManager"/>
         </property>
+        <property name="eventManager">
+            <ref bean="eventManager"/>
+        </property>
     </bean>
 
     <!-- ============================================================= -->
@@ -52,6 +55,9 @@ The beans defined within the security subsystem need not be accessed by other co
         </property>
         <property name="ldapManager">
             <ref bean="ldapManager"/>
+        </property>
+        <property name="eventManager">
+            <ref bean="eventManager"/>
         </property>
     </bean>
 

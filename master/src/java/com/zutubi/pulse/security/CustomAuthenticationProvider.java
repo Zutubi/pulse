@@ -1,5 +1,9 @@
 package com.zutubi.pulse.security;
 
+import com.zutubi.pulse.events.Event;
+import com.zutubi.pulse.events.EventListener;
+import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.events.system.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.model.AcegiUser;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.UserManager;
@@ -17,7 +21,7 @@ import org.acegisecurity.userdetails.UserDetails;
 
 /**
  */
-public class CustomAuthenticationProvider extends DaoAuthenticationProvider
+public class CustomAuthenticationProvider extends DaoAuthenticationProvider implements EventListener
 {
     private static final Logger LOG = Logger.getLogger(CustomAuthenticationProvider.class);
 
@@ -30,13 +34,19 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider
         // Just check for non-existent user auto-adding.
         if(ldapManager.canAutoAdd())
         {
-            UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) authentication;
+            final UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) authentication;
 
             User user = userManager.getUser(token.getName());
             if(user == null)
             {
                 LOG.debug("User '" + token.getName() + "' does not exist, asking LDAP manager");
-                tryAutoAdd(token.getName(), (String) token.getCredentials());
+                AcegiUtils.runAsSystem(new Runnable()
+                {
+                    public void run()
+                    {
+                        tryAutoAdd(token.getName(), (String) token.getCredentials());
+                    }
+                });
             }
         }
 
@@ -48,7 +58,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider
         LOG.debug("Testing for user '" + username + "' via LDAP");
 
         // We can auto-add the user if they can be authenticated via LDAP.
-        UserConfiguration user = ldapManager.authenticate(username, password);
+        UserConfiguration user = ldapManager.authenticate(username, password, true);
         if(user != null)
         {
             LOG.debug("User '" + username + "' found via LDAP, adding.");
@@ -66,7 +76,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider
         if(user.getLdapAuthentication())
         {
             LOG.debug("Authenticating user '" + user.getUsername() + "' via LDAP");
-            if(ldapManager.authenticate(authentication.getName(), authentication.getCredentials().toString()) == null)
+            if(ldapManager.authenticate(authentication.getName(), authentication.getCredentials().toString(), false) == null)
             {
                 LOG.debug("Authentication failed for user '" + user.getUsername() + "' via LDAP");
                 throw new BadCredentialsException("Bad credentials");
@@ -86,6 +96,16 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider
         return UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication);
     }
 
+    public void handleEvent(Event event)
+    {
+        configurationProvider = ((ConfigurationEventSystemStartedEvent) event).getConfigurationProvider();
+    }
+
+    public Class[] getHandledEvents()
+    {
+        return new Class[]{ ConfigurationEventSystemStartedEvent.class };
+    }
+
     public void setLdapManager(LdapManager ldapManager)
     {
         this.ldapManager = ldapManager;
@@ -97,8 +117,8 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider
         this.userManager = userManager;
     }
 
-    public void setConfigurationProvider(ConfigurationProvider configurationProvider)
+    public void setEventManager(EventManager eventManager)
     {
-        this.configurationProvider = configurationProvider;
+        eventManager.register(this);
     }
 }

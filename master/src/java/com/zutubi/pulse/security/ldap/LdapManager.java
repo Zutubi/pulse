@@ -13,7 +13,7 @@ public interface LdapManager
 {
     void connect();
 
-    public UserConfiguration authenticate(String username, String password);
+    public UserConfiguration authenticate(String username, String password, boolean addContact);
 
     public void addLdapRoles(AcegiUser user);
 
