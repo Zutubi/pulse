@@ -68,7 +68,9 @@ public class RecipeTerminationService implements EventListener
     {
         this.eventManager = eventManager;
     }
-public void setThreadFactory(ThreadFactory threadFactory)
+
+    public void setThreadFactory(ThreadFactory threadFactory)
     {
         this.threadFactory = threadFactory;
-    }}
+    }
+}
