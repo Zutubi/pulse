@@ -47,11 +47,15 @@
         <dependency org="xstream" name="xstream" rev="1.2" conf="external,build,release->default"/>
 
         <dependency org="eclipse" name="equinox" rev="3.3" conf="external,build,release->default"/>
-        <dependency org="eclipse" name="equinox-bundles" rev="3.3" conf="build->default">
+        <dependency org="eclipse" name="equinox-bundles" rev="3.3_1" conf="build->default"/>
+<!--
             <artifact name="org.eclipse.equinox.common_3.3.0.v20070426" type="jar"/>
             <artifact name="org.eclipse.equinox.registry_3.3.0.v20070522" type="jar"/>
-            <!--<artifact name="org.eclipse.core.jobs_3.3.0.v20070423" type="jar"/>-->
+-->
+                <!--<artifact name="org.eclipse.core.jobs_3.3.0.v20070423" type="jar"/>-->
+<!--
         </dependency>
+-->
 
         <dependency org="springframework" name="spring" rev="2.0" conf="external,build,release->spring-beans,spring-context,spring-core"/>
     </dependencies>
