@@ -198,8 +198,6 @@ public class BuildController implements EventListener
 
     public void handleEvent(Event evt)
     {
-        // Add an event filter here... we are only interested in events that belong to the project
-        // that we are dealing with. Q: How do we identify our events..
         try
         {
             if (evt instanceof BuildCommencedEvent)
@@ -208,6 +206,14 @@ public class BuildController implements EventListener
                 if (e.getBuildResult() == buildResult)
                 {
                     handleBuildCommenced();
+                }
+            }
+            else if (evt instanceof BuildStatusEvent)
+            {
+                BuildStatusEvent e = (BuildStatusEvent) evt;
+                if (e.getBuildResult() == buildResult)
+                {
+                    buildLogger.status(e.getMessage());
                 }
             }
             else if (evt instanceof BuildTerminationRequestEvent)
@@ -247,8 +253,6 @@ public class BuildController implements EventListener
 
     private void handleBuildCommenced()
     {
-        publishEvent(new PreBuildEvent(this, buildResult, buildContext));
-
         // It is important that this directory is created *after* the build
         // result is commenced and saved to the database, so that the
         // database knows of the possibility of some other persistent
@@ -265,7 +269,9 @@ public class BuildController implements EventListener
         }
 
         buildLogger.prepare();
-        eventManager.register(buildLogger);
+        buildLogger.preBuild();
+        publishEvent(new PreBuildEvent(this, buildResult, buildContext));
+        buildLogger.preBuildCompleted();
 
         tree.prepare(buildResult);
 
@@ -529,6 +535,7 @@ public class BuildController implements EventListener
         }
 
         buildResult.commence(buildRevision.getTimestamp());
+        buildLogger.commenced(buildResult);
         if (previousSuccessful != null)
         {
             buildResult.getStamps().setEstimatedRunningTime(previousSuccessful.getStamps().getElapsed());
@@ -676,13 +683,16 @@ public class BuildController implements EventListener
             buildResult.abortUnfinishedRecipes();
             buildResult.setHasWorkDir(projectConfig.getOptions().getRetainWorkingCopy());
             buildResult.complete();
+            buildLogger.completed(buildResult);
 
             // The timing of this event is important: handlers of this event
             // are allowed to add information to and modify the state of the
             // build result.  Hence it is crucial that indexing and a final
             // save are done afterwards.
             addCompletedBuildProperties(buildContext, buildResult, configurationManager);
+            buildLogger.postBuild();
             publishEvent(new PostBuildEvent(this, buildResult, buildContext));
+            buildLogger.postBuildCompleted();
 
             // calculate the feature counts at the end of the build so that the result hierarchy does not need to
             // be traversed when this information is required.
@@ -706,7 +716,6 @@ public class BuildController implements EventListener
         eventManager.unregister(asyncListener);
         publishEvent(new BuildCompletedEvent(this, buildResult, buildContext));
 
-        eventManager.unregister(buildLogger);
         buildLogger.done();
 
         // this must be last since we are in fact stopping the thread running this method.., we are
@@ -716,7 +725,7 @@ public class BuildController implements EventListener
 
     public Class[] getHandledEvents()
     {
-        return new Class[]{BuildCommencedEvent.class, RecipeEvent.class, BuildTerminationRequestEvent.class, RecipeTimeoutEvent.class};
+        return new Class[]{BuildCommencedEvent.class, BuildStatusEvent.class, RecipeEvent.class, BuildTerminationRequestEvent.class, RecipeTimeoutEvent.class};
     }
 
     public long getBuildId()

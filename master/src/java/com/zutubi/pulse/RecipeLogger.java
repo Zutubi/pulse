@@ -7,14 +7,13 @@ import com.zutubi.pulse.events.build.*;
 /**
  * Creates the combined log of a recipe's execution.
  */
-public interface RecipeLogger
+public interface RecipeLogger extends HookLogger
 {
     void prepare();
 
     void log(RecipeDispatchedEvent event);
     void log(RecipeCommencedEvent event, RecipeResult result);
     void log(CommandCommencedEvent event, CommandResult result);
-    void log(OutputEvent event);
     void log(CommandCompletedEvent event, CommandResult result);
     void log(RecipeCompletedEvent event, RecipeResult result);
     void log(RecipeStatusEvent event);

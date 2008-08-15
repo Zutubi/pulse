@@ -10,6 +10,7 @@ import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.*;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.events.*;
+import com.zutubi.pulse.events.build.BuildStatusEvent;
 import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.events.build.RecipeStatusEvent;
@@ -190,7 +191,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         if (!buildRevision.isInitialised())
         {
             // Let's initialise it
-            eventManager.publish(new RecipeStatusEvent(this, dispatchRequest.getRequest().getId(), "Initialising build revision..."));
+            eventManager.publish(new BuildStatusEvent(this, dispatchRequest.getBuild(), "Initialising build revision..."));
             ProjectConfiguration projectConfig = dispatchRequest.getProject().getConfig();
             ScmConfiguration scm = projectConfig.getScm();
 
@@ -203,7 +204,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
                 // May throw a BuildException
                 updateRevision(dispatchRequest, revision);
-                eventManager.publish(new RecipeStatusEvent(this, dispatchRequest.getRequest().getId(), "Revision initialised to '" + revision.getRevisionString() + "'"));
+                eventManager.publish(new BuildStatusEvent(this, dispatchRequest.getBuild(), "Revision initialised to '" + revision.getRevisionString() + "'"));
             }
             finally
             {

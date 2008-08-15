@@ -1,18 +1,16 @@
 package com.zutubi.pulse.tove.config.project.hooks;
 
+import com.zutubi.pulse.HookLogger;
 import com.zutubi.pulse.MasterBuildProperties;
 import com.zutubi.pulse.agent.MasterLocationProvider;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.ExecutionContext;
-import com.zutubi.pulse.core.ListenerEventOutputStream;
+import com.zutubi.pulse.core.LoggerOutputStream;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.Result;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.build.BuildEvent;
-import com.zutubi.pulse.events.build.BuildOutputCommencedEvent;
-import com.zutubi.pulse.events.build.BuildOutputCompletedEvent;
 import com.zutubi.pulse.events.build.StageEvent;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
@@ -36,7 +34,7 @@ public class BuildHookManager
     private MasterConfigurationManager configurationManager;
     private MasterLocationProvider masterLocationProvider;
 
-    public void handleEvent(Event event, EventListener listener)
+    public void handleEvent(Event event, HookLogger logger)
     {
         final BuildEvent be = (BuildEvent) event;
         BuildResult buildResult = be.getBuildResult();
@@ -55,13 +53,12 @@ public class BuildHookManager
                         resultNode = ((StageEvent) be).getStageNode();
                     }
 
-
-                    listener.handleEvent(new BuildOutputCommencedEvent(this, hook.getName()));
+                    logger.hookCommenced(hook.getName());
                     OutputStream out = null;
                     try
                     {
                         // stream the output to whoever is listening.
-                        out = new ListenerEventOutputStream(listener, true);
+                        out = new LoggerOutputStream(logger);
                         context.setOutputStream(out);
                         executeTask(hook, context, be.getBuildResult(), resultNode, false);
                     }
@@ -69,7 +66,7 @@ public class BuildHookManager
                     {
                         IOUtils.close(out);
                     }
-                    listener.handleEvent(new BuildOutputCompletedEvent(this));
+                    logger.hookCompleted(hook.getName());
                 }
             }
         }

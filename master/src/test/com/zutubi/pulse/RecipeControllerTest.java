@@ -610,10 +610,6 @@ public class RecipeControllerTest extends PulseTestCase
         {
         }
 
-        public void log(CommandOutputEvent event)
-        {
-        }
-
         public void log(CommandCompletedEvent event, CommandResult result)
         {
         }
@@ -671,9 +667,24 @@ public class RecipeControllerTest extends PulseTestCase
             throw new RuntimeException("Not implemented");
         }
 
-        public void log(OutputEvent event)
+        public void hookCommenced(String name)
         {
+            throw new RuntimeException("Method not yet implemented");
+        }
 
+        public void hookCompleted(String name)
+        {
+            throw new RuntimeException("Method not yet implemented");
+        }
+
+        public void log(byte[] output)
+        {
+            throw new RuntimeException("Method not yet implemented");
+        }
+
+        public void log(byte[] output, int offset, int length)
+        {
+            throw new RuntimeException("Method not yet implemented");
         }
     }
 }

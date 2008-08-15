@@ -1,11 +1,6 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.events.EventListener;
-import com.zutubi.pulse.events.build.BuildEvent;
-import com.zutubi.pulse.events.build.OutputEvent;
-import com.zutubi.pulse.events.build.BuildOutputCommencedEvent;
-import com.zutubi.pulse.events.build.BuildOutputCompletedEvent;
+import com.zutubi.pulse.model.BuildResult;
 
 import java.io.File;
 
@@ -13,7 +8,7 @@ import java.io.File;
  *
  *
  */
-public class DefaultBuildLogger extends AbstractFileLogger implements BuildLogger, EventListener
+public class DefaultBuildLogger extends AbstractOutputLogger implements BuildLogger
 {
     private static final String PRE_MARKER = "============================[ task output below ]============================";
     private static final String POST_MARKER = "============================[ task output above ]============================";
@@ -28,55 +23,63 @@ public class DefaultBuildLogger extends AbstractFileLogger implements BuildLogge
         openWriter();
     }
 
-    public void log(Event event)
+    public void preBuild()
     {
-        if (event instanceof OutputEvent)
+        logMarker("Running pre build hooks...");
+    }
+
+    public void preBuildCompleted()
+    {
+        logMarker("Pre build hooks complete.");
+    }
+
+    public void hookCommenced(String name)
+    {
+        logMarker("Hook '" + name + "' commenced");
+        if (writer != null)
         {
-            log((OutputEvent) event);
-        }
-        else if (event instanceof BuildOutputCommencedEvent)
-        {
-            if (writer != null)
-            {
-                writer.println(PRE_MARKER);
-                writer.flush();
-            }
-        }
-        else if (event instanceof BuildOutputCompletedEvent)
-        {
-            if (writer != null)
-            {
-                writer.println(POST_MARKER);
-                writer.flush();
-            }
-        }
-        else
-        {
-            logMarker(event.toString());
+            writer.println(PRE_MARKER);
+            writer.flush();
         }
     }
 
-    public void log(OutputEvent evt)
+    public void hookCompleted(String name)
     {
         if (writer != null)
         {
-            writer.print(new String(evt.getData()));
+            writer.println(POST_MARKER);
             writer.flush();
         }
+        logMarker("Hook '" + name + "' completed");
+    }
+
+    public void commenced(BuildResult build)
+    {
+        logMarker("Build commenced", build.getStamps().getStartTime());
+    }
+
+    public void status(String message)
+    {
+        logMarker(message);
+    }
+
+    public void completed(BuildResult build)
+    {
+        logMarker("Build completed with status " + build.getState().getPrettyString(), build.getStamps().getEndTime());
+    }
+
+    public void postBuild()
+    {
+        logMarker("Running post build hooks...");
+    }
+
+    public void postBuildCompleted()
+    {
+        logMarker("Post build hooks complete.");
     }
 
     public void done()
     {
         closeWriter();
-    }
-
-    public void handleEvent(Event event)
-    {
-        log(event);
-    }
-
-    public Class[] getHandledEvents()
-    {
-        return new Class[]{BuildEvent.class};
     }
 }
