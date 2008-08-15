@@ -5,11 +5,11 @@ import com.zutubi.pulse.acceptance.support.PackageFactory;
 import com.zutubi.pulse.acceptance.support.Pulse;
 import com.zutubi.pulse.acceptance.support.PulsePackage;
 import com.zutubi.pulse.plugins.ConfigurablePluginPaths;
+import com.zutubi.pulse.plugins.Plugin;
 import com.zutubi.pulse.plugins.PluginException;
 import com.zutubi.pulse.plugins.PluginManager;
 import com.zutubi.pulse.plugins.PluginManagerTest;
 import com.zutubi.pulse.plugins.PluginUpgradeManager;
-import com.zutubi.pulse.plugins.Plugin;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.upgrade.DefaultUpgradeManager;
 import com.zutubi.pulse.upgrade.UpgradeTask;
@@ -50,6 +50,12 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
     protected void setUp() throws Exception
     {
         File pkgFile = getPulsePackage();
+/*
+        if (pkgFile == null)
+        {
+            pkgFile = new File("test-packages/pulse-2.0.9.zip");
+        }
+*/
 
         PackageFactory factory = new JythonPackageFactory();
         PulsePackage pkg = factory.createPackage(pkgFile);
@@ -155,6 +161,26 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
         restartPluginCore();
 
         assertFalse(pluginUpgradeManager.isUpgradeRequired());
+    }
+
+    public void testRequestUpgradeViaPluginInterface() throws Exception
+    {
+        FileSystemUtils.copy(paths.getPluginStorageDir(), producer2);
+
+        startupPluginCore();
+
+        assertFalse(pluginUpgradeManager.isUpgradeRequired());
+
+        Plugin plugin = pluginManager.getPlugin("com.zutubi.bundles.producer");
+        plugin.upgrade(producer3.toURI());
+        assertEquals(Plugin.State.UPDATING, plugin.getState());
+
+        restartPluginCore();
+
+        assertTrue(pluginUpgradeManager.isUpgradeRequired());
+
+        plugin = pluginManager.getPlugin("com.zutubi.bundles.producer");
+        assertEquals(Plugin.State.VERSION_CHANGE, plugin.getState());
     }
 
     public void testInPlaceNew() throws Exception
