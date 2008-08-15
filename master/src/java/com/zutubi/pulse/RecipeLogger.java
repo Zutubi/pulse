@@ -14,7 +14,7 @@ public interface RecipeLogger
     void log(RecipeDispatchedEvent event);
     void log(RecipeCommencedEvent event, RecipeResult result);
     void log(CommandCommencedEvent event, CommandResult result);
-    void log(CommandOutputEvent event);
+    void log(OutputEvent event);
     void log(CommandCompletedEvent event, CommandResult result);
     void log(RecipeCompletedEvent event, RecipeResult result);
     void log(RecipeStatusEvent event);

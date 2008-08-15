@@ -670,5 +670,10 @@ public class RecipeControllerTest extends PulseTestCase
         {
             throw new RuntimeException("Not implemented");
         }
+
+        public void log(OutputEvent event)
+        {
+
+        }
     }
 }

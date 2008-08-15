@@ -3,18 +3,17 @@ package com.zutubi.pulse.tove.config.project.hooks;
 import com.zutubi.pulse.MasterBuildProperties;
 import com.zutubi.pulse.agent.MasterLocationProvider;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.core.BuildEventOutputStream;
 import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.ListenerEventOutputStream;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.Result;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
-import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.BuildEvent;
-import com.zutubi.pulse.events.build.StageEvent;
 import com.zutubi.pulse.events.build.BuildOutputCommencedEvent;
 import com.zutubi.pulse.events.build.BuildOutputCompletedEvent;
+import com.zutubi.pulse.events.build.StageEvent;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.RecipeResultNode;
@@ -30,16 +29,14 @@ import java.util.concurrent.Executors;
  * Manages the execution of build hooks at various points in the build
  * process.
  */
-public class BuildHookManager implements EventListener
+public class BuildHookManager
 {
     private ExecutorService executor = Executors.newSingleThreadExecutor();
 
     private MasterConfigurationManager configurationManager;
     private MasterLocationProvider masterLocationProvider;
 
-    private EventManager eventManager;
-
-    public void handleEvent(Event event)
+    public void handleEvent(Event event, EventListener listener)
     {
         final BuildEvent be = (BuildEvent) event;
         BuildResult buildResult = be.getBuildResult();
@@ -58,12 +55,13 @@ public class BuildHookManager implements EventListener
                         resultNode = ((StageEvent) be).getStageNode();
                     }
 
-                    eventManager.publish(new BuildOutputCommencedEvent(this));
+
+                    listener.handleEvent(new BuildOutputCommencedEvent(this, hook.getName()));
                     OutputStream out = null;
                     try
                     {
                         // stream the output to whoever is listening.
-                        out = new BuildEventOutputStream(eventManager, true);
+                        out = new ListenerEventOutputStream(listener, true);
                         context.setOutputStream(out);
                         executeTask(hook, context, be.getBuildResult(), resultNode, false);
                     }
@@ -71,7 +69,7 @@ public class BuildHookManager implements EventListener
                     {
                         IOUtils.close(out);
                     }
-                    eventManager.publish(new BuildOutputCompletedEvent(this));
+                    listener.handleEvent(new BuildOutputCompletedEvent(this));
                 }
             }
         }
@@ -133,17 +131,6 @@ public class BuildHookManager implements EventListener
                 }
             }
         }
-    }
-
-    public Class[] getHandledEvents()
-    {
-        return new Class[]{BuildEvent.class};
-    }
-
-    public void setEventManager(EventManager eventManager)
-    {
-        this.eventManager = eventManager;
-        eventManager.register(this);
     }
 
     public void setConfigurationManager(MasterConfigurationManager configurationManager)

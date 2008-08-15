@@ -19,7 +19,6 @@ public abstract class EventOutputStream extends OutputStream implements Runnable
      */
     public static int MINIMUM_SIZE = 1024;
 
-    protected EventManager eventManager;
     private byte[] buffer;
     protected int offset;
 
@@ -29,9 +28,8 @@ public abstract class EventOutputStream extends OutputStream implements Runnable
      */
     private static final int AUTO_FLUSH_INTERVAL = 5000;
 
-    public EventOutputStream(EventManager eventManager, boolean autoflush)
+    public EventOutputStream(boolean autoflush)
     {
-        this.eventManager = eventManager;
         buffer = new byte[MINIMUM_SIZE];
         offset = 0;
 

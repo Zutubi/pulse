@@ -10,9 +10,12 @@ import com.zutubi.pulse.events.build.BuildOutputEvent;
  */
 public class BuildEventOutputStream extends EventOutputStream
 {
+    private EventManager eventManager;
+
     public BuildEventOutputStream(EventManager eventManager, boolean autoflush)
     {
-        super(eventManager, autoflush);
+        super(autoflush);
+        this.eventManager = eventManager;
     }
 
     protected void sendEvent(byte[] sendBuffer)

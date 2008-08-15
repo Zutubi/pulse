@@ -18,6 +18,7 @@ import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.tove.config.project.BuildOptionsConfiguration;
 import com.zutubi.pulse.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.tove.config.project.hooks.BuildHookManager;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.TimeStamps;
 import com.zutubi.pulse.util.TreeNode;
@@ -68,6 +69,7 @@ public class BuildController implements EventListener
     private ServiceTokenManager serviceTokenManager;
     private BuildResult previousSuccessful;
     private ExecutionContext buildContext;
+    private BuildHookManager buildHookManager;
 
     private ScmClientFactory<ScmConfiguration> scmClientFactory;
     private ThreadFactory threadFactory;
@@ -108,7 +110,7 @@ public class BuildController implements EventListener
         // anywhere, even for different builds, it is much safer to ensure we
         // *only* use that thread after we have registered the listener.
         eventManager.register(asyncListener);
-        eventManager.publish(new BuildCommencedEvent(this, buildResult, buildContext));
+        publishEvent(new BuildCommencedEvent(this, buildResult, buildContext));
     }
 
     public BuildTree createBuildTree()
@@ -177,6 +179,7 @@ public class BuildController implements EventListener
             rc.setBuildManager(buildManager);
             rc.setServiceTokenManager(serviceTokenManager);
             rc.setEventManager(eventManager);
+            rc.setBuildHookManager(buildHookManager);
 
             TreeNode<RecipeController> child = new TreeNode<RecipeController>(rc);
             rcNode.add(child);
@@ -244,7 +247,7 @@ public class BuildController implements EventListener
 
     private void handleBuildCommenced()
     {
-        eventManager.publish(new PreBuildEvent(this, buildResult, buildContext));
+        publishEvent(new PreBuildEvent(this, buildResult, buildContext));
 
         // It is important that this directory is created *after* the build
         // result is commenced and saved to the database, so that the
@@ -607,7 +610,7 @@ public class BuildController implements EventListener
     {
         if (controller.isFinished())
         {
-            eventManager.publish(new RecipeCollectingEvent(this, controller.getResult().getId()));
+            publishEvent(new RecipeCollectingEvent(this, controller.getResult().getId()));
 
             if (collect)
             {
@@ -617,7 +620,7 @@ public class BuildController implements EventListener
             controller.cleanup(buildResult);
             controller.sendPostStageEvent();
 
-            eventManager.publish(new RecipeCollectedEvent(this, controller.getResult().getId()));
+            publishEvent(new RecipeCollectedEvent(this, controller.getResult().getId()));
             return true;
         }
 
@@ -679,7 +682,7 @@ public class BuildController implements EventListener
             // build result.  Hence it is crucial that indexing and a final
             // save are done afterwards.
             addCompletedBuildProperties(buildContext, buildResult, configurationManager);
-            eventManager.publish(new PostBuildEvent(this, buildResult, buildContext));
+            publishEvent(new PostBuildEvent(this, buildResult, buildContext));
 
             // calculate the feature counts at the end of the build so that the result hierarchy does not need to
             // be traversed when this information is required.
@@ -701,7 +704,7 @@ public class BuildController implements EventListener
         }
 
         eventManager.unregister(asyncListener);
-        eventManager.publish(new BuildCompletedEvent(this, buildResult, buildContext));
+        publishEvent(new BuildCompletedEvent(this, buildResult, buildContext));
 
         eventManager.unregister(buildLogger);
         buildLogger.done();
@@ -719,6 +722,16 @@ public class BuildController implements EventListener
     public long getBuildId()
     {
         return buildResult.getId();
+    }
+
+    private void publishEvent(Event evt)
+    {
+        if (evt instanceof BuildEvent)
+        {
+            buildHookManager.handleEvent(evt, buildLogger);
+        }
+        
+        eventManager.publish(evt);
     }
 
     public void setConfigurationManager(MasterConfigurationManager configurationManager)
@@ -789,6 +802,11 @@ public class BuildController implements EventListener
     public void setMasterLocationProvider(MasterLocationProvider masterLocationProvider)
     {
         this.masterLocationProvider = masterLocationProvider;
+    }
+
+    public void setBuildHookManager(BuildHookManager buildHookManager)
+    {
+        this.buildHookManager = buildHookManager;
     }
 
     private static interface BootstrapperCreator

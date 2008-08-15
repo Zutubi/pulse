@@ -22,6 +22,7 @@ import com.zutubi.pulse.license.events.LicenseUpdateEvent;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.scheduling.quartz.TimeoutRecipeJob;
 import com.zutubi.pulse.services.ServiceTokenManager;
+import com.zutubi.pulse.tove.config.project.hooks.BuildHookManager;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.logging.Logger;
 import org.quartz.JobDetail;
@@ -73,6 +74,7 @@ public class FatController implements EventListener, Stoppable
     private AccessManager accessManager;
     private MasterLocationProvider masterLocationProvider;
     private ResourceManager resourceManager;
+    private BuildHookManager buildHookManager;
 
     /**
      * When the fat controller is enabled, it will handle incoming build requests.
@@ -280,6 +282,7 @@ public class FatController implements EventListener, Stoppable
                 collector.setProjectConfig(event.getProjectConfig());
                 BuildController controller = new BuildController(event);
                 controller.setBuildManager(buildManager);
+                controller.setBuildHookManager(buildHookManager);
                 controller.setCollector(collector);
                 controller.setEventManager(eventManager);
                 controller.setProjectManager(projectManager);
@@ -476,5 +479,10 @@ public class FatController implements EventListener, Stoppable
     public void setMasterLocationProvider(MasterLocationProvider masterLocationProvider)
     {
         this.masterLocationProvider = masterLocationProvider;
+    }
+
+    public void setBuildHookManager(BuildHookManager buildHookManager)
+    {
+        this.buildHookManager = buildHookManager;
     }
 }

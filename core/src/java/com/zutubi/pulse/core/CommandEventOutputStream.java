@@ -10,11 +10,13 @@ import com.zutubi.pulse.events.build.CommandOutputEvent;
 public class CommandEventOutputStream extends EventOutputStream
 {
     private long recipeId;
+    private EventManager eventManager;
 
     public CommandEventOutputStream(EventManager eventManager, long recipeId, boolean autoflush)
     {
-        super(eventManager, autoflush);
+        super(autoflush);
         this.recipeId = recipeId;
+        this.eventManager = eventManager;
     }
 
     protected void sendEvent(byte[] sendBuffer)

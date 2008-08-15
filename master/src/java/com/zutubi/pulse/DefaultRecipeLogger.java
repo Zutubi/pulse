@@ -2,14 +2,8 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.RecipeResult;
-import com.zutubi.pulse.events.build.CommandCommencedEvent;
-import com.zutubi.pulse.events.build.CommandCompletedEvent;
-import com.zutubi.pulse.events.build.CommandOutputEvent;
-import com.zutubi.pulse.events.build.RecipeCommencedEvent;
-import com.zutubi.pulse.events.build.RecipeCompletedEvent;
-import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
-import com.zutubi.pulse.events.build.RecipeErrorEvent;
-import com.zutubi.pulse.events.build.RecipeStatusEvent;
+import com.zutubi.pulse.events.build.*;
+import com.zutubi.pulse.events.Event;
 import com.zutubi.util.Pair;
 import com.zutubi.util.Sort;
 
@@ -40,7 +34,7 @@ public class DefaultRecipeLogger extends AbstractFileLogger implements RecipeLog
 
     public void log(RecipeDispatchedEvent event)
     {
-        logMarker("Recipe dispatched to agent " + event.getAgent().getConfig().getName(), System.currentTimeMillis());
+        logMarker("Recipe dispatched to agent " + event.getAgent().getConfig().getName());
     }
 
     public void log(RecipeCommencedEvent event, RecipeResult result)
@@ -51,14 +45,10 @@ public class DefaultRecipeLogger extends AbstractFileLogger implements RecipeLog
     public void log(CommandCommencedEvent event, CommandResult result)
     {
         logMarker("Command '" + result.getCommandName() + "' commenced", result.getStamps().getStartTime());
-        if (writer != null)
-        {
-            writer.println(PRE_RULE);
-            writer.flush();
-        }
+        writePreRule();
     }
 
-    public void log(CommandOutputEvent event)
+    public void log(OutputEvent event)
     {
         if (writer != null)
         {
@@ -69,11 +59,7 @@ public class DefaultRecipeLogger extends AbstractFileLogger implements RecipeLog
 
     public void log(CommandCompletedEvent event, CommandResult result)
     {
-        if (writer != null)
-        {
-            writer.println(POST_RULE);
-            writer.flush();
-        }
+        writePostRule();
 
         logMarker("Command '" + result.getCommandName() + "' completed with status " + result.getState().getPrettyString(), result.getStamps().getEndTime());
         if (result.getProperties().size() > 0)
@@ -122,7 +108,7 @@ public class DefaultRecipeLogger extends AbstractFileLogger implements RecipeLog
 
     public void log(RecipeErrorEvent event, RecipeResult result)
     {
-        logMarker("Recipe terminated with an error: " + event.getErrorMessage(), System.currentTimeMillis());
+        logMarker("Recipe terminated with an error: " + event.getErrorMessage());
     }
 
     public void complete(RecipeResult result)
@@ -158,6 +144,45 @@ public class DefaultRecipeLogger extends AbstractFileLogger implements RecipeLog
     public void postStageComplete()
     {
         logMarker("Post stage hooks complete.");
+    }
+
+    public void log(Event event)
+    {
+        if (event instanceof OutputEvent)
+        {
+            log((OutputEvent)event);
+        }
+        else if (event instanceof BuildOutputCommencedEvent)
+        {
+            logMarker("Hook '" + ((BuildOutputCommencedEvent)event).getCommandName() + "' commenced");
+            writePreRule();
+        }
+        else if (event instanceof BuildOutputCompletedEvent)
+        {
+            writePostRule();
+        }
+        else
+        {
+//            logMarker(event.toString());
+        }
+    }
+
+    private void writePreRule()
+    {
+        if (writer != null)
+        {
+            writer.println(PRE_RULE);
+            writer.flush();
+        }
+    }
+
+    private void writePostRule()
+    {
+        if (writer != null)
+        {
+            writer.println(POST_RULE);
+            writer.flush();
+        }
     }
 
     public void done()
