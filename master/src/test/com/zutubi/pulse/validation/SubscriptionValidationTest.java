@@ -47,14 +47,14 @@ public class SubscriptionValidationTest extends AbstractValidationTestCase
     {
         RepeatedUnsuccessfulConditionConfiguration condition = new RepeatedUnsuccessfulConditionConfiguration();
         condition.setAfter(0);
-        validateAndAssertFieldErrors(subscriptionPath, "condition", condition, "after", "after must be positive");
+        validateAndAssertFieldErrors(subscriptionPath, "condition", condition, "after", "notify after must be positive");
     }
 
     public void testRepeatedUnsuccessfulConditionNegativeAfter() throws TypeException
     {
         RepeatedUnsuccessfulConditionConfiguration condition = new RepeatedUnsuccessfulConditionConfiguration();
         condition.setAfter(-1);
-        validateAndAssertFieldErrors(subscriptionPath, "condition", condition, "after", "after must be positive");
+        validateAndAssertFieldErrors(subscriptionPath, "condition", condition, "after", "notify after must be positive");
     }
 
     public void testCustomConditionValid() throws TypeException
