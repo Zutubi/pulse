@@ -48,7 +48,7 @@ public class AcceptanceTestSuite
         main.addTestSuite(JythonPackageFactoryTest.class); // check the support code works before running the acceptance test suite.
         main.addTestSuite(PluginUpgradeManagerAcceptanceTest.class);
         main.addTest(new AcceptanceTestSuiteSetupTeardown(suite));
-//        main.addTestSuite(AgentUpgradeAcceptanceTest.class);
+        main.addTestSuite(AgentUpgradeAcceptanceTest.class);
         main.addTestSuite(StartupShutdownAcceptanceTest.class);
 
         return main;
