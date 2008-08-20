@@ -9,35 +9,36 @@
         <conf name="internal-bundles" extends="equinox-bundles" description="Internal bundles required by Pulse."/>
         <conf name="prepackaged-bundles" description="Prepackaged bundles required by Pulse."/>
         <conf name="build" extends="*" description="Modules that must be built when packaging this module."/>
+        <conf name="src" description="The source packages included as part of the source release"/>
     </configurations>
 
     <publications/>
 
     <dependencies>
         <!-- Project module dependencies -->
-        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="release->@"/>
+        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="release,src->@"/>
 
         <!-- Internal plugins -->
         <dependency org="zutubi" name="com.zutubi.pulse.core" rev="latest.integration" conf="internal-bundles->bundle"/>
         <dependency org="eclipse" name="equinox-bundles" rev="3.3" conf="equinox-bundles->default"/>
 
         <!-- Prepackaged plugins -->
-        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.ant" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
-        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.bjam" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
-        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.core" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
-        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.make" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
-        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.maven" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
-        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.maven2" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
-        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.xcode" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
-        <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.boostregression" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
-        <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.cppunit" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
-        <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.cunit" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
-        <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.gcc" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
-        <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.ocunit" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
-        <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.unittestpp" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
-        <dependency org="zutubi" name="com.zutubi.pulse.core.scm.cvs" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
-        <dependency org="zutubi" name="com.zutubi.pulse.core.scm.p4" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
-        <dependency org="zutubi" name="com.zutubi.pulse.core.scm.svn" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.ant" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.bjam" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.core" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.make" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.maven" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.maven2" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.commands.xcode" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.boostregression" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.cppunit" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.cunit" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.gcc" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.ocunit" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.postprocessors.unittestpp" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.scm.cvs" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.scm.p4" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core.scm.svn" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
     </dependencies>
 </ivy-module>
 

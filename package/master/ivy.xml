@@ -8,6 +8,7 @@
         <conf name="internal-bundles" description="Internal bundles required by Pulse."/>
         <conf name="prepackaged-bundles" description="Prepackaged bundles required by Pulse."/>
         <conf name="build" extends="*" description="Modules that must be built when packaging this module."/>
+        <conf name="src" description="The source packages included as part of the source release"/>
     </configurations>
 
     <publications/>
@@ -17,11 +18,11 @@
         <dependency org="zutubi" name="pulse-server-core-package" rev="latest.integration" conf="*->@"/>
         <dependency org="zutubi" name="pulse-slave-package" rev="latest.integration" conf="build->@"/>
 
-        <dependency org="zutubi" name="pulse-master" rev="latest.integration" conf="release->@"/>
+        <dependency org="zutubi" name="pulse-master" rev="latest.integration" conf="release,src->@"/>
 
         <!-- Prepackaged plugins -->
-        <dependency org="zutubi" name="com.zutubi.pulse.master.external.jira" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
-        <dependency org="zutubi" name="com.zutubi.pulse.master.hook.email" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
-        <dependency org="zutubi" name="com.zutubi.pulse.master.hook.tag" rev="latest.integration" conf="prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.master.external.jira" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.master.hook.email" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.master.hook.tag" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>
     </dependencies>
 </ivy-module>

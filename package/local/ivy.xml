@@ -8,13 +8,13 @@
         <conf name="internal-bundles" description="Internal bundles required by Pulse."/>
         <conf name="prepackaged-bundles" description="Prepackaged bundles required by Pulse."/>
         <conf name="build" extends="*" description="Modules that must be built when packaging this module."/>
+        <conf name="src" description="The source packages included as part of the source release"/>
     </configurations>
 
     <publications/>
 
     <dependencies>
         <dependency org="zutubi" name="pulse-core-package" rev="latest.integration" conf="*->@"/>
-
-        <dependency org="zutubi" name="pulse-local" rev="latest.integration" conf="release->@"/>
+        <dependency org="zutubi" name="pulse-local" rev="latest.integration" conf="release,src->@"/>
     </dependencies>
 </ivy-module>
