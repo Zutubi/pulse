@@ -11,10 +11,12 @@
     <configurations>
         <conf name="release" description="Defines those packages that are included in the final release."/>
         <conf name="build" description="All of the packages required during the build."/>
+        <conf name="src" description="The source packages included as part of the source release"/>
     </configurations>
 
     <publications>
         <artifact name="com.zutubi.config.annotations" type="jar" conf="release, build"/>
+        <artifact name="com.zutubi.config.annotations-src" type="jar" conf="src"/>
     </publications>
     
     <dependencies>

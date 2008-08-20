@@ -16,10 +16,12 @@
         <conf name="build" description="All of the packages required during the build."/>
         <conf name="internal-bundles" description="Internal bundles required by Pulse."/>
         <conf name="prepackaged-bundles" description="Prepackaged bundles required by Pulse."/>
+        <conf name="src" description="The source packages included as part of the source release"/>
     </configurations>
 
     <publications>
         <artifact name="pulse-master" type="jar" conf="release,build"/>
+        <artifact name="pulse-master-src" type="jar" conf="src"/>
     </publications>
 
     <dependencies>

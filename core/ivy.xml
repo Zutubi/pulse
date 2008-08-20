@@ -13,17 +13,19 @@
         <conf name="release" description="Defines those packages that are included in the final release."/>
         <conf name="external" description="All of those packages that are external to Pulse."/>
         <conf name="build" description="All of the packages required during the build."/>
+        <conf name="src" description="The source packages included as part of the source release"/>
     </configurations>
 
     <publications>
         <artifact name="pulse-core" type="jar" conf="release, build"/>
+        <artifact name="pulse-core-src" type="jar" conf="src"/>
         <artifact name="pulse-core-test" type="jar" conf="build"/>
     </publications>
 
     <dependencies>
         <!-- Project module dependencies -->
-        <dependency org="zutubi" name="com.zutubi.validation" rev="latest.integration" conf="release,external,build->@"/>
-        <dependency org="zutubi" name="com.zutubi.config.annotations" rev="latest.integration" conf="release,external,build->@"/>
+        <dependency org="zutubi" name="com.zutubi.validation" rev="latest.integration" conf="release,external,build,src->@"/>
+        <dependency org="zutubi" name="com.zutubi.config.annotations" rev="latest.integration" conf="release,external,build,src->@"/>
 
         <!-- Library dependencies -->
         <dependency org="zutubi" name="boot" rev="2.0" conf="external,build,release->default"/>
