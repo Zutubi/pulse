@@ -10,21 +10,19 @@
 
     <configurations>
         <conf name="build"/>
-        <conf name="source"/>
         <conf name="bundle"/>
         <conf name="external"/>
         <conf name="bundled_3rd_party"/>
+        <conf name="src" description="The source packages included as part of the source release"/>
     </configurations>
 
     <publications>
-        <!-- The runtime artifacts for this module. -->
-        <artifact type="jar" conf="bundle,build"/>
-        <!-- The source artifacts for this module. -->
-        <artifact name="com.zutubi.pulse.master.hook.email-src" type="jar" conf="source"/>
+        <artifact name="com.zutubi.pulse.master.hook.email" type="jar" conf="bundle,build"/>
+        <artifact name="com.zutubi.pulse.master.hook.email-src" type="jar" conf="src"/>
     </publications>
 
     <dependencies>
-        <dependency org="zutubi" name="com.zutubi.pulse.core" rev="latest.integration" conf="build,source,external,builded_3rd_party->@"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core" rev="latest.integration" conf="build,src,external,builded_3rd_party->@"/>
 
         <dependency org="zutubi" name="pulse-master" rev="latest.integration" conf="build->@"/>
     </dependencies>

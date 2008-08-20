@@ -10,18 +10,18 @@
 
     <configurations>
         <conf name="build"/>
-        <conf name="source"/>
         <conf name="bundle"/>
         <conf name="external"/>
         <conf name="bundled_3rd_party"/>
+        <conf name="src" description="The source packages included as part of the source release"/>
     </configurations>
 
     <publications>
-        <artifact type="jar" conf="build,bundle"/>
-        <artifact name="com.zutubi.pulse.core-src" type="jar" conf="source"/>
+        <artifact name="com.zutubi.pulse.core" type="jar" conf="build,bundle"/>
+        <artifact name="com.zutubi.pulse.core-src" type="jar" conf="src"/>
     </publications>
 
     <dependencies>
-        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="build->@"/>
+        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="build,src->@"/>
     </dependencies>
 </ivy-module>
