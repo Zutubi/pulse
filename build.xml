@@ -163,9 +163,7 @@
             <fileset dir="local/etc" includes="classpath.txt"/>
         </copy>
 
-        <exec executable="zip" dir="${package.root.local}/..">
-            <arg line="-r ../${package.name.local}.zip ${package.name.local}"/>
-        </exec>
+        <native-zip dir="${package.root.local}/.." file="../${package.name.local}.zip" path="${package.name.local}"/>
 
         <tar destfile="build/${package.name.local}.tar.gz" compression="gzip">
             <tarfileset dir="${package.root.local}/.." mode="755" username="root" group="root">
@@ -178,7 +176,16 @@
         </tar>
 
         <antcall target="nsis.local"/>
+
+        <!--
+         Now we retrieve the source dependencies into the ${package.root.local}/src directory.
+         -->
+        <retrieve-package-src-deps module="local" dest="${package.root.local}/src"/>
+
+        <native-zip dir="${package.root.local}/.." file="../${package.name.local}-src.zip" path="${package.name.local}/src"/>
+
     </target>
+    
 
     <target name="nsis.local" if="run.nsis">
         <property name="package.name.local" value="pulse-dev-${pulse.version}"/>
@@ -286,6 +293,14 @@
         </tar>
 
         <antcall target="nsis.slave"/>
+
+        <!--
+         Now we retrieve the source dependencies into the ${package.root.slave}/src directory.
+         -->
+        <retrieve-package-src-deps module="slave" dest="${package.root.slave}/src"/>
+
+        <native-zip dir="${package.root.slave}/.." file="../${package.name.slave}-src.zip" path="${package.name.slave}/src"/>
+
     </target>
 
     <target name="nsis.slave" if="run.nsis">
@@ -416,6 +431,15 @@
         </tar>
 
         <antcall target="nsis.master"/>
+
+        <!--
+         Now we retrieve the source dependencies into the ${package.root.slave}/src directory.
+         -->
+        <retrieve-package-src-deps module="master" dest="${package.root.master}/src"/>
+
+        <native-zip dir="${package.root.master}/.." file="../${package.name.master}-src.zip" path="${package.name.master}/src"/>
+
+
     </target>
 
     <target name="nsis.master" if="run.nsis">
@@ -507,48 +531,6 @@
 
         <fail message="One or more acceptance tests failed.  See the reports (${report.dir}) for details."
               if="test.failed"/>
-
-<!--
-        <exec executable="bash" spawn="true">
-            <arg line="scripts/setup-services.sh"/>
-        </exec>
-
-        <waitfor maxwait="2" maxwaitunit="minute">
-            <socket server="localhost" port="3088"/>
-        </waitfor>
-
-        <antcall target="test.agent.upgrade"/>
-
-        <exec executable="bash">
-            <arg line="scripts/teardown-services.sh"/>
-        </exec>
--->
-    </target>
-
-    <target name="test.agent.upgrade">
-        <exec executable="python" failonerror="true">
-            <arg line="scripts/upgradetest.py ${pulse.version} ${pulse.build} both"/>
-        </exec>
-    </target>
-
-    <target name="setup.master" depends="init">
-        <property name="build.dir" value="acceptance/build"/>
-        <junit>
-            <sysproperty key="pulse.port" value="${master.port}"/>
-            <sysproperty key="bootstrap" value="com/zutubi/pulse/bootstrap/bootstrapContext.xml"/>
-            <classpath>
-                <pathelement location="${build.dir}/classes"/>
-                <pathelement location="${build.dir}/test.classes"/>
-                <fileset dir="${build.dir}/lib">
-                    <include name="**/*.jar"/>
-                </fileset>
-            </classpath>
-            <batchtest todir="fubar">
-                <fileset dir="acceptance/src/test">
-                    <include name="**/SetupAcceptanceTest.java"/>
-                </fileset>
-            </batchtest>
-        </junit>
     </target>
 
     <target name="idea" depends="build.all"
@@ -582,6 +564,29 @@
 
     <target name="setup.dev" depends="idea,refresh.plugins"
             description="Sets up a dev environment from a clean checkout."/>
+
+    <target name="source.package" depends="init, clean">
+
+        <property name="package.name" value="pulse-${pulse.version}-src"/>
+        <mkdir dir="build/${package.name}"/>
+
+        <copy todir="build/${package.name}">
+            <fileset dir=".">
+                <include name="**/*"/>
+                <exclude name="build/*"/>
+                <exclude name="**/LicneseEncoder.java"/>
+                <exclude name="**/LicneseDecoder.java"/>
+                <exclude name="**/.svn"/>
+            </fileset>
+        </copy>
+
+        <copyright src="build/${package.name}" value="${copyright.statement}">
+            <include name="**/*.java"/>
+        </copyright>
+
+        <native-zip dir="${project.root.dir}/build" file="${package.name}.zip" path="${package.name}"/>
+        
+    </target>
 
     <macrodef name="build-package-deps">
         <attribute name="module"/>
@@ -618,5 +623,23 @@
         </sequential>
     </macrodef>
 
+    <macrodef name="retrieve-package-src-deps">
+        <attribute name="module"/>
+        <attribute name="dest"/>
+        <sequential>
+            <retrieve-dependencies ivyfile="package/@{module}/ivy.xml" conf="src" dest="@{dest}"/>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="native-zip">
+        <attribute name="dir"/>
+        <attribute name="file"/>
+        <attribute name="path"/>
+        <sequential>
+            <exec executable="zip" dir="@{dir}">
+                <arg line="-r @{file} @{path}"/>
+            </exec>
+        </sequential>
+    </macrodef>
 
 </project>

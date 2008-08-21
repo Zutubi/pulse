@@ -44,7 +44,8 @@
         <property name="classes.dir" value="${build.dir}/classes"/>
         <property name="test.classes.dir" value="${build.dir}/test.classes"/>
         <property name="report.dir" value="${build.dir}/reports"/>
-        <property name="process.src.dir" value="${build.dir}/src"/>
+        
+        <property name="build.tmp.dir" value="${build.dir}/tmp"/>
 
         <property name="project.repository" value="${project.root.dir}/build/repository"/>
 
@@ -105,6 +106,9 @@
             </fileset>
         </path>
 
+        <!-- TODO: This exclusion set should be located in the individual model files, not in the base.
+             TODO: Use: ${ivy.module}.test.selection
+         -->
         <path id="test.run.selection">
             <fileset dir="src/test">
                 <include name="**/*Test.java"/>
@@ -126,15 +130,16 @@
         <patternset id="release.excludes">
             <exclude name="**/LicenseEncoder*"/>
         </patternset>
+        
     </target>
 
     <target name="show" depends="init"/>
 
     <target name="clean" depends="init, module-pre-clean, common-clean, module-post-clean"/>
 
-    <target name="module-pre-clean"/>
+    <target name="module-pre-clean" description="Pre clean hook."/>
 
-    <target name="module-post-clean"/>
+    <target name="module-post-clean" description="Post clean hook."/>
 
     <target name="common-clean">
         <delete dir="${build.dir}"/>
@@ -144,11 +149,12 @@
     <!-- prepare for new build -->
     <target name="prepare" depends="init, module-pre-prepare, common-prepare, module-post-prepare"/>
 
-    <target name="module-pre-prepare"/>
+    <target name="module-pre-prepare" description="Pre prepare hook."/>
 
-    <target name="module-post-prepare"/>
+    <target name="module-post-prepare" description="Post prepare hook."/>
 
     <target name="common-prepare">
+
         <mkdir dir="${classes.dir}"/>
         <mkdir dir="${build.lib.dir}"/>
         <mkdir dir="${test.classes.dir}"/>
@@ -164,11 +170,13 @@
 
     <target name="prepare-dependencies" unless="skip.dependencies">
 
+        <!-- Determine the build list, storing the details in the build.path${ivy.module} reference. -->
         <ivy:buildlist reference="build.path.${ivy.module}" root="${ivy.module}" excluderoot="true" skipbuildwithoutivy="true">
             <fileset dir="${project.root.dir}" includes="*/build.xml"/>
             <fileset dir="${project.root.dir}/bundles" includes="*/build.xml"/>
         </ivy:buildlist>
 
+        <!-- run the builds -->
         <subant inheritAll="false" target="build.module" buildpathref="build.path.${ivy.module}">
             <property name="skip.tests" value="true"/>
             <property name="skip.dependencies" value="true"/>
@@ -179,9 +187,9 @@
     <!-- perform the actual build -->
     <target name="build" depends="init, module-pre-build, common-build, module-post-build"/>
 
-    <target name="module-pre-build"/>
+    <target name="module-pre-build" description="Pre build hook."/>
 
-    <target name="module-post-build"/>
+    <target name="module-post-build" description="Post build hook."/>
 
     <target name="common-build">
         <echo message="----------------------------------------------"/>
@@ -197,7 +205,7 @@
             <path refid="src.resources"/>
         </copy>
 
-        <if>
+        <if> <!-- if we have tests to build, then do so. -->
             <not><isset property="no.tests"/></not>
             <then>
                 <javac target="5" destdir="${test.classes.dir}" debug="true">
@@ -216,9 +224,9 @@
     <!-- run tests -->
     <target name="test" depends="init, module-pre-test, common-test, module-post-test"/>
 
-    <target name="module-pre-test"/>
+    <target name="module-pre-test" description="Pre test hook."/>
 
-    <target name="module-post-test"/>
+    <target name="module-post-test" description="Post test hook."/>
 
     <target name="common-test" unless="skip.tests">
         <echo message="----------------------------------------------"/>
@@ -234,9 +242,10 @@
             </classpath>
             <formatter type="xml"/>
             <batchtest todir="${report.dir}/junit/xml">
-                <path refid="test.run.selection"/>
+                <path refid="test.run.selection"/> <!-- TODO: replace with ${ivy.module}.test.selection -->
             </batchtest>
         </junit>
+
         <!-- generate the junit html report. -->
         <junitreport todir="${report.dir}/junit">
             <fileset dir="${report.dir}/junit/xml">
@@ -295,23 +304,25 @@
         <attribute name="pathref"/>
         <attribute name="name"/>
         <sequential>
-            <delete dir="build/tmp"/>
-            <mkdir dir="build/tmp"/>
+            <delete dir="${build.tmp.dir}"/>
+            <mkdir dir="${build.tmp.dir}"/>
 
-            <copy todir="build/tmp" overwrite="true">
+            <copy todir="${build.tmp.dir}" overwrite="true">
                 <path refid="@{pathref}"/>
             </copy>
 
-            <copyright src="build/tmp" value="${copyright.statement}">
+            <copyright src="${build.tmp.dir}" value="${copyright.statement}">
                 <include name="**/*.java"/>
             </copyright>
 
             <jar file="build/@{name}">
-                <fileset dir="build/tmp"/>
+                <fileset dir="${build.tmp.dir}"/>
             </jar>
+            
         </sequential>
     </macrodef>
 
     <!-- build this module. -->
     <target name="build.module" depends="clean, prepare, build, test, package, publish"/>
+
 </project>

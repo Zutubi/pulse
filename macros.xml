@@ -10,6 +10,10 @@
         </sequential>
     </macrodef>
 
+    <!-- Load the ivy task definitions from the following locations.
+        a) in the ant lib.
+        b) project.root/etc 
+    -->
     <macrodef name="load-ivy-taskdef">
         <sequential>
             <if>
