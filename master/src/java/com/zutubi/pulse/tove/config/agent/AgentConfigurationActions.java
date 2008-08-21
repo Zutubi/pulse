@@ -42,7 +42,10 @@ public class AgentConfigurationActions
                 actions.add(ACTION_DISABLE);
             }
             actions.add(ACTION_PING);
-            actions.add(ACTION_GC);
+            if (agent.isOnline())
+            {
+                actions.add(ACTION_GC);
+            }
         }
         else if (agent.isDisabled())
         {
