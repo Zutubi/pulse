@@ -49,7 +49,6 @@ public class ComponentContext
         // not sure if we need to separate the context from the tree.
         top.setParent(null);
         top.close();
-        top.refresh();
     }
 
     private static void publishContext(ConfigurableApplicationContext newContext)
