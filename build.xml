@@ -574,8 +574,8 @@
             <fileset dir=".">
                 <include name="**/*"/>
                 <exclude name="build/*"/>
-                <exclude name="**/LicneseEncoder.java"/>
-                <exclude name="**/LicneseDecoder.java"/>
+                <exclude name="**/LicenseEncoder.java"/>
+                <exclude name="**/LicenseDecoder.java"/>
                 <exclude name="**/.svn"/>
             </fileset>
         </copy>
