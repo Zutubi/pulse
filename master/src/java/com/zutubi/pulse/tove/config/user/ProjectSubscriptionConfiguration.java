@@ -10,6 +10,7 @@ import com.zutubi.pulse.condition.antlr.NotifyConditionLexer;
 import com.zutubi.pulse.condition.antlr.NotifyConditionParser;
 import com.zutubi.pulse.condition.antlr.NotifyConditionTreeParser;
 import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.util.logging.Logger;
@@ -72,7 +73,29 @@ public class ProjectSubscriptionConfiguration extends SubscriptionConfiguration
 
     public boolean conditionSatisfied(BuildResult result)
     {
-        return !result.isPersonal() && getNotifyCondition().satisfied(result, configurationProvider.getAncestorOfType(this, UserConfiguration.class));
+        if (result.isPersonal())
+        {
+            return false;
+        }
+        
+        Project project = result.getProject();
+        if (getProjects().size() > 0)
+        {
+            boolean matchingProject = false;
+            for (ProjectConfiguration projectConfig : getProjects())
+            {
+                if (projectConfig.getProjectId() == project.getId())
+                {
+                    matchingProject = true;
+                }
+            }
+            if (!matchingProject)
+            {
+                return false;
+            }
+        }
+        
+        return getNotifyCondition().satisfied(result, configurationProvider.getAncestorOfType(this, UserConfiguration.class));
     }
 
     public NotifyCondition getNotifyCondition()
