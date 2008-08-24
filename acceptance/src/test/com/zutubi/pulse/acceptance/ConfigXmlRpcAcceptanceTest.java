@@ -584,7 +584,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         try
         {
             Vector<String> actions = xmlRpcHelper.getConfigActions(path);
-            assertEquals(Arrays.asList(AgentConfigurationActions.ACTION_DISABLE, AgentConfigurationActions.ACTION_PING, AgentConfigurationActions.ACTION_GC),
+            assertEquals(Arrays.asList(AgentConfigurationActions.ACTION_DISABLE, AgentConfigurationActions.ACTION_PING),
                          new LinkedList<String>(actions));
         }
         finally
