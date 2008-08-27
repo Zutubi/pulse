@@ -132,16 +132,10 @@ public class BuildQueue
                 it.next();
                 while(it.hasNext())
                 {
-                    if (it.next().getId() == id)
+                    AbstractBuildRequestEvent event = it.next();
+                    if (event.getId() == id)
                     {
-                        AbstractBuildRequestEvent event = it.next();
-                        if (event.getId() == id)
-                        {
-                            accessManager.ensurePermission(ProjectConfigurationActions.ACTION_CANCEL_BUILD, event);
-                            it.remove();
-                            return true;
-                        }
-
+                        accessManager.ensurePermission(ProjectConfigurationActions.ACTION_CANCEL_BUILD, event);
                         it.remove();
                         return true;
                     }
