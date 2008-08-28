@@ -387,6 +387,12 @@ public class SvnWorkingCopy extends PersonalBuildSupport implements WorkingCopy
         SVNStatusType propertiesStatus = svnStatus.getPropertiesStatus();
         if (propertiesStatus != SVNStatusType.STATUS_NONE)
         {
+            // if we record a property change path, we MUST have an interesting file
+            // status to ensure that it is recorded.
+            if (!fileState.isInteresting())
+            {
+                fileState = FileStatus.State.METADATA_MODIFIED;
+            }
             propertyChangedPaths.add(path);
         }
 

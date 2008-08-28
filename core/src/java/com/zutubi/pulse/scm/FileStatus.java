@@ -252,6 +252,23 @@ public class FileStatus
                 return true;
             }
         },
+        METADATA_MODIFIED
+        {
+            public boolean isConsistent()
+            {
+                return true;
+            }
+
+            public boolean isInteresting()
+            {
+                return true;
+            }
+
+            public boolean requiresFile()
+            {
+                return false;
+            }
+        },
         OBSTRUCTED
         {
             public boolean isConsistent()
