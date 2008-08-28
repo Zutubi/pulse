@@ -14,6 +14,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.LinkedList;
 
 /**
  * Extension manager for managing post-processors (e.g. JUnit report
@@ -68,6 +70,19 @@ public class PostProcessorExtensionManager extends AbstractExtensionManager
         {
             fileLoaderFactory.unregister((String) o);
         }
+    }
+
+    public PostProcessorDescriptor getPostProcessor(String name)
+    {
+        List<PostProcessorDescriptor> descriptors = new LinkedList<PostProcessorDescriptor>(getPostProcessors());
+        for (PostProcessorDescriptor descriptor : descriptors)
+        {
+            if (descriptor.getName().equals(name))
+            {
+                return descriptor;
+            }
+        }
+        return null;
     }
 
     public Collection<PostProcessorDescriptor> getPostProcessors()

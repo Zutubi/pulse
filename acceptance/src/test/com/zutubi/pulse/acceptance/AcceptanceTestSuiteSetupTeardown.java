@@ -25,7 +25,6 @@ public class AcceptanceTestSuiteSetupTeardown extends TestSetup
 {
     private Pulse pulse;
     private Pulse agent;
-//    private File tmp;
 
     public AcceptanceTestSuiteSetupTeardown(junit.framework.Test test)
     {
@@ -35,8 +34,8 @@ public class AcceptanceTestSuiteSetupTeardown extends TestSetup
     @BeforeSuite
     public void setUp() throws Exception
     {
-        JythonPackageFactory factory= new JythonPackageFactory();
-        
+        JythonPackageFactory factory = new JythonPackageFactory();
+
         int port = Integer.getInteger("pulse.port");
 
         File pulsePackage = PulseTestCase.getPulsePackage();
@@ -62,33 +61,11 @@ public class AcceptanceTestSuiteSetupTeardown extends TestSetup
     @AfterSuite
     public void tearDown() throws IOException
     {
-        try
-        {
-            if (pulse != null)
-            {
-                pulse.stop();
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+        shutdown(pulse);
         pulse = null;
 
-        try
-        {
-            if (agent != null)
-            {
-                agent.stop();
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+        shutdown(agent);
         agent = null;
-
-//        PulseTestCase.removeDirectory(tmp);
     }
 
     public static File getAgentPackage()
@@ -106,4 +83,18 @@ public class AcceptanceTestSuiteSetupTeardown extends TestSetup
         return pkg;
     }
 
+    protected void shutdown(Pulse pulse)
+    {
+        try
+        {
+            if (pulse != null)
+            {
+                pulse.stop();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
 }

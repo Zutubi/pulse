@@ -1,14 +1,10 @@
-package com.zutubi.pulse.acceptance;
+package com.zutubi.pulse.acceptance.plugins;
 
-import com.zutubi.pulse.acceptance.support.JythonPackageFactory;
-import com.zutubi.pulse.acceptance.support.PackageFactory;
-import com.zutubi.pulse.acceptance.support.Pulse;
-import com.zutubi.pulse.acceptance.support.PulsePackage;
-import com.zutubi.pulse.plugins.ConfigurablePluginPaths;
+import com.zutubi.pulse.acceptance.plugins.PluginSystem;
 import com.zutubi.pulse.plugins.Plugin;
-import com.zutubi.pulse.plugins.PluginException;
 import com.zutubi.pulse.plugins.PluginManager;
 import com.zutubi.pulse.plugins.PluginManagerTest;
+import com.zutubi.pulse.plugins.PluginPaths;
 import com.zutubi.pulse.plugins.PluginUpgradeManager;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.upgrade.DefaultUpgradeManager;
@@ -17,15 +13,11 @@ import com.zutubi.pulse.upgrade.UpgradeableComponent;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.bean.ObjectFactory;
-import org.eclipse.core.internal.registry.osgi.OSGIUtils;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.io.File;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.List;
 
 /**
@@ -42,13 +34,18 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
     private File producer2;
     private File producer3;
     private File tmpDir;
-    private ConfigurablePluginPaths paths;
+    private PluginPaths paths;
 
-    protected PluginManager pluginManager;
+    private PluginSystem pluginSystem;
 
     @BeforeMethod
     protected void setUp() throws Exception
     {
+        super.setUp();
+
+        // base directory will be cleaned up at the end of the test.
+        tmpDir = FileSystemUtils.createTempDir(PluginManagerTest.class.getName(), "");
+
         File pkgFile = getPulsePackage();
 /*
         if (pkgFile == null)
@@ -57,35 +54,8 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
         }
 */
 
-        PackageFactory factory = new JythonPackageFactory();
-        PulsePackage pkg = factory.createPackage(pkgFile);
-
-        // base directory will be cleaned up at the end of the test.
-        tmpDir = FileSystemUtils.createTempDir(PluginManagerTest.class.getName(), "");
-
-        Pulse pulse = pkg.extractTo(tmpDir.getCanonicalPath());
-
-        // Plugin paths configuration based on
-        // a) are we dealing with an existing package.
-        // b) are we running within IntelliJ.
-        
-        File internalDir = new File(pulse.getPluginRoot(), "internal");
-        File prepackagedDir = new File(pulse.getPluginRoot(), "prepackaged");
-        File osgiDir = new File(pulse.getPluginRoot(), "config");
-
-        File storageDir = new File(tmpDir, "plugin/storage");
-        assertTrue(storageDir.mkdirs());
-        
-        File workDir = new File(tmpDir, "plugin/work");
-        assertTrue(workDir.mkdirs());
-
-        paths = new ConfigurablePluginPaths();
-        paths.setPrepackagedPluginStorageDir(prepackagedDir);
-        paths.setInternalPluginStorageDir(internalDir);
-        paths.setOsgiConfigurationDir(osgiDir);
-        paths.setPluginRegistryDir(storageDir);
-        paths.setPluginStorageDir(storageDir);
-        paths.setPluginWorkDir(workDir);
+        pluginSystem = new PluginSystem(pkgFile, tmpDir);
+        paths = pluginSystem.getPluginPaths();
 
         File bundleDir = new File(getPulseRoot(), FileSystemUtils.composeFilename("core", "src", "test", "com", "zutubi", "pulse", "plugins", "test-bundles"));
         producer1 = new File(bundleDir, "com.zutubi.bundles.producer_1.0.0.jar");
@@ -98,27 +68,25 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
     @AfterMethod
     protected void tearDown() throws Exception
     {
-        try
-        {
-            shutdownPluginCore();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+        pluginSystem.shutdown();
+        pluginSystem = null;
+        paths = null;
 
         objectFactory = null;
 
-        if (!FileSystemUtils.rmdir(tmpDir))
-        {
-            // deletion consistently fails on windows - an open file handle to the bundle jars being the cause.
-        }
+        producer1 = null;
+        producer2 = null;
+        producer3 = null;
 
+        removeDirectory(tmpDir);
+        tmpDir = null;
+        
         super.tearDown();
     }
 
     public void testPluginUpgradeSanityCheck() throws Exception
     {
+        assertTrue(paths.getPluginStorageDir().mkdirs());
         FileSystemUtils.copy(paths.getPluginStorageDir(), producer2);
 
         startupPluginCore();
@@ -165,13 +133,14 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
 
     public void testRequestUpgradeViaPluginInterface() throws Exception
     {
+        assertTrue(paths.getPluginStorageDir().mkdirs());
         FileSystemUtils.copy(paths.getPluginStorageDir(), producer2);
 
         startupPluginCore();
 
         assertFalse(pluginUpgradeManager.isUpgradeRequired());
 
-        Plugin plugin = pluginManager.getPlugin("com.zutubi.bundles.producer");
+        Plugin plugin = pluginSystem.getPluginManager().getPlugin("com.zutubi.bundles.producer");
         plugin.upgrade(producer3.toURI());
         assertEquals(Plugin.State.UPDATING, plugin.getState());
 
@@ -179,7 +148,7 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
 
         assertTrue(pluginUpgradeManager.isUpgradeRequired());
 
-        plugin = pluginManager.getPlugin("com.zutubi.bundles.producer");
+        plugin = pluginSystem.getPluginManager().getPlugin("com.zutubi.bundles.producer");
         assertEquals(Plugin.State.VERSION_CHANGE, plugin.getState());
     }
 
@@ -232,13 +201,13 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
 
         startupPluginCore();
 
-        assertFalse(pluginManager.isVersionChangeDetected());
+        assertFalse(pluginSystem.getPluginManager().isVersionChangeDetected());
         assertFalse(pluginUpgradeManager.isUpgradeRequired());
 
-        Plugin plugin = pluginManager.getInternalPlugin("com.zutubi.bundles.producer");
+        Plugin plugin = pluginSystem.getPluginManager().getInternalPlugin("com.zutubi.bundles.producer");
         if (plugin == null)
         {
-            plugin = pluginManager.getPlugin("com.zutubi.bundles.producer");
+            plugin = pluginSystem.getPluginManager().getPlugin("com.zutubi.bundles.producer");
         }
         
         assertEquals(Plugin.State.ENABLED, plugin.getState());
@@ -246,6 +215,10 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
 
     private void assertNoUpgradeHandledCorrectly(File dir, boolean internal) throws Exception
     {
+        if (!dir.exists())
+        {
+            assertTrue(dir.mkdirs());
+        }
         FileSystemUtils.copy(dir, producer1);
 
         startupPluginCore();
@@ -261,26 +234,30 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
 
         if (!internal)
         {
-            assertTrue(pluginManager.isVersionChangeDetected());
+            assertTrue(pluginSystem.getPluginManager().isVersionChangeDetected());
         }
 
         assertFalse(pluginUpgradeManager.isUpgradeRequired());
 
-        Plugin plugin = pluginManager.getInternalPlugin("com.zutubi.bundles.producer");
+        Plugin plugin = pluginSystem.getPluginManager().getInternalPlugin("com.zutubi.bundles.producer");
         if (plugin == null)
         {
-            plugin = pluginManager.getPlugin("com.zutubi.bundles.producer");
+            plugin = pluginSystem.getPluginManager().getPlugin("com.zutubi.bundles.producer");
         }
         assertEquals(Plugin.State.ENABLED, plugin.getState());
     }
 
     private void assertUpgradeHandledCorrectly(File dir, boolean internal) throws Exception
     {
+        if (!dir.exists())
+        {
+            assertTrue(dir.mkdirs());
+        }
         FileSystemUtils.copy(dir, producer2);
 
         startupPluginCore();
 
-        assertEquals("2.0.0", pluginManager.getPluginRegistry().getEntry("com.zutubi.bundles.producer").get(PluginManager.PLUGIN_VERSION_KEY));
+        assertEquals("2.0.0", pluginSystem.getPluginManager().getPluginRegistry().getEntry("com.zutubi.bundles.producer").get(PluginManager.PLUGIN_VERSION_KEY));
 
         shutdownPluginCore();
 
@@ -291,11 +268,11 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
         
         if (!internal)
         {
-            assertTrue(pluginManager.isVersionChangeDetected());
+            assertTrue(pluginSystem.getPluginManager().isVersionChangeDetected());
         }
 
         assertTrue(pluginUpgradeManager.isUpgradeRequired());
-        assertEquals("2.0.0", pluginManager.getPluginRegistry().getEntry("com.zutubi.bundles.producer").get(PluginManager.PLUGIN_VERSION_KEY));
+        assertEquals("2.0.0", pluginSystem.getPluginManager().getPluginRegistry().getEntry("com.zutubi.bundles.producer").get(PluginManager.PLUGIN_VERSION_KEY));
     }
 
     private void restartPluginCore() throws Exception
@@ -304,71 +281,20 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
         startupPluginCore();
     }
 
-    private void startupPluginCore() throws PluginException
+    private void startupPluginCore() throws Exception
     {
-        try
-        {
-            pluginManager = new PluginManager();
-            pluginManager.setPluginPaths(paths);
-            pluginManager.init();
+        pluginSystem.startup();
 
-            pluginUpgradeManager = new PluginUpgradeManager();
-            pluginUpgradeManager.setPluginManager(pluginManager);
-            pluginUpgradeManager.setObjectFactory(objectFactory);
-            pluginUpgradeManager.init();
-        }
-        catch (Exception e)
-        {
-            throw new PluginException(e);
-        }
+        pluginUpgradeManager = new PluginUpgradeManager();
+        pluginUpgradeManager.setPluginManager(pluginSystem.getPluginManager());
+        pluginUpgradeManager.setObjectFactory(objectFactory);
+        pluginUpgradeManager.init();
     }
 
     protected void shutdownPluginCore() throws Exception
     {
-        if (pluginManager != null)
-        {
-            pluginManager.destroy();
-            pluginManager = null;
-            OSGIUtilsAccessor.reset();
-        }
+        pluginSystem.shutdown();
         pluginUpgradeManager = null;
     }
-
-    public static class OSGIUtilsAccessor
-    {
-        public static void reset() throws IllegalAccessException, NoSuchFieldException
-        {
-            Field f = OSGIUtils.class.getDeclaredField("singleton");
-            f.setAccessible(true);
-            f.set(OSGIUtils.getDefault(), null);
-        }
-
-        public static void nullifyFields() throws NoSuchFieldException, IllegalAccessException
-        {
-            String[] fieldNames = new String[]{"bundleTracker", "debugTracker", "configurationLocationTracker"};
-
-            for (String fieldName : fieldNames)
-            {
-                Field f = OSGIUtils.class.getDeclaredField(fieldName);
-                f.setAccessible(true);
-                f.set(OSGIUtils.getDefault(), null);
-            }
-        }
-
-        public static void initServices() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException
-        {
-            Method m = OSGIUtils.class.getDeclaredMethod("initServices");
-            m.setAccessible(true);
-            m.invoke(OSGIUtils.getDefault());
-        }
-
-        public static void closeServices() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException
-        {
-            Method m = OSGIUtils.class.getDeclaredMethod("closeServices");
-            m.setAccessible(true);
-            m.invoke(OSGIUtils.getDefault());
-        }
-    }
-
 }
 
