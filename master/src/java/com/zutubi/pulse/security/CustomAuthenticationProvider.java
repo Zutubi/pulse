@@ -29,6 +29,11 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider impl
     private LdapManager ldapManager;
     private ConfigurationProvider configurationProvider;
 
+    public CustomAuthenticationProvider()
+    {
+        setForcePrincipalAsString(true);
+    }
+
     public Authentication authenticate(Authentication authentication) throws AuthenticationException
     {
         // Just check for non-existent user auto-adding.

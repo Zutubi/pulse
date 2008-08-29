@@ -14,16 +14,27 @@ import com.zutubi.pulse.tove.config.group.BuiltinGroupConfiguration;
 import com.zutubi.pulse.tove.config.group.GroupConfiguration;
 import com.zutubi.pulse.tove.config.user.DashboardConfiguration;
 import com.zutubi.pulse.tove.config.user.UserConfiguration;
-import com.zutubi.tove.config.*;
+import com.zutubi.tove.config.ConfigurationEventListener;
+import com.zutubi.tove.config.ConfigurationInjector;
+import com.zutubi.tove.config.ConfigurationProvider;
+import com.zutubi.tove.config.ConfigurationRegistry;
+import com.zutubi.tove.config.ConfigurationStateManager;
+import com.zutubi.tove.config.ExternalStateManager;
+import com.zutubi.tove.config.TypeAdapter;
+import com.zutubi.tove.config.TypeListener;
 import com.zutubi.tove.config.events.ConfigurationEvent;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.TextUtils;
 import org.acegisecurity.providers.encoding.PasswordEncoder;
-import org.acegisecurity.userdetails.UserDetails;
 import org.acegisecurity.userdetails.UsernameNotFoundException;
 import org.springframework.dao.DataAccessException;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -262,7 +273,7 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
      * @throws UsernameNotFoundException
      * @throws DataAccessException
      */
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, DataAccessException
+    public AcegiUser loadUserByUsername(String username) throws UsernameNotFoundException, DataAccessException
     {
         if (!TextUtils.stringSet(username))
         {

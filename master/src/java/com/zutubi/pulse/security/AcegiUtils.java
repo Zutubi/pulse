@@ -2,8 +2,10 @@ package com.zutubi.pulse.security;
 
 import com.zutubi.pulse.model.AcegiUser;
 import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.tove.config.group.ServerPermission;
 import com.zutubi.pulse.tove.config.user.UserConfiguration;
+import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.tove.security.Actor;
 import org.acegisecurity.Authentication;
 import org.acegisecurity.context.SecurityContextHolder;
@@ -30,7 +32,7 @@ public class AcegiUtils
     {
         return systemUser;
     }
-    
+
     /**
      * Logs the current thread in as the system user, with priveleges to do
      * everything.
@@ -39,7 +41,7 @@ public class AcegiUtils
     {
         loginAs(systemUser);
     }
-    
+
     /**
      * A utility method to 'log in' the specified user. After this call, all authentication
      * requests will be made against the new user.
@@ -57,10 +59,9 @@ public class AcegiUtils
      * Runs the given task as the given user, then restores the original
      * user.
      *
-     * @see #runAsSystem(Runnable)
-     * 
      * @param user     user to run the task as
      * @param runnable the task to run
+     * @see #runAsSystem(Runnable)
      */
     public static void runAsUser(AcegiUser user, Runnable runnable)
     {
@@ -80,9 +81,8 @@ public class AcegiUtils
      * Runs the given task as the system user, then restores the original
      * user.
      *
-     * @see #runAsUser(com.zutubi.pulse.model.AcegiUser, Runnable)
-     *
      * @param runnable the task to run
+     * @see #runAsUser(com.zutubi.pulse.model.AcegiUser,Runnable)
      */
     public static void runAsSystem(Runnable runnable)
     {
@@ -111,7 +111,7 @@ public class AcegiUtils
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null)
         {
-            if(authentication instanceof AnonymousAuthenticationToken)
+            if (authentication instanceof AnonymousAuthenticationToken)
             {
                 AnonymousAuthenticationToken token = (AnonymousAuthenticationToken) authentication;
                 return new AnonymousActor(token);
@@ -122,6 +122,10 @@ public class AcegiUtils
                 if (principle instanceof AcegiUser)
                 {
                     return ((AcegiUser) principle);
+                }
+                else if (principle instanceof String)
+                {
+                    return fixCachedAuthentication(authentication);
                 }
             }
         }
@@ -141,10 +145,10 @@ public class AcegiUtils
         if (getLoggedInUsername() != null)
         {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if(authentication != null)
+            if (authentication != null)
             {
                 Object details = authentication.getDetails();
-                if(details != null && details instanceof BasicAuthenticationDetails)
+                if (details != null && details instanceof BasicAuthenticationDetails)
                 {
                     return false;
                 }
@@ -163,21 +167,45 @@ public class AcegiUtils
      *
      * @param role the role to test for
      * @return true iff there is a logged in user who has been granted the
-     * given role
+     *         given role
      */
     public static boolean userHasRole(String role)
     {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(authentication != null)
+        if (authentication != null)
         {
             Object principle = authentication.getPrincipal();
-            if(principle instanceof UserDetails)
+            if (principle instanceof UserDetails)
             {
                 AcegiUser details = (AcegiUser) principle;
+                return details.getGrantedAuthorities().contains(role);
+            }
+            else if (principle instanceof String)
+            {
+                AcegiUser details = fixCachedAuthentication(authentication);
                 return details.getGrantedAuthorities().contains(role);
             }
         }
 
         return false;
+    }
+
+    /**
+     * On login, the authentication object that is created uses a string principle to support
+     * the LDAP integration and lack of password storage with the user object (CIB-1624).  Because
+     * we really want the AcegiUser object as the principle, we 'fix' the cached authentication
+     * instance 'just in time' 
+     */
+    private static AcegiUser fixCachedAuthentication(Authentication authentication)
+    {
+        UserManager userManager = ComponentContext.getBean("userManager");
+
+        UserDetails user = userManager.loadUserByUsername((String) authentication.getPrincipal());
+        UsernamePasswordAuthenticationToken result = new UsernamePasswordAuthenticationToken(user,
+                authentication.getCredentials(), user.getAuthorities());
+        result.setDetails(authentication.getDetails());
+        SecurityContextHolder.getContext().setAuthentication(result);
+
+        return (AcegiUser) user;
     }
 }
