@@ -20,7 +20,7 @@ public class BuildingTestHandler implements TestHandler
     {
         if(suites.size() > 0)
         {
-            suites.peek().add(suiteResult);
+            suites.peek().add(suiteResult, TestSuiteResult.Resolution.OFF);
         }
         else
         {
@@ -38,6 +38,6 @@ public class BuildingTestHandler implements TestHandler
 
     public void handleCase(TestCaseResult caseResult, Element element)
     {
-        suites.peek().add(caseResult);
+        suites.peek().add(caseResult, TestSuiteResult.Resolution.OFF);
     }
 }

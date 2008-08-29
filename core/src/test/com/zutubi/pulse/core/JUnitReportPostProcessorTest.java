@@ -150,6 +150,24 @@ public class JUnitReportPostProcessorTest extends XMLReportPostProcessorTestBase
         checkPassCase(nested, "test2");
     }
 
+    public void testDuplicatesResolutionOff()
+    {
+        TestSuiteResult tests = runProcessor("duplicates");
+        TestSuiteResult suite = tests.getSuite("com.zutubi.pulse.junit.SimpleTest");
+        assertEquals(1, suite.getCases().size());
+    }
+
+    public void testDuplicatesResolutionAppend() throws FileLoadException
+    {
+        pp.setResolveConflicts(TestSuiteResult.Resolution.APPEND.toString());
+        TestSuiteResult tests = runProcessor("duplicates");
+        TestSuiteResult suite = tests.getSuite("com.zutubi.pulse.junit.SimpleTest");
+        assertEquals(3, suite.getCases().size());
+        assertNotNull(suite.getCase("testSimple"));
+        assertNotNull(suite.getCase("testSimple2"));
+        assertNotNull(suite.getCase("testSimple3"));
+    }
+
     private void checkWarning(TestResult testResult, String name, long duration, String contents)
     {
         assertTrue(testResult instanceof TestSuiteResult);

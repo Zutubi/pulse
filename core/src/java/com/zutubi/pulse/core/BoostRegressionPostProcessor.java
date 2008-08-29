@@ -69,7 +69,7 @@ public class BoostRegressionPostProcessor extends XMLReportPostProcessor
                 details = getDetails(element);
             }
 
-            suiteResult.add(new TestCaseResult(name, TestCaseResult.UNKNOWN_DURATION, status, details));
+            suiteResult.add(new TestCaseResult(name, TestCaseResult.UNKNOWN_DURATION, status, details), getResolveConflicts());
         }
     }
 
@@ -150,7 +150,7 @@ public class BoostRegressionPostProcessor extends XMLReportPostProcessor
         if(suite == null)
         {
             suite = new TestSuiteResult(path[index]);
-            parentSuite.add(suite);
+            parentSuite.add(suite, getResolveConflicts());
         }
 
         return getSuite(path, index + 1, suite);

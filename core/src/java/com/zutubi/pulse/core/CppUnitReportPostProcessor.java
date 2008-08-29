@@ -73,7 +73,7 @@ public class CppUnitReportPostProcessor extends XMLReportPostProcessor
 
             TestSuiteResult suite = getSuite(name[0]);
             TestCaseResult result = new TestCaseResult(name[1], TestResult.UNKNOWN_DURATION, status, message);
-            suite.add(result);
+            suite.add(result, getResolveConflicts());
         }
     }
 
@@ -88,7 +88,7 @@ public class CppUnitReportPostProcessor extends XMLReportPostProcessor
 
             TestSuiteResult suite = getSuite(name[0]);
             TestCaseResult result = new TestCaseResult(name[1]);
-            suite.add(result);
+            suite.add(result, getResolveConflicts());
         }
     }
 
@@ -96,7 +96,7 @@ public class CppUnitReportPostProcessor extends XMLReportPostProcessor
     {
         for(TestSuiteResult suite: suites.values())
         {
-            tests.add(suite);
+            tests.add(suite, getResolveConflicts());
         }
     }
 

@@ -77,7 +77,7 @@ public class OCUnitReportPostProcessor extends TestReportPostProcessor
             if (START_SUITE_PATTERN.matcher(currentLine).matches())
             {
                 // we have a test suite.
-                tests.add(processSuite());
+                tests.add(processSuite(), getResolveConflicts());
             }
             currentLine = nextLine();
         }
@@ -104,7 +104,7 @@ public class OCUnitReportPostProcessor extends TestReportPostProcessor
             // if new suite, then recurse.
             if (START_SUITE_PATTERN.matcher(currentLine).matches())
             {
-                suite.add(processSuite());
+                suite.add(processSuite(), getResolveConflicts());
             }
             // if test case, then create it.
             else if (CASE_SUMMARY_PATTERN.matcher(currentLine).matches())
@@ -125,7 +125,7 @@ public class OCUnitReportPostProcessor extends TestReportPostProcessor
                     result.setStatus(TestCaseResult.Status.FAILURE);
                 }
                 result.setDuration((long) (Double.parseDouble(caseMatch.group(4)) * 1000));
-                suite.add(result);
+                suite.add(result, getResolveConflicts());
                 caseOutput = "";
             }
             else

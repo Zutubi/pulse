@@ -10,9 +10,11 @@ import java.io.File;
  */
 public abstract class TestReportPostProcessor implements PostProcessor
 {
+
     private String name;
     private String suite;
     private boolean failOnFailure = true;
+    private TestSuiteResult.Resolution resolveConflicts = TestSuiteResult.Resolution.OFF;
 
     public String getName()
     {
@@ -60,7 +62,7 @@ public abstract class TestReportPostProcessor implements PostProcessor
 
             if(suite != null)
             {
-                context.getTestResults().add(parentSuite);
+                context.getTestResults().add(parentSuite, resolveConflicts);
             }
             
             if(failOnFailure && !result.failed() && !result.errored())
@@ -81,4 +83,20 @@ public abstract class TestReportPostProcessor implements PostProcessor
         return this;
     }
 
+    public TestSuiteResult.Resolution getResolveConflicts()
+    {
+        return resolveConflicts;
+    }
+
+    public void setResolveConflicts(String resolution) throws FileLoadException
+    {
+        try
+        {
+            resolveConflicts = TestSuiteResult.Resolution.valueOf(resolution.toUpperCase());
+        }
+        catch(IllegalArgumentException e)
+        {
+            throw new FileLoadException("Unrecognised conflict resolution '" + resolution + "'");
+        }
+    }
 }

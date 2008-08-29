@@ -1,19 +1,14 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.core.model.TestSuiteResult;
 import com.zutubi.pulse.core.model.TestCaseResult;
-import com.zutubi.pulse.core.model.TestResult;
-import com.zutubi.pulse.core.model.Result;
-import com.zutubi.pulse.util.XMLUtils;
+import com.zutubi.pulse.core.model.TestSuiteResult;
 import com.zutubi.pulse.util.UnaryFunction;
+import com.zutubi.pulse.util.XMLUtils;
 import com.zutubi.pulse.util.logging.Logger;
-
-import java.util.Map;
-import java.util.TreeMap;
-
-import nu.xom.*;
-import org.xml.sax.SAXNotRecognizedException;
-import org.xml.sax.SAXNotSupportedException;
+import nu.xom.Builder;
+import nu.xom.Document;
+import nu.xom.Element;
+import nu.xom.XMLException;
 import org.xml.sax.SAXException;
 
 /**
@@ -104,7 +99,7 @@ public class CUnitReportPostProcessor extends XMLReportPostProcessor
                 }
             });
 
-            tests.add(suite);
+            tests.add(suite, getResolveConflicts());
         }
         catch (XMLException e)
         {
@@ -119,7 +114,7 @@ public class CUnitReportPostProcessor extends XMLReportPostProcessor
             Element success = element.getFirstChildElement(ELEMENT_RUN_TEST_SUCCESS);
             if(success != null)
             {
-                suite.add(new TestCaseResult(XMLUtils.getRequiredChildText(success, ELEMENT_TEST_NAME, true)));
+                suite.add(new TestCaseResult(XMLUtils.getRequiredChildText(success, ELEMENT_TEST_NAME, true)), getResolveConflicts());
             }
             else
             {
@@ -132,7 +127,7 @@ public class CUnitReportPostProcessor extends XMLReportPostProcessor
                     TestCaseResult caseResult = suite.getCase(name);
                     if(caseResult == null)
                     {
-                        suite.add(new TestCaseResult(name, TestCaseResult.UNKNOWN_DURATION, TestCaseResult.Status.FAILURE, message));
+                        suite.add(new TestCaseResult(name, TestCaseResult.UNKNOWN_DURATION, TestCaseResult.Status.FAILURE, message), getResolveConflicts());
                     }
                     else
                     {
@@ -165,8 +160,8 @@ public class CUnitReportPostProcessor extends XMLReportPostProcessor
             String name = XMLUtils.getRequiredChildText(element, ELEMENT_SUITE_NAME, true);
             String failureReason = XMLUtils.getRequiredChildText(element, ELEMENT_SUITE_FAILURE_REASON, true);
             TestSuiteResult suite = new TestSuiteResult(name);
-            suite.add(new TestCaseResult("Suite Failure Notification", TestCaseResult.UNKNOWN_DURATION, TestCaseResult.Status.ERROR, failureReason));
-            tests.add(suite);
+            suite.add(new TestCaseResult("Suite Failure Notification", TestCaseResult.UNKNOWN_DURATION, TestCaseResult.Status.ERROR, failureReason), getResolveConflicts());
+            tests.add(suite, getResolveConflicts());
         }
         catch(XMLException e)
         {

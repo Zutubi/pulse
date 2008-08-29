@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites>
+    <testsuite errors="1" failures="1" id="2" name="SimpleTest" package="com.zutubi.pulse.junit" tests="3" time="0.09">
+        <properties>
+            <property name="java.runtime.name" value="Java(TM) 2 Runtime Environment, Standard Edition"></property>
+        </properties>
+
+        <testcase classname="com.zutubi.pulse.junit.SimpleTest" name="testSimple" time="0.0"></testcase>
+        <testcase classname="com.zutubi.pulse.junit.SimpleTest" name="testSimple" time="0.0"></testcase>
+        <testcase classname="com.zutubi.pulse.junit.SimpleTest" name="testSimple" time="0.0"></testcase>
+
+        <system-out></system-out>
+        <system-err></system-err>
+    </testsuite>
+</testsuites>

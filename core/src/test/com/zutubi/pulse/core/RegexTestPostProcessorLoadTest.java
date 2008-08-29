@@ -1,5 +1,7 @@
 package com.zutubi.pulse.core;
 
+import com.zutubi.pulse.core.model.TestSuiteResult;
+
 /**
  */
 public class RegexTestPostProcessorLoadTest extends FileLoaderTestBase
@@ -14,6 +16,6 @@ public class RegexTestPostProcessorLoadTest extends FileLoaderTestBase
         assertEquals(0, pp.getDetailsGroup());
         assertEquals("PASS", pp.getPassStatus());
         assertEquals("FAIL", pp.getFailureStatus());
-        assertEquals(RegexTestPostProcessor.Resolution.APPEND, pp.getResolveConflicts());
+        assertEquals(TestSuiteResult.Resolution.APPEND, pp.getResolveConflicts());
     }
 }

@@ -91,7 +91,7 @@ public class JUnitReportPostProcessor extends XMLReportPostProcessor
             processCase(cases.get(i), suite);
         }
 
-        tests.add(suite);
+        tests.add(suite, getResolveConflicts());
     }
 
     private void processCase(Element element, TestSuiteResult suite)
@@ -111,7 +111,7 @@ public class JUnitReportPostProcessor extends XMLReportPostProcessor
 
         long duration = getDuration(element);
         TestCaseResult caseResult = new TestCaseResult(name, duration);
-        suite.add(caseResult);
+        suite.add(caseResult, getResolveConflicts());
 
         Element child = element.getFirstChildElement(errorElement);
         if(child != null)

@@ -8,6 +8,13 @@ import java.util.*;
  */
 public class TestSuiteResult extends TestResult
 {
+    public enum Resolution
+    {
+        APPEND,
+        OFF,
+        PREPEND
+    }
+
     /**
      * Child suites, stored in name order.
      */
@@ -49,6 +56,11 @@ public class TestSuiteResult extends TestResult
 
     public void add(TestSuiteResult suite)
     {
+        add(suite, Resolution.OFF);
+    }
+    
+    public void add(TestSuiteResult suite, Resolution resolution)
+    {
         int index = Collections.binarySearch(suites, suite, comparator);
         if (index < 0)
         {
@@ -59,31 +71,67 @@ public class TestSuiteResult extends TestResult
             TestSuiteResult existing = suites.get(index);
             for(TestSuiteResult childSuite: suite.getSuites())
             {
-                existing.add(childSuite);
+                existing.add(childSuite, resolution);
             }
 
             for(TestCaseResult childCase: suite.getCases())
             {
-                existing.add(childCase);
+                existing.add(childCase, resolution);
             }
         }
     }
 
     public void add(TestCaseResult childCase)
     {
+        add(childCase, Resolution.OFF);
+    }
+    
+    public void add(TestCaseResult childCase, Resolution resolution)
+    {
         TestCaseResult existing = getCase(childCase.getName());
         if (existing == null)
         {
-            cases.put(childCase.getName(), childCase);
+            addCase(childCase);
         }
         else
         {
-            if(childCase.getStatus().compareTo(existing.getStatus()) > 0)
+            if(resolution == Resolution.OFF)
             {
-                // The new is more severe.  Although we can't keep all info,
-                // be nice and keep the worst result.
-                cases.put(childCase.getName(), childCase);
+                if(childCase.getStatus().compareTo(existing.getStatus()) > 0)
+                {
+                    // The new is more severe.  Although we can't keep all info,
+                    // be nice and keep the worst result.
+                    addCase(childCase);
+                }
             }
+            else
+            {
+                int addition = 2;
+                while(hasCase(makeCaseName(childCase.getName(), addition, resolution)))
+                {
+                    addition++;
+                }
+
+                childCase.setName(makeCaseName(childCase.getName(), addition, resolution));
+                addCase(childCase);
+            }
+        }
+    }
+
+    private void addCase(TestCaseResult childCase)
+    {
+        cases.put(childCase.getName(), childCase);
+    }
+
+    private String makeCaseName(String name, int addition, Resolution resolveConflicts)
+    {
+        if(resolveConflicts == Resolution.APPEND)
+        {
+            return name + addition;
+        }
+        else
+        {
+            return Integer.toString(addition) + name;
         }
     }
 

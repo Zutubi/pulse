@@ -63,7 +63,7 @@ public class UnitTestPlusPlusReportPostProcessor extends XMLReportPostProcessor
             {
                 caseResult = new TestCaseResult(name, duration, TestCaseResult.Status.FAILURE, failure.getAttributeValue(ATTRIBUTE_MESSAGE));
             }
-            suiteResult.add(caseResult);
+            suiteResult.add(caseResult, getResolveConflicts());
         }
     }
 
@@ -89,7 +89,7 @@ public class UnitTestPlusPlusReportPostProcessor extends XMLReportPostProcessor
     {
         for(TestSuiteResult suite: suites.values())
         {
-            tests.add(suite);
+            tests.add(suite, getResolveConflicts());
         }
     }
 
