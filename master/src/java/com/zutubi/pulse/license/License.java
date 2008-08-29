@@ -171,7 +171,7 @@ public class License
                 ObjectUtils.equals(type, other.type) &&
                 ObjectUtils.equals(supportedAgents, other.supportedAgents) &&
                 ObjectUtils.equals(supportedUsers, other.supportedUsers) &&
-                ObjectUtils.equals(supportedContactPoints, other.supportedContactPoints) &&
+                ObjectUtils.equals(getSupportedContactPoints(), other.getSupportedContactPoints()) &&
                 ObjectUtils.equals(supportedProjects, other.supportedProjects);
     }
 
