@@ -27,6 +27,7 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.TextUtils;
 import org.acegisecurity.providers.encoding.PasswordEncoder;
 import org.acegisecurity.userdetails.UsernameNotFoundException;
+import org.acegisecurity.userdetails.UserDetails;
 import org.springframework.dao.DataAccessException;
 
 import java.util.HashMap;
@@ -273,7 +274,7 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
      * @throws UsernameNotFoundException
      * @throws DataAccessException
      */
-    public AcegiUser loadUserByUsername(String username) throws UsernameNotFoundException, DataAccessException
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, DataAccessException
     {
         if (!TextUtils.stringSet(username))
         {

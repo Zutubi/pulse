@@ -2,10 +2,8 @@ package com.zutubi.pulse.security;
 
 import com.zutubi.pulse.model.AcegiUser;
 import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.tove.config.group.ServerPermission;
 import com.zutubi.pulse.tove.config.user.UserConfiguration;
-import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.tove.security.Actor;
 import org.acegisecurity.Authentication;
 import org.acegisecurity.context.SecurityContextHolder;
@@ -123,10 +121,6 @@ public class AcegiUtils
                 {
                     return ((AcegiUser) principle);
                 }
-                else if (principle instanceof String)
-                {
-                    return fixCachedAuthentication(authentication);
-                }
             }
         }
         return null;
@@ -180,32 +174,8 @@ public class AcegiUtils
                 AcegiUser details = (AcegiUser) principle;
                 return details.getGrantedAuthorities().contains(role);
             }
-            else if (principle instanceof String)
-            {
-                AcegiUser details = fixCachedAuthentication(authentication);
-                return details.getGrantedAuthorities().contains(role);
-            }
         }
 
         return false;
-    }
-
-    /**
-     * On login, the authentication object that is created uses a string principle to support
-     * the LDAP integration and lack of password storage with the user object (CIB-1624).  Because
-     * we really want the AcegiUser object as the principle, we 'fix' the cached authentication
-     * instance 'just in time' 
-     */
-    private static AcegiUser fixCachedAuthentication(Authentication authentication)
-    {
-        UserManager userManager = ComponentContext.getBean("userManager");
-
-        UserDetails user = userManager.loadUserByUsername((String) authentication.getPrincipal());
-        UsernamePasswordAuthenticationToken result = new UsernamePasswordAuthenticationToken(user,
-                authentication.getCredentials(), user.getAuthorities());
-        result.setDetails(authentication.getDetails());
-        SecurityContextHolder.getContext().setAuthentication(result);
-
-        return (AcegiUser) user;
     }
 }
