@@ -526,6 +526,13 @@
     <target name="init">
         <property name="project.root.dir" value="."/>
         <property name="project.repository" value="${project.root.dir}/build/repository"/>
+
+        <path id="custom.task.path">
+            <fileset dir="${project.root.dir}/etc">
+                <include name="**/*.jar"/>
+            </fileset>
+        </path>
+        <taskdef name="copyright" classname="com.zutubi.pulse.CopyrightTask" classpathref="custom.task.path"/>
     </target>
 
     <!--
@@ -545,6 +552,27 @@
         <retrieve.dependencies module="local" dest="lib" conf="external"/>
         <retrieve.dependencies module="master" dest="lib" conf="external"/>
         <retrieve.dependencies module="slave" dest="lib" conf="external"/>
+    </target>
+
+    <target name="source.package" depends="init, clean">
+        <property name="package.name" value="pulse-${pulse.version}-src"/>
+        <mkdir dir="build/${package.name}"/>
+
+        <copy todir="build/${package.name}">
+            <fileset dir=".">
+                <include name="**/*"/>
+                <exclude name="build/*"/>
+                <exclude name="**/LicenseEncoder.java"/>
+                <exclude name="**/LicenseDecoder.java"/>
+                <exclude name="**/.svn"/>
+            </fileset>
+        </copy>
+
+        <copyright src="build/${package.name}" value="${copyright.statement}">
+            <include name="**/*.java"/>
+        </copyright>
+
+        <native-zip dir="${project.root.dir}/build" file="${package.name}.zip" path="${package.name}"/>
     </target>
 
     <!--
@@ -574,6 +602,17 @@
             <ant inheritAll="false" dir="server-core" antfile="build.xml" target="@{target}"/>
             <ant inheritAll="false" dir="master" antfile="build.xml" target="@{target}"/>
             <ant inheritAll="false" dir="slave" antfile="build.xml" target="@{target}"/>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="native-zip">
+        <attribute name="dir"/>
+        <attribute name="file"/>
+        <attribute name="path"/>
+        <sequential>
+            <exec executable="zip" dir="@{dir}">
+                <arg line="-r @{file} @{path}"/>
+            </exec>
         </sequential>
     </macrodef>
 </project>
