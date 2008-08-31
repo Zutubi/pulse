@@ -112,12 +112,15 @@ public class CvsCore
                 // strip the relative repo path from the working directory to determine the relative repository root.
                 String path = FileSystemUtils.normaliseSeparators(workingDirectory.getCanonicalPath());
                 String repoPath = readRespositoryPath(workingDirectory);
-                if (repoPath != null)
+                if (TextUtils.stringSet(repoPath))
                 {
-                    if (!path.endsWith(repoPath))
+                    if (path.endsWith(repoPath))
+                    {
+                        path = path.substring(0, path.lastIndexOf(repoPath));
+                    }
+                    else
                     {
                         LOG.warning("Expected path '" + path + "' to end with '" + repoPath + "'");
-                        path = path.substring(0, path.lastIndexOf(repoPath));
                     }
                 }
 

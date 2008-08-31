@@ -9,6 +9,7 @@ import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.scm.cvs.CvsClient;
 import com.zutubi.pulse.core.scm.cvs.CvsRevision;
+import com.zutubi.util.logging.Logger;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
 
@@ -28,6 +29,8 @@ import java.util.Map;
  */
 public class LogInformationAnalyser
 {
+    private static final Logger LOG = Logger.getLogger(LogInformationAnalyser.class);
+
     //-------------------------------------------------------------------------
     // change set analysis:
     // - cvs changes are not atomic. therefore,
@@ -174,7 +177,17 @@ public class LogInformationAnalyser
             List<Revision> localChanges = set.getChanges();
             // we use the last change because it has the most recent date. all the other information is
             // is common to all the changes.
-            Revision lastChange = localChanges.get(localChanges.size() - 1);
+            Revision lastChange = null;
+            for (int i = localChanges.size() - 1; 0 <= i; i--)
+            {
+                // CIB-1627: we want the last change that contains a date.
+                lastChange = localChanges.get(i);
+                if (lastChange.getDate() != null)
+                {
+                    break;
+                }
+            }
+
             CvsRevision rev = new CvsRevision(lastChange.getAuthor(), lastChange.getTag(), lastChange.getMessage(), lastChange.getDate());
             Changelist changelist = new Changelist(CvsClient.convertRevision(rev));
             for (Revision change : localChanges)
@@ -182,6 +195,19 @@ public class LogInformationAnalyser
                 changelist.addChange(new Change(change.getFilename(), change.getRevision(), change.getAction()));
             }
             changelists.add(changelist);
+            
+            // CIB-1627: need some logging. We do not expect this to be null, but have had cases where this is so.  Not exactly
+            // sure what should be done until we see some examples of this.
+            if (changelist.getDate() == null)
+            {
+                com.zutubi.pulse.core.model.Revision revision = changelist.getRevision();
+                LOG.warning("Unexpected changelist date 'null'");
+                LOG.warning("  - author: " + revision.getAuthor());
+                LOG.warning("  - branch: " + revision.getBranch());
+                LOG.warning("  - comment: " + revision.getComment());
+                LOG.warning("  - revision string: " + revision.getRevisionString());
+            }
+
         }
 
         return changelists;

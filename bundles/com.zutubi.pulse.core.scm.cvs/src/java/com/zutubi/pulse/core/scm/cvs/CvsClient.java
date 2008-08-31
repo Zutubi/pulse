@@ -387,7 +387,22 @@ public class CvsClient implements ScmClient, DataCacheAware
         {
             public int compare(Changelist o1, Changelist o2)
             {
-                return o1.getDate().compareTo(o2.getDate());
+                // filter null dates to the start, although we need to work out what no
+                // date means in a revision...
+                Date d1 = o1.getDate();
+                Date d2 = o2.getDate();
+                if (d1 == null)
+                {
+                    return (d2 == null)? 0 : -1;
+                }
+                else
+                {
+                    if (d2 == null)
+                    {
+                        return 1;
+                    }
+                    return d1.compareTo(o2.getDate());
+                }
             }
         });
 
