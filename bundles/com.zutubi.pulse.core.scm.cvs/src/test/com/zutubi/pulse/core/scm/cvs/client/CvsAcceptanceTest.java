@@ -34,7 +34,7 @@ public class CvsAcceptanceTest extends TestCase
 
         Logger.setLogging("system");
 
-        String cvsRoot = ":ext:cvstester:cvs@cinnamonbob.com:/cvsroot";
+        String cvsRoot = ":ext:daniel:xxxx@zutubi.com:/cvsroots/default";
 
         cvs = new CvsCore();
         cvs.setRoot(CVSRoot.parse(cvsRoot));

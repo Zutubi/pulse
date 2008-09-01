@@ -45,7 +45,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         super.setUp();
         Logger.setLogging("system");
 
-        String cvsRoot = ":ext:cvstester:cvs@192.168.1.99:/cvsroot";
+        String cvsRoot = ":ext:daniel:xxxx@zutubi.com:/cvsroots/default";
         cvs = new CvsCore();
         cvs.setRoot(CVSRoot.parse(cvsRoot));
         analyser = new LogInformationAnalyser("test", CVSRoot.parse(cvsRoot));
