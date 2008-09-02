@@ -575,6 +575,7 @@
                 <exclude name="build/*"/>
                 <exclude name="**/LicenseEncoder.java"/>
                 <exclude name="**/LicenseEncodeDecodeTest.java"/>
+                <exclude name="**/LicenseKeyValidatorTest.java"/>
                 <exclude name="**/.svn"/>
             </fileset>
         </copy>
