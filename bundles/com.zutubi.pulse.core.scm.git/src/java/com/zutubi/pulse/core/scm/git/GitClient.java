@@ -1,20 +1,21 @@
-package com.zutubi.pulse.core.git;
+package com.zutubi.pulse.core.scm.git;
 
-import com.zutubi.pulse.core.scm.ScmClient;
+import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.scm.FileStatus;
 import com.zutubi.pulse.core.scm.ScmCapability;
-import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.pulse.core.scm.ScmContext;
 import com.zutubi.pulse.core.scm.ScmEventHandler;
-import com.zutubi.pulse.core.scm.FileStatus;
+import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.ScmFile;
-import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.model.Changelist;
 
-import java.util.Set;
-import java.util.List;
-import java.io.InputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -22,6 +23,7 @@ import java.io.IOException;
  */
 public class GitClient implements ScmClient
 {
+    private static final Set<ScmCapability> CAPABILITIES = new HashSet<ScmCapability>();
 
     public void close()
     {
@@ -30,7 +32,7 @@ public class GitClient implements ScmClient
 
     public Set<ScmCapability> getCapabilities()
     {
-        return null;
+        return CAPABILITIES;
     }
 
     public String getUid() throws ScmException

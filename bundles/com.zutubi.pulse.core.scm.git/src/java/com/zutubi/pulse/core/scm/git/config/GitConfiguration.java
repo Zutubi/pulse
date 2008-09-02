@@ -1,12 +1,14 @@
-package com.zutubi.pulse.core.git.config;
+package com.zutubi.pulse.core.scm.git.config;
 
 import com.zutubi.pulse.core.scm.config.PollableScmConfiguration;
 import com.zutubi.config.annotations.Transient;
+import com.zutubi.config.annotations.SymbolicName;
 
 /**
  *
  *
  */
+@SymbolicName("zutubi.gitConfig")
 public class GitConfiguration extends PollableScmConfiguration
 {
     @Transient

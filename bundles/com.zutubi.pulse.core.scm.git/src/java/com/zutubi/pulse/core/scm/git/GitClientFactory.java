@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.git;
+package com.zutubi.pulse.core.scm.git;
 
 import com.zutubi.pulse.core.scm.ScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmClient;
@@ -13,6 +13,6 @@ public class GitClientFactory implements ScmClientFactory
 {
     public ScmClient createClient(ScmConfiguration config) throws ScmException
     {
-        return null;
+        return new GitClient();
     }
 }
