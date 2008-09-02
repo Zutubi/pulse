@@ -38,4 +38,9 @@ public class AntResourceConstructor implements ResourceConstructor
     {
         return constructor.createResource(home);
     }
+
+    public String lookupHome()
+    {
+        return System.getenv("ANT_HOME");
+    }
 }

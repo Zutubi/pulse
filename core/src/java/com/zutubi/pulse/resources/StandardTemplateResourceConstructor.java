@@ -29,6 +29,11 @@ public class StandardTemplateResourceConstructor implements ResourceConstructor
         this.scriptName = scriptName;
     }
 
+    public String lookupHome()
+    {
+        return null;
+    }
+
     public boolean isResourceHome(String home)
     {
         return home != null && isResourceHome(new File(home));

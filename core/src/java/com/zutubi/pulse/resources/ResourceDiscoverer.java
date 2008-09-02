@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.util.SystemUtils;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.util.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,17 +12,44 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * The resource discoverer is responsible for the automatic discovery of common resources.
+ *
+ * The configuration of the resources along with the smarts about the various resources is delegated to
+ * the ResourceConstructor implementations.
+ * 
  */
+//TODO: extend this to allow the registeration of resource constructors.
 public class ResourceDiscoverer
 {
+    private static final Logger LOG = Logger.getLogger(ResourceDiscoverer.class);
+
+    /**
+     * Run the resource discovery process, returning a list of all the discovered resources.
+     *
+     * @return list of discovered resources.
+     */
     public List<Resource> discover()
     {
         List<Resource> result = new LinkedList<Resource>();
-        discoverAnt(result);
+
+        for (ResourceConstructor constructor : getConstructors())
+        {
+            String home = constructor.lookupHome();
+            if (constructor.isResourceHome(home))
+            {
+                try
+                {
+                    result.add(constructor.createResource(home));
+                }
+                catch (IOException e)
+                {
+                    LOG.warning(e);
+                }
+            }
+        }
+
         discoverMake(result);
-        discoverMaven(result);
-        discoverMaven2(result);
-        discoverJava(result);
+
         return result;
     }
 
@@ -35,85 +63,16 @@ public class ResourceDiscoverer
         return constructors;
     }
 
-    private void discoverAnt(List<Resource> resources)
-    {
-        String home = System.getenv("ANT_HOME");
-        AntResourceConstructor antConstructor = new AntResourceConstructor();
-        if (antConstructor.isResourceHome(home))
-        {
-            try
-            {
-                resources.add(antConstructor.createResource(home));
-            }
-            catch (IOException e)
-            {
-                e.printStackTrace();
-            }
-        }
-    }
-
     private void discoverMake(List<Resource> resources)
     {
+        //TODO: merge this resource in with the existing resoruce constructors.  May require some reworking of the interfaces
+        //TODO: since current resource constructors require home directories.
         File makeBin = SystemUtils.findInPath("make");
         if (makeBin != null)
         {
             Resource makeResource = new Resource("make");
             makeResource.addProperty(new ResourceProperty("make.bin", FileSystemUtils.normaliseSeparators(makeBin.getAbsolutePath()), false, false, false));
             resources.add(makeResource);
-        }
-    }
-
-    private void discoverMaven(List<Resource> resources)
-    {
-        String home = System.getenv("MAVEN_HOME");
-        MavenResourceConstructor constructor = new MavenResourceConstructor();
-        if (constructor.isResourceHome(home))
-        {
-            try
-            {
-                resources.add(constructor.createResource(home));
-            }
-            catch (IOException e)
-            {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void discoverMaven2(List<Resource> resources)
-    {
-        String home = System.getenv("MAVEN2_HOME");
-        Maven2ResourceConstructor constructor = new Maven2ResourceConstructor();
-        if (constructor.isResourceHome(home))
-        {
-            try
-            {
-                resources.add(constructor.createResource(home));
-            }
-            catch (IOException e)
-            {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void discoverJava(List<Resource> resources)
-    {
-        // TODO: look for java on the path.
-        // look for JAVA_HOME in the environment.
-        String home = System.getenv("JAVA_HOME");
-
-        JavaResourceConstructor javaConstructor = new JavaResourceConstructor();
-        if (javaConstructor.isResourceHome(home))
-        {
-            try
-            {
-                resources.add(javaConstructor.createResource(home));
-            }
-            catch (IOException e)
-            {
-                e.printStackTrace();
-            }
         }
     }
 }

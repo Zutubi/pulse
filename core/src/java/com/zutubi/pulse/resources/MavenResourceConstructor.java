@@ -38,4 +38,9 @@ public class MavenResourceConstructor implements ResourceConstructor
     {
         return constructor.createResource(home);
     }
+
+    public String lookupHome()
+    {
+        return System.getenv("MAVEN_HOME");
+    }
 }

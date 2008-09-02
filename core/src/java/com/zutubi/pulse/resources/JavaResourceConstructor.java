@@ -86,4 +86,11 @@ public class JavaResourceConstructor implements ResourceConstructor
         }
     }
 
+
+    public String lookupHome()
+    {
+        // TODO: look for java on the path.
+        // look for JAVA_HOME in the environment.
+        return System.getenv(JAVA_HOME);
+    }
 }
