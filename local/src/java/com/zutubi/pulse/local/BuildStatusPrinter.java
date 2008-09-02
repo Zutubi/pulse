@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.build.*;
-import com.zutubi.pulse.util.TimeStamps;
+import com.zutubi.util.TimeStamps;
 import com.zutubi.util.ForkOutputStream;
 
 import java.io.File;

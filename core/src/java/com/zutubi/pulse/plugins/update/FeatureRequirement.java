@@ -1,6 +1,6 @@
 package com.zutubi.pulse.plugins.update;
 
-import com.zutubi.pulse.plugins.Version;
+import com.zutubi.pulse.plugins.PluginVersion;
 
 /**
  * A dependency of a feature on either another feature or plugin.
@@ -9,10 +9,10 @@ public class FeatureRequirement
 {
     private boolean feature;
     private String id;
-    private Version version;
+    private PluginVersion version;
     private VersionMatch match = VersionMatch.COMPATIBLE;
 
-    public FeatureRequirement(boolean feature, String id, Version version, VersionMatch match)
+    public FeatureRequirement(boolean feature, String id, PluginVersion version, VersionMatch match)
     {
         this.feature = feature;
         this.id = id;
@@ -30,7 +30,7 @@ public class FeatureRequirement
         return id;
     }
 
-    public Version getVersion()
+    public PluginVersion getVersion()
     {
         return version;
     }
@@ -40,7 +40,7 @@ public class FeatureRequirement
         return match;
     }
 
-    public boolean satisfied(Version installed)
+    public boolean satisfied(PluginVersion installed)
     {
         return version == null || match == null || match.versionsMatch(installed, version);
     }

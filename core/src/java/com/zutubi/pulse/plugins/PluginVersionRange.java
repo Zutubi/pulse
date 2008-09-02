@@ -3,14 +3,14 @@ package com.zutubi.pulse.plugins;
 /**
  * Stores a range of versions, used in expression of dependencies.
  */
-public class VersionRange
+public class PluginVersionRange
 {
-    private Version min;
+    private PluginVersion min;
     private boolean includeMin;
-    private Version max;
+    private PluginVersion max;
     private boolean includeMax;
 
-    public VersionRange(Version min, boolean includeMin, Version max, boolean includeMax)
+    public PluginVersionRange(PluginVersion min, boolean includeMin, PluginVersion max, boolean includeMax)
     {
         this.min = min;
         this.includeMin = includeMin;
@@ -18,7 +18,7 @@ public class VersionRange
         this.includeMax = includeMax;
     }
 
-    public Version getMin()
+    public PluginVersion getMin()
     {
         return min;
     }
@@ -28,7 +28,7 @@ public class VersionRange
         return includeMin;
     }
 
-    public Version getMax()
+    public PluginVersion getMax()
     {
         return max;
     }
@@ -42,10 +42,10 @@ public class VersionRange
     {
         if (min == null)
         {
-            return Version.NONE.toString();
+            return PluginVersion.NONE.toString();
         }
 
-        if (Version.MAX.equals(max))
+        if (PluginVersion.MAX.equals(max))
         {
             return min.toString();
         }

@@ -7,7 +7,7 @@ import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
-import com.zutubi.pulse.util.TimeStamps;
+import com.zutubi.util.TimeStamps;
 
 /**
  */

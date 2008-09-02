@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceVersion;
-import com.zutubi.pulse.util.SystemUtils;
+import com.zutubi.util.SystemUtils;
 import com.zutubi.pulse.util.FileSystemUtils;
 
 import java.io.File;

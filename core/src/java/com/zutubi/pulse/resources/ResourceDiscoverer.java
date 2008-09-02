@@ -2,7 +2,7 @@ package com.zutubi.pulse.resources;
 
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceProperty;
-import com.zutubi.pulse.util.SystemUtils;
+import com.zutubi.util.SystemUtils;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 

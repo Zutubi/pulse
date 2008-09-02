@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.model;
 
-import com.zutubi.pulse.util.TimeStamps;
+import com.zutubi.util.TimeStamps;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.util.Date;

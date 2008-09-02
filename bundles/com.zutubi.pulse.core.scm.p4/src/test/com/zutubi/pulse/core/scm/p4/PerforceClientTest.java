@@ -10,7 +10,7 @@ import com.zutubi.pulse.core.scm.ScmFile;
 import com.zutubi.pulse.core.scm.ScmContext;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.SystemUtils;
+import com.zutubi.util.SystemUtils;
 import com.zutubi.pulse.util.ZipUtils;
 import com.zutubi.util.IOUtils;
 

@@ -1,8 +1,8 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.util.TreeNode;
-import com.zutubi.pulse.util.TreeNodeOperation;
+import com.zutubi.util.TreeNode;
+import com.zutubi.util.TreeNodeOperation;
 
 import java.util.Iterator;
 import java.util.LinkedList;

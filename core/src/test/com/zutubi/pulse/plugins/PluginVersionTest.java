@@ -4,11 +4,11 @@ import com.zutubi.pulse.test.PulseTestCase;
 
 /**
  */
-public class VersionTest extends PulseTestCase
+public class PluginVersionTest extends PulseTestCase
 {
     public void testSimpleVersion()
     {
-        Version v = new Version("1.2.3.v2006");
+        PluginVersion v = new PluginVersion("1.2.3.v2006");
         assertEquals(1, v.getMajor());
         assertEquals(2, v.getMinor());
         assertEquals(3, v.getService());
@@ -17,7 +17,7 @@ public class VersionTest extends PulseTestCase
 
     public void testNoQualifier()
     {
-        Version v = new Version("1.2.3");
+        PluginVersion v = new PluginVersion("1.2.3");
         assertEquals(1, v.getMajor());
         assertEquals(2, v.getMinor());
         assertEquals(3, v.getService());
@@ -26,7 +26,7 @@ public class VersionTest extends PulseTestCase
 
     public void testEmptyQualifier()
     {
-        Version v = new Version("1.2.3.");
+        PluginVersion v = new PluginVersion("1.2.3.");
         assertEquals(1, v.getMajor());
         assertEquals(2, v.getMinor());
         assertEquals(3, v.getService());
@@ -37,7 +37,7 @@ public class VersionTest extends PulseTestCase
     {
         try
         {
-            Version v = new Version("1.2");
+            PluginVersion v = new PluginVersion("1.2");
             fail();
         }
         catch (IllegalArgumentException e)
@@ -50,7 +50,7 @@ public class VersionTest extends PulseTestCase
     {
         try
         {
-            Version v = new Version("1");
+            PluginVersion v = new PluginVersion("1");
             fail();
         }
         catch (IllegalArgumentException e)
@@ -63,7 +63,7 @@ public class VersionTest extends PulseTestCase
     {
         try
         {
-            Version v = new Version("");
+            PluginVersion v = new PluginVersion("");
             fail();
         }
         catch (IllegalArgumentException e)
@@ -74,16 +74,16 @@ public class VersionTest extends PulseTestCase
 
     public void testCompareIdentical()
     {
-        Version v1 = new Version("1.2.3.v20070111");
-        Version v2 = new Version("1.2.3.v20070111");
+        PluginVersion v1 = new PluginVersion("1.2.3.v20070111");
+        PluginVersion v2 = new PluginVersion("1.2.3.v20070111");
         assertTrue(v1.equals(v2));
         assertTrue(v1.compareTo(v2) == 0);
     }
 
     public void testCompareOneQualifier()
     {
-        Version v1 = new Version("1.2.3.v20070111");
-        Version v2 = new Version("1.2.3");
+        PluginVersion v1 = new PluginVersion("1.2.3.v20070111");
+        PluginVersion v2 = new PluginVersion("1.2.3");
         assertTrue(v1.equals(v2));
         assertTrue(v1.compareTo(v2) == 0);
         assertTrue(v2.compareTo(v1) == 0);
@@ -91,16 +91,16 @@ public class VersionTest extends PulseTestCase
 
     public void testCompareNoQualifiers()
     {
-        Version v1 = new Version("1.2.3");
-        Version v2 = new Version("1.2.3");
+        PluginVersion v1 = new PluginVersion("1.2.3");
+        PluginVersion v2 = new PluginVersion("1.2.3");
         assertTrue(v1.equals(v2));
         assertTrue(v1.compareTo(v2) == 0);
     }
     
     public void testCompareQualifierChange()
     {
-        Version v1 = new Version("1.2.3.v20070111");
-        Version v2 = new Version("1.2.3.v20070112");
+        PluginVersion v1 = new PluginVersion("1.2.3.v20070111");
+        PluginVersion v2 = new PluginVersion("1.2.3.v20070112");
         assertFalse(v1.equals(v2));
         assertTrue(v1.compareTo(v2) < 0);
         assertTrue(v2.compareTo(v1) > 0);
@@ -108,8 +108,8 @@ public class VersionTest extends PulseTestCase
 
     public void testCompareServiceChange()
     {
-        Version v1 = new Version("1.2.3");
-        Version v2 = new Version("1.2.10");
+        PluginVersion v1 = new PluginVersion("1.2.3");
+        PluginVersion v2 = new PluginVersion("1.2.10");
         assertFalse(v1.equals(v2));
         assertTrue(v1.compareTo(v2) < 0);
         assertTrue(v2.compareTo(v1) > 0);
@@ -117,8 +117,8 @@ public class VersionTest extends PulseTestCase
 
     public void testCompareMinorChange()
     {
-        Version v1 = new Version("1.2.3");
-        Version v2 = new Version("1.7777.3");
+        PluginVersion v1 = new PluginVersion("1.2.3");
+        PluginVersion v2 = new PluginVersion("1.7777.3");
         assertFalse(v1.equals(v2));
         assertTrue(v1.compareTo(v2) < 0);
         assertTrue(v2.compareTo(v1) > 0);
@@ -126,8 +126,8 @@ public class VersionTest extends PulseTestCase
 
     public void testCompareMajorChange()
     {
-        Version v1 = new Version("1.2.3");
-        Version v2 = new Version("3.2.3");
+        PluginVersion v1 = new PluginVersion("1.2.3");
+        PluginVersion v2 = new PluginVersion("3.2.3");
         assertFalse(v1.equals(v2));
         assertTrue(v1.compareTo(v2) < 0);
         assertTrue(v2.compareTo(v1) > 0);
@@ -135,19 +135,19 @@ public class VersionTest extends PulseTestCase
 
     public void testToString()
     {
-        Version v = new Version("1.2.3.v20089");
+        PluginVersion v = new PluginVersion("1.2.3.v20089");
         assertEquals("1.2.3.v20089", v.toString());
     }
 
     public void testToStringEmtpyQualifier()
     {
-        Version v = new Version("1.2.3.");
+        PluginVersion v = new PluginVersion("1.2.3.");
         assertEquals("1.2.3", v.toString());
     }
     
     public void testToStringNoQualifier()
     {
-        Version v = new Version("1.2.3");
+        PluginVersion v = new PluginVersion("1.2.3");
         assertEquals("1.2.3", v.toString());
     }
 }

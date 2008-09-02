@@ -5,7 +5,7 @@ import static com.zutubi.pulse.core.BuildProperties.PROPERTY_OUTPUT_DIR;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.jni.ProcessControl;
-import com.zutubi.pulse.util.SystemUtils;
+import com.zutubi.util.SystemUtils;
 import com.zutubi.util.*;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;

@@ -1,7 +1,8 @@
-package com.zutubi.pulse.util;
+package com.zutubi.util;
 
 import junit.framework.TestCase;
 import com.zutubi.util.Constants;
+import com.zutubi.util.TimeStamps;
 
 /**
  *

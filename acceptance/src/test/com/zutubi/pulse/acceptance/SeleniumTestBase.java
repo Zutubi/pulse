@@ -6,7 +6,7 @@ import com.zutubi.pulse.acceptance.forms.admin.AddProjectWizard;
 import com.zutubi.pulse.acceptance.forms.admin.SelectTypeState;
 import com.zutubi.pulse.acceptance.pages.LoginPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
-import com.zutubi.pulse.util.SystemUtils;
+import com.zutubi.util.SystemUtils;
 import com.zutubi.pulse.webwork.mapping.Urls;
 import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.util.ExceptionWrappingRunnable;
@@ -18,9 +18,6 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Vector;
-
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.AfterMethod;
 
 /**
  * Helper base class for web UI acceptance tests that use Selenium.

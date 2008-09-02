@@ -66,17 +66,17 @@ public class PluginRegistryEntry
         return get(PLUGIN_TYPE_KEY);
     }
 
-    public Version getVersion()
+    public PluginVersion getVersion()
     {
         String versionString = get(PLUGIN_VERSION_KEY);
         if (!TextUtils.stringSet(versionString))
         {
             return null;
         }
-        return new Version(versionString);
+        return new PluginVersion(versionString);
     }
 
-    public void setVersion(Version version)
+    public void setVersion(PluginVersion version)
     {
         put(PLUGIN_VERSION_KEY, version.toString());
     }

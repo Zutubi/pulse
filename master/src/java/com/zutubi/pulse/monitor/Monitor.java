@@ -1,6 +1,6 @@
 package com.zutubi.pulse.monitor;
 
-import com.zutubi.pulse.util.TimeStamps;
+import com.zutubi.util.TimeStamps;
 
 import java.util.Collections;
 import java.util.HashMap;

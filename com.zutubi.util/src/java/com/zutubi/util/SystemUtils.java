@@ -1,4 +1,4 @@
-package com.zutubi.pulse.util;
+package com.zutubi.util;
 
 import com.zutubi.util.IOUtils;
 import com.zutubi.util.logging.Logger;

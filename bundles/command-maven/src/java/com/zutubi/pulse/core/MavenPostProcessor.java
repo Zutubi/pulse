@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.util.SystemUtils;
+import com.zutubi.util.SystemUtils;
 
 /**
  * <class-comment/>

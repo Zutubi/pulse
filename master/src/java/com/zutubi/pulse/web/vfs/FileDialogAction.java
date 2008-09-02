@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web.vfs;
 
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.util.SystemUtils;
+import com.zutubi.util.SystemUtils;
 
 import java.io.File;
 

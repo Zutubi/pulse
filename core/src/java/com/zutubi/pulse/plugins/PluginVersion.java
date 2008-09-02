@@ -4,17 +4,17 @@ import com.zutubi.util.TextUtils;
 
 /**
  */
-public class Version implements Comparable<Version>
+public class PluginVersion implements Comparable<PluginVersion>
 {
-    public static final Version NONE = new Version(0, 0, 0, null);
-    public static final Version MAX = new Version(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, null);
+    public static final PluginVersion NONE = new PluginVersion(0, 0, 0, null);
+    public static final PluginVersion MAX = new PluginVersion(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, null);
     
     private int major;
     private int minor;
     private int service;
     private String qualifier;
     
-    public Version(String version) throws IllegalArgumentException
+    public PluginVersion(String version) throws IllegalArgumentException
     {
         if (version == null)
         {
@@ -63,7 +63,7 @@ public class Version implements Comparable<Version>
         }
     }
 
-    public Version(int major, int minor, int service, String qualifier)
+    public PluginVersion(int major, int minor, int service, String qualifier)
     {
         this.major = major;
         this.minor = minor;
@@ -93,12 +93,12 @@ public class Version implements Comparable<Version>
 
     public boolean equals(Object obj)
     {
-        if(obj == null || !(obj instanceof Version))
+        if(obj == null || !(obj instanceof PluginVersion))
         {
             return false;
         }
 
-        Version other = (Version) obj;
+        PluginVersion other = (PluginVersion) obj;
         return compareTo(other) == 0;
     }
 
@@ -112,7 +112,7 @@ public class Version implements Comparable<Version>
         return String.format("%d.%d.%d", major, minor, service) + (TextUtils.stringSet(qualifier) ? ("." + qualifier) : "");
     }
 
-    public int compareTo(Version o)
+    public int compareTo(PluginVersion o)
     {
         int result = major - o.major;
         if(result == 0)

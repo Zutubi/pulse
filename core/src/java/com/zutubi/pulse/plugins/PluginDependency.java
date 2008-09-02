@@ -7,10 +7,10 @@ package com.zutubi.pulse.plugins;
 public class PluginDependency
 {
     private String id;
-    private VersionRange versionRange;
+    private PluginVersionRange versionRange;
     private Plugin supplier;
 
-    public PluginDependency(String id, VersionRange versionRange, Plugin supplier)
+    public PluginDependency(String id, PluginVersionRange versionRange, Plugin supplier)
     {
         this.id = id;
         this.versionRange = versionRange;
@@ -22,7 +22,7 @@ public class PluginDependency
         return id;
     }
 
-    public VersionRange getVersionRange()
+    public PluginVersionRange getVersionRange()
     {
         return versionRange;
     }

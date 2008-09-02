@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.scm;
 
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.SystemUtils;
+import com.zutubi.util.SystemUtils;
 
 import java.io.File;
 import java.io.IOException;

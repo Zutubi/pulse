@@ -17,7 +17,7 @@ import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.system.SystemStartedEvent;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.tove.config.group.ServerPermission;
-import com.zutubi.pulse.util.TimeStamps;
+import com.zutubi.util.TimeStamps;
 import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.config.*;
 import com.zutubi.tove.security.AccessManager;

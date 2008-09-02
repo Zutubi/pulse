@@ -12,6 +12,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import com.zutubi.util.TimeStamps;
+
 public class TimeStampsType implements CompositeUserType
 {
     private static final int[] TYPES = new int[]{Types.BIGINT, Types.BIGINT, Types.BIGINT, Types.BIGINT};

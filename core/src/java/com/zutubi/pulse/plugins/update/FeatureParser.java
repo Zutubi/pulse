@@ -1,7 +1,7 @@
 package com.zutubi.pulse.plugins.update;
 
 import static com.zutubi.pulse.plugins.update.UpdateParserUtils.*;
-import com.zutubi.pulse.plugins.Version;
+import com.zutubi.pulse.plugins.PluginVersion;
 import com.zutubi.pulse.util.XMLUtils;
 import nu.xom.Document;
 import nu.xom.Element;
@@ -46,7 +46,7 @@ public class FeatureParser
         Document doc = XMLUtils.streamToDoc(in);
         Element root = doc.getRootElement();
         String id = XMLUtils.getRequiredAttribute(root, ATTRIBUTE_ID);
-        Version version = getVersion(root, true);
+        PluginVersion version = getVersion(root, true);
         String label = XMLUtils.getAttributeDefault(root, ATTRIBUTE_LABEL, id);
         String description = getOptionalText(root, ELEMENT_DESCRIPTION);
         String providerName = root.getAttributeValue(ATTRIBUTE_PROVIDER_NAME);
@@ -133,7 +133,7 @@ public class FeatureParser
             }
         }
 
-        Version version = getVersion(element, false);
+        PluginVersion version = getVersion(element, false);
         VersionMatch match = VersionMatch.COMPATIBLE;
         String matchString = element.getAttributeValue(ATTRIBUTE_MATCH);
 

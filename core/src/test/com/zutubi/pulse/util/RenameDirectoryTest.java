@@ -23,7 +23,7 @@ public class RenameDirectoryTest extends PulseTestCase
         super.setUp();
 
         // add setup code here.
-        tmpDir = FileSystemUtils.createTempDir(ZipTest.class.getName(), "");
+        tmpDir = FileSystemUtils.createTempDir(ZipUtilsTest.class.getName(), "");
     }
 
     public void tearDown() throws Exception

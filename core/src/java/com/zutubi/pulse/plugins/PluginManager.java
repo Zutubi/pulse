@@ -160,7 +160,7 @@ public class PluginManager
             PluginRegistryEntry entry = registry.getEntry(plugin.getId());
             if (entry.containsKey(PLUGIN_VERSION_KEY))
             {
-                Version registryVersion = entry.getVersion();
+                PluginVersion registryVersion = entry.getVersion();
                 if (registryVersion == null)
                 {
                     LOG.warning("Unexpected null version string in plugin registry for " + plugin.getId() + ".");
@@ -662,7 +662,7 @@ public class PluginManager
         {
             if (entry.containsKey(PLUGIN_VERSION_KEY))
             {
-                Version registryVersion = new Version(entry.get(PLUGIN_VERSION_KEY));
+                PluginVersion registryVersion = new PluginVersion(entry.get(PLUGIN_VERSION_KEY));
                 if (registryVersion.compareTo(plugin.getVersion()) != 0)
                 {
                     plugin.setState(Plugin.State.VERSION_CHANGE);
@@ -943,14 +943,14 @@ public class PluginManager
         });
     }
 
-    private VersionRange convertVersionRange(org.eclipse.osgi.service.resolver.VersionRange versionRange)
+    private PluginVersionRange convertVersionRange(org.eclipse.osgi.service.resolver.VersionRange versionRange)
     {
-        return new VersionRange(convertVersion(versionRange.getMinimum()), versionRange.getIncludeMinimum(), convertVersion(versionRange.getMaximum()), versionRange.getIncludeMaximum());
+        return new PluginVersionRange(convertVersion(versionRange.getMinimum()), versionRange.getIncludeMinimum(), convertVersion(versionRange.getMaximum()), versionRange.getIncludeMaximum());
     }
 
-    private Version convertVersion(org.osgi.framework.Version version)
+    private PluginVersion convertVersion(org.osgi.framework.Version version)
     {
-        return new Version(version.getMajor(), version.getMinor(), version.getMicro(), version.getQualifier());
+        return new PluginVersion(version.getMajor(), version.getMinor(), version.getMicro(), version.getQualifier());
     }
 
     private URI downloadPlugin(URI source, File dest) throws PluginException

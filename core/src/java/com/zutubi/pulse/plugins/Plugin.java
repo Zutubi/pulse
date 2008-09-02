@@ -90,7 +90,7 @@ public interface Plugin
      * @return the plugin version, which is the OSGi bundle version.  The
      *         format is a dotted-decimal style string (e.g. 2.0.0).
      */
-    Version getVersion();
+    PluginVersion getVersion();
 
     String getVendor();
 

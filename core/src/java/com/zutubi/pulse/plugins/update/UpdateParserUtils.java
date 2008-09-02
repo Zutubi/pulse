@@ -1,7 +1,7 @@
 package com.zutubi.pulse.plugins.update;
 
 import com.zutubi.pulse.util.XMLUtils;
-import com.zutubi.pulse.plugins.Version;
+import com.zutubi.pulse.plugins.PluginVersion;
 import nu.xom.Element;
 import nu.xom.Elements;
 import nu.xom.ParsingException;
@@ -63,7 +63,7 @@ public class UpdateParserUtils
         return resolveURL(urlString, site == null ? null : site.getURL());
     }
 
-    static Version getVersion(Element e, boolean required) throws ParsingException
+    static PluginVersion getVersion(Element e, boolean required) throws ParsingException
     {
         String versionString;
         if(required)
@@ -81,7 +81,7 @@ public class UpdateParserUtils
 
         try
         {
-            return new Version(versionString);
+            return new PluginVersion(versionString);
         }
         catch(IllegalArgumentException ex)
         {

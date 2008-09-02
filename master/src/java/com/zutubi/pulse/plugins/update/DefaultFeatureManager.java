@@ -3,7 +3,7 @@ package com.zutubi.pulse.plugins.update;
 import com.zutubi.pulse.plugins.Plugin;
 import com.zutubi.pulse.plugins.PluginException;
 import com.zutubi.pulse.plugins.PluginManager;
-import com.zutubi.pulse.plugins.Version;
+import com.zutubi.pulse.plugins.PluginVersion;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.logging.Logger;
@@ -114,7 +114,7 @@ public class DefaultFeatureManager implements FeatureManager
         else
         {
             Plugin p = pluginManager.getPlugin(requirement.getId());
-            Version v = p.getVersion();
+            PluginVersion v = p.getVersion();
             try
             {
                 return p != null && requirement.satisfied(v);

@@ -90,8 +90,8 @@ public class PluginUpgradeManager implements UpgradeableComponentSource
             Map<String, List<UpgradeTaskHolder>> requiredUpgradeTasks = new HashMap<String, List<UpgradeTaskHolder>>();
             for (Plugin plugin : upgradedPlugins)
             {
-                Version installedVersion = plugin.getVersion();
-                Version registryVersion = new Version(registry.getEntry(plugin.getId()).get(PluginManager.PLUGIN_VERSION_KEY));
+                PluginVersion installedVersion = plugin.getVersion();
+                PluginVersion registryVersion = new PluginVersion(registry.getEntry(plugin.getId()).get(PluginManager.PLUGIN_VERSION_KEY));
 
                 List<UpgradeTaskHolder> tasks = definedUpgradeTasks.get(plugin.getId());
                 if (tasks != null && tasks.size() > 0)
@@ -102,7 +102,7 @@ public class PluginUpgradeManager implements UpgradeableComponentSource
                     {
                         // > registry
                         // <= installed
-                        Version taskVersion = new Version(task.getVersion());
+                        PluginVersion taskVersion = new PluginVersion(task.getVersion());
                         if (registryVersion.compareTo(taskVersion) < 0 && taskVersion.compareTo(installedVersion) <= 0)
                         {
                             // need to execute this upgrade task.
@@ -179,8 +179,8 @@ public class PluginUpgradeManager implements UpgradeableComponentSource
         // should be recording the new version of the plugin to which we just upgraded.
         PluginRegistryEntry entry = pluginRegistry.getEntry(plugin.getId());
 
-        Version oldVersion = entry.getVersion();
-        Version newVersion = plugin.getVersion();
+        PluginVersion oldVersion = entry.getVersion();
+        PluginVersion newVersion = plugin.getVersion();
 
         // log that we have upgraded from oldversion -> newversion.
         LOG.info("Plugin '"+plugin.getId()+"' has been upgraded from " + oldVersion + " to " + newVersion + ".");

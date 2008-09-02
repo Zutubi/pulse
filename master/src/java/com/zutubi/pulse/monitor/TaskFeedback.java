@@ -1,6 +1,6 @@
 package com.zutubi.pulse.monitor;
 
-import com.zutubi.pulse.util.TimeStamps;
+import com.zutubi.util.TimeStamps;
 
 /**
  *

@@ -76,9 +76,9 @@ public abstract class LocalPlugin implements Plugin
         return (String) manifest.get(HEADER_VENDOR);
     }
 
-    public Version getVersion()
+    public PluginVersion getVersion()
     {
-        return new Version((String) manifest.get(HEADER_VERSION));
+        return new PluginVersion((String) manifest.get(HEADER_VERSION));
     }
 
     public URI getSource()

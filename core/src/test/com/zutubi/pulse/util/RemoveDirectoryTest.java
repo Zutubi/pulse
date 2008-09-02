@@ -14,25 +14,6 @@ public class RemoveDirectoryTest extends PulseTestCase
         assertTrue(FileSystemUtils.rmdir(new File("/this/directory/does/not/exist")));
     }
 
-/*
-    public void testRemoveFile() throws IOException
-    {
-        File tmpDir = createTmpDir();
-        File aFile = new File(tmpDir, "aFile");
-
-        try
-        {
-            FileSystemUtils.createFile(aFile, "some data");
-            assertFalse(FileSystemUtils.rmdir(aFile));
-        }
-        finally
-        {
-            aFile.delete();
-            tmpDir.delete();
-        }
-    }
-*/
-
     public void testRemoveEmpty() throws IOException
     {
         File tmpDir = createTmpDir();

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.plugins.update;
 
-import com.zutubi.pulse.plugins.Version;
+import com.zutubi.pulse.plugins.PluginVersion;
 
 import java.net.URL;
 import java.util.LinkedList;
@@ -14,7 +14,7 @@ import java.util.List;
 public class FeatureManifest
 {
     private String id;
-    private Version version;
+    private PluginVersion version;
     private String label;
     private String providerName;
     private URL image;
@@ -28,7 +28,7 @@ public class FeatureManifest
     private List<FeatureRequirement> requirements = new LinkedList<FeatureRequirement>();
 
 
-    public FeatureManifest(String id, Version version, String label, String description, String providerName, URL image)
+    public FeatureManifest(String id, PluginVersion version, String label, String description, String providerName, URL image)
     {
         this.id = id;
         this.version = version;
@@ -43,7 +43,7 @@ public class FeatureManifest
         return id;
     }
 
-    public Version getVersion()
+    public PluginVersion getVersion()
     {
         return version;
     }
