@@ -40,7 +40,6 @@
         <taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="custom.task.path"/>
         <taskdef uri="antlib:com.zutubi.ant" resource="com/zutubi/ant/antlib.xml" classpathref="custom.task.path"/>
         <taskdef name="ideamodule" classname="configurator.task.IdeaJavaModuleTask" classpathref="custom.task.path"/>
-        <taskdef resource="testngtasks" classpathref="custom.task.path"/>
 
         <load-ivy-taskdef/>
 
@@ -575,7 +574,7 @@
                 <include name="**/*"/>
                 <exclude name="build/*"/>
                 <exclude name="**/LicenseEncoder.java"/>
-                <exclude name="**/LicenseDecoder.java"/>
+                <exclude name="**/LicenseEncodeDecodeTest.java"/>
                 <exclude name="**/.svn"/>
             </fileset>
         </copy>
