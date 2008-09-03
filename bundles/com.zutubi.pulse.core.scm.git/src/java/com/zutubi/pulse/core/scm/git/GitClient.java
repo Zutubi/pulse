@@ -9,6 +9,7 @@ import com.zutubi.pulse.core.scm.ScmContext;
 import com.zutubi.pulse.core.scm.ScmEventHandler;
 import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.ScmFile;
+import com.zutubi.pulse.util.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,6 +25,8 @@ import java.util.Set;
 public class GitClient implements ScmClient
 {
     private static final Set<ScmCapability> CAPABILITIES = new HashSet<ScmCapability>();
+    
+    private String repository;
 
     public void close()
     {
@@ -37,17 +40,35 @@ public class GitClient implements ScmClient
 
     public String getUid() throws ScmException
     {
-        return null;
+        return repository;
     }
 
     public String getLocation() throws ScmException
     {
-        return null;
+        return getUid();
     }
 
     public Revision checkout(ScmContext context, ScmEventHandler handler) throws ScmException
     {
-        return null;
+        NativeGit git = new NativeGit();
+        File workingDir = context.getDir();
+        // git does not like a checkouts into existing directories - not this way anyways.
+        if (workingDir.exists() && !FileSystemUtils.rmdir(workingDir))
+        {
+            throw new ScmException("Failed in clean checkout.  Could not delete directory: " + workingDir.getAbsolutePath());
+        }
+
+        git.setWorkingDirectory(workingDir.getParentFile());
+        git.clone(repository, workingDir.getName());
+
+        // what is the current head revision?.
+        git.setWorkingDirectory(workingDir);
+        List<GitLogEntry> entries = git.log("HEAD^", "HEAD");
+        GitLogEntry entry = entries.get(0);
+
+        entry.getDate(); //TODO: requires conversion.
+        
+        return new Revision(entry.getAuthor(), entry.getComment(), null, entry.getCommit());
     }
 
     public Revision update(ScmContext context, ScmEventHandler handler) throws ScmException
@@ -98,5 +119,10 @@ public class GitClient implements ScmClient
     public Revision getRevision(String revision) throws ScmException
     {
         return null;
+    }
+
+    public void setRepository(String repository)
+    {
+        this.repository = repository;
     }
 }

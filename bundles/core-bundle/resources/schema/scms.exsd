@@ -39,7 +39,7 @@
 
     <element name="scm">
         <complexType>
-            <attribute name="name" type="string">
+            <attribute name="name" type="string" use="required">
                 <annotation>
                     <documentation>
                         The name of the SCM.

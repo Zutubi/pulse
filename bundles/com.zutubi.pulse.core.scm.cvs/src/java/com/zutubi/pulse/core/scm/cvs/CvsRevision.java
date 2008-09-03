@@ -13,7 +13,7 @@ import java.util.Date;
  * particular checkin (new revision). Because cvs does not support atomic
  * commits, these revisions are a best guess.
  */
-public class CvsRevision //extends Revision
+public class CvsRevision
 {
     public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyyMMdd-HH:mm:ss");
 
@@ -247,7 +247,6 @@ public class CvsRevision //extends Revision
             this.time = -1;
         }
     }
-
 
     public boolean equals(Object o)
     {
