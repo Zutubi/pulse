@@ -153,6 +153,8 @@
 
     <bean id="recipeQueue" class="com.zutubi.pulse.ThreadedRecipeQueue" autowire="byName"/>
 
+    <bean id="recipeDispatchService" class="com.zutubi.pulse.RecipeDispatchService" autowire="byName" init-method="init"/>
+
     <bean id="resultNotifier" class="com.zutubi.pulse.ResultNotifier" autowire="byName" init-method="init"/>
 
     <bean id="shutdownManager" class="com.zutubi.pulse.ShutdownManager">

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.tove.config.project;
 
 import com.zutubi.pulse.AgentService;
-import com.zutubi.pulse.RecipeDispatchRequest;
+import com.zutubi.pulse.RecipeAssignmentRequest;
 import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
 
 /**
@@ -16,7 +16,7 @@ public class SpecificAgentRequirements implements AgentRequirements
         this.agent = agent;
     }
 
-    public boolean fulfilledBy(RecipeDispatchRequest request, AgentService service)
+    public boolean fulfilledBy(RecipeAssignmentRequest request, AgentService service)
     {
         return service.getAgentConfig().equals(agent);
     }

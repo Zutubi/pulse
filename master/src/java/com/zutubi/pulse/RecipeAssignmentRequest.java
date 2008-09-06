@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * A request to dispatch a recipe to some build hostRequirements, which may be restricted.
  */
-public class RecipeDispatchRequest
+public class RecipeAssignmentRequest
 {
     private Project project;
     private AgentRequirements hostRequirements;
@@ -28,7 +28,7 @@ public class RecipeDispatchRequest
      */
     private long timeout = -1;
 
-    public RecipeDispatchRequest(Project project, AgentRequirements hostRequirements, List<ResourceRequirement> resourceRequirements, BuildRevision revision, RecipeRequest request, BuildResult build)
+    public RecipeAssignmentRequest(Project project, AgentRequirements hostRequirements, List<ResourceRequirement> resourceRequirements, BuildRevision revision, RecipeRequest request, BuildResult build)
     {
         this.project = project;
         this.hostRequirements = hostRequirements;

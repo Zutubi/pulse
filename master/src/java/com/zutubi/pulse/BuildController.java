@@ -20,9 +20,9 @@ import com.zutubi.pulse.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.tove.config.project.hooks.BuildHookManager;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.util.Constants;
 import com.zutubi.util.TimeStamps;
 import com.zutubi.util.TreeNode;
-import com.zutubi.util.Constants;
 import com.zutubi.util.logging.Logger;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -171,10 +171,10 @@ public class BuildController implements EventListener
             recipeRequest.addAllProperties(projectConfig.getProperties().values());
             recipeRequest.addAllProperties(stage.getProperties().values());
 
-            RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(project, stage.getAgentRequirements(), resourceRequirements, request.getRevision(), recipeRequest, buildResult);
+            RecipeAssignmentRequest assignmentRequest = new RecipeAssignmentRequest(project, stage.getAgentRequirements(), resourceRequirements, request.getRevision(), recipeRequest, buildResult);
             DefaultRecipeLogger logger = new DefaultRecipeLogger(new File(paths.getRecipeDir(buildResult, recipeResult.getId()), RecipeResult.RECIPE_LOG));
             RecipeResultNode previousRecipe = previousSuccessful == null ? null : previousSuccessful.findResultNodeByHandle(stage.getHandle());
-            RecipeController rc = new RecipeController(buildResult, childResultNode, dispatchRequest, recipeContext, previousRecipe, logger, collector, configurationManager, resourceManager);
+            RecipeController rc = new RecipeController(buildResult, childResultNode, assignmentRequest, recipeContext, previousRecipe, logger, collector, configurationManager, resourceManager);
             rc.setRecipeQueue(queue);
             rc.setBuildManager(buildManager);
             rc.setServiceTokenManager(serviceTokenManager);
@@ -441,7 +441,7 @@ public class BuildController implements EventListener
                     scheduleTimeout(e.getRecipeId());
                 }
             }
-            else if (e instanceof RecipeDispatchedEvent)
+            else if (e instanceof RecipeAssignedEvent)
             {
                 if (!buildResult.commenced())
                 {
@@ -515,8 +515,8 @@ public class BuildController implements EventListener
      */
     private void handleFirstDispatch(RecipeController controller)
     {
-        RecipeDispatchRequest dispatchRequest = controller.getDispatchRequest();
-        RecipeRequest request = dispatchRequest.getRequest();
+        RecipeAssignmentRequest assignmentRequest = controller.getDispatchRequest();
+        RecipeRequest request = assignmentRequest.getRequest();
 
         try
         {
@@ -527,7 +527,7 @@ public class BuildController implements EventListener
             LOG.warning("Unable to save pulse file for build: " + e.getMessage(), e);
         }
 
-        BuildRevision buildRevision = dispatchRequest.getRevision();
+        BuildRevision buildRevision = assignmentRequest.getRevision();
         addRevisionProperties(buildContext, buildRevision);
         if (!buildResult.isPersonal())
         {

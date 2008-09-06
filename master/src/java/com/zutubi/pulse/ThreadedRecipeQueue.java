@@ -11,7 +11,7 @@ import com.zutubi.pulse.core.scm.*;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.events.*;
 import com.zutubi.pulse.events.build.BuildStatusEvent;
-import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
+import com.zutubi.pulse.events.build.RecipeAssignedEvent;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.events.build.RecipeStatusEvent;
 import com.zutubi.pulse.events.system.ConfigurationEventSystemStartedEvent;
@@ -31,7 +31,10 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -50,7 +53,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     /**
      * The internal queue of dispatch requests.
      */
-    private final DispatchQueue dispatchQueue = new DispatchQueue();
+    private final RequestQueue requestQueue = new RequestQueue();
     
     private ExecutorService executor;
 
@@ -71,8 +74,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
      */
     private long unsatisfiableTimeout = 0;
 
-    private BlockingQueue<DispatchedRequest> dispatchedQueue = new LinkedBlockingQueue<DispatchedRequest>();
-
+    private RecipeDispatchService recipeDispatchService;
     private AgentManager agentManager;
     private EventManager eventManager;
     private GlobalConfiguration globalConfiguration;
@@ -94,7 +96,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
                 updateTimeoutsForAgent(a);
             }
 
-            Thread dispatcherThread = new Thread(new Dispatcher(), "Recipe Dispatcher Service");
+            Thread dispatcherThread = new Thread(new RecipeDispatchService(), "Recipe Dispatcher Service");
             dispatcherThread.setDaemon(true);
             dispatcherThread.start();
 
@@ -125,37 +127,37 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     /**
      * Enqueue a new recipe dispatch request.
      *
-     * @param dispatchRequest the request to be enqueued
+     * @param assignmentRequest the request to be enqueued
      */
-    public void enqueue(RecipeDispatchRequest dispatchRequest)
+    public void enqueue(RecipeAssignmentRequest assignmentRequest)
     {
         RecipeErrorEvent error = null;
 
         try
         {
-            determineRevision(dispatchRequest);
+            determineRevision(assignmentRequest);
 
             lock.lock();
             try
             {
-                if (requestMayBeFulfilled(dispatchRequest))
+                if (requestMayBeFulfilled(assignmentRequest))
                 {
-                    addToQueue(dispatchRequest);
+                    addToQueue(assignmentRequest);
                 }
                 else
                 {
                     if(unsatisfiableTimeout == 0)
                     {
-                        error = new RecipeErrorEvent(this, dispatchRequest.getRequest().getId(), "No online agent is capable of executing the build stage");
+                        error = new RecipeErrorEvent(this, assignmentRequest.getRequest().getId(), "No online agent is capable of executing the build stage");
                     }
                     else
                     {
                         if(unsatisfiableTimeout > 0)
                         {
-                            dispatchRequest.setTimeout(System.currentTimeMillis() + unsatisfiableTimeout);
+                            assignmentRequest.setTimeout(System.currentTimeMillis() + unsatisfiableTimeout);
                         }
 
-                        addToQueue(dispatchRequest);
+                        addToQueue(assignmentRequest);
                     }
                 }
             }
@@ -167,7 +169,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         catch (Exception e)
         {
             LOG.error(e);
-            error = new RecipeErrorEvent(this, dispatchRequest.getRequest().getId(), "Unable to determine revision to build: " + e.getMessage());
+            error = new RecipeErrorEvent(this, assignmentRequest.getRequest().getId(), "Unable to determine revision to build: " + e.getMessage());
         }
 
 
@@ -178,21 +180,21 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         }
     }
 
-    private void addToQueue(RecipeDispatchRequest dispatchRequest)
+    private void addToQueue(RecipeAssignmentRequest assignmentRequest)
     {
-        dispatchQueue.add(dispatchRequest);
-        dispatchRequest.queued();
+        requestQueue.add(assignmentRequest);
+        assignmentRequest.queued();
         lockCondition.signal();
     }
 
-    private void determineRevision(RecipeDispatchRequest dispatchRequest) throws BuildException, ScmException
+    private void determineRevision(RecipeAssignmentRequest assignmentRequest) throws BuildException, ScmException
     {
-        BuildRevision buildRevision = dispatchRequest.getRevision();
+        BuildRevision buildRevision = assignmentRequest.getRevision();
         if (!buildRevision.isInitialised())
         {
             // Let's initialise it
-            eventManager.publish(new BuildStatusEvent(this, dispatchRequest.getBuild(), "Initialising build revision..."));
-            ProjectConfiguration projectConfig = dispatchRequest.getProject().getConfig();
+            eventManager.publish(new BuildStatusEvent(this, assignmentRequest.getBuild(), "Initialising build revision..."));
+            ProjectConfiguration projectConfig = assignmentRequest.getProject().getConfig();
             ScmConfiguration scm = projectConfig.getScm();
 
             ScmClient client = null;
@@ -203,8 +205,8 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
                 Revision revision = supportsRevisions ? client.getLatestRevision() : new Revision(System.currentTimeMillis());
 
                 // May throw a BuildException
-                updateRevision(dispatchRequest, revision);
-                eventManager.publish(new BuildStatusEvent(this, dispatchRequest.getBuild(), "Revision initialised to '" + revision.getRevisionString() + "'"));
+                updateRevision(assignmentRequest, revision);
+                eventManager.publish(new BuildStatusEvent(this, assignmentRequest.getBuild(), "Revision initialised to '" + revision.getRevisionString() + "'"));
             }
             finally
             {
@@ -213,25 +215,25 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         }
     }
 
-    private void updateRevision(RecipeDispatchRequest dispatchRequest, Revision revision) throws BuildException
+    private void updateRevision(RecipeAssignmentRequest assignmentRequest, Revision revision) throws BuildException
     {
-        ProjectConfiguration projectConfig = dispatchRequest.getProject().getConfig();
+        ProjectConfiguration projectConfig = assignmentRequest.getProject().getConfig();
         TypeConfiguration type = projectConfig.getType();
         String pulseFile;
         try
         {
-            pulseFile = type.getPulseFile(dispatchRequest.getRequest().getId(), projectConfig, revision, null);
+            pulseFile = type.getPulseFile(assignmentRequest.getRequest().getId(), projectConfig, revision, null);
         }
         catch (Exception e)
         {
             throw new BuildException("Unable to retrieve pulse file: " + e.getMessage(), e);
         }
-        dispatchRequest.getRevision().update(revision, pulseFile);
+        assignmentRequest.getRevision().update(revision, pulseFile);
     }
 
-    public List<RecipeDispatchRequest> takeSnapshot()
+    public List<RecipeAssignmentRequest> takeSnapshot()
     {
-        return dispatchQueue.snapshot();
+        return requestQueue.snapshot();
     }
 
     public boolean cancelRequest(long id)
@@ -241,9 +243,9 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         try
         {
             lock.lock();
-            RecipeDispatchRequest removeRequest = null;
+            RecipeAssignmentRequest removeRequest = null;
 
-            for (RecipeDispatchRequest request : dispatchQueue)
+            for (RecipeAssignmentRequest request : requestQueue)
             {
                 if (request.getRequest().getId() == id)
                 {
@@ -254,7 +256,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
             if (removeRequest != null)
             {
-                dispatchQueue.remove(removeRequest);
+                requestQueue.remove(removeRequest);
                 removed = true;
             }
         }
@@ -282,7 +284,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
     private void resetTimeouts(Agent agent)
     {
-        for(RecipeDispatchRequest request: dispatchQueue)
+        for(RecipeAssignmentRequest request: requestQueue)
         {
             if(request.hasTimeout() && request.getHostRequirements().fulfilledBy(request, agent.getService()))
             {
@@ -293,7 +295,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
     void offline(Agent agent)
     {
-        List<RecipeDispatchRequest> removedRequests = null;
+        List<RecipeAssignmentRequest> removedRequests = null;
 
         lock.lock();
         try
@@ -325,7 +327,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     {
         assert(lock.isHeldByCurrentThread());
 
-        for (RecipeDispatchRequest request : dispatchQueue)
+        for (RecipeAssignmentRequest request : requestQueue)
         {
             if (!request.hasTimeout() && !requestMayBeFulfilled(request))
             {
@@ -334,12 +336,12 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         }
     }
 
-    private List<RecipeDispatchRequest> removeUnfulfillable()
+    private List<RecipeAssignmentRequest> removeUnfulfillable()
     {
         assert(lock.isHeldByCurrentThread());
 
-        List<RecipeDispatchRequest> unfulfillable = new LinkedList<RecipeDispatchRequest>();
-        for (RecipeDispatchRequest request : dispatchQueue)
+        List<RecipeAssignmentRequest> unfulfillable = new LinkedList<RecipeAssignmentRequest>();
+        for (RecipeAssignmentRequest request : requestQueue)
         {
             if (!requestMayBeFulfilled(request))
             {
@@ -347,11 +349,11 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
             }
         }
 
-        dispatchQueue.removeAll(unfulfillable);
+        requestQueue.removeAll(unfulfillable);
         return unfulfillable;
     }
 
-    private boolean requestMayBeFulfilled(RecipeDispatchRequest request)
+    private boolean requestMayBeFulfilled(RecipeAssignmentRequest request)
     {
         eventManager.publish(new RecipeStatusEvent(this, request.getRequest().getId(), "Checking recipe agent requirements..."));
         for (Agent a : agentManager.getOnlineAgents())
@@ -389,10 +391,10 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
                     break;
                 }
 
-                List<RecipeDispatchRequest> doneRequests = new LinkedList<RecipeDispatchRequest>();
+                List<RecipeAssignmentRequest> doneRequests = new LinkedList<RecipeAssignmentRequest>();
                 long currentTime = System.currentTimeMillis();
 
-                for (RecipeDispatchRequest request : dispatchQueue)
+                for (RecipeAssignmentRequest request : requestQueue)
                 {
                     if(request.hasTimedOut(currentTime))
                     {
@@ -417,7 +419,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
                     }
                 }
 
-                dispatchQueue.removeAll(doneRequests);
+                requestQueue.removeAll(doneRequests);
 
                 try
                 {
@@ -444,7 +446,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         isRunning = false;
     }
 
-    private boolean dispatchRequest(RecipeDispatchRequest request, Agent agent, List<RecipeDispatchRequest> dispatchedRequests)
+    private boolean dispatchRequest(RecipeAssignmentRequest request, Agent agent, List<RecipeAssignmentRequest> dispatchedRequests)
     {
         BuildRevision buildRevision = request.getRevision();
         RecipeRequest recipeRequest = request.getRequest();
@@ -458,7 +460,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         // This code cannot handle an agent rejecting the build
         // (the handling was backed outdue to CIB-553 and the fact that
         // agents do not currently reject builds)
-        eventManager.publish(new RecipeDispatchedEvent(this, recipeRequest, agent));
+        eventManager.publish(new RecipeAssignedEvent(this, recipeRequest, agent));
         dispatchedRequests.add(request);
 
         ExecutionContext context = recipeRequest.getContext();
@@ -466,7 +468,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
         context.addString(NAMESPACE_INTERNAL, PROPERTY_CLEAN_BUILD, Boolean.toString(request.getProject().isForceCleanForAgent(agent.getId())));
 
-        dispatchedQueue.offer(new DispatchedRequest(recipeRequest, agent));
+        recipeDispatchService.dispatch(new RecipeAssignedEvent(this, recipeRequest, agent));
 
         return true;
     }
@@ -506,7 +508,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         lock.lock();
         try
         {
-            return dispatchQueue.size();
+            return requestQueue.size();
         }
         finally
         {
@@ -572,14 +574,14 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
     private void handleScmChange(ScmChangeEvent event)
     {
-        List<RecipeDispatchRequest> rejects = null;
+        List<RecipeAssignmentRequest> rejects = null;
         lock.lock();
         try
         {
-            List<RecipeDispatchRequest> unfulfillable = checkQueueForChanges(event.getSource(), event, dispatchQueue);
+            List<RecipeAssignmentRequest> unfulfillable = checkQueueForChanges(event.getSource(), event, requestQueue);
             if(unsatisfiableTimeout == 0)
             {
-                dispatchQueue.removeAll(unfulfillable);
+                requestQueue.removeAll(unfulfillable);
                 rejects = unfulfillable;
             }
             else if(unsatisfiableTimeout > 0)
@@ -599,9 +601,9 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         }
     }
 
-    private void updateTimeouts(List<RecipeDispatchRequest> requests, long timeout)
+    private void updateTimeouts(List<RecipeAssignmentRequest> requests, long timeout)
     {
-        for(RecipeDispatchRequest request: requests)
+        for(RecipeAssignmentRequest request: requests)
         {
             if(!request.hasTimeout())
             {
@@ -610,19 +612,19 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         }
     }
 
-    private void publishUnfulfillable(List<RecipeDispatchRequest> unfulfillable)
+    private void publishUnfulfillable(List<RecipeAssignmentRequest> unfulfillable)
     {
-        for (RecipeDispatchRequest request : unfulfillable)
+        for (RecipeAssignmentRequest request : unfulfillable)
         {
             eventManager.publish(new RecipeErrorEvent(this, request.getRequest().getId(), "No online agent is capable of executing the build stage"));
         }
     }
 
-    private List<RecipeDispatchRequest> checkQueueForChanges(ProjectConfiguration changedProject, ScmChangeEvent event, DispatchQueue requests)
+    private List<RecipeAssignmentRequest> checkQueueForChanges(ProjectConfiguration changedProject, ScmChangeEvent event, RequestQueue requests)
     {
-        List<RecipeDispatchRequest> unfulfillable = new LinkedList<RecipeDispatchRequest>();
+        List<RecipeAssignmentRequest> unfulfillable = new LinkedList<RecipeAssignmentRequest>();
 
-        for (RecipeDispatchRequest request : requests)
+        for (RecipeAssignmentRequest request : requests)
         {
             ProjectConfiguration requestProject = request.getProject().getConfig();
             if (!request.getRevision().isFixed() && requestProject.getProjectId() == changedProject.getProjectId())
@@ -689,6 +691,11 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         this.sleepInterval = sleepInterval;
     }
 
+    public void setRecipeDispatchService(RecipeDispatchService recipeDispatchService)
+    {
+        this.recipeDispatchService = recipeDispatchService;
+    }
+
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
@@ -704,6 +711,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     {
         this.scmClientFactory = scmClientFactory;
     }
+
     public void setThreadFactory(ThreadFactory threadFactory)
     {
         this.threadFactory = threadFactory;
@@ -721,35 +729,6 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         }
     }
 
-    private class Dispatcher implements Runnable
-    {
-        public void run()
-        {
-            while(!stopRequested)
-            {
-                DispatchedRequest dispatchedRequest;
-                try
-                {
-                    dispatchedRequest = dispatchedQueue.take();
-                }
-                catch (InterruptedException e)
-                {
-                    continue;
-                }
-
-                try
-                {
-                    dispatchedRequest.agent.getService().build(dispatchedRequest.recipeRequest);
-                }
-                catch (Exception e)
-                {
-                    LOG.warning("Unable to dispatch recipe: " + e.getMessage(), e);
-                    eventManager.publish(new RecipeErrorEvent(this, dispatchedRequest.recipeRequest.getId(), "Unable to dispatch recipe: " + e.getMessage()));
-                }
-            }
-        }
-    }
-
     /**
      * Allow easy / safe access to a snapshot of the list of recipe dispatch requests.  Changes
      * to the list itself are synchronized so that the snapshot is not taken in the middle of a
@@ -758,36 +737,36 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
      *
      * See CIB-1401.
      */
-    private class DispatchQueue implements Iterable<RecipeDispatchRequest>
+    private class RequestQueue implements Iterable<RecipeAssignmentRequest>
     {
-        private final List<RecipeDispatchRequest> list = new LinkedList<RecipeDispatchRequest>();
+        private final List<RecipeAssignmentRequest> list = new LinkedList<RecipeAssignmentRequest>();
 
-        public synchronized void add(RecipeDispatchRequest item)
+        public synchronized void add(RecipeAssignmentRequest item)
         {
             list.add(item);
         }
 
-        public synchronized void remove(RecipeDispatchRequest item)
+        public synchronized void remove(RecipeAssignmentRequest item)
         {
             list.remove(item);
         }
 
-        public synchronized void addAll(Collection<RecipeDispatchRequest> items)
+        public synchronized void addAll(Collection<RecipeAssignmentRequest> items)
         {
             list.addAll(items);
         }
 
-        public synchronized void removeAll(Collection<RecipeDispatchRequest> items)
+        public synchronized void removeAll(Collection<RecipeAssignmentRequest> items)
         {
             list.removeAll(items);
         }
 
-        public synchronized List<RecipeDispatchRequest> snapshot()
+        public synchronized List<RecipeAssignmentRequest> snapshot()
         {
-            return new LinkedList<RecipeDispatchRequest>(list);
+            return new LinkedList<RecipeAssignmentRequest>(list);
         }
 
-        public Iterator<RecipeDispatchRequest> iterator()
+        public Iterator<RecipeAssignmentRequest> iterator()
         {
             return list.iterator();
         }
@@ -797,5 +776,4 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
             return list.size();
         }
     }
-
 }

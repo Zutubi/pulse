@@ -6,9 +6,9 @@ import java.util.List;
  */
 public interface RecipeQueue
 {
-    void enqueue(RecipeDispatchRequest request);
+    void enqueue(RecipeAssignmentRequest request);
 
-    List<RecipeDispatchRequest> takeSnapshot();
+    List<RecipeAssignmentRequest> takeSnapshot();
 
     /**
      * Attempts to cancel the request for the given recipe.

@@ -31,7 +31,7 @@ public class RecipeController
     private BuildResult buildResult;
     private RecipeResultNode recipeResultNode;
     private RecipeResult recipeResult;
-    private RecipeDispatchRequest dispatchRequest;
+    private RecipeAssignmentRequest assignmentRequest;
     private ExecutionContext recipeContext;
     private RecipeResultNode previousSuccessful;
     private RecipeLogger logger;
@@ -47,12 +47,12 @@ public class RecipeController
     private ResourceManager resourceManager;
     private BuildHookManager buildHookManager;
 
-    public RecipeController(BuildResult buildResult, RecipeResultNode recipeResultNode, RecipeDispatchRequest dispatchRequest, ExecutionContext recipeContext, RecipeResultNode previousSuccessful, RecipeLogger logger, RecipeResultCollector collector, MasterConfigurationManager configurationManager, ResourceManager resourceManager)
+    public RecipeController(BuildResult buildResult, RecipeResultNode recipeResultNode, RecipeAssignmentRequest assignmentRequest, ExecutionContext recipeContext, RecipeResultNode previousSuccessful, RecipeLogger logger, RecipeResultCollector collector, MasterConfigurationManager configurationManager, ResourceManager resourceManager)
     {
         this.buildResult = buildResult;
         this.recipeResultNode = recipeResultNode;
         this.recipeResult = recipeResultNode.getResult();
-        this.dispatchRequest = dispatchRequest;
+        this.assignmentRequest = assignmentRequest;
         this.recipeContext = recipeContext;
         this.previousSuccessful = previousSuccessful;
         this.logger = logger;
@@ -74,8 +74,8 @@ public class RecipeController
         {
             // allow for just in time setting of the bootstrapper since this can not be configured during
             // the build initialisation.
-            dispatchRequest.getRequest().setBootstrapper(bootstrapper);
-            queue.enqueue(dispatchRequest);
+            assignmentRequest.getRequest().setBootstrapper(bootstrapper);
+            queue.enqueue(assignmentRequest);
         }
         catch (BuildException e)
         {
@@ -97,9 +97,9 @@ public class RecipeController
 
         try
         {
-            if (event instanceof RecipeDispatchedEvent)
+            if (event instanceof RecipeAssignedEvent)
             {
-                handleRecipeDispatch((RecipeDispatchedEvent) event);
+                handleRecipeDispatch((RecipeAssignedEvent) event);
             }
             else if (event instanceof RecipeCommencedEvent)
             {
@@ -142,7 +142,7 @@ public class RecipeController
         return true;
     }
 
-    private void handleRecipeDispatch(RecipeDispatchedEvent event)
+    private void handleRecipeDispatch(RecipeAssignedEvent event)
     {
         logger.log(event);
         Agent agent = event.getAgent();
@@ -153,7 +153,7 @@ public class RecipeController
         ResourceRepository resourceRepository = resourceManager.getAgentRepository(agent);
         if (resourceRepository != null)
         {
-            BuildProperties.addResourceProperties(recipeContext, dispatchRequest.getResourceRequirements(), resourceRepository);
+            BuildProperties.addResourceProperties(recipeContext, assignmentRequest.getResourceRequirements(), resourceRepository);
         }
     }
 
@@ -376,9 +376,9 @@ public class RecipeController
 
     }
 
-    public RecipeDispatchRequest getDispatchRequest()
+    public RecipeAssignmentRequest getDispatchRequest()
     {
-        return dispatchRequest;
+        return assignmentRequest;
     }
 
     public RecipeResult getResult()

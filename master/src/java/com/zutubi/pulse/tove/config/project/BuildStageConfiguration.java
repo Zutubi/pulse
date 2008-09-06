@@ -2,7 +2,7 @@ package com.zutubi.pulse.tove.config.project;
 
 import com.zutubi.config.annotations.*;
 import com.zutubi.pulse.AgentService;
-import com.zutubi.pulse.RecipeDispatchRequest;
+import com.zutubi.pulse.RecipeAssignmentRequest;
 import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.model.ResourceRequirement;
@@ -109,7 +109,7 @@ public class BuildStageConfiguration extends AbstractNamedConfiguration
             LOG.severe(e);
             return new AgentRequirements()
             {
-                public boolean fulfilledBy(RecipeDispatchRequest request, AgentService service)
+                public boolean fulfilledBy(RecipeAssignmentRequest request, AgentService service)
                 {
                     return false;
                 }

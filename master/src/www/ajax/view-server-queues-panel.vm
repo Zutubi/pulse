@@ -100,16 +100,16 @@
             #contentHeading("queue.when" 1)
         </tr>
 #if($recipeQueueSnapshot.size() > 0)
-    #foreach($dispatchRequest in $recipeQueueSnapshot)
-        #set($build = $dispatchRequest.build)
+    #foreach($assignmentRequest in $recipeQueueSnapshot)
+        #set($build = $assignmentRequest.build)
         #set($project = $build.project)
         <tr>
             #ownerCell($build "content")
             #rightCell($build.number)
             #dynamicLinkCell($project.name "$urls.projectHome($project)")
-            #dynamicCell($dispatchRequest.request.recipeNameSafe)
-            #dynamicCell($dispatchRequest.hostRequirements.summary)
-            #contentCell($dispatchRequest.prettyQueueTime)
+            #dynamicCell($assignmentRequest.request.recipeNameSafe)
+            #dynamicCell($assignmentRequest.hostRequirements.summary)
+            #contentCell($assignmentRequest.prettyQueueTime)
         </tr>
     #end
 #else

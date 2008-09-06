@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web.server;
 
 import com.zutubi.pulse.FatController;
-import com.zutubi.pulse.RecipeDispatchRequest;
+import com.zutubi.pulse.RecipeAssignmentRequest;
 import com.zutubi.pulse.RecipeQueue;
 import com.zutubi.pulse.events.build.AbstractBuildRequestEvent;
 import com.zutubi.pulse.model.BuildManager;
@@ -19,7 +19,7 @@ public class ViewServerQueuesAction extends ActionSupport
 {
     private List<AbstractBuildRequestEvent> buildQueue;
     private List<BuildResult> executingBuilds;
-    private List<RecipeDispatchRequest> recipeQueueSnapshot;
+    private List<RecipeAssignmentRequest> recipeQueueSnapshot;
     private FatController fatController;
     private RecipeQueue recipeQueue;
     private BuildManager buildManager;
@@ -39,7 +39,7 @@ public class ViewServerQueuesAction extends ActionSupport
         return recipeQueue.isRunning();
     }
 
-    public List<RecipeDispatchRequest> getRecipeQueueSnapshot()
+    public List<RecipeAssignmentRequest> getRecipeQueueSnapshot()
     {
         return recipeQueueSnapshot;
     }

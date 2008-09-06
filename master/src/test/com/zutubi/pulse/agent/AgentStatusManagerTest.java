@@ -985,7 +985,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
     {
         ExecutionContext context = new ExecutionContext();
         context.add(BuildProperties.NAMESPACE_INTERNAL, new Property(BuildProperties.PROPERTY_RECIPE_ID, Long.toString(recipeId)));
-        eventManager.publish(new RecipeDispatchedEvent(this, new RecipeRequest(context), agent));
+        eventManager.publish(new RecipeAssignedEvent(this, new RecipeRequest(context), agent));
     }
 
     private void sendRecipeCollecting(int recipeId)

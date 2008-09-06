@@ -1,7 +1,7 @@
 package com.zutubi.pulse.tove.config.project;
 
 import com.zutubi.pulse.AgentService;
-import com.zutubi.pulse.RecipeDispatchRequest;
+import com.zutubi.pulse.RecipeAssignmentRequest;
 
 /**
  * An interface for determining if an agent satisfies the requirements to
@@ -10,5 +10,5 @@ import com.zutubi.pulse.RecipeDispatchRequest;
  */
 public interface AgentRequirements
 {
-    public boolean fulfilledBy(RecipeDispatchRequest request, AgentService service);
+    public boolean fulfilledBy(RecipeAssignmentRequest request, AgentService service);
 }

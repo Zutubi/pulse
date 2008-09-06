@@ -43,7 +43,7 @@ public class RecipeControllerTest extends PulseTestCase
 
     private RecipeResult rootResult;
     private RecipeResultNode rootNode;
-    private RecipeDispatchRequest dispatchRequest;
+    private RecipeAssignmentRequest assignmentRequest;
     private RecipeController recipeController;
 
     protected void setUp() throws Exception
@@ -71,7 +71,7 @@ public class RecipeControllerTest extends PulseTestCase
         Project project = new Project();
         project.setConfig(new ProjectConfiguration());
         BuildResult build = new BuildResult(new ManualTriggerBuildReason("user"), project, 1, false);
-        dispatchRequest = new RecipeDispatchRequest(project, new AnyCapableAgentRequirements(), null, new BuildRevision(), recipeRequest, null);
+        assignmentRequest = new RecipeAssignmentRequest(project, new AnyCapableAgentRequirements(), null, new BuildRevision(), recipeRequest, null);
         MasterConfigurationManager configurationManager = new SimpleMasterConfigurationManager()
         {
             public File getDataDirectory()
@@ -84,7 +84,7 @@ public class RecipeControllerTest extends PulseTestCase
                 return new Data(getDataDirectory());
             }
         };
-        recipeController = new RecipeController(build, rootNode, dispatchRequest, new ExecutionContext(), null, logger, resultCollector, configurationManager, new DefaultResourceManager());
+        recipeController = new RecipeController(build, rootNode, assignmentRequest, new ExecutionContext(), null, logger, resultCollector, configurationManager, new DefaultResourceManager());
         recipeController.setRecipeQueue(recipeQueue);
         recipeController.setBuildManager(buildManager);
         recipeController.setEventManager(new DefaultEventManager());
@@ -107,9 +107,9 @@ public class RecipeControllerTest extends PulseTestCase
         Bootstrapper bootstrapper = new CheckoutBootstrapper("project", null, new BuildRevision(), false);
         recipeController.initialise(bootstrapper);
         assertTrue(recipeQueue.hasDispatched(rootResult.getId()));
-        RecipeDispatchRequest dispatched = recipeQueue.getRequest(rootResult.getId());
-        assertSame(dispatchRequest, dispatched);
-        assertSame(dispatchRequest.getRequest().getBootstrapper(), bootstrapper);
+        RecipeAssignmentRequest dispatched = recipeQueue.getRequest(rootResult.getId());
+        assertSame(assignmentRequest, dispatched);
+        assertSame(assignmentRequest.getRequest().getBootstrapper(), bootstrapper);
     }
 
     public void testDispatchedEvent()
@@ -119,7 +119,7 @@ public class RecipeControllerTest extends PulseTestCase
 
         // After dispatching, the controller should handle a dispatched event
         // by recording the build service on the result node.
-        RecipeDispatchedEvent event = new RecipeDispatchedEvent(this, new RecipeRequest(makeContext("project", rootResult.getId(), "test")), new MockAgent(buildService));
+        RecipeAssignedEvent event = new RecipeAssignedEvent(this, new RecipeRequest(makeContext("project", rootResult.getId(), "test")), new MockAgent(buildService));
         assertTrue(recipeController.handleRecipeEvent(event));
         assertEquals(buildService.getHostName(), rootNode.getHost());
 
@@ -335,14 +335,14 @@ public class RecipeControllerTest extends PulseTestCase
 
     class MockRecipeQueue implements RecipeQueue
     {
-        private Map<Long, RecipeDispatchRequest> dispatched = new TreeMap<Long, RecipeDispatchRequest>();
+        private Map<Long, RecipeAssignmentRequest> dispatched = new TreeMap<Long, RecipeAssignmentRequest>();
 
-        public void enqueue(RecipeDispatchRequest request)
+        public void enqueue(RecipeAssignmentRequest request)
         {
             dispatched.put(request.getRequest().getId(), request);
         }
 
-        public List<RecipeDispatchRequest> takeSnapshot()
+        public List<RecipeAssignmentRequest> takeSnapshot()
         {
             throw new RuntimeException("Method not implemented.");
         }
@@ -372,7 +372,7 @@ public class RecipeControllerTest extends PulseTestCase
             return dispatched.containsKey(recipeId);
         }
 
-        public RecipeDispatchRequest getRequest(long recipeId)
+        public RecipeAssignmentRequest getRequest(long recipeId)
         {
             return dispatched.get(recipeId);
         }
@@ -598,7 +598,7 @@ public class RecipeControllerTest extends PulseTestCase
 
     public class MockRecipeLogger implements RecipeLogger
     {
-        public void log(RecipeDispatchedEvent event)
+        public void log(RecipeAssignedEvent event)
         {
         }
 

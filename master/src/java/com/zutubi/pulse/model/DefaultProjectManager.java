@@ -20,7 +20,7 @@ import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.BuildRequestEvent;
 import com.zutubi.pulse.events.build.PersonalBuildRequestEvent;
-import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
+import com.zutubi.pulse.events.build.RecipeAssignedEvent;
 import com.zutubi.pulse.events.system.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.pulse.license.LicenseManager;
@@ -644,9 +644,9 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
     public void handleEvent(Event evt)
     {
-        if (evt instanceof RecipeDispatchedEvent)
+        if (evt instanceof RecipeAssignedEvent)
         {
-            RecipeDispatchedEvent rde = (RecipeDispatchedEvent) evt;
+            RecipeAssignedEvent rde = (RecipeAssignedEvent) evt;
             RecipeRequest request = rde.getRequest();
             ProjectConfiguration projectConfig = nameToConfig.get(request.getProject());
             if(projectConfig != null)
@@ -674,7 +674,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
     public Class[] getHandledEvents()
     {
-        return new Class[] { RecipeDispatchedEvent.class, ConfigurationEventSystemStartedEvent.class, ConfigurationSystemStartedEvent.class };
+        return new Class[] { RecipeAssignedEvent.class, ConfigurationEventSystemStartedEvent.class, ConfigurationSystemStartedEvent.class };
     }
 
     public void setLicenseManager(LicenseManager licenseManager)

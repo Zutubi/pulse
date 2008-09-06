@@ -27,7 +27,7 @@ public class DefaultRecipeLogger extends AbstractOutputLogger implements RecipeL
         openWriter();
     }
 
-    public void log(RecipeDispatchedEvent event)
+    public void log(RecipeAssignedEvent event)
     {
         logMarker("Recipe dispatched to agent " + event.getAgent().getConfig().getName());
     }

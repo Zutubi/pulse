@@ -4,21 +4,20 @@ import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.core.RecipeRequest;
 
 /**
- * Raised when a recipe has been dispatched to a build host.
+ * Raised when a recipe has been assigned to an agent.
  */
-public class RecipeDispatchedEvent extends RecipeEvent
+public class RecipeAssignedEvent extends RecipeEvent
 {
     /**
-     * The request that was dispatched.
+     * The request that has been assigned.
      */
     RecipeRequest request;
     /**
-     * The agent the recipe was dispatched to.
+     * The agent the recipe was assigned to.
      */
     private Agent agent;
 
-
-    public RecipeDispatchedEvent(Object source, RecipeRequest request, Agent agent)
+    public RecipeAssignedEvent(Object source, RecipeRequest request, Agent agent)
     {
         super(source, request.getId());
         this.request = request;
@@ -37,7 +36,7 @@ public class RecipeDispatchedEvent extends RecipeEvent
 
     public String toString()
     {
-        StringBuffer buff = new StringBuffer("Recipe Dispatched Event");
+        StringBuffer buff = new StringBuffer("Recipe Assigned Event");
         buff.append(": ").append(getRecipeId());
         if (getAgent() != null)
         {

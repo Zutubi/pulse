@@ -1,7 +1,7 @@
 package com.zutubi.pulse.tove.config.project;
 
 import com.zutubi.pulse.AgentService;
-import com.zutubi.pulse.RecipeDispatchRequest;
+import com.zutubi.pulse.RecipeAssignmentRequest;
 import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.PulseFileLoader;
 import com.zutubi.pulse.core.PulseFileLoaderFactory;
@@ -24,7 +24,7 @@ public class AnyCapableAgentRequirements implements AgentRequirements
     {
     }
 
-    public boolean fulfilledBy(RecipeDispatchRequest request, AgentService service)
+    public boolean fulfilledBy(RecipeAssignmentRequest request, AgentService service)
     {
         List<ResourceRequirement> requirements = request.getResourceRequirements();
         for(ResourceRequirement requirement: requirements)

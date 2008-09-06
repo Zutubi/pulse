@@ -17,18 +17,15 @@ import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.events.*;
-import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
+import com.zutubi.pulse.events.build.RecipeAssignedEvent;
 import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.events.system.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.pulse.logging.CustomLogRecord;
-import com.zutubi.pulse.model.AgentState;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.UnknownBuildReason;
-import com.zutubi.pulse.model.ResourceRequirement;
+import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.scm.ScmChangeEvent;
+import com.zutubi.pulse.security.PulseThreadFactory;
 import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.services.UpgradeStatus;
 import com.zutubi.pulse.tove.config.admin.GlobalConfiguration;
@@ -62,7 +59,8 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
     private Agent slave1000;
     private List<RecipeErrorEvent> recipeErrors;
     private DefaultEventManager eventManager;
-    private RecipeDispatchedEvent dispatchedEvent;
+    private RecipeAssignedEvent assignedEvent;
+    private RecipeDispatchService recipeDispatchService;
 
     public ThreadedRecipeQueueTest(String testName)
     {
@@ -76,16 +74,21 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
     {
         super.setUp();
 
-        // add setup code here.
         eventManager = new DefaultEventManager();
         eventManager.register(this);
 
+        recipeDispatchService = new RecipeDispatchService();
+        recipeDispatchService.setEventManager(eventManager);
+        recipeDispatchService.setThreadFactory(new PulseThreadFactory());
+        recipeDispatchService.init();
+        
         agentManager = new MockAgentManager();
 
         MockConfigurationProvider configurationProvider = new MockConfigurationProvider();
         configurationProvider.insert("test", new GlobalConfiguration());
 
         queue = new ThreadedRecipeQueue();
+        queue.setRecipeDispatchService(recipeDispatchService);
         queue.setEventManager(eventManager);
         queue.setAgentManager(agentManager);
         queue.setUnsatisfiableTimeout(-1);
@@ -110,7 +113,6 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
 
     public void tearDown() throws Exception
     {
-        // add tear down code here.
         eventManager.unregister(this);
         slave1000 = null;
         agentManager = null;
@@ -120,6 +122,8 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         dispatchedSemaphore = null;
         queue = null;
         recipeErrors = null;
+        recipeDispatchService.stop(true);
+        recipeDispatchService = null;
         super.tearDown();
     }
 
@@ -267,12 +271,12 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
 
     public void testSnapshot()
     {
-        RecipeDispatchRequest request1 = createDispatchRequest(0);
-        RecipeDispatchRequest request2 = createDispatchRequest(0);
+        RecipeAssignmentRequest request1 = createDispatchRequest(0);
+        RecipeAssignmentRequest request2 = createDispatchRequest(0);
         queue.enqueue(request1);
         queue.enqueue(request2);
 
-        List<RecipeDispatchRequest> snapshot = queue.takeSnapshot();
+        List<RecipeAssignmentRequest> snapshot = queue.takeSnapshot();
         assertEquals(2, snapshot.size());
         assertEquals(request1, snapshot.get(0));
         assertEquals(request2, snapshot.get(1));
@@ -280,8 +284,8 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
 
     public void testSnapshotAfterDispatch() throws Exception
     {
-        RecipeDispatchRequest request1 = createDispatchRequest(0);
-        RecipeDispatchRequest request2 = createDispatchRequest(1);
+        RecipeAssignmentRequest request1 = createDispatchRequest(0);
+        RecipeAssignmentRequest request2 = createDispatchRequest(1);
         queue.enqueue(request1);
         queue.enqueue(request2);
 
@@ -290,21 +294,21 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
 
         Thread.sleep(500);
 
-        List<RecipeDispatchRequest> snapshot = queue.takeSnapshot();
+        List<RecipeAssignmentRequest> snapshot = queue.takeSnapshot();
         assertEquals(1, snapshot.size());
         assertEquals(request2, snapshot.get(0));
     }
 
     public void testCancel() throws Exception
     {
-        RecipeDispatchRequest request = createDispatchRequest(0, 1);
+        RecipeAssignmentRequest request = createDispatchRequest(0, 1);
         queue.enqueue(request);
         assertTrue(queue.cancelRequest(1));
     }
 
     public void testCancelAfterDelay() throws Exception
     {
-        RecipeDispatchRequest request = createDispatchRequest(0, 1);
+        RecipeAssignmentRequest request = createDispatchRequest(0, 1);
         queue.enqueue(request);
         Thread.sleep(1000);
         assertTrue(queue.cancelRequest(1));
@@ -312,7 +316,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
 
     public void testCancelNoSuchId() throws Exception
     {
-        RecipeDispatchRequest request = createDispatchRequest(0, 1);
+        RecipeAssignmentRequest request = createDispatchRequest(0, 1);
         queue.enqueue(request);
         assertFalse(queue.cancelRequest(2));
     }
@@ -381,7 +385,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
 
     public void testFixedRevision() throws Exception
     {
-        RecipeDispatchRequest request = createDispatchRequest(0);
+        RecipeAssignmentRequest request = createDispatchRequest(0);
         request.getRevision().update(createRevision(88), getPulseFileForRevision(88));
         request.getRevision().apply(request.getRequest());
 
@@ -389,7 +393,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         queue.enqueue(request);
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
         assertTrue(dispatchedSemaphore.tryAcquire(30, TimeUnit.SECONDS));
-        assertEquals(dispatchedEvent.getRequest().getPulseFileSource(), getPulseFileForRevision(88));
+        assertEquals(assignedEvent.getRequest().getPulseFileSource(), getPulseFileForRevision(88));
     }
 
     public void testChangeWhileQueued() throws Exception
@@ -406,8 +410,8 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         sendAvailable(agent);
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
         assertTrue(dispatchedSemaphore.tryAcquire(30, TimeUnit.SECONDS));
-        assertEquals(1001, dispatchedEvent.getRequest().getId());
-        assertEquals(getPulseFileForRevision(98), dispatchedEvent.getRequest().getPulseFileSource());
+        assertEquals(1001, assignedEvent.getRequest().getId());
+        assertEquals(getPulseFileForRevision(98), assignedEvent.getRequest().getPulseFileSource());
     }
 
     public void testChangeOtherScmWhileQueued() throws Exception
@@ -424,8 +428,8 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         sendAvailable(agent);
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
         assertTrue(dispatchedSemaphore.tryAcquire(30, TimeUnit.SECONDS));
-        assertEquals(1001, dispatchedEvent.getRecipeId());
-        assertEquals(getPulseFileForRevision(1), dispatchedEvent.getRequest().getPulseFileSource());
+        assertEquals(1001, assignedEvent.getRecipeId());
+        assertEquals(getPulseFileForRevision(1), assignedEvent.getRequest().getPulseFileSource());
     }
 
     private ProjectConfiguration createProjectConfig()
@@ -465,7 +469,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
         assertTrue(dispatchedSemaphore.tryAcquire(30, TimeUnit.SECONDS));
 
-        RecipeDispatchRequest request = createDispatchRequest(0, 1001);
+        RecipeAssignmentRequest request = createDispatchRequest(0, 1001);
         request.getRevision().update(createRevision(5), getPulseFileForRevision(5));
         request.getRevision().apply(request.getRequest());
         queue.enqueue(request);
@@ -474,8 +478,8 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         sendAvailable(agent);
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
         assertTrue(dispatchedSemaphore.tryAcquire(30, TimeUnit.SECONDS));
-        assertEquals(1001, dispatchedEvent.getRecipeId());
-        assertEquals(getPulseFileForRevision(5), dispatchedEvent.getRequest().getPulseFileSource());
+        assertEquals(1001, assignedEvent.getRecipeId());
+        assertEquals(getPulseFileForRevision(5), assignedEvent.getRequest().getPulseFileSource());
     }
 
     public void testChangeMakesUnfulfillable() throws Exception
@@ -509,8 +513,8 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         sendAvailable(agent);
         assertTrue(semaphore.tryAcquire(30, TimeUnit.SECONDS));
         assertTrue(dispatchedSemaphore.tryAcquire(30, TimeUnit.SECONDS));
-        assertEquals(1001, dispatchedEvent.getRecipeId());
-        assertEquals(getPulseFileForRevision(1), dispatchedEvent.getRequest().getPulseFileSource());
+        assertEquals(1001, assignedEvent.getRecipeId());
+        assertEquals(getPulseFileForRevision(1), assignedEvent.getRequest().getPulseFileSource());
     }
 
     public void testOfflineRemovedFromAvailable() throws InterruptedException
@@ -656,12 +660,12 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         return agent;
     }
 
-    private RecipeDispatchRequest createDispatchRequest(int type, long id)
+    private RecipeAssignmentRequest createDispatchRequest(int type, long id)
     {
         return createDispatchRequest(type, id, createProjectConfig());
     }
 
-    private RecipeDispatchRequest createDispatchRequest(int type, long id, ProjectConfiguration projectConfig)
+    private RecipeAssignmentRequest createDispatchRequest(int type, long id, ProjectConfiguration projectConfig)
     {
         Project project = new Project();
         project.setConfig(projectConfig);
@@ -672,10 +676,10 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         context.addString(NAMESPACE_INTERNAL, PROPERTY_RECIPE_ID, Long.toString(id));
         RecipeRequest request = new RecipeRequest(context);
         request.setBootstrapper(new ChainBootstrapper());
-        return new RecipeDispatchRequest(project, requirements, null, new BuildRevision(), request, result);
+        return new RecipeAssignmentRequest(project, requirements, null, new BuildRevision(), request, result);
     }
 
-    private RecipeDispatchRequest createDispatchRequest(int type)
+    private RecipeAssignmentRequest createDispatchRequest(int type)
     {
         return createDispatchRequest(type, -1);
     }
@@ -689,15 +693,15 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
         }
         else
         {
-            dispatchedEvent = (RecipeDispatchedEvent)evt;
-            agentManager.unavailable(dispatchedEvent.getAgent());
+            assignedEvent = (RecipeAssignedEvent)evt;
+            agentManager.unavailable(assignedEvent.getAgent());
             dispatchedSemaphore.release();
         }
     }
 
     public Class[] getHandledEvents()
     {
-        return new Class[]{RecipeErrorEvent.class, RecipeDispatchedEvent.class};
+        return new Class[]{RecipeErrorEvent.class, RecipeAssignedEvent.class};
     }
 
     class MockScm extends ScmConfiguration
@@ -941,7 +945,7 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             return new MockAgentRequirements(type);
         }
 
-        public boolean fulfilledBy(RecipeDispatchRequest request, AgentService service)
+        public boolean fulfilledBy(RecipeAssignmentRequest request, AgentService service)
         {
             return (((MockAgentService) service).getType() == type) &&
                     Long.valueOf(request.getRevision().getRevision().getRevisionString()) >= 0;

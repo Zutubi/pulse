@@ -11,7 +11,7 @@ public interface RecipeLogger extends HookLogger
 {
     void prepare();
 
-    void log(RecipeDispatchedEvent event);
+    void log(RecipeAssignedEvent event);
     void log(RecipeCommencedEvent event, RecipeResult result);
     void log(CommandCommencedEvent event, CommandResult result);
     void log(CommandCompletedEvent event, CommandResult result);

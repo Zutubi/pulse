@@ -277,7 +277,7 @@ public class AgentStatusManager implements EventListener
         }
     }
 
-    private void handleRecipeStarted(RecipeDispatchedEvent event)
+    private void handleRecipeStarted(RecipeAssignedEvent event)
     {
         Agent agent = agentsById.get(event.getAgent().getId());
         if(agent != null)
@@ -484,9 +484,9 @@ public class AgentStatusManager implements EventListener
                 AgentPingEvent ape = (AgentPingEvent) event;
                 handlePing(ape.getAgent(), ape.getPingStatus());
             }
-            else if(event instanceof RecipeDispatchedEvent)
+            else if(event instanceof RecipeAssignedEvent)
             {
-                handleRecipeStarted((RecipeDispatchedEvent) event);
+                handleRecipeStarted((RecipeAssignedEvent) event);
             }
             else if(event instanceof RecipeCollectingEvent)
             {
@@ -543,7 +543,7 @@ public class AgentStatusManager implements EventListener
                 RecipeCollectedEvent.class,
                 RecipeCollectingEvent.class,
                 RecipeCompletedEvent.class,
-                RecipeDispatchedEvent.class,
+                RecipeAssignedEvent.class,
         };
     }
 }
