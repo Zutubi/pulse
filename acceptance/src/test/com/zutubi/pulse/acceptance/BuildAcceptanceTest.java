@@ -27,7 +27,7 @@ import java.util.Vector;
 @Test(dependsOnGroups = {"init.*"})
 public class BuildAcceptanceTest extends SeleniumTestBase
 {
-    private static final String PROJECT_NAME = "BuildAcceptanceTest-Project";
+    private static final String LOCATOR_ENV_ARTIFACT = "link=env.txt";
 
     @BeforeMethod
     protected void setUp() throws Exception
@@ -87,15 +87,18 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
     public void testDetailedView() throws Exception
     {
-        loginAsAdmin();
-        ensureBuild();
+        addProject(random, true);
 
-        BuildDetailedViewPage detailedViewPage = new BuildDetailedViewPage(selenium, urls, PROJECT_NAME, 1);
+        loginAsAdmin();
+        triggerSuccessfulBuild(random, AgentManager.MASTER_AGENT_NAME);
+
+        BuildDetailedViewPage detailedViewPage = new BuildDetailedViewPage(selenium, urls, random, 1);
         detailedViewPage.goTo();
-        SeleniumUtils.assertNotVisible(selenium, "link=env.txt");
+        SeleniumUtils.waitForLocator(selenium, LOCATOR_ENV_ARTIFACT);
+        SeleniumUtils.assertNotVisible(selenium, LOCATOR_ENV_ARTIFACT);
         detailedViewPage.clickCommand("default", "build");
-        SeleniumUtils.assertVisible(selenium, "link=env.txt");
-        selenium.click("link=env.txt");
+        SeleniumUtils.assertVisible(selenium, LOCATOR_ENV_ARTIFACT);
+        selenium.click(LOCATOR_ENV_ARTIFACT);
         selenium.waitForPageToLoad("10000");
         assertTextPresent("Process Environment");
 
@@ -217,13 +220,15 @@ public class BuildAcceptanceTest extends SeleniumTestBase
 
     public void testBuildLogAvailable() throws Exception
     {
-        loginAsAdmin();
-        ensureBuild();
+        addProject(random, true);
 
-        BuildDetailedViewPage detailedViewPage = new BuildDetailedViewPage(selenium, urls, PROJECT_NAME, 1);
+        loginAsAdmin();
+        triggerSuccessfulBuild(random, AgentManager.MASTER_AGENT_NAME);
+
+        BuildDetailedViewPage detailedViewPage = new BuildDetailedViewPage(selenium, urls, random, 1);
         detailedViewPage.goTo();
 
-        String logLinkId = "log-" + PROJECT_NAME + "-1";
+        String logLinkId = "log-" + random + "-1";
 
         SeleniumUtils.assertLinkPresent(selenium, logLinkId);
 
@@ -249,7 +254,7 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         BuildDetailedViewPage detailedViewPage = new BuildDetailedViewPage(selenium, urls, projectName, buildId);
         detailedViewPage.goTo();
         detailedViewPage.clickCommand("default", "build");
-        selenium.click("link=env.txt");
+        selenium.click(LOCATOR_ENV_ARTIFACT);
         selenium.waitForPageToLoad("10000");
     }
 
@@ -271,14 +276,6 @@ public class BuildAcceptanceTest extends SeleniumTestBase
         }
 
         return requirement;
-    }
-
-    private void ensureBuild() throws Exception
-    {
-        if(ensureProject(PROJECT_NAME))
-        {
-            triggerSuccessfulBuild(PROJECT_NAME, AgentManager.MASTER_AGENT_NAME);
-        }
     }
 
     private void triggerSuccessfulBuild(String projectName, String agent)
