@@ -99,7 +99,7 @@ public class RecipeController
         {
             if (event instanceof RecipeAssignedEvent)
             {
-                handleRecipeDispatch((RecipeAssignedEvent) event);
+                handleRecipeAssigned((RecipeAssignedEvent) event);
             }
             else if (event instanceof RecipeCommencedEvent)
             {
@@ -142,7 +142,7 @@ public class RecipeController
         return true;
     }
 
-    private void handleRecipeDispatch(RecipeAssignedEvent event)
+    private void handleRecipeAssigned(RecipeAssignedEvent event)
     {
         logger.log(event);
         Agent agent = event.getAgent();

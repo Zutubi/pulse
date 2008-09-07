@@ -113,7 +113,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
 
     public void testAgentExecuteRecipe()
     {
-        Agent agent = addAgentAndDispatchRecipe(1, 1000);
+        Agent agent = addAgentAndAssignRecipe(1, 1000);
         sendPing(agent, new SlaveStatus(PingStatus.BUILDING, 1000, false));
         sendPing(agent, new SlaveStatus(PingStatus.BUILDING, 1000, false));
         sendPing(agent, new SlaveStatus(PingStatus.BUILDING, 1000, false));
@@ -124,7 +124,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
 
     public void testAgentRecipeError()
     {
-        Agent agent = addAgentAndDispatchRecipe(1, 1000);
+        Agent agent = addAgentAndAssignRecipe(1, 1000);
         sendPing(agent, new SlaveStatus(PingStatus.BUILDING, 1000, false));
         clearEvents();
 
@@ -140,7 +140,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
     {
         // We should handle going directly from recipe dispatched to a recipe
         // complete event.
-        Agent agent = addAgentAndDispatchRecipe(1, 1000);
+        Agent agent = addAgentAndAssignRecipe(1, 1000);
         completeAndCollectRecipe(agent, 1000);
 
         onComplete();
@@ -150,7 +150,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
     {
         // We should handle going directly from recipe dispatched to a recipe
         // error event.
-        Agent agent = addAgentAndDispatchRecipe(1, 1000);
+        Agent agent = addAgentAndAssignRecipe(1, 1000);
 
         sendRecipeCollecting(1000);
         assertNoEvents();
@@ -160,12 +160,12 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
         onComplete();
     }
 
-    public void testRecipeDispatchIdlePingRace()
+    public void testRecipeAssignedIdlePingRace()
     {
         // It is valid to see an idle ping post recipe dispatch.
         Agent agent = addAgent(1);
         sendPing(agent, new SlaveStatus(PingStatus.IDLE));
-        sendRecipeDispatched(agent, 1000);
+        sendRecipeAssigned(agent, 1000);
         clearEvents();
 
         sendPing(agent, new SlaveStatus(PingStatus.IDLE, 1000, false));
@@ -177,14 +177,14 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
         onComplete();
     }
 
-    public void testRecipeDispatchNeverBuilding()
+    public void testRecipeAssignedNeverBuilding()
     {
         // If the agent keeps returning idle pings after the timeout post
         // recipe dispatch, then we assume it is not a race but an error.
         lowerTimeout();
         Agent agent = addAgent(1);
         sendPing(agent, new SlaveStatus(PingStatus.IDLE));
-        sendRecipeDispatched(agent, 1000);
+        sendRecipeAssigned(agent, 1000);
         clearEvents();
         waitForTimeout();
         sendPing(agent, new SlaveStatus(PingStatus.IDLE, 1000, false));
@@ -198,7 +198,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
     {
         // Post stage actions are free to fiddle with agents in the post
         // recipe state, so no ping will have an affect.
-        Agent agent = addAgentAndDispatchRecipe(1, 1000);
+        Agent agent = addAgentAndAssignRecipe(1, 1000);
 
         sendRecipeCollecting(1000);
         sendPing(agent, new SlaveStatus(PingStatus.BUILDING, 1000, false));
@@ -222,7 +222,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
         // Although unlikely, we could see building pings for the previous
         // recipe in the awaiting ping state.  These should be ignored as
         // they are racey.
-        Agent agent = addAgentAndDispatchRecipe(1, 1000);
+        Agent agent = addAgentAndAssignRecipe(1, 1000);
         sendRecipeCollecting(1000);
         sendRecipeCollected(1000);
         clearEvents();
@@ -240,7 +240,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
         // we are in the awaiting ping state, which should eventually timeout
         // and try and regain the agent's attention.
         lowerTimeout();
-        Agent agent = addAgentAndDispatchRecipe(1, 1000);
+        Agent agent = addAgentAndAssignRecipe(1, 1000);
         sendRecipeCollecting(1000);
         sendRecipeCollected(1000);
         clearEvents();
@@ -257,7 +257,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
     public void testIntermittentOfflineDuringRecipe()
     {
         // One offline ping is not enough to kill a recipe.
-        Agent agent = addAgentAndDispatchRecipe(1, 1000);
+        Agent agent = addAgentAndAssignRecipe(1, 1000);
 
         sendPing(agent, new SlaveStatus(PingStatus.BUILDING, 1000, false));
         sendPing(agent, new SlaveStatus(PingStatus.OFFLINE));
@@ -273,7 +273,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
     {
         // Continued offline pings pass the timeout should kill a recipe.
         lowerTimeout();
-        Agent agent = addAgentAndDispatchRecipe(1, 1000);
+        Agent agent = addAgentAndAssignRecipe(1, 1000);
 
         sendPing(agent, new SlaveStatus(PingStatus.BUILDING, 1000, false));
         waitForTimeout();
@@ -289,7 +289,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
 
     public void testRecipeMismatch()
     {
-        Agent agent = addAgentAndDispatchRecipe(1, 1000);
+        Agent agent = addAgentAndAssignRecipe(1, 1000);
 
         sendPing(agent, new SlaveStatus(PingStatus.BUILDING, 2000, false));
         assertEvents(new RecipeErrorEvent(this, 1000, "Agent recipe mismatch"));
@@ -308,7 +308,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
 
     public void testRecipeMismatchTerminateFails()
     {
-        Agent agent = addAgentAndDispatchRecipe(1, 1000);
+        Agent agent = addAgentAndAssignRecipe(1, 1000);
 
         sendPing(agent, new SlaveStatus(PingStatus.BUILDING, 2000, false));
         assertEvents(new RecipeErrorEvent(this, 1000, "Agent recipe mismatch"));
@@ -403,9 +403,9 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
         onComplete();
     }
 
-    public void testDisableRecipeDispatchedAgent()
+    public void testDisableRecipeAssignedAgent()
     {
-        Agent agent = addAgentAndDispatchRecipe(1, 1000);
+        Agent agent = addAgentAndAssignRecipe(1, 1000);
         clearEvents();
 
         completeDisableOnIdleBuild(agent);
@@ -415,7 +415,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
 
     public void testDisableBuildingAgent()
     {
-        Agent agent = addAgentAndDispatchRecipe(1, 1000);
+        Agent agent = addAgentAndAssignRecipe(1, 1000);
         sendPing(agent, new SlaveStatus(PingStatus.BUILDING, 1000, false));
         clearEvents();
 
@@ -435,7 +435,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
 
     public void testDisablePostRecipeAgent()
     {
-        Agent agent = addAgentAndDispatchRecipe(1, 1000);
+        Agent agent = addAgentAndAssignRecipe(1, 1000);
         sendPing(agent, new SlaveStatus(PingStatus.BUILDING, 1000, false));
         sendRecipeCollecting(1000);
         clearEvents();
@@ -451,7 +451,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
 
     public void testDisableAwaitingPingAgent()
     {
-        Agent agent = addAgentAndDispatchRecipe(1, 1000);
+        Agent agent = addAgentAndAssignRecipe(1, 1000);
         sendPing(agent, new SlaveStatus(PingStatus.BUILDING, 1000, false));
         sendRecipeCollecting(1000);
         sendRecipeCollected(1000);
@@ -464,9 +464,9 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
         onComplete();
     }
 
-    public void testHardDisableRecipeDispatchAgent()
+    public void testHardDisableRecipeAssignedAgent()
     {
-        Agent agent = addAgentAndDispatchRecipe(1, 1000);
+        Agent agent = addAgentAndAssignRecipe(1, 1000);
         sendDisableRequest(agent);
         assertEnableState(agent, AgentState.EnableState.DISABLING);
 
@@ -477,7 +477,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
 
     public void testHardDisableBuildingAgent()
     {
-        Agent agent = addAgentAndDispatchRecipe(1, 1000);
+        Agent agent = addAgentAndAssignRecipe(1, 1000);
         sendPing(agent, new SlaveStatus(PingStatus.BUILDING, 1000, false));
         clearEvents();
 
@@ -505,7 +505,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
 
     public void testHardDisablePostRecipeAgent()
     {
-        Agent agent = addAgentAndDispatchRecipe(1, 1000);
+        Agent agent = addAgentAndAssignRecipe(1, 1000);
         sendPing(agent, new SlaveStatus(PingStatus.BUILDING, 1000, false));
         sendRecipeCollecting(1000);
         clearEvents();
@@ -524,7 +524,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
 
     public void testHardDisableAtDifferentStages()
     {
-        Agent agent = addAgentAndDispatchRecipe(1, 1000);
+        Agent agent = addAgentAndAssignRecipe(1, 1000);
         sendPing(agent, new SlaveStatus(PingStatus.BUILDING, 1000, false));
         clearEvents();
         sendDisableRequest(agent);
@@ -592,7 +592,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
 
     public void testEnableDisabling()
     {
-        Agent agent = addAgentAndDispatchRecipe(1, 1000);
+        Agent agent = addAgentAndAssignRecipe(1, 1000);
         sendPing(agent, new SlaveStatus(PingStatus.BUILDING, 1000, false));
 
         sendDisableRequest(agent);
@@ -639,9 +639,9 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
         onComplete();
     }
 
-    public void testRemoveRecipeDispatchedAgent()
+    public void testRemoveRecipeAssignedAgent()
     {
-        Agent agent = addAgentAndDispatchRecipe(1, 1000);
+        Agent agent = addAgentAndAssignRecipe(1, 1000);
         clearEvents();
         removeAgent(agent);
 
@@ -652,7 +652,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
 
     public void testRemoveBuildingAgent()
     {
-        Agent agent = addAgentAndDispatchRecipe(1, 1000);
+        Agent agent = addAgentAndAssignRecipe(1, 1000);
         sendPing(agent, new SlaveStatus(PingStatus.BUILDING, 1000, false));
         clearEvents();
         removeAgent(agent);
@@ -674,7 +674,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
 
     public void testRemovePostRecipeAgent()
     {
-        Agent agent = addAgentAndDispatchRecipe(1, 1000);
+        Agent agent = addAgentAndAssignRecipe(1, 1000);
         sendPing(agent, new SlaveStatus(PingStatus.BUILDING, 1000, false));
         sendRecipeCollecting(1000);
         clearEvents();
@@ -688,7 +688,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
 
     public void testRemoveAwaitingPingAgent()
     {
-        Agent agent = addAgentAndDispatchRecipe(1, 1000);
+        Agent agent = addAgentAndAssignRecipe(1, 1000);
         sendPing(agent, new SlaveStatus(PingStatus.BUILDING, 1000, false));
         sendRecipeCollecting(1000);
         sendRecipeCollected(1000);
@@ -730,7 +730,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
 
     public void testChangeBuildingAgent()
     {
-        Agent agent = addAgentAndDispatchRecipe(1, 1000);
+        Agent agent = addAgentAndAssignRecipe(1, 1000);
         sendPing(agent, new SlaveStatus(PingStatus.BUILDING, 1000, false));
         clearEvents();
         Agent newAgent = changeAgent(agent);
@@ -768,7 +768,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
 
     public void testVersionMismatchBuilding()
     {
-        Agent agent = addAgentAndDispatchRecipe(1, 1000);
+        Agent agent = addAgentAndAssignRecipe(1, 1000);
         sendPing(agent, new SlaveStatus(PingStatus.BUILDING, 1000, false));
         clearEvents();
         sendPing(agent, new SlaveStatus(PingStatus.VERSION_MISMATCH));
@@ -809,7 +809,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
 
     public void testTokenMismatchBuilding()
     {
-        Agent agent = addAgentAndDispatchRecipe(1, 1000);
+        Agent agent = addAgentAndAssignRecipe(1, 1000);
         sendPing(agent, new SlaveStatus(PingStatus.BUILDING, 1000, false));
         clearEvents();
         sendPing(agent, new SlaveStatus(PingStatus.TOKEN_MISMATCH));
@@ -849,7 +849,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
 
     public void testInvalidMasterBuilding()
     {
-        Agent agent = addAgentAndDispatchRecipe(1, 1000);
+        Agent agent = addAgentAndAssignRecipe(1, 1000);
         sendPing(agent, new SlaveStatus(PingStatus.BUILDING, 1000, false));
         clearEvents();
         sendPing(agent, new SlaveStatus(PingStatus.INVALID_MASTER));
@@ -883,12 +883,12 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
         assertFalse(allAgents.contains(agent));
     }
 
-    private Agent addAgentAndDispatchRecipe(int agentId, int recipeId)
+    private Agent addAgentAndAssignRecipe(int agentId, int recipeId)
     {
         Agent agent = addAgent(agentId);
         sendPing(agent, new SlaveStatus(PingStatus.IDLE));
         clearEvents();
-        sendRecipeDispatched(agent, recipeId);
+        sendRecipeAssigned(agent, recipeId);
         assertEvents(new AgentUnavailableEvent(this, agent));
         assertEquals(Status.RECIPE_DISPATCHED, agent.getStatus());
         return agent;
@@ -981,7 +981,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
         eventManager.publish(new AgentPingEvent(this, agent, status));
     }
 
-    private void sendRecipeDispatched(Agent agent, int recipeId)
+    private void sendRecipeAssigned(Agent agent, int recipeId)
     {
         ExecutionContext context = new ExecutionContext();
         context.add(BuildProperties.NAMESPACE_INTERNAL, new Property(BuildProperties.PROPERTY_RECIPE_ID, Long.toString(recipeId)));

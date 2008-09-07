@@ -96,10 +96,6 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
                 updateTimeoutsForAgent(a);
             }
 
-            Thread dispatcherThread = new Thread(new RecipeDispatchService(), "Recipe Dispatcher Service");
-            dispatcherThread.setDaemon(true);
-            dispatcherThread.start();
-
             start();
         }
         catch (Exception e)
@@ -715,18 +711,6 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     public void setThreadFactory(ThreadFactory threadFactory)
     {
         this.threadFactory = threadFactory;
-    }
-
-    private static class DispatchedRequest
-    {
-        RecipeRequest recipeRequest;
-        Agent agent;
-
-        public DispatchedRequest(RecipeRequest recipeRequest, Agent agent)
-        {
-            this.recipeRequest = recipeRequest;
-            this.agent = agent;
-        }
     }
 
     /**
