@@ -14,6 +14,8 @@ public class GitConfiguration extends ScmConfiguration
 {
     private String repository;
 
+    private String branch;
+
     @Transient
     public String getType()
     {
@@ -36,5 +38,15 @@ public class GitConfiguration extends ScmConfiguration
     public void setRepository(String repository)
     {
         this.repository = repository;
+    }
+
+    public void setBranch(String branch)
+    {
+        this.branch = branch;
+    }
+
+    public String getBranch()
+    {
+        return branch;
     }
 }

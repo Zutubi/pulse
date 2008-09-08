@@ -49,25 +49,21 @@ public class NativeGit
     {
         String[] command = {"git", "clone", repository, dir};
         
-        NoopOutputHandler handler = new NoopOutputHandler();
-        handler.setCommand(command);
-        
-        runWithHandler(handler, null, command);
-
-        if (handler.getExitCode() != 0)
-        {
-            LOG.warning("Git command: " + StringUtils.join(" ", command) + " exited " +
-                    "with non zero exit code: " + handler.getExitCode());
-            LOG.warning(handler.getError());
-        }
+        run(command);
     }
 
     public void pull() throws ScmException
     {
         String[] command = {"git", "pull"};
         
-        NoopOutputHandler handler = new NoopOutputHandler();
-        handler.setCommand(command);
+        run(command);
+    }
+
+    public List<GitLogEntry> log(String from, String to) throws ScmException
+    {
+        String[] command = {"git", "log", from+".."+to};
+
+        LogOutputHandler handler = new LogOutputHandler();
         
         runWithHandler(handler, null, command);
 
@@ -77,18 +73,32 @@ public class NativeGit
                     "with non zero exit code: " + handler.getExitCode());
             LOG.warning(handler.getError());
         }
-    }
-
-    public List<GitLogEntry> log(String from, String to) throws ScmException
-    {
-        LogOutputHandler handler = new LogOutputHandler();
-        
-        runWithHandler(handler, null, "git", "log", from+".."+to);
 
         return handler.getEntries();
     }
 
-    public void runWithHandler(final OutputHandler handler, String input, String... commands) throws ScmException
+    public void checkout(String branch) throws ScmException
+    {
+        String[] command = {"git", "checkout", branch};
+
+        run(command);
+    }
+
+    protected void run(String... commands) throws ScmException
+    {
+        OutputHandlerAdapter handler = new OutputHandlerAdapter();
+
+        runWithHandler(handler, null, commands);
+
+        if (handler.getExitCode() != 0)
+        {
+            LOG.warning("Git command: " + StringUtils.join(" ", commands) + " exited " +
+                    "with non zero exit code: " + handler.getExitCode());
+            LOG.warning(handler.getError());
+        }
+    }
+
+    protected void runWithHandler(final OutputHandler handler, String input, String... commands) throws ScmException
     {
         if (LOG.isLoggable(Level.FINE))
         {
@@ -188,39 +198,16 @@ public class NativeGit
 
         void handleExitCode(int code) throws ScmException;
 
+        int getExitCode();
+
         void checkCancelled() throws ScmCancelledException;
     }
 
     private class OutputHandlerAdapter implements OutputHandler
     {
-        public void handleStdout(String line)
-        {
-
-        }
-
-        public void handleStderr(String line)
-        {
-
-        }
-
-        public void handleExitCode(int code) throws ScmException
-        {
-
-        }
-
-        public void checkCancelled() throws ScmCancelledException
-        {
-
-        }
-    }
-
-    private class NoopOutputHandler extends OutputHandlerAdapter
-    {
         private int exitCode;
-
+        
         private String error;
-
-        private String[] command;
 
         public void handleStdout(String line)
         {
@@ -236,6 +223,11 @@ public class NativeGit
             error = error + line + "\n";
         }
 
+        public String getError()
+        {
+            return error;
+        }
+
         public void handleExitCode(int code) throws ScmException
         {
             this.exitCode = code;
@@ -246,14 +238,9 @@ public class NativeGit
             return exitCode;
         }
 
-        public String getError()
+        public void checkCancelled() throws ScmCancelledException
         {
-            return error;
-        }
 
-        public void setCommand(String[] command)
-        {
-            this.command = command;
         }
     }
 

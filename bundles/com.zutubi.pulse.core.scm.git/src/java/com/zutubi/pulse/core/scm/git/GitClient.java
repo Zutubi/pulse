@@ -10,6 +10,7 @@ import com.zutubi.pulse.core.scm.ScmEventHandler;
 import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.ScmFile;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.util.TextUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,6 +28,7 @@ public class GitClient implements ScmClient
     private static final Set<ScmCapability> CAPABILITIES = new HashSet<ScmCapability>();
     
     private String repository;
+    private String branch;
 
     public void close()
     {
@@ -61,8 +63,15 @@ public class GitClient implements ScmClient
         git.setWorkingDirectory(workingDir.getParentFile());
         git.clone(repository, workingDir.getName());
 
-        // what is the current head revision?.
         git.setWorkingDirectory(workingDir);
+
+        // do we need to switch branches?.
+        if (TextUtils.stringSet(branch))
+        {
+            git.checkout(branch);
+        }
+
+        // what is the current head revision?.
         List<GitLogEntry> entries = git.log("HEAD^", "HEAD");
         GitLogEntry entry = entries.get(0);
 
@@ -122,5 +131,10 @@ public class GitClient implements ScmClient
     public void setRepository(String repository)
     {
         this.repository = repository;
+    }
+
+    public void setBranch(String branch)
+    {
+        this.branch = branch;
     }
 }
