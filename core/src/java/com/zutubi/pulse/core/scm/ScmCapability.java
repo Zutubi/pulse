@@ -10,7 +10,7 @@ public enum ScmCapability
 {
     /**
      * This defines whether or not the contents of the SCM repository can be browsed / navigated.
-     * This involves being able obtain a listing of remote directories.
+     * This involves being able obtain a listing of the repository directories.
      */
     BROWSE,
 

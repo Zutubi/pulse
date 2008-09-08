@@ -66,14 +66,12 @@ public class GitClient implements ScmClient
         List<GitLogEntry> entries = git.log("HEAD^", "HEAD");
         GitLogEntry entry = entries.get(0);
 
-        entry.getDate(); //TODO: requires conversion.
-        
-        return new Revision(entry.getAuthor(), entry.getComment(), null, entry.getCommit());
+        return new Revision(entry.getAuthor(), entry.getComment(), entry.getDate(), entry.getCommit());
     }
 
     public Revision update(ScmContext context, ScmEventHandler handler) throws ScmException
     {
-        return null;
+        return checkout(context, handler);
     }
 
     public InputStream retrieve(String path, Revision revision) throws ScmException

@@ -1,5 +1,7 @@
 package com.zutubi.pulse.core.scm.git;
 
+import java.util.Date;
+
 /**
  *
  *
@@ -8,7 +10,7 @@ public class GitLogEntry
 {
     private String commit = "";
     private String author = "";
-    private String date = "";
+    private Date date = null;
     private String comment = "";
 
     public String getCommit()
@@ -31,12 +33,12 @@ public class GitLogEntry
         this.author = author;
     }
 
-    public String getDate()
+    public Date getDate()
     {
         return date;
     }
 
-    public void setDate(String date)
+    public void setDate(Date date)
     {
         this.date = date;
     }

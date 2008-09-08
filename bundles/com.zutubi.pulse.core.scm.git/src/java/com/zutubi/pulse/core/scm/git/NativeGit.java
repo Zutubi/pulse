@@ -6,6 +6,7 @@ import com.zutubi.pulse.util.process.AsyncProcess;
 import com.zutubi.pulse.util.process.LineHandler;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
+import com.opensymphony.util.TextUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,6 +16,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.List;
 import java.util.LinkedList;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
 
 /**
  *
@@ -27,6 +30,8 @@ public class NativeGit
     private static final long PROCESS_TIMEOUT = Long.getLong("pulse.git.inactivity.timeout", 300);
 
     private static final String ASCII_CHARSET = "US-ASCII";
+
+    private final static SimpleDateFormat LOG_DATE_FORMAT = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy z");
 
     private ProcessBuilder git;
 
@@ -42,12 +47,36 @@ public class NativeGit
 
     public void clone(String repository, String dir) throws ScmException
     {
-        runWithHandler(new NoopOutputHandler(), null, "git", "clone", repository, dir);
+        String[] command = {"git", "clone", repository, dir};
+        
+        NoopOutputHandler handler = new NoopOutputHandler();
+        handler.setCommand(command);
+        
+        runWithHandler(handler, null, command);
+
+        if (handler.getExitCode() != 0)
+        {
+            LOG.warning("Git command: " + StringUtils.join(" ", command) + " exited " +
+                    "with non zero exit code: " + handler.getExitCode());
+            LOG.warning(handler.getError());
+        }
     }
 
     public void pull() throws ScmException
     {
-        runWithHandler(new NoopOutputHandler(), null, "git", "pull");
+        String[] command = {"git", "pull"};
+        
+        NoopOutputHandler handler = new NoopOutputHandler();
+        handler.setCommand(command);
+        
+        runWithHandler(handler, null, command);
+
+        if (handler.getExitCode() != 0)
+        {
+            LOG.warning("Git command: " + StringUtils.join(" ", command) + " exited " +
+                    "with non zero exit code: " + handler.getExitCode());
+            LOG.warning(handler.getError());
+        }
     }
 
     public List<GitLogEntry> log(String from, String to) throws ScmException
@@ -187,19 +216,44 @@ public class NativeGit
 
     private class NoopOutputHandler extends OutputHandlerAdapter
     {
+        private int exitCode;
+
+        private String error;
+
+        private String[] command;
+
         public void handleStdout(String line)
         {
-            System.out.println("handleStdout: " + line);
+
         }
 
         public void handleStderr(String line)
         {
-            System.out.println("handleStderr: " + line);
+            if (!TextUtils.stringSet(error))
+            {
+                error = "";
+            }
+            error = error + line + "\n";
         }
 
         public void handleExitCode(int code) throws ScmException
         {
-            System.out.println("handleExitCode: " + code);
+            this.exitCode = code;
+        }
+
+        public int getExitCode()
+        {
+            return exitCode;
+        }
+
+        public String getError()
+        {
+            return error;
+        }
+
+        public void setCommand(String[] command)
+        {
+            this.command = command;
         }
     }
 
@@ -219,11 +273,19 @@ public class NativeGit
             }
             else if (line.startsWith("Author: "))
             {
-                currentEntry.setCommit(line.substring(8).trim());
+                currentEntry.setAuthor(line.substring(8).trim());
             }
             else if (line.startsWith("Date:   "))
             {
-                currentEntry.setCommit(line.substring(8).trim());
+                String dtStr = line.substring(8).trim();
+                try
+                {
+                    currentEntry.setDate(LOG_DATE_FORMAT.parse(dtStr));
+                }
+                catch (ParseException e)
+                {
+                    LOG.warning(e);
+                }
             }
             else
             {
