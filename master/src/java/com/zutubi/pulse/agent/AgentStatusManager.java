@@ -314,9 +314,9 @@ public class AgentStatusManager implements EventListener
         }
     }
 
-    private void handleRecipeCollected(RecipeCollectedEvent event)
+    private void handleRecipeCompleted(long recipeId)
     {
-        Agent agent = agentsByRecipeId.remove(event.getRecipeId());
+        Agent agent = agentsByRecipeId.remove(recipeId);
         if(agent != null)
         {
             if (agent.isDisabling())
@@ -330,7 +330,7 @@ public class AgentStatusManager implements EventListener
                 if (agent.isSlave())
                 {
                     SlaveAgent slaveAgent = ((SlaveAgent) agent);
-                    slaveAgent.updateStatus(Status.AWAITING_PING, event.getRecipeId());
+                    slaveAgent.updateStatus(Status.AWAITING_PING, recipeId);
 
                     // Request a ping immediately so no time is wasted
                     publishEvent(new AgentPingRequestedEvent(this, slaveAgent));
@@ -528,7 +528,11 @@ public class AgentStatusManager implements EventListener
             }
             else if(event instanceof RecipeCollectedEvent)
             {
-                handleRecipeCollected((RecipeCollectedEvent )event);
+                handleRecipeCompleted(((RecipeCollectedEvent) event).getRecipeId());
+            }
+            else if(event instanceof RecipeAbortedEvent)
+            {
+                handleRecipeCompleted(((RecipeAbortedEvent) event).getRecipeId());
             }
             else if(event instanceof AgentDisableRequestedEvent)
             {
@@ -574,6 +578,7 @@ public class AgentStatusManager implements EventListener
                 AgentEnableRequestedEvent.class,
                 AgentPingEvent.class,
                 AgentRemovedEvent.class,
+                RecipeAbortedEvent.class,
                 RecipeCollectedEvent.class,
                 RecipeCollectingEvent.class,
                 RecipeCompletedEvent.class,
