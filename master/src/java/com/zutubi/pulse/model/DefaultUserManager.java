@@ -8,6 +8,8 @@ import com.zutubi.pulse.model.persistence.GroupDao;
 import com.zutubi.pulse.model.persistence.UserDao;
 import com.zutubi.pulse.security.ldap.LdapManager;
 import com.zutubi.pulse.web.DefaultAction;
+import com.zutubi.pulse.util.RandomUtils;
+import com.opensymphony.util.TextUtils;
 import org.acegisecurity.providers.encoding.PasswordEncoder;
 import org.acegisecurity.userdetails.UserDetails;
 import org.acegisecurity.userdetails.UsernameNotFoundException;
@@ -89,9 +91,19 @@ public class DefaultUserManager implements UserManager
         newUser.setDefaultAction(DefaultAction.WELCOME_ACTION);
         newUser.setLdapAuthentication(useLdapAuthencation);
         save(newUser);
+
         // can only update the password on a persistent user since the password salt relies
         // upon the users id.
-        setPassword(newUser, newUser.getPassword());
+        if (useLdapAuthencation && !TextUtils.stringSet(newUser.getPassword()))
+        {
+            // for ldap authentication, the password is not stored locally, and therefore needs to
+            // be somewhat randomly generated.
+            setPassword(newUser, RandomUtils.randomString(10));            
+        }
+        else
+        {
+            setPassword(newUser, newUser.getPassword());
+        }
         save(newUser);
 
         licenseManager.refreshAuthorisations();

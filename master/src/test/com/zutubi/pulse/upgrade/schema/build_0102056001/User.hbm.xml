@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+<hibernate-mapping>
+
+    <!-- -->
+    <class name="com.zutubi.pulse.model.User" table="LOCAL_USER" lazy="false">
+        <cache usage="read-write"/>
+
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="login" column="LOGIN" type="string" length="255"/>
+
+        <property name="name" column="NAME" type="string" not-null="false" length="255"/>
+
+        <property name="password" column="PASSWORD" type="string" not-null="false" length="255"/>
+
+        <property name="enabled" column="ENABLED" type="boolean"/>
+
+        <property name="nextBuildNumber" column="NEXT_BUILD_NUMBER" type="long"/>
+    </class>
+
+</hibernate-mapping>
