@@ -4,6 +4,7 @@ import com.zutubi.pulse.monitor.TaskException;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
+import com.zutubi.util.RandomUtils;
 import org.acegisecurity.providers.encoding.Md5PasswordEncoder;
 
 import java.util.Map;
@@ -59,7 +60,7 @@ public class FixNPEOnLDAPRememberMe extends AbstractUpgradeTask
                 {
                     String path = entry.getKey();
 
-                    String encodedPassword = encoder.encodePassword(String.valueOf(System.currentTimeMillis()), null);
+                    String encodedPassword = encoder.encodePassword(RandomUtils.randomString(10), null);
 
                     MutableRecord updatedUser = user.copy(true);
                     updatedUser.put("password", encodedPassword);

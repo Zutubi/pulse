@@ -12,6 +12,7 @@ import com.zutubi.pulse.tove.config.user.UserConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.ConfigurationRegistry;
 import com.zutubi.util.logging.Logger;
+import com.zutubi.util.RandomUtils;
 import org.acegisecurity.Authentication;
 import org.acegisecurity.AuthenticationException;
 import org.acegisecurity.BadCredentialsException;
@@ -69,7 +70,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider impl
             
             // auto added users receive a random password that allows the remember me processing function.
             // (it fails if no password is set, and we do not record the LDAP password).
-            userManager.setPassword(user, String.valueOf(System.currentTimeMillis()));
+            userManager.setPassword(user, RandomUtils.randomString(10));
         }
         else
         {
