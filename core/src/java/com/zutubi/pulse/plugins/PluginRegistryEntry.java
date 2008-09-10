@@ -56,14 +56,34 @@ public class PluginRegistryEntry
         return get(PLUGIN_SOURCE_KEY);
     }
 
-    public String getState()
+    public PluginManager.State getState()
     {
-        return get(PLUGIN_STATE_KEY);
+        String stateStr = get(PLUGIN_STATE_KEY);
+        if (TextUtils.stringSet(stateStr))
+        {
+            return PluginManager.State.valueOf(stateStr);
+        }
+        return null;
     }
 
-    public String getType()
+    public void setState(PluginManager.State state)
     {
-        return get(PLUGIN_TYPE_KEY);
+        put(PLUGIN_STATE_KEY, state.toString());
+    }
+
+    public Plugin.Type getType()
+    {
+        String typeStr = get(PLUGIN_TYPE_KEY);
+        if (TextUtils.stringSet(typeStr))
+        {
+            return Plugin.Type.valueOf(typeStr);
+        }
+        return null;
+    }
+
+    public void setType(Plugin.Type type)
+    {
+        put(PLUGIN_TYPE_KEY, type.toString());
     }
 
     public PluginVersion getVersion()

@@ -91,7 +91,7 @@ public class PluginUpgradeManager implements UpgradeableComponentSource
             for (Plugin plugin : upgradedPlugins)
             {
                 PluginVersion installedVersion = plugin.getVersion();
-                PluginVersion registryVersion = new PluginVersion(registry.getEntry(plugin.getId()).get(PluginManager.PLUGIN_VERSION_KEY));
+                PluginVersion registryVersion = new PluginVersion(registry.getEntry(plugin.getId()).get(PluginRegistryEntry.PLUGIN_VERSION_KEY));
 
                 List<UpgradeTaskHolder> tasks = definedUpgradeTasks.get(plugin.getId());
                 if (tasks != null && tasks.size() > 0)
@@ -184,7 +184,7 @@ public class PluginUpgradeManager implements UpgradeableComponentSource
 
         // log that we have upgraded from oldversion -> newversion.
         LOG.info("Plugin '"+plugin.getId()+"' has been upgraded from " + oldVersion + " to " + newVersion + ".");
-        entry.put(PluginManager.PLUGIN_VERSION_KEY, newVersion.toString());
+        entry.put(PluginRegistryEntry.PLUGIN_VERSION_KEY, newVersion.toString());
         pluginRegistry.flush();
         plugin.resolve();
     }

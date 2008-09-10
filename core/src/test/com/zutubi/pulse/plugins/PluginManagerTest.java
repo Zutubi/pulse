@@ -446,6 +446,40 @@ public class PluginManagerTest extends BasePluginSystemTestCase
         assertNull(plugin);
     }
 
+    /**
+     * Test for CIB-1630.  The problem here is that a plugin exists in the registry as uninstalled, however the
+     * plugin jar is picked up on a startup scan.  The plugin should be re-installed.
+     *
+     * A side complication is that it is difficult to distinguish between a plugin that is manually installed and a
+     * plugin that is uninstalled - but we fail to delete the jar file.
+     * 
+     * @throws Exception
+     */
+    public void testUninstallAndReinstallPlugin() throws Exception
+    {
+        startupPluginCore();
+
+        Plugin plugin = manager.install(producer1.toURI(), true);
+        assertEquals(Plugin.State.ENABLED, plugin.getState());
+
+        restartPluginCore();
+
+        plugin = manager.getPlugin(plugin.getId());
+        plugin.uninstall();
+        assertEquals(Plugin.State.UNINSTALLING, plugin.getState());
+
+        restartPluginCore();
+
+        plugin = manager.getPlugin(PRODUCER_ID);
+        assertNull(plugin);
+
+        shutdownPluginCore();
+
+        FileSystemUtils.copy(paths.getPluginStorageDir(), producer1);
+
+        startupPluginCore();
+    }
+
     public void testReinstallAfterUninstall() throws Exception
     {
         startupPluginCore();

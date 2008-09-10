@@ -49,12 +49,9 @@ public class PluginManager
 
     //-- plugin registry keys. --
 
-    private static final String PLUGIN_STATE_KEY = "plugin.state";
-    private static final String PLUGIN_TYPE_KEY = "plugin.type";
-    public static final String PLUGIN_VERSION_KEY = "plugin.version";
-    public static final String PLUGIN_SOURCE_KEY = "plugin.uri";
-    private static final String PLUGIN_PENDING_KEY = "plugin.pending.action";
-    private static final String UPGRADE_SOURCE_KEY = "plugin.upgrade.source";
+    private static final String PLUGIN_SOURCE_KEY = PluginRegistryEntry.PLUGIN_SOURCE_KEY;
+    private static final String PLUGIN_PENDING_KEY = PluginRegistryEntry.PLUGIN_PENDING_KEY;
+    private static final String UPGRADE_SOURCE_KEY = PluginRegistryEntry.UPGRADE_SOURCE_KEY;
 
     //--- pending action strings
 
@@ -68,7 +65,7 @@ public class PluginManager
 
     private boolean versionChangeDetected = false;
 
-    private enum State
+    public enum State
     {
         ENABLED, DISABLED, UNINSTALLED
     }
@@ -129,9 +126,9 @@ public class PluginManager
             {
                 try
                 {
-                    LocalPlugin plugin = createPluginHandle(entry.get(PLUGIN_SOURCE_KEY), Plugin.Type.valueOf(entry.get(PLUGIN_TYPE_KEY)));
+                    LocalPlugin plugin = createPluginHandle(entry.getSource(), entry.getType());
                     plugin.setState(Plugin.State.INSTALLED);
-                    State targetState = State.valueOf(entry.get(PLUGIN_STATE_KEY));
+                    State targetState = entry.getState();
                     switch (targetState)
                     {
                         case ENABLED:
@@ -158,7 +155,7 @@ public class PluginManager
         for (LocalPlugin plugin : installedPlugins)
         {
             PluginRegistryEntry entry = registry.getEntry(plugin.getId());
-            if (entry.containsKey(PLUGIN_VERSION_KEY))
+            if (entry.getVersion() != null)
             {
                 PluginVersion registryVersion = entry.getVersion();
                 if (registryVersion == null)
@@ -295,7 +292,7 @@ public class PluginManager
                 // check for manually uninstalled plugins.
                 if (entry.containsKey(PLUGIN_SOURCE_KEY))
                 {
-                    String sourceUriString = entry.get(PLUGIN_SOURCE_KEY);
+                    String sourceUriString = entry.getSource();
                     if (!TextUtils.stringSet(sourceUriString))
                     {
                         LOG.warning("Registry entry for plugin '" + id + "' is corrupt. It contains a null source string.");
@@ -305,7 +302,7 @@ public class PluginManager
                     if (!source.exists())
                     {
                         // looks like this plugin is no longer available.
-                        entry.put(PLUGIN_STATE_KEY, State.UNINSTALLED.toString());
+                        entry.setState(State.UNINSTALLED);
                         entry.remove(PLUGIN_SOURCE_KEY);
                         saveRegistry();
                     }
@@ -338,13 +335,13 @@ public class PluginManager
                         }
                         if (pendingAction.equals(DISABLE_PENDING_ACTION))
                         {
-                            entry.put(PLUGIN_STATE_KEY, State.DISABLED.toString());
+                            entry.setState(State.DISABLED);
                         }
                         else if (pendingAction.equals(UNINSTALL_PENDING_ACTION))
                         {
                             if (entry.containsKey(PLUGIN_SOURCE_KEY))
                             {
-                                String source = entry.get(PLUGIN_SOURCE_KEY);
+                                String source = entry.getSource();
                                 if (!TextUtils.stringSet(source))
                                 {
                                     LOG.warning("Registry entry for plugin '" + id + "' is corrupt. Uninstall source not specified.");
@@ -353,7 +350,7 @@ public class PluginManager
                                 FileSystemUtils.delete(plugin);
                                 entry.remove(PLUGIN_SOURCE_KEY);
                             }
-                            entry.put(PLUGIN_STATE_KEY, State.UNINSTALLED.toString());
+                            entry.setState(State.UNINSTALLED);
                         }
                         else if (pendingAction.equals(UPGRADE_PENDING_ACTION))
                         {
@@ -386,7 +383,7 @@ public class PluginManager
         PluginRegistryEntry entry = registry.getEntry(id);
 
         // delete the old
-        File pluginFile = new File(new URI(entry.get(PLUGIN_SOURCE_KEY)));
+        File pluginFile = new File(new URI(entry.getSource()));
         if (pluginFile.isDirectory())
         {
             FileSystemUtils.rmdir(pluginFile);
@@ -435,7 +432,7 @@ public class PluginManager
                 {
                     PluginRegistryEntry entry = registry.getEntry(plugin.getId());
 
-                    State state = State.valueOf(entry.get(PLUGIN_STATE_KEY));
+                    State state = entry.getState();
                     if (state == State.UNINSTALLED)
                     {
                         // this plugin has been uninstalled, nothing further is required from it.
@@ -443,13 +440,13 @@ public class PluginManager
                     }
 
                     // version check. if new version available, mark it for pending upgrade.
-                    String pluginSourceString = entry.get(PLUGIN_SOURCE_KEY);
+                    String pluginSourceString = entry.getSource();
                     if (!TextUtils.stringSet(pluginSourceString))
                     {
                         LOG.warning("Can not complete pre-packaged plugin version for " + plugin.getId() + ".  Installed source not available.");
                         continue;
                     }
-                    LocalPlugin registeredPlugin = createPluginHandle(new URI(pluginSourceString), Plugin.Type.valueOf(entry.get(PLUGIN_TYPE_KEY)));
+                    LocalPlugin registeredPlugin = createPluginHandle(new URI(pluginSourceString), entry.getType());
 
                     //TODO: provide the user with the opportunity to not upgrade to the new version. They may have an old version for a specific reason.
 
@@ -490,21 +487,29 @@ public class PluginManager
                 {
                     PluginRegistryEntry registryEntry = registry.getEntry(plugin.getId());
 
-                    // is the current file the same as the registered file?
-                    URI registryURI = new URI(registryEntry.get(PLUGIN_SOURCE_KEY));
-                    if (registryURI.compareTo(file.toURI()) == 0)
+                    if (State.UNINSTALLED.equals(registryEntry.getState()))
                     {
-                        continue;
+                        // plugin is already where we want it, just a matter of installing it.
+                        registerPlugin(createPluginHandle(file.toURI(), type));
                     }
+                    else
+                    {
+                        // is the current file the same as the registered file?
+                        URI registryURI = new URI(registryEntry.getSource());
+                        if (registryURI.compareTo(file.toURI()) == 0)
+                        {
+                            continue;
+                        }
 
-                    // we always want to be using the latest version of the internal plugins, so update
-                    // the registry with whatever we find. The system startup will detect the version change
-                    // if one exists.
-                    // NOTE: We are effectively re-registering each of the internal plugins each time round
-                    registryEntry.put(PLUGIN_SOURCE_KEY, file.toURI().toString());
-                    saveRegistry();
+                        // we always want to be using the latest version of the internal plugins, so update
+                        // the registry with whatever we find. The system startup will detect the version change
+                        // if one exists.
+                        // NOTE: We are effectively re-registering each of the internal plugins each time round
+                        registryEntry.put(PLUGIN_SOURCE_KEY, file.toURI().toString());
+                        saveRegistry();
 
-                    // Alternative - only update if a) no version specified, b) there is a known version increase.
+                        // Alternative - only update if a) no version specified, b) there is a known version increase.
+                    }
                 }
             }
             catch (URISyntaxException e)
@@ -583,7 +588,7 @@ public class PluginManager
 
         // process the disable.  this is the same thing that is done if PENDING_DISABLE is encountered.
         PluginRegistryEntry entry = registry.getEntry(plugin.getId());
-        entry.put(PLUGIN_STATE_KEY, State.DISABLED.toString());
+        entry.setState(State.DISABLED);
         saveRegistry();
         plugin.setState(Plugin.State.DISABLED);
     }
@@ -604,7 +609,7 @@ public class PluginManager
             PluginRegistryEntry entry = registry.getEntry(plugin.getId());
             if (entry.containsKey(PLUGIN_SOURCE_KEY))
             {
-                String source = entry.get(PLUGIN_SOURCE_KEY);
+                String source = entry.getSource();
                 if (!TextUtils.stringSet(source))
                 {
                     LOG.warning("Unable to remove source for plugin " + plugin.getId() + " during uninstall.  Source not known.");
@@ -624,7 +629,7 @@ public class PluginManager
 
                 entry.remove(PLUGIN_SOURCE_KEY);
             }
-            entry.put(PLUGIN_STATE_KEY, State.UNINSTALLED.toString());
+            entry.setState(State.UNINSTALLED);
             saveRegistry();
 
             plugin.setState(Plugin.State.UNINSTALLED);
@@ -654,15 +659,15 @@ public class PluginManager
         // assumption: we can enable
 
         PluginRegistryEntry entry = registry.getEntry(plugin.getId());
-        entry.put(PLUGIN_STATE_KEY, State.ENABLED.toString());
+        entry.setState(State.ENABLED);
         saveRegistry();
 
         // check version, if it has changed, then set the plugin state to VERSION_CHANGED.
         try
         {
-            if (entry.containsKey(PLUGIN_VERSION_KEY))
+            if (entry.getVersion() != null)
             {
-                PluginVersion registryVersion = new PluginVersion(entry.get(PLUGIN_VERSION_KEY));
+                PluginVersion registryVersion = entry.getVersion();
                 if (registryVersion.compareTo(plugin.getVersion()) != 0)
                 {
                     plugin.setState(Plugin.State.VERSION_CHANGE);
@@ -692,7 +697,7 @@ public class PluginManager
                 plugin.setBundle(equinox.activate(plugin.getSource()));
                 plugin.setBundleDescription(equinox.getBundleDescription(plugin.getId(), plugin.getVersion().toString()));
 
-                entry.put(PLUGIN_VERSION_KEY, plugin.getVersion().toString());
+                entry.setVersion(plugin.getVersion());
                 saveRegistry();
                 plugin.setState(Plugin.State.ENABLED);
             }
@@ -809,7 +814,7 @@ public class PluginManager
             // fully activate the plugin.
             plugin.getBundle().start(Bundle.START_TRANSIENT);
             PluginRegistryEntry registryEntry = registry.getEntry(plugin.getId());
-            registryEntry.put(PLUGIN_VERSION_KEY, plugin.getVersion().toString());
+            registryEntry.setVersion(plugin.getVersion());
             plugin.setState(Plugin.State.ENABLED);
         }
         catch (Exception e)
@@ -883,8 +888,8 @@ public class PluginManager
         {
             PluginRegistryEntry registryEntry = registry.register(plugin);
             registryEntry.put(PLUGIN_SOURCE_KEY, plugin.getSource().toString());
-            registryEntry.put(PLUGIN_STATE_KEY, State.ENABLED.toString());
-            registryEntry.put(PLUGIN_TYPE_KEY, plugin.getType().toString());
+            registryEntry.setState(State.ENABLED);
+            registryEntry.setType(plugin.getType());
             saveRegistry();
             return registryEntry;
         }

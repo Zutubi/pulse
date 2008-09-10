@@ -1,10 +1,9 @@
 package com.zutubi.pulse.acceptance.plugins;
 
-import com.zutubi.pulse.acceptance.plugins.PluginSystem;
 import com.zutubi.pulse.plugins.Plugin;
-import com.zutubi.pulse.plugins.PluginManager;
 import com.zutubi.pulse.plugins.PluginManagerTest;
 import com.zutubi.pulse.plugins.PluginPaths;
+import com.zutubi.pulse.plugins.PluginRegistryEntry;
 import com.zutubi.pulse.plugins.PluginUpgradeManager;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.upgrade.DefaultUpgradeManager;
@@ -257,7 +256,7 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
 
         startupPluginCore();
 
-        assertEquals("2.0.0", pluginSystem.getPluginManager().getPluginRegistry().getEntry("com.zutubi.bundles.producer").get(PluginManager.PLUGIN_VERSION_KEY));
+        assertEquals("2.0.0", pluginSystem.getPluginManager().getPluginRegistry().getEntry("com.zutubi.bundles.producer").get(PluginRegistryEntry.PLUGIN_VERSION_KEY));
 
         shutdownPluginCore();
 
@@ -272,7 +271,7 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
         }
 
         assertTrue(pluginUpgradeManager.isUpgradeRequired());
-        assertEquals("2.0.0", pluginSystem.getPluginManager().getPluginRegistry().getEntry("com.zutubi.bundles.producer").get(PluginManager.PLUGIN_VERSION_KEY));
+        assertEquals("2.0.0", pluginSystem.getPluginManager().getPluginRegistry().getEntry("com.zutubi.bundles.producer").get(PluginRegistryEntry.PLUGIN_VERSION_KEY));
     }
 
     private void restartPluginCore() throws Exception
