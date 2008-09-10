@@ -31,6 +31,7 @@
                 <ref local="addBrowseViewConfiguration"/>
                 <ref local="updateDefaultAction"/>
                 <ref local="addDefaultVersionToProjectResourceRequirements"/>
+                <ref local="fixNPEonLDAPrememberme"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -56,6 +57,10 @@
 
     <bean id="addDefaultVersionToProjectResourceRequirements" class="com.zutubi.pulse.upgrade.tasks.AddDefaultVersionToResourceRequirementUpgradeTask" autowire="byName">
         <property name="buildNumber" value="200009002"/>
+    </bean>
+
+    <bean id="fixNPEonLDAPrememberme" class="com.zutubi.pulse.upgrade.tasks.FixNPEOnLDAPRememberMe" autowire="byName">
+        <property name="buildNumber" value="200011001"/>
     </bean>
 
 </beans>

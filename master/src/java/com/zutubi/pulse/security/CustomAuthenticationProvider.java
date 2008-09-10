@@ -62,7 +62,14 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider impl
         if(user != null)
         {
             LOG.debug("User '" + username + "' found via LDAP, adding.");
-            configurationProvider.insert(ConfigurationRegistry.USERS_SCOPE, user);
+            String newUserPath = configurationProvider.insert(ConfigurationRegistry.USERS_SCOPE, user);
+
+            // refresh so that we have the persistent user instance.
+            user = configurationProvider.get(newUserPath, UserConfiguration.class);
+            
+            // auto added users receive a random password that allows the remember me processing function.
+            // (it fails if no password is set, and we do not record the LDAP password).
+            userManager.setPassword(user, String.valueOf(System.currentTimeMillis()));
         }
         else
         {
