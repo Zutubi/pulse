@@ -48,7 +48,7 @@ public class NativeGit
     public void clone(String repository, String dir) throws ScmException
     {
         String[] command = {"git", "clone", repository, dir};
-        
+
         run(command);
     }
 
@@ -56,6 +56,13 @@ public class NativeGit
     {
         String[] command = {"git", "pull"};
         
+        run(command);
+    }
+
+    public void fetch(String remote) throws ScmException
+    {
+        String[] command = {"git", "fetch", remote};
+
         run(command);
     }
 
@@ -82,6 +89,24 @@ public class NativeGit
         String[] command = {"git", "checkout", branch};
 
         run(command);
+    }
+
+    public List<GitBranchEntry> branch() throws ScmException
+    {
+        String[] command = {"git", "branch", "-r"};
+
+        BranchOutputHandler handler = new BranchOutputHandler();
+
+        runWithHandler(handler, null, command);
+
+        if (handler.getExitCode() != 0)
+        {
+            LOG.warning("Git command: " + StringUtils.join(" ", command) + " exited " +
+                    "with non zero exit code: " + handler.getExitCode());
+            LOG.warning(handler.getError());
+        }
+
+        return handler.getBranches();
     }
 
     protected void run(String... commands) throws ScmException
@@ -285,6 +310,28 @@ public class NativeGit
         public List<GitLogEntry> getEntries()
         {
             return entries;
+        }
+    }
+
+    private class BranchOutputHandler extends OutputHandlerAdapter
+    {
+        private List<GitBranchEntry> branches = new LinkedList<GitBranchEntry>();
+
+        public void handleStdout(String line)
+        {
+            GitBranchEntry entry = new GitBranchEntry();
+            if (line.startsWith("*"))
+            {
+                entry.setActive(true);
+                line = line.substring(2);
+            }
+            entry.setName(line.trim());
+            branches.add(entry);
+        }
+
+        public List<GitBranchEntry> getBranches()
+        {
+            return branches;
         }
     }
 }
