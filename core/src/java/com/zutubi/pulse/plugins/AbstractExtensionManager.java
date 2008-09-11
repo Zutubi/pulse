@@ -34,7 +34,7 @@ public abstract class AbstractExtensionManager implements IExtensionChangeHandle
         IExtensionTracker tracker = pluginManager.getExtensionTracker();
 
         IExtensionPoint extensionPoint = registry.getExtensionPoint(getExtensionPointId());
-        if(extensionPoint == null)
+        if (extensionPoint == null)
         {
             // check that the MANIFEST.MF files are being copied into the classpath. ie:
             // ensure that IDEA treating *.mf files are resources that need to be copied into the
@@ -99,6 +99,12 @@ public abstract class AbstractExtensionManager implements IExtensionChangeHandle
             LOG.info(e);
             handleExtensionError(extension, e);
         }
+        catch (Throwable t)
+        {
+            LOG.warning("Failed to load extension class: " + cls + " due to " + t.getClass().getName() + ". Cause: " + t.getMessage());
+            LOG.info(t);
+            handleExtensionError(extension, t);
+        }
 
         return clazz;
     }
@@ -134,7 +140,7 @@ public abstract class AbstractExtensionManager implements IExtensionChangeHandle
      *
      * @param extension used to determine the contributing bundle
      * @return all &lt;config&gt; elements for configuration extensions defined
-     *         within the same bundle as the given extension 
+     *         within the same bundle as the given extension
      */
     protected List<IConfigurationElement> getConfigElements(IExtension extension)
     {
