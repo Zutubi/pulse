@@ -91,7 +91,7 @@ public class LsAction extends VFSActionSupport
         this.depth = depth;
     }
 
-    public List getListing()
+    public List<FileObjectWrapper> getListing()
     {
         return listing;
     }
