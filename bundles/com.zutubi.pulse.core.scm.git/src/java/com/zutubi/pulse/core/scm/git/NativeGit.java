@@ -59,9 +59,13 @@ public class NativeGit
         run(command);
     }
 
-    public void fetch(String remote) throws ScmException
+    public void fetch(String ...remote) throws ScmException
     {
-        String[] command = {"git", "fetch", remote};
+        String[] command = new String[2 + remote.length];
+        command[0] = "git";
+        command[1] = "fetch";
+
+        System.arraycopy(remote, 0, command, 2, remote.length);
 
         run(command);
     }
@@ -86,14 +90,14 @@ public class NativeGit
 
     public void checkout(String branch) throws ScmException
     {
-        String[] command = {"git", "checkout", branch};
+        String[] command = {"git", "checkout", "-b", branch, "origin/" + branch};
 
         run(command);
     }
 
     public List<GitBranchEntry> branch() throws ScmException
     {
-        String[] command = {"git", "branch", "-r"};
+        String[] command = {"git", "branch"};
 
         BranchOutputHandler handler = new BranchOutputHandler();
 
