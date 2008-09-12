@@ -1,8 +1,6 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.agent.Agent;
-import com.zutubi.pulse.agent.AgentManager;
-import com.zutubi.pulse.agent.MasterLocationProvider;
+import com.zutubi.pulse.agent.*;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
@@ -68,6 +66,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     private AgentManager agentManager;
     private EventManager eventManager;
     private MasterLocationProvider masterLocationProvider;
+    private AgentSorter agentSorter = new DefaultAgentSorter();
 
     public ThreadedRecipeQueue()
     {
@@ -379,7 +378,8 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
                     }
                     else
                     {
-                        for (Agent agent : agentManager.getAvailableAgents())
+                        Iterable<Agent> agentList = agentSorter.sort(agentManager.getAvailableAgents(), request);
+                        for (Agent agent : agentList)
                         {
                             BuildService service = agent.getBuildService();
 
@@ -691,6 +691,11 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     public void setMasterLocationProvider(MasterLocationProvider masterLocationProvider)
     {
         this.masterLocationProvider = masterLocationProvider;
+    }
+
+    public void setAgentSorter(AgentSorter agentSorter)
+    {
+        this.agentSorter = agentSorter;
     }
 
     private static class DispatchedRequest
