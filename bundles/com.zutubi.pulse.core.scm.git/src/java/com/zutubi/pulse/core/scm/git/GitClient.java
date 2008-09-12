@@ -80,7 +80,17 @@ public class GitClient implements ScmClient
 
     public Revision update(ScmContext context, ScmEventHandler handler) throws ScmException
     {
-        return checkout(context, handler);
+        NativeGit git = new NativeGit();
+        File workingDir = context.getDir();
+
+        git.setWorkingDirectory(workingDir);
+        git.pull();
+
+        // what is the current head revision?.
+        List<GitLogEntry> entries = git.log("HEAD^", "HEAD");
+        GitLogEntry entry = entries.get(0);
+
+        return new Revision(entry.getAuthor(), entry.getComment(), entry.getDate(), entry.getCommit());
     }
 
     public InputStream retrieve(String path, Revision revision) throws ScmException
