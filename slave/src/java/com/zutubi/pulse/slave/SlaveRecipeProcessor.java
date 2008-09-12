@@ -1,9 +1,6 @@
 package com.zutubi.pulse.slave;
 
-import com.zutubi.pulse.BuildContext;
-import com.zutubi.pulse.ChainBootstrapper;
-import com.zutubi.pulse.ServerBootstrapper;
-import com.zutubi.pulse.ServerRecipePaths;
+import com.zutubi.pulse.*;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
@@ -11,6 +8,7 @@ import com.zutubi.pulse.events.build.RecipeErrorEvent;
 import com.zutubi.pulse.repository.SlaveFileRepository;
 import com.zutubi.pulse.services.MasterService;
 import com.zutubi.pulse.services.ServiceTokenManager;
+import com.zutubi.pulse.util.FileSystem;
 import com.zutubi.pulse.util.logging.Logger;
 
 import java.net.MalformedURLException;
@@ -26,10 +24,11 @@ public class SlaveRecipeProcessor
     private EventManager eventManager;
     private MasterProxyFactory masterProxyFactory;
     private ServiceTokenManager serviceTokenManager;
+    private RecipeCleanup recipeCleanup;
 
     public SlaveRecipeProcessor()
     {
-        // TODO on startup, clean out any existing working/output directories left around
+        recipeCleanup = new RecipeCleanup(new FileSystem());
     }
 
     private EventListener registerMasterListener(String master, MasterService service, long id)
@@ -70,6 +69,7 @@ public class SlaveRecipeProcessor
 
             try
             {
+                recipeCleanup.cleanup(eventManager, processorPaths.getRecipesRoot(), request.getId());
                 recipeProcessor.build(request, processorPaths, repo, true, context);
             }
             catch (BuildException e)

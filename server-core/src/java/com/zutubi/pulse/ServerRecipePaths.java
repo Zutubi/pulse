@@ -42,7 +42,7 @@ public class ServerRecipePaths implements RecipePaths
         this.incremental = incremental;
     }
 
-    private File getRecipesRoot()
+    public File getRecipesRoot()
     {
         return new File(dataDir, "recipes");
     }

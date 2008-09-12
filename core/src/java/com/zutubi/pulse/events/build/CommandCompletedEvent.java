@@ -19,6 +19,32 @@ public class CommandCompletedEvent extends RecipeEvent
         return result;
     }
 
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+        if (!super.equals(o))
+        {
+            return false;
+        }
+
+        CommandCompletedEvent event = (CommandCompletedEvent) o;
+        return result.equals(event.result);
+    }
+
+    public int hashCode()
+    {
+        int result1 = super.hashCode();
+        result1 = 31 * result1 + result.hashCode();
+        return result1;
+    }
+
     public String toString()
     {
         StringBuffer buff = new StringBuffer("Command Completed Event: ");

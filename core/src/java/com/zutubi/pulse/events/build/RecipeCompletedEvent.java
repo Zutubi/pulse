@@ -40,6 +40,39 @@ public class RecipeCompletedEvent extends RecipeEvent
         this.buildVersion = buildVersion;
     }
 
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+        if (!super.equals(o))
+        {
+            return false;
+        }
+
+        RecipeCompletedEvent event = (RecipeCompletedEvent) o;
+
+        if (buildVersion != null ? !buildVersion.equals(event.buildVersion) : event.buildVersion != null)
+        {
+            return false;
+        }
+
+        return result.equals(event.result);
+    }
+
+    public int hashCode()
+    {
+        int result1 = super.hashCode();
+        result1 = 31 * result1 + result.hashCode();
+        result1 = 31 * result1 + (buildVersion != null ? buildVersion.hashCode() : 0);
+        return result1;
+    }
+
     public String toString()
     {
         StringBuffer buff = new StringBuffer("Recipe Completed Event");
