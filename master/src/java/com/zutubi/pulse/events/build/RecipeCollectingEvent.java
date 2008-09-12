@@ -13,7 +13,7 @@ public class RecipeCollectingEvent extends RecipeEvent
 
     public String toString()
     {
-        StringBuffer buff = new StringBuffer("Recipe Collection Completed Event");
+        StringBuffer buff = new StringBuffer("Recipe Collecting Event");
         buff.append(": ").append(getRecipeId());
         return buff.toString();
     }
