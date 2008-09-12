@@ -41,8 +41,12 @@ import java.util.List;
  */
 public class BuildController implements EventListener
 {
-    private static final String TIMEOUT_TRIGGER_GROUP = "timeout";
     private static final Logger LOG = Logger.getLogger(BuildController.class);
+
+    static final String ALLOW_PERSONAL_BUILDS = "ALLOW_PERSONAL_BUILDS";
+    static final String PULSE_RESTRICT_PERSONAL_BUILDS = "pulse.restrict.personal.builds";
+
+    private static final String TIMEOUT_TRIGGER_GROUP = "timeout";
 
     private AbstractBuildRequestEvent request;
     private Project project;
@@ -120,7 +124,7 @@ public class BuildController implements EventListener
         buildProperties.add(new ResourceProperty("project", project.getName()));
         buildProperties.add(new ResourceProperty("specification", specification.getName()));
         
-        configure(root, buildResult.getRoot(), specification, specification.getRoot());
+        configure(root, buildResult.getRoot(), specification.getRoot());
 
         return tree;
     }
@@ -136,7 +140,7 @@ public class BuildController implements EventListener
         return previousSuccessful;
     }
 
-    private void configure(TreeNode<RecipeController> rcNode, RecipeResultNode resultNode, BuildSpecification specification, BuildSpecificationNode specNode)
+    private void configure(TreeNode<RecipeController> rcNode, RecipeResultNode resultNode, BuildSpecificationNode specNode)
     {
         for (BuildSpecificationNode node : specNode.getChildren())
         {
@@ -152,7 +156,7 @@ public class BuildController implements EventListener
 
             boolean incremental = !request.isPersonal() && specification.getCheckoutScheme() == BuildSpecification.CheckoutScheme.INCREMENTAL_UPDATE;
             List<ResourceProperty> recipeProperties = new LinkedList<ResourceProperty>(buildProperties);
-            RecipeRequest recipeRequest = new RecipeRequest(project.getName(), specification.getName(), recipeResult.getId(), stage.getRecipe(), incremental, true, specification.getRetainWorkingCopy(), getResourceRequirements(specification, node), recipeProperties);
+            RecipeRequest recipeRequest = new RecipeRequest(project.getName(), specification.getName(), recipeResult.getId(), stage.getRecipe(), incremental, true, specification.getRetainWorkingCopy(), getResourceRequirements(node, Boolean.getBoolean(PULSE_RESTRICT_PERSONAL_BUILDS)), recipeProperties);
             RecipeDispatchRequest dispatchRequest = new RecipeDispatchRequest(specification, stage.getHostRequirements(), request.getRevision(), recipeRequest, buildResult);
             DefaultRecipeLogger logger = new DefaultRecipeLogger(new File(paths.getRecipeDir(buildResult, recipeResult.getId()), RecipeResult.RECIPE_LOG));
             RecipeResultNode previousRecipe = previousSuccessful == null ? null : previousSuccessful.findResultNode(stage.getPname());
@@ -160,16 +164,25 @@ public class BuildController implements EventListener
             TreeNode<RecipeController> child = new TreeNode<RecipeController>(rc);
             rcNode.add(child);
             pendingRecipes++;
-            configure(child, childResultNode, specification, node);
+            configure(child, childResultNode, node);
         }
     }
 
-    private List<ResourceRequirement> getResourceRequirements(BuildSpecification specification, BuildSpecificationNode node)
+    List<ResourceRequirement> getResourceRequirements(BuildSpecificationNode node, boolean restrictPersonalBuilds)
     {
         List<ResourceRequirement> requirements = new LinkedList<ResourceRequirement>();
         requirements.addAll(specification.getRoot().getResourceRequirements());
         requirements.addAll(node.getResourceRequirements());
+        if (needsPersonalBuildResource(restrictPersonalBuilds))
+        {
+            requirements.add(new ResourceRequirement(ALLOW_PERSONAL_BUILDS, null));
+        }
         return requirements;
+    }
+
+    boolean needsPersonalBuildResource(boolean restrictPersonalBuilds)
+    {
+        return restrictPersonalBuilds && request.isPersonal();
     }
 
     public void handleEvent(Event evt)
