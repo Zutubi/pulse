@@ -5,6 +5,7 @@ import com.zutubi.pulse.SystemInfo;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.agent.PingStatus;
 import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.core.ObjectFactory;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.model.Resource;
 import com.zutubi.pulse.filesystem.FileInfo;
@@ -38,6 +39,7 @@ public class SlaveServiceImpl implements SlaveService
     private SlaveRecipeProcessor slaveRecipeProcessor;
     private ServerMessagesHandler serverMessagesHandler;
     private MasterProxyFactory masterProxyFactory;
+    private ObjectFactory objectFactory;
 
     private boolean firstStatus = true;
 
@@ -124,12 +126,18 @@ public class SlaveServiceImpl implements SlaveService
     {
         serviceTokenManager.validateToken(token);
 
-        RecipeCommand command = new RecipeCommand(master, slaveId, request, context);
-        ComponentContext.autowire(command);
-        ErrorHandlingRunnable runnable = new ErrorHandlingRunnable(master, serviceTokenManager, request.getId(), command);
-        ComponentContext.autowire(runnable);
+        try
+        {
+            RecipeCommand command = objectFactory.buildBean(RecipeCommand.class, new Class[]{String.class, Long.TYPE, RecipeRequest.class, BuildContext.class}, new Object[] {master, slaveId, request, context});
+            ErrorHandlingRunnable runnable = new ErrorHandlingRunnable(masterProxyFactory.createProxy(master), serviceTokenManager.getToken(), request.getId(), command);
+            return slaveQueue.enqueueExclusive(runnable);
+        }
+        catch (Exception e)
+        {
+            LOG.severe(e);
+        }
 
-        return slaveQueue.enqueueExclusive(runnable);
+        return true;
     }
 
     public void cleanupRecipe(String token, String project, String spec, long recipeId, boolean incremental) throws InvalidTokenException
@@ -276,5 +284,10 @@ public class SlaveServiceImpl implements SlaveService
     public void setMasterProxyFactory(MasterProxyFactory masterProxyFactory)
     {
         this.masterProxyFactory = masterProxyFactory;
+    }
+
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
     }
 }
