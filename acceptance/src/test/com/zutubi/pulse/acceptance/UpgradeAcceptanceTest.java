@@ -11,7 +11,7 @@ import com.zutubi.pulse.transfer.TransferException;
 import com.zutubi.pulse.hibernate.MutableConfiguration;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.ZipUtils;
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 import org.apache.commons.cli.ParseException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;

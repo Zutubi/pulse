@@ -1,7 +1,7 @@
 package com.zutubi.tove.velocity;
 
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.util.logging.Logger;
 import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.exception.ParseErrorException;
@@ -25,7 +25,7 @@ public class I18NDirective extends AbstractI18NDirective
 
     public I18NDirective()
     {
-        ComponentContext.autowire(this);
+        SpringComponentContext.autowire(this);
     }
 
     /**

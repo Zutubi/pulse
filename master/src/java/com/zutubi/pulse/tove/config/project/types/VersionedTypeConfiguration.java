@@ -10,7 +10,7 @@ import com.zutubi.pulse.core.scm.ScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.validation.annotations.Required;
 
 import java.io.InputStream;

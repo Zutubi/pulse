@@ -3,7 +3,7 @@ package com.zutubi.pulse.tove.config.user;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.Password;
 import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.validation.Validateable;
@@ -68,7 +68,7 @@ public class SignupUserConfiguration extends AbstractConfiguration implements Va
 
     public void validate(ValidationContext context)
     {
-        UserManager userManager = ComponentContext.getBean("userManager");
+        UserManager userManager = SpringComponentContext.getBean("userManager");
         if(login != null && userManager.getUser(login) != null)
         {
             context.addFieldError("login", "login '" + login + "' is already in use; please choose another login");

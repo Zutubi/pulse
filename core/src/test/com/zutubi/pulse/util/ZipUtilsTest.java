@@ -1,7 +1,7 @@
 package com.zutubi.pulse.util;
 
 import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.SystemUtils;
 
 import java.io.*;

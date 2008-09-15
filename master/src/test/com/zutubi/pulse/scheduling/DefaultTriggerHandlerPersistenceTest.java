@@ -1,6 +1,6 @@
 package com.zutubi.pulse.scheduling;
 
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.model.persistence.hibernate.PersistenceTestCase;
 import com.zutubi.pulse.model.persistence.TriggerDao;
 
@@ -25,8 +25,8 @@ public class DefaultTriggerHandlerPersistenceTest extends PersistenceTestCase
     {
         super.setUp();
 
-        handler = (TriggerHandler) ComponentContext.getBean("triggerHandler");
-        triggerDao = (TriggerDao) ComponentContext.getBean("triggerDao");
+        handler = (TriggerHandler) SpringComponentContext.getBean("triggerHandler");
+        triggerDao = (TriggerDao) SpringComponentContext.getBean("triggerDao");
     }
 
     protected void tearDown() throws Exception

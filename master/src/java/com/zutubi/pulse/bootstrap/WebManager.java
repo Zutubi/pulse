@@ -4,10 +4,7 @@ import com.zutubi.pulse.jetty.JettyManager;
 import com.opensymphony.xwork.config.ConfigurationManager;
 import com.opensymphony.xwork.config.providers.XmlConfigurationProvider;
 import com.zutubi.pulse.security.SecurityManager;
-import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.events.EventListener;
-import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.events.system.SystemStartedEvent;
+import com.zutubi.pulse.spring.SpringComponentContext;
 
 /**
  */
@@ -36,7 +33,7 @@ public class WebManager
         loadXworkConfiguration("xwork.xml");
 
         // enable security only when the standard xwork file is loaded.
-        SecurityManager securityManager = ComponentContext.getBean("securityManager");
+        SecurityManager securityManager = SpringComponentContext.getBean("securityManager");
         securityManager.secure();
     }
 

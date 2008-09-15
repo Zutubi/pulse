@@ -13,7 +13,7 @@ import com.zutubi.pulse.events.build.CommandCommencedEvent;
 import com.zutubi.pulse.events.build.CommandCompletedEvent;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
 import java.io.FileInputStream;

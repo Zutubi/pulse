@@ -4,7 +4,7 @@ import com.zutubi.pulse.bootstrap.MasterUserPaths;
 import com.zutubi.pulse.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.monitor.FeedbackAware;
 import com.zutubi.pulse.monitor.TaskFeedback;
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.Pair;
 import com.zutubi.util.StringUtils;
 

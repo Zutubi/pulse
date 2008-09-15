@@ -4,7 +4,7 @@ import com.caucho.hessian.io.HessianInput;
 import com.caucho.hessian.io.HessianOutput;
 import com.caucho.hessian.io.SerializerFactory;
 import com.caucho.hessian.server.HessianSkeleton;
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.pulse.spring.SpringObjectFactory;
@@ -73,7 +73,7 @@ public class CustomHessianServlet extends GenericServlet
         if (customSerialiserFactory == null)
         {
             // TODO: when we get autowiring of servlets sorted out, we can remove this call to the ComponentContext.
-            customSerialiserFactory = (CustomSerialiserFactory) ComponentContext.getBean("customSerialiserFactory");
+            customSerialiserFactory = (CustomSerialiserFactory) SpringComponentContext.getBean("customSerialiserFactory");
         }
         return customSerialiserFactory;
     }
@@ -93,8 +93,8 @@ public class CustomHessianServlet extends GenericServlet
         try
         {
             CustomHessianClassLoader customClassLoader = new CustomHessianClassLoader(originalClassLoader);
-            customClassLoader.setRegistry((HessianConfigurationExtensionManager) ComponentContext.getBean("hessianExtensionManager"));
-            customClassLoader.setPluginManager((PluginManager) ComponentContext.getBean("pluginManager"));
+            customClassLoader.setRegistry((HessianConfigurationExtensionManager) SpringComponentContext.getBean("hessianExtensionManager"));
+            customClassLoader.setPluginManager((PluginManager) SpringComponentContext.getBean("pluginManager"));
             
             Thread.currentThread().setContextClassLoader(customClassLoader);
 

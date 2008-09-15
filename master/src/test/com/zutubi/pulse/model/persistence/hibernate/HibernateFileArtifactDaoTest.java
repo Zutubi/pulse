@@ -1,6 +1,6 @@
 package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.model.persistence.ArtifactDao;
@@ -16,8 +16,8 @@ public class HibernateFileArtifactDaoTest extends MasterPersistenceTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        artifactDao = (ArtifactDao) ComponentContext.getBean("artifactDao");
-        fileArtifactDao = (FileArtifactDao) ComponentContext.getBean("fileArtifactDao");
+        artifactDao = (ArtifactDao) SpringComponentContext.getBean("artifactDao");
+        fileArtifactDao = (FileArtifactDao) SpringComponentContext.getBean("fileArtifactDao");
     }
 
     protected void tearDown() throws Exception

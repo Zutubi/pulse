@@ -6,7 +6,7 @@ import com.zutubi.pulse.core.scm.ScmChangeAccumulator;
 import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.StringUtils;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;

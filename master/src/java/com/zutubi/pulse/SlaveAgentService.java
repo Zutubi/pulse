@@ -13,7 +13,7 @@ import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.ZipUtils;
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.mortbay.util.UrlEncoded;
 

@@ -2,7 +2,7 @@ package com.zutubi.pulse.core.model;
 
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.util.TimeStamps;
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 
 import java.io.*;
 import java.util.LinkedList;

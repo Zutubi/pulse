@@ -9,7 +9,7 @@ import com.zutubi.pulse.transfer.xml.XMLTransferSource;
 import com.zutubi.pulse.transfer.xml.XMLTransferTarget;
 import com.zutubi.pulse.util.JDBCUtils;
 import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.UnaryProcedure;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.mapping.Column;

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.servlet;
 
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.pulse.vfs.pulse.AbstractPulseFileObject;
 import com.zutubi.pulse.vfs.pulse.AddressableFileObject;
@@ -91,7 +91,7 @@ public class DisplayServlet extends HttpServlet
     {
         if (fsManager == null)
         {
-            fsManager = (FileSystemManager) ComponentContext.getBean("fileSystemManager");
+            fsManager = (FileSystemManager) SpringComponentContext.getBean("fileSystemManager");
         }
         return fsManager;
     }

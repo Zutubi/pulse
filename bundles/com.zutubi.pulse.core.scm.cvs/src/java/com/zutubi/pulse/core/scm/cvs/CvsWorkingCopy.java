@@ -7,7 +7,7 @@ import com.zutubi.pulse.core.scm.*;
 import com.zutubi.pulse.core.scm.cvs.client.CvsCore;
 import com.zutubi.pulse.personal.PersonalBuildException;
 import com.zutubi.pulse.personal.PersonalBuildSupport;
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.TextUtils;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.DefaultFileInfoContainer;

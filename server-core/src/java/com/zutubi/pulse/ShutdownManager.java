@@ -1,6 +1,6 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.util.logging.Logger;
 
@@ -82,7 +82,7 @@ public class ShutdownManager
         else
         {
             // cleanout the component context.
-            ComponentContext.closeAll();
+            SpringComponentContext.closeAll();
             System.err.printf("[%s] Shutdown complete.\n", getDateString());
         }
     }

@@ -6,7 +6,7 @@ import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.SystemUtils;
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;

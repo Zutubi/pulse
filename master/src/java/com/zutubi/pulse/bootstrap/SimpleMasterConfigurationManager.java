@@ -8,7 +8,8 @@ import com.zutubi.pulse.database.DatabaseConfig;
 import com.zutubi.pulse.database.DriverRegistry;
 import com.zutubi.pulse.events.DataDirectoryChangedEvent;
 import com.zutubi.pulse.events.EventManager;
-import com.zutubi.util.IOUtils;
+import com.zutubi.pulse.spring.SpringComponentContext;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.TextUtils;
 
 import java.io.File;
@@ -158,7 +159,7 @@ public class SimpleMasterConfigurationManager extends AbstractConfigurationManag
         getSystemConfig().setDataPath(f.getAbsolutePath());
 
         // this object is instantiated before the eventManager, so the wiring needs to be manual.
-        EventManager eventManager = (EventManager) ComponentContext.getBean("eventManager");
+        EventManager eventManager = (EventManager) SpringComponentContext.getBean("eventManager");
         eventManager.publish(new DataDirectoryChangedEvent(this));
 
         // refresh the data instance.

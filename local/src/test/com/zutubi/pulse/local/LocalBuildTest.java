@@ -1,10 +1,10 @@
 package com.zutubi.pulse.local;
 
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 
 import java.io.*;
 import java.net.URISyntaxException;
@@ -33,7 +33,7 @@ public class LocalBuildTest extends PulseTestCase
     @Override
     protected void tearDown() throws Exception
     {
-        ComponentContext.closeAll();
+        SpringComponentContext.closeAll();
         removeDirectory(tmpDir);
         super.tearDown();
     }

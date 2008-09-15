@@ -2,8 +2,8 @@ package com.zutubi.pulse.slave;
 
 import com.zutubi.pulse.SystemInfo;
 import com.zutubi.pulse.Version;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.agent.PingStatus;
-import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.StartupManager;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.Resource;
@@ -54,7 +54,7 @@ public class SlaveServiceImpl implements SlaveService
 
         // Currently we always accept the request
         UpdateCommand command = new UpdateCommand(build, master, token, handle, packageUrl, packageSize);
-        ComponentContext.autowire(command);
+        SpringComponentContext.autowire(command);
         threadPool.execute(command);
         return true;
     }
@@ -125,9 +125,9 @@ public class SlaveServiceImpl implements SlaveService
         serviceTokenManager.validateToken(token);
 
         RecipeCommand command = new RecipeCommand(master, handle, request);
-        ComponentContext.autowire(command);
+        SpringComponentContext.autowire(command);
         ErrorHandlingRunnable runnable = new ErrorHandlingRunnable(master, serviceTokenManager, request.getId(), command);
-        ComponentContext.autowire(runnable);
+        SpringComponentContext.autowire(runnable);
 
         return slaveQueue.enqueueExclusive(runnable);
     }
@@ -137,7 +137,7 @@ public class SlaveServiceImpl implements SlaveService
         serviceTokenManager.validateToken(token);
 
         CleanupRecipeCommand command = new CleanupRecipeCommand(project, recipeId, incremental);
-        ComponentContext.autowire(command);
+        SpringComponentContext.autowire(command);
         threadPool.execute(command);
     }
 

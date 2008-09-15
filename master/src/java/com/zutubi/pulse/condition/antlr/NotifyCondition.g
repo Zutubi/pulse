@@ -3,7 +3,7 @@ header {
 }
 
 {
-    import com.zutubi.pulse.bootstrap.ComponentContext;
+    import com.zutubi.pulse.spring.ComponentContext;
     import com.zutubi.pulse.condition.*;
 }
 

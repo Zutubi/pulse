@@ -3,6 +3,7 @@ package com.zutubi.pulse.bootstrap;
 import com.zutubi.pulse.logging.LogConfiguration;
 import com.zutubi.pulse.logging.LogConfigurationManager;
 import com.zutubi.pulse.tove.config.admin.LoggingConfiguration;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.tove.config.ConfigurationEventListener;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.events.ConfigurationEvent;
@@ -48,9 +49,9 @@ public class MasterLogConfiguration implements LogConfiguration, ConfigurationEv
 
     private ConfigurationProvider getConfigurationProvider()
     {
-        if (configurationProvider == null && ComponentContext.containsBean(CONFIGURATION_PROVIDER_NAME))
+        if (configurationProvider == null && SpringComponentContext.containsBean(CONFIGURATION_PROVIDER_NAME))
         {
-            configurationProvider = ComponentContext.getBean(CONFIGURATION_PROVIDER_NAME);
+            configurationProvider = SpringComponentContext.getBean(CONFIGURATION_PROVIDER_NAME);
             if (configurationProvider != null)
             {
                 configurationProvider.registerEventListener(this, false, false, LoggingConfiguration.class);

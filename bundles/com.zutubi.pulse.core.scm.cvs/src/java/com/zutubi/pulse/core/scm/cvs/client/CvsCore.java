@@ -8,7 +8,7 @@ import com.zutubi.pulse.core.scm.cvs.client.commands.*;
 import com.zutubi.pulse.core.scm.cvs.client.util.CvsUtils;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.Constants;
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.Client;

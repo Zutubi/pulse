@@ -1,8 +1,7 @@
 package com.zutubi.pulse.bootstrap.tasks;
 
-import com.zutubi.pulse.security.AcegiSecurityManager;
 import com.zutubi.pulse.bootstrap.StartupTask;
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.bootstrap.WebManager;
 import com.zutubi.pulse.bootstrap.SetupManager;
 
@@ -28,10 +27,10 @@ public class ProcessSetupStartupTask implements Runnable, StartupTask
     public void execute()
     {
         // load the setup context. we do not expect this to take long, so we dont worry about a holding page here.
-        ComponentContext.addClassPathContextDefinitions(setupContexts.toArray(new String[setupContexts.size()]));
+        SpringComponentContext.addClassPathContextDefinitions(setupContexts.toArray(new String[setupContexts.size()]));
 
         // Deploy the setup xwork configuration.
-        WebManager webManager = (WebManager) ComponentContext.getBean("webManager");
+        WebManager webManager = (WebManager) SpringComponentContext.getBean("webManager");
         webManager.deploySetup();
 
         Thread setupThread = threadFactory.newThread(this);
@@ -57,7 +56,7 @@ public class ProcessSetupStartupTask implements Runnable, StartupTask
 
     public void run()
     {
-        SetupManager setupManager = (SetupManager) ComponentContext.getBean("setupManager");
+        SetupManager setupManager = (SetupManager) SpringComponentContext.getBean("setupManager");
         setupManager.startSetupWorkflow(this);
     }
 

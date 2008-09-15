@@ -16,7 +16,7 @@ import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.RecipeResultNode;
 import com.zutubi.pulse.model.persistence.hibernate.HibernateBuildResultDao;
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.UnaryProcedure;
 
 import java.io.OutputStream;

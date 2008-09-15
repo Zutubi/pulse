@@ -1,6 +1,6 @@
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.database.DatabaseConfig;
 import com.zutubi.pulse.database.DatabaseConsole;
 import com.zutubi.pulse.database.DatabaseConsoleBeanFactory;
@@ -37,13 +37,13 @@ public abstract class BaseUpgradeTaskTestCase extends PulseTestCase
     {
         super.setUp();
 
-        ComponentContext.addClassPathContextDefinitions("com/zutubi/pulse/bootstrap/testBootstrapContext.xml");
-        dataSource = (BasicDataSource) ComponentContext.getBean("dataSource");
-        databaseConfig = (DatabaseConfig) ComponentContext.getBean("databaseConfig");
+        SpringComponentContext.addClassPathContextDefinitions("com/zutubi/pulse/bootstrap/testBootstrapContext.xml");
+        dataSource = (BasicDataSource) SpringComponentContext.getBean("dataSource");
+        databaseConfig = (DatabaseConfig) SpringComponentContext.getBean("databaseConfig");
 
         // initialise required schema.
         DatabaseConsoleBeanFactory factory = new DatabaseConsoleBeanFactory();
-        factory.setDatabaseConfig((DatabaseConfig) ComponentContext.getBean("databaseConfig"));
+        factory.setDatabaseConfig((DatabaseConfig) SpringComponentContext.getBean("databaseConfig"));
         factory.setDataSource(dataSource);
         factory.setHibernateMappings(getTestMappings());
 
@@ -60,7 +60,7 @@ public abstract class BaseUpgradeTaskTestCase extends PulseTestCase
         databaseConsole = null;
         databaseConfig = null;
 
-        ComponentContext.closeAll();
+        SpringComponentContext.closeAll();
 
         super.tearDown();
     }

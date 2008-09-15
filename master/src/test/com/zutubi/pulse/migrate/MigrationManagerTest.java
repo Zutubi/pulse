@@ -14,7 +14,7 @@ import com.zutubi.pulse.hibernate.SchemaRefactor;
 import com.zutubi.pulse.util.JDBCUtils;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.RandomUtils;
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.hibernate.cfg.Environment;
 

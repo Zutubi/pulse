@@ -1,12 +1,12 @@
 package com.zutubi.pulse.servlet;
 
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.model.BuildManager;
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -29,11 +29,11 @@ public class ViewFileServlet extends HttpServlet
     {
         if (buildManager == null)
         {
-            buildManager = (BuildManager) ComponentContext.getBean("buildManager");
+            buildManager = (BuildManager) SpringComponentContext.getBean("buildManager");
         }
         if (configurationManager == null)
         {
-            configurationManager =  (MasterConfigurationManager) ComponentContext.getBean("configurationManager");
+            configurationManager =  (MasterConfigurationManager) SpringComponentContext.getBean("configurationManager");
         }
 
         String path = httpServletRequest.getPathInfo();

@@ -3,7 +3,7 @@ package com.zutubi.pulse.migrate;
 import com.zutubi.config.annotations.*;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.tove.config.setup.DatabaseType;
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.TextUtils;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;

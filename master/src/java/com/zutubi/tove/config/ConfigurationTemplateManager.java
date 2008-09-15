@@ -1,7 +1,7 @@
 package com.zutubi.tove.config;
 
 import com.zutubi.config.annotations.Wire;
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.config.ConfigurationList;
 import com.zutubi.pulse.core.config.ConfigurationMap;
@@ -571,7 +571,7 @@ public class ConfigurationTemplateManager
         CompositeType type = typeRegistry.getType(instance.getClass());
         if(type != null && type.hasAnnotation(Wire.class, true))
         {
-            ComponentContext.autowire(instance);
+            SpringComponentContext.autowire(instance);
         }
     }
 

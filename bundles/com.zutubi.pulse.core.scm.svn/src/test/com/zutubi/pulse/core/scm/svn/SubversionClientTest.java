@@ -10,7 +10,7 @@ import com.zutubi.pulse.core.scm.ScmFile;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.ZipUtils;
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 import org.tmatesoft.svn.core.SVNURL;
 
 import java.io.File;

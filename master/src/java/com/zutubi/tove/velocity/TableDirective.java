@@ -1,6 +1,6 @@
 package com.zutubi.tove.velocity;
 
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.model.Table;
 import com.zutubi.tove.table.TableDescriptor;
@@ -39,7 +39,7 @@ public class TableDirective extends ToveDirective
 
     public TableDirective()
     {
-        ComponentContext.autowire(this);
+        SpringComponentContext.autowire(this);
     }
 
     public void setAjax(boolean ajax)
@@ -76,7 +76,7 @@ public class TableDirective extends ToveDirective
 
             // generate the table descriptor based on the type of the results.
             TableDescriptorFactory tableFactory = new TableDescriptorFactory();
-            ComponentContext.autowire(tableFactory);
+            SpringComponentContext.autowire(tableFactory);
 
             TableDescriptor tableDescriptor = tableFactory.create(path, collectionType);
             Table table = tableDescriptor.instantiate(path, data);

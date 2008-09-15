@@ -4,6 +4,7 @@ import com.zutubi.pulse.config.ConfigSupport;
 import com.zutubi.pulse.config.FileConfig;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.system.SystemStartedEvent;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
@@ -118,7 +119,7 @@ public class DefaultStartupManager implements StartupManager
             startTime = System.currentTimeMillis();
 
             // send a message to the rest of the system that all is good to go.
-            EventManager eventManager = (EventManager) ComponentContext.getBean("eventManager");
+            EventManager eventManager = (EventManager) SpringComponentContext.getBean("eventManager");
             eventManager.publish(new SystemStartedEvent(this));
 
             runStartupTasks(postStartupTasks);

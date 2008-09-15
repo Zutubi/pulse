@@ -2,7 +2,7 @@ package com.zutubi.pulse.tove.config.project.types;
 
 import com.zutubi.config.annotations.*;
 import com.zutubi.pulse.PostProcessorManager;
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.personal.PatchArchive;
@@ -102,7 +102,7 @@ public abstract class TemplateTypeConfiguration extends TypeConfiguration
     {
         if(velocityEngine == null)
         {
-            velocityEngine = (VelocityEngine) ComponentContext.getBean("velocityEngine");
+            velocityEngine = (VelocityEngine) SpringComponentContext.getBean("velocityEngine");
         }
         return velocityEngine;
     }

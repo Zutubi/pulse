@@ -7,7 +7,7 @@ import com.zutubi.pulse.tove.config.project.types.FileArtifactConfiguration;
 import com.zutubi.pulse.tove.config.project.types.PostProcessorFragment;
 import com.zutubi.pulse.tove.config.project.types.TemplateTypeConfiguration;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 import org.apache.velocity.app.VelocityEngine;
 
 import java.io.File;

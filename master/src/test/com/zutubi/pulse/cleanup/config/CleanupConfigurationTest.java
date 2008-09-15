@@ -1,6 +1,6 @@
 package com.zutubi.pulse.cleanup.config;
 
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
@@ -31,8 +31,8 @@ public class CleanupConfigurationTest extends MasterPersistenceTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        projectDao = (ProjectDao) ComponentContext.getBean("projectDao");
-        buildResultDao = (BuildResultDao) ComponentContext.getBean("buildResultDao");
+        projectDao = (ProjectDao) SpringComponentContext.getBean("projectDao");
+        buildResultDao = (BuildResultDao) SpringComponentContext.getBean("buildResultDao");
 
         p1 = new Project();
         p2 = new Project();

@@ -3,7 +3,7 @@ package com.zutubi.pulse.core;
 import com.zutubi.pulse.core.validation.CommandValidationException;
 import com.zutubi.pulse.validation.PulseValidationContext;
 import com.zutubi.pulse.validation.PulseValidationManager;
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.ValidationException;

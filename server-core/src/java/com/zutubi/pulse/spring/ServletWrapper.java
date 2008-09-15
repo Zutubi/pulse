@@ -1,6 +1,6 @@
 package com.zutubi.pulse.spring;
 
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.TextUtils;
 
@@ -83,7 +83,7 @@ public class ServletWrapper implements Servlet
 
         try
         {
-            ObjectFactory objectFactory = (ObjectFactory) ComponentContext.getBean("objectFactory");
+            ObjectFactory objectFactory = (ObjectFactory) SpringComponentContext.getBean("objectFactory");
             return objectFactory.buildBean(className);
         }
         catch (Exception e)

@@ -1,7 +1,7 @@
 package com.zutubi.tove.webwork;
 
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.bootstrap.SystemPaths;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.tove.actions.ActionManager;
@@ -79,7 +79,7 @@ public class ConfigurationUIModel
 
         this.path = PathUtils.normalizePath(path);
 
-        ComponentContext.autowire(this);
+        SpringComponentContext.autowire(this);
 
         analyse();
     }

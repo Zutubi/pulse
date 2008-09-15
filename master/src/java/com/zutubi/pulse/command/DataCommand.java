@@ -1,6 +1,6 @@
 package com.zutubi.pulse.command;
 
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.bootstrap.DefaultSetupManager;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.SystemBootstrapManager;
@@ -78,18 +78,18 @@ public abstract class DataCommand implements Command
         SystemBootstrapManager sbm = new SystemBootstrapManager();
         sbm.loadBootstrapContext();
 
-        configurationManager = (MasterConfigurationManager) ComponentContext.getBean("configurationManager");
+        configurationManager = (MasterConfigurationManager) SpringComponentContext.getBean("configurationManager");
         if (!checkConfigFile())
         {
             return 2;
         }
 
-        ComponentContext.addClassPathContextDefinitions("classpath:/com/zutubi/pulse/bootstrap/context/databaseContext.xml");
-        ComponentContext.addClassPathContextDefinitions("classpath:/com/zutubi/pulse/bootstrap/context/hibernateMappingsContext.xml");
+        SpringComponentContext.addClassPathContextDefinitions("classpath:/com/zutubi/pulse/bootstrap/context/databaseContext.xml");
+        SpringComponentContext.addClassPathContextDefinitions("classpath:/com/zutubi/pulse/bootstrap/context/hibernateMappingsContext.xml");
 
-        dataSource = (DataSource) ComponentContext.getBean("dataSource");
+        dataSource = (DataSource) SpringComponentContext.getBean("dataSource");
 
-        List<String> mappings = (List<String>) ComponentContext.getBean("hibernateMappings");
+        List<String> mappings = (List<String>) SpringComponentContext.getBean("hibernateMappings");
 
         configuration = new MutableConfiguration();
         configuration.addClassPathMappings(mappings);

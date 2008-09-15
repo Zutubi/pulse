@@ -1,7 +1,7 @@
 package com.zutubi.tove.webwork;
 
 import com.opensymphony.xwork.ActionContext;
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.config.ConfigurationCheckHandler;
 import com.zutubi.tove.config.ConfigurationReferenceManager;
@@ -94,7 +94,7 @@ public class CheckAction extends ToveActionSupport
 
         // Instantiate and execute the check handler.
         ConfigurationCheckHandler handler = (ConfigurationCheckHandler) instantiator.instantiate(checkType, checkRecord);
-        ComponentContext.autowire(handler);
+        SpringComponentContext.autowire(handler);
         Exception exception = null;
         try
         {

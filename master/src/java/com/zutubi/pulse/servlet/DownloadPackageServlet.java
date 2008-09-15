@@ -1,10 +1,10 @@
 package com.zutubi.pulse.servlet;
 
 import com.zutubi.pulse.Version;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.bootstrap.SystemPaths;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
-import com.zutubi.pulse.bootstrap.ComponentContext;
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
 import javax.servlet.http.HttpServlet;
@@ -97,7 +97,7 @@ public class DownloadPackageServlet extends HttpServlet
     {
         if(systemPaths == null)
         {
-            ConfigurationManager configurationManager = (ConfigurationManager) ComponentContext.getBean("configurationManager");
+            ConfigurationManager configurationManager = (ConfigurationManager) SpringComponentContext.getBean("configurationManager");
             systemPaths = configurationManager.getSystemPaths();
         }
 

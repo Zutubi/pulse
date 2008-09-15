@@ -1,6 +1,6 @@
 package com.zutubi.pulse.personal;
 
-import com.zutubi.pulse.util.PasswordReader;
+import com.zutubi.util.io.PasswordReader;
 
 import java.io.BufferedReader;
 import java.io.IOException;

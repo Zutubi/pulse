@@ -7,7 +7,7 @@ import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.webwork.mapping.Urls;
 import com.zutubi.util.Constants;
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 

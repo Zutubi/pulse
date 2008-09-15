@@ -1,6 +1,5 @@
-package com.zutubi.pulse.bootstrap;
+package com.zutubi.pulse.spring;
 
-import com.zutubi.pulse.spring.SpringAutowireSupport;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -8,10 +7,12 @@ import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 /**
  * The component context is the central storage location for the systems ApplicatonContext
- * object. We need some way to make the context available to those components for which
+ * object.
+ *
+ * The main purpose of this is to make the context available to those components for which
  * springs auto-wiring is not available.
  */
-public class ComponentContext
+public class SpringComponentContext
 {
     private static ConfigurableApplicationContext context = null;
 

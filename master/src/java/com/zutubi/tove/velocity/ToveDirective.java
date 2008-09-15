@@ -3,7 +3,7 @@ package com.zutubi.tove.velocity;
 import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.velocity.AbstractDirective;
 import com.zutubi.tove.type.Type;
 import com.zutubi.tove.type.record.Record;
@@ -21,7 +21,7 @@ public abstract class ToveDirective extends AbstractDirective
 
     public ToveDirective()
     {
-        ComponentContext.autowire(this);
+        SpringComponentContext.autowire(this);
     }
 
     public void setProperty(String property)

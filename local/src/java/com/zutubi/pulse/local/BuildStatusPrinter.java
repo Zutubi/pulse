@@ -1,12 +1,12 @@
 package com.zutubi.pulse.local;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.build.*;
+import com.zutubi.pulse.core.model.*;
 import com.zutubi.util.TimeStamps;
-import com.zutubi.util.ForkOutputStream;
+import com.zutubi.util.io.ForkOutputStream;
 
 import java.io.File;
 import java.io.OutputStream;

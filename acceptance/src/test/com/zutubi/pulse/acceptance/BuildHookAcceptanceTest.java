@@ -11,7 +11,7 @@ import com.zutubi.pulse.tove.config.project.hooks.*;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.type.record.PathUtils;
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;

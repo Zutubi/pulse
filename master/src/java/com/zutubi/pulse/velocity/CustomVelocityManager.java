@@ -4,7 +4,7 @@ import com.opensymphony.webwork.views.velocity.VelocityManager;
 import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.agent.AgentManager;
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
@@ -35,7 +35,7 @@ public class CustomVelocityManager extends VelocityManager implements EventListe
 
     public CustomVelocityManager()
     {
-        ComponentContext.autowire(this);
+        SpringComponentContext.autowire(this);
     }
 
     public Context createContext(OgnlValueStack stack, HttpServletRequest req, HttpServletResponse res)
@@ -107,7 +107,7 @@ public class CustomVelocityManager extends VelocityManager implements EventListe
 
     public void handleEvent(Event event)
     {
-        ComponentContext.autowire(this);
+        SpringComponentContext.autowire(this);
     }
 
     public Class[] getHandledEvents()

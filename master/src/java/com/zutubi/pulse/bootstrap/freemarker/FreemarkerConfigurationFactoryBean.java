@@ -1,6 +1,6 @@
 package com.zutubi.pulse.bootstrap.freemarker;
 
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.webwork.mapping.Urls;
 import com.zutubi.util.logging.Logger;
@@ -79,7 +79,7 @@ public class FreemarkerConfigurationFactoryBean implements FactoryBean
 
     private MasterConfigurationManager getConfigurationManager()
     {
-        return (MasterConfigurationManager) ComponentContext.getBean("configurationManager");
+        return (MasterConfigurationManager) SpringComponentContext.getBean("configurationManager");
     }
 
     public Class getObjectType()

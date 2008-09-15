@@ -1,6 +1,6 @@
 package com.zutubi.pulse.plugins;
 
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.pulse.util.FileSystemUtils;
 
 import java.io.FileFilter;

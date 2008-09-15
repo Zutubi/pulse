@@ -1,6 +1,6 @@
 package com.zutubi.tove.velocity;
 
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.velocity.AbstractDirective;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.webwork.ToveUtils;
@@ -26,7 +26,7 @@ public class DisplayNameDirective extends AbstractDirective
 
     public DisplayNameDirective()
     {
-        ComponentContext.autowire(this);
+        SpringComponentContext.autowire(this);
     }
 
     public void setPath(String path)

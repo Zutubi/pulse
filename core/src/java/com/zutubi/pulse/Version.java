@@ -1,6 +1,6 @@
 package com.zutubi.pulse;
 
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.Constants;
 import com.zutubi.util.logging.Logger;
 

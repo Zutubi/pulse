@@ -1,7 +1,7 @@
 package com.zutubi.pulse.util;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.UnaryProcedure;
 import nu.xom.*;
 

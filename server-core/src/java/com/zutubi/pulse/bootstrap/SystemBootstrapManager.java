@@ -1,5 +1,7 @@
 package com.zutubi.pulse.bootstrap;
 
+import com.zutubi.pulse.spring.SpringComponentContext;
+
 import java.io.File;
 
 /**
@@ -42,17 +44,17 @@ public class SystemBootstrapManager
         File contextFile = new File(contextName);
         if (contextFile.isFile())
         {
-            ComponentContext.addFileContextDefinitions(contextName);
+            SpringComponentContext.addFileContextDefinitions(contextName);
         }
         else // look it up on the classpath.
         {
-            ComponentContext.addClassPathContextDefinitions(contextName);
+            SpringComponentContext.addClassPathContextDefinitions(contextName);
         }
     }
 
     public void bootstrapSystem()
     {
         loadBootstrapContext();
-        ((StartupManager) ComponentContext.getBean(STARTUP_MANAGER_BEAN)).init();
+        ((StartupManager) SpringComponentContext.getBean(STARTUP_MANAGER_BEAN)).init();
     }
 }

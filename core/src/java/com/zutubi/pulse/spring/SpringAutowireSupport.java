@@ -11,7 +11,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 /**
  * Autowire support has been adapted from com.opensymphony.xwork.spring.SpringObjectFactory
  */
-public class SpringAutowireSupport implements ApplicationContextAware
+class SpringAutowireSupport implements ApplicationContextAware
 {
     private static final Logger LOG = Logger.getLogger(SpringAutowireSupport.class);
 

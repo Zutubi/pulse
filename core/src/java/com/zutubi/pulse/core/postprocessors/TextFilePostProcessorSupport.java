@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.postprocessors;
 
 import com.zutubi.pulse.core.BuildException;
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 
 import java.io.BufferedReader;
 import java.io.File;

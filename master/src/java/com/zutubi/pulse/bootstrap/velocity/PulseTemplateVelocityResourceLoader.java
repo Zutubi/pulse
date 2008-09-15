@@ -1,6 +1,6 @@
 package com.zutubi.pulse.bootstrap.velocity;
 
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.SystemPaths;
 import org.apache.commons.collections.ExtendedProperties;
@@ -20,7 +20,7 @@ public class PulseTemplateVelocityResourceLoader extends FileResourceLoader
     {
         // since velocity does not provide an object creation hook,
         // we need to handle the autowiring ourselves.
-        ComponentContext.autowire(this);
+        SpringComponentContext.autowire(this);
     }
 
     /**

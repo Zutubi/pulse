@@ -1,7 +1,7 @@
 package com.zutubi.pulse.config;
 
 import com.zutubi.util.Constants;
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 
 import java.io.*;
 import java.util.Enumeration;

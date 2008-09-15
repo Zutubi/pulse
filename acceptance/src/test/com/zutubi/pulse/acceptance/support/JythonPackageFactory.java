@@ -1,7 +1,7 @@
 package com.zutubi.pulse.acceptance.support;
 
 import com.sun.script.jython.JythonScriptEngine;
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 
 import javax.script.Invocable;
 import javax.script.ScriptEngine;

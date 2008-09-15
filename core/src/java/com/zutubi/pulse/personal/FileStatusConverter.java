@@ -1,4 +1,4 @@
-package com.zutubi.pulse.xstream;
+package com.zutubi.pulse.personal;
 
 import com.thoughtworks.xstream.converters.ConversionException;
 import com.thoughtworks.xstream.converters.Converter;

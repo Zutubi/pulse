@@ -2,7 +2,7 @@ package com.zutubi.pulse.servlet;
 
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
@@ -29,7 +29,7 @@ public class ProfileServlet extends HttpServlet
         {
             // a) servlet is not autowired.
             // b) when servlet is initialised, the userManager is not available.
-            userManager = (UserManager) ComponentContext.getBean("userManager");
+            userManager = (UserManager) SpringComponentContext.getBean("userManager");
         }
         return userManager;
     }

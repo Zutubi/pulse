@@ -1,6 +1,6 @@
 package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.database.DatabaseConsole;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.util.logging.Logger;
@@ -63,8 +63,8 @@ public abstract class PersistenceTestCase extends PulseTestCase
         DriverManager.registerDriver(new jdbcDriver());
 
         String[] configLocations = getConfigLocations();
-        ComponentContext.addClassPathContextDefinitions(configLocations);
-        context = ComponentContext.getContext();
+        SpringComponentContext.addClassPathContextDefinitions(configLocations);
+        context = SpringComponentContext.getContext();
 
         dataSource = (DataSource) context.getBean("dataSource");
         console = (DatabaseConsole) context.getBean("databaseConsole");
@@ -103,7 +103,7 @@ public abstract class PersistenceTestCase extends PulseTestCase
         transactionStatus = null;
         transactionDefinition = null;
         transactionManager = null;
-        ComponentContext.closeAll();
+        SpringComponentContext.closeAll();
         context = null;
 
         super.tearDown();

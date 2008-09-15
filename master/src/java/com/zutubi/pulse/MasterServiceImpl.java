@@ -1,7 +1,7 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.agent.AgentManager;
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.events.Event;
@@ -106,7 +106,7 @@ public class MasterServiceImpl implements MasterService
     {
         if(resourceManager == null)
         {
-            ComponentContext.autowire(this);
+            SpringComponentContext.autowire(this);
         }
         return resourceManager;
     }
@@ -115,7 +115,7 @@ public class MasterServiceImpl implements MasterService
     {
         if(serviceTokenManager == null)
         {
-            ComponentContext.autowire(this);
+            SpringComponentContext.autowire(this);
         }
 
         return serviceTokenManager;

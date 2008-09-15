@@ -2,7 +2,7 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.agent.MasterLocationProvider;
 import com.zutubi.pulse.agent.PingStatus;
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.StartupManager;
 import com.zutubi.pulse.core.BuildException;
@@ -185,7 +185,7 @@ public class MasterAgentService implements AgentService
     {
         if (masterRecipeProcessor == null)
         {
-            masterRecipeProcessor = ComponentContext.getBean("masterRecipeProcessor");
+            masterRecipeProcessor = SpringComponentContext.getBean("masterRecipeProcessor");
         }
         return masterRecipeProcessor;
     }
@@ -204,7 +204,7 @@ public class MasterAgentService implements AgentService
     {
         if (resourceManager == null)
         {
-            resourceManager = ComponentContext.getBean("resourceManager");
+            resourceManager = SpringComponentContext.getBean("resourceManager");
         }
         return resourceManager;
     }

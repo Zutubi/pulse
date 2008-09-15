@@ -2,7 +2,7 @@ package com.zutubi.pulse.database;
 
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.File;

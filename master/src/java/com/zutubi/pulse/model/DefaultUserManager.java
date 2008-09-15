@@ -1,6 +1,6 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.system.ConfigurationEventSystemStartedEvent;
@@ -335,7 +335,7 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
     {
         if(buildManager == null)
         {
-            buildManager = (BuildManager) ComponentContext.getBean("buildManager");
+            buildManager = (BuildManager) SpringComponentContext.getBean("buildManager");
         }
         return buildManager;
     }
@@ -349,7 +349,7 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
     {
         if(ldapManager == null)
         {
-            ldapManager = (LdapManager) ComponentContext.getBean("ldapManager");
+            ldapManager = (LdapManager) SpringComponentContext.getBean("ldapManager");
         }
         return ldapManager;
     }

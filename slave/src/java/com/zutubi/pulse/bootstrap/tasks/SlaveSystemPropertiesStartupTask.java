@@ -1,6 +1,6 @@
 package com.zutubi.pulse.bootstrap.tasks;
 
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.pulse.bootstrap.StartupTask;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;

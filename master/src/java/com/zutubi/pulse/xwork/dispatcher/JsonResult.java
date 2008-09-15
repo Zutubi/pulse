@@ -5,9 +5,9 @@ import com.opensymphony.webwork.ServletActionContext;
 import com.opensymphony.webwork.dispatcher.WebWorkResultSupport;
 import com.opensymphony.xwork.ActionInvocation;
 import com.opensymphony.xwork.util.OgnlValueStack;
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.json.JSONException;
 import org.json.JSONWriter;
@@ -274,7 +274,7 @@ public class JsonResult extends WebWorkResultSupport
 
     private JsonDefinitionLoader getDefaultDefinitionLoader()
     {
-        final MasterConfigurationManager config = (MasterConfigurationManager) ComponentContext.getBean("configurationManager");
+        final MasterConfigurationManager config = (MasterConfigurationManager) SpringComponentContext.getBean("configurationManager");
         return new JsonDefinitionLoader()
         {
             public InputStream load(String location) throws FileNotFoundException

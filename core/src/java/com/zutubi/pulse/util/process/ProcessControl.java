@@ -1,4 +1,4 @@
-package com.zutubi.pulse.jni;
+package com.zutubi.pulse.util.process;
 
 import com.zutubi.pulse.command.PulseCtl;
 import com.zutubi.util.SystemUtils;

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.bootstrap.DefaultSetupManager;
 import com.zutubi.pulse.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.cleanup.config.CleanupUnit;
@@ -472,7 +472,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     private String getPulseFile(ProjectConfiguration projectConfig, Revision revision, PatchArchive patch) throws Exception
     {
         TypeConfiguration type = projectConfig.getType();
-        ComponentContext.autowire(type);
+        SpringComponentContext.autowire(type);
         return type.getPulseFile(0, projectConfig, revision, patch);
     }
 

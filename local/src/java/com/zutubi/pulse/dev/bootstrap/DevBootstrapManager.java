@@ -1,6 +1,6 @@
 package com.zutubi.pulse.dev.bootstrap;
 
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.plugins.PluginManager;
 
 import java.io.File;
@@ -38,7 +38,7 @@ public class DevBootstrapManager
             loadContext(context);
         }
 
-        PluginManager pluginManager = ComponentContext.getBean("pluginManager");
+        PluginManager pluginManager = SpringComponentContext.getBean("pluginManager");
         pluginManager.initialiseExtensions();
     }
 
@@ -50,16 +50,16 @@ public class DevBootstrapManager
         File contextFile = new File(contextName);
         if (contextFile.isFile())
         {
-            ComponentContext.addFileContextDefinitions(contextName);
+            SpringComponentContext.addFileContextDefinitions(contextName);
         }
         else
         {
-            ComponentContext.addClassPathContextDefinitions(contextName);
+            SpringComponentContext.addClassPathContextDefinitions(contextName);
         }
     }
 
     public static void shutdown()
     {
-        ComponentContext.closeAll();
+        SpringComponentContext.closeAll();
     }
 }

@@ -1,13 +1,13 @@
 package com.zutubi.pulse.local;
 
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.core.*;
 import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.dev.bootstrap.DevBootstrapManager;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.resources.ResourceDiscoverer;
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 import org.apache.commons.cli.*;
 
 import java.io.*;
@@ -103,7 +103,7 @@ public class LocalBuild
     public static LocalBuild bootstrap()
     {
         DevBootstrapManager.startup("com/zutubi/pulse/local/bootstrap/context/applicationContext.xml");
-        return ComponentContext.getBean("localBuild");
+        return SpringComponentContext.getBean("localBuild");
     }
 
     private FileResourceRepository createRepository(String resourcesFile) throws PulseException

@@ -2,9 +2,9 @@ package com.zutubi.pulse.api;
 
 import com.zutubi.pulse.ShutdownManager;
 import com.zutubi.pulse.Version;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.AgentManager;
-import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.model.*;
@@ -58,7 +58,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
     public RemoteApi()
     {
         // can remove this call when we sort out autowiring from the XmlRpcServlet.
-        ComponentContext.autowire(this);
+        SpringComponentContext.autowire(this);
     }
 
     /**
@@ -1768,7 +1768,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
     public void handleEvent(Event evt)
     {
         // Rewire on startup to get the full token manager.
-        ComponentContext.autowire(this);
+        SpringComponentContext.autowire(this);
         eventManager.unregister(this);
     }
 

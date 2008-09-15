@@ -5,7 +5,7 @@ import com.caucho.hessian.io.AbstractHessianInput;
 import com.caucho.hessian.io.HessianOutput;
 import com.caucho.hessian.io.HessianProtocolException;
 import com.zutubi.util.logging.Logger;
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.StringUtils;
 
 import java.io.FileNotFoundException;

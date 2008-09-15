@@ -4,7 +4,7 @@ import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.hibernate.MutableConfiguration;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.JDBCUtils;
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.cfg.Environment;

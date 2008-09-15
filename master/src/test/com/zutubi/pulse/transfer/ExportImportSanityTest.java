@@ -1,6 +1,6 @@
 package com.zutubi.pulse.transfer;
 
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.transfer.jdbc.HibernateTransferSource;
 import com.zutubi.pulse.transfer.jdbc.HibernateTransferTarget;
 import com.zutubi.pulse.hibernate.MutableConfiguration;
@@ -29,11 +29,11 @@ public class ExportImportSanityTest extends TestCase
 
     public void runExportImportJDBC() throws IOException, TransferException
     {
-        ComponentContext.addClassPathContextDefinitions("classpath:/com/zutubi/pulse/bootstrap/context/hibernateMappingsContext.xml");
+        SpringComponentContext.addClassPathContextDefinitions("classpath:/com/zutubi/pulse/bootstrap/context/hibernateMappingsContext.xml");
 
         MutableConfiguration configuration = new MutableConfiguration();
 
-        List<String> mappings = (List<String>) ComponentContext.getBean("hibernateMappings");
+        List<String> mappings = (List<String>) SpringComponentContext.getBean("hibernateMappings");
         configuration.addClassPathMappings(mappings);
 
         Properties hibernateProperties = new Properties();
@@ -65,11 +65,11 @@ public class ExportImportSanityTest extends TestCase
 
     public void runExportImportXML() throws IOException, TransferException
     {
-        ComponentContext.addClassPathContextDefinitions("classpath:/com/zutubi/pulse/bootstrap/context/hibernateMappingsContext.xml");
+        SpringComponentContext.addClassPathContextDefinitions("classpath:/com/zutubi/pulse/bootstrap/context/hibernateMappingsContext.xml");
 
         MutableConfiguration configuration = new MutableConfiguration();
 
-        List<String> mappings = (List<String>) ComponentContext.getBean("hibernateMappings");
+        List<String> mappings = (List<String>) SpringComponentContext.getBean("hibernateMappings");
         configuration.addClassPathMappings(mappings);
 
         Properties hibernateProperties = new Properties();

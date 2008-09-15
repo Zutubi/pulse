@@ -1,7 +1,7 @@
 package com.zutubi.pulse.util.process;
 
-import com.zutubi.pulse.jni.ProcessControl;
-import com.zutubi.util.IOUtils;
+import com.zutubi.pulse.util.process.ProcessControl;
+import com.zutubi.util.io.IOUtils;
 
 import java.io.*;
 import java.util.concurrent.Semaphore;

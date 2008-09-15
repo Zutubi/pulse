@@ -1,6 +1,6 @@
 package com.zutubi.pulse.tove.config.project.triggers;
 
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.core.PulseRuntimeException;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
@@ -68,7 +68,7 @@ public class TriggerManager implements ExternalStateManager<TriggerConfiguration
     {
         try
         {
-            ComponentContext.autowire(instance);
+            SpringComponentContext.autowire(instance);
             Trigger trigger = instance.newTrigger();
             scheduler.schedule(trigger);
             return trigger.getId();

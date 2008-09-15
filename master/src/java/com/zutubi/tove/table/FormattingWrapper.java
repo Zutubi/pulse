@@ -1,7 +1,7 @@
 package com.zutubi.tove.table;
 
 import com.zutubi.config.annotations.Format;
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.tove.ColumnFormatter;
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.type.CompositeType;
@@ -43,7 +43,7 @@ public class FormattingWrapper
             if (formatter != null)
             {
                 // FIXME: maybe this should be calling the object factory instead.
-                Object formatterInstance = ComponentContext.createBean(formatter);
+                Object formatterInstance = SpringComponentContext.createBean(formatter);
 
                 String methodName = "get" + name.substring(0, 1).toUpperCase() + name.substring(1);
                 Method getter;

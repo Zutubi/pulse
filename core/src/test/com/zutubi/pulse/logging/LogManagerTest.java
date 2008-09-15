@@ -22,7 +22,7 @@ public class LogManagerTest extends PulseTestCase
 
         Map<String, HandlerFactory> factories = new HashMap<String, HandlerFactory>();
         factories.put("ConsoleHandler", new ConsoleHandlerFactory());
-                
+
         logManager = new LogManager();
         logManager.setFactories(factories);
         instanceCount = 0;
@@ -102,7 +102,7 @@ public class LogManagerTest extends PulseTestCase
     public void testLogConfig()
     {
         Properties props = new Properties();
-        props.put("config", "com.zutubi.pulse.logging.TestConfigObject");
+        props.put("config", "com.zutubi.pulse.logging.LogManagerTest$TestConfigObject");
         assertEquals(0, instanceCount);
         logManager.configure(props);
         assertEquals(1, instanceCount);
@@ -218,5 +218,13 @@ public class LogManagerTest extends PulseTestCase
         logManager.resetLevels();
         assertEquals(null, Logger.getLogger("a.b.c").getLevel());
         assertEquals(1, Logger.getLogger("a.b.c").getHandlers().length);
+    }
+
+    public static class TestConfigObject
+    {
+        public TestConfigObject()
+        {
+            LogManagerTest.instanceCount++;
+        }
     }
 }

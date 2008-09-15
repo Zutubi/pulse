@@ -4,7 +4,7 @@ import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.util.RandomUtils;
-import com.zutubi.util.TempFileInputStream;
+import com.zutubi.util.io.TempFileInputStream;
 import com.zutubi.pulse.util.ZipUtils;
 
 import java.io.File;

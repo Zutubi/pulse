@@ -2,7 +2,7 @@ package com.zutubi.pulse.repository;
 
 import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.services.ServiceTokenManager;
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;

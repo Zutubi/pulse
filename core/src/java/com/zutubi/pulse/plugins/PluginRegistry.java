@@ -1,7 +1,7 @@
 package com.zutubi.pulse.plugins;
 
 import com.zutubi.util.logging.Logger;
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;

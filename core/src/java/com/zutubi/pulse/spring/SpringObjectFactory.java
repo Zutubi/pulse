@@ -1,16 +1,17 @@
 package com.zutubi.pulse.spring;
 
-import com.zutubi.pulse.bootstrap.ComponentContext;
 import com.zutubi.util.bean.DefaultObjectFactory;
 
 /**
- * 
+ * The spring object factory is an implementation of the ObjectFactory interface that
+ * uses the SpringComponentContext to wire the objects on creation.
+ *  
  */
 public class SpringObjectFactory extends DefaultObjectFactory
 {
     public <W> W buildBean(Class<W> clazz) throws Exception
     {
-        return ComponentContext.createBean(clazz);
+        return SpringComponentContext.createBean(clazz);
     }
 
     public <V> V buildBean(String className) throws Exception
@@ -21,7 +22,7 @@ public class SpringObjectFactory extends DefaultObjectFactory
     public <V> V buildBean(Class<V> clazz, Class[] argTypes, Object[] args) throws Exception
     {
         V object = super.buildBean(clazz, argTypes, args);
-        ComponentContext.autowire(object);
+        SpringComponentContext.autowire(object);
         return object;
     }
 

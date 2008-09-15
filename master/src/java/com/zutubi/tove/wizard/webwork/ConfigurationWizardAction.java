@@ -2,7 +2,7 @@ package com.zutubi.tove.wizard.webwork;
 
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.type.CollectionType;
@@ -315,7 +315,7 @@ public class ConfigurationWizardAction extends com.opensymphony.xwork.ActionSupp
         {
             try
             {
-                wizardInstance = (AbstractTypeWizard) ComponentContext.createBean(wizardClass);
+                wizardInstance = (AbstractTypeWizard) SpringComponentContext.createBean(wizardClass);
             }
             catch (Exception e)
             {
@@ -327,7 +327,7 @@ public class ConfigurationWizardAction extends com.opensymphony.xwork.ActionSupp
         if (wizardInstance == null)
         {
             wizardInstance = new SingleTypeWizard();
-            ComponentContext.autowire(wizardInstance);
+            SpringComponentContext.autowire(wizardInstance);
         }
 
         wizardInstance.setParameters(parentPath, insertPath, templateParentPath, templateParentRecord, template);

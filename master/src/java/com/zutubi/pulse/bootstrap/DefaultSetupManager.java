@@ -2,6 +2,7 @@ package com.zutubi.pulse.bootstrap;
 
 import com.opensymphony.xwork.spring.SpringObjectFactory;
 import com.zutubi.pulse.Version;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.bootstrap.conf.EnvConfig;
 import com.zutubi.pulse.bootstrap.tasks.ProcessSetupStartupTask;
 import com.zutubi.pulse.config.PropertiesWriter;
@@ -21,7 +22,7 @@ import com.zutubi.pulse.upgrade.UpgradeManager;
 import com.zutubi.tove.config.*;
 import com.zutubi.tove.type.record.DelegatingHandleAllocator;
 import com.zutubi.tove.type.record.RecordManager;
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 import freemarker.cache.FileTemplateLoader;
@@ -180,7 +181,7 @@ public class DefaultSetupManager implements SetupManager
     {
         loadContexts(configContexts);
 
-        ConfigurationRegistry configurationRegistry = ComponentContext.getBean("configurationRegistry");
+        ConfigurationRegistry configurationRegistry = SpringComponentContext.getBean("configurationRegistry");
         configurationRegistry.initSetup();
     }
 
@@ -281,7 +282,7 @@ public class DefaultSetupManager implements SetupManager
         loadContexts(dataContexts);
 
         // create the database based on the hibernate configuration.
-        databaseConsole = (DatabaseConsole) ComponentContext.getBean("databaseConsole");
+        databaseConsole = (DatabaseConsole) SpringComponentContext.getBean("databaseConsole");
         if (databaseConsole.isEmbedded())
         {
             printConsoleMessage("Using embedded database (only recommended for evaluation purposes).");
@@ -398,7 +399,7 @@ public class DefaultSetupManager implements SetupManager
         File userTemplateRoot = configurationManager.getUserPaths().getUserTemplateRoot();
         if (userTemplateRoot.isDirectory())
         {
-            freemarker.template.Configuration freemarkerConfiguration = ComponentContext.getBean("freemarkerConfiguration");
+            freemarker.template.Configuration freemarkerConfiguration = SpringComponentContext.getBean("freemarkerConfiguration");
             TemplateLoader existingLoader = freemarkerConfiguration.getTemplateLoader();
             try
             {
@@ -435,16 +436,16 @@ public class DefaultSetupManager implements SetupManager
 
     private void initialiseConfigurationPersistence()
     {
-        RecordManager recordManager = ComponentContext.getBean("recordManager");
-        PluginManager pluginManager = ComponentContext.getBean("pluginManager");
-        DelegatingHandleAllocator handleAllocator = ComponentContext.getBean("handleAllocator");
-        ConfigurationPersistenceManager configurationPersistenceManager = ComponentContext.getBean("configurationPersistenceManager");
-        ConfigurationReferenceManager configurationReferenceManager = ComponentContext.getBean("configurationReferenceManager");
-        ConfigurationTemplateManager configurationTemplateManager = ComponentContext.getBean("configurationTemplateManager");
-        ConfigurationRefactoringManager configurationRefactoringManager = ComponentContext.getBean("configurationRefactoringManager");
-        ConfigurationRegistry configurationRegistry = ComponentContext.getBean("configurationRegistry");
-        ConfigurationExtensionManager configurationExtensionManager = ComponentContext.getBean("configurationExtensionManager");
-        ConfigurationStateManager configurationStateManager = ComponentContext.getBean("configurationStateManager");
+        RecordManager recordManager = SpringComponentContext.getBean("recordManager");
+        PluginManager pluginManager = SpringComponentContext.getBean("pluginManager");
+        DelegatingHandleAllocator handleAllocator = SpringComponentContext.getBean("handleAllocator");
+        ConfigurationPersistenceManager configurationPersistenceManager = SpringComponentContext.getBean("configurationPersistenceManager");
+        ConfigurationReferenceManager configurationReferenceManager = SpringComponentContext.getBean("configurationReferenceManager");
+        ConfigurationTemplateManager configurationTemplateManager = SpringComponentContext.getBean("configurationTemplateManager");
+        ConfigurationRefactoringManager configurationRefactoringManager = SpringComponentContext.getBean("configurationRefactoringManager");
+        ConfigurationRegistry configurationRegistry = SpringComponentContext.getBean("configurationRegistry");
+        ConfigurationExtensionManager configurationExtensionManager = SpringComponentContext.getBean("configurationExtensionManager");
+        ConfigurationStateManager configurationStateManager = SpringComponentContext.getBean("configurationStateManager");
 
         recordManager.init();
 
@@ -462,7 +463,7 @@ public class DefaultSetupManager implements SetupManager
 
         configurationTemplateManager.init();
 
-        LogConfigurationManager logConfigurationManager = ComponentContext.getBean("logConfigurationManager");
+        LogConfigurationManager logConfigurationManager = SpringComponentContext.getBean("logConfigurationManager");
         logConfigurationManager.init();
     }
 
@@ -476,7 +477,7 @@ public class DefaultSetupManager implements SetupManager
 
         // Remove the upgrade context from the ComponentContext stack / namespace.
         // They are no longer required.
-        ComponentContext.pop();
+        SpringComponentContext.pop();
         loadContexts(setupContexts);
 
         if (isSetupRequired())
@@ -508,10 +509,10 @@ public class DefaultSetupManager implements SetupManager
         // (e.g. the command extension manager requires the file loader), but
         // must come before the final init of the configuration as they are
         // required when instantiating config objects.
-        PluginManager pluginManager = ComponentContext.getBean("pluginManager");
+        PluginManager pluginManager = SpringComponentContext.getBean("pluginManager");
         pluginManager.initialiseExtensions();
 
-        DefaultConfigurationProvider configurationProvider = ComponentContext.getBean("configurationProvider");
+        DefaultConfigurationProvider configurationProvider = SpringComponentContext.getBean("configurationProvider");
         configurationProvider.init();
         this.configurationProvider = configurationProvider;
 
@@ -520,14 +521,14 @@ public class DefaultSetupManager implements SetupManager
 
     private void loadContexts(List<String> contexts)
     {
-        ComponentContext.addClassPathContextDefinitions(contexts.toArray(new String[contexts.size()]));
-        ComponentContext.autowire(this);
+        SpringComponentContext.addClassPathContextDefinitions(contexts.toArray(new String[contexts.size()]));
+        SpringComponentContext.autowire(this);
 
         // xwork object factory refresh - need to ensure that it has a reference to the latest spring context.
-        SpringObjectFactory objFact = (SpringObjectFactory) ComponentContext.getBean("xworkObjectFactory");
+        SpringObjectFactory objFact = (SpringObjectFactory) SpringComponentContext.getBean("xworkObjectFactory");
         if (objFact != null)
         {
-            objFact.setApplicationContext(ComponentContext.getContext());
+            objFact.setApplicationContext(SpringComponentContext.getContext());
         }
     }
 
@@ -549,7 +550,7 @@ public class DefaultSetupManager implements SetupManager
 
     private boolean isSetupRequired()
     {
-        ConfigurationTemplateManager configurationTemplateManager = ComponentContext.getBean("configurationTemplateManager");
+        ConfigurationTemplateManager configurationTemplateManager = SpringComponentContext.getBean("configurationTemplateManager");
         return configurationTemplateManager.getRecord(ConfigurationRegistry.USERS_SCOPE).size() == 0;
     }
 

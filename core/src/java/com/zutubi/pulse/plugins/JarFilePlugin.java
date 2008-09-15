@@ -1,6 +1,6 @@
 package com.zutubi.pulse.plugins;
 
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.pulse.util.FileSystemUtils;
 import org.eclipse.osgi.framework.util.Headers;
 import org.osgi.framework.BundleException;
@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.net.MalformedURLException;
 
 /**
  *

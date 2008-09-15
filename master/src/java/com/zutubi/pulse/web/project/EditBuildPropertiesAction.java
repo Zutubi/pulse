@@ -4,7 +4,7 @@ import com.opensymphony.xwork.ActionContext;
 import static com.zutubi.config.annotations.FieldParameter.ACTIONS;
 import static com.zutubi.config.annotations.FieldParameter.SCRIPTS;
 import com.zutubi.config.annotations.FieldType;
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.core.config.NamedConfigurationComparator;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Revision;
@@ -228,7 +228,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
             try
             {
                 TypeConfiguration projectType = projectConfig.getType();
-                ComponentContext.autowire(projectType);
+                SpringComponentContext.autowire(projectType);
                 projectType.getPulseFile(0L, projectConfig, r, null);
             }
             catch (Exception e)

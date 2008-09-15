@@ -6,7 +6,7 @@ import com.zutubi.pulse.bootstrap.SetupManager;
 import com.zutubi.pulse.database.DriverRegistry;
 import com.zutubi.pulse.tove.config.setup.SetupDatabaseTypeConfiguration;
 import com.zutubi.tove.webwork.TransientAction;
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
 import java.util.Properties;

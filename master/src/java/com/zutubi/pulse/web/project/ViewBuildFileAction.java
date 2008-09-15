@@ -3,7 +3,7 @@ package com.zutubi.pulse.web.project;
 import com.uwyn.jhighlight.renderer.XmlXhtmlRenderer;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

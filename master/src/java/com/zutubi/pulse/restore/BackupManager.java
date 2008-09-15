@@ -1,6 +1,6 @@
 package com.zutubi.pulse.restore;
 
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
@@ -62,12 +62,12 @@ public class BackupManager
             {
                 if (scheduler == null)
                 {
-                    scheduler = ComponentContext.getBean("scheduler");
+                    scheduler = SpringComponentContext.getBean("scheduler");
                 }
 
                 if (configurationProvider == null)
                 {
-                    configurationProvider = ComponentContext.getBean("configurationProvider");
+                    configurationProvider = SpringComponentContext.getBean("configurationProvider");
                 }
 
                 initialiseManager();

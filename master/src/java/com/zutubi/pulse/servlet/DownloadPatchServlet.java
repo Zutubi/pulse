@@ -1,11 +1,11 @@
 package com.zutubi.pulse.servlet;
 
 import com.zutubi.pulse.MasterBuildPaths;
-import com.zutubi.pulse.bootstrap.ComponentContext;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.services.InvalidTokenException;
 import com.zutubi.pulse.services.ServiceTokenManager;
-import com.zutubi.util.IOUtils;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
 import javax.servlet.http.HttpServlet;
@@ -96,7 +96,7 @@ public class DownloadPatchServlet extends HttpServlet
     {
         if(configurationManager == null)
         {
-            configurationManager = (MasterConfigurationManager) ComponentContext.getBean("configurationManager");
+            configurationManager = (MasterConfigurationManager) SpringComponentContext.getBean("configurationManager");
         }
         return configurationManager;
     }
@@ -105,7 +105,7 @@ public class DownloadPatchServlet extends HttpServlet
     {
         if(serviceTokenManager == null)
         {
-            serviceTokenManager = (ServiceTokenManager) ComponentContext.getBean("serviceTokenManager");
+            serviceTokenManager = (ServiceTokenManager) SpringComponentContext.getBean("serviceTokenManager");
         }
         return serviceTokenManager;
     }
