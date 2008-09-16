@@ -7,7 +7,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * <class-comment/>
+ * An event dispatcher that dispatches events on a separate thread to the thread
+ * on which the event was raised.
+ * 
  */
 public class AsynchronousDispatcher implements EventDispatcher
 {

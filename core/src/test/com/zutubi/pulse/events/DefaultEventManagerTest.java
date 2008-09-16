@@ -6,7 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * <class-comment/>
  */
 public class DefaultEventManagerTest extends TestCase
 {

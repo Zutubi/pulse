@@ -2,7 +2,7 @@ package com.zutubi.pulse.license;
 
 import com.zutubi.pulse.bootstrap.DataResolver;
 import com.zutubi.pulse.core.config.Configuration;
-import com.zutubi.pulse.events.DataDirectoryChangedEvent;
+import com.zutubi.pulse.core.events.DataDirectoryChangedEvent;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;

@@ -5,7 +5,8 @@ import com.zutubi.util.logging.Logger;
 import java.util.List;
 
 /**
- * <class-comment/>
+ * An event dispatcher implementation that uses the thread on which the event was
+ * published to dispatch to the listeners.
  */
 public class SynchronousDispatcher implements EventDispatcher
 {

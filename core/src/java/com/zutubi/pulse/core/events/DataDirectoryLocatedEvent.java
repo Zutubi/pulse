@@ -1,4 +1,6 @@
-package com.zutubi.pulse.events;
+package com.zutubi.pulse.core.events;
+
+import com.zutubi.pulse.events.Event;
 
 /**
  * An event raised just after the data directory is discovered, before it is

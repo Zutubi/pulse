@@ -2,13 +2,13 @@ package com.zutubi.pulse.bootstrap;
 
 import com.opensymphony.xwork.spring.SpringObjectFactory;
 import com.zutubi.pulse.Version;
+import com.zutubi.pulse.core.events.DataDirectoryLocatedEvent;
 import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.bootstrap.conf.EnvConfig;
 import com.zutubi.pulse.bootstrap.tasks.ProcessSetupStartupTask;
 import com.zutubi.pulse.config.PropertiesWriter;
 import com.zutubi.pulse.database.DatabaseConsole;
 import com.zutubi.pulse.database.DriverRegistry;
-import com.zutubi.pulse.events.DataDirectoryLocatedEvent;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.logging.LogConfigurationManager;
