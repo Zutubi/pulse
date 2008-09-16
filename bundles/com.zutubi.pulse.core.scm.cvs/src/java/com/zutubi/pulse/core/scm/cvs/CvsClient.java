@@ -32,6 +32,7 @@ public class CvsClient implements ScmClient, DataCacheAware
     private CvsCore core;
 
     private String module;
+    private String[] modules;
     private String branch;
     private String root;
     private String password;
@@ -59,7 +60,15 @@ public class CvsClient implements ScmClient, DataCacheAware
         {
             this.module = this.module.trim();
         }
-        
+
+        // parse the comma separated list of modules.
+        StringTokenizer tokens = new StringTokenizer(module, ", ", false);
+        modules = new String[tokens.countTokens()];
+        for(int i = 0; tokens.hasMoreTokens(); i++)
+        {
+            modules[i] = tokens.nextToken();
+        }
+
         this.branch = branch;
         this.root = root;
         this.password = password;
@@ -83,6 +92,7 @@ public class CvsClient implements ScmClient, DataCacheAware
 
     public Set<ScmCapability> getCapabilities()
     {
+        // should disable browsing on repos that do not support the remote ls operation.
         return new HashSet<ScmCapability>(Arrays.asList(ScmCapability.values()));
     }
 
@@ -172,7 +182,10 @@ public class CvsClient implements ScmClient, DataCacheAware
     public void tag(Revision revision, String name, boolean moveExisting) throws ScmException
     {
         assertRevisionArgValid(revision);
-        core.tag(module, convertRevision(revision), name, moveExisting);
+        for (String module: modules)
+        {
+            core.tag(module, convertRevision(revision), name, moveExisting);
+        }
     }
 
     private void writePropertiesToContext(ScmContext context) throws ScmException
@@ -183,6 +196,14 @@ public class CvsClient implements ScmClient, DataCacheAware
             context.addProperty("cvs.branch", branch);
         }
         context.addProperty("cvs.module", module);
+        if (modules.length > 1)
+        {
+            context.addProperty("cvs.module.count", String.valueOf(modules.length));
+            for (int i = 0; i < modules.length; i++)
+            {
+                context.addProperty("cvs.module." + (i + 1) , modules[i]);
+            }
+        }
     }
 
     public void storeConnectionDetails(File outputDir) throws ScmException, IOException
@@ -239,8 +260,11 @@ public class CvsClient implements ScmClient, DataCacheAware
 
         writePropertiesToContext(context);
         
-        core.checkout(context.getDir(), module, convertRevision(revision), handler);
-        
+        for (String module: modules)
+        {
+            core.checkout(context.getDir(), module, convertRevision(revision), handler);
+        }
+
         return revision;
     }
 
@@ -325,7 +349,13 @@ public class CvsClient implements ScmClient, DataCacheAware
         // assert that the branch for both revisions is the same. We do not support retrieving
         // differences across multiple branches/revisions. For practical reasons, we do not need to...
 
-        List<LogInformation> info = core.rlog(module, convertRevision(from), convertRevision(to));
+        List<LogInformation> info = new LinkedList<LogInformation>();
+
+        for (String module: modules)
+        {
+            info.addAll(core.rlog(module, convertRevision(from), convertRevision(to)));
+        }
+        
         LogInformationAnalyser analyser = new LogInformationAnalyser(getUid(), CVSRoot.parse(root));
 
         String branch = (from != null) ? from.getBranch() : (to != null) ? to.getBranch() : null;
@@ -448,7 +478,6 @@ public class CvsClient implements ScmClient, DataCacheAware
         Calendar twoYearsAgo = Calendar.getInstance();
         twoYearsAgo.add(Calendar.YEAR, -2);
 
-        LogInformationAnalyser.Revision latestUpdate;
         int increment = 1;
         while (true)
         {
@@ -480,6 +509,14 @@ public class CvsClient implements ScmClient, DataCacheAware
         //TODO: listing is based on the availability of the remote list command, available on 1.12.x cvs servers.
         List<ScmFile> listing = new LinkedList<ScmFile>();
 
+        String version = core.version();
+        if (version.contains("1.11"))
+        {
+            // do not browse for 1.11 repositories, the remote list functionality is not available.
+            // this needs to be passed through via the capabilities as well.
+            return listing;
+        }
+        
         for (RlsInfo info : core.list(path))
         {
             listing.add(new ScmFile(info.getModule(), info.getName(), info.isDirectory()));
@@ -521,14 +558,19 @@ public class CvsClient implements ScmClient, DataCacheAware
         {
             tmpDir = createTemporaryDirectory();
 
+            String currentModule = null;
             try
             {
                 // non - recursive.
-                core.checkout(tmpDir, module, null, false, null);
+                for (String module: modules)
+                {
+                    currentModule = module;
+                    core.checkout(tmpDir, currentModule, null, false, null);
+                }
             }
             catch (ScmException e)
             {
-                throw new ScmException("Failed to locate the module " + getModule());
+                throw new ScmException("Failed to locate the module '" + currentModule + "'");
             }
         }
         catch (IOException e)
