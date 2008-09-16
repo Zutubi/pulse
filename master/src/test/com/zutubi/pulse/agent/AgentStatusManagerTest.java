@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.BuildProperties;
 import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.Property;
 import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.events.*;
 import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.model.AgentState;

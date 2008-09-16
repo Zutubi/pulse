@@ -2,9 +2,9 @@ package com.zutubi.pulse.core;
 
 import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.events.CommandCommencedEvent;
+import com.zutubi.pulse.core.events.CommandCompletedEvent;
 import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.events.build.CommandCommencedEvent;
-import com.zutubi.pulse.events.build.CommandCompletedEvent;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.Pair;

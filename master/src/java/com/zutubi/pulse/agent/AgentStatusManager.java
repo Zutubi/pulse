@@ -4,6 +4,9 @@ import com.zutubi.pulse.events.*;
 import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.model.AgentState;
 import com.zutubi.pulse.services.SlaveStatus;
+import com.zutubi.pulse.core.events.RecipeErrorEvent;
+import com.zutubi.pulse.core.events.RecipeCompletedEvent;
+import com.zutubi.pulse.core.events.RecipeEvent;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.logging.Logger;
 

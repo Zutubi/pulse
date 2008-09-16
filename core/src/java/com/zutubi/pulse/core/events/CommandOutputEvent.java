@@ -1,4 +1,4 @@
-package com.zutubi.pulse.events.build;
+package com.zutubi.pulse.core.events;
 
 /**
  * Carries a chunk of output from the currently-executing command.  These

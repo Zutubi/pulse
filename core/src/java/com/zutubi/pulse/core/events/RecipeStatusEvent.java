@@ -1,4 +1,4 @@
-package com.zutubi.pulse.events.build;
+package com.zutubi.pulse.core.events;
 
 /**
  * A recipe event that just carries a status message for the recipe log.

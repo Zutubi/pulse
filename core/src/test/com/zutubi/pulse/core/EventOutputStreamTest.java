@@ -4,7 +4,7 @@ import com.zutubi.pulse.events.DefaultEventManager;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.events.build.OutputEvent;
+import com.zutubi.pulse.core.events.OutputEvent;
 import com.zutubi.pulse.test.PulseTestCase;
 
 import java.io.IOException;

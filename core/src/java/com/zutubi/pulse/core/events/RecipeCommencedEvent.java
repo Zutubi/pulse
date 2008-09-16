@@ -1,4 +1,4 @@
-package com.zutubi.pulse.events.build;
+package com.zutubi.pulse.core.events;
 
 /**
  * This event is raised by the recipe processor when commencing a recipe.

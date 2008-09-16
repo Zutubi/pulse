@@ -1,5 +1,7 @@
 package com.zutubi.pulse.events.build;
 
+import com.zutubi.pulse.core.events.RecipeEvent;
+
 /**
  * This event is raised by the build controller when a recipe is completed
  * and the artifacts have been collected/cleaned up on the slave.  Note this

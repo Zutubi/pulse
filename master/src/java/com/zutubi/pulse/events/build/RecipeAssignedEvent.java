@@ -2,6 +2,7 @@ package com.zutubi.pulse.events.build;
 
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.core.events.RecipeEvent;
 
 /**
  * Raised when a recipe has been assigned to an agent.

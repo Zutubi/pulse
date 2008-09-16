@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse;
 
 import com.zutubi.pulse.OutputLogger;
 
@@ -8,11 +8,11 @@ import java.io.OutputStream;
 /**
  * An output stream that writes directly to an output log.
  */
-public class LoggerOutputStream extends OutputStream
+public class OutputLoggerOutputStream extends OutputStream
 {
     private OutputLogger logger;
 
-    public LoggerOutputStream(OutputLogger logger)
+    public OutputLoggerOutputStream(OutputLogger logger)
     {
         this.logger = logger;
     }

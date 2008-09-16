@@ -1,7 +1,7 @@
 package com.zutubi.pulse.slave;
 
 import com.zutubi.pulse.core.BuildException;
-import com.zutubi.pulse.events.build.RecipeErrorEvent;
+import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.services.MasterService;
 import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.util.logging.Logger;

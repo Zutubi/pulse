@@ -5,7 +5,7 @@ import com.zutubi.pulse.MasterBuildProperties;
 import com.zutubi.pulse.agent.MasterLocationProvider;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.ExecutionContext;
-import com.zutubi.pulse.core.LoggerOutputStream;
+import com.zutubi.pulse.OutputLoggerOutputStream;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.Result;
 import com.zutubi.pulse.core.model.ResultState;
@@ -58,7 +58,7 @@ public class BuildHookManager
                     try
                     {
                         // stream the output to whoever is listening.
-                        out = new LoggerOutputStream(logger);
+                        out = new OutputLoggerOutputStream(logger);
                         context.setOutputStream(out);
                         executeTask(hook, context, be.getBuildResult(), resultNode, false);
                     }

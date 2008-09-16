@@ -1,5 +1,7 @@
 package com.zutubi.pulse.events.build;
 
+import com.zutubi.pulse.core.events.OutputEvent;
+
 /**
  *
  *

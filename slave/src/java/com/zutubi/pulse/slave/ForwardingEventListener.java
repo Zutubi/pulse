@@ -2,7 +2,7 @@ package com.zutubi.pulse.slave;
 
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
-import com.zutubi.pulse.events.build.RecipeEvent;
+import com.zutubi.pulse.core.events.RecipeEvent;
 import com.zutubi.pulse.services.MasterService;
 import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.util.logging.Logger;

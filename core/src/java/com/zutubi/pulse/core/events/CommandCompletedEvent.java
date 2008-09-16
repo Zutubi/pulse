@@ -1,4 +1,4 @@
-package com.zutubi.pulse.events.build;
+package com.zutubi.pulse.core.events;
 
 import com.zutubi.pulse.core.model.CommandResult;
 
