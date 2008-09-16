@@ -29,10 +29,16 @@ public class RecipeCleanup
 
     public void cleanup(EventManager eventManager, File directoryToClean, long recipeId)
     {
+        if (!directoryToClean.isDirectory())
+        {
+            // No recipes directory yet exists.
+            return;
+        }
+        
         File[] files = directoryToClean.listFiles();
         if (files == null)
         {
-            LOG.warning("unable to list contents of recipe directory '" + directoryToClean.getAbsolutePath() + "'");
+            LOG.warning("Unable to list contents of recipes directory '" + directoryToClean.getAbsolutePath() + "'");
             return;
         }
 

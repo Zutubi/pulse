@@ -19,6 +19,10 @@ public class SlaveRecipeProcessor
 {
     private static final Logger LOG = Logger.getLogger(SlaveRecipeProcessor.class);
 
+    private static final int NO_RECIPE = 0;
+
+    private long buildingRecipe = NO_RECIPE;
+
     private RecipeProcessor recipeProcessor;
     private SlaveConfigurationManager configurationManager;
     private EventManager eventManager;
@@ -60,15 +64,16 @@ public class SlaveRecipeProcessor
         if(masterProxy != null)
         {
             EventListener listener = registerMasterListener(master, masterProxy, request.getId());
-            ResourceRepository repo = new RemoteResourceRepository(slaveId, masterProxy, serviceTokenManager);
-            ServerRecipePaths processorPaths = new ServerRecipePaths(request.getProject(), request.getSpec(), request.getId(), configurationManager.getUserPaths().getData(), request.isIncremental());
-
-            context.setFileRepository(new SlaveFileRepository(processorPaths.getRecipeRoot(), master, serviceTokenManager));
-            Bootstrapper requestBootstrapper = request.getBootstrapper();
-            request.setBootstrapper(new ChainBootstrapper(new ServerBootstrapper(), requestBootstrapper));
-
             try
             {
+                buildingRecipe = request.getId();
+                ResourceRepository repo = new RemoteResourceRepository(slaveId, masterProxy, serviceTokenManager);
+                ServerRecipePaths processorPaths = new ServerRecipePaths(request.getProject(), request.getSpec(), request.getId(), configurationManager.getUserPaths().getData(), request.isIncremental());
+
+                context.setFileRepository(new SlaveFileRepository(processorPaths.getRecipeRoot(), master, serviceTokenManager));
+                Bootstrapper requestBootstrapper = request.getBootstrapper();
+                request.setBootstrapper(new ChainBootstrapper(new ServerBootstrapper(), requestBootstrapper));
+
                 recipeCleanup.cleanup(eventManager, processorPaths.getRecipesRoot(), request.getId());
                 recipeProcessor.build(request, processorPaths, repo, true, context);
             }
@@ -87,7 +92,25 @@ public class SlaveRecipeProcessor
             finally
             {
                 eventManager.unregister(listener);
+                buildingRecipe = NO_RECIPE;
             }
+        }
+    }
+
+    public long getBuildingRecipe()
+    {
+        return buildingRecipe;
+    }
+
+    public void terminateRecipe(long id)
+    {
+        try
+        {
+            recipeProcessor.terminateRecipe(id);
+        }
+        catch (InterruptedException e)
+        {
+            LOG.warning("Interrupted while terminating recipe", e);
         }
     }
 
@@ -111,25 +134,8 @@ public class SlaveRecipeProcessor
         this.masterProxyFactory = masterProxyFactory;
     }
 
-    public void terminateRecipe(long id)
-    {
-        try
-        {
-            recipeProcessor.terminateRecipe(id);
-        }
-        catch (InterruptedException e)
-        {
-            LOG.warning("Interrupted while terminating recipe", e);
-        }
-    }
-
     public void setServiceTokenManager(ServiceTokenManager serviceTokenManager)
     {
         this.serviceTokenManager = serviceTokenManager;
-    }
-
-    public long getBuildingRecipe()
-    {
-        return recipeProcessor.getBuildingRecipe();
     }
 }
