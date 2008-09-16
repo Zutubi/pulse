@@ -577,6 +577,21 @@
                 <exclude name="**/LicenseEncodeDecodeTest.java"/>
                 <exclude name="**/LicenseKeyValidatorTest.java"/>
                 <exclude name="**/.svn"/>
+                <include name="etc/pulse.ipr"/>
+                <!-- exclude intellij project files -->
+                <exclude name="**/*.ipr"/>
+                <exclude name="**/*.iws"/>
+                <exclude name="**/*.iml"/>
+                <!-- other excludes that are useful when generating source package from an existing workspace. -->
+                <exclude name="**/*.*~"/>
+                <exclude name="velocity.log"/>
+            </fileset>
+        </copy>
+
+        <!-- move the pulse.ipr file. -->
+        <copy todir="build/${package.name}">
+            <fileset dir="etc">
+                <include name="pulse.ipr"/>
             </fileset>
         </copy>
 
