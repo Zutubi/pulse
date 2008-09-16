@@ -14,6 +14,7 @@ import com.zutubi.tove.wizard.Wizard;
 import com.zutubi.tove.wizard.WizardState;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.validation.*;
+import com.zutubi.validation.xwork.XWorkValidationAdapter;
 import com.zutubi.validation.i18n.MessagesTextProvider;
 
 import java.util.Map;

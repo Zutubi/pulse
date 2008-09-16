@@ -1,7 +1,8 @@
 package com.zutubi.validation;
 
 /**
- * <class-comment/>
+ * Exception used by the validation process to indicate something has prevented
+ * the validation from completing successfully.
  */
 public class ValidationException extends Exception
 {

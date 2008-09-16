@@ -1,7 +1,8 @@
 package com.zutubi.validation.validators;
 
 /**
- * <class-comment/>
+ * Validator to ensure that the specified value is within the range defined
+ * by the min and max values.
  */
 public class IntegerRangeValidator extends AbstractRangeValidator<Integer>
 {

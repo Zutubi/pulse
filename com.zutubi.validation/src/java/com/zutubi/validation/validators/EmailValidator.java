@@ -6,7 +6,8 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
 /**
- * Checks that a field has a valid email address.
+ * Checks that a field has a valid email address, according to the default validation
+ * of the javax.mail.internet.InternetAddress object.
  */
 public class EmailValidator extends StringFieldValidatorSupport
 {

@@ -2,6 +2,7 @@ package com.zutubi.validation;
 
 import com.zutubi.validation.i18n.DefaultTextProvider;
 import com.zutubi.validation.i18n.TextProvider;
+import com.zutubi.validation.xwork.XWorkValidationAdapter;
 
 import java.util.Collection;
 import java.util.List;

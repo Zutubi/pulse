@@ -5,7 +5,9 @@ import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.ShortCircuitableValidator;
 
 /**
- * <class-comment/>
+ * The validator support class implements the boiler plate methods from the Validator and
+ * ShortCircuitValidator interfaces, allowing validator implementations to focus on the
+ * details of the validation.
  */
 public abstract class ValidatorSupport implements Validator, ShortCircuitableValidator
 {

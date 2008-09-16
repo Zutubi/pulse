@@ -3,7 +3,7 @@ package com.zutubi.validation.validators;
 import com.zutubi.validation.ValidationException;
 
 /**
- * <class-comment/>
+ * A trivial no operation validator that does nothing.
  */
 public class NoopFieldValidator extends FieldValidatorSupport
 {

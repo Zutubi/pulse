@@ -6,7 +6,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
- * Checks for valid URLs.
+ * Use the default java.net.URL url validation.
  */
 public class URLValidator extends StringFieldValidatorSupport
 {

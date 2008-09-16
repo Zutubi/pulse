@@ -1,4 +1,6 @@
-package com.zutubi.validation;
+package com.zutubi.validation.xwork;
+
+import com.zutubi.validation.ValidationAware;
 
 import java.util.*;
 
