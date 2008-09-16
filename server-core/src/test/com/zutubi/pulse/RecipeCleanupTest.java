@@ -24,6 +24,7 @@ public class RecipeCleanupTest extends PulseTestCase
         recipeCleanup = new RecipeCleanup(fileSystem);
         eventManager = mock(EventManager.class);
         recipeDir = mock(File.class);
+        stub(recipeDir.isDirectory()).toReturn(Boolean.TRUE);
         inOrder = inOrder(eventManager);
     }
 
@@ -35,6 +36,14 @@ public class RecipeCleanupTest extends PulseTestCase
         }
 
         verifyNoMoreInteractions(eventManager);
+    }
+
+    public void testCleanupNoSuchDirectory()
+    {
+        stub(recipeDir.isDirectory()).toReturn(Boolean.FALSE);
+        recipeCleanup.cleanup(eventManager, recipeDir, 42);
+        verify(recipeDir).isDirectory();
+        verifyNoMoreInteractions(recipeDir);
     }
 
     public void testCleanupEmptyDirectory()
