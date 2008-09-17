@@ -158,7 +158,7 @@ public class NativeGit
             }
             catch (IOException e)
             {
-                throw new ScmException("Error writing to input of p4 process", e);
+                throw new ScmException("Error writing to input of git process", e);
             }
         }
 
@@ -197,7 +197,7 @@ public class NativeGit
                     long secondsSinceActivity = (System.currentTimeMillis() - lastActivityTime) / 1000;
                     if (secondsSinceActivity >= PROCESS_TIMEOUT)
                     {
-                        throw new ScmException("Timing out p4 process after " + secondsSinceActivity + " seconds of inactivity");
+                        throw new ScmException("Timing out git process after " + secondsSinceActivity + " seconds of inactivity");
                     }
                 }
             }
@@ -211,7 +211,7 @@ public class NativeGit
         }
         catch (IOException e)
         {
-            throw new ScmException("Error reading output of p4 process", e);
+            throw new ScmException("Error reading output of git process", e);
         }
         finally
         {
