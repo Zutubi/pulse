@@ -1,5 +1,8 @@
 package com.zutubi.pulse.core.scm.git;
 
+import com.zutubi.pulse.core.model.Change;
+import com.zutubi.pulse.core.scm.ScmCancelledException;
+import com.zutubi.pulse.core.scm.ScmEventHandler;
 import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
@@ -8,8 +11,9 @@ import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.net.URL;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
@@ -54,6 +58,43 @@ public class NativeGitTest extends PulseTestCase
         assertTrue(new File(cloneBase, ".git").isDirectory());
         assertTrue(new File(cloneBase, "README.txt").isFile());
         assertTrue(new File(cloneBase, "build.xml").isFile());
+    }
+
+    public void testCloneStatusMessages() throws ScmException
+    {
+        final List<String> statusMessages = new LinkedList<String>();
+        git.setWorkingDirectory(tmp);
+        git.setScmEventHandler(new ScmEventHandlerAdapter()
+        {
+            public void status(String message)
+            {
+                statusMessages.add(message);
+            }
+        });
+        git.clone(repository, "base");
+
+        assertTrue(statusMessages.size() > 0);
+    }
+
+    public void testCloneCancelled() throws ScmException
+    {
+        try
+        {
+            git.setWorkingDirectory(tmp);
+            git.setScmEventHandler(new ScmEventHandlerAdapter()
+            {
+                public void checkCancelled() throws ScmCancelledException
+                {
+                    throw new ScmCancelledException("Operation cancelled");
+                }
+            });
+            git.clone(repository, "base");
+            fail("Expected the operation to be cancelled.");
+        }
+        catch (ScmException e)
+        {
+            // expected.
+        }
     }
 
     public void testLogOnOriginalRepository() throws ScmException
@@ -133,6 +174,27 @@ public class NativeGitTest extends PulseTestCase
         //TODO: need to verify that something new has been picked up.
 
         // update to revision x, then pull to HEAD.
+    }
+
+    /**
+     * Simple noop adapter to simplify the usage of the scm event handler in testing.
+     */
+    private class ScmEventHandlerAdapter implements ScmEventHandler
+    {
+        public void status(String message)
+        {
+
+        }
+
+        public void fileChanged(Change change)
+        {
+
+        }
+
+        public void checkCancelled() throws ScmCancelledException
+        {
+
+        }
     }
 
 }

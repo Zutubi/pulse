@@ -5,7 +5,8 @@ import com.zutubi.validation.providers.AnnotationValidatorProvider;
 import com.zutubi.validation.providers.ReflectionValidatorProvider;
 
 /**
- * <class-comment/>
+ * An extension of the default validation manager configured with the
+ * pre-configured as required for Pulse.
  */
 public class PulseValidationManager extends DefaultValidationManager
 {

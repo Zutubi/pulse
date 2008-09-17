@@ -2,6 +2,7 @@ package com.zutubi.pulse.core.scm.git;
 
 import com.zutubi.pulse.core.scm.ScmCancelledException;
 import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.scm.ScmEventHandler;
 import com.zutubi.pulse.util.process.AsyncProcess;
 import com.zutubi.pulse.util.process.LineHandler;
 import com.zutubi.util.StringUtils;
@@ -20,8 +21,9 @@ import java.text.SimpleDateFormat;
 import java.text.ParseException;
 
 /**
+ * The native git object is a wrapper around the implementation details for running native git operations.
  *
- *
+ * 
  */
 public class NativeGit
 {
@@ -33,6 +35,8 @@ public class NativeGit
 
     private final static SimpleDateFormat LOG_DATE_FORMAT = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy z");
 
+    private ScmEventHandler scmHandler;
+
     private ProcessBuilder git;
 
     public NativeGit()
@@ -43,6 +47,11 @@ public class NativeGit
     public void setWorkingDirectory(File dir)
     {
         git.directory(dir);
+    }
+
+    public void setScmEventHandler(ScmEventHandler scmHandler)
+    {
+        this.scmHandler = scmHandler;
     }
 
     public void clone(String repository, String dir) throws ScmException
@@ -240,7 +249,10 @@ public class NativeGit
 
         public void handleStdout(String line)
         {
-
+            if (scmHandler != null)
+            {
+                scmHandler.status(line);
+            }
         }
 
         public void handleStderr(String line)
@@ -269,10 +281,16 @@ public class NativeGit
 
         public void checkCancelled() throws ScmCancelledException
         {
-
+            if (scmHandler != null)
+            {
+                scmHandler.checkCancelled();
+            }
         }
     }
 
+    /**
+     * Read the output from the git log command, interpretting the output.
+     */
     private class LogOutputHandler extends OutputHandlerAdapter
     {
         private List<GitLogEntry> entries = new LinkedList<GitLogEntry>();
@@ -317,6 +335,10 @@ public class NativeGit
         }
     }
 
+    /**
+     * Read the output from the git branch command, interpretting the information as
+     * necessary.
+     */
     private class BranchOutputHandler extends OutputHandlerAdapter
     {
         private List<GitBranchEntry> branches = new LinkedList<GitBranchEntry>();
