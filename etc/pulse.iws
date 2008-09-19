@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4" relativePaths="false">
-  <component name="RunManager" selected="Application.Pulse Server">
-    <configuration default="false" name="Pulse Server" type="Application" factoryName="Application" enabled="false" merge="false">
+  <component name="RunManager" selected="Application.Pulse Master">
+    <configuration default="false" name="Pulse Master" type="Application" factoryName="Application" enabled="false" merge="false">
       <option name="MAIN_CLASS_NAME" value="com.zutubi.pulse.command.StartCommand" />
       <option name="VM_PARAMETERS" value="-Xmx1024m -Dbootstrap=com/zutubi/pulse/bootstrap/ideaBootstrapContext.xml -XX:+HeapDumpOnOutOfMemoryError" />
       <option name="PROGRAM_PARAMETERS" value="" />
@@ -16,6 +16,27 @@
         <option name="LOCAL" value="true" />
       </RunnerSettings>
       <ConfigurationWrapper RunnerId="Debug" />
+      <method>
+        <option name="Make" value="true" />
+      </method>
+    </configuration>
+    <configuration default="false" name="Pulse Slave" type="Application" factoryName="Application" enabled="false" merge="false">
+      <option name="MAIN_CLASS_NAME" value="com.zutubi.pulse.command.StartCommand" />
+      <option name="VM_PARAMETERS" value="-Dbootstrap=com/zutubi/pulse/bootstrap/ideaBootstrapContext.xml" />
+      <option name="PROGRAM_PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" value="" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <module name="slave" />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="1804" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="true" />
+      </RunnerSettings>
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Debug" />
+      <ConfigurationWrapper RunnerId="Run" />
       <method>
         <option name="Make" value="true" />
       </method>
