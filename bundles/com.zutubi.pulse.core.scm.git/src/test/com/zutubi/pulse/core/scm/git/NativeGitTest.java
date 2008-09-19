@@ -15,10 +15,6 @@ import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- *
- *
- */
 public class NativeGitTest extends PulseTestCase
 {
     private File tmp;
@@ -73,7 +69,9 @@ public class NativeGitTest extends PulseTestCase
         });
         git.clone(repository, "base");
 
-        assertTrue(statusMessages.size() > 0);
+        assertEquals(1, statusMessages.size());
+        String message = statusMessages.get(0);
+        assertTrue(message.startsWith("Initialized empty Git repository"));
     }
 
     public void testCloneCancelled() throws ScmException
@@ -178,9 +176,6 @@ public class NativeGitTest extends PulseTestCase
         // update to revision x, then pull to HEAD.
     }
 
-    /**
-     * Simple noop adapter to simplify the usage of the scm event handler in testing.
-     */
     private class ScmEventHandlerAdapter implements ScmEventHandler
     {
         public void status(String message)

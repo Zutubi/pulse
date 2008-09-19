@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.scm.ScmEventHandler;
 import com.zutubi.pulse.util.process.AsyncProcess;
 import com.zutubi.pulse.util.process.LineHandler;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.Constants;
 import com.zutubi.util.logging.Logger;
 import com.opensymphony.util.TextUtils;
 
@@ -22,17 +23,12 @@ import java.text.ParseException;
 
 /**
  * The native git object is a wrapper around the implementation details for running native git operations.
- *
- * 
  */
 public class NativeGit
 {
     private static final Logger LOG = Logger.getLogger(NativeGit.class);
-
     private static final long PROCESS_TIMEOUT = Long.getLong("pulse.git.inactivity.timeout", 300);
-
     private static final String ASCII_CHARSET = "US-ASCII";
-
     private final static SimpleDateFormat LOG_DATE_FORMAT = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy z");
 
     private ScmEventHandler scmHandler;
@@ -56,16 +52,12 @@ public class NativeGit
 
     public void clone(String repository, String dir) throws ScmException
     {
-        String[] command = {"git", "clone", repository, dir};
-
-        run(command);
+        run("git", "clone", repository, dir);
     }
 
     public void pull() throws ScmException
     {
-        String[] command = {"git", "pull"};
-        
-        run(command);
+        run("git", "pull");
     }
 
     public void fetch(String ...remote) throws ScmException
@@ -99,9 +91,7 @@ public class NativeGit
 
     public void checkout(String branch) throws ScmException
     {
-        String[] command = {"git", "checkout", "-b", branch, "origin/" + branch};
-
-        run(command);
+        run("git", "checkout", "-b", branch, "origin/" + branch);
     }
 
     public List<GitBranchEntry> branch() throws ScmException
@@ -261,7 +251,7 @@ public class NativeGit
             {
                 error = "";
             }
-            error = error + line + "\n";
+            error = error + line + Constants.LINE_SEPARATOR;
         }
 
         public String getError()
@@ -290,28 +280,41 @@ public class NativeGit
 
     /**
      * Read the output from the git log command, interpretting the output.
+     *
+     * Sample output:
+     *
+     * commit 78be6b2f12399ea2332a5148440086913cb910fb
+     * Author: Daniel Ostermeier <daniel@zutubi.com>
+     * Date:   Fri Sep 12 11:30:12 2008 +1000
+     *
+     *    update
      */
     private class LogOutputHandler extends OutputHandlerAdapter
     {
+        private static final String COMMIT_TAG =    "commit ";
+        private static final String AUTHOR_TAG =    "Author: ";
+        private static final String DATE_TAG =      "Date:   ";
+
         private List<GitLogEntry> entries = new LinkedList<GitLogEntry>();
         
         private GitLogEntry currentEntry;
 
         public void handleStdout(String line)
         {
-            if (line.startsWith("commit "))
+            System.out.println(line);
+            if (line.startsWith(COMMIT_TAG))
             {
                 currentEntry = new GitLogEntry();
                 entries.add(currentEntry);
-                currentEntry.setCommit(line.substring(7).trim());
+                currentEntry.setCommit(line.substring(COMMIT_TAG.length()).trim());
             }
-            else if (line.startsWith("Author: "))
+            else if (line.startsWith(AUTHOR_TAG))
             {
-                currentEntry.setAuthor(line.substring(8).trim());
+                currentEntry.setAuthor(line.substring(AUTHOR_TAG.length()).trim());
             }
-            else if (line.startsWith("Date:   "))
+            else if (line.startsWith(DATE_TAG))
             {
-                String dtStr = line.substring(8).trim();
+                String dtStr = line.substring(DATE_TAG.length()).trim();
                 try
                 {
                     currentEntry.setDate(LOG_DATE_FORMAT.parse(dtStr));
