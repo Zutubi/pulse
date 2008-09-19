@@ -190,7 +190,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
             client = scmClientFactory.createClient(projectConfig.getScm());
             if (!latestRevisions.containsKey(projectId))
             {
-                latestRevisions.put(projectId, client.getLatestRevision());
+                latestRevisions.put(projectId, client.getLatestRevision(null));
                 return;
             }
 
@@ -199,7 +199,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
             // slightly paranoid, but we can not rely on the scm implementations to behave as expected.
             if (previous == null)
             {
-                latestRevisions.put(projectId, client.getLatestRevision());
+                latestRevisions.put(projectId, client.getLatestRevision(null));
                 return;
             }
 
@@ -268,7 +268,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
     private Revision getLatestRevisionSince(Revision revision, ScmClient client) throws ScmException
     {
         // this assumes that getting the revision since revision x is more efficient than getting the latest revision.
-        List<Revision> revisions = client.getRevisions(revision, null);
+        List<Revision> revisions = client.getRevisions(null, revision, null);
         if (revisions.size() > 0)
         {
             // get the latest revision.

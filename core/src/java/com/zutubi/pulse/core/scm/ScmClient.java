@@ -2,6 +2,7 @@ package com.zutubi.pulse.core.scm;
 
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.ExecutionContext;
 
 import java.io.Closeable;
 import java.io.File;
@@ -35,7 +36,7 @@ public interface ScmClient extends Closeable
      * Returns a string that uniquely identifies the server itself.  This may
      * include the server address and repository root, for example.  All
      * SCMClient objects talking to the same SCM should return the same id.
-     *
+     * <p/>
      * Required for all implementations.
      *
      * @return a unique id for the SCM server
@@ -46,57 +47,54 @@ public interface ScmClient extends Closeable
     /**
      * Returns a summarised form of the location of the source this SCM has
      * been configured to check out.  For example, an subversion URL.
-     *
+     * <p/>
      * Required for all implementations.
      *
      * @return a summarised form of the source location, fit for human
-     * consumption
+     *         consumption
      * @throws ScmException on error
      */
     String getLocation() throws ScmException;
 
     /**
      * Checks out a new working copy to the specified context.
-     *
+     * <p/>
      * Required for all implementations.
      *
-     * @param context     defines the context for the checkout operation
-     * @param handler     if not null, receives notifications of events during the
-     *
+     * @param context  defines the execution context in which the operation is being run
+     * @param revision defines the revision to be checked out.
+     * @param handler  if not null, receives notifications of events during the
      * @return the revision of the locally checked out working copy.
-     *
      * @throws ScmException on error
      */
-    Revision checkout(ScmContext context, ScmEventHandler handler) throws ScmException;
+    Revision checkout(ExecutionContext context, Revision revision, ScmEventHandler handler) throws ScmException;
 
     /**
      * Update the working directory to the specified context.
-     *
+     * <p/>
      * Required for all implementations.  If an incremental update is not
      * possible then an update may be the same as a checkout.
      *
-     * @param context    defines the context for the checkout operation
-     * @param handler    if not null, receives notifications of events during the
-     *
+     * @param context  defines the execution context in which the operation is being run
+     * @param revision defines the revision the local working directory should be updated to
+     * @param handler  if not null, receives notifications of events during the
      * @return the revision updated to.
-     * 
      * @throws ScmException on error.
      */
-    Revision update(ScmContext context, ScmEventHandler handler) throws ScmException;
+    Revision update(ExecutionContext context, Revision revision, ScmEventHandler handler) throws ScmException;
 
     /**
      * Checks out the specified file at the given revision.
      *
+     * @param context  defines the scm context in which the operation is being run
      * @param path     path defining the content to be retrieved.
      * @param revision the revision be checked out or null for the latest
      *                 revision (may be ignored by implementations that do
-     *                 not support {@link ScmCapability#REVISIONS}).
-     *
+     *                 not support {@link com.zutubi.pulse.core.scm.ScmCapability#REVISIONS}).
      * @return input stream providing access to the requested content.
-     *
      * @throws ScmException on error
      */
-    InputStream retrieve(String path, Revision revision) throws ScmException;
+    InputStream retrieve(ScmContext context, String path, Revision revision) throws ScmException;
 
     /**
      * Stores details about the connection to the server to the given
@@ -104,102 +102,111 @@ public interface ScmClient extends Closeable
      * needed to reproduce the same build, and may also include
      * miscellaneous information the is useful to the user.  If there is no
      * additional information to store, this operation may be a no-op.
-     *
+     * <p/>
      * Required for all implementations (but may be a no-op).
      *
      * @param outputDir location to store files containing the connection
      *                  details
      * @throws ScmException on error obtaining the details
-     * @throws IOException if an I/O error occurs writing the details to disk
+     * @throws IOException  if an I/O error occurs writing the details to disk
      */
     void storeConnectionDetails(File outputDir) throws ScmException, IOException;
 
     /**
      * Returns the policy for line endings enforced at a client level, if any.
-     *
+     * <p/>
      * Required for all implementations.
      *
+     * @param context  defines the scm context in which the operation is being run
      * @return the EOL policy, which will be EOLStyle.BINARY if no policy is
      *         in effect
      * @throws ScmException on error
      */
-    FileStatus.EOLStyle getEOLPolicy() throws ScmException;
+    FileStatus.EOLStyle getEOLPolicy(ScmContext context) throws ScmException;
 
     /**
      * Returns the latest repository revision.
-     *
+     * <p/>
      * Required for implementations that support
      * {@link ScmCapability#REVISIONS}.
      *
+     * @param context  defines the scm context in which the operation is being run
      * @return the latest revision in the repository
      * @throws ScmException on error
      */
-    Revision getLatestRevision() throws ScmException;
+    Revision getLatestRevision(ScmContext context) throws ScmException;
 
     /**
      * Returns a list of revisions occuring between the given revisions.
      * The from revision itself it NOT included in the result.
-     *
+     * <p/>
      * Required for {@link ScmCapability#REVISIONS}.
      *
-     * @param from      the revision before the first revision to return
-     * @param to        the revision that defined the inclusive upper bound for this call.
+     * @param context  defines the scm context in which the operation is being run
+     * @param from     the revision before the first revision to return
+     * @param to       the revision that defined the inclusive upper bound for this call.
+     *
      * @return a list of revisions for all changes since from
-     * 
      * @throws ScmException if an error occurs talking to the server
      */
-    List<Revision> getRevisions(Revision from, Revision to) throws ScmException;
+    List<Revision> getRevisions(ScmContext context, Revision from, Revision to) throws ScmException;
 
     /**
      * Returns a list of changelists occuring in between the given revisions.
      * The changelist that created the from revision itself is NOT included in
      * the model.
-     *
+     * <p/>
      * Required for {@link ScmCapability#CHANGESETS}.
      *
-     * @param from  the revision before the first changelist to include in the model
-     * @param to    the last revision to include in the model
+     * @param context  defines the scm context in which the operation is being run
+     * @param from     the revision before the first changelist to include in the model
+     * @param to       the last revision to include in the model
+     *
      * @return a list of changelists that occured between the two revisions
+     *
      * @throws ScmException if an error occurs talking to the server
      */
-    List<Changelist> getChanges(Revision from, Revision to) throws ScmException;
+    List<Changelist> getChanges(ScmContext context, Revision from, Revision to) throws ScmException;
 
     /**
      * Returns a list of all files/directories in the given path (which
      * should specify a directory).  This function is NOT recursive, i.e.
      * only direct descendents should be listed.
-     *
+     * <p/>
      * Required for {@link ScmCapability#BROWSE}.
      *
-     * @param path the path to list (relative to the root of the connection,
-     *             i.e. an empty string is valid and means "list the root").
+     * @param context  defines the scm context in which the operation is being run
+     * @param path     the path to list (relative to the root of the connection,
+     *                 i.e. an empty string is valid and means "list the root").
      * @param revision revision at which to browse, or null for the latest
      *                 revision (may be ignored by implementations that do not
-     *                 support {@link ScmCapability#REVISIONS}).
+     *                 support {@link com.zutubi.pulse.core.scm.ScmCapability#REVISIONS}).
      * @return a list of files and directories contained within the given
      *         path
      * @throws ScmException on error
      */
-    List<ScmFile> browse(String path, Revision revision) throws ScmException;
+    List<ScmFile> browse(ScmContext context, String path, Revision revision) throws ScmException;
 
     /**
      * Applies a tag to the given revision of all files in the server's view .
-     *
+     * <p/>
      * Required for {@link ScmCapability#TAG}.
      *
+     * @param context      defines the execution context in which the operation is being run
      * @param revision     the revision to be tagged
      * @param name         the name of the tag, which has an SCM-specific format
      * @param moveExisting if true and a tag of the same name already exists,
      *                     that tag will be moved to the new revision and files
+     *
      * @throws ScmException on error
      */
-    void tag(Revision revision, String name, boolean moveExisting) throws ScmException;
+    void tag(ExecutionContext context, Revision revision, String name, boolean moveExisting) throws ScmException;
 
     /**
      * Converts a string into a revision.  The string is input from the user,
      * and thus should be validated.  If it is invalid, an SCMException
      * should be thrown.
-     *
+     * <p/>
      * Required for {@link ScmCapability#REVISIONS}.
      *
      * @param revision revision input string to be converted into an actual
@@ -207,5 +214,5 @@ public interface ScmClient extends Closeable
      * @return a valid revision derived from the string
      * @throws ScmException if the given revision is invalid
      */
-    Revision getRevision(String revision) throws ScmException;
+    Revision parseRevision(String revision) throws ScmException;
 }

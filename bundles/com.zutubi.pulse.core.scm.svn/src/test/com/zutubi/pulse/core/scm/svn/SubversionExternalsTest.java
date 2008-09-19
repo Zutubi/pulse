@@ -4,6 +4,7 @@ import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.*;
+import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.ZipUtils;
@@ -163,7 +164,7 @@ public class SubversionExternalsTest extends PulseTestCase
     public void testGetChangesOnExternal() throws Exception
     {
         server.addExternalPath(".");
-        List<Changelist> changes = server.getChanges(createRevision(5), createRevision(6));
+        List<Changelist> changes = server.getChanges(null, createRevision(5), createRevision(6));
         assertEquals(1, changes.size());
         assertChange(changes.get(0), "6", "/ext1/trunk/file1");
     }
@@ -171,7 +172,7 @@ public class SubversionExternalsTest extends PulseTestCase
     public void testGetChangesOnExternalAndBundle() throws Exception
     {
         server.addExternalPath(".");
-        List<Changelist> changes = server.getChanges(createRevision(4), createRevision(6));
+        List<Changelist> changes = server.getChanges(null, createRevision(4), createRevision(6));
         assertEquals(2, changes.size());
         assertChange(changes.get(0), "5", "/bundle/trunk/file1");
         assertChange(changes.get(1), "6", "/ext1/trunk/file1");
@@ -180,14 +181,14 @@ public class SubversionExternalsTest extends PulseTestCase
     public void testGetChangesOnMetaExternals() throws Exception
     {
         server.addExternalPath(".");
-        List<Changelist> changes = server.getChanges(createRevision(6), createRevision(7));
+        List<Changelist> changes = server.getChanges(null, createRevision(6), createRevision(7));
         assertEquals(0, changes.size());
     }
 
     public void testGetChangesOnAll() throws Exception
     {
         server.addExternalPath(".");
-        List<Changelist> changes = server.getChanges(createRevision(7), createRevision(8));
+        List<Changelist> changes = server.getChanges(null, createRevision(7), createRevision(8));
         assertEquals(1, changes.size());
         assertChange(changes.get(0), "8", "/bundle/trunk/file2", "/ext1/trunk/file2", "/ext2/trunk/file2", "/meta/trunk/file2");
     }
@@ -214,10 +215,9 @@ public class SubversionExternalsTest extends PulseTestCase
     public void testUpdate() throws Exception
     {
         doCheckout(2);
-        ScmContext context = new ScmContext();
-        context.setRevision(new Revision("5"));
-        context.setDir(checkoutDir);
-        server.update(context, null);
+        ExecutionContext context = new ExecutionContext();
+        context.setWorkingDir(checkoutDir);
+        server.update(context, new Revision("5"), null);
 
         assertFile("file1", "edited bundle file1\n");
         assertFile("pull1/file1", "");
@@ -227,12 +227,10 @@ public class SubversionExternalsTest extends PulseTestCase
 
     private void doCheckout(int rev) throws ScmException
     {
-        ScmContext context = new ScmContext();
-        Revision revision = new Revision(Integer.toString(rev));
-        context.setRevision(revision);
-        context.setDir(checkoutDir);
+        ExecutionContext context = new ExecutionContext();
+        context.setWorkingDir(checkoutDir);
         server.addExternalPath(".");
-        server.checkout(context, new ScmEventHandler()
+        server.checkout(context, new Revision(Integer.toString(rev)), new ScmEventHandler()
         {
             public void status(String message)
             {
@@ -288,7 +286,7 @@ public class SubversionExternalsTest extends PulseTestCase
         {
             server = new SubversionClient("http://svn.nuxeo.org/nuxeo/bundles/ECM-trunk");
             server.addExternalPath(".");
-            List<Changelist> changelists = server.getChanges(createRevision(6600), createRevision(6603));
+            List<Changelist> changelists = server.getChanges(null, createRevision(6600), createRevision(6603));
             for(Changelist list: changelists)
             {
                 System.out.println(list.getRevision().getRevisionString() + ": " + list.getComment());

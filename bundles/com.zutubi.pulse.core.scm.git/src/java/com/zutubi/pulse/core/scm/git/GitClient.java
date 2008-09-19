@@ -1,14 +1,15 @@
 package com.zutubi.pulse.core.scm.git;
 
+import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.FileStatus;
 import com.zutubi.pulse.core.scm.ScmCapability;
 import com.zutubi.pulse.core.scm.ScmClient;
-import com.zutubi.pulse.core.scm.ScmContext;
 import com.zutubi.pulse.core.scm.ScmEventHandler;
 import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.ScmFile;
+import com.zutubi.pulse.core.scm.ScmContext;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.TextUtils;
 
@@ -50,10 +51,10 @@ public class GitClient implements ScmClient
         return getUid();
     }
 
-    public Revision checkout(ScmContext context, ScmEventHandler handler) throws ScmException
+    public Revision checkout(ExecutionContext context, Revision revision, ScmEventHandler handler) throws ScmException
     {
         NativeGit git = new NativeGit();
-        File workingDir = context.getDir();
+        File workingDir = context.getWorkingDir();
         // git does not like a checkouts into existing directories - not this way anyways.
         if (workingDir.exists() && !FileSystemUtils.rmdir(workingDir))
         {
@@ -78,10 +79,12 @@ public class GitClient implements ScmClient
         return new Revision(entry.getAuthor(), entry.getComment(), entry.getDate(), entry.getCommit());
     }
 
-    public Revision update(ScmContext context, ScmEventHandler handler) throws ScmException
+    public Revision update(ExecutionContext context, Revision revision, ScmEventHandler handler) throws ScmException
     {
         NativeGit git = new NativeGit();
-        File workingDir = context.getDir();
+        File workingDir = context.getWorkingDir();
+
+        //TODO: we want to update to a specific revision...
 
         git.setWorkingDirectory(workingDir);
         git.pull();
@@ -93,7 +96,7 @@ public class GitClient implements ScmClient
         return new Revision(entry.getAuthor(), entry.getComment(), entry.getDate(), entry.getCommit());
     }
 
-    public InputStream retrieve(String path, Revision revision) throws ScmException
+    public InputStream retrieve(ScmContext context, String path, Revision revision) throws ScmException
     {
         return null;
     }
@@ -103,37 +106,42 @@ public class GitClient implements ScmClient
 
     }
 
-    public FileStatus.EOLStyle getEOLPolicy() throws ScmException
+    public FileStatus.EOLStyle getEOLPolicy(ScmContext context) throws ScmException
     {
         return null;
     }
 
-    public Revision getLatestRevision() throws ScmException
+    public Revision getLatestRevision(ScmContext context) throws ScmException
     {
         return null;
     }
 
-    public List<Revision> getRevisions(Revision from, Revision to) throws ScmException
+    public List<Revision> getRevisions(ScmContext context, Revision from, Revision to) throws ScmException
     {
         return null;
     }
 
-    public List<Changelist> getChanges(Revision from, Revision to) throws ScmException
+    public List<Changelist> getChanges(ScmContext context, Revision from, Revision to) throws ScmException
     {
         return null;
     }
 
-    public List<ScmFile> browse(String path, Revision revision) throws ScmException
+    public List<ScmFile> browse(ScmContext context, String path, Revision revision) throws ScmException
     {
         return null;
     }
 
-    public void tag(Revision revision, String name, boolean moveExisting) throws ScmException
+    public void tag(ExecutionContext context, Revision revision, String name, boolean moveExisting) throws ScmException
     {
 
     }
 
     public Revision getRevision(String revision) throws ScmException
+    {
+        return parseRevision(revision);
+    }
+
+    public Revision parseRevision(String revision) throws ScmException
     {
         return null;
     }

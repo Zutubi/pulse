@@ -2,10 +2,10 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
-import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.scm.ScmClient;
-import com.zutubi.pulse.core.scm.ScmContext;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
+import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.util.logging.Logger;
 
@@ -24,7 +24,7 @@ public class CheckoutBootstrapper extends ScmBootstrapper
         this.persist = persist;
     }
 
-    public ScmClient bootstrap(ScmContext context)
+    public ScmClient doBootstrap(ExecutionContext executionContext)
     {
         ScmClient scm = null;
         try
@@ -34,10 +34,9 @@ public class CheckoutBootstrapper extends ScmBootstrapper
             {
                 id = getId();
             }
-            context.setId(id);
-            context.setRevision(revision.getRevision());
+            executionContext.addString("scm.bootstrap.id", id);
             scm = createScmClient();
-            scm.checkout(context, this);
+            scm.checkout(executionContext, revision.getRevision(), this);
             return scm;
         }
         catch (ScmException e)

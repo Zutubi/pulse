@@ -313,7 +313,7 @@ public class BuildController implements EventListener
         try
         {
             client = scmClientFactory.createClient(projectConfig.getScm());
-            FileStatus.EOLStyle localEOL = client.getEOLPolicy();
+            FileStatus.EOLStyle localEOL = client.getEOLPolicy(null);
             initialBootstrapper = new PatchBootstrapper(initialBootstrapper, pbr.getUser().getId(), pbr.getNumber(), localEOL);
         }
         catch (ScmException e)
@@ -582,7 +582,7 @@ public class BuildController implements EventListener
         List<Changelist> result = new LinkedList<Changelist>();
         if(client.getCapabilities().contains(ScmCapability.CHANGESETS))
         {
-            List<Changelist> scmChanges = client.getChanges(previousRevision, revision);
+            List<Changelist> scmChanges = client.getChanges(null, previousRevision, revision);
 
             for (Changelist change : scmChanges)
             {

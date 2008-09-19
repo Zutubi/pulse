@@ -51,9 +51,6 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmEventHandler
         FileOutputStream fout = null;
         ScmClient client = null;
 
-        ScmContext scmContext = new ScmContext();
-        scmContext.setDir(workDir);
-
         try
         {
             fout = new FileOutputStream(new File(outDir, BootstrapCommand.FILES_FILE));
@@ -67,7 +64,7 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmEventHandler
             }
 
             outputWriter = new PrintWriter(out);
-            client = bootstrap(scmContext);
+            client = doBootstrap(context);
         }
         catch (IOException e)
         {
@@ -86,19 +83,6 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmEventHandler
             try
             {
                 client.storeConnectionDetails(outDir);
-
-                List<ScmContext.Property> properties = scmContext.getProperties();
-                PulseScope recipeScope = context.getScope().getAncestor(BuildProperties.SCOPE_RECIPE);
-                for (ScmContext.Property prop : properties)
-                {
-                    recipeScope.add(new ResourceProperty(
-                            prop.getName(),
-                            prop.getValue(),
-                            prop.isAddToEnvironment(),
-                            prop.isAddToPath(),
-                            prop.isResolveVariables())
-                    );
-                }
             }
             catch (Exception e)
             {
@@ -151,5 +135,5 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmEventHandler
         return factory.createClient(scmConfig);
     }
 
-    abstract ScmClient bootstrap(ScmContext context);
+    abstract ScmClient doBootstrap(ExecutionContext executionContext);
 }

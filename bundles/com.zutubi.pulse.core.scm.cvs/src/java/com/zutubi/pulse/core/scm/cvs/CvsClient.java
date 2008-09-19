@@ -1,5 +1,9 @@
 package com.zutubi.pulse.core.scm.cvs;
 
+import com.zutubi.pulse.core.BuildProperties;
+import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.PulseScope;
+import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
@@ -8,14 +12,17 @@ import com.zutubi.pulse.core.scm.cvs.client.CvsCore;
 import com.zutubi.pulse.core.scm.cvs.client.LogInformationAnalyser;
 import com.zutubi.pulse.core.scm.cvs.client.commands.RlsInfo;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.util.io.CleanupInputStream;
-import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.TextUtils;
+import com.zutubi.util.io.CleanupInputStream;
 import com.zutubi.util.logging.Logger;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 /**
@@ -179,7 +186,7 @@ public class CvsClient implements ScmClient, DataCacheAware
         });
     }
 
-    public void tag(Revision revision, String name, boolean moveExisting) throws ScmException
+    public void tag(ExecutionContext context, Revision revision, String name, boolean moveExisting) throws ScmException
     {
         assertRevisionArgValid(revision);
         for (String module: modules)
@@ -188,52 +195,45 @@ public class CvsClient implements ScmClient, DataCacheAware
         }
     }
 
-    private void writePropertiesToContext(ScmContext context) throws ScmException
+    private void writePropertiesToContext(ExecutionContext context) throws ScmException
     {
-        context.addProperty("cvs.root", root);
+        //TODO: Would prefer to be using the context.addString, but I dont know what 'scope' that ends up in
+        //TODO: nor what will happen to that scope - how long it will survivie since it is the leaf.
+        //TODO: Going to the scope manually for backward compatibility until the above concern is resolved.
+        
+        PulseScope scope = context.getScope().getAncestor(BuildProperties.SCOPE_RECIPE);
+        scope.add(new ResourceProperty("cvs.root", root));
         if (branch != null)
         {
-            context.addProperty("cvs.branch", branch);
+            scope.add(new ResourceProperty("cvs.branch", branch));
         }
-        context.addProperty("cvs.module", module);
+        scope.add(new ResourceProperty("cvs.module", module));
         if (modules.length > 1)
         {
-            context.addProperty("cvs.module.count", String.valueOf(modules.length));
+            scope.add(new ResourceProperty("cvs.module.count", String.valueOf(modules.length)));
             for (int i = 0; i < modules.length; i++)
             {
-                context.addProperty("cvs.module." + (i + 1) , modules[i]);
+                scope.add(new ResourceProperty("cvs.module." + (i + 1), modules[i]));
             }
         }
     }
 
     public void storeConnectionDetails(File outputDir) throws ScmException, IOException
     {
-        Properties props = new Properties();
-        props.put("root", root);
-        if(branch != null)
-        {
-            props.put("branch", branch);
-        }
-        props.put("module", module);
-
-        FileOutputStream os = null;
-        try
-        {
-            os = new FileOutputStream(new File(outputDir, "cvs.properties"));
-            props.store(os, "CVS connection properties");
-        }
-        finally
-        {
-            IOUtils.close(os);
-        }
+        //TODO: These details are already stored in the execution context, so no need to store them here.
     }
 
-    public FileStatus.EOLStyle getEOLPolicy()
+    public FileStatus.EOLStyle getEOLPolicy(ScmContext context)
     {
         return FileStatus.EOLStyle.BINARY;
     }
 
     public Revision getRevision(String revision) throws ScmException
+    {
+        return parseRevision(revision);
+    }
+
+    public Revision parseRevision(String revision) throws ScmException
     {
         CvsRevision cvsRevision = new CvsRevision(revision);
         if(cvsRevision.getBranch() == null)
@@ -246,23 +246,22 @@ public class CvsClient implements ScmClient, DataCacheAware
         return convertRevision(cvsRevision);
     }
 
-    public Revision checkout(ScmContext context, ScmEventHandler handler) throws ScmException
+    public Revision checkout(ExecutionContext context, Revision revision, ScmEventHandler handler) throws ScmException
     {
-        Revision revision = context.getRevision();
         if (revision == Revision.HEAD)
         {
             // FIXME: it would be good to be able to avoid this call to get the latest revision and
             // simply use the information from the checkout / update
             // It would be nice to have the revision that we checkout/update to be returned by the cvscore
             // and then return that revision from this method.
-            revision = getLatestRevision();
+            revision = getLatestRevision(null);
         }
 
         writePropertiesToContext(context);
         
         for (String module: modules)
         {
-            core.checkout(context.getDir(), module, convertRevision(revision), handler);
+            core.checkout(context.getWorkingDir(), module, convertRevision(revision), handler);
         }
 
         return revision;
@@ -275,9 +274,8 @@ public class CvsClient implements ScmClient, DataCacheAware
      * @param context
      * @param handler
      */
-    public Revision update(ScmContext context, ScmEventHandler handler) throws ScmException
+    public Revision update(ExecutionContext context, Revision rev, ScmEventHandler handler) throws ScmException
     {
-        Revision rev = context.getRevision();
         assertRevisionArgValid(rev);
         writePropertiesToContext(context);
 
@@ -286,7 +284,7 @@ public class CvsClient implements ScmClient, DataCacheAware
         // go into the sub directories.  So, if we have sub directories that contain a CVS directory, we have a local
         // working copy, and should run an update from WITHIN THOSE DIRECTORIES.  If not, then we can run a checkout
         // When will there be multiple directories? When we are dealing with an &module.
-        File[] workingDirs = getSubdirectoriesContainingCvsDirectories(context.getDir());
+        File[] workingDirs = getSubdirectoriesContainingCvsDirectories(context.getWorkingDir());
         if (workingDirs.length > 0)
         {
             for (File workingDir : workingDirs)
@@ -297,7 +295,7 @@ public class CvsClient implements ScmClient, DataCacheAware
         return rev;
     }
 
-    public InputStream retrieve(String path, Revision revision) throws ScmException
+    public InputStream retrieve(ScmContext context, String path, Revision revision) throws ScmException
     {
         if (!TextUtils.stringSet(path))
         {
@@ -344,7 +342,7 @@ public class CvsClient implements ScmClient, DataCacheAware
         }
     }
 
-    public List<Changelist> getChanges(Revision from, Revision to) throws ScmException
+    public List<Changelist> getChanges(ScmContext context, Revision from, Revision to) throws ScmException
     {
         // assert that the branch for both revisions is the same. We do not support retrieving
         // differences across multiple branches/revisions. For practical reasons, we do not need to...
@@ -410,9 +408,9 @@ public class CvsClient implements ScmClient, DataCacheAware
         return changes;
     }
 
-    public List<Revision> getRevisions(Revision from, Revision to) throws ScmException
+    public List<Revision> getRevisions(ScmContext context, Revision from, Revision to) throws ScmException
     {
-        List<Changelist> changes = getChanges(from, to);
+        List<Changelist> changes = getChanges(null, from, to);
         Collections.sort(changes, new Comparator<Changelist>()
         {
             public int compare(Changelist o1, Changelist o2)
@@ -460,11 +458,11 @@ public class CvsClient implements ScmClient, DataCacheAware
             throw new IllegalArgumentException("since revision date can not be null.");
         }
 
-        List<Changelist> changelists = getChanges(since, null);
+        List<Changelist> changelists = getChanges(null, since, null);
         return changelists.size() > 0;
     }
 
-    public Revision getLatestRevision() throws ScmException
+    public Revision getLatestRevision(ScmContext context) throws ScmException
     {
         // The latest revision is determined by running successive rlog commands.  Each time we go back a little
         // bit further in the hope that we encounter a change.  When we detect that change, we have the latest revision.
@@ -484,7 +482,7 @@ public class CvsClient implements ScmClient, DataCacheAware
             cal.add(Calendar.DAY_OF_YEAR, -increment);
 
             CvsRevision since = new CvsRevision("", branch, "", cal.getTime());
-            List<Revision> revisions = getRevisions(convertRevision(since), null);
+            List<Revision> revisions = getRevisions(null, convertRevision(since), null);
             if (revisions.size() > 0)
             {
                 return revisions.get(revisions.size() - 1);
@@ -504,7 +502,7 @@ public class CvsClient implements ScmClient, DataCacheAware
         }
     }
 
-    public List<ScmFile> browse(String path, Revision revision) throws ScmException
+    public List<ScmFile> browse(ScmContext context, String path, Revision revision) throws ScmException
     {
         //TODO: listing is based on the availability of the remote list command, available on 1.12.x cvs servers.
         List<ScmFile> listing = new LinkedList<ScmFile>();

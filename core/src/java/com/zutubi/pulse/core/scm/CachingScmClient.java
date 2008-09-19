@@ -17,11 +17,11 @@ public abstract class CachingScmClient implements ScmClient, ScmCachePopulator
 
     public boolean requiresRefresh(Revision revision) throws ScmException
     {
-        List<Revision> newRevisions = getRevisions(revision, null);
+        List<Revision> newRevisions = getRevisions(null, revision, null);
         return newRevisions.size() > 0;
     }
 
-    public List<ScmFile> browse(String path, Revision revision) throws ScmException
+    public List<ScmFile> browse(ScmContext context, String path, Revision revision) throws ScmException
     {
         Map<String, CachingScmFile> cachedListing = ScmFileCache.getInstance().lookup(this);
         if (cachedListing.containsKey(path))

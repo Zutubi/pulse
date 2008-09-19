@@ -3,6 +3,7 @@ package com.zutubi.pulse.core.scm;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.config.ResourceProperty;
+import com.zutubi.pulse.core.ExecutionContext;
 
 import java.util.Set;
 import java.util.HashSet;
@@ -66,22 +67,22 @@ public class MockScmClient implements ScmClient, DataCacheAware
         throw new RuntimeException("Method not implemented.");
     }
 
-    public Revision checkout(ScmContext context, ScmEventHandler handler) throws ScmException
+    public Revision checkout(ExecutionContext context, Revision revision, ScmEventHandler handler) throws ScmException
     {
         throw new RuntimeException("Method not implemented.");
     }
 
-    public InputStream retrieve(String path, Revision revision) throws ScmException
+    public InputStream retrieve(ScmContext context, String path, Revision revision) throws ScmException
     {
         throw new RuntimeException("Method not implemented.");
     }
 
-    public List<Changelist> getChanges(Revision from, Revision to) throws ScmException
+    public List<Changelist> getChanges(ScmContext context, Revision from, Revision to) throws ScmException
     {
         throw new RuntimeException("Method not implemented.");
     }
 
-    public List<Revision> getRevisions(Revision from, Revision to) throws ScmException
+    public List<Revision> getRevisions(ScmContext context, Revision from, Revision to) throws ScmException
     {
         throw new RuntimeException("Method not implemented.");
     }
@@ -91,7 +92,7 @@ public class MockScmClient implements ScmClient, DataCacheAware
         throw new RuntimeException("Method not implemented.");
     }
 
-    public Revision getLatestRevision() throws ScmException
+    public Revision getLatestRevision(ScmContext context) throws ScmException
     {
         if(throwError)
         {
@@ -103,17 +104,17 @@ public class MockScmClient implements ScmClient, DataCacheAware
         }
     }
 
-    public List<ScmFile> browse(String path, Revision revision) throws ScmException
+    public List<ScmFile> browse(ScmContext context, String path, Revision revision) throws ScmException
     {
         throw new RuntimeException("Method not implemented.");
     }
 
-    public Revision update(ScmContext context, ScmEventHandler handler) throws ScmException
+    public Revision update(ExecutionContext context, Revision revision, ScmEventHandler handler) throws ScmException
     {
         throw new RuntimeException("Method not implemented.");
     }
 
-    public void tag(Revision revision, String name, boolean moveExisting) throws ScmException
+    public void tag(ExecutionContext context, Revision revision, String name, boolean moveExisting) throws ScmException
     {
         throw new RuntimeException("Method not implemented");
     }
@@ -128,12 +129,17 @@ public class MockScmClient implements ScmClient, DataCacheAware
         throw new RuntimeException("Method not implemented.");
     }
 
-    public FileStatus.EOLStyle getEOLPolicy() throws ScmException
+    public FileStatus.EOLStyle getEOLPolicy(ScmContext context) throws ScmException
     {
         return FileStatus.EOLStyle.BINARY;
     }
 
     public Revision getRevision(String revision) throws ScmException
+    {
+        return parseRevision(revision);
+    }
+
+    public Revision parseRevision(String revision) throws ScmException
     {
         throw new RuntimeException("Method not yet implemented.");
     }

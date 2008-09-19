@@ -53,13 +53,13 @@ public class ChangelistIsolator
             {
                 // The spec has never been built or even requested.  Just build
                 // the latest (we need to start somewhere!).
-                result = Arrays.asList(client.getLatestRevision());
+                result = Arrays.asList(client.getLatestRevision(null));
             }
             else
             {
                 // We now have the last requested revision, return every revision
                 // since then.
-                result = client.getRevisions(latestBuiltRevision, null);
+                result = client.getRevisions(null, latestBuiltRevision, null);
             }
         }
         finally

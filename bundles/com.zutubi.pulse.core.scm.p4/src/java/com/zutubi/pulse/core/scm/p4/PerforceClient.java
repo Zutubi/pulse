@@ -3,6 +3,9 @@ package com.zutubi.pulse.core.scm.p4;
 import com.zutubi.pulse.core.Property;
 import com.zutubi.pulse.core.PulseScope;
 import com.zutubi.pulse.core.VariableHelper;
+import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.BuildProperties;
+import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
@@ -193,9 +196,9 @@ public class PerforceClient extends CachingScmClient
         return clientName;
     }
 
-    public Revision getLatestRevision() throws ScmException
+    public Revision getLatestRevision(ScmContext context) throws ScmException
     {
-        return core.convertRevision(getLatestRevision(null));
+        return core.convertRevision(getLatestRevision((String)null));
     }
 
     private NumericalRevision getLatestRevision(String clientName) throws ScmException
@@ -228,7 +231,7 @@ public class PerforceClient extends CachingScmClient
 
     public void populate(ScmFileCache.CacheItem item) throws ScmException
     {
-        item.cachedRevision = getLatestRevision();
+        item.cachedRevision = getLatestRevision((ScmContext)null);
         item.cachedListing = new TreeMap<String, CachingScmFile>();
 
         CachingScmFile rootFile = new CachingScmFile("", true);
@@ -532,14 +535,13 @@ public class PerforceClient extends CachingScmClient
         }
     }
 
-    public Revision checkout(ScmContext context, ScmEventHandler handler) throws ScmException
+    public Revision checkout(ExecutionContext context, Revision revision, ScmEventHandler handler) throws ScmException
     {
-        Revision revision = context.getRevision();
         addPropertiesToContext(context);
-        return sync(context.getId(), context.getDir(), revision, handler, true);
+        return sync(context.getString("scm.bootstrap.id"), context.getWorkingDir(), revision, handler, true);
     }
 
-    public InputStream retrieve(String path, Revision revision) throws ScmException
+    public InputStream retrieve(ScmContext context, String path, Revision revision) throws ScmException
     {
         String clientName = updateClient(null, null, core.convertRevision(revision));
 
@@ -579,14 +581,14 @@ public class PerforceClient extends CachingScmClient
         }
     }
 
-    public List<Changelist> getChanges(Revision from, Revision to) throws ScmException
+    public List<Changelist> getChanges(ScmContext context, Revision from, Revision to) throws ScmException
     {
         List<Changelist> result = new LinkedList<Changelist>();
         getRevisions(from, to, result);
         return result;
     }
 
-    public List<Revision> getRevisions(Revision from, Revision to) throws ScmException
+    public List<Revision> getRevisions(ScmContext context, Revision from, Revision to) throws ScmException
     {
         return getRevisions(from, to, null);
     }
@@ -680,15 +682,14 @@ public class PerforceClient extends CachingScmClient
         return false;
     }
 
-    public Revision update(ScmContext context, ScmEventHandler handler) throws ScmException
+    public Revision update(ExecutionContext context, Revision rev, ScmEventHandler handler) throws ScmException
     {
-        Revision rev = context.getRevision();
         addPropertiesToContext(context);
-        sync(context.getId(), context.getDir(), rev, handler, false);
+        sync(context.getString("scm.bootstrap.id"), context.getWorkingDir(), rev, handler, false);
         return rev;
     }
 
-    public void tag(Revision revision, String name, boolean moveExisting) throws ScmException
+    public void tag(ExecutionContext context, Revision revision, String name, boolean moveExisting) throws ScmException
     {
         String clientName = updateClient(null, null, core.convertRevision(revision));
         try
@@ -710,13 +711,19 @@ public class PerforceClient extends CachingScmClient
         }
     }
 
-    private void addPropertiesToContext(ScmContext context) throws ScmException
+    private void addPropertiesToContext(ExecutionContext context) throws ScmException
     {
+        PulseScope scope = context.getScope().getAncestor(BuildProperties.SCOPE_RECIPE);
+
         for (Map.Entry<String, String> entry : core.getEnv().entrySet())
         {
-            context.addProperty(entry.getKey(), entry.getValue(), true);
+            ResourceProperty resourceProperty = new ResourceProperty(entry.getKey(), entry.getValue());
+            resourceProperty.setAddToEnvironment(true);
+            scope.add(resourceProperty);
         }
-        context.addProperty("P4CLIENT", getClientName(context.getId()), true);
+        ResourceProperty resourceProperty = new ResourceProperty("P4CLIENT", getClientName(context.getString("scm.bootstrap.id")));
+        resourceProperty.setAddToEnvironment(true);
+        scope.add(resourceProperty);
     }
 
     public void storeConnectionDetails(File outputDir) throws ScmException, IOException
@@ -728,7 +735,7 @@ public class PerforceClient extends CachingScmClient
         FileSystemUtils.createFile(new File(outputDir, "template-client.txt"), result.stdout.toString());
     }
 
-    public FileStatus.EOLStyle getEOLPolicy() throws ScmException
+    public FileStatus.EOLStyle getEOLPolicy(ScmContext context) throws ScmException
     {
         final FileStatus.EOLStyle[] eol = new FileStatus.EOLStyle[]{FileStatus.EOLStyle.NATIVE};
 
@@ -839,6 +846,11 @@ public class PerforceClient extends CachingScmClient
 
     public Revision getRevision(String revision) throws ScmException
     {
+        return parseRevision(revision);
+    }
+
+    public Revision parseRevision(String revision) throws ScmException
+    {
         String clientName = updateClient(null, null, null);
         try
         {
@@ -890,8 +902,8 @@ public class PerforceClient extends CachingScmClient
         try
         {
             PerforceClient client = new PerforceClient("localhost:1666", "jsankey", "", "pulse-demo");
-            client.retrieve("file", new Revision(null, null, null, "2"));
-            List<Changelist> cls = client.getChanges(new Revision(null, null, null, "2"), new Revision(null, null, null, "6"));
+            client.retrieve(null, "file", new Revision(null, null, null, "2"));
+            List<Changelist> cls = client.getChanges(null, new Revision(null, null, null, "2"), new Revision(null, null, null, "6"));
 
             for (Changelist l : cls)
             {

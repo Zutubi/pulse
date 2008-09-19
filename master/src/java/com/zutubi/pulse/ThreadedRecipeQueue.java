@@ -198,7 +198,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
             {
                 client = scmClientFactory.createClient(scm);
                 boolean supportsRevisions = client.getCapabilities().contains(ScmCapability.REVISIONS);
-                Revision revision = supportsRevisions ? client.getLatestRevision() : new Revision(System.currentTimeMillis());
+                Revision revision = supportsRevisions ? client.getLatestRevision(null) : new Revision(System.currentTimeMillis());
 
                 // May throw a BuildException
                 updateRevision(assignmentRequest, revision);

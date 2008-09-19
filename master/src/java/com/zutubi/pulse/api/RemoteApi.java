@@ -1560,7 +1560,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
                     client = scmClientFactory.createClient(project.getConfig().getScm());
                     if(client.getCapabilities().contains(ScmCapability.REVISIONS))
                     {
-                        r = client.getRevision(revision);
+                        r = client.parseRevision(revision);
                     }
                     else
                     {

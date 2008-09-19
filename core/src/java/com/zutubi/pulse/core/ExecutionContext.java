@@ -3,6 +3,7 @@ package com.zutubi.pulse.core;
 import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_USER;
 import com.zutubi.pulse.core.config.ResourceProperty;
+import com.zutubi.pulse.core.model.Revision;
 
 import java.io.File;
 import java.io.OutputStream;
@@ -19,10 +20,18 @@ public class ExecutionContext
 {
     // If you add a field, remember to update the copy constructor
     private MultiScopeStack scopeStack;
+    /**
+     * The base workspace directory for the build.
+     */
     private File workingDir = null;
+    /**
+     * The output stream tied to this execution context.  All build output should be sent
+     * via this output stream so that it can be captured and reported to the user.
+     */
     private OutputStream outputStream = null;
-    // TODO: replace this with more generic support for extracting properties
-    // from the build
+
+    // from the build - used by maven to specify the maven version number of the build.  We should
+    // pass this value around as a user(?) property rather than directly implemented as a field.
     private String version = null;
 
     public ExecutionContext()
@@ -38,6 +47,9 @@ public class ExecutionContext
         this.version = other.version;
     }
 
+/* are these ever used?  They expose the Reference interface which is specific to the pulse file, so
+   it would be better if they are removed.  References may be used internally, but as far as a client of
+   this class is concerned, it simply stores useful details about the execution environment.
     public Reference getReference(String namespace, String name)
     {
         return scopeStack.getScope(namespace).getReference(name);
@@ -47,6 +59,7 @@ public class ExecutionContext
     {
         return scopeStack.getScope().getReference(name);
     }
+*/
 
     public String getString(String namespace, String name)
     {

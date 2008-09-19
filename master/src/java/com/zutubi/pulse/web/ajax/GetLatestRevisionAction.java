@@ -49,7 +49,7 @@ public class GetLatestRevisionAction extends ProjectActionSupport
                 client = scmClientFactory.createClient(project.getConfig().getScm());
                 if(client.getCapabilities().contains(ScmCapability.REVISIONS))
                 {
-                    latestRevision = client.getLatestRevision().getRevisionString();
+                    latestRevision = client.getLatestRevision(null).getRevisionString();
                 }
                 else
                 {

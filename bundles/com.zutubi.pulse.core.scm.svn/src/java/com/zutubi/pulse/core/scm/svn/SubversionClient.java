@@ -4,6 +4,10 @@ import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.*;
+import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.PulseScope;
+import com.zutubi.pulse.core.BuildProperties;
+import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.StringUtils;
@@ -302,9 +306,8 @@ public class SubversionClient implements ScmClient
         }
     }
 
-    public Revision checkout(ScmContext context, ScmEventHandler handler) throws ScmException
+    public Revision checkout(ExecutionContext context, Revision revision, ScmEventHandler handler) throws ScmException
     {
-        Revision revision = context.getRevision();
         addPropertiesToContext(context);
 
         SVNRevision svnRevision;
@@ -312,7 +315,7 @@ public class SubversionClient implements ScmClient
 
         if (revision == null)
         {
-            svnRevision = convertRevision(getLatestRevision());
+            svnRevision = convertRevision(getLatestRevision(null));
         }
         else
         {
@@ -326,8 +329,8 @@ public class SubversionClient implements ScmClient
 
         try
         {
-            updateClient.doCheckout(repository.getLocation(), context.getDir(), svnRevision, svnRevision, true);
-            updateExternals(context.getDir(), revision, updateClient, handler);
+            updateClient.doCheckout(repository.getLocation(), context.getWorkingDir(), svnRevision, svnRevision, true);
+            updateExternals(context.getWorkingDir(), revision, updateClient, handler);
         }
         catch (SVNException e)
         {
@@ -356,7 +359,7 @@ public class SubversionClient implements ScmClient
         }
     }
 
-    public InputStream retrieve(String path, Revision revision) throws ScmException
+    public InputStream retrieve(ScmContext context, String path, Revision revision) throws ScmException
     {
         ByteArrayOutputStream os = new ByteArrayOutputStream(1024);
 
@@ -376,7 +379,7 @@ public class SubversionClient implements ScmClient
     {
         if (to == null)
         {
-            to = getLatestRevision();
+            to = getLatestRevision(null);
         }
 
         long fromNumber = convertRevision(from).getNumber() + 1;
@@ -526,16 +529,16 @@ public class SubversionClient implements ScmClient
         }
     }
 
-    public List<Changelist> getChanges(Revision from, Revision to) throws ScmException
+    public List<Changelist> getChanges(ScmContext context, Revision from, Revision to) throws ScmException
     {
         ChangelistAccumulator accumulator = new ChangelistAccumulator();
         reportChanges(accumulator, from, to);
         return accumulator.getChangelists();
     }
 
-    public List<Revision> getRevisions(Revision from, Revision to) throws ScmException
+    public List<Revision> getRevisions(ScmContext context, Revision from, Revision to) throws ScmException
     {
-        List<Changelist> changes = getChanges(from, to);
+        List<Changelist> changes = getChanges(null, from, to);
         Collections.sort(changes, new Comparator<Changelist>()
         {
             public int compare(Changelist o1, Changelist o2)
@@ -555,7 +558,7 @@ public class SubversionClient implements ScmClient
 
     public boolean hasChangedSince(Revision since) throws ScmException
     {
-        NumericalRevision latestRevision = convertToNumericalRevision(getLatestRevision());
+        NumericalRevision latestRevision = convertToNumericalRevision(getLatestRevision(null));
         if (latestRevision.getRevisionNumber() != (convertToNumericalRevision(since)).getRevisionNumber())
         {
             ChangeDetector detector = new ChangeDetector();
@@ -568,7 +571,7 @@ public class SubversionClient implements ScmClient
         }
     }
 
-    public Revision getLatestRevision() throws ScmException
+    public Revision getLatestRevision(ScmContext context) throws ScmException
     {
         try
         {
@@ -580,7 +583,7 @@ public class SubversionClient implements ScmClient
         }
     }
 
-    public List<ScmFile> browse(String path, Revision revision) throws ScmException
+    public List<ScmFile> browse(ScmContext context, String path, Revision revision) throws ScmException
     {
         LinkedList<SVNDirEntry> files = new LinkedList<SVNDirEntry>();
         try
@@ -622,15 +625,14 @@ public class SubversionClient implements ScmClient
         return result;
     }
 
-    public Revision update(ScmContext context, ScmEventHandler handler) throws ScmException
+    public Revision update(ExecutionContext context, Revision rev, ScmEventHandler handler) throws ScmException
     {
-        Revision rev = context.getRevision();
         addPropertiesToContext(context);
         // CIB-610: cleanup before update in case WC is locked.
         SVNWCClient wcClient = new SVNWCClient(authenticationManager, null);
         try
         {
-            wcClient.doCleanup(context.getDir());
+            wcClient.doCleanup(context.getWorkingDir());
         }
         catch (SVNException e)
         {
@@ -643,8 +645,8 @@ public class SubversionClient implements ScmClient
             client.setEventHandler(new ChangeEventHandler(handler));
         }
 
-        update(context.getDir(), convertRevision(rev), client);
-        updateExternals(context.getDir(), rev, client, handler);
+        update(context.getWorkingDir(), convertRevision(rev), client);
+        updateExternals(context.getWorkingDir(), rev, client, handler);
         return rev;
     }
 
@@ -678,7 +680,7 @@ public class SubversionClient implements ScmClient
         }
     }
 
-    public void tag(Revision revision, String name, boolean moveExisting) throws ScmException
+    public void tag(ExecutionContext context, Revision revision, String name, boolean moveExisting) throws ScmException
     {
         try
         {
@@ -707,9 +709,10 @@ public class SubversionClient implements ScmClient
         }
     }
 
-    private void addPropertiesToContext(ScmContext context) throws ScmException
+    private void addPropertiesToContext(ExecutionContext context) throws ScmException
     {
-        context.addProperty("svn.url", url);
+        PulseScope scope = context.getScope().getAncestor(BuildProperties.SCOPE_RECIPE);
+        scope.add(new ResourceProperty("svn.url", url));
     }
 
     public void storeConnectionDetails(File outputDir) throws ScmException, IOException
@@ -729,12 +732,17 @@ public class SubversionClient implements ScmClient
         }
     }
 
-    public FileStatus.EOLStyle getEOLPolicy()
+    public FileStatus.EOLStyle getEOLPolicy(ScmContext context)
     {
         return FileStatus.EOLStyle.BINARY;
     }
 
     public Revision getRevision(String revision) throws ScmException
+    {
+        return parseRevision(revision);
+    }
+
+    public Revision parseRevision(String revision) throws ScmException
     {
         try
         {

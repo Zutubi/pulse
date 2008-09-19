@@ -2,10 +2,10 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
-import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.scm.ScmClient;
-import com.zutubi.pulse.core.scm.ScmContext;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
+import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.util.logging.Logger;
 
@@ -20,15 +20,15 @@ public class UpdateBootstrapper extends ScmBootstrapper
         super(project, scmConfig, revision);
     }
 
-    ScmClient bootstrap(ScmContext context)
+    ScmClient doBootstrap(ExecutionContext executionContext)
     {
         ScmClient scm = null;
         try
         {
-            context.setId(getId());
-            context.setRevision(revision.getRevision());
             scm = createScmClient();
-            scm.update(context, this);
+            // Temporarily pass the id string through so that the p4 implementation can work with it.
+            executionContext.addString("scm.bootstrap.id", getId());
+            scm.update(executionContext, revision.getRevision(), this);
             return scm;
         }
         catch (ScmException e)
