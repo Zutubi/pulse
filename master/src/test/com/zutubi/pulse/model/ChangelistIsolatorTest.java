@@ -165,7 +165,7 @@ public class ChangelistIsolatorTest extends PulseTestCase
             ret.add(new Revision(null, null, null, Long.toString(r)));
         }
 
-        mockScm.expectAndReturn("getRevisions", C.args(C.eq(new Revision(null, null, null, Long.toString(since))), C.IS_NULL), ret);
+        mockScm.expectAndReturn("getRevisions", C.args(C.IS_ANYTHING, C.eq(new Revision(null, null, null, Long.toString(since))), C.IS_NULL), ret);
         mockScm.expect("close");
     }
 
