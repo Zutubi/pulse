@@ -534,6 +534,32 @@
 
     <target name="idea" depends="build.all"
             description="Adds modules to an IDEA project file (pulse.ipr) for all Pulse modules and plugins.">
+
+        <!-- copy the template idea project files into the project directory if they dont already exist. -->
+        <available file="pulse.ipr" property="pulse.ipr.available"/>
+        <if>
+            <not><isset property="pulse.ipr.available"/></not>
+            <then>
+                <copy todir="${project.root.dir}" overwrite="true">
+                    <fileset dir="etc">
+                        <include name="pulse.ipr"/>
+                    </fileset>
+                </copy>
+            </then>
+        </if>
+
+        <available file="pulse.iws" property="pulse.iws.available"/>
+        <if>
+            <not><isset property="pulse.iws.available"/></not>
+            <then>
+                <copy todir="${project.root.dir}" overwrite="true">
+                    <fileset dir="etc">
+                        <include name="pulse.iws"/>
+                    </fileset>
+                </copy>
+            </then>
+        </if>
+
         <zutubi:ivytoidea conf="build" projectFile="pulse.ipr" propertiesFile="build.properties">
             <fileset dir="${project.root.dir}/">
                 <include name="*/ivy.xml"/>
@@ -570,14 +596,14 @@
         <mkdir dir="build/${package.name}"/>
 
         <copy todir="build/${package.name}">
-            <fileset dir=".">
+            <fileset dir="${project.root.dir}">
                 <include name="**/*"/>
-                <exclude name="build/*"/>
+                <exclude name="build/**"/>
+                <exclude name="classes/**"/>
                 <exclude name="**/LicenseEncoder.java"/>
                 <exclude name="**/LicenseEncodeDecodeTest.java"/>
                 <exclude name="**/LicenseKeyValidatorTest.java"/>
                 <exclude name="**/.svn"/>
-                <include name="etc/pulse.ipr"/>
                 <!-- exclude intellij project files -->
                 <exclude name="**/*.ipr"/>
                 <exclude name="**/*.iws"/>
@@ -586,12 +612,9 @@
                 <exclude name="**/*.*~"/>
                 <exclude name="velocity.log"/>
             </fileset>
-        </copy>
-
-        <!-- move the pulse.ipr file. -->
-        <copy todir="build/${package.name}">
-            <fileset dir="etc">
-                <include name="pulse.ipr"/>
+            <fileset dir="${project.root.dir}">
+                <include name="etc/pulse.ipr"/>
+                <include name="etc/pulse.iws"/>
             </fileset>
         </copy>
 
@@ -600,7 +623,7 @@
         </copyright>
 
         <native-zip dir="${project.root.dir}/build" file="${package.name}.zip" path="${package.name}"/>
-        
+
     </target>
 
     <macrodef name="build-package-deps">
