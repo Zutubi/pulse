@@ -15,15 +15,15 @@ public abstract class CachingScmClient implements ScmClient, ScmCachePopulator
         return getLocation();
     }
 
-    public boolean requiresRefresh(Revision revision) throws ScmException
+    public boolean requiresRefresh(ScmContext context, Revision revision) throws ScmException
     {
-        List<Revision> newRevisions = getRevisions(null, revision, null);
+        List<Revision> newRevisions = getRevisions(context, revision, null);
         return newRevisions.size() > 0;
     }
 
     public List<ScmFile> browse(ScmContext context, String path, Revision revision) throws ScmException
     {
-        Map<String, CachingScmFile> cachedListing = ScmFileCache.getInstance().lookup(this);
+        Map<String, CachingScmFile> cachedListing = ScmFileCache.getInstance().lookup(context, this);
         if (cachedListing.containsKey(path))
         {
             return cachedListing.get(path).list();

@@ -18,9 +18,9 @@ public class ScmContext
         return persistentWorkingDir;
     }
 
-    public void setPersistentWorkingDir(File persistentWorkingDir)
+    public void setPersistentWorkingDir(File dir)
     {
-        this.persistentWorkingDir = persistentWorkingDir;
+        this.persistentWorkingDir = dir;
     }
 
 }

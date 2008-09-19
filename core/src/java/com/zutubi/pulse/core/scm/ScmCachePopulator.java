@@ -9,7 +9,7 @@ public interface ScmCachePopulator
 {
     String getUniqueLocation() throws ScmException;
 
-    boolean requiresRefresh(Revision revision) throws ScmException;
+    boolean requiresRefresh(ScmContext context, Revision revision) throws ScmException;
 
     void populate(ScmFileCache.CacheItem item) throws ScmException;
 }

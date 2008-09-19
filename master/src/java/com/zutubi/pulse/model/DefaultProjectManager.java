@@ -1,6 +1,5 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.bootstrap.DefaultSetupManager;
 import com.zutubi.pulse.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.cleanup.config.CleanupUnit;
@@ -11,9 +10,10 @@ import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.NamedConfigurationComparator;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.model.TestCaseIndex;
-import com.zutubi.pulse.core.scm.DelegateScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmCapability;
+import com.zutubi.pulse.core.scm.ScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
+import com.zutubi.pulse.core.scm.ScmContextFactory;
 import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
@@ -31,12 +31,20 @@ import com.zutubi.pulse.model.persistence.TestCaseIndexDao;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.scheduling.SchedulingException;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.tove.config.LabelConfiguration;
 import com.zutubi.pulse.tove.config.group.AbstractGroupConfiguration;
 import com.zutubi.pulse.tove.config.project.ProjectAclConfiguration;
 import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.tove.config.project.types.TypeConfiguration;
-import com.zutubi.tove.config.*;
+import com.zutubi.tove.config.ConfigurationInjector;
+import com.zutubi.tove.config.ConfigurationProvider;
+import com.zutubi.tove.config.ConfigurationRegistry;
+import com.zutubi.tove.config.ConfigurationStateManager;
+import com.zutubi.tove.config.ConfigurationTemplateManager;
+import com.zutubi.tove.config.ExternalStateManager;
+import com.zutubi.tove.config.TypeAdapter;
+import com.zutubi.tove.config.TypeListener;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.security.Actor;
 import com.zutubi.tove.type.CompositeType;
@@ -49,7 +57,15 @@ import com.zutubi.util.Predicate;
 import com.zutubi.util.Sort;
 import com.zutubi.util.logging.Logger;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * 
@@ -67,7 +83,8 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     private BuildManager buildManager;
     private EventManager eventManager;
     private ChangelistIsolator changelistIsolator;
-    private DelegateScmClientFactory scmClientManager;
+    private ScmClientFactory scmClientManager;
+    private ScmContextFactory scmContextFactory;
     private LicenseManager licenseManager;
     private AgentStateDao agentStateDao;
 
@@ -120,6 +137,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     {
         changelistIsolator = new ChangelistIsolator(buildManager);
         changelistIsolator.setScmClientFactory(scmClientManager);
+        changelistIsolator.setScmContextFactory(scmContextFactory);
 
         // register the canAddProject authorisation with the license manager.
         AddProjectAuthorisation addProjectAuthorisation = new AddProjectAuthorisation();
@@ -713,9 +731,14 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         configurationInjector.registerSetter(Project.class, this);
     }
 
-    public void setScmClientManager(DelegateScmClientFactory scmClientManager)
+    public void setScmClientManager(ScmClientFactory scmClientManager)
     {
         this.scmClientManager = scmClientManager;
+    }
+
+    public void setScmContextFactory(ScmContextFactory scmContextFactory)
+    {
+        this.scmContextFactory = scmContextFactory;
     }
 
     public void setAccessManager(AccessManager accessManager)

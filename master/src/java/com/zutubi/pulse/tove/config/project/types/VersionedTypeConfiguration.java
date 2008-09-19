@@ -8,6 +8,9 @@ import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.pulse.core.scm.ScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
+import com.zutubi.pulse.core.scm.ScmContext;
+import com.zutubi.pulse.core.scm.ScmContextFactory;
+import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.io.IOUtils;
@@ -28,6 +31,8 @@ public class VersionedTypeConfiguration extends TypeConfiguration
     @Transient
     private ScmClientFactory scmClientFactory;
 
+    private ScmContextFactory scmContextFactory;
+
     public String getPulseFileName()
     {
         return pulseFileName;
@@ -44,8 +49,10 @@ public class VersionedTypeConfiguration extends TypeConfiguration
         InputStream is = null;
         try
         {
-            scmClient = scmClientFactory.createClient(projectConfig.getScm());
-            is = scmClient.retrieve(null, pulseFileName, revision);
+            ScmConfiguration scm = projectConfig.getScm();
+            ScmContext context = scmContextFactory.createContext(projectConfig.getProjectId(), scm);
+            scmClient = scmClientFactory.createClient(scm);
+            is = scmClient.retrieve(context, pulseFileName, revision);
             return IOUtils.inputStreamToString(is);
         }
         finally
@@ -58,5 +65,10 @@ public class VersionedTypeConfiguration extends TypeConfiguration
     public void setScmClientFactory(ScmClientFactory scmClientFactory)
     {
         this.scmClientFactory = scmClientFactory;
+    }
+
+    public void setScmContextFactory(ScmContextFactory scmContextFactory)
+    {
+        this.scmContextFactory = scmContextFactory;
     }
 }

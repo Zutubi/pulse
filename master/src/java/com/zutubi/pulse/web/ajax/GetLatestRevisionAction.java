@@ -5,6 +5,8 @@ import com.zutubi.pulse.core.scm.ScmCapability;
 import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.pulse.core.scm.ScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
+import com.zutubi.pulse.core.scm.ScmContext;
+import com.zutubi.pulse.core.scm.ScmContextFactory;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.web.project.ProjectActionSupport;
 
@@ -18,6 +20,7 @@ public class GetLatestRevisionAction extends ProjectActionSupport
     private String latestRevision;
     private String error;
     private ScmClientFactory scmClientFactory;
+    private ScmContextFactory scmContextFactory;
 
     public boolean isSuccessful()
     {
@@ -46,10 +49,11 @@ public class GetLatestRevisionAction extends ProjectActionSupport
             ScmClient client = null;
             try
             {
+                ScmContext context = scmContextFactory.createContext(project.getConfig().getProjectId(), project.getConfig().getScm());
                 client = scmClientFactory.createClient(project.getConfig().getScm());
                 if(client.getCapabilities().contains(ScmCapability.REVISIONS))
                 {
-                    latestRevision = client.getLatestRevision(null).getRevisionString();
+                    latestRevision = client.getLatestRevision(context).getRevisionString();
                 }
                 else
                 {
@@ -74,5 +78,10 @@ public class GetLatestRevisionAction extends ProjectActionSupport
     public void setScmClientFactory(ScmClientFactory scmClientFactory)
     {
         this.scmClientFactory = scmClientFactory;
+    }
+
+    public void setScmContextFactory(ScmContextFactory scmContextFactory)
+    {
+        this.scmContextFactory = scmContextFactory;
     }
 }

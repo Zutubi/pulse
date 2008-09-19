@@ -4,6 +4,8 @@ import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.pulse.core.scm.ScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.scm.ScmContext;
+import com.zutubi.pulse.core.scm.ScmContextFactory;
 import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 
 import java.io.InputStream;
@@ -20,6 +22,7 @@ public class DownloadSCMFileAction extends ProjectActionBase
     private String contentType;
 
     private ScmClientFactory scmClientFactory;
+    private ScmContextFactory scmContextFactory;
 
     public String getPath()
     {
@@ -48,7 +51,8 @@ public class DownloadSCMFileAction extends ProjectActionBase
         {
             ProjectConfiguration projectConfig = getRequiredProject().getConfig();
             client = scmClientFactory.createClient(projectConfig.getScm());
-            inputStream = client.retrieve(null, path, null);
+            ScmContext context = scmContextFactory.createContext(projectConfig.getProjectId(), projectConfig.getScm());
+            inputStream = client.retrieve(context, path, null);
             contentType = URLConnection.guessContentTypeFromName(path);
             return SUCCESS;
         }
@@ -66,5 +70,10 @@ public class DownloadSCMFileAction extends ProjectActionBase
     public void setScmClientFactory(ScmClientFactory scmClientFactory)
     {
         this.scmClientFactory = scmClientFactory;
+    }
+
+    public void setScmContextFactory(ScmContextFactory scmContextFactory)
+    {
+        this.scmContextFactory = scmContextFactory;
     }
 }

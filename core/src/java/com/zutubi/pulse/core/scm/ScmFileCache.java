@@ -1,7 +1,6 @@
 package com.zutubi.pulse.core.scm;
 
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.scm.ScmException;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -34,7 +33,7 @@ public class ScmFileCache
         return INSTANCE;
     }
 
-    public Map<String, CachingScmFile> lookup(ScmCachePopulator populator) throws ScmException
+    public Map<String, CachingScmFile> lookup(ScmContext context, ScmCachePopulator populator) throws ScmException
     {
         CacheItem item;
 
@@ -45,7 +44,7 @@ public class ScmFileCache
             if (cache.containsKey(uid))
             {
                 item = cache.get(uid);
-                if (populator.requiresRefresh(item.cachedRevision))
+                if (populator.requiresRefresh(context, item.cachedRevision))
                 {
                     populator.populate(item);
                 }

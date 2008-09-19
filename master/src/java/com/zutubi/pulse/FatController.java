@@ -5,7 +5,8 @@ import com.zutubi.pulse.agent.MasterLocationProvider;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.model.Entity;
-import com.zutubi.pulse.core.scm.DelegateScmClientFactory;
+import com.zutubi.pulse.core.scm.ScmClientFactory;
+import com.zutubi.pulse.core.scm.ScmContextFactory;
 import com.zutubi.pulse.events.AsynchronousDelegatingListener;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
@@ -19,7 +20,13 @@ import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.license.events.LicenseEvent;
 import com.zutubi.pulse.license.events.LicenseExpiredEvent;
 import com.zutubi.pulse.license.events.LicenseUpdateEvent;
-import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.model.BuildManager;
+import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.model.ResourceManager;
+import com.zutubi.pulse.model.TestManager;
+import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.scheduling.quartz.TimeoutRecipeJob;
 import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.tove.config.project.hooks.BuildHookManager;
@@ -55,7 +62,8 @@ public class FatController implements EventListener, Stoppable
     private AsynchronousDelegatingListener asyncListener;
     private BuildManager buildManager;
     private TestManager testManager;
-    private DelegateScmClientFactory scmClientFactory;
+    private ScmClientFactory scmClientFactory;
+    private ScmContextFactory scmContextFactory;
     private MasterConfigurationManager configManager;
     private RecipeQueue recipeQueue;
 
@@ -291,6 +299,7 @@ public class FatController implements EventListener, Stoppable
                 controller.setServiceTokenManager(serviceTokenManager);
                 controller.setTestManager(testManager);
                 controller.setScmClientFactory(scmClientFactory);
+                controller.setScmContextFactory(scmContextFactory);
                 controller.setUserManager(userManager);
                 controller.setConfigurationManager(configManager);
                 controller.setMasterLocationProvider(masterLocationProvider);
@@ -451,7 +460,7 @@ public class FatController implements EventListener, Stoppable
         this.testManager = testManager;
     }
 
-    public void setScmClientFactory(DelegateScmClientFactory scmClientFactory)
+    public void setScmClientFactory(ScmClientFactory scmClientFactory)
     {
         this.scmClientFactory = scmClientFactory;
     }
@@ -484,5 +493,10 @@ public class FatController implements EventListener, Stoppable
     public void setBuildHookManager(BuildHookManager buildHookManager)
     {
         this.buildHookManager = buildHookManager;
+    }
+
+    public void setScmContextFactory(ScmContextFactory scmContextFactory)
+    {
+        this.scmContextFactory = scmContextFactory;
     }
 }

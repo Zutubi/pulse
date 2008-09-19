@@ -1,6 +1,13 @@
 package com.zutubi.pulse.vfs.pulse;
 
-import com.zutubi.pulse.core.scm.*;
+import com.zutubi.pulse.core.scm.ScmClient;
+import com.zutubi.pulse.core.scm.ScmClientFactory;
+import com.zutubi.pulse.core.scm.ScmClientUtils;
+import com.zutubi.pulse.core.scm.ScmContext;
+import com.zutubi.pulse.core.scm.ScmContextFactory;
+import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.scm.ScmFile;
+import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.vfs.FileAction;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
@@ -27,6 +34,7 @@ public class ScmFileObject extends AbstractPulseFileObject
 
     private ScmFile scmFile;
     private List<ScmFile> scmChildren;
+    private ScmContextFactory scmContextFactory;
 
     public ScmFileObject(final FileName name, final AbstractFileSystem fs)
     {
@@ -72,8 +80,11 @@ public class ScmFileObject extends AbstractPulseFileObject
             ScmClient client = null;
             try
             {
-                client = scmClientFactory.createClient(getAncestor(ScmProvider.class).getScm());
-                scmChildren = client.browse(null, scmFile.getPath(), null);
+                ScmConfiguration scm = getAncestor(ScmProvider.class).getScm();
+                long projectId = getAncestor(ProjectProvider.class).getProjectId();
+                ScmContext context = scmContextFactory.createContext(projectId, scm);
+                client = scmClientFactory.createClient(scm);
+                scmChildren = client.browse(context, scmFile.getPath(), null);
             }
             catch (ScmException e)
             {
@@ -157,5 +168,10 @@ public class ScmFileObject extends AbstractPulseFileObject
     public void setScmClientFactory(ScmClientFactory scmClientFactory)
     {
         this.scmClientFactory = scmClientFactory;
+    }
+
+    public void setScmContextFactory(ScmContextFactory scmContextFactory)
+    {
+        this.scmContextFactory = scmContextFactory;
     }
 }

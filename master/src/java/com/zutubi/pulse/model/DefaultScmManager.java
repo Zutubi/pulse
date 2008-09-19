@@ -7,6 +7,8 @@ import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.pulse.core.scm.ScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.scm.ScmContextFactory;
+import com.zutubi.pulse.core.scm.ScmContext;
 import com.zutubi.pulse.core.scm.config.Pollable;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.events.EventManager;
@@ -49,6 +51,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
     private EventManager eventManager;
     private ShutdownManager shutdownManager;
     private ScmClientFactory scmClientFactory;
+    private ScmContextFactory scmContextFactory;
     private Scheduler scheduler;
     private ConfigurationProvider configurationProvider;
     private ThreadFactory threadFactory;
@@ -187,10 +190,11 @@ public class DefaultScmManager implements ScmManager, Stoppable
             projectManager.save(project);
 
             // when was the last time that we checked? if never, get the latest revision.
+            ScmContext context = scmContextFactory.createContext(projectConfig.getProjectId(), projectConfig.getScm());
             client = scmClientFactory.createClient(projectConfig.getScm());
             if (!latestRevisions.containsKey(projectId))
             {
-                latestRevisions.put(projectId, client.getLatestRevision(null));
+                latestRevisions.put(projectId, client.getLatestRevision(context));
                 return;
             }
 
@@ -199,7 +203,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
             // slightly paranoid, but we can not rely on the scm implementations to behave as expected.
             if (previous == null)
             {
-                latestRevisions.put(projectId, client.getLatestRevision(null));
+                latestRevisions.put(projectId, client.getLatestRevision(context));
                 return;
             }
 
@@ -212,7 +216,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
                     if (quietTime < System.currentTimeMillis())
                     {
                         Revision lastChange = waiting.get(projectId).second;
-                        Revision latest = getLatestRevisionSince(lastChange, client);
+                        Revision latest = getLatestRevisionSince(lastChange, client, context);
                         if (latest != null)
                         {
                             // there has been a commit during the 'quiet period', lets reset the timer.
@@ -228,7 +232,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
                 }
                 else
                 {
-                    Revision latest = getLatestRevisionSince(previous, client);
+                    Revision latest = getLatestRevisionSince(previous, client, context);
                     if (latest != null)
                     {
                         if (pollable.getQuietPeriod() != 0)
@@ -244,7 +248,7 @@ public class DefaultScmManager implements ScmManager, Stoppable
             }
             else
             {
-                Revision latest = getLatestRevisionSince(previous, client);
+                Revision latest = getLatestRevisionSince(previous, client, context);
                 if (latest != null)
                 {
                     sendScmChangeEvent(projectConfig, latest, previous);
@@ -265,10 +269,10 @@ public class DefaultScmManager implements ScmManager, Stoppable
         }
     }
 
-    private Revision getLatestRevisionSince(Revision revision, ScmClient client) throws ScmException
+    private Revision getLatestRevisionSince(Revision revision, ScmClient client, ScmContext context) throws ScmException
     {
         // this assumes that getting the revision since revision x is more efficient than getting the latest revision.
-        List<Revision> revisions = client.getRevisions(null, revision, null);
+        List<Revision> revisions = client.getRevisions(context, revision, null);
         if (revisions.size() > 0)
         {
             // get the latest revision.
@@ -339,5 +343,10 @@ public class DefaultScmManager implements ScmManager, Stoppable
     public void setThreadFactory(ThreadFactory threadFactory)
     {
         this.threadFactory = threadFactory;
+    }
+
+    public void setScmContextFactory(ScmContextFactory scmContextFactory)
+    {
+        this.scmContextFactory = scmContextFactory;
     }
 }

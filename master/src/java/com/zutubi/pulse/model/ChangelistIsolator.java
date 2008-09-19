@@ -5,6 +5,8 @@ import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.pulse.core.scm.ScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.scm.ScmContextFactory;
+import com.zutubi.pulse.core.scm.ScmContext;
 import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 
 import java.util.Arrays;
@@ -19,6 +21,7 @@ public class ChangelistIsolator
     private Map<Long, Revision> latestRequestedRevisions = new TreeMap<Long, Revision>();
     private BuildManager buildManager;
     private ScmClientFactory scmClientFactory;
+    private ScmContextFactory scmContextFactory;
 
     public ChangelistIsolator(BuildManager buildManager)
     {
@@ -48,18 +51,19 @@ public class ChangelistIsolator
         ScmClient client = null;
         try
         {
+            ScmContext context = scmContextFactory.createContext(projectConfig.getProjectId(), projectConfig.getScm());
             client = scmClientFactory.createClient(projectConfig.getScm());
             if (latestBuiltRevision == null)
             {
                 // The spec has never been built or even requested.  Just build
                 // the latest (we need to start somewhere!).
-                result = Arrays.asList(client.getLatestRevision(null));
+                result = Arrays.asList(client.getLatestRevision(context));
             }
             else
             {
                 // We now have the last requested revision, return every revision
                 // since then.
-                result = client.getRevisions(null, latestBuiltRevision, null);
+                result = client.getRevisions(context, latestBuiltRevision, null);
             }
         }
         finally
@@ -111,5 +115,10 @@ public class ChangelistIsolator
     public void setScmClientFactory(ScmClientFactory scmClientFactory)
     {
         this.scmClientFactory = scmClientFactory;
+    }
+
+    public void setScmContextFactory(ScmContextFactory scmContextFactory)
+    {
+        this.scmContextFactory = scmContextFactory;
     }
 }

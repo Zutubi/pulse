@@ -80,6 +80,7 @@ public class BuildController implements EventListener
     private ResourceManager resourceManager;
 
     private DefaultBuildLogger buildLogger;
+    private ScmContextFactory scmContextFactory;
 
     public BuildController(AbstractBuildRequestEvent event)
     {
@@ -312,8 +313,9 @@ public class BuildController implements EventListener
         ScmClient client = null;
         try
         {
+            ScmContext context = scmContextFactory.createContext(projectConfig.getProjectId(), projectConfig.getScm());
             client = scmClientFactory.createClient(projectConfig.getScm());
-            FileStatus.EOLStyle localEOL = client.getEOLPolicy(null);
+            FileStatus.EOLStyle localEOL = client.getEOLPolicy(context);
             initialBootstrapper = new PatchBootstrapper(initialBootstrapper, pbr.getUser().getId(), pbr.getNumber(), localEOL);
         }
         catch (ScmException e)
@@ -562,8 +564,9 @@ public class BuildController implements EventListener
                 ScmClient client = null;
                 try
                 {
+                    ScmContext context = scmContextFactory.createContext(projectConfig.getProjectId(), scm);
                     client = scmClientFactory.createClient(scm);
-                    getChangeSince(client, previousRevision, revision);
+                    getChangeSince(context, client, previousRevision, revision);
                 }
                 catch (ScmException e)
                 {
@@ -577,12 +580,12 @@ public class BuildController implements EventListener
         }
     }
 
-    private List<Changelist> getChangeSince(ScmClient client, Revision previousRevision, Revision revision) throws ScmException
+    private List<Changelist> getChangeSince(ScmContext context, ScmClient client, Revision previousRevision, Revision revision) throws ScmException
     {
         List<Changelist> result = new LinkedList<Changelist>();
         if(client.getCapabilities().contains(ScmCapability.CHANGESETS))
         {
-            List<Changelist> scmChanges = client.getChanges(null, previousRevision, revision);
+            List<Changelist> scmChanges = client.getChanges(context, previousRevision, revision);
 
             for (Changelist change : scmChanges)
             {
@@ -820,6 +823,11 @@ public class BuildController implements EventListener
     public void setBuildHookManager(BuildHookManager buildHookManager)
     {
         this.buildHookManager = buildHookManager;
+    }
+
+    public void setScmContextFactory(ScmContextFactory scmContextFactory)
+    {
+        this.scmContextFactory = scmContextFactory;
     }
 
     private static interface BootstrapperCreator

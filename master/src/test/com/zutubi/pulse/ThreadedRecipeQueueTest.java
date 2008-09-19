@@ -16,6 +16,9 @@ import com.zutubi.pulse.core.scm.DelegateScmClientFactory;
 import com.zutubi.pulse.core.scm.MockScmClient;
 import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.scm.ScmContextFactory;
+import com.zutubi.pulse.core.scm.DefaultScmContextFactory;
+import com.zutubi.pulse.core.scm.ScmContext;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.events.*;
 import com.zutubi.pulse.events.build.RecipeAssignedEvent;
@@ -100,6 +103,13 @@ public class ThreadedRecipeQueueTest extends TestCase implements EventListener
             {
                 MockScm scm = (MockScm) config;
                 return new MockScmClient(scm.throwError);
+            }
+        });
+        queue.setScmContextFactory(new ScmContextFactory()
+        {
+            public ScmContext createContext(long projectId, ScmConfiguration scm) throws ScmException
+            {
+                return new ScmContext();
             }
         });
         queue.setThreadFactory(Executors.defaultThreadFactory());

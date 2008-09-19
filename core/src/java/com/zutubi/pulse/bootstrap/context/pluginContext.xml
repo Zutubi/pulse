@@ -8,4 +8,20 @@
     <bean id="scmExtensionManager" class="com.zutubi.pulse.core.scm.ScmExtensionManager" init-method="init"/>
     <bean id="scmClientFactory" class="com.zutubi.pulse.core.scm.DelegateScmClientFactory"/>
     <bean id="hessianExtensionManager" class="com.zutubi.pulse.hessian.HessianConfigurationExtensionManager" init-method="init"/>
+
+    <bean id="scmContextFactory" class="com.zutubi.pulse.core.scm.DefaultScmContextFactory">
+        <property name="projectsDir">
+            <ref local="projectDir"/>
+        </property>
+    </bean>
+
+    <bean id="projectDir" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+        <property name="targetBeanName">
+            <value>configurationManager</value>
+        </property>
+        <property name="propertyPath">
+            <value>userPaths.projectRoot</value>
+        </property>
+    </bean>
+
 </beans>

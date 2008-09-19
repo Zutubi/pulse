@@ -79,6 +79,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     private EventManager eventManager;
     private GlobalConfiguration globalConfiguration;
     private ScmClientFactory scmClientFactory;
+    private ScmContextFactory scmContextFactory;
     private ThreadFactory threadFactory;
 
     public ThreadedRecipeQueue()
@@ -196,9 +197,10 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
             ScmClient client = null;
             try
             {
+                ScmContext context = scmContextFactory.createContext(projectConfig.getProjectId(), scm);
                 client = scmClientFactory.createClient(scm);
                 boolean supportsRevisions = client.getCapabilities().contains(ScmCapability.REVISIONS);
-                Revision revision = supportsRevisions ? client.getLatestRevision(null) : new Revision(System.currentTimeMillis());
+                Revision revision = supportsRevisions ? client.getLatestRevision(context) : new Revision(System.currentTimeMillis());
 
                 // May throw a BuildException
                 updateRevision(assignmentRequest, revision);
@@ -711,6 +713,11 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     public void setThreadFactory(ThreadFactory threadFactory)
     {
         this.threadFactory = threadFactory;
+    }
+
+    public void setScmContextFactory(ScmContextFactory scmContextFactory)
+    {
+        this.scmContextFactory = scmContextFactory;
     }
 
     /**

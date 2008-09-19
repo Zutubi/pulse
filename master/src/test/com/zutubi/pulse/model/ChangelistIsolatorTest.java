@@ -7,6 +7,8 @@ import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.DelegateScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.scm.ScmContextFactory;
+import com.zutubi.pulse.core.scm.ScmContext;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.tove.config.project.BuildOptionsConfiguration;
@@ -179,6 +181,13 @@ public class ChangelistIsolatorTest extends PulseTestCase
             public ScmClient createClient(ScmConfiguration config) throws ScmException
             {
                 return scmClient;
+            }
+        });
+        isolator.setScmContextFactory(new ScmContextFactory()
+        {
+            public ScmContext createContext(long projectId, ScmConfiguration scm) throws ScmException
+            {
+                return new ScmContext();
             }
         });
     }
