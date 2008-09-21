@@ -35,6 +35,15 @@ public class NativeGit
 
     private ProcessBuilder git;
 
+    private static final String GIT = "git";
+    private static final String PULL_COMMAND = "pull";
+    private static final String FETCH_COMMAND = "fetch";
+    private static final String LOG_COMMAND = "log";
+    private static final String CLONE_COMMAND = "clone";
+    private static final String CHECKOUT_COMMAND = "checkout";
+    private static final String BRANCH_COMMAND = "branch";
+    private static final String BRANCH_OPTION = "-b";
+
     public NativeGit()
     {
         git = new ProcessBuilder();
@@ -52,19 +61,19 @@ public class NativeGit
 
     public void clone(String repository, String dir) throws ScmException
     {
-        run("git", "clone", repository, dir);
+        run(GIT, CLONE_COMMAND, repository, dir);
     }
 
     public void pull() throws ScmException
     {
-        run("git", "pull");
+        run(GIT, PULL_COMMAND);
     }
 
     public void fetch(String ...remote) throws ScmException
     {
         String[] command = new String[2 + remote.length];
-        command[0] = "git";
-        command[1] = "fetch";
+        command[0] = GIT;
+        command[1] = FETCH_COMMAND;
 
         System.arraycopy(remote, 0, command, 2, remote.length);
 
@@ -73,7 +82,7 @@ public class NativeGit
 
     public List<GitLogEntry> log(String from, String to) throws ScmException
     {
-        String[] command = {"git", "log", from+".."+to};
+        String[] command = {GIT, LOG_COMMAND, from+".."+to};
 
         LogOutputHandler handler = new LogOutputHandler();
         
@@ -91,12 +100,12 @@ public class NativeGit
 
     public void checkout(String branch) throws ScmException
     {
-        run("git", "checkout", "-b", branch, "origin/" + branch);
+        run(GIT, CHECKOUT_COMMAND, BRANCH_OPTION, branch, "origin/" + branch);
     }
 
     public List<GitBranchEntry> branch() throws ScmException
     {
-        String[] command = {"git", "branch"};
+        String[] command = {GIT, BRANCH_COMMAND};
 
         BranchOutputHandler handler = new BranchOutputHandler();
 
@@ -291,9 +300,9 @@ public class NativeGit
      */
     private class LogOutputHandler extends OutputHandlerAdapter
     {
-        private static final String COMMIT_TAG =    "commit ";
-        private static final String AUTHOR_TAG =    "Author: ";
-        private static final String DATE_TAG =      "Date:   ";
+        private static final String COMMIT_TAG =    "commit";
+        private static final String AUTHOR_TAG =    "Author:";
+        private static final String DATE_TAG =      "Date:";
 
         private List<GitLogEntry> entries = new LinkedList<GitLogEntry>();
         
@@ -301,7 +310,6 @@ public class NativeGit
 
         public void handleStdout(String line)
         {
-            System.out.println(line);
             if (line.startsWith(COMMIT_TAG))
             {
                 currentEntry = new GitLogEntry();
@@ -326,9 +334,17 @@ public class NativeGit
             }
             else
             {
-                //TODO: improve handling of comment - it seems to be 
-                //TODO: preformatted - remove preformatting if practical.
-                currentEntry.setComment(currentEntry.getComment() + line);
+                // trim the leading whitespace.
+                int i = 0;
+                for (; i < line.length(); i++)
+                {
+                    if (!Character.isWhitespace(line.charAt(i)))
+                    {
+                        break;
+                    }
+                }
+
+                currentEntry.setComment(currentEntry.getComment() + line.substring(i));
             }
         }
 
