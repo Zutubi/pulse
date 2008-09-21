@@ -27,15 +27,15 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
     private ConfigurationStateManager configurationStateManager;
     private EventManager eventManager;
     private ThreadFactory threadFactory;
-    private MultiplexingListener syncMux;
-    private MultiplexingListener asyncMux;
+    private DemultiplexingListener syncMux;
+    private DemultiplexingListener asyncMux;
 
     public void init()
     {
-        syncMux = new MultiplexingListener(ConfigurationEvent.class);
+        syncMux = new DemultiplexingListener(ConfigurationEvent.class);
         eventManager.register(syncMux);
 
-        asyncMux = new MultiplexingListener(ConfigurationEvent.class);
+        asyncMux = new DemultiplexingListener(ConfigurationEvent.class);
         AsynchronousDelegatingListener asych = new AsynchronousDelegatingListener(asyncMux, threadFactory);
         eventManager.register(asych);
 
@@ -190,7 +190,7 @@ public class DefaultConfigurationProvider implements ConfigurationProvider
         return configurationTemplateManager.deepClone(instance);
     }
 
-    private void unregister(final ConfigurationEventListener listener, MultiplexingListener mux)
+    private void unregister(final ConfigurationEventListener listener, DemultiplexingListener mux)
     {
         mux.removeDelegate(new Predicate<EventListener>()
         {

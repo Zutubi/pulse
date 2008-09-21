@@ -1,9 +1,9 @@
 package com.zutubi.tove.config;
 
 import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.pulse.events.DemultiplexingListener;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.FilteringListener;
-import com.zutubi.pulse.events.MultiplexingListener;
 import com.zutubi.tove.config.events.ConfigurationEvent;
 import com.zutubi.util.NullaryFunction;
 
@@ -18,13 +18,13 @@ public class MockConfigurationProvider implements ConfigurationProvider
     private Map<String, Configuration> instancesByPath = new HashMap<String, Configuration>();
     private Map<Class<? extends Configuration>, List<Configuration>> instancesByClass = new HashMap<Class<? extends Configuration>, List<Configuration>>();
 
-    private MultiplexingListener syncMux;
-    private MultiplexingListener asyncMux;
+    private DemultiplexingListener syncMux;
+    private DemultiplexingListener asyncMux;
 
     public MockConfigurationProvider()
     {
-        syncMux = new MultiplexingListener(ConfigurationEvent.class);
-        asyncMux = new MultiplexingListener(ConfigurationEvent.class);
+        syncMux = new DemultiplexingListener(ConfigurationEvent.class);
+        asyncMux = new DemultiplexingListener(ConfigurationEvent.class);
     }
 
     public <T extends Configuration> T get(String path, Class<T> clazz)
