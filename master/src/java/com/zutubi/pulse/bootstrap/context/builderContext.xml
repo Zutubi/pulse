@@ -211,4 +211,17 @@
 
     <bean id="configurationProvider" class="com.zutubi.tove.config.DefaultConfigurationProvider" autowire="byName"/>
 
+    <bean id="scmContextFactory" class="com.zutubi.pulse.core.scm.DefaultScmContextFactory">
+        <property name="projectsDir">
+            <bean id="projectDir" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+                <property name="targetBeanName">
+                    <value>configurationManager</value>
+                </property>
+                <property name="propertyPath">
+                    <value>userPaths.projectRoot</value>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
 </beans>

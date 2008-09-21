@@ -9,11 +9,7 @@ import org.acegisecurity.providers.encoding.Md5PasswordEncoder;
 
 import java.util.Map;
 
-/**
- *
- *
- */
-public class FixNPEOnLDAPRememberMe extends AbstractUpgradeTask
+public class FixNPEOnLDAPRememberMeUpgradeTask extends AbstractUpgradeTask
 {
     private RecordManager recordManager;
 

@@ -34,12 +34,6 @@ public class PostProcessorPluginAcceptanceTest extends PulseTestCase
         tmpDir = FileSystemUtils.createTempDir(PostProcessorPluginAcceptanceTest.class.getName(), "");
 
         File pkgFile = getPulsePackage();
-/*
-        if (pkgFile == null)
-        {
-            pkgFile = new File("test-packages/pulse-2.0.9.zip");
-        }
-*/
 
         if (!pkgFile.exists())
         {
