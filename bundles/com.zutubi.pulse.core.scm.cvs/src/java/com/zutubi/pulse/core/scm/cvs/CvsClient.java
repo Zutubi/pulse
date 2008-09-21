@@ -14,6 +14,7 @@ import com.zutubi.pulse.core.scm.cvs.client.commands.RlsInfo;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.io.CleanupInputStream;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
@@ -23,6 +24,7 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.FileOutputStream;
 import java.util.*;
 
 /**
@@ -220,7 +222,24 @@ public class CvsClient implements ScmClient, DataCacheAware
 
     public void storeConnectionDetails(File outputDir) throws ScmException, IOException
     {
-        //TODO: These details are already stored in the execution context, so no need to store them here.
+        Properties props = new Properties();
+        props.put("root", root);
+        if(branch != null)
+        {
+            props.put("branch", branch);
+        }
+        props.put("module", module);
+
+        FileOutputStream os = null;
+        try
+        {
+            os = new FileOutputStream(new File(outputDir, "cvs.properties"));
+            props.store(os, "CVS connection properties");
+        }
+        finally
+        {
+            IOUtils.close(os);
+        }
     }
 
     public FileStatus.EOLStyle getEOLPolicy(ScmContext context)

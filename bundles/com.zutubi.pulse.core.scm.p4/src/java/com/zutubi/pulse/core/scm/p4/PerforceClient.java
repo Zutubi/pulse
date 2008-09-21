@@ -844,11 +844,6 @@ public class PerforceClient extends CachingScmClient
 
     }
 
-    public Revision getRevision(String revision) throws ScmException
-    {
-        return parseRevision(revision);
-    }
-
     public Revision parseRevision(String revision) throws ScmException
     {
         String clientName = updateClient(null, null, null);

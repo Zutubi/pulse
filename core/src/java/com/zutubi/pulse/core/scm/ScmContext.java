@@ -11,7 +11,8 @@ public class ScmContext
     private File persistentWorkingDir;
 
     /**
-     * @return location to use for the working copy.
+     * @return a persistent working directory available for use by the scm
+     * implementation to persist data between invocations.
      */
     public File getPersistentWorkingDir()
     {

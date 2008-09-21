@@ -57,11 +57,12 @@ public interface ScmClient extends Closeable
     String getLocation() throws ScmException;
 
     /**
-     * Checks out a new working copy to the specified context.
+     * Checks out a new working copy to the specified context.  The target directory for this checkout
+     * is defined as the ExecutionContext's working directory.
      * <p/>
      * Required for all implementations.
      *
-     * @param context  defines the execution context in which the operation is being run
+     * @param context  defines the execution context in which the operation is being run.
      * @param revision defines the revision to be checked out.
      * @param handler  if not null, receives notifications of events during the
      * @return the revision of the locally checked out working copy.
@@ -70,7 +71,8 @@ public interface ScmClient extends Closeable
     Revision checkout(ExecutionContext context, Revision revision, ScmEventHandler handler) throws ScmException;
 
     /**
-     * Update the working directory to the specified context.
+     * Update the working directory to the specified context.  The target directory for this checkout
+     * is defined as the ExecutionContext's working directory.
      * <p/>
      * Required for all implementations.  If an incremental update is not
      * possible then an update may be the same as a checkout.

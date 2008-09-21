@@ -737,11 +737,6 @@ public class SubversionClient implements ScmClient
         return FileStatus.EOLStyle.BINARY;
     }
 
-    public Revision getRevision(String revision) throws ScmException
-    {
-        return parseRevision(revision);
-    }
-
     public Revision parseRevision(String revision) throws ScmException
     {
         try

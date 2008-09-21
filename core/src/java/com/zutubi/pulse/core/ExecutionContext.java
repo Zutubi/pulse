@@ -3,7 +3,6 @@ package com.zutubi.pulse.core;
 import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_USER;
 import com.zutubi.pulse.core.config.ResourceProperty;
-import com.zutubi.pulse.core.model.Revision;
 
 import java.io.File;
 import java.io.OutputStream;
@@ -21,7 +20,7 @@ public class ExecutionContext
     // If you add a field, remember to update the copy constructor
     private MultiScopeStack scopeStack;
     /**
-     * The base workspace directory for the build.
+     * The base directory for the build.
      */
     private File workingDir = null;
     /**
@@ -46,20 +45,6 @@ public class ExecutionContext
         this.outputStream = other.outputStream;
         this.version = other.version;
     }
-
-/* are these ever used?  They expose the Reference interface which is specific to the pulse file, so
-   it would be better if they are removed.  References may be used internally, but as far as a client of
-   this class is concerned, it simply stores useful details about the execution environment.
-    public Reference getReference(String namespace, String name)
-    {
-        return scopeStack.getScope(namespace).getReference(name);
-    }
-
-    public Reference getReference(String name)
-    {
-        return scopeStack.getScope().getReference(name);
-    }
-*/
 
     public String getString(String namespace, String name)
     {
