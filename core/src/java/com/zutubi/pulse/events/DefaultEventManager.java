@@ -3,11 +3,12 @@ package com.zutubi.pulse.events;
 import java.util.*;
 
 /**
- * <class-comment/>
+ * A default implementation of {@link EventManager}.
  */
 public class DefaultEventManager implements EventManager
 {
     private final Map<Class, List<EventListener>> typeToListener = new HashMap<Class, List<EventListener>>();
+    private final ThreadLocal<DeferredQueue> publishThreadLocal = new ThreadLocal<DeferredQueue>();
 
     private EventDispatcher dispatcher;
 
@@ -26,8 +27,7 @@ public class DefaultEventManager implements EventManager
         Class[] clazzes = listener.getHandledEvents();
         if (clazzes == null || clazzes.length == 0)
         {
-            // if no handle events are defined, then the listener will be registered to receive all events.
-            clazzes = new Class[]{Object.class};
+            clazzes = new Class[]{Event.class};
         }
         for (Class clazz : clazzes)
         {
@@ -87,18 +87,79 @@ public class DefaultEventManager implements EventManager
         return listeners;
     }
 
-    public void publish(Event evt)
+    public void publish(Event event)
     {
-        if (evt == null)
+        publish(event, PublishFlag.IMMEDIATE);
+    }
+
+    public void publish(Event event, PublishFlag how)
+    {
+        if (event == null)
         {
             return;
         }
 
-        Set<EventListener> listeners;
-        synchronized (this) {
-            listeners = lookupListeners(evt.getClass());
+        switch (how)
+        {
+            case DEFERRED:
+                deferredPublish(event);
+                break;
+            case IMMEDIATE:
+                immediatePublish(event);
+                break;
+        }
+    }
+
+    private void deferredPublish(Event event)
+    {
+        DeferredQueue context = publishThreadLocal.get();
+        if (context == null)
+        {
+            immediatePublish(event);
+        }
+        else
+        {
+            context.push(event);
+        }
+    }
+
+    private void immediatePublish(Event event)
+    {
+        DeferredQueue nestedContext = publishThreadLocal.get();
+        DeferredQueue context = new DeferredQueue();
+        publishThreadLocal.set(context);
+        try
+        {
+            Set<EventListener> listeners;
+            synchronized (this)
+            {
+                listeners = lookupListeners(event.getClass());
+            }
+
+            dispatcher.dispatch(event, new LinkedList<EventListener>(listeners));
+        }
+        finally
+        {
+            publishThreadLocal.set(nestedContext);
+            context.publishAll();
+        }
+    }
+
+    private class DeferredQueue
+    {
+        private List<Event> deferred = new LinkedList<Event>();
+
+        public void push(Event event)
+        {
+            deferred.add(event);
         }
 
-        dispatcher.dispatch(evt, new LinkedList<EventListener>(listeners));
+        public void publishAll()
+        {
+            for(Event event: deferred)
+            {
+                immediatePublish(event);
+            }
+        }
     }
 }

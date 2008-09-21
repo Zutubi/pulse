@@ -1,36 +1,43 @@
 package com.zutubi.pulse.events;
 
-import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.events.EventListener;
-
 /**
- * The base interface implemented by event managers.
- * 
+ * The base interface implemented by event managers.  Event managers support
+ * registering listeners and publishing events to those listeners.
  */
 public interface EventManager
 {
     /**
-     * Register an event listener with the event manager so that it is notified
-     * on the occurance of specific events.
+     * Register an event listener so that it is notified on the occurrence of
+     * specific events.
      *
-     * @param eventListener instance
+     * @param eventListener listener to register
      */
     void register(EventListener eventListener);
 
     /**
-     * Unregister an event listener so that it is no longer notified of the occurance
-     * of events.
+     * Unregister an event listener so that it is no longer notified of events.
      *
-     * @param eventListener instance
+     * @param eventListener listener to unregister
      */
     void unregister(EventListener eventListener);
 
     /**
-     * Publish an event to the event manager which will notify the appropriate event
-     * listeners.  This is how events are sent out to all of the registered event
-     * listeners.
+     * Publish an event, notifying the appropriate event listeners.
+     * Equivalent to publish(evt, PublishFlag.IMMEDIATE).
      *
-     * @param evt being published.
+     * @see com.zutubi.pulse.events.PublishFlag
+     * @see #publish(Event,PublishFlag)
+     *
+     * @param event the event being published
      */
-    void publish(Event evt);
+    void publish(Event event);
+
+    /**
+     * Publish an event, notifying the appropriate event listeners.
+
+     * @param event the event to publish
+     * @param how   how the event should be published, see the enumeration
+     *              types for details
+     */
+    void publish(Event event, PublishFlag how);
 }
