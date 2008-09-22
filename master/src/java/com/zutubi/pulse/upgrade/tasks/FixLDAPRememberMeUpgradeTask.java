@@ -15,8 +15,7 @@ import java.util.LinkedList;
 import org.acegisecurity.providers.encoding.Md5PasswordEncoder;
 
 /**
- *
- *
+ * Upgrade task that ensures ldap users have random passwords.
  */
 public class FixLDAPRememberMeUpgradeTask extends DatabaseUpgradeTask
 {
@@ -73,12 +72,12 @@ public class FixLDAPRememberMeUpgradeTask extends DatabaseUpgradeTask
 
     public String getName()
     {
-        return null;
+        return "LDAP User remember me fix.";
     }
 
     public String getDescription()
     {
-        return null;
+        return "Data fix to correct a fault with the LDAP users remember me login functionality. ";
     }
 
     public boolean haltOnFailure()
