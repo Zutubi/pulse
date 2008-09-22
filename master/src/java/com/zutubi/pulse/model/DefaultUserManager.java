@@ -224,6 +224,14 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
         return number;
     }
 
+    public UserConfiguration insert(UserConfiguration user)
+    {
+        // insert the new user configuration instance.  Note that the state instance will be
+        // created separately via a call to {@link UserManager#createState}
+        String insertedPath = configurationProvider.insert(ConfigurationRegistry.USERS_SCOPE, user);
+        return configurationProvider.get(insertedPath, UserConfiguration.class);
+    }
+
     public GroupConfiguration getGroupConfig(String name)
     {
         return configurationProvider.get(PathUtils.getPath(ConfigurationRegistry.GROUPS_SCOPE, name), GroupConfiguration.class);

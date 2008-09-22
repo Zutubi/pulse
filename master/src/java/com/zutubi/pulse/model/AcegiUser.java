@@ -21,6 +21,15 @@ public class AcegiUser implements Actor, UserDetails
     private boolean enabled;
     private boolean ldapAuthentication;
 
+    public AcegiUser(String user, String pass)
+    {
+        this.username = user;
+        this.password = pass;
+        this.enabled = true;
+        this.authorities = new GrantedAuthority[0];
+        this.ldapAuthentication = true;
+    }
+
     public AcegiUser(User user, List<GroupConfiguration> groups)
     {
         UserConfiguration config = user.getConfig();

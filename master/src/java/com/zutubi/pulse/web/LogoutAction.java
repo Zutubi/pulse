@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 /**
- * <class-comment/>
  */
 public class LogoutAction extends ActionSupport
 {

@@ -1,18 +1,11 @@
 package com.zutubi.pulse.security;
 
-import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.events.EventListener;
-import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.events.system.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.model.AcegiUser;
-import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.security.ldap.LdapManager;
 import com.zutubi.pulse.tove.config.user.UserConfiguration;
-import com.zutubi.tove.config.ConfigurationProvider;
-import com.zutubi.tove.config.ConfigurationRegistry;
-import com.zutubi.util.logging.Logger;
 import com.zutubi.util.RandomUtils;
+import com.zutubi.util.logging.Logger;
 import org.acegisecurity.Authentication;
 import org.acegisecurity.AuthenticationException;
 import org.acegisecurity.BadCredentialsException;
@@ -20,25 +13,51 @@ import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 import org.acegisecurity.providers.dao.DaoAuthenticationProvider;
 import org.acegisecurity.userdetails.UserDetails;
 
+import java.security.GeneralSecurityException;
+
 /**
+ * A custom implementation of {@link DaoAuthenticationProvider}.
+ * <p/>
+ * This authentication provider is used to provide our custom ldap behaviour
+ * <ul>
+ * <li>automatically add users authenticated via ldap</li>
+ * </ul>
+ * <p/>
+ * Users created via the auto add functionality do not store the users password locally.
+ * Instead, a random hash is created for them each time they manually log in and out, and is
+ * used to authenticate there remember me cookies.
  */
-public class CustomAuthenticationProvider extends DaoAuthenticationProvider implements EventListener
+public class CustomAuthenticationProvider extends DaoAuthenticationProvider
 {
     private static final Logger LOG = Logger.getLogger(CustomAuthenticationProvider.class);
 
     private UserManager userManager;
     private LdapManager ldapManager;
-    private ConfigurationProvider configurationProvider;
 
+    /**
+     * Implementation of the {@link org.acegisecurity.providers.AuthenticationProvider#authenticate(org.acegisecurity.Authentication)}
+     * method.
+     *
+     * This implementation will attempt to add an unknown user to the system if they are
+     * successfully authenticated via ldap.  Passwords associated with users created in this
+     * way are random strings used as tokens to locally authenticate the user.  No live passwords
+     * are stored for ldap users.
+     *
+     * @param authentication the authentication request object.
+     * @return a fully authenticated object including credentials.
+     *
+     * @throws AuthenticationException if authentication fails.
+     */
     public Authentication authenticate(Authentication authentication) throws AuthenticationException
     {
         // Just check for non-existent user auto-adding.
-        if(ldapManager.canAutoAdd())
+        if (ldapManager.canAutoAdd())
         {
             final UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) authentication;
 
-            User user = userManager.getUser(token.getName());
-            if(user == null)
+            // has this user been added yet?.
+            UserConfiguration user = userManager.getUserConfig(token.getName());
+            if (user == null)
             {
                 LOG.debug("User '" + token.getName() + "' does not exist, asking LDAP manager");
                 AcegiUtils.runAsSystem(new Runnable()
@@ -48,6 +67,10 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider impl
                         tryAutoAdd(token.getName(), (String) token.getCredentials());
                     }
                 });
+            }
+            else
+            {
+                setRandomPassword(user);
             }
         }
 
@@ -60,17 +83,12 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider impl
 
         // We can auto-add the user if they can be authenticated via LDAP.
         UserConfiguration user = ldapManager.authenticate(username, password, true);
-        if(user != null)
+        if (user != null)
         {
             LOG.debug("User '" + username + "' found via LDAP, adding.");
-            String newUserPath = configurationProvider.insert(ConfigurationRegistry.USERS_SCOPE, user);
+            user = userManager.insert(user);
 
-            // refresh so that we have the persistent user instance.
-            user = configurationProvider.get(newUserPath, UserConfiguration.class);
-            
-            // auto added users receive a random password that allows the remember me processing function.
-            // (it fails if no password is set, and we do not record the LDAP password).
-            userManager.setPassword(user, RandomUtils.randomString(10));
+            setRandomPassword(user);
         }
         else
         {
@@ -78,13 +96,26 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider impl
         }
     }
 
+    private void setRandomPassword(UserConfiguration user)
+    {
+        try
+        {
+            userManager.setPassword(user, RandomUtils.secureRandomString(10));
+        }
+        catch (GeneralSecurityException e)
+        {
+            // fall back to something semi random.
+            userManager.setPassword(user, RandomUtils.randomString(10));
+        }
+    }
+
     protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException
     {
         AcegiUser user = (AcegiUser) userDetails;
-        if(user.getLdapAuthentication())
+        if (user.getLdapAuthentication())
         {
             LOG.debug("Authenticating user '" + user.getUsername() + "' via LDAP");
-            if(ldapManager.authenticate(authentication.getName(), authentication.getCredentials().toString(), false) == null)
+            if (ldapManager.authenticate(authentication.getName(), authentication.getCredentials().toString(), false) == null)
             {
                 LOG.debug("Authentication failed for user '" + user.getUsername() + "' via LDAP");
                 throw new BadCredentialsException("Bad credentials");
@@ -104,16 +135,6 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider impl
         return UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication);
     }
 
-    public void handleEvent(Event event)
-    {
-        configurationProvider = ((ConfigurationEventSystemStartedEvent) event).getConfigurationProvider();
-    }
-
-    public Class[] getHandledEvents()
-    {
-        return new Class[]{ ConfigurationEventSystemStartedEvent.class };
-    }
-
     public void setLdapManager(LdapManager ldapManager)
     {
         this.ldapManager = ldapManager;
@@ -123,10 +144,5 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider impl
     {
         setUserDetailsService(userManager);
         this.userManager = userManager;
-    }
-
-    public void setEventManager(EventManager eventManager)
-    {
-        eventManager.register(this);
     }
 }

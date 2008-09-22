@@ -16,7 +16,11 @@ import com.zutubi.pulse.tove.config.group.ServerPermission;
 import com.zutubi.pulse.tove.config.user.UserConfiguration;
 import com.zutubi.tove.config.ConfigurationReferenceManager;
 import com.zutubi.tove.config.ConfigurationRegistry;
-import com.zutubi.tove.type.*;
+import com.zutubi.tove.type.CompositeType;
+import com.zutubi.tove.type.SimpleInstantiator;
+import com.zutubi.tove.type.Type;
+import com.zutubi.tove.type.TypeException;
+import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.wizard.WizardTransition;
 import com.zutubi.tove.wizard.webwork.AbstractTypeWizard;
@@ -40,7 +44,6 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
     private CompositeType adminConfigType;
     private CompositeType serverConfigType;
 
-    private UserManager userManager;
     private MasterConfigurationManager configurationManager;
     private SetupManager setupManager;
     private ConfigurationReferenceManager configurationReferenceManager;
@@ -231,11 +234,6 @@ public class SetupConfigurationWizard extends AbstractTypeWizard
         assert(paths.size() == 1);
         String path = paths.get(0);
         configurationTemplateManager.saveRecord(path, record);
-    }
-
-    public void setUserManager(UserManager userManager)
-    {
-        this.userManager = userManager;
     }
 
     public void setConfigurationManager(MasterConfigurationManager configurationManager)

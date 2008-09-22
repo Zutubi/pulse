@@ -6,7 +6,6 @@ import com.zutubi.pulse.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.tove.config.user.SignupUserConfiguration;
 import com.zutubi.pulse.tove.config.user.UserConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
-import com.zutubi.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.webwork.TransientAction;
 import org.acegisecurity.AccessDeniedException;
 
@@ -35,7 +34,8 @@ public class SignupUserAction extends TransientAction<SignupUserConfiguration>
 
         UserConfiguration user = new UserConfiguration(instance.getLogin(), instance.getName());
         user.setPassword(instance.getPassword());
-        configurationProvider.insert(ConfigurationRegistry.USERS_SCOPE, user);
+        user = userManager.insert(user);
+
         User state = userManager.getUser(instance.getLogin());
         state.setConfig(user);
         AcegiUtils.loginAs(userManager.getPrinciple(state));

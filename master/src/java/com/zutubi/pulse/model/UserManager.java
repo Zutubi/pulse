@@ -58,4 +58,13 @@ public interface UserManager extends EntityManager<User>, UserDetailsService
     long getNextBuildNumber(User user);
 
     GroupConfiguration getGroupConfig(String name);
+
+    /**
+     * Insert a new user.
+     *
+     * @param user configuration to be inserted.
+     *
+     * @return the persistent version of the user parameter.
+     */
+    UserConfiguration insert(UserConfiguration user);
 }
