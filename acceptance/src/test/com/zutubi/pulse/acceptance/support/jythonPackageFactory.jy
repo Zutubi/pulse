@@ -46,7 +46,12 @@ class PulsePackage(com.zutubi.pulse.acceptance.support.PulsePackage):
             ret = subprocess.call(command)
 
         if ret != 0:
-            raise Exception('Extract process '+str(command)+' exited with code %d' % ret)
+            # return value of 50 on windows seems to indicate the extract failed because a generated
+            # path was too long.
+            if ret == 50 and isWindows():
+                raise Exception('Extract process '+str(command)+' exited with code %d. Does an extracted file exceed the maximum path length?' % ret)
+            else:
+                raise Exception('Extract process '+str(command)+' exited with code %d' % ret)
 
         return Pulse(os.path.join(destDir, self.getBasename()))
 

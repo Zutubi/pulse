@@ -31,7 +31,7 @@ public class PostProcessorPluginAcceptanceTest extends PulseTestCase
         super.setUp();
 
         // base directory will be cleaned up at the end of the test.
-        tmpDir = FileSystemUtils.createTempDir(PostProcessorPluginAcceptanceTest.class.getName(), "");
+        tmpDir = FileSystemUtils.createTempDir();
 
         File pkgFile = getPulsePackage();
 
@@ -91,6 +91,5 @@ public class PostProcessorPluginAcceptanceTest extends PulseTestCase
 
         // verify that the reference is to the expected instance.
         assertNotNull(ref.getValue());
-
     }
 }
