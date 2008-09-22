@@ -12,10 +12,10 @@ import com.zutubi.util.io.IOUtils;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
-import java.text.SimpleDateFormat;
-import java.text.ParseException;
 
 public class NativeGitTest extends PulseTestCase
 {
@@ -124,7 +124,7 @@ public class NativeGitTest extends PulseTestCase
         assertEquals("Daniel Ostermeier <daniel@zutubi.com>", entry.getAuthor());
         assertEquals("78be6b2f12399ea2332a5148440086913cb910fb", entry.getCommit());
         assertEquals("update", entry.getComment());
-        assertEquals(new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy z").parse("Fri Sep 12 11:30:12 2008 EST"), entry.getDate());
+        assertEquals(new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z").parse("Fri Sep 12 11:30:12 2008 +1000"), entry.getDate());
     }
 
     public void testBranchOnOriginalRepository() throws ScmException
