@@ -1,22 +1,22 @@
 package com.zutubi.pulse.monitor;
 
-import java.util.Iterator;
 import java.util.Arrays;
+import java.util.Iterator;
 
 /**
  *
  *
  */
-public class ArrayJobWrapper implements Job
+public class ArrayJobWrapper<T extends Task> implements Job<T>
 {
-    private Task[] tasks;
+    private T[] tasks;
 
-    public ArrayJobWrapper(Task... tasks)
+    public ArrayJobWrapper(T... tasks)
     {
         this.tasks = tasks;
     }
 
-    public Iterator<Task> getTasks()
+    public Iterator<T> getTasks()
     {
         return Arrays.asList(tasks).iterator();
     }

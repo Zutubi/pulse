@@ -1,12 +1,9 @@
 package com.zutubi.pulse.upgrade;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Arrays;
 
-/**
- * <class-comment/>
- */
 public class DefaultUpgradeManagerTest extends UpgradeTestCase
 {
     private DefaultUpgradeManager upgradeManager;

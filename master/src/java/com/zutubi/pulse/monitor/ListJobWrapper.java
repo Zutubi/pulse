@@ -1,22 +1,22 @@
 package com.zutubi.pulse.monitor;
 
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  *
  *
  */
-public class ListJobWrapper implements Job
+public class ListJobWrapper<T extends Task> implements Job<T>
 {
-    private List<Task> tasks;
+    private List<T> tasks;
 
-    public ListJobWrapper(List<Task> tasks)
+    public ListJobWrapper(List<T> tasks)
     {
         this.tasks = tasks;
     }
 
-    public Iterator<Task> getTasks()
+    public Iterator<T> getTasks()
     {
         return tasks.iterator();
     }

@@ -6,7 +6,7 @@ import java.util.Iterator;
  *
  *
  */
-public interface Job
+public interface Job<T extends Task>
 {
-    Iterator<Task> getTasks();
+    Iterator<T> getTasks();
 }

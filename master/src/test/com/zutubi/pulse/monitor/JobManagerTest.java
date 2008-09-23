@@ -113,7 +113,7 @@ public class JobManagerTest extends PulseTestCase
         thread.interrupt();
     }
 
-    private class NoopJob implements Job
+    private class NoopJob implements Job<Task>
     {
         public Iterator<Task> getTasks()
         {
@@ -121,11 +121,11 @@ public class JobManagerTest extends PulseTestCase
         }
     }
 
-    private class NeverEndingJob implements Job
+    private class NeverEndingJob implements Job<NeverEndingTask>
     {
-        public Iterator<Task> getTasks()
+        public Iterator<NeverEndingTask> getTasks()
         {
-            List<Task> tasks = new LinkedList<Task>();
+            List<NeverEndingTask> tasks = new LinkedList<NeverEndingTask>();
             tasks.add(new NeverEndingTask("yawn"));
             return tasks.iterator();
         }

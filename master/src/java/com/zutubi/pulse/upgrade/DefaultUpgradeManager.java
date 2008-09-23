@@ -1,20 +1,9 @@
 package com.zutubi.pulse.upgrade;
 
-import com.zutubi.pulse.monitor.Job;
-import com.zutubi.pulse.monitor.JobListener;
-import com.zutubi.pulse.monitor.JobRunner;
-import com.zutubi.pulse.monitor.Task;
-import com.zutubi.pulse.monitor.Monitor;
-import com.zutubi.pulse.monitor.TaskFeedback;
+import com.zutubi.pulse.monitor.*;
 import com.zutubi.util.logging.Logger;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.*;
 
 /**
  * <class-comment/>
@@ -217,7 +206,7 @@ public class DefaultUpgradeManager implements UpgradeManager
         }
     }
 
-    private class UpgradeTaskGroupJobAdapter implements Job, Iterator<Task>, JobListener
+    private class UpgradeTaskGroupJobAdapter implements Job<UpgradeTask>, Iterator<UpgradeTask>, JobListener<UpgradeTask>
     {
         private Iterator<UpgradeTaskGroup> groups;
 
@@ -225,7 +214,7 @@ public class DefaultUpgradeManager implements UpgradeManager
 
         private JobListener listener = new DelegateJobListener();
 
-        private Map<Task, JobListener> taskListeners = new HashMap<Task, JobListener>();
+        private Map<UpgradeTask, JobListener<UpgradeTask>> taskListeners = new HashMap<UpgradeTask, JobListener<UpgradeTask>>();
 
         public UpgradeTaskGroupJobAdapter(List<UpgradeTaskGroup> groups)
         {
@@ -241,7 +230,7 @@ public class DefaultUpgradeManager implements UpgradeManager
             this.tasks = currentGroup.getTasks().iterator();
         }
 
-        public void taskStarted(Task task)
+        public void taskStarted(UpgradeTask task)
         {
             if (taskListeners.containsKey(task))
             {
@@ -249,7 +238,7 @@ public class DefaultUpgradeManager implements UpgradeManager
             }
         }
 
-        public void taskCompleted(Task task)
+        public void taskCompleted(UpgradeTask task)
         {
             if (taskListeners.containsKey(task))
             {
@@ -257,7 +246,7 @@ public class DefaultUpgradeManager implements UpgradeManager
             }
         }
 
-        public void taskFailed(Task task)
+        public void taskFailed(UpgradeTask task)
         {
             if (taskListeners.containsKey(task))
             {
@@ -265,7 +254,7 @@ public class DefaultUpgradeManager implements UpgradeManager
             }
         }
 
-        public void taskAborted(Task task)
+        public void taskAborted(UpgradeTask task)
         {
             if (taskListeners.containsKey(task))
             {
@@ -278,7 +267,7 @@ public class DefaultUpgradeManager implements UpgradeManager
             return tasks.hasNext() || groups.hasNext();
         }
 
-        public Task next()
+        public UpgradeTask next()
         {
             if (tasks.hasNext())
             {
@@ -302,7 +291,7 @@ public class DefaultUpgradeManager implements UpgradeManager
 
                 tasks = currentGroup.getTasks().iterator();
 
-                Task task = tasks.next();
+                UpgradeTask task = tasks.next();
                 taskListeners.put(task, listener);
                 return task;
             }
@@ -315,7 +304,7 @@ public class DefaultUpgradeManager implements UpgradeManager
             throw new RuntimeException("Remove not supported.");
         }
 
-        public Iterator<Task> getTasks()
+        public Iterator<UpgradeTask> getTasks()
         {
             return this;
         }

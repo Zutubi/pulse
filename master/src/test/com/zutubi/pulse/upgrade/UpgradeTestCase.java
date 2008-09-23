@@ -8,18 +8,9 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- *
- *
- */
-public class UpgradeTestCase extends TestCase
+public abstract class UpgradeTestCase extends TestCase
 {
-    public void testNoop()
-    {
-        // help idea so that it does not report a test case with not tests as bad.    
-    }
-
-    protected static class UpgradeableComponentAdapter implements UpgradeableComponent, JobListener
+    protected static class UpgradeableComponentAdapter implements UpgradeableComponent, JobListener<UpgradeTaskAdapter>
     {
         private boolean upgradeRequired = false;
         private List<UpgradeTaskAdapter> tasks = new LinkedList<UpgradeTaskAdapter>();
@@ -83,25 +74,25 @@ public class UpgradeTestCase extends TestCase
             return wasAborted;
         }
 
-        public void taskCompleted(Task task)
+        public void taskCompleted(UpgradeTaskAdapter task)
         {
             completedTasks.add(task);
             assertTrue(tasks.contains(task));
         }
 
-        public void taskFailed(Task task)
+        public void taskFailed(UpgradeTaskAdapter task)
         {
             failedTasks.add(task);
             assertTrue(tasks.contains(task));
         }
 
-        public void taskAborted(Task task)
+        public void taskAborted(UpgradeTaskAdapter task)
         {
             abortedTasks.add(task);
             assertTrue(tasks.contains(task));
         }
 
-        public void taskStarted(Task task)
+        public void taskStarted(UpgradeTaskAdapter task)
         {
             assertTrue(tasks.contains(task));
         }

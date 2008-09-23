@@ -4,13 +4,13 @@ package com.zutubi.pulse.monitor;
  *
  *
  */
-public interface JobListener
+public interface JobListener<T extends Task>
 {
-    void taskStarted(Task task);
+    void taskStarted(T task);
 
-    void taskFailed(Task task);
+    void taskFailed(T task);
 
-    void taskCompleted(Task task);
+    void taskCompleted(T task);
 
-    void taskAborted(Task task);
+    void taskAborted(T task);
 }
