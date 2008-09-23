@@ -26,19 +26,19 @@ public class RecordUtils
             return false;
         }
 
-        if(value instanceof Object[])
-        {
-            if(!(otherValue instanceof Object[]) || !Arrays.equals((Object[])value, (Object[])otherValue))
-            {
-                return false;
-            }
-        }
-        else if(otherValue instanceof Object[] || !value.equals(otherValue))
+        if (value.getClass() != otherValue.getClass())
         {
             return false;
+
         }
 
-        return true;
+        if (value.getClass().isArray())
+        {
+            return Arrays.equals((Object[])value, (Object[])otherValue);
+        }
+        else
+        {
+            return value.equals(otherValue);
+        }
     }
-
 }
