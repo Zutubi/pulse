@@ -29,7 +29,6 @@ public class RecordUtils
         if (value.getClass() != otherValue.getClass())
         {
             return false;
-
         }
 
         if (value.getClass().isArray())
