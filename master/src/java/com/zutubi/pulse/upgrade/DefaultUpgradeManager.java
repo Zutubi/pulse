@@ -301,7 +301,7 @@ public class DefaultUpgradeManager implements UpgradeManager
 
         public void remove()
         {
-            throw new RuntimeException("Remove not supported.");
+            throw new UnsupportedOperationException("Remove not supported.");
         }
 
         public Iterator<UpgradeTask> getTasks()

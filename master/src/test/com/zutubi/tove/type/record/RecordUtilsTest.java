@@ -4,6 +4,31 @@ import com.zutubi.pulse.test.PulseTestCase;
 
 public class RecordUtilsTest extends PulseTestCase
 {
+    public void testIsSimpleNull()
+    {
+        assertFalse(RecordUtils.isSimpleValue(null));
+    }
+    
+    public void testIsSimpleAnotherType()
+    {
+        assertFalse(RecordUtils.isSimpleValue(new Object()));
+    }
+
+    public void testIsSimpleRecord()
+    {
+        assertFalse(RecordUtils.isSimpleValue(new MutableRecordImpl()));
+    }
+
+    public void testIsSimpleString()
+    {
+        assertTrue(RecordUtils.isSimpleValue("yay"));
+    }
+
+    public void testIsSimpleStringArray()
+    {
+        assertTrue(RecordUtils.isSimpleValue(new String[0]));
+    }
+
     public void testValuesEqualBothNull()
     {
         assertTrue(RecordUtils.valuesEqual(null, null));

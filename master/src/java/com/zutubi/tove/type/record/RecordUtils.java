@@ -3,9 +3,25 @@ package com.zutubi.tove.type.record;
 import java.util.Arrays;
 
 /**
+ * Utility methods for working with records.
  */
 public class RecordUtils
 {
+    /**
+     * Tests if an object value has a type which is valid for a simple record
+     * property (i.e. not a nested record).
+
+     * @param value the value to test
+     * @return true iff the given value is non-null and is valid as a simple
+     *         record property
+     */
+    public static boolean isSimpleValue(Object value)
+    {
+        // The given object may not have come from a record at all, so don't
+        // just test for it not being a record itself.
+        return (value instanceof String) || (value instanceof String[]);
+    }
+
     /**
      * Returns true if the two given simple values are equal.  This handles
      * both nulls and the different types of object which may be present as

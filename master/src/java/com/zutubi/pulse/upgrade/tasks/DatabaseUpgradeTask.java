@@ -7,37 +7,18 @@ import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
 import javax.sql.DataSource;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.io.*;
+import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
 
 /**
- * <class-comment/>
  */
 public abstract class DatabaseUpgradeTask extends AbstractUpgradeTask implements DataSourceAware
 {
     private static final Logger LOG = Logger.getLogger(DatabaseUpgradeTask.class);
 
     protected DataSource dataSource;
-
-    /**
-     * Required resource.
-     *
-     * @param source
-     */
-    public void setDataSource(DataSource source)
-    {
-        this.dataSource = source;
-    }
 
     public void execute() throws UpgradeException
     {
@@ -47,7 +28,7 @@ public abstract class DatabaseUpgradeTask extends AbstractUpgradeTask implements
             connection = dataSource.getConnection();
             execute(connection);
         }
-        catch(IOException e)
+        catch (IOException e)
         {
             LOG.error(e);
             addError("IOException: " + e.getMessage() + ". Please see the log files for details.");
@@ -86,7 +67,7 @@ public abstract class DatabaseUpgradeTask extends AbstractUpgradeTask implements
         {
             stmt = con.prepareCall("SELECT id FROM " + table);
             rs = stmt.executeQuery();
-            while(rs.next())
+            while (rs.next())
             {
                 all.add(rs.getLong("id"));
             }
@@ -134,9 +115,9 @@ public abstract class DatabaseUpgradeTask extends AbstractUpgradeTask implements
     {
         String sql = "CREATE INDEX " + indexName + " ON " + table + " (";
         boolean first = true;
-        for(String column: columns)
+        for (String column : columns)
         {
-            if(first)
+            if (first)
             {
                 first = false;
             }
@@ -147,7 +128,7 @@ public abstract class DatabaseUpgradeTask extends AbstractUpgradeTask implements
 
             sql += column;
         }
-        
+
         sql += ")";
 
         runUpdate(con, sql);
@@ -157,11 +138,11 @@ public abstract class DatabaseUpgradeTask extends AbstractUpgradeTask implements
     {
         String sql;
         String databaseProductName = con.getMetaData().getDatabaseProductName().toLowerCase();
-        if(databaseProductName.contains("postgres"))
+        if (databaseProductName.contains("postgres"))
         {
             sql = "DROP INDEX IF EXISTS " + indexName;
         }
-        else if(databaseProductName.contains("mysql"))
+        else if (databaseProductName.contains("mysql"))
         {
             sql = "DROP INDEX " + indexName + " ON " + table;
         }
@@ -195,7 +176,7 @@ public abstract class DatabaseUpgradeTask extends AbstractUpgradeTask implements
         {
             query = con.prepareStatement(sql);
             rs = query.executeQuery();
-            if(rs.next())
+            if (rs.next())
             {
                 return rs.getLong(1);
             }
@@ -207,5 +188,10 @@ public abstract class DatabaseUpgradeTask extends AbstractUpgradeTask implements
         }
 
         return null;
+    }
+
+    public void setDataSource(DataSource source)
+    {
+        this.dataSource = source;
     }
 }

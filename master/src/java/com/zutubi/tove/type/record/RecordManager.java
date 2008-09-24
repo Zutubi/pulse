@@ -152,7 +152,6 @@ public class RecordManager implements HandleAllocator
      * @param path   path of the record to update: a record must exist at
      *               this path
      * @param values a record holding new simple values to apply
-     * @return the new record created by the update
      */
     public synchronized void update(final String path, final Record values)
     {
@@ -185,7 +184,6 @@ public class RecordManager implements HandleAllocator
      *
      * @param path      path to store the new record at
      * @param record the record value to store
-     * @return the newly-inserted record
      */
     public synchronized void insert(final String path, final Record record)
     {
@@ -218,7 +216,6 @@ public class RecordManager implements HandleAllocator
      *
      * @param path   path to store the record at
      * @param record record values to store
-     * @return the newly-stored record
      */
     public synchronized void insertOrUpdate(String path, Record record)
     {

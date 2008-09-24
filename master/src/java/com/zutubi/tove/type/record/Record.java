@@ -13,8 +13,8 @@ public interface Record
     /**
      * Get the symbolic name associated with the data for this record.  The
      * symbolic name defines the type of the record's data.  For collections,
-     * it is one of the CollectionType.SN_* constants.  Otherwise, it is the
-     * symbolic name of a type registered with the type registry.
+     * it is null.  Otherwise, it is the symbolic name of a type registered
+     * with the type registry.
      * 
      * @return the symbolic name
      *
