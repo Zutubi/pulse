@@ -15,5 +15,5 @@ import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 @SymbolicName("zutubi.typeConfig")
 public abstract class TypeConfiguration extends AbstractConfiguration
 {
-    public abstract String getPulseFile(long id, ProjectConfiguration projectConfig, Revision revision, PatchArchive patch) throws Exception;
+    public abstract String getPulseFile(ProjectConfiguration projectConfig, Revision revision, PatchArchive patch) throws Exception;
 }

@@ -50,11 +50,6 @@ public class PatchBootstrapper implements Bootstrapper
         }
     }
 
-    public void prepare(String agent)
-    {
-        delegate.prepare(agent);
-    }
-
     public void terminate()
     {
         delegate.terminate();

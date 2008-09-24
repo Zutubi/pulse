@@ -33,7 +33,7 @@ public class CustomTypeConfiguration extends TypeConfiguration implements Valida
     @Transient
     private PulseFileLoaderFactory fileLoaderFactory;
 
-    public String getPulseFile(long id, ProjectConfiguration projectConfig, Revision revision, PatchArchive patch)
+    public String getPulseFile(ProjectConfiguration projectConfig, Revision revision, PatchArchive patch)
     {
         return pulseFileString;
     }

@@ -1,15 +1,15 @@
 package com.zutubi.pulse.scheduling;
 
-import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
+import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <class-comment/>
@@ -88,21 +88,11 @@ public class EventSchedulerStrategy implements SchedulerStrategy
         }
     }
 
-    /**
-     * Required resource.
-     *
-     * @param eventManager
-     */
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
     }
 
-    /**
-     * Required resource.
-     *
-     * @param triggerHandler
-     */
     public void setTriggerHandler(TriggerHandler triggerHandler)
     {
         this.triggerHandler = triggerHandler;
@@ -127,11 +117,6 @@ public class EventSchedulerStrategy implements SchedulerStrategy
         return false;
     }
 
-    /**
-     * Required resource.
-     * 
-     * @param objectFactory
-     */
     public void setObjectFactory(ObjectFactory objectFactory)
     {
         this.objectFactory = objectFactory;
@@ -158,6 +143,7 @@ public class EventSchedulerStrategy implements SchedulerStrategy
             try
             {
                 boolean accept = true;
+                TaskExecutionContext context = new TaskExecutionContext();
                 Class<? extends EventTriggerFilter> filterClass = eventTrigger.getFilterClass();
 
                 if(filterClass != null)
@@ -165,7 +151,7 @@ public class EventSchedulerStrategy implements SchedulerStrategy
                     try
                     {
                         EventTriggerFilter filter = objectFactory.buildBean(filterClass);
-                        accept = filter.accept(eventTrigger, evt);
+                        accept = filter.accept(eventTrigger, evt, context);
                     }
                     catch (Exception e)
                     {
@@ -175,7 +161,7 @@ public class EventSchedulerStrategy implements SchedulerStrategy
 
                 if(accept)
                 {
-                    triggerHandler.fire(trigger);
+                    triggerHandler.fire(trigger, context);
                 }
             }
             catch (SchedulingException e)

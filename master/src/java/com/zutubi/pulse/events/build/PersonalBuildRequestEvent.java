@@ -7,6 +7,7 @@ import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 
 /**
+ * A request for a personal build.
  */
 public class PersonalBuildRequestEvent extends AbstractBuildRequestEvent
 {
@@ -16,7 +17,7 @@ public class PersonalBuildRequestEvent extends AbstractBuildRequestEvent
 
     public PersonalBuildRequestEvent(Object source, long number, BuildRevision revision, User user, PatchArchive patch, ProjectConfiguration projectConfig)
     {
-        super(source, revision, projectConfig);
+        super(source, revision, projectConfig, null, false);
         this.number = number;
         this.user = user;
         this.patch = patch;

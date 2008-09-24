@@ -4,7 +4,6 @@ import com.opensymphony.xwork.ActionContext;
 import static com.zutubi.config.annotations.FieldParameter.ACTIONS;
 import static com.zutubi.config.annotations.FieldParameter.SCRIPTS;
 import com.zutubi.config.annotations.FieldType;
-import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.core.config.NamedConfigurationComparator;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Revision;
@@ -12,6 +11,8 @@ import com.zutubi.pulse.core.scm.*;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.model.ManualTriggerBuildReason;
 import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.tove.config.project.types.TypeConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
@@ -229,7 +230,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
             {
                 TypeConfiguration projectType = projectConfig.getType();
                 SpringComponentContext.autowire(projectType);
-                projectType.getPulseFile(0L, projectConfig, r, null);
+                projectType.getPulseFile(projectConfig, r, null);
             }
             catch (Exception e)
             {
@@ -242,7 +243,7 @@ public class EditBuildPropertiesAction extends ProjectActionBase
 
         try
         {
-            projectManager.triggerBuild(projectConfig, new ManualTriggerBuildReason((String)getPrinciple()), r, true);
+            projectManager.triggerBuild(projectConfig, new ManualTriggerBuildReason((String)getPrinciple()), r, ProjectManager.TRIGGER_CATEGORY_MANUAL, false, true);
         }
         catch (Exception e)
         {

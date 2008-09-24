@@ -43,10 +43,10 @@ public class CollectionUtils
         }
     }
 
-    public static String[] filterToArray(String[] in, Predicate<String> predicate)
+    public static <T> T[] filterToArray(T[] in, Predicate<T> predicate)
     {
-        List<String> result = filter(in, predicate);
-        return result.toArray(new String[result.size()]);
+        List<T> result = filter(in, predicate);
+        return (T[]) result.toArray(Arrays.copyOf(in, result.size(), in.getClass()));
     }
 
     public static <T, U> List<U> map(Collection<T> l, Mapping<T, U> m)

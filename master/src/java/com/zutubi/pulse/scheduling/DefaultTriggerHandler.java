@@ -1,8 +1,8 @@
 package com.zutubi.pulse.scheduling;
 
+import com.zutubi.pulse.model.persistence.TriggerDao;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
-import com.zutubi.pulse.model.persistence.TriggerDao;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -88,11 +88,6 @@ public class DefaultTriggerHandler implements TriggerHandler
         }
     }
 
-    /**
-     * Required resource.
-     *
-     * @param objectFactory
-     */
     public void setObjectFactory(ObjectFactory objectFactory)
     {
         this.objectFactory = objectFactory;

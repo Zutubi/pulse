@@ -2,6 +2,7 @@ package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.model.ManualTriggerBuildReason;
 import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 
 public class TriggerBuildAction extends ProjectActionBase
@@ -17,7 +18,7 @@ public class TriggerBuildAction extends ProjectActionBase
             return "prompt";
         }
         
-        getProjectManager().triggerBuild(projectConfig, new ManualTriggerBuildReason((String)getPrinciple()), null, true);
+        getProjectManager().triggerBuild(projectConfig, new ManualTriggerBuildReason((String)getPrinciple()), null, ProjectManager.TRIGGER_CATEGORY_MANUAL, false, true);
 
         try
         {

@@ -13,9 +13,12 @@ public interface EventTriggerFilter
      *
      * @param trigger the trigger that is checking the event
      * @param event   the event to check
+     * @param context the context in which the trigger task will execute if
+     *                the event is accepted - filters may populate the
+     *                context to pass information to the task
      * @return true iff this filter accepts this event
      */
-    boolean accept(Trigger trigger, Event event);
+    boolean accept(Trigger trigger, Event event, TaskExecutionContext context);
 
     /**
      * Returns true if the trigger is based upon the given project.  This

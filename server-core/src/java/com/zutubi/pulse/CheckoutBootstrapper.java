@@ -10,7 +10,7 @@ import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.util.logging.Logger;
 
 /**
- * <class-comment/>
+ * A bootstrapper that runs a clean checkout from the project's SCM.
  */
 public class CheckoutBootstrapper extends ScmBootstrapper
 {
@@ -32,7 +32,7 @@ public class CheckoutBootstrapper extends ScmBootstrapper
             String id = null;
             if(persist)
             {
-                id = getId();
+                id = getId(executionContext);
             }
             executionContext.addString("scm.bootstrap.id", id);
             scm = createScmClient();

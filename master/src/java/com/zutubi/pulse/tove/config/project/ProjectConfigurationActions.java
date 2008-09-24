@@ -104,7 +104,7 @@ public class ProjectConfigurationActions
         String user = AcegiUtils.getLoggedInUsername();
         if (user != null)
         {
-            projectManager.triggerBuild(projectConfig, new ManualTriggerBuildReason(user), null, true);
+            projectManager.triggerBuild(projectConfig, new ManualTriggerBuildReason(user), null, ProjectManager.TRIGGER_CATEGORY_MANUAL, false, true);
         }
     }
 
@@ -142,7 +142,7 @@ public class ProjectConfigurationActions
         CustomTypeConfiguration result = new CustomTypeConfiguration();
         try
         {
-            result.setPulseFileString(projectConfiguration.getType().getPulseFile(0, projectConfiguration, null, null));
+            result.setPulseFileString(projectConfiguration.getType().getPulseFile(projectConfiguration, null, null));
         }
         catch (Exception e)
         {

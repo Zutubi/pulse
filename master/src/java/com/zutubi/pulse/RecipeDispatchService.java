@@ -1,9 +1,10 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.core.Stoppable;
+import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.RecipeAssignedEvent;
-import com.zutubi.pulse.core.events.RecipeErrorEvent;
+import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
 import com.zutubi.util.logging.Logger;
 
 import java.util.concurrent.BlockingQueue;
@@ -49,6 +50,7 @@ public class RecipeDispatchService implements Runnable, Stoppable
             try
             {
                 assignment.getAgent().getService().build(assignment.getRequest());
+                eventManager.publish(new RecipeDispatchedEvent(this, assignment.getRecipeId(), assignment.getAgent()));
             }
             catch (Exception e)
             {

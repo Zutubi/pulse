@@ -2,151 +2,182 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.events.build.AbstractBuildRequestEvent;
-import com.zutubi.pulse.tove.config.project.ProjectConfigurationActions;
-import com.zutubi.tove.security.AccessManager;
+import com.zutubi.util.bean.ObjectFactory;
+import com.zutubi.util.logging.Logger;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * The build queue manages multiple build requests for a single project or
- * user, ensuring (with the guidance of the FatController) that a project
- * is not building in parallel with itself, and that users only have one
- * live personal build at a time.
+ * The build queue manages {@link EntityBuildQueue} instances for each
+ * project and user.  As build requests come in they are sent to the
+ * appropriate queue.
  */
 public class BuildQueue
 {
+    private static final Logger LOG = Logger.getLogger(BuildQueue.class);
+
     /**
-     * Map from entity to queued requests for that entity.  The first item
-     * in the list is the executing build for the entity.  Behind that are
-     * queued requests for the entity.  The entity is either a project or a
-     * user (for personal builds).
+     * Map from entity to a specific queue for that entity.  The entity is
+     * either a project or a user (for personal builds).
      */
-    private Map<Object, List<AbstractBuildRequestEvent>> requests;
-    private AccessManager accessManager;
+    private Map<Entity, EntityBuildQueue> entityQueues = new HashMap<Entity, EntityBuildQueue>();
+    private boolean stopped = false;
 
-    public BuildQueue()
-    {
-        this.requests = new HashMap<Object, List<AbstractBuildRequestEvent>>();
-    }
+    private ObjectFactory objectFactory;
 
     /**
-     * Adds the request to the queue and returns true if it should be
-     * executed immediately.
+     * Adds the request to the queue.  The request will be activated if the
+     * number of active builds for the owner is not yet at the limit.
      *
      * @param event the request to add
-     * @return true iff the project of the given request can be built now
      */
-    public boolean buildRequested(AbstractBuildRequestEvent event)
+    public void buildRequested(AbstractBuildRequestEvent event)
     {
-        Object owner = event.getOwner();
-        checkOwner(owner);
-
-        List<AbstractBuildRequestEvent> entityRequests = requests.get(owner);
-        if (entityRequests.size() > 0)
+        if (!stopped)
         {
-            enqueueRequest(entityRequests, event);
-            return false;
+            lookupQueueForOwner(event.getOwner()).handleRequest(event);
         }
-        else
-        {
-            entityRequests.add(event);
-            return true;
-        }
-    }
-
-    private void checkOwner(Object owner)
-    {
-        if (!requests.containsKey(owner))
-        {
-            requests.put(owner, new LinkedList<AbstractBuildRequestEvent>());
-        }
-    }
-
-    private void enqueueRequest(List<AbstractBuildRequestEvent> entityRequests, AbstractBuildRequestEvent event)
-    {
-        // Fixed revisions are always accepted, floating will be filtered out
-        // if there is already a floater for the same project.
-        if (!event.getRevision().isFixed())
-        {
-            // Include the running build, it can be floating until the first
-            // recipe is dispatched (CIB-701).
-            for (AbstractBuildRequestEvent e : entityRequests)
-            {
-                if (!e.getRevision().isFixed() && e.getProjectConfig().equals(event.getProjectConfig()))
-                {
-                    // Existing floater, no need to remember this request.
-                    return;
-                }
-            }
-        }
-
-        // Unique spec, add to end of queue.
-        entityRequests.add(event);
     }
 
     /**
-     * Dequeues the completed request and returns the next request event for
-     * the given entity.
+     * Notifies the queue that a build has completed.  The build is removed
+     * from the active builds.
      *
-     * @param owner owner of the completed build
-     * @return the next request for the project, or null if there is none
+     * @param owner   owner (project or user) of the build
+     * @param buildId the build result id (<strong>not</strong> the number)
      */
-    public AbstractBuildRequestEvent buildCompleted(Entity owner)
+    public void buildCompleted(Entity owner, long buildId)
     {
-        List<AbstractBuildRequestEvent> entityRequests = requests.get(owner);
-        assert(entityRequests.size() > 0);
-        entityRequests.remove(0);
-
-        if (entityRequests.size() > 0)
-        {
-            return entityRequests.get(0);
-        }
-        else
-        {
-            return null;
-        }
+        lookupQueueForOwner(owner).handleBuildCompleted(buildId);
     }
 
-    public Map<Object, List<AbstractBuildRequestEvent>> takeSnapshot()
+    private EntityBuildQueue lookupQueueForOwner(Entity owner)
     {
-        Map<Object, List<AbstractBuildRequestEvent>> queue = new HashMap<Object, List<AbstractBuildRequestEvent>>();
-        for (Map.Entry<Object, List<AbstractBuildRequestEvent>> entry : requests.entrySet())
+        EntityBuildQueue queue = entityQueues.get(owner);
+        if (queue == null)
         {
-            List<AbstractBuildRequestEvent> events = new LinkedList<AbstractBuildRequestEvent>(entry.getValue());
-            queue.put(entry.getKey(), events);
+            try
+            {
+                queue = objectFactory.buildBean(EntityBuildQueue.class, new Class[] { Entity.class, Integer.TYPE }, new Object[] { owner, 1 });
+            }
+            catch (Exception e)
+            {
+                LOG.severe(e);
+            }
+
+            entityQueues.put(owner, queue);
         }
 
         return queue;
     }
 
-    public boolean cancelBuild(long id)
+    /**
+     * @return the total number of active builds for all owners
+     */
+    public int getActiveBuildCount()
     {
-        // Locate build request and remove it.  If it does not exist, return false.
-        for (Map.Entry<Object, List<AbstractBuildRequestEvent>> entry : requests.entrySet())
+        int total = 0;
+        for (EntityBuildQueue queue: entityQueues.values())
         {
-            List<AbstractBuildRequestEvent> events = entry.getValue();
-            // Ignore the first in the list: it is already running
-            Iterator<AbstractBuildRequestEvent> it = events.iterator();
-            if(it.hasNext())
-            {
-                it.next();
-                while(it.hasNext())
-                {
-                    AbstractBuildRequestEvent event = it.next();
-                    if (event.getId() == id)
-                    {
-                        accessManager.ensurePermission(ProjectConfigurationActions.ACTION_CANCEL_BUILD, event);
-                        it.remove();
-                        return true;
-                    }
-                }
-            }
+            total += queue.getActiveBuildCount();
         }
-        return false;
+
+        return total;
     }
 
-    public void setAccessManager(AccessManager accessManager)
+    /**
+     * Returns a consistent view of this queue at a point in time.
+     *
+     * @see Snapshot
+     *
+     * @return the current state of the quue
+     */
+    public Snapshot takeSnapshot()
     {
-        this.accessManager = accessManager;
+        Snapshot snapshot = new Snapshot();
+        for (EntityBuildQueue queue: entityQueues.values())
+        {
+            snapshot.addEntityQueue(queue);
+        }
+
+        return snapshot;
+    }
+
+    /**
+     * Cancels a queued build by the request event id.  If the build is already
+     * active, or no longer queued, this is a no-op.
+     *
+     * @param requestEventId event identifier of the request to cancel
+     * @return true if the request was found and cancelled, false if it was not
+     *         found or already active
+     */
+    public boolean cancelBuild(long requestEventId)
+    {
+        boolean found = false;
+        for (EntityBuildQueue queue: entityQueues.values())
+        {
+            if (queue.cancelQueuedRequest(requestEventId))
+            {
+                found = true;
+                break;
+            }
+        }
+
+        return found;
+    }
+
+    /**
+     * Notifies this queue that we are stopping, so no further requests should
+     * be accepted or activated.
+     */
+    public void stop()
+    {
+        this.stopped = true;
+        for (EntityBuildQueue queue: entityQueues.values())
+        {
+            queue.stop();
+        }
+    }
+
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
+    }
+
+    /**
+     * Used to hold a consistent snapshot across all queues.
+     */
+    public static class Snapshot
+    {
+        private Map<Entity, List<EntityBuildQueue.ActiveBuild>> activeBuilds = new HashMap<Entity, List<EntityBuildQueue.ActiveBuild>>();
+        private Map<Entity, List<AbstractBuildRequestEvent>> queuedBuilds = new HashMap<Entity, List<AbstractBuildRequestEvent>>();
+
+        void addEntityQueue(EntityBuildQueue queue)
+        {
+            activeBuilds.put(queue.getOwner(), queue.getActiveBuildsSnapshot());
+            queuedBuilds.put(queue.getOwner(), queue.getQueuedBuildsSnapshot());
+        }
+
+        /**
+         * @return a map from an entity (project or user) to the active builds
+         * for that entity.  Builds activate first are last in the list.
+         */
+        public Map<Entity, List<EntityBuildQueue.ActiveBuild>> getActiveBuilds()
+        {
+            return Collections.unmodifiableMap(activeBuilds);
+        }
+
+        /**
+         * @return a map from an entity (project or user) to the queued build
+         * requests for that entity.  Builds requested first are last in the
+         * list.
+         */
+        public Map<Entity, List<AbstractBuildRequestEvent>> getQueuedBuilds()
+        {
+            return Collections.unmodifiableMap(queuedBuilds);
+        }
     }
 }

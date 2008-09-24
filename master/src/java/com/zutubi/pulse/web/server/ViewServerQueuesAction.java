@@ -1,19 +1,19 @@
 package com.zutubi.pulse.web.server;
 
-import com.zutubi.pulse.FatController;
-import com.zutubi.pulse.RecipeAssignmentRequest;
-import com.zutubi.pulse.RecipeQueue;
+import com.zutubi.pulse.*;
 import com.zutubi.pulse.events.build.AbstractBuildRequestEvent;
 import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.web.ActionSupport;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
+ * Action to show the build and recipe queues.
  */
 public class ViewServerQueuesAction extends ActionSupport
 {
@@ -56,32 +56,20 @@ public class ViewServerQueuesAction extends ActionSupport
         buildQueue = new LinkedList<AbstractBuildRequestEvent>();
         executingBuilds = new LinkedList<BuildResult>();
 
-        Map<Object, List<AbstractBuildRequestEvent>> builds = fatController.snapshotBuildQueue();
-        for(Object entity: builds.keySet())
+        BuildQueue.Snapshot snapshot = fatController.snapshotBuildQueue();
+        for (List<AbstractBuildRequestEvent> queuedForEntity: snapshot.getQueuedBuilds().values())
         {
-            List<AbstractBuildRequestEvent> events = builds.get(entity);
-            if(events.size() > 0)
+            buildQueue.addAll(queuedForEntity);
+        }
+
+        for (List<EntityBuildQueue.ActiveBuild> activeForEntity: snapshot.getActiveBuilds().values())
+        {
+            for (EntityBuildQueue.ActiveBuild activeBuild: activeForEntity)
             {
-                AbstractBuildRequestEvent active = events.get(0);
-                BuildResult result;
-                if(active.isPersonal())
+                BuildResult buildResult = buildManager.getBuildResult(activeBuild.getController().getBuildId());
+                if (buildResult != null && !buildResult.completed())
                 {
-                    result = buildManager.getLatestBuildResult((User) active.getOwner());
-                }
-                else
-                {
-                    Project project = (Project) active.getOwner();
-                    result = buildManager.getLatestBuildResult(project);
-                }
-
-                if(result != null && !result.completed())
-                {
-                    executingBuilds.add(result);
-                }
-
-                if(events.size() > 1)
-                {
-                    buildQueue.addAll(events.subList(1, events.size()));
+                    executingBuilds.add(buildResult);
                 }
             }
         }
@@ -98,7 +86,7 @@ public class ViewServerQueuesAction extends ActionSupport
         {
             public int compare(BuildResult o1, BuildResult o2)
             {
-                return (int) (o1.getStamps().getStartTime() - o2.getStamps().getEndTime());
+                return (int) (o1.getStamps().getStartTime() - o2.getStamps().getStartTime());
             }
         });
 

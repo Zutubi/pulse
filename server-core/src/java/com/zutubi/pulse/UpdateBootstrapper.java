@@ -10,6 +10,8 @@ import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.util.logging.Logger;
 
 /**
+ * Bootstrapper which runs an incremental update on a working copy using the
+ * project's SCM.
  */
 public class UpdateBootstrapper extends ScmBootstrapper
 {
@@ -27,7 +29,7 @@ public class UpdateBootstrapper extends ScmBootstrapper
         {
             scm = createScmClient();
             // Temporarily pass the id string through so that the p4 implementation can work with it.
-            executionContext.addString("scm.bootstrap.id", getId());
+            executionContext.addString("scm.bootstrap.id", getId(executionContext));
             scm.update(executionContext, revision.getRevision(), this);
             return scm;
         }

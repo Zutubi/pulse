@@ -1,12 +1,15 @@
 package com.zutubi.pulse.agent;
 
+import com.zutubi.pulse.core.events.RecipeCompletedEvent;
+import com.zutubi.pulse.core.events.RecipeErrorEvent;
+import com.zutubi.pulse.core.events.RecipeEvent;
 import com.zutubi.pulse.events.*;
-import com.zutubi.pulse.events.build.*;
+import com.zutubi.pulse.events.build.RecipeAssignedEvent;
+import com.zutubi.pulse.events.build.RecipeCollectedEvent;
+import com.zutubi.pulse.events.build.RecipeCollectingEvent;
+import com.zutubi.pulse.events.build.RecipeTerminateRequestEvent;
 import com.zutubi.pulse.model.AgentState;
 import com.zutubi.pulse.services.SlaveStatus;
-import com.zutubi.pulse.core.events.RecipeErrorEvent;
-import com.zutubi.pulse.core.events.RecipeCompletedEvent;
-import com.zutubi.pulse.core.events.RecipeEvent;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.logging.Logger;
 
@@ -119,7 +122,7 @@ public class AgentStatusManager implements EventListener
                 switch(oldStatus)
                 {
                     case BUILDING:
-                    case RECIPE_DISPATCHED:
+                    case RECIPE_ASSIGNED:
                         publishEvent(new RecipeErrorEvent(this, agent.getRecipeId(), "Agent status changed to '" + pingStatus.getStatus().getPrettyString() + "' while recipe in progress"));
 
                         // So severe that we will not do the usual post
@@ -188,7 +191,7 @@ public class AgentStatusManager implements EventListener
         long pingRecipe = pingStatus.getRecipeId();
         switch (agent.getStatus())
         {
-            case RECIPE_DISPATCHED:
+            case RECIPE_ASSIGNED:
             case BUILDING:
                 if (pingRecipe == agent.getRecipeId())
                 {
@@ -247,7 +250,7 @@ public class AgentStatusManager implements EventListener
                 agent.updateStatus(pingStatus);
                 break;
 
-            case RECIPE_DISPATCHED:
+            case RECIPE_ASSIGNED:
                 if (agent.getSecondsSincePing() > getAgentOfflineTimeout())
                 {
                     publishEvent(new RecipeErrorEvent(this, agent.getRecipeId(), "Agent idle after recipe expected to have commenced"));
@@ -265,7 +268,7 @@ public class AgentStatusManager implements EventListener
         switch (agent.getStatus())
         {
             case BUILDING:
-            case RECIPE_DISPATCHED:
+            case RECIPE_ASSIGNED:
                 // Don't immediately give up - wait for the timeout.
                 if (agent.getSecondsSincePing() > getAgentOfflineTimeout())
                 {
@@ -280,14 +283,14 @@ public class AgentStatusManager implements EventListener
         }
     }
 
-    private void handleRecipeStarted(RecipeAssignedEvent event)
+    private void handleRecipeAssigned(RecipeAssignedEvent event)
     {
         Agent agent = agentsById.get(event.getAgent().getId());
         if(agent != null)
         {
             agentsByRecipeId.put(event.getRecipeId(), agent);
             publishEvent(new AgentUnavailableEvent(this, agent));
-            agent.updateStatus(Status.RECIPE_DISPATCHED, event.getRecipeId());
+            agent.updateStatus(Status.RECIPE_ASSIGNED, event.getRecipeId());
         }
     }
 
@@ -358,7 +361,7 @@ public class AgentStatusManager implements EventListener
                     switch (status)
                     {
                         case BUILDING:
-                        case RECIPE_DISPATCHED:
+                        case RECIPE_ASSIGNED:
                             publishEvent(new RecipeTerminateRequestEvent(this, agent.getService(), agent.getRecipeId()));
                             publishEvent(new RecipeErrorEvent(this, agent.getRecipeId(), "Agent disabled while recipe in progress"));
                             break;
@@ -416,7 +419,7 @@ public class AgentStatusManager implements EventListener
             Agent runningAgent = agentsByRecipeId.remove(recipeId);
             switch(runningAgent.getStatus())
             {
-                case RECIPE_DISPATCHED:
+                case RECIPE_ASSIGNED:
                 case BUILDING:
                     publishEvent(new RecipeErrorEvent(this, recipeId, "Agent deleted while recipe in progress"));
                     break;
@@ -489,7 +492,7 @@ public class AgentStatusManager implements EventListener
             }
             else if(event instanceof RecipeAssignedEvent)
             {
-                handleRecipeStarted((RecipeAssignedEvent) event);
+                handleRecipeAssigned((RecipeAssignedEvent) event);
             }
             else if(event instanceof RecipeCollectingEvent)
             {

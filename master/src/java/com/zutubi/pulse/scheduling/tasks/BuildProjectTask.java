@@ -1,5 +1,6 @@
 package com.zutubi.pulse.scheduling.tasks;
 
+import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.model.TriggerBuildReason;
 import com.zutubi.pulse.scheduling.Task;
@@ -8,15 +9,22 @@ import com.zutubi.pulse.scheduling.Trigger;
 import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.logging.Logger;
 
-import java.io.Serializable;
-import java.util.Map;
-
 /**
- * <class-comment/>
+ * A trigger task which triggers a project build.
  */
 public class BuildProjectTask implements Task
 {
-    public static final String PARAM_FORCE = "force";
+    /**
+     * The fixed revision to be built, if not present the revision will float
+     * to the latest (Revision, optional).
+     */
+    public static final String PARAM_REVISION  = "revision";
+    /**
+     * Indicates if the raised build request should be replaceable by later
+     * requests from the same source while queued (Boolean, optional, defaults
+     * to true).
+     */
+    public static final String PARAM_REPLACEABLE = "replaceable";
 
     private static final Logger LOG = Logger.getLogger(BuildProjectTask.class);
 
@@ -25,20 +33,27 @@ public class BuildProjectTask implements Task
     public void execute(TaskExecutionContext context)
     {
         Trigger trigger = context.getTrigger();
-        Map<Serializable, Serializable> dataMap = trigger.getDataMap();
         long projectId = trigger.getProject();
-        boolean force = dataMap.containsKey(PARAM_FORCE);
+        Revision revision = (Revision) context.get(PARAM_REVISION);
+
+        Boolean replaceableValue = (Boolean) context.get(PARAM_REPLACEABLE);
+        boolean replaceable = replaceableValue == null || replaceableValue;
 
         ProjectConfiguration project = projectManager.getProjectConfig(projectId, false);
         if (project != null)
         {
             // generate build request.
-            projectManager.triggerBuild(project, new TriggerBuildReason(trigger.getName()), null, force);
+            projectManager.triggerBuild(project, new TriggerBuildReason(trigger.getName()), revision, getSource(trigger), replaceable, false);
         }
         else
         {
             LOG.warning("Build project task fired for unknown project '" + projectId + "' (trigger '" + trigger.getName() + "')");
         }
+    }
+
+    private static String getSource(Trigger trigger)
+    {
+        return "trigger '" + trigger.getName() + "'";
     }
 
     public void setProjectManager(ProjectManager projectManager)

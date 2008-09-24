@@ -4,9 +4,9 @@ import static com.zutubi.pulse.MasterBuildProperties.*;
 import com.zutubi.pulse.agent.MasterLocationProvider;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.*;
+import com.zutubi.pulse.core.events.RecipeCommencedEvent;
 import com.zutubi.pulse.core.events.RecipeCompletedEvent;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
-import com.zutubi.pulse.core.events.RecipeCommencedEvent;
 import com.zutubi.pulse.core.events.RecipeEvent;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.scm.*;
@@ -23,6 +23,7 @@ import com.zutubi.pulse.tove.config.project.BuildOptionsConfiguration;
 import com.zutubi.pulse.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.tove.config.project.hooks.BuildHookManager;
+import com.zutubi.pulse.tove.config.project.types.TypeConfiguration;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.Constants;
 import com.zutubi.util.TimeStamps;
@@ -61,7 +62,7 @@ public class BuildController implements EventListener
     private TestManager testManager;
     private MasterLocationProvider masterLocationProvider;
     private MasterConfigurationManager configurationManager;
-    private RecipeQueue queue;
+    private RecipeQueue recipeQueue;
     private RecipeResultCollector collector;
     private BuildTree tree;
     private BuildResult buildResult;
@@ -80,6 +81,7 @@ public class BuildController implements EventListener
     private ResourceManager resourceManager;
 
     private DefaultBuildLogger buildLogger;
+    private RecipeDispatchService recipeDispatchService;
     private ScmContextFactory scmContextFactory;
 
     public BuildController(AbstractBuildRequestEvent event)
@@ -87,16 +89,12 @@ public class BuildController implements EventListener
         this.request = event;
     }
 
-    public void init()
-    {
-        this.projectConfig = request.getProjectConfig();
-        this.project = projectManager.getProject(projectConfig.getProjectId(), false);
-        this.asyncListener = new AsynchronousDelegatingListener(this, threadFactory);
-
-    }
-
     public void run()
     {
+        projectConfig = request.getProjectConfig();
+        project = projectManager.getProject(projectConfig.getProjectId(), false);
+        asyncListener = new AsynchronousDelegatingListener(this, threadFactory);
+
         createBuildTree();
 
         // Fail early if things are not as expected.
@@ -115,7 +113,7 @@ public class BuildController implements EventListener
         // anywhere, even for different builds, it is much safer to ensure we
         // *only* use that thread after we have registered the listener.
         eventManager.register(asyncListener);
-        publishEvent(new BuildCommencedEvent(this, buildResult, buildContext));
+        publishEvent(new BuildControllerBootstrapEvent(this, buildResult, buildContext));
     }
 
     public BuildTree createBuildTree()
@@ -179,8 +177,8 @@ public class BuildController implements EventListener
             RecipeAssignmentRequest assignmentRequest = new RecipeAssignmentRequest(project, stage.getAgentRequirements(), resourceRequirements, request.getRevision(), recipeRequest, buildResult);
             DefaultRecipeLogger logger = new DefaultRecipeLogger(new File(paths.getRecipeDir(buildResult, recipeResult.getId()), RecipeResult.RECIPE_LOG));
             RecipeResultNode previousRecipe = previousSuccessful == null ? null : previousSuccessful.findResultNodeByHandle(stage.getHandle());
-            RecipeController rc = new RecipeController(buildResult, childResultNode, assignmentRequest, recipeContext, previousRecipe, logger, collector, configurationManager, resourceManager);
-            rc.setRecipeQueue(queue);
+            RecipeController rc = new RecipeController(buildResult, childResultNode, assignmentRequest, recipeContext, previousRecipe, logger, collector, configurationManager, resourceManager, recipeDispatchService);
+            rc.setRecipeQueue(recipeQueue);
             rc.setBuildManager(buildManager);
             rc.setServiceTokenManager(serviceTokenManager);
             rc.setEventManager(eventManager);
@@ -205,12 +203,12 @@ public class BuildController implements EventListener
     {
         try
         {
-            if (evt instanceof BuildCommencedEvent)
+            if (evt instanceof BuildControllerBootstrapEvent)
             {
-                BuildCommencedEvent e = (BuildCommencedEvent) evt;
+                BuildControllerBootstrapEvent e = (BuildControllerBootstrapEvent) evt;
                 if (e.getBuildResult() == buildResult)
                 {
-                    handleBuildCommenced();
+                    handleControllerBootstrap();
                 }
             }
             else if (evt instanceof BuildStatusEvent)
@@ -229,14 +227,9 @@ public class BuildController implements EventListener
             {
                 handleRecipeTimeout((RecipeTimeoutEvent) evt);
             }
-            else if (evt instanceof RecipeCollectingEvent || evt instanceof RecipeCollectedEvent)
-            {
-                // Ignore these.
-            }
             else if (evt instanceof RecipeEvent)
             {
-                RecipeEvent e = (RecipeEvent) evt;
-                handleRecipeEvent(e);
+                handleRecipeEvent((RecipeEvent) evt);
             }
             else
             {
@@ -256,7 +249,7 @@ public class BuildController implements EventListener
         }
     }
 
-    private void handleBuildCommenced()
+    private void handleControllerBootstrap()
     {
         // It is important that this directory is created *after* the build
         // result is commenced and saved to the database, so that the
@@ -278,6 +271,7 @@ public class BuildController implements EventListener
         publishEvent(new PreBuildEvent(this, buildResult, buildContext));
         buildLogger.preBuildCompleted();
 
+        initialiseRevision();
         tree.prepare(buildResult);
 
         // execute the first level of recipe controllers...
@@ -304,6 +298,104 @@ public class BuildController implements EventListener
                 return initialBootstrapper;
             }
         }, tree.getRoot().getChildren());
+    }
+
+    private void initialiseRevision()
+    {
+        BuildRevision buildRevision = request.getRevision();
+        buildRevision.lock();
+        try
+        {
+            if (!buildRevision.isInitialised())
+            {
+                buildLogger.status("Initialising build revision...");
+                updateRevision(buildRevision, null, null, true);
+                buildLogger.status("Revision initialised to '" + buildRevision.getRevision().getRevisionString() + "'");
+            }
+        }
+        finally
+        {
+            buildRevision.unlock();
+        }
+    }
+
+    /**
+     * Updates an active build's revision to the new revision.  This is
+     * allowed up until the point where the revision is fixed (which is at the
+     * same time as the build commences).
+     *
+     * The build revision for this build <strong>must</strong> be locked before
+     * making this call.
+     *
+     * @param revision  the new revision, which may be null to indicate that
+     *                  the latest revision should be used
+     * @param pulseFile the pulse file for the revision, ignored if revision is
+     *                  null (the pulse file will be obtained for the obtained
+     *                  latest revision)
+     *
+     * @throws BuildException if the revision cannot be set due to an error
+     */
+    public void updateRevision(Revision revision, String pulseFile)
+    {
+        updateRevision(request.getRevision(), revision, pulseFile, false);
+    }
+
+    private void updateRevision(BuildRevision buildRevision, Revision revision, String pulseFile, boolean first)
+    {
+        if (revision == null)
+        {
+            revision = getLatestRevision();
+            pulseFile = getPulseFileForRevision(revision);
+        }
+
+        if (revision.equals(buildRevision.getRevision()))
+        {
+            return;
+        }
+
+        buildRevision.update(revision, pulseFile);
+
+        if (!first)
+        {
+            buildLogger.status("Revision updated to '" + buildRevision.getRevision() + "' due to a newer build request");
+            eventManager.publish(new BuildRevisionUpdatedEvent(this, buildResult, buildRevision));
+        }
+    }
+
+    private Revision getLatestRevision()
+    {
+        ScmConfiguration scm = projectConfig.getScm();
+        ScmClient client = null;
+        try
+        {
+            client = scmClientFactory.createClient(scm);
+            ScmContext scmContext = scmContextFactory.createContext(project.getId(), scm);
+            boolean supportsRevisions = client.getCapabilities().contains(ScmCapability.REVISIONS);
+            return supportsRevisions ? client.getLatestRevision(scmContext) : new Revision(System.currentTimeMillis());
+        }
+        catch (ScmException e)
+        {
+            throw new BuildException("Unable to retrieve latest revision: " + e.getMessage(), e);
+        }
+        finally
+        {
+            ScmClientUtils.close(client);
+        }
+    }
+
+    private String getPulseFileForRevision(Revision revision)
+    {
+        TypeConfiguration type = projectConfig.getType();
+        String pulseFile;
+        try
+        {
+            pulseFile = type.getPulseFile(projectConfig, revision, null);
+        }
+        catch (Exception e)
+        {
+            throw new BuildException("Unable to retrieve pulse file: " + e.getMessage(), e);
+        }
+        return pulseFile;
     }
 
     private Bootstrapper createPersonalBuildBootstrapper(Bootstrapper initialBootstrapper)
@@ -416,13 +508,19 @@ public class BuildController implements EventListener
 
     private void handleRecipeEvent(RecipeEvent e)
     {
+        if (e instanceof RecipeCollectingEvent || e instanceof RecipeCollectedEvent)
+        {
+            // Ignore these.
+            return;
+        }
+
         RecipeController controller;
         TreeNode<RecipeController> foundNode = null;
 
         for (TreeNode<RecipeController> node : executingControllers)
         {
             controller = node.getData();
-            if (controller.handleRecipeEvent(e))
+            if (controller.matchesRecipeEvent(e))
             {
                 foundNode = node;
                 break;
@@ -451,7 +549,7 @@ public class BuildController implements EventListener
             {
                 if (!buildResult.commenced())
                 {
-                    handleFirstDispatch(foundNode.getData());
+                    handleFirstAssignment();
                 }
             }
             else if (e instanceof RecipeCompletedEvent || e instanceof RecipeErrorEvent)
@@ -480,8 +578,10 @@ public class BuildController implements EventListener
                         buildManager.save(buildResult);
                     }
                 }
+
             }
 
+            foundNode.getData().handleRecipeEvent(e);
             checkNodeStatus(foundNode);
         }
     }
@@ -516,24 +616,20 @@ public class BuildController implements EventListener
     /**
      * Called when the first recipe for this build is dispatched.  It is at
      * this point that the build is said to have commenced.
-     *
-     * @param controller the controller for the recipe that has been dispatched
      */
-    private void handleFirstDispatch(RecipeController controller)
+    private void handleFirstAssignment()
     {
-        RecipeAssignmentRequest assignmentRequest = controller.getDispatchRequest();
-        RecipeRequest request = assignmentRequest.getRequest();
+        BuildRevision buildRevision = request.getRevision();
 
         try
         {
-            FileSystemUtils.createFile(new File(buildResult.getAbsoluteOutputDir(configurationManager.getDataDirectory()), BuildResult.PULSE_FILE), request.getPulseFileSource());
+            FileSystemUtils.createFile(new File(buildResult.getAbsoluteOutputDir(configurationManager.getDataDirectory()), BuildResult.PULSE_FILE), buildRevision.getPulseFile());
         }
         catch (IOException e)
         {
             LOG.warning("Unable to save pulse file for build: " + e.getMessage(), e);
         }
 
-        BuildRevision buildRevision = assignmentRequest.getRevision();
         addRevisionProperties(buildContext, buildRevision);
         if (!buildResult.isPersonal())
         {
@@ -732,7 +828,7 @@ public class BuildController implements EventListener
 
     public Class[] getHandledEvents()
     {
-        return new Class[]{BuildCommencedEvent.class, BuildStatusEvent.class, RecipeEvent.class, BuildTerminationRequestEvent.class, RecipeTimeoutEvent.class};
+        return new Class[]{BuildControllerBootstrapEvent.class, BuildStatusEvent.class, RecipeEvent.class, BuildTerminationRequestEvent.class, RecipeTimeoutEvent.class};
     }
 
     public long getBuildId()
@@ -780,9 +876,9 @@ public class BuildController implements EventListener
         this.testManager = testManager;
     }
 
-    public void setQueue(RecipeQueue queue)
+    public void setRecipeQueue(RecipeQueue recipeQueue)
     {
-        this.queue = queue;
+        this.recipeQueue = recipeQueue;
     }
 
     public void setCollector(RecipeResultCollector collector)
@@ -823,6 +919,11 @@ public class BuildController implements EventListener
     public void setBuildHookManager(BuildHookManager buildHookManager)
     {
         this.buildHookManager = buildHookManager;
+    }
+
+    public void setRecipeDispatchService(RecipeDispatchService recipeDispatchService)
+    {
+        this.recipeDispatchService = recipeDispatchService;
     }
 
     public void setScmContextFactory(ScmContextFactory scmContextFactory)

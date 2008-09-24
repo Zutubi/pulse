@@ -16,6 +16,11 @@ public class SpecificAgentRequirements implements AgentRequirements
         this.agent = agent;
     }
 
+    public String getSummary()
+    {
+        return agent.getName();
+    }
+
     public boolean fulfilledBy(RecipeAssignmentRequest request, AgentService service)
     {
         return service.getAgentConfig().equals(agent);

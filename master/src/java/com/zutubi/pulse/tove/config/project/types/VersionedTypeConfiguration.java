@@ -5,11 +5,7 @@ import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Transient;
 import com.zutubi.config.annotations.Wire;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.scm.ScmClient;
-import com.zutubi.pulse.core.scm.ScmClientFactory;
-import com.zutubi.pulse.core.scm.ScmClientUtils;
-import com.zutubi.pulse.core.scm.ScmContext;
-import com.zutubi.pulse.core.scm.ScmContextFactory;
+import com.zutubi.pulse.core.scm.*;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
@@ -43,7 +39,7 @@ public class VersionedTypeConfiguration extends TypeConfiguration
         this.pulseFileName = pulseFileName;
     }
 
-    public String getPulseFile(long id, ProjectConfiguration projectConfig, Revision revision, PatchArchive patch) throws Exception
+    public String getPulseFile(ProjectConfiguration projectConfig, Revision revision, PatchArchive patch) throws Exception
     {
         ScmClient scmClient = null;
         InputStream is = null;

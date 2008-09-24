@@ -5,15 +5,16 @@ import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.model.*;
 
 /**
+ * A request for a project build.
  */
 public class BuildRequestEvent extends AbstractBuildRequestEvent
 {
     private BuildReason reason;
     private Project owner;
 
-    public BuildRequestEvent(Object source, BuildReason reason, Project project, BuildRevision revision)
+    public BuildRequestEvent(Object source, BuildReason reason, Project project, BuildRevision revision, String requestSource, boolean replaceable)
     {
-        super(source, revision, project.getConfig());
+        super(source, revision, project.getConfig(), requestSource, replaceable);
         this.owner = project;
         this.reason = reason;
     }
@@ -51,6 +52,14 @@ public class BuildRequestEvent extends AbstractBuildRequestEvent
         {
             // should never be null, but then again, toString must never fail either.
             buff.append(": ").append(getReason().getSummary());
+        }
+        if (getRequestSource() != null)
+        {
+            buff.append(": ").append(getRequestSource());
+        }
+        if(isReplaceable())
+        {
+            buff.append(" (replaceable)");
         }
         return buff.toString();
     }

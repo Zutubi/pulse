@@ -1,11 +1,11 @@
 package com.zutubi.tove.config;
 
 import com.zutubi.config.annotations.Wire;
-import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.config.ConfigurationList;
 import com.zutubi.pulse.core.config.ConfigurationMap;
 import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.tove.config.cleanup.*;
 import com.zutubi.tove.config.events.*;
 import com.zutubi.tove.security.AccessManager;
@@ -830,7 +830,6 @@ public class ConfigurationTemplateManager
                 MapType type = (MapType) scope.getType();
                 String idProperty = type.getKeyProperty();
                 Map<String, Record> recordsByPath = recordManager.selectAll(PathUtils.getPath(scope.getScopeName(), PathUtils.WILDCARD_ANY_ELEMENT));
-
 
                 Map<Long, List<Record>> recordsByParent = new HashMap<Long, List<Record>>();
                 for (Map.Entry<String, Record> entry : recordsByPath.entrySet())

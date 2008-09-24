@@ -1,5 +1,6 @@
 package com.zutubi.pulse.tove.config.project;
 
+import com.zutubi.config.annotations.Transient;
 import com.zutubi.pulse.AgentService;
 import com.zutubi.pulse.RecipeAssignmentRequest;
 
@@ -10,5 +11,7 @@ import com.zutubi.pulse.RecipeAssignmentRequest;
  */
 public interface AgentRequirements
 {
+    @Transient
+    public String getSummary();
     public boolean fulfilledBy(RecipeAssignmentRequest request, AgentService service);
 }

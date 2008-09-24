@@ -16,4 +16,20 @@ public class RecordLocators
     {
         return new PathPatternRecordLocator(pathPattern);
     }
+
+    /**
+     * Create a new locator that can filter the output of another locator based
+     * on the symbolic names of the records.  Only records with symbolic names
+     * that are acceptable will be allowed to pass.
+     *
+     * @param delegate                delegate locator used to find records to
+     *                                filter
+     * @param acceptableSymbolicNames the types that this filter will allow to
+     *                                pass
+     * @return a type-filtering locater
+     */
+    public static RecordLocator newTypeFilter(RecordLocator delegate, String... acceptableSymbolicNames)
+    {
+        return new TypeFilterRecordLocator(delegate, acceptableSymbolicNames);
+    }
 }

@@ -1,12 +1,7 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.agent.AgentManager;
-import com.zutubi.pulse.agent.MasterLocationProvider;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.Stoppable;
-import com.zutubi.pulse.core.model.Entity;
-import com.zutubi.pulse.core.scm.ScmClientFactory;
-import com.zutubi.pulse.core.scm.ScmContextFactory;
 import com.zutubi.pulse.events.AsynchronousDelegatingListener;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
@@ -20,26 +15,17 @@ import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.license.events.LicenseEvent;
 import com.zutubi.pulse.license.events.LicenseExpiredEvent;
 import com.zutubi.pulse.license.events.LicenseUpdateEvent;
-import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.ProjectManager;
-import com.zutubi.pulse.model.ResourceManager;
-import com.zutubi.pulse.model.TestManager;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.scheduling.quartz.TimeoutRecipeJob;
-import com.zutubi.pulse.services.ServiceTokenManager;
-import com.zutubi.pulse.tove.config.project.hooks.BuildHookManager;
-import com.zutubi.tove.security.AccessManager;
+import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -60,35 +46,22 @@ public class FatController implements EventListener, Stoppable
 
     private EventManager eventManager;
     private AsynchronousDelegatingListener asyncListener;
-    private BuildManager buildManager;
-    private TestManager testManager;
-    private ScmClientFactory scmClientFactory;
-    private ScmContextFactory scmContextFactory;
-    private MasterConfigurationManager configManager;
-    private RecipeQueue recipeQueue;
 
-    private Lock runningBuildsLock = new ReentrantLock();
-    private Condition stoppedCondition = runningBuildsLock.newCondition();
-    private boolean stopping = false;
-    private Set<BuildController> runningBuilds = new HashSet<BuildController>();
-    private Lock buildQueueLock = new ReentrantLock();
+    private Lock lock = new ReentrantLock();
+    private Condition stoppedCondition = lock.newCondition();
     private BuildQueue buildQueue = new BuildQueue();
     private Scheduler quartzScheduler;
     private ProjectManager projectManager;
     private AgentManager agentManager;
     private UserManager userManager;
-    private ServiceTokenManager serviceTokenManager;
     private ThreadFactory threadFactory;
-    private AccessManager accessManager;
-    private MasterLocationProvider masterLocationProvider;
-    private ResourceManager resourceManager;
-    private BuildHookManager buildHookManager;
 
     /**
      * When the fat controller is enabled, it will handle incoming build requests.
      * If not, it will ignore them.
      */
     private boolean enabled = false;
+    private ObjectFactory objectFactory;
 
     public FatController()
     {
@@ -96,7 +69,7 @@ public class FatController implements EventListener, Stoppable
 
     public void init() throws SchedulerException
     {
-        buildQueue.setAccessManager(accessManager);
+        buildQueue.setObjectFactory(objectFactory);
         asyncListener = new AsynchronousDelegatingListener(this, threadFactory);
         eventManager.register(asyncListener);
 
@@ -158,12 +131,11 @@ public class FatController implements EventListener, Stoppable
 
     public void stop(boolean force)
     {
-        // Make sure all controllers are done
-        runningBuildsLock.lock();
+        lock.lock();
         try
         {
-            // Flag that no new builds should be initiated
-            stopping = true;
+            // Notify the queue to not activate any more builds.
+            buildQueue.stop();
 
             if (force)
             {
@@ -174,7 +146,7 @@ public class FatController implements EventListener, Stoppable
             {
                 // Wait for builds to complete
                 LOG.info("Waiting for running builds to complete...");
-                while (runningBuilds.size() > 0)
+                while (buildQueue.getActiveBuildCount() > 0)
                 {
                     try
                     {
@@ -190,7 +162,7 @@ public class FatController implements EventListener, Stoppable
         }
         finally
         {
-            runningBuildsLock.unlock();
+            lock.unlock();
         }
 
         // Now stop handling events
@@ -255,64 +227,14 @@ public class FatController implements EventListener, Stoppable
             return;
         }
 
-        boolean requested;
-        buildQueueLock.lock();
+        lock.lock();
         try
         {
-            requested = buildQueue.buildRequested(event);
+            buildQueue.buildRequested(event);
         }
         finally
         {
-            buildQueueLock.unlock();
-        }
-
-        if (requested)
-        {
-            startBuild(event);
-        }
-    }
-
-    private void startBuild(AbstractBuildRequestEvent event)
-    {
-        final Project project = projectManager.getProject(event.getProjectConfig().getProjectId(), false);
-
-        runningBuildsLock.lock();
-        try
-        {
-            if (!stopping)
-            {
-                if(!event.isPersonal())
-                {
-                    projectManager.buildCommenced(project.getId());
-                }
-
-                DefaultRecipeResultCollector collector = new DefaultRecipeResultCollector(configManager);
-                collector.setProjectConfig(event.getProjectConfig());
-                BuildController controller = new BuildController(event);
-                controller.setBuildManager(buildManager);
-                controller.setBuildHookManager(buildHookManager);
-                controller.setCollector(collector);
-                controller.setEventManager(eventManager);
-                controller.setProjectManager(projectManager);
-                controller.setQuartzScheduler(quartzScheduler);
-                controller.setQueue(recipeQueue);
-                controller.setServiceTokenManager(serviceTokenManager);
-                controller.setTestManager(testManager);
-                controller.setScmClientFactory(scmClientFactory);
-                controller.setScmContextFactory(scmContextFactory);
-                controller.setUserManager(userManager);
-                controller.setConfigurationManager(configManager);
-                controller.setMasterLocationProvider(masterLocationProvider);
-                controller.setThreadFactory(threadFactory);
-                controller.setResourceManager(resourceManager);
-                controller.init();
-                controller.run();
-                runningBuilds.add(controller);
-            }
-        }
-        finally
-        {
-            runningBuildsLock.unlock();
+            lock.unlock();
         }
     }
 
@@ -323,46 +245,19 @@ public class FatController implements EventListener, Stoppable
 
     private void handleBuildCompleted(BuildCompletedEvent event)
     {
-        runningBuildsLock.lock();
+        lock.lock();
         try
         {
-            BuildResult result = event.getBuildResult();
-            BuildController controller = (BuildController) event.getSource();
-            runningBuilds.remove(controller);
-
-            if (runningBuilds.size() == 0)
+            final BuildResult buildResult = event.getBuildResult();
+            buildQueue.buildCompleted(buildResult.getOwner(), buildResult.getId());
+            if (buildQueue.getActiveBuildCount() == 0)
             {
                 stoppedCondition.signalAll();
-            }
-
-            if(!result.isPersonal())
-            {
-                projectManager.buildCompleted(result.getProject().getId(), result.succeeded());
-            }
-
-            if (!stopping)
-            {
-                Entity owner = result.getOwner();
-                AbstractBuildRequestEvent queuedEvent;
-                buildQueueLock.lock();
-                try
-                {
-                    queuedEvent = buildQueue.buildCompleted(owner);
-                }
-                finally
-                {
-                    buildQueueLock.unlock();
-                }
-                
-                if (queuedEvent != null)
-                {
-                    startBuild(queuedEvent);
-                }
             }
         }
         finally
         {
-            runningBuildsLock.unlock();
+            lock.unlock();
         }
     }
 
@@ -379,19 +274,19 @@ public class FatController implements EventListener, Stoppable
     /**
      * Retrieve a snapshot of the current build queue.
      *
-     * @return a mapping of owners to queued build request events. These events will be
-     * the order that these events will be handled.
+     * @return a consistent view across the build queue at a single moment in
+     *         time.
      */
-    public Map<Object, List<AbstractBuildRequestEvent>> snapshotBuildQueue()
+    public BuildQueue.Snapshot snapshotBuildQueue()
     {
-        buildQueueLock.lock();
+        lock.lock();
         try
         {
             return buildQueue.takeSnapshot();
         }
         finally
         {
-            buildQueueLock.unlock();
+            lock.unlock();
         }
     }
 
@@ -404,25 +299,15 @@ public class FatController implements EventListener, Stoppable
      */
     public boolean cancelQueuedBuild(long id)
     {
-        buildQueueLock.lock();
+        lock.lock();
         try
         {
             return buildQueue.cancelBuild(id);
         }
         finally
         {
-            buildQueueLock.unlock();
+            lock.unlock();
         }
-    }
-
-    public void setBuildManager(BuildManager buildManager)
-    {
-        this.buildManager = buildManager;
-    }
-
-    public void setRecipeQueue(RecipeQueue recipeQueue)
-    {
-        this.recipeQueue = recipeQueue;
     }
 
     public void setEventManager(EventManager eventManager)
@@ -435,19 +320,9 @@ public class FatController implements EventListener, Stoppable
         this.quartzScheduler = quartzScheduler;
     }
 
-    public void setConfigurationManager(MasterConfigurationManager configManager)
-    {
-        this.configManager = configManager;
-    }
-
     public void setProjectManager(ProjectManager projectManager)
     {
         this.projectManager = projectManager;
-    }
-
-    public void setServiceTokenManager(ServiceTokenManager serviceTokenManager)
-    {
-        this.serviceTokenManager = serviceTokenManager;
     }
 
     public void setUserManager(UserManager userManager)
@@ -455,29 +330,9 @@ public class FatController implements EventListener, Stoppable
         this.userManager = userManager;
     }
 
-    public void setTestManager(TestManager testManager)
-    {
-        this.testManager = testManager;
-    }
-
-    public void setScmClientFactory(ScmClientFactory scmClientFactory)
-    {
-        this.scmClientFactory = scmClientFactory;
-    }
-
     public void setThreadFactory(ThreadFactory threadFactory)
     {
         this.threadFactory = threadFactory;
-    }
-
-    public void setAccessManager(AccessManager accessManager)
-    {
-        this.accessManager = accessManager;
-    }
-
-    public void setResourceManager(ResourceManager resourceManager)
-    {
-        this.resourceManager = resourceManager;
     }
 
     public void setAgentManager(AgentManager agentManager)
@@ -485,18 +340,8 @@ public class FatController implements EventListener, Stoppable
         this.agentManager = agentManager;
     }
 
-    public void setMasterLocationProvider(MasterLocationProvider masterLocationProvider)
+    public void setObjectFactory(ObjectFactory objectFactory)
     {
-        this.masterLocationProvider = masterLocationProvider;
-    }
-
-    public void setBuildHookManager(BuildHookManager buildHookManager)
-    {
-        this.buildHookManager = buildHookManager;
-    }
-
-    public void setScmContextFactory(ScmContextFactory scmContextFactory)
-    {
-        this.scmContextFactory = scmContextFactory;
+        this.objectFactory = objectFactory;
     }
 }

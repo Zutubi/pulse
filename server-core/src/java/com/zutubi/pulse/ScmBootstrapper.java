@@ -1,19 +1,17 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.core.*;
 import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.BuildProperties.PROPERTY_OUTPUT_DIR;
-import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.scm.*;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.util.io.ForkOutputStream;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.*;
-import java.util.List;
 
 /**
  * A bootstrapper that populates the working directory by checking out from one SCM.
@@ -22,7 +20,6 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmEventHandler
 {
     private static final Logger LOG = Logger.getLogger(ScmBootstrapper.class);
 
-    protected String agent;
     protected String project;
     protected ScmConfiguration scmConfig;
     protected BuildRevision revision;
@@ -36,14 +33,8 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmEventHandler
         this.revision = revision;
     }
 
-    public void prepare(String agent)
-    {
-        this.agent = agent;
-    }
-
     public void bootstrap(ExecutionContext context)
     {
-        File workDir = context.getWorkingDir();
         File outDir = new File(context.getFile(NAMESPACE_INTERNAL, PROPERTY_OUTPUT_DIR), BootstrapCommand.OUTPUT_NAME);
         outDir.mkdirs();
 
@@ -95,9 +86,9 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmEventHandler
         }
     }
 
-    protected String getId()
+    protected String getId(ExecutionContext buildContext)
     {
-        return project + "-" + agent;
+        return project + "-" + buildContext.getString(BuildProperties.NAMESPACE_INTERNAL, BuildProperties.PROPERTY_AGENT);
     }
 
     public void status(String message)

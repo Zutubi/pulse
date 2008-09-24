@@ -1,35 +1,39 @@
 package com.zutubi.pulse;
 
-import com.mockobjects.dynamic.C;
-import com.mockobjects.dynamic.Mock;
 import com.zutubi.pulse.bootstrap.tasks.BuildAborterStartupTask;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.model.persistence.ProjectDao;
+import com.zutubi.pulse.model.persistence.mock.MockEntityDao;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.tove.config.user.UserConfiguration;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
-/**
- */
 public class BuildAborterTest extends PulseTestCase
 {
-    private MockProjectManager projectManager;
-    private MockBuildManager buildManager;
+    private BuildManager buildManager;
+    private DefaultProjectManager projectManager;
     private BuildAborterStartupTask aborter;
 
     protected void setUp() throws Exception
     {
-        projectManager = new MockProjectManager();
         buildManager = new MockBuildManager();
+
+        projectManager = new DefaultProjectManager();
+        projectManager.setProjectDao(new MockProjectDao());
+        projectManager.setBuildManager(buildManager);
+
         aborter = new BuildAborterStartupTask();
         aborter.setProjectManager(projectManager);
         aborter.setBuildManager(buildManager);
 
-        Mock mockUserManager = new Mock(UserManager.class);
-        mockUserManager.expectAndReturn("getAllUsers", C.ANY_ARGS, new ArrayList<User>());
-        aborter.setUserManager((UserManager) mockUserManager.proxy());
+        UserManager userManager = mock(UserManager.class);
+        doReturn(Collections.emptyList()).when(userManager).getAllUsers();
+        aborter.setUserManager(userManager);
     }
 
     public void testNoProjects()
@@ -86,9 +90,7 @@ public class BuildAborterTest extends PulseTestCase
 
         assertTrue(result.succeeded());
 
-        Mock mockUserManager = new Mock(UserManager.class);
-        mockUserManager.expectAndReturn("getAllUsers", C.ANY_ARGS, Arrays.asList(user));
-        aborter.setUserManager((UserManager) mockUserManager.proxy());
+        wireMockUserManager(user);
         aborter.execute();
 
         assertTrue(result.succeeded());
@@ -106,13 +108,18 @@ public class BuildAborterTest extends PulseTestCase
         assertTrue(result.commenced());
         assertFalse(result.completed());
 
-        Mock mockUserManager = new Mock(UserManager.class);
-        mockUserManager.expectAndReturn("getAllUsers", C.ANY_ARGS, Arrays.asList(user));
-        aborter.setUserManager((UserManager) mockUserManager.proxy());
+        wireMockUserManager(user);
         aborter.execute();
 
         assertTrue(result.errored());
         assertTrue(result.getFeatures(Feature.Level.ERROR).get(0).getSummary().contains("shut down"));
+    }
+
+    private void wireMockUserManager(User... users)
+    {
+        UserManager userManager = mock(UserManager.class);
+        doReturn(Arrays.asList(users)).when(userManager).getAllUsers();
+        aborter.setUserManager(userManager);
     }
 
     private User newUser()
@@ -122,5 +129,9 @@ public class BuildAborterTest extends PulseTestCase
         user.setId(1);
         user.setConfig(config);
         return user;
+    }
+
+    public static class MockProjectDao extends MockEntityDao<Project> implements ProjectDao
+    {
     }
 }

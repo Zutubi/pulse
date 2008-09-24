@@ -16,7 +16,8 @@ import java.util.List;
  */
 public interface ProjectManager extends EntityManager<Project>
 {
-    String GLOBAL_PROJECT_NAME = "global project template";
+    String GLOBAL_PROJECT_NAME     = "global project template";
+    String TRIGGER_CATEGORY_MANUAL = "manual";
 
     @SecureResult
     List<ProjectConfiguration> getAllProjectConfigs(boolean allowInvalid);
@@ -40,9 +41,7 @@ public interface ProjectManager extends EntityManager<Project>
 
     int getProjectCount();
 
-    void buildCommenced(long projectId);
-
-    void buildCompleted(long projectId, boolean successful);
+    void abortUnfinishedBuilds(Project project, String message);
 
     @SecureParameter(action = ProjectConfigurationActions.ACTION_PAUSE)
     Project pauseProject(Project project);
@@ -69,11 +68,16 @@ public interface ProjectManager extends EntityManager<Project>
      * @param revision      the revision to build, or null if the revision is
      *                      not fixed (in which case changelist isolation may
      *                      result in multiple build requests
+     * @param source        a freeform source for the trigger, used to
+     *                      identify related triggers for superceding
+     * @param replaceable   if true, while queue this build request may be
+     *                      replaced by another with the same source (has no
+     *                      effect if isolating changelists)
      * @param force         if true, force a build to occur even if the
      *                      latest has been built
      */
     @SecureParameter(action = ProjectConfigurationActions.ACTION_TRIGGER, parameterType = ProjectConfiguration.class)
-    void triggerBuild(ProjectConfiguration project, BuildReason reason, Revision revision, boolean force);
+    void triggerBuild(ProjectConfiguration project, BuildReason reason, Revision revision, String source, boolean replaceable, boolean force);
 
     @SecureParameter(action = ProjectConfigurationActions.ACTION_TRIGGER, parameterType = Project.class)
     void triggerBuild(long number, Project project, User user, PatchArchive archive) throws PulseException;

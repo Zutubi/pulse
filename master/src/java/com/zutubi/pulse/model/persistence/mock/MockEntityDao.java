@@ -9,9 +9,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * <class-comment/>
+ * A trivial implementation of {@link EntityDao} which can be used for testing.
  */
-public abstract class MockEntityDao<T extends Entity> implements EntityDao<T>
+public class MockEntityDao<T extends Entity> implements EntityDao<T>
 {
     private long id = 1;
 

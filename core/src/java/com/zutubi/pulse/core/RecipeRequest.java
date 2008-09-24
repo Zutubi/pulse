@@ -117,10 +117,4 @@ public class RecipeRequest
     {
         this.properties.addAll(properties);
     }
-
-    public void prepare(String agent)
-    {
-        bootstrapper.prepare(agent);
-        context.addString(NAMESPACE_INTERNAL, PROPERTY_AGENT, agent);
-    }
 }

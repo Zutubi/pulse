@@ -134,11 +134,11 @@ public enum Status
                     return false;
                 }
             },
-    RECIPE_DISPATCHED
+    RECIPE_ASSIGNED
             {
                 public String getPrettyString()
                 {
-                    return "recipe dispatched";
+                    return "recipe assigned";
                 }
 
                 public boolean isOnline()

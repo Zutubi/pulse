@@ -19,7 +19,6 @@ public class ProjectRepoBootstrapper implements Bootstrapper
     private final String projectName;
     private final ScmConfiguration scmConfig;
     private BuildRevision revision;
-    private String agent;
     private ScmBootstrapper childBootstrapper;
 
     public ProjectRepoBootstrapper(String projectName, ScmConfiguration scmConfig, BuildRevision revision)
@@ -40,7 +39,6 @@ public class ProjectRepoBootstrapper implements Bootstrapper
         // run the scm bootstrapper on the local directory,
         boolean cleanBuild = context.getBoolean(NAMESPACE_INTERNAL, PROPERTY_CLEAN_BUILD, false);
         childBootstrapper = selectBootstrapper(cleanBuild, paths.getPersistentWorkDir());
-        childBootstrapper.prepare(agent);
 
         RecipePaths mungedPaths = new RecipePaths()
         {
@@ -85,11 +83,6 @@ public class ProjectRepoBootstrapper implements Bootstrapper
                 throw new BuildException(e);
             }
         }
-    }
-
-    public void prepare(String agent)
-    {
-        this.agent = agent;
     }
 
     public void terminate()

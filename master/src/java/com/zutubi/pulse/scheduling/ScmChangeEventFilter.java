@@ -13,7 +13,7 @@ public class ScmChangeEventFilter implements EventTriggerFilter
 {
     private ProjectManager projectManager;
 
-    public boolean accept(Trigger trigger, Event event)
+    public boolean accept(Trigger trigger, Event event, TaskExecutionContext context)
     {
         ScmChangeEvent changeEvent = (ScmChangeEvent) event;
         ProjectConfiguration project = projectManager.getProjectConfig(trigger.getProject(), false);

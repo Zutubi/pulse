@@ -2,7 +2,6 @@ package com.zutubi.pulse.api;
 
 import com.zutubi.pulse.ShutdownManager;
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
@@ -16,8 +15,8 @@ import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.system.SystemStartedEvent;
 import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.tove.config.group.ServerPermission;
-import com.zutubi.util.TimeStamps;
 import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.config.*;
 import com.zutubi.tove.security.AccessManager;
@@ -1577,7 +1576,7 @@ public class RemoteApi implements com.zutubi.pulse.events.EventListener
                 }
             }
 
-            projectManager.triggerBuild(project.getConfig(), new RemoteTriggerBuildReason(), r, true);
+            projectManager.triggerBuild(project.getConfig(), new RemoteTriggerBuildReason(), r, "remote api", false, true);
             return true;
         }
         finally

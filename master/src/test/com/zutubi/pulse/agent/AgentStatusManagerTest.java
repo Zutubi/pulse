@@ -7,7 +7,10 @@ import com.zutubi.pulse.core.Property;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.events.*;
-import com.zutubi.pulse.events.build.*;
+import com.zutubi.pulse.events.build.RecipeAssignedEvent;
+import com.zutubi.pulse.events.build.RecipeCollectedEvent;
+import com.zutubi.pulse.events.build.RecipeCollectingEvent;
+import com.zutubi.pulse.events.build.RecipeTerminateRequestEvent;
 import com.zutubi.pulse.model.AgentState;
 import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.test.PulseTestCase;
@@ -139,7 +142,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
 
     public void testAgentExecuteRecipeNoBuildingPing()
     {
-        // We should handle going directly from recipe dispatched to a recipe
+        // We should handle going directly from recipe assigned to a recipe
         // complete event.
         Agent agent = addAgentAndAssignRecipe(1, 1000);
         completeAndCollectRecipe(agent, 1000);
@@ -149,7 +152,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
 
     public void testAgentImmediateRecipeError()
     {
-        // We should handle going directly from recipe dispatched to a recipe
+        // We should handle going directly from recipe assigned to a recipe
         // error event.
         Agent agent = addAgentAndAssignRecipe(1, 1000);
 
@@ -891,7 +894,7 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
         clearEvents();
         sendRecipeAssigned(agent, recipeId);
         assertEvents(new AgentUnavailableEvent(this, agent));
-        assertEquals(Status.RECIPE_DISPATCHED, agent.getStatus());
+        assertEquals(Status.RECIPE_ASSIGNED, agent.getStatus());
         return agent;
     }
 

@@ -109,6 +109,11 @@ public class BuildStageConfiguration extends AbstractNamedConfiguration
             LOG.severe(e);
             return new AgentRequirements()
             {
+                public String getSummary()
+                {
+                    return "[none]";
+                }
+
                 public boolean fulfilledBy(RecipeAssignmentRequest request, AgentService service)
                 {
                     return false;

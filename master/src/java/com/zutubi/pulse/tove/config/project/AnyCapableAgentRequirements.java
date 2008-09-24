@@ -24,6 +24,11 @@ public class AnyCapableAgentRequirements implements AgentRequirements
     {
     }
 
+    public String getSummary()
+    {
+        return "[any]";
+    }
+
     public boolean fulfilledBy(RecipeAssignmentRequest request, AgentService service)
     {
         List<ResourceRequirement> requirements = request.getResourceRequirements();

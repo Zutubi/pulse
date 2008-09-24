@@ -1,25 +1,17 @@
 package com.zutubi.pulse;
 
-import static com.zutubi.pulse.MasterBuildProperties.PROPERTY_CLEAN_BUILD;
-import static com.zutubi.pulse.MasterBuildProperties.addRevisionProperties;
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.AgentManager;
-import com.zutubi.pulse.core.*;
-import com.zutubi.pulse.core.events.RecipeStatusEvent;
-import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_INTERNAL;
-import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.scm.*;
-import com.zutubi.pulse.core.scm.config.ScmConfiguration;
-import com.zutubi.pulse.events.*;
-import com.zutubi.pulse.events.build.BuildStatusEvent;
-import com.zutubi.pulse.events.build.RecipeAssignedEvent;
+import com.zutubi.pulse.core.BuildRevision;
+import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
+import com.zutubi.pulse.core.events.RecipeStatusEvent;
+import com.zutubi.pulse.events.*;
+import com.zutubi.pulse.events.build.BuildRevisionUpdatedEvent;
+import com.zutubi.pulse.events.build.RecipeAssignedEvent;
 import com.zutubi.pulse.events.system.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.events.system.SystemStartedEvent;
-import com.zutubi.pulse.scm.ScmChangeEvent;
 import com.zutubi.pulse.tove.config.admin.GlobalConfiguration;
-import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
-import com.zutubi.pulse.tove.config.project.types.TypeConfiguration;
 import com.zutubi.tove.config.ConfigurationEventListener;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.events.ConfigurationEvent;
@@ -51,7 +43,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     private final Condition lockCondition = lock.newCondition();
 
     /**
-     * The internal queue of dispatch requests.
+     * The internal queue of assignment requests.
      */
     private final RequestQueue requestQueue = new RequestQueue();
     
@@ -74,12 +66,9 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
      */
     private long unsatisfiableTimeout = 0;
 
-    private RecipeDispatchService recipeDispatchService;
     private AgentManager agentManager;
     private EventManager eventManager;
     private GlobalConfiguration globalConfiguration;
-    private ScmClientFactory scmClientFactory;
-    private ScmContextFactory scmContextFactory;
     private ThreadFactory threadFactory;
 
     public ThreadedRecipeQueue()
@@ -132,8 +121,6 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
 
         try
         {
-            determineRevision(assignmentRequest);
-
             lock.lock();
             try
             {
@@ -182,51 +169,6 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         requestQueue.add(assignmentRequest);
         assignmentRequest.queued();
         lockCondition.signal();
-    }
-
-    private void determineRevision(RecipeAssignmentRequest assignmentRequest) throws BuildException, ScmException
-    {
-        BuildRevision buildRevision = assignmentRequest.getRevision();
-        if (!buildRevision.isInitialised())
-        {
-            // Let's initialise it
-            eventManager.publish(new BuildStatusEvent(this, assignmentRequest.getBuild(), "Initialising build revision..."));
-            ProjectConfiguration projectConfig = assignmentRequest.getProject().getConfig();
-            ScmConfiguration scm = projectConfig.getScm();
-
-            ScmClient client = null;
-            try
-            {
-                ScmContext context = scmContextFactory.createContext(projectConfig.getProjectId(), scm);
-                client = scmClientFactory.createClient(scm);
-                boolean supportsRevisions = client.getCapabilities().contains(ScmCapability.REVISIONS);
-                Revision revision = supportsRevisions ? client.getLatestRevision(context) : new Revision(System.currentTimeMillis());
-
-                // May throw a BuildException
-                updateRevision(assignmentRequest, revision);
-                eventManager.publish(new BuildStatusEvent(this, assignmentRequest.getBuild(), "Revision initialised to '" + revision.getRevisionString() + "'"));
-            }
-            finally
-            {
-                ScmClientUtils.close(client);
-            }
-        }
-    }
-
-    private void updateRevision(RecipeAssignmentRequest assignmentRequest, Revision revision) throws BuildException
-    {
-        ProjectConfiguration projectConfig = assignmentRequest.getProject().getConfig();
-        TypeConfiguration type = projectConfig.getType();
-        String pulseFile;
-        try
-        {
-            pulseFile = type.getPulseFile(assignmentRequest.getRequest().getId(), projectConfig, revision, null);
-        }
-        catch (Exception e)
-        {
-            throw new BuildException("Unable to retrieve pulse file: " + e.getMessage(), e);
-        }
-        assignmentRequest.getRevision().update(revision, pulseFile);
     }
 
     public List<RecipeAssignmentRequest> takeSnapshot()
@@ -401,18 +343,27 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
                     }
                     else
                     {
-                        for (Agent agent : agentManager.getAvailableAgents())
+                        BuildRevision buildRevision = request.getRevision();
+                        buildRevision.lock();
+                        try
                         {
-                            AgentService service = agent.getService();
-
-                            // can the request be sent to this service?
-                            if (request.getHostRequirements().fulfilledBy(request, service))
+                            for (Agent agent : agentManager.getAvailableAgents())
                             {
-                                if (dispatchRequest(request, agent, doneRequests))
+                                AgentService service = agent.getService();
+
+                                // can the request be sent to this service?
+                                if (request.getHostRequirements().fulfilledBy(request, service))
                                 {
+                                    buildRevision.fix();
+                                    eventManager.publish(new RecipeAssignedEvent(this, request.getRequest(), agent));
+                                    doneRequests.add(request);
                                     break;
                                 }
                             }
+                        }
+                        finally
+                        {
+                            buildRevision.unlock();
                         }
                     }
                 }
@@ -442,33 +393,6 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         executor.shutdown();
         LOG.debug("stopped.");
         isRunning = false;
-    }
-
-    private boolean dispatchRequest(RecipeAssignmentRequest request, Agent agent, List<RecipeAssignmentRequest> dispatchedRequests)
-    {
-        BuildRevision buildRevision = request.getRevision();
-        RecipeRequest recipeRequest = request.getRequest();
-
-        // This must be called before publishing the event.
-        // We can no longer update the revision once we have dispatched a
-        // request: it is fixed here if not already.
-        buildRevision.apply(recipeRequest);
-        recipeRequest.prepare(agent.getConfig().getName());
-
-        // This code cannot handle an agent rejecting the build
-        // (the handling was backed outdue to CIB-553 and the fact that
-        // agents do not currently reject builds)
-        eventManager.publish(new RecipeAssignedEvent(this, recipeRequest, agent));
-        dispatchedRequests.add(request);
-
-        ExecutionContext context = recipeRequest.getContext();
-        addRevisionProperties(context, buildRevision);
-
-        context.addString(NAMESPACE_INTERNAL, PROPERTY_CLEAN_BUILD, Boolean.toString(request.getProject().isForceCleanForAgent(agent.getId())));
-
-        recipeDispatchService.dispatch(new RecipeAssignedEvent(this, recipeRequest, agent));
-
-        return true;
     }
 
     public void stop(boolean force)
@@ -524,9 +448,9 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         {
             handleConnectivityEvent((AgentConnectivityEvent) evt);
         }
-        else if (evt instanceof ScmChangeEvent)
+        else if (evt instanceof BuildRevisionUpdatedEvent)
         {
-            handleScmChange((ScmChangeEvent) evt);
+            handleBuildRevisionUpdated((BuildRevisionUpdatedEvent) evt);
         }
         else if (evt instanceof AgentResourcesDiscoveredEvent)
         {
@@ -570,13 +494,13 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         }
     }
 
-    private void handleScmChange(ScmChangeEvent event)
+    private void handleBuildRevisionUpdated(BuildRevisionUpdatedEvent event)
     {
         List<RecipeAssignmentRequest> rejects = null;
         lock.lock();
         try
         {
-            List<RecipeAssignmentRequest> unfulfillable = checkQueueForChanges(event.getSource(), event, requestQueue);
+            List<RecipeAssignmentRequest> unfulfillable = checkQueueForChanges(event, requestQueue);
             if(unsatisfiableTimeout == 0)
             {
                 requestQueue.removeAll(unfulfillable);
@@ -618,19 +542,15 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         }
     }
 
-    private List<RecipeAssignmentRequest> checkQueueForChanges(ProjectConfiguration changedProject, ScmChangeEvent event, RequestQueue requests)
+    private List<RecipeAssignmentRequest> checkQueueForChanges(BuildRevisionUpdatedEvent event, RequestQueue requests)
     {
         List<RecipeAssignmentRequest> unfulfillable = new LinkedList<RecipeAssignmentRequest>();
-
         for (RecipeAssignmentRequest request : requests)
         {
-            ProjectConfiguration requestProject = request.getProject().getConfig();
-            if (!request.getRevision().isFixed() && requestProject.getProjectId() == changedProject.getProjectId())
+            if (request.getBuild().getId() == event.getBuildResult().getId())
             {
                 try
                 {
-                    eventManager.publish(new RecipeStatusEvent(this, request.getRequest().getId(), "Change detected while queued, updating build revision to '" + event.getNewRevision() + "'"));
-                    updateRevision(request, event.getNewRevision());
                     if (!requestMayBeFulfilled(request))
                     {
                         unfulfillable.add(request);
@@ -653,8 +573,8 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
                 AgentAvailableEvent.class,
                 AgentConnectivityEvent.class,
                 AgentResourcesDiscoveredEvent.class,
+                BuildRevisionUpdatedEvent.class,
                 ConfigurationEventSystemStartedEvent.class,
-                ScmChangeEvent.class,
                 SystemStartedEvent.class
         };
     }
@@ -689,11 +609,6 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         this.sleepInterval = sleepInterval;
     }
 
-    public void setRecipeDispatchService(RecipeDispatchService recipeDispatchService)
-    {
-        this.recipeDispatchService = recipeDispatchService;
-    }
-
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
@@ -705,19 +620,9 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
         this.agentManager = agentManager;
     }
 
-    public void setScmClientFactory(ScmClientFactory scmClientFactory)
-    {
-        this.scmClientFactory = scmClientFactory;
-    }
-
     public void setThreadFactory(ThreadFactory threadFactory)
     {
         this.threadFactory = threadFactory;
-    }
-
-    public void setScmContextFactory(ScmContextFactory scmContextFactory)
-    {
-        this.scmContextFactory = scmContextFactory;
     }
 
     /**

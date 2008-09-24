@@ -1,24 +1,19 @@
 package com.zutubi.pulse;
 
+import static com.zutubi.pulse.MasterBuildProperties.addRevisionProperties;
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.*;
-import com.zutubi.pulse.core.events.CommandCompletedEvent;
-import com.zutubi.pulse.core.events.CommandOutputEvent;
-import com.zutubi.pulse.core.events.RecipeErrorEvent;
-import com.zutubi.pulse.core.events.CommandCommencedEvent;
-import com.zutubi.pulse.core.events.RecipeCommencedEvent;
-import com.zutubi.pulse.core.events.RecipeStatusEvent;
-import com.zutubi.pulse.core.events.RecipeEvent;
-import com.zutubi.pulse.core.events.RecipeCompletedEvent;
-import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_INTERNAL;
-import static com.zutubi.pulse.core.BuildProperties.PROPERTY_INCREMENTAL_BUILD;
+import static com.zutubi.pulse.core.BuildProperties.*;
+import com.zutubi.pulse.core.events.*;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.FeaturePersister;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.events.build.*;
+import com.zutubi.pulse.events.build.PostStageEvent;
+import com.zutubi.pulse.events.build.RecipeAssignedEvent;
+import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
 import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.RecipeResultNode;
@@ -48,14 +43,15 @@ public class RecipeController
     private ServiceTokenManager serviceTokenManager;
     private boolean finished = false;
 
-    private RecipeQueue queue;
+    private RecipeQueue recipeQueue;
     private AgentService agentService;
     private EventManager eventManager;
     private MasterConfigurationManager configurationManager;
     private ResourceManager resourceManager;
     private BuildHookManager buildHookManager;
+    private RecipeDispatchService recipeDispatchService;
 
-    public RecipeController(BuildResult buildResult, RecipeResultNode recipeResultNode, RecipeAssignmentRequest assignmentRequest, ExecutionContext recipeContext, RecipeResultNode previousSuccessful, RecipeLogger logger, RecipeResultCollector collector, MasterConfigurationManager configurationManager, ResourceManager resourceManager)
+    public RecipeController(BuildResult buildResult, RecipeResultNode recipeResultNode, RecipeAssignmentRequest assignmentRequest, ExecutionContext recipeContext, RecipeResultNode previousSuccessful, RecipeLogger logger, RecipeResultCollector collector, MasterConfigurationManager configurationManager, ResourceManager resourceManager, RecipeDispatchService recipeDispatchService)
     {
         this.buildResult = buildResult;
         this.recipeResultNode = recipeResultNode;
@@ -67,6 +63,7 @@ public class RecipeController
         this.collector = collector;
         this.configurationManager = configurationManager;
         this.resourceManager = resourceManager;
+        this.recipeDispatchService = recipeDispatchService;
     }
 
     public void prepare(BuildResult buildResult)
@@ -83,7 +80,7 @@ public class RecipeController
             // allow for just in time setting of the bootstrapper since this can not be configured during
             // the build initialisation.
             assignmentRequest.getRequest().setBootstrapper(bootstrapper);
-            queue.enqueue(assignmentRequest);
+            recipeQueue.enqueue(assignmentRequest);
         }
         catch (BuildException e)
         {
@@ -95,19 +92,22 @@ public class RecipeController
         }
     }
 
-    public boolean handleRecipeEvent(RecipeEvent event)
+    public boolean matchesRecipeEvent(RecipeEvent event)
     {
-        if (event.getRecipeId() != recipeResult.getId())
-        {
-            // not interested in this event..
-            return false;
-        }
+        return event.getRecipeId() == recipeResult.getId();
+    }
 
+    public void handleRecipeEvent(RecipeEvent event)
+    {
         try
         {
             if (event instanceof RecipeAssignedEvent)
             {
                 handleRecipeAssigned((RecipeAssignedEvent) event);
+            }
+            else if (event instanceof RecipeDispatchedEvent)
+            {
+                handleRecipeDispatched((RecipeDispatchedEvent) event);
             }
             else if (event instanceof RecipeCommencedEvent)
             {
@@ -146,8 +146,6 @@ public class RecipeController
         {
             handleUnexpectedException(e);
         }
-
-        return true;
     }
 
     private void handleRecipeAssigned(RecipeAssignedEvent event)
@@ -163,6 +161,24 @@ public class RecipeController
         {
             BuildProperties.addResourceProperties(recipeContext, assignmentRequest.getResourceRequirements(), resourceRepository);
         }
+
+        // Update the request and its context before it is sent to the agent.
+        RecipeRequest recipeRequest = assignmentRequest.getRequest();
+        BuildRevision buildRevision = assignmentRequest.getRevision();
+        recipeRequest.setPulseFileSource(buildRevision.getPulseFile());
+
+        ExecutionContext agentContext = recipeRequest.getContext();
+        addRevisionProperties(agentContext, buildRevision);
+        agentContext.addString(NAMESPACE_INTERNAL, BuildProperties.PROPERTY_AGENT, agent.getConfig().getName());
+        agentContext.addString(NAMESPACE_INTERNAL, PROPERTY_CLEAN_BUILD, Boolean.toString(buildResult.getProject().isForceCleanForAgent(agent.getId())));
+
+        // Now it may be dispatched.
+        recipeDispatchService.dispatch(event);
+    }
+
+    private void handleRecipeDispatched(RecipeDispatchedEvent event)
+    {
+        logger.log(event);
     }
 
     private void handleRecipeCommenced(RecipeCommencedEvent event)
@@ -375,7 +391,7 @@ public class RecipeController
             // Not yet commanced, try and catch it at the recipe queue. If
             // we don't catch it, then we wait for the RecipeCommencedEvent.
             recipeResult.terminate(timeout);
-            if(queue.cancelRequest(recipeResult.getId()))
+            if(recipeQueue.cancelRequest(recipeResult.getId()))
             {
                 // We caught it now, so we are complete.
                 complete();
@@ -384,7 +400,7 @@ public class RecipeController
 
     }
 
-    public RecipeAssignmentRequest getDispatchRequest()
+    public RecipeAssignmentRequest getAssignmentRequest()
     {
         return assignmentRequest;
     }
@@ -407,7 +423,7 @@ public class RecipeController
 
     public void setRecipeQueue(RecipeQueue queue)
     {
-        this.queue = queue;
+        this.recipeQueue = queue;
     }
 
     public void setEventManager(EventManager eventManager)

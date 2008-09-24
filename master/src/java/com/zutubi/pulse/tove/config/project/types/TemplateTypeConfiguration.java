@@ -2,10 +2,10 @@ package com.zutubi.pulse.tove.config.project.types;
 
 import com.zutubi.config.annotations.*;
 import com.zutubi.pulse.PostProcessorManager;
-import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.personal.PatchArchive;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.logging.Logger;
 import org.apache.velocity.VelocityContext;
@@ -66,7 +66,7 @@ public abstract class TemplateTypeConfiguration extends TypeConfiguration
         artifacts.put(artifact.getName(), artifact);
     }
 
-    public String getPulseFile(long id, ProjectConfiguration projectConfig, Revision revision, PatchArchive patch)
+    public String getPulseFile(ProjectConfiguration projectConfig, Revision revision, PatchArchive patch)
     {
         try
         {

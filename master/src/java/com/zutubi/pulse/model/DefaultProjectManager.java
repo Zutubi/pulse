@@ -10,17 +10,11 @@ import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.NamedConfigurationComparator;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.model.TestCaseIndex;
-import com.zutubi.pulse.core.scm.ScmCapability;
-import com.zutubi.pulse.core.scm.ScmClientFactory;
-import com.zutubi.pulse.core.scm.ScmClientUtils;
-import com.zutubi.pulse.core.scm.ScmContextFactory;
-import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.scm.*;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.events.build.BuildRequestEvent;
-import com.zutubi.pulse.events.build.PersonalBuildRequestEvent;
-import com.zutubi.pulse.events.build.RecipeAssignedEvent;
+import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.events.system.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.pulse.license.LicenseManager;
@@ -37,14 +31,7 @@ import com.zutubi.pulse.tove.config.group.AbstractGroupConfiguration;
 import com.zutubi.pulse.tove.config.project.ProjectAclConfiguration;
 import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.tove.config.project.types.TypeConfiguration;
-import com.zutubi.tove.config.ConfigurationInjector;
-import com.zutubi.tove.config.ConfigurationProvider;
-import com.zutubi.tove.config.ConfigurationRegistry;
-import com.zutubi.tove.config.ConfigurationStateManager;
-import com.zutubi.tove.config.ConfigurationTemplateManager;
-import com.zutubi.tove.config.ExternalStateManager;
-import com.zutubi.tove.config.TypeAdapter;
-import com.zutubi.tove.config.TypeListener;
+import com.zutubi.tove.config.*;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.security.Actor;
 import com.zutubi.tove.type.CompositeType;
@@ -57,15 +44,7 @@ import com.zutubi.util.Predicate;
 import com.zutubi.util.Sort;
 import com.zutubi.util.logging.Logger;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * 
@@ -353,6 +332,16 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         return getProjects(true).size();
     }
 
+    public void abortUnfinishedBuilds(Project project, String message)
+    {
+        List<BuildResult> abortedBuilds = buildManager.abortUnfinishedBuilds(project, message);
+        if (abortedBuilds.size() > 0)
+        {
+            project.setBuildCount(project.getBuildCount() + abortedBuilds.size());
+            projectDao.save(project);
+        }
+    }
+
     private void deleteProject(Project entity)
     {
         try
@@ -396,7 +385,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     {
     }
 
-    public void triggerBuild(ProjectConfiguration projectConfig, BuildReason reason, Revision revision, boolean force)
+    public void triggerBuild(ProjectConfiguration projectConfig, BuildReason reason, Revision revision, String source, boolean replaceable, boolean force)
     {
         Project project = getProject(projectConfig.getProjectId(), false);
 
@@ -414,13 +403,14 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
                         List<Revision> revisions = changelistIsolator.getRevisionsToRequest(projectConfig, project, force);
                         for(Revision r: revisions)
                         {
-                            requestBuildOfRevision(reason, project, r);
+                            // Note when isolating changelists we never replace existing requests
+                            requestBuildOfRevision(reason, project, r, source, false);
                         }
                     }
                     else
                     {
                         LOG.warning("Unable to use changelist isolation for project '" + projectConfig.getName() + "' as the SCM does not support revisions");
-                        requestBuildFloating(reason, project);
+                        requestBuildFloating(reason, project, source, replaceable);
                     }
                 }
                 catch (ScmException e)
@@ -430,13 +420,13 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
             }
             else
             {
-                requestBuildFloating(reason, project);
+                requestBuildFloating(reason, project, source, replaceable);
             }
         }
         else
         {
             // Just raise one request.
-            requestBuildOfRevision(reason, project, revision);
+            requestBuildOfRevision(reason, project, revision, source, replaceable);
         }
     }
 
@@ -469,17 +459,17 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         return number;
     }
 
-    private void requestBuildFloating(BuildReason reason, Project project)
+    private void requestBuildFloating(BuildReason reason, Project project, String category, boolean replaceable)
     {
-        eventManager.publish(new BuildRequestEvent(this, reason, project, new BuildRevision()));
+        eventManager.publish(new BuildRequestEvent(this, reason, project, new BuildRevision(), category, replaceable));
     }
 
-    private void requestBuildOfRevision(BuildReason reason, Project project, Revision revision)
+    private void requestBuildOfRevision(BuildReason reason, Project project, Revision revision, String source, boolean replaceable)
     {
         try
         {
             String pulseFile = getPulseFile(project.getConfig(), revision, null);
-            eventManager.publish(new BuildRequestEvent(this, reason, project, new BuildRevision(revision, pulseFile, reason.isUser())));
+            eventManager.publish(new BuildRequestEvent(this, reason, project, new BuildRevision(revision, pulseFile, reason.isUser()), source, replaceable));
         }
         catch (Exception e)
         {
@@ -491,34 +481,7 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
     {
         TypeConfiguration type = projectConfig.getType();
         SpringComponentContext.autowire(type);
-        return type.getPulseFile(0, projectConfig, revision, patch);
-    }
-
-    public void buildCommenced(long projectId)
-    {
-        Project project = getProject(projectId, true);
-        if (project != null)
-        {
-            project.buildCommenced();
-            projectDao.save(project);
-        }
-    }
-
-    public void buildCompleted(long projectId, boolean successful)
-    {
-        Project project = getProject(projectId, true);
-        if (project != null)
-        {
-            project.buildCompleted();
-
-            project.setBuildCount(project.getBuildCount() + 1);
-            if(successful)
-            {
-                project.setSuccessCount(project.getSuccessCount() + 1);
-            }
-
-            projectDao.save(project);
-        }
+        return type.getPulseFile(projectConfig, revision, patch);
     }
 
     public Project pauseProject(Project project)
@@ -660,24 +623,70 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
         state.setConfig(projectConfiguration);
     }
 
-    public void handleEvent(Event evt)
+    private void handleBuildActivated(BuildActivatedEvent event)
     {
-        if (evt instanceof RecipeAssignedEvent)
+        AbstractBuildRequestEvent buildRequestEvent = event.getEvent();
+        if (!buildRequestEvent.isPersonal())
         {
-            RecipeAssignedEvent rde = (RecipeAssignedEvent) evt;
-            RecipeRequest request = rde.getRequest();
-            ProjectConfiguration projectConfig = nameToConfig.get(request.getProject());
-            if(projectConfig != null)
+            Project project = getProject(buildRequestEvent.getOwner().getId(), true);
+            if (project != null)
             {
-                Project project = projectDao.findById(projectConfig.getProjectId());
-                if(project != null)
+                project.buildCommenced();
+                projectDao.save(project);
+            }
+        }
+    }
+
+    private void handleBuildCompleted(BuildCompletedEvent event)
+    {
+        BuildResult buildResult = event.getBuildResult();
+        if (!buildResult.isPersonal())
+        {
+            Project project = getProject(buildResult.getProject().getId(), true);
+            if (project != null)
+            {
+                project.buildCompleted();
+                project.setBuildCount(project.getBuildCount() + 1);
+                if (buildResult.succeeded())
                 {
-                    if(project.clearForceCleanForAgent(rde.getAgent().getId()))
-                    {
-                        projectDao.save(project);
-                    }
+                    project.setSuccessCount(project.getSuccessCount() + 1);
+                }
+
+                projectDao.save(project);
+            }
+        }
+    }
+
+    private void handleRecipeAssigned(RecipeAssignedEvent rde)
+    {
+        RecipeRequest request = rde.getRequest();
+        ProjectConfiguration projectConfig = nameToConfig.get(request.getProject());
+        if(projectConfig != null)
+        {
+            Project project = projectDao.findById(projectConfig.getProjectId());
+            if(project != null)
+            {
+                if(project.clearForceCleanForAgent(rde.getAgent().getId()))
+                {
+                    projectDao.save(project);
                 }
             }
+        }
+    }
+
+    public void handleEvent(Event evt)
+    {
+        if (evt instanceof BuildActivatedEvent)
+        {
+            handleBuildActivated((BuildActivatedEvent) evt);
+        }
+        else if (evt instanceof BuildCompletedEvent)
+        {
+            handleBuildCompleted((BuildCompletedEvent) evt);
+        }
+        else if (evt instanceof RecipeAssignedEvent)
+        {
+            handleRecipeAssigned((RecipeAssignedEvent) evt);
         }
         else if(evt instanceof ConfigurationEventSystemStartedEvent)
         {
@@ -692,7 +701,11 @@ public class DefaultProjectManager implements ProjectManager, ExternalStateManag
 
     public Class[] getHandledEvents()
     {
-        return new Class[] { RecipeAssignedEvent.class, ConfigurationEventSystemStartedEvent.class, ConfigurationSystemStartedEvent.class };
+        return new Class[] { BuildActivatedEvent.class,
+                             BuildCompletedEvent.class,
+                             RecipeAssignedEvent.class,
+                             ConfigurationEventSystemStartedEvent.class,
+                             ConfigurationSystemStartedEvent.class };
     }
 
     public void setLicenseManager(LicenseManager licenseManager)

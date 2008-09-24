@@ -1,150 +1,227 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.core.BuildRevision;
-import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.events.build.BuildRequestEvent;
-import com.zutubi.pulse.model.BuildReason;
+import com.zutubi.pulse.events.build.AbstractBuildRequestEvent;
 import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
-import com.zutubi.tove.security.AccessManager;
-import static org.mockito.Mockito.mock;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Predicate;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doReturn;
 
-/**
- */
-public class BuildQueueTest extends PulseTestCase
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+public class BuildQueueTest extends BuildQueueTestCase
 {
     private BuildQueue queue;
 
-    private Project p1;
-    private ProjectConfiguration pc1;
-    private Project p2;
-    private ProjectConfiguration pc2;
+    private Project project1;
+    private Project project2;
 
     protected void setUp() throws Exception
     {
         super.setUp();
 
-        p1 = new Project();
-        p1.setId(1);
-        pc1 = new ProjectConfiguration();
-        pc1.setHandle(102);
-        p1.setConfig(pc1);
+        project1 = createProject();
+        project2 = createProject();
 
-        p2 = new Project();
-        p2.setId(2);
-        pc2 = new ProjectConfiguration();
-        pc2.setHandle(102);
-        p2.setConfig(pc2);
-
-        AccessManager mockManager = mock(AccessManager.class);
+        doReturn(project1).when(projectManager).getProject(eq(project1.getId()), anyBoolean());
+        doReturn(project2).when(projectManager).getProject(eq(project2.getId()), anyBoolean());
 
         queue = new BuildQueue();
-        queue.setAccessManager(mockManager);
+        queue.setObjectFactory(objectFactory);
+
+        objectFactory.initProperties(this);
     }
 
     protected void tearDown() throws Exception
     {
         queue = null;
-        p1 = null;
-        p2 = null;
-        pc1 = null;
-        pc2 = null;
+        project1 = null;
+        project2 = null;
 
         super.tearDown();
     }
 
     public void testSimpleQueue()
     {
-        assertTrue(queue.buildRequested(createRequest(p1)));
-        assertNull(queue.buildCompleted(p1));
+        final int BUILD_ID = nextId.getAndIncrement();
+
+        final AbstractBuildRequestEvent request = createRequest(project1, BUILD_ID, "source", false, null);
+
+        queue.buildRequested(request);
+        assertActive(project1, request);
+        assertActive(project2);
+
+        queue.buildCompleted(project1, BUILD_ID);
+        assertActive(project1);
+        assertActive(project2);
     }
 
     public void testQueueTwice()
     {
-        assertTrue(queue.buildRequested(createRequest(p1)));
-        assertNull(queue.buildCompleted(p1));
-        assertTrue(queue.buildRequested(createRequest(p1)));
-        assertNull(queue.buildCompleted(p1));
+        final int BUILD_ID1 = nextId.getAndIncrement();
+        final int BUILD_ID2 = nextId.getAndIncrement();
+
+        final AbstractBuildRequestEvent request1 = createRequest(project1, BUILD_ID1, "source", false, null);
+        final AbstractBuildRequestEvent request2 = createRequest(project1, BUILD_ID2, "source", false, null);
+
+        queue.buildRequested(request1);
+        assertActive(project1, request1);
+
+        queue.buildCompleted(project1, BUILD_ID1);
+        assertActive(project1);
+
+        queue.buildRequested(request2);
+        assertActive(project1, request2);
+
+        queue.buildCompleted(project1, BUILD_ID2);
+        assertActive(project1);
+    }
+
+    public void testQueueBehind()
+    {
+        final int BUILD_ID1 = nextId.getAndIncrement();
+        final int BUILD_ID2 = nextId.getAndIncrement();
+
+        final AbstractBuildRequestEvent request1 = createRequest(project1, BUILD_ID1, "source", false, null);
+        final AbstractBuildRequestEvent request2 = createRequest(project1, BUILD_ID2, "source", false, null);
+
+        queue.buildRequested(request1);
+        queue.buildRequested(request2);
+        assertActive(project1, request1);
+        assertQueued(project1, request2);
+
+        queue.buildCompleted(project1, BUILD_ID1);
+        assertActive(project1, request2);
+        assertQueued(project1);
+
+        queue.buildCompleted(project1, BUILD_ID2);
+        assertActive(project1);
+        assertQueued(project1);
     }
 
     public void testMultiProjects()
     {
-        assertTrue(queue.buildRequested(createRequest(p1)));
-        assertTrue(queue.buildRequested(createRequest(p2)));
-        assertNull(queue.buildCompleted(p1));
-        assertNull(queue.buildCompleted(p2));
+        final int BUILD_ID1 = nextId.getAndIncrement();
+        final int BUILD_ID2 = nextId.getAndIncrement();
+
+        final AbstractBuildRequestEvent request1 = createRequest(project1, BUILD_ID1, "source", false, null);
+        final AbstractBuildRequestEvent request2 = createRequest(project2, BUILD_ID2, "source", false, null);
+
+        queue.buildRequested(request1);
+        assertActive(project1, request1);
+        assertActive(project2);
+
+        queue.buildRequested(request2);
+        assertActive(project1, request1);
+        assertActive(project2, request2);
+
+        queue.buildCompleted(project1, BUILD_ID1);
+        assertActive(project1);
+        assertActive(project2, request2);
+
+        queue.buildCompleted(project2, BUILD_ID2);
+        assertActive(project1);
+        assertActive(project2);
     }
 
-    public void testCancelQueuedBuild()
+    public void testGetActiveBuildCount()
     {
-        assertTrue(queue.buildRequested(createRequest(p1)));
-        BuildRequestEvent request2 = createRequest(p1);
-        assertFalse(queue.buildRequested(request2));
-        queue.cancelBuild(request2.getId());
-        assertNull(queue.buildCompleted(p1));
+        final AbstractBuildRequestEvent requestProject1_1 = createRequest(project1, nextId.getAndIncrement(), "source", false, null);
+        final AbstractBuildRequestEvent requestProject2_1 = createRequest(project2, nextId.getAndIncrement(), "source", false, null);
+        final AbstractBuildRequestEvent requestProject1_2 = createRequest(project1, nextId.getAndIncrement(), "source", false, null);
+
+        queue.buildRequested(requestProject1_1);
+        assertEquals(1, queue.getActiveBuildCount());
+
+        queue.buildRequested(requestProject2_1);
+        assertEquals(2, queue.getActiveBuildCount());
+
+        queue.buildRequested(requestProject1_2);
+        assertEquals(2, queue.getActiveBuildCount());
     }
 
-    public void testCancelLastBuildInQueue()
+    public void testCancelActive()
     {
-        BuildRequestEvent event1 = createFixedRequest(p1);
-        BuildRequestEvent event2 = createFixedRequest(p1);
-        assertTrue(queue.buildRequested(event1));
-        assertFalse(queue.buildRequested(event2));
-        assertTrue(queue.cancelBuild(event2.getId()));
-        assertNull(queue.buildCompleted(p1));
+        final AbstractBuildRequestEvent request = createRequest(project1, nextId.getAndIncrement(), "source", false, null);
+
+        queue.buildRequested(request);
+        assertActive(project1, request);
+
+        queue.cancelBuild(request.getId());
+        assertActive(project1, request);
     }
 
-    public void testCancelFirstBuildInQueue()
+    public void testCancelFirst()
     {
-        // can not cancel the first build in the queue, since this build will be active.
-        BuildRequestEvent event1 = createFixedRequest(p1);
-        BuildRequestEvent event2 = createFixedRequest(p1);
-        assertTrue(queue.buildRequested(event1));
-        assertFalse(queue.buildRequested(event2));
-        assertFalse(queue.cancelBuild(event1.getId()));
-        assertNotNull(queue.buildCompleted(p1));
-        assertNull(queue.buildCompleted(p1));
+        cancelHelper(1);
     }
 
-    public void testCancelMiddleBuildInQueue()
+    public void testCancelMiddle()
     {
-        BuildRequestEvent event1 = createFixedRequest(p1);
-        BuildRequestEvent event2 = createFixedRequest(p1);
-        BuildRequestEvent event3 = createFixedRequest(p1);
-        assertTrue(queue.buildRequested(event1));
-        assertFalse(queue.buildRequested(event2));
-        assertFalse(queue.buildRequested(event3));
-        assertTrue(queue.cancelBuild(event2.getId()));
-        assertNotNull(queue.buildCompleted(p1));
-        assertNull(queue.buildCompleted(p1));
+        cancelHelper(2);
     }
 
-    private BuildRequestEvent createRequest(Project project)
+    public void testCancelLast()
     {
-        return new BuildRequestEvent(this, new MockBuildReason(), project, new BuildRevision());
+        cancelHelper(3);
     }
 
-    private BuildRequestEvent createFixedRequest(Project project)
+    private void cancelHelper(final int indexToCancel)
     {
-        return new BuildRequestEvent(this, new MockBuildReason(), project, new BuildRevision(new Revision(0), "", false));
-    }
+        final AbstractBuildRequestEvent[] requests = new AbstractBuildRequestEvent[] {
+                createRequest(project1, nextId.getAndIncrement(), "source", false, null),
+                createRequest(project1, nextId.getAndIncrement(), "source", false, null),
+                createRequest(project1, nextId.getAndIncrement(), "source", false, null),
+                createRequest(project1, nextId.getAndIncrement(), "source", false, null),
+        };
 
-    private class MockBuildReason implements BuildReason
-    {
-        public boolean isUser()
+        for (AbstractBuildRequestEvent request: requests)
         {
-            return false;
+            queue.buildRequested(request);
         }
 
-        public String getSummary()
-        {
-            return "mock";
-        }
+        // The queue is in reverse order, and does not have the first (active)
+        // request.
+        final List<AbstractBuildRequestEvent> queuedList = Arrays.asList(Arrays.copyOfRange(requests, 1, requests.length));
+        Collections.reverse(queuedList);
+        final AbstractBuildRequestEvent[] queued = queuedList.toArray(new AbstractBuildRequestEvent[queuedList.size()]);
 
-        public Object clone() throws CloneNotSupportedException
+        assertActive(project1, requests[0]);
+        assertQueued(project1, queued);
+
+        queue.cancelBuild(requests[indexToCancel].getId());
+
+        assertActive(project1, requests[0]);
+        
+        // The queue should be the same, minus the cancelled request.
+        assertQueued(project1, CollectionUtils.filterToArray(queued, new Predicate<AbstractBuildRequestEvent>()
         {
-            return super.clone();
-        }
+            public boolean satisfied(AbstractBuildRequestEvent event)
+            {
+                return event.getId() != requests[indexToCancel].getId();
+            }
+        }));
+    }
+
+    public void testStop()
+    {
+        queue.stop();
+        queue.buildRequested(createRequest(project1, nextId.getAndIncrement(), "source", false, null));
+        assertEquals(0, queue.getActiveBuildCount());
+        assertActive(project1);
+        assertQueued(project1);
+    }
+
+    private void assertActive(Project project, AbstractBuildRequestEvent... events)
+    {
+        assertActive(queue.takeSnapshot().getActiveBuilds().get(project), events);
+    }
+
+    private void assertQueued(Project project, AbstractBuildRequestEvent... events)
+    {
+        assertQueued(queue.takeSnapshot().getQueuedBuilds().get(project), events);
     }
 }

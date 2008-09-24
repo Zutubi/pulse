@@ -20,9 +20,11 @@
         #else
             #contentCell("build.id.unknown")
         #end
-            #dynamicLinkCell($request.project.name "$urls.projectHome($request.project)")
-        #if($request.revision.fixed)
-            #dynamicCell($request.revision.revision)
+            #dynamicLinkCell($request.projectConfig.name "$urls.projectHome($request.project)")
+        #if($request.revision.revision)
+            <td class="content">
+                $request.revision.revision #if($request.replaceable) [replaceable] #end
+            </td>
         #else
             #contentCell("queue.revision.floating")
         #end
@@ -47,8 +49,8 @@
         #headingRow("active.builds" 8)
         <tr>
             #contentHeading("queue.owner" 1)
-            #contentHeading("project" 1)
             #contentHeading("build.id" 1)
+            #contentHeading("project" 1)
             #contentHeading("build.status" 2)
             #contentHeading("build.when" 1)
             #contentHeading("build.elapsed" 1)
@@ -61,8 +63,8 @@
 
         <tr>
             #ownerCell($buildResult "content")
-            <td class="content"><a href="$urls.projectHome($project)">$!webwork.htmlEncode($project.name)</a></td>
             #dynamicRightLinkCell($buildResult.number "$urls.build($buildResult)")
+            <td class="content"><a href="$urls.projectHome($project)">$!webwork.htmlEncode($project.name)</a></td>
             #statusCell($buildResult true)
             #dateClassCell($buildResult)
             #elapsedCell($buildResult)

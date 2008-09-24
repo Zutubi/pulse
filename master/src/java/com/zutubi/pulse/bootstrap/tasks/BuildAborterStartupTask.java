@@ -16,21 +16,23 @@ public class BuildAborterStartupTask implements StartupTask
 
     public void execute()
     {
-        List<Project> projects = projectManager.getProjects(true);
-        for (Project project : projects)
+        buildManager.executeInTransaction(new Runnable()
         {
-            List<BuildResult> abortedResults = buildManager.abortUnfinishedBuilds(project, ABORT_MESSAGE);
-            for(BuildResult result: abortedResults)
+            public void run()
             {
-                projectManager.buildCompleted(project.getId(), false);
-            }
-        }
+                List<Project> projects = projectManager.getProjects(true);
+                for (Project project : projects)
+                {
+                    projectManager.abortUnfinishedBuilds(project, ABORT_MESSAGE);
+                }
 
-        List<User> users = userManager.getAllUsers();
-        for(User user: users)
-        {
-            buildManager.abortUnfinishedBuilds(user, ABORT_MESSAGE);
-        }
+                List<User> users = userManager.getAllUsers();
+                for(User user: users)
+                {
+                    buildManager.abortUnfinishedBuilds(user, ABORT_MESSAGE);
+                }
+            }
+        });
     }
 
     public boolean haltOnFailure()
