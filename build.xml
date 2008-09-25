@@ -102,9 +102,7 @@
         <delete dir="working"/>
 
         <!-- clean out the user.home/.pulse2?/* directory -->
-        <delete dir="${user.home}/.pulse"/>
         <delete dir="${user.home}/.pulse2"/>
-        <delete dir="${user.home}/.pulse-agent"/>
         <delete dir="${user.home}/.pulse2-agent"/>
 
         <!-- goodbye plugin registry -->
