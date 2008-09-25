@@ -775,6 +775,8 @@ public class BuildController implements EventListener
 
     private void completeBuild()
     {
+        abortUnfinishedRecipes();
+
         // If there is an SQL problem while saving the build result, the build becomes stuck and the server
         // needs to be restarted to clear it up.  To prevent the need for server restarts, we catch and log the exception
         // and continue.  This leaves the build result in an incorrect state, but will allow builds to continue. The
@@ -783,7 +785,6 @@ public class BuildController implements EventListener
         // Unfortunately, if we can not write to the db, then we are a little stuffed.
         try
         {
-            buildResult.abortUnfinishedRecipes();
             buildResult.setHasWorkDir(projectConfig.getOptions().getRetainWorkingCopy());
             buildResult.complete();
             buildLogger.completed(buildResult);
@@ -824,6 +825,15 @@ public class BuildController implements EventListener
         // this must be last since we are in fact stopping the thread running this method.., we are
         // after all responding to an event on this listener.
         asyncListener.stop(true);
+    }
+
+    private void abortUnfinishedRecipes()
+    {
+        buildResult.abortUnfinishedRecipes();
+        for (TreeNode<RecipeController> controllerNode: executingControllers)
+        {
+            eventManager.publish(new RecipeAbortedEvent(this, controllerNode.getData().getResult().getId()));
+        }
     }
 
     public Class[] getHandledEvents()

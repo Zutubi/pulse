@@ -4,10 +4,7 @@ import com.zutubi.pulse.core.events.RecipeCompletedEvent;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.core.events.RecipeEvent;
 import com.zutubi.pulse.events.*;
-import com.zutubi.pulse.events.build.RecipeAssignedEvent;
-import com.zutubi.pulse.events.build.RecipeCollectedEvent;
-import com.zutubi.pulse.events.build.RecipeCollectingEvent;
-import com.zutubi.pulse.events.build.RecipeTerminateRequestEvent;
+import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.model.AgentState;
 import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.util.Predicate;
@@ -303,9 +300,9 @@ public class AgentStatusManager implements EventListener
         }
     }
 
-    private void handleRecipeCollected(RecipeCollectedEvent event)
+    private void handleRecipeCompleted(long recipeId)
     {
-        Agent agent = agentsByRecipeId.remove(event.getRecipeId());
+        Agent agent = agentsByRecipeId.remove(recipeId);
         if(agent != null)
         {
             if (agent.isDisabling())
@@ -316,7 +313,7 @@ public class AgentStatusManager implements EventListener
             }
             else
             {
-                agent.updateStatus(Status.AWAITING_PING, event.getRecipeId());
+                agent.updateStatus(Status.AWAITING_PING, recipeId);
 
                 // Request a ping immediately so no time is wasted
                 publishEvent(new AgentPingRequestedEvent(this, agent));
@@ -500,7 +497,11 @@ public class AgentStatusManager implements EventListener
             }
             else if(event instanceof RecipeCollectedEvent)
             {
-                handleRecipeCollected((RecipeCollectedEvent) event);
+                handleRecipeCompleted(((RecipeCollectedEvent) event).getRecipeId());
+            }
+            else if(event instanceof RecipeAbortedEvent)
+            {
+                handleRecipeCompleted(((RecipeAbortedEvent) event).getRecipeId());
             }
             else if(event instanceof AgentDisableRequestedEvent)
             {
@@ -546,6 +547,7 @@ public class AgentStatusManager implements EventListener
                 AgentEnableRequestedEvent.class,
                 AgentPingEvent.class,
                 AgentRemovedEvent.class,
+                RecipeAbortedEvent.class,
                 RecipeCollectedEvent.class,
                 RecipeCollectingEvent.class,
                 RecipeCompletedEvent.class,

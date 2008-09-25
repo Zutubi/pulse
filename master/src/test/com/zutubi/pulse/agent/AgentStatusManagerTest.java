@@ -7,10 +7,7 @@ import com.zutubi.pulse.core.Property;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.events.*;
-import com.zutubi.pulse.events.build.RecipeAssignedEvent;
-import com.zutubi.pulse.events.build.RecipeCollectedEvent;
-import com.zutubi.pulse.events.build.RecipeCollectingEvent;
-import com.zutubi.pulse.events.build.RecipeTerminateRequestEvent;
+import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.model.AgentState;
 import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.pulse.test.PulseTestCase;
@@ -868,6 +865,72 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
         onComplete();
     }
 
+    public void testAbortAfterAssign()
+    {
+        Agent agent = addAgentAndAssignRecipe(1, 1000);
+        sendRecipeAborted(1000);
+        assertEquals(Status.AWAITING_PING, agent.getStatus());
+        assertEvents(new AgentPingRequestedEvent(this, agent));
+        sendPing(agent, new SlaveStatus(PingStatus.IDLE));
+        assertEquals(Status.IDLE, agent.getStatus());
+        assertEvents(new AgentAvailableEvent(this, agent));
+
+        onComplete();
+    }
+
+    public void testAbortBuilding()
+    {
+        Agent agent = addAgentAndAssignRecipe(1, 1000);
+        sendPing(agent, new SlaveStatus(PingStatus.BUILDING, 1000, false));
+        assertEquals(Status.BUILDING, agent.getStatus());
+        sendRecipeAborted(1000);
+        assertEquals(Status.AWAITING_PING, agent.getStatus());
+        assertEvents(new AgentPingRequestedEvent(this, agent));
+
+        onComplete();
+    }
+
+    public void testAbortDisabling()
+    {
+        Agent agent = addAgentAndAssignRecipe(1, 1000);
+        sendDisableRequest(agent);
+        sendPing(agent, new SlaveStatus(PingStatus.BUILDING, 1000, false));
+        assertEnableState(agent, AgentState.EnableState.DISABLING);
+        sendRecipeAborted(1000);
+        assertBusyAgentDisabled(agent);
+
+        onComplete();
+    }
+
+    public void testAbortCollecting()
+    {
+        Agent agent = addAgentAndAssignRecipe(1, 1000);
+        sendPing(agent, new SlaveStatus(PingStatus.BUILDING, 1000, false));
+        sendRecipeCollecting(1000);
+        assertEquals(Status.POST_RECIPE, agent.getStatus());
+        sendRecipeAborted(1000);
+        assertEquals(Status.AWAITING_PING, agent.getStatus());
+        assertEvents(new AgentPingRequestedEvent(this, agent));
+
+        onComplete();
+    }
+    
+    public void testAbortIdle()
+    {
+        Agent agent = addAgentAndAssignRecipe(1, 1000);
+        sendPing(agent, new SlaveStatus(PingStatus.BUILDING, 1000, false));
+        sendRecipeCollecting(1000);
+        sendRecipeCollected(1000);
+        assertEvents(new AgentPingRequestedEvent(this, agent));
+        sendPing(agent, new SlaveStatus(PingStatus.IDLE, 1000, false));
+        assertEquals(Status.IDLE, agent.getStatus());
+        assertEvents(new AgentAvailableEvent(this, agent));
+        sendRecipeAborted(1000);
+        assertEquals(Status.IDLE, agent.getStatus());
+
+        onComplete();
+    }
+
     private void assertBusyAgentDisabled(Agent agent)
     {
         assertAgentDisabled(agent);
@@ -1000,6 +1063,11 @@ public class AgentStatusManagerTest extends PulseTestCase implements EventListen
     private void sendRecipeCollected(int recipeId)
     {
         eventManager.publish(new RecipeCollectedEvent(this, recipeId));
+    }
+
+    private void sendRecipeAborted(int recipeId)
+    {
+        eventManager.publish(new RecipeAbortedEvent(this, recipeId));
     }
 
     private void sendDisableRequest(Agent agent)
