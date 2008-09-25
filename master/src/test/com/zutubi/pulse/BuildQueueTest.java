@@ -10,6 +10,7 @@ import static org.mockito.Mockito.doReturn;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 public class BuildQueueTest extends BuildQueueTestCase
@@ -185,7 +186,8 @@ public class BuildQueueTest extends BuildQueueTestCase
 
         // The queue is in reverse order, and does not have the first (active)
         // request.
-        final List<AbstractBuildRequestEvent> queuedList = Arrays.asList(Arrays.copyOfRange(requests, 1, requests.length));
+        final List<AbstractBuildRequestEvent> queuedList = new LinkedList(Arrays.asList(requests));
+        queuedList.remove(0);
         Collections.reverse(queuedList);
         final AbstractBuildRequestEvent[] queued = queuedList.toArray(new AbstractBuildRequestEvent[queuedList.size()]);
 
