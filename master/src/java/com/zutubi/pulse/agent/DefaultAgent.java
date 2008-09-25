@@ -60,6 +60,11 @@ public class DefaultAgent implements Agent
         return agentService;
     }
 
+    public String getName()
+    {
+        return getConfig().getName();
+    }
+
     public Status getStatus()
     {
         return status;

@@ -11,6 +11,7 @@ import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
  */
 public interface Agent
 {
+    String getName();
     Status getStatus();
     String getLocation();
     UpgradeState getUpgradeState();
@@ -44,5 +45,4 @@ public interface Agent
     AgentState.EnableState getEnableState();
 
     void setAgentState(AgentState agentState);
-
 }

@@ -2,6 +2,8 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.AgentManager;
+import com.zutubi.pulse.agent.DefaultAgentSorter;
+import com.zutubi.pulse.agent.AgentSorter;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
@@ -70,6 +72,7 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     private EventManager eventManager;
     private GlobalConfiguration globalConfiguration;
     private ThreadFactory threadFactory;
+    private AgentSorter agentSorter = new DefaultAgentSorter();
 
     public ThreadedRecipeQueue()
     {
@@ -347,7 +350,8 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
                         buildRevision.lock();
                         try
                         {
-                            for (Agent agent : agentManager.getAvailableAgents())
+                            Iterable<Agent> agentList = agentSorter.sort(agentManager.getAvailableAgents(), request);
+                            for (Agent agent : agentList)
                             {
                                 AgentService service = agent.getService();
 
@@ -623,6 +627,11 @@ public class ThreadedRecipeQueue implements Runnable, RecipeQueue, EventListener
     public void setThreadFactory(ThreadFactory threadFactory)
     {
         this.threadFactory = threadFactory;
+    }
+
+    public void setAgentSorter(AgentSorter agentSorter)
+    {
+        this.agentSorter = agentSorter;
     }
 
     /**
