@@ -8,6 +8,7 @@ import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.repository.MasterFileRepository;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
+import com.zutubi.pulse.util.FileSystem;
 
 /**
  *
@@ -21,6 +22,7 @@ public class MasterRecipeRunner implements Runnable
     private EventManager eventManager;
     private MasterConfigurationManager configurationManager;
     private ResourceRepository resourceRepository;
+    private RecipeCleanup recipeCleanup;
 
     public MasterRecipeRunner(RecipeRequest request, RecipeProcessor recipeProcessor, EventManager eventManager, MasterConfigurationManager configurationManager, ResourceRepository resourceRepository)
     {
@@ -29,6 +31,7 @@ public class MasterRecipeRunner implements Runnable
         this.eventManager = eventManager;
         this.configurationManager = configurationManager;
         this.resourceRepository = resourceRepository;
+        recipeCleanup = new RecipeCleanup(new FileSystem());
     }
 
     public void run()
@@ -43,6 +46,8 @@ public class MasterRecipeRunner implements Runnable
         context.push();
         try
         {
+            recipeCleanup.cleanup(eventManager, recipePaths.getRecipesRoot(), request.getId());
+
             context.addValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, recipePaths);
             context.addValue(NAMESPACE_INTERNAL, PROPERTY_RESOURCE_REPOSITORY, resourceRepository);
             context.addValue(NAMESPACE_INTERNAL, PROPERTY_FILE_REPOSITORY, new MasterFileRepository(configurationManager));

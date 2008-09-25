@@ -280,11 +280,6 @@ public class RecipeProcessor
         }
     }
 
-    public long getBuildingRecipe()
-    {
-        return runningRecipe;
-    }
-
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;

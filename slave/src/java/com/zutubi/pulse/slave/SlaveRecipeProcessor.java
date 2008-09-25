@@ -1,8 +1,6 @@
 package com.zutubi.pulse.slave;
 
-import com.zutubi.pulse.ChainBootstrapper;
-import com.zutubi.pulse.ServerBootstrapper;
-import com.zutubi.pulse.ServerRecipePaths;
+import com.zutubi.pulse.*;
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import static com.zutubi.pulse.core.BuildProperties.*;
@@ -11,10 +9,13 @@ import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.repository.SlaveFileRepository;
 import com.zutubi.pulse.services.MasterService;
 import com.zutubi.pulse.services.ServiceTokenManager;
+import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
+import com.zutubi.pulse.util.FileSystem;
 
 import java.net.MalformedURLException;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  */
@@ -22,15 +23,18 @@ public class SlaveRecipeProcessor
 {
     private static final Logger LOG = Logger.getLogger(SlaveRecipeProcessor.class);
 
+    private AtomicLong buildingRecipe = new AtomicLong(SlaveStatus.NO_RECIPE);
+
     private RecipeProcessor recipeProcessor;
     private SlaveConfigurationManager configurationManager;
     private EventManager eventManager;
     private MasterProxyFactory masterProxyFactory;
     private ServiceTokenManager serviceTokenManager;
+    private RecipeCleanup recipeCleanup;
 
     public SlaveRecipeProcessor()
     {
-        // TODO on startup, clean out any existing working/output directories left around
+        recipeCleanup = new RecipeCleanup(new FileSystem());
     }
 
     private EventListener registerMasterListener(String master, MasterService service, long id)
@@ -61,6 +65,7 @@ public class SlaveRecipeProcessor
         MasterService masterProxy = getMasterProxy(master);
         if(masterProxy != null)
         {
+            buildingRecipe.set(request.getId());
             ExecutionContext context = request.getContext();
             EventListener listener = registerMasterListener(master, masterProxy, request.getId());
             ResourceRepository repo = new RemoteResourceRepository(handle, masterProxy, serviceTokenManager);
@@ -73,12 +78,15 @@ public class SlaveRecipeProcessor
             EventOutputStream outputStream = null;
             try
             {
+                recipeCleanup.cleanup(eventManager, processorPaths.getRecipesRoot(), request.getId());
+
                 context.addValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, processorPaths);
                 context.addValue(NAMESPACE_INTERNAL, PROPERTY_RESOURCE_REPOSITORY, repo);
                 context.addValue(NAMESPACE_INTERNAL, PROPERTY_FILE_REPOSITORY, new SlaveFileRepository(processorPaths.getRecipeRoot(), master, serviceTokenManager));
                 outputStream = new CommandEventOutputStream(eventManager, request.getId(), true);
                 context.setOutputStream(outputStream);
                 context.setWorkingDir(processorPaths.getBaseDir());
+
                 recipeProcessor.build(request);
             }
             catch (BuildException e)
@@ -98,7 +106,25 @@ public class SlaveRecipeProcessor
                 IOUtils.close(outputStream);
                 context.pop();
                 eventManager.unregister(listener);
+                buildingRecipe.set(SlaveStatus.NO_RECIPE);
             }
+        }
+    }
+
+    public long getBuildingRecipe()
+    {
+        return buildingRecipe.get();
+    }
+
+    public void terminateRecipe(long id)
+    {
+        try
+        {
+            recipeProcessor.terminateRecipe(id);
+        }
+        catch (InterruptedException e)
+        {
+            LOG.warning("Interrupted while terminating recipe", e);
         }
     }
 
@@ -122,25 +148,8 @@ public class SlaveRecipeProcessor
         this.masterProxyFactory = masterProxyFactory;
     }
 
-    public void terminateRecipe(long id)
-    {
-        try
-        {
-            recipeProcessor.terminateRecipe(id);
-        }
-        catch (InterruptedException e)
-        {
-            LOG.warning("Interrupted while terminating recipe", e);
-        }
-    }
-
     public void setServiceTokenManager(ServiceTokenManager serviceTokenManager)
     {
         this.serviceTokenManager = serviceTokenManager;
-    }
-
-    public long getBuildingRecipe()
-    {
-        return recipeProcessor.getBuildingRecipe();
     }
 }

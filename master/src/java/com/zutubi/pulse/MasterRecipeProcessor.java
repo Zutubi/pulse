@@ -6,16 +6,21 @@ import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.util.logging.Logger;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  */
 public class MasterRecipeProcessor implements Stoppable
 {
     private static final Logger LOG = Logger.getLogger(MasterRecipeProcessor.class);
+
+    private AtomicLong buildingRecipe = new AtomicLong(SlaveStatus.NO_RECIPE);
 
     private ExecutorService executor;
     private RecipeProcessor recipeProcessor;
@@ -27,9 +32,24 @@ public class MasterRecipeProcessor implements Stoppable
         executor = Executors.newSingleThreadExecutor();
     }
 
-    public void processRecipe(RecipeRequest request, ResourceRepository agentRepository)
+    public void processRecipe(final RecipeRequest request, final ResourceRepository agentRepository)
     {
-        executor.execute(new MasterRecipeRunner(request, recipeProcessor, eventManager, configurationManager, agentRepository));
+        executor.submit(new Runnable()
+        {
+            public void run()
+            {
+                try
+                {
+                    buildingRecipe.set(request.getId());
+                    MasterRecipeRunner recipeRunner = new MasterRecipeRunner(request, recipeProcessor, eventManager, configurationManager, agentRepository);
+                    recipeRunner.run();
+                }
+                finally
+                {
+                    buildingRecipe.set(SlaveStatus.NO_RECIPE);
+                }
+            }
+        });
     }
 
     public void setRecipeProcessor(RecipeProcessor recipeProcessor)
@@ -63,7 +83,7 @@ public class MasterRecipeProcessor implements Stoppable
 
     public long getBuildingRecipe()
     {
-        return recipeProcessor.getBuildingRecipe(); 
+        return buildingRecipe.get();
     }
 
     public void setEventManager(EventManager eventManager)

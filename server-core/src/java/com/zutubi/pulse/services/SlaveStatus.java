@@ -7,6 +7,8 @@ import com.zutubi.pulse.agent.PingStatus;
  */
 public class SlaveStatus
 {
+    public static final long NO_RECIPE = 0;
+
     /**
      *  The agent status, as reported by the slave itself.
      */
@@ -15,7 +17,7 @@ public class SlaveStatus
      * Id of the recipe that the slave is building, or 0 if it is not
      * currently executing a build.
      */
-    private long recipeId = 0;
+    private long recipeId = NO_RECIPE;
     /**
      * If true, this is the first status request the agent has answered since
      * it booted.  Used to detect agent bounces between pings (CIB-1141).
