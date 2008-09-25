@@ -1,6 +1,7 @@
 package com.zutubi.util;
 
 import java.io.PrintStream;
+import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -46,7 +47,7 @@ public class CollectionUtils
     public static <T> T[] filterToArray(T[] in, Predicate<T> predicate)
     {
         List<T> result = filter(in, predicate);
-        return (T[]) result.toArray(Arrays.copyOf(in, result.size(), in.getClass()));
+        return result.toArray((T[])Array.newInstance(in.getClass().getComponentType(), result.size()));
     }
 
     public static <T, U> List<U> map(Collection<T> l, Mapping<T, U> m)
