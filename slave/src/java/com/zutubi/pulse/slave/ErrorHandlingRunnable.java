@@ -3,10 +3,7 @@ package com.zutubi.pulse.slave;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.services.MasterService;
-import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.util.logging.Logger;
-
-import java.net.MalformedURLException;
 
 /**
  */
@@ -14,16 +11,15 @@ public class ErrorHandlingRunnable implements Runnable
 {
     private static final Logger LOG = Logger.getLogger(ErrorHandlingRunnable.class);
 
-    private String master;
-    private ServiceTokenManager serviceTokenManager;
+    private MasterService master;
+    private String serviceToken;
     private long recipeId;
     private Runnable delegate;
-    private MasterProxyFactory masterProxyFactory;
 
-    public ErrorHandlingRunnable(String master, ServiceTokenManager serviceTokenManager, long recipeId, Runnable delegate)
+    public ErrorHandlingRunnable(MasterService master, String serviceToken, long recipeId, Runnable delegate)
     {
         this.master = master;
-        this.serviceTokenManager = serviceTokenManager;
+        this.serviceToken = serviceToken;
         this.recipeId = recipeId;
         this.delegate = delegate;
     }
@@ -37,27 +33,22 @@ public class ErrorHandlingRunnable implements Runnable
         catch (BuildException e)
         {
             LOG.warning(e);
-            sendError(e);
+            sendError(e.getMessage());
         }
         catch (Exception e)
         {
             LOG.severe(e);
-            sendError(new BuildException("Unexpected error: " + e.getMessage(), e));
+            sendError("Unexpected error: " + e.getMessage());
         }
     }
 
-    private void sendError(BuildException error)
+    private void sendError(String error)
     {
-        RecipeErrorEvent event = new RecipeErrorEvent(null, recipeId, error.getMessage());
+        RecipeErrorEvent event = new RecipeErrorEvent(null, recipeId, error);
 
         try
         {
-            MasterService service = masterProxyFactory.createProxy(master);
-            service.handleEvent(serviceTokenManager.getToken(), event);
-        }
-        catch (MalformedURLException e)
-        {
-            LOG.warning(e);
+            master.handleEvent(serviceToken, event);
         }
         catch (RuntimeException e)
         {
@@ -65,8 +56,4 @@ public class ErrorHandlingRunnable implements Runnable
         }
     }
 
-    public void setMasterProxyFactory(MasterProxyFactory masterProxyFactory)
-    {
-        this.masterProxyFactory = masterProxyFactory;
-    }
 }

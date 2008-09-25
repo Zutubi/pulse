@@ -2,7 +2,6 @@ package com.zutubi.pulse.slave;
 
 import com.zutubi.pulse.SystemInfo;
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.agent.PingStatus;
 import com.zutubi.pulse.bootstrap.StartupManager;
 import com.zutubi.pulse.core.RecipeRequest;
@@ -16,6 +15,8 @@ import com.zutubi.pulse.services.*;
 import com.zutubi.pulse.slave.command.CleanupRecipeCommand;
 import com.zutubi.pulse.slave.command.RecipeCommand;
 import com.zutubi.pulse.slave.command.UpdateCommand;
+import com.zutubi.pulse.spring.SpringComponentContext;
+import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
@@ -38,6 +39,7 @@ public class SlaveServiceImpl implements SlaveService
     private SlaveRecipeProcessor slaveRecipeProcessor;
     private ServerMessagesHandler serverMessagesHandler;
     private MasterProxyFactory masterProxyFactory;
+    private ObjectFactory objectFactory;
 
     private boolean firstStatus = true;
 
@@ -124,12 +126,18 @@ public class SlaveServiceImpl implements SlaveService
     {
         serviceTokenManager.validateToken(token);
 
-        RecipeCommand command = new RecipeCommand(master, handle, request);
-        SpringComponentContext.autowire(command);
-        ErrorHandlingRunnable runnable = new ErrorHandlingRunnable(master, serviceTokenManager, request.getId(), command);
-        SpringComponentContext.autowire(runnable);
+        try
+        {
+            RecipeCommand command = objectFactory.buildBean(RecipeCommand.class, new Class[]{String.class, Long.TYPE, RecipeRequest.class }, new Object[] {master, handle, request });
+            ErrorHandlingRunnable runnable = new ErrorHandlingRunnable(masterProxyFactory.createProxy(master), serviceTokenManager.getToken(), request.getId(), command);
+            return slaveQueue.enqueueExclusive(runnable);
+        }
+        catch (Exception e)
+        {
+            LOG.severe(e);
+        }
 
-        return slaveQueue.enqueueExclusive(runnable);
+        return true;
     }
 
     public void cleanupRecipe(String token, String project, long recipeId, boolean incremental) throws InvalidTokenException
@@ -281,5 +289,10 @@ public class SlaveServiceImpl implements SlaveService
     public void setMasterProxyFactory(MasterProxyFactory masterProxyFactory)
     {
         this.masterProxyFactory = masterProxyFactory;
+    }
+
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
     }
 }

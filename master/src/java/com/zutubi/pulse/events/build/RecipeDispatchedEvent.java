@@ -29,6 +29,32 @@ public class RecipeDispatchedEvent extends RecipeEvent
         return agent;
     }
 
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+        if (!super.equals(o))
+        {
+            return false;
+        }
+
+        RecipeDispatchedEvent event = (RecipeDispatchedEvent) o;
+        return agent.equals(event.agent);
+    }
+
+    public int hashCode()
+    {
+        int result = super.hashCode();
+        result = 31 * result + agent.hashCode();
+        return result;
+    }
+
     public String toString()
     {
         StringBuffer buff = new StringBuffer("Recipe Dispatched Event");

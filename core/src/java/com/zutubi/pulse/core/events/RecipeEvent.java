@@ -19,6 +19,26 @@ public class RecipeEvent extends Event<Object>
         return recipeId;
     }
 
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+
+        RecipeEvent event = (RecipeEvent) o;
+        return recipeId == event.recipeId;
+    }
+
+    public int hashCode()
+    {
+        return (int) (recipeId ^ (recipeId >>> 32));
+    }
+
     public String toString()
     {
         StringBuffer buff = new StringBuffer("Recipe Event");

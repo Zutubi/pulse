@@ -17,6 +17,32 @@ public class RecipeErrorEvent extends RecipeEvent
         return errorMessage;
     }
 
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+        if (!super.equals(o))
+        {
+            return false;
+        }
+
+        RecipeErrorEvent event = (RecipeErrorEvent) o;
+        return errorMessage.equals(event.errorMessage);
+    }
+
+    public int hashCode()
+    {
+        int result = super.hashCode();
+        result = 31 * result + errorMessage.hashCode();
+        return result;
+    }
+
     public String toString()
     {
         StringBuffer buff = new StringBuffer("Recipe Error Event");
