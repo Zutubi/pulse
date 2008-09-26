@@ -20,6 +20,7 @@ import com.zutubi.util.TextUtils;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Collections;
 
 /**
  * Analyses a configuration path, extracting information that is used to
@@ -173,25 +174,7 @@ public class ConfigurationUIModel
 
         if (!(type instanceof CollectionType))
         {
-            // determine the actions.
-            final Messages messages = Messages.getInstance(type.getClazz());
-            List<String> actionNames = actionManager.getActions(instance, true);
-            actionNames.remove(AccessManager.ACTION_VIEW);
-            actionNames.remove(AccessManager.ACTION_CLONE);
-
-            final String[] key = new String[]{ null };
-            if (parentType != null && parentType instanceof MapType)
-            {
-                key[0] = PathUtils.getBaseName(path);
-            }
-
-            actions = CollectionUtils.map(actionNames, new Mapping<String, ActionLink>()
-            {
-                public ActionLink map(String actionName)
-                {
-                    return ToveUtils.getActionLink(actionName, record, key[0], messages, systemPaths);
-                }
-            });
+            determineActions(parentType);
 
             displayFields = stateDisplayManager.getDisplayFields(instance);
             
@@ -210,6 +193,37 @@ public class ConfigurationUIModel
         }
 
         displayName = ToveUtils.getDisplayName(path, configurationTemplateManager);
+    }
+
+    private void determineActions(ComplexType parentType)
+    {
+        final Messages messages = Messages.getInstance(type.getClazz());
+        List<String> actionNames = actionManager.getActions(instance, true);
+        actionNames.remove(AccessManager.ACTION_VIEW);
+        actionNames.remove(AccessManager.ACTION_CLONE);
+
+        if (actionNames.size() > 0)
+        {
+            final String[] key = new String[]{ null };
+            final Record[] parentRecord = new Record[]{ null };
+            if (parentType != null && parentType instanceof MapType)
+            {
+                parentRecord[0] = configurationTemplateManager.getRecord(parentPath);
+                key[0] = PathUtils.getBaseName(path);
+            }
+
+            actions = CollectionUtils.map(actionNames, new Mapping<String, ActionLink>()
+            {
+                public ActionLink map(String actionName)
+                {
+                    return ToveUtils.getActionLink(actionName, parentRecord[0], key[0], messages, systemPaths);
+                }
+            });
+        }
+        else
+        {
+            actions = Collections.emptyList();
+        }
     }
 
     public Object format(String fieldName)

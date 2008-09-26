@@ -512,22 +512,30 @@ public class ToveUtils
     /**
      * Creates an action link for a given action on the given data.  The link
      * includes extra UI decoration, e.g. the icon and potential
-     * transformation of "delete" into "hide" for display purposes.
+     * transformation of "delete" into "hide" for display purposes.  In order
+     * to determine if the "delete" action should be "hide", the parent record
+     * (i.e. the map) is required when getting action links for map items.
      *
      * @param actionName   action to create the link for
-     * @param data         record the action applies to
-     * @param key          if the record is a map item, the map key,
-     *                     otherwise it should be null
+     * @param parentRecord if the parent record is a map, that map record,
+     *                     otherwise null
+     * @param key          if the parent record is a map, the map key of the
+     *                     item that the action applies to, otherwise null
      * @param messages     used to format UI labels
      * @param systemPaths  used to locate icons
      * @return details of an action link for UI display
      */
-    public static ActionLink getActionLink(String actionName, Record data, String key, Messages messages, SystemPaths systemPaths)
+    public static ActionLink getActionLink(String actionName, Record parentRecord, String key, Messages messages, SystemPaths systemPaths)
     {
-        String action = actionName;
-        if(actionName.equals(AccessManager.ACTION_DELETE) && data instanceof TemplateRecord)
+        if (key != null && !parentRecord.isCollection())
         {
-            TemplateRecord templateRecord = (TemplateRecord) data;
+            throw new IllegalArgumentException("Can only specify a key for map items.  Did you pass the parent record?");
+        }
+        
+        String action = actionName;
+        if(actionName.equals(AccessManager.ACTION_DELETE) && parentRecord instanceof TemplateRecord)
+        {
+            TemplateRecord templateRecord = (TemplateRecord) parentRecord;
             TemplateRecord templateParent = templateRecord.getParent();
             if(templateParent != null && key != null && templateParent.getOwner(key) != null)
             {
