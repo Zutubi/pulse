@@ -5,64 +5,73 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * A default implementation of an object factory.  Beans are created using
+ * reflection to find and call constructors.
+ * 
  * Implementation adapted from com.opensymphony.xwork.ObjectFactory
- *
  */
 public class DefaultObjectFactory implements ObjectFactory
 {
-    private final Map<String, Class> classes = new HashMap<String, Class>();
+    private  final Map<String, Class> classes = new HashMap<String, Class>();
 
     // not sure if this method belongs in this interface... it is pretty broken when considering
     // plugins.
-    public Class getClassInstance(String className) throws ClassNotFoundException
+    public <T> Class<? extends T> getClassInstance(String className, Class<? super T> token) throws ClassNotFoundException
     {
-        Class clazz = classes.get(className);
+        Class<?> clazz = classes.get(className);
         if (clazz == null)
         {
             clazz = getClass().getClassLoader().loadClass(className);
+            if(!token.isAssignableFrom(clazz))
+            {
+                throw new ClassCastException("Loaded class '" + clazz.getName() + "' is not a subtype of '" + token.getName() + "'");
+            }
+
             classes.put(className, clazz);
         }
-        return clazz;
+
+        // We use the type token parameter to verify the classes we load.  Keep
+        // the warning suppression as narrowly-scoped as possible, meaning we
+        // also need to suppress IDEA's inspection.
+        //noinspection UnnecessaryLocalVariable
+        @SuppressWarnings("unchecked")
+        Class<? extends T> result = (Class<? extends T>) clazz;
+        return result;
     }
 
     /**
-     * Create an instance of the bean defined by the specified class.
+     * Create an instance of the bean defined by the specified class, using the
+     * default constructor.
      *
-     * @param clazz
-     *
-     * @return
-     *
-     * @throws Exception
+     * @param clazz the type to create an instance of
+     * @return a new instance of the given type
+     * @throws Exception on any error reflecting or building the object
      */
-    public <V> V buildBean(Class<V> clazz) throws Exception
+    public <T> T buildBean(Class<? extends T> clazz) throws Exception
     {
         return clazz.newInstance();
     }
 
-    public <U> U buildBean(String className) throws Exception
+    public <T> T buildBean(String className, Class<? super T> token) throws Exception
     {
-        Class<U> clazz = getClassInstance(className);
+        // javac cannot infer this type argument
+        //noinspection RedundantTypeArguments
+        Class<? extends T> clazz = this.<T>getClassInstance(className, token);
         return clazz.newInstance();
     }
 
-    public <W> W buildBean(Class<W> clazz, Class[] argTypes, Object[] args) throws Exception
+    public <T> T buildBean(Class<? extends T> clazz, Class[] argTypes, Object[] args) throws Exception
     {
-        Constructor<W> constructor = clazz.getConstructor(argTypes);
-        if (constructor != null)
-        {
-            return (W) constructor.newInstance(args);
-        }
-        throw new RuntimeException(String.format("Failed to locate the requested constructor for '%s'", clazz.getName()));
+        Constructor<? extends T> constructor = clazz.getConstructor(argTypes);
+        return constructor.newInstance(args);
     }
 
-    public <X> X buildBean(String className, Class[] argTypes, Object[] args) throws Exception
+    public <T> T buildBean(String className, Class<? super T> token, Class[] argTypes, Object[] args) throws Exception
     {
-        Class<X> clazz = getClassInstance(className);
-        Constructor<X> constructor = clazz.getConstructor(argTypes);
-        if (constructor != null)
-        {
-            return (X) constructor.newInstance(args);
-        }
-        throw new RuntimeException(String.format("Failed to locate the requested constructor for '%s'", clazz.getName()));
+        // javac cannot infer this type argument
+        //noinspection RedundantTypeArguments
+        Class<? extends T> clazz = this.<T>getClassInstance(className, token);
+        Constructor<? extends T> constructor = clazz.getConstructor(argTypes);
+        return constructor.newInstance(args);
     }
 }

@@ -29,10 +29,14 @@
 
 package com.sun.script.jython;
 
-import javax.script.*;
-import java.lang.reflect.*;
-import java.io.*;
 import org.python.core.*;
+
+import javax.script.*;
+import java.io.IOException;
+import java.io.Reader;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
 
 public class JythonScriptEngine extends AbstractScriptEngine 
@@ -120,7 +124,7 @@ public class JythonScriptEngine extends AbstractScriptEngine
             if (thiz == myScope) {
                 // lookup in built-in functions. This way
                 // user can call invoke built-in functions.
-                PyObject builtins = systemState.get().builtins;
+                PyObject builtins = PySystemState.builtins;
                 func = builtins.__finditem__(name);
             }
         }
@@ -149,7 +153,7 @@ public class JythonScriptEngine extends AbstractScriptEngine
             throw new IllegalArgumentException("interface Class expected");
         }
         final Object thiz = obj;
-        return (T) Proxy.newProxyInstance(
+        return clazz.cast(Proxy.newProxyInstance(
               clazz.getClassLoader(),
               new Class[] { clazz },
               new InvocationHandler() {
@@ -159,7 +163,7 @@ public class JythonScriptEngine extends AbstractScriptEngine
                                        thiz, m.getName(), args);                      
                       return py2java(java2py(res), m.getReturnType());
                   }
-              });
+              }));
     }
 
 

@@ -7,7 +7,7 @@ import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 /**
  * This event indicates that a change has been detected in an SCM.
  */
-public class ScmChangeEvent extends Event<ProjectConfiguration>
+public class ScmChangeEvent extends Event
 {
     private Revision newRevision;
     private Revision previousRevision;
@@ -17,6 +17,11 @@ public class ScmChangeEvent extends Event<ProjectConfiguration>
         super(source);
         this.newRevision = newRevision;
         this.previousRevision = previousRevision;
+    }
+
+    public ProjectConfiguration getProjectConfiguration()
+    {
+        return (ProjectConfiguration) getSource();
     }
 
     public Revision getNewRevision()
@@ -34,9 +39,9 @@ public class ScmChangeEvent extends Event<ProjectConfiguration>
         StringBuffer buff = new StringBuffer("SCM Change Event");
         if (getSource() != null)
         {
-            buff.append(": ").append(getSource().getName());
+            buff.append(": ").append((getProjectConfiguration()).getName());
         }
         buff.append(": ").append(getPreviousRevision()).append(" -> ").append(getNewRevision());
         return buff.toString();
-    }    
+    }
 }

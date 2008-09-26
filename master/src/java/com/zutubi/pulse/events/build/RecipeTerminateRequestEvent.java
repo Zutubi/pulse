@@ -6,7 +6,7 @@ import com.zutubi.pulse.events.Event;
 /**
  * Request to terminate a recipe, due to some error or a timeout.
  */
-public class RecipeTerminateRequestEvent extends Event<Object>
+public class RecipeTerminateRequestEvent extends Event
 {
     private AgentService service;
     private long recipeId;

@@ -1,8 +1,7 @@
 package com.zutubi.pulse.spring;
 
-import com.zutubi.pulse.spring.SpringComponentContext;
-import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.TextUtils;
+import com.zutubi.util.bean.ObjectFactory;
 
 import javax.servlet.*;
 import java.io.IOException;
@@ -74,7 +73,7 @@ public class FilterWrapper implements Filter
         try
         {
             ObjectFactory objectFactory = (ObjectFactory) SpringComponentContext.getBean("objectFactory");
-            return objectFactory.buildBean(className);
+            return objectFactory.buildBean(className, Filter.class);
         }
         catch (Exception e)
         {

@@ -7,7 +7,7 @@ import com.zutubi.pulse.model.BuildResult;
 
 /**
  */
-public class BuildEvent extends Event<Object>
+public class BuildEvent extends Event
 {
     private BuildResult buildResult;
     private ExecutionContext context;

@@ -3,7 +3,7 @@ package com.zutubi.pulse.events;
 /**
  * The base interface implemented by all classes interested in events.
  */
-public interface EventListener extends java.util.EventListener
+public interface EventListener
 {
     /**
      * The callback method through which the listener is notified of the

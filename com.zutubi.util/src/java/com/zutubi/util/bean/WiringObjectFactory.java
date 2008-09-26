@@ -2,13 +2,13 @@ package com.zutubi.util.bean;
 
 import com.zutubi.util.ReflectionUtils;
 
+import java.beans.BeanInfo;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Map;
 import java.util.HashMap;
-import java.beans.Introspector;
-import java.beans.BeanInfo;
-import java.beans.PropertyDescriptor;
+import java.util.Map;
 
 /**
  * An object factory that can autowire properties based on the fields of some
@@ -37,37 +37,43 @@ public class WiringObjectFactory implements ObjectFactory
         }
     }
 
-    public <V> V buildBean(Class<V> clazz) throws Exception
+    public <T> T buildBean(Class<? extends T> clazz) throws Exception
     {
-        V bean = delegate.buildBean(clazz);
+        T bean = delegate.buildBean(clazz);
         wire(bean);
         return bean;
     }
 
-    public <U> U buildBean(String className) throws Exception
+    public <T> T buildBean(String className, Class<? super T> token) throws Exception
     {
-        U bean = (U)delegate.buildBean(className);
+        // javac requires this type argument
+        //noinspection RedundantTypeArguments
+        T bean = delegate.<T>buildBean(className, token);
         wire(bean);
         return bean;
     }
 
-    public <W> W buildBean(Class<W> clazz, Class[] argTypes, Object[] args) throws Exception
+    public <T> T buildBean(Class<? extends T> clazz, Class[] argTypes, Object[] args) throws Exception
     {
-        W bean = delegate.buildBean(clazz, argTypes, args);
+        T bean = delegate.buildBean(clazz, argTypes, args);
         wire(bean);
         return bean;
     }
 
-    public <X> X buildBean(String className, Class[] argTypes, Object[] args) throws Exception
+    public <T> T buildBean(String className, Class<? super T> token, Class[] argTypes, Object[] args) throws Exception
     {
-        X bean = (X)delegate.buildBean(className, argTypes, args);
+        // javac requires this type argument
+        //noinspection RedundantTypeArguments
+        T bean = delegate.<T>buildBean(className, token, argTypes, args);
         wire(bean);
         return bean;
     }
 
-    public Class getClassInstance(String className) throws ClassNotFoundException
+    public <T> Class<? extends T> getClassInstance(String className, Class<? super T> token) throws ClassNotFoundException
     {
-        return delegate.getClassInstance(className);
+        // javac requires this type argument
+        //noinspection RedundantTypeArguments
+        return delegate.<T>getClassInstance(className, token);
     }
 
     private void wire(Object bean)

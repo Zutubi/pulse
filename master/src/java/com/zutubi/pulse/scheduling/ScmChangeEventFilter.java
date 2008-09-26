@@ -17,7 +17,7 @@ public class ScmChangeEventFilter implements EventTriggerFilter
     {
         ScmChangeEvent changeEvent = (ScmChangeEvent) event;
         ProjectConfiguration project = projectManager.getProjectConfig(trigger.getProject(), false);
-        return project != null && project.getName().equals(changeEvent.getSource().getName());
+        return project != null && project.getName().equals(changeEvent.getProjectConfiguration().getName());
     }
 
     public boolean dependsOnProject(Trigger trigger, long projectId)

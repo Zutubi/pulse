@@ -10,8 +10,11 @@ public class EventTrigger extends Trigger
 {
     static final String TYPE = "event";
 
-    private static final Class<Event>[] DEFAULT_TRIGGER_EVENTS = new Class[]{Event.class};
-    private Class<Event>[] triggers = DEFAULT_TRIGGER_EVENTS;
+    // Here we specify Event.class directly, making the cast safe
+    @SuppressWarnings("unchecked")
+    private static final Class<? extends Event>[] DEFAULT_TRIGGER_EVENTS = (Class<? extends Event>[])new Class[]{Event.class};
+
+    private Class<? extends Event>[] triggers = DEFAULT_TRIGGER_EVENTS;
     private Class<? extends EventTriggerFilter> filterClass = null;
 
     /**
@@ -38,16 +41,20 @@ public class EventTrigger extends Trigger
         this.filterClass = filterClass;
     }
 
+    // This method checks the trigger class type.
+    @SuppressWarnings("unchecked")
     public EventTrigger(Class<? extends Event> trigger, String name, String group)
     {
         super(name, group);
-        triggers = new Class[]{trigger};
+        triggers = (Class<? extends Event>[]) new Class[]{trigger};
     }
 
+    // This method checks the trigger class type.
+    @SuppressWarnings("unchecked")
     public EventTrigger(Class<? extends Event> trigger, String name, String group, Class<? extends EventTriggerFilter> filterClass)
     {
         super(name, group);
-        triggers = new Class[]{trigger};
+        triggers = (Class<? extends Event>[]) new Class[]{trigger};
         this.filterClass = filterClass;
     }
 
@@ -61,25 +68,22 @@ public class EventTrigger extends Trigger
      *
      * @return the array of event classes.
      */
-    public Class<Event>[] getTriggerEvents()
+    public Class<? extends Event>[] getTriggerEvents()
     {
         return triggers;
     }
 
-    /**
-     * Used by hibernate.
-     */
-    private Class getTriggerEvent()
+    @SuppressWarnings({"UnusedDeclaration"}) // Used by hibernate
+    private Class<? extends Event> getTriggerEvent()
     {
         return getTriggerEvents()[0];
     }
 
-    /**
-     * Used by hibernate.
-     */
+    // This method checks the trigger class type, and is used by hibernate
+    @SuppressWarnings({"unchecked", "UnusedDeclaration"})
     private void setTriggerEvent(Class<? extends Event> event)
     {
-        triggers = new Class[]{ event };
+        triggers = (Class<? extends Event>[]) new Class[]{ event };
     }
 
     public Class<? extends EventTriggerFilter> getFilterClass()

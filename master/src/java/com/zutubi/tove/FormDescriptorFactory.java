@@ -289,7 +289,7 @@ public class FormDescriptorFactory
             {
                 try
                 {
-                    AnnotationHandler handler = objectFactory.buildBean(handlerAnnotation.className());
+                    AnnotationHandler handler = objectFactory.buildBean(handlerAnnotation.className(), AnnotationHandler.class);
                     handler.process(type, annotation, descriptor);
                 }
                 catch (InstantiationException e)

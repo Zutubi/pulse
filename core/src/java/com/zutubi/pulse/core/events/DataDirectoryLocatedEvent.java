@@ -7,7 +7,7 @@ import com.zutubi.pulse.events.Event;
  * used.  A brand new data directory will be initialised prior to this event,
  * but otherwise will be unused.
  */
-public class DataDirectoryLocatedEvent extends Event<Object>
+public class DataDirectoryLocatedEvent extends Event
 {
     public DataDirectoryLocatedEvent(Object source)
     {

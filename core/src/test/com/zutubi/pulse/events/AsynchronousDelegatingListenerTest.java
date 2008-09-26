@@ -38,7 +38,7 @@ public class AsynchronousDelegatingListenerTest extends PulseTestCase
         WatiListener delegate = new WatiListener();
         AsynchronousDelegatingListener l = new AsynchronousDelegatingListener(delegate, Executors.defaultThreadFactory());
 
-        l.handleEvent(new Event<Object>(this));
+        l.handleEvent(new Event(this));
         // the listener thread is now waiting for the semaphore to release.
         // we can only release it if it is indeed in a separate thread.
         eventSemaphore.release();

@@ -65,7 +65,7 @@ public abstract class TypeListener<T extends Configuration> implements Configura
             {
                 // Change occured to a child path.  No matter what happened, it
                 // is seen as a change to our own path.
-                T ancestor = event.getSource().getAncestorOfType((Configuration) instance, configurationClass);
+                T ancestor = event.getConfigurationTemplateManager().getAncestorOfType((Configuration) instance, configurationClass);
                 if (ancestor != null)
                 {
                     if (event.isPost())

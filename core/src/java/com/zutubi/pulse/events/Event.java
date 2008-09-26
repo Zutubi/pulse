@@ -5,28 +5,28 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * <class-comment/>
+ * Base class for all events.
  */
-public class Event<T>
+public class Event
 {
     private static AtomicLong NEXT_ID = new AtomicLong(1);
 
-    protected transient T source;
+    protected transient Object source;
     protected final long id;
     protected transient List<Exception> exceptions;
 
-    public Event(T source)
+    public Event(Object source)
     {
         this.source = source;
         this.id = NEXT_ID.getAndIncrement();
     }
 
-    public T getSource()
+    public Object getSource()
     {
         return source;
     }
 
-    public void setSource(T o)
+    public void setSource(Object o)
     {
         source = o;
     }

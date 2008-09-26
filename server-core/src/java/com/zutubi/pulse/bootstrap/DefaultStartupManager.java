@@ -160,7 +160,7 @@ public class DefaultStartupManager implements StartupManager
 
             try
             {
-                instance = objectFactory.buildBean(name);
+                instance = objectFactory.buildBean(name, StartupTask.class);
                 instance.execute();
             }
             catch (Exception e)

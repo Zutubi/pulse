@@ -429,7 +429,7 @@ public class DefaultEventManagerTest extends TestCase
         }
     }
 
-    private static class TestEvent extends Event<Object> implements TestInterface
+    private static class TestEvent extends Event implements TestInterface
     {
         public TestEvent(Object source)
         {
@@ -437,7 +437,7 @@ public class DefaultEventManagerTest extends TestCase
         }
     }
 
-    private static class OuterEvent extends Event<Object>
+    private static class OuterEvent extends Event
     {
         public OuterEvent(Object source)
         {
@@ -445,7 +445,7 @@ public class DefaultEventManagerTest extends TestCase
         }
     }
 
-    private static class MiddleEvent extends Event<Object>
+    private static class MiddleEvent extends Event
     {
         public MiddleEvent(Object source)
         {
@@ -453,7 +453,7 @@ public class DefaultEventManagerTest extends TestCase
         }
     }
 
-    private static class InnerEvent extends Event<Object>
+    private static class InnerEvent extends Event
     {
         public InnerEvent(Object source)
         {

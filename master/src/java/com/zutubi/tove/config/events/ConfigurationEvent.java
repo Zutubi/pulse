@@ -7,7 +7,7 @@ import com.zutubi.tove.config.ConfigurationTemplateManager;
 /**
  * Base for events raised when configuration changes occur.
  */
-public abstract class ConfigurationEvent extends Event<ConfigurationTemplateManager>
+public abstract class ConfigurationEvent extends Event
 {
     private Configuration instance;
 
@@ -15,6 +15,11 @@ public abstract class ConfigurationEvent extends Event<ConfigurationTemplateMana
     {
         super(source);
         this.instance = instance;
+    }
+
+    public ConfigurationTemplateManager getConfigurationTemplateManager()
+    {
+        return (ConfigurationTemplateManager) getSource();
     }
 
     public Configuration getInstance()

@@ -1,17 +1,17 @@
 package com.zutubi.util.bean;
 
 /**
- * <class-comment/>
+ * Interface for a generic factory, used to build instances by type.
  */
 public interface ObjectFactory
 {
-    public <V> V buildBean(Class<V> clazz) throws Exception;
+    public <T> T buildBean(Class<? extends T> clazz) throws Exception;
 
-    public <U> U buildBean(String className) throws Exception;
+    public <T> T buildBean(String className, Class<? super T> token) throws Exception;
 
-    <W> W buildBean(Class<W> clazz, Class[] argTypes, Object[] args) throws Exception;
+    <T> T buildBean(Class<? extends T> clazz, Class[] argTypes, Object[] args) throws Exception;
 
-    <X> X buildBean(String className, Class[] argTypes, Object[] args) throws Exception;
+    <T> T buildBean(String className, Class<? super T> token, Class[] argTypes, Object[] args) throws Exception;
 
-    Class getClassInstance(String className) throws ClassNotFoundException;
+    <T> Class<? extends T> getClassInstance(String className, Class<? super T> token) throws ClassNotFoundException;
 }

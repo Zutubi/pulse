@@ -1,8 +1,8 @@
 package com.zutubi.pulse.slave;
 
+import com.zutubi.pulse.core.events.RecipeEvent;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
-import com.zutubi.pulse.core.events.RecipeEvent;
 import com.zutubi.pulse.services.MasterService;
 import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.util.logging.Logger;
@@ -47,6 +47,6 @@ public class ForwardingEventListener implements EventListener
 
     public Class[] getHandledEvents()
     {
-        return new Class[]{RecipeEvent.class};
+        return new Class[]{RecipeEvent.class };
     }
 }

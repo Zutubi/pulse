@@ -4,11 +4,11 @@ import com.caucho.hessian.io.HessianInput;
 import com.caucho.hessian.io.HessianOutput;
 import com.caucho.hessian.io.SerializerFactory;
 import com.caucho.hessian.server.HessianSkeleton;
+import com.zutubi.pulse.plugins.PluginManager;
 import com.zutubi.pulse.spring.SpringComponentContext;
+import com.zutubi.pulse.spring.SpringObjectFactory;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
-import com.zutubi.pulse.spring.SpringObjectFactory;
-import com.zutubi.pulse.plugins.PluginManager;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -49,8 +49,8 @@ public class CustomHessianServlet extends GenericServlet
 
         try
         {
-            Class serviceClass = objectFactory.getClassInstance(serviceName);
-            skeleton = new HessianSkeleton(objectFactory.buildBean(implName), serviceClass);
+            Class<?> serviceClass = objectFactory.getClassInstance(serviceName, Object.class);
+            skeleton = new HessianSkeleton(objectFactory.buildBean(implName, Object.class), serviceClass);
         }
         catch (Exception e)
         {

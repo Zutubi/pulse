@@ -1,23 +1,18 @@
 package com.zutubi.pulse.core;
 
 import static com.zutubi.pulse.core.BuildProperties.*;
+import com.zutubi.pulse.core.events.*;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.core.events.RecipeCompletedEvent;
-import com.zutubi.pulse.core.events.CommandCompletedEvent;
-import com.zutubi.pulse.core.events.CommandCommencedEvent;
-import com.zutubi.pulse.core.events.RecipeCommencedEvent;
-import com.zutubi.pulse.core.events.RecipeEvent;
-import com.zutubi.pulse.core.events.RecipeStatusEvent;
 import com.zutubi.pulse.events.DefaultEventManager;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.bean.ObjectFactory;
+import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,9 +53,9 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
         // just a little bit of wiring tomfoolary to inject the event manager into the recipe.
         ObjectFactory factory = new DefaultObjectFactory()
         {
-            public <V> V buildBean(Class<V> clazz) throws Exception
+            public <T> T buildBean(Class<? extends T> clazz) throws Exception
             {
-                V bean = super.buildBean(clazz);
+                T bean = super.buildBean(clazz);
                 if (bean instanceof Recipe)
                 {
                     ((Recipe)bean).setEventManager(eventManager);
@@ -336,7 +331,7 @@ public class RecipeProcessorTest extends PulseTestCase implements EventListener
 
     private RecipeCompletedEvent assertRecipeCompleted(long id, ResultState state)
     {
-        Event<Object> e = assertEvent(id);
+        Event e = assertEvent(id);
         assertTrue(e instanceof RecipeCompletedEvent);
 
         RecipeCompletedEvent ce = (RecipeCompletedEvent) e;
