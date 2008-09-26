@@ -19,9 +19,7 @@ import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.scheduling.quartz.TimeoutRecipeJob;
 import com.zutubi.pulse.services.ServiceTokenManager;
-import com.zutubi.pulse.tove.config.project.BuildOptionsConfiguration;
-import com.zutubi.pulse.tove.config.project.BuildStageConfiguration;
-import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.tove.config.project.*;
 import com.zutubi.pulse.tove.config.project.hooks.BuildHookManager;
 import com.zutubi.pulse.tove.config.project.types.TypeConfiguration;
 import com.zutubi.pulse.util.FileSystemUtils;
@@ -87,11 +85,11 @@ public class BuildController implements EventListener
     public BuildController(AbstractBuildRequestEvent event)
     {
         this.request = event;
+        projectConfig = request.getProjectConfig();
     }
 
     public void run()
     {
-        projectConfig = request.getProjectConfig();
         project = projectManager.getProject(projectConfig.getProjectId(), false);
         asyncListener = new AsynchronousDelegatingListener(this, threadFactory);
 
@@ -174,7 +172,7 @@ public class BuildController implements EventListener
             recipeRequest.addAllProperties(projectConfig.getProperties().values());
             recipeRequest.addAllProperties(stage.getProperties().values());
 
-            RecipeAssignmentRequest assignmentRequest = new RecipeAssignmentRequest(project, stage.getAgentRequirements(), resourceRequirements, request.getRevision(), recipeRequest, buildResult);
+            RecipeAssignmentRequest assignmentRequest = new RecipeAssignmentRequest(project, getAgentRequirements(stage), resourceRequirements, request.getRevision(), recipeRequest, buildResult);
             DefaultRecipeLogger logger = new DefaultRecipeLogger(new File(paths.getRecipeDir(buildResult, recipeResult.getId()), RecipeResult.RECIPE_LOG));
             RecipeResultNode previousRecipe = previousSuccessful == null ? null : previousSuccessful.findResultNodeByHandle(stage.getHandle());
             RecipeController rc = new RecipeController(buildResult, childResultNode, assignmentRequest, recipeContext, previousRecipe, logger, collector, configurationManager, resourceManager, recipeDispatchService);
@@ -188,6 +186,16 @@ public class BuildController implements EventListener
             rcNode.add(child);
             pendingRecipes++;
         }
+    }
+
+    private AgentRequirements getAgentRequirements(BuildStageConfiguration stage)
+    {
+        AgentRequirements stageRequirements = stage.getAgentRequirements();
+        if (buildResult.isPersonal())
+        {
+            stageRequirements = new PersonalBuildAgentRequirements(stageRequirements);
+        }
+        return stageRequirements;
     }
 
     private List<ResourceRequirement> getResourceRequirements(BuildStageConfiguration node)

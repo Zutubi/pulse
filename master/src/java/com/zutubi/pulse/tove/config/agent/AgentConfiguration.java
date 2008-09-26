@@ -33,6 +33,7 @@ public class AgentConfiguration extends AbstractConfiguration implements NamedCo
     private String host;
     @Numeric(min = 1)
     private int port = 8090;
+    private boolean allowPersonalBuilds = true;
     private Map<String, Resource> resources;
     private List<AgentAclConfiguration> permissions = new LinkedList<AgentAclConfiguration>();
 
@@ -77,6 +78,16 @@ public class AgentConfiguration extends AbstractConfiguration implements NamedCo
     public void setPort(int port)
     {
         this.port = port;
+    }
+
+    public boolean getAllowPersonalBuilds()
+    {
+        return allowPersonalBuilds;
+    }
+
+    public void setAllowPersonalBuilds(boolean allowPersonalBuilds)
+    {
+        this.allowPersonalBuilds = allowPersonalBuilds;
     }
 
     public long getAgentStateId()

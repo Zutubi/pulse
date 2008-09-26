@@ -33,6 +33,7 @@
                 <ref local="addDefaultVersionToProjectResourceRequirements"/>
                 <ref local="fixNPEOnLDAPRememberMe"/>
                 <ref local="buildCompletedTriggerPropagateRevision"/>
+                <ref local="addAllowPersonalBuilds"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -66,5 +67,9 @@
 
     <bean id="buildCompletedTriggerPropagateRevision" class="com.zutubi.pulse.upgrade.tasks.BuildCompletedTriggerPropagateRevisionUpgradeTask" autowire="byName">
         <property name="buildNumber" value="200011002"/>
+    </bean>
+
+    <bean id="addAllowPersonalBuilds" class="com.zutubi.pulse.upgrade.tasks.AddAllowPersonalBuildsUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="200011003"/>
     </bean>
 </beans>

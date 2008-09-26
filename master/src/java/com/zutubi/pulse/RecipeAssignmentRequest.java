@@ -107,4 +107,9 @@ public class RecipeAssignmentRequest
     {
         timeout = -1;
     }
+
+    public boolean isPersonal()
+    {
+        return build.isPersonal();
+    }
 }

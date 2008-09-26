@@ -12,6 +12,8 @@ import com.zutubi.util.logging.Logger;
 
 import java.util.List;
 import java.util.Map;
+import java.util.LinkedList;
+import java.util.HashMap;
 
 /**
  *  A build stage is a component of a build that represents the execution of a
@@ -30,8 +32,8 @@ public class BuildStageConfiguration extends AbstractNamedConfiguration
     private AgentConfiguration agent;
     private String recipe;
     @Ordered
-    private Map<String, ResourceProperty> properties;
-    private List<ResourceRequirement> requirements;
+    private Map<String, ResourceProperty> properties = new HashMap<String, ResourceProperty>();
+    private List<ResourceRequirement> requirements = new LinkedList<ResourceRequirement>();
 
     @Transient
     private ObjectFactory objectFactory;
