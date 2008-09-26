@@ -34,6 +34,7 @@
                 <ref local="fixNPEOnLDAPRememberMe"/>
                 <ref local="buildCompletedTriggerPropagateRevision"/>
                 <ref local="addAllowPersonalBuilds"/>
+                <ref local="ensureBackupConfigPermanent"/>
             </list>
         </property>
         <property name="systemTasks">
@@ -71,5 +72,9 @@
 
     <bean id="addAllowPersonalBuilds" class="com.zutubi.pulse.upgrade.tasks.AddAllowPersonalBuildsUpgradeTask" autowire="byName">
         <property name="buildNumber" value="200011003"/>
+    </bean>
+
+    <bean id="ensureBackupConfigPermanent" class="com.zutubi.pulse.upgrade.tasks.EnsureBackupConfigPermanentUpgradeTask" autowire="byName">
+        <property name="buildNumber" value="200011004"/>
     </bean>
 </beans>

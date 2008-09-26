@@ -66,6 +66,11 @@ public class MutableRecordImpl extends AbstractMutableRecord
         return getMeta().keySet();
     }
 
+    public boolean containsMetaKey(String key)
+    {
+        return getMeta().containsKey(key);
+    }
+
     public boolean containsKey(String key)
     {
         return getData().containsKey(key);

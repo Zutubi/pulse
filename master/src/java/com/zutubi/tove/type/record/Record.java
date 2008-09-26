@@ -50,6 +50,15 @@ public interface Record
     int size();
 
     /**
+     * Test whether or not the specified meta key is present within the record.
+     *
+     * @param key being tested
+     *
+     * @return true if the meta key is present in the record, false otherwise.
+     */
+    boolean containsMetaKey(String key);
+
+    /**
      * Test whether or not the specified key is present within the record.
      *
      * @param key being tested

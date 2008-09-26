@@ -70,6 +70,11 @@ public class TemplateRecord extends AbstractRecord
         return keySet().isEmpty();
     }
 
+    public boolean containsMetaKey(String key)
+    {
+        return metaKeySet().contains(key);
+    }
+
     public boolean containsKey(String key)
     {
         return keySet().contains(key);

@@ -8,8 +8,8 @@ import com.zutubi.validation.annotations.Constraint;
 import com.zutubi.validation.annotations.Required;
 
 /**
- *
- *
+ * Settings for automatic backups.  By default backups are enabled and run
+ * daily at 5am.
  */
 @SymbolicName("zutubi.backupConfig")
 @Form(fieldOrder = {"enabled", "cronSchedule"})
@@ -23,6 +23,11 @@ public class BackupConfiguration extends AbstractConfiguration
 
     @ControllingCheckbox(dependentFields = {"cronSchedule"})
     private boolean enabled = true;
+
+    public BackupConfiguration()
+    {
+        setPermanent(true);
+    }
 
     public boolean isEnabled()
     {

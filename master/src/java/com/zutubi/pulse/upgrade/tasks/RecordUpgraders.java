@@ -14,7 +14,7 @@ public class RecordUpgraders
      * @return the new upgrader
      * @throws IllegalArgumentException if the value given is not simple
      */
-    public static RecordUpgrader newAddProperty(String name, String value)
+    public static RecordUpgrader newAddProperty(String name, Object value)
     {
         return new AddPropertyRecordUpgrader(name, value);
     }
@@ -44,5 +44,17 @@ public class RecordUpgraders
     public static RecordUpgrader newRenameProperty(String oldName, String newName)
     {
         return new RenamePropertyRecordUpgrader(oldName, newName);
+    }
+
+    /**
+     * Create a new upgrader that will add a meta property to records.
+     *
+     * @param name  the name of the meta property to add
+     * @param value the default value for the property
+     * @return the new upgrader
+     */
+    public static RecordUpgrader newAddMetaProperty(String name, String value)
+    {
+        return new AddMetaPropertyRecordUpgrader(name, value);
     }
 }

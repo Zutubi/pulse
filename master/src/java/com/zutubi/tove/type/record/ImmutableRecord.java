@@ -38,6 +38,11 @@ public class ImmutableRecord implements Record
         return delegate.size();
     }
 
+    public boolean containsMetaKey(String key)
+    {
+        return delegate.containsMetaKey(key);
+    }
+
     public boolean containsKey(String key)
     {
         return delegate.containsKey(key);

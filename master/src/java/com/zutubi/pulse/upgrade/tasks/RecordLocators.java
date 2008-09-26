@@ -6,6 +6,18 @@ package com.zutubi.pulse.upgrade.tasks;
 public class RecordLocators
 {
     /**
+     * Create a new locator that finds a single record by a specific path.  If
+     * the path does not exist, no records will be returned.
+     *
+     * @param path path to use to select the single record
+     * @return a locator to find a single record by a fixed path
+     */
+    public static RecordLocator newPath(String path)
+    {
+        return new PathRecordLocator(path);
+    }
+
+    /**
      * Create a new locator that finds records by their path pattern.  Patterns
      * are defined by {@link com.zutubi.tove.type.record.RecordManager#selectAll(String)}.
      *
