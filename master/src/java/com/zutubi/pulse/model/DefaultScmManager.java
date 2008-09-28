@@ -1,6 +1,7 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.ShutdownManager;
+import com.zutubi.pulse.master.scm.ScmContextFactory;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.*;

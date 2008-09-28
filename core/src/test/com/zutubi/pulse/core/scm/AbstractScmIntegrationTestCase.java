@@ -17,28 +17,37 @@ import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 
 /**
- *
- *
  */
 public abstract class AbstractScmIntegrationTestCase extends TestCase
 {
     protected File workingDir;
+    protected File tmp;
+    protected File persistentWorkingDir;
 
     protected ScmClient client;
     protected ExpectedTestResults testData;
     protected String prefix;
+    private ScmContext context;
 
     protected void setUp() throws Exception
     {
         super.setUp();
 
-        workingDir = FileSystemUtils.createTempDir("dir", null, null);
+        tmp = FileSystemUtils.createTempDir();
+        workingDir = new File(tmp, "wd");
+        persistentWorkingDir = new File(tmp, "pwd");
+
+        context = new ScmContext();
+        context.setPersistentWorkingDir(persistentWorkingDir);
     }
 
     protected void tearDown() throws Exception
     {
         assertTrue(FileSystemUtils.rmdir(workingDir));
+        tmp = null;
         workingDir = null;
+        persistentWorkingDir = null;
+        context = null;
 
         super.tearDown();
     }
@@ -141,7 +150,15 @@ public abstract class AbstractScmIntegrationTestCase extends TestCase
         assertFilesExist(testData.getFilesFor(revision));
 
         Changelist expectedChangelist = testData.getAggregatedChanges(null, revision);
-        assertChangesEqual(expectedChangelist.getChanges(), handler.getChanges());
+
+        if (handler.getChanges().size() > 0)
+        {
+            assertChangesEqual(expectedChangelist.getChanges(), handler.getChanges());
+        }
+        else
+        {
+            assertTrue(handler.getStatusMessages().size() > 0);
+        }
 
 /*
         // these properties are specific to the cvs implementation...
@@ -179,7 +196,14 @@ public abstract class AbstractScmIntegrationTestCase extends TestCase
         Changelist expectedChangelist = testData.getAggregatedChanges(initialRevision, requestedRevision);
 
         assertFilesExist(testData.getFilesFor(requestedRevision));
-        assertChangesEqual(expectedChangelist.getChanges(), handler.getChanges());
+        if (handler.getChanges().size() > 0)
+        {
+            assertChangesEqual(expectedChangelist.getChanges(), handler.getChanges());
+        }
+        else
+        {
+            assertTrue(handler.getStatusMessages().size() > 0);
+        }
     }
 
     public void testRetrieveFile() throws ScmException, IOException
@@ -187,7 +211,7 @@ public abstract class AbstractScmIntegrationTestCase extends TestCase
         InputStream input = null;
         try
         {
-            input = client.retrieve(null, prefix + "project/src/com/package.properties", null);
+            input = client.retrieve(context, prefix + "project/src/com/package.properties", null);
             ByteArrayOutputStream output = new ByteArrayOutputStream();
             IOUtils.joinStreams(input, output);
             assertEquals("key=value", output.toString());
@@ -205,14 +229,14 @@ public abstract class AbstractScmIntegrationTestCase extends TestCase
         InputStream input = null;
         try
         {
-            input = client.retrieve(null, path, testData.getRevision(3));
+            input = client.retrieve(context, path, testData.getRevision(3));
             ByteArrayOutputStream output = new ByteArrayOutputStream();
             IOUtils.joinStreams(input, output);
             assertFalse(output.toString().contains("testSomethingElse"));
 
             IOUtils.close(input);
 
-            input = client.retrieve(null, path, Revision.HEAD);
+            input = client.retrieve(context, path, Revision.HEAD);
             output = new ByteArrayOutputStream();
             IOUtils.joinStreams(input, output);
             assertTrue(output.toString().contains("testSomethingElse"));
@@ -230,7 +254,7 @@ public abstract class AbstractScmIntegrationTestCase extends TestCase
         InputStream input = null;
         try
         {
-            input = client.retrieve(null, path, Revision.HEAD);
+            input = client.retrieve(context, path, Revision.HEAD);
             fail();
         }
         catch (ScmException e)
@@ -252,7 +276,7 @@ public abstract class AbstractScmIntegrationTestCase extends TestCase
         InputStream input = null;
         try
         {
-            input = client.retrieve(null, path, Revision.HEAD);
+            input = client.retrieve(context, path, Revision.HEAD);
             fail();
         }
         catch (ScmException e)
@@ -272,7 +296,7 @@ public abstract class AbstractScmIntegrationTestCase extends TestCase
     public void testBrowse() throws ScmException
     {
         // FIXME: using full repository path rather than data path.
-        List<ScmFile> listing = client.browse(null, prefix + "project", null);
+        List<ScmFile> listing = client.browse(context, prefix + "project", null);
 
         List<ScmFile> expectedListing = this.testData.browse(prefix + "project");
         assertEquals(expectedListing.size(), listing.size());
@@ -282,7 +306,7 @@ public abstract class AbstractScmIntegrationTestCase extends TestCase
             assertTrue(listing.contains(file));
         }
 
-        listing = client.browse(null, prefix + "project/test", null);
+        listing = client.browse(context, prefix + "project/test", null);
         expectedListing = this.testData.browse(prefix + "project/test");
         assertEquals(expectedListing.size(), listing.size());
 
@@ -295,7 +319,7 @@ public abstract class AbstractScmIntegrationTestCase extends TestCase
     public void testAttemptingToBrowseFile() throws ScmException
     {
         // FIXME: using full repository path rather than data path.
-        List<ScmFile> listing = client.browse(null, prefix + "project/README.txt", null);
+        List<ScmFile> listing = client.browse(context, prefix + "project/README.txt", null);
         List<ScmFile> expectedListing = this.testData.browse(prefix + "project/README.txt");
         assertEquals(expectedListing.size(), listing.size());
 
@@ -312,7 +336,7 @@ public abstract class AbstractScmIntegrationTestCase extends TestCase
 
     public void testGetLatestRevision() throws ScmException
     {
-        Revision revision = client.getLatestRevision(null);
+        Revision revision = client.getLatestRevision(context);
         assertEquals(testData.getRevision(4), revision);
     }
 
@@ -321,7 +345,7 @@ public abstract class AbstractScmIntegrationTestCase extends TestCase
         Revision x = testData.getRevision(0);
         Revision y = testData.getRevision(4);
 
-        List<Revision> revisions = client.getRevisions(null, x, y);
+        List<Revision> revisions = client.getRevisions(context, x, y);
         List<Revision> expectedRevisions = testData.getRevisions(x, y);
         assertRevisionsEqual(expectedRevisions, revisions);
     }
@@ -330,7 +354,7 @@ public abstract class AbstractScmIntegrationTestCase extends TestCase
     {
         Revision x = testData.getRevision(2);
 
-        List<Revision> revisions = client.getRevisions(null, x, null);
+        List<Revision> revisions = client.getRevisions(context, x, null);
         List<Revision> expectedRevisions = testData.getRevisions(x, null);
         assertRevisionsEqual(expectedRevisions, revisions);
     }
@@ -354,21 +378,21 @@ public abstract class AbstractScmIntegrationTestCase extends TestCase
         Revision x = testData.getRevision(0);
         Revision y = testData.getRevision(1);
 
-        List<Changelist> changelists = client.getChanges(null, x, y);
+        List<Changelist> changelists = client.getChanges(context, x, y);
         List<Changelist> expectedChangeLists = testData.getChanges(x, y);
         assertChangelistsEqual(expectedChangeLists, changelists);
 
         x = testData.getRevision(1);
         y = testData.getRevision(2);
 
-        changelists = client.getChanges(null, x, y);
+        changelists = client.getChanges(context, x, y);
         expectedChangeLists = testData.getChanges(x, y);
         assertChangelistsEqual(expectedChangeLists, changelists);
 
         x = testData.getRevision(2);
         y = testData.getRevision(4);
 
-        changelists = client.getChanges(null, x, y);
+        changelists = client.getChanges(context, x, y);
         expectedChangeLists = testData.getChanges(x, y);
         assertChangelistsEqual(expectedChangeLists, changelists);
 
@@ -379,7 +403,7 @@ public abstract class AbstractScmIntegrationTestCase extends TestCase
         x = testData.getRevision(4);
         y = testData.getRevision(4);
 
-        changelists = client.getChanges(null, x, y);
+        changelists = client.getChanges(context, x, y);
         assertEquals(0, changelists.size());
     }
 
@@ -387,7 +411,7 @@ public abstract class AbstractScmIntegrationTestCase extends TestCase
     {
         Revision x = testData.getRevision(2);
 
-        List<Changelist> changelists = client.getChanges(null, x, null);
+        List<Changelist> changelists = client.getChanges(context, x, null);
         List<Changelist> expectedChangeLists = testData.getChanges(x, null);
         assertChangelistsEqual(expectedChangeLists, changelists);
     }

@@ -1025,6 +1025,18 @@ public class StringUtilsTest extends TestCase
         assertEquals("123123123", StringUtils.times("123", 3));
     }
 
+    public void testStripLeadingWhitespace()
+    {
+        assertEquals("", StringUtils.stripLeadingWhitespace(""));
+        assertEquals("", StringUtils.stripLeadingWhitespace(" "));
+        assertEquals("", StringUtils.stripLeadingWhitespace("  "));
+        assertEquals("abc", StringUtils.stripLeadingWhitespace("abc"));
+        assertEquals("abc", StringUtils.stripLeadingWhitespace(" abc"));
+        assertEquals("abc", StringUtils.stripLeadingWhitespace("  abc"));
+        assertEquals("abc  ", StringUtils.stripLeadingWhitespace("  abc  "));
+        assertEquals("", StringUtils.stripLeadingWhitespace("  \n   "));
+    }
+
     private <T> T[] a(T... a)
     {
         return a;

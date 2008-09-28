@@ -1297,4 +1297,22 @@ public class StringUtils
 
         return result.toString();
     }
+
+    /**
+     * Remove any leading whitespace from the string.
+     * @param str with leading whitespace
+     * @return the string with leading whitespace removed
+     */
+    public static String stripLeadingWhitespace(String str)
+    {
+        int i = 0;
+        for (; i < str.length(); i++)
+        {
+            if (!Character.isWhitespace(str.charAt(i)))
+            {
+                break;
+            }
+        }
+        return str.substring(i);
+    }
 }

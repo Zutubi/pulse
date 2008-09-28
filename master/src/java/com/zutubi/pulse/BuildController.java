@@ -23,6 +23,7 @@ import com.zutubi.pulse.tove.config.project.*;
 import com.zutubi.pulse.tove.config.project.hooks.BuildHookManager;
 import com.zutubi.pulse.tove.config.project.types.TypeConfiguration;
 import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.master.scm.ScmContextFactory;
 import com.zutubi.util.Constants;
 import com.zutubi.util.TimeStamps;
 import com.zutubi.util.TreeNode;

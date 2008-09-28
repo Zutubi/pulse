@@ -7,8 +7,7 @@ import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.personal.PersonalBuildUI;
 
 /**
- *
- *
+ * to be implemented.
  */
 public class GitWorkingCopy implements WorkingCopy
 {

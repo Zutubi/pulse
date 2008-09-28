@@ -1,20 +1,23 @@
 package com.zutubi.pulse.core.scm.git.config;
 
-import com.zutubi.pulse.core.scm.config.PollableScmConfiguration;
-import com.zutubi.pulse.core.scm.config.ScmConfiguration;
-import com.zutubi.config.annotations.Transient;
+import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.config.annotations.Transient;
+import com.zutubi.pulse.core.scm.config.PollableScmConfiguration;
+import com.zutubi.validation.annotations.Required;
 
 /**
  *
  *
  */
 @SymbolicName("zutubi.gitConfig")
-public class GitConfiguration extends ScmConfiguration
+//@ConfigurationCheck("GitConfigurationCheckHandler")
+@Form(fieldOrder = {"repository", "branch", "checkoutScheme", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod"})
+public class GitConfiguration extends PollableScmConfiguration
 {
     private String repository;
 
-    private String branch;
+    private String branch = "master";
 
     @Transient
     public String getType()
@@ -30,6 +33,7 @@ public class GitConfiguration extends ScmConfiguration
         return null;
     }
 
+    @Required
     public String getRepository()
     {
         return repository;
@@ -40,6 +44,7 @@ public class GitConfiguration extends ScmConfiguration
         this.repository = repository;
     }
 
+    @Required
     public void setBranch(String branch)
     {
         this.branch = branch;

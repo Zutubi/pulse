@@ -14,6 +14,7 @@ import com.zutubi.pulse.events.build.RecipeAssignedEvent;
 import com.zutubi.pulse.events.system.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.events.system.SystemStartedEvent;
 import com.zutubi.pulse.tove.config.admin.GlobalConfiguration;
+import com.zutubi.pulse.master.scm.ScmContextFactory;
 import com.zutubi.tove.config.ConfigurationEventListener;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.events.ConfigurationEvent;

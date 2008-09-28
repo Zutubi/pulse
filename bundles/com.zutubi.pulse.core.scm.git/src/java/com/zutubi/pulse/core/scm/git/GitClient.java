@@ -1,15 +1,16 @@
 package com.zutubi.pulse.core.scm.git;
 
 import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.FileStatus;
 import com.zutubi.pulse.core.scm.ScmCapability;
 import com.zutubi.pulse.core.scm.ScmClient;
+import com.zutubi.pulse.core.scm.ScmContext;
 import com.zutubi.pulse.core.scm.ScmEventHandler;
 import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.ScmFile;
-import com.zutubi.pulse.core.scm.ScmContext;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.TextUtils;
 
@@ -17,45 +18,76 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
- *
- *
+ * Implementation of the {@link com.zutubi.pulse.core.scm.ScmClient} interface for the
+ * GIT source control system (http://git.or.cz/).
  */
 public class GitClient implements ScmClient
 {
     private static final Set<ScmCapability> CAPABILITIES = new HashSet<ScmCapability>();
-    
-    private String repository;
-    private String branch;
 
-    public void close()
+    static
     {
-
+        CAPABILITIES.add(ScmCapability.BROWSE);
+        CAPABILITIES.add(ScmCapability.CHANGESETS);
+        CAPABILITIES.add(ScmCapability.POLL);
+        CAPABILITIES.add(ScmCapability.REVISIONS);
     }
 
+    private String repository;
+    private String branch;
+    private static final String LOCAL_BRANCH_NAME = "local";
+    private static final String TMP_BRANCH_PREFIX = "tmp.";
+
+    /**
+     * @see com.zutubi.pulse.core.scm.ScmClient#close()
+     */
+    public void close()
+    {
+        // noop.
+    }
+
+    /**
+     * @see com.zutubi.pulse.core.scm.ScmClient#getCapabilities()
+     */
     public Set<ScmCapability> getCapabilities()
     {
         return CAPABILITIES;
     }
 
+    /**
+     * @see com.zutubi.pulse.core.scm.ScmClient#getUid()
+     */
     public String getUid() throws ScmException
     {
         return repository;
     }
 
+    /**
+     * @see com.zutubi.pulse.core.scm.ScmClient#getLocation()
+     */
     public String getLocation() throws ScmException
     {
         return getUid();
     }
 
+    /**
+     * @see com.zutubi.pulse.core.scm.ScmClient#checkout(com.zutubi.pulse.core.ExecutionContext, com.zutubi.pulse.core.model.Revision, com.zutubi.pulse.core.scm.ScmEventHandler)
+     */
     public Revision checkout(ExecutionContext context, Revision revision, ScmEventHandler handler) throws ScmException
     {
         NativeGit git = new NativeGit();
+        git.setScmEventHandler(handler);
+
         File workingDir = context.getWorkingDir();
-        // git does not like a checkouts into existing directories - not this way anyways.
+        // Git likes to create the directory we clone into, so we need to ensure that it can do so.
         if (workingDir.exists() && !FileSystemUtils.rmdir(workingDir))
         {
             throw new ScmException("Failed in clean checkout.  Could not delete directory: " + workingDir.getAbsolutePath());
@@ -65,85 +97,311 @@ public class GitClient implements ScmClient
         git.clone(repository, workingDir.getName());
 
         git.setWorkingDirectory(workingDir);
+        git.checkout("origin/" + branch, LOCAL_BRANCH_NAME);
 
-        // do we need to switch branches?.
-        if (TextUtils.stringSet(branch))
+        if (revision != null && TextUtils.stringSet(revision.getRevisionString()))
         {
-            git.checkout(branch);
+            String rev = revision.getRevisionString();
+            git.checkout(rev, TMP_BRANCH_PREFIX + rev);
         }
 
-        // what is the current head revision?.
-        List<GitLogEntry> entries = git.log("HEAD^", "HEAD");
-        GitLogEntry entry = entries.get(0);
+        GitLogEntry entry = git.log(1).get(0);
 
-        return new Revision(entry.getAuthor(), entry.getComment(), entry.getDate(), entry.getCommit());
+        Revision rev = new Revision(entry.getAuthor(), entry.getComment(), entry.getDate(), entry.getId());
+        rev.setBranch(branch);
+        return rev;
     }
 
+    /**
+     * @see com.zutubi.pulse.core.scm.ScmClient#update(com.zutubi.pulse.core.ExecutionContext, com.zutubi.pulse.core.model.Revision, com.zutubi.pulse.core.scm.ScmEventHandler)
+     */
     public Revision update(ExecutionContext context, Revision revision, ScmEventHandler handler) throws ScmException
     {
-        NativeGit git = new NativeGit();
         File workingDir = context.getWorkingDir();
 
-        //TODO: we want to update to a specific revision...
-
+        NativeGit git = new NativeGit();
+        git.setScmEventHandler(handler);
         git.setWorkingDirectory(workingDir);
+
+        // switch to the primary local checkout and update.
+        git.checkout(LOCAL_BRANCH_NAME);
         git.pull();
 
-        // what is the current head revision?.
-        List<GitLogEntry> entries = git.log("HEAD^", "HEAD");
-        GitLogEntry entry = entries.get(0);
+        // cleanup any existing tmp local branches.
+        List<GitBranchEntry> branches = git.branch();
+        for (GitBranchEntry branch : branches)
+        {
+            if (branch.getName().startsWith(TMP_BRANCH_PREFIX))
+            {
+                git.deleteBranch(branch.getName());
+            }
+        }
 
-        return new Revision(entry.getAuthor(), entry.getComment(), entry.getDate(), entry.getCommit());
+        if (revision != null && TextUtils.stringSet(revision.getRevisionString()))
+        {
+            String rev = revision.getRevisionString();
+            git.checkout(rev, TMP_BRANCH_PREFIX + rev);
+        }
+
+        git.setWorkingDirectory(workingDir);
+        GitLogEntry entry = git.log(1).get(0);
+
+        Revision rev = new Revision(entry.getAuthor(), entry.getComment(), entry.getDate(), entry.getId());
+        rev.setBranch(branch);
+        return rev;
     }
 
+    /**
+     * @see com.zutubi.pulse.core.scm.ScmClient#retrieve(com.zutubi.pulse.core.scm.ScmContext, String, com.zutubi.pulse.core.model.Revision)
+     */
     public InputStream retrieve(ScmContext context, String path, Revision revision) throws ScmException
     {
-        return null;
+        synchronized (context)
+        {
+            File workingDir = context.getPersistentWorkingDir();
+
+            preparePersistentDirectory(workingDir);
+
+            NativeGit git = new NativeGit();
+            git.setWorkingDirectory(workingDir);
+
+            if (revision == null)
+            {
+                return git.show(path);
+            }
+            else
+            {
+                return git.show(revision.getRevisionString(), path);
+            }
+        }
     }
 
+    /**
+     * @see com.zutubi.pulse.core.scm.ScmClient#storeConnectionDetails(java.io.File)
+     */
     public void storeConnectionDetails(File outputDir) throws ScmException, IOException
     {
 
     }
 
+    /**
+     * @see com.zutubi.pulse.core.scm.ScmClient#getEOLPolicy(com.zutubi.pulse.core.scm.ScmContext)
+     */
     public FileStatus.EOLStyle getEOLPolicy(ScmContext context) throws ScmException
     {
-        return null;
+        return FileStatus.EOLStyle.BINARY;
     }
 
+    /**
+     * @see com.zutubi.pulse.core.scm.ScmClient#getLatestRevision(com.zutubi.pulse.core.scm.ScmContext)
+     */
     public Revision getLatestRevision(ScmContext context) throws ScmException
     {
-        return null;
+        synchronized (context)
+        {
+            File workingDir = context.getPersistentWorkingDir();
+
+            preparePersistentDirectory(workingDir);
+
+            // need to handle the case where this is the first revision...
+            NativeGit git = new NativeGit();
+            git.setWorkingDirectory(workingDir);
+
+            GitLogEntry entry = git.log(1).get(0);
+
+            Revision rev = new Revision(entry.getAuthor(), entry.getComment(), entry.getDate(), entry.getId());
+            rev.setBranch(branch);
+            return rev;
+        }
     }
 
+    private void preparePersistentDirectory(File workingDir) throws ScmException
+    {
+        NativeGit git = new NativeGit();
+        if (new File(workingDir, ".git").isDirectory())
+        {
+            git.setWorkingDirectory(workingDir);
+            git.checkout(LOCAL_BRANCH_NAME);
+            git.pull();
+        }
+        else
+        {
+            // git does not like a checkouts into existing directories - not this way anyways.
+            if (workingDir.exists() && !FileSystemUtils.rmdir(workingDir))
+            {
+                throw new ScmException("Failed in clean checkout.  Could not delete directory: " + workingDir.getAbsolutePath());
+            }
+
+            git.setWorkingDirectory(workingDir.getParentFile());
+            git.clone(repository, workingDir.getName());
+
+            git.setWorkingDirectory(workingDir);
+            git.checkout("origin/" + branch, LOCAL_BRANCH_NAME);
+        }
+    }
+
+    /**
+     * @see com.zutubi.pulse.core.scm.ScmClient#getRevisions(com.zutubi.pulse.core.scm.ScmContext, com.zutubi.pulse.core.model.Revision, com.zutubi.pulse.core.model.Revision)
+     */
     public List<Revision> getRevisions(ScmContext context, Revision from, Revision to) throws ScmException
     {
-        return null;
+        synchronized (context)
+        {
+            File workingDir = context.getPersistentWorkingDir();
+
+            preparePersistentDirectory(workingDir);
+
+            if (to == null)
+            {
+                to = new Revision("HEAD");
+            }
+
+            NativeGit git = new NativeGit();
+            git.setWorkingDirectory(workingDir);
+
+            List<GitLogEntry> entries = git.log(from.getRevisionString(), to.getRevisionString());
+
+            List<Revision> revisions = new LinkedList<Revision>();
+            for (GitLogEntry entry : entries)
+            {
+                Revision rev = new Revision(entry.getAuthor(), entry.getComment(), entry.getDate(), entry.getId());
+                rev.setBranch(branch);
+                revisions.add(rev);
+            }
+            return revisions;
+        }
     }
 
+    /**
+     * @see com.zutubi.pulse.core.scm.ScmClient#getChanges(com.zutubi.pulse.core.scm.ScmContext, com.zutubi.pulse.core.model.Revision, com.zutubi.pulse.core.model.Revision)
+     */
     public List<Changelist> getChanges(ScmContext context, Revision from, Revision to) throws ScmException
     {
-        return null;
+        synchronized (context)
+        {
+            File workingDir = context.getPersistentWorkingDir();
+
+            preparePersistentDirectory(workingDir);
+
+            if (to == null)
+            {
+                to = new Revision("HEAD");
+            }
+
+            NativeGit git = new NativeGit();
+            git.setWorkingDirectory(workingDir);
+
+            List<GitLogEntry> entries = git.log(from.getRevisionString(), to.getRevisionString());
+
+            // be aware, the log contains duplicate file entries for the edit/delete case.
+
+            List<Changelist> changelists = new LinkedList<Changelist>();
+            for (GitLogEntry entry : entries)
+            {
+                Revision rev = new Revision(entry.getAuthor(), entry.getComment(), entry.getDate(), entry.getId());
+                rev.setBranch(branch);
+                
+                Changelist changelist = new Changelist(rev);
+
+                Map<String, String> fileActions = new HashMap<String, String>();
+                for (GitLogEntry.FileChangeEntry file : entry.getFiles())
+                {
+                    if (fileActions.containsKey(file.getName()))
+                    {
+                        if (file.getAction().equals("delete"))
+                        {
+                            fileActions.put(file.getName(), "delete");
+                        }
+                    }
+                    else
+                    {
+                        fileActions.put(file.getName(), file.getAction());
+                    }
+                }
+
+                for (Map.Entry<String, String> e : fileActions.entrySet())
+                {
+                    Change.Action action;
+                    if (e.getValue().equals("update"))
+                    {
+                        action = Change.Action.EDIT;
+                    }
+                    else if (e.getValue().equals("delete"))
+                    {
+                        action = Change.Action.DELETE;
+                    }
+                    else if (e.getValue().equals("create"))
+                    {
+                        action = Change.Action.ADD;
+                    }
+                    else
+                    {
+                        action = Change.Action.UNKNOWN;
+                    }
+                    Change change = new Change(e.getKey(), entry.getId(), action);
+                    changelist.addChange(change);
+                }
+                changelists.add(changelist);
+            }
+
+            return changelists;
+        }
     }
 
+    /**
+     * @see com.zutubi.pulse.core.scm.ScmClient#browse(com.zutubi.pulse.core.scm.ScmContext, String, com.zutubi.pulse.core.model.Revision)
+     */
     public List<ScmFile> browse(ScmContext context, String path, Revision revision) throws ScmException
     {
-        return null;
+        synchronized (context)
+        {
+            File workingDir = context.getPersistentWorkingDir();
+
+            preparePersistentDirectory(workingDir);
+
+            if (revision != null && TextUtils.stringSet(revision.getRevisionString()))
+            {
+                // reset to the requested revision.  We expect the requested revision to be in the log.
+                String rev = revision.getRevisionString();
+
+                NativeGit git = new NativeGit();
+                git.setWorkingDirectory(workingDir);
+                git.checkout(rev, TMP_BRANCH_PREFIX + rev);
+            }
+
+            ScmFile parent = new ScmFile(path);
+            File base = new File(workingDir, path);
+            if (base.isFile())
+            {
+                return Arrays.asList(new ScmFile(path));
+            }
+            List<ScmFile> listing = new LinkedList<ScmFile>();
+            if (base.isDirectory())
+            {
+                for (File file : base.listFiles())
+                {
+                    ScmFile f = new ScmFile(parent, file.getName(), file.isDirectory());
+                    listing.add(f);
+                }
+            }
+            return listing;
+        }
     }
 
+    /**
+     * @see com.zutubi.pulse.core.scm.ScmClient#tag(com.zutubi.pulse.core.ExecutionContext, com.zutubi.pulse.core.model.Revision, String, boolean)
+     */
     public void tag(ExecutionContext context, Revision revision, String name, boolean moveExisting) throws ScmException
     {
-
+        // not yet implemented.
     }
 
-    public Revision getRevision(String revision) throws ScmException
-    {
-        return parseRevision(revision);
-    }
-
+    /**
+     * @see com.zutubi.pulse.core.scm.ScmClient#parseRevision(String)    
+     */
     public Revision parseRevision(String revision) throws ScmException
     {
-        return null;
+        return new Revision(revision);
     }
 
     public void setRepository(String repository)

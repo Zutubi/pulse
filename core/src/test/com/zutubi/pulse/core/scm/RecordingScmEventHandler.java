@@ -8,12 +8,12 @@ import java.util.Collections;
 
 
 /**
- *
- *
  */
 public class RecordingScmEventHandler implements ScmEventHandler
 {
     private List<Change> changes = new LinkedList<Change>();
+
+    private List<String> statusMessages = new LinkedList<String>();
 
     public void fileChanged(Change change)
     {
@@ -32,7 +32,12 @@ public class RecordingScmEventHandler implements ScmEventHandler
 
     public void status(String message)
     {
+        statusMessages.add(message);
+    }
 
+    public List<String> getStatusMessages()
+    {
+        return statusMessages;
     }
 
     public void checkCancelled() throws ScmCancelledException

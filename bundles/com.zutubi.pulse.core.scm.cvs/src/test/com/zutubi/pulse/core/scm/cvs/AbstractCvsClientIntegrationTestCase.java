@@ -12,10 +12,6 @@ import java.util.List;
 import java.util.Arrays;
 import java.io.IOException;
 
-/**
- *
- *
- */
 public abstract class AbstractCvsClientIntegrationTestCase extends AbstractScmIntegrationTestCase
 {
     public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyyMMdd-HH:mm:ss z");

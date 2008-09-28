@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.pulse.core.scm.ScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.ScmContext;
-import com.zutubi.pulse.core.scm.ScmContextFactory;
+import com.zutubi.pulse.master.scm.ScmContextFactory;
 import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.ScmFile;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
