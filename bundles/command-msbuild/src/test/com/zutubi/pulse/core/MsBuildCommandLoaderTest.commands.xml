@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<project>
+    <recipe name="default">
+        <msbuild name="defaults"/>
+        <msbuild name="buildfile" build-file="mybf"/>
+        <msbuild name="targets" targets="clean test"/>
+        <msbuild name="configuration" configuration="Release"/>
+        <msbuild name="properties">
+            <build-property name="foo" value="bar"/>
+        </msbuild>
+        <msbuild name="nopp" post-process="false"/>
+    </recipe>
+</project>
+        

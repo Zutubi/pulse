@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="Build">
+    <Message Text="Configuration = $(Configuration)"/>
+    <Message Text="foo = $(foo)"/>
+  </Target>
+    <Target Name="T1">
+        <Message Text="Ran T1"/>
+    </Target>
+    <Target Name="T2">
+        <Message Text="Ran T2"/>
+    </Target>
+</Project>

@@ -1,0 +1,11 @@
+Microsoft (R) Build Engine Version 3.5.21022.8
+[Microsoft .NET Framework, Version 2.0.50727.1434]
+Copyright (C) Microsoft Corporation 2007. All rights reserved.
+
+Build started 28/09/2008 2:52:01 PM.
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:00.38

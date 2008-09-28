@@ -2,15 +2,16 @@ package com.zutubi.pulse.core;
 
 import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.BuildProperties.PROPERTY_RECIPE_PATHS;
+import com.zutubi.pulse.core.events.CommandCommencedEvent;
+import com.zutubi.pulse.core.events.CommandCompletedEvent;
 import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
-import com.zutubi.pulse.core.events.CommandCompletedEvent;
 import com.zutubi.pulse.events.DefaultEventManager;
 import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.core.events.CommandCommencedEvent;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
@@ -18,6 +19,7 @@ import com.zutubi.util.io.IOUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -190,6 +192,32 @@ public abstract class CommandTestBase extends PulseTestCase implements EventList
     {
         String commandDirName = String.format("00000000-%s", result.getCommandName());
         return new File(outputDir, FileSystemUtils.composeFilename(commandDirName, artifact.getFile().getPath()));
+    }
+
+    protected StoredFileArtifact getOutputArtifact(CommandResult result)
+    {
+        return result.getFileArtifact(ExecutableCommand.OUTPUT_ARTIFACT_NAME + "/" + ExecutableCommand.OUTPUT_FILENAME);
+    }
+
+    protected void assertErrorsMatch(StoredFileArtifact artifact, String... summaryRegexes)
+    {
+        assertFeatures(artifact, Feature.Level.ERROR, summaryRegexes);
+    }
+
+    protected void assertWarningsMatch(StoredFileArtifact artifact, String... summaryRegexes)
+    {
+        assertFeatures(artifact, Feature.Level.WARNING, summaryRegexes);
+    }
+
+    protected void assertFeatures(StoredFileArtifact artifact, Feature.Level level, String... summaryRegexes)
+    {
+        List<Feature> features = artifact.getFeatures(level);
+        assertEquals(summaryRegexes.length, features.size());
+        for(int i = 0; i < summaryRegexes.length; i++)
+        {
+            String summary = features.get(i).getSummary();
+            assertTrue("Summary '" + summary + "' does not match regex '" + summaryRegexes[i], summary.matches(summaryRegexes[i]));
+        }
     }
 
     public void handleEvent(Event evt)
