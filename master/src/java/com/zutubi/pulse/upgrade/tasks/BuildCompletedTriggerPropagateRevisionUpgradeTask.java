@@ -26,11 +26,6 @@ public class BuildCompletedTriggerPropagateRevisionUpgradeTask extends AbstractR
         return true;
     }
 
-    protected String getScope()
-    {
-        return "projects";
-    }
-
     protected RecordLocator getRecordLocator()
     {
         // Find all triggers, filter down to build completed triggers.

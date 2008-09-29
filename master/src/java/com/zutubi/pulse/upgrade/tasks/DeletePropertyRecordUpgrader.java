@@ -4,7 +4,7 @@ import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.RecordUtils;
 
 /**
- * Deletes an existing property from a record.
+ * Deletes an existing simple property from a record.
  */
 class DeletePropertyRecordUpgrader implements RecordUpgrader
 {

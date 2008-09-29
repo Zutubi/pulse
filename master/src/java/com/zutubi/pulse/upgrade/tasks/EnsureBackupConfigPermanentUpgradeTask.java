@@ -1,10 +1,10 @@
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.tove.type.record.PathUtils;
 
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Adds the permanent flag to backup configuration if it is not already
@@ -27,11 +27,6 @@ public class EnsureBackupConfigPermanentUpgradeTask extends AbstractRecordProper
     public boolean haltOnFailure()
     {
         return true;
-    }
-
-    protected String getScope()
-    {
-        return SCOPE_SETTINGS;
     }
 
     protected RecordLocator getRecordLocator()

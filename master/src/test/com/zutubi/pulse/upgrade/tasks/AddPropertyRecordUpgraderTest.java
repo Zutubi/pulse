@@ -10,6 +10,9 @@ public class AddPropertyRecordUpgraderTest extends PulseTestCase
     private static final String PROPERTY_VALUE = "test value";
     private static final String SCOPE = "scope";
     private static final String PATH = SCOPE + "/path";
+    private static final String TEMPLATED_SCOPE = "templated scope";
+    private static final String TEMPLATED_ANCESTOR_PATH = TEMPLATED_SCOPE + "/ancestor";
+    private static final String TEMPLATED_NO_ANCESTOR_PATH = TEMPLATED_SCOPE + "/noancestor";
 
     private AddPropertyRecordUpgrader upgrader;
 
@@ -17,7 +20,16 @@ public class AddPropertyRecordUpgraderTest extends PulseTestCase
     {
         super.setUp();
         upgrader = new AddPropertyRecordUpgrader(PROPERTY_NAME, PROPERTY_VALUE);
-        upgrader.setScopeDetails(new ScopeDetails(SCOPE));
+
+        TemplatedScopeDetails templatedScopeDetails = mock(TemplatedScopeDetails.class);
+        doReturn(true).when(templatedScopeDetails).hasAncestor(TEMPLATED_ANCESTOR_PATH);
+        doReturn(false).when(templatedScopeDetails).hasAncestor(TEMPLATED_NO_ANCESTOR_PATH);
+
+        PersistentScopes scopes = mock(PersistentScopes.class);
+        doReturn(new ScopeDetails(SCOPE)).when(scopes).findByPath(startsWith(SCOPE));
+        doReturn(templatedScopeDetails).when(scopes).findByPath(startsWith(TEMPLATED_SCOPE));
+
+        upgrader.setPersistentScopes(scopes);
     }
 
     public void testSimpleScope()
@@ -29,23 +41,15 @@ public class AddPropertyRecordUpgraderTest extends PulseTestCase
 
     public void testTemplatedScopeNoAncestor()
     {
-        TemplatedScopeDetails scopeDetails = mock(TemplatedScopeDetails.class);
-        doReturn(false).when(scopeDetails).hasAncestor(anyString());
-        upgrader.setScopeDetails(scopeDetails);
-
         MutableRecordImpl mutable = new MutableRecordImpl();
-        upgrader.upgrade(PATH, mutable);
+        upgrader.upgrade(TEMPLATED_NO_ANCESTOR_PATH, mutable);
         assertEquals(PROPERTY_VALUE, mutable.get(PROPERTY_NAME));
     }
 
     public void testTemplatedScopeHasAncestor()
     {
-        TemplatedScopeDetails scopeDetails = mock(TemplatedScopeDetails.class);
-        doReturn(true).when(scopeDetails).hasAncestor(anyString());
-        upgrader.setScopeDetails(scopeDetails);
-
         MutableRecordImpl mutable = new MutableRecordImpl();
-        upgrader.upgrade(PATH, mutable);
+        upgrader.upgrade(TEMPLATED_ANCESTOR_PATH, mutable);
         assertNull(mutable.get(PROPERTY_NAME));
     }
 

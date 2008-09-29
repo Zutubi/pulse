@@ -1,9 +1,9 @@
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.tove.type.record.*;
+import com.zutubi.tove.type.record.PathUtils;
 
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Adds the new allowPersonalBuilds flag to agent configurations.
@@ -26,11 +26,6 @@ public class AddAllowPersonalBuildsUpgradeTask extends AbstractRecordPropertiesU
     public boolean haltOnFailure()
     {
         return true;
-    }
-
-    protected String getScope()
-    {
-        return SCOPE_AGENTS;
     }
 
     protected RecordLocator getRecordLocator()

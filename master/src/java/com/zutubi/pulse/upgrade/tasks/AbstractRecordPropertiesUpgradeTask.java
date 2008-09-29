@@ -1,11 +1,9 @@
 package com.zutubi.pulse.upgrade.tasks;
 
 import com.zutubi.pulse.upgrade.UpgradeException;
-import com.zutubi.tove.type.TypeRegistry;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
-import com.zutubi.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -35,10 +33,7 @@ import java.util.Map;
  */
 public abstract class AbstractRecordPropertiesUpgradeTask extends AbstractUpgradeTask
 {
-    private static final String[] TEMPLATED_SCOPES = {"projects", "agents"};
-    
     protected RecordManager recordManager;
-    protected TypeRegistry typeRegistry;
 
     public void execute() throws UpgradeException
     {
@@ -64,38 +59,21 @@ public abstract class AbstractRecordPropertiesUpgradeTask extends AbstractUpgrad
     {
         // Create the details lazily as it takes some time and will not
         // be necessary for all tasks.
-        ScopeDetails scopeDetails = createScopeDetails(getScope());
-        wireScopeDetails(recordLocator, scopeDetails);
+        PersistentScopes scopes = new PersistentScopes(recordManager);
+        wireScopes(recordLocator, scopes);
         for (RecordUpgrader upgrader: recordUpgraders)
         {
-            wireScopeDetails(upgrader, scopeDetails);
+            wireScopes(upgrader, scopes);
         }
     }
 
-    private ScopeDetails createScopeDetails(String scope) throws UpgradeException
+    private void wireScopes(Object o, PersistentScopes persistentScopes) throws UpgradeException
     {
-        if (CollectionUtils.contains(TEMPLATED_SCOPES, scope))
+        if (o instanceof PersistentScopesAware)
         {
-            return new TemplatedScopeDetails(scope, recordManager);
-        }
-        else
-        {
-            return new ScopeDetails(scope);
+            ((PersistentScopesAware) o).setPersistentScopes(persistentScopes);
         }
     }
-
-    private void wireScopeDetails(Object o, ScopeDetails scopeDetails) throws UpgradeException
-    {
-        if (o instanceof ScopeDetailsAware)
-        {
-            ((ScopeDetailsAware) o).setScopeDetails(scopeDetails);
-        }
-    }
-
-    /**
-     * @return the name of the scope in which this task operates
-     */
-    protected abstract String getScope();
 
     /**
      * Defines how this task identifies the records it will upgrade.  All
@@ -121,10 +99,5 @@ public abstract class AbstractRecordPropertiesUpgradeTask extends AbstractUpgrad
     public void setRecordManager(RecordManager recordManager)
     {
         this.recordManager = recordManager;
-    }
-
-    public void setTypeRegistry(TypeRegistry typeRegistry)
-    {
-        this.typeRegistry = typeRegistry;
     }
 }

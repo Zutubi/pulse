@@ -4,14 +4,15 @@ import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.RecordUtils;
 
 /**
- * Adds a new property to an existing record, with a fixed default value.
+ * Adds a new property to an existing record, with a fixed default value.  The
+ * property value must be simple (a string or string array).
  */
-class AddPropertyRecordUpgrader implements RecordUpgrader, ScopeDetailsAware
+class AddPropertyRecordUpgrader implements RecordUpgrader, PersistentScopesAware
 {
     private String name;
     private Object value;
 
-    private ScopeDetails scopeDetails;
+    private PersistentScopes persistentScopes;
 
     /**
      * @param name  the name of the property to add
@@ -38,6 +39,7 @@ class AddPropertyRecordUpgrader implements RecordUpgrader, ScopeDetailsAware
             return;
         }
 
+        ScopeDetails scopeDetails = persistentScopes.findByPath(path);
         if (scopeDetails instanceof TemplatedScopeDetails)
         {
             // In templated scopes we should only add the property to records
@@ -52,8 +54,8 @@ class AddPropertyRecordUpgrader implements RecordUpgrader, ScopeDetailsAware
         record.put(name, value);
     }
 
-    public void setScopeDetails(ScopeDetails scopeDetails)
+    public void setPersistentScopes(PersistentScopes persistentScopes)
     {
-        this.scopeDetails = scopeDetails;
+        this.persistentScopes = persistentScopes;
     }
 }

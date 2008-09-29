@@ -9,12 +9,12 @@ import com.zutubi.util.CollectionUtils;
  * Automatically figures out if the property is NoInherit and handles it
  * accordingly.
  */
-class AddMetaPropertyRecordUpgrader implements RecordUpgrader, ScopeDetailsAware
+class AddMetaPropertyRecordUpgrader implements RecordUpgrader, PersistentScopesAware
 {
     private String name;
     private String value;
 
-    private ScopeDetails scopeDetails;
+    private PersistentScopes persistentScopes;
 
     /**
      * @param name  the name of the property to add
@@ -34,6 +34,7 @@ class AddMetaPropertyRecordUpgrader implements RecordUpgrader, ScopeDetailsAware
             return;
         }
 
+        ScopeDetails scopeDetails = persistentScopes.findByPath(path);
         if (scopeDetails instanceof TemplatedScopeDetails &&
             !CollectionUtils.contains(TemplateRecord.NO_INHERIT_META_KEYS, name))
         {
@@ -50,8 +51,8 @@ class AddMetaPropertyRecordUpgrader implements RecordUpgrader, ScopeDetailsAware
         record.putMeta(name, value);
     }
 
-    public void setScopeDetails(ScopeDetails scopeDetails)
+    public void setPersistentScopes(PersistentScopes persistentScopes)
     {
-        this.scopeDetails = scopeDetails;
+        this.persistentScopes = persistentScopes;
     }
 }
