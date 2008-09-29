@@ -231,10 +231,13 @@ public class DefaultResourceManager implements ResourceManager, com.zutubi.pulse
                 AgentConfiguration config = configurationProvider.get(agentPath, AgentConfiguration.class);
                 if(config != null)
                 {
-                    Map<String, Resource> agentResources = config.getResources();
                     for (Resource r : discoveredResources)
                     {
+                        Map<String, Resource> agentResources = config.getResources();
                         addResource(agentPath, r, agentResources.get(r.getName()));
+
+                        // Lookup again, we just change this agent.
+                        config = configurationProvider.get(agentPath, AgentConfiguration.class);
                     }
                 }
 

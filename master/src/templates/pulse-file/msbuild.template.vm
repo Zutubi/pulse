@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<project defaultRecipe="msbuild build">
+
+    #parse("pulse-file/prologue.vm")
+
+    <recipe name="msbuild build">
+        <command name="build">
+            <!-- pull in the msbuild resource if configured. -->
+            <resource name="msbuild" required="false"/>
+            <msbuild
+#if($buildFile)
+                    build-file="$buildFile"
+#end
+#if($targets)
+                    targets="$targets"
+#end
+#if($configuration)
+                    configuration="$configuration"
+#end
+#if($arguments)
+                    args="$arguments"
+#end
+#if($workingDirectory)
+                    working-dir="${base.dir}/$workingDirectory"
+#end
+                    >
+#foreach($buildProperty in $buildProperties)
+                <build-property name="$buildProperty.name" value="$buildProperty.value"/>
+#end
+                #parse("pulse-file/output.processors.vm")
+            </msbuild>
+
+            #parse("pulse-file/artifacts.vm")
+
+        </command>
+    </recipe>
+</project>

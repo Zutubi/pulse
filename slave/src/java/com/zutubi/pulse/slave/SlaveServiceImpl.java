@@ -9,7 +9,6 @@ import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.filesystem.FileInfo;
 import com.zutubi.pulse.logging.CustomLogRecord;
 import com.zutubi.pulse.logging.ServerMessagesHandler;
-import com.zutubi.pulse.resources.ResourceConstructor;
 import com.zutubi.pulse.resources.ResourceDiscoverer;
 import com.zutubi.pulse.services.*;
 import com.zutubi.pulse.slave.command.CleanupRecipeCommand;
@@ -20,7 +19,6 @@ import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.LinkedList;
 import java.util.List;
@@ -161,23 +159,6 @@ public class SlaveServiceImpl implements SlaveService
     {
         ResourceDiscoverer discoverer = new ResourceDiscoverer();
         return discoverer.discover();
-    }
-
-    public Resource createResource(ResourceConstructor constructor, String path)
-    {
-        try
-        {
-            return constructor.createResource(path);
-        }
-        catch (IOException e)
-        {
-            return null;
-        }
-    }
-
-    public boolean isResourceHome(ResourceConstructor constructor, String path)
-    {
-        return constructor.isResourceHome(path);
     }
 
     public void garbageCollect()

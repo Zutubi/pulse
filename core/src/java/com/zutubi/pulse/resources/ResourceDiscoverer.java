@@ -1,14 +1,7 @@
 package com.zutubi.pulse.resources;
 
 import com.zutubi.pulse.core.config.Resource;
-import com.zutubi.pulse.core.config.ResourceProperty;
-import com.zutubi.util.SystemUtils;
-import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.util.logging.Logger;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -21,8 +14,6 @@ import java.util.List;
 //TODO: extend this to allow the registeration of resource constructors.
 public class ResourceDiscoverer
 {
-    private static final Logger LOG = Logger.getLogger(ResourceDiscoverer.class);
-
     /**
      * Run the resource discovery process, returning a list of all the discovered resources.
      *
@@ -30,49 +21,14 @@ public class ResourceDiscoverer
      */
     public List<Resource> discover()
     {
-        List<Resource> result = new LinkedList<Resource>();
-
-        for (ResourceConstructor constructor : getConstructors())
-        {
-            String home = constructor.lookupHome();
-            if (constructor.isResourceHome(home))
-            {
-                try
-                {
-                    result.add(constructor.createResource(home));
-                }
-                catch (IOException e)
-                {
-                    LOG.warning(e);
-                }
-            }
-        }
-
-        discoverMake(result);
-
-        return result;
-    }
-
-    private List<ResourceConstructor> getConstructors()
-    {
-        List<ResourceConstructor> constructors = new LinkedList<ResourceConstructor>();
-        constructors.add(new AntResourceConstructor());
-        constructors.add(new JavaResourceConstructor());
-        constructors.add(new MavenResourceConstructor());
-        constructors.add(new Maven2ResourceConstructor());
-        return constructors;
-    }
-
-    private void discoverMake(List<Resource> resources)
-    {
-        //TODO: merge this resource in with the existing resoruce constructors.  May require some reworking of the interfaces
-        //TODO: since current resource constructors require home directories.
-        File makeBin = SystemUtils.findInPath("make");
-        if (makeBin != null)
-        {
-            Resource makeResource = new Resource("make");
-            makeResource.addProperty(new ResourceProperty("make.bin", FileSystemUtils.normaliseSeparators(makeBin.getAbsolutePath()), false, false, false));
-            resources.add(makeResource);
-        }
+        CompositeResourceLocator locator = new CompositeResourceLocator(
+                new StandardHomeDirectoryResourceLocator("ant", true),
+                new StandardHomeDirectoryResourceLocator("java", false),
+                new StandardHomeDirectoryResourceLocator("maven", true),
+                new StandardHomeDirectoryResourceLocator("maven2", "MAVEN2_HOME", "mvn", true),
+                new SimpleBinaryResourceLocator("make"),
+                new MsBuildResourceLocator()
+        );
+        return locator.locate();
     }
 }

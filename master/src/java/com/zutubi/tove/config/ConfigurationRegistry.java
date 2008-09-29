@@ -108,6 +108,7 @@ public class ConfigurationRegistry
             registerConfigurationType(MavenTypeConfiguration.class);
             registerConfigurationType(Maven2TypeConfiguration.class);
             registerConfigurationType(MakeTypeConfiguration.class);
+            registerConfigurationType(MsBuildTypeConfiguration.class);
             registerConfigurationType(VersionedTypeConfiguration.class);
             registerConfigurationType(XCodeTypeConfiguration.class);
 

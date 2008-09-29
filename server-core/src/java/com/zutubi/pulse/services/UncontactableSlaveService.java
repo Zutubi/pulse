@@ -5,7 +5,6 @@ import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.filesystem.FileInfo;
 import com.zutubi.pulse.logging.CustomLogRecord;
-import com.zutubi.pulse.resources.ResourceConstructor;
 
 import java.util.List;
 
@@ -73,16 +72,6 @@ public class UncontactableSlaveService implements SlaveService
     }
 
     public String[] listRoots(String token)
-    {
-        throw new RuntimeException("Agent configuration is invalid: " + errorMessage);
-    }
-
-    public Resource createResource(ResourceConstructor constructor, String path)
-    {
-        throw new RuntimeException("Agent configuration is invalid: " + errorMessage);
-    }
-
-    public boolean isResourceHome(ResourceConstructor constructor, String path)
     {
         throw new RuntimeException("Agent configuration is invalid: " + errorMessage);
     }

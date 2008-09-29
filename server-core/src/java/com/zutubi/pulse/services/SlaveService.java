@@ -5,7 +5,6 @@ import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.filesystem.FileInfo;
 import com.zutubi.pulse.logging.CustomLogRecord;
-import com.zutubi.pulse.resources.ResourceConstructor;
 
 import java.util.List;
 
@@ -71,10 +70,6 @@ public interface SlaveService
     FileInfo getFileInfo(String token, String path);
 
     String[] listRoots(String token);
-
-    Resource createResource(ResourceConstructor constructor, String path);
-
-    boolean isResourceHome(ResourceConstructor constructor, String path);
 
     void garbageCollect();
 }
