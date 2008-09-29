@@ -6,6 +6,10 @@ import com.zutubi.pulse.services.MasterService;
 import com.zutubi.util.logging.Logger;
 
 /**
+ * A {@link Runnable} implementation that wraps another runnable and catches
+ * any build or unexpected exceptions that it throws.  The exceptions are
+ * reported back to the master as recipe errors.  This prevents an error
+ * killing the build on a slave without the master realising it.
  */
 public class ErrorHandlingRunnable implements Runnable
 {

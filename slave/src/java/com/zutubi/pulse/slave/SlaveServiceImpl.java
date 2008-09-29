@@ -134,10 +134,8 @@ public class SlaveServiceImpl implements SlaveService
         }
         catch (Exception e)
         {
-            LOG.severe(e);
+            throw new RuntimeException(e);
         }
-
-        return true;
     }
 
     public void cleanupRecipe(String token, String project, long recipeId, boolean incremental) throws InvalidTokenException
