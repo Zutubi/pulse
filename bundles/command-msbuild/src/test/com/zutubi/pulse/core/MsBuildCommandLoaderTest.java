@@ -77,7 +77,7 @@ public class MsBuildCommandLoaderTest extends FileLoaderTestBase
         PulseFile bf = new PulseFile();
         try
         {
-            loader.load(getInput("propertyValidation"), bf);
+            loader.load(getInput("propertyvalidation"), bf);
             fail("Should not be able to load a build-property with no name");
         }
         catch (PulseException e)
