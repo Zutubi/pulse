@@ -162,13 +162,21 @@ public class BuildRevision
      */
     public void unlock()
     {
-        lockEntries--;
         lock.unlock();
+        lockEntries--;
+    }
+
+    /**
+     * @return true iff this revision is currently locked
+     */
+    public boolean isLocked()
+    {
+        return lockEntries > 0;
     }
 
     private void checkLocked()
     {
-        if (lockEntries <= 0)
+        if (!isLocked())
         {
             throw new IllegalStateException("Call to method requiring lock without holding lock");
         }
