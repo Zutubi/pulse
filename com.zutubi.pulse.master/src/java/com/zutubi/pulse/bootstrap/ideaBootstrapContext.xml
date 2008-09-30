@@ -29,24 +29,24 @@
         <property name="systemPaths">
             <bean class="com.zutubi.pulse.bootstrap.ConfigurableSystemPaths">
                 <property name="systemRootString">
-                    <value>master/system</value>
+                    <value>com.zutubi.pulse.master/system</value>
                 </property>
                 <property name="contentRootString">
-                    <value>master/src/www</value>
+                    <value>com.zutubi.pulse.master/src/www</value>
                 </property>
                 <property name="configRootString">
-                    <value>master/etc</value>
+                    <value>com.zutubi.pulse.master/etc</value>
                 </property>
                 <property name="logRootString">
-                    <value>master/system/logs</value>
+                    <value>com.zutubi.pulse.master/system/logs</value>
                 </property>
                 <property name="tmpRootString">
-                    <value>master/system/tmp</value>
+                    <value>com.zutubi.pulse.master/system/tmp</value>
                 </property>
                 <property name="templateRootStrings">
                     <list>
-                        <value>master/src/templates</value>
-                        <value>master/src/www</value>
+                        <value>com.zutubi.pulse.master/src/templates</value>
+                        <value>com.zutubi.pulse.master/src/www</value>
                     </list>
                 </property>
             </bean>
@@ -55,7 +55,7 @@
 
     <bean id="pluginPaths" class="com.zutubi.pulse.plugins.ConfigurablePluginPaths">
         <property name="internalPluginStorageString" value="plugins/internal"/>
-        <property name="osgiConfigurationString" value="master/etc/osgi"/>
+        <property name="osgiConfigurationString" value="com.zutubi.pulse.master/etc/osgi"/>
         <property name="pluginRegistryString" value="plugins"/>
         <property name="pluginStorageString" value="plugins/prepackaged"/>
         <property name="pluginWorkString" value="plugins/work"/>

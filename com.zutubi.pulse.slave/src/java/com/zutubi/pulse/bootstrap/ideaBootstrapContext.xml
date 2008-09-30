@@ -22,36 +22,27 @@
         <property name="systemPaths">
             <bean id="paths" class="com.zutubi.pulse.bootstrap.ConfigurableSystemPaths">
                 <property name="systemRootString">
-                    <value>slave/system</value>
+                    <value>com.zutubi.pulse.slave/system</value>
                 </property>
                 <property name="tmpRootString">
-                    <value>slave/system/tmp</value>
+                    <value>com.zutubi.pulse.slave/system/tmp</value>
                 </property>
                 <property name="contentRootString">
-                    <value>slave/src/www</value>
+                    <value>com.zutubi.pulse.slave/src/www</value>
                 </property>
                 <property name="configRootString">
-                    <value>slave/etc</value>
+                    <value>com.zutubi.pulse.slave/etc</value>
                 </property>
                 <property name="logRootString">
-                    <value>slave/system/logs</value>
+                    <value>com.zutubi.pulse.slave/system/logs</value>
                 </property>
             </bean>
         </property>
     </bean>
 
-<!--
-    <bean id="pluginPaths" class="com.zutubi.pulse.plugins.ConfigurablePluginPaths">
-        <property name="pluginConfigurationRootString" value="master/etc/osgi"/>
-        <property name="internalPluginRootString" value="plugins/internal"/>
-        <property name="prepackagedPluginRootString" value="plugins/prepackaged"/>
-        <property name="userPluginRootString" value="user/plugins"/>
-    </bean>
--->
-
     <bean id="pluginPaths" class="com.zutubi.pulse.plugins.ConfigurablePluginPaths">
         <property name="internalPluginStorageString" value="plugins/internal"/>
-        <property name="osgiConfigurationString" value="master/etc/osgi"/>
+        <property name="osgiConfigurationString" value="com.zutubi.pulse.slave/etc/osgi"/>
         <property name="pluginRegistryString" value="plugins"/>
         <property name="pluginStorageString" value="plugins/prepackaged"/>
         <property name="pluginWorkString" value="plugins/work"/>
