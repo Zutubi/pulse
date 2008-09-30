@@ -27,7 +27,7 @@ public abstract class TemplateTypeConfigurationTestBase extends PulseTestCase
     {
         super.setUp();
         engine = new VelocityEngine();
-        File pulseRoot = new File(getPulseRoot(), "master/src/templates");
+        File pulseRoot = new File(getPulseRoot(), "com.zutubi.pulse.master/src/templates");
         engine.setProperty("file.resource.loader.path", pulseRoot.getAbsolutePath());
         engine.init();
         TemplateTypeConfiguration type = getType();
@@ -57,7 +57,7 @@ public abstract class TemplateTypeConfigurationTestBase extends PulseTestCase
     protected void createAndVerify(String expectedName) throws Exception
     {
         String got = getType().getPulseFile(null, null, null);
-        File file = new File(getPulseRoot(), FileSystemUtils.composeFilename("master", "src", "test", "com", "zutubi", "pulse", "model", getClass().getSimpleName() + "." + expectedName + ".xml"));
+        File file = new File(getPulseRoot(), FileSystemUtils.composeFilename("com.zutubi.pulse.master", "src", "test", "com", "zutubi", "pulse", "model", getClass().getSimpleName() + "." + expectedName + ".xml"));
 
         if(generateMode)
         {

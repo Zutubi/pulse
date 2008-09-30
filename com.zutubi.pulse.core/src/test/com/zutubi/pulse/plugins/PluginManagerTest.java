@@ -28,7 +28,7 @@ public class PluginManagerTest extends BasePluginSystemTestCase
     {
         super.setUp();
 
-        File bundleDir = getTestDataDir("core", "test-bundles");
+        File bundleDir = getTestDataDir("com.zutubi.pulse.core", "test-bundles");
         producer1 = new File(bundleDir, "com.zutubi.bundles.producer_1.0.0.jar");
         producer11 = new File(bundleDir, "com.zutubi.bundles.producer_1.1.0.jar");
         producer2 = new File(bundleDir, "com.zutubi.bundles.producer_2.0.0.jar");

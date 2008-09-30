@@ -2,8 +2,6 @@
 
 set -e
 
-COMPONENTS="core local server-core master slave"
-
 fatal()
 {
     echo $*

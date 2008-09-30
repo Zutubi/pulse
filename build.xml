@@ -87,16 +87,16 @@
         <delete file="velocity.log"/>
 
         <!-- clean out the master -->
-        <delete dir="master/system"/>
-        <delete file="master/etc/admin.token"/>
-        <delete file="master/etc/service.token"/>
-        <delete file="master/etc/runtime.properties"/>
+        <delete dir="com.zutubi.pulse.master/system"/>
+        <delete file="com.zutubi.pulse.master/etc/admin.token"/>
+        <delete file="com.zutubi.pulse.master/etc/service.token"/>
+        <delete file="com.zutubi.pulse.master/etc/runtime.properties"/>
 
         <!-- clean out the slave -->
-        <delete dir="slave/system"/>
-        <delete file="slave/etc/admin.token"/>
-        <delete file="slave/etc/service.token"/>
-        <delete file="slave/etc/runtime.properties"/>
+        <delete dir="com.zutubi.pulse.slave/system"/>
+        <delete file="com.zutubi.pulse.slave/etc/admin.token"/>
+        <delete file="com.zutubi.pulse.slave/etc/service.token"/>
+        <delete file="com.zutubi.pulse.slave/etc/runtime.properties"/>
 
         <!-- clean out the script/test playground. -->
         <delete dir="working"/>
@@ -116,7 +116,7 @@
         <!-- the following should be cleaned out by calls to the respective module/clean targets. -->
         <delete dir="package/core/build"/>
         <delete dir="package/local/build"/>
-        <delete dir="package/server-core/build"/>
+        <delete dir="package/servercore/build"/>
         <delete dir="package/slave/build"/>
         <delete dir="package/master/build"/>
     </target>
@@ -140,8 +140,8 @@
         </replace>
 
         <copy todir="${package.root.local}/bin">
-            <fileset dir="core/src/bin" includes="**/*"/>
-            <fileset dir="local/src/bin" includes="**/*"/>
+            <fileset dir="com.zutubi.pulse.core/src/bin" includes="**/*"/>
+            <fileset dir="com.zutubi.pulse.local/src/bin" includes="**/*"/>
         </copy>
 
         <fixcrlf srcdir="${package.root.local}/bin" eol="lf" eof="remove" includes="**/*.sh"/>
@@ -150,14 +150,14 @@
         <retrieve-package-deps module="local" dest="${version.root.local}"/>
 
         <copy todir="${version.root.local}/lib">
-            <fileset dir="core/etc" includes="*.dll"/>
-            <fileset dir="local/etc" includes="*.xml"/>
+            <fileset dir="com.zutubi.pulse.core/etc" includes="*.dll"/>
+            <fileset dir="com.zutubi.pulse.local/etc" includes="*.xml"/>
         </copy>
 
         <copy todir="${version.root.local}/boot">
-            <fileset dir="core/etc" includes="*.commands.properties"/>
-            <fileset dir="local/etc" includes="*.commands.properties"/>
-            <fileset dir="local/etc" includes="classpath.txt"/>
+            <fileset dir="com.zutubi.pulse.core/etc" includes="*.commands.properties"/>
+            <fileset dir="com.zutubi.pulse.local/etc" includes="*.commands.properties"/>
+            <fileset dir="com.zutubi.pulse.local/etc" includes="classpath.txt"/>
         </copy>
 
         <native-zip dir="${package.root.local}/.." file="../${package.name.local}.zip" path="${package.name.local}"/>
@@ -222,13 +222,13 @@
         </replace>
 
         <copy todir="${package.root.slave}/bin">
-            <fileset dir="core/src/bin" includes="**/*"/>
-            <fileset dir="local/src/bin" includes="**/*"/>
-            <fileset dir="server-core/src/bin" includes="**/*"/>
+            <fileset dir="com.zutubi.pulse.core/src/bin" includes="**/*"/>
+            <fileset dir="com.zutubi.pulse.local/src/bin" includes="**/*"/>
+            <fileset dir="com.zutubi.pulse.servercore/src/bin" includes="**/*"/>
         </copy>
 
         <copy todir="${package.root.slave}/lib">
-            <fileset dir="server-core/src/lib" includes="**/*"/>
+            <fileset dir="com.zutubi.pulse.servercore/src/lib" includes="**/*"/>
         </copy>
 
         <fixcrlf srcdir="${package.root.slave}/bin" eol="lf" eof="remove" includes="**/*.sh"/>
@@ -245,24 +245,24 @@
         </replace>
 
         <copy todir="${version.root.slave}/system/config">
-            <fileset dir="slave/etc" includes="pulse-agent.properties,logging.properties"/>
-            <fileset dir="slave/etc" includes="logging/*.properties"/>
+            <fileset dir="com.zutubi.pulse.slave/etc" includes="pulse-agent.properties,logging.properties"/>
+            <fileset dir="com.zutubi.pulse.slave/etc" includes="logging/*.properties"/>
         </copy>
 
         <copy todir="${version.root.slave}/system/www">
-            <fileset dir="slave/src/www" includes="**/*"/>
+            <fileset dir="com.zutubi.pulse.slave/src/www" includes="**/*"/>
         </copy>
 
         <copy todir="${version.root.slave}/lib">
-            <fileset dir="core/etc" includes="*.dll"/>
-            <fileset dir="slave/etc" includes="*.xml"/>
+            <fileset dir="com.zutubi.pulse.core/etc" includes="*.dll"/>
+            <fileset dir="com.zutubi.pulse.slave/etc" includes="*.xml"/>
         </copy>
 
         <copy todir="${version.root.slave}/boot">
-            <fileset dir="core/etc" includes="*.commands.properties"/>
-            <fileset dir="local/etc" includes="*.commands.properties"/>
-            <fileset dir="server-core/etc" includes="*.commands.properties"/>
-            <fileset dir="slave/etc" includes="classpath.txt"/>
+            <fileset dir="com.zutubi.pulse.core/etc" includes="*.commands.properties"/>
+            <fileset dir="com.zutubi.pulse.local/etc" includes="*.commands.properties"/>
+            <fileset dir="com.zutubi.pulse.servercore/etc" includes="*.commands.properties"/>
+            <fileset dir="com.zutubi.pulse.slave/etc" includes="classpath.txt"/>
         </copy>
 
         <replace dir="${package.root.slave}/bin" replacefilterfile="slave/subst.properties">
@@ -343,14 +343,14 @@
         </replace>
 
         <copy todir="${package.root.master}/bin">
-            <fileset dir="core/src/bin" includes="**/*"/>
-            <fileset dir="local/src/bin" includes="**/*"/>
-            <fileset dir="server-core/src/bin" includes="**/*"/>
-            <fileset dir="master/src/bin" includes="**/*"/>
+            <fileset dir="com.zutubi.pulse.core/src/bin" includes="**/*"/>
+            <fileset dir="com.zutubi.pulse.local/src/bin" includes="**/*"/>
+            <fileset dir="com.zutubi.pulse.servercore/src/bin" includes="**/*"/>
+            <fileset dir="com.zutubi.pulse.master/src/bin" includes="**/*"/>
         </copy>
 
         <copy todir="${package.root.master}/lib">
-            <fileset dir="server-core/src/lib" includes="**/*"/>
+            <fileset dir="com.zutubi.pulse.servercore/src/lib" includes="**/*"/>
         </copy>
 
         <fixcrlf srcdir="${package.root.master}/bin" eol="lf" eof="remove" includes="**/*.sh"/>
@@ -359,13 +359,13 @@
         <retrieve-package-deps module="master" dest="${version.root.master}"/>
 
         <copy todir="${version.root.master}/system/templates">
-            <fileset dir="master/src/templates" includes="**/*.vm **/*.ftl **/*.properties **/*.example"/>
+            <fileset dir="com.zutubi.pulse.master/src/templates" includes="**/*.vm **/*.ftl **/*.properties **/*.example"/>
         </copy>
         <copy todir="${package.root.master}/logs">
             <fileset dir="etc" includes="delete-me.txt"/>
         </copy>
         <copy todir="${version.root.master}/system/www">
-            <fileset dir="master/src/www" includes="**/*"/>
+            <fileset dir="com.zutubi.pulse.master/src/www" includes="**/*"/>
         </copy>
 
         <!-- copy the readme file. -->
@@ -378,22 +378,22 @@
 
         <!-- /config is for user configuration properties -->
         <copy todir="${version.root.master}/system/config">
-            <fileset dir="master/etc" includes="pulse-defaults.properties,logging.properties"/>
-            <fileset dir="master/etc" includes="logging/*.properties"/>
-            <fileset dir="master/etc" includes="*.properties.template"/>
+            <fileset dir="com.zutubi.pulse.master/etc" includes="pulse-defaults.properties,logging.properties"/>
+            <fileset dir="com.zutubi.pulse.master/etc" includes="logging/*.properties"/>
+            <fileset dir="com.zutubi.pulse.master/etc" includes="*.properties.template"/>
         </copy>
 
         <copy todir="${version.root.master}/lib">
-            <fileset dir="core/etc" includes="*.dll"/>
-            <fileset dir="master/etc" includes="*.xml"/>
+            <fileset dir="com.zutubi.pulse.core/etc" includes="*.dll"/>
+            <fileset dir="com.zutubi.pulse.master/etc" includes="*.xml"/>
         </copy>
 
         <copy todir="${version.root.master}/boot">
-            <fileset dir="core/etc" includes="*.commands.properties"/>
-            <fileset dir="local/etc" includes="*.commands.properties"/>
-            <fileset dir="server-core/etc" includes="*.commands.properties"/>
-            <fileset dir="master/etc" includes="*.commands.properties"/>
-            <fileset dir="master/etc" includes="classpath.txt"/>
+            <fileset dir="com.zutubi.pulse.core/etc" includes="*.commands.properties"/>
+            <fileset dir="com.zutubi.pulse.local/etc" includes="*.commands.properties"/>
+            <fileset dir="com.zutubi.pulse.servercore/etc" includes="*.commands.properties"/>
+            <fileset dir="com.zutubi.pulse.master/etc" includes="*.commands.properties"/>
+            <fileset dir="com.zutubi.pulse.master/etc" includes="classpath.txt"/>
         </copy>
 
         <replace dir="${package.root.master}/bin" replacefilterfile="master/subst.properties">
@@ -473,7 +473,7 @@
         <mkdir dir="${report.dir}/xml"/>
         <mkdir dir="${report.dir}/html"/>
 
-        <javac target="5" srcdir="master/src/java" destdir="${build.dir}/classes" includes="**/LicenseEncoder*" debug="true">
+        <javac target="5" srcdir="com.zutubi.pulse.master/src/java" destdir="${build.dir}/classes" includes="**/LicenseEncoder*" debug="true">
             <classpath>
                 <fileset dir="${build.dir}/lib">
                     <include name="**/*.jar"/>
@@ -650,7 +650,7 @@
             <retrieve-dependencies ivyfile="package/@{module}/ivy.xml" conf="prepackaged-bundles" dest="@{dest}/system/plugins/prepackaged"/>
 
             <copy todir="@{dest}/system/plugins/config">
-                <fileset dir="master/etc/osgi" includes="config.ini"/>
+                <fileset dir="com.zutubi.pulse.master/etc/osgi" includes="config.ini"/>
             </copy>
 
             <move tofile="@{dest}/../../lib/boot.jar">

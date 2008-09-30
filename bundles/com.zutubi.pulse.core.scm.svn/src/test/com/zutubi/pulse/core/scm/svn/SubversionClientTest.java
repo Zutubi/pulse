@@ -300,7 +300,7 @@ public class SubversionClientTest extends PulseTestCase
 
     private void assertRevision(File dir, int revision) throws IOException
     {
-        File dataFile = getTestDataFile("server-core", Integer.toString(revision), "zip");
+        File dataFile = getTestDataFile("com.zutubi.pulse.servercore", Integer.toString(revision), "zip");
         ZipUtils.extractZip(dataFile, expectedDir);
         assertDirectoriesEqual(new File(new File(expectedDir, "test"), "trunk"), dir);
     }

@@ -15,7 +15,7 @@ public class ProcessControlTest extends PulseTestCase
         System.setProperty(ProcessControl.NATIVE_PROCESS_KILL, "true");
         if(ProcessControl.init())
         {
-            File buildFile = getTestDataFile("core", getName(), "xml");
+            File buildFile = getTestDataFile("com.zutubi.pulse.core", getName(), "xml");
             ProcessBuilder processBuilder = new ProcessBuilder("ant.bat", "-f", buildFile.getAbsolutePath(), "doit");
             processBuilder.redirectErrorStream(true);
             final Process p = processBuilder.start();

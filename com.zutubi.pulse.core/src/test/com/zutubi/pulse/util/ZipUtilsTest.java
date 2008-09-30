@@ -645,7 +645,7 @@ public class ZipUtilsTest extends PulseTestCase
         InputStream is = null;
         try
         {
-            File dataFile = getTestDataFile("core", name, "zip");
+            File dataFile = getTestDataFile("com.zutubi.pulse.core", name, "zip");
             ZipUtils.extractZip(dataFile, tmpDir);
         }
         finally

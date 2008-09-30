@@ -27,7 +27,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
     {
         super.setUp();
         renderer = new FreemarkerBuildResultRenderer();
-        File pulseRoot = new File(getPulseRoot(), "master/src/templates");
+        File pulseRoot = new File(getPulseRoot(), "com.zutubi.pulse.master/src/templates");
 
         Configuration freemarkerConfiguration = new Configuration();
         freemarkerConfiguration.setDirectoryForTemplateLoading(pulseRoot);

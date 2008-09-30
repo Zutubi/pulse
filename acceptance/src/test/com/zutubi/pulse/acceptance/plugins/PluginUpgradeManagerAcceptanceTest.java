@@ -56,7 +56,7 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
         pluginSystem = new PluginSystem(pkgFile, tmpDir);
         paths = pluginSystem.getPluginPaths();
 
-        File bundleDir = new File(getPulseRoot(), FileSystemUtils.composeFilename("core", "src", "test", "com", "zutubi", "pulse", "plugins", "test-bundles"));
+        File bundleDir = new File(getPulseRoot(), FileSystemUtils.composeFilename("com.zutubi.pulse.core", "src", "test", "com", "zutubi", "pulse", "plugins", "test-bundles"));
         producer1 = new File(bundleDir, "com.zutubi.bundles.producer_1.0.0.jar");
         producer2 = new File(bundleDir, "com.zutubi.bundles.producer_2.0.0.jar");
         producer3 = new File(bundleDir, "com.zutubi.bundles.producer_3.0.0.jar");

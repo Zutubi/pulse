@@ -18,7 +18,7 @@ public class AsyncProcessTest extends PulseTestCase
     protected void setUp() throws Exception
     {
         tempDir = FileSystemUtils.createTempDir(AsyncProcessTest.class.getName(), "");
-        File scriptsDir = getTestDataFile("core", null, "scripts");
+        File scriptsDir = getTestDataFile("com.zutubi.pulse.core", null, "scripts");
         FileSystemUtils.copy(tempDir, scriptsDir.listFiles(new FileFilter()
         {
             public boolean accept(File pathname)
