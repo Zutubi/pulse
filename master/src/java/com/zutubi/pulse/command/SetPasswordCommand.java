@@ -1,5 +1,8 @@
 package com.zutubi.pulse.command;
 
+import com.zutubi.pulse.tove.config.user.UserConfigurationActions;
+import com.zutubi.tove.config.ConfigurationRegistry;
+import com.zutubi.tove.type.record.PathUtils;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.ParseException;
@@ -8,6 +11,7 @@ import org.apache.xmlrpc.XmlRpcException;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 
@@ -20,8 +24,8 @@ public class SetPasswordCommand extends AdminCommand
     private String password;
 
     /**
-     * Set the username identifying the account for which the password will be updated.
-     * @param username
+     * @param username the username identifying the account for which the
+     *                 password will be updated
      */
     public void setUser(String username)
     {
@@ -29,9 +33,7 @@ public class SetPasswordCommand extends AdminCommand
     }
 
     /**
-     * Set the new password that will be set.
-     *
-     * @param newPassword
+     * @param newPassword the new password that will be set.
      */
     public void setPassword(String newPassword)
     {
@@ -52,12 +54,12 @@ public class SetPasswordCommand extends AdminCommand
 
     public List<String> getUsages()
     {
-        return Arrays.asList(new String[] { "<username> <password>" });
+        return Arrays.asList("<username> <password>");
     }
 
     public List<String> getAliases()
     {
-        return Arrays.asList(new String[] { "passwd", "password", "sp", "setp" });
+        return Arrays.asList("passwd", "password", "sp", "setp");
     }
 
     public int doExecute(String[] argv) throws XmlRpcException, IOException, ParseException
@@ -76,8 +78,17 @@ public class SetPasswordCommand extends AdminCommand
         setUser(args[0]);
         setPassword(args[1]);
 
-        xmlRpcClient.execute("RemoteApi.setPassword", new Vector<Object>(Arrays.asList(
-                new Object[]{adminToken, user, password})));
+        Hashtable<String, Object> config = new Hashtable<String, Object>();
+        config.put("meta.symbolicName", "zutubi.setPasswordConfig");
+        config.put("password", password);
+        config.put("confirmPassword", password);
+        
+        xmlRpcClient.execute("RemoteApi.doConfigActionWithArgument", new Vector<Object>(Arrays.asList(
+                adminToken,
+                PathUtils.getPath(ConfigurationRegistry.USERS_SCOPE, user),
+                UserConfigurationActions.ACTION_SET_PASSWORD,
+                config
+        )));
         return 0;
     }
 

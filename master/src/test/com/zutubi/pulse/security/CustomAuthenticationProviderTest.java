@@ -78,6 +78,7 @@ public class CustomAuthenticationProviderTest extends PulseTestCase
     {
         UserConfiguration user = new UserConfiguration();
         user.setLogin("user");
+        user.setAuthenticatedViaLdap(true);
 
         stub(ldapManager.canAutoAdd()).toReturn(true);
         stub(ldapManager.authenticate(same(user.getLogin()), same("pass"), anyBoolean())).toReturn(user);
@@ -89,5 +90,22 @@ public class CustomAuthenticationProviderTest extends PulseTestCase
 
         verify(userManager, never()).insert((UserConfiguration)anyObject());
         verify(userManager, times(1)).setPassword(same(user), anyString());
+    }
+
+    public void testDoNotResetPasswordOnNonLDAPUser()
+    {
+        UserConfiguration user = new UserConfiguration();
+        user.setLogin("user");
+
+        stub(ldapManager.canAutoAdd()).toReturn(true);
+        stub(ldapManager.authenticate(same(user.getLogin()), same("pass"), anyBoolean())).toReturn(user);
+        stub(userManager.getUserConfig(user.getLogin())).toReturn(user);
+        stub(userManager.loadUserByUsername(user.getLogin())).toReturn(new AcegiUser(user.getLogin(), "pass"));
+
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken("user", "pass");
+        authenticationProvider.authenticate(token);
+
+        verify(userManager, never()).insert((UserConfiguration)anyObject());
+        verify(userManager, never()).setPassword(same(user), anyString());
     }
 }
