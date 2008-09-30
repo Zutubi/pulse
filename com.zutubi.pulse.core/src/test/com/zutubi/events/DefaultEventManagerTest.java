@@ -1,6 +1,5 @@
-package com.zutubi.pulse.events;
+package com.zutubi.events;
 
-import com.zutubi.events.*;
 import junit.framework.TestCase;
 
 import java.util.LinkedList;

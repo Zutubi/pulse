@@ -1,16 +1,8 @@
-package com.zutubi.pulse.events;
+package com.zutubi.events;
 
-import com.zutubi.events.AllEventListener;
-import com.zutubi.events.DefaultEventManager;
-import com.zutubi.events.Event;
-import com.zutubi.events.EventManager;
-import com.zutubi.pulse.test.PulseTestCase;
+import junit.framework.TestCase;
 
-/**
- *
- *
- */
-public class AllEventListenerTest extends PulseTestCase
+public class AllEventListenerTest extends TestCase
 {
     private EventManager eventManager = null;
 

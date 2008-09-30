@@ -1,18 +1,12 @@
-package com.zutubi.pulse.events;
+package com.zutubi.events;
 
-import com.zutubi.events.AsynchronousDelegatingListener;
-import com.zutubi.events.Event;
-import com.zutubi.events.EventListener;
-import com.zutubi.pulse.test.PulseTestCase;
+import junit.framework.TestCase;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-/**
- * <class-comment/>
- */
-public class AsynchronousDelegatingListenerTest extends PulseTestCase
+public class AsynchronousDelegatingListenerTest extends TestCase
 {
     private Semaphore eventSemaphore = new Semaphore(0);
     private Semaphore doneSemaphore = new Semaphore(0);
