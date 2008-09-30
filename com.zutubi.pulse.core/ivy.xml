@@ -24,6 +24,7 @@
 
     <dependencies>
         <!-- Project module dependencies -->
+        <dependency org="zutubi" name="com.zutubi.events" rev="latest.integration" conf="release,external,build,src->@"/>
         <dependency org="zutubi" name="com.zutubi.validation" rev="latest.integration" conf="release,external,build,src->@"/>
         <dependency org="zutubi" name="com.zutubi.config.annotations" rev="latest.integration" conf="release,external,build,src->@"/>
 
