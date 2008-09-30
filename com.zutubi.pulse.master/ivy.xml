@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
-    <info organisation="zutubi" module="pulse-master" status="integration">
+    <info organisation="zutubi" module="com.zutubi.pulse.master" status="integration">
         <ivyauthor name="zutubi" url="http://www.zutubi.com/"/>
         <description homepage="http://www.zutubi.com/">
             The pulse master module is what is commonly thought of as Pulse. It includes
@@ -20,12 +20,12 @@
     </configurations>
 
     <publications>
-        <artifact name="pulse-master" type="jar" conf="release,build"/>
-        <artifact name="pulse-master-src" type="jar" conf="src"/>
+        <artifact name="com.zutubi.pulse.master" type="jar" conf="release,build"/>
+        <artifact name="com.zutubi.pulse.master-src" type="jar" conf="src"/>
     </publications>
 
     <dependencies>
-        <dependency org="zutubi" name="pulse-servercore" rev="latest.integration" conf="*->@"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.servercore" rev="latest.integration" conf="*->@"/>
 
         <dependency org="acegisecurity" name="acegisecurity" rev="1.0.0" conf="external,build,release->default"/>
 

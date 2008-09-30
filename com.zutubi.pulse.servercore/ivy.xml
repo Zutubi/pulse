@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
-    <info organisation="zutubi" module="pulse-servercore" status="integration">
+    <info organisation="zutubi" module="com.zutubi.pulse.servercore" status="integration">
         <ivyauthor name="zutubi" url="http://www.zutubi.com/"/>
         <description homepage="http://www.zutubi.com/">
             The pulse server core module is for all of those pulse components that
@@ -19,14 +19,14 @@
     </configurations>
 
     <publications>
-        <artifact name="pulse-servercore" type="jar" conf="release, build"/>
-        <artifact name="pulse-servercore-src" type="jar" conf="src"/>
-        <artifact name="pulse-servercore-test" type="jar" conf="build"/>
+        <artifact name="com.zutubi.pulse.servercore" type="jar" conf="release, build"/>
+        <artifact name="com.zutubi.pulse.servercore-src" type="jar" conf="src"/>
+        <artifact name="com.zutubi.pulse.servercore-test" type="jar" conf="build"/>
     </publications>
 
     <dependencies>
         <!-- Project module dependencies -->
-        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="*->@"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core" rev="latest.integration" conf="*->@"/>
 
         <!-- Library dependencies -->
         <dependency org="apache" name="commons-collections" rev="3.1" conf="external,build,release->default"/>

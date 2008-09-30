@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
-    <info organisation="zutubi" module="pulse-core" status="integration">
+    <info organisation="zutubi" module="com.zutubi.pulse.core" status="integration">
         <ivyauthor name="zutubi" url="http://www.zutubi.com/"/>
         <description homepage="http://www.zutubi.com/">
             The pulse core module defines the core components that are common
@@ -17,9 +17,9 @@
     </configurations>
 
     <publications>
-        <artifact name="pulse-core" type="jar" conf="release, build"/>
-        <artifact name="pulse-core-src" type="jar" conf="src"/>
-        <artifact name="pulse-core-test" type="jar" conf="build"/>
+        <artifact name="com.zutubi.pulse.core" type="jar" conf="release, build"/>
+        <artifact name="com.zutubi.pulse.core-src" type="jar" conf="src"/>
+        <artifact name="com.zutubi.pulse.core-test" type="jar" conf="build"/>
     </publications>
 
     <dependencies>

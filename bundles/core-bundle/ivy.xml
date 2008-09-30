@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
-    <info organisation="zutubi" module="com.zutubi.pulse.core" status="integration">
+    <info organisation="zutubi" module="com.zutubi.pulse.core.bundle" status="integration">
         <ivyauthor name="Zutubi" url="http://www.zutubi.com/"/>
         <description homepage="http://www.zutubi.com/">
 
@@ -17,11 +17,11 @@
     </configurations>
 
     <publications>
-        <artifact name="com.zutubi.pulse.core" type="jar" conf="build,bundle"/>
-        <artifact name="com.zutubi.pulse.core-src" type="jar" conf="src"/>
+        <artifact name="com.zutubi.pulse.core.bundle" type="jar" conf="build,bundle"/>
+        <artifact name="com.zutubi.pulse.core.bundle-src" type="jar" conf="src"/>
     </publications>
 
     <dependencies>
-        <dependency org="zutubi" name="pulse-core" rev="latest.integration" conf="build,src->@"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core" rev="latest.integration" conf="build,src->@"/>
     </dependencies>
 </ivy-module>

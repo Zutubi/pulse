@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
-    <info organisation="zutubi" module="pulse-slave" status="integration">
+    <info organisation="zutubi" module="com.zutubi.pulse.slave" status="integration">
         <ivyauthor name="zutubi" url="http://www.zutubi.com/"/>
         <description homepage="http://www.zutubi.com/">
             The pulse remote slave agent.
@@ -18,11 +18,11 @@
     </configurations>
 
     <publications>
-        <artifact name="pulse-slave" type="jar" conf="release,build"/>
-        <artifact name="pulse-slave-src" type="jar" conf="src"/>
+        <artifact name="com.zutubi.pulse.slave" type="jar" conf="release,build"/>
+        <artifact name="com.zutubi.pulse.slave-src" type="jar" conf="src"/>
     </publications>
 
     <dependencies>
-        <dependency org="zutubi" name="pulse-servercore" rev="latest.integration" conf="*->@"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.servercore" rev="latest.integration" conf="*->@"/>
     </dependencies>
 </ivy-module>

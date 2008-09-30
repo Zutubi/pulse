@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
-    <info organisation="zutubi" module="pulse-master-package" status="integration"/>
+    <info organisation="zutubi" module="com.zutubi.pulse.master-package" status="integration"/>
 
     <configurations>
         <conf name="release" description="Defines those packages that are included in the final release."/>
@@ -15,10 +15,10 @@
 
     <dependencies>
         <!-- Project module dependencies -->
-        <dependency org="zutubi" name="pulse-server-core-package" rev="latest.integration" conf="*->@"/>
-        <dependency org="zutubi" name="pulse-slave-package" rev="latest.integration" conf="build->@"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.servercore-package" rev="latest.integration" conf="*->@"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.slave-package" rev="latest.integration" conf="build->@"/>
 
-        <dependency org="zutubi" name="pulse-master" rev="latest.integration" conf="release,src->@"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.master" rev="latest.integration" conf="release,src->@"/>
 
         <!-- Prepackaged plugins -->
         <dependency org="zutubi" name="com.zutubi.pulse.master.external.jira" rev="latest.integration" conf="src->@;prepackaged-bundles->bundle"/>

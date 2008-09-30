@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
-    <info organisation="zutubi" module="pulse-local-package" status="integration"/>
+    <info organisation="zutubi" module="com.zutubi.pulse.local-package" status="integration"/>
 
     <configurations>
         <conf name="release" description="Defines those packages that are included in the final release."/>
@@ -14,7 +14,7 @@
     <publications/>
 
     <dependencies>
-        <dependency org="zutubi" name="pulse-core-package" rev="latest.integration" conf="*->@"/>
-        <dependency org="zutubi" name="pulse-local" rev="latest.integration" conf="release,src->@"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.core-package" rev="latest.integration" conf="*->@"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.local" rev="latest.integration" conf="release,src->@"/>
     </dependencies>
 </ivy-module>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
-    <info organisation="zutubi" module="com.zutubi.pulse.servercore" status="integration">
+    <info organisation="zutubi" module="com.zutubi.pulse.servercore.bundle" status="integration">
         <ivyauthor name="Zutubi" url="http://www.zutubi.com/"/>
         <description homepage="http://www.zutubi.com/">
             Exposes extension points available on servers (both agents and the master).
@@ -17,11 +17,11 @@
     </configurations>
 
     <publications>
-        <artifact name="com.zutubi.pulse.servercore" type="jar" conf="build,bundle"/>
-        <artifact name="com.zutubi.pulse.servercore-src" type="jar" conf="src"/>
+        <artifact name="com.zutubi.pulse.servercore.bundle" type="jar" conf="build,bundle"/>
+        <artifact name="com.zutubi.pulse.servercore.bundle-src" type="jar" conf="src"/>
     </publications>
 
     <dependencies>
-        <dependency org="zutubi" name="pulse-servercore" rev="latest.integration" conf="build,external,src->@"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.servercore" rev="latest.integration" conf="build,external,src->@"/>
     </dependencies>
 </ivy-module>

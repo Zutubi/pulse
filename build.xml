@@ -265,7 +265,7 @@
             <fileset dir="com.zutubi.pulse.slave/etc" includes="classpath.txt"/>
         </copy>
 
-        <replace dir="${package.root.slave}/bin" replacefilterfile="slave/subst.properties">
+        <replace dir="${package.root.slave}/bin" replacefilterfile="com.zutubi.pulse.slave/subst.properties">
             <include name="**/*.in"/>
         </replace>
 
@@ -309,7 +309,7 @@
         <copy file="installer/pulse.nsi.in" tofile="${package.root.slave}/pulse.nsi"/>
         <copy file="installer/findjava.exe" todir="${package.root.slave}/bin"/>
 
-        <replace file="${package.root.slave}/pulse.nsi" replacefilterfile="slave/subst.properties">
+        <replace file="${package.root.slave}/pulse.nsi" replacefilterfile="com.zutubi.pulse.slave/subst.properties">
             <replacefilter token="__PACKAGE_NAME__" value="${package.name.slave}"/>
             <replacefilter token="__VERSION__" value="${pulse.version}"/>
         </replace>
@@ -396,7 +396,7 @@
             <fileset dir="com.zutubi.pulse.master/etc" includes="classpath.txt"/>
         </copy>
 
-        <replace dir="${package.root.master}/bin" replacefilterfile="master/subst.properties">
+        <replace dir="${package.root.master}/bin" replacefilterfile="com.zutubi.pulse.master/subst.properties">
             <include name="**/*.in"/>
         </replace>
 
@@ -448,7 +448,7 @@
         <copy file="installer/pulse.nsi.in" tofile="${package.root.master}/pulse.nsi"/>
         <copy file="installer/findjava.exe" todir="${package.root.master}/bin"/>
 
-        <replace file="${package.root.master}/pulse.nsi" replacefilterfile="master/subst.properties">
+        <replace file="${package.root.master}/pulse.nsi" replacefilterfile="com.zutubi.pulse.master/subst.properties">
             <replacefilter token="__PACKAGE_NAME__" value="${package.name.master}"/>
             <replacefilter token="__VERSION__" value="${pulse.version}"/>
         </replace>
@@ -627,7 +627,7 @@
     <macrodef name="build-package-deps">
         <attribute name="module"/>
         <sequential>
-            <ivy:buildlist reference="build.path.@{module}" root="pulse-@{module}-package" ivyfilepath="ivy.xml" excluderoot="true" skipbuildwithoutivy="true">
+            <ivy:buildlist reference="build.path.@{module}" root="com.zutubi.pulse.@{module}-package" ivyfilepath="ivy.xml" excluderoot="true" skipbuildwithoutivy="true">
                 <fileset dir="${project.root.dir}/">
                     <include name="*/build.xml"/>
                     <include name="bundles/*/build.xml"/>
