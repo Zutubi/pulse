@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
-    <info organisation="zutubi" module="pulse-acceptance" status="integration">
+    <info organisation="zutubi" module="com.zutubi.pulse.acceptance" status="integration">
         <ivyauthor name="zutubi" url="http://www.zutubi.com/"/>
         <description homepage="http://www.zutubi.com/">
             A dedicated module for Pulse acceptance tests.
@@ -17,13 +17,13 @@
     </configurations>
 
     <publications>
-        <artifact name="pulse-acceptance" type="jar" conf="release,build"/>
+        <artifact name="com.zutubi.pulse.acceptance" type="jar" conf="release,build"/>
     </publications>
 
     <dependencies>
-        <dependency org="zutubi" name="pulse-local" rev="latest.integration" conf="*->@"/>
-        <dependency org="zutubi" name="pulse-slave" rev="latest.integration" conf="*->@"/>
-        <dependency org="zutubi" name="pulse-master" rev="latest.integration" conf="*->@"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.local" rev="latest.integration" conf="*->@"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.slave" rev="latest.integration" conf="*->@"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.master" rev="latest.integration" conf="*->@"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.scm.svn" rev="latest.integration" conf="*->@"/>
 
         <dependency org="openqa" name="selenium" rev="1.0.b1" conf="external,build->default"/>

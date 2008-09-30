@@ -463,12 +463,12 @@
     <target name="build.acceptance">
         <subant inheritall="false" target="build.module">
             <property name="skip.dependencies" value="true"/>
-            <fileset dir="acceptance" includes="build.xml"/>
+            <fileset dir="com.zutubi.pulse.acceptance" includes="build.xml"/>
         </subant>
     </target>
 
     <target name="run.accept.master" depends="build.acceptance, init">
-        <property name="build.dir" value="acceptance/build"/>
+        <property name="build.dir" value="com.zutubi.pulse.acceptance/build"/>
         <property name="report.dir" value="build/reports/junit"/>
         <mkdir dir="${report.dir}/xml"/>
         <mkdir dir="${report.dir}/html"/>
@@ -507,7 +507,7 @@
             </classpath>
             <formatter type="xml"/>
             <batchtest todir="${report.dir}/xml">
-                <fileset dir="acceptance/src/test">
+                <fileset dir="com.zutubi.pulse.acceptance/src/test">
                     <include name="**/AcceptanceTestSuite.java"/>
                 </fileset>
             </batchtest>
