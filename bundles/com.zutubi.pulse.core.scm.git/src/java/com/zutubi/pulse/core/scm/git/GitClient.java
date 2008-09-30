@@ -4,26 +4,14 @@ import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.scm.FileStatus;
-import com.zutubi.pulse.core.scm.ScmCapability;
-import com.zutubi.pulse.core.scm.ScmClient;
-import com.zutubi.pulse.core.scm.ScmContext;
-import com.zutubi.pulse.core.scm.ScmEventHandler;
-import com.zutubi.pulse.core.scm.ScmException;
-import com.zutubi.pulse.core.scm.ScmFile;
+import com.zutubi.pulse.core.scm.*;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.TextUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.*;
 
 /**
  * Implementation of the {@link com.zutubi.pulse.core.scm.ScmClient} interface for the
@@ -45,6 +33,10 @@ public class GitClient implements ScmClient
     private String branch;
     private static final String LOCAL_BRANCH_NAME = "local";
     private static final String TMP_BRANCH_PREFIX = "tmp.";
+    private static final Revision HEAD = new Revision("HEAD");
+    private static final String FLAG_EDITED =   "M";
+    private static final String FLAG_ADDED =    "A";
+    private static final String FLAG_DELETED =  "D";
 
     /**
      * @see com.zutubi.pulse.core.scm.ScmClient#close()
@@ -79,7 +71,7 @@ public class GitClient implements ScmClient
     }
 
     /**
-     * @see com.zutubi.pulse.core.scm.ScmClient#checkout(com.zutubi.pulse.core.ExecutionContext, com.zutubi.pulse.core.model.Revision, com.zutubi.pulse.core.scm.ScmEventHandler)
+     * @see com.zutubi.pulse.core.scm.ScmClient#checkout(com.zutubi.pulse.core.ExecutionContext,com.zutubi.pulse.core.model.Revision,com.zutubi.pulse.core.scm.ScmEventHandler)
      */
     public Revision checkout(ExecutionContext context, Revision revision, ScmEventHandler handler) throws ScmException
     {
@@ -105,6 +97,8 @@ public class GitClient implements ScmClient
             git.checkout(rev, TMP_BRANCH_PREFIX + rev);
         }
 
+        // todo: if we want to provide extra feedback on the checkout, we run the checkout and then traverse the files, reporting them all as added.
+
         GitLogEntry entry = git.log(1).get(0);
 
         Revision rev = new Revision(entry.getAuthor(), entry.getComment(), entry.getDate(), entry.getId());
@@ -113,7 +107,7 @@ public class GitClient implements ScmClient
     }
 
     /**
-     * @see com.zutubi.pulse.core.scm.ScmClient#update(com.zutubi.pulse.core.ExecutionContext, com.zutubi.pulse.core.model.Revision, com.zutubi.pulse.core.scm.ScmEventHandler)
+     * @see com.zutubi.pulse.core.scm.ScmClient#update(com.zutubi.pulse.core.ExecutionContext,com.zutubi.pulse.core.model.Revision,com.zutubi.pulse.core.scm.ScmEventHandler)
      */
     public Revision update(ExecutionContext context, Revision revision, ScmEventHandler handler) throws ScmException
     {
@@ -125,6 +119,9 @@ public class GitClient implements ScmClient
 
         // switch to the primary local checkout and update.
         git.checkout(LOCAL_BRANCH_NAME);
+
+        // todo: determine the changes pulled in for the scm handler.  Get initial revision, pull, get final revision, then diff the two.
+
         git.pull();
 
         // cleanup any existing tmp local branches.
@@ -152,7 +149,7 @@ public class GitClient implements ScmClient
     }
 
     /**
-     * @see com.zutubi.pulse.core.scm.ScmClient#retrieve(com.zutubi.pulse.core.scm.ScmContext, String, com.zutubi.pulse.core.model.Revision)
+     * @see com.zutubi.pulse.core.scm.ScmClient#retrieve(com.zutubi.pulse.core.scm.ScmContext,String,com.zutubi.pulse.core.model.Revision)
      */
     public InputStream retrieve(ScmContext context, String path, Revision revision) throws ScmException
     {
@@ -241,7 +238,7 @@ public class GitClient implements ScmClient
     }
 
     /**
-     * @see com.zutubi.pulse.core.scm.ScmClient#getRevisions(com.zutubi.pulse.core.scm.ScmContext, com.zutubi.pulse.core.model.Revision, com.zutubi.pulse.core.model.Revision)
+     * @see com.zutubi.pulse.core.scm.ScmClient#getRevisions(com.zutubi.pulse.core.scm.ScmContext,com.zutubi.pulse.core.model.Revision,com.zutubi.pulse.core.model.Revision)
      */
     public List<Revision> getRevisions(ScmContext context, Revision from, Revision to) throws ScmException
     {
@@ -253,7 +250,7 @@ public class GitClient implements ScmClient
 
             if (to == null)
             {
-                to = new Revision("HEAD");
+                to = HEAD;
             }
 
             NativeGit git = new NativeGit();
@@ -273,7 +270,7 @@ public class GitClient implements ScmClient
     }
 
     /**
-     * @see com.zutubi.pulse.core.scm.ScmClient#getChanges(com.zutubi.pulse.core.scm.ScmContext, com.zutubi.pulse.core.model.Revision, com.zutubi.pulse.core.model.Revision)
+     * @see com.zutubi.pulse.core.scm.ScmClient#getChanges(com.zutubi.pulse.core.scm.ScmContext,com.zutubi.pulse.core.model.Revision,com.zutubi.pulse.core.model.Revision)
      */
     public List<Changelist> getChanges(ScmContext context, Revision from, Revision to) throws ScmException
     {
@@ -285,7 +282,7 @@ public class GitClient implements ScmClient
 
             if (to == null)
             {
-                to = new Revision("HEAD");
+                to = HEAD;
             }
 
             NativeGit git = new NativeGit();
@@ -300,37 +297,21 @@ public class GitClient implements ScmClient
             {
                 Revision rev = new Revision(entry.getAuthor(), entry.getComment(), entry.getDate(), entry.getId());
                 rev.setBranch(branch);
-                
+
                 Changelist changelist = new Changelist(rev);
 
-                Map<String, String> fileActions = new HashMap<String, String>();
                 for (GitLogEntry.FileChangeEntry file : entry.getFiles())
                 {
-                    if (fileActions.containsKey(file.getName()))
-                    {
-                        if (file.getAction().equals("delete"))
-                        {
-                            fileActions.put(file.getName(), "delete");
-                        }
-                    }
-                    else
-                    {
-                        fileActions.put(file.getName(), file.getAction());
-                    }
-                }
-
-                for (Map.Entry<String, String> e : fileActions.entrySet())
-                {
                     Change.Action action;
-                    if (e.getValue().equals("update"))
+                    if (file.getAction().equals(FLAG_EDITED))
                     {
                         action = Change.Action.EDIT;
                     }
-                    else if (e.getValue().equals("delete"))
+                    else if (file.getAction().equals(FLAG_DELETED))
                     {
                         action = Change.Action.DELETE;
                     }
-                    else if (e.getValue().equals("create"))
+                    else if (file.getAction().equals(FLAG_ADDED))
                     {
                         action = Change.Action.ADD;
                     }
@@ -338,7 +319,8 @@ public class GitClient implements ScmClient
                     {
                         action = Change.Action.UNKNOWN;
                     }
-                    Change change = new Change(e.getKey(), entry.getId(), action);
+                    
+                    Change change = new Change(file.getName(), entry.getId(), action);
                     changelist.addChange(change);
                 }
                 changelists.add(changelist);
@@ -349,7 +331,7 @@ public class GitClient implements ScmClient
     }
 
     /**
-     * @see com.zutubi.pulse.core.scm.ScmClient#browse(com.zutubi.pulse.core.scm.ScmContext, String, com.zutubi.pulse.core.model.Revision)
+     * @see com.zutubi.pulse.core.scm.ScmClient#browse(com.zutubi.pulse.core.scm.ScmContext,String,com.zutubi.pulse.core.model.Revision)
      */
     public List<ScmFile> browse(ScmContext context, String path, Revision revision) throws ScmException
     {
@@ -389,7 +371,7 @@ public class GitClient implements ScmClient
     }
 
     /**
-     * @see com.zutubi.pulse.core.scm.ScmClient#tag(com.zutubi.pulse.core.ExecutionContext, com.zutubi.pulse.core.model.Revision, String, boolean)
+     * @see com.zutubi.pulse.core.scm.ScmClient#tag(com.zutubi.pulse.core.ExecutionContext,com.zutubi.pulse.core.model.Revision,String,boolean)
      */
     public void tag(ExecutionContext context, Revision revision, String name, boolean moveExisting) throws ScmException
     {
@@ -397,7 +379,7 @@ public class GitClient implements ScmClient
     }
 
     /**
-     * @see com.zutubi.pulse.core.scm.ScmClient#parseRevision(String)    
+     * @see com.zutubi.pulse.core.scm.ScmClient#parseRevision(String)
      */
     public Revision parseRevision(String revision) throws ScmException
     {

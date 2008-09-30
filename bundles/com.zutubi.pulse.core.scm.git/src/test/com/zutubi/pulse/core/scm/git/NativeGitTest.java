@@ -90,7 +90,7 @@ public class NativeGitTest extends PulseTestCase
         GitLogEntry entry = entries.get(0);
         assertEquals("Daniel Ostermeier <daniel@zutubi.com>", entry.getAuthor());
         assertEquals("78be6b2f12399ea2332a5148440086913cb910fb", entry.getId());
-        assertEquals("    update", entry.getComment());
+        assertEquals("update", entry.getComment());
         assertEquals(new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z").parse("Fri Sep 12 11:30:12 2008 +1000"), entry.getDate());
     }
 
@@ -105,7 +105,7 @@ public class NativeGitTest extends PulseTestCase
         GitLogEntry entry = entries.get(0);
         assertEquals("Daniel Ostermeier <daniel@zutubi.com>", entry.getAuthor());
         assertEquals("78be6b2f12399ea2332a5148440086913cb910fb", entry.getId());
-        assertEquals("    update", entry.getComment());
+        assertEquals("update", entry.getComment());
         assertEquals(new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z").parse("Fri Sep 12 11:30:12 2008 +1000"), entry.getDate());
     }
 

@@ -10,11 +10,7 @@ import com.zutubi.util.Constants;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Iterator;
@@ -23,8 +19,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * The native git object is a wrapper around the implementation details for running native git operations.
@@ -51,8 +45,8 @@ public class NativeGit
     private static final String COMMAND_BRANCH = "branch";
     private static final String COMMAND_SHOW = "show";
     private static final String CHECKOUT_OPTION_BRANCH = "-b";
-    private static final String LOG_OPTION_STAT = "--stat";
-    private static final String LOG_OPTION_SUMMARY = "--summary";
+    private static final String LOG_OPTION_NAME_STATUS = "--name-status";
+    private static final String LOG_OPTION_PRETTY = "--pretty";
     private static final String LOG_OPTION_CHANGES = "-n";
     private static final String CLONE_OPTION_NO_CHECKOUT = "--no-checkout";
     private static final String LOG_OPTION_REVERSE = "--reverse";
@@ -141,8 +135,8 @@ public class NativeGit
         List<String> command = new LinkedList<String>();
         command.add(GIT);
         command.add(COMMAND_LOG);
-        command.add(LOG_OPTION_STAT);
-        command.add(LOG_OPTION_SUMMARY);
+        command.add(LOG_OPTION_NAME_STATUS);
+        command.add(LOG_OPTION_PRETTY + "=format:%H%n%cn%n%ce%n%cd%n%s%n.");
         command.add(LOG_OPTION_REVERSE);
         if (changes != -1)
         {
@@ -374,33 +368,16 @@ public class NativeGit
     /**
      * Read the output from the git log command, interpretting the output.
      * <p/>
-     * Sample output:
-     * <p/>
-     * commit d8fba19342690182dc7fd032dbc71eb8541966da
-     * Author: Daniel Ostermeier <daniel@zutubi.com>
-     * Date:   Tue Sep 23 18:10:12 2008 +1000
-     * <p/>
-     * update 8
-     * <p/>
-     * file.txt |    7 +------
-     * new.txt  |    1 +
-     * 2 files changed, 2 insertions(+), 6 deletions(-)
-     * create mode 100755 b.txt
-     * delete mode 100755 a.txt
+     *        e34da05e88de03a4aa5b10b338382f09bbe65d4b
+     *        Daniel Ostermeier
+     *        daniel@zutubi.com
+     *        Sun Sep 28 15:06:49 2008 +1000
+     *        removed content from a.txt
+     *
+     *        M       a.txt
      */
     private class LogOutputHandler extends OutputHandlerAdapter
     {
-        private static final String COMMIT_TAG = "commit";
-        private static final String AUTHOR_TAG = "Author:";
-        private static final String DATE_TAG = "Date:";
-
-        private final Pattern commitPattern = Pattern.compile("commit (.*)");
-        private final Pattern authorPattern = Pattern.compile("Author:(.*)");
-        private final Pattern datePattern = Pattern.compile("Date:(.*)");
-        private final Pattern filesPattern = Pattern.compile("(.*)[ ]*\\|.*");
-        private final Pattern summaryPattern = Pattern.compile(" \\d+ files changed, \\d+ insertions\\(\\+\\), \\d+ deletions\\(-\\)");
-        private final Pattern createDeletePattern = Pattern.compile(" (.+?) mode \\d+ (.*)");
-
         private List<GitLogEntry> entries;
 
         private List<String> lines;
@@ -429,132 +406,46 @@ public class NativeGit
                 entries = new LinkedList<GitLogEntry>();
 
                 // a) splitup the individual log entries.
-                List<List<String>> individualEntries = new LinkedList<List<String>>();
-                List<String> currentEntry = null;
-                for (String line : lines)
+                Iterator<String> i = lines.iterator();
+                while (i.hasNext())
                 {
-                    if (commitPattern.matcher(line).matches())
-                    {
-                        if (currentEntry != null)
-                        {
-                            individualEntries.add(currentEntry);
-                        }
-                        currentEntry = new LinkedList<String>();
-                    }
-                    if (currentEntry != null)
-                    {
-                        currentEntry.add(line);
-                    }
-                }
-                if (currentEntry != null)
-                {
-                    individualEntries.add(currentEntry);
-                }
-
-                // process the individual entries.
-                for (List<String> entry : individualEntries)
-                {
-                    Matcher m;
-                    Iterator<String> iterator = entry.iterator();
-                    String str = iterator.next();
-
                     GitLogEntry logEntry = new GitLogEntry();
-                    logEntry.setId(str.substring(COMMIT_TAG.length()).trim());
-                    str = iterator.next();
-                    if (authorPattern.matcher(str).matches())
+                    List<String> raw = new LinkedList<String>();
+                    String str;
+                    logEntry.setId(str = i.next());
+                    raw.add(str);
+                    logEntry.setAuthor(str = i.next() + " <" + i.next() + ">");
+                    raw.add(str);
+                    logEntry.setDateString(str = i.next());
+                    try
                     {
-                        logEntry.setAuthor(str.substring(AUTHOR_TAG.length()).trim());
-                        str = iterator.next();
+                        logEntry.setDate(LOG_DATE_FORMAT.parse(str));
                     }
-                    else
+                    catch (ParseException e)
                     {
-                        throw new RuntimeException();
+                        // noop.
                     }
+                    raw.add(str);
 
-                    if (datePattern.matcher(str).matches())
+                    String comment = "";
+                    while (!(str = i.next()).equals("."))
                     {
-                        try
-                        {
-
-                            String dateString = str.substring(DATE_TAG.length()).trim();
-                            logEntry.setDateString(dateString);
-                            logEntry.setDate(LOG_DATE_FORMAT.parse(dateString));
-                        }
-                        catch (ParseException e)
-                        {
-                            LOG.warning(e);
-                        }
-                        str = iterator.next();
-                    }
-                    else
-                    {
-                        throw new RuntimeException();
-                    }
-
-                    // comment
-                    String comment = str;
-                    while (iterator.hasNext())
-                    {
-                        str = iterator.next();
-                        comment = comment + str;
-                        if (!TextUtils.stringSet(str))
-                        {
-                            break;
-                        }
+                        comment += str;
+                        raw.add(str);
                     }
                     logEntry.setComment(comment);
+                    raw.add(str); // dot.
 
-                    if (!TextUtils.stringSet(str))
+                    // until newline or until end.
+                    while (i.hasNext() && TextUtils.stringSet(str = i.next()))
                     {
-                        if (iterator.hasNext())
-                        {
-                            str = iterator.next();
-                        }
+                        logEntry.addFileChange(str.substring(1).trim(), str.substring(0, 1));
+                        raw.add(str);
                     }
-
-                    while ((m = filesPattern.matcher(str)).matches())
-                    {
-                        // files.
-                        String file = m.group(1);
-                        logEntry.addFileChange(file, "update");
-                        if (iterator.hasNext())
-                        {
-                            str = iterator.next();
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-                    if (summaryPattern.matcher(str).matches())
-                    {
-                        // summary.
-                        if (iterator.hasNext())
-                        {
-                            str = iterator.next();
-                        }
-                    }
-
-                    while ((m = createDeletePattern.matcher(str)).matches())
-                    {
-                        String action = m.group(1);
-                        String file = m.group(2);
-                        logEntry.addFileChange(file, action);
-
-                        if (iterator.hasNext())
-                        {
-                            str = iterator.next();
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-
-                    logEntry.setRaw(entry);
+                    
+                    logEntry.setRaw(raw);
                     entries.add(logEntry);
                 }
-
             }
             return entries;
         }
