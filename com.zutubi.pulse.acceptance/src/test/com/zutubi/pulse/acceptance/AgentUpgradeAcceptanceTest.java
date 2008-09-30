@@ -58,7 +58,7 @@ public class AgentUpgradeAcceptanceTest extends PulseTestCase
 
             // get old agent package that we are upgrading from.
             // a) start with a predefined package, later move to a range of older packages that we can test from.
-            File oldAgentPackage = new File(getPulseRoot(), join("acceptance", "src", "test", "data", "pulse-agent-2.0.0.zip"));
+            File oldAgentPackage = new File(getPulseRoot(), join("com.zutubi.pulse.acceptance", "src", "test", "data", "pulse-agent-2.0.0.zip"));
 
             // ensure that the two packages exist.
 

@@ -33,7 +33,7 @@ public class BuildHookAcceptanceTest extends SeleniumTestBase
     private static final String HOOKS_BASENAME = "buildHooks";
     private static final String HOOKS_PATH   = PathUtils.getPath(PROJECT_PATH, HOOKS_BASENAME);
 
-    private static final File DUMPENV_JAR = new File(TestUtils.getPulseRoot(), FileSystemUtils.composeFilename("acceptance", "src", "test", "misc", "dumpenv.jar"));
+    private static final File DUMPENV_JAR = new File(TestUtils.getPulseRoot(), FileSystemUtils.composeFilename("com.zutubi.pulse.acceptance", "src", "test", "misc", "dumpenv.jar"));
 
     private File tempDir;
 

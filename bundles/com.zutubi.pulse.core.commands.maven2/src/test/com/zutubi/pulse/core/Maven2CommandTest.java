@@ -147,11 +147,7 @@ public class Maven2CommandTest extends ExecutableCommandTestBase
 
     private File getSource(String name) throws URISyntaxException
     {
-        URL resource = getClass().getResource("Maven2CommandLoadTest.basic.xml");
-        File resourceFile = new File(resource.toURI());
-        File moduleDir = new File(resourceFile.getAbsolutePath().replaceFirst("command-maven2.*", "command-maven2"));
-
-        return new File(moduleDir, FileSystemUtils.composeFilename("src", "test", "com", "zutubi", "pulse", "core", getClass().getSimpleName() + "." + name));
+        return getTestDataDir("bundles/com.zutubi.pulse.core.commands.maven2", getClass().getSimpleName() + "." + name);
     }
 
     protected File getCommandOutput(CommandResult commandResult) throws IOException

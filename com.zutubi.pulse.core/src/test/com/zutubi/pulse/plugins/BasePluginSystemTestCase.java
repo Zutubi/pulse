@@ -53,7 +53,7 @@ public abstract class BasePluginSystemTestCase extends PulseTestCase
         paths.setPluginWorkDir(workDir);
 
         // copy contents from etc osgi into temp osgi dir.
-        FileSystemUtils.copy(osgiDir, new File(getPulseRoot(), "master/etc/osgi").listFiles(new FileFilter()
+        FileSystemUtils.copy(osgiDir, new File(getPulseRoot(), "com.zutubi.pulse.master/etc/osgi").listFiles(new FileFilter()
         {
             public boolean accept(File file)
             {

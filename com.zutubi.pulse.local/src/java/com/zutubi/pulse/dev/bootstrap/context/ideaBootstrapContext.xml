@@ -2,7 +2,7 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
     <bean id="devPaths" class="com.zutubi.pulse.dev.bootstrap.ConfigurableDevPaths">
-        <property name="osgiConfigurationString" value="com.zutubi.pulse.local/etc/osgi"/>
+        <property name="osgiConfigurationString" value="com.zutubi.pulse.master/etc/osgi"/>
         <property name="internalPluginStorageString" value="plugins/internal"/>
         <property name="pluginRegistryString" value="plugins"/>
         <property name="pluginStorageString" value="plugins/prepackaged"/>

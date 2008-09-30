@@ -40,7 +40,7 @@ public class PostProcessorPluginAcceptanceTest extends PulseTestCase
             fail("Pulse package file '" + pkgFile.getAbsolutePath() + "'does not exist.");
         }
 
-        File dataDir = new File(getPulseRoot(), FileSystemUtils.join("acceptance", "src", "test", "data"));
+        File dataDir = new File(getPulseRoot(), FileSystemUtils.join("com.zutubi.pulse.acceptance", "src", "test", "data"));
         samplePostProccorPlugin = new File(dataDir, "com.zutubi.bundles.postprocessor.sample_1.0.0.jar");
 
         pluginSystem = new PluginSystem(pkgFile, tmpDir);

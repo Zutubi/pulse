@@ -399,7 +399,7 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
     {
         ExecutableCommand command = new ExecutableCommand();
         command.setExe("java");
-        command.addArguments("-jar", getTestDataFile("bundles/command-core", "exit", "jar").getAbsolutePath(), Integer.toString(exitCode));
+        command.addArguments("-jar", getTestDataFile("bundles/com.zutubi.pulse.core.commands.core", "exit", "jar").getAbsolutePath(), Integer.toString(exitCode));
         StatusMapping mapping = command.createStatusMapping();
         mapping.setCode(mappedCode);
         mapping.setStatus(mappedStatus.getPrettyString());
@@ -427,7 +427,7 @@ public class ExecutableCommandTest extends ExecutableCommandTestBase
     {
         URL resource = getClass().getResource("ExecutableCommandLoaderTest.testExecutableArgs.xml");
         String resourcePath = new File(resource.toURI()).getAbsolutePath();
-        File moduleDir = new File(resourcePath.substring(0, resourcePath.lastIndexOf("command-core") + 12));
+        File moduleDir = new File(resourcePath.substring(0, resourcePath.lastIndexOf("com.zutubi.pulse.core.commands.core") + 12));
         return new File(moduleDir, FileSystemUtils.composeFilename("src", "test", getClass().getName().replace('.', File.separatorChar) + "." + testName + "." + extension));
     }
 
