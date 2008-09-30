@@ -1,11 +1,11 @@
 package com.zutubi.pulse;
 
+import com.zutubi.events.AsynchronousDelegatingListener;
+import com.zutubi.events.Event;
+import com.zutubi.events.EventListener;
+import com.zutubi.events.EventManager;
 import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.core.Stoppable;
-import com.zutubi.pulse.events.AsynchronousDelegatingListener;
-import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.events.EventListener;
-import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.AbstractBuildRequestEvent;
 import com.zutubi.pulse.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.events.build.BuildTerminationRequestEvent;

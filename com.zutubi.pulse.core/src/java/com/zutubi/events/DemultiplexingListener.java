@@ -1,4 +1,4 @@
-package com.zutubi.pulse.events;
+package com.zutubi.events;
 
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;

@@ -2,11 +2,15 @@ package com.zutubi.pulse.agent;
 
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
+import com.zutubi.events.DefaultEventManager;
+import com.zutubi.events.Event;
+import com.zutubi.events.EventListener;
+import com.zutubi.events.EventManager;
 import com.zutubi.pulse.AgentService;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.bootstrap.DefaultSystemPaths;
 import com.zutubi.pulse.bootstrap.SystemPaths;
-import com.zutubi.pulse.events.*;
+import com.zutubi.pulse.events.AgentUpgradeCompleteEvent;
 import com.zutubi.pulse.model.AgentState;
 import com.zutubi.pulse.services.UpgradeState;
 import com.zutubi.pulse.services.UpgradeStatus;

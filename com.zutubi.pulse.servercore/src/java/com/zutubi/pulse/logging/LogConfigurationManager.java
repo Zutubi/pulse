@@ -1,9 +1,9 @@
 package com.zutubi.pulse.logging;
 
+import com.zutubi.events.AllEventListener;
+import com.zutubi.events.Event;
+import com.zutubi.events.EventManager;
 import com.zutubi.pulse.bootstrap.SystemPaths;
-import com.zutubi.pulse.events.AllEventListener;
-import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.events.EventManager;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;

@@ -1,5 +1,8 @@
 package com.zutubi.pulse.agent;
 
+import com.zutubi.events.Event;
+import com.zutubi.events.EventListener;
+import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.events.RecipeCompletedEvent;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.core.events.RecipeEvent;

@@ -1,4 +1,4 @@
-package com.zutubi.pulse.events;
+package com.zutubi.events;
 
 import java.util.LinkedList;
 import java.util.List;

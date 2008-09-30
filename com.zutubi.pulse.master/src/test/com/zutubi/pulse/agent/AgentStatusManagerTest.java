@@ -1,5 +1,9 @@
 package com.zutubi.pulse.agent;
 
+import com.zutubi.events.DefaultEventManager;
+import com.zutubi.events.Event;
+import com.zutubi.events.EventListener;
+import com.zutubi.events.EventManager;
 import com.zutubi.pulse.AgentService;
 import com.zutubi.pulse.core.BuildProperties;
 import com.zutubi.pulse.core.ExecutionContext;

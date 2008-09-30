@@ -1,4 +1,4 @@
-package com.zutubi.pulse.events;
+package com.zutubi.events;
 
 /**
  * Extend this listener if you are interested in being notified about

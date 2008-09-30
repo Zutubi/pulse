@@ -1,6 +1,6 @@
 package com.zutubi.pulse.license;
 
-import com.zutubi.pulse.events.DefaultEventManager;
+import com.zutubi.events.DefaultEventManager;
 import junit.framework.TestCase;
 
 /**

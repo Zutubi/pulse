@@ -1,6 +1,6 @@
 package com.zutubi.pulse.scheduling;
 
-import com.zutubi.pulse.events.Event;
+import com.zutubi.events.Event;
 
 /**
  * The EventTrigger is triggered by the occurance of an event within the system.

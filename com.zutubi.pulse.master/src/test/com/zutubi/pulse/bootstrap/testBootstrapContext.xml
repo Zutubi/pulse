@@ -58,11 +58,11 @@
 
     <bean name="objectFactory" class="com.zutubi.pulse.spring.SpringObjectFactory"/>
 
-    <bean id="eventManager" class="com.zutubi.pulse.events.DefaultEventManager">
+    <bean id="eventManager" class="com.zutubi.events.DefaultEventManager">
         <constructor-arg index="0" ref="eventDispatcher"/>
     </bean>
 
-    <bean id="eventDispatcher" class="com.zutubi.pulse.events.SynchronousDispatcher"/>
+    <bean id="eventDispatcher" class="com.zutubi.events.SynchronousDispatcher"/>
 
     <bean id="threadFactory" class="com.zutubi.pulse.security.PulseThreadFactory"/>
 

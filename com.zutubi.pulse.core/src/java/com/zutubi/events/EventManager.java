@@ -1,4 +1,4 @@
-package com.zutubi.pulse.events;
+package com.zutubi.events;
 
 /**
  * The base interface implemented by event managers.  Event managers support
@@ -25,7 +25,7 @@ public interface EventManager
      * Publish an event, notifying the appropriate event listeners.
      * Equivalent to publish(evt, PublishFlag.IMMEDIATE).
      *
-     * @see com.zutubi.pulse.events.PublishFlag
+     * @see PublishFlag
      * @see #publish(Event,PublishFlag)
      *
      * @param event the event being published

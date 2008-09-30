@@ -1,8 +1,8 @@
 package com.zutubi.tove.config;
 
+import com.zutubi.events.Event;
+import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.config.Configuration;
-import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
@@ -16,7 +16,7 @@ import java.util.logging.Level;
  * Manages access to the configuration system.  Allows UIs to filter what a
  * user can see and do to configuration.
  */
-public class ConfigurationSecurityManager implements com.zutubi.pulse.events.EventListener
+public class ConfigurationSecurityManager implements com.zutubi.events.EventListener
 {
     private static final Logger LOG = Logger.getLogger(ConfigurationSecurityManager.class);
 

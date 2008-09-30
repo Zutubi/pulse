@@ -1,4 +1,4 @@
-package com.zutubi.pulse.events;
+package com.zutubi.events;
 
 /**
  * The base interface implemented by all classes interested in events.

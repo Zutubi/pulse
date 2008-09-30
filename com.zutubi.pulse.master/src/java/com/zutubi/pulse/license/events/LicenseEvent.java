@@ -1,6 +1,6 @@
 package com.zutubi.pulse.license.events;
 
-import com.zutubi.pulse.events.Event;
+import com.zutubi.events.Event;
 import com.zutubi.pulse.license.License;
 
 /**

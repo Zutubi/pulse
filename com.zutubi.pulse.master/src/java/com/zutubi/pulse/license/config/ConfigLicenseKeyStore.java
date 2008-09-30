@@ -1,8 +1,8 @@
 package com.zutubi.pulse.license.config;
 
-import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.events.EventListener;
-import com.zutubi.pulse.events.EventManager;
+import com.zutubi.events.Event;
+import com.zutubi.events.EventListener;
+import com.zutubi.events.EventManager;
 import com.zutubi.pulse.license.AbstractLicenseKeyStore;
 import com.zutubi.pulse.license.LicenseException;
 import com.zutubi.pulse.tove.config.admin.GlobalConfiguration;

@@ -1,7 +1,7 @@
 package com.zutubi.tove.config;
 
+import com.zutubi.events.*;
 import com.zutubi.pulse.core.config.Configuration;
-import com.zutubi.pulse.events.*;
 import com.zutubi.pulse.events.system.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.tove.config.events.ConfigurationEvent;

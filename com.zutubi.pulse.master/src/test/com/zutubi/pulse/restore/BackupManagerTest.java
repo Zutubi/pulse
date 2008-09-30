@@ -1,8 +1,8 @@
 package com.zutubi.pulse.restore;
 
+import com.zutubi.events.DefaultEventManager;
+import com.zutubi.events.EventManager;
 import com.zutubi.pulse.bootstrap.Data;
-import com.zutubi.pulse.events.DefaultEventManager;
-import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.system.SystemStartedEvent;
 import com.zutubi.pulse.model.persistence.mock.MockTriggerDao;
 import com.zutubi.pulse.scheduling.CronTrigger;

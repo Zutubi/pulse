@@ -1,5 +1,9 @@
 package com.zutubi.pulse.events;
 
+import com.zutubi.events.AllEventListener;
+import com.zutubi.events.DefaultEventManager;
+import com.zutubi.events.Event;
+import com.zutubi.events.EventManager;
 import com.zutubi.pulse.test.PulseTestCase;
 
 /**

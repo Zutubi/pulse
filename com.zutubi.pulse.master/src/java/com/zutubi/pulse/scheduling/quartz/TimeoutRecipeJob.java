@@ -1,7 +1,7 @@
 package com.zutubi.pulse.scheduling.quartz;
 
+import com.zutubi.events.EventManager;
 import com.zutubi.pulse.FatController;
-import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.RecipeTimeoutEvent;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;

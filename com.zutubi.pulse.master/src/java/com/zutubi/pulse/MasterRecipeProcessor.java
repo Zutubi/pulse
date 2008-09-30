@@ -1,17 +1,16 @@
 package com.zutubi.pulse;
 
+import com.zutubi.events.EventManager;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.RecipeProcessor;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.core.Stoppable;
-import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.util.logging.Logger;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**

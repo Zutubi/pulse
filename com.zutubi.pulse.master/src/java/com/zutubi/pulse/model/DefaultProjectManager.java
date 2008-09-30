@@ -1,5 +1,8 @@
 package com.zutubi.pulse.model;
 
+import com.zutubi.events.Event;
+import com.zutubi.events.EventListener;
+import com.zutubi.events.EventManager;
 import com.zutubi.pulse.bootstrap.DefaultSetupManager;
 import com.zutubi.pulse.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.cleanup.config.CleanupUnit;
@@ -13,16 +16,13 @@ import com.zutubi.pulse.core.model.TestCaseIndex;
 import com.zutubi.pulse.core.scm.ScmCapability;
 import com.zutubi.pulse.core.scm.ScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
-import com.zutubi.pulse.master.scm.ScmContextFactory;
 import com.zutubi.pulse.core.scm.ScmException;
-import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.events.EventListener;
-import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.*;
 import com.zutubi.pulse.events.system.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.pulse.license.LicenseManager;
 import com.zutubi.pulse.license.authorisation.AddProjectAuthorisation;
+import com.zutubi.pulse.master.scm.ScmContextFactory;
 import com.zutubi.pulse.model.persistence.AgentStateDao;
 import com.zutubi.pulse.model.persistence.ProjectDao;
 import com.zutubi.pulse.model.persistence.TestCaseIndexDao;

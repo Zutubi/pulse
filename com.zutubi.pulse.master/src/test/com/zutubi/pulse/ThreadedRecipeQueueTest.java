@@ -1,5 +1,7 @@
 package com.zutubi.pulse;
 
+import com.zutubi.events.DefaultEventManager;
+import com.zutubi.events.Event;
 import com.zutubi.pulse.agent.*;
 import com.zutubi.pulse.core.BuildException;
 import static com.zutubi.pulse.core.BuildProperties.*;
@@ -9,8 +11,9 @@ import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.events.*;
-import com.zutubi.pulse.events.EventListener;
+import com.zutubi.pulse.events.AgentAvailableEvent;
+import com.zutubi.pulse.events.AgentOfflineEvent;
+import com.zutubi.pulse.events.AgentOnlineEvent;
 import com.zutubi.pulse.events.build.BuildRevisionUpdatedEvent;
 import com.zutubi.pulse.events.build.RecipeAssignedEvent;
 import com.zutubi.pulse.events.system.ConfigurationEventSystemStartedEvent;
@@ -37,7 +40,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  */
-public class ThreadedRecipeQueueTest extends TestCase implements EventListener
+public class ThreadedRecipeQueueTest extends TestCase implements com.zutubi.events.EventListener
 {
     private static final String PULSE_FILE = "<xml version=\"1.0\"><project default-recipe=\"default\"><recipe name=\"default\"/></project>";
 

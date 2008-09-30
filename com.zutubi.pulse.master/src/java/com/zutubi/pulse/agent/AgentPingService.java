@@ -1,10 +1,10 @@
 package com.zutubi.pulse.agent;
 
+import com.zutubi.events.EventManager;
 import com.zutubi.pulse.AgentService;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.events.AgentPingEvent;
-import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.services.SlaveStatus;
 import com.zutubi.util.logging.Logger;
 

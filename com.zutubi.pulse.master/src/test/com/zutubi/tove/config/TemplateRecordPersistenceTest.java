@@ -3,11 +3,11 @@ package com.zutubi.tove.config;
 import com.zutubi.config.annotations.NoInherit;
 import com.zutubi.config.annotations.Ordered;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.events.Event;
 import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.config.ConfigurationList;
 import com.zutubi.pulse.core.config.ConfigurationMap;
-import com.zutubi.pulse.events.Event;
 import com.zutubi.tove.config.events.*;
 import com.zutubi.tove.type.*;
 import com.zutubi.tove.type.record.MutableRecord;
@@ -1600,7 +1600,7 @@ public class TemplateRecordPersistenceTest extends AbstractConfigurationSystemTe
         assertEquals("default", stage.get("name"));
     }
 
-    public static class Listener implements com.zutubi.pulse.events.EventListener
+    public static class Listener implements com.zutubi.events.EventListener
     {
         private List<ConfigurationEvent> events = new LinkedList<ConfigurationEvent>();
 

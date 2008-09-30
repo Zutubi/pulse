@@ -1,7 +1,7 @@
 package com.zutubi.tove.config;
 
+import com.zutubi.events.DefaultEventManager;
 import com.zutubi.pulse.core.config.Configuration;
-import com.zutubi.pulse.events.DefaultEventManager;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.security.GlobalAuthorityProvider;
 import com.zutubi.pulse.security.PulseThreadFactory;

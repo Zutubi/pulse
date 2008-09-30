@@ -1,4 +1,4 @@
-package com.zutubi.pulse.events;
+package com.zutubi.events;
 
 /**
  * Flags to indicates how the {@link EventManager} should publish an event.

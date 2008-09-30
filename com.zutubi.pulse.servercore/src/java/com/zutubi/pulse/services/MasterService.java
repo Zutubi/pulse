@@ -1,6 +1,6 @@
 package com.zutubi.pulse.services;
 
-import com.zutubi.pulse.events.Event;
+import com.zutubi.events.Event;
 import com.zutubi.pulse.core.config.Resource;
 
 import java.util.List;

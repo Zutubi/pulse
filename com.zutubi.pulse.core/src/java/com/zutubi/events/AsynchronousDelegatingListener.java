@@ -1,6 +1,5 @@
-package com.zutubi.pulse.events;
+package com.zutubi.events;
 
-import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.util.logging.Logger;
 
 import java.util.concurrent.ExecutorService;
@@ -17,7 +16,7 @@ import java.util.concurrent.TimeUnit;
  * thread and are delegated in the same order as they are received.
  *
  */
-public class AsynchronousDelegatingListener implements EventListener, Stoppable
+public class AsynchronousDelegatingListener implements EventListener
 {
     private static final Logger LOG = Logger.getLogger(AsynchronousDelegatingListener.class);
 

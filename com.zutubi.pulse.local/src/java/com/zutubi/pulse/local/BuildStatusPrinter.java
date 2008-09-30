@@ -1,15 +1,10 @@
 package com.zutubi.pulse.local;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.events.EventListener;
+import com.zutubi.events.Event;
+import com.zutubi.events.EventListener;
+import com.zutubi.pulse.core.events.*;
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.core.events.RecipeEvent;
-import com.zutubi.pulse.core.events.RecipeCommencedEvent;
-import com.zutubi.pulse.core.events.RecipeErrorEvent;
-import com.zutubi.pulse.core.events.CommandCompletedEvent;
-import com.zutubi.pulse.core.events.CommandCommencedEvent;
-import com.zutubi.pulse.core.events.RecipeCompletedEvent;
 import com.zutubi.util.TimeStamps;
 import com.zutubi.util.io.ForkOutputStream;
 

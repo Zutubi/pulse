@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.events;
 
-import com.zutubi.pulse.events.Event;
+import com.zutubi.events.Event;
 
 /**
  * This event is generated when the systems data directory is changed. This event will be generated

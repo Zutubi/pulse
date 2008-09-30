@@ -1,9 +1,9 @@
 package com.zutubi.tove.config;
 
+import com.zutubi.events.DemultiplexingListener;
+import com.zutubi.events.Event;
+import com.zutubi.events.FilteringListener;
 import com.zutubi.pulse.core.config.Configuration;
-import com.zutubi.pulse.events.DemultiplexingListener;
-import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.events.FilteringListener;
 import com.zutubi.tove.config.events.ConfigurationEvent;
 import com.zutubi.util.NullaryFunction;
 
@@ -151,7 +151,7 @@ public class MockConfigurationProvider implements ConfigurationProvider
         asyncMux.handleEvent(evt);
     }
     
-    private static class Listener implements com.zutubi.pulse.events.EventListener
+    private static class Listener implements com.zutubi.events.EventListener
     {
         private ConfigurationEventListener delegate;
 

@@ -1,9 +1,9 @@
 package com.zutubi.pulse.scheduling;
 
+import com.zutubi.events.DefaultEventManager;
+import com.zutubi.events.Event;
+import com.zutubi.events.EventManager;
 import com.zutubi.util.bean.DefaultObjectFactory;
-import com.zutubi.pulse.events.DefaultEventManager;
-import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.events.EventManager;
 
 /**
  * <class-comment/>

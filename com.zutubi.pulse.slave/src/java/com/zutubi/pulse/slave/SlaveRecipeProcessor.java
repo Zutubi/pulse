@@ -1,18 +1,21 @@
 package com.zutubi.pulse.slave;
 
-import com.zutubi.pulse.*;
+import com.zutubi.events.EventListener;
+import com.zutubi.events.EventManager;
+import com.zutubi.pulse.ChainBootstrapper;
+import com.zutubi.pulse.RecipeCleanup;
+import com.zutubi.pulse.ServerBootstrapper;
+import com.zutubi.pulse.ServerRecipePaths;
 import com.zutubi.pulse.core.*;
-import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import static com.zutubi.pulse.core.BuildProperties.*;
-import com.zutubi.pulse.events.EventListener;
-import com.zutubi.pulse.events.EventManager;
+import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.repository.SlaveFileRepository;
 import com.zutubi.pulse.services.MasterService;
 import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.services.SlaveStatus;
+import com.zutubi.pulse.util.FileSystem;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
-import com.zutubi.pulse.util.FileSystem;
 
 import java.net.MalformedURLException;
 import java.util.concurrent.atomic.AtomicLong;

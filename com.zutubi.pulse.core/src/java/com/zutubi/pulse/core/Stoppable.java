@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core;
 
 /**
+ * Generic interface for anything that can be stopped.
  */
 public interface Stoppable
 {

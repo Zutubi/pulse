@@ -1,8 +1,8 @@
 package com.zutubi.pulse.security;
 
-import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.events.EventListener;
-import com.zutubi.pulse.events.EventManager;
+import com.zutubi.events.Event;
+import com.zutubi.events.EventListener;
+import com.zutubi.events.EventManager;
 import com.zutubi.pulse.events.system.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.model.GrantedAuthority;
 import com.zutubi.pulse.tove.config.admin.GlobalConfiguration;

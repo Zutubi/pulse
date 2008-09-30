@@ -1,8 +1,8 @@
 package com.zutubi.pulse.bootstrap;
 
+import com.zutubi.events.EventManager;
 import com.zutubi.pulse.config.ConfigSupport;
 import com.zutubi.pulse.config.FileConfig;
-import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.system.SystemStartedEvent;
 import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.util.bean.ObjectFactory;

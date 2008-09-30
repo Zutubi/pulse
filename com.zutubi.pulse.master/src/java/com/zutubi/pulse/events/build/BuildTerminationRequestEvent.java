@@ -1,6 +1,6 @@
 package com.zutubi.pulse.events.build;
 
-import com.zutubi.pulse.events.Event;
+import com.zutubi.events.Event;
 
 /**
  * Raised to request that all running builds be forcefully terminated.

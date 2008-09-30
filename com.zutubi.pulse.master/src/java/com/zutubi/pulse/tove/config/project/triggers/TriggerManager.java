@@ -1,14 +1,14 @@
 package com.zutubi.pulse.tove.config.project.triggers;
 
-import com.zutubi.pulse.spring.SpringComponentContext;
+import com.zutubi.events.Event;
+import com.zutubi.events.EventListener;
+import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.PulseRuntimeException;
-import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.events.EventListener;
-import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.system.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.scheduling.SchedulingException;
 import com.zutubi.pulse.scheduling.Trigger;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.tove.config.*;
 import com.zutubi.util.logging.Logger;
 

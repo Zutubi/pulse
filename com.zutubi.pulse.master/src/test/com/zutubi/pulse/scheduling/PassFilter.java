@@ -1,6 +1,6 @@
 package com.zutubi.pulse.scheduling;
 
-import com.zutubi.pulse.events.Event;
+import com.zutubi.events.Event;
 
 /**
  */

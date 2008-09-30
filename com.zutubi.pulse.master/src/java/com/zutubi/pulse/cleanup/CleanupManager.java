@@ -1,10 +1,10 @@
 package com.zutubi.pulse.cleanup;
 
+import com.zutubi.events.Event;
+import com.zutubi.events.EventListener;
+import com.zutubi.events.EventManager;
 import com.zutubi.pulse.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.cleanup.config.CleanupWhat;
-import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.events.EventListener;
-import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.model.persistence.BuildResultDao;

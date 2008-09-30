@@ -2,13 +2,12 @@ package com.zutubi.tove.config;
 
 import com.zutubi.config.annotations.Reference;
 import com.zutubi.config.annotations.SymbolicName;
+import com.zutubi.events.AllEventListener;
+import com.zutubi.events.Event;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.config.NamedConfiguration;
-import com.zutubi.pulse.events.AllEventListener;
-import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.events.EventListener;
 import com.zutubi.tove.config.events.*;
 import com.zutubi.tove.security.*;
 import com.zutubi.tove.transaction.UserTransaction;
@@ -334,7 +333,7 @@ public class ConfigurationTemplateManagerTest extends AbstractConfigurationSyste
     public void testAllInsertEventsAreGenerated()
     {
         final List<ConfigurationEvent> events = new LinkedList<ConfigurationEvent>();
-        eventManager.register(new EventListener()
+        eventManager.register(new com.zutubi.events.EventListener()
         {
             public void handleEvent(Event evt)
             {

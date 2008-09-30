@@ -1,11 +1,11 @@
 package com.zutubi.pulse;
 
+import com.zutubi.events.EventManager;
+import com.zutubi.events.PublishFlag;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.model.Entity;
-import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.events.PublishFlag;
 import com.zutubi.pulse.events.build.AbstractBuildRequestEvent;
 import com.zutubi.pulse.events.build.BuildActivatedEvent;
 import com.zutubi.pulse.tove.config.project.ProjectConfigurationActions;

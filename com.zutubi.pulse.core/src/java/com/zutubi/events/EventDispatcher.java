@@ -1,6 +1,4 @@
-package com.zutubi.pulse.events;
-
-import com.zutubi.pulse.events.Event;
+package com.zutubi.events;
 
 import java.util.List;
 

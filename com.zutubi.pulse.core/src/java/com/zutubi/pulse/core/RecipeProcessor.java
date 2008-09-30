@@ -1,18 +1,18 @@
 package com.zutubi.pulse.core;
 
+import com.zutubi.events.EventManager;
 import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.config.ResourceProperty;
+import com.zutubi.pulse.core.events.RecipeCommencedEvent;
+import com.zutubi.pulse.core.events.RecipeCompletedEvent;
+import com.zutubi.pulse.core.events.RecipeStatusEvent;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.TestSuitePersister;
 import com.zutubi.pulse.core.model.TestSuiteResult;
-import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.core.events.RecipeCommencedEvent;
-import com.zutubi.pulse.core.events.RecipeStatusEvent;
-import com.zutubi.pulse.core.events.RecipeCompletedEvent;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.pulse.util.ZipUtils;
-import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.TextUtils;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.ByteArrayInputStream;

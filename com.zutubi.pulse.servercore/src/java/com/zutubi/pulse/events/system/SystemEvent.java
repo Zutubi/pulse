@@ -1,6 +1,6 @@
 package com.zutubi.pulse.events.system;
 
-import com.zutubi.pulse.events.Event;
+import com.zutubi.events.Event;
 
 /**
  * Parent for all system events.  These are events that indicate a change in

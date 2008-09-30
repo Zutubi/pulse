@@ -1,8 +1,8 @@
 package com.zutubi.pulse.scheduling;
 
+import com.zutubi.events.Event;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.scheduling.tasks.BuildProjectTask;
 

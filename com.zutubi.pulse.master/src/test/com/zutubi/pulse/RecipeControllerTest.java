@@ -1,5 +1,6 @@
 package com.zutubi.pulse;
 
+import com.zutubi.events.DefaultEventManager;
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.Status;
 import com.zutubi.pulse.bootstrap.Data;
@@ -14,7 +15,6 @@ import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.events.*;
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.events.DefaultEventManager;
 import com.zutubi.pulse.events.build.RecipeAssignedEvent;
 import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
 import com.zutubi.pulse.logging.CustomLogRecord;

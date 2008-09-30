@@ -1,5 +1,8 @@
 package com.zutubi.pulse.events;
 
+import com.zutubi.events.AsynchronousDelegatingListener;
+import com.zutubi.events.Event;
+import com.zutubi.events.EventListener;
 import com.zutubi.pulse.test.PulseTestCase;
 
 import java.util.concurrent.Executors;

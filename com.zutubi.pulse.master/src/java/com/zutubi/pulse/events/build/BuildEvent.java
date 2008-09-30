@@ -1,8 +1,8 @@
 package com.zutubi.pulse.events.build;
 
+import com.zutubi.events.Event;
 import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.model.Result;
-import com.zutubi.pulse.events.Event;
 import com.zutubi.pulse.model.BuildResult;
 
 /**

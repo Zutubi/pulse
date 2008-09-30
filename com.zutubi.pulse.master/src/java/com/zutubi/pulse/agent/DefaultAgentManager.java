@@ -1,12 +1,13 @@
 package com.zutubi.pulse.agent;
 
+import com.zutubi.events.Event;
+import com.zutubi.events.EventManager;
 import com.zutubi.pulse.*;
 import com.zutubi.pulse.bootstrap.DefaultSetupManager;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.StartupManager;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.events.*;
-import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.system.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.pulse.license.LicenseManager;
@@ -40,7 +41,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  */
-public class DefaultAgentManager implements AgentManager, ExternalStateManager<AgentConfiguration>, EventListener, Stoppable
+public class DefaultAgentManager implements AgentManager, ExternalStateManager<AgentConfiguration>, com.zutubi.events.EventListener, Stoppable
 {
     private static final Logger LOG = Logger.getLogger(DefaultAgentManager.class);
 

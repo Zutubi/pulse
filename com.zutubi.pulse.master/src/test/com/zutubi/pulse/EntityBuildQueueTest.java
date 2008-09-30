@@ -1,10 +1,10 @@
 package com.zutubi.pulse;
 
+import com.zutubi.events.Event;
+import com.zutubi.events.EventListener;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.events.EventListener;
 import com.zutubi.pulse.events.build.AbstractBuildRequestEvent;
 import com.zutubi.pulse.events.build.BuildActivatedEvent;
 import com.zutubi.pulse.events.build.BuildRequestEvent;

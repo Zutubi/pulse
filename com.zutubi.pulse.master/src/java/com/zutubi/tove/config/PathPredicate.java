@@ -1,6 +1,6 @@
 package com.zutubi.tove.config;
 
-import com.zutubi.pulse.events.Event;
+import com.zutubi.events.Event;
 import com.zutubi.tove.config.events.ConfigurationEvent;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.Predicate;

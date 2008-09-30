@@ -1,8 +1,8 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.events.EventManager;
-import com.zutubi.pulse.util.FileSystem;
+import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.events.RecipeStatusEvent;
+import com.zutubi.pulse.util.FileSystem;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;

@@ -1,16 +1,16 @@
 package com.zutubi.pulse.scheduling;
 
-import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.events.EventListener;
-import com.zutubi.pulse.events.EventManager;
+import com.zutubi.events.Event;
+import com.zutubi.events.EventListener;
+import com.zutubi.events.EventManager;
 import com.zutubi.pulse.events.system.SystemStartedEvent;
 import com.zutubi.pulse.model.persistence.TriggerDao;
 import com.zutubi.util.logging.Logger;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.Arrays;
 
 /**
  * <class-comment/>

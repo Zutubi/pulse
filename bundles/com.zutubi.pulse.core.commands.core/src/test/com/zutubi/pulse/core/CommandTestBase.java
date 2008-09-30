@@ -1,5 +1,9 @@
 package com.zutubi.pulse.core;
 
+import com.zutubi.events.DefaultEventManager;
+import com.zutubi.events.Event;
+import com.zutubi.events.EventListener;
+import com.zutubi.events.EventManager;
 import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.BuildProperties.PROPERTY_RECIPE_PATHS;
 import com.zutubi.pulse.core.events.CommandCommencedEvent;
@@ -8,10 +12,6 @@ import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
-import com.zutubi.pulse.events.DefaultEventManager;
-import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.events.EventListener;
-import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;

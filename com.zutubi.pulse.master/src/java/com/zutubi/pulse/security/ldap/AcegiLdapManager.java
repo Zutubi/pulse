@@ -1,7 +1,7 @@
 package com.zutubi.pulse.security.ldap;
 
-import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.events.EventManager;
+import com.zutubi.events.Event;
+import com.zutubi.events.EventManager;
 import com.zutubi.pulse.events.system.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.pulse.license.LicenseHolder;
@@ -34,7 +34,7 @@ import java.util.*;
 
 /**
  */
-public class AcegiLdapManager implements LdapManager, ConfigurationEventListener, com.zutubi.pulse.events.EventListener
+public class AcegiLdapManager implements LdapManager, ConfigurationEventListener, com.zutubi.events.EventListener
 {
     private static final Logger LOG = Logger.getLogger(AcegiLdapManager.class);
 

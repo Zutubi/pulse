@@ -1,5 +1,7 @@
 package com.zutubi.pulse.api;
 
+import com.zutubi.events.Event;
+import com.zutubi.events.EventManager;
 import com.zutubi.pulse.ShutdownManager;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.agent.Agent;
@@ -11,8 +13,6 @@ import com.zutubi.pulse.core.scm.*;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.events.AgentDisableRequestedEvent;
 import com.zutubi.pulse.events.AgentEnableRequestedEvent;
-import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.system.SystemStartedEvent;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.spring.SpringComponentContext;
@@ -31,7 +31,7 @@ import java.util.*;
 /**
  * Implements a simple API for remote monitoring and control.
  */
-public class RemoteApi implements com.zutubi.pulse.events.EventListener
+public class RemoteApi implements com.zutubi.events.EventListener
 {
     private static final Logger LOG = Logger.getLogger(RemoteApi.class);
 

@@ -1,5 +1,7 @@
 package com.zutubi.pulse;
 
+import com.zutubi.events.DefaultEventManager;
+import com.zutubi.events.EventManager;
 import com.zutubi.pulse.agent.MasterLocationProvider;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.MasterUserPaths;
@@ -7,8 +9,6 @@ import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.config.MockScmConfiguration;
-import com.zutubi.pulse.events.DefaultEventManager;
-import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.AbstractBuildRequestEvent;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.security.PulseThreadFactory;

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.events.build;
 
+import com.zutubi.events.Event;
 import com.zutubi.pulse.AgentService;
-import com.zutubi.pulse.events.Event;
 
 /**
  * Request to terminate a recipe, due to some error or a timeout.

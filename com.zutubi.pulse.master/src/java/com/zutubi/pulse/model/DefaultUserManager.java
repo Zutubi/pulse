@@ -1,47 +1,36 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.spring.SpringComponentContext;
-import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.events.EventManager;
+import com.zutubi.events.Event;
+import com.zutubi.events.EventListener;
+import com.zutubi.events.EventManager;
 import com.zutubi.pulse.events.system.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.pulse.license.LicenseManager;
 import com.zutubi.pulse.license.authorisation.AddUserAuthorisation;
 import com.zutubi.pulse.model.persistence.UserDao;
 import com.zutubi.pulse.security.ldap.LdapManager;
+import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.tove.config.group.AbstractGroupConfiguration;
 import com.zutubi.pulse.tove.config.group.BuiltinGroupConfiguration;
 import com.zutubi.pulse.tove.config.group.GroupConfiguration;
 import com.zutubi.pulse.tove.config.user.DashboardConfiguration;
 import com.zutubi.pulse.tove.config.user.UserConfiguration;
-import com.zutubi.tove.config.ConfigurationEventListener;
-import com.zutubi.tove.config.ConfigurationInjector;
-import com.zutubi.tove.config.ConfigurationProvider;
-import com.zutubi.tove.config.ConfigurationRegistry;
-import com.zutubi.tove.config.ConfigurationStateManager;
-import com.zutubi.tove.config.ExternalStateManager;
-import com.zutubi.tove.config.TypeAdapter;
-import com.zutubi.tove.config.TypeListener;
+import com.zutubi.tove.config.*;
 import com.zutubi.tove.config.events.ConfigurationEvent;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.TextUtils;
 import org.acegisecurity.providers.encoding.PasswordEncoder;
-import org.acegisecurity.userdetails.UsernameNotFoundException;
 import org.acegisecurity.userdetails.UserDetails;
+import org.acegisecurity.userdetails.UsernameNotFoundException;
 import org.springframework.dao.DataAccessException;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  *
  *
  */
-public class DefaultUserManager implements UserManager, ExternalStateManager<UserConfiguration>, ConfigurationInjector.ConfigurationSetter<User>, com.zutubi.pulse.events.EventListener
+public class DefaultUserManager implements UserManager, ExternalStateManager<UserConfiguration>, ConfigurationInjector.ConfigurationSetter<User>, EventListener
 {
     private UserDao userDao;
     private PasswordEncoder passwordEncoder;

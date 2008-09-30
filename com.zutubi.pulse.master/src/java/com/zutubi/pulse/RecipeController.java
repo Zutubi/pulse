@@ -1,5 +1,7 @@
 package com.zutubi.pulse;
 
+import com.zutubi.events.Event;
+import com.zutubi.events.EventManager;
 import static com.zutubi.pulse.MasterBuildProperties.addRevisionProperties;
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
@@ -9,8 +11,6 @@ import com.zutubi.pulse.core.events.*;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.FeaturePersister;
 import com.zutubi.pulse.core.model.RecipeResult;
-import com.zutubi.pulse.events.Event;
-import com.zutubi.pulse.events.EventManager;
 import com.zutubi.pulse.events.build.PostStageEvent;
 import com.zutubi.pulse.events.build.RecipeAssignedEvent;
 import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
