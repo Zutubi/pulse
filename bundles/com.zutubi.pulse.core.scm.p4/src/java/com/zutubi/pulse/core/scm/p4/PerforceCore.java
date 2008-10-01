@@ -5,8 +5,8 @@ import com.zutubi.pulse.core.scm.NumericalRevision;
 import com.zutubi.pulse.core.scm.ScmCancelledException;
 import com.zutubi.pulse.core.scm.ScmException;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
-import com.zutubi.pulse.util.process.AsyncProcess;
-import com.zutubi.pulse.util.process.LineHandler;
+import com.zutubi.pulse.core.util.process.AsyncProcess;
+import com.zutubi.pulse.core.util.process.LineHandler;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 

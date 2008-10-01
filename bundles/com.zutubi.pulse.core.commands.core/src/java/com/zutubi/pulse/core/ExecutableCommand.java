@@ -4,12 +4,13 @@ import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.BuildProperties.PROPERTY_OUTPUT_DIR;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.util.process.ProcessControl;
+import com.zutubi.pulse.core.util.process.ProcessControl;
+import com.zutubi.util.Constants;
 import com.zutubi.util.SystemUtils;
-import com.zutubi.util.*;
+import com.zutubi.util.TextUtils;
 import com.zutubi.util.io.ForkOutputStream;
-import com.zutubi.util.io.IgnoreCloseOutputStream;
 import com.zutubi.util.io.IOUtils;
+import com.zutubi.util.io.IgnoreCloseOutputStream;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;
 

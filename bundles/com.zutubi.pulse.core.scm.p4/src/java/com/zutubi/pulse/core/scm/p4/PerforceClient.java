@@ -1,19 +1,15 @@
 package com.zutubi.pulse.core.scm.p4;
 
-import com.zutubi.pulse.core.Property;
-import com.zutubi.pulse.core.PulseScope;
-import com.zutubi.pulse.core.VariableHelper;
-import com.zutubi.pulse.core.ExecutionContext;
-import com.zutubi.pulse.core.BuildProperties;
-import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.*;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
-import com.zutubi.pulse.util.process.AsyncProcess;
-import com.zutubi.pulse.util.process.BufferingCharHandler;
+import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.pulse.core.util.process.AsyncProcess;
+import com.zutubi.pulse.core.util.process.BufferingCharHandler;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 

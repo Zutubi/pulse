@@ -1,6 +1,5 @@
-package com.zutubi.pulse.util.process;
+package com.zutubi.pulse.core.util.process;
 
-import com.zutubi.pulse.util.process.ProcessControl;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.*;

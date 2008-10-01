@@ -1,4 +1,4 @@
-package com.zutubi.pulse.util.process;
+package com.zutubi.pulse.core.util.process;
 
 import com.zutubi.pulse.command.PulseCtl;
 import com.zutubi.util.SystemUtils;
