@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="http://www.jayasoft.fr/org/ivyrep/ivy-doc.xsl"?>
 <ivy-module version="1.0">
-    <info organisation="zutubi" module="com.zutubi.pulse.local" status="integration">
+    <info organisation="zutubi" module="com.zutubi.pulse.dev" status="integration">
         <ivyauthor name="zutubi" url="http://www.zutubi.com/"/>
         <description homepage="http://www.zutubi.com/">
-            The pulse local module contains the local build functionality. The local
-            build allows the core pulse engine to be executed against a local pulse
-            file via a command line interface.
+            The pulse dev module contains the developer tools. These tools include
+            the personal build client and the local build command.
         </description>
     </info>
 
@@ -18,9 +17,9 @@
     </configurations>
 
     <publications>
-        <artifact name="com.zutubi.pulse.local" type="jar" conf="release,build"/>
-        <artifact name="com.zutubi.pulse.local-src" type="jar" conf="src"/>
-        <artifact name="com.zutubi.pulse.local-test" type="jar" conf="build"/>
+        <artifact name="com.zutubi.pulse.dev" type="jar" conf="release,build"/>
+        <artifact name="com.zutubi.pulse.dev-src" type="jar" conf="src"/>
+        <artifact name="com.zutubi.pulse.dev-test" type="jar" conf="build"/>
     </publications>
 
     <dependencies>

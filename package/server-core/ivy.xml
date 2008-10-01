@@ -15,7 +15,7 @@
 
     <dependencies>
         <!-- Packaging module dependencies -->
-        <dependency org="zutubi" name="com.zutubi.pulse.local-package" rev="latest.integration" conf="*->@"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.dev-package" rev="latest.integration" conf="*->@"/>
 
         <!-- Project module dependencies -->
         <dependency org="zutubi" name="com.zutubi.pulse.servercore" rev="latest.integration" conf="release,src->@"/>

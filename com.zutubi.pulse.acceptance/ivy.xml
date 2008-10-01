@@ -21,7 +21,7 @@
     </publications>
 
     <dependencies>
-        <dependency org="zutubi" name="com.zutubi.pulse.local" rev="latest.integration" conf="*->@"/>
+        <dependency org="zutubi" name="com.zutubi.pulse.dev" rev="latest.integration" conf="*->@"/>
         <dependency org="zutubi" name="com.zutubi.pulse.slave" rev="latest.integration" conf="*->@"/>
         <dependency org="zutubi" name="com.zutubi.pulse.master" rev="latest.integration" conf="*->@"/>
         <dependency org="zutubi" name="com.zutubi.pulse.core.scm.svn" rev="latest.integration" conf="*->@"/>

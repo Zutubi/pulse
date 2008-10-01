@@ -7,7 +7,7 @@
         <dir-artifact name="core junit" base="com.zutubi.pulse.core/build/reports/junit/html" fail-if-not-present="false"/>
         <dir-artifact name="servercore junit" base="com.zutubi.pulse.servercore/build/reports/junit/html" fail-if-not-present="false"/>
         <dir-artifact name="master junit" base="com.zutubi.pulse.master/build/reports/junit/html" fail-if-not-present="false"/>
-        <dir-artifact name="local junit" base="com.zutubi.pulse.local/build/reports/junit/html" fail-if-not-present="false"/>
+        <dir-artifact name="dev junit" base="com.zutubi.pulse.dev/build/reports/junit/html" fail-if-not-present="false"/>
         <dir-artifact name="junit xml reports">
             <include pattern="**/build/reports/junit/xml/*.xml"/>
             <process processor="${junit.pp}"/>

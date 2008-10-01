@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:ivy="antlib:fr.jayasoft.ivy.ant" name="local module" basedir=".">
+<project xmlns:ivy="antlib:fr.jayasoft.ivy.ant" name="dev module" basedir=".">
     <import file="../common-build.xml" />
 
     <target name="module-pre-init">
