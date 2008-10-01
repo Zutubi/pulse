@@ -1,4 +1,6 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.commands.msbuild;
+
+import com.zutubi.pulse.core.*;
 
 import java.util.List;
 

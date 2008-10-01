@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.commands.msbuild;
 
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.postprocessors.PostProcessorTestBase;
