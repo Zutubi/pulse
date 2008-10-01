@@ -1,4 +1,4 @@
-package com.zutubi.pulse.personal;
+package com.zutubi.pulse.core.personal;
 
 /**
  * Helper for personal build implementations that simplifies listener

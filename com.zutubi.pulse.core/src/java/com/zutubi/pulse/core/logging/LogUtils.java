@@ -1,21 +1,21 @@
-package com.zutubi.pulse.logging;
+package com.zutubi.pulse.core.logging;
 
 import com.zutubi.util.ClassLoaderUtils;
 
-import java.util.Properties;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
 import java.util.StringTokenizer;
-import java.util.logging.Level;
 import java.util.logging.Filter;
 import java.util.logging.Formatter;
+import java.util.logging.Level;
 
 /**
  * <class-comment/>
  */
-class LogUtils
+public class LogUtils
 {
-    protected static String getString(Properties config, String key, String defaultValue)
+    public static String getString(Properties config, String key, String defaultValue)
     {
         if (!config.containsKey(key))
         {
@@ -24,7 +24,7 @@ class LogUtils
         return config.getProperty(key);
     }
 
-    protected static int getInt(Properties config, String key, int defaultValue)
+    public static int getInt(Properties config, String key, int defaultValue)
     {
         if (!config.containsKey(key))
         {
@@ -33,7 +33,7 @@ class LogUtils
         return Integer.parseInt(config.getProperty(key));
     }
 
-    protected static boolean getBoolean(Properties config, String key, boolean defaultValue)
+    public static boolean getBoolean(Properties config, String key, boolean defaultValue)
     {
         if (!config.containsKey(key))
         {
@@ -42,7 +42,7 @@ class LogUtils
         return Boolean.parseBoolean(config.getProperty(key));
     }
 
-    protected static Level getLevel(Properties config, String key, Level defaultValue)
+    public static Level getLevel(Properties config, String key, Level defaultValue)
     {
         if (!config.containsKey(key))
         {
@@ -51,7 +51,7 @@ class LogUtils
         return Level.parse(config.getProperty(key));
     }
 
-    protected static Filter getFilter(Properties config, String key, Filter defaultValue)
+    public static Filter getFilter(Properties config, String key, Filter defaultValue)
     {
         if (!config.containsKey(key))
         {
@@ -74,7 +74,7 @@ class LogUtils
         }
     }
 
-    protected static Formatter getFormatter(Properties config, String key, Formatter defaultValue)
+    public static Formatter getFormatter(Properties config, String key, Formatter defaultValue)
     {
         if (!config.containsKey(key))
         {
@@ -97,7 +97,7 @@ class LogUtils
         }
     }
 
-    protected static List<String> getList(Properties config, String key, List<String> defaultValue)
+    public static List<String> getList(Properties config, String key, List<String> defaultValue)
     {
         if (!config.containsKey(key))
         {

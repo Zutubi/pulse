@@ -1,4 +1,7 @@
-package com.zutubi.pulse.command;
+package com.zutubi.pulse.core.command;
+
+import com.zutubi.pulse.command.BootContext;
+import com.zutubi.pulse.command.Command;
 
 import java.util.Arrays;
 import java.util.HashMap;

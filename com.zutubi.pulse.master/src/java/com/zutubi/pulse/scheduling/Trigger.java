@@ -2,7 +2,7 @@ package com.zutubi.pulse.scheduling;
 
 import com.zutubi.config.annotations.Transient;
 import com.zutubi.pulse.core.model.Entity;
-import com.zutubi.pulse.model.NamedEntity;
+import com.zutubi.pulse.core.model.NamedEntity;
 
 import java.io.Serializable;
 import java.util.Calendar;

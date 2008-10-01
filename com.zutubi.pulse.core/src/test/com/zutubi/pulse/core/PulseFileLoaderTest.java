@@ -1,7 +1,6 @@
 package com.zutubi.pulse.core;
 
-import com.zutubi.pulse.model.CustomProjectValidationPredicate;
-import com.zutubi.pulse.model.ResourceRequirement;
+import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.IOException;
@@ -47,12 +46,5 @@ public class PulseFileLoaderTest extends FileLoaderTestBase
     private String getPulseFile(String name) throws IOException
     {
         return IOUtils.inputStreamToString(getInput(name));
-    }
-
-    public void testCustomProjectValidation() throws Exception
-    {
-        PulseFile pulseFile = new PulseFile();
-        loader.load(getInput("customValidation"), pulseFile, new PulseScope(), new FileResourceRepository(), new CustomProjectValidationPredicate());
-        assertNotNull(pulseFile.getRecipe("bar"));
     }
 }

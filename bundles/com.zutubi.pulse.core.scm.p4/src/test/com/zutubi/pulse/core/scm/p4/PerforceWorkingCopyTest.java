@@ -1,14 +1,14 @@
 package com.zutubi.pulse.core.scm.p4;
 
-import com.zutubi.pulse.core.util.config.PropertiesConfig;
+import com.zutubi.pulse.core.personal.PersonalBuildUI;
 import com.zutubi.pulse.core.scm.FileStatus;
 import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.WorkingCopyStatus;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
-import com.zutubi.pulse.personal.PersonalBuildUI;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.pulse.core.util.ZipUtils;
+import com.zutubi.pulse.core.util.config.PropertiesConfig;
 
 import java.io.File;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package com.zutubi.pulse.model;
+package com.zutubi.pulse.tove.config.project.types;
 
 import com.zutubi.pulse.core.ResourceReference;
 import com.zutubi.pulse.core.TypeLoadPredicate;

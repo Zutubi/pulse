@@ -52,7 +52,7 @@ This context requires:
         </property>
     </bean>
 
-    <bean id="logManager" class="com.zutubi.pulse.logging.LogManager">
+    <bean id="logManager" class="com.zutubi.pulse.core.logging.LogManager">
         <property name="factories">
             <map>
                 <entry><key><value>FileHandler</value></key><ref local="fileHandlerFactory"/></entry>
@@ -68,7 +68,7 @@ This context requires:
         </property>
     </bean>
 
-    <bean id="consoleHandlerFactory" class="com.zutubi.pulse.logging.ConsoleHandlerFactory"/>
-    <bean id="memoryHandlerFactory" class="com.zutubi.pulse.logging.MemoryHandlerFactory"/>
+    <bean id="consoleHandlerFactory" class="com.zutubi.pulse.core.logging.ConsoleHandlerFactory"/>
+    <bean id="memoryHandlerFactory" class="com.zutubi.pulse.core.logging.MemoryHandlerFactory"/>
 
 </beans>

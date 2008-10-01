@@ -1,12 +1,8 @@
 package com.zutubi.pulse.tove.config.project;
 
 import com.zutubi.config.annotations.*;
-import com.zutubi.pulse.core.config.AbstractConfiguration;
-import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
-import com.zutubi.pulse.core.config.NamedConfiguration;
-import com.zutubi.pulse.core.config.ResourceProperty;
+import com.zutubi.pulse.core.config.*;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
-import com.zutubi.pulse.model.ResourceRequirement;
 import com.zutubi.pulse.tove.config.LabelConfiguration;
 import com.zutubi.pulse.tove.config.project.changeviewer.ChangeViewerConfiguration;
 import com.zutubi.pulse.tove.config.project.commit.CommitMessageTransformerConfiguration;

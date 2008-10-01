@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.config.Resource;
-import com.zutubi.pulse.model.ResourceRequirement;
+import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 

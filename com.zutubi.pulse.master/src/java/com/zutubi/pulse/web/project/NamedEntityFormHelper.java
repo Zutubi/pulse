@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.model.NamedEntity;
-import com.zutubi.pulse.model.NamedEntityComparator;
+import com.zutubi.pulse.core.model.NamedEntity;
+import com.zutubi.pulse.core.model.NamedEntityComparator;
 
 import java.util.*;
 

@@ -2,6 +2,7 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.core.config.Resource;
+import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
 
 import java.util.LinkedList;

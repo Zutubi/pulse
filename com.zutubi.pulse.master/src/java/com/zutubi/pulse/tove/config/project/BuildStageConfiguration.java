@@ -5,15 +5,15 @@ import com.zutubi.pulse.AgentService;
 import com.zutubi.pulse.RecipeAssignmentRequest;
 import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
 import com.zutubi.pulse.core.config.ResourceProperty;
-import com.zutubi.pulse.model.ResourceRequirement;
+import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.LinkedList;
-import java.util.HashMap;
 
 /**
  *  A build stage is a component of a build that represents the execution of a

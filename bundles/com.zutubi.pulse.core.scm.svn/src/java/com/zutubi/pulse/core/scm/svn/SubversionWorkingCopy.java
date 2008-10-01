@@ -1,11 +1,11 @@
 package com.zutubi.pulse.core.scm.svn;
 
-import com.zutubi.pulse.core.util.config.Config;
-import com.zutubi.pulse.core.util.config.ConfigSupport;
 import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.personal.PersonalBuildSupport;
 import com.zutubi.pulse.core.scm.*;
 import static com.zutubi.pulse.core.scm.svn.SubversionConstants.*;
-import com.zutubi.pulse.personal.PersonalBuildSupport;
+import com.zutubi.pulse.core.util.config.Config;
+import com.zutubi.pulse.core.util.config.ConfigSupport;
 import org.tmatesoft.svn.core.SVNCancelException;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNNodeKind;

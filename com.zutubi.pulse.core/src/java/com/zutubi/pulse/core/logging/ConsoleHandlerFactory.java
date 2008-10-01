@@ -1,7 +1,9 @@
-package com.zutubi.pulse.logging;
+package com.zutubi.pulse.core.logging;
 
-import java.util.logging.*;
 import java.util.Properties;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.SimpleFormatter;
 
 /**
  * <class-comment/>

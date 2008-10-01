@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.scm;
 
+import com.zutubi.pulse.core.personal.PersonalBuildException;
 import com.zutubi.pulse.core.util.config.Config;
-import com.zutubi.pulse.personal.PersonalBuildException;
 
 import java.io.File;
 import java.lang.reflect.Constructor;

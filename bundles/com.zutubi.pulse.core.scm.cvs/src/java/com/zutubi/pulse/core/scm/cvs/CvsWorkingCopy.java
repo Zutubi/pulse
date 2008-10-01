@@ -1,14 +1,14 @@
 package com.zutubi.pulse.core.scm.cvs;
 
-import com.zutubi.pulse.core.util.config.Config;
-import com.zutubi.pulse.core.util.config.ConfigSupport;
 import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.personal.PersonalBuildException;
+import com.zutubi.pulse.core.personal.PersonalBuildSupport;
 import com.zutubi.pulse.core.scm.*;
 import com.zutubi.pulse.core.scm.cvs.client.CvsCore;
-import com.zutubi.pulse.personal.PersonalBuildException;
-import com.zutubi.pulse.personal.PersonalBuildSupport;
-import com.zutubi.util.io.IOUtils;
+import com.zutubi.pulse.core.util.config.Config;
+import com.zutubi.pulse.core.util.config.ConfigSupport;
 import com.zutubi.util.TextUtils;
+import com.zutubi.util.io.IOUtils;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.DefaultFileInfoContainer;
 import org.netbeans.lib.cvsclient.command.status.StatusInformation;

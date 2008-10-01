@@ -1,5 +1,7 @@
 package com.zutubi.pulse.model;
 
+import com.zutubi.pulse.core.model.NamedEntityComparator;
+
 import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;

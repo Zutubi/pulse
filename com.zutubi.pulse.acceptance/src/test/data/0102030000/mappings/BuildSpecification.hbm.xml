@@ -52,7 +52,7 @@
         <bag name="resourceRequirements" cascade="all,delete-orphan" table="RESOURCE_REQUIREMENTS" lazy="false">
             <cache usage="read-write"/>
             <key column="NODE_ID"/>
-            <composite-element class="com.zutubi.pulse.model.ResourceRequirement">
+            <composite-element class="com.zutubi.pulse.core.config.ResourceRequirement">
                 <property name="resource" type="string" not-null="true" length="255"/>
                 <property name="version" type="string" length="255"/>
             </composite-element>

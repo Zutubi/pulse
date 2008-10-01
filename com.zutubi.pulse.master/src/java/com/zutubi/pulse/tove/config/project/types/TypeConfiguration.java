@@ -3,7 +3,7 @@ package com.zutubi.pulse.tove.config.project.types;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.personal.PatchArchive;
+import com.zutubi.pulse.core.personal.PatchArchive;
 import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 
 /**

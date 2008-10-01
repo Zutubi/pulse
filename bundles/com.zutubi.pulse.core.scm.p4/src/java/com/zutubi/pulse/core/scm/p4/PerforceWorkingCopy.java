@@ -1,15 +1,15 @@
 package com.zutubi.pulse.core.scm.p4;
 
-import com.zutubi.pulse.core.util.config.Config;
-import com.zutubi.pulse.core.util.config.ConfigSupport;
 import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.personal.PersonalBuildSupport;
+import com.zutubi.pulse.core.personal.PersonalBuildUI;
 import com.zutubi.pulse.core.scm.NumericalRevision;
 import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.WorkingCopy;
 import com.zutubi.pulse.core.scm.WorkingCopyStatus;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
-import com.zutubi.pulse.personal.PersonalBuildSupport;
-import com.zutubi.pulse.personal.PersonalBuildUI;
+import com.zutubi.pulse.core.util.config.Config;
+import com.zutubi.pulse.core.util.config.ConfigSupport;
 
 import java.io.File;
 

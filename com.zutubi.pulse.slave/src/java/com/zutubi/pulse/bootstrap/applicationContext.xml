@@ -46,7 +46,7 @@
         </property>
     </bean>
 
-    <bean id="logManager" class="com.zutubi.pulse.logging.LogManager">
+    <bean id="logManager" class="com.zutubi.pulse.core.logging.LogManager">
         <property name="factories">
             <map>
                 <entry><key><value>FileHandler</value></key><ref local="fileHandlerFactory"/></entry>
@@ -77,8 +77,8 @@
         </property>
     </bean>
 
-    <bean id="consoleHandlerFactory" class="com.zutubi.pulse.logging.ConsoleHandlerFactory"/>
-    <bean id="memoryHandlerFactory" class="com.zutubi.pulse.logging.MemoryHandlerFactory"/>
+    <bean id="consoleHandlerFactory" class="com.zutubi.pulse.core.logging.ConsoleHandlerFactory"/>
+    <bean id="memoryHandlerFactory" class="com.zutubi.pulse.core.logging.MemoryHandlerFactory"/>
 
     <bean id="tokenManager" class="com.zutubi.pulse.api.AdminTokenManager" autowire="byName" init-method="init"/>
 

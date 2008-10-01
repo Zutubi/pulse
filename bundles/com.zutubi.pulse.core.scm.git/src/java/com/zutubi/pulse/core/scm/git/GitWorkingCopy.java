@@ -1,10 +1,10 @@
 package com.zutubi.pulse.core.scm.git;
 
-import com.zutubi.pulse.core.scm.WorkingCopy;
-import com.zutubi.pulse.core.scm.ScmException;
-import com.zutubi.pulse.core.scm.WorkingCopyStatus;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.personal.PersonalBuildUI;
+import com.zutubi.pulse.core.personal.PersonalBuildUI;
+import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.scm.WorkingCopy;
+import com.zutubi.pulse.core.scm.WorkingCopyStatus;
 
 /**
  * to be implemented.

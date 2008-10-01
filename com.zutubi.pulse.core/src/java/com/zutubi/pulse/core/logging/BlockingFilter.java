@@ -1,7 +1,7 @@
-package com.zutubi.pulse.logging;
+package com.zutubi.pulse.core.logging;
 
-import java.util.logging.LogRecord;
 import java.util.logging.Filter;
+import java.util.logging.LogRecord;
 
 /**
  * <class-comment/>

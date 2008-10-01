@@ -1,4 +1,4 @@
-package com.zutubi.pulse.personal;
+package com.zutubi.pulse.core.personal;
 
 import com.zutubi.pulse.core.PulseException;
 

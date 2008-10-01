@@ -1,4 +1,4 @@
-package com.zutubi.pulse.model;
+package com.zutubi.pulse.core.model;
 
 /**
  */

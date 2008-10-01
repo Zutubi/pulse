@@ -1,5 +1,7 @@
 package com.zutubi.pulse.personal;
 
+import com.zutubi.pulse.core.personal.PersonalBuildException;
+
 /**
  * A special exception that is thrown when the user chooses to abort a
  * personal build.

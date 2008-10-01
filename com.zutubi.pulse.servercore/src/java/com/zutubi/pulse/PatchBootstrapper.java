@@ -5,8 +5,8 @@ import com.zutubi.pulse.core.BuildException;
 import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.PulseException;
+import com.zutubi.pulse.core.personal.PatchArchive;
 import com.zutubi.pulse.core.scm.FileStatus;
-import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.repository.FileRepository;
 
 import java.io.File;

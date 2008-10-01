@@ -3,8 +3,8 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.pulse.acceptance.pages.admin.*;
 import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
 import com.zutubi.pulse.agent.AgentManager;
+import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.model.ProjectManager;
-import com.zutubi.pulse.model.ResourceRequirement;
 import com.zutubi.pulse.tove.config.LabelConfiguration;
 import com.zutubi.pulse.tove.config.group.ServerPermission;
 import com.zutubi.pulse.tove.config.project.BuildStageConfiguration;
@@ -13,14 +13,13 @@ import com.zutubi.pulse.tove.config.user.UserConfigurationActions;
 import com.zutubi.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.tove.type.record.PathUtils;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Vector;
-
-import org.testng.annotations.Test;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.AfterMethod;
 
 /**
  * Tests for deletion of various things: an area that is notorious for bugs!

@@ -2,7 +2,7 @@ package com.zutubi.pulse.core;
 
 import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.config.ResourceProperty;
-import com.zutubi.pulse.model.ResourceRequirement;
+import com.zutubi.pulse.core.config.ResourceRequirement;
 
 import java.util.Collection;
 import java.util.LinkedList;

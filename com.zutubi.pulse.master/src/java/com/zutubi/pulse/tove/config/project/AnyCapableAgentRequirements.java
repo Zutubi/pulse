@@ -5,7 +5,7 @@ import com.zutubi.pulse.RecipeAssignmentRequest;
 import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.PulseFileLoader;
 import com.zutubi.pulse.core.PulseFileLoaderFactory;
-import com.zutubi.pulse.model.ResourceRequirement;
+import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.util.logging.Logger;
 
 import java.util.List;

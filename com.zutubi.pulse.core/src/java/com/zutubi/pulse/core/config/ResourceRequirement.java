@@ -1,13 +1,6 @@
-package com.zutubi.pulse.model;
+package com.zutubi.pulse.core.config;
 
-import com.zutubi.config.annotations.ControllingCheckbox;
-import com.zutubi.config.annotations.FieldAction;
-import com.zutubi.config.annotations.Form;
-import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.config.annotations.Table;
-import com.zutubi.config.annotations.Wizard;
-import com.zutubi.config.annotations.Transient;
-import com.zutubi.pulse.core.config.AbstractConfiguration;
+import com.zutubi.config.annotations.*;
 import com.zutubi.validation.annotations.Required;
 
 /**

@@ -1,10 +1,10 @@
-package com.zutubi.pulse.logging;
+package com.zutubi.pulse.core.logging;
 
 import java.util.Properties;
-import java.util.logging.MemoryHandler;
-import java.util.logging.Level;
-import java.util.logging.SimpleFormatter;
 import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.MemoryHandler;
+import java.util.logging.SimpleFormatter;
 
 /**
  * <class-comment/>

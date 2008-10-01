@@ -2,6 +2,10 @@ package com.zutubi.pulse.personal;
 
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.personal.PatchArchive;
+import com.zutubi.pulse.core.personal.PersonalBuildException;
+import com.zutubi.pulse.core.personal.PersonalBuildSupport;
+import com.zutubi.pulse.core.personal.PersonalBuildUI;
 import com.zutubi.pulse.core.scm.*;
 import com.zutubi.pulse.xmlrpc.PulseXmlRpcClient;
 import com.zutubi.pulse.xmlrpc.PulseXmlRpcException;

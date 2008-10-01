@@ -1,10 +1,10 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.util.TextUtils;
 import com.opensymphony.xwork.ValidationAware;
 import com.zutubi.pulse.core.*;
-import com.zutubi.pulse.model.CustomProjectValidationPredicate;
+import com.zutubi.pulse.tove.config.project.types.CustomProjectValidationPredicate;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.util.bean.DefaultObjectFactory;
 
 import java.io.ByteArrayInputStream;

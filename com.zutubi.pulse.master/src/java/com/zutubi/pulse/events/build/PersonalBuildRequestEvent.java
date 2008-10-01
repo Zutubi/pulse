@@ -2,8 +2,8 @@ package com.zutubi.pulse.events.build;
 
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.model.Entity;
+import com.zutubi.pulse.core.personal.PatchArchive;
 import com.zutubi.pulse.model.*;
-import com.zutubi.pulse.personal.PatchArchive;
 import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 
 /**

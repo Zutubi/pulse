@@ -1,5 +1,6 @@
 package com.zutubi.pulse.personal;
 
+import com.zutubi.pulse.core.personal.PersonalBuildUI;
 import com.zutubi.util.io.PasswordReader;
 
 import java.io.BufferedReader;

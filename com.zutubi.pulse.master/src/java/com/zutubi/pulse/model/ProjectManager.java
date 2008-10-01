@@ -2,7 +2,7 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.personal.PatchArchive;
+import com.zutubi.pulse.core.personal.PatchArchive;
 import com.zutubi.pulse.security.SecureParameter;
 import com.zutubi.pulse.security.SecureResult;
 import com.zutubi.pulse.tove.config.project.ProjectConfiguration;

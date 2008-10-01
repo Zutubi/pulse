@@ -2,9 +2,9 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.ResourceRequirement;
 import com.zutubi.pulse.tove.config.project.AgentRequirements;
 import com.zutubi.util.TimeStamps;
 

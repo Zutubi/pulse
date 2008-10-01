@@ -2,11 +2,14 @@ package com.zutubi.pulse.personal;
 
 import com.zutubi.pulse.command.BootContext;
 import com.zutubi.pulse.command.Command;
+import com.zutubi.pulse.core.personal.PatchArchive;
+import com.zutubi.pulse.core.personal.PersonalBuildException;
+import com.zutubi.pulse.core.personal.PersonalBuildUI;
+import com.zutubi.pulse.core.scm.WorkingCopy;
+import com.zutubi.pulse.core.scm.WorkingCopyStatus;
 import com.zutubi.pulse.core.util.config.CommandLineConfig;
 import com.zutubi.pulse.core.util.config.CompositeConfig;
 import com.zutubi.pulse.core.util.config.PropertiesConfig;
-import com.zutubi.pulse.core.scm.WorkingCopy;
-import com.zutubi.pulse.core.scm.WorkingCopyStatus;
 import com.zutubi.pulse.dev.bootstrap.DevBootstrapManager;
 import org.apache.commons.cli.*;
 

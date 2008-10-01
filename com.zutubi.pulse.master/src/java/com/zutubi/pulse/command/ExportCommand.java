@@ -1,5 +1,6 @@
 package com.zutubi.pulse.command;
 
+import com.zutubi.pulse.core.command.HelpCommand;
 import com.zutubi.pulse.transfer.TransferAPI;
 import com.zutubi.pulse.transfer.TransferException;
 import org.apache.commons.cli.CommandLine;

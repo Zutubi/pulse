@@ -1,4 +1,4 @@
-package com.zutubi.pulse.personal;
+package com.zutubi.pulse.core.personal;
 
 /**
  * Implementations of this interface listen for details of personal build

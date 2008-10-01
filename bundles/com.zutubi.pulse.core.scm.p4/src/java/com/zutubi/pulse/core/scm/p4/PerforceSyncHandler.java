@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.scm.p4;
 
-import com.zutubi.pulse.personal.PersonalBuildUI;
+import com.zutubi.pulse.core.personal.PersonalBuildUI;
 import com.zutubi.pulse.core.scm.ScmCancelledException;
 import com.zutubi.pulse.core.scm.ScmException;
 
