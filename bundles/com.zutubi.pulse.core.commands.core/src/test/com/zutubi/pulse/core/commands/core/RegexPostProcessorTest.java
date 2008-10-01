@@ -1,7 +1,10 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.commands.core;
 
 import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.BuildProperties.PROPERTY_OUTPUT_DIR;
+import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.FileLoadException;
+import com.zutubi.pulse.core.RegexPattern;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.io.IOUtils;

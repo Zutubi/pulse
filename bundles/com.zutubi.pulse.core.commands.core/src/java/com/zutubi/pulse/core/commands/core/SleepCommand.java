@@ -1,5 +1,7 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.commands.core;
 
+import com.zutubi.pulse.core.CommandSupport;
+import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.model.CommandResult;
 
 import java.util.concurrent.Semaphore;

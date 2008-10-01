@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.commands.core;
 
 /**
  * A post-processor for JUnitEE XML reports - which are identical to JUnit

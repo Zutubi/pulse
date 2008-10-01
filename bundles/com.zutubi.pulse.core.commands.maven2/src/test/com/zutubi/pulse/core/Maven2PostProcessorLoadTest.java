@@ -1,5 +1,7 @@
 package com.zutubi.pulse.core;
 
+import com.zutubi.pulse.core.commands.core.RegexPostProcessor;
+
 /**
  */
 public class Maven2PostProcessorLoadTest extends FileLoaderTestBase

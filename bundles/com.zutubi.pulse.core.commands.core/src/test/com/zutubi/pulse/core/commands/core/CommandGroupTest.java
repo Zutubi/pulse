@@ -1,5 +1,6 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.commands.core;
 
+import com.zutubi.pulse.core.*;
 import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.ResultState;

@@ -1,10 +1,10 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.commands.core;
 
+import com.opensymphony.util.TextUtils;
+import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.annotations.Required;
-import com.zutubi.pulse.core.model.ResultState;
-import com.opensymphony.util.TextUtils;
 
 /**
  * A way to map command exit codes to specified result states.

@@ -1,4 +1,6 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.commands.core;
+
+import com.zutubi.pulse.core.*;
 
 /**
  *
@@ -15,9 +17,9 @@ public class FileLoaderSanityTest extends FileLoaderTestBase
 
         loader.register("command", CommandGroup.class);
         loader.register("executable", ExecutableCommand.class);
-        loader.register("property", Property.class);    
-        loader.register("post-processor", PostProcessorGroup.class);    
-        loader.register("regex.pp", RegexPostProcessor.class);    
+        loader.register("property", Property.class);
+        loader.register("post-processor", PostProcessorGroup.class);
+        loader.register("regex.pp", RegexPostProcessor.class);
     }
 
     public void testSampleProject() throws Exception

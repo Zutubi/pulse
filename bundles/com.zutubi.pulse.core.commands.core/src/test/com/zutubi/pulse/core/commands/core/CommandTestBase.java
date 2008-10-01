@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.commands.core;
 
 import com.zutubi.events.DefaultEventManager;
 import com.zutubi.events.Event;
@@ -6,14 +6,18 @@ import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.BuildProperties.PROPERTY_RECIPE_PATHS;
+import com.zutubi.pulse.core.Command;
+import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.Recipe;
+import com.zutubi.pulse.core.SimpleRecipePaths;
 import com.zutubi.pulse.core.events.CommandCommencedEvent;
 import com.zutubi.pulse.core.events.CommandCompletedEvent;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
-import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;

@@ -1,5 +1,8 @@
 package com.zutubi.pulse.core;
 
+import com.zutubi.pulse.core.commands.core.JUnitSummaryPostProcessor;
+import com.zutubi.pulse.core.commands.core.PostProcessorGroup;
+import com.zutubi.pulse.core.commands.core.RegexPostProcessor;
 import com.zutubi.util.SystemUtils;
 
 /**

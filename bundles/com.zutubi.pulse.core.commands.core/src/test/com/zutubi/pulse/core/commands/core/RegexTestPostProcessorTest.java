@@ -1,6 +1,8 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.commands.core;
 
 import static com.zutubi.pulse.core.BuildProperties.*;
+import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.core.model.TestCaseResult;

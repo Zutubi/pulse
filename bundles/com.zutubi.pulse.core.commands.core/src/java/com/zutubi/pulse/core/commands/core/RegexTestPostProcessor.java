@@ -1,11 +1,12 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.commands.core;
 
+import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.core.model.TestCaseResult;
 import com.zutubi.pulse.core.model.TestSuiteResult;
 import com.zutubi.pulse.core.postprocessors.PostProcessorContext;
 import com.zutubi.pulse.core.postprocessors.TestReportPostProcessorSupport;
-import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.TextUtils;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.BufferedReader;

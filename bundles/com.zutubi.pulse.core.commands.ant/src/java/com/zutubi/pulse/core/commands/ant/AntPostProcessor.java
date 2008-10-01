@@ -2,7 +2,7 @@ package com.zutubi.pulse.core.commands.ant;
 
 import com.zutubi.pulse.core.ExpressionElement;
 import com.zutubi.pulse.core.RegexPattern;
-import com.zutubi.pulse.core.RegexPostProcessor;
+import com.zutubi.pulse.core.commands.core.RegexPostProcessor;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.util.SystemUtils;
 

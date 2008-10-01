@@ -1,5 +1,6 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.commands.core;
 
+import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.util.TextUtils;
 import com.zutubi.validation.Validateable;

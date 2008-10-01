@@ -94,15 +94,15 @@ common-test:
     [junit] Tests run: 9, Failures: 0, Errors: 0, Time elapsed: 12.778 sec
     [junit] Running com.zutubi.pulse.core.commands.ant.AntPostProcessorTest
     [junit] Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 0.321 sec
-    [junit] Running com.zutubi.pulse.core.CommandGroupLoadTest
+    [junit] Running com.zutubi.pulse.core.commands.core.CommandGroupLoadTest
     [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 1.332 sec
-    [junit] Running com.zutubi.pulse.core.CommandGroupTest
+    [junit] Running com.zutubi.pulse.core.commands.core.CommandGroupTest
     [junit] Tests run: 14, Failures: 0, Errors: 0, Time elapsed: 1.752 sec
-    [junit] Running com.zutubi.pulse.core.ExecutableCommandTest
+    [junit] Running com.zutubi.pulse.core.commands.core.ExecutableCommandTest
     [junit] Tests run: 5, Failures: 0, Errors: 0, Time elapsed: 2.243 sec
     [junit] Running com.zutubi.pulse.core.FileLoaderTest
     [junit] Tests run: 38, Failures: 0, Errors: 0, Time elapsed: 2.213 sec
-    [junit] Running com.zutubi.pulse.core.JUnitReportPostProcessorTest
+    [junit] Running com.zutubi.pulse.core.commands.core.JUnitReportPostProcessorTest
     [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.41 sec
     [junit] Running com.zutubi.pulse.core.MakeCommandTest
     [junit] Tests run: 9, Failures: 0, Errors: 0, Time elapsed: 1.152 sec
@@ -112,9 +112,9 @@ common-test:
     [junit] Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 0.19 sec
     [junit] Running com.zutubi.pulse.core.RecipeProcessorTest
     [junit] Tests run: 9, Failures: 0, Errors: 0, Time elapsed: 4.767 sec
-    [junit] Running com.zutubi.pulse.core.RegexPostProcessorLoadTest
+    [junit] Running com.zutubi.pulse.core.commands.core.RegexPostProcessorLoadTest
     [junit] Tests run: 11, Failures: 0, Errors: 0, Time elapsed: 0.631 sec
-    [junit] Running com.zutubi.pulse.core.RegexPostProcessorTest
+    [junit] Running com.zutubi.pulse.core.commands.core.RegexPostProcessorTest
     [junit] Tests run: 37, Failures: 0, Errors: 0, Time elapsed: 0.881 sec
     [junit] Running com.zutubi.pulse.core.ResourceReferenceTest
     [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 1.132 sec

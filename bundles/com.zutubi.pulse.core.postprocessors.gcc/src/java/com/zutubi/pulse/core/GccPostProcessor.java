@@ -1,5 +1,7 @@
 package com.zutubi.pulse.core;
 
+import com.zutubi.pulse.core.commands.core.RegexPostProcessor;
+
 /**
  * A post-processor for gcc (and related compiler) output.  Captures error
  * and warning messages.

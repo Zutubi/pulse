@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.commands.ant;
 
-import com.zutubi.pulse.core.ExecutableCommand;
-import com.zutubi.pulse.core.ExecutableCommandTestBase;
+import com.zutubi.pulse.core.commands.core.ExecutableCommand;
+import com.zutubi.pulse.core.commands.core.ExecutableCommandTestBase;
 
 /**
  */

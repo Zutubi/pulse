@@ -1,6 +1,7 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.commands.core;
 
 import static com.zutubi.pulse.core.BuildProperties.*;
+import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.postprocessors.XMLTestReportPostProcessorTestBase;
 
@@ -76,7 +77,7 @@ public class JUnitReportPostProcessorTest extends XMLTestReportPostProcessorTest
         assertEquals(1, tests.getSuites().size());
 
         TestSuiteResult suite = tests.getSuites().get(0);
-        assertEquals("com.zutubi.pulse.core.JUnitReportPostProcessorTest", suite.getName());
+        assertEquals("com.zutubi.pulse.core.commands.core.JUnitReportPostProcessorTest", suite.getName());
         assertEquals(391, suite.getDuration());
 
         TestCaseResult[] children = suite.getCases().toArray(new TestCaseResult[suite.getCases().size()]);
@@ -84,10 +85,12 @@ public class JUnitReportPostProcessorTest extends XMLTestReportPostProcessorTest
         checkCase(children[0], "testSimple", TestCaseResult.Status.PASS, 291, null);
         checkCase(children[1], "testFailure", TestCaseResult.Status.FAILURE, 10,
                 "junit.framework.AssertionFailedError\n" +
-                        "\tat com.zutubi.pulse.core.JUnitReportPostProcessorTest.testFailure(JUnitReportPostProcessorTest.java:63)");
+                        "\tat\n" +
+                        "        com.zutubi.pulse.core.commands.core.JUnitReportPostProcessorTest.testFailure(JUnitReportPostProcessorTest.java:63)");
         checkCase(children[2], "testError", TestCaseResult.Status.ERROR, 0,
                 "java.lang.RuntimeException: whoops!\n" +
-                        "\tat com.zutubi.pulse.core.JUnitReportPostProcessorTest.testError(JUnitReportPostProcessorTest.java:68)");
+                        "\tat\n" +
+                        "        com.zutubi.pulse.core.commands.core.JUnitReportPostProcessorTest.testError(JUnitReportPostProcessorTest.java:68)");
     }
 
     public void testFailOnFailure() throws Exception
