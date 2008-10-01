@@ -69,7 +69,7 @@ public class RegexPostProcessor extends LineBasedPostProcessorSupport
         }
     }
 
-    protected void addWarningRegexs(String... warningRegexs)
+    public void addWarningRegexs(String... warningRegexs)
     {
         for (String warningRegex : warningRegexs)
         {

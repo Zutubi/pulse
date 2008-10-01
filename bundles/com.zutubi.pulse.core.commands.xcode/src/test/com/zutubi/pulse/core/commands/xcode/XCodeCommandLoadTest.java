@@ -1,4 +1,7 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.commands.xcode;
+
+import com.zutubi.pulse.core.FileLoaderTestBase;
+import com.zutubi.pulse.core.PulseException;
 
 import java.util.Arrays;
 import java.util.Collections;
