@@ -6,7 +6,6 @@ import com.zutubi.pulse.core.*;
 import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.core.util.FileSystem;
-import com.zutubi.pulse.repository.SlaveFileRepository;
 import com.zutubi.pulse.servercore.ChainBootstrapper;
 import com.zutubi.pulse.servercore.RecipeCleanup;
 import com.zutubi.pulse.servercore.ServerBootstrapper;
@@ -14,6 +13,7 @@ import com.zutubi.pulse.servercore.ServerRecipePaths;
 import com.zutubi.pulse.servercore.services.MasterService;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;
 import com.zutubi.pulse.servercore.services.SlaveStatus;
+import com.zutubi.pulse.slave.repository.SlaveFileRepository;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 

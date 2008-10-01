@@ -1,4 +1,4 @@
-package com.zutubi.pulse.bootstrap.tasks;
+package com.zutubi.pulse.slave.bootstrap.tasks;
 
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.StartupTask;

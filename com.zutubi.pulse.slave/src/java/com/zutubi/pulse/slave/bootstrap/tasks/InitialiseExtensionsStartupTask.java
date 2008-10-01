@@ -1,4 +1,4 @@
-package com.zutubi.pulse.bootstrap.tasks;
+package com.zutubi.pulse.slave.bootstrap.tasks;
 
 import com.zutubi.pulse.core.plugins.PluginManager;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
