@@ -1,4 +1,4 @@
-package com.zutubi.pulse.local;
+package com.zutubi.pulse.dev.local;
 
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.*;
@@ -102,7 +102,7 @@ public class LocalBuild
 
     public static LocalBuild bootstrap()
     {
-        DevBootstrapManager.startup("com/zutubi/pulse/local/bootstrap/context/applicationContext.xml");
+        DevBootstrapManager.startup("com/zutubi/pulse/dev/local/bootstrap/context/applicationContext.xml");
         return SpringComponentContext.getBean("localBuild");
     }
 

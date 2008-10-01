@@ -1,4 +1,4 @@
-package com.zutubi.pulse.local;
+package com.zutubi.pulse.dev.local;
 
 import java.io.PrintStream;
 

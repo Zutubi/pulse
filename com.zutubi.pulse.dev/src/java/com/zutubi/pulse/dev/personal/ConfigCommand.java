@@ -1,12 +1,12 @@
-package com.zutubi.pulse.personal;
+package com.zutubi.pulse.dev.personal;
 
 import com.zutubi.pulse.command.BootContext;
 import com.zutubi.pulse.command.Command;
 import com.zutubi.pulse.core.personal.PersonalBuildException;
 import com.zutubi.pulse.core.personal.PersonalBuildUI;
 import com.zutubi.pulse.core.util.config.PropertiesConfig;
-import com.zutubi.pulse.xmlrpc.PulseXmlRpcClient;
-import com.zutubi.pulse.xmlrpc.PulseXmlRpcException;
+import com.zutubi.pulse.dev.xmlrpc.PulseXmlRpcClient;
+import com.zutubi.pulse.dev.xmlrpc.PulseXmlRpcException;
 import org.apache.commons.cli.*;
 
 import java.io.File;

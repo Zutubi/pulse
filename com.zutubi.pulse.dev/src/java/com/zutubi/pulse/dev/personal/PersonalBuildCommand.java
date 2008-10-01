@@ -1,4 +1,4 @@
-package com.zutubi.pulse.personal;
+package com.zutubi.pulse.dev.personal;
 
 import com.zutubi.pulse.command.BootContext;
 import com.zutubi.pulse.command.Command;

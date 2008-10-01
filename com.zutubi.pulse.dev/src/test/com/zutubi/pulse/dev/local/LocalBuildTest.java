@@ -1,7 +1,7 @@
-package com.zutubi.pulse.local;
+package com.zutubi.pulse.dev.local;
 
-import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.core.PulseException;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
@@ -41,7 +41,7 @@ public class LocalBuildTest extends PulseTestCase
     private File getExpectedOutput(String name)
     {
         File root = getPulseRoot();
-        return new File(root, FileSystemUtils.composeFilename("local", "src", "test", "com", "zutubi", "pulse", "local", "data", name));
+        return new File(root, FileSystemUtils.composeFilename("com.zutubi.pulse.dev", "src", "test", "com", "zutubi", "pulse", "dev", "local", "data", name));
     }
 
     private String copyFile(String name) throws IOException, URISyntaxException

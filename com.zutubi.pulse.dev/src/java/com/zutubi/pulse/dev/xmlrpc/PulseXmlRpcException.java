@@ -1,4 +1,4 @@
-package com.zutubi.pulse.xmlrpc;
+package com.zutubi.pulse.dev.xmlrpc;
 
 import com.zutubi.pulse.core.PulseRuntimeException;
 

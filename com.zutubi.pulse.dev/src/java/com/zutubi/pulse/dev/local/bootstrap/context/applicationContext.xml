@@ -10,5 +10,5 @@
 
     <bean id="objectFactory" class="com.zutubi.pulse.core.spring.SpringObjectFactory"/>
 
-    <bean id="localBuild" class="com.zutubi.pulse.local.LocalBuild" autowire="byName"/>
+    <bean id="localBuild" class="com.zutubi.pulse.dev.local.LocalBuild" autowire="byName"/>
 </beans>

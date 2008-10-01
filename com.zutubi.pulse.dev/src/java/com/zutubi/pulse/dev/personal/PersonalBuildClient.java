@@ -1,4 +1,4 @@
-package com.zutubi.pulse.personal;
+package com.zutubi.pulse.dev.personal;
 
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.model.Revision;
@@ -7,8 +7,8 @@ import com.zutubi.pulse.core.personal.PersonalBuildException;
 import com.zutubi.pulse.core.personal.PersonalBuildSupport;
 import com.zutubi.pulse.core.personal.PersonalBuildUI;
 import com.zutubi.pulse.core.scm.*;
-import com.zutubi.pulse.xmlrpc.PulseXmlRpcClient;
-import com.zutubi.pulse.xmlrpc.PulseXmlRpcException;
+import com.zutubi.pulse.dev.xmlrpc.PulseXmlRpcClient;
+import com.zutubi.pulse.dev.xmlrpc.PulseXmlRpcException;
 import com.zutubi.util.io.IOUtils;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;

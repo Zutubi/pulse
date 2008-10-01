@@ -1,4 +1,4 @@
-package com.zutubi.pulse.local;
+package com.zutubi.pulse.dev.local;
 
 import com.zutubi.pulse.core.BootstrapperSupport;
 import com.zutubi.pulse.core.BuildException;

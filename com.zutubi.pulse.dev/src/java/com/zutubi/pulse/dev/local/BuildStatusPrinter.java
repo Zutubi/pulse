@@ -1,4 +1,4 @@
-package com.zutubi.pulse.local;
+package com.zutubi.pulse.dev.local;
 
 import com.opensymphony.util.TextUtils;
 import com.zutubi.events.Event;
