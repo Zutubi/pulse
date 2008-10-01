@@ -10,7 +10,7 @@
 
         <many-to-one name="reason" class="com.zutubi.pulse.model.AbstractBuildReason" column="REASON" cascade="all" lazy="false"/>
 
-        <property name="stamps" type="com.zutubi.pulse.util.TimeStampsType">
+        <property name="stamps" type="com.zutubi.pulse.master.util.hibernate.TimeStampsType">
             <column name="QUEUE" sql-type="BIGINT"/>
             <column name="START" sql-type="BIGINT"/>
             <column name="FINISH" sql-type="BIGINT" index="idx_buildresult_finish"/>
@@ -106,7 +106,7 @@
             <generator class="hilo"/>
         </id>
 
-        <property name="stamps" type="com.zutubi.pulse.util.TimeStampsType">
+        <property name="stamps" type="com.zutubi.pulse.master.util.hibernate.TimeStampsType">
             <column name="QUEUE" sql-type="BIGINT"/>
             <column name="START" sql-type="BIGINT"/>
             <column name="FINISH" sql-type="BIGINT"/>

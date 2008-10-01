@@ -18,7 +18,7 @@
 
         <property name="lastPollTime" column="LAST_POLL_TIME" type="long"/>
 
-        <property name="properties" column="PROPERTIES" type="com.zutubi.pulse.util.PropertiesType" length="4096"/>
+        <property name="properties" column="PROPERTIES" type="com.zutubi.pulse.master.util.hibernate.PropertiesType" length="4096"/>
 
         <subclass name="com.zutubi.pulse.model.P4" discriminator-value="P4" dynamic-update="false">
         </subclass>

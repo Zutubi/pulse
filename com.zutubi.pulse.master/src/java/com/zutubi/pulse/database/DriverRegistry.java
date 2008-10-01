@@ -1,7 +1,7 @@
 package com.zutubi.pulse.database;
 
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.util.DriverWrapper;
+import com.zutubi.pulse.master.util.jdbc.DriverWrapper;
 import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.RandomUtils;

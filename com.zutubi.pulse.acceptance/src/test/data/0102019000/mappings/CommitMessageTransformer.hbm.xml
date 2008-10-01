@@ -12,7 +12,7 @@
 
         <property name="name" column="NAME" type="string" length="255"/>
 
-        <property name="properties" column="PROPERTIES" type="com.zutubi.pulse.util.PropertiesType" length="4095"/>
+        <property name="properties" column="PROPERTIES" type="com.zutubi.pulse.master.util.hibernate.PropertiesType" length="4095"/>
 
         <bag name="projects" table="COMMIT_MESSAGE_TRANSFORMER_PROJECTS" lazy="false">
             <key column="TRANSFORMER_ID"/>

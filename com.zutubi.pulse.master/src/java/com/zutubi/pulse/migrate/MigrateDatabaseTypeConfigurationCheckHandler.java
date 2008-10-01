@@ -5,7 +5,7 @@ import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.config.ConfigurationCheckHandlerSupport;
 import com.zutubi.pulse.tove.config.setup.DatabaseType;
-import com.zutubi.pulse.util.DriverWrapper;
+import com.zutubi.pulse.master.util.jdbc.DriverWrapper;
 import com.zutubi.pulse.util.JDBCUtils;
 import com.zutubi.util.logging.Logger;
 

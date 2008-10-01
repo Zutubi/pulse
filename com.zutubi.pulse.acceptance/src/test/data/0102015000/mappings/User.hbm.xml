@@ -75,7 +75,7 @@
         <property name="name" column="NAME" type="string" not-null="false" length="255"/>
         <property name="uid" column="UID" type="string" not-null="false" length="255"/>
 
-        <property name="properties" column="PROPERTIES" type="com.zutubi.pulse.util.PropertiesType" not-null="false"
+        <property name="properties" column="PROPERTIES" type="com.zutubi.pulse.master.util.hibernate.PropertiesType" not-null="false"
                   length="4095"/>
 
         <many-to-one name="user" column="USER_ID" class="com.zutubi.pulse.model.User" insert="true" lazy="false"/>

@@ -10,7 +10,7 @@
 
         <property name="commandName" column="COMMAND_NAME" type="string" length="255"/>
 
-        <property name="stamps" type="com.zutubi.pulse.util.TimeStampsType">
+        <property name="stamps" type="com.zutubi.pulse.master.util.hibernate.TimeStampsType">
             <column name="QUEUE" sql-type="BIGINT"/>
             <column name="START" sql-type="BIGINT"/>
             <column name="FINISH" sql-type="BIGINT"/>
@@ -34,7 +34,7 @@
             <column name="ERROR_FEATURE_COUNT" default="-1"/>
         </property>
 
-        <property name="properties" column="PROPERTIES" type="com.zutubi.pulse.util.PropertiesType" length="4095"/>
+        <property name="properties" column="PROPERTIES" type="com.zutubi.pulse.master.util.hibernate.PropertiesType" length="4095"/>
 
         <list name="artifacts" cascade="all,delete-orphan" lazy="true">
             <key column="COMMAND_RESULT_ID"/>

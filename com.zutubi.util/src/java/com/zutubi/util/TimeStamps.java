@@ -1,11 +1,9 @@
 package com.zutubi.util;
 
-import com.zutubi.util.Constants;
-
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.io.Serializable;
 
 /**
  * A time stamp pair to mark the start and end times for something.
