@@ -425,23 +425,23 @@
 
       </properties>
 
-      <testcase classname="com.zutubi.pulse.core.AntCommandTest" name="testBasicDefault" time="2.183"></testcase>
+      <testcase classname="com.zutubi.pulse.core.commands.ant.AntCommandTest" name="testBasicDefault" time="2.183"></testcase>
 
-      <testcase classname="com.zutubi.pulse.core.AntCommandTest" name="testBasicTargets" time="2.133"></testcase>
+      <testcase classname="com.zutubi.pulse.core.commands.ant.AntCommandTest" name="testBasicTargets" time="2.133"></testcase>
 
-      <testcase classname="com.zutubi.pulse.core.AntCommandTest" name="testDoubleSpaceTargets" time="1.352"></testcase>
+      <testcase classname="com.zutubi.pulse.core.commands.ant.AntCommandTest" name="testDoubleSpaceTargets" time="1.352"></testcase>
 
-      <testcase classname="com.zutubi.pulse.core.AntCommandTest" name="testEnvironment" time="1.472"></testcase>
+      <testcase classname="com.zutubi.pulse.core.commands.ant.AntCommandTest" name="testEnvironment" time="1.472"></testcase>
 
-      <testcase classname="com.zutubi.pulse.core.AntCommandTest" name="testExplicitBuildfile" time="3.225"></testcase>
+      <testcase classname="com.zutubi.pulse.core.commands.ant.AntCommandTest" name="testExplicitBuildfile" time="3.225"></testcase>
 
-      <testcase classname="com.zutubi.pulse.core.AntCommandTest" name="testExplicitArguments" time="1.241"></testcase>
+      <testcase classname="com.zutubi.pulse.core.commands.ant.AntCommandTest" name="testExplicitArguments" time="1.241"></testcase>
 
-      <testcase classname="com.zutubi.pulse.core.AntCommandTest" name="testRunNoBuildFile" time="0.521"></testcase>
+      <testcase classname="com.zutubi.pulse.core.commands.ant.AntCommandTest" name="testRunNoBuildFile" time="0.521"></testcase>
 
-      <testcase classname="com.zutubi.pulse.core.AntCommandTest" name="testRunNonExistantBuildFile" time="0.541"></testcase>
+      <testcase classname="com.zutubi.pulse.core.commands.ant.AntCommandTest" name="testRunNonExistantBuildFile" time="0.541"></testcase>
 
-      <testcase classname="com.zutubi.pulse.core.AntCommandTest" name="test" time="0.02"></testcase>
+      <testcase classname="com.zutubi.pulse.core.commands.ant.AntCommandTest" name="test" time="0.02"></testcase>
 
       <system-out></system-out>
 
@@ -654,13 +654,13 @@
 
       </properties>
 
-      <testcase classname="com.zutubi.pulse.core.AntPostProcessorTest" name="testSuccess" time="0.14"></testcase>
+      <testcase classname="com.zutubi.pulse.core.commands.ant.AntPostProcessorTest" name="testSuccess" time="0.14"></testcase>
 
-      <testcase classname="com.zutubi.pulse.core.AntPostProcessorTest" name="testNoBuildFile" time="0.03"></testcase>
+      <testcase classname="com.zutubi.pulse.core.commands.ant.AntPostProcessorTest" name="testNoBuildFile" time="0.03"></testcase>
 
-      <testcase classname="com.zutubi.pulse.core.AntPostProcessorTest" name="testSyntaxError" time="0.03"></testcase>
+      <testcase classname="com.zutubi.pulse.core.commands.ant.AntPostProcessorTest" name="testSyntaxError" time="0.03"></testcase>
 
-      <testcase classname="com.zutubi.pulse.core.AntPostProcessorTest" name="testJavacError" time="0.04"></testcase>
+      <testcase classname="com.zutubi.pulse.core.commands.ant.AntPostProcessorTest" name="testJavacError" time="0.04"></testcase>
 
       <system-out></system-out>
 

@@ -90,9 +90,9 @@ common-test:
     [junit] Running com.zutubi.pulse.VersionTest
     [junit] Tests run: 2, Failures: 1, Errors: 0, Time elapsed: 0.18 sec
     [junit] Test com.zutubi.pulse.VersionTest FAILED
-    [junit] Running com.zutubi.pulse.core.AntCommandTest
+    [junit] Running com.zutubi.pulse.core.commands.ant.AntCommandTest
     [junit] Tests run: 9, Failures: 0, Errors: 0, Time elapsed: 12.778 sec
-    [junit] Running com.zutubi.pulse.core.AntPostProcessorTest
+    [junit] Running com.zutubi.pulse.core.commands.ant.AntPostProcessorTest
     [junit] Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 0.321 sec
     [junit] Running com.zutubi.pulse.core.CommandGroupLoadTest
     [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 1.332 sec

@@ -1,5 +1,8 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.commands.ant;
 
+import com.zutubi.pulse.core.ExecutableCommand;
+import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.ProcessArtifact;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.util.SystemUtils;
 
