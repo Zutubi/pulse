@@ -6,7 +6,7 @@
 <beans>
     <bean id="objectFactory" class="com.zutubi.pulse.core.spring.SpringObjectFactory"/>
 
-    <bean id="shutdownManager" class="com.zutubi.pulse.ShutdownManager">
+    <bean id="shutdownManager" class="com.zutubi.pulse.servercore.ShutdownManager">
     </bean>
 
     <import resource="classpath:/com/zutubi/pulse/bootstrap/context/loggingContext.xml"/>

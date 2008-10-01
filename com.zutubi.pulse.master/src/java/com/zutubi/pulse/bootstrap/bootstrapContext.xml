@@ -2,7 +2,7 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans default-autowire="byName">
 
-    <bean id="startupManager" class="com.zutubi.pulse.bootstrap.DefaultStartupManager">
+    <bean id="startupManager" class="com.zutubi.pulse.servercore.bootstrap.DefaultStartupManager">
         <property name="startupTasks">
             <list>
                 <value>com.zutubi.pulse.bootstrap.tasks.LoginAsSystemStartupTask</value>
@@ -24,7 +24,7 @@
 
     <bean id="configurationManager" class="com.zutubi.pulse.bootstrap.SimpleMasterConfigurationManager"/>
 
-    <bean id="pluginPaths" class="com.zutubi.pulse.bootstrap.ServerPluginPaths" init-method="init">
+    <bean id="pluginPaths" class="com.zutubi.pulse.servercore.bootstrap.ServerPluginPaths" init-method="init">
         <property name="configurationManager">
             <ref bean="configurationManager"/>
         </property>

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.vfs.pulse;
 
-import com.zutubi.pulse.filesystem.FileSystemException;
+import com.zutubi.pulse.servercore.filesystem.FileSystemException;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.type.ComplexType;

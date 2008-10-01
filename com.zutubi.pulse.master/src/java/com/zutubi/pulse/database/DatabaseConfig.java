@@ -1,12 +1,11 @@
 package com.zutubi.pulse.database;
 
-import com.zutubi.pulse.bootstrap.MasterUserPaths;
+import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 import com.zutubi.util.logging.Logger;
-
-import java.util.Properties;
-
 import org.apache.commons.dbcp.BasicDataSource;
 import org.hibernate.cfg.Environment;
+
+import java.util.Properties;
 
 /**
  * The database configuration object represents all of the connection configuration details.

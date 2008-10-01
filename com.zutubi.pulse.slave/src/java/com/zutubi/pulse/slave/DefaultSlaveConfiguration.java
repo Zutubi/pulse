@@ -1,15 +1,15 @@
 package com.zutubi.pulse.slave;
 
-import com.zutubi.util.TextUtils;
-import com.zutubi.pulse.bootstrap.SystemConfiguration;
-import com.zutubi.pulse.bootstrap.SystemPaths;
-import com.zutubi.pulse.bootstrap.conf.EnvConfig;
-import com.zutubi.pulse.bootstrap.conf.VolatileReadOnlyConfig;
+import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.pulse.core.util.config.CompositeConfig;
 import com.zutubi.pulse.core.util.config.Config;
 import com.zutubi.pulse.core.util.config.ConfigSupport;
-import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.pulse.core.util.config.FileConfig;
+import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
+import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
+import com.zutubi.pulse.servercore.bootstrap.conf.EnvConfig;
+import com.zutubi.pulse.servercore.bootstrap.conf.VolatileReadOnlyConfig;
+import com.zutubi.util.TextUtils;
 
 import java.io.File;
 

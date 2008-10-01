@@ -1,8 +1,7 @@
 package com.zutubi.pulse.events;
 
-import com.zutubi.pulse.agent.Status;
 import com.zutubi.pulse.agent.Agent;
-import com.zutubi.pulse.services.SlaveStatus;
+import com.zutubi.pulse.servercore.services.SlaveStatus;
 
 /**
  */

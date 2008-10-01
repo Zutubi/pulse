@@ -1,8 +1,8 @@
 package com.zutubi.pulse.web;
 
 import com.opensymphony.webwork.ServletActionContext;
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import org.acegisecurity.ui.rememberme.TokenBasedRememberMeServices;
 
 import javax.servlet.http.Cookie;

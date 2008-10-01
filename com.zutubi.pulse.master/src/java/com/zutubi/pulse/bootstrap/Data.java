@@ -1,13 +1,16 @@
 package com.zutubi.pulse.bootstrap;
 
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
+import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.pulse.core.util.config.Config;
 import com.zutubi.pulse.core.util.config.FileConfig;
 import com.zutubi.pulse.database.DatabaseConsole;
 import com.zutubi.pulse.database.HSQLDBUtils;
-import com.zutubi.pulse.core.util.ZipUtils;
+import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
+import com.zutubi.pulse.servercore.bootstrap.StartupException;
+import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -276,7 +279,7 @@ public class Data implements MasterUserPaths
     //---( implementation of the user paths interface )---
 
     /**
-     * @see com.zutubi.pulse.bootstrap.MasterUserPaths#getUserConfigRoot()
+     * @see com.zutubi.pulse.servercore.bootstrap.MasterUserPaths#getUserConfigRoot()
      */
     public File getUserConfigRoot()
     {
@@ -288,7 +291,7 @@ public class Data implements MasterUserPaths
     }
 
     /**
-     * @see com.zutubi.pulse.bootstrap.MasterUserPaths#getDatabaseRoot()
+     * @see com.zutubi.pulse.servercore.bootstrap.MasterUserPaths#getDatabaseRoot()
      */
     public File getDatabaseRoot()
     {
@@ -300,7 +303,7 @@ public class Data implements MasterUserPaths
     }
 
     /**
-     * @see com.zutubi.pulse.bootstrap.MasterUserPaths#getProjectRoot()
+     * @see com.zutubi.pulse.servercore.bootstrap.MasterUserPaths#getProjectRoot()
      */
     public File getProjectRoot()
     {

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.restore;
 
-import com.zutubi.pulse.bootstrap.MasterUserPaths;
 import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 
 import java.io.File;
 import java.io.IOException;

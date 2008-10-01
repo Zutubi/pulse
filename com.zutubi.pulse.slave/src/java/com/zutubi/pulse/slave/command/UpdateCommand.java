@@ -1,17 +1,17 @@
 package com.zutubi.pulse.slave.command;
 
-import com.zutubi.pulse.ShutdownManager;
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.command.PulseCtl;
 import com.zutubi.pulse.core.PulseRuntimeException;
-import com.zutubi.pulse.services.MasterService;
-import com.zutubi.pulse.services.UpgradeState;
-import com.zutubi.pulse.services.UpgradeStatus;
-import com.zutubi.pulse.slave.MasterProxyFactory;
 import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.pulse.core.util.ZipUtils;
-import com.zutubi.util.io.IOUtils;
+import com.zutubi.pulse.servercore.ShutdownManager;
+import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.servercore.services.MasterService;
+import com.zutubi.pulse.servercore.services.UpgradeState;
+import com.zutubi.pulse.servercore.services.UpgradeStatus;
+import com.zutubi.pulse.slave.MasterProxyFactory;
 import com.zutubi.util.RandomUtils;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;

@@ -1,7 +1,6 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.events.EventManager;
-import com.zutubi.pulse.ShutdownManager;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.*;
@@ -14,6 +13,7 @@ import com.zutubi.pulse.scheduling.SimpleTrigger;
 import com.zutubi.pulse.scheduling.Trigger;
 import com.zutubi.pulse.scm.MonitorScms;
 import com.zutubi.pulse.scm.ScmChangeEvent;
+import com.zutubi.pulse.servercore.ShutdownManager;
 import com.zutubi.pulse.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;

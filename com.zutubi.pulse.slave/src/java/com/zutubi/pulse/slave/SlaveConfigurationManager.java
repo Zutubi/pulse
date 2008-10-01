@@ -1,8 +1,8 @@
 package com.zutubi.pulse.slave;
 
-import com.zutubi.pulse.bootstrap.AbstractConfigurationManager;
-import com.zutubi.pulse.bootstrap.SystemConfiguration;
-import com.zutubi.pulse.bootstrap.SystemPaths;
+import com.zutubi.pulse.servercore.bootstrap.AbstractConfigurationManager;
+import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
+import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 
 /**
  */

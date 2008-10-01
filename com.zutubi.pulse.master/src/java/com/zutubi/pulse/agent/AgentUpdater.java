@@ -3,10 +3,10 @@ package com.zutubi.pulse.agent;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.AgentService;
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.bootstrap.SystemPaths;
 import com.zutubi.pulse.events.AgentUpgradeCompleteEvent;
-import com.zutubi.pulse.services.UpgradeState;
-import com.zutubi.pulse.services.UpgradeStatus;
+import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
+import com.zutubi.pulse.servercore.services.UpgradeState;
+import com.zutubi.pulse.servercore.services.UpgradeStatus;
 import com.zutubi.pulse.servlet.DownloadPackageServlet;
 import com.zutubi.util.logging.Logger;
 

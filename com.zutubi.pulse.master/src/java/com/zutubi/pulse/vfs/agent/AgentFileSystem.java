@@ -2,11 +2,11 @@ package com.zutubi.pulse.vfs.agent;
 
 import com.caucho.hessian.client.HessianRuntimeException;
 import com.zutubi.pulse.SlaveProxyFactory;
-import com.zutubi.pulse.SystemInfo;
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.AgentManager;
-import com.zutubi.pulse.services.ServiceTokenManager;
-import com.zutubi.pulse.services.SlaveService;
+import com.zutubi.pulse.servercore.SystemInfo;
+import com.zutubi.pulse.servercore.services.ServiceTokenManager;
+import com.zutubi.pulse.servercore.services.SlaveService;
 import com.zutubi.util.logging.Logger;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileObject;

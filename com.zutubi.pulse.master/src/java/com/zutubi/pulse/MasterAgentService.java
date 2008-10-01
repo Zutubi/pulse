@@ -1,9 +1,7 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.agent.MasterLocationProvider;
-import com.zutubi.pulse.agent.PingStatus;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.bootstrap.StartupManager;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.Resource;
@@ -11,10 +9,14 @@ import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.resources.ResourceDiscoverer;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.core.util.FileSystemUtils;
-import com.zutubi.pulse.logging.CustomLogRecord;
-import com.zutubi.pulse.logging.ServerMessagesHandler;
 import com.zutubi.pulse.model.ResourceManager;
-import com.zutubi.pulse.services.SlaveStatus;
+import com.zutubi.pulse.servercore.ServerRecipePaths;
+import com.zutubi.pulse.servercore.SystemInfo;
+import com.zutubi.pulse.servercore.agent.PingStatus;
+import com.zutubi.pulse.servercore.bootstrap.StartupManager;
+import com.zutubi.pulse.servercore.logging.CustomLogRecord;
+import com.zutubi.pulse.servercore.logging.ServerMessagesHandler;
+import com.zutubi.pulse.servercore.services.SlaveStatus;
 import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
 import com.zutubi.util.logging.Logger;
 

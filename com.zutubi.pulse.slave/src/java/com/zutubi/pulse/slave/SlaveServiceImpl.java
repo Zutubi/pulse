@@ -1,17 +1,17 @@
 package com.zutubi.pulse.slave;
 
-import com.zutubi.pulse.SystemInfo;
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.agent.PingStatus;
-import com.zutubi.pulse.bootstrap.StartupManager;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.resources.ResourceDiscoverer;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
-import com.zutubi.pulse.filesystem.FileInfo;
-import com.zutubi.pulse.logging.CustomLogRecord;
-import com.zutubi.pulse.logging.ServerMessagesHandler;
-import com.zutubi.pulse.services.*;
+import com.zutubi.pulse.servercore.SystemInfo;
+import com.zutubi.pulse.servercore.agent.PingStatus;
+import com.zutubi.pulse.servercore.bootstrap.StartupManager;
+import com.zutubi.pulse.servercore.filesystem.FileInfo;
+import com.zutubi.pulse.servercore.logging.CustomLogRecord;
+import com.zutubi.pulse.servercore.logging.ServerMessagesHandler;
+import com.zutubi.pulse.servercore.services.*;
 import com.zutubi.pulse.slave.command.CleanupRecipeCommand;
 import com.zutubi.pulse.slave.command.RecipeCommand;
 import com.zutubi.pulse.slave.command.UpdateCommand;

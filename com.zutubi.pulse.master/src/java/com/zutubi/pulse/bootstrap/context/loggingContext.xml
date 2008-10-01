@@ -26,7 +26,7 @@ This context requires:
     spring.
     Leave it here for now until a solution presents itself.
     -->
-    <bean id="logConfigurationManager" class="com.zutubi.pulse.logging.LogConfigurationManager" init-method="init">
+    <bean id="logConfigurationManager" class="com.zutubi.pulse.servercore.logging.LogConfigurationManager" init-method="init">
         <property name="logConfiguration">
             <ref local="logConfiguration"/>
         </property>
@@ -62,7 +62,7 @@ This context requires:
         </property>
     </bean>
 
-    <bean id="fileHandlerFactory" class="com.zutubi.pulse.logging.FileHandlerFactory">
+    <bean id="fileHandlerFactory" class="com.zutubi.pulse.servercore.logging.FileHandlerFactory">
         <property name="objectFactory">
             <ref bean="objectFactory"/>
         </property>

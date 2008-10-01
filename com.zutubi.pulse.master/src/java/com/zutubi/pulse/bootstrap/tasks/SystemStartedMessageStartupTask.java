@@ -3,8 +3,8 @@ package com.zutubi.pulse.bootstrap.tasks;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.bootstrap.DefaultSetupManager;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.bootstrap.StartupTask;
-import com.zutubi.pulse.bootstrap.SystemConfiguration;
+import com.zutubi.pulse.servercore.bootstrap.StartupTask;
+import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.tove.config.admin.GlobalConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
 

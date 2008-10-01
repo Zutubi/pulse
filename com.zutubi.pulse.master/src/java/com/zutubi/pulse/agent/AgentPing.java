@@ -1,7 +1,8 @@
 package com.zutubi.pulse.agent;
 
 import com.zutubi.pulse.AgentService;
-import com.zutubi.pulse.services.SlaveStatus;
+import com.zutubi.pulse.servercore.agent.PingStatus;
+import com.zutubi.pulse.servercore.services.SlaveStatus;
 import com.zutubi.util.logging.Logger;
 
 import java.net.ConnectException;

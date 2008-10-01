@@ -1,9 +1,9 @@
 package com.zutubi.pulse.bootstrap.tasks;
 
-import com.zutubi.pulse.bootstrap.StartupTask;
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
-import com.zutubi.pulse.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.Version;
+import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.servercore.bootstrap.StartupTask;
+import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
 
 import java.text.DateFormat;
 import java.util.Date;

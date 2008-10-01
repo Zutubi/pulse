@@ -3,8 +3,8 @@ package com.zutubi.pulse.scheduling;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
-import com.zutubi.pulse.events.system.SystemStartedEvent;
 import com.zutubi.pulse.model.persistence.TriggerDao;
+import com.zutubi.pulse.servercore.events.system.SystemStartedEvent;
 import com.zutubi.util.logging.Logger;
 
 import java.util.Arrays;

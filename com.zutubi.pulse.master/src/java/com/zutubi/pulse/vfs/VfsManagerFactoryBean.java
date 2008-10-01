@@ -2,7 +2,7 @@ package com.zutubi.pulse.vfs;
 
 import com.zutubi.pulse.SlaveProxyFactory;
 import com.zutubi.pulse.agent.AgentManager;
-import com.zutubi.pulse.services.ServiceTokenManager;
+import com.zutubi.pulse.servercore.services.ServiceTokenManager;
 import com.zutubi.pulse.vfs.agent.AgentFileProvider;
 import com.zutubi.pulse.vfs.local.DefaultLocalFileProvider;
 import com.zutubi.pulse.vfs.pulse.PulseFileProvider;

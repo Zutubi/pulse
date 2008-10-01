@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web.agents;
 
-import com.zutubi.pulse.logging.CustomLogRecord;
-import com.zutubi.pulse.logging.ServerMessagesHandler;
+import com.zutubi.pulse.servercore.logging.CustomLogRecord;
+import com.zutubi.pulse.servercore.logging.ServerMessagesHandler;
 
 import java.util.logging.Level;
 

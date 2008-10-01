@@ -5,7 +5,7 @@
 -->
 <beans>
 
-    <bean id="startupManager" class="com.zutubi.pulse.bootstrap.DefaultStartupManager" autowire="byName">
+    <bean id="startupManager" class="com.zutubi.pulse.servercore.bootstrap.DefaultStartupManager" autowire="byName">
         <property name="startupTasks">
             <list>
                 <value>com.zutubi.pulse.bootstrap.tasks.LoginAsSystemStartupTask</value>
@@ -27,7 +27,7 @@
 
     <bean id="configurationManager" class="com.zutubi.pulse.bootstrap.SimpleMasterConfigurationManager">
         <property name="systemPaths">
-            <bean class="com.zutubi.pulse.bootstrap.ConfigurableSystemPaths">
+            <bean class="com.zutubi.pulse.servercore.bootstrap.ConfigurableSystemPaths">
                 <property name="systemRootString">
                     <value>com.zutubi.pulse.master/system</value>
                 </property>

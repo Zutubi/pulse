@@ -2,6 +2,8 @@ package com.zutubi.pulse.bootstrap;
 
 import com.zutubi.pulse.database.DatabaseConfig;
 import com.zutubi.pulse.database.DriverRegistry;
+import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 
 import java.io.File;
 import java.io.IOException;

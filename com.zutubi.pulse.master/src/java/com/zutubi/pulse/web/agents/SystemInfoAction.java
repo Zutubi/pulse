@@ -1,9 +1,9 @@
 package com.zutubi.pulse.web.agents;
 
-import com.zutubi.pulse.SystemInfo;
 import com.zutubi.pulse.agent.Agent;
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
-import com.zutubi.pulse.bootstrap.StartupManager;
+import com.zutubi.pulse.servercore.SystemInfo;
+import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.servercore.bootstrap.StartupManager;
 import com.zutubi.util.logging.Logger;
 
 /**

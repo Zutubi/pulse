@@ -1,16 +1,16 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.command.ShutdownCommand;
-import com.zutubi.pulse.command.StartCommand;
-import com.zutubi.pulse.license.LicenseException;
-import com.zutubi.pulse.license.LicenseType;
-import com.zutubi.pulse.test.LicenseHelper;
 import com.zutubi.pulse.core.test.TestUtils;
-import com.zutubi.pulse.transfer.TransferAPI;
-import com.zutubi.pulse.transfer.TransferException;
-import com.zutubi.pulse.hibernate.MutableConfiguration;
 import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.pulse.core.util.ZipUtils;
+import com.zutubi.pulse.hibernate.MutableConfiguration;
+import com.zutubi.pulse.license.LicenseException;
+import com.zutubi.pulse.license.LicenseType;
+import com.zutubi.pulse.servercore.command.ShutdownCommand;
+import com.zutubi.pulse.servercore.command.StartCommand;
+import com.zutubi.pulse.test.LicenseHelper;
+import com.zutubi.pulse.transfer.TransferAPI;
+import com.zutubi.pulse.transfer.TransferException;
 import com.zutubi.util.io.IOUtils;
 import org.apache.commons.cli.ParseException;
 import org.springframework.jdbc.core.JdbcTemplate;

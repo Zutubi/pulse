@@ -1,6 +1,6 @@
 package com.zutubi.pulse.slave.xmlrpc;
 
-import com.zutubi.pulse.xmlrpc.XmlRpcServlet;
+import com.zutubi.pulse.servercore.xmlrpc.XmlRpcServlet;
 import com.zutubi.pulse.slave.api.RemoteApi;
 
 import javax.servlet.ServletConfig;

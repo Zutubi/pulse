@@ -1,7 +1,7 @@
 package com.zutubi.pulse.vfs.agent;
 
 import com.caucho.hessian.client.HessianRuntimeException;
-import com.zutubi.pulse.filesystem.FileInfo;
+import com.zutubi.pulse.servercore.filesystem.FileInfo;
 import com.zutubi.util.logging.Logger;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;

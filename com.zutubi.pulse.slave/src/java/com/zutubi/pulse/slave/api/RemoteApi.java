@@ -1,10 +1,10 @@
 package com.zutubi.pulse.slave.api;
 
-import com.zutubi.pulse.api.AuthenticationException;
-import com.zutubi.pulse.api.AdminTokenManager;
-import com.zutubi.pulse.core.spring.SpringComponentContext;
-import com.zutubi.pulse.ShutdownManager;
 import com.zutubi.pulse.Version;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
+import com.zutubi.pulse.servercore.ShutdownManager;
+import com.zutubi.pulse.servercore.api.AdminTokenManager;
+import com.zutubi.pulse.servercore.api.AuthenticationException;
 
 /**
  */

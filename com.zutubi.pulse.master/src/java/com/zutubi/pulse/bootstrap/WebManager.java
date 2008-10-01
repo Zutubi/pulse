@@ -1,10 +1,10 @@
 package com.zutubi.pulse.bootstrap;
 
-import com.zutubi.pulse.jetty.JettyManager;
 import com.opensymphony.xwork.config.ConfigurationManager;
 import com.opensymphony.xwork.config.providers.XmlConfigurationProvider;
-import com.zutubi.pulse.security.SecurityManager;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
+import com.zutubi.pulse.security.SecurityManager;
+import com.zutubi.pulse.servercore.jetty.JettyManager;
 
 /**
  */

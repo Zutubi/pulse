@@ -2,7 +2,7 @@ package com.zutubi.pulse.agent;
 
 import com.zutubi.pulse.security.SecureParameter;
 import com.zutubi.pulse.security.SecureResult;
-import com.zutubi.pulse.services.UpgradeStatus;
+import com.zutubi.pulse.servercore.services.UpgradeStatus;
 import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.tove.config.agent.AgentConfigurationActions;
 

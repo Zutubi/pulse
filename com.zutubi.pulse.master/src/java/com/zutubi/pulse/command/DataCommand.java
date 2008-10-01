@@ -1,20 +1,15 @@
 package com.zutubi.pulse.command;
 
-import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.bootstrap.DefaultSetupManager;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.bootstrap.SystemBootstrapManager;
-import com.zutubi.pulse.bootstrap.SystemConfiguration;
-import com.zutubi.pulse.bootstrap.conf.EnvConfig;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.database.DatabaseConfig;
 import com.zutubi.pulse.hibernate.MutableConfiguration;
+import com.zutubi.pulse.servercore.bootstrap.SystemBootstrapManager;
+import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
+import com.zutubi.pulse.servercore.bootstrap.conf.EnvConfig;
 import com.zutubi.util.TextUtils;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.OptionBuilder;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
+import org.apache.commons.cli.*;
 
 import javax.sql.DataSource;
 import java.io.File;

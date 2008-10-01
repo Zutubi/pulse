@@ -30,7 +30,7 @@
 
     <bean id="configurationManager" class="com.zutubi.pulse.bootstrap.SimpleMasterConfigurationManager">
         <property name="systemPaths">
-            <bean class="com.zutubi.pulse.bootstrap.ConfigurableSystemPaths">
+            <bean class="com.zutubi.pulse.servercore.bootstrap.ConfigurableSystemPaths">
                 <property name="systemRootString">
                     <value>master/system</value>
                 </property>

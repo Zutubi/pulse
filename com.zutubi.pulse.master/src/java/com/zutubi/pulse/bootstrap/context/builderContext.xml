@@ -147,7 +147,7 @@
 
     <bean id="slaveProxyFactory" class="com.zutubi.pulse.SlaveProxyFactory" autowire="byName"/>
 
-    <bean id="hessianProxyFactory" class="com.zutubi.pulse.hessian.CustomHessianProxyFactory" autowire="byName"/>
+    <bean id="hessianProxyFactory" class="com.zutubi.pulse.servercore.hessian.CustomHessianProxyFactory" autowire="byName"/>
 
     <bean id="fatController" class="com.zutubi.pulse.FatController" autowire="byName" init-method="init"/>
 
@@ -157,7 +157,7 @@
 
     <bean id="resultNotifier" class="com.zutubi.pulse.ResultNotifier" autowire="byName" init-method="init"/>
 
-    <bean id="shutdownManager" class="com.zutubi.pulse.ShutdownManager">
+    <bean id="shutdownManager" class="com.zutubi.pulse.servercore.ShutdownManager">
         <property name="stoppables">
             <list>
                 <ref bean="scheduler"/>
@@ -175,7 +175,7 @@
 
     <bean id="tokenManager" class="com.zutubi.pulse.api.DefaultTokenManager" autowire="byName" init-method="init"/>
 
-    <bean id="serverMessagesHandler" class="com.zutubi.pulse.logging.ServerMessagesHandler" init-method="init"/>
+    <bean id="serverMessagesHandler" class="com.zutubi.pulse.servercore.logging.ServerMessagesHandler" init-method="init"/>
 
     <bean id="notifyConditionFactory" class="com.zutubi.pulse.condition.NotifyConditionFactory">
         <property name="objectFactory">
@@ -193,7 +193,7 @@
 
     <bean id="queries" class="com.zutubi.pulse.search.Queries" autowire="byName"/>
 
-    <bean id="serviceTokenManager" class="com.zutubi.pulse.services.ServiceTokenManager" autowire="byName" init-method="init"/>
+    <bean id="serviceTokenManager" class="com.zutubi.pulse.servercore.services.ServiceTokenManager" autowire="byName" init-method="init"/>
 
     <!-- re create the file system manager now that the slave details are available. -->
     <bean id="fileSystemManager" class="com.zutubi.pulse.vfs.VfsManagerFactoryBean" destroy-method="shutdown">

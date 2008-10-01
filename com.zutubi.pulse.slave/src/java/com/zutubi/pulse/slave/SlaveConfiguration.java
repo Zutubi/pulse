@@ -1,6 +1,6 @@
 package com.zutubi.pulse.slave;
 
-import com.zutubi.pulse.logging.LogConfiguration;
+import com.zutubi.pulse.servercore.logging.LogConfiguration;
 
 /**
  */

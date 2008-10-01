@@ -1,14 +1,18 @@
 package com.zutubi.pulse.bootstrap;
 
 import com.zutubi.events.EventManager;
-import com.zutubi.pulse.bootstrap.conf.EnvConfig;
-import com.zutubi.pulse.bootstrap.conf.VolatileReadOnlyConfig;
-import com.zutubi.pulse.core.util.config.Config;
-import com.zutubi.pulse.core.util.config.FileConfig;
 import com.zutubi.pulse.core.events.DataDirectoryChangedEvent;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
+import com.zutubi.pulse.core.util.config.Config;
+import com.zutubi.pulse.core.util.config.FileConfig;
 import com.zutubi.pulse.database.DatabaseConfig;
 import com.zutubi.pulse.database.DriverRegistry;
+import com.zutubi.pulse.servercore.bootstrap.AbstractConfigurationManager;
+import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
+import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
+import com.zutubi.pulse.servercore.bootstrap.SystemConfigurationSupport;
+import com.zutubi.pulse.servercore.bootstrap.conf.EnvConfig;
+import com.zutubi.pulse.servercore.bootstrap.conf.VolatileReadOnlyConfig;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.io.IOUtils;
 

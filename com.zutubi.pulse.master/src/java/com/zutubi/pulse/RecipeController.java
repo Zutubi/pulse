@@ -18,7 +18,8 @@ import com.zutubi.pulse.model.BuildManager;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.RecipeResultNode;
 import com.zutubi.pulse.model.ResourceManager;
-import com.zutubi.pulse.services.ServiceTokenManager;
+import com.zutubi.pulse.servercore.CopyBootstrapper;
+import com.zutubi.pulse.servercore.services.ServiceTokenManager;
 import com.zutubi.pulse.tove.config.project.hooks.BuildHookManager;
 import com.zutubi.util.logging.Logger;
 

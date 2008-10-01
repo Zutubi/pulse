@@ -1,9 +1,9 @@
 package com.zutubi.pulse.bootstrap.tasks;
 
-import com.zutubi.pulse.bootstrap.StartupTask;
-import com.zutubi.pulse.core.spring.SpringComponentContext;
-import com.zutubi.pulse.bootstrap.WebManager;
 import com.zutubi.pulse.bootstrap.SetupManager;
+import com.zutubi.pulse.bootstrap.WebManager;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
+import com.zutubi.pulse.servercore.bootstrap.StartupTask;
 
 import java.util.LinkedList;
 import java.util.List;

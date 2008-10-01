@@ -6,7 +6,7 @@ import com.zutubi.pulse.core.RecipeProcessor;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.core.Stoppable;
-import com.zutubi.pulse.services.SlaveStatus;
+import com.zutubi.pulse.servercore.services.SlaveStatus;
 import com.zutubi.util.logging.Logger;
 
 import java.util.concurrent.ExecutorService;

@@ -11,9 +11,9 @@ This context exports:
 -->
 <beans>
 
-    <bean id="customSerialiserFactory" class="com.zutubi.pulse.hessian.CustomSerialiserFactory"/>
+    <bean id="customSerialiserFactory" class="com.zutubi.pulse.servercore.hessian.CustomSerialiserFactory"/>
 
-    <bean id="jettyManager" class="com.zutubi.pulse.jetty.JettyManager">
+    <bean id="jettyManager" class="com.zutubi.pulse.servercore.jetty.JettyManager">
         <property name="jettyServer">
             <ref local="jettyServer"/>
         </property>
@@ -22,7 +22,7 @@ This context exports:
         </property>
     </bean>
 
-    <bean id="jettyServer" class="com.zutubi.pulse.jetty.JettyServerFactoryBean" destroy-method="shutdown">
+    <bean id="jettyServer" class="com.zutubi.pulse.servercore.jetty.JettyServerFactoryBean" destroy-method="shutdown">
         <property name="configurationManager">
             <ref bean="configurationManager"/>
         </property>
@@ -41,7 +41,7 @@ This context exports:
     </bean>
 
     <!-- Token manager required for scripted access to the remote api. -->
-    <bean id="adminTokenManager" class="com.zutubi.pulse.api.AdminTokenManager" autowire="byName" init-method="init">
+    <bean id="adminTokenManager" class="com.zutubi.pulse.servercore.api.AdminTokenManager" autowire="byName" init-method="init">
         <property name="configRoot">
             <bean id="configRoot" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
                 <property name="targetBeanName">

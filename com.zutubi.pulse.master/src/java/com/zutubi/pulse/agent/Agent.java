@@ -2,8 +2,9 @@ package com.zutubi.pulse.agent;
 
 import com.zutubi.pulse.AgentService;
 import com.zutubi.pulse.model.AgentState;
-import com.zutubi.pulse.services.SlaveStatus;
-import com.zutubi.pulse.services.UpgradeState;
+import com.zutubi.pulse.servercore.agent.Status;
+import com.zutubi.pulse.servercore.services.SlaveStatus;
+import com.zutubi.pulse.servercore.services.UpgradeState;
 import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
 
 /**

@@ -1,5 +1,6 @@
 package com.zutubi.pulse.events.system;
 
+import com.zutubi.pulse.servercore.events.system.SystemEvent;
 import com.zutubi.tove.config.ConfigurationProvider;
 
 /**

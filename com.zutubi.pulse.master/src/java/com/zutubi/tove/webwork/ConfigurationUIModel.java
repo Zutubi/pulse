@@ -1,9 +1,9 @@
 package com.zutubi.tove.webwork;
 
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.core.spring.SpringComponentContext;
-import com.zutubi.pulse.bootstrap.SystemPaths;
 import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
+import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.tove.config.*;
 import com.zutubi.tove.format.StateDisplayManager;
@@ -18,9 +18,9 @@ import com.zutubi.util.Mapping;
 import com.zutubi.util.Pair;
 import com.zutubi.util.TextUtils;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Collections;
 
 /**
  * Analyses a configuration path, extracting information that is used to

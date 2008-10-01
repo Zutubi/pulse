@@ -5,12 +5,12 @@ import com.zutubi.events.EventManager;
 import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.core.config.Resource;
-import com.zutubi.pulse.model.ResourceManager;
-import com.zutubi.pulse.services.InvalidTokenException;
-import com.zutubi.pulse.services.MasterService;
-import com.zutubi.pulse.services.ServiceTokenManager;
-import com.zutubi.pulse.services.UpgradeStatus;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
+import com.zutubi.pulse.model.ResourceManager;
+import com.zutubi.pulse.servercore.services.InvalidTokenException;
+import com.zutubi.pulse.servercore.services.MasterService;
+import com.zutubi.pulse.servercore.services.ServiceTokenManager;
+import com.zutubi.pulse.servercore.services.UpgradeStatus;
 
 import java.util.List;
 

@@ -1,8 +1,8 @@
 package com.zutubi.pulse.bootstrap.velocity;
 
-import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.bootstrap.SystemPaths;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
+import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import org.apache.commons.collections.ExtendedProperties;
 import org.apache.velocity.runtime.resource.loader.FileResourceLoader;
 

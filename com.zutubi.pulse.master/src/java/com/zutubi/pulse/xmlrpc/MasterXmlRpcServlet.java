@@ -1,6 +1,7 @@
 package com.zutubi.pulse.xmlrpc;
 
 import com.zutubi.pulse.api.RemoteApi;
+import com.zutubi.pulse.servercore.xmlrpc.XmlRpcServlet;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;

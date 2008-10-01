@@ -1,9 +1,9 @@
 package com.zutubi.pulse.bootstrap.tasks;
 
+import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
+import com.zutubi.pulse.servercore.bootstrap.StartupTask;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
-import com.zutubi.pulse.bootstrap.StartupTask;
-import com.zutubi.pulse.bootstrap.ConfigurationManager;
 
 import java.io.File;
 import java.io.FileInputStream;

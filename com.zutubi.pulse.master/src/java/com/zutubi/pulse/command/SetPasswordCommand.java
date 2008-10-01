@@ -1,6 +1,7 @@
 package com.zutubi.pulse.command;
 
 import com.zutubi.pulse.core.command.HelpCommand;
+import com.zutubi.pulse.servercore.command.AdminCommand;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.ParseException;

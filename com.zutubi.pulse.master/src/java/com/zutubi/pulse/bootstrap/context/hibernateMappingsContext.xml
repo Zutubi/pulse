@@ -10,7 +10,7 @@ This context exports:
 -->
 <beans>
 
-    <bean id="hibernateMappings" class="com.zutubi.pulse.bootstrap.SpringListBean">
+    <bean id="hibernateMappings" class="com.zutubi.pulse.servercore.bootstrap.SpringListBean">
         <property name="list">
             <list>
                 <value>com/zutubi/pulse/model/persistence/hibernate/BuildResult.hbm.xml</value>

@@ -1,9 +1,9 @@
 package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.core.util.FileSystemUtils;
-import com.zutubi.pulse.filesystem.File;
-import com.zutubi.pulse.filesystem.FileSystem;
-import com.zutubi.pulse.filesystem.FileSystemException;
+import com.zutubi.pulse.servercore.filesystem.File;
+import com.zutubi.pulse.servercore.filesystem.FileSystem;
+import com.zutubi.pulse.servercore.filesystem.FileSystemException;
 import com.zutubi.pulse.web.DirectoryEntry;
 import com.zutubi.util.TextUtils;
 

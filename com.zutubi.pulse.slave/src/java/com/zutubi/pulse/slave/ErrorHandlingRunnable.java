@@ -2,7 +2,7 @@ package com.zutubi.pulse.slave;
 
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
-import com.zutubi.pulse.services.MasterService;
+import com.zutubi.pulse.servercore.services.MasterService;
 import com.zutubi.util.logging.Logger;
 
 /**

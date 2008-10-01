@@ -3,7 +3,7 @@ package com.zutubi.pulse.web.agents;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.agent.AgentManager;
-import com.zutubi.pulse.bootstrap.SystemPaths;
+import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.tove.actions.ActionManager;

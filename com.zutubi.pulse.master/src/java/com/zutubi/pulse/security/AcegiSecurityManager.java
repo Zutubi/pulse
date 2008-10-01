@@ -1,6 +1,6 @@
 package com.zutubi.pulse.security;
 
-import com.zutubi.pulse.jetty.JettyManager;
+import com.zutubi.pulse.servercore.jetty.JettyManager;
 import com.zutubi.pulse.spring.web.context.FilterToBeanProxy;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.providers.ProviderManager;

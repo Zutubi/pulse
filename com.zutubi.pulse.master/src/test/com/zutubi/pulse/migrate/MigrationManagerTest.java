@@ -1,18 +1,18 @@
 package com.zutubi.pulse.migrate;
 
 import com.zutubi.pulse.bootstrap.Data;
-import com.zutubi.pulse.bootstrap.MasterUserPaths;
 import com.zutubi.pulse.bootstrap.SimpleMasterConfigurationManager;
-import com.zutubi.pulse.database.DatabaseConfig;
-import com.zutubi.pulse.monitor.JobManager;
-import com.zutubi.pulse.monitor.Monitor;
 import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.pulse.core.util.JDBCUtils;
+import com.zutubi.pulse.database.DatabaseConfig;
 import com.zutubi.pulse.hibernate.HackyConnectionProvider;
 import com.zutubi.pulse.hibernate.HibernateUtils;
 import com.zutubi.pulse.hibernate.MutableConfiguration;
 import com.zutubi.pulse.hibernate.SchemaRefactor;
-import com.zutubi.pulse.core.util.JDBCUtils;
-import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.pulse.monitor.JobManager;
+import com.zutubi.pulse.monitor.Monitor;
+import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.io.IOUtils;
 import org.apache.commons.dbcp.BasicDataSource;

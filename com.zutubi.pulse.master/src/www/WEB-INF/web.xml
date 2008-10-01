@@ -17,7 +17,7 @@
     -->
     <filter>
         <filter-name>Acegi Session Filter</filter-name>
-        <filter-class>com.zutubi.pulse.spring.FilterWrapper</filter-class>
+        <filter-class>com.zutubi.pulse.servercore.spring.FilterWrapperlterWrapper</filter-class>
         <init-param>
             <param-name>delegateClassName</param-name>
             <param-value>com.zutubi.pulse.security.HttpSessionContextIntegrationFilter</param-value>
@@ -31,7 +31,7 @@
 
     <filter>
         <filter-name>redirect</filter-name>
-        <filter-class>com.zutubi.pulse.servlet.RedirectServletFilter</filter-class>
+        <filter-class>com.zutubi.pulse.servercore.servlet.RedirectServletFilterrvletFilter</filter-class>
         <init-param>
             <param-name>destination</param-name>
             <param-value>default.action</param-value>
@@ -115,21 +115,21 @@
 
     <servlet>
         <servlet-name>hessian</servlet-name>
-        <servlet-class>com.zutubi.pulse.hessian.CustomHessianServlet</servlet-class>
+        <servlet-class>com.zutubi.pulse.servercore.hessian.CustomHessianServlet</servlet-class>
         <init-param>
             <param-name>home-class</param-name>
             <param-value>com.zutubi.pulse.MasterServiceImpl</param-value>
         </init-param>
         <init-param>
             <param-name>home-api</param-name>
-            <param-value>com.zutubi.pulse.services.MasterService</param-value>
+            <param-value>com.zutubi.pulse.servercore.services.MasterService</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
 
     <servlet>
         <servlet-name>download</servlet-name>
-        <servlet-class>com.zutubi.pulse.servlet.DownloadResultsServlet</servlet-class>
+        <servlet-class>com.zutubi.pulse.servercore.servlet.DownloadResultsServletultsServlet</servlet-class>
     </servlet>
 
     <servlet>
