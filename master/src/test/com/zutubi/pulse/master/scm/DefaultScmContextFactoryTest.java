@@ -1,9 +1,10 @@
 package com.zutubi.pulse.master.scm;
 
+import com.zutubi.pulse.core.scm.ScmContext;
+import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.scm.config.MockScmConfiguration;
 import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.core.scm.ScmException;
-import com.zutubi.pulse.core.scm.ScmContext;
 
 import java.io.File;
 
@@ -16,9 +17,6 @@ public class DefaultScmContextFactoryTest extends PulseTestCase
     {
         super.setUp();
 
-        // i would like to mock this directory out, but can not see a way to do so with mockito - considering
-        // that the context factory attempts to create a new file based on this file.  Maybe insert a
-        // file system interface?
         tmp = FileSystemUtils.createTempDir();
 
         factory = new DefaultScmContextFactory();
@@ -36,10 +34,20 @@ public class DefaultScmContextFactoryTest extends PulseTestCase
 
     public void testScmContextCorrectlyConfigured() throws ScmException
     {
-/*
-        ScmContext context = factory.createContext(1, null);
+        MockScmConfiguration config = new MockScmConfiguration();
+        config.setHandle(1);
+        ScmContext context = factory.createContext(1, config);
         File expectedDir = new File(tmp, FileSystemUtils.join("1", "scm"));
         assertEquals(expectedDir, context.getPersistentWorkingDir());
-*/
     }
+
+    public void testScmContextReused() throws ScmException
+    {
+        MockScmConfiguration config = new MockScmConfiguration();
+        config.setHandle(1);
+        ScmContext a = factory.createContext(1, config);
+        ScmContext b = factory.createContext(1, config);
+        assertSame(a, b);
+    }
+
 }

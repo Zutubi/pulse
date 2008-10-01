@@ -1,9 +1,9 @@
 package com.zutubi.pulse.core.scm.git;
 
 import com.zutubi.pulse.core.ExecutionContext;
-import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Change;
+import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.RecordingScmEventHandler;
 import com.zutubi.pulse.core.scm.ScmContext;
 import com.zutubi.pulse.core.scm.ScmException;
@@ -13,14 +13,13 @@ import com.zutubi.pulse.util.ZipUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;
-import java.io.InputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
+import java.io.InputStream;
+import java.net.URL;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.net.URL;
 
 public class GitClientTest extends PulseTestCase
 {
@@ -31,6 +30,8 @@ public class GitClientTest extends PulseTestCase
     private ExecutionContext context;
     private RecordingScmEventHandler handler;
     private ScmContext scmContext;
+    
+    private static final String TEST_AUTHOR = "Daniel Ostermeier <daniel@zutubi.com>";
 
     protected void setUp() throws Exception
     {
@@ -44,11 +45,8 @@ public class GitClientTest extends PulseTestCase
         File repositoryBase = new File(tmp, "repo");
 
         repository = "file://" + repositoryBase.getCanonicalPath();
-//        repository = "file://c:\\tmp\\git-testing";
 
-        client = new GitClient();
-        client.setRepository(repository);
-        client.setBranch("master");
+        client = new GitClient(repository, "master");
 
         workingDir = new File(tmp, "wd");
         context = new ExecutionContext();
@@ -79,14 +77,12 @@ public class GitClientTest extends PulseTestCase
         Revision rev = client.checkout(context, null, handler);
 
         assertEquals("e34da05e88de03a4aa5b10b338382f09bbe65d4b", rev.getRevisionString());
-        assertEquals("Daniel Ostermeier <daniel@zutubi.com>", rev.getAuthor());
+        assertEquals(TEST_AUTHOR, rev.getAuthor());
         assertEquals("removed content from a.txt", rev.getComment());
         assertEquals(parse("Sun Sep 28 15:06:49 2008 +1000"), rev.getDate());
         assertEquals("master", rev.getBranch());
 
-        assertTrue(new File(workingDir, "a.txt").isFile());
-        assertTrue(new File(workingDir, "b.txt").isFile());
-        assertTrue(new File(workingDir, "c.txt").isFile());
+        assertFiles(workingDir, "a.txt", "b.txt", "c.txt");
         assertTrue(new File(workingDir, ".git").isDirectory());
 
         assertEquals(2, handler.getStatusMessages().size());
@@ -98,14 +94,12 @@ public class GitClientTest extends PulseTestCase
         Revision rev = client.checkout(context, null, handler);
 
         assertEquals("c34b545b6954b8946967c250dde7617c24a9bb4b", rev.getRevisionString());
-        assertEquals("Daniel Ostermeier <daniel@zutubi.com>", rev.getAuthor());
+        assertEquals(TEST_AUTHOR, rev.getAuthor());
         assertEquals("removed content from file 1.txt", rev.getComment());
         assertEquals(parse("Sun Sep 28 14:57:57 2008 +1000"), rev.getDate());
         assertEquals("branch", rev.getBranch());
 
-        assertTrue(new File(workingDir, "1.txt").isFile());
-        assertTrue(new File(workingDir, "2.txt").isFile());
-        assertTrue(new File(workingDir, "3.txt").isFile());
+        assertFiles(workingDir, "1.txt", "2.txt", "3.txt");
         assertTrue(new File(workingDir, ".git").isDirectory());
     }
 
@@ -114,14 +108,12 @@ public class GitClientTest extends PulseTestCase
         Revision rev = client.checkout(context, new Revision("96e8d45dd7627d9e3cab980e90948e3ae1c99c62"), handler);
 
         assertEquals("96e8d45dd7627d9e3cab980e90948e3ae1c99c62", rev.getRevisionString());
-        assertEquals("Daniel Ostermeier <daniel@zutubi.com>", rev.getAuthor());
+        assertEquals(TEST_AUTHOR, rev.getAuthor());
         assertEquals("initial commit", rev.getComment());
         assertEquals(parse("Sun Sep 28 13:26:10 2008 +1000"), rev.getDate());
         assertEquals("master", rev.getBranch());
 
-        assertTrue(new File(workingDir, "a.txt").isFile());
-        assertTrue(new File(workingDir, "b.txt").isFile());
-        assertTrue(new File(workingDir, "c.txt").isFile());
+        assertFiles(workingDir, "a.txt", "b.txt", "c.txt");
         assertTrue(new File(workingDir, ".git").isDirectory());
 
         assertEquals(2, handler.getStatusMessages().size());
@@ -133,7 +125,7 @@ public class GitClientTest extends PulseTestCase
         Revision rev = client.checkout(context, new Revision("83d35b25a6b4711c4d9424c337bf82e5398756f3"), handler);
 
         assertEquals("83d35b25a6b4711c4d9424c337bf82e5398756f3", rev.getRevisionString());
-        assertEquals("Daniel Ostermeier <daniel@zutubi.com>", rev.getAuthor());
+        assertEquals(TEST_AUTHOR, rev.getAuthor());
         assertEquals("initial commit on branch", rev.getComment());
         assertEquals(parse("Sun Sep 28 13:40:17 2008 +1000"), rev.getDate());
         assertEquals("branch", rev.getBranch());
@@ -160,31 +152,27 @@ public class GitClientTest extends PulseTestCase
     public void testRetrieve() throws ScmException, IOException
     {
         InputStream content = client.retrieve(scmContext, "a.txt", null);
-        String data = readToString(content);
-        assertEquals("", data);
+        assertEquals("", IOUtils.inputStreamToString(content));
     }
 
     public void testRetrieveFromRevision() throws IOException, ScmException
     {
         InputStream content = client.retrieve(scmContext, "a.txt", new Revision("b69a48a6b0f567d0be110c1fbca2c48fc3e1b112"));
-        String data = readToString(content);
-        assertEquals("content", data);
+        assertEquals("content", IOUtils.inputStreamToString(content));
     }
 
     public void testRetrieveOnBranch() throws ScmException, IOException
     {
         client.setBranch("branch");
         InputStream content = client.retrieve(scmContext, "1.txt", null);
-        String data = readToString(content);
-        assertEquals("", data);
+        assertEquals("", IOUtils.inputStreamToString(content));
     }
 
     public void testRetrieveFromRevisionOnBranch() throws ScmException, IOException
     {
         client.setBranch("branch");
         InputStream content = client.retrieve(scmContext, "1.txt", new Revision("7d61890eb55586ec99416c53c581bf561591a608"));
-        String data = readToString(content);
-        assertEquals("content", data);
+        assertEquals("content", IOUtils.inputStreamToString(content));
     }
 
     public void testUpdate() throws ScmException
@@ -219,7 +207,7 @@ public class GitClientTest extends PulseTestCase
         
         Revision rev = client.update(context, new Revision("b69a48a6b0f567d0be110c1fbca2c48fc3e1b112"), handler);
         assertEquals("b69a48a6b0f567d0be110c1fbca2c48fc3e1b112", rev.getRevisionString());
-        assertEquals("Daniel Ostermeier <daniel@zutubi.com>", rev.getAuthor());
+        assertEquals(TEST_AUTHOR, rev.getAuthor());
         assertEquals("added content to a.txt", rev.getComment());
         assertEquals(parse("Sun Sep 28 15:06:32 2008 +1000"), rev.getDate());
         assertEquals("master", rev.getBranch());
@@ -242,7 +230,7 @@ public class GitClientTest extends PulseTestCase
         Changelist changelist = changes.get(0);
         assertEquals("removed content from a.txt", changelist.getComment());
         assertEquals("e34da05e88de03a4aa5b10b338382f09bbe65d4b", changelist.getRevision().getRevisionString());
-        assertEquals("Daniel Ostermeier <daniel@zutubi.com>", changelist.getUser());
+        assertEquals(TEST_AUTHOR, changelist.getUser());
         assertEquals(1, changelist.getChanges().size());
         Change change = changelist.getChanges().get(0);
         assertEquals(Change.Action.EDIT, change.getAction());
@@ -254,10 +242,12 @@ public class GitClientTest extends PulseTestCase
         return new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z").parse(str);
     }
 
-    private String readToString(InputStream content) throws IOException
+    private void assertFiles(File base, String... filenames)
     {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        IOUtils.joinStreams(content, out);
-        return out.toString();
+        for (String filename : filenames)
+        {
+            assertTrue(filename + " is not a file.", new File(base, filename).isFile());
+        }
     }
+
 }

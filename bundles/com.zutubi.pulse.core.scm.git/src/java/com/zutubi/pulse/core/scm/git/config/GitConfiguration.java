@@ -15,8 +15,10 @@ import com.zutubi.validation.annotations.Required;
 @Form(fieldOrder = {"repository", "branch", "checkoutScheme", "monitor", "customPollingInterval", "pollingInterval", "quietPeriodEnabled", "quietPeriod"})
 public class GitConfiguration extends PollableScmConfiguration
 {
+    @Required
     private String repository;
 
+    @Required
     private String branch = "master";
 
     @Transient
@@ -33,7 +35,6 @@ public class GitConfiguration extends PollableScmConfiguration
         return null;
     }
 
-    @Required
     public String getRepository()
     {
         return repository;
@@ -44,7 +45,6 @@ public class GitConfiguration extends PollableScmConfiguration
         this.repository = repository;
     }
 
-    @Required
     public void setBranch(String branch)
     {
         this.branch = branch;

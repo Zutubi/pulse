@@ -15,10 +15,6 @@ public class GitClientFactory implements ScmClientFactory<GitConfiguration>
 {
     public ScmClient createClient(GitConfiguration config) throws ScmException
     {
-        GitClient client = new GitClient();
-        client.setRepository(config.getRepository());
-        client.setBranch(config.getBranch());
-        
-        return client;
+        return new GitClient(config.getRepository(), config.getBranch());
     }
 }

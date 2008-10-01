@@ -25,18 +25,6 @@ import java.util.logging.Level;
  */
 public class NativeGit
 {
-    private static final Logger LOG = Logger.getLogger(NativeGit.class);
-    private static final long PROCESS_TIMEOUT = Long.getLong("pulse.git.inactivity.timeout", 300);
-    private static final String ASCII_CHARSET = "US-ASCII";
-    /**
-     * The date format used to read the 'date' field on git log output.
-     */
-    private final SimpleDateFormat LOG_DATE_FORMAT = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z");
-
-    private ScmEventHandler scmHandler;
-
-    private ProcessBuilder git;
-
     private static final String GIT = "git";
     private static final String COMMAND_PULL = "pull";
     private static final String COMMAND_LOG = "log";
@@ -51,6 +39,17 @@ public class NativeGit
     private static final String CLONE_OPTION_NO_CHECKOUT = "--no-checkout";
     private static final String LOG_OPTION_REVERSE = "--reverse";
     private static final String BRANCH_OPTION_DELETE = "-D";
+    private static final String REVISION_HEAD = "HEAD";
+
+    private static final Logger LOG = Logger.getLogger(NativeGit.class);
+    private static final long PROCESS_TIMEOUT = Long.getLong("pulse.git.inactivity.timeout", 300);
+    private static final String ASCII_CHARSET = "US-ASCII";
+    /**
+     * The date format used to read the 'date' field on git log output.
+     */
+    private final SimpleDateFormat LOG_DATE_FORMAT = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z");
+
+    private ProcessBuilder git;
 
     public NativeGit()
     {
@@ -60,7 +59,7 @@ public class NativeGit
     /**
      * Set the working directory in which the native git commands will be run.
      *
-     * @param dir working directory.
+     * @param dir working directory must exist.
      */
     public void setWorkingDirectory(File dir)
     {
@@ -71,24 +70,19 @@ public class NativeGit
         git.directory(dir);
     }
 
-    public void setScmEventHandler(ScmEventHandler scmHandler)
+    public void clone(ScmEventHandler handler, String repository, String dir) throws ScmException
     {
-        this.scmHandler = scmHandler;
+        run(handler, GIT, COMMAND_CLONE, CLONE_OPTION_NO_CHECKOUT, repository, dir);
     }
 
-    public void clone(String repository, String dir) throws ScmException
+    public void pull(ScmEventHandler handler) throws ScmException
     {
-        run(GIT, COMMAND_CLONE, CLONE_OPTION_NO_CHECKOUT, repository, dir);
-    }
-
-    public void pull() throws ScmException
-    {
-        run(GIT, COMMAND_PULL);
+        run(handler, GIT, COMMAND_PULL);
     }
 
     public InputStream show(String file) throws ScmException
     {
-        return show("HEAD", file);
+        return show(REVISION_HEAD, file);
     }
 
     public InputStream show(String revision, String file) throws ScmException
@@ -105,12 +99,6 @@ public class NativeGit
         };
 
         runWithHandler(handler, null, commands);
-
-        if (handler.getExitCode() != 0)
-        {
-            throw new ScmException("Git command: " + StringUtils.join(" ", commands) + " exited " +
-                    "with non zero exit code: " + handler.getExitCode() + ". " + handler.getError());
-        }
 
         return new ByteArrayInputStream(buffer.toString().getBytes());
     }
@@ -152,23 +140,17 @@ public class NativeGit
 
         runWithHandler(handler, null, command.toArray(new String[command.size()]));
 
-        if (handler.getExitCode() != 0)
-        {
-            throw new ScmException("Git command: " + StringUtils.join(" ", command) + " exited " +
-                    "with non zero exit code: " + handler.getExitCode() + ". " + handler.getError());
-        }
-
         return handler.getEntries();
     }
 
-    public void checkout(String branch) throws ScmException
+    public void checkout(ScmEventHandler handler, String branch) throws ScmException
     {
-        run(GIT, COMMAND_CHECKOUT, branch);
+        run(handler, GIT, COMMAND_CHECKOUT, branch);
     }
     
-    public void checkout(String branch, String localBranch) throws ScmException
+    public void checkout(ScmEventHandler handler, String branch, String localBranch) throws ScmException
     {
-        run(GIT, COMMAND_CHECKOUT, CHECKOUT_OPTION_BRANCH, localBranch, branch);
+        run(handler, GIT, COMMAND_CHECKOUT, CHECKOUT_OPTION_BRANCH, localBranch, branch);
     }
 
     public void deleteBranch(String branch) throws ScmException
@@ -189,26 +171,19 @@ public class NativeGit
 
         runWithHandler(handler, null, command);
 
-        if (handler.getExitCode() != 0)
-        {
-            throw new ScmException("Git command: " + StringUtils.join(" ", command) + " exited " +
-                    "with non zero exit code: " + handler.getExitCode() + ". " + handler.getError());
-        }
-
         return handler.getBranches();
     }
 
     protected void run(String... commands) throws ScmException
     {
-        OutputHandlerAdapter handler = new OutputHandlerAdapter();
+        run(null, commands);
+    }
+    
+    protected void run(ScmEventHandler scmHandler, String... commands) throws ScmException
+    {
+        OutputHandlerAdapter handler = new OutputHandlerAdapter(scmHandler);
 
         runWithHandler(handler, null, commands);
-
-        if (handler.getExitCode() != 0)
-        {
-            throw new ScmException("Git command: " + StringUtils.join(" ", commands) + " exited " +
-                    "with non zero exit code: " + handler.getExitCode() + ". " + handler.getError());
-        }
     }
 
     protected void runWithHandler(final OutputHandler handler, String input, String... commands) throws ScmException
@@ -288,6 +263,13 @@ public class NativeGit
             while (exitCode == null);
 
             handler.handleExitCode(exitCode);
+
+            if (exitCode != 0)
+            {
+                throw new ScmException("Git command: " + StringUtils.join(" ", commands) + " exited " +
+                        "with non zero exit code: " + handler.getExitCode() + ". " + handler.getError());
+            }
+
         }
         catch (InterruptedException e)
         {
@@ -323,6 +305,17 @@ public class NativeGit
         private int exitCode;
 
         private String error;
+
+        private ScmEventHandler scmHandler;
+
+        public OutputHandlerAdapter()
+        {
+        }
+
+        public OutputHandlerAdapter(ScmEventHandler scmHandler)
+        {
+            this.scmHandler = scmHandler;
+        }
 
         public void handleStdout(String line)
         {

@@ -1300,7 +1300,7 @@ public class StringUtils
 
     /**
      * Remove any leading whitespace from the string.
-     * @param str with leading whitespace
+     * @param str string with leading whitespace
      * @return the string with leading whitespace removed
      */
     public static String stripLeadingWhitespace(String str)
