@@ -650,7 +650,7 @@ public class ExecutableCommand extends CommandSupport implements Validateable
      *
      * @param arguments to be added.
      */
-    protected void addArguments(String ...arguments)
+    public void addArguments(String ...arguments)
     {
         for (String arg : arguments)
         {

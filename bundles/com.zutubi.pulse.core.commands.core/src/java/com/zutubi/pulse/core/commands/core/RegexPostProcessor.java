@@ -59,7 +59,7 @@ public class RegexPostProcessor extends LineBasedPostProcessorSupport
         return patterns;
     }
 
-    protected void addErrorRegexs(String... errorRegexs)
+    public void addErrorRegexs(String... errorRegexs)
     {
         for (String errorRegex : errorRegexs)
         {

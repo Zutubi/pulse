@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.commands.maven;
 
 import com.zutubi.pulse.core.commands.core.JUnitSummaryPostProcessor;
 import com.zutubi.pulse.core.commands.core.PostProcessorGroup;
