@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.postprocessors.gcc;
 
 import com.zutubi.pulse.core.postprocessors.PostProcessorTestBase;
 
