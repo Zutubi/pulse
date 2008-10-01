@@ -1,5 +1,6 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.commands.make;
 
+import com.zutubi.pulse.core.RegexPattern;
 import com.zutubi.pulse.core.commands.core.RegexPostProcessor;
 import com.zutubi.pulse.core.model.Feature;
 

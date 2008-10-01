@@ -2068,23 +2068,23 @@
 
       </properties>
 
-      <testcase classname="com.zutubi.pulse.core.MakeCommandTest" name="testBasicDefault" time="0.181"></testcase>
+      <testcase classname="com.zutubi.pulse.core.commands.make.MakeCommandTest" name="testBasicDefault" time="0.181"></testcase>
 
-      <testcase classname="com.zutubi.pulse.core.MakeCommandTest" name="testBasicTargets" time="0.17"></testcase>
+      <testcase classname="com.zutubi.pulse.core.commands.make.MakeCommandTest" name="testBasicTargets" time="0.17"></testcase>
 
-      <testcase classname="com.zutubi.pulse.core.MakeCommandTest" name="testDoubleSpaceTargets" time="0.13"></testcase>
+      <testcase classname="com.zutubi.pulse.core.commands.make.MakeCommandTest" name="testDoubleSpaceTargets" time="0.13"></testcase>
 
-      <testcase classname="com.zutubi.pulse.core.MakeCommandTest" name="testEnvironment" time="0.13"></testcase>
+      <testcase classname="com.zutubi.pulse.core.commands.make.MakeCommandTest" name="testEnvironment" time="0.13"></testcase>
 
-      <testcase classname="com.zutubi.pulse.core.MakeCommandTest" name="testExplicitBuildfile" time="0.1"></testcase>
+      <testcase classname="com.zutubi.pulse.core.commands.make.MakeCommandTest" name="testExplicitBuildfile" time="0.1"></testcase>
 
-      <testcase classname="com.zutubi.pulse.core.MakeCommandTest" name="testExplicitArguments" time="0.141"></testcase>
+      <testcase classname="com.zutubi.pulse.core.commands.make.MakeCommandTest" name="testExplicitArguments" time="0.141"></testcase>
 
-      <testcase classname="com.zutubi.pulse.core.MakeCommandTest" name="testRunNoBuildFile" time="0.11"></testcase>
+      <testcase classname="com.zutubi.pulse.core.commands.make.MakeCommandTest" name="testRunNoBuildFile" time="0.11"></testcase>
 
-      <testcase classname="com.zutubi.pulse.core.MakeCommandTest" name="testRunNonExistantBuildFile" time="0.09"></testcase>
+      <testcase classname="com.zutubi.pulse.core.commands.make.MakeCommandTest" name="testRunNonExistantBuildFile" time="0.09"></testcase>
 
-      <testcase classname="com.zutubi.pulse.core.MakeCommandTest" name="test" time="0.02"></testcase>
+      <testcase classname="com.zutubi.pulse.core.commands.make.MakeCommandTest" name="test" time="0.02"></testcase>
 
       <system-out></system-out>
 
@@ -2297,7 +2297,7 @@
 
       </properties>
 
-      <testcase classname="com.zutubi.pulse.core.MakePostProcessorLoadTest" name="testBasic" time="0.391"></testcase>
+      <testcase classname="com.zutubi.pulse.core.commands.make.MakePostProcessorLoadTest" name="testBasic" time="0.391"></testcase>
 
       <system-out></system-out>
 
@@ -2510,13 +2510,13 @@
 
       </properties>
 
-      <testcase classname="com.zutubi.pulse.core.MakePostProcessorTest" name="testCommandError" time="0.09"></testcase>
+      <testcase classname="com.zutubi.pulse.core.commands.make.MakePostProcessorTest" name="testCommandError" time="0.09"></testcase>
 
-      <testcase classname="com.zutubi.pulse.core.MakePostProcessorTest" name="testNoSuchCommand" time="0.0"></testcase>
+      <testcase classname="com.zutubi.pulse.core.commands.make.MakePostProcessorTest" name="testNoSuchCommand" time="0.0"></testcase>
 
-      <testcase classname="com.zutubi.pulse.core.MakePostProcessorTest" name="testRecursiveError" time="0.01"></testcase>
+      <testcase classname="com.zutubi.pulse.core.commands.make.MakePostProcessorTest" name="testRecursiveError" time="0.01"></testcase>
 
-      <testcase classname="com.zutubi.pulse.core.MakePostProcessorTest" name="testNoSuchMakefile" time="0.01"></testcase>
+      <testcase classname="com.zutubi.pulse.core.commands.make.MakePostProcessorTest" name="testNoSuchMakefile" time="0.01"></testcase>
 
       <system-out></system-out>
 
