@@ -1,6 +1,6 @@
 package com.zutubi.pulse.plugins.update;
 
-import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.pulse.plugins.PluginVersion;
 

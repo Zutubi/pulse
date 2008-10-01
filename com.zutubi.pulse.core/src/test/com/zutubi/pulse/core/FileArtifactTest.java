@@ -2,8 +2,8 @@ package com.zutubi.pulse.core;
 
 import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.pulse.core.test.PulseTestCase;
 
 import java.io.File;
 import java.io.IOException;

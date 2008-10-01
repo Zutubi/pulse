@@ -2,13 +2,13 @@ package com.zutubi.pulse.scheduling;
 
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.UnknownBuildReason;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.scheduling.tasks.BuildProjectTask;
-import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.tove.config.user.UserConfiguration;
 
 import java.io.Serializable;

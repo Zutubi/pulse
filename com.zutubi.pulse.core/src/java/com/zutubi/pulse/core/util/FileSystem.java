@@ -1,4 +1,4 @@
-package com.zutubi.pulse.util;
+package com.zutubi.pulse.core.util;
 
 import java.io.File;
 import java.io.FilenameFilter;

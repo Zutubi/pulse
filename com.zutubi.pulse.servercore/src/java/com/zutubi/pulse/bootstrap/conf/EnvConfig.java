@@ -3,7 +3,7 @@ package com.zutubi.pulse.bootstrap.conf;
 import com.zutubi.pulse.command.PulseCtl;
 import com.zutubi.pulse.config.Config;
 import com.zutubi.pulse.config.ConfigSupport;
-import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.core.util.FileSystemUtils;
 
 /**
  * <class-comment/>

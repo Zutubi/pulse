@@ -1,6 +1,6 @@
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.upgrade.UpgradeException;
 import com.zutubi.tove.type.record.MutableRecordImpl;
 import com.zutubi.tove.type.record.Record;

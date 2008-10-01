@@ -1,6 +1,6 @@
 package com.zutubi.pulse.monitor;
 
-import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.core.test.PulseTestCase;
 
 import java.util.Iterator;
 import java.util.LinkedList;

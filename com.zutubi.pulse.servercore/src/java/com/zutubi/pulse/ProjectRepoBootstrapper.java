@@ -3,7 +3,7 @@ package com.zutubi.pulse;
 import com.zutubi.pulse.core.*;
 import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
-import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.core.util.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;

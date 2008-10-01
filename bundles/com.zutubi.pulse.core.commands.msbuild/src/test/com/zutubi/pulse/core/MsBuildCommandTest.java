@@ -2,7 +2,7 @@ package com.zutubi.pulse.core;
 
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
-import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.util.SystemUtils;
 
 import java.io.File;

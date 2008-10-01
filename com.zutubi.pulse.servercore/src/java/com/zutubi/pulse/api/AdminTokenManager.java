@@ -1,6 +1,6 @@
 package com.zutubi.pulse.api;
 
-import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.logging.Logger;
 

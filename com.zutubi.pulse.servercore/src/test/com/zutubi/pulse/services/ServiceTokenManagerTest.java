@@ -1,8 +1,8 @@
 package com.zutubi.pulse.services;
 
 import com.zutubi.pulse.bootstrap.*;
-import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.mockobjects.dynamic.Mock;
 import com.mockobjects.dynamic.C;
 

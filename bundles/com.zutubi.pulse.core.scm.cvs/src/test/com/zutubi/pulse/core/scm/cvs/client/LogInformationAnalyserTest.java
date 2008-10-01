@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.scm.cvs.CvsRevision;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.ScmException;
-import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.core.test.PulseTestCase;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.CommandException;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;

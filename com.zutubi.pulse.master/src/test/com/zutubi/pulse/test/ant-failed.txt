@@ -128,11 +128,11 @@ common-test:
     [junit] Tests run: 10, Failures: 0, Errors: 0, Time elapsed: 0.14 sec
     [junit] Running com.zutubi.util.CircularBufferTest
     [junit] Tests run: 14, Failures: 0, Errors: 0, Time elapsed: 0.151 sec
-    [junit] Running com.zutubi.pulse.util.FileSystemUtilsTest
+    [junit] Running com.zutubi.pulse.core.util.FileSystemUtilsTest
     [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.091 sec
-    [junit] Running com.zutubi.pulse.util.RemoveDirectoryTest
+    [junit] Running com.zutubi.pulse.core.util.RemoveDirectoryTest
     [junit] Tests run: 6, Failures: 0, Errors: 0, Time elapsed: 0.21 sec
-    [junit] Running com.zutubi.pulse.util.RenameDirectoryTest
+    [junit] Running com.zutubi.pulse.core.util.RenameDirectoryTest
     [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.16 sec
     [junit] Running com.zutubi.util.StringUtilsTest
     [junit] Tests run: 21, Failures: 2, Errors: 0, Time elapsed: 0.13 sec

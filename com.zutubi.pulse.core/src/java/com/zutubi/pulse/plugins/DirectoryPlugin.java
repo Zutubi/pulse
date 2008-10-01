@@ -1,6 +1,6 @@
 package com.zutubi.pulse.plugins;
 
-import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import org.eclipse.osgi.framework.util.Headers;
 import org.osgi.framework.BundleException;

@@ -2,9 +2,9 @@ package com.zutubi.pulse.model.persistence.hibernate;
 
 import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.database.DatabaseConsole;
-import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.logging.Logger;
-import com.zutubi.pulse.util.JDBCUtils;
+import com.zutubi.pulse.core.util.JDBCUtils;
 import org.hibernate.SessionFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.PlatformTransactionManager;

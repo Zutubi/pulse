@@ -4,8 +4,8 @@ import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.database.DatabaseConfig;
 import com.zutubi.pulse.database.DatabaseConsole;
 import com.zutubi.pulse.database.DatabaseConsoleBeanFactory;
-import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.util.JDBCUtils;
+import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.util.JDBCUtils;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.hsqldb.jdbcDriver;
 

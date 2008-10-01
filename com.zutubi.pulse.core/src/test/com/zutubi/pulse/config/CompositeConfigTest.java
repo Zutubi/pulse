@@ -1,6 +1,6 @@
 package com.zutubi.pulse.config;
 
-import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.core.test.PulseTestCase;
 
 /**
  * <class-comment/>

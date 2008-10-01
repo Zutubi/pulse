@@ -1,6 +1,6 @@
 package com.zutubi.pulse.slave;
 
-import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.core.test.PulseTestCase;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Semaphore;

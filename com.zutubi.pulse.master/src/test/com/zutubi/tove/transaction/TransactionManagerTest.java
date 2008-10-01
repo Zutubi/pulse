@@ -1,6 +1,6 @@
 package com.zutubi.tove.transaction;
 
-import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.core.test.PulseTestCase;
 import junit.framework.Assert;
 
 /**

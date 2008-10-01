@@ -1,6 +1,6 @@
 package com.zutubi.tove.type.record;
 
-import com.zutubi.pulse.util.XMLUtils;
+import com.zutubi.pulse.core.util.XMLUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
 import com.zutubi.util.logging.Logger;

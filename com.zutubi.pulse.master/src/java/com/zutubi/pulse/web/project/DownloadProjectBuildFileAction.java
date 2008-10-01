@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.tove.config.project.types.TypeConfiguration;
-import com.zutubi.pulse.util.XMLUtils;
+import com.zutubi.pulse.core.util.XMLUtils;
 import org.hsqldb.lib.StringInputStream;
 
 import java.io.InputStream;

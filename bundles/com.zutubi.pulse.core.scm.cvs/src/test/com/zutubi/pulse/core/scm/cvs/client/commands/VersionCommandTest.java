@@ -2,12 +2,10 @@ package com.zutubi.pulse.core.scm.cvs.client.commands;
 
 import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.cvs.client.CvsCore;
-import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.core.test.PulseTestCase;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.CommandException;
 import org.netbeans.lib.cvsclient.connection.AuthenticationException;
-
-import java.io.File;
 
 public class VersionCommandTest extends PulseTestCase
 {

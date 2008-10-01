@@ -2,7 +2,7 @@ package com.zutubi.tove.config;
 
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.core.config.Configuration;
-import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.Sort;
 
 import java.util.Collections;

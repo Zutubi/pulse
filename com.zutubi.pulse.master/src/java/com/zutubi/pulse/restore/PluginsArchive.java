@@ -1,6 +1,6 @@
 package com.zutubi.pulse.restore;
 
-import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.pulse.plugins.PluginPaths;
 
 import java.io.File;

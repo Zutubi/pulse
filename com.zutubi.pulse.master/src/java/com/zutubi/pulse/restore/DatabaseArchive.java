@@ -8,7 +8,7 @@ import com.zutubi.pulse.transfer.TransferAPI;
 import com.zutubi.pulse.transfer.TransferException;
 import com.zutubi.pulse.transfer.TransferListener;
 import com.zutubi.pulse.hibernate.MutableConfiguration;
-import com.zutubi.pulse.util.JDBCUtils;
+import com.zutubi.pulse.core.util.JDBCUtils;
 import com.zutubi.util.io.IOUtils;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;

@@ -1,13 +1,13 @@
 package com.zutubi.pulse.bootstrap;
 
 import com.zutubi.pulse.Version;
+import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.config.Config;
 import com.zutubi.pulse.config.FileConfig;
 import com.zutubi.pulse.database.DatabaseConsole;
 import com.zutubi.pulse.database.HSQLDBUtils;
-import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.ZipUtils;
+import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 

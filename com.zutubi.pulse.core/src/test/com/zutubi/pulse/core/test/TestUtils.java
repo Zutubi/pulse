@@ -1,4 +1,4 @@
-package com.zutubi.pulse.test;
+package com.zutubi.pulse.core.test;
 
 import com.zutubi.pulse.Version;
 import com.zutubi.util.TextUtils;
@@ -8,7 +8,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 /**
- * <class comment/>
  */
 public class TestUtils
 {

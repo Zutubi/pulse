@@ -1,9 +1,9 @@
-package com.zutubi.pulse.util;
+package com.zutubi.pulse.core.util;
 
 import java.io.File;
 import java.io.IOException;
 
-import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.core.test.PulseTestCase;
 
 /**
  * Test case for the rename functionality of the FileSystemUtils.

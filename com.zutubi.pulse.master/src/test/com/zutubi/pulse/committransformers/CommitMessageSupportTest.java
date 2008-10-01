@@ -1,6 +1,6 @@
 package com.zutubi.pulse.committransformers;
 
-import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.tove.config.project.commit.CommitMessageTransformerConfiguration;
 import com.zutubi.pulse.tove.config.project.commit.LinkTransformerConfiguration;
 

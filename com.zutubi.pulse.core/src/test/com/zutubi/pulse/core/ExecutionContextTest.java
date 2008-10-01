@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core;
 
 import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_INTERNAL;
-import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.core.test.PulseTestCase;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

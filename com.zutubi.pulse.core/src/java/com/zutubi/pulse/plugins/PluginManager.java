@@ -3,7 +3,7 @@ package com.zutubi.pulse.plugins;
 import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.plugins.osgi.Equinox;
 import com.zutubi.pulse.plugins.osgi.OSGiFramework;
-import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.util.*;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;

@@ -3,7 +3,7 @@ package com.zutubi.pulse.xwork.dispatcher;
 import com.opensymphony.webwork.ServletActionContext;
 import com.opensymphony.xwork.MockActionInvocation;
 import com.opensymphony.xwork.util.OgnlValueStack;
-import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.web.ActionSupport;
 import com.mockobjects.servlet.MockHttpServletResponse;
 

@@ -1,4 +1,4 @@
-package com.zutubi.pulse.util;
+package com.zutubi.pulse.core.util;
 
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.StringUtils;

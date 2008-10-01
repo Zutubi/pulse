@@ -5,11 +5,11 @@ import com.zutubi.pulse.monitor.JobRunner;
 import com.zutubi.pulse.monitor.Monitor;
 import com.zutubi.pulse.monitor.TaskException;
 import com.zutubi.pulse.monitor.TaskFeedback;
-import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.transfer.TransferException;
 import com.zutubi.pulse.hibernate.HibernateUtils;
 import com.zutubi.pulse.hibernate.MutableConfiguration;
-import com.zutubi.pulse.util.JDBCUtils;
+import com.zutubi.pulse.core.util.JDBCUtils;
 import nu.xom.ParsingException;
 
 import javax.sql.DataSource;

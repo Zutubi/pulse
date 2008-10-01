@@ -1,11 +1,11 @@
 package com.zutubi.pulse.personal;
 
 import com.zutubi.pulse.core.PulseException;
+import com.zutubi.pulse.core.util.ZipUtils;
+import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.pulse.core.scm.FileStatus;
 import com.zutubi.pulse.core.scm.WorkingCopyStatus;
-import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.ZipUtils;
+import com.zutubi.pulse.core.test.PulseTestCase;
 
 import java.io.File;
 import java.io.IOException;

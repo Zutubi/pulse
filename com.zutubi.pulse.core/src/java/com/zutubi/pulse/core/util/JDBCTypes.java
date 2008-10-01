@@ -1,4 +1,4 @@
-package com.zutubi.pulse.util;
+package com.zutubi.pulse.core.util;
 
 import java.sql.Types;
 import java.lang.reflect.Field;

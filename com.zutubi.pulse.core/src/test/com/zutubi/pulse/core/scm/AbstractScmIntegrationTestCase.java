@@ -13,7 +13,7 @@ import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.ExecutionContext;
-import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 
 /**

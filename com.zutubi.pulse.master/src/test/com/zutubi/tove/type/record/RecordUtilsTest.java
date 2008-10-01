@@ -1,6 +1,6 @@
 package com.zutubi.tove.type.record;
 
-import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.core.test.PulseTestCase;
 
 public class RecordUtilsTest extends PulseTestCase
 {

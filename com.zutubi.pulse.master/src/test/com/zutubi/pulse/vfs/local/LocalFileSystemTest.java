@@ -1,11 +1,8 @@
 package com.zutubi.pulse.vfs.local;
 
-import com.zutubi.pulse.test.PulseTestCase;
-import org.apache.commons.vfs.FileObject;
+import com.zutubi.pulse.core.test.PulseTestCase;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.impl.DefaultFileSystemManager;
-
-import java.io.File;
 
 /**
  *

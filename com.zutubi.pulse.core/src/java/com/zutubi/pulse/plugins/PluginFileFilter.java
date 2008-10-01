@@ -1,7 +1,7 @@
 package com.zutubi.pulse.plugins;
 
 import com.zutubi.util.io.IOUtils;
-import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.core.util.FileSystemUtils;
 
 import java.io.FileFilter;
 import java.io.File;

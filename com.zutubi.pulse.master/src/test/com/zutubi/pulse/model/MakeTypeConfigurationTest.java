@@ -2,7 +2,7 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.tove.config.project.types.MakeTypeConfiguration;
 import com.zutubi.pulse.tove.config.project.types.TemplateTypeConfiguration;
-import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.core.util.FileSystemUtils;
 
 /**
  */

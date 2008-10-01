@@ -1,6 +1,6 @@
 package com.zutubi.pulse.transfer.jdbc;
 
-import com.zutubi.pulse.util.JDBCUtils;
+import com.zutubi.pulse.core.util.JDBCUtils;
 import com.zutubi.pulse.transfer.TransferSource;
 import com.zutubi.pulse.transfer.TransferTarget;
 import com.zutubi.pulse.transfer.TransferException;

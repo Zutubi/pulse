@@ -1,7 +1,7 @@
 package com.zutubi.pulse.database;
 
 import com.zutubi.util.io.IOUtils;
-import com.zutubi.pulse.util.JDBCUtils;
+import com.zutubi.pulse.core.util.JDBCUtils;
 import com.zutubi.util.logging.Logger;
 
 import javax.sql.DataSource;

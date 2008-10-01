@@ -2,17 +2,13 @@ package com.zutubi.pulse.acceptance;
 
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.AfterSuite;
-import org.testng.annotations.Test;
 import com.zutubi.pulse.acceptance.support.PulsePackage;
 import com.zutubi.pulse.acceptance.support.Pulse;
 import com.zutubi.pulse.acceptance.support.JythonPackageFactory;
-import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.TextUtils;
 
-import javax.script.ScriptException;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import junit.extensions.TestSetup;

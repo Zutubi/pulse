@@ -4,7 +4,7 @@ import com.zutubi.util.TextUtils;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.io.TempFileInputStream;
-import com.zutubi.pulse.util.ZipUtils;
+import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.pulse.vfs.pulse.AbstractPulseFileObject;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;

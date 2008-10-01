@@ -1,6 +1,6 @@
 package com.zutubi.pulse.hibernate;
 
-import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.core.test.PulseTestCase;
 
 import java.util.Arrays;
 import java.io.IOException;

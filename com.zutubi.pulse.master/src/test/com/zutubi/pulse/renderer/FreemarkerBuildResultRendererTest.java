@@ -2,7 +2,7 @@ package com.zutubi.pulse.renderer;
 
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.model.*;
-import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.tove.config.user.UserConfiguration;
 import com.zutubi.pulse.webwork.mapping.Urls;

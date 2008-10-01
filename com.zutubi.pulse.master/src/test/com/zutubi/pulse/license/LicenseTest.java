@@ -1,6 +1,6 @@
 package com.zutubi.pulse.license;
 
-import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.core.test.PulseTestCase;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

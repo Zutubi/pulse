@@ -1,7 +1,7 @@
 package com.zutubi.pulse.restore;
 
-import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.ZipUtils;
+import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.util.RandomUtils;
 
 import java.io.File;

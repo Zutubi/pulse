@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.scm.AbstractScmIntegrationTestCase;
 import com.zutubi.pulse.core.scm.ExpectedTestResults;
 import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.util.ZipUtils;
+import com.zutubi.pulse.core.util.ZipUtils;
 
 import java.util.List;
 import java.util.LinkedList;

@@ -4,7 +4,7 @@ import com.zutubi.pulse.bootstrap.SystemPaths;
 import com.zutubi.pulse.committransformers.CommitMessageSupport;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import freemarker.template.Configuration;

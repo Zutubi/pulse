@@ -1,6 +1,6 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.pulse.filesystem.File;
 import com.zutubi.pulse.filesystem.FileSystem;
 import com.zutubi.pulse.filesystem.FileSystemException;

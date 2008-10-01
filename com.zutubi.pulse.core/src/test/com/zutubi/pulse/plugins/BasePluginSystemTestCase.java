@@ -1,7 +1,7 @@
 package com.zutubi.pulse.plugins;
 
-import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.util.FileSystemUtils;
 import org.eclipse.core.internal.registry.osgi.OSGIUtils;
 
 import java.io.File;

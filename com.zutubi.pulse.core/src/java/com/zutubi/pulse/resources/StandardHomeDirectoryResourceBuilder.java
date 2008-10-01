@@ -1,11 +1,11 @@
 package com.zutubi.pulse.resources;
 
 import com.zutubi.pulse.core.FileLoadException;
+import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.config.ResourceVersion;
 import static com.zutubi.pulse.resources.StandardHomeDirectoryConstants.*;
-import com.zutubi.pulse.util.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.upgrade.tasks;
 
 import com.zutubi.pulse.upgrade.UpgradeTask;
-import com.zutubi.pulse.util.JDBCUtils;
+import com.zutubi.pulse.core.util.JDBCUtils;
 
 import java.sql.SQLException;
 import java.util.LinkedList;

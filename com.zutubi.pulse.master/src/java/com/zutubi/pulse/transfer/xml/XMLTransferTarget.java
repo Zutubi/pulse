@@ -1,6 +1,6 @@
 package com.zutubi.pulse.transfer.xml;
 
-import com.zutubi.pulse.util.JDBCTypes;
+import com.zutubi.pulse.core.util.JDBCTypes;
 import com.zutubi.pulse.transfer.TransferTarget;
 import com.zutubi.pulse.transfer.xml.ProxySerializer;
 import com.zutubi.pulse.transfer.Table;

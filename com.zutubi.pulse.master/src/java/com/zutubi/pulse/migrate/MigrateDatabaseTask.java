@@ -11,7 +11,7 @@ import com.zutubi.pulse.transfer.TransferException;
 import com.zutubi.pulse.transfer.TransferListener;
 import com.zutubi.pulse.transfer.jdbc.HibernateUniqueKeyTable;
 import com.zutubi.pulse.hibernate.MutableConfiguration;
-import com.zutubi.pulse.util.JDBCUtils;
+import com.zutubi.pulse.core.util.JDBCUtils;
 import org.hibernate.cfg.Configuration;
 
 import javax.sql.DataSource;

@@ -1,13 +1,13 @@
 package com.zutubi.pulse.transfer;
 
 import com.zutubi.pulse.Version;
+import com.zutubi.pulse.core.util.JDBCUtils;
 import com.zutubi.pulse.transfer.jdbc.HibernateTransferException;
 import com.zutubi.pulse.transfer.jdbc.HibernateTransferSource;
 import com.zutubi.pulse.transfer.jdbc.HibernateTransferTarget;
 import com.zutubi.pulse.transfer.jdbc.MappingUtils;
 import com.zutubi.pulse.transfer.xml.XMLTransferSource;
 import com.zutubi.pulse.transfer.xml.XMLTransferTarget;
-import com.zutubi.pulse.util.JDBCUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.UnaryProcedure;

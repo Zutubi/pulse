@@ -2,13 +2,13 @@ package com.zutubi.pulse.cleanup.config;
 
 import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.pulse.core.model.ResultState;
+import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.TriggerBuildReason;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
 import com.zutubi.pulse.model.persistence.ProjectDao;
 import com.zutubi.pulse.model.persistence.hibernate.MasterPersistenceTestCase;
-import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.util.Constants;
 
 import java.util.Arrays;

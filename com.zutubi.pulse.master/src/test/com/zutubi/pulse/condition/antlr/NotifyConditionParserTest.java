@@ -4,7 +4,7 @@ import antlr.MismatchedTokenException;
 import antlr.collections.AST;
 import com.zutubi.pulse.condition.*;
 import com.zutubi.pulse.core.PulseRuntimeException;
-import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.validation.validators.SubscriptionConditionValidator;
 import com.zutubi.util.bean.DefaultObjectFactory;
 

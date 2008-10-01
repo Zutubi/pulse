@@ -2,10 +2,10 @@ package com.zutubi.tove.config;
 
 import com.zutubi.events.DefaultEventManager;
 import com.zutubi.pulse.core.config.Configuration;
+import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.security.GlobalAuthorityProvider;
 import com.zutubi.pulse.security.PulseThreadFactory;
-import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.tove.config.cleanup.ConfigurationCleanupManager;
 import com.zutubi.tove.security.Actor;
 import com.zutubi.tove.security.ActorProvider;

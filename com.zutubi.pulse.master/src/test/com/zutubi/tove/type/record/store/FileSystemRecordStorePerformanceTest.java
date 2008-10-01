@@ -1,6 +1,6 @@
 package com.zutubi.tove.type.record.store;
 
-import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.tove.transaction.UserTransaction;
 import com.zutubi.tove.type.record.Record;

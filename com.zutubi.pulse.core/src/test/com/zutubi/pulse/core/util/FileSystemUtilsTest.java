@@ -1,6 +1,6 @@
-package com.zutubi.pulse.util;
+package com.zutubi.pulse.core.util;
 
-import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.SystemUtils;
 

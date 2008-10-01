@@ -1,4 +1,4 @@
-package com.zutubi.pulse.util;
+package com.zutubi.pulse.core.util;
 
 import com.opensymphony.util.TextUtils;
 import com.zutubi.util.io.IOUtils;

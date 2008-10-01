@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.model.persistence.ProjectDao;
 import com.zutubi.pulse.model.persistence.mock.MockEntityDao;
-import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.tove.config.user.UserConfiguration;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;

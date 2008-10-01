@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.model;
 
-import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.XMLUtils;
+import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.pulse.core.util.XMLUtils;
 import com.zutubi.util.logging.Logger;
 import nu.xom.*;
 import org.apache.commons.codec.binary.Base64;

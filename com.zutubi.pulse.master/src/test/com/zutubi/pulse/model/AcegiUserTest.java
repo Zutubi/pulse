@@ -1,6 +1,6 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.tove.config.group.BuiltinGroupConfiguration;
 import com.zutubi.pulse.tove.config.group.GroupConfiguration;
 import com.zutubi.pulse.tove.config.group.ServerPermission;

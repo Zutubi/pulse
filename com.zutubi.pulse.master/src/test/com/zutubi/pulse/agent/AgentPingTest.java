@@ -3,8 +3,8 @@ package com.zutubi.pulse.agent;
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
 import com.zutubi.pulse.AgentService;
+import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.services.SlaveStatus;
-import com.zutubi.pulse.test.PulseTestCase;
 import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
 
 /**

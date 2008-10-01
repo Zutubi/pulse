@@ -10,7 +10,7 @@ import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.master.scm.ScmContextFactory;
 import com.zutubi.pulse.core.scm.ScmContext;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
-import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.tove.config.project.BuildOptionsConfiguration;
 import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 

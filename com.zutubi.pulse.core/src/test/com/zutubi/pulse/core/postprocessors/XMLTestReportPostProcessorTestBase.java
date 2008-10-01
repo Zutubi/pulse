@@ -3,7 +3,7 @@ package com.zutubi.pulse.core.postprocessors;
 import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.core.test.PulseTestCase;
 
 import java.io.File;
 

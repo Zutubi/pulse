@@ -1,6 +1,6 @@
 package com.zutubi.pulse.security;
 
-import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.core.test.PulseTestCase;
 import org.acegisecurity.providers.encoding.Md5PasswordEncoder;
 
 /**

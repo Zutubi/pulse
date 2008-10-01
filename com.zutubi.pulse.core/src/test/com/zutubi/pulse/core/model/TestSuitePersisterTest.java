@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.model;
 
-import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.util.FileSystemUtils;
 import nu.xom.ParsingException;
 
 import java.io.File;

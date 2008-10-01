@@ -3,7 +3,7 @@ package com.zutubi.pulse.transfer;
 import com.zutubi.pulse.database.DatabaseConfig;
 import com.zutubi.pulse.hibernate.HibernateUtils;
 import com.zutubi.pulse.hibernate.MutableConfiguration;
-import com.zutubi.pulse.util.JDBCUtils;
+import com.zutubi.pulse.core.util.JDBCUtils;
 import junit.framework.TestCase;
 import nu.xom.ParsingException;
 

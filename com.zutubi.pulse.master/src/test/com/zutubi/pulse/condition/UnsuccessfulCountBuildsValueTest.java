@@ -6,7 +6,7 @@ import com.mockobjects.dynamic.FullConstraintMatcher;
 import com.mockobjects.dynamic.Mock;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.model.*;
-import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.core.test.PulseTestCase;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.hibernate;
 
-import com.zutubi.pulse.util.JDBCUtils;
+import com.zutubi.pulse.core.util.JDBCUtils;
 import org.hibernate.cfg.Environment;
 import org.hibernate.dialect.Dialect;
 

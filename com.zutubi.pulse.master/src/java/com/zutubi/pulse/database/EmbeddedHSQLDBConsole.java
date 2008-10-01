@@ -2,7 +2,7 @@ package com.zutubi.pulse.database;
 
 import com.zutubi.pulse.hibernate.MutableConfiguration;
 import com.zutubi.pulse.hibernate.SchemaRefactor;
-import com.zutubi.pulse.util.JDBCUtils;
+import com.zutubi.pulse.core.util.JDBCUtils;
 import com.zutubi.util.logging.Logger;
 import org.apache.commons.dbcp.BasicDataSource;
 

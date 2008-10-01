@@ -1,15 +1,15 @@
 package com.zutubi.pulse.core.scm.git;
 
 import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.scm.RecordingScmEventHandler;
 import com.zutubi.pulse.core.scm.ScmContext;
 import com.zutubi.pulse.core.scm.ScmException;
-import com.zutubi.pulse.test.PulseTestCase;
-import com.zutubi.pulse.util.FileSystemUtils;
-import com.zutubi.pulse.util.ZipUtils;
+import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;

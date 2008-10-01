@@ -1,6 +1,6 @@
 package com.zutubi.pulse.plugins;
 
-import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.core.util.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;

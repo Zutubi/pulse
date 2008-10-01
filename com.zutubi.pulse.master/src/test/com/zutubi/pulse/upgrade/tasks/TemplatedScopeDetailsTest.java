@@ -1,7 +1,7 @@
 package com.zutubi.pulse.upgrade.tasks;
 
 import com.zutubi.pulse.core.PulseRuntimeException;
-import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.tove.type.record.*;
 import com.zutubi.tove.type.record.store.InMemoryRecordStore;

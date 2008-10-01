@@ -2,7 +2,7 @@ package com.zutubi.pulse.tove.config.project;
 
 import com.zutubi.pulse.AgentService;
 import com.zutubi.pulse.RecipeAssignmentRequest;
-import com.zutubi.pulse.test.PulseTestCase;
+import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.stub;

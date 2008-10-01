@@ -4,7 +4,7 @@ import com.zutubi.pulse.bootstrap.Data;
 import com.zutubi.pulse.monitor.JobManager;
 import com.zutubi.pulse.monitor.Monitor;
 import com.zutubi.pulse.monitor.Task;
-import com.zutubi.pulse.util.FileSystemUtils;
+import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
