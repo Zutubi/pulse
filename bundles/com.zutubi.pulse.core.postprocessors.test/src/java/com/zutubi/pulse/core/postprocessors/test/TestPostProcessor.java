@@ -1,5 +1,7 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.postprocessors.test;
 
+import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.SelfReference;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
