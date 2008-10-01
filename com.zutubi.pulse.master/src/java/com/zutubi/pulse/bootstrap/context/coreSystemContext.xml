@@ -10,7 +10,7 @@
     </bean>
 
     <import resource="classpath:/com/zutubi/pulse/bootstrap/context/loggingContext.xml"/>
-    <import resource="classpath:/com/zutubi/pulse/bootstrap/context/eventContext.xml"/>
+    <import resource="classpath:/com/zutubi/pulse/core/bootstrap/context/eventContext.xml"/>
     <!--<import resource="classpath:/com/zutubi/pulse/bootstrap/context/webserverContext.xml"/>-->
 
     <bean id="jobManager" class="com.zutubi.pulse.monitor.JobManager"></bean>

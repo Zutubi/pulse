@@ -20,7 +20,7 @@
                 <value>classpath:/com/zutubi/pulse/bootstrap/context/recordContext.xml</value>
                 <value>classpath:/com/zutubi/pulse/bootstrap/context/hibernateContext.xml</value>
                 <value>classpath:/com/zutubi/pulse/bootstrap/context/cacheContext.xml</value>
-                <value>classpath:/com/zutubi/pulse/bootstrap/context/pluginContext.xml</value>
+                <value>classpath:/com/zutubi/pulse/core/bootstrap/context/pluginContext.xml</value>
             </list>
         </property>
         <property name="restoreContexts">

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
-    <import resource="classpath:/com/zutubi/pulse/bootstrap/context/eventContext.xml"/>
-    <import resource="classpath:/com/zutubi/pulse/bootstrap/context/pluginContext.xml"/>
+    <import resource="classpath:/com/zutubi/pulse/core/bootstrap/context/eventContext.xml"/>
+    <import resource="classpath:/com/zutubi/pulse/core/bootstrap/context/pluginContext.xml"/>
 
     <bean id="configRoot" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
         <property name="targetBeanName">
