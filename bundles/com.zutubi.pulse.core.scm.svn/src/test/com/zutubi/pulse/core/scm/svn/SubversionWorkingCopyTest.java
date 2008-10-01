@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.scm.svn;
 
-import com.zutubi.pulse.config.PropertiesConfig;
+import com.zutubi.pulse.core.util.config.PropertiesConfig;
 import com.zutubi.pulse.core.scm.FileStatus;
 import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.WorkingCopyStatus;

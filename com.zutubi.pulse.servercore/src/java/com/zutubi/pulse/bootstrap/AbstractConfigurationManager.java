@@ -1,7 +1,7 @@
 package com.zutubi.pulse.bootstrap;
 
 import com.zutubi.pulse.bootstrap.conf.EnvConfig;
-import com.zutubi.pulse.config.PropertiesConfig;
+import com.zutubi.pulse.core.util.config.PropertiesConfig;
 
 import java.io.File;
 

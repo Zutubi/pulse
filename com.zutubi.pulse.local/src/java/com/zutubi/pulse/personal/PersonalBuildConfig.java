@@ -1,7 +1,7 @@
 package com.zutubi.pulse.personal;
 
-import com.zutubi.pulse.config.*;
 import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.pulse.core.util.config.*;
 
 import java.io.File;
 

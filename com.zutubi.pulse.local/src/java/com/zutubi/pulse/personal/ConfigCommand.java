@@ -2,7 +2,7 @@ package com.zutubi.pulse.personal;
 
 import com.zutubi.pulse.command.BootContext;
 import com.zutubi.pulse.command.Command;
-import com.zutubi.pulse.config.PropertiesConfig;
+import com.zutubi.pulse.core.util.config.PropertiesConfig;
 import com.zutubi.pulse.xmlrpc.PulseXmlRpcClient;
 import com.zutubi.pulse.xmlrpc.PulseXmlRpcException;
 import org.apache.commons.cli.*;

@@ -1,4 +1,4 @@
-package com.zutubi.pulse.config;
+package com.zutubi.pulse.core.util.config;
 
 import org.apache.commons.cli.CommandLine;
 

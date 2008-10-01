@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.scm.p4;
 
-import com.zutubi.pulse.config.Config;
-import com.zutubi.pulse.config.ConfigSupport;
+import com.zutubi.pulse.core.util.config.Config;
+import com.zutubi.pulse.core.util.config.ConfigSupport;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.NumericalRevision;
 import com.zutubi.pulse.core.scm.ScmException;

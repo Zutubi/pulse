@@ -1,6 +1,6 @@
 package com.zutubi.pulse.bootstrap.conf;
 
-import com.zutubi.pulse.config.Config;
+import com.zutubi.pulse.core.util.config.Config;
 
 import java.util.Properties;
 

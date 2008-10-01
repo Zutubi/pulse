@@ -1,4 +1,4 @@
-package com.zutubi.pulse.config;
+package com.zutubi.pulse.core.util.config;
 
 /**
  *

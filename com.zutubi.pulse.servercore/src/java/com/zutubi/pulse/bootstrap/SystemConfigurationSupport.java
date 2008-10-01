@@ -1,9 +1,9 @@
 package com.zutubi.pulse.bootstrap;
 
 import com.zutubi.util.TextUtils;
-import com.zutubi.pulse.config.CompositeConfig;
-import com.zutubi.pulse.config.Config;
-import com.zutubi.pulse.config.ConfigSupport;
+import com.zutubi.pulse.core.util.config.CompositeConfig;
+import com.zutubi.pulse.core.util.config.Config;
+import com.zutubi.pulse.core.util.config.ConfigSupport;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
