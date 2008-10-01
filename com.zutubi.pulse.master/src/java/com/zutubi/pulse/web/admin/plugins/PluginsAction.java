@@ -1,11 +1,11 @@
 package com.zutubi.pulse.web.admin.plugins;
 
-import com.zutubi.pulse.plugins.Plugin;
+import com.zutubi.pulse.core.plugins.Plugin;
 
-import java.util.List;
+import java.text.Collator;
 import java.util.Collections;
 import java.util.Comparator;
-import java.text.Collator;
+import java.util.List;
 
 /**
  An action showing for the administration > plugins page.

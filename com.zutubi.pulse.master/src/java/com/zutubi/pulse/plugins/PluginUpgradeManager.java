@@ -1,15 +1,12 @@
 package com.zutubi.pulse.plugins;
 
+import com.zutubi.pulse.core.plugins.*;
 import com.zutubi.pulse.upgrade.UpgradeTask;
 import com.zutubi.pulse.upgrade.UpgradeableComponent;
 import com.zutubi.pulse.upgrade.UpgradeableComponentSource;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
-import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IContributor;
-import org.eclipse.core.runtime.IExtension;
-import org.eclipse.core.runtime.IExtensionPoint;
-import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.*;
 
 import java.io.IOException;
 import java.util.HashMap;

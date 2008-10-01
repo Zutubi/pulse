@@ -62,7 +62,7 @@ public class ProcessControl
         if (homePath == null)
         {
             // Development version?
-            dll = new File("core/etc/pulse.dll");
+            dll = new File("com.zutubi.pulse.core/etc/pulse.dll");
         }
         else
         {

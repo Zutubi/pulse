@@ -1,10 +1,10 @@
 package com.zutubi.pulse.vfs.pulse;
 
+import com.zutubi.pulse.core.plugins.Plugin;
 import org.apache.commons.vfs.FileName;
-import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
-import com.zutubi.pulse.plugins.Plugin;
 
 /**
  * Represents a single plugin.  Selection shows a detailed view of the plugin.

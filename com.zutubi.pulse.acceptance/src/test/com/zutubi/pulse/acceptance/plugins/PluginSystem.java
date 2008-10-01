@@ -4,11 +4,7 @@ import com.zutubi.pulse.acceptance.support.JythonPackageFactory;
 import com.zutubi.pulse.acceptance.support.PackageFactory;
 import com.zutubi.pulse.acceptance.support.Pulse;
 import com.zutubi.pulse.acceptance.support.PulsePackage;
-import com.zutubi.pulse.plugins.ConfigurablePluginPaths;
-import com.zutubi.pulse.plugins.PluginManager;
-import com.zutubi.pulse.plugins.PluginPaths;
-import com.zutubi.pulse.plugins.Plugin;
-import com.zutubi.pulse.plugins.PluginException;
+import com.zutubi.pulse.core.plugins.*;
 import org.eclipse.core.internal.registry.osgi.OSGIUtils;
 
 import java.io.File;

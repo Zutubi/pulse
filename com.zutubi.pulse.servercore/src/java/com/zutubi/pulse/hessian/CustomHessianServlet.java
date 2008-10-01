@@ -4,10 +4,10 @@ import com.caucho.hessian.io.HessianInput;
 import com.caucho.hessian.io.HessianOutput;
 import com.caucho.hessian.io.SerializerFactory;
 import com.caucho.hessian.server.HessianSkeleton;
-import com.zutubi.pulse.plugins.PluginManager;
+import com.zutubi.pulse.core.hessian.HessianConfigurationExtensionManager;
+import com.zutubi.pulse.core.plugins.PluginManager;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.core.spring.SpringObjectFactory;
-import com.zutubi.pulse.core.hessian.HessianConfigurationExtensionManager;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 

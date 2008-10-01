@@ -2,20 +2,12 @@ package com.zutubi.pulse.core.plugins;
 
 import com.zutubi.pulse.core.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.postprocessors.PostProcessor;
-import com.zutubi.pulse.plugins.AbstractExtensionManager;
-import com.zutubi.pulse.plugins.ConfigUtils;
-import com.zutubi.pulse.plugins.PluginManager;
 import com.zutubi.util.logging.Logger;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
-import java.util.LinkedList;
+import java.util.*;
 
 /**
  * Extension manager for managing post-processors (e.g. JUnit report

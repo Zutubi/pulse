@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.hessian;
 
-import com.zutubi.pulse.plugins.AbstractExtensionManager;
+import com.zutubi.pulse.core.plugins.AbstractExtensionManager;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;

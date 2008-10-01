@@ -1,6 +1,6 @@
 package com.zutubi.pulse.bootstrap;
 
-import com.zutubi.pulse.plugins.PluginPaths;
+import com.zutubi.pulse.core.plugins.PluginPaths;
 
 import java.io.File;
 

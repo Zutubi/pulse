@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web.admin.plugins;
 
+import com.zutubi.pulse.core.plugins.PluginManager;
 import com.zutubi.pulse.web.ActionSupport;
-import com.zutubi.pulse.plugins.PluginManager;
 
 /**
  * <class comment/>

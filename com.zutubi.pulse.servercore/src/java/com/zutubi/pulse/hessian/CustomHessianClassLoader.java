@@ -1,7 +1,7 @@
 package com.zutubi.pulse.hessian;
 
-import com.zutubi.pulse.plugins.PluginManager;
 import com.zutubi.pulse.core.hessian.HessianConfigurationExtensionManager;
+import com.zutubi.pulse.core.plugins.PluginManager;
 
 import java.security.SecureClassLoader;
 

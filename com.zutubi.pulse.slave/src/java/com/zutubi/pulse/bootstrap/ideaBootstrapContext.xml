@@ -40,7 +40,7 @@
         </property>
     </bean>
 
-    <bean id="pluginPaths" class="com.zutubi.pulse.plugins.ConfigurablePluginPaths">
+    <bean id="pluginPaths" class="com.zutubi.pulse.core.plugins.ConfigurablePluginPaths">
         <property name="internalPluginStorageString" value="plugins/internal"/>
         <property name="osgiConfigurationString" value="com.zutubi.pulse.master/etc/osgi"/>
         <property name="pluginRegistryString" value="plugins"/>

@@ -1,8 +1,6 @@
 package com.zutubi.pulse.core.plugins;
 
 import com.zutubi.pulse.core.PulseFileLoaderFactory;
-import com.zutubi.pulse.plugins.AbstractExtensionManager;
-import com.zutubi.pulse.plugins.PluginManager;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;

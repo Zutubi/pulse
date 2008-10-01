@@ -1,15 +1,15 @@
 package com.zutubi.pulse.acceptance.plugins;
 
-import com.zutubi.pulse.plugins.Plugin;
-import com.zutubi.pulse.plugins.PluginManagerTest;
-import com.zutubi.pulse.plugins.PluginPaths;
-import com.zutubi.pulse.plugins.PluginRegistryEntry;
-import com.zutubi.pulse.plugins.PluginUpgradeManager;
+import com.zutubi.pulse.core.plugins.Plugin;
+import com.zutubi.pulse.core.plugins.PluginManagerTest;
+import com.zutubi.pulse.core.plugins.PluginPaths;
+import com.zutubi.pulse.core.plugins.PluginRegistryEntry;
 import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.pulse.plugins.PluginUpgradeManager;
 import com.zutubi.pulse.upgrade.DefaultUpgradeManager;
 import com.zutubi.pulse.upgrade.UpgradeTask;
 import com.zutubi.pulse.upgrade.UpgradeableComponent;
-import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.bean.ObjectFactory;
 import org.testng.annotations.AfterMethod;
@@ -56,7 +56,7 @@ public class PluginUpgradeManagerAcceptanceTest extends PulseTestCase
         pluginSystem = new PluginSystem(pkgFile, tmpDir);
         paths = pluginSystem.getPluginPaths();
 
-        File bundleDir = new File(getPulseRoot(), FileSystemUtils.composeFilename("com.zutubi.pulse.core", "src", "test", "com", "zutubi", "pulse", "plugins", "test-bundles"));
+        File bundleDir = new File(getPulseRoot(), FileSystemUtils.composeFilename("com.zutubi.pulse.core", "src", "test", "com", "zutubi", "pulse", "core", "plugins", "test-bundles"));
         producer1 = new File(bundleDir, "com.zutubi.bundles.producer_1.0.0.jar");
         producer2 = new File(bundleDir, "com.zutubi.bundles.producer_2.0.0.jar");
         producer3 = new File(bundleDir, "com.zutubi.bundles.producer_3.0.0.jar");

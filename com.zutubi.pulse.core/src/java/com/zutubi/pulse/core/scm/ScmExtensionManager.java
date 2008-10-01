@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.scm;
 
+import com.zutubi.pulse.core.plugins.AbstractExtensionManager;
+import com.zutubi.pulse.core.plugins.PluginManager;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
-import com.zutubi.pulse.plugins.AbstractExtensionManager;
-import com.zutubi.pulse.plugins.PluginManager;
 import com.zutubi.util.logging.Logger;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;

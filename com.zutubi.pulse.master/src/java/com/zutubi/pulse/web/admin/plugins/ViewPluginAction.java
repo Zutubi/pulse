@@ -1,8 +1,8 @@
 package com.zutubi.pulse.web.admin.plugins;
 
-import com.zutubi.pulse.plugins.LocalPlugin;
-import com.zutubi.pulse.plugins.Plugin;
-import com.zutubi.pulse.plugins.PluginDependency;
+import com.zutubi.pulse.core.plugins.LocalPlugin;
+import com.zutubi.pulse.core.plugins.Plugin;
+import com.zutubi.pulse.core.plugins.PluginDependency;
 import com.zutubi.pulse.web.LookupErrorException;
 
 import java.util.List;
