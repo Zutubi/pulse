@@ -1,4 +1,7 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.postprocessors.cppunit;
+
+import com.zutubi.pulse.core.FileLoaderTestBase;
+import com.zutubi.pulse.core.PulseException;
 
 /**
  */
