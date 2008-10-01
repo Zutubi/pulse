@@ -5,6 +5,7 @@ import com.zutubi.pulse.Version;
 import com.zutubi.pulse.agent.PingStatus;
 import com.zutubi.pulse.bootstrap.StartupManager;
 import com.zutubi.pulse.core.RecipeRequest;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.filesystem.FileInfo;
 import com.zutubi.pulse.logging.CustomLogRecord;
@@ -14,7 +15,6 @@ import com.zutubi.pulse.services.*;
 import com.zutubi.pulse.slave.command.CleanupRecipeCommand;
 import com.zutubi.pulse.slave.command.RecipeCommand;
 import com.zutubi.pulse.slave.command.UpdateCommand;
-import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 

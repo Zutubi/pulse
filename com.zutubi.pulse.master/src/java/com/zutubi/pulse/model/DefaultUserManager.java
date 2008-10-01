@@ -9,7 +9,7 @@ import com.zutubi.pulse.license.LicenseManager;
 import com.zutubi.pulse.license.authorisation.AddUserAuthorisation;
 import com.zutubi.pulse.model.persistence.UserDao;
 import com.zutubi.pulse.security.ldap.LdapManager;
-import com.zutubi.pulse.spring.SpringComponentContext;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.tove.config.group.AbstractGroupConfiguration;
 import com.zutubi.pulse.tove.config.group.BuiltinGroupConfiguration;
 import com.zutubi.pulse.tove.config.group.GroupConfiguration;

@@ -1,7 +1,7 @@
 package com.zutubi.tove.webwork;
 
 import com.opensymphony.xwork.ActionContext;
-import com.zutubi.pulse.spring.SpringComponentContext;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.config.ConfigurationCheckHandler;
 import com.zutubi.tove.config.ConfigurationReferenceManager;

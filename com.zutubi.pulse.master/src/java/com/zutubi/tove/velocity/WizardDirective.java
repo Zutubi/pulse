@@ -3,7 +3,7 @@ package com.zutubi.tove.velocity;
 import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.spring.SpringComponentContext;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.bootstrap.freemarker.FreemarkerConfigurationFactoryBean;
 import com.zutubi.pulse.velocity.AbstractDirective;
 import com.zutubi.tove.FormDescriptorFactory;

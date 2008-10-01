@@ -1,6 +1,6 @@
 package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.zutubi.pulse.spring.SpringComponentContext;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.model.persistence.ArtifactDao;

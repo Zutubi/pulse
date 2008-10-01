@@ -6,9 +6,9 @@ import com.zutubi.pulse.bootstrap.conf.VolatileReadOnlyConfig;
 import com.zutubi.pulse.core.util.config.Config;
 import com.zutubi.pulse.core.util.config.FileConfig;
 import com.zutubi.pulse.core.events.DataDirectoryChangedEvent;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.database.DatabaseConfig;
 import com.zutubi.pulse.database.DriverRegistry;
-import com.zutubi.pulse.spring.SpringComponentContext;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.io.IOUtils;
 

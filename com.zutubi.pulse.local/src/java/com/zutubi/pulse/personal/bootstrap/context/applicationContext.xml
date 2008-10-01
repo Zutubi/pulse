@@ -4,5 +4,5 @@
     <import resource="classpath:/com/zutubi/pulse/bootstrap/context/pluginContext.xml"/>
 
     <bean id="fileLoaderFactory" class="com.zutubi.pulse.core.PulseFileLoaderFactory" autowire="byName"/>
-    <bean id="objectFactory" class="com.zutubi.pulse.spring.SpringObjectFactory"/>
+    <bean id="objectFactory" class="com.zutubi.pulse.core.spring.SpringObjectFactory"/>
 </beans>

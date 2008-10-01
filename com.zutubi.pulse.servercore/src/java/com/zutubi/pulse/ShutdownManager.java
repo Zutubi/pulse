@@ -1,6 +1,6 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.spring.SpringComponentContext;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.core.Stoppable;
 import com.zutubi.util.logging.Logger;
 

@@ -2,7 +2,7 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.agent.MasterLocationProvider;
 import com.zutubi.pulse.agent.PingStatus;
-import com.zutubi.pulse.spring.SpringComponentContext;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.StartupManager;
 import com.zutubi.pulse.core.BuildException;

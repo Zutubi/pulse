@@ -4,7 +4,7 @@
 
 -->
 <beans>
-    <bean id="objectFactory" class="com.zutubi.pulse.spring.SpringObjectFactory"/>
+    <bean id="objectFactory" class="com.zutubi.pulse.core.spring.SpringObjectFactory"/>
 
     <bean id="shutdownManager" class="com.zutubi.pulse.ShutdownManager">
     </bean>

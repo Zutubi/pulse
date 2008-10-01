@@ -1,7 +1,7 @@
 package com.zutubi.tove.table;
 
 import com.zutubi.config.annotations.Format;
-import com.zutubi.pulse.spring.SpringComponentContext;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.tove.ColumnFormatter;
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.type.CompositeType;

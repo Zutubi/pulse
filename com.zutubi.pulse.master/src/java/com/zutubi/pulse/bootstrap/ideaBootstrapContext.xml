@@ -61,7 +61,7 @@
         <property name="pluginWorkString" value="plugins/work"/>
     </bean>
 
-    <bean id="objectFactory" class="com.zutubi.pulse.spring.SpringObjectFactory"/>
+    <bean id="objectFactory" class="com.zutubi.pulse.core.spring.SpringObjectFactory"/>
 
     <!-- TODO: Do we still require this here? We dont really need it until the webapp is up... -->
     <bean id="xworkObjectFactory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>

@@ -1,4 +1,4 @@
-package com.zutubi.pulse.spring;
+package com.zutubi.pulse.core.spring;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;

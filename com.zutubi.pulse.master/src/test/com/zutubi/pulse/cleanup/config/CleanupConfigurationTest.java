@@ -1,6 +1,6 @@
 package com.zutubi.pulse.cleanup.config;
 
-import com.zutubi.pulse.spring.SpringComponentContext;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.model.BuildResult;

@@ -2,6 +2,7 @@ package com.zutubi.pulse.spring;
 
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.bean.ObjectFactory;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
 
 import javax.servlet.*;
 import java.io.IOException;

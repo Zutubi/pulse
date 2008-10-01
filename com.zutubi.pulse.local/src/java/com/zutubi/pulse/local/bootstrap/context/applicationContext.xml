@@ -8,7 +8,7 @@
 
     <bean id="fileLoaderFactory" class="com.zutubi.pulse.core.PulseFileLoaderFactory" autowire="byName"/>
 
-    <bean id="objectFactory" class="com.zutubi.pulse.spring.SpringObjectFactory"/>
+    <bean id="objectFactory" class="com.zutubi.pulse.core.spring.SpringObjectFactory"/>
 
     <bean id="localBuild" class="com.zutubi.pulse.local.LocalBuild" autowire="byName"/>
 </beans>

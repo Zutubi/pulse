@@ -10,7 +10,7 @@ import com.zutubi.pulse.services.InvalidTokenException;
 import com.zutubi.pulse.services.MasterService;
 import com.zutubi.pulse.services.ServiceTokenManager;
 import com.zutubi.pulse.services.UpgradeStatus;
-import com.zutubi.pulse.spring.SpringComponentContext;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
 
 import java.util.List;
 

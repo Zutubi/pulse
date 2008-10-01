@@ -1,6 +1,6 @@
 package com.zutubi.pulse.dev.bootstrap;
 
-import com.zutubi.pulse.spring.SpringComponentContext;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.plugins.PluginManager;
 
 import java.io.File;

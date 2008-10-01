@@ -3,7 +3,7 @@ package com.zutubi.pulse.tove.config.user;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.Password;
 import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.pulse.spring.SpringComponentContext;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.validation.Validateable;

@@ -56,7 +56,7 @@
         </property>
     </bean>
 
-    <bean name="objectFactory" class="com.zutubi.pulse.spring.SpringObjectFactory"/>
+    <bean name="objectFactory" class="com.zutubi.pulse.core.spring.SpringObjectFactory"/>
 
     <bean id="eventManager" class="com.zutubi.events.DefaultEventManager">
         <constructor-arg index="0" ref="eventDispatcher"/>

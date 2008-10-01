@@ -1,6 +1,6 @@
 package com.zutubi.pulse.model.persistence.hibernate;
 
-import com.zutubi.pulse.spring.SpringComponentContext;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.database.DatabaseConsole;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.logging.Logger;

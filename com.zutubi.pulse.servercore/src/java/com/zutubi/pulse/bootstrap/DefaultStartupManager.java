@@ -4,7 +4,7 @@ import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.util.config.ConfigSupport;
 import com.zutubi.pulse.core.util.config.FileConfig;
 import com.zutubi.pulse.events.system.SystemStartedEvent;
-import com.zutubi.pulse.spring.SpringComponentContext;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 

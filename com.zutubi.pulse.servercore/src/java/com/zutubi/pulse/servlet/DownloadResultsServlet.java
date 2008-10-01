@@ -1,7 +1,7 @@
 package com.zutubi.pulse.servlet;
 
 import com.zutubi.pulse.ServerRecipePaths;
-import com.zutubi.pulse.spring.SpringComponentContext;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.services.InvalidTokenException;
 import com.zutubi.pulse.services.ServiceTokenManager;

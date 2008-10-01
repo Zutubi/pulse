@@ -1,6 +1,6 @@
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.pulse.spring.SpringComponentContext;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.database.DatabaseConfig;
 import com.zutubi.pulse.database.DatabaseConsole;
 import com.zutubi.pulse.database.DatabaseConsoleBeanFactory;

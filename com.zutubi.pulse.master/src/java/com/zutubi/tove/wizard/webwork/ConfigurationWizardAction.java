@@ -2,7 +2,7 @@ package com.zutubi.tove.wizard.webwork;
 
 import com.opensymphony.xwork.ActionContext;
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.spring.SpringComponentContext;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.type.CollectionType;

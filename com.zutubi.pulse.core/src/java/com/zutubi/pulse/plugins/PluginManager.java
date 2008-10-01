@@ -1,6 +1,6 @@
 package com.zutubi.pulse.plugins;
 
-import com.zutubi.pulse.spring.SpringComponentContext;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.plugins.osgi.Equinox;
 import com.zutubi.pulse.plugins.osgi.OSGiFramework;
 import com.zutubi.pulse.core.util.FileSystemUtils;

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.transfer;
 
-import com.zutubi.pulse.spring.SpringComponentContext;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.transfer.jdbc.HibernateTransferSource;
 import com.zutubi.pulse.transfer.jdbc.HibernateTransferTarget;
 import com.zutubi.pulse.hibernate.MutableConfiguration;

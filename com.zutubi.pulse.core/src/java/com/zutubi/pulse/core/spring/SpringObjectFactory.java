@@ -1,4 +1,4 @@
-package com.zutubi.pulse.spring;
+package com.zutubi.pulse.core.spring;
 
 import com.zutubi.util.bean.DefaultObjectFactory;
 

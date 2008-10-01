@@ -2,7 +2,7 @@ package com.zutubi.pulse.bootstrap;
 
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.util.FileSystemUtils;
-import com.zutubi.pulse.spring.SpringComponentContext;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.core.util.config.Config;
 import com.zutubi.pulse.core.util.config.FileConfig;
 import com.zutubi.pulse.database.DatabaseConsole;

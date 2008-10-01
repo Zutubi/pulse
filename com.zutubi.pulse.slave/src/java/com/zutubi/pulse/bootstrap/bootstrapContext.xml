@@ -26,6 +26,6 @@
         </property>
     </bean>
     
-    <bean id="objectFactory" class="com.zutubi.pulse.spring.SpringObjectFactory"/>
+    <bean id="objectFactory" class="com.zutubi.pulse.core.spring.SpringObjectFactory"/>
 
 </beans>

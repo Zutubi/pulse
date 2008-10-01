@@ -2,7 +2,7 @@ package com.zutubi.pulse.servlet;
 
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.spring.SpringComponentContext;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;

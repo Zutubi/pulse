@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.core.BuildException;
-import com.zutubi.pulse.spring.SpringComponentContext;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.tove.config.project.types.TypeConfiguration;
 import com.zutubi.pulse.core.util.XMLUtils;

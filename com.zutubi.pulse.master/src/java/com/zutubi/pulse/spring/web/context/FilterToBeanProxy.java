@@ -4,7 +4,7 @@ import org.springframework.context.ApplicationContext;
 
 import javax.servlet.FilterConfig;
 
-import com.zutubi.pulse.spring.SpringComponentContext;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
 
 /**
  * <class-comment/>

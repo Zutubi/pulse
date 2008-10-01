@@ -1,7 +1,7 @@
 package com.zutubi.pulse.servlet;
 
 import com.zutubi.util.TextUtils;
-import com.zutubi.pulse.spring.SpringComponentContext;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import com.zutubi.pulse.vfs.pulse.AbstractPulseFileObject;

@@ -14,7 +14,7 @@ import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.UserManager;
 import com.zutubi.pulse.security.AcegiUtils;
-import com.zutubi.pulse.spring.SpringComponentContext;
+import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.webwork.mapping.Urls;
 import com.zutubi.tove.config.ConfigurationProvider;
