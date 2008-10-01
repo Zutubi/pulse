@@ -100,7 +100,7 @@ public class RegexPattern
         return exclusion;
     }
 
-    List<ExpressionElement> getExclusions()
+    public List<ExpressionElement> getExclusions()
     {
         return exclusions;
     }

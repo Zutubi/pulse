@@ -1,5 +1,7 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.commands.maven2;
 
+import com.zutubi.pulse.core.ExpressionElement;
+import com.zutubi.pulse.core.RegexPattern;
 import com.zutubi.pulse.core.commands.core.JUnitSummaryPostProcessor;
 import com.zutubi.pulse.core.commands.core.PostProcessorGroup;
 import com.zutubi.pulse.core.commands.core.RegexPostProcessor;

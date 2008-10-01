@@ -1,4 +1,8 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.commands.maven2;
+
+import com.zutubi.pulse.core.ExpressionElement;
+import com.zutubi.pulse.core.FileLoaderTestBase;
+import com.zutubi.pulse.core.PulseException;
 
 import java.util.List;
 

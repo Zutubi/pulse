@@ -1,5 +1,6 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.commands.maven2;
 
+import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.commands.core.ExecutableCommandTestBase;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.Feature;

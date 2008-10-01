@@ -1,5 +1,7 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.commands.maven2;
 
+import com.zutubi.pulse.core.FileLoaderTestBase;
+import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.commands.core.RegexPostProcessor;
 
 /**
