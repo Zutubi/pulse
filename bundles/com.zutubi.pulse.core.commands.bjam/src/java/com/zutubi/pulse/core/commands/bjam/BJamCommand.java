@@ -1,5 +1,7 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.commands.bjam;
 
+import com.zutubi.pulse.core.ExecutableCommand;
+import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
 

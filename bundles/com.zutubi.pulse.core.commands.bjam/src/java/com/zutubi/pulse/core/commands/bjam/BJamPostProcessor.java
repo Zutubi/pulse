@@ -1,4 +1,6 @@
-package com.zutubi.pulse.core;
+package com.zutubi.pulse.core.commands.bjam;
+
+import com.zutubi.pulse.core.RegexPostProcessor;
 
 /**
  * A post processor that looks for error messages from Boost Jam (bjam).

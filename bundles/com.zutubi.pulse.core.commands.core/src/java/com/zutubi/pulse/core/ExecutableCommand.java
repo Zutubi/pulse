@@ -33,7 +33,7 @@ public class ExecutableCommand extends CommandSupport implements Validateable
     static final String ENV_ARTIFACT_NAME = "environment";
     static final String ENV_FILENAME = "env.txt";
 
-    static final String OUTPUT_ARTIFACT_NAME = "command output";
+    public static final String OUTPUT_ARTIFACT_NAME = "command output";
     static final String OUTPUT_FILENAME = "output.txt";
 
     private String exe;
