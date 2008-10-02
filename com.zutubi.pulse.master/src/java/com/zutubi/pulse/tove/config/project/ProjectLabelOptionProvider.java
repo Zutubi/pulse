@@ -1,7 +1,7 @@
 package com.zutubi.pulse.tove.config.project;
 
-import com.zutubi.pulse.model.ProjectGroup;
-import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.master.model.ProjectGroup;
+import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.tove.ListOptionProvider;
 import com.zutubi.tove.type.TypeProperty;
 import com.zutubi.util.CollectionUtils;

@@ -1,8 +1,8 @@
 package com.zutubi.pulse.web;
 
-import com.zutubi.pulse.license.License;
-import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.master.agent.AgentManager;
+import com.zutubi.pulse.master.license.License;
+import com.zutubi.pulse.master.license.LicenseHolder;
 
 import java.util.LinkedList;
 

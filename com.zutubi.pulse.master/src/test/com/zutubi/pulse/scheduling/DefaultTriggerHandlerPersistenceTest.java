@@ -1,8 +1,8 @@
 package com.zutubi.pulse.scheduling;
 
 import com.zutubi.pulse.core.spring.SpringComponentContext;
-import com.zutubi.pulse.model.persistence.TriggerDao;
-import com.zutubi.pulse.model.persistence.hibernate.PersistenceTestCase;
+import com.zutubi.pulse.master.model.persistence.TriggerDao;
+import com.zutubi.pulse.master.model.persistence.hibernate.PersistenceTestCase;
 
 /**
  * <class-comment/>

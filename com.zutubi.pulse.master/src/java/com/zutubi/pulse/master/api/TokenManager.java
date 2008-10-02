@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.api;
 
-import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.servercore.api.AuthenticationException;
 
 /**

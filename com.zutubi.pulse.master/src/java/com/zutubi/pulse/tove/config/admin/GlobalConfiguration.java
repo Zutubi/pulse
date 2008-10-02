@@ -5,8 +5,8 @@ import com.zutubi.config.annotations.ControllingCheckbox;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
-import com.zutubi.pulse.jabber.config.JabberConfiguration;
-import com.zutubi.pulse.license.config.LicenseConfiguration;
+import com.zutubi.pulse.master.jabber.config.JabberConfiguration;
+import com.zutubi.pulse.master.license.config.LicenseConfiguration;
 import com.zutubi.pulse.restore.BackupConfiguration;
 import com.zutubi.util.TextUtils;
 

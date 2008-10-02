@@ -1,6 +1,6 @@
 package com.zutubi.pulse.velocity;
 
-import com.zutubi.pulse.license.LicenseHolder;
+import com.zutubi.pulse.master.license.LicenseHolder;
 
 import java.util.Arrays;
 

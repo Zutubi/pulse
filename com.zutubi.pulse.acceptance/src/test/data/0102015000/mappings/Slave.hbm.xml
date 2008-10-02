@@ -2,7 +2,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
 <hibernate-mapping>
 
-    <class name="com.zutubi.pulse.model.Slave" table="SLAVE" lazy="false">
+    <class name="com.zutubi.pulse.master.model.Slave" table="SLAVE" lazy="false">
 
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
@@ -18,7 +18,7 @@
         
         <bag name="resources" cascade="all,delete-orphan" lazy="false">
             <key column="SLAVE_ID"/>
-            <one-to-many class="com.zutubi.pulse.model.PersistentResource"/>
+            <one-to-many class="com.zutubi.pulse.master.model.PersistentResource"/>
         </bag>
 
     </class>

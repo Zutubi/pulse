@@ -3,7 +3,7 @@ package com.zutubi.pulse.master.events.build;
 import com.zutubi.events.Event;
 import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.model.Result;
-import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.master.model.BuildResult;
 
 /**
  */

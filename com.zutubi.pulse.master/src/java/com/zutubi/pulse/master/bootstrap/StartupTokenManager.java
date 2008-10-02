@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.bootstrap;
 
 import com.zutubi.pulse.master.api.TokenManager;
-import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.servercore.api.AdminTokenManager;
 import com.zutubi.pulse.servercore.api.AuthenticationException;
 

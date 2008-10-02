@@ -1,7 +1,7 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.master.events.build.AbstractBuildRequestEvent;
-import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.master.model.Project;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;
 import static org.mockito.Matchers.anyBoolean;

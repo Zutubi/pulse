@@ -2,7 +2,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
 <hibernate-mapping>
 
-    <class name="com.zutubi.pulse.model.BuildSpecification" table="BUILD_SPECIFICATION" lazy="false">
+    <class name="com.zutubi.pulse.master.model.BuildSpecification" table="BUILD_SPECIFICATION" lazy="false">
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>
@@ -21,7 +21,7 @@
 
         <property name="prompt" column="PROMPT" type="boolean"/>
 
-        <many-to-one name="root" class="com.zutubi.pulse.model.BuildSpecificationNode"
+        <many-to-one name="root" class="com.zutubi.pulse.master.model.BuildSpecificationNode"
                      column="ROOT_ID" cascade="all" lazy="false"/>
 
         <bag name="properties" cascade="all,delete-orphan" lazy="false">
@@ -30,16 +30,16 @@
         </bag>
     </class>
 
-    <class name="com.zutubi.pulse.model.BuildSpecificationNode" table="BUILD_SPECIFICATION_NODE" lazy="false">
+    <class name="com.zutubi.pulse.master.model.BuildSpecificationNode" table="BUILD_SPECIFICATION_NODE" lazy="false">
 
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>
 
-        <component name="stage" class="com.zutubi.pulse.model.BuildStage">
+        <component name="stage" class="com.zutubi.pulse.master.model.BuildStage">
             <many-to-one name="pname" column="PNAME" class="com.zutubi.pulse.core.model.PersistentName" cascade="save-update" lazy="false"/>
 
-            <many-to-one name="hostRequirements" class="com.zutubi.pulse.model.AbstractBuildHostRequirements"
+            <many-to-one name="hostRequirements" class="com.zutubi.pulse.master.model.AbstractBuildHostRequirements"
                          column="BUILD_HOST_REQUIREMENTS_ID"
                          cascade="all" unique="true"/>
 
@@ -56,13 +56,13 @@
 
         <bag name="postActions" cascade="all,delete-orphan" lazy="false">
             <key column="SPECIFICATION_NODE_ID"/>
-            <one-to-many class="com.zutubi.pulse.model.PostBuildAction"/>
+            <one-to-many class="com.zutubi.pulse.master.model.PostBuildAction"/>
         </bag>
 
         <list name="children" cascade="all,delete-orphan" lazy="false">
             <key column="PARENT_ID"/>
             <index column="ORDINAL"/>
-            <one-to-many class="com.zutubi.pulse.model.BuildSpecificationNode"/>
+            <one-to-many class="com.zutubi.pulse.master.model.BuildSpecificationNode"/>
         </list>
     </class>
 
@@ -74,7 +74,7 @@
         <property name="name" type="string" column="NAME"/>
     </class>
 
-    <class name="com.zutubi.pulse.model.AbstractBuildHostRequirements" table="BUILD_HOST_REQUIREMENTS" lazy="false">
+    <class name="com.zutubi.pulse.master.model.AbstractBuildHostRequirements" table="BUILD_HOST_REQUIREMENTS" lazy="false">
 
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
@@ -82,12 +82,12 @@
 
         <discriminator column="REQUIREMENTS_TYPE" type="string" length="63"/>
 
-        <subclass name="com.zutubi.pulse.model.AnyCapableBuildHostRequirements" discriminator-value="ANY_CAPABLE"/>
+        <subclass name="com.zutubi.pulse.master.model.AnyCapableBuildHostRequirements" discriminator-value="ANY_CAPABLE"/>
 
-        <subclass name="com.zutubi.pulse.model.MasterBuildHostRequirements" discriminator-value="MASTER"/>
+        <subclass name="com.zutubi.pulse.master.model.MasterBuildHostRequirements" discriminator-value="MASTER"/>
 
-        <subclass name="com.zutubi.pulse.model.SlaveBuildHostRequirements" discriminator-value="SLAVE">
-            <many-to-one name="slave" class="com.zutubi.pulse.model.Slave" cascade="none"/>
+        <subclass name="com.zutubi.pulse.master.model.SlaveBuildHostRequirements" discriminator-value="SLAVE">
+            <many-to-one name="slave" class="com.zutubi.pulse.master.model.Slave" cascade="none"/>
         </subclass>
     </class>
 

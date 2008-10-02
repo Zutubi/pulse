@@ -2,10 +2,10 @@ package com.zutubi.pulse.master.api;
 
 import com.mockobjects.dynamic.Mock;
 import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.pulse.model.AcegiUser;
-import com.zutubi.pulse.model.GrantedAuthority;
-import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.model.UserManager;
+import com.zutubi.pulse.master.model.AcegiUser;
+import com.zutubi.pulse.master.model.GrantedAuthority;
+import com.zutubi.pulse.master.model.User;
+import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.servercore.api.AuthenticationException;
 import com.zutubi.pulse.tove.config.group.ServerPermission;
 import com.zutubi.pulse.tove.config.user.UserConfiguration;

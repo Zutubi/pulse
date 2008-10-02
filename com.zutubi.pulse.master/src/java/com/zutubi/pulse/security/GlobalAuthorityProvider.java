@@ -4,7 +4,7 @@ import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.master.events.system.ConfigurationEventSystemStartedEvent;
-import com.zutubi.pulse.model.GrantedAuthority;
+import com.zutubi.pulse.master.model.GrantedAuthority;
 import com.zutubi.pulse.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.tove.config.group.ServerPermission;
 import com.zutubi.tove.config.ConfigurationProvider;

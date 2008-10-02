@@ -13,7 +13,7 @@ import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.master.events.*;
 import com.zutubi.pulse.master.events.build.*;
-import com.zutubi.pulse.model.AgentState;
+import com.zutubi.pulse.master.model.AgentState;
 import com.zutubi.pulse.servercore.agent.PingStatus;
 import com.zutubi.pulse.servercore.agent.Status;
 import com.zutubi.pulse.servercore.services.SlaveStatus;

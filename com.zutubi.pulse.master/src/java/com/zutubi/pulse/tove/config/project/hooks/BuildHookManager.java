@@ -12,10 +12,10 @@ import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.events.build.BuildEvent;
 import com.zutubi.pulse.master.events.build.StageEvent;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.RecipeResultNode;
-import com.zutubi.pulse.model.persistence.hibernate.HibernateBuildResultDao;
+import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.master.model.RecipeResultNode;
+import com.zutubi.pulse.master.model.persistence.hibernate.HibernateBuildResultDao;
 import com.zutubi.util.UnaryProcedure;
 import com.zutubi.util.io.IOUtils;
 

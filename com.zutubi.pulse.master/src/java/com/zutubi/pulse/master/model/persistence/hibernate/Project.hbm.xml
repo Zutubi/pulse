@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+<hibernate-mapping>
+    <class name="com.zutubi.pulse.master.model.Project" table="PROJECT" lazy="false">
+        <cache usage="read-write"/>
+
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="stateName" column="STATE" type="string" length="31"/>
+
+        <bag name="forceCleanAgents" table="FORCE_CLEAN_AGENTS" lazy="false" cascade="save-update">
+ 	        <key column="PROJECT_ID"/>
+            <many-to-many class="com.zutubi.pulse.master.model.AgentState" column="AGENT_ID"/>
+ 	    </bag>
+
+        <property name="nextBuildNumber" column="NEXT_BUILD_NUMBER" type="long"/>
+
+        <property name="buildCount" type="int">
+            <column name="BUILD_COUNT" default="0"/>
+        </property>
+        <property name="successCount" type="int">
+            <column name="SUCCESS_COUNT" default="0"/>
+        </property>
+
+        <property name="lastPollTime" column="LAST_POLL_TIME" type="long"/>
+    </class>
+</hibernate-mapping>

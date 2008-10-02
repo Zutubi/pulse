@@ -15,7 +15,7 @@
         </property>
     </bean>
 
-    <bean id="buildManagerTarget" class="com.zutubi.pulse.model.DefaultBuildManager" autowire="byName"
+    <bean id="buildManagerTarget" class="com.zutubi.pulse.master.model.DefaultBuildManager" autowire="byName"
           init-method="init"/>
     <bean id="buildManager" class="org.springframework.aop.framework.ProxyFactoryBean">
         <property name="target">
@@ -29,7 +29,7 @@
         </property>
     </bean>
 
-    <bean id="projectManagerTarget" class="com.zutubi.pulse.model.DefaultProjectManager" autowire="byName"/>
+    <bean id="projectManagerTarget" class="com.zutubi.pulse.master.model.DefaultProjectManager" autowire="byName"/>
     <bean id="projectManager" class="org.springframework.aop.framework.ProxyFactoryBean">
         <property name="target">
             <ref bean="projectManagerTarget"/>
@@ -42,7 +42,7 @@
         </property>
     </bean>
 
-    <bean id="resourceManagerTarget" class="com.zutubi.pulse.model.DefaultResourceManager" autowire="byName"/>
+    <bean id="resourceManagerTarget" class="com.zutubi.pulse.master.model.DefaultResourceManager" autowire="byName"/>
     <bean id="resourceManager" class="org.springframework.aop.framework.ProxyFactoryBean">
         <property name="target">
             <ref bean="resourceManagerTarget"/>
@@ -54,7 +54,7 @@
         </property>
     </bean>
 
-    <bean id="agentStateManagerTarget" class="com.zutubi.pulse.model.DefaultAgentStateManager" autowire="byName"
+    <bean id="agentStateManagerTarget" class="com.zutubi.pulse.master.model.DefaultAgentStateManager" autowire="byName"
           init-method="init"/>
     <bean id="agentStateManager" class="org.springframework.aop.framework.ProxyFactoryBean">
         <property name="target">
@@ -67,9 +67,9 @@
         </property>
     </bean>
 
-    <bean id="scmManager" class="com.zutubi.pulse.model.DefaultScmManager" autowire="byName" init-method="init" destroy-method="shutdown"/>
+    <bean id="scmManager" class="com.zutubi.pulse.master.model.DefaultScmManager" autowire="byName" init-method="init" destroy-method="shutdown"/>
 
-    <bean id="testManagerTarget" class="com.zutubi.pulse.model.DefaultTestManager" autowire="byName"/>
+    <bean id="testManagerTarget" class="com.zutubi.pulse.master.model.DefaultTestManager" autowire="byName"/>
     <bean id="testManager" class="org.springframework.aop.framework.ProxyFactoryBean">
         <property name="target">
             <ref bean="testManagerTarget"/>
@@ -183,9 +183,9 @@
         </property>
     </bean>
 
-    <bean id="jabberManager" class="com.zutubi.pulse.jabber.JabberManager" autowire="byName"/>
+    <bean id="jabberManager" class="com.zutubi.pulse.master.jabber.JabberManager" autowire="byName"/>
 
-    <bean id="licenseMonitor" class="com.zutubi.pulse.license.LicenseMonitor" autowire="byName" init-method="init"/>
+    <bean id="licenseMonitor" class="com.zutubi.pulse.master.license.LicenseMonitor" autowire="byName" init-method="init"/>
 
     <bean id="postProcessorManager" class="com.zutubi.pulse.DefaultPostProcessorManager" autowire="byName"/>
 

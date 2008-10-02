@@ -3,8 +3,8 @@ package com.zutubi.pulse.tove.config.project.hooks;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
 import com.zutubi.pulse.master.events.build.BuildEvent;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.RecipeResultNode;
+import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.model.RecipeResultNode;
 
 /**
  * A build hook is a task that runs on the Pulse master at some point during

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.tove.config.user;
 
-import com.zutubi.pulse.model.BuildManager;
-import com.zutubi.pulse.model.UserManager;
+import com.zutubi.pulse.master.model.BuildManager;
+import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.tove.config.cleanup.RecordCleanupTask;
 
 import java.util.Arrays;

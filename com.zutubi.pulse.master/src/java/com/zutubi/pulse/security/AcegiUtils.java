@@ -1,7 +1,7 @@
 package com.zutubi.pulse.security;
 
-import com.zutubi.pulse.model.AcegiUser;
-import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.master.model.AcegiUser;
+import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.tove.config.group.ServerPermission;
 import com.zutubi.pulse.tove.config.user.UserConfiguration;
 import com.zutubi.tove.security.Actor;
@@ -80,7 +80,7 @@ public class AcegiUtils
      * user.
      *
      * @param runnable the task to run
-     * @see #runAsUser(com.zutubi.pulse.model.AcegiUser,Runnable)
+     * @see #runAsUser(com.zutubi.pulse.master.model.AcegiUser,Runnable)
      */
     public static void runAsSystem(Runnable runnable)
     {

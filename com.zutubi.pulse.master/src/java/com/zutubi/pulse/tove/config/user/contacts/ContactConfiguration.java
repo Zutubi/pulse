@@ -5,7 +5,7 @@ import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.config.annotations.Table;
 import com.zutubi.config.annotations.Transient;
 import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
-import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.master.model.BuildResult;
 
 /**
  * Base for all contact points, establishes the minimal contract they must

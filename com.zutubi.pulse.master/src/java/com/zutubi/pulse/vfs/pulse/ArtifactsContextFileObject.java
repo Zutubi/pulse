@@ -1,7 +1,7 @@
 package com.zutubi.pulse.vfs.pulse;
 
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.RecipeResultNode;
+import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.web.vfs.DirectoryComparator;
 import com.zutubi.util.StringUtils;
 import org.apache.commons.vfs.FileName;

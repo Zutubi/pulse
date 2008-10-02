@@ -57,7 +57,7 @@ This context requires:
     </bean>
 
 
-    <bean id="anyTypeDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateAnyTypeDao">
+    <bean id="anyTypeDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateAnyTypeDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>
@@ -77,7 +77,7 @@ This context requires:
     </bean>
 
 
-    <bean id="artifactDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateArtifactDao">
+    <bean id="artifactDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateArtifactDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>
@@ -96,7 +96,7 @@ This context requires:
         </property>
     </bean>
 
-    <bean id="buildResultDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateBuildResultDao">
+    <bean id="buildResultDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateBuildResultDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>
@@ -115,7 +115,7 @@ This context requires:
         </property>
     </bean>
 
-    <bean id="changelistDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateChangelistDao">
+    <bean id="changelistDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateChangelistDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>
@@ -134,7 +134,7 @@ This context requires:
         </property>
     </bean>
 
-    <bean id="fileArtifactDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateFileArtifactDao">
+    <bean id="fileArtifactDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateFileArtifactDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>
@@ -154,7 +154,7 @@ This context requires:
     </bean>
 
 
-    <bean id="projectDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateProjectDao">
+    <bean id="projectDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateProjectDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>
@@ -173,7 +173,7 @@ This context requires:
         </property>
     </bean>
 
-    <bean id="testCaseIndexDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateTestCaseIndexDao">
+    <bean id="testCaseIndexDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateTestCaseIndexDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>
@@ -192,7 +192,7 @@ This context requires:
         </property>
     </bean>
 
-    <bean id="agentStateDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateAgentStateDao">
+    <bean id="agentStateDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateAgentStateDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>
@@ -211,7 +211,7 @@ This context requires:
         </property>
     </bean>
 
-    <bean id="triggerDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateTriggerDao">
+    <bean id="triggerDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateTriggerDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>
@@ -231,7 +231,7 @@ This context requires:
         </property>
     </bean>
 
-    <bean id="userDaoTarget" class="com.zutubi.pulse.model.persistence.hibernate.HibernateUserDao">
+    <bean id="userDaoTarget" class="com.zutubi.pulse.master.model.persistence.hibernate.HibernateUserDao">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>

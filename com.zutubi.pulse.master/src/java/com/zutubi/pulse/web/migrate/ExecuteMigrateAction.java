@@ -1,6 +1,5 @@
 package com.zutubi.pulse.web.migrate;
 
-import com.zutubi.pulse.migrate.MigrationManager;
 import com.zutubi.pulse.monitor.Monitor;
 
 /**

@@ -7,8 +7,8 @@ import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.master.events.build.BuildEvent;
 import com.zutubi.pulse.master.events.build.PostBuildEvent;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.RecipeResultNode;
+import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.model.RecipeResultNode;
 
 import java.util.LinkedList;
 import java.util.List;

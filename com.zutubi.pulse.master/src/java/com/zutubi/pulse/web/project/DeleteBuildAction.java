@@ -1,6 +1,6 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.master.model.BuildResult;
 
 /**
  * Used to manually delete a build result from the web UI.

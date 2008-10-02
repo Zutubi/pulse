@@ -4,7 +4,7 @@ import com.zutubi.config.annotations.Classification;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.Select;
 import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.tove.config.ConfigurationProvider;
 
 /**

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.search;
 
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.master.model.Project;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Expression;
 import org.hibernate.criterion.Order;

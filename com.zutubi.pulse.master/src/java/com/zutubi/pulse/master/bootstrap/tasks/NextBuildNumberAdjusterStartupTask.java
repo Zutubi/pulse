@@ -2,8 +2,8 @@ package com.zutubi.pulse.master.bootstrap.tasks;
 
 import com.zutubi.pulse.MasterBuildPaths;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.servercore.bootstrap.StartupTask;
 import com.zutubi.util.logging.Logger;
 

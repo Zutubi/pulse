@@ -1,6 +1,6 @@
 package com.zutubi.pulse.web.user;
 
-import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.tove.config.user.UserPreferencesConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.util.TextUtils;

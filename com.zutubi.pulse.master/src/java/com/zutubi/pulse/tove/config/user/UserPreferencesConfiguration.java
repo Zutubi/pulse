@@ -2,7 +2,7 @@ package com.zutubi.pulse.tove.config.user;
 
 import com.zutubi.config.annotations.*;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
-import com.zutubi.pulse.model.BuildColumns;
+import com.zutubi.pulse.master.model.BuildColumns;
 import com.zutubi.pulse.tove.config.user.contacts.ContactConfiguration;
 import com.zutubi.pulse.web.DefaultAction;
 import com.zutubi.util.StringUtils;

@@ -6,7 +6,7 @@ import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.master.events.AgentOnlineEvent;
 import com.zutubi.pulse.master.events.AgentResourcesDiscoveredEvent;
-import com.zutubi.pulse.model.ResourceManager;
+import com.zutubi.pulse.master.model.ResourceManager;
 import com.zutubi.util.logging.Logger;
 
 import java.util.List;

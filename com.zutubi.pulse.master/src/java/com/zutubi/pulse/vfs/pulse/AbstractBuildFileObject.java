@@ -1,7 +1,7 @@
 package com.zutubi.pulse.vfs.pulse;
 
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.tove.security.AccessManager;

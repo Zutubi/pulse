@@ -2,7 +2,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
 <hibernate-mapping>
 
-    <class name="com.zutubi.pulse.model.Project" table="PROJECT" lazy="false">
+    <class name="com.zutubi.pulse.master.model.Project" table="PROJECT" lazy="false">
         <cache usage="read-write"/>
 
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
@@ -17,43 +17,43 @@
 
         <property name="stateName" column="STATE" type="string" length="31"/>
 
-        <many-to-one name="pulseFileDetails" class="com.zutubi.pulse.model.PulseFileDetails" column="BOB_FILE_DETAILS" lazy="false" cascade="all"/>
+        <many-to-one name="pulseFileDetails" class="com.zutubi.pulse.master.model.PulseFileDetails" column="BOB_FILE_DETAILS" lazy="false" cascade="all"/>
 
         <bag name="buildSpecifications" cascade="all,delete-orphan" lazy="false">
             <cache usage="read-write"/>
             <key column="PROJECT_ID"/>
-            <one-to-many class="com.zutubi.pulse.model.BuildSpecification"/>
+            <one-to-many class="com.zutubi.pulse.master.model.BuildSpecification"/>
         </bag>
 
-        <many-to-one name="defaultSpecification" class="com.zutubi.pulse.model.BuildSpecification" column="DEFAULT_SPECIFICATION" lazy="false" cascade="none"/>
+        <many-to-one name="defaultSpecification" class="com.zutubi.pulse.master.model.BuildSpecification" column="DEFAULT_SPECIFICATION" lazy="false" cascade="none"/>
 
         <bag name="postBuildActions" cascade="all,delete-orphan" lazy="false">
             <cache usage="read-write"/>
             <key column="PROJECT_ID"/>
-            <one-to-many class="com.zutubi.pulse.model.PostBuildAction"/>
+            <one-to-many class="com.zutubi.pulse.master.model.PostBuildAction"/>
         </bag>
 
         <bag name="cleanupRules" cascade="all,delete-orphan" lazy="false">
             <cache usage="read-write"/>
             <key column="PROJECT_ID"/>
-            <one-to-many class="com.zutubi.pulse.model.CleanupRule"/>
+            <one-to-many class="com.zutubi.pulse.master.model.CleanupRule"/>
         </bag>
 
-        <many-to-one name="scm" class="com.zutubi.pulse.model.Scm" column="SCM" cascade="all" lazy="false"/>
+        <many-to-one name="scm" class="com.zutubi.pulse.master.model.Scm" column="SCM" cascade="all" lazy="false"/>
 
-        <many-to-one name="changeViewer" class="com.zutubi.pulse.model.ChangeViewer" column="CHANGE_VIEWER" cascade="all" lazy="false"/>
+        <many-to-one name="changeViewer" class="com.zutubi.pulse.master.model.ChangeViewer" column="CHANGE_VIEWER" cascade="all" lazy="false"/>
 
         <bag name="aclEntries" inverse="true" cascade="all,delete-orphan" lazy="false">
             <cache usage="read-write"/>
             <key column="PROJECT_ID"/>
-            <one-to-many class="com.zutubi.pulse.model.ProjectAclEntry"/>
+            <one-to-many class="com.zutubi.pulse.master.model.ProjectAclEntry"/>
         </bag>
 
         <property name="nextBuildNumber" column="NEXT_BUILD_NUMBER" type="long"/>
         
     </class>
 
-    <class name="com.zutubi.pulse.model.ChangeViewer" table="CHANGE_VIEWER" lazy="false">
+    <class name="com.zutubi.pulse.master.model.ChangeViewer" table="CHANGE_VIEWER" lazy="false">
         <cache usage="read-write"/>
 
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
@@ -62,35 +62,35 @@
 
         <discriminator column="TYPE" type="string" length="63"/>
 
-        <subclass name="com.zutubi.pulse.model.CustomChangeViewer" discriminator-value="CUSTOM" lazy="false">
+        <subclass name="com.zutubi.pulse.master.model.CustomChangeViewer" discriminator-value="CUSTOM" lazy="false">
             <property name="changesetURL" type="string" length="511"/>
             <property name="fileViewURL" type="string" length="511"/>
             <property name="fileDownloadURL" type="string" length="511"/>
             <property name="fileDiffURL" type="string" length="511"/>
         </subclass>
 
-        <subclass name="com.zutubi.pulse.model.FisheyeChangeViewer" discriminator-value="FISHEYE" lazy="false">
+        <subclass name="com.zutubi.pulse.master.model.FisheyeChangeViewer" discriminator-value="FISHEYE" lazy="false">
             <property name="baseURL" type="string" length="511"/>
             <property name="projectPath" type="string" length="511"/>
         </subclass>
 
-        <subclass name="com.zutubi.pulse.model.P4WebChangeViewer" discriminator-value="P4WEB" lazy="false">
+        <subclass name="com.zutubi.pulse.master.model.P4WebChangeViewer" discriminator-value="P4WEB" lazy="false">
             <property name="baseURL" type="string" length="511"/>
             <property name="projectPath" type="string" length="511"/>
         </subclass>
 
-        <subclass name="com.zutubi.pulse.model.TracChangeViewer" discriminator-value="TRAC" lazy="false">
+        <subclass name="com.zutubi.pulse.master.model.TracChangeViewer" discriminator-value="TRAC" lazy="false">
             <property name="baseURL" type="string" length="511"/>
             <property name="projectPath" type="string" length="511"/>
         </subclass>
 
-        <subclass name="com.zutubi.pulse.model.ViewVCChangeViewer" discriminator-value="VIEWVC" lazy="false">
+        <subclass name="com.zutubi.pulse.master.model.ViewVCChangeViewer" discriminator-value="VIEWVC" lazy="false">
             <property name="baseURL" type="string" length="511"/>
             <property name="projectPath" type="string" length="511"/>
         </subclass>
     </class>
 
-    <class name="com.zutubi.pulse.model.ProjectAclEntry" table="PROJECT_ACL_ENTRY" lazy="false">
+    <class name="com.zutubi.pulse.master.model.ProjectAclEntry" table="PROJECT_ACL_ENTRY" lazy="false">
         <cache usage="read-write"/>
 
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
@@ -101,10 +101,10 @@
 
         <property name="mask" type="int"/>
 
-        <many-to-one name="aclObjectIdentity" column="PROJECT_ID" class="com.zutubi.pulse.model.Project" not-null="true"/>
+        <many-to-one name="aclObjectIdentity" column="PROJECT_ID" class="com.zutubi.pulse.master.model.Project" not-null="true"/>
     </class>
 
-    <class name="com.zutubi.pulse.model.PulseFileDetails" table="BOB_FILE_DETAILS" lazy="false">
+    <class name="com.zutubi.pulse.master.model.PulseFileDetails" table="BOB_FILE_DETAILS" lazy="false">
         <cache usage="read-write"/>
 
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
@@ -113,19 +113,19 @@
 
         <discriminator column="SOURCE_TYPE" type="string" length="63"/>
 
-        <subclass name="com.zutubi.pulse.model.CustomPulseFileDetails" discriminator-value="CUSTOM" lazy="false">
+        <subclass name="com.zutubi.pulse.master.model.CustomPulseFileDetails" discriminator-value="CUSTOM" lazy="false">
             <property name="pulseFile" column="PULSE_FILE" type="text"/>
         </subclass>
 
-        <subclass name="com.zutubi.pulse.model.VersionedPulseFileDetails" discriminator-value="VERSIONED" lazy="false">
+        <subclass name="com.zutubi.pulse.master.model.VersionedPulseFileDetails" discriminator-value="VERSIONED" lazy="false">
             <property name="pulseFileName" column="PULSE_FILE_NAME" type="string" length="255"/>
         </subclass>
 
-        <subclass name="com.zutubi.pulse.model.TemplatePulseFileDetails" lazy="false">
+        <subclass name="com.zutubi.pulse.master.model.TemplatePulseFileDetails" lazy="false">
             <bag name="captures" cascade="all,delete-orphan" lazy="false">
                 <cache usage="read-write"/>
                 <key column="DETAILS_ID"/>
-                <one-to-many class="com.zutubi.pulse.model.Capture"/>
+                <one-to-many class="com.zutubi.pulse.master.model.Capture"/>
             </bag>
 
             <bag name="outputProcessors" table="OUTPUT_PROCESSORS" lazy="false">
@@ -134,7 +134,7 @@
                 <element type="string" column="PROCESSOR" not-null="true"/>
             </bag>
 
-            <subclass name="com.zutubi.pulse.model.AntPulseFileDetails" discriminator-value="ANT" lazy="false">
+            <subclass name="com.zutubi.pulse.master.model.AntPulseFileDetails" discriminator-value="ANT" lazy="false">
                 <property name="buildFile" column="BUILD_FILE" type="string" length="255"/>
                 <property name="targets" column="TARGETS" type="string" length="255"/>
                 <property name="arguments" column="ARGUMENTS" type="string" length="1023"/>
@@ -147,7 +147,7 @@
                 </map>
             </subclass>
 
-            <subclass name="com.zutubi.pulse.model.ExecutablePulseFileDetails" discriminator-value="EXE" lazy="false">
+            <subclass name="com.zutubi.pulse.master.model.ExecutablePulseFileDetails" discriminator-value="EXE" lazy="false">
                 <!-- Overlap columns with other subtypes -->
                 <property name="executable" column="BUILD_FILE" type="string" length="255"/>
                 <property name="arguments" column="ARGUMENTS" type="string" length="1023"/>
@@ -160,7 +160,7 @@
                 </map>
             </subclass>
 
-            <subclass name="com.zutubi.pulse.model.MakePulseFileDetails" discriminator-value="MAKE" lazy="false">
+            <subclass name="com.zutubi.pulse.master.model.MakePulseFileDetails" discriminator-value="MAKE" lazy="false">
                 <property name="makefile" column="MAKEFILE" type="string" length="255"/>
                 <property name="targets" column="TARGETS" type="string" length="1023"/>
                 <property name="arguments" column="ARGUMENTS" type="string" length="1023"/>
@@ -173,20 +173,20 @@
                 </map>
             </subclass>
 
-            <subclass name="com.zutubi.pulse.model.MavenPulseFileDetails" discriminator-value="MAVEN" lazy="false">
+            <subclass name="com.zutubi.pulse.master.model.MavenPulseFileDetails" discriminator-value="MAVEN" lazy="false">
                 <property name="workingDir" column="BASE_DIR" type="string" length="1023"/>
                 <property name="targets" column="TARGETS" type="string" length="1023"/>
                 <property name="arguments" column="ARGUMENTS" type="string" length="1023"/>
             </subclass>
 
-            <subclass name="com.zutubi.pulse.model.Maven2PulseFileDetails" discriminator-value="MAVEN2" lazy="false">
+            <subclass name="com.zutubi.pulse.master.model.Maven2PulseFileDetails" discriminator-value="MAVEN2" lazy="false">
                 <property name="workingDir" column="BASE_DIR" type="string" length="1023"/>
                 <!-- Use a targets column so that it overlaps with other subtypes -->
                 <property name="goals" column="TARGETS" type="string" length="1023"/>
                 <property name="arguments" column="ARGUMENTS" type="string" length="1023"/>
             </subclass>
 
-            <subclass name="com.zutubi.pulse.model.XCodePulseFileDetails" discriminator-value="XCODE" lazy="false">
+            <subclass name="com.zutubi.pulse.master.model.XCodePulseFileDetails" discriminator-value="XCODE" lazy="false">
                 <property name="workingDir" column="BASE_DIR" type="string" length="1023"/>
                 <property name="target" column="TARGETS" type="string" length="1023"/>
                 <property name="project" column="PROJECT" type="string" length="1023"/>
@@ -198,7 +198,7 @@
         </subclass>
     </class>
 
-    <class name="com.zutubi.pulse.model.Capture" table="CAPTURE">
+    <class name="com.zutubi.pulse.master.model.Capture" table="CAPTURE">
         <cache usage="read-write"/>
 
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
@@ -215,20 +215,20 @@
             <element type="string" column="PROCESSOR" not-null="true" length="255"/>
         </bag>
 
-        <subclass name="com.zutubi.pulse.model.DirectoryCapture" discriminator-value="DIRECTORY" lazy="false">
+        <subclass name="com.zutubi.pulse.master.model.DirectoryCapture" discriminator-value="DIRECTORY" lazy="false">
             <property name="base" type="string" length="4095"/>
             <property name="includes" type="string" length="4095"/>
             <property name="excludes" type="string" length="4095"/>
             <property name="mimeType" type="string" length="4095"/>
         </subclass>
 
-        <subclass name="com.zutubi.pulse.model.FileCapture" discriminator-value="FILE" lazy="false">
+        <subclass name="com.zutubi.pulse.master.model.FileCapture" discriminator-value="FILE" lazy="false">
             <property name="file" type="string" length="4095"/>
             <property name="mimeType" type="string" length="255"/>
         </subclass>
     </class>
 
-    <class name="com.zutubi.pulse.model.PostBuildAction" table="POST_BUILD_ACTION">
+    <class name="com.zutubi.pulse.master.model.PostBuildAction" table="POST_BUILD_ACTION">
         <cache usage="read-write"/>
 
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
@@ -242,25 +242,25 @@
         <bag name="specifications" table="POST_BUILD_ACTION_SPECIFICATIONS" lazy="false">
             <cache usage="read-write"/>
             <key column="ACTION_ID"/>
-            <many-to-many class="com.zutubi.pulse.model.BuildSpecification" column="SPECIFICATION_ID"/>
+            <many-to-many class="com.zutubi.pulse.master.model.BuildSpecification" column="SPECIFICATION_ID"/>
         </bag>
 
         <property name="statesString" type="string" length="255"/>
 
         <property name="failOnError" type="boolean"/>
 
-        <subclass name="com.zutubi.pulse.model.RunExecutablePostBuildAction" discriminator-value="EXECUTABLE" lazy="false">
+        <subclass name="com.zutubi.pulse.master.model.RunExecutablePostBuildAction" discriminator-value="EXECUTABLE" lazy="false">
             <property name="command" type="string" length="255"/>
             <property name="arguments" type="text"/>
         </subclass>
 
-        <subclass name="com.zutubi.pulse.model.TagPostBuildAction" discriminator-value="TAG" lazy="false">
+        <subclass name="com.zutubi.pulse.master.model.TagPostBuildAction" discriminator-value="TAG" lazy="false">
             <property name="tag" type="string" length="255"/>
             <property name="moveExisting" type="boolean"/>
         </subclass>
     </class>
 
-    <class name="com.zutubi.pulse.model.CleanupRule" table="CLEANUP_RULE" lazy="false">
+    <class name="com.zutubi.pulse.master.model.CleanupRule" table="CLEANUP_RULE" lazy="false">
         <cache usage="read-write"/>
 
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">

@@ -1407,10 +1407,6 @@
     #end
 #end
 
-#macro( contactPointIcon $contact)
-    #if ($contact.class.name == 'com.zutubi.pulse.model.EmailContactPoint')<img alt="email" src="$base/images/email_16.png"/>#end
-#end
-
 <!--- quartz trigger state -->
 #macro( renderQuartzTriggerState $state)
     #if ($state == -1)<span style='color:black;'>none</span>#end

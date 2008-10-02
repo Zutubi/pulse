@@ -7,7 +7,7 @@ import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
-import com.zutubi.pulse.model.ResourceManager;
+import com.zutubi.pulse.master.model.ResourceManager;
 import com.zutubi.pulse.servercore.SystemInfo;
 import com.zutubi.pulse.servercore.logging.CustomLogRecord;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;

@@ -1,8 +1,8 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.core.config.ResourceVersion;
 import com.zutubi.pulse.core.config.Resource;
-import com.zutubi.pulse.model.ResourceManager;
+import com.zutubi.pulse.core.config.ResourceVersion;
+import com.zutubi.pulse.master.model.ResourceManager;
 import com.zutubi.pulse.web.ActionSupport;
 
 import java.util.*;

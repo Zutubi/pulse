@@ -2,10 +2,10 @@ package com.zutubi.pulse.tove.config.setup;
 
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.bootstrap.SetupManager;
-import com.zutubi.pulse.model.AcegiUser;
-import com.zutubi.pulse.model.GrantedAuthority;
-import com.zutubi.pulse.model.User;
-import com.zutubi.pulse.model.UserManager;
+import com.zutubi.pulse.master.model.AcegiUser;
+import com.zutubi.pulse.master.model.GrantedAuthority;
+import com.zutubi.pulse.master.model.User;
+import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.security.AcegiUtils;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfigurationSupport;
 import com.zutubi.pulse.tove.config.admin.EmailConfiguration;

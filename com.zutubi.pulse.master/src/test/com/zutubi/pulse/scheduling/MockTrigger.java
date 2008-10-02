@@ -1,6 +1,6 @@
 package com.zutubi.pulse.scheduling;
 
-import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.master.model.Project;
 
 /**
  */

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.tove.config.agent;
 
-import com.zutubi.pulse.model.AgentStateManager;
-import com.zutubi.pulse.model.BuildManager;
+import com.zutubi.pulse.master.model.AgentStateManager;
+import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.tove.config.DatabaseStateCleanupTaskSupport;
 
 /**

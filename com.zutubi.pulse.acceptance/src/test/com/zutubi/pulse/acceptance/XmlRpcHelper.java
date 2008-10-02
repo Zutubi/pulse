@@ -3,7 +3,7 @@ package com.zutubi.pulse.acceptance;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.config.ResourceProperty;
-import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.tove.config.group.GroupConfiguration;
 import com.zutubi.pulse.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.tove.config.project.ProjectAclConfiguration;

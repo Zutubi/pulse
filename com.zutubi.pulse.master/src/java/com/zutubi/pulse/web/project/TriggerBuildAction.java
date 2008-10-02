@@ -1,8 +1,8 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.model.ManualTriggerBuildReason;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.master.model.ManualTriggerBuildReason;
+import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 
 public class TriggerBuildAction extends ProjectActionBase

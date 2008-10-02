@@ -2,8 +2,8 @@ package com.zutubi.pulse.web.server;
 
 import com.zutubi.pulse.*;
 import com.zutubi.pulse.master.events.build.AbstractBuildRequestEvent;
-import com.zutubi.pulse.model.BuildManager;
-import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.master.model.BuildManager;
+import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.pulse.web.ActionSupport;
 

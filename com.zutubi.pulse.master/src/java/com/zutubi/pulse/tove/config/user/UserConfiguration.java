@@ -2,7 +2,7 @@ package com.zutubi.pulse.tove.config.user;
 
 import com.zutubi.config.annotations.*;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
-import com.zutubi.pulse.model.GrantedAuthority;
+import com.zutubi.pulse.master.model.GrantedAuthority;
 import com.zutubi.tove.type.Extendable;
 import com.zutubi.validation.annotations.Required;
 

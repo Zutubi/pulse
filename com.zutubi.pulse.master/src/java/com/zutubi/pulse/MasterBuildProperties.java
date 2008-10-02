@@ -10,7 +10,7 @@ import com.zutubi.pulse.core.model.TestResultSummary;
 import com.zutubi.pulse.core.scm.CheckoutScheme;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.tove.config.project.BuildStageConfiguration;
 import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 

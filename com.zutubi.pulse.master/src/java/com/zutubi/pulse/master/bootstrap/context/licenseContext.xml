@@ -2,7 +2,7 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 
-    <bean id="licenseManager" class="com.zutubi.pulse.license.LicenseManager" autowire="byName" init-method="init">
+    <bean id="licenseManager" class="com.zutubi.pulse.master.license.LicenseManager" autowire="byName" init-method="init">
         <property name="licenseKeyStore">
             <ref bean="licenseKeyStore"/>
         </property>
@@ -17,9 +17,9 @@
     </bean>
 
     <!-- the current key store is the Data object. -->
-    <bean id="licenseKeyStore" class="com.zutubi.pulse.license.config.ConfigLicenseKeyStore" init-method="init" autowire="byName"/>
+    <bean id="licenseKeyStore" class="com.zutubi.pulse.master.license.config.ConfigLicenseKeyStore" init-method="init" autowire="byName"/>
 
     <!-- CHECK IF THIS IS STILL USED. -->
-    <bean id="canRunPulseAuthorisation" class="com.zutubi.pulse.license.authorisation.CanRunPulseAuthorisation" autowire="byName"/>
+    <bean id="canRunPulseAuthorisation" class="com.zutubi.pulse.master.license.authorisation.CanRunPulseAuthorisation" autowire="byName"/>
 
 </beans>

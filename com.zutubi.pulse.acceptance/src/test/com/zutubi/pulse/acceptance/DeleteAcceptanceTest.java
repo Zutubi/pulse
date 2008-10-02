@@ -4,7 +4,7 @@ import com.zutubi.pulse.acceptance.pages.admin.*;
 import com.zutubi.pulse.acceptance.pages.browse.BrowsePage;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.master.agent.AgentManager;
-import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.tove.config.LabelConfiguration;
 import com.zutubi.pulse.tove.config.group.ServerPermission;
 import com.zutubi.pulse.tove.config.project.BuildStageConfiguration;

@@ -3,8 +3,8 @@ package com.zutubi.pulse.master.charting.demo;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.master.charting.BuildResultsDataSource;
 import com.zutubi.pulse.master.charting.DemoBuildResultDataSource;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.UnknownBuildReason;
+import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.model.UnknownBuildReason;
 
 import java.util.Calendar;
 import java.util.LinkedList;

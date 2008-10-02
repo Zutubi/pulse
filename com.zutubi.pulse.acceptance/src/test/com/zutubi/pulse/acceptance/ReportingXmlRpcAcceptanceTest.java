@@ -1,7 +1,7 @@
 package com.zutubi.pulse.acceptance;
 
 import com.zutubi.pulse.master.agent.AgentManager;
-import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.tove.config.LabelConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.Sort;

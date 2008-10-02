@@ -1,8 +1,8 @@
 package com.zutubi.pulse.scheduling.tasks;
 
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.model.ProjectManager;
-import com.zutubi.pulse.model.TriggerBuildReason;
+import com.zutubi.pulse.master.model.ProjectManager;
+import com.zutubi.pulse.master.model.TriggerBuildReason;
 import com.zutubi.pulse.scheduling.Task;
 import com.zutubi.pulse.scheduling.TaskExecutionContext;
 import com.zutubi.pulse.scheduling.Trigger;

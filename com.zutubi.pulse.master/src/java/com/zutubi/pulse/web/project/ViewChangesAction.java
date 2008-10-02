@@ -3,7 +3,7 @@ package com.zutubi.pulse.web.project;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.ChangelistComparator;
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.master.model.BuildResult;
 
 import java.util.Collections;
 import java.util.LinkedList;

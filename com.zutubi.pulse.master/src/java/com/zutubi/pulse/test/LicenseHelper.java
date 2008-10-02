@@ -1,9 +1,9 @@
 package com.zutubi.pulse.test;
 
-import com.zutubi.pulse.license.License;
-import com.zutubi.pulse.license.LicenseException;
-import com.zutubi.pulse.license.LicenseKeyFactory;
-import com.zutubi.pulse.license.LicenseType;
+import com.zutubi.pulse.master.license.License;
+import com.zutubi.pulse.master.license.LicenseException;
+import com.zutubi.pulse.master.license.LicenseKeyFactory;
+import com.zutubi.pulse.master.license.LicenseType;
 import com.zutubi.util.StringUtils;
 
 import java.util.Calendar;
@@ -24,7 +24,7 @@ public class LicenseHelper
             {
                 // remove the compile time dependency on the License Encoder.
                 keyFactory = (LicenseKeyFactory) Class.forName(
-                        "com.zutubi.pulse.license.LicenseEncoder").newInstance();
+                        "com.zutubi.pulse.master.license.LicenseEncoder").newInstance();
             }
             catch (Exception e)
             {

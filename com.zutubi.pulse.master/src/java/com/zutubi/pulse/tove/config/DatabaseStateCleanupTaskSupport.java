@@ -1,6 +1,6 @@
 package com.zutubi.pulse.tove.config;
 
-import com.zutubi.pulse.model.BuildManager;
+import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.tove.config.cleanup.RecordCleanupTaskSupport;
 
 /**

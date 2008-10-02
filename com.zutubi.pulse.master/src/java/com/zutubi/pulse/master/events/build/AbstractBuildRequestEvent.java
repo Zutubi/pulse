@@ -3,9 +3,9 @@ package com.zutubi.pulse.master.events.build;
 import com.zutubi.events.Event;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.model.Entity;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.ProjectManager;
-import com.zutubi.pulse.model.UserManager;
+import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.model.ProjectManager;
+import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.TimeStamps;
 

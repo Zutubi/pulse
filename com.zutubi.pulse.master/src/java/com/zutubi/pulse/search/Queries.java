@@ -1,6 +1,6 @@
 package com.zutubi.pulse.search;
 
-import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.master.model.BuildResult;
 import org.hibernate.SessionFactory;
 
 /**

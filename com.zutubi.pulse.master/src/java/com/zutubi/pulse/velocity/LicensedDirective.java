@@ -1,7 +1,7 @@
 package com.zutubi.pulse.velocity;
 
+import com.zutubi.pulse.master.license.LicenseHolder;
 import com.zutubi.util.TextUtils;
-import com.zutubi.pulse.license.LicenseHolder;
 import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;

@@ -1,8 +1,8 @@
 package com.zutubi.pulse.scheduling;
 
-import com.zutubi.util.bean.DefaultObjectFactory;
-import com.zutubi.pulse.model.persistence.mock.MockTriggerDao;
 import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.master.model.persistence.mock.MockTriggerDao;
+import com.zutubi.util.bean.DefaultObjectFactory;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;

@@ -4,10 +4,10 @@ import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.UnknownBuildReason;
-import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.master.model.UnknownBuildReason;
+import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.scheduling.tasks.BuildProjectTask;
 import com.zutubi.pulse.tove.config.user.UserConfiguration;
 

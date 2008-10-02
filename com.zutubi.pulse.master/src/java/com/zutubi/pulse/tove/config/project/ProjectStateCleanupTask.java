@@ -1,8 +1,8 @@
 package com.zutubi.pulse.tove.config.project;
 
-import com.zutubi.pulse.model.BuildManager;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.master.model.BuildManager;
+import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.tove.config.DatabaseStateCleanupTaskSupport;
 import com.zutubi.tove.config.ToveRuntimeException;
 

@@ -1,8 +1,8 @@
 package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.model.Project;
 import com.zutubi.util.UnaryProcedure;
 
 import java.util.List;

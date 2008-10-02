@@ -1,6 +1,6 @@
 package com.zutubi.pulse.web.admin.user;
 
-import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.web.user.UserActionSupport;
 
 /**

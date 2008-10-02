@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web.ajax;
 
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.tove.config.project.hooks.BuildHookConfiguration;
 import com.zutubi.pulse.tove.config.project.hooks.BuildHookManager;
 import com.zutubi.pulse.web.LookupErrorException;

@@ -11,7 +11,7 @@ import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.events.build.AbstractBuildRequestEvent;
-import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.security.PulseThreadFactory;
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 import com.zutubi.pulse.tove.config.project.ProjectConfiguration;

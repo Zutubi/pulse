@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.charting;
 
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.persistence.BuildResultDao;
+import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 
 import java.util.Calendar;
 import java.util.List;

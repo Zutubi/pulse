@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.model.TestSuitePersister;
 import com.zutubi.pulse.core.model.TestSuiteResult;
 import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.model.RecipeResultNode;
+import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 

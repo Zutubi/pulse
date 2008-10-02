@@ -6,10 +6,10 @@ import com.mockobjects.dynamic.FullConstraintMatcher;
 import com.mockobjects.dynamic.Mock;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.pulse.model.BuildManager;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.ManualTriggerBuildReason;
-import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.master.model.BuildManager;
+import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.model.ManualTriggerBuildReason;
+import com.zutubi.pulse.master.model.Project;
 
 import java.util.ArrayList;
 import java.util.List;

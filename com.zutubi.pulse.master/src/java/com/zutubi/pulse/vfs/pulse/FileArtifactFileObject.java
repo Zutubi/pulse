@@ -3,7 +3,7 @@ package com.zutubi.pulse.vfs.pulse;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
-import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.vfs.FileAction;
 import com.zutubi.pulse.webwork.mapping.Urls;
 import com.zutubi.util.logging.Logger;

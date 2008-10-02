@@ -1,6 +1,6 @@
 package com.zutubi.pulse.tove.config.user;
 
-import com.zutubi.pulse.model.BuildColumns;
+import com.zutubi.pulse.master.model.BuildColumns;
 import com.zutubi.tove.MapOption;
 import com.zutubi.tove.MapOptionProvider;
 import com.zutubi.tove.type.TypeProperty;

@@ -2,7 +2,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
 <hibernate-mapping>
 
-    <class name="com.zutubi.pulse.model.Scm" table="SCM" lazy="false">
+    <class name="com.zutubi.pulse.master.model.Scm" table="SCM" lazy="false">
 
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
@@ -20,13 +20,13 @@
 
         <property name="properties" column="PROPERTIES" type="com.zutubi.pulse.master.util.hibernate.PropertiesType" length="4096"/>
 
-        <subclass name="com.zutubi.pulse.model.P4" discriminator-value="P4" dynamic-update="false">
+        <subclass name="com.zutubi.pulse.master.model.P4" discriminator-value="P4" dynamic-update="false">
         </subclass>
 
-        <subclass name="com.zutubi.pulse.model.Svn" discriminator-value="SVN" dynamic-update="false">
+        <subclass name="com.zutubi.pulse.master.model.Svn" discriminator-value="SVN" dynamic-update="false">
         </subclass>
 
-        <subclass name="com.zutubi.pulse.model.Cvs" discriminator-value="CVS" dynamic-update="false">
+        <subclass name="com.zutubi.pulse.master.model.Cvs" discriminator-value="CVS" dynamic-update="false">
         </subclass>
 
     </class>

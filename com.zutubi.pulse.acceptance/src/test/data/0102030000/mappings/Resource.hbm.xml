@@ -2,14 +2,14 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
 <hibernate-mapping>
 
-    <class name="com.zutubi.pulse.model.PersistentResource" table="RESOURCE" lazy="false">
+    <class name="com.zutubi.pulse.master.model.PersistentResource" table="RESOURCE" lazy="false">
         <cache usage="read-write"/>
         
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>
 
-        <many-to-one name="slave" column="SLAVE_ID" class="com.zutubi.pulse.model.Slave" cascade="none" lazy="false"/>
+        <many-to-one name="slave" column="SLAVE_ID" class="com.zutubi.pulse.master.model.Slave" cascade="none" lazy="false"/>
 
         <property name="name" column="NAME" type="string" length="1023"/>
 

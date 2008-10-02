@@ -1,9 +1,9 @@
 package com.zutubi.pulse.tove.config.project;
 
-import com.zutubi.pulse.model.BuildManager;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.ProjectManager;
+import com.zutubi.pulse.master.model.BuildManager;
+import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.tove.config.ConfigurationValidationContext;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.validation.validators.StringFieldValidatorSupport;

@@ -2,8 +2,8 @@ package com.zutubi.pulse.xwork.validator.validators;
 
 import com.opensymphony.xwork.validator.ValidationException;
 import com.opensymphony.xwork.validator.validators.FieldValidatorSupport;
-import com.zutubi.pulse.license.LicenseDecoder;
-import com.zutubi.pulse.license.LicenseException;
+import com.zutubi.pulse.master.license.LicenseDecoder;
+import com.zutubi.pulse.master.license.LicenseException;
 
 /**
  * <class-comment/>

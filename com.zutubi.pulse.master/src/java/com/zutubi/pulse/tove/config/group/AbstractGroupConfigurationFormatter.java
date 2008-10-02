@@ -1,6 +1,6 @@
 package com.zutubi.pulse.tove.config.group;
 
-import com.zutubi.pulse.model.GrantedAuthority;
+import com.zutubi.pulse.master.model.GrantedAuthority;
 
 /**
  */

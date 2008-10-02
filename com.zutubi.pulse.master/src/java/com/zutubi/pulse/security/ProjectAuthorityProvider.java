@@ -1,6 +1,6 @@
 package com.zutubi.pulse.security;
 
-import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.master.model.Project;
 import com.zutubi.tove.security.AuthorityProvider;
 import com.zutubi.tove.security.DefaultAccessManager;
 

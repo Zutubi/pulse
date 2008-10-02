@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.model.BuildManager;
+import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.util.io.IOUtils;
 
 import javax.servlet.ServletException;

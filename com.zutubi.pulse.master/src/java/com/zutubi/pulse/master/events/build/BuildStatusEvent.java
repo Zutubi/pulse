@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.events.build;
 
-import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.master.model.BuildResult;
 
 /**
  * Event with a custom status message for a build.

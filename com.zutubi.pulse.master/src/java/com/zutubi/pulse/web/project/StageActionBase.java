@@ -1,9 +1,9 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.util.TextUtils;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.RecipeResultNode;
+import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.web.LookupErrorException;
+import com.zutubi.util.TextUtils;
 
 /**
  * Helper base class for actions that may drill down to the stage level.

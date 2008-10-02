@@ -1,13 +1,13 @@
 package com.zutubi.pulse.servlet;
 
-import com.zutubi.pulse.model.UserManager;
-import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
+import com.zutubi.pulse.master.model.User;
+import com.zutubi.pulse.master.model.UserManager;
 
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.MessageFormat;
 

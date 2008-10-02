@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.events.build;
 
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.model.Entity;
-import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.master.model.*;
 
 /**
  * A request for a project build.

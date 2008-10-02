@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.bootstrap.tasks;
 
-import com.zutubi.pulse.model.*;
+import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.servercore.bootstrap.StartupTask;
 
 import java.util.List;

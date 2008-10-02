@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web.migrate;
 
+import com.zutubi.pulse.master.migrate.MigrationManager;
 import com.zutubi.pulse.web.ActionSupport;
-import com.zutubi.pulse.migrate.MigrationManager;
 
 /**
  *

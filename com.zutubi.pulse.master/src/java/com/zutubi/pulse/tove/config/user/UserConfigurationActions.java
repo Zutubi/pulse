@@ -1,6 +1,6 @@
 package com.zutubi.pulse.tove.config.user;
 
-import com.zutubi.pulse.model.UserManager;
+import com.zutubi.pulse.master.model.UserManager;
 
 import java.util.Arrays;
 import java.util.Collections;

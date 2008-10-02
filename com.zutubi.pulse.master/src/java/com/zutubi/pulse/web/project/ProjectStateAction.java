@@ -1,6 +1,6 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.model.Project;
+import com.zutubi.pulse.master.model.Project;
 
 /**
  * An action to change the state of a project (e.g. to pause it);

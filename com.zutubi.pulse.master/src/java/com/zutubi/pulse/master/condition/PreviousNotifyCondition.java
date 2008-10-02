@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.condition;
 
-import com.zutubi.pulse.model.BuildManager;
-import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.master.model.BuildManager;
+import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.tove.config.user.UserConfiguration;
 
 /**

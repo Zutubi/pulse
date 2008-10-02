@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.agent;
 
 import com.zutubi.pulse.AgentService;
-import com.zutubi.pulse.model.AgentState;
+import com.zutubi.pulse.master.model.AgentState;
 import com.zutubi.pulse.servercore.agent.Status;
 import com.zutubi.pulse.servercore.services.SlaveStatus;
 import com.zutubi.pulse.servercore.services.UpgradeState;

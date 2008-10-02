@@ -2,10 +2,10 @@ package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.model.BuildColumns;
-import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.model.User;
+import com.zutubi.pulse.master.model.BuildColumns;
+import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.model.Project;
+import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.tove.config.user.UserPreferencesConfiguration;
 
 import java.util.List;

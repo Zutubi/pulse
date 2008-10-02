@@ -4,8 +4,8 @@ import com.opensymphony.util.TextUtils;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.database.DatabaseConfig;
 import com.zutubi.pulse.master.database.DriverRegistry;
-import com.zutubi.pulse.migrate.MigrateDatabaseTypeConfiguration;
-import com.zutubi.pulse.migrate.MigrationManager;
+import com.zutubi.pulse.master.migrate.MigrateDatabaseTypeConfiguration;
+import com.zutubi.pulse.master.migrate.MigrationManager;
 import com.zutubi.pulse.tove.config.setup.DatabaseType;
 import com.zutubi.tove.webwork.TransientAction;
 

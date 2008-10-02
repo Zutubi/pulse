@@ -4,7 +4,7 @@ import com.zutubi.pulse.MasterBuildPaths;
 import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.personal.PatchArchive;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;

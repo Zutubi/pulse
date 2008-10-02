@@ -1,7 +1,6 @@
 package com.zutubi.pulse.scheduling;
 
 import com.zutubi.pulse.core.Stoppable;
-import com.zutubi.pulse.model.Project;
 
 import java.util.List;
 

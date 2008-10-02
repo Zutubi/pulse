@@ -1,6 +1,6 @@
 package com.zutubi.pulse.renderer;
 
-import com.zutubi.pulse.model.BuildResult;
+import com.zutubi.pulse.master.model.BuildResult;
 
 import java.io.Writer;
 import java.util.List;
