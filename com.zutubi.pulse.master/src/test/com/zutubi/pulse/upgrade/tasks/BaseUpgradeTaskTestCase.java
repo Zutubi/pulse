@@ -3,9 +3,9 @@ package com.zutubi.pulse.upgrade.tasks;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.core.util.JDBCUtils;
-import com.zutubi.pulse.database.DatabaseConfig;
-import com.zutubi.pulse.database.DatabaseConsole;
-import com.zutubi.pulse.database.DatabaseConsoleBeanFactory;
+import com.zutubi.pulse.master.database.DatabaseConfig;
+import com.zutubi.pulse.master.database.DatabaseConsole;
+import com.zutubi.pulse.master.database.DatabaseConsoleBeanFactory;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.hsqldb.jdbcDriver;
 

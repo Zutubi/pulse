@@ -10,7 +10,7 @@ import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.pulse.events.AgentPingEvent;
+import com.zutubi.pulse.master.events.AgentPingEvent;
 import com.zutubi.pulse.security.PulseThreadFactory;
 import com.zutubi.pulse.servercore.SystemInfo;
 import com.zutubi.pulse.servercore.agent.PingStatus;

@@ -4476,7 +4476,7 @@ abc xxx abc]
       <system-err></system-err>
 
   </testsuite>
-  <testsuite errors="0" failures="0" id="18" name="DefaultEventManagerTest" package="com.zutubi.pulse.events" tests="10" time="0.14">
+  <testsuite errors="0" failures="0" id="18" name="DefaultEventManagerTest" package="com.zutubi.pulse.master.events" tests="10" time="0.14">
   
     <properties>
     
@@ -4682,25 +4682,25 @@ abc xxx abc]
 
       </properties>
 
-      <testcase classname="com.zutubi.pulse.events.DefaultEventManagerTest" name="testRegisterListener" time="0.03"></testcase>
+      <testcase classname="com.zutubi.pulse.master.events.DefaultEventManagerTest" name="testRegisterListener" time="0.03"></testcase>
 
-      <testcase classname="com.zutubi.pulse.events.DefaultEventManagerTest" name="testMultipleRegistrationsBySingleListener" time="0.0"></testcase>
+      <testcase classname="com.zutubi.pulse.master.events.DefaultEventManagerTest" name="testMultipleRegistrationsBySingleListener" time="0.0"></testcase>
 
-      <testcase classname="com.zutubi.pulse.events.DefaultEventManagerTest" name="testUnregisterListener" time="0.0"></testcase>
+      <testcase classname="com.zutubi.pulse.master.events.DefaultEventManagerTest" name="testUnregisterListener" time="0.0"></testcase>
 
-      <testcase classname="com.zutubi.pulse.events.DefaultEventManagerTest" name="testListenerRegisteredInCallbackDoesNotReceiveEvent" time="0.02"></testcase>
+      <testcase classname="com.zutubi.pulse.master.events.DefaultEventManagerTest" name="testListenerRegisteredInCallbackDoesNotReceiveEvent" time="0.02"></testcase>
 
-      <testcase classname="com.zutubi.pulse.events.DefaultEventManagerTest" name="testListenerUnregisteredInCallbackStillReceivesEvent" time="0.01"></testcase>
+      <testcase classname="com.zutubi.pulse.master.events.DefaultEventManagerTest" name="testListenerUnregisteredInCallbackStillReceivesEvent" time="0.01"></testcase>
 
-      <testcase classname="com.zutubi.pulse.events.DefaultEventManagerTest" name="testHandleByClassPartA" time="0.0"></testcase>
+      <testcase classname="com.zutubi.pulse.master.events.DefaultEventManagerTest" name="testHandleByClassPartA" time="0.0"></testcase>
 
-      <testcase classname="com.zutubi.pulse.events.DefaultEventManagerTest" name="testHandleByClassPartB" time="0.0"></testcase>
+      <testcase classname="com.zutubi.pulse.master.events.DefaultEventManagerTest" name="testHandleByClassPartB" time="0.0"></testcase>
 
-      <testcase classname="com.zutubi.pulse.events.DefaultEventManagerTest" name="testReceiveAllEventsByDefault" time="0.0"></testcase>
+      <testcase classname="com.zutubi.pulse.master.events.DefaultEventManagerTest" name="testReceiveAllEventsByDefault" time="0.0"></testcase>
 
-      <testcase classname="com.zutubi.pulse.events.DefaultEventManagerTest" name="testHandleByInterfacePartA" time="0.0"></testcase>
+      <testcase classname="com.zutubi.pulse.master.events.DefaultEventManagerTest" name="testHandleByInterfacePartA" time="0.0"></testcase>
 
-      <testcase classname="com.zutubi.pulse.events.DefaultEventManagerTest" name="testHandleByInterfacePartB" time="0.0"></testcase>
+      <testcase classname="com.zutubi.pulse.master.events.DefaultEventManagerTest" name="testHandleByInterfacePartB" time="0.0"></testcase>
 
       <system-out></system-out>
 

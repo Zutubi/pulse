@@ -5,8 +5,8 @@ import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.Select;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.events.build.BuildEvent;
-import com.zutubi.pulse.events.build.PostBuildEvent;
+import com.zutubi.pulse.master.events.build.BuildEvent;
+import com.zutubi.pulse.master.events.build.PostBuildEvent;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.RecipeResultNode;
 

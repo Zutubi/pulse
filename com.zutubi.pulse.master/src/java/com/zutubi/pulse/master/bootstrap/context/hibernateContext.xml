@@ -20,7 +20,7 @@ This context requires:
 
     <import resource="classpath:/com/zutubi/pulse/master/bootstrap/context/hibernateMappingsContext.xml"/>
 
-    <bean id="databaseConsole" class="com.zutubi.pulse.database.DatabaseConsoleBeanFactory" autowire="byName">
+    <bean id="databaseConsole" class="com.zutubi.pulse.master.database.DatabaseConsoleBeanFactory" autowire="byName">
         <property name="hibernateMappings"><ref bean="hibernateMappings"/></property>
     </bean>
 

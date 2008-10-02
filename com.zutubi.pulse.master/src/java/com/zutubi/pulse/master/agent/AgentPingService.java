@@ -4,7 +4,7 @@ import com.zutubi.events.EventManager;
 import com.zutubi.pulse.AgentService;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.Stoppable;
-import com.zutubi.pulse.events.AgentPingEvent;
+import com.zutubi.pulse.master.events.AgentPingEvent;
 import com.zutubi.pulse.servercore.agent.PingStatus;
 import com.zutubi.pulse.servercore.services.SlaveStatus;
 import com.zutubi.util.logging.Logger;
@@ -76,7 +76,7 @@ public class AgentPingService implements Stoppable
 
     /**
      * Requests that the given agent is pinged.  When the ping completes an
-     * {@link com.zutubi.pulse.events.AgentPingEvent} is raised.
+     * {@link com.zutubi.pulse.master.events.AgentPingEvent} is raised.
      *
      * If there is currently a ping in progress for the agent, this request
      * is ignored.  However, it is guaranteed that a ping event will be

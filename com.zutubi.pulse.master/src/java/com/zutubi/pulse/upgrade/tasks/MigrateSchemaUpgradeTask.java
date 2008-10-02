@@ -1,19 +1,18 @@
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.pulse.database.DatabaseConfig;
+import com.zutubi.pulse.master.database.DatabaseConfig;
+import com.zutubi.pulse.master.hibernate.HackyConnectionProvider;
+import com.zutubi.pulse.master.hibernate.MutableConfiguration;
+import com.zutubi.pulse.master.hibernate.SchemaRefactor;
 import com.zutubi.pulse.upgrade.DataSourceAware;
 import com.zutubi.pulse.upgrade.UpgradeException;
-import com.zutubi.pulse.hibernate.MutableConfiguration;
-import com.zutubi.pulse.hibernate.HackyConnectionProvider;
-import com.zutubi.pulse.hibernate.SchemaRefactor;
+import org.hibernate.cfg.Environment;
 
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
-
-import org.hibernate.cfg.Environment;
 
 /**
  * <class-comment/>
@@ -51,7 +50,7 @@ public class MigrateSchemaUpgradeTask extends AbstractUpgradeTask implements Dat
             // load these properties from the context, same place that all the other
             // properties are defined.
             Properties props = databaseConfig.getHibernateProperties();
-            props.put(Environment.CONNECTION_PROVIDER, "com.zutubi.pulse.hibernate.HackyConnectionProvider");
+            props.put(Environment.CONNECTION_PROVIDER, "com.zutubi.pulse.master.hibernate.HackyConnectionProvider");
 
             // slight hack to provide hibernate with access to the configured datasource.
             HackyConnectionProvider.dataSource = dataSource;

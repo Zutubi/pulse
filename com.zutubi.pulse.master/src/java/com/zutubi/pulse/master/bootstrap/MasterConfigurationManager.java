@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.bootstrap;
 
-import com.zutubi.pulse.database.DatabaseConfig;
-import com.zutubi.pulse.database.DriverRegistry;
+import com.zutubi.pulse.master.database.DatabaseConfig;
+import com.zutubi.pulse.master.database.DriverRegistry;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 

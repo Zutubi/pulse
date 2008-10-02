@@ -13,8 +13,8 @@ public class Loggers
     {
         if (eventLogger == null)
         {
-            // the logger for the com.zutubi.pulse.events package. 
-            eventLogger = Logger.getLogger("com.zutubi.pulse.events");
+            // the logger for the com.zutubi.pulse.master.events package.
+            eventLogger = Logger.getLogger("com.zutubi.pulse.master.events");
 
             // events should only go to the event log.
             eventLogger.setUseParentHandlers(false);

@@ -1,36 +1,23 @@
 package com.zutubi.pulse.restore;
 
-import com.zutubi.pulse.database.DatabaseConfig;
+import com.zutubi.pulse.core.util.JDBCUtils;
+import com.zutubi.pulse.master.database.DatabaseConfig;
+import com.zutubi.pulse.master.hibernate.MutableConfiguration;
 import com.zutubi.pulse.monitor.FeedbackAware;
 import com.zutubi.pulse.monitor.TaskFeedback;
 import com.zutubi.pulse.transfer.Table;
 import com.zutubi.pulse.transfer.TransferAPI;
 import com.zutubi.pulse.transfer.TransferException;
 import com.zutubi.pulse.transfer.TransferListener;
-import com.zutubi.pulse.hibernate.MutableConfiguration;
-import com.zutubi.pulse.core.util.JDBCUtils;
 import com.zutubi.util.io.IOUtils;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 import javax.sql.DataSource;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * An archive wrapper around the transfer api to enable backup and restore of database contents.

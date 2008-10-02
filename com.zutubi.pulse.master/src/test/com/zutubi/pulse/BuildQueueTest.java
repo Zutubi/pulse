@@ -1,6 +1,6 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.events.build.AbstractBuildRequestEvent;
+import com.zutubi.pulse.master.events.build.AbstractBuildRequestEvent;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Predicate;

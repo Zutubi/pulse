@@ -3,7 +3,7 @@ package com.zutubi.pulse.master.agent;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
-import com.zutubi.pulse.events.build.RecipeTerminateRequestEvent;
+import com.zutubi.pulse.master.events.build.RecipeTerminateRequestEvent;
 import com.zutubi.util.logging.Logger;
 
 import java.util.concurrent.ExecutorService;

@@ -1,15 +1,15 @@
 package com.zutubi.pulse.migrate;
 
-import com.zutubi.pulse.database.DatabaseConfig;
+import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.util.JDBCUtils;
+import com.zutubi.pulse.master.database.DatabaseConfig;
+import com.zutubi.pulse.master.hibernate.HibernateUtils;
+import com.zutubi.pulse.master.hibernate.MutableConfiguration;
 import com.zutubi.pulse.monitor.JobRunner;
 import com.zutubi.pulse.monitor.Monitor;
 import com.zutubi.pulse.monitor.TaskException;
 import com.zutubi.pulse.monitor.TaskFeedback;
-import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.transfer.TransferException;
-import com.zutubi.pulse.hibernate.HibernateUtils;
-import com.zutubi.pulse.hibernate.MutableConfiguration;
-import com.zutubi.pulse.core.util.JDBCUtils;
 import nu.xom.ParsingException;
 
 import javax.sql.DataSource;

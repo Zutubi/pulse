@@ -3,13 +3,13 @@ package com.zutubi.pulse.migrate;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.pulse.core.util.JDBCUtils;
-import com.zutubi.pulse.database.DatabaseConfig;
-import com.zutubi.pulse.hibernate.HackyConnectionProvider;
-import com.zutubi.pulse.hibernate.HibernateUtils;
-import com.zutubi.pulse.hibernate.MutableConfiguration;
-import com.zutubi.pulse.hibernate.SchemaRefactor;
 import com.zutubi.pulse.master.bootstrap.Data;
 import com.zutubi.pulse.master.bootstrap.SimpleMasterConfigurationManager;
+import com.zutubi.pulse.master.database.DatabaseConfig;
+import com.zutubi.pulse.master.hibernate.HackyConnectionProvider;
+import com.zutubi.pulse.master.hibernate.HibernateUtils;
+import com.zutubi.pulse.master.hibernate.MutableConfiguration;
+import com.zutubi.pulse.master.hibernate.SchemaRefactor;
 import com.zutubi.pulse.monitor.JobManager;
 import com.zutubi.pulse.monitor.Monitor;
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
@@ -169,7 +169,7 @@ public class MigrationManagerTest extends PulseTestCase
 
             Properties hibernateProperties = new Properties();
             hibernateProperties.setProperty(DatabaseConfig.HIBERNATE_DIALECT, HibernateUtils.inferHibernateDialect(jdbcProperties));
-            hibernateProperties.put(Environment.CONNECTION_PROVIDER, "com.zutubi.pulse.hibernate.HackyConnectionProvider");
+            hibernateProperties.put(Environment.CONNECTION_PROVIDER, "com.zutubi.pulse.master.hibernate.HackyConnectionProvider");
 
             HackyConnectionProvider.dataSource = getDataSource();
 

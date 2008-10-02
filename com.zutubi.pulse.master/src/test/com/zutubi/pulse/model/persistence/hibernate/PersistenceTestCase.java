@@ -1,16 +1,16 @@
 package com.zutubi.pulse.model.persistence.hibernate;
 
 import com.zutubi.pulse.core.spring.SpringComponentContext;
-import com.zutubi.pulse.database.DatabaseConsole;
 import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.util.logging.Logger;
 import com.zutubi.pulse.core.util.JDBCUtils;
+import com.zutubi.pulse.master.database.DatabaseConsole;
+import com.zutubi.util.logging.Logger;
 import org.hibernate.SessionFactory;
+import org.hsqldb.jdbcDriver;
 import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
-import org.hsqldb.jdbcDriver;
 
 import javax.sql.DataSource;
 import java.beans.BeanInfo;
@@ -18,10 +18,10 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
-import java.util.logging.Filter;
-import java.util.logging.LogRecord;
-import java.util.logging.Level;
 import java.sql.DriverManager;
+import java.util.logging.Filter;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 
 /**
  *

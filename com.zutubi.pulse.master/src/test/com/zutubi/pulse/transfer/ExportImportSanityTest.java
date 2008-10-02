@@ -1,7 +1,7 @@
 package com.zutubi.pulse.transfer;
 
 import com.zutubi.pulse.core.spring.SpringComponentContext;
-import com.zutubi.pulse.hibernate.MutableConfiguration;
+import com.zutubi.pulse.master.hibernate.MutableConfiguration;
 import com.zutubi.pulse.transfer.jdbc.HibernateTransferSource;
 import com.zutubi.pulse.transfer.jdbc.HibernateTransferTarget;
 import junit.framework.TestCase;

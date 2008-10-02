@@ -1,9 +1,9 @@
 package com.zutubi.pulse.transfer;
 
-import com.zutubi.pulse.database.DatabaseConfig;
-import com.zutubi.pulse.hibernate.HibernateUtils;
-import com.zutubi.pulse.hibernate.MutableConfiguration;
 import com.zutubi.pulse.core.util.JDBCUtils;
+import com.zutubi.pulse.master.database.DatabaseConfig;
+import com.zutubi.pulse.master.hibernate.HibernateUtils;
+import com.zutubi.pulse.master.hibernate.MutableConfiguration;
 import junit.framework.TestCase;
 import nu.xom.ParsingException;
 

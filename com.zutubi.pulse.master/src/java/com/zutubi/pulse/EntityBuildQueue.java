@@ -5,9 +5,9 @@ import com.zutubi.events.PublishFlag;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.model.Entity;
-import com.zutubi.pulse.events.build.AbstractBuildRequestEvent;
-import com.zutubi.pulse.events.build.BuildActivatedEvent;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.master.events.build.AbstractBuildRequestEvent;
+import com.zutubi.pulse.master.events.build.BuildActivatedEvent;
 import com.zutubi.pulse.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.StringUtils;
@@ -136,7 +136,7 @@ public class EntityBuildQueue
      *       administrator</li>
      * </ul>
      * 
-     * @param id identifer of the {@link com.zutubi.pulse.events.build.AbstractBuildRequestEvent}
+     * @param id identifer of the {@link com.zutubi.pulse.master.events.build.AbstractBuildRequestEvent}
      *           to cancel
      * @return true if the request was found and successfully cancelled
      */

@@ -124,7 +124,7 @@ common-test:
     [junit] Tests run: 18, Failures: 0, Errors: 0, Time elapsed: 0.11 sec
     [junit] Running com.zutubi.pulse.core.model.CommandResultTest
     [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.23 sec
-    [junit] Running com.zutubi.pulse.events.DefaultEventManagerTest
+    [junit] Running com.zutubi.pulse.master.events.DefaultEventManagerTest
     [junit] Tests run: 10, Failures: 0, Errors: 0, Time elapsed: 0.14 sec
     [junit] Running com.zutubi.util.CircularBufferTest
     [junit] Tests run: 14, Failures: 0, Errors: 0, Time elapsed: 0.151 sec

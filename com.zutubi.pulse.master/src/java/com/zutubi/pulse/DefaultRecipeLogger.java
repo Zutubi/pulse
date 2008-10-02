@@ -3,8 +3,8 @@ package com.zutubi.pulse;
 import com.zutubi.pulse.core.events.*;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.RecipeResult;
-import com.zutubi.pulse.events.build.RecipeAssignedEvent;
-import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
+import com.zutubi.pulse.master.events.build.RecipeAssignedEvent;
+import com.zutubi.pulse.master.events.build.RecipeDispatchedEvent;
 import com.zutubi.util.Pair;
 import com.zutubi.util.Sort;
 

@@ -2,7 +2,7 @@ package com.zutubi.pulse.tove.config.project.hooks;
 
 import com.zutubi.config.annotations.Internal;
 import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.pulse.events.build.BuildEvent;
+import com.zutubi.pulse.master.events.build.BuildEvent;
 
 /**
  * A build hook that is triggered automatically at some point in a build.

@@ -10,7 +10,7 @@ import com.zutubi.pulse.AgentService;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.core.util.FileSystemUtils;
-import com.zutubi.pulse.events.AgentUpgradeCompleteEvent;
+import com.zutubi.pulse.master.events.AgentUpgradeCompleteEvent;
 import com.zutubi.pulse.model.AgentState;
 import com.zutubi.pulse.servercore.bootstrap.DefaultSystemPaths;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;

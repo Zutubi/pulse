@@ -2,9 +2,9 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 
-    <bean id="dataSource" class="com.zutubi.pulse.database.DataSourceBeanFactory" destroy-method="close" autowire="byName"/>
+    <bean id="dataSource" class="com.zutubi.pulse.master.database.DataSourceBeanFactory" destroy-method="close" autowire="byName"/>
     
-    <bean id="databaseConfig" class="com.zutubi.pulse.database.DatabaseConfig">
+    <bean id="databaseConfig" class="com.zutubi.pulse.master.database.DatabaseConfig">
         <constructor-arg index="0">
             <props>
                 <prop key="jdbc.driverClassName">org.hsqldb.jdbcDriver</prop>
@@ -16,7 +16,7 @@
         </constructor-arg>
     </bean>
 
-    <bean id="postgresDatabaseConfig" class="com.zutubi.pulse.database.DatabaseConfig">
+    <bean id="postgresDatabaseConfig" class="com.zutubi.pulse.master.database.DatabaseConfig">
         <constructor-arg index="0">
             <props>
                 <prop key="jdbc.driverClassName">org.postgresql.Driver</prop>

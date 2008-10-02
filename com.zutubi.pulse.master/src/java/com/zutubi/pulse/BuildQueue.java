@@ -1,7 +1,7 @@
 package com.zutubi.pulse;
 
 import com.zutubi.pulse.core.model.Entity;
-import com.zutubi.pulse.events.build.AbstractBuildRequestEvent;
+import com.zutubi.pulse.master.events.build.AbstractBuildRequestEvent;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 

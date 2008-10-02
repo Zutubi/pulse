@@ -2,7 +2,7 @@ package com.zutubi.pulse.tove.config.project.triggers;
 
 import com.zutubi.config.annotations.*;
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.events.build.BuildCompletedEvent;
+import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.scheduling.BuildCompletedEventFilter;
 import com.zutubi.pulse.scheduling.EventTrigger;
 import com.zutubi.pulse.scheduling.Trigger;
