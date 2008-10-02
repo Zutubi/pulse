@@ -1,11 +1,11 @@
 package com.zutubi.pulse.master.tove.config.project;
 
-import com.zutubi.pulse.AgentService;
-import com.zutubi.pulse.RecipeAssignmentRequest;
 import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.PulseFileLoader;
 import com.zutubi.pulse.core.PulseFileLoaderFactory;
 import com.zutubi.pulse.core.config.ResourceRequirement;
+import com.zutubi.pulse.master.AgentService;
+import com.zutubi.pulse.master.RecipeAssignmentRequest;
 import com.zutubi.util.logging.Logger;
 
 import java.util.List;

@@ -6,11 +6,11 @@
     <package name="default" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
-        <action name="default" class="com.zutubi.pulse.web.ActionSupport">
+        <action name="default" class="com.zutubi.pulse.master.web.ActionSupport">
             <result name="success" type="velocity">system-starting.vm</result>
         </action>
 
-        <action name="login" class="com.zutubi.pulse.web.ActionSupport">
+        <action name="login" class="com.zutubi.pulse.master.web.ActionSupport">
             <result name="success" type="redirect">default.action</result>
         </action>
 

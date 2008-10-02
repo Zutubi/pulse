@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.agent;
 
 import com.zutubi.events.EventManager;
-import com.zutubi.pulse.AgentService;
 import com.zutubi.pulse.Version;
+import com.zutubi.pulse.master.AgentService;
 import com.zutubi.pulse.master.events.AgentUpgradeCompleteEvent;
 import com.zutubi.pulse.master.servlet.DownloadPackageServlet;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;

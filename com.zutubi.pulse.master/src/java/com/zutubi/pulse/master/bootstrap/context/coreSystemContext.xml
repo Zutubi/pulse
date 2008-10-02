@@ -18,7 +18,7 @@
     define the file system manager here so that it is available during setup. This is also redefined later
     when other requirements become available.
     -->
-    <bean id="fileSystemManager" class="com.zutubi.pulse.vfs.VfsManagerFactoryBean" destroy-method="shutdown">
+    <bean id="fileSystemManager" class="com.zutubi.pulse.master.vfs.VfsManagerFactoryBean" destroy-method="shutdown">
         <property name="objectFactory"><ref bean="objectFactory"/></property>
     </bean>
 

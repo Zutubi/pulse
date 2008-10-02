@@ -2,7 +2,7 @@ package com.zutubi.pulse.acceptance.pages;
 
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.SeleniumUtils;
-import com.zutubi.pulse.webwork.mapping.Urls;
+import com.zutubi.pulse.master.webwork.mapping.Urls;
 import com.zutubi.util.StringUtils;
 import junit.framework.Assert;
 

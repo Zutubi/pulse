@@ -141,7 +141,7 @@ common-test:
     [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.1 sec
     [junit] Running com.zutubi.pulse.util.ZipTest
     [junit] Tests run: 13, Failures: 0, Errors: 0, Time elapsed: 0.821 sec
-    [junit] Running com.zutubi.pulse.xwork.validator.validators.IntegralValidatorTest
+    [junit] Running com.zutubi.pulse.master.xwork.validator.validators.IntegralValidatorTest
     [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.531 sec
 [junitreport] Transform time: 4076ms
 

@@ -13,12 +13,12 @@
             <result-type name="freemarker" class="com.opensymphony.webwork.views.freemarker.FreemarkerResult"/>
             <result-type name="httpheader" class="com.opensymphony.webwork.dispatcher.HttpHeaderResult"/>
             <result-type name="stream" class="com.opensymphony.webwork.dispatcher.StreamResult"/>
-            <result-type name="velocity-xml" class="com.zutubi.pulse.xwork.dispatcher.VelocityXmlResult"/>
-            <result-type name="json" class="com.zutubi.pulse.xwork.dispatcher.JsonResult"/>
-            <result-type name="flexjson" class="com.zutubi.pulse.xwork.dispatcher.FlexJsonResult"/>
-            <result-type name="rss" class="com.zutubi.pulse.xwork.results.JITFeedResult"/>
-            <result-type name="up" class="com.zutubi.pulse.xwork.results.UpResult"/>
-            <result-type name="startupajax" class="com.zutubi.pulse.xwork.results.SystemStartingAjaxResult"/>
+            <result-type name="velocity-xml" class="com.zutubi.pulse.master.xwork.dispatcher.VelocityXmlResult"/>
+            <result-type name="json" class="com.zutubi.pulse.master.xwork.dispatcher.JsonResult"/>
+            <result-type name="flexjson" class="com.zutubi.pulse.master.xwork.dispatcher.FlexJsonResult"/>
+            <result-type name="rss" class="com.zutubi.pulse.master.xwork.results.JITFeedResult"/>
+            <result-type name="up" class="com.zutubi.pulse.master.xwork.results.UpResult"/>
+            <result-type name="startupajax" class="com.zutubi.pulse.master.xwork.results.SystemStartingAjaxResult"/>
         </result-types>
 
         <interceptors>
@@ -39,15 +39,15 @@
             <interceptor name="fileUpload" class="com.opensymphony.webwork.interceptor.FileUploadInterceptor"/>
             <interceptor name="execAndWait" class="com.opensymphony.webwork.interceptor.ExecuteAndWaitInterceptor"/>
 
-            <interceptor name="taskExecAndWait" class="com.zutubi.pulse.webwork.interceptor.ExecAndWaitInterceptor"/>
-            <interceptor name="prepare" class="com.zutubi.pulse.xwork.interceptor.PrepareInterceptor"/>
-            <interceptor name="cancel" class="com.zutubi.pulse.xwork.interceptor.CancelWorkflowInterceptor"/>
+            <interceptor name="taskExecAndWait" class="com.zutubi.pulse.master.webwork.interceptor.ExecAndWaitInterceptor"/>
+            <interceptor name="prepare" class="com.zutubi.pulse.master.xwork.interceptor.PrepareInterceptor"/>
+            <interceptor name="cancel" class="com.zutubi.pulse.master.xwork.interceptor.CancelWorkflowInterceptor"/>
             <interceptor name="prototypeWizard" class="com.zutubi.tove.wizard.webwork.ConfigurationWizardInterceptor"/>
-            <interceptor name="ajax" class="com.zutubi.pulse.xwork.interceptor.AjaxInterceptor"/>
-            <interceptor name="errorHanding" class="com.zutubi.pulse.xwork.interceptor.ErrorHandlingInterceptor"/>
-            <interceptor name="configErrorHandling" class="com.zutubi.pulse.xwork.interceptor.ConfigErrorHandlingInterceptor"/>
-            <interceptor name="hibernateSession" class="com.zutubi.pulse.xwork.interceptor.HibernateSessionInterceptor"/>
-            <interceptor name="readOnly" class="com.zutubi.pulse.xwork.interceptor.ReadOnlyInterceptor"/>
+            <interceptor name="ajax" class="com.zutubi.pulse.master.xwork.interceptor.AjaxInterceptor"/>
+            <interceptor name="errorHanding" class="com.zutubi.pulse.master.xwork.interceptor.ErrorHandlingInterceptor"/>
+            <interceptor name="configErrorHandling" class="com.zutubi.pulse.master.xwork.interceptor.ConfigErrorHandlingInterceptor"/>
+            <interceptor name="hibernateSession" class="com.zutubi.pulse.master.xwork.interceptor.HibernateSessionInterceptor"/>
+            <interceptor name="readOnly" class="com.zutubi.pulse.master.xwork.interceptor.ReadOnlyInterceptor"/>
 
             <!-- Primitive stack with no hibernate session -->
             <interceptor-stack name="noSessionStack">

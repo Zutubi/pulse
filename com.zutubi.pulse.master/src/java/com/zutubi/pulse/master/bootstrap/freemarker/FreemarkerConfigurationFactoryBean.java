@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.bootstrap.freemarker;
 
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.webwork.mapping.Urls;
+import com.zutubi.pulse.master.webwork.mapping.Urls;
 import com.zutubi.util.logging.Logger;
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.FileTemplateLoader;

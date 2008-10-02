@@ -6339,7 +6339,7 @@ test8
       <system-err></system-err>
 
   </testsuite>
-  <testsuite errors="0" failures="0" id="26" name="IntegralValidatorTest" package="com.zutubi.pulse.xwork.validator.validators" tests="3" time="0.531">
+  <testsuite errors="0" failures="0" id="26" name="IntegralValidatorTest" package="com.zutubi.pulse.master.xwork.validator.validators" tests="3" time="0.531">
   
     <properties>
     
@@ -6545,11 +6545,11 @@ test8
 
       </properties>
 
-      <testcase classname="com.zutubi.pulse.xwork.validator.validators.IntegralValidatorTest" name="testEmptyString" time="0.421"></testcase>
+      <testcase classname="com.zutubi.pulse.master.xwork.validator.validators.IntegralValidatorTest" name="testEmptyString" time="0.421"></testcase>
 
-      <testcase classname="com.zutubi.pulse.xwork.validator.validators.IntegralValidatorTest" name="testEmptyStringWhenRequired" time="0.02"></testcase>
+      <testcase classname="com.zutubi.pulse.master.xwork.validator.validators.IntegralValidatorTest" name="testEmptyStringWhenRequired" time="0.02"></testcase>
 
-      <testcase classname="com.zutubi.pulse.xwork.validator.validators.IntegralValidatorTest" name="testAlphabeticString" time="0.0"></testcase>
+      <testcase classname="com.zutubi.pulse.master.xwork.validator.validators.IntegralValidatorTest" name="testAlphabeticString" time="0.0"></testcase>
 
       <system-out></system-out>
 

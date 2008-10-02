@@ -2,7 +2,7 @@ package com.zutubi.pulse.acceptance.pages.dashboard;
 
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.pages.browse.BuildTestsPage;
-import com.zutubi.pulse.webwork.mapping.Urls;
+import com.zutubi.pulse.master.webwork.mapping.Urls;
 
 /**
  * The tests tab for a personal build result.

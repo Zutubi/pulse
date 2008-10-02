@@ -74,7 +74,7 @@
     and debugging.
     -->
     <listener>
-        <listener-class>com.zutubi.pulse.xwork.servlet.ReloadResourceContextListener</listener-class>
+        <listener-class>com.zutubi.pulse.master.xwork.servlet.ReloadResourceContextListener</listener-class>
     </listener>
 
     <servlet>
@@ -118,7 +118,7 @@
         <servlet-class>com.zutubi.pulse.servercore.hessian.CustomHessianServlet</servlet-class>
         <init-param>
             <param-name>home-class</param-name>
-            <param-value>com.zutubi.pulse.MasterServiceImpl</param-value>
+            <param-value>com.zutubi.pulse.master.MasterServiceImpl</param-value>
         </init-param>
         <init-param>
             <param-name>home-api</param-name>
@@ -155,7 +155,7 @@
     <!-- Entry point for xmlrpc services. -->
     <servlet>
         <servlet-name>XmlRpcServlet</servlet-name>
-        <servlet-class>com.zutubi.pulse.xmlrpc.MasterXmlRpcServlet</servlet-class>
+        <servlet-class>com.zutubi.pulse.master.xmlrpc.MasterXmlRpcServlet</servlet-class>
     </servlet>
 
     <!--

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.config.user;
 
-import com.zutubi.pulse.web.DefaultAction;
+import com.zutubi.pulse.master.web.DefaultAction;
 import com.zutubi.tove.ListOptionProvider;
 import com.zutubi.tove.type.TypeProperty;
 

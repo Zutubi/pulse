@@ -1,6 +1,6 @@
 package com.zutubi.tove.webwork.help;
 
-import com.zutubi.pulse.web.ActionSupport;
+import com.zutubi.pulse.master.web.ActionSupport;
 import com.zutubi.tove.wizard.TypeWizardState;
 import com.zutubi.tove.wizard.webwork.AbstractTypeWizard;
 import com.zutubi.tove.wizard.webwork.ConfigurationWizardAction;

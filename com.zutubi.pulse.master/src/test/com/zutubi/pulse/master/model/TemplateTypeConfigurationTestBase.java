@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.model;
 
-import com.zutubi.pulse.PostProcessorManager;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.pulse.master.PostProcessorManager;
 import com.zutubi.pulse.master.tove.config.project.types.DefaultPostProcessorFragment;
 import com.zutubi.pulse.master.tove.config.project.types.FileArtifactConfiguration;
 import com.zutubi.pulse.master.tove.config.project.types.PostProcessorFragment;

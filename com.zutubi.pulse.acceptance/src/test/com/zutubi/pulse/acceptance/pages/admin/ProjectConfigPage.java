@@ -1,7 +1,7 @@
 package com.zutubi.pulse.acceptance.pages.admin;
 
 import com.thoughtworks.selenium.Selenium;
-import com.zutubi.pulse.webwork.mapping.Urls;
+import com.zutubi.pulse.master.webwork.mapping.Urls;
 
 /**
  * The page shown when looking at a project in the configuration view.

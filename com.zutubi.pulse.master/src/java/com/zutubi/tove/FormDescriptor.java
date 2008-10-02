@@ -1,6 +1,6 @@
 package com.zutubi.tove;
 
-import com.zutubi.pulse.webwork.mapping.PulseActionMapper;
+import com.zutubi.pulse.master.webwork.mapping.PulseActionMapper;
 import com.zutubi.tove.model.Field;
 import com.zutubi.tove.model.Form;
 import com.zutubi.tove.model.SubmitFieldDescriptor;

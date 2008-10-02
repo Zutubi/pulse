@@ -1,10 +1,10 @@
 package com.zutubi.pulse.master.tove.config.agent;
 
 import com.zutubi.config.annotations.*;
-import com.zutubi.pulse.SlaveProxyFactory;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.core.config.NamedConfiguration;
 import com.zutubi.pulse.core.config.Resource;
+import com.zutubi.pulse.master.SlaveProxyFactory;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;
 import com.zutubi.validation.annotations.Numeric;

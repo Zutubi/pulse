@@ -1,6 +1,6 @@
 package com.zutubi.tove.webwork;
 
-import com.zutubi.pulse.web.vfs.FileObjectWrapper;
+import com.zutubi.pulse.master.web.vfs.FileObjectWrapper;
 
 /**
  * Data structure used to send the details of a single file to the Ext tree

@@ -2,8 +2,8 @@ package com.zutubi.pulse.master.agent;
 
 import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
-import com.zutubi.pulse.*;
 import com.zutubi.pulse.core.Stoppable;
+import com.zutubi.pulse.master.*;
 import com.zutubi.pulse.master.bootstrap.DefaultSetupManager;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.events.*;

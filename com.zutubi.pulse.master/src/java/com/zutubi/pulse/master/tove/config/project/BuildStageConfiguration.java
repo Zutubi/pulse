@@ -1,11 +1,11 @@
 package com.zutubi.pulse.master.tove.config.project;
 
 import com.zutubi.config.annotations.*;
-import com.zutubi.pulse.AgentService;
-import com.zutubi.pulse.RecipeAssignmentRequest;
 import com.zutubi.pulse.core.config.AbstractNamedConfiguration;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.config.ResourceRequirement;
+import com.zutubi.pulse.master.AgentService;
+import com.zutubi.pulse.master.RecipeAssignmentRequest;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;

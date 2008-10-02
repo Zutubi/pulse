@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.config.project.types;
 
-import com.zutubi.pulse.PostProcessorManager;
+import com.zutubi.pulse.master.PostProcessorManager;
 import com.zutubi.tove.MapOption;
 import com.zutubi.tove.MapOptionProvider;
 import com.zutubi.tove.type.TypeProperty;

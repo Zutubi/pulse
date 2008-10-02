@@ -4,7 +4,7 @@ import com.zutubi.config.annotations.*;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
 import com.zutubi.pulse.master.model.BuildColumns;
 import com.zutubi.pulse.master.tove.config.user.contacts.ContactConfiguration;
-import com.zutubi.pulse.web.DefaultAction;
+import com.zutubi.pulse.master.web.DefaultAction;
 import com.zutubi.util.StringUtils;
 import com.zutubi.validation.annotations.Numeric;
 

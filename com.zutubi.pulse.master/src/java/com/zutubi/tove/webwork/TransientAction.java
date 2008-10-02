@@ -4,7 +4,7 @@ import com.opensymphony.xwork.ActionContext;
 import com.zutubi.i18n.Messages;
 import com.zutubi.i18n.MessagesProvider;
 import com.zutubi.pulse.core.config.Configuration;
-import com.zutubi.pulse.web.ActionSupport;
+import com.zutubi.pulse.master.web.ActionSupport;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.type.CompositeType;
 import com.zutubi.tove.type.Type;
