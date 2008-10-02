@@ -2,10 +2,10 @@ package com.zutubi.pulse.tove.config.agent;
 
 import com.zutubi.config.annotations.Permission;
 import com.zutubi.events.EventManager;
-import com.zutubi.pulse.agent.Agent;
-import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.events.AgentDisableRequestedEvent;
 import com.zutubi.pulse.events.AgentEnableRequestedEvent;
+import com.zutubi.pulse.master.agent.Agent;
+import com.zutubi.pulse.master.agent.AgentManager;
 
 import java.util.LinkedList;
 import java.util.List;

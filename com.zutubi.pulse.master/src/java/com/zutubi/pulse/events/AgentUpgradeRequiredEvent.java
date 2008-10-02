@@ -1,6 +1,6 @@
 package com.zutubi.pulse.events;
 
-import com.zutubi.pulse.agent.Agent;
+import com.zutubi.pulse.master.agent.Agent;
 
 /**
  * Raised when an agent reports a version mismatch.

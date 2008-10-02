@@ -1,12 +1,12 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.agent.MasterLocationProvider;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.pulse.core.util.ZipUtils;
+import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.model.ResourceManager;
 import com.zutubi.pulse.servercore.SystemInfo;
 import com.zutubi.pulse.servercore.logging.CustomLogRecord;

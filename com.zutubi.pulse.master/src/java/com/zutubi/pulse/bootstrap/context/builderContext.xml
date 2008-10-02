@@ -81,7 +81,7 @@
         </property>
     </bean>
 
-    <bean id="agentManagerTarget" class="com.zutubi.pulse.agent.DefaultAgentManager" autowire="byName"/>
+    <bean id="agentManagerTarget" class="com.zutubi.pulse.master.agent.DefaultAgentManager" autowire="byName"/>
     <bean id="agentManager" class="org.springframework.aop.framework.ProxyFactoryBean">
         <property name="target">
             <ref bean="agentManagerTarget"/>
@@ -93,13 +93,13 @@
         </property>
     </bean>
 
-    <bean id="masterLocationProvider" class="com.zutubi.pulse.agent.DefaultMasterLocationProvider" autowire="byName"/>
+    <bean id="masterLocationProvider" class="com.zutubi.pulse.master.agent.DefaultMasterLocationProvider" autowire="byName"/>
 
-    <bean id="agentPingService" class="com.zutubi.pulse.agent.AgentPingService" autowire="byName" init-method="init"/>
+    <bean id="agentPingService" class="com.zutubi.pulse.master.agent.AgentPingService" autowire="byName" init-method="init"/>
 
-    <bean id="resourceDiscoveryService" class="com.zutubi.pulse.agent.ResourceDiscoveryService" autowire="byName" init-method="init"/>
+    <bean id="resourceDiscoveryService" class="com.zutubi.pulse.master.agent.ResourceDiscoveryService" autowire="byName" init-method="init"/>
 
-    <bean id="recipeTerminationService" class="com.zutubi.pulse.agent.RecipeTerminationService" autowire="byName" init-method="init"/>
+    <bean id="recipeTerminationService" class="com.zutubi.pulse.master.agent.RecipeTerminationService" autowire="byName" init-method="init"/>
 
     <bean id="recipeProcessor" class="com.zutubi.pulse.core.RecipeProcessor" autowire="byName" init-method="init"/>
 

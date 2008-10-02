@@ -1,6 +1,6 @@
 package com.zutubi.pulse.scheduling.tasks;
 
-import com.zutubi.pulse.agent.AgentManager;
+import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.scheduling.Task;
 import com.zutubi.pulse.scheduling.TaskExecutionContext;
 import com.zutubi.util.logging.Logger;

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.tove.config.agent;
 
-import com.zutubi.pulse.agent.Agent;
-import com.zutubi.pulse.agent.AgentManager;
+import com.zutubi.pulse.master.agent.Agent;
+import com.zutubi.pulse.master.agent.AgentManager;
 
 /**
  * Shows agent status information.

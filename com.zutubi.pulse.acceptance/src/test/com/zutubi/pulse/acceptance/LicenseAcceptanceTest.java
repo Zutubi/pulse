@@ -6,19 +6,18 @@ import com.zutubi.pulse.acceptance.pages.admin.CompositePage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.acceptance.pages.admin.UsersPage;
 import com.zutubi.pulse.acceptance.pages.browse.ProjectHomePage;
-import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.license.LicenseType;
 import com.zutubi.pulse.license.config.LicenseConfiguration;
+import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.test.LicenseHelper;
 import com.zutubi.util.Constants;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import java.util.Date;
 import java.util.Hashtable;
-
-import org.testng.annotations.Test;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.AfterMethod;
 
 /**
  * Test for managing the server license and ensuring the licenses are

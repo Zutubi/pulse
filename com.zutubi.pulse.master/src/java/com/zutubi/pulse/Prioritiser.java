@@ -1,6 +1,6 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.agent.Agent;
+import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.util.Sort;
 import org.mortbay.util.Credential;
 

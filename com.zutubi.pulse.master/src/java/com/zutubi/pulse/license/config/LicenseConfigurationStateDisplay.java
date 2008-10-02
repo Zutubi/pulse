@@ -1,13 +1,13 @@
 package com.zutubi.pulse.license.config;
 
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.agent.AgentManager;
+import com.zutubi.pulse.Version;
 import com.zutubi.pulse.license.License;
 import com.zutubi.pulse.license.LicenseHolder;
 import com.zutubi.pulse.license.LicenseType;
+import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.model.UserManager;
-import com.zutubi.pulse.Version;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

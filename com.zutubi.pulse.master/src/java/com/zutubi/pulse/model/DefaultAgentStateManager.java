@@ -1,6 +1,6 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.agent.AgentPingService;
+import com.zutubi.pulse.master.agent.AgentPingService;
 import com.zutubi.pulse.model.persistence.AgentStateDao;
 import com.zutubi.pulse.scheduling.Scheduler;
 import com.zutubi.pulse.scheduling.SchedulingException;

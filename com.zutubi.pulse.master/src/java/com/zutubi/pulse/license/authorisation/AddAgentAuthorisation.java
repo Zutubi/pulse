@@ -1,8 +1,8 @@
 package com.zutubi.pulse.license.authorisation;
 
-import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.license.License;
 import com.zutubi.pulse.license.LicenseHolder;
+import com.zutubi.pulse.master.agent.AgentManager;
 
 /**
  * <class-comment/>

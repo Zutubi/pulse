@@ -1,7 +1,6 @@
 package com.zutubi.pulse;
 
 import com.zutubi.events.DefaultEventManager;
-import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.bootstrap.Data;
 import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.bootstrap.SimpleMasterConfigurationManager;
@@ -18,6 +17,7 @@ import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.pulse.events.build.RecipeAssignedEvent;
 import com.zutubi.pulse.events.build.RecipeDispatchedEvent;
+import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.model.*;
 import com.zutubi.pulse.servercore.CheckoutBootstrapper;
 import com.zutubi.pulse.servercore.SystemInfo;

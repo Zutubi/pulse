@@ -1,4 +1,4 @@
-package com.zutubi.pulse.agent;
+package com.zutubi.pulse.master.agent;
 
 /**
  */

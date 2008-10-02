@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web.agents;
 
 import com.caucho.hessian.client.HessianRuntimeException;
-import com.zutubi.pulse.agent.Agent;
+import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.servercore.logging.CustomLogRecord;
 import com.zutubi.pulse.web.PagingSupport;
 import com.zutubi.util.logging.Logger;

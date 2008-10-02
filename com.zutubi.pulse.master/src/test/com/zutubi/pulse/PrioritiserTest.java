@@ -1,9 +1,9 @@
 package com.zutubi.pulse;
 
-import com.zutubi.pulse.agent.Agent;
+import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
-import com.zutubi.pulse.core.test.PulseTestCase;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.stub;
 

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.web.agents;
 
-import com.zutubi.pulse.agent.Agent;
+import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.tove.model.ActionLink;
 
 import java.util.LinkedList;

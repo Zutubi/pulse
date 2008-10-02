@@ -1,8 +1,8 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.core.config.Resource;
+import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
 
 import java.util.List;

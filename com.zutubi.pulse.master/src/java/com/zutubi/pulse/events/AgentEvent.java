@@ -1,7 +1,7 @@
 package com.zutubi.pulse.events;
 
 import com.zutubi.events.Event;
-import com.zutubi.pulse.agent.Agent;
+import com.zutubi.pulse.master.agent.Agent;
 
 /**
  * <class comment/>

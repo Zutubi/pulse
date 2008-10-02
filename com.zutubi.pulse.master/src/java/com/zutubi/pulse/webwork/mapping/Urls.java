@@ -1,7 +1,7 @@
 package com.zutubi.pulse.webwork.mapping;
 
-import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.core.model.CommandResult;
+import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.pulse.model.Project;
 import com.zutubi.pulse.model.RecipeResultNode;

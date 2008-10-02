@@ -2,7 +2,6 @@ package com.zutubi.pulse.model;
 
 import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
-import com.zutubi.pulse.agent.Agent;
 import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.core.config.Resource;
@@ -10,6 +9,7 @@ import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.config.ResourceVersion;
 import com.zutubi.pulse.events.system.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.events.system.ConfigurationSystemStartedEvent;
+import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.TypeAdapter;

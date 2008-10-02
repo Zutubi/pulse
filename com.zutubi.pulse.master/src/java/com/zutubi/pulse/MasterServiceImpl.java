@@ -2,10 +2,10 @@ package com.zutubi.pulse;
 
 import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
-import com.zutubi.pulse.agent.AgentManager;
 import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
+import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.model.ResourceManager;
 import com.zutubi.pulse.servercore.services.InvalidTokenException;
 import com.zutubi.pulse.servercore.services.MasterService;

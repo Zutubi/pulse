@@ -1,19 +1,18 @@
 package com.zutubi.pulse.acceptance;
 
-import com.zutubi.pulse.agent.AgentManager;
+import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.model.ProjectManager;
 import com.zutubi.pulse.tove.config.LabelConfiguration;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.Sort;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Vector;
-
-import org.testng.annotations.Test;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.AfterMethod;
 
 /**
  * Tests for the remote API, primarily the reporting functionality.

@@ -8,7 +8,7 @@ import com.zutubi.pulse.acceptance.pages.WelcomePage;
 import com.zutubi.pulse.acceptance.pages.admin.AgentConfigPage;
 import com.zutubi.pulse.acceptance.pages.admin.ListPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectConfigPage;
-import com.zutubi.pulse.agent.AgentManager;
+import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.tove.config.agent.AgentConfigurationActions;
 import com.zutubi.pulse.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.tove.config.ConfigurationRegistry;
