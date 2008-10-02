@@ -1,12 +1,22 @@
 package com.zutubi.pulse.core;
 
 /**
+ * Allow for custom pulse file tags to be defined and registered within the Pulse file.
  *
+ * For example:
+ *   <register name="customTag" class="com.example.custom.Tag"/>
  *
+ *   <customTag/>
  */
 public class Register implements InitComponent, FileLoaderAware
 {
+    /**
+     * The name of the tag as it will appear in the pulse file.
+     */
     private String tagName;
+    /**
+     * The class name of the class that implements the tag.
+     */
     private String className;
 
     private FileLoader loader;
