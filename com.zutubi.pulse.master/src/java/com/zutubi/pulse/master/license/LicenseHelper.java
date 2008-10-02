@@ -1,9 +1,5 @@
-package com.zutubi.pulse.test;
+package com.zutubi.pulse.master.license;
 
-import com.zutubi.pulse.master.license.License;
-import com.zutubi.pulse.master.license.LicenseException;
-import com.zutubi.pulse.master.license.LicenseKeyFactory;
-import com.zutubi.pulse.master.license.LicenseType;
 import com.zutubi.util.StringUtils;
 
 import java.util.Calendar;
