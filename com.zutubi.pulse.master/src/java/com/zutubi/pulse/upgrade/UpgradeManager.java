@@ -1,6 +1,6 @@
 package com.zutubi.pulse.upgrade;
 
-import com.zutubi.pulse.monitor.Monitor;
+import com.zutubi.pulse.master.monitor.Monitor;
 
 import java.util.List;
 

@@ -1,8 +1,8 @@
 package com.zutubi.pulse.web.scheduling;
 
+import com.zutubi.pulse.master.scheduling.Scheduler;
+import com.zutubi.pulse.master.scheduling.Trigger;
 import com.zutubi.pulse.web.ActionSupport;
-import com.zutubi.pulse.scheduling.Scheduler;
-import com.zutubi.pulse.scheduling.Trigger;
 
 import java.util.List;
 

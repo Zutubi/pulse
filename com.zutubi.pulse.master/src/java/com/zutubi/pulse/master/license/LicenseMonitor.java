@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.license;
 
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.master.license.events.LicenseExpiredEvent;
-import com.zutubi.pulse.scheduling.*;
+import com.zutubi.pulse.master.scheduling.*;
 import com.zutubi.util.logging.Logger;
 
 /**

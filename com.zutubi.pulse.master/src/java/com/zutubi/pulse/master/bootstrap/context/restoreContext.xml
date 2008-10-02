@@ -14,7 +14,7 @@
         </property>
     </bean>
 
-    <bean id="archiveManager" class="com.zutubi.pulse.restore.DefaultRestoreManager">
+    <bean id="archiveManager" class="com.zutubi.pulse.master.restore.DefaultRestoreManager">
         <property name="tmpDirectory">
             <bean id="tmpRoot" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
                 <property name="targetBeanName">
@@ -38,7 +38,7 @@
         </property>
     </bean>
 
-    <bean id="backupManager" class="com.zutubi.pulse.restore.BackupManager" autowire="byName" init-method="init">
+    <bean id="backupManager" class="com.zutubi.pulse.master.restore.BackupManager" autowire="byName" init-method="init">
         <property name="backupDir">
             <bean class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
                 <property name="targetBeanName">
@@ -67,21 +67,21 @@
         </property>
     </bean>
 
-    <bean id="recordsArchive" class="com.zutubi.pulse.restore.RecordsArchive"/>
+    <bean id="recordsArchive" class="com.zutubi.pulse.master.restore.RecordsArchive"/>
     
-    <bean id="databaseArchive" class="com.zutubi.pulse.restore.DatabaseArchive">
+    <bean id="databaseArchive" class="com.zutubi.pulse.master.restore.DatabaseArchive">
         <property name="mappings">
             <ref bean="hibernateMappings"/>
         </property>
     </bean>
 
-    <bean id="dataDirectoryArchive" class="com.zutubi.pulse.restore.DataDirectoryArchive">
+    <bean id="dataDirectoryArchive" class="com.zutubi.pulse.master.restore.DataDirectoryArchive">
         <property name="userPaths">
             <ref local="userPaths"/>
         </property>
     </bean>
 
-    <bean id="artifactArchive" class="com.zutubi.pulse.restore.ArtifactArchive">
+    <bean id="artifactArchive" class="com.zutubi.pulse.master.restore.ArtifactArchive">
         <property name="userPaths">
             <ref local="userPaths"/>
         </property>

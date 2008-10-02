@@ -6,9 +6,9 @@ import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.PulseRuntimeException;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.events.system.ConfigurationEventSystemStartedEvent;
-import com.zutubi.pulse.scheduling.Scheduler;
-import com.zutubi.pulse.scheduling.SchedulingException;
-import com.zutubi.pulse.scheduling.Trigger;
+import com.zutubi.pulse.master.scheduling.Scheduler;
+import com.zutubi.pulse.master.scheduling.SchedulingException;
+import com.zutubi.pulse.master.scheduling.Trigger;
 import com.zutubi.tove.config.*;
 import com.zutubi.util.logging.Logger;
 

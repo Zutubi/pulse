@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.model.persistence.hibernate;
 
 import com.zutubi.pulse.master.model.persistence.TriggerDao;
-import com.zutubi.pulse.scheduling.Trigger;
+import com.zutubi.pulse.master.scheduling.Trigger;
 
 import java.util.List;
 

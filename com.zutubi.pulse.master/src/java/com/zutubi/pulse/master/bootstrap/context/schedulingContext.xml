@@ -42,7 +42,7 @@ This context requires:
     </bean>
 
     <!-- We don't initialise the scheduler here: it must wait for the startup event. -->
-    <bean id="schedulerTarget" class="com.zutubi.pulse.scheduling.DefaultScheduler" autowire="byName">
+    <bean id="schedulerTarget" class="com.zutubi.pulse.master.scheduling.DefaultScheduler" autowire="byName">
         <property name="strategies">
             <list>
                 <ref local="cronSchedulerStrategy"/>
@@ -65,18 +65,18 @@ This context requires:
         </property>
     </bean>
 
-    <bean id="cronSchedulerStrategy" class="com.zutubi.pulse.scheduling.CronSchedulerStrategy">
+    <bean id="cronSchedulerStrategy" class="com.zutubi.pulse.master.scheduling.CronSchedulerStrategy">
         <property name="quartzScheduler">
             <ref local="quartzScheduler"/>
         </property>
     </bean>
-    <bean id="simpleSchedulerStrategy" class="com.zutubi.pulse.scheduling.SimpleSchedulerStrategy">
+    <bean id="simpleSchedulerStrategy" class="com.zutubi.pulse.master.scheduling.SimpleSchedulerStrategy">
         <property name="quartzScheduler">
             <ref local="quartzScheduler"/>
         </property>
     </bean>
 
-    <bean id="eventSchedulerStrategy" class="com.zutubi.pulse.scheduling.EventSchedulerStrategy">
+    <bean id="eventSchedulerStrategy" class="com.zutubi.pulse.master.scheduling.EventSchedulerStrategy">
         <property name="eventManager">
             <ref bean="eventManager"/>
         </property>
@@ -103,7 +103,7 @@ This context requires:
         </property>
     </bean>
 
-    <bean id="triggerHandlerTarget" class="com.zutubi.pulse.scheduling.DefaultTriggerHandler">
+    <bean id="triggerHandlerTarget" class="com.zutubi.pulse.master.scheduling.DefaultTriggerHandler">
         <!-- not sure why this is needs to be wired directly. -->
         <property name="objectFactory">
             <ref bean="objectFactory"/>

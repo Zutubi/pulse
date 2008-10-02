@@ -1,7 +1,7 @@
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.pulse.monitor.TaskException;
-import com.zutubi.pulse.restore.BackupConfiguration;
+import com.zutubi.pulse.master.monitor.TaskException;
+import com.zutubi.pulse.master.restore.BackupConfiguration;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.MutableRecordImpl;
 import com.zutubi.tove.type.record.Record;

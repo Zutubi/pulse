@@ -2,9 +2,9 @@ package com.zutubi.pulse.tove.config.project.triggers;
 
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.pulse.scheduling.CronTrigger;
-import com.zutubi.pulse.scheduling.Trigger;
-import com.zutubi.pulse.scheduling.tasks.BuildProjectTask;
+import com.zutubi.pulse.master.scheduling.CronTrigger;
+import com.zutubi.pulse.master.scheduling.Trigger;
+import com.zutubi.pulse.master.scheduling.tasks.BuildProjectTask;
 import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.validation.annotations.Constraint;

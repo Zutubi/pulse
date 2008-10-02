@@ -1,8 +1,6 @@
 package com.zutubi.pulse.upgrade;
 
-import com.zutubi.pulse.monitor.Task;
-
-import java.util.List;
+import com.zutubi.pulse.master.monitor.Task;
 
 /**
  * The upgrade task interface.

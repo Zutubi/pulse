@@ -13,7 +13,7 @@ import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.model.UserManager;
-import com.zutubi.pulse.renderer.BuildResultRenderer;
+import com.zutubi.pulse.master.renderer.BuildResultRenderer;
 import com.zutubi.pulse.tove.config.admin.EmailConfiguration;
 import com.zutubi.pulse.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.tove.config.project.hooks.BuildHookTaskConfiguration;

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.cleanup;
 
-import com.zutubi.pulse.scheduling.Task;
-import com.zutubi.pulse.scheduling.TaskExecutionContext;
+import com.zutubi.pulse.master.scheduling.Task;
+import com.zutubi.pulse.master.scheduling.TaskExecutionContext;
 
 /**
  * <class-comment/>

@@ -18,7 +18,7 @@ import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.model.UserManager;
-import com.zutubi.pulse.scheduling.quartz.TimeoutRecipeJob;
+import com.zutubi.pulse.master.scheduling.quartz.TimeoutRecipeJob;
 import com.zutubi.pulse.servercore.events.system.SystemStartedEvent;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;

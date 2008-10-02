@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web.restore;
 
+import com.zutubi.pulse.master.restore.RestoreManager;
 import com.zutubi.pulse.web.ActionSupport;
-import com.zutubi.pulse.restore.RestoreManager;
 
 /**
  *

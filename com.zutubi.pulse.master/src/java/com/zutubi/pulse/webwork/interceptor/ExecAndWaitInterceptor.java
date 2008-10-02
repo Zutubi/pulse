@@ -2,7 +2,7 @@ package com.zutubi.pulse.webwork.interceptor;
 
 import com.opensymphony.xwork.ActionInvocation;
 import com.opensymphony.xwork.ActionProxy;
-import com.zutubi.pulse.monitor.Monitor;
+import com.zutubi.pulse.master.monitor.Monitor;
 import com.zutubi.pulse.web.restore.ExecuteRestoreAction;
 
 /**

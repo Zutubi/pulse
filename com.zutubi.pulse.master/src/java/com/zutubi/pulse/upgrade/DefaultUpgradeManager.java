@@ -1,6 +1,6 @@
 package com.zutubi.pulse.upgrade;
 
-import com.zutubi.pulse.monitor.*;
+import com.zutubi.pulse.master.monitor.*;
 import com.zutubi.util.logging.Logger;
 
 import java.util.*;

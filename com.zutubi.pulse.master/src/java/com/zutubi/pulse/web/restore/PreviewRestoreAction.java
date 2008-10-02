@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web.restore;
 
-import com.zutubi.pulse.restore.Archive;
-import com.zutubi.pulse.monitor.Task;
+import com.zutubi.pulse.master.monitor.Task;
+import com.zutubi.pulse.master.restore.Archive;
 
 import java.util.List;
 

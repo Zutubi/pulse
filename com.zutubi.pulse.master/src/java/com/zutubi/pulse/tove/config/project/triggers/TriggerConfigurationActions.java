@@ -1,8 +1,8 @@
 package com.zutubi.pulse.tove.config.project.triggers;
 
-import com.zutubi.pulse.scheduling.Scheduler;
-import com.zutubi.pulse.scheduling.SchedulingException;
-import com.zutubi.pulse.scheduling.Trigger;
+import com.zutubi.pulse.master.scheduling.Scheduler;
+import com.zutubi.pulse.master.scheduling.SchedulingException;
+import com.zutubi.pulse.master.scheduling.Trigger;
 
 import java.util.LinkedList;
 import java.util.List;

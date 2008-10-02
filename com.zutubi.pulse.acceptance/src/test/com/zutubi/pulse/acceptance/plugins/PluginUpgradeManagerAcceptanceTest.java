@@ -6,7 +6,7 @@ import com.zutubi.pulse.core.plugins.PluginPaths;
 import com.zutubi.pulse.core.plugins.PluginRegistryEntry;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.core.util.FileSystemUtils;
-import com.zutubi.pulse.plugins.PluginUpgradeManager;
+import com.zutubi.pulse.master.plugins.PluginUpgradeManager;
 import com.zutubi.pulse.upgrade.DefaultUpgradeManager;
 import com.zutubi.pulse.upgrade.UpgradeTask;
 import com.zutubi.pulse.upgrade.UpgradeableComponent;

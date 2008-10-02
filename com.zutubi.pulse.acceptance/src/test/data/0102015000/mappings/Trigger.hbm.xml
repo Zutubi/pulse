@@ -2,7 +2,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
 <hibernate-mapping>
 
-    <class name="com.zutubi.pulse.scheduling.Trigger" table="LOCAL_TRIGGER" lazy="false">
+    <class name="com.zutubi.pulse.master.scheduling.Trigger" table="LOCAL_TRIGGER" lazy="false">
 
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
@@ -26,19 +26,19 @@
 
         <property name="triggerState" column="STATE" type="string" not-null="true"/>
 
-        <subclass name="com.zutubi.pulse.scheduling.NoopTrigger" discriminator-value="NOOP" dynamic-update="false">
+        <subclass name="com.zutubi.pulse.master.scheduling.NoopTrigger" discriminator-value="NOOP" dynamic-update="false">
         </subclass>
 
-        <subclass name="com.zutubi.pulse.scheduling.CronTrigger" discriminator-value="CRON" dynamic-update="false">
+        <subclass name="com.zutubi.pulse.master.scheduling.CronTrigger" discriminator-value="CRON" dynamic-update="false">
             <property name="cron" column="CRON" type="string" not-null="false"/>
         </subclass>
 
-        <subclass name="com.zutubi.pulse.scheduling.EventTrigger" discriminator-value="EVENT" dynamic-update="false">
+        <subclass name="com.zutubi.pulse.master.scheduling.EventTrigger" discriminator-value="EVENT" dynamic-update="false">
             <property name="triggerEvent" column="TRIGGER_EVENT" type="class"/>
             <property name="filterClass" column="FILTER_CLASS" type="class"/>
         </subclass>
 
-        <subclass name="com.zutubi.pulse.scheduling.SimpleTrigger" discriminator-value="SIMPLE" dynamic-update="false">
+        <subclass name="com.zutubi.pulse.master.scheduling.SimpleTrigger" discriminator-value="SIMPLE" dynamic-update="false">
         </subclass>
 
     </class>

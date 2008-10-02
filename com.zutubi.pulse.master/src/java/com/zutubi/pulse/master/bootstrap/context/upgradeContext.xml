@@ -22,7 +22,7 @@
         </property>
     </bean>
 
-    <bean id="pluginUpgradeManager" class="com.zutubi.pulse.plugins.PluginUpgradeManager" init-method="init" autowire="byName"/>
+    <bean id="pluginUpgradeManager" class="com.zutubi.pulse.master.plugins.PluginUpgradeManager" init-method="init" autowire="byName"/>
 
     <bean id="pulseUpgradeableComponent" class="com.zutubi.pulse.upgrade.tasks.PulseUpgradeableComponent" autowire="byName">
         <property name="tasks">

@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.migrate;
 
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.monitor.AbstractTask;
-import com.zutubi.pulse.monitor.TaskException;
+import com.zutubi.pulse.master.monitor.AbstractTask;
+import com.zutubi.pulse.master.monitor.TaskException;
 
 import java.io.IOException;
 import java.util.Properties;

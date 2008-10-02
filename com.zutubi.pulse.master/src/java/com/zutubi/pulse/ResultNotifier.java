@@ -12,7 +12,7 @@ import com.zutubi.pulse.master.events.build.BuildCompletedEvent;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
-import com.zutubi.pulse.renderer.BuildResultRenderer;
+import com.zutubi.pulse.master.renderer.BuildResultRenderer;
 import com.zutubi.pulse.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.tove.config.user.SubscriptionConfiguration;

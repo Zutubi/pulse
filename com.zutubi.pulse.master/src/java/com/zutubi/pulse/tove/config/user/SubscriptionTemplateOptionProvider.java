@@ -1,7 +1,7 @@
 package com.zutubi.pulse.tove.config.user;
 
-import com.zutubi.pulse.renderer.BuildResultRenderer;
-import com.zutubi.pulse.renderer.TemplateInfo;
+import com.zutubi.pulse.master.renderer.BuildResultRenderer;
+import com.zutubi.pulse.master.renderer.TemplateInfo;
 import com.zutubi.tove.MapOption;
 import com.zutubi.tove.MapOptionProvider;
 import com.zutubi.tove.type.TypeProperty;

@@ -1,14 +1,14 @@
 package com.zutubi.pulse.upgrade.tasks;
 
-import com.zutubi.pulse.monitor.TaskException;
+import com.zutubi.pulse.master.monitor.TaskException;
 import com.zutubi.tove.type.record.MutableRecord;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.tove.type.record.RecordManager;
 import com.zutubi.util.RandomUtils;
 import org.acegisecurity.providers.encoding.Md5PasswordEncoder;
 
-import java.util.Map;
 import java.security.GeneralSecurityException;
+import java.util.Map;
 
 public class FixNPEOnLDAPRememberMeUpgradeTask extends AbstractUpgradeTask
 {

@@ -1,8 +1,8 @@
 package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.master.model.Project;
-import com.zutubi.pulse.scheduling.SchedulingException;
-import com.zutubi.pulse.scheduling.Trigger;
+import com.zutubi.pulse.master.scheduling.SchedulingException;
+import com.zutubi.pulse.master.scheduling.Trigger;
 import com.zutubi.util.logging.Logger;
 
 /**

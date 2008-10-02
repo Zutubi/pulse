@@ -1,7 +1,7 @@
 package com.zutubi.pulse.tove.config.project.triggers;
 
-import com.zutubi.pulse.scheduling.Scheduler;
-import com.zutubi.pulse.scheduling.Trigger;
+import com.zutubi.pulse.master.scheduling.Scheduler;
+import com.zutubi.pulse.master.scheduling.Trigger;
 
 /**
  *

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.upgrade;
 
-import com.zutubi.pulse.monitor.TaskException;
+import com.zutubi.pulse.master.monitor.TaskException;
 
 /**
  * <class-comment/>

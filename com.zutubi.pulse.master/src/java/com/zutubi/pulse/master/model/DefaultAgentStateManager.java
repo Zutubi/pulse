@@ -2,11 +2,11 @@ package com.zutubi.pulse.master.model;
 
 import com.zutubi.pulse.master.agent.AgentPingService;
 import com.zutubi.pulse.master.model.persistence.AgentStateDao;
-import com.zutubi.pulse.scheduling.Scheduler;
-import com.zutubi.pulse.scheduling.SchedulingException;
-import com.zutubi.pulse.scheduling.SimpleTrigger;
-import com.zutubi.pulse.scheduling.Trigger;
-import com.zutubi.pulse.scheduling.tasks.PingSlaves;
+import com.zutubi.pulse.master.scheduling.Scheduler;
+import com.zutubi.pulse.master.scheduling.SchedulingException;
+import com.zutubi.pulse.master.scheduling.SimpleTrigger;
+import com.zutubi.pulse.master.scheduling.Trigger;
+import com.zutubi.pulse.master.scheduling.tasks.PingSlaves;
 import com.zutubi.util.Constants;
 import com.zutubi.util.logging.Logger;
 
