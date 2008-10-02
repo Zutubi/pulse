@@ -7,7 +7,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 /**
- * <class-comment/>
  */
 public class VersionTest extends PulseTestCase
 {

@@ -13,7 +13,13 @@ import java.util.Properties;
 /**
  * This class provides a java interface to the contents of the version.properties
  * file. All access to the contents of that properties file should be handled
- * through ths object.
+ * through ths object.  As such, this object provides access to the following:
+ * <ul>
+ * <li>version number: the human friendly product version string</li>
+ * <li>build date: the date on which this version of the product was built.</li>
+ * <li>build number: the unique build number identifying this build.</li>
+ * <li>release date: the date on which this major.minor version of the software was released.</li>
+ * </ul>
  */
 public class Version implements Comparable
 {
@@ -93,6 +99,8 @@ public class Version implements Comparable
     /**
      * The version string is a human readable representation of the current version
      * of the system.
+     *
+     * @return the version number
      */
     public String getVersionNumber()
     {
@@ -102,6 +110,8 @@ public class Version implements Comparable
     /**
      * The build date is a string representing the date that this version of the system
      * was built.
+     *
+     * @return the build date
      */
     public String getBuildDate()
     {
@@ -136,6 +146,8 @@ public class Version implements Comparable
      *
      * This is used to distinguish between a 'software release date' (releaseDate) and a
      * 'patch release date' (buildDate)
+     *
+     * @return the release date.
      */
     public String getReleaseDate()
     {
@@ -170,6 +182,8 @@ public class Version implements Comparable
     /**
      * The build number is a machine friendly representation of the current version of the
      * system.
+     *
+     * @return the build number.
      */
     public String getBuildNumber()
     {
@@ -206,9 +220,9 @@ public class Version implements Comparable
     /**
      * Write this verison object to the specified output stream.
      *
-     * @param out
+     * @param out the output stream to which we are writing the version details.
      *
-     * @throws IOException
+     * @throws IOException if there is a problem writing to the specified output stream
      */
     public void write(OutputStream out) throws IOException
     {
@@ -219,7 +233,7 @@ public class Version implements Comparable
 
     /**
      * Write this version object to the specified properties object.
-     * @param props
+     * @param props the properties object to which we are writing the version details in key:value format.
      */
     public void write(Properties props)
     {
@@ -231,7 +245,9 @@ public class Version implements Comparable
 
     /**
      * Helper method for writing this version to a file.
-     * @param f
+     * @param f the file to which we are writing the version details.
+     *
+     * @throws IOException if there is a problem writing the version details to the file.
      */
     public void write(File f) throws IOException
     {
@@ -250,9 +266,11 @@ public class Version implements Comparable
     /**
      * Helper method for reading version from a file.
      *
-     * @param f
+     * @param f the file from which we are loading the version details.
      *
      * @return version defined in file, or null.
+     *
+     * @throws IOException if we failed to load the version details from the specified file.
      */
     public static Version load(File f) throws IOException
     {
