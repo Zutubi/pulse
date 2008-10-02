@@ -1,11 +1,11 @@
 package com.zutubi.tove.config;
 
 import com.zutubi.config.annotations.ConfigurationCheck;
-import com.zutubi.pulse.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.config.ConfigurationCheckHandler;
 import com.zutubi.pulse.core.config.ConfigurationCreator;
 import com.zutubi.pulse.core.scm.config.PollableScmConfiguration;
+import com.zutubi.pulse.master.cleanup.config.CleanupConfiguration;
 import com.zutubi.pulse.security.GlobalAuthorityProvider;
 import com.zutubi.pulse.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.tove.config.agent.AgentConfiguration;

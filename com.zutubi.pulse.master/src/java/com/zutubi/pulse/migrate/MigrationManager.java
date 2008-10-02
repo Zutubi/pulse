@@ -1,10 +1,10 @@
 package com.zutubi.pulse.migrate;
 
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.database.DatabaseConfig;
+import com.zutubi.pulse.hibernate.MutableConfiguration;
+import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.monitor.JobManager;
 import com.zutubi.pulse.monitor.Monitor;
-import com.zutubi.pulse.hibernate.MutableConfiguration;
 
 import java.io.IOException;
 import java.util.List;

@@ -3,7 +3,7 @@ package com.zutubi.pulse.tove.config.user;
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.condition.NotifyConditionFactory;
+import com.zutubi.pulse.master.condition.NotifyConditionFactory;
 import com.zutubi.util.StringUtils;
 import com.zutubi.validation.Validateable;
 import com.zutubi.validation.ValidationContext;

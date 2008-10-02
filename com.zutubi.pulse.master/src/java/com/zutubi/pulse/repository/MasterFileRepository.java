@@ -1,7 +1,7 @@
 package com.zutubi.pulse.repository;
 
 import com.zutubi.pulse.MasterBuildPaths;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.servercore.repository.FileRepository;
 
 import java.io.File;

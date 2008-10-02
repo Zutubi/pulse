@@ -1,7 +1,7 @@
 package com.zutubi.pulse.tove.config.setup;
 
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.bootstrap.SetupManager;
+import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.master.bootstrap.SetupManager;
 import com.zutubi.pulse.model.AcegiUser;
 import com.zutubi.pulse.model.GrantedAuthority;
 import com.zutubi.pulse.model.User;

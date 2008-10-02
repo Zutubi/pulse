@@ -1,6 +1,6 @@
 package com.zutubi.pulse.web.tree;
 
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.web.ActionSupport;
 
 import java.io.File;

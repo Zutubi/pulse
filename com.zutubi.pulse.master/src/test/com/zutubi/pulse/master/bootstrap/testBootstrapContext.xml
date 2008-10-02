@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+
+    <bean id="dataSource" class="com.zutubi.pulse.database.DataSourceBeanFactory" destroy-method="close" autowire="byName"/>
+    
+    <bean id="databaseConfig" class="com.zutubi.pulse.database.DatabaseConfig">
+        <constructor-arg index="0">
+            <props>
+                <prop key="jdbc.driverClassName">org.hsqldb.jdbcDriver</prop>
+                <prop key="jdbc.url">jdbc:hsqldb:mem:testdb</prop>
+                <prop key="jdbc.username">sa</prop>
+                <prop key="jdbc.password"></prop>
+                <prop key="hibernate.dialect">org.hibernate.dialect.HSQLDialect</prop>
+            </props>
+        </constructor-arg>
+    </bean>
+
+    <bean id="postgresDatabaseConfig" class="com.zutubi.pulse.database.DatabaseConfig">
+        <constructor-arg index="0">
+            <props>
+                <prop key="jdbc.driverClassName">org.postgresql.Driver</prop>
+                <prop key="jdbc.url">jdbc:postgresql://localhost:5432/pulse</prop>
+                <prop key="jdbc.username">postgres</prop>
+                <prop key="jdbc.password">postgres</prop>
+                <prop key="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</prop>
+            </props>
+        </constructor-arg>
+    </bean>
+
+    <bean id="configurationManager" class="com.zutubi.pulse.master.bootstrap.SimpleMasterConfigurationManager">
+        <property name="systemPaths">
+            <bean class="com.zutubi.pulse.servercore.bootstrap.ConfigurableSystemPaths">
+                <property name="systemRootString">
+                    <value>master/system</value>
+                </property>
+                <property name="contentRootString">
+                    <value>master/src/www</value>
+                </property>
+                <property name="configRootString">
+                    <value>master/etc</value>
+                </property>
+                <property name="logRootString">
+                    <value>master/system/logs</value>
+                </property>
+                <property name="tmpRootString">
+                    <value>master/system/tmp</value>
+                </property>
+                <property name="templateRootStrings">
+                    <list>
+                        <value>master/src/templates</value>
+                        <value>master/src/www</value>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean name="objectFactory" class="com.zutubi.pulse.core.spring.SpringObjectFactory"/>
+
+    <bean id="eventManager" class="com.zutubi.events.DefaultEventManager">
+        <constructor-arg index="0" ref="eventDispatcher"/>
+    </bean>
+
+    <bean id="eventDispatcher" class="com.zutubi.events.SynchronousDispatcher"/>
+
+    <bean id="threadFactory" class="com.zutubi.pulse.security.PulseThreadFactory"/>
+
+</beans>

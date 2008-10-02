@@ -1,9 +1,9 @@
 package com.zutubi.pulse.web.user;
 
-import com.zutubi.util.TextUtils;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.web.ActionSupport;
+import com.zutubi.util.TextUtils;
 
 import java.util.Arrays;
 

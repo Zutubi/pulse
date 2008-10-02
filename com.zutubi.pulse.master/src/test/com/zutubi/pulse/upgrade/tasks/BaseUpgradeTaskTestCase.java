@@ -1,11 +1,11 @@
 package com.zutubi.pulse.upgrade.tasks;
 
 import com.zutubi.pulse.core.spring.SpringComponentContext;
+import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.util.JDBCUtils;
 import com.zutubi.pulse.database.DatabaseConfig;
 import com.zutubi.pulse.database.DatabaseConsole;
 import com.zutubi.pulse.database.DatabaseConsoleBeanFactory;
-import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.pulse.core.util.JDBCUtils;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.hsqldb.jdbcDriver;
 
@@ -37,7 +37,7 @@ public abstract class BaseUpgradeTaskTestCase extends PulseTestCase
     {
         super.setUp();
 
-        SpringComponentContext.addClassPathContextDefinitions("com/zutubi/pulse/bootstrap/testBootstrapContext.xml");
+        SpringComponentContext.addClassPathContextDefinitions("com/zutubi/pulse/master/bootstrap/testBootstrapContext.xml");
         dataSource = (BasicDataSource) SpringComponentContext.getBean("dataSource");
         databaseConfig = (DatabaseConfig) SpringComponentContext.getBean("databaseConfig");
 

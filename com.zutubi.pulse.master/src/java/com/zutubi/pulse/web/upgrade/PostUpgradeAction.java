@@ -1,6 +1,6 @@
 package com.zutubi.pulse.web.upgrade;
 
-import com.zutubi.pulse.bootstrap.SetupManager;
+import com.zutubi.pulse.master.bootstrap.SetupManager;
 
 /**
  * <class-comment/>

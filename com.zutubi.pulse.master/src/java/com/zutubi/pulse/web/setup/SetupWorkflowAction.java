@@ -1,7 +1,6 @@
 package com.zutubi.pulse.web.setup;
 
-import com.zutubi.pulse.bootstrap.SetupManager;
-import com.zutubi.pulse.bootstrap.SetupState;
+import com.zutubi.pulse.master.bootstrap.SetupManager;
 
 /**
  * Redirects to the correct action based on the current setup state.

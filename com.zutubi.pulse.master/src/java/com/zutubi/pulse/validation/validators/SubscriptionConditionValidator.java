@@ -3,11 +3,11 @@ package com.zutubi.pulse.validation.validators;
 import antlr.MismatchedTokenException;
 import antlr.NoViableAltException;
 import antlr.collections.AST;
-import com.zutubi.pulse.condition.NotifyCondition;
-import com.zutubi.pulse.condition.NotifyConditionFactory;
-import com.zutubi.pulse.condition.antlr.NotifyConditionLexer;
-import com.zutubi.pulse.condition.antlr.NotifyConditionParser;
-import com.zutubi.pulse.condition.antlr.NotifyConditionTreeParser;
+import com.zutubi.pulse.master.condition.NotifyCondition;
+import com.zutubi.pulse.master.condition.NotifyConditionFactory;
+import com.zutubi.pulse.master.condition.antlr.NotifyConditionLexer;
+import com.zutubi.pulse.master.condition.antlr.NotifyConditionParser;
+import com.zutubi.pulse.master.condition.antlr.NotifyConditionTreeParser;
 import com.zutubi.validation.ValidationException;
 import com.zutubi.validation.validators.StringFieldValidatorSupport;
 

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.external.jira;
 
 import com.zutubi.config.annotations.*;
-import com.zutubi.pulse.committransformers.Substitution;
+import com.zutubi.pulse.master.committransformers.Substitution;
 import com.zutubi.pulse.tove.config.project.commit.CommitMessageTransformerConfiguration;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;

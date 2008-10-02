@@ -1,10 +1,10 @@
 package com.zutubi.pulse.model;
 
-import com.zutubi.util.TextUtils;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.model.persistence.TestCaseIndexDao;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 import nu.xom.Attribute;
 import nu.xom.Element;

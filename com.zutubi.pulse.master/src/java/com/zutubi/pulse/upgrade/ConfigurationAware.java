@@ -1,6 +1,6 @@
 package com.zutubi.pulse.upgrade;
 
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 
 /**
  * Interface for upgrade tasks that require access to the configuration

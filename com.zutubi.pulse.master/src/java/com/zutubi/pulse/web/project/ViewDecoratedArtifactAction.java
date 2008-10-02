@@ -1,9 +1,9 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.PlainFeature;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
+import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.util.logging.Logger;
 
 import java.io.*;

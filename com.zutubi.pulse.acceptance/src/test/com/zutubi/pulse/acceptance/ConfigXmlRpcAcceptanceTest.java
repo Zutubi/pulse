@@ -8,12 +8,11 @@ import com.zutubi.pulse.tove.config.user.UserConfigurationActions;
 import com.zutubi.tove.config.ConfigurationRegistry;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.Sort;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import java.util.*;
-
-import org.testng.annotations.Test;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.AfterMethod;
 
 /**
  * Tests for the remote API functions dealing with configuration.  Other
@@ -643,7 +642,7 @@ public class ConfigXmlRpcAcceptanceTest extends BaseXmlRpcAcceptanceTest
         }
         catch(Exception e)
         {
-            assertEquals("java.lang.Exception: com.zutubi.pulse.api.ValidationException: password: passwords do not match", e.getMessage());
+            assertEquals("java.lang.Exception: com.zutubi.pulse.master.api.ValidationException: password: passwords do not match", e.getMessage());
         }
         finally
         {

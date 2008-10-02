@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+
+    <bean id="velocityEngine" class="com.zutubi.pulse.master.bootstrap.velocity.VelocityEngineFactoryBean"/>
+
+    <bean id="transactionInterceptor" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="buildManagerTarget" class="com.zutubi.pulse.model.DefaultBuildManager" autowire="byName"
+          init-method="init"/>
+    <bean id="buildManager" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="target">
+            <ref bean="buildManagerTarget"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <value>securityInterceptor</value>
+                <value>transactionInterceptor</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="projectManagerTarget" class="com.zutubi.pulse.model.DefaultProjectManager" autowire="byName"/>
+    <bean id="projectManager" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="target">
+            <ref bean="projectManagerTarget"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <value>securityInterceptor</value>
+                <value>transactionInterceptor</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="resourceManagerTarget" class="com.zutubi.pulse.model.DefaultResourceManager" autowire="byName"/>
+    <bean id="resourceManager" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="target">
+            <ref bean="resourceManagerTarget"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <value>transactionInterceptor</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="agentStateManagerTarget" class="com.zutubi.pulse.model.DefaultAgentStateManager" autowire="byName"
+          init-method="init"/>
+    <bean id="agentStateManager" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="target">
+            <ref bean="agentStateManagerTarget"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <value>transactionInterceptor</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="scmManager" class="com.zutubi.pulse.model.DefaultScmManager" autowire="byName" init-method="init" destroy-method="shutdown"/>
+
+    <bean id="testManagerTarget" class="com.zutubi.pulse.model.DefaultTestManager" autowire="byName"/>
+    <bean id="testManager" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="target">
+            <ref bean="testManagerTarget"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <value>transactionInterceptor</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="agentManagerTarget" class="com.zutubi.pulse.master.agent.DefaultAgentManager" autowire="byName"/>
+    <bean id="agentManager" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="target">
+            <ref bean="agentManagerTarget"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <value>securityInterceptor</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="masterLocationProvider" class="com.zutubi.pulse.master.agent.DefaultMasterLocationProvider" autowire="byName"/>
+
+    <bean id="agentPingService" class="com.zutubi.pulse.master.agent.AgentPingService" autowire="byName" init-method="init"/>
+
+    <bean id="resourceDiscoveryService" class="com.zutubi.pulse.master.agent.ResourceDiscoveryService" autowire="byName" init-method="init"/>
+
+    <bean id="recipeTerminationService" class="com.zutubi.pulse.master.agent.RecipeTerminationService" autowire="byName" init-method="init"/>
+
+    <bean id="recipeProcessor" class="com.zutubi.pulse.core.RecipeProcessor" autowire="byName" init-method="init"/>
+
+    <bean id="fileLoaderFactory" class="com.zutubi.pulse.core.PulseFileLoaderFactory" autowire="byName"/>
+
+    <bean id="masterRecipeProcessor" class="com.zutubi.pulse.MasterRecipeProcessor" autowire="byName"/>
+
+    <bean id="buildResultRenderer" class="com.zutubi.pulse.renderer.FreemarkerBuildResultRenderer" autowire="byName"/>
+
+    <bean id="masterConfiguration" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+        <property name="targetBeanName">
+            <value>configurationManager</value>
+        </property>
+        <property name="propertyPath">
+            <value>appConfig</value>
+        </property>
+    </bean>
+
+    <bean id="systemConfiguration" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+        <property name="targetBeanName">
+            <value>configurationManager</value>
+        </property>
+        <property name="propertyPath">
+            <value>systemConfig</value>
+        </property>
+    </bean>
+
+    <bean id="userConfigRoot" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+        <property name="targetBeanName">
+            <value>configurationManager</value>
+        </property>
+        <property name="propertyPath">
+            <value>userPaths.userConfigRoot</value>
+        </property>
+    </bean>
+
+    <bean id="configRoot" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+        <property name="targetBeanName">
+            <value>configurationManager</value>
+        </property>
+        <property name="propertyPath">
+            <value>systemPaths.configRoot</value>
+        </property>
+    </bean>
+
+    <bean id="slaveProxyFactory" class="com.zutubi.pulse.SlaveProxyFactory" autowire="byName"/>
+
+    <bean id="hessianProxyFactory" class="com.zutubi.pulse.servercore.hessian.CustomHessianProxyFactory" autowire="byName"/>
+
+    <bean id="fatController" class="com.zutubi.pulse.FatController" autowire="byName" init-method="init"/>
+
+    <bean id="recipeQueue" class="com.zutubi.pulse.ThreadedRecipeQueue" autowire="byName"/>
+
+    <bean id="recipeDispatchService" class="com.zutubi.pulse.RecipeDispatchService" autowire="byName" init-method="init"/>
+
+    <bean id="resultNotifier" class="com.zutubi.pulse.ResultNotifier" autowire="byName" init-method="init"/>
+
+    <bean id="shutdownManager" class="com.zutubi.pulse.servercore.ShutdownManager">
+        <property name="stoppables">
+            <list>
+                <ref bean="scheduler"/>
+                <ref bean="fatController"/>
+                <ref bean="recipeQueue"/>
+                <ref bean="masterRecipeProcessor"/>
+                <ref bean="agentPingService"/>
+                <ref bean="agentManager"/>
+                <ref bean="jabberManager"/>
+                <ref bean="jettyManager"/>
+                <ref bean="databaseConsole"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="tokenManager" class="com.zutubi.pulse.master.api.DefaultTokenManager" autowire="byName" init-method="init"/>
+
+    <bean id="serverMessagesHandler" class="com.zutubi.pulse.servercore.logging.ServerMessagesHandler" init-method="init"/>
+
+    <bean id="notifyConditionFactory" class="com.zutubi.pulse.master.condition.NotifyConditionFactory">
+        <property name="objectFactory">
+            <ref bean="objectFactory"/>
+        </property>
+    </bean>
+
+    <bean id="jabberManager" class="com.zutubi.pulse.jabber.JabberManager" autowire="byName"/>
+
+    <bean id="licenseMonitor" class="com.zutubi.pulse.license.LicenseMonitor" autowire="byName" init-method="init"/>
+
+    <bean id="postProcessorManager" class="com.zutubi.pulse.DefaultPostProcessorManager" autowire="byName"/>
+
+    <bean id="guestAccessManager" class="com.zutubi.pulse.GuestAccessManager" autowire="byName"/>
+
+    <bean id="queries" class="com.zutubi.pulse.search.Queries" autowire="byName"/>
+
+    <bean id="serviceTokenManager" class="com.zutubi.pulse.servercore.services.ServiceTokenManager" autowire="byName" init-method="init"/>
+
+    <!-- re create the file system manager now that the slave details are available. -->
+    <bean id="fileSystemManager" class="com.zutubi.pulse.vfs.VfsManagerFactoryBean" destroy-method="shutdown">
+        <property name="agentManager"><ref local="agentManager"/></property>
+        <property name="slaveProxyFactory"><ref local="slaveProxyFactory"/></property>
+        <property name="serviceTokenManager"><ref local="serviceTokenManager"/></property>
+        <property name="objectFactory"><ref bean="objectFactory"/></property>
+    </bean>
+
+    <bean id="cleanupManager" class="com.zutubi.pulse.master.cleanup.CleanupManager" autowire="byName" init-method="init"/>
+
+    <bean id="triggerManager" class="com.zutubi.pulse.tove.config.project.triggers.TriggerManager" autowire="byName"/>
+
+    <bean id="buildHookManager" class="com.zutubi.pulse.tove.config.project.hooks.BuildHookManager" autowire="byName"/>
+
+    <bean id="configurationProvider" class="com.zutubi.tove.config.DefaultConfigurationProvider" autowire="byName"/>
+
+    <bean id="scmContextFactory" class="com.zutubi.pulse.master.scm.DefaultScmContextFactory">
+        <property name="projectsDir">
+            <bean id="projectDir" class="org.springframework.beans.factory.config.PropertyPathFactoryBean">
+                <property name="targetBeanName">
+                    <value>configurationManager</value>
+                </property>
+                <property name="propertyPath">
+                    <value>userPaths.projectRoot</value>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+</beans>

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.tove.config.project.commit;
 
-import com.zutubi.pulse.committransformers.CommitMessageSupport;
 import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.master.committransformers.CommitMessageSupport;
 
 import java.util.Arrays;
 

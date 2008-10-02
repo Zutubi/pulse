@@ -1,7 +1,7 @@
 package com.zutubi.pulse.freemarker;
 
 import com.opensymphony.webwork.views.freemarker.FreemarkerManager;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.util.logging.Logger;
 import freemarker.cache.FileTemplateLoader;

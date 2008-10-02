@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web.setup;
 
+import com.zutubi.pulse.master.bootstrap.SetupManager;
 import com.zutubi.pulse.web.ActionSupport;
-import com.zutubi.pulse.bootstrap.SetupManager;
 
 /**
  * <class-comment/>

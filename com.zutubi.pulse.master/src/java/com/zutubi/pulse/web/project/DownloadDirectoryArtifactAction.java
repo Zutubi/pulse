@@ -1,9 +1,9 @@
 package com.zutubi.pulse.web.project;
 
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.util.ZipUtils;
+import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.io.TempFileInputStream;
 

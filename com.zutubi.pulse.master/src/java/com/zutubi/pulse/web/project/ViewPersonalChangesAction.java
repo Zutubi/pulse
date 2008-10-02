@@ -1,9 +1,9 @@
 package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.MasterBuildPaths;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.personal.PatchArchive;
+import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.model.BuildResult;
 import com.zutubi.util.logging.Logger;
 

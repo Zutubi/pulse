@@ -2,10 +2,10 @@ package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.MasterBuildPaths;
 import com.zutubi.pulse.core.model.RecipeResult;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.model.BuildResult;
-import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.model.RecipeResultNode;
+import com.zutubi.pulse.model.User;
 import com.zutubi.pulse.tove.config.user.UserPreferencesConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
 

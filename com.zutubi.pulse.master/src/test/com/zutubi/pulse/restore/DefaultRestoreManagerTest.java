@@ -1,12 +1,12 @@
 package com.zutubi.pulse.restore;
 
-import com.zutubi.pulse.bootstrap.Data;
+import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.pulse.master.bootstrap.Data;
+import com.zutubi.pulse.monitor.JobManager;
 import com.zutubi.pulse.monitor.Monitor;
 import com.zutubi.pulse.monitor.Task;
 import com.zutubi.pulse.monitor.TaskFeedback;
-import com.zutubi.pulse.monitor.JobManager;
-import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.pulse.core.util.FileSystemUtils;
 
 import java.io.File;
 import java.util.List;

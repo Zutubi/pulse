@@ -1,8 +1,8 @@
 package com.zutubi.pulse.scheduling;
 
 import com.zutubi.pulse.core.spring.SpringComponentContext;
-import com.zutubi.pulse.model.persistence.hibernate.PersistenceTestCase;
 import com.zutubi.pulse.model.persistence.TriggerDao;
+import com.zutubi.pulse.model.persistence.hibernate.PersistenceTestCase;
 
 /**
  * <class-comment/>
@@ -39,9 +39,9 @@ public class DefaultTriggerHandlerPersistenceTest extends PersistenceTestCase
 
     protected String[] getConfigLocations()
     {
-        return new String[]{"com/zutubi/pulse/bootstrap/testBootstrapContext.xml",
-                "com/zutubi/pulse/bootstrap/context/hibernateContext.xml",
-                "com/zutubi/pulse/bootstrap/context/schedulingContext.xml"};
+        return new String[]{"com/zutubi/pulse/master/bootstrap/testBootstrapContext.xml",
+                "com/zutubi/pulse/master/bootstrap/context/hibernateContext.xml",
+                "com/zutubi/pulse/master/bootstrap/context/schedulingContext.xml"};
     }
 
     /**

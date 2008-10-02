@@ -2,7 +2,7 @@ package com.zutubi.pulse.tove.config.project.commit;
 
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.pulse.committransformers.Substitution;
+import com.zutubi.pulse.master.committransformers.Substitution;
 import com.zutubi.validation.annotations.Required;
 import com.zutubi.validation.annotations.ValidRegex;
 

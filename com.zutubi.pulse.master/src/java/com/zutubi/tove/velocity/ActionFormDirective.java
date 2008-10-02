@@ -1,6 +1,6 @@
 package com.zutubi.tove.velocity;
 
-import com.zutubi.pulse.bootstrap.freemarker.FreemarkerConfigurationFactoryBean;
+import com.zutubi.pulse.master.bootstrap.freemarker.FreemarkerConfigurationFactoryBean;
 import com.zutubi.tove.FormDescriptor;
 import com.zutubi.tove.FormDescriptorFactory;
 import com.zutubi.tove.model.Form;

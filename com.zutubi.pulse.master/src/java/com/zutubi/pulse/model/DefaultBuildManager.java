@@ -1,15 +1,15 @@
 package com.zutubi.pulse.model;
 
 import com.zutubi.pulse.MasterBuildPaths;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.pulse.database.DatabaseConsole;
+import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.model.persistence.ArtifactDao;
 import com.zutubi.pulse.model.persistence.BuildResultDao;
 import com.zutubi.pulse.model.persistence.ChangelistDao;
 import com.zutubi.pulse.model.persistence.FileArtifactDao;
 import com.zutubi.pulse.security.PulseThreadFactory;
-import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;

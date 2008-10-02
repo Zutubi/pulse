@@ -19,13 +19,13 @@
             <element type="long" column="PROJECT_ID" not-null="true"/>
         </bag>
 
-        <subclass name="com.zutubi.pulse.committransformers.LinkCommitMessageTransformer" discriminator-value="LINK" dynamic-update="false">
+        <subclass name="com.zutubi.pulse.master.committransformers.LinkCommitMessageTransformer" discriminator-value="LINK" dynamic-update="false">
         </subclass>
 
-        <subclass name="com.zutubi.pulse.committransformers.CustomCommitMessageTransformer" discriminator-value="CUSTOM" dynamic-update="false">
+        <subclass name="com.zutubi.pulse.master.committransformers.CustomCommitMessageTransformer" discriminator-value="CUSTOM" dynamic-update="false">
         </subclass>
 
-        <subclass name="com.zutubi.pulse.committransformers.JiraCommitMessageTransformer" discriminator-value="JIRA" dynamic-update="false">
+        <subclass name="com.zutubi.pulse.master.committransformers.JiraCommitMessageTransformer" discriminator-value="JIRA" dynamic-update="false">
         </subclass>
 
     </class>

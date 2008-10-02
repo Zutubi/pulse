@@ -17,8 +17,8 @@ public abstract class MasterPersistenceTestCase extends PersistenceTestCase
     protected String[] getConfigLocations()
     {
         return new String[]{
-                "com/zutubi/pulse/bootstrap/testBootstrapContext.xml",
-                "com/zutubi/pulse/bootstrap/context/hibernateContext.xml"
+                "com/zutubi/pulse/master/bootstrap/testBootstrapContext.xml",
+                "com/zutubi/pulse/master/bootstrap/context/hibernateContext.xml"
         };
     }
 }

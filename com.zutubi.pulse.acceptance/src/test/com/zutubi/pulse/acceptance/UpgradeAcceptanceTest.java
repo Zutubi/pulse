@@ -117,7 +117,7 @@ public class UpgradeAcceptanceTest extends SeleniumTestBase
         restoreDatabase(buildDir);
 
         setupServerProperties(build);
-        System.setProperty("bootstrap", "com/zutubi/pulse/bootstrap/ideaBootstrapContext.xml");
+        System.setProperty("bootstrap", "com/zutubi/pulse/master/bootstrap/ideaBootstrapContext.xml");
 
         runUpgrade(build);
     }
@@ -225,7 +225,7 @@ public class UpgradeAcceptanceTest extends SeleniumTestBase
 
     public void testUpgradeFromVersionOnePointOne() throws Exception
     {
-        System.setProperty("bootstrap", "com/zutubi/pulse/bootstrap/ideaBootstrapContext.xml");
+        System.setProperty("bootstrap", "com/zutubi/pulse/master/bootstrap/ideaBootstrapContext.xml");
 
         // extract zip file.
         File data = new File(dataArea, "pulse-1.1.0-data.zip");

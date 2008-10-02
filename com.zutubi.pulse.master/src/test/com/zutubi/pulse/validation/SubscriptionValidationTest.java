@@ -1,6 +1,6 @@
 package com.zutubi.pulse.validation;
 
-import com.zutubi.pulse.condition.NotifyConditionFactory;
+import com.zutubi.pulse.master.condition.NotifyConditionFactory;
 import com.zutubi.pulse.tove.config.user.*;
 import com.zutubi.pulse.tove.config.user.contacts.EmailContactConfiguration;
 import com.zutubi.tove.config.ConfigurationRegistry;

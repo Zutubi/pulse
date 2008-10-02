@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans default-autowire="byName">
+
+    <bean id="startupManager" class="com.zutubi.pulse.servercore.bootstrap.DefaultStartupManager">
+        <property name="startupTasks">
+            <list>
+                <value>com.zutubi.pulse.master.bootstrap.tasks.LoginAsSystemStartupTask</value>
+                <value>com.zutubi.pulse.master.bootstrap.tasks.FreemarkerLoggingStartupTask</value>
+                <value>com.zutubi.pulse.master.bootstrap.tasks.CoreSystemStartupTask</value>
+                <value>com.zutubi.pulse.master.bootstrap.tasks.WebserverStartupTask</value>
+                <value>com.zutubi.pulse.master.bootstrap.tasks.ProcessSetupStartupTask</value>
+                <value>com.zutubi.pulse.master.bootstrap.tasks.BuildAborterStartupTask</value>
+                <value>com.zutubi.pulse.master.bootstrap.tasks.NextBuildNumberAdjusterStartupTask</value>
+            </list>
+        </property>
+        <property name="postStartupTasks">
+            <list>
+                <value>com.zutubi.pulse.master.bootstrap.tasks.DeployMainWebappStartupTask</value>
+                <value>com.zutubi.pulse.master.bootstrap.tasks.SystemStartedMessageStartupTask</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="configurationManager" class="com.zutubi.pulse.master.bootstrap.SimpleMasterConfigurationManager"/>
+
+    <bean id="pluginPaths" class="com.zutubi.pulse.servercore.bootstrap.ServerPluginPaths" init-method="init">
+        <property name="configurationManager">
+            <ref bean="configurationManager"/>
+        </property>
+    </bean>
+
+    <bean id="objectFactory" class="com.zutubi.pulse.core.spring.SpringObjectFactory"/>
+
+    <bean id="xworkObjectFactory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>
+
+    <bean id="threadFactory" class="com.zutubi.pulse.security.PulseThreadFactory"/>
+</beans>

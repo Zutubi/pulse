@@ -1,6 +1,6 @@
 package com.zutubi.pulse.tove.config.project;
 
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 
 /**
  *

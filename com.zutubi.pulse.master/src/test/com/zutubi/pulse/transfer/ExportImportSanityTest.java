@@ -1,9 +1,9 @@
 package com.zutubi.pulse.transfer;
 
 import com.zutubi.pulse.core.spring.SpringComponentContext;
+import com.zutubi.pulse.hibernate.MutableConfiguration;
 import com.zutubi.pulse.transfer.jdbc.HibernateTransferSource;
 import com.zutubi.pulse.transfer.jdbc.HibernateTransferTarget;
-import com.zutubi.pulse.hibernate.MutableConfiguration;
 import junit.framework.TestCase;
 import org.apache.commons.dbcp.BasicDataSource;
 
@@ -29,7 +29,7 @@ public class ExportImportSanityTest extends TestCase
 
     public void runExportImportJDBC() throws IOException, TransferException
     {
-        SpringComponentContext.addClassPathContextDefinitions("classpath:/com/zutubi/pulse/bootstrap/context/hibernateMappingsContext.xml");
+        SpringComponentContext.addClassPathContextDefinitions("classpath:/com/zutubi/pulse/master/bootstrap/context/hibernateMappingsContext.xml");
 
         MutableConfiguration configuration = new MutableConfiguration();
 
@@ -65,7 +65,7 @@ public class ExportImportSanityTest extends TestCase
 
     public void runExportImportXML() throws IOException, TransferException
     {
-        SpringComponentContext.addClassPathContextDefinitions("classpath:/com/zutubi/pulse/bootstrap/context/hibernateMappingsContext.xml");
+        SpringComponentContext.addClassPathContextDefinitions("classpath:/com/zutubi/pulse/master/bootstrap/context/hibernateMappingsContext.xml");
 
         MutableConfiguration configuration = new MutableConfiguration();
 

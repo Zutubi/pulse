@@ -1,7 +1,7 @@
 package com.zutubi.pulse.tove.config.user;
 
 import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.pulse.condition.NotifyConditionFactory;
+import com.zutubi.pulse.master.condition.NotifyConditionFactory;
 
 /**
  * A condition that is always true, and hence allows notifications for all

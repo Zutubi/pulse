@@ -1,6 +1,6 @@
 package com.zutubi.tove.velocity;
 
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
+import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.webwork.mapping.PulseActionMapper;
 import com.zutubi.tove.webwork.ToveUtils;
 import com.zutubi.util.StringUtils;

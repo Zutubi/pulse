@@ -1,9 +1,8 @@
 package com.zutubi.pulse.web.upgrade;
 
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.bootstrap.Data;
-import com.zutubi.pulse.upgrade.UpgradeTask;
+import com.zutubi.pulse.master.bootstrap.Data;
+import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.upgrade.UpgradeTaskGroup;
 
 import java.util.List;
