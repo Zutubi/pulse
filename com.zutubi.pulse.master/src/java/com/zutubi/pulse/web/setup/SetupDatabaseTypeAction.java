@@ -4,7 +4,7 @@ import com.zutubi.pulse.master.bootstrap.Data;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.bootstrap.SetupManager;
 import com.zutubi.pulse.master.database.DriverRegistry;
-import com.zutubi.pulse.tove.config.setup.SetupDatabaseTypeConfiguration;
+import com.zutubi.pulse.master.tove.config.setup.SetupDatabaseTypeConfiguration;
 import com.zutubi.tove.webwork.TransientAction;
 import com.zutubi.util.io.IOUtils;
 

@@ -1,10 +1,10 @@
 package com.zutubi.pulse.web.admin.user;
 
 import com.zutubi.pulse.master.model.User;
-import com.zutubi.pulse.security.AcegiUtils;
-import com.zutubi.pulse.tove.config.admin.GlobalConfiguration;
-import com.zutubi.pulse.tove.config.user.SignupUserConfiguration;
-import com.zutubi.pulse.tove.config.user.UserConfiguration;
+import com.zutubi.pulse.master.security.AcegiUtils;
+import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
+import com.zutubi.pulse.master.tove.config.user.SignupUserConfiguration;
+import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.webwork.TransientAction;
 import org.acegisecurity.AccessDeniedException;

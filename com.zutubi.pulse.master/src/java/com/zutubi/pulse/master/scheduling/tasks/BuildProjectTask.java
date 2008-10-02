@@ -6,7 +6,7 @@ import com.zutubi.pulse.master.model.TriggerBuildReason;
 import com.zutubi.pulse.master.scheduling.Task;
 import com.zutubi.pulse.master.scheduling.TaskExecutionContext;
 import com.zutubi.pulse.master.scheduling.Trigger;
-import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.logging.Logger;
 
 /**

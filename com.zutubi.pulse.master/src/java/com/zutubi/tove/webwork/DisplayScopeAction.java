@@ -1,6 +1,6 @@
 package com.zutubi.tove.webwork;
 
-import com.zutubi.pulse.security.AcegiUtils;
+import com.zutubi.pulse.master.security.AcegiUtils;
 import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.TemplateNode;

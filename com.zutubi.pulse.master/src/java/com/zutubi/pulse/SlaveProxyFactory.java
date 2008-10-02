@@ -1,9 +1,9 @@
 package com.zutubi.pulse;
 
+import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.servercore.hessian.CustomHessianProxyFactory;
 import com.zutubi.pulse.servercore.services.SlaveService;
 import com.zutubi.pulse.servercore.services.UncontactableSlaveService;
-import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
 
 import java.net.MalformedURLException;
 import java.net.URL;

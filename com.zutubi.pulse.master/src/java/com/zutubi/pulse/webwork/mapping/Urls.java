@@ -5,7 +5,7 @@ import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.RecipeResultNode;
-import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
+import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.util.StringUtils;
 
 /**

@@ -53,16 +53,16 @@
     <!-- Security system -->
     <bean id="configurationSecurityManager" class="com.zutubi.tove.config.ConfigurationSecurityManager" autowire="byName"/>
     <bean id="accessManager" class="com.zutubi.tove.security.DefaultAccessManager" autowire="byName"/>
-    <bean id="actorProvider" class="com.zutubi.pulse.security.AcegiActorProvider" autowire="byName"/>
-    <bean id="globalAuthorityProvider" class="com.zutubi.pulse.security.GlobalAuthorityProvider" autowire="byName"/>
-    <bean id="projectConfigurationAuthorityProvider" class="com.zutubi.pulse.security.ProjectConfigurationAuthorityProvider" autowire="byName"/>
-    <bean id="projectAuthorityProvider" class="com.zutubi.pulse.security.ProjectAuthorityProvider" autowire="byName"/>
-    <bean id="buildResultAuthorityProvider" class="com.zutubi.pulse.security.BuildResultAuthorityProvider" autowire="byName"/>
-    <bean id="buildRequestEventAuthorityProvider" class="com.zutubi.pulse.security.BuildRequestEventAuthorityProvider" autowire="byName"/>
-    <bean id="agentConfigurationAuthorityProvider" class="com.zutubi.pulse.security.AgentConfigurationAuthorityProvider" autowire="byName"/>
-    <bean id="agentAuthorityProvider" class="com.zutubi.pulse.security.AgentAuthorityProvider" autowire="byName"/>
-    <bean id="userConfigurationAuthorityProvider" class="com.zutubi.pulse.security.UserConfigurationAuthorityProvider" autowire="byName"/>
-    <bean id="userAuthorityProvider" class="com.zutubi.pulse.security.UserAuthorityProvider" autowire="byName"/>
+    <bean id="actorProvider" class="com.zutubi.pulse.master.security.AcegiActorProvider" autowire="byName"/>
+    <bean id="globalAuthorityProvider" class="com.zutubi.pulse.master.security.GlobalAuthorityProvider" autowire="byName"/>
+    <bean id="projectConfigurationAuthorityProvider" class="com.zutubi.pulse.master.security.ProjectConfigurationAuthorityProvider" autowire="byName"/>
+    <bean id="projectAuthorityProvider" class="com.zutubi.pulse.master.security.ProjectAuthorityProvider" autowire="byName"/>
+    <bean id="buildResultAuthorityProvider" class="com.zutubi.pulse.master.security.BuildResultAuthorityProvider" autowire="byName"/>
+    <bean id="buildRequestEventAuthorityProvider" class="com.zutubi.pulse.master.security.BuildRequestEventAuthorityProvider" autowire="byName"/>
+    <bean id="agentConfigurationAuthorityProvider" class="com.zutubi.pulse.master.security.AgentConfigurationAuthorityProvider" autowire="byName"/>
+    <bean id="agentAuthorityProvider" class="com.zutubi.pulse.master.security.AgentAuthorityProvider" autowire="byName"/>
+    <bean id="userConfigurationAuthorityProvider" class="com.zutubi.pulse.master.security.UserConfigurationAuthorityProvider" autowire="byName"/>
+    <bean id="userAuthorityProvider" class="com.zutubi.pulse.master.security.UserAuthorityProvider" autowire="byName"/>
 
-    <bean id="securityInterceptor" class="com.zutubi.pulse.security.SecurityInterceptor" autowire="byName"/>
+    <bean id="securityInterceptor" class="com.zutubi.pulse.master.security.SecurityInterceptor" autowire="byName"/>
 </beans>

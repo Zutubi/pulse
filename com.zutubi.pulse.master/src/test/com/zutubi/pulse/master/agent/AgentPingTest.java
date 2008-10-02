@@ -4,9 +4,9 @@ import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
 import com.zutubi.pulse.AgentService;
 import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.servercore.agent.PingStatus;
 import com.zutubi.pulse.servercore.services.SlaveStatus;
-import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
 
 /**
  */

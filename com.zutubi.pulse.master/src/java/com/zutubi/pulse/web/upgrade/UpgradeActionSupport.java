@@ -1,6 +1,6 @@
 package com.zutubi.pulse.web.upgrade;
 
-import com.zutubi.pulse.upgrade.UpgradeManager;
+import com.zutubi.pulse.master.upgrade.UpgradeManager;
 import com.zutubi.pulse.web.ActionSupport;
 
 /**

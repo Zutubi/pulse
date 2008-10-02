@@ -3,7 +3,7 @@ package com.zutubi.pulse;
 import com.zutubi.pulse.core.BuildException;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.BuildResult;
-import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 
 import java.io.File;
 

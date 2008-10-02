@@ -12,12 +12,12 @@ import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.pulse.master.events.AgentUpgradeCompleteEvent;
 import com.zutubi.pulse.master.model.AgentState;
+import com.zutubi.pulse.master.servlet.DownloadPackageServlet;
+import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.servercore.bootstrap.DefaultSystemPaths;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.pulse.servercore.services.UpgradeState;
 import com.zutubi.pulse.servercore.services.UpgradeStatus;
-import com.zutubi.pulse.servlet.DownloadPackageServlet;
-import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
 
 import java.io.File;
 import java.util.concurrent.Executors;

@@ -7,10 +7,10 @@ import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.BuildColumns;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.User;
-import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
-import com.zutubi.pulse.tove.config.project.ProjectConfigurationActions;
-import com.zutubi.pulse.tove.config.project.hooks.BuildHookConfiguration;
-import com.zutubi.pulse.tove.config.user.UserPreferencesConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
+import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookConfiguration;
+import com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.logging.Logger;
 

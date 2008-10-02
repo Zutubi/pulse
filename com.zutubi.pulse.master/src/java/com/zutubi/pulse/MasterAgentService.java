@@ -10,6 +10,7 @@ import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.ResourceManager;
+import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.servercore.ServerRecipePaths;
 import com.zutubi.pulse.servercore.SystemInfo;
 import com.zutubi.pulse.servercore.agent.PingStatus;
@@ -17,7 +18,6 @@ import com.zutubi.pulse.servercore.bootstrap.StartupManager;
 import com.zutubi.pulse.servercore.logging.CustomLogRecord;
 import com.zutubi.pulse.servercore.logging.ServerMessagesHandler;
 import com.zutubi.pulse.servercore.services.SlaveStatus;
-import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;

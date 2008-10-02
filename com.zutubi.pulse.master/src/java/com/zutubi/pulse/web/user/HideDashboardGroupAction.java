@@ -2,8 +2,8 @@ package com.zutubi.pulse.web.user;
 
 import com.zutubi.pulse.master.model.ProjectGroup;
 import com.zutubi.pulse.master.model.User;
-import com.zutubi.pulse.security.AcegiUtils;
-import com.zutubi.pulse.tove.config.user.DashboardConfiguration;
+import com.zutubi.pulse.master.security.AcegiUtils;
+import com.zutubi.pulse.master.tove.config.user.DashboardConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;

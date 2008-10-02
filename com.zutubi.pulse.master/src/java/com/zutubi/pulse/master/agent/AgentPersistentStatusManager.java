@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.agent;
 
 import com.zutubi.pulse.master.model.AgentState;
-import com.zutubi.pulse.security.SecureParameter;
-import com.zutubi.pulse.tove.config.agent.AgentConfigurationActions;
+import com.zutubi.pulse.master.security.SecureParameter;
+import com.zutubi.pulse.master.tove.config.agent.AgentConfigurationActions;
 
 /**
  */

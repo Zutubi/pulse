@@ -9,7 +9,7 @@ import com.zutubi.pulse.master.monitor.JobRunner;
 import com.zutubi.pulse.master.monitor.Monitor;
 import com.zutubi.pulse.master.monitor.TaskException;
 import com.zutubi.pulse.master.monitor.TaskFeedback;
-import com.zutubi.pulse.transfer.TransferException;
+import com.zutubi.pulse.master.transfer.TransferException;
 import nu.xom.ParsingException;
 
 import javax.sql.DataSource;

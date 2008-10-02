@@ -6,7 +6,7 @@ import com.zutubi.pulse.master.bootstrap.tasks.BuildAborterStartupTask;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.model.persistence.ProjectDao;
 import com.zutubi.pulse.master.model.persistence.mock.MockEntityDao;
-import com.zutubi.pulse.tove.config.user.UserConfiguration;
+import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 

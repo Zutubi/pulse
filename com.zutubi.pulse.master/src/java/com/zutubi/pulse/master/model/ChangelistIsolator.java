@@ -3,7 +3,7 @@ package com.zutubi.pulse.master.model;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.*;
 import com.zutubi.pulse.master.scm.ScmContextFactory;
-import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 
 import java.util.Arrays;
 import java.util.List;

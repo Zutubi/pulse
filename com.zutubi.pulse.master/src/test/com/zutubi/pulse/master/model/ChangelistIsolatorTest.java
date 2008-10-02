@@ -11,8 +11,8 @@ import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.master.scm.ScmContextFactory;
-import com.zutubi.pulse.tove.config.project.BuildOptionsConfiguration;
-import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.project.BuildOptionsConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 
 import java.util.Arrays;
 import java.util.LinkedList;

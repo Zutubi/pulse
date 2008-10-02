@@ -66,5 +66,5 @@
     <!-- TODO: Do we still require this here? We dont really need it until the webapp is up... -->
     <bean id="xworkObjectFactory" class="com.opensymphony.xwork.spring.SpringObjectFactory" init-method="initObjectFactory"/>
     
-    <bean id="threadFactory" class="com.zutubi.pulse.security.PulseThreadFactory"/>
+    <bean id="threadFactory" class="com.zutubi.pulse.master.security.PulseThreadFactory"/>
 </beans>

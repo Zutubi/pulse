@@ -20,7 +20,7 @@
         <filter-class>com.zutubi.pulse.servercore.spring.FilterWrapperlterWrapper</filter-class>
         <init-param>
             <param-name>delegateClassName</param-name>
-            <param-value>com.zutubi.pulse.security.HttpSessionContextIntegrationFilter</param-value>
+            <param-value>com.zutubi.pulse.master.security.HttpSessionContextIntegrationFilter</param-value>
         </init-param>
     </filter>
 
@@ -134,22 +134,22 @@
 
     <servlet>
         <servlet-name>display</servlet-name>
-        <servlet-class>com.zutubi.pulse.servlet.DisplayServlet</servlet-class>
+        <servlet-class>com.zutubi.pulse.master.servletservlet.DisplayServlet</servlet-class>
     </servlet>
 
     <servlet>
         <servlet-name>file</servlet-name>
-        <servlet-class>com.zutubi.pulse.servlet.FileServlet</servlet-class>
+        <servlet-class>com.zutubi.pulse.master.servlet.FileServlet</servlet-class>
     </servlet>
 
     <servlet>
         <servlet-name>package</servlet-name>
-        <servlet-class>com.zutubi.pulse.servlet.DownloadPackageServlet</servlet-class>
+        <servlet-class>com.zutubi.pulse.master.servlet.DownloadPackageServlet</servlet-class>
     </servlet>
 
     <servlet>
         <servlet-name>patch</servlet-name>
-        <servlet-class>com.zutubi.pulse.servlet.DownloadPatchServlet</servlet-class>
+        <servlet-class>com.zutubi.pulse.master.servletservlet.DownloadPatchServlet</servlet-class>
     </servlet>
 
     <!-- Entry point for xmlrpc services. -->
@@ -179,7 +179,7 @@
 
     <servlet>
         <servlet-name>ViewFileServlet</servlet-name>
-        <servlet-class>com.zutubi.pulse.servlet.ViewFileServlet</servlet-class>
+        <servlet-class>com.zutubi.pulse.master.servlet.ViewFileServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>

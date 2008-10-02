@@ -2,7 +2,7 @@ package com.zutubi.pulse.web.project;
 
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.master.model.*;
-import com.zutubi.pulse.tove.config.user.UserPreferencesConfiguration;
+import com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration;
 import com.zutubi.pulse.web.PagingSupport;
 import com.zutubi.pulse.xwork.interceptor.Preparable;
 

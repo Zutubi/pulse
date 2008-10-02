@@ -4,7 +4,7 @@ import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
-import com.zutubi.pulse.velocity.AbstractDirective;
+import com.zutubi.pulse.master.velocity.AbstractDirective;
 import com.zutubi.tove.type.Type;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.util.TextUtils;

@@ -5,7 +5,7 @@ import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.master.events.system.ConfigurationEventSystemStartedEvent;
-import com.zutubi.pulse.security.AcegiUtils;
+import com.zutubi.pulse.master.security.AcegiUtils;
 import com.zutubi.tove.ConventionSupport;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.util.bean.ObjectFactory;

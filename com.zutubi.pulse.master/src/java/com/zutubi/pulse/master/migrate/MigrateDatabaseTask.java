@@ -7,11 +7,11 @@ import com.zutubi.pulse.master.monitor.AbstractTask;
 import com.zutubi.pulse.master.monitor.FeedbackAware;
 import com.zutubi.pulse.master.monitor.TaskException;
 import com.zutubi.pulse.master.monitor.TaskFeedback;
-import com.zutubi.pulse.transfer.Table;
-import com.zutubi.pulse.transfer.TransferAPI;
-import com.zutubi.pulse.transfer.TransferException;
-import com.zutubi.pulse.transfer.TransferListener;
-import com.zutubi.pulse.transfer.jdbc.HibernateUniqueKeyTable;
+import com.zutubi.pulse.master.transfer.Table;
+import com.zutubi.pulse.master.transfer.TransferAPI;
+import com.zutubi.pulse.master.transfer.TransferException;
+import com.zutubi.pulse.master.transfer.TransferListener;
+import com.zutubi.pulse.master.transfer.jdbc.HibernateUniqueKeyTable;
 import org.hibernate.cfg.Configuration;
 
 import javax.sql.DataSource;

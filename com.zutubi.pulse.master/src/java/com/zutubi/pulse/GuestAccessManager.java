@@ -7,9 +7,9 @@ import com.zutubi.pulse.master.events.system.ConfigurationEventSystemStartedEven
 import com.zutubi.pulse.master.events.system.ConfigurationSystemStartedEvent;
 import com.zutubi.pulse.master.model.GrantedAuthority;
 import com.zutubi.pulse.master.model.UserManager;
-import com.zutubi.pulse.tove.config.admin.GlobalConfiguration;
-import com.zutubi.pulse.tove.config.group.AbstractGroupConfiguration;
-import com.zutubi.pulse.tove.config.group.BuiltinGroupConfiguration;
+import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
+import com.zutubi.pulse.master.tove.config.group.AbstractGroupConfiguration;
+import com.zutubi.pulse.master.tove.config.group.BuiltinGroupConfiguration;
 import com.zutubi.tove.config.ConfigurationEventListener;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.ConfigurationRegistry;

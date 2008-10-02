@@ -2,8 +2,8 @@ package com.zutubi.pulse;
 
 import com.zutubi.pulse.core.plugins.PostProcessorDescriptor;
 import com.zutubi.pulse.core.plugins.PostProcessorExtensionManager;
-import com.zutubi.pulse.tove.config.project.types.DefaultPostProcessorFragment;
-import com.zutubi.pulse.tove.config.project.types.PostProcessorFragment;
+import com.zutubi.pulse.master.tove.config.project.types.DefaultPostProcessorFragment;
+import com.zutubi.pulse.master.tove.config.project.types.PostProcessorFragment;
 
 import java.util.Collection;
 import java.util.Map;

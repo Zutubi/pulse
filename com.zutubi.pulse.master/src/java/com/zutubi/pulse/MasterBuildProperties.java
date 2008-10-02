@@ -11,8 +11,8 @@ import com.zutubi.pulse.core.scm.CheckoutScheme;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.*;
-import com.zutubi.pulse.tove.config.project.BuildStageConfiguration;
-import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.project.BuildStageConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 
 import java.io.File;
 import java.util.Date;

@@ -18,9 +18,9 @@ import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.model.ResourceManager;
+import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookManager;
 import com.zutubi.pulse.servercore.CopyBootstrapper;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;
-import com.zutubi.pulse.tove.config.project.hooks.BuildHookManager;
 import com.zutubi.util.logging.Logger;
 
 import java.io.IOException;

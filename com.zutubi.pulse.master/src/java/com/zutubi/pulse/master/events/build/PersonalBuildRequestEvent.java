@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.BuildRevision;
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.core.personal.PatchArchive;
 import com.zutubi.pulse.master.model.*;
-import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 
 /**
  * A request for a personal build.

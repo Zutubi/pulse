@@ -4,10 +4,10 @@ import com.zutubi.events.EventManager;
 import com.zutubi.pulse.AgentService;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.master.events.AgentUpgradeCompleteEvent;
+import com.zutubi.pulse.master.servlet.DownloadPackageServlet;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.pulse.servercore.services.UpgradeState;
 import com.zutubi.pulse.servercore.services.UpgradeStatus;
-import com.zutubi.pulse.servlet.DownloadPackageServlet;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;

@@ -9,7 +9,7 @@ import com.zutubi.pulse.master.model.persistence.ArtifactDao;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.pulse.master.model.persistence.ChangelistDao;
 import com.zutubi.pulse.master.model.persistence.FileArtifactDao;
-import com.zutubi.pulse.security.PulseThreadFactory;
+import com.zutubi.pulse.master.security.PulseThreadFactory;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;

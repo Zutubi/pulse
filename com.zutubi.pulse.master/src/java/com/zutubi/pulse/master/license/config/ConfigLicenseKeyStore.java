@@ -5,7 +5,7 @@ import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.master.license.AbstractLicenseKeyStore;
 import com.zutubi.pulse.master.license.LicenseException;
-import com.zutubi.pulse.tove.config.admin.GlobalConfiguration;
+import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.events.PostSaveEvent;
 import com.zutubi.tove.type.record.MutableRecord;

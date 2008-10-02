@@ -2,10 +2,10 @@ package com.zutubi.pulse.master.agent;
 
 import com.zutubi.pulse.AgentService;
 import com.zutubi.pulse.master.model.AgentState;
+import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.servercore.agent.Status;
 import com.zutubi.pulse.servercore.services.SlaveStatus;
 import com.zutubi.pulse.servercore.services.UpgradeState;
-import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
 
 /**
  * An abstraction over an agent, be it the local (master) agent or a slave.

@@ -35,7 +35,7 @@ public class MutableConfigurationTest extends PulseTestCase
         MutableConfiguration config = new MutableConfiguration();
         assertNull(config.getClassMapping("types"));
         
-        config.addClassPathMappings(Arrays.asList("com/zutubi/pulse/transfer/Schema.hbm.xml"));
+        config.addClassPathMappings(Arrays.asList("com/zutubi/pulse/master/transfer/Schema.hbm.xml"));
         assertNotNull(config.getClassMapping("types"));
 
         MutableConfiguration copy = config.copy();

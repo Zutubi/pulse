@@ -1,7 +1,7 @@
 package com.zutubi.tove.velocity;
 
 import com.zutubi.pulse.core.spring.SpringComponentContext;
-import com.zutubi.pulse.velocity.AbstractDirective;
+import com.zutubi.pulse.master.velocity.AbstractDirective;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.webwork.ToveUtils;
 import org.apache.velocity.context.InternalContextAdapter;

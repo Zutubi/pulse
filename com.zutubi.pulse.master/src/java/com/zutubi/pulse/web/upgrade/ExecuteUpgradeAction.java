@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web.upgrade;
 
 import com.zutubi.pulse.master.monitor.Monitor;
-import com.zutubi.pulse.upgrade.UpgradeTaskGroup;
+import com.zutubi.pulse.master.upgrade.UpgradeTaskGroup;
 
 import java.util.List;
 

@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.model;
 
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.security.SecureParameter;
-import com.zutubi.pulse.security.SecureResult;
+import com.zutubi.pulse.master.security.SecureParameter;
+import com.zutubi.pulse.master.security.SecureResult;
 import com.zutubi.tove.security.AccessManager;
 
 import java.util.List;

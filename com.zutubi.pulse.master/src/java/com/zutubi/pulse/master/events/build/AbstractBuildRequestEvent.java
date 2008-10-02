@@ -6,7 +6,7 @@ import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.model.UserManager;
-import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.TimeStamps;
 
 /**

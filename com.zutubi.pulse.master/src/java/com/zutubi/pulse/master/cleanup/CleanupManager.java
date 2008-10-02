@@ -12,8 +12,8 @@ import com.zutubi.pulse.master.scheduling.Scheduler;
 import com.zutubi.pulse.master.scheduling.SchedulingException;
 import com.zutubi.pulse.master.scheduling.SimpleTrigger;
 import com.zutubi.pulse.master.scheduling.Trigger;
-import com.zutubi.pulse.security.PulseThreadFactory;
-import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.security.PulseThreadFactory;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.util.Constants;
 import com.zutubi.util.logging.Logger;
 

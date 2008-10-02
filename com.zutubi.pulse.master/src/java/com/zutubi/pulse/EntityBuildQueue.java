@@ -8,7 +8,7 @@ import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.events.build.AbstractBuildRequestEvent;
 import com.zutubi.pulse.master.events.build.BuildActivatedEvent;
-import com.zutubi.pulse.tove.config.project.ProjectConfigurationActions;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import com.zutubi.tove.security.AccessManager;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.bean.ObjectFactory;

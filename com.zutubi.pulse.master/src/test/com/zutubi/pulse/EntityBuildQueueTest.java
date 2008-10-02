@@ -12,7 +12,7 @@ import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
 import com.zutubi.pulse.master.model.UserManager;
-import com.zutubi.pulse.tove.config.project.ProjectConfigurationActions;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfigurationActions;
 import org.acegisecurity.AccessDeniedException;
 import static org.mockito.Mockito.*;
 

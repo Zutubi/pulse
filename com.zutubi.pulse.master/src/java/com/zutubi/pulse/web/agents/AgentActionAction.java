@@ -1,6 +1,6 @@
 package com.zutubi.pulse.web.agents;
 
-import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
+import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.webwork.mapping.Urls;
 import com.zutubi.tove.actions.ActionManager;
 import com.zutubi.util.TextUtils;

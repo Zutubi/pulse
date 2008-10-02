@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.committransformers;
 
 import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.pulse.tove.config.project.commit.CommitMessageTransformerConfiguration;
-import com.zutubi.pulse.tove.config.project.commit.LinkTransformerConfiguration;
+import com.zutubi.pulse.master.tove.config.project.commit.CommitMessageTransformerConfiguration;
+import com.zutubi.pulse.master.tove.config.project.commit.LinkTransformerConfiguration;
 
 import java.util.LinkedList;
 import java.util.List;

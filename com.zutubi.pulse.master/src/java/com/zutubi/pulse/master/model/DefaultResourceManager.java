@@ -10,7 +10,7 @@ import com.zutubi.pulse.core.config.ResourceVersion;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.events.system.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.master.events.system.ConfigurationSystemStartedEvent;
-import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
+import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.TypeAdapter;
 import com.zutubi.tove.config.TypeListener;

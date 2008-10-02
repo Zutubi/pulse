@@ -1,8 +1,8 @@
 package com.zutubi.tove.handler;
 
 import com.zutubi.pulse.core.config.Configuration;
-import com.zutubi.pulse.tove.config.EmptyOptionProvider;
-import com.zutubi.pulse.tove.config.EnumOptionProvider;
+import com.zutubi.pulse.master.tove.config.EmptyOptionProvider;
+import com.zutubi.pulse.master.tove.config.EnumOptionProvider;
 import com.zutubi.tove.Descriptor;
 import com.zutubi.tove.OptionProvider;
 import com.zutubi.tove.config.ConfigurationProvider;

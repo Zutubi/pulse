@@ -5,7 +5,7 @@ import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.bootstrap.freemarker.FreemarkerConfigurationFactoryBean;
-import com.zutubi.pulse.velocity.AbstractDirective;
+import com.zutubi.pulse.master.velocity.AbstractDirective;
 import com.zutubi.tove.FormDescriptorFactory;
 import com.zutubi.tove.WizardDescriptor;
 import com.zutubi.tove.freemarker.GetTextMethod;

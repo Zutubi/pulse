@@ -4,8 +4,8 @@ import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
-import com.zutubi.pulse.tove.config.project.changeviewer.P4WebChangeViewer;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.project.changeviewer.P4WebChangeViewer;
 import com.zutubi.tove.config.MockConfigurationProvider;
 
 /**

@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.Project;
-import com.zutubi.pulse.tove.config.project.AgentRequirements;
+import com.zutubi.pulse.master.tove.config.project.AgentRequirements;
 import com.zutubi.util.TimeStamps;
 
 import java.util.List;

@@ -9,7 +9,7 @@
         In particular, NO DATASOURCE!. You have been warned.
     -->
 
-    <bean id="upgradeManager" class="com.zutubi.pulse.upgrade.DefaultUpgradeManager" autowire="byName">
+    <bean id="upgradeManager" class="com.zutubi.pulse.master.upgrade.DefaultUpgradeManager" autowire="byName">
         <property name="upgradeableComponents">
             <list>
                 <ref local="pulseUpgradeableComponent"/>
@@ -24,7 +24,7 @@
 
     <bean id="pluginUpgradeManager" class="com.zutubi.pulse.master.plugins.PluginUpgradeManager" init-method="init" autowire="byName"/>
 
-    <bean id="pulseUpgradeableComponent" class="com.zutubi.pulse.upgrade.tasks.PulseUpgradeableComponent" autowire="byName">
+    <bean id="pulseUpgradeableComponent" class="com.zutubi.pulse.master.upgrade.tasks.PulseUpgradeableComponent" autowire="byName">
         <property name="tasks">
             <list>
                 <ref local="addBackupConfiguration"/>
@@ -44,37 +44,37 @@
         </property>
     </bean>
 
-    <bean id="backup" class="com.zutubi.pulse.upgrade.tasks.BackupUpgradeTask" autowire="byName"/>
+    <bean id="backup" class="com.zutubi.pulse.master.upgrade.tasks.BackupUpgradeTask" autowire="byName"/>
 
-    <bean id="addBackupConfiguration" class="com.zutubi.pulse.upgrade.tasks.AddBackupConfigurationToSettingsUpgradeTask" autowire="byName">
+    <bean id="addBackupConfiguration" class="com.zutubi.pulse.master.upgrade.tasks.AddBackupConfigurationToSettingsUpgradeTask" autowire="byName">
         <property name="buildNumber" value="200007001"/>
     </bean>
 
-    <bean id="addBrowseViewConfiguration" class="com.zutubi.pulse.upgrade.tasks.AddBrowseViewConfigurationUpgradeTask" autowire="byName">
+    <bean id="addBrowseViewConfiguration" class="com.zutubi.pulse.master.upgrade.tasks.AddBrowseViewConfigurationUpgradeTask" autowire="byName">
         <property name="buildNumber" value="200007002"/>
     </bean>
 
-    <bean id="updateDefaultAction" class="com.zutubi.pulse.upgrade.tasks.UpdateDefaultActionUpgradeTask" autowire="byName">
+    <bean id="updateDefaultAction" class="com.zutubi.pulse.master.upgrade.tasks.UpdateDefaultActionUpgradeTask" autowire="byName">
         <property name="buildNumber" value="200009001"/>
     </bean>
 
-    <bean id="addDefaultVersionToProjectResourceRequirements" class="com.zutubi.pulse.upgrade.tasks.AddDefaultVersionToResourceRequirementUpgradeTask" autowire="byName">
+    <bean id="addDefaultVersionToProjectResourceRequirements" class="com.zutubi.pulse.master.upgrade.tasks.AddDefaultVersionToResourceRequirementUpgradeTask" autowire="byName">
         <property name="buildNumber" value="200009002"/>
     </bean>
 
-    <bean id="fixNPEOnLDAPRememberMe" class="com.zutubi.pulse.upgrade.tasks.FixNPEOnLDAPRememberMeUpgradeTask" autowire="byName">
+    <bean id="fixNPEOnLDAPRememberMe" class="com.zutubi.pulse.master.upgrade.tasks.FixNPEOnLDAPRememberMeUpgradeTask" autowire="byName">
         <property name="buildNumber" value="200011001"/>
     </bean>
 
-    <bean id="buildCompletedTriggerPropagateRevision" class="com.zutubi.pulse.upgrade.tasks.BuildCompletedTriggerPropagateRevisionUpgradeTask" autowire="byName">
+    <bean id="buildCompletedTriggerPropagateRevision" class="com.zutubi.pulse.master.upgrade.tasks.BuildCompletedTriggerPropagateRevisionUpgradeTask" autowire="byName">
         <property name="buildNumber" value="200011002"/>
     </bean>
 
-    <bean id="addAllowPersonalBuilds" class="com.zutubi.pulse.upgrade.tasks.AddAllowPersonalBuildsUpgradeTask" autowire="byName">
+    <bean id="addAllowPersonalBuilds" class="com.zutubi.pulse.master.upgrade.tasks.AddAllowPersonalBuildsUpgradeTask" autowire="byName">
         <property name="buildNumber" value="200011003"/>
     </bean>
 
-    <bean id="ensureBackupConfigPermanent" class="com.zutubi.pulse.upgrade.tasks.EnsureBackupConfigPermanentUpgradeTask" autowire="byName">
+    <bean id="ensureBackupConfigPermanent" class="com.zutubi.pulse.master.upgrade.tasks.EnsureBackupConfigPermanentUpgradeTask" autowire="byName">
         <property name="buildNumber" value="200011004"/>
     </bean>
 </beans>

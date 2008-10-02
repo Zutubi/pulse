@@ -5,9 +5,9 @@ import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.ChangelistComparator;
 import com.zutubi.pulse.core.model.NamedEntityComparator;
 import com.zutubi.pulse.master.model.*;
-import com.zutubi.pulse.security.AcegiUtils;
-import com.zutubi.pulse.tove.config.user.DashboardConfiguration;
-import com.zutubi.pulse.tove.config.user.contacts.ContactConfiguration;
+import com.zutubi.pulse.master.security.AcegiUtils;
+import com.zutubi.pulse.master.tove.config.user.DashboardConfiguration;
+import com.zutubi.pulse.master.tove.config.user.contacts.ContactConfiguration;
 import com.zutubi.pulse.web.ActionSupport;
 import com.zutubi.util.logging.Logger;
 

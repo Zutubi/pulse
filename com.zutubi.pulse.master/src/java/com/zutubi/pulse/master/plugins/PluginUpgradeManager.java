@@ -1,9 +1,9 @@
 package com.zutubi.pulse.master.plugins;
 
 import com.zutubi.pulse.core.plugins.*;
-import com.zutubi.pulse.upgrade.UpgradeTask;
-import com.zutubi.pulse.upgrade.UpgradeableComponent;
-import com.zutubi.pulse.upgrade.UpgradeableComponentSource;
+import com.zutubi.pulse.master.upgrade.UpgradeTask;
+import com.zutubi.pulse.master.upgrade.UpgradeableComponent;
+import com.zutubi.pulse.master.upgrade.UpgradeableComponentSource;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 import org.eclipse.core.runtime.*;

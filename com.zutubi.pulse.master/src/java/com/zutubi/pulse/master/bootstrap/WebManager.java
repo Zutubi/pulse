@@ -3,7 +3,7 @@ package com.zutubi.pulse.master.bootstrap;
 import com.opensymphony.xwork.config.ConfigurationManager;
 import com.opensymphony.xwork.config.providers.XmlConfigurationProvider;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
-import com.zutubi.pulse.security.SecurityManager;
+import com.zutubi.pulse.master.security.SecurityManager;
 import com.zutubi.pulse.servercore.jetty.JettyManager;
 
 /**

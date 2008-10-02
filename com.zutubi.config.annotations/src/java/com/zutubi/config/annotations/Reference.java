@@ -16,6 +16,6 @@ import java.lang.annotation.Target;
 @Handler(className = DefaultAnnotationHandlers.REFERENCE)
 public @interface Reference
 {
-    String optionProvider() default "com.zutubi.pulse.tove.config.DefaultReferenceOptionProvider";
+    String optionProvider() default "com.zutubi.pulse.master.tove.config.DefaultReferenceOptionProvider";
     String cleanupTaskProvider() default "com.zutubi.tove.config.cleanup.DefaultReferenceCleanupTaskProvider";
 }

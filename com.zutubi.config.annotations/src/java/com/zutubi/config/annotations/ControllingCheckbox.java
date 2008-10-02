@@ -2,10 +2,10 @@ package com.zutubi.config.annotations;
 
 import com.zutubi.validation.annotations.Constraint;
 
-import java.lang.annotation.Target;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * A checkbox field that controls dependent fields.  When the checkbox is in
@@ -16,7 +16,7 @@ import java.lang.annotation.RetentionPolicy;
 @Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @Field(type = FieldType.CONTROLLING_CHECKBOX)
-@Constraint("com.zutubi.pulse.validation.validators.ControllingCheckboxValidator")
+@Constraint("com.zutubi.pulse.master.validation.validators.ControllingCheckboxValidator")
 @Handler(className = DefaultAnnotationHandlers.FIELD)
 public @interface ControllingCheckbox
 {

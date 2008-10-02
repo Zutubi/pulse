@@ -2,7 +2,7 @@ package com.zutubi.pulse.acceptance.forms.admin;
 
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.forms.ConfigurationForm;
-import com.zutubi.pulse.tove.config.user.UserConfiguration;
+import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 
 /**
  * Form for editing a user's details.

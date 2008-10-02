@@ -2,7 +2,7 @@ package com.zutubi.pulse.acceptance.forms.admin;
 
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.forms.ConfigurationForm;
-import com.zutubi.pulse.tove.config.user.SetPasswordConfiguration;
+import com.zutubi.pulse.master.tove.config.user.SetPasswordConfiguration;
 
 /**
  * User set password action form.

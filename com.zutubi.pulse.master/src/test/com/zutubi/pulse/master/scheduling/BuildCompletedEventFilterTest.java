@@ -9,7 +9,7 @@ import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.UnknownBuildReason;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.scheduling.tasks.BuildProjectTask;
-import com.zutubi.pulse.tove.config.user.UserConfiguration;
+import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 
 import java.io.Serializable;
 import java.util.Map;

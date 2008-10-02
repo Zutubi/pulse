@@ -1,8 +1,8 @@
 package com.zutubi.pulse.web;
 
 import com.zutubi.pulse.master.model.User;
-import com.zutubi.pulse.security.AcegiUtils;
-import com.zutubi.pulse.tove.config.user.UserPreferencesConfiguration;
+import com.zutubi.pulse.master.security.AcegiUtils;
+import com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
 
 /**

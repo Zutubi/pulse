@@ -1,7 +1,7 @@
 package com.zutubi.pulse.web;
 
 import com.zutubi.pulse.master.model.User;
-import com.zutubi.pulse.security.AcegiUtils;
+import com.zutubi.pulse.master.security.AcegiUtils;
 
 /**
  * The default action controls the page presented to the user when they first arrive at the

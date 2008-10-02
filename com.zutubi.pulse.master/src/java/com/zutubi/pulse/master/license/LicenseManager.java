@@ -9,9 +9,9 @@ import com.zutubi.pulse.master.bootstrap.DataResolver;
 import com.zutubi.pulse.master.events.system.ConfigurationEventSystemStartedEvent;
 import com.zutubi.pulse.master.license.authorisation.Authorisation;
 import com.zutubi.pulse.master.license.events.LicenseUpdateEvent;
-import com.zutubi.pulse.tove.config.agent.AgentConfiguration;
-import com.zutubi.pulse.tove.config.project.ProjectConfiguration;
-import com.zutubi.pulse.tove.config.user.UserConfiguration;
+import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
+import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
+import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.tove.config.events.InsertEvent;
 import com.zutubi.util.logging.Logger;
 

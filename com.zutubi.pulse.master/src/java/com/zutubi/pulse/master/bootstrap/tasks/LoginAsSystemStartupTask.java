@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.bootstrap.tasks;
 
-import com.zutubi.pulse.security.AcegiUtils;
+import com.zutubi.pulse.master.security.AcegiUtils;
 import com.zutubi.pulse.servercore.bootstrap.StartupTask;
 
 /**

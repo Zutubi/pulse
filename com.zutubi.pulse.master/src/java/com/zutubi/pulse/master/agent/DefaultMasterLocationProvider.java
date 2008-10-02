@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.agent;
 
+import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
-import com.zutubi.pulse.tove.config.admin.GlobalConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
 
 /**

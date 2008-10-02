@@ -18,7 +18,7 @@ public class BackupConfiguration extends AbstractConfiguration
     public static final String DEFAULT_CRON_SCHEDULE = "0 0 5 * * ?";
 
     @Required
-    @Constraint("com.zutubi.pulse.tove.config.project.triggers.CronExpressionValidator")
+    @Constraint("com.zutubi.pulse.master.tove.config.project.triggers.CronExpressionValidator")
     private String cronSchedule = DEFAULT_CRON_SCHEDULE;
 
     @ControllingCheckbox(dependentFields = {"cronSchedule"})

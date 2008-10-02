@@ -14,13 +14,13 @@ import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.RecipeResultNode;
 import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.renderer.BuildResultRenderer;
-import com.zutubi.pulse.tove.config.admin.EmailConfiguration;
-import com.zutubi.pulse.tove.config.admin.GlobalConfiguration;
-import com.zutubi.pulse.tove.config.project.hooks.BuildHookTaskConfiguration;
-import com.zutubi.pulse.tove.config.project.hooks.CompatibleHooks;
-import com.zutubi.pulse.tove.config.project.hooks.ManualBuildHookConfiguration;
-import com.zutubi.pulse.tove.config.project.hooks.PostBuildHookConfiguration;
-import com.zutubi.pulse.tove.config.user.contacts.EmailContactConfiguration;
+import com.zutubi.pulse.master.tove.config.admin.EmailConfiguration;
+import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
+import com.zutubi.pulse.master.tove.config.project.hooks.BuildHookTaskConfiguration;
+import com.zutubi.pulse.master.tove.config.project.hooks.CompatibleHooks;
+import com.zutubi.pulse.master.tove.config.project.hooks.ManualBuildHookConfiguration;
+import com.zutubi.pulse.master.tove.config.project.hooks.PostBuildHookConfiguration;
+import com.zutubi.pulse.master.tove.config.user.contacts.EmailContactConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.TextUtils;
@@ -41,7 +41,7 @@ public class EmailCommittersTaskConfiguration extends AbstractConfiguration impl
 {
     @Required
     private String emailDomain;
-    @Select(optionProvider = "com.zutubi.pulse.tove.config.user.SubscriptionTemplateOptionProvider")
+    @Select(optionProvider = "com.zutubi.pulse.master.tove.config.user.SubscriptionTemplateOptionProvider")
     private String template;
     private boolean ignorePulseUsers;
 

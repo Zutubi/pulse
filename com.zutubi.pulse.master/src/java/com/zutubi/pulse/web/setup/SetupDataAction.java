@@ -3,8 +3,8 @@ package com.zutubi.pulse.web.setup;
 import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.bootstrap.SetupManager;
+import com.zutubi.pulse.master.tove.config.setup.SetupDataConfiguration;
 import com.zutubi.pulse.servercore.bootstrap.conf.EnvConfig;
-import com.zutubi.pulse.tove.config.setup.SetupDataConfiguration;
 import com.zutubi.tove.webwork.TransientAction;
 import com.zutubi.util.TextUtils;
 

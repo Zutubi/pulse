@@ -2,7 +2,7 @@ package com.zutubi.pulse.acceptance.forms.setup;
 
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.forms.ConfigurationForm;
-import com.zutubi.pulse.tove.config.setup.SetupDatabaseTypeConfiguration;
+import com.zutubi.pulse.master.tove.config.setup.SetupDatabaseTypeConfiguration;
 
 /**
  */

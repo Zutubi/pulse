@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.model;
 
 import com.zutubi.pulse.core.model.Entity;
-import com.zutubi.pulse.tove.config.user.UserConfiguration;
-import com.zutubi.pulse.tove.config.user.UserPreferencesConfiguration;
+import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
+import com.zutubi.pulse.master.tove.config.user.UserPreferencesConfiguration;
 
 /**
  * 
