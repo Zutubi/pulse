@@ -1,23 +1,18 @@
-package com.zutubi.pulse.master.xwork.validator.validators;
+package com.zutubi.pulse.master.license;
 
-import com.opensymphony.xwork.validator.ValidationException;
-import com.opensymphony.xwork.validator.validators.FieldValidatorSupport;
-import com.zutubi.pulse.master.license.LicenseDecoder;
-import com.zutubi.pulse.master.license.LicenseException;
+import com.zutubi.validation.ValidationException;
+import com.zutubi.validation.validators.FieldValidatorSupport;
 
 /**
- * <class-comment/>
+ * Checks if a license key may be decoded.
  */
 public class LicenseKeyValidator extends FieldValidatorSupport
 {
-    // FIXME is this used?  there is validation elsewhere, and this may be
-    // FIXME incomplete?
-    public void validate(Object object) throws ValidationException
+    public void validateField(Object obj) throws ValidationException
     {
-        Object obj = getFieldValue(getFieldName(), object);
         if (obj == null || !(obj instanceof String))
         {
-            addFieldError(getFieldName(), getValidatorContext().getText(getMessageKey()));
+            addError();
             return;
         }
 
@@ -33,7 +28,7 @@ public class LicenseKeyValidator extends FieldValidatorSupport
             if (decoder.decode(licenseKey.getBytes()) == null)
             {
                 // validation of the license key has failed.
-                addFieldError(getFieldName(), getValidatorContext().getText(getMessageKey()));
+                addError();
             }
         }
         catch (LicenseException e)

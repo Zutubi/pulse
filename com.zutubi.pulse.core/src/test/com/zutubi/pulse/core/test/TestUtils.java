@@ -25,13 +25,13 @@ public class TestUtils
             }
         }
 
-        File master = new File("master");
+        File master = new File("com.zutubi.pulse.master");
         if (master.isDirectory())
         {
             return master.getAbsoluteFile().getParentFile();
         }
 
-        master = new File("../master");
+        master = new File("../com.zutubi.pulse.master");
         if (master.isDirectory())
         {
             return master.getAbsoluteFile().getParentFile();
@@ -42,7 +42,7 @@ public class TestUtils
         try
         {
             File resourceFile = new File(resource.toURI());
-            return new File(resourceFile.getAbsolutePath().replaceFirst("core/classes/.*", ""));
+            return new File(resourceFile.getAbsolutePath().replaceFirst("com.zutubi.pulse.core/classes/.*", ""));
         }
         catch (URISyntaxException e)
         {

@@ -17,7 +17,7 @@
     -->
     <filter>
         <filter-name>Acegi Session Filter</filter-name>
-        <filter-class>com.zutubi.pulse.servercore.spring.FilterWrapperlterWrapper</filter-class>
+        <filter-class>com.zutubi.pulse.servercore.spring.FilterWrapper</filter-class>
         <init-param>
             <param-name>delegateClassName</param-name>
             <param-value>com.zutubi.pulse.master.security.HttpSessionContextIntegrationFilter</param-value>
@@ -31,7 +31,7 @@
 
     <filter>
         <filter-name>redirect</filter-name>
-        <filter-class>com.zutubi.pulse.servercore.servlet.RedirectServletFilterrvletFilter</filter-class>
+        <filter-class>com.zutubi.pulse.servercore.servlet.RedirectServletFilter</filter-class>
         <init-param>
             <param-name>destination</param-name>
             <param-value>default.action</param-value>
@@ -129,12 +129,12 @@
 
     <servlet>
         <servlet-name>download</servlet-name>
-        <servlet-class>com.zutubi.pulse.servercore.servlet.DownloadResultsServletultsServlet</servlet-class>
+        <servlet-class>com.zutubi.pulse.servercore.servlet.DownloadResultsServlet</servlet-class>
     </servlet>
 
     <servlet>
         <servlet-name>display</servlet-name>
-        <servlet-class>com.zutubi.pulse.master.servletservlet.DisplayServlet</servlet-class>
+        <servlet-class>com.zutubi.pulse.master.servlet.DisplayServlet</servlet-class>
     </servlet>
 
     <servlet>
@@ -149,7 +149,7 @@
 
     <servlet>
         <servlet-name>patch</servlet-name>
-        <servlet-class>com.zutubi.pulse.master.servletservlet.DownloadPatchServlet</servlet-class>
+        <servlet-class>com.zutubi.pulse.master.servlet.DownloadPatchServlet</servlet-class>
     </servlet>
 
     <!-- Entry point for xmlrpc services. -->

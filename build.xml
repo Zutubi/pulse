@@ -141,7 +141,6 @@
 
         <copy todir="${package.root.dev}/bin">
             <fileset dir="com.zutubi.pulse.core/src/bin" includes="**/*"/>
-            <fileset dir="com.zutubi.pulse.dev/src/bin" includes="**/*"/>
         </copy>
 
         <fixcrlf srcdir="${package.root.dev}/bin" eol="lf" eof="remove" includes="**/*.sh"/>
@@ -223,7 +222,6 @@
 
         <copy todir="${package.root.slave}/bin">
             <fileset dir="com.zutubi.pulse.core/src/bin" includes="**/*"/>
-            <fileset dir="com.zutubi.pulse.dev/src/bin" includes="**/*"/>
             <fileset dir="com.zutubi.pulse.servercore/src/bin" includes="**/*"/>
         </copy>
 
@@ -344,9 +342,7 @@
 
         <copy todir="${package.root.master}/bin">
             <fileset dir="com.zutubi.pulse.core/src/bin" includes="**/*"/>
-            <fileset dir="com.zutubi.pulse.dev/src/bin" includes="**/*"/>
             <fileset dir="com.zutubi.pulse.servercore/src/bin" includes="**/*"/>
-            <fileset dir="com.zutubi.pulse.master/src/bin" includes="**/*"/>
         </copy>
 
         <copy todir="${package.root.master}/lib">

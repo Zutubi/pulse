@@ -10,7 +10,7 @@
 
     <servlet>
         <servlet-name>hessian</servlet-name>
-        <servlet-class>com.zutubi.pulse.servercore.hessian.CustomHessianServletsianServlet</servlet-class>
+        <servlet-class>com.zutubi.pulse.servercore.hessian.CustomHessianServlet</servlet-class>
         <init-param>
             <param-name>home-class</param-name>
             <param-value>com.zutubi.pulse.slave.SlaveServiceImpl</param-value>
@@ -29,7 +29,7 @@
 
     <servlet>
         <servlet-name>download</servlet-name>
-        <servlet-class>com.zutubi.pulse.servercore.servlet.DownloadResultsServletultsServlet</servlet-class>
+        <servlet-class>com.zutubi.pulse.servercore.servlet.DownloadResultsServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
