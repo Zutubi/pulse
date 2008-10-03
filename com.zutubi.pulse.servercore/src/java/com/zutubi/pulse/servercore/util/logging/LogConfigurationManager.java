@@ -1,9 +1,9 @@
-package com.zutubi.pulse.servercore.logging;
+package com.zutubi.pulse.servercore.util.logging;
 
 import com.zutubi.events.AllEventListener;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
-import com.zutubi.pulse.core.logging.LogManager;
+import com.zutubi.pulse.core.util.logging.LogManager;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.util.logging.Logger;
 

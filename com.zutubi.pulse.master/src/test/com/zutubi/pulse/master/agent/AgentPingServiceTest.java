@@ -15,7 +15,7 @@ import com.zutubi.pulse.master.security.PulseThreadFactory;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.servercore.SystemInfo;
 import com.zutubi.pulse.servercore.agent.PingStatus;
-import com.zutubi.pulse.servercore.logging.CustomLogRecord;
+import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
 import com.zutubi.pulse.servercore.services.SlaveStatus;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.stub;

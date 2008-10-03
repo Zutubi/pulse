@@ -1,7 +1,7 @@
-package com.zutubi.pulse.servercore.logging;
+package com.zutubi.pulse.servercore.util.logging;
 
-import com.zutubi.pulse.core.logging.HandlerFactory;
-import com.zutubi.pulse.core.logging.LogUtils;
+import com.zutubi.pulse.core.util.logging.HandlerFactory;
+import com.zutubi.pulse.core.util.logging.LogUtils;
 import com.zutubi.util.bean.ObjectFactory;
 
 import java.util.Properties;
@@ -9,7 +9,6 @@ import java.util.logging.Level;
 import java.util.logging.XMLFormatter;
 
 /**
- * <class-comment/>
  */
 public class FileHandlerFactory implements HandlerFactory
 {

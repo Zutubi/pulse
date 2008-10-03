@@ -1,4 +1,4 @@
-package com.zutubi.pulse.servercore.logging;
+package com.zutubi.pulse.servercore.util.logging;
 
 import com.zutubi.util.CircularBuffer;
 import com.zutubi.util.StringUtils;
@@ -13,12 +13,15 @@ import java.util.logging.Logger;
 /**
  * A custom logging handler that remembers recent messages in a memory
  * buffer, so they can be viewed via the web interface.
+ *
+ * On initialisation, this handler registers itself with the logging system
+ * and begins storing log messages.
  */
 public class ServerMessagesHandler extends Handler
 {
     private static final int DEFAULT_CAPACITY = 100;
 
-    private CircularBuffer<CustomLogRecord> records = new CircularBuffer<CustomLogRecord>(DEFAULT_CAPACITY);
+    private final CircularBuffer<CustomLogRecord> records = new CircularBuffer<CustomLogRecord>(DEFAULT_CAPACITY);
 
     public void init()
     {
@@ -28,7 +31,7 @@ public class ServerMessagesHandler extends Handler
 
     public void publish(LogRecord record)
     {
-        if(record.getLevel() == Level.WARNING || record.getLevel() == Level.SEVERE)
+        if(record.getLevel().intValue() >= Level.WARNING.intValue())
         {
             synchronized(records)
             {

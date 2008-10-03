@@ -19,7 +19,7 @@ import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.upgrade.UpgradeManager;
 import com.zutubi.pulse.servercore.bootstrap.*;
 import com.zutubi.pulse.servercore.bootstrap.conf.EnvConfig;
-import com.zutubi.pulse.servercore.logging.LogConfigurationManager;
+import com.zutubi.pulse.servercore.util.logging.LogConfigurationManager;
 import com.zutubi.tove.config.*;
 import com.zutubi.tove.type.record.DelegatingHandleAllocator;
 import com.zutubi.tove.type.record.RecordManager;

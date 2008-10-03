@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.logging;
+package com.zutubi.pulse.core.util.logging;
 
 import com.zutubi.util.io.IOUtils;
 
@@ -10,23 +10,29 @@ import java.util.logging.Handler;
 import java.util.logging.Logger;
 
 /**
- * <class-comment/>
+ * The LogManager provides a wrapper around the default java.util.logging.LogManager that
+ * allows for the use of a custom logging configuration file format.
  */
 public class LogManager
 {
     private Map<String, HandlerFactory> handlerFactories = new HashMap<String, HandlerFactory>();
 
-    public void setFactories(Map<String, HandlerFactory> factories)
-    {
-        this.handlerFactories = factories;
-    }
-
+    /**
+     * Reset the existing logging configuration.
+     *
+     * @see java.util.logging.LogManager#reset() 
+     */
     public void reset()
     {
         // reset the logging configuration... like completely blank it out.
         java.util.logging.LogManager.getLogManager().reset();
     }
 
+    /**
+     * Reset the logging levels for all of the configured Loggers to null.
+     *
+     * @see java.util.logging.Logger#setLevel(java.util.logging.Level)  
+     */
     public void resetLevels()
     {
         Enumeration<String> loggerNames = java.util.logging.LogManager.getLogManager().getLoggerNames();
@@ -38,6 +44,12 @@ public class LogManager
         }
     }
 
+    /**
+     * Configure the logging system via the details contained within the file.  It is expected that
+     * the contents of this file can be loaded using the {@link java.util.Properties#load(java.io.InputStream)}
+     *
+     * @param config the properties file.
+     */
     public void configure(File config)
     {
         if (!config.isFile())
@@ -152,5 +164,10 @@ public class LogManager
         {
             return null;
         }
+    }
+
+    public void setFactories(Map<String, HandlerFactory> factories)
+    {
+        this.handlerFactories = factories;
     }
 }

@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.logging;
+package com.zutubi.pulse.core.util.logging;
 
 import com.zutubi.util.ClassLoaderUtils;
 
@@ -11,7 +11,8 @@ import java.util.logging.Formatter;
 import java.util.logging.Level;
 
 /**
- * <class-comment/>
+ * A set of convenience methods that simplify access to the logging properties through parsing
+ * the strings and loading classes.
  */
 public class LogUtils
 {
@@ -97,6 +98,17 @@ public class LogUtils
         }
     }
 
+    /**
+     * This method looks up the property associated with the specified key in the properties object, and
+     * treats it as a comma separated list of values.  These values are returned in a list.  If the key
+     * is not found in the properties, or does not refer to a value, the defaultValue is returned.
+     *
+     * @param config is the properties instance from which the list of values is retrieved.
+     * @param key is the name of the property being retrieved.
+     * @param defaultValue is the default value, returned if no suitable value is value can be retrieved.
+     *
+     * @return a list of strings, representing the individual values of the comma separated list.
+     */
     public static List<String> getList(Properties config, String key, List<String> defaultValue)
     {
         if (!config.containsKey(key))

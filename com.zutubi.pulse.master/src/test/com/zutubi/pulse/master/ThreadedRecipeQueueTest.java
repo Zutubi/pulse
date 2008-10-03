@@ -36,7 +36,7 @@ import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration
 import com.zutubi.pulse.servercore.ChainBootstrapper;
 import com.zutubi.pulse.servercore.SystemInfo;
 import com.zutubi.pulse.servercore.agent.PingStatus;
-import com.zutubi.pulse.servercore.logging.CustomLogRecord;
+import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
 import com.zutubi.pulse.servercore.services.SlaveStatus;
 import com.zutubi.pulse.servercore.services.UpgradeStatus;
 import com.zutubi.tove.config.MockConfigurationProvider;

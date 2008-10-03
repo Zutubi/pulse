@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.logging;
+package com.zutubi.pulse.core.util.logging;
 
 import java.util.Properties;
 import java.util.logging.Handler;
@@ -7,7 +7,11 @@ import java.util.logging.MemoryHandler;
 import java.util.logging.SimpleFormatter;
 
 /**
- * <class-comment/>
+ * An implementation of the HandlerFactory used to create instances of the
+ * {@link java.util.logging.MemoryHandler}
+ *
+ * @see java.util.logging.MemoryHandler for details on the supported
+ * configuration options.
  */
 public class MemoryHandlerFactory implements HandlerFactory
 {

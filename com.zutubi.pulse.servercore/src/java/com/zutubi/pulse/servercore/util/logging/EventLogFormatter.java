@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.logging;
+package com.zutubi.pulse.servercore.util.logging;
 
 import com.zutubi.util.Constants;
 
@@ -8,7 +8,6 @@ import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
 /**
- * <class-comment/>
  */
 public class EventLogFormatter extends Formatter
 {

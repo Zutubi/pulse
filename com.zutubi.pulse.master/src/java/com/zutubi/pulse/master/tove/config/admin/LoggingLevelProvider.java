@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.tove.config.admin;
 
-import com.zutubi.pulse.servercore.logging.LogConfigurationManager;
+import com.zutubi.pulse.servercore.util.logging.LogConfigurationManager;
 import com.zutubi.tove.ListOptionProvider;
 import com.zutubi.tove.type.TypeProperty;
 

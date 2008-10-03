@@ -1,4 +1,4 @@
-package com.zutubi.pulse.servercore.logging;
+package com.zutubi.pulse.servercore.util.logging;
 
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;

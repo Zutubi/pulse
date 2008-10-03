@@ -1,4 +1,4 @@
-package com.zutubi.pulse.servercore.logging;
+package com.zutubi.pulse.servercore.util.logging;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

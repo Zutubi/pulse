@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.web;
 
 import com.zutubi.pulse.master.web.agents.ServerMessagesActionSupport;
-import com.zutubi.pulse.servercore.logging.CustomLogRecord;
+import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
 
 import java.util.Collections;
 import java.util.List;

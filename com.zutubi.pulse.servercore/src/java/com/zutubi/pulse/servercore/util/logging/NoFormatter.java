@@ -1,12 +1,10 @@
-package com.zutubi.pulse.servercore.logging;
+package com.zutubi.pulse.servercore.util.logging;
 
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
 /**
  * An implementation of the formatter that applies no extra formatting to log messages.
- *
- * @author Daniel Ostermeier
  */
 public class NoFormatter extends Formatter
 {

@@ -26,7 +26,7 @@ This context requires:
     spring.
     Leave it here for now until a solution presents itself.
     -->
-    <bean id="logConfigurationManager" class="com.zutubi.pulse.servercore.logging.LogConfigurationManager" init-method="init">
+    <bean id="logConfigurationManager" class="com.zutubi.pulse.servercore.util.logging.LogConfigurationManager" init-method="init">
         <property name="logConfiguration">
             <ref local="logConfiguration"/>
         </property>
@@ -52,7 +52,7 @@ This context requires:
         </property>
     </bean>
 
-    <bean id="logManager" class="com.zutubi.pulse.core.logging.LogManager">
+    <bean id="logManager" class="com.zutubi.pulse.core.util.logging.LogManager">
         <property name="factories">
             <map>
                 <entry><key><value>FileHandler</value></key><ref local="fileHandlerFactory"/></entry>
@@ -62,13 +62,13 @@ This context requires:
         </property>
     </bean>
 
-    <bean id="fileHandlerFactory" class="com.zutubi.pulse.servercore.logging.FileHandlerFactory">
+    <bean id="fileHandlerFactory" class="com.zutubi.pulse.servercore.util.logging.FileHandlerFactory">
         <property name="objectFactory">
             <ref bean="objectFactory"/>
         </property>
     </bean>
 
-    <bean id="consoleHandlerFactory" class="com.zutubi.pulse.core.logging.ConsoleHandlerFactory"/>
-    <bean id="memoryHandlerFactory" class="com.zutubi.pulse.core.logging.MemoryHandlerFactory"/>
+    <bean id="consoleHandlerFactory" class="com.zutubi.pulse.core.util.logging.ConsoleHandlerFactory"/>
+    <bean id="memoryHandlerFactory" class="com.zutubi.pulse.core.util.logging.MemoryHandlerFactory"/>
 
 </beans>

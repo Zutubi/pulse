@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.logging;
+package com.zutubi.pulse.core.util.logging;
 
 import com.zutubi.pulse.core.test.PulseTestCase;
 
@@ -8,13 +8,12 @@ import java.util.Properties;
 import java.util.logging.*;
 
 /**
- * <class-comment/>
  */
 public class LogManagerTest extends PulseTestCase
 {
     public static int instanceCount = 0;
 
-    private com.zutubi.pulse.core.logging.LogManager logManager;
+    private com.zutubi.pulse.core.util.logging.LogManager logManager;
 
     protected void setUp() throws Exception
     {
@@ -23,7 +22,7 @@ public class LogManagerTest extends PulseTestCase
         Map<String, HandlerFactory> factories = new HashMap<String, HandlerFactory>();
         factories.put("ConsoleHandler", new ConsoleHandlerFactory());
 
-        logManager = new com.zutubi.pulse.core.logging.LogManager();
+        logManager = new com.zutubi.pulse.core.util.logging.LogManager();
         logManager.setFactories(factories);
         instanceCount = 0;
     }
@@ -102,7 +101,7 @@ public class LogManagerTest extends PulseTestCase
     public void testLogConfig()
     {
         Properties props = new Properties();
-        props.put("config", "com.zutubi.pulse.core.logging.LogManagerTest$TestConfigObject");
+        props.put("config", "com.zutubi.pulse.core.util.logging.LogManagerTest$TestConfigObject");
         assertEquals(0, instanceCount);
         logManager.configure(props);
         assertEquals(1, instanceCount);

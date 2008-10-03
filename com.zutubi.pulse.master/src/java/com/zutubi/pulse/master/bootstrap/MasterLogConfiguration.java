@@ -2,8 +2,8 @@ package com.zutubi.pulse.master.bootstrap;
 
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.tove.config.admin.LoggingConfiguration;
-import com.zutubi.pulse.servercore.logging.LogConfiguration;
-import com.zutubi.pulse.servercore.logging.LogConfigurationManager;
+import com.zutubi.pulse.servercore.util.logging.LogConfiguration;
+import com.zutubi.pulse.servercore.util.logging.LogConfigurationManager;
 import com.zutubi.tove.config.ConfigurationEventListener;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.events.ConfigurationEvent;
