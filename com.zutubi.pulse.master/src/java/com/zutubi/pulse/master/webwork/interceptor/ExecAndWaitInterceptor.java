@@ -17,8 +17,6 @@ public class ExecAndWaitInterceptor extends com.opensymphony.webwork.interceptor
         
         Object action = proxy.getAction();
 
-        // should implement the 
-
         Monitor monitor = ((ExecuteRestoreAction)action).getMonitor();
 
         if (monitor.isFinished())

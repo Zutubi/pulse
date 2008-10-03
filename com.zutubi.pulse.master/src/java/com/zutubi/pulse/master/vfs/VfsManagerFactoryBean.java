@@ -28,27 +28,24 @@ public class VfsManagerFactoryBean implements FactoryBean
 
     public Object getObject() throws Exception
     {
-        if (instance == null)
+        synchronized(this)
         {
-            synchronized(this)
+            if (instance == null)
             {
-                if (instance == null)
-                {
-                    instance = new DefaultFileSystemManager();
-                    instance.setFilesCache(new NullFilesCache());
-                    instance.addProvider("local", new DefaultLocalFileProvider());
-                    instance.addProvider("ram", new RamFileProvider());
-                    AgentFileProvider agentFileProviderfileProvider = new AgentFileProvider();
-                    agentFileProviderfileProvider.setAgentManager(agentManager);
-                    agentFileProviderfileProvider.setSlaveProxyFactory(proxyFactory);
-                    agentFileProviderfileProvider.setServiceTokenManager(serviceTokenManager);
-                    instance.addProvider("agent", agentFileProviderfileProvider);
+                instance = new DefaultFileSystemManager();
+                instance.setFilesCache(new NullFilesCache());
+                instance.addProvider("local", new DefaultLocalFileProvider());
+                instance.addProvider("ram", new RamFileProvider());
+                AgentFileProvider agentFileProviderfileProvider = new AgentFileProvider();
+                agentFileProviderfileProvider.setAgentManager(agentManager);
+                agentFileProviderfileProvider.setSlaveProxyFactory(proxyFactory);
+                agentFileProviderfileProvider.setServiceTokenManager(serviceTokenManager);
+                instance.addProvider("agent", agentFileProviderfileProvider);
 
-                    PulseFileProvider pulseFileProvider = objectFactory.buildBean(PulseFileProvider.class);
-                    instance.addProvider("pulse", pulseFileProvider);
+                PulseFileProvider pulseFileProvider = objectFactory.buildBean(PulseFileProvider.class);
+                instance.addProvider("pulse", pulseFileProvider);
 
-                    instance.init();
-                }
+                instance.init();
             }
         }
         return instance;
