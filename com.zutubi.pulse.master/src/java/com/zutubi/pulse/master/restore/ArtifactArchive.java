@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.restore;
 
-import com.zutubi.pulse.master.monitor.FeedbackAware;
-import com.zutubi.pulse.master.monitor.TaskFeedback;
+import com.zutubi.pulse.master.util.monitor.FeedbackAware;
+import com.zutubi.pulse.master.util.monitor.TaskFeedback;
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
 import com.zutubi.util.Pair;

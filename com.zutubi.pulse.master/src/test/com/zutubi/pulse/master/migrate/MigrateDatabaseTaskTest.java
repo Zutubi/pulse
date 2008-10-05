@@ -5,10 +5,10 @@ import com.zutubi.pulse.core.util.JDBCUtils;
 import com.zutubi.pulse.master.database.DatabaseConfig;
 import com.zutubi.pulse.master.hibernate.HibernateUtils;
 import com.zutubi.pulse.master.hibernate.MutableConfiguration;
-import com.zutubi.pulse.master.monitor.JobRunner;
-import com.zutubi.pulse.master.monitor.Monitor;
-import com.zutubi.pulse.master.monitor.TaskException;
-import com.zutubi.pulse.master.monitor.TaskFeedback;
+import com.zutubi.pulse.master.util.monitor.JobRunner;
+import com.zutubi.pulse.master.util.monitor.Monitor;
+import com.zutubi.pulse.master.util.monitor.TaskException;
+import com.zutubi.pulse.master.util.monitor.TaskFeedback;
 import com.zutubi.pulse.master.transfer.TransferException;
 import nu.xom.ParsingException;
 

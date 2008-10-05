@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.restore;
 
-import com.zutubi.pulse.master.monitor.Monitor;
-import com.zutubi.pulse.master.monitor.Task;
+import com.zutubi.pulse.master.util.monitor.Monitor;
+import com.zutubi.pulse.master.util.monitor.Task;
 
 import java.io.File;
 import java.util.List;

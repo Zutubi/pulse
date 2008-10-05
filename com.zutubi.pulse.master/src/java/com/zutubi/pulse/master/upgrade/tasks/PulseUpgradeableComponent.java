@@ -3,7 +3,7 @@ package com.zutubi.pulse.master.upgrade.tasks;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.master.bootstrap.Data;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.master.monitor.JobListener;
+import com.zutubi.pulse.master.util.monitor.JobListener;
 import com.zutubi.pulse.master.upgrade.ConfigurationAware;
 import com.zutubi.pulse.master.upgrade.UpgradeTask;
 import com.zutubi.pulse.master.upgrade.UpgradeableComponent;

@@ -1,11 +1,7 @@
-package com.zutubi.pulse.master.monitor;
+package com.zutubi.pulse.master.util.monitor;
 
 import com.zutubi.util.TimeStamps;
 
-/**
- *
- *
- */
 public class TaskFeedback
 {
     private static final int UNDEFINED = -1;

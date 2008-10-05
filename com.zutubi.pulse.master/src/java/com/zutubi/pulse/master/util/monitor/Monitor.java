@@ -1,13 +1,9 @@
-package com.zutubi.pulse.master.monitor;
+package com.zutubi.pulse.master.util.monitor;
 
 import com.zutubi.util.TimeStamps;
 
 import java.util.*;
 
-/**
- *
- *
- */
 public class Monitor
 {
     private static final long UNDEFINED = -1;

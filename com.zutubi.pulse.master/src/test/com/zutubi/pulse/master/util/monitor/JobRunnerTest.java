@@ -1,12 +1,8 @@
-package com.zutubi.pulse.master.monitor;
+package com.zutubi.pulse.master.util.monitor;
 
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.Constants;
 
-/**
- *
- *
- */
 public class JobRunnerTest extends PulseTestCase
 {
     private JobRunner runner = null;

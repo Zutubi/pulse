@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.upgrade;
 
-import com.zutubi.pulse.master.monitor.JobListener;
-import com.zutubi.pulse.master.monitor.Task;
+import com.zutubi.pulse.master.util.monitor.JobListener;
+import com.zutubi.pulse.master.util.monitor.Task;
 import junit.framework.TestCase;
 
 import java.util.Arrays;

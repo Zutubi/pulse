@@ -1,10 +1,10 @@
-package com.zutubi.pulse.master.monitor;
+package com.zutubi.pulse.master.util.monitor;
 
 import java.util.List;
 
 /**
- *
- *
+ * The task interface represents the smallest unit of work that can be monitored
+ * by the monitoring system.
  */
 public interface Task
 {

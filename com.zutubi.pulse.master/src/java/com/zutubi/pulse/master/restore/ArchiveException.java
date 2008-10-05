@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.restore;
 
-import com.zutubi.pulse.master.monitor.TaskException;
+import com.zutubi.pulse.master.util.monitor.TaskException;
 
 /**
  *

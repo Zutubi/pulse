@@ -12,7 +12,7 @@
     <import resource="classpath:/com/zutubi/pulse/master/bootstrap/context/loggingContext.xml"/>
     <import resource="classpath:/com/zutubi/pulse/core/bootstrap/context/eventContext.xml"/>
 
-    <bean id="jobManager" class="com.zutubi.pulse.master.monitor.JobManager"></bean>
+    <bean id="jobManager" class="com.zutubi.pulse.master.util.monitor.JobManager"></bean>
 
     <!--
     define the file system manager here so that it is available during setup. This is also redefined later

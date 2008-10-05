@@ -1,12 +1,8 @@
-package com.zutubi.pulse.master.monitor;
+package com.zutubi.pulse.master.util.monitor;
 
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- *
- *
- */
 public abstract class AbstractTask implements Task
 {
     private String name;

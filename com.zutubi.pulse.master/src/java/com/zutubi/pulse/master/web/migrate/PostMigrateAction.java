@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.web.migrate;
 
 import com.zutubi.pulse.master.bootstrap.SetupManager;
 import com.zutubi.pulse.master.migrate.MigrationManager;
-import com.zutubi.pulse.master.monitor.Monitor;
+import com.zutubi.pulse.master.util.monitor.Monitor;
 
 /**
  *

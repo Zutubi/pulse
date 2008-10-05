@@ -1,4 +1,4 @@
-package com.zutubi.pulse.master.monitor;
+package com.zutubi.pulse.master.util.monitor;
 
 import com.zutubi.util.logging.Logger;
 
@@ -6,10 +6,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- *
- *
- */
 public class JobRunner
 {
     private static final Logger LOG = Logger.getLogger(JobRunner.class);

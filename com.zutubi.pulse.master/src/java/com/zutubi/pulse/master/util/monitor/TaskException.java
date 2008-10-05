@@ -1,11 +1,7 @@
-package com.zutubi.pulse.master.monitor;
+package com.zutubi.pulse.master.util.monitor;
 
 import com.zutubi.pulse.core.PulseException;
 
-/**
- *
- *
- */
 public class TaskException extends PulseException
 {
     public TaskException()

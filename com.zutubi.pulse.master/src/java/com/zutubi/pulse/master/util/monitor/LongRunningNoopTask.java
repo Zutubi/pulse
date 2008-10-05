@@ -1,11 +1,7 @@
-package com.zutubi.pulse.master.monitor;
+package com.zutubi.pulse.master.util.monitor;
 
 import com.zutubi.util.Constants;
 
-/**
- *
- *
- */
 public class LongRunningNoopTask extends AbstractTask implements FeedbackAware
 {
     private long duration;

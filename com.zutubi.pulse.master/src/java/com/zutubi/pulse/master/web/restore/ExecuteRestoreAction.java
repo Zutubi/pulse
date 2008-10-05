@@ -2,8 +2,8 @@ package com.zutubi.pulse.master.web.restore;
 
 import com.zutubi.pulse.master.bootstrap.DefaultSetupManager;
 import com.zutubi.pulse.master.bootstrap.SetupManager;
-import com.zutubi.pulse.master.monitor.Monitor;
-import com.zutubi.pulse.master.monitor.Task;
+import com.zutubi.pulse.master.util.monitor.Monitor;
+import com.zutubi.pulse.master.util.monitor.Task;
 
 import java.io.File;
 import java.util.List;

@@ -1,8 +1,8 @@
-package com.zutubi.pulse.master.monitor;
+package com.zutubi.pulse.master.util.monitor;
 
 /**
- *
- *
+ * The job listener interface defines a set of callbacks that can be
+ * implemented to track the execution of the tasks within a job.
  */
 public interface JobListener<T extends Task>
 {

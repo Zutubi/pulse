@@ -1,4 +1,4 @@
-package com.zutubi.pulse.master.monitor;
+package com.zutubi.pulse.master.util.monitor;
 
 import com.zutubi.pulse.core.test.PulseTestCase;
 
@@ -6,10 +6,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- *
- *
- */
 public class JobManagerTest extends PulseTestCase
 {
     private JobManager jobManager;

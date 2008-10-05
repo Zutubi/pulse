@@ -12,7 +12,7 @@ import com.zutubi.pulse.master.database.DatabaseConsole;
 import com.zutubi.pulse.master.database.DriverRegistry;
 import com.zutubi.pulse.master.license.LicenseHolder;
 import com.zutubi.pulse.master.migrate.MigrationManager;
-import com.zutubi.pulse.master.monitor.Monitor;
+import com.zutubi.pulse.master.util.monitor.Monitor;
 import com.zutubi.pulse.master.restore.ArchiveException;
 import com.zutubi.pulse.master.restore.RestoreManager;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
