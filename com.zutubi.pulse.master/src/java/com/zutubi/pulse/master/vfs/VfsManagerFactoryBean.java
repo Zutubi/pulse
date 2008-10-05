@@ -2,9 +2,9 @@ package com.zutubi.pulse.master.vfs;
 
 import com.zutubi.pulse.master.SlaveProxyFactory;
 import com.zutubi.pulse.master.agent.AgentManager;
-import com.zutubi.pulse.master.vfs.agent.AgentFileProvider;
-import com.zutubi.pulse.master.vfs.local.DefaultLocalFileProvider;
-import com.zutubi.pulse.master.vfs.pulse.PulseFileProvider;
+import com.zutubi.pulse.master.vfs.provider.agent.AgentFileProvider;
+import com.zutubi.pulse.master.vfs.provider.local.DefaultLocalFileProvider;
+import com.zutubi.pulse.master.vfs.provider.pulse.PulseFileProvider;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;
 import com.zutubi.util.bean.ObjectFactory;
 import org.apache.commons.vfs.FileSystemManager;
@@ -13,9 +13,6 @@ import org.apache.commons.vfs.impl.DefaultFileSystemManager;
 import org.apache.commons.vfs.provider.ram.RamFileProvider;
 import org.springframework.beans.factory.FactoryBean;
 
-/**
- * <class comment/>
- */
 public class VfsManagerFactoryBean implements FactoryBean
 {
     private ObjectFactory objectFactory;
@@ -36,6 +33,7 @@ public class VfsManagerFactoryBean implements FactoryBean
                 instance.setFilesCache(new NullFilesCache());
                 instance.addProvider("local", new DefaultLocalFileProvider());
                 instance.addProvider("ram", new RamFileProvider());
+                
                 AgentFileProvider agentFileProviderfileProvider = new AgentFileProvider();
                 agentFileProviderfileProvider.setAgentManager(agentManager);
                 agentFileProviderfileProvider.setSlaveProxyFactory(proxyFactory);

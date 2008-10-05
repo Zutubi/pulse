@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.web.vfs;
 
 import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
-import com.zutubi.pulse.master.vfs.pulse.AbstractPulseFileObject;
+import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.io.TempFileInputStream;

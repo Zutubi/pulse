@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.servlet;
 
 import com.zutubi.pulse.core.spring.SpringComponentContext;
-import com.zutubi.pulse.master.vfs.pulse.AbstractPulseFileObject;
-import com.zutubi.pulse.master.vfs.pulse.AddressableFileObject;
+import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
+import com.zutubi.pulse.master.vfs.provider.pulse.AddressableFileObject;
 import com.zutubi.util.logging.Logger;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileSystemManager;
