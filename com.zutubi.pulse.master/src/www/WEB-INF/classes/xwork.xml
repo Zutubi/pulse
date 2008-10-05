@@ -6,132 +6,132 @@
     <package name="default" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
-        <action name="default" class="com.zutubi.pulse.master.web.DefaultAction">
+        <action name="default" class="com.zutubi.pulse.master.xwork.actions.DefaultAction">
             <result name="dashboard" type="redirect">/dashboard/home/</result>
             <result name="welcome" type="velocity">/welcome.vm</result>
             <result name="browse" type="redirect">/browse/</result>
         </action>
 
-        <action name="login" class="com.zutubi.pulse.master.web.LoginAction">
+        <action name="login" class="com.zutubi.pulse.master.xwork.actions.LoginAction">
             <result name="cancel" type="redirect">/</result>
             <result name="input" type="velocity">login.vm</result>
             <result name="success" type="velocity">login.vm</result>
         </action>
 
-        <action name="logout" class="com.zutubi.pulse.master.web.LogoutAction">
+        <action name="logout" class="com.zutubi.pulse.master.xwork.actions.LogoutAction">
             <result name="success" type="redirect">/</result>
         </action>
 
-        <action name="signup" class="com.zutubi.pulse.master.web.admin.user.SignupUserAction">
+        <action name="signup" class="com.zutubi.pulse.master.xwork.actions.admin.user.SignupUserAction">
             <result name="cancel" type="redirect">/</result>
             <result name="input" type="velocity">signup.vm</result>
             <result name="success" type="redirect">/</result>
         </action>
 
-        <action name="dismissWelcome" class="com.zutubi.pulse.master.web.DismissWelcomeAction">
+        <action name="dismissWelcome" class="com.zutubi.pulse.master.xwork.actions.DismissWelcomeAction">
             <result name="success" type="redirect">/default.action</result>
         </action>
 
-        <action name="viewAgents" class="com.zutubi.pulse.master.web.agents.ViewAgentsAction">
+        <action name="viewAgents" class="com.zutubi.pulse.master.xwork.actions.agents.ViewAgentsAction">
             <interceptor-ref name="ajaxReadOnlyStack"/>
             <result name="success" type="velocity">/view-agents.vm</result>
         </action>
 
-        <action name="agentAction" class="com.zutubi.pulse.master.web.agents.AgentActionAction">
+        <action name="agentAction" class="com.zutubi.pulse.master.xwork.actions.agents.AgentActionAction">
             <result name="success" type="redirect">${redirect}</result>
         </action>
 
-        <action name="viewServerQueues" class="com.zutubi.pulse.master.web.server.ViewServerQueuesAction">
+        <action name="viewServerQueues" class="com.zutubi.pulse.master.xwork.actions.server.ViewServerQueuesAction">
             <interceptor-ref name="ajaxReadOnlyStack"/>
             <result name="success" type="velocity">/view-server-queues.vm</result>
         </action>
 
-        <action name="cancelBuild" class="com.zutubi.pulse.master.web.server.CancelBuildAction">
+        <action name="cancelBuild" class="com.zutubi.pulse.master.xwork.actions.server.CancelBuildAction">
             <result name="success" type="redirect">${redirect}</result>
         </action>
 
-        <action name="cancelQueuedBuild" class="com.zutubi.pulse.master.web.server.CancelQueuedBuildAction">
+        <action name="cancelQueuedBuild" class="com.zutubi.pulse.master.xwork.actions.server.CancelQueuedBuildAction">
             <result name="success" type="redirect">/server/activity/</result>
         </action>
 
-        <action name="viewAgentStatus" class="com.zutubi.pulse.master.web.agents.ViewAgentStatusAction">
+        <action name="viewAgentStatus" class="com.zutubi.pulse.master.xwork.actions.agents.ViewAgentStatusAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">/view-agent-status.vm</result>
         </action>
 
-        <action name="agentMessages" class="com.zutubi.pulse.master.web.agents.ServerMessagesAction">
+        <action name="agentMessages" class="com.zutubi.pulse.master.xwork.actions.agents.ServerMessagesAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">/agent-messages.vm</result>
         </action>
 
-        <action name="serverMessages" class="com.zutubi.pulse.master.web.agents.ServerMessagesAction">
+        <action name="serverMessages" class="com.zutubi.pulse.master.xwork.actions.agents.ServerMessagesAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">/server-messages.vm</result>
         </action>
 
-        <action name="internalError" class="com.zutubi.pulse.master.web.InternalErrorAction">
+        <action name="internalError" class="com.zutubi.pulse.master.xwork.actions.InternalErrorAction">
             <result name="success" type="velocity">/internal-error.vm</result>
             <result name="input" type="velocity">/internal-error.vm</result>
             <result name="cancel" type="velocity">/internal-error.vm</result>
         </action>
 
-        <action name="404" class="com.zutubi.pulse.master.web.FourOhFourAction">
+        <action name="404" class="com.zutubi.pulse.master.xwork.actions.FourOhFourAction">
             <result name="success" type="velocity">/404.vm</result>
             <result name="input" type="velocity">/404.vm</result>
             <result name="error" type="velocity">/404.vm</result>
         </action>
 
-        <action name="viewProjects" class="com.zutubi.pulse.master.web.project.BrowseAction">
+        <action name="viewProjects" class="com.zutubi.pulse.master.xwork.actions.project.BrowseAction">
             <interceptor-ref name="ajaxReadOnlyStack"/>
             <result name="success" type="velocity">/view-projects.vm</result>
         </action>
 
-        <action name="projectAction" class="com.zutubi.pulse.master.web.project.ProjectActionAction">
+        <action name="projectAction" class="com.zutubi.pulse.master.xwork.actions.project.ProjectActionAction">
             <result name="success" type="redirect">${redirect}</result>
         </action>
 
-        <action name="viewBuild" class="com.zutubi.pulse.master.web.project.ViewBuildAction">
+        <action name="viewBuild" class="com.zutubi.pulse.master.xwork.actions.project.ViewBuildAction">
             <interceptor-ref name="ajaxReadOnlyStack"/>
             <result name="success" type="velocity">/view-build.vm</result>
         </action>
 
-        <action name="viewChanges" class="com.zutubi.pulse.master.web.project.ViewChangesAction">
+        <action name="viewChanges" class="com.zutubi.pulse.master.xwork.actions.project.ViewChangesAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">/view-changes.vm</result>
             <result name="personal" type="chain">viewPersonalChanges</result>
         </action>
 
-        <action name="viewPersonalChanges" class="com.zutubi.pulse.master.web.project.ViewPersonalChangesAction">
+        <action name="viewPersonalChanges" class="com.zutubi.pulse.master.xwork.actions.project.ViewPersonalChangesAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">/view-personal-changes.vm</result>
         </action>
 
-        <action name="viewTests" class="com.zutubi.pulse.master.web.project.ViewBuildAction">
+        <action name="viewTests" class="com.zutubi.pulse.master.xwork.actions.project.ViewBuildAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">/view-tests.vm</result>
         </action>
 
-        <action name="viewTestSuite" class="com.zutubi.pulse.master.web.project.ViewTestSuiteAction">
+        <action name="viewTestSuite" class="com.zutubi.pulse.master.xwork.actions.project.ViewTestSuiteAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">/view-test-suite.vm</result>
         </action>
 
-        <action name="viewCommandLog" class="com.zutubi.pulse.master.web.project.ViewBuildAction">
+        <action name="viewCommandLog" class="com.zutubi.pulse.master.xwork.actions.project.ViewBuildAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">/view-command-log.vm</result>
         </action>
 
-        <action name="viewBuildArtifacts" class="com.zutubi.pulse.master.web.project.ViewArtifactsAction">
+        <action name="viewBuildArtifacts" class="com.zutubi.pulse.master.xwork.actions.project.ViewArtifactsAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">/view-artifacts.vm</result>
         </action>
 
-        <action name="viewBuildFile" class="com.zutubi.pulse.master.web.project.ViewBuildFileAction">
+        <action name="viewBuildFile" class="com.zutubi.pulse.master.xwork.actions.project.ViewBuildFileAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">/view-build-file.vm</result>
         </action>
 
-        <action name="downloadBuildFile" class="com.zutubi.pulse.master.web.project.DownloadBuildFileAction">
+        <action name="downloadBuildFile" class="com.zutubi.pulse.master.xwork.actions.project.DownloadBuildFileAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="stream">
                 <param name="contentType">${contentType}</param>
@@ -139,14 +139,14 @@
             </result>
         </action>
 
-        <action name="downloadProjectBuildFile" class="com.zutubi.pulse.master.web.project.DownloadProjectBuildFileAction">
+        <action name="downloadProjectBuildFile" class="com.zutubi.pulse.master.xwork.actions.project.DownloadProjectBuildFileAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="stream">
                 <param name="contentType">${contentType}</param>
             </result>
         </action>
 
-        <action name="downloadDirectoryArtifact" class="com.zutubi.pulse.master.web.project.DownloadDirectoryArtifactAction">
+        <action name="downloadDirectoryArtifact" class="com.zutubi.pulse.master.xwork.actions.project.DownloadDirectoryArtifactAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="stream">
                 <param name="contentType">${contentType}</param>
@@ -154,7 +154,7 @@
             </result>
         </action>
 
-        <action name="tailRecipeLog" class="com.zutubi.pulse.master.web.project.TailRecipeLogAction">
+        <action name="tailRecipeLog" class="com.zutubi.pulse.master.xwork.actions.project.TailRecipeLogAction">
             <interceptor-ref name="completeStack"/>
             <result name="tail" type="velocity">/tail-recipe-log.vm</result>
             <result name="raw" type="stream">
@@ -163,7 +163,7 @@
             </result>
         </action>
 
-        <action name="tailBuildLog" class="com.zutubi.pulse.master.web.project.TailBuildLogAction">
+        <action name="tailBuildLog" class="com.zutubi.pulse.master.xwork.actions.project.TailBuildLogAction">
             <interceptor-ref name="completeStack"/>
             <result name="tail" type="velocity">/tail-build-log.vm</result>
             <result name="raw" type="stream">
@@ -172,37 +172,37 @@
             </result>
         </action>
 
-        <action name="viewChangelist" class="com.zutubi.pulse.master.web.project.ViewChangelistAction">
+        <action name="viewChangelist" class="com.zutubi.pulse.master.xwork.actions.project.ViewChangelistAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">/view-changelist.vm</result>
         </action>
 
-        <action name="triggerBuild" class="com.zutubi.pulse.master.web.project.TriggerBuildAction">
+        <action name="triggerBuild" class="com.zutubi.pulse.master.xwork.actions.project.TriggerBuildAction">
             <result name="success" type="redirect">/browse/projects/${u_projectName}/</result>
             <result name="prompt" type="chain">editBuildProperties!input</result>
         </action>
 
-        <action name="editBuildProperties!input" class="com.zutubi.pulse.master.web.project.EditBuildPropertiesAction" method="doInput">
+        <action name="editBuildProperties!input" class="com.zutubi.pulse.master.xwork.actions.project.EditBuildPropertiesAction" method="doInput">
             <result name="input" type="velocity">/edit-build-properties.vm</result>
         </action>
 
-        <action name="editBuildProperties" class="com.zutubi.pulse.master.web.project.EditBuildPropertiesAction">
+        <action name="editBuildProperties" class="com.zutubi.pulse.master.xwork.actions.project.EditBuildPropertiesAction">
             <result name="input" type="velocity">/edit-build-properties.vm</result>
             <result name="success" type="redirect">/browse/projects/${u_projectName}/</result>
             <result name="cancel" type="redirect">/browse/projects/${u_projectName}/</result>
         </action>
 
-        <action name="viewArtifact" class="com.zutubi.pulse.master.web.project.ViewDecoratedArtifactAction">
+        <action name="viewArtifact" class="com.zutubi.pulse.master.xwork.actions.project.ViewDecoratedArtifactAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">/view-artifact.vm</result>
         </action>
 
-        <action name="browseProjectDir" class="com.zutubi.pulse.master.web.project.BrowseProjectDirAction">
+        <action name="browseProjectDir" class="com.zutubi.pulse.master.xwork.actions.project.BrowseProjectDirAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">/browse-project-dir.vm</result>
         </action>
 
-        <action name="cat" class="com.zutubi.pulse.master.web.vfs.CatAction">
+        <action name="cat" class="com.zutubi.pulse.master.xwork.actions.vfs.CatAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="stream">
                 <param name="contentType">${contentType}</param>
@@ -210,7 +210,7 @@
             </result>
         </action>
 
-        <action name="zip" class="com.zutubi.pulse.master.web.vfs.ZipAction">
+        <action name="zip" class="com.zutubi.pulse.master.xwork.actions.vfs.ZipAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="stream">
                 <param name="contentType">${contentType}</param>
@@ -218,12 +218,12 @@
             </result>
         </action>
 
-        <action name="browseProjectScm" class="com.zutubi.pulse.master.web.project.BrowseProjectScmAction">
+        <action name="browseProjectScm" class="com.zutubi.pulse.master.xwork.actions.project.BrowseProjectScmAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">/browse-project-scm-dir.vm</result>
         </action>
 
-        <action name="downloadSCMFile" class="com.zutubi.pulse.master.web.project.DownloadSCMFileAction">
+        <action name="downloadSCMFile" class="com.zutubi.pulse.master.xwork.actions.project.DownloadSCMFileAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="stream">
                 <param name="contentType">${contentType}</param>
@@ -231,52 +231,52 @@
             </result>
         </action>
 
-        <action name="index!default" class="com.zutubi.pulse.master.web.ActionSupport">
+        <action name="index!default" class="com.zutubi.pulse.master.xwork.actions.ActionSupport">
             <result name="success" type="velocity">/index.vm</result>
         </action>
 
-        <action name="currentBuild" class="com.zutubi.pulse.master.web.project.ProjectHomeAction">
+        <action name="currentBuild" class="com.zutubi.pulse.master.xwork.actions.project.ProjectHomeAction">
             <interceptor-ref name="ajaxReadOnlyStack"/>
             <result name="success" type="velocity">/project-home.vm</result>
             <result name="error" type="redirect">/browse/</result>
         </action>
 
-        <action name="projectState" class="com.zutubi.pulse.master.web.project.ProjectStateAction">
+        <action name="projectState" class="com.zutubi.pulse.master.xwork.actions.project.ProjectStateAction">
             <result name="success" type="redirect">/browse/projects/${u_projectName}/</result>
         </action>
 
-        <action name="history" class="com.zutubi.pulse.master.web.project.HistoryAction">
+        <action name="history" class="com.zutubi.pulse.master.xwork.actions.project.HistoryAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">/history.vm</result>
         </action>
 
-        <action name="viewTriggers" class="com.zutubi.pulse.master.web.scheduling.ViewTriggersAction">
+        <action name="viewTriggers" class="com.zutubi.pulse.master.xwork.actions.scheduling.ViewTriggersAction">
             <result name="success" type="velocity">/view-triggers.vm</result>
         </action>
 
-        <action name="viewSystemInfo" class="com.zutubi.pulse.master.web.agents.SystemInfoAction">
+        <action name="viewSystemInfo" class="com.zutubi.pulse.master.xwork.actions.agents.SystemInfoAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">/view-systeminfo.vm</result>
         </action>
 
-        <action name="garbageCollect" class="com.zutubi.pulse.master.web.console.GarbageCollectAction">
+        <action name="garbageCollect" class="com.zutubi.pulse.master.xwork.actions.console.GarbageCollectAction">
             <result name="success" type="redirect">/viewSystemInfo.action</result>
         </action>
 
-        <action name="quartzSystemInfo" class="com.zutubi.pulse.master.web.console.QuartzAdminAction">
+        <action name="quartzSystemInfo" class="com.zutubi.pulse.master.xwork.actions.console.QuartzAdminAction">
             <result name="success" type="velocity">/view-quartz.vm</result>
         </action>
 
-        <action name="deleteBuild" class="com.zutubi.pulse.master.web.project.DeleteBuildAction">
+        <action name="deleteBuild" class="com.zutubi.pulse.master.xwork.actions.project.DeleteBuildAction">
             <result name="personal" type="redirect">/dashboard/my/</result>
             <result name="success" type="redirect">/browse/projects/${u_projectName}/</result>
         </action>
 
-        <action name="rss" class="com.zutubi.pulse.master.web.rss.BuildResultsRssAction">
+        <action name="rss" class="com.zutubi.pulse.master.xwork.actions.rss.BuildResultsRssAction">
             <interceptor-ref name="completeReadOnlyStack"/>
         </action>
 
-        <action name="projectReports" class="com.zutubi.pulse.master.web.project.ViewReportsAction">
+        <action name="projectReports" class="com.zutubi.pulse.master.xwork.actions.project.ViewReportsAction">
             <interceptor-ref name="completeReadOnlyStack"/>
             <result name="success" type="velocity">/project-reports.vm</result>
             <result name="input" type="velocity">/project-reports.vm</result>
@@ -286,13 +286,13 @@
     <package name="dashboard" namespace="/dashboard" extends="webwork-default-package">
         <default-interceptor-ref name="completeReadOnlyStack"/>
 
-        <action name="home" class="com.zutubi.pulse.master.web.user.DashboardAction">
+        <action name="home" class="com.zutubi.pulse.master.xwork.actions.user.DashboardAction">
             <interceptor-ref name="ajaxReadOnlyStack"/>
             <result name="success" type="velocity">/dashboard.vm</result>
             <result name="guest" type="redirect">/viewProjects.action</result>
         </action>
 
-        <action name="my" class="com.zutubi.pulse.master.web.user.MyBuildsAction">
+        <action name="my" class="com.zutubi.pulse.master.xwork.actions.user.MyBuildsAction">
             <interceptor-ref name="ajaxReadOnlyStack"/>
             <result name="success" type="velocity">/my-builds.vm</result>
             <result name="guest" type="redirect">/viewProjects.action</result>
@@ -302,7 +302,7 @@
     <package name="personal" namespace="/personal" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
-        <action name="personalBuild" class="com.zutubi.pulse.master.web.PersonalBuildAction">
+        <action name="personalBuild" class="com.zutubi.pulse.master.xwork.actions.PersonalBuildAction">
             <result name="error" type="velocity">error.vm</result>
             <result name="success" type="velocity">success.vm</result>
         </action>
@@ -311,11 +311,11 @@
     <package name="user" namespace="/user" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
-        <action name="hideDashboardProject" class="com.zutubi.pulse.master.web.user.HideDashboardProjectAction">
+        <action name="hideDashboardProject" class="com.zutubi.pulse.master.xwork.actions.user.HideDashboardProjectAction">
             <result name="success" type="redirect">/dashboard/home/</result>
         </action>
 
-        <action name="hideDashboardGroup" class="com.zutubi.pulse.master.web.user.HideDashboardGroupAction">
+        <action name="hideDashboardGroup" class="com.zutubi.pulse.master.xwork.actions.user.HideDashboardGroupAction">
             <result name="success" type="redirect">/dashboard/home/</result>
         </action>
     </package>
@@ -325,7 +325,7 @@
         a simple redirect to ensure that if the startup requests '/startup/starting.action'
         from this xwork config, it handles it gracefully.
          -->
-        <action name="starting" class="com.zutubi.pulse.master.web.ActionSupport">
+        <action name="starting" class="com.zutubi.pulse.master.xwork.actions.ActionSupport">
             <result name="success" type="redirect">/</result>
         </action>
     </package>
@@ -336,11 +336,11 @@
         due to a refresh at the time the contexts are switched over) from
         this xwork config, it handles it gracefully.
          -->
-        <action name="setup" class="com.zutubi.pulse.master.web.ActionSupport">
+        <action name="setup" class="com.zutubi.pulse.master.xwork.actions.ActionSupport">
             <result name="success" type="redirect">/</result>
         </action>
 
-        <action name="execute" class="com.zutubi.pulse.master.web.ActionSupport">
+        <action name="execute" class="com.zutubi.pulse.master.xwork.actions.ActionSupport">
             <result name="success" type="redirect">/</result>
         </action>
     </package>
@@ -348,34 +348,34 @@
     <package name="admin" namespace="/admin" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
-        <action name="hibernateStatistics" class="com.zutubi.pulse.master.web.admin.debug.DumpHibernateStatisticsAction">
+        <action name="hibernateStatistics" class="com.zutubi.pulse.master.xwork.actions.admin.debug.DumpHibernateStatisticsAction">
             <interceptor-ref name="defaultReadOnlyStack"/>
             <result name="success" type="velocity">hibernate-statistics.vm</result>
         </action>
 
-        <action name="toggleHibernateStatistics" class="com.zutubi.pulse.master.web.admin.debug.ToggleHibernateStatisticsAction">
+        <action name="toggleHibernateStatistics" class="com.zutubi.pulse.master.xwork.actions.admin.debug.ToggleHibernateStatisticsAction">
             <interceptor-ref name="defaultReadOnlyStack"/>
             <result name="success" type="redirect">hibernateStatistics.action</result>
         </action>
 
-        <action name="toggleRecipeQueue" class="com.zutubi.pulse.master.web.admin.ToggleRecipeQueueAction">
+        <action name="toggleRecipeQueue" class="com.zutubi.pulse.master.xwork.actions.admin.ToggleRecipeQueueAction">
             <result name="success" type="redirect">/server/activity/</result>
         </action>
 
-        <action name="disableUser" class="com.zutubi.pulse.master.web.admin.user.DisableUserAction">
+        <action name="disableUser" class="com.zutubi.pulse.master.xwork.actions.admin.user.DisableUserAction">
             <result name="input" type="velocity">undefined.vm</result>
             <result name="success" type="redirect">viewUsers.action?startPage=${startPage}</result>
         </action>
 
-        <action name="addSystemProperty" class="com.zutubi.pulse.master.web.admin.SystemPropertiesAction" method="doAdd">
+        <action name="addSystemProperty" class="com.zutubi.pulse.master.xwork.actions.admin.SystemPropertiesAction" method="doAdd">
             <result name="success" type="redirect">/admin/settings/</result>
         </action>
         
-        <action name="removeSystemProperty" class="com.zutubi.pulse.master.web.admin.SystemPropertiesAction" method="doRemove">
+        <action name="removeSystemProperty" class="com.zutubi.pulse.master.xwork.actions.admin.SystemPropertiesAction" method="doRemove">
             <result name="success" type="redirect">/admin/settings/</result>
         </action>
 
-        <action name="installPlugin" class="com.zutubi.pulse.master.web.admin.plugins.InstallPluginAction">
+        <action name="installPlugin" class="com.zutubi.pulse.master.xwork.actions.admin.plugins.InstallPluginAction">
             <result name="input" type="velocity">addplugin.vm</result>
             <result name="error" type="velocity">addplugin.vm</result>
             <result name="success" type="redirect">/admin/plugins/</result>
@@ -390,7 +390,7 @@
             <result name="guest" type="redirect">/browse/projects/</result>
         </action>
 
-        <action name="plugins" class="com.zutubi.pulse.master.web.admin.plugins.PluginsAction">
+        <action name="plugins" class="com.zutubi.pulse.master.xwork.actions.admin.plugins.PluginsAction">
             <result name="success" type="velocity">plugins.vm</result>
         </action>
     </package>
@@ -402,73 +402,73 @@
             <result name="error" type="velocity">/ajax/generic-error-panel.vm</result>
         </global-results>
 
-        <action name="dashboardPanel" class="com.zutubi.pulse.master.web.user.DashboardAction">
+        <action name="dashboardPanel" class="com.zutubi.pulse.master.xwork.actions.user.DashboardAction">
             <result name="success" type="velocity">dashboard-panel.vm</result>
             <result name="error" type="redirect">/</result>
         </action>
 
-        <action name="myBuildsPanel" class="com.zutubi.pulse.master.web.user.MyBuildsAction">
+        <action name="myBuildsPanel" class="com.zutubi.pulse.master.xwork.actions.user.MyBuildsAction">
             <result name="success" type="velocity">my-builds-panel.vm</result>
             <result name="error" type="redirect">/</result>
         </action>
 
-        <action name="viewProjectsPanel" class="com.zutubi.pulse.master.web.project.BrowseAction">
+        <action name="viewProjectsPanel" class="com.zutubi.pulse.master.xwork.actions.project.BrowseAction">
             <result name="success" type="velocity">view-projects-panel.vm</result>
         </action>
 
-        <action name="projectHomePanel" class="com.zutubi.pulse.master.web.project.ProjectHomeAction">
+        <action name="projectHomePanel" class="com.zutubi.pulse.master.xwork.actions.project.ProjectHomeAction">
             <result name="success" type="velocity">project-home-panel.vm</result>
         </action>
 
-        <action name="viewBuildPanel" class="com.zutubi.pulse.master.web.project.ViewBuildAction">
+        <action name="viewBuildPanel" class="com.zutubi.pulse.master.xwork.actions.project.ViewBuildAction">
             <result name="success" type="velocity">view-build-panel.vm</result>
         </action>
 
-        <action name="tailRecipeLogPanel" class="com.zutubi.pulse.master.web.project.TailRecipeLogAction">
+        <action name="tailRecipeLogPanel" class="com.zutubi.pulse.master.xwork.actions.project.TailRecipeLogAction">
             <result name="tail" type="velocity">tail-log-panel.vm</result>
         </action>
 
-        <action name="tailBuildLogPanel" class="com.zutubi.pulse.master.web.project.TailBuildLogAction">
+        <action name="tailBuildLogPanel" class="com.zutubi.pulse.master.xwork.actions.project.TailBuildLogAction">
             <result name="tail" type="velocity">tail-log-panel.vm</result>
         </action>
 
-        <action name="historyPanel" class="com.zutubi.pulse.master.web.project.HistoryAction">
+        <action name="historyPanel" class="com.zutubi.pulse.master.xwork.actions.project.HistoryAction">
             <result name="success" type="velocity">history-panel.vm</result>
         </action>
 
-        <action name="viewAgentsPanel" class="com.zutubi.pulse.master.web.agents.ViewAgentsAction">
+        <action name="viewAgentsPanel" class="com.zutubi.pulse.master.xwork.actions.agents.ViewAgentsAction">
             <result name="success" type="velocity">view-agents-panel.vm</result>
         </action>
 
-        <action name="viewServerQueuesPanel" class="com.zutubi.pulse.master.web.server.ViewServerQueuesAction">
+        <action name="viewServerQueuesPanel" class="com.zutubi.pulse.master.xwork.actions.server.ViewServerQueuesAction">
             <result name="success" type="velocity">view-server-queues-panel.vm</result>
         </action>
 
-        <action name="ls" class="com.zutubi.pulse.master.web.vfs.LsAction">
+        <action name="ls" class="com.zutubi.pulse.master.xwork.actions.vfs.LsAction">
             <result name="success" type="json">ls.xml</result>
             <result name="error" type="json">error.xml</result>
         </action>
 
-        <action name="mkdir" class="com.zutubi.pulse.master.web.vfs.MkdirAction">
+        <action name="mkdir" class="com.zutubi.pulse.master.xwork.actions.vfs.MkdirAction">
             <result name="success" type="json">mkdir.xml</result>
             <result name="error" type="json">error.xml</result>
         </action>
 
-        <action name="rmdir" class="com.zutubi.pulse.master.web.vfs.RmAction">
+        <action name="rmdir" class="com.zutubi.pulse.master.xwork.actions.vfs.RmAction">
             <result name="success" type="json">rmdir.xml</result>
             <result name="error" type="json">error.xml</result>
         </action>
 
-        <action name="customiseBuildColumns" class="com.zutubi.pulse.master.web.user.CustomiseBuildColumnsAction">
+        <action name="customiseBuildColumns" class="com.zutubi.pulse.master.xwork.actions.user.CustomiseBuildColumnsAction">
             <interceptor-ref name="ajaxStack"/>
             <result name="success" type="httpheader">200</result>
         </action>
 
-        <action name="getLatestRevision" class="com.zutubi.pulse.master.web.ajax.GetLatestRevisionAction">
+        <action name="getLatestRevision" class="com.zutubi.pulse.master.xwork.actions.ajax.GetLatestRevisionAction">
             <result name="success" type="json">revision.xml</result>
         </action>
 
-        <action name="triggerBuildHook" class="com.zutubi.pulse.master.web.ajax.TriggerBuildHookAction">
+        <action name="triggerBuildHook" class="com.zutubi.pulse.master.xwork.actions.ajax.TriggerBuildHookAction">
             <result name="success" type="flexjson">result</result>
         </action>
     </package>
@@ -587,7 +587,7 @@
     </package>
 
     <package name="actionAjax" namespace="/aaction" extends="configAjax">
-        <action name="editBuildProperties" class="com.zutubi.pulse.master.web.project.EditBuildPropertiesAction">
+        <action name="editBuildProperties" class="com.zutubi.pulse.master.xwork.actions.project.EditBuildPropertiesAction">
             <param name="ajax">true</param>
             <result name="input" type="flexjson">newPanel</result>
             <result name="cancel" type="flexjson">configurationResponse</result>
@@ -612,25 +612,25 @@
     <package name="adminAjax" namespace="/ajax/admin" extends="admin">
         <default-interceptor-ref name="ajaxStack"/>
 
-        <action name="allPlugins" class="com.zutubi.pulse.master.web.admin.plugins.PluginsAction">
+        <action name="allPlugins" class="com.zutubi.pulse.master.xwork.actions.admin.plugins.PluginsAction">
             <interceptor-ref name="ajaxReadOnlyStack"/>
             <result name="success" type="velocity">/ajax/all-plugins.vm</result>
         </action>
 
-        <action name="viewPlugin" class="com.zutubi.pulse.master.web.admin.plugins.ViewPluginAction">
+        <action name="viewPlugin" class="com.zutubi.pulse.master.xwork.actions.admin.plugins.ViewPluginAction">
             <interceptor-ref name="ajaxReadOnlyStack"/>
             <result name="success" type="velocity">/ajax/view-plugin.vm</result>
         </action>
 
-        <action name="uninstallPlugin" class="com.zutubi.pulse.master.web.admin.plugins.UnInstallPluginAction">
+        <action name="uninstallPlugin" class="com.zutubi.pulse.master.xwork.actions.admin.plugins.UnInstallPluginAction">
             <result name="success" type="httpheader">200</result>
         </action>
 
-        <action name="enablePlugin" class="com.zutubi.pulse.master.web.admin.plugins.EnablePluginAction">
+        <action name="enablePlugin" class="com.zutubi.pulse.master.xwork.actions.admin.plugins.EnablePluginAction">
             <result name="success" type="httpheader">200</result>
         </action>
 
-        <action name="disablePlugin" class="com.zutubi.pulse.master.web.admin.plugins.DisablePluginAction">
+        <action name="disablePlugin" class="com.zutubi.pulse.master.xwork.actions.admin.plugins.DisablePluginAction">
             <result name="success" type="httpheader">200</result>
         </action>
     </package>
@@ -638,23 +638,23 @@
     <package name="popups" namespace="/popups" extends="webwork-default-package">
         <default-interceptor-ref name="completeReadOnlyStack"/>
 
-        <action name="browseResources" class="com.zutubi.pulse.master.web.project.BrowseResourcesAction">
+        <action name="browseResources" class="com.zutubi.pulse.master.xwork.actions.project.BrowseResourcesAction">
             <result name="success" type="velocity">resource-browser.vm</result>
         </action>
 
-        <action name="new-folder" class="com.zutubi.pulse.master.web.ActionSupport">
+        <action name="new-folder" class="com.zutubi.pulse.master.xwork.actions.ActionSupport">
             <result name="success" type="velocity">tree/browse-new-folder.vm</result>
         </action>
 
-        <action name="fileDialog" class="com.zutubi.pulse.master.web.admin.AddResourceFileDialogAction">
+        <action name="fileDialog" class="com.zutubi.pulse.master.xwork.actions.admin.AddResourceFileDialogAction">
             <result name="success" type="velocity">tree/filedialog.vm</result>
         </action>
 
-        <action name="pluginFileDialog" class="com.zutubi.pulse.master.web.admin.plugins.PluginFileDialogAction">
+        <action name="pluginFileDialog" class="com.zutubi.pulse.master.xwork.actions.admin.plugins.PluginFileDialogAction">
             <result name="success" type="velocity">tree/filedialog.vm</result>
         </action>
 
-        <action name="scmFileDialog" class="com.zutubi.pulse.master.web.admin.ScmFileDialogAction">
+        <action name="scmFileDialog" class="com.zutubi.pulse.master.xwork.actions.admin.ScmFileDialogAction">
             <result name="success" type="velocity">tree/filedialog.vm</result>
         </action>
     </package>

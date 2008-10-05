@@ -1,6 +1,6 @@
 package com.zutubi.tove.webwork.help;
 
-import com.zutubi.pulse.master.web.ActionSupport;
+import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.util.TextUtils;
 
 /**

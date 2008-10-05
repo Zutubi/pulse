@@ -2,9 +2,9 @@ package com.zutubi.tove.webwork;
 
 import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
 import com.zutubi.pulse.master.vfs.provider.pulse.ComparatorProvider;
-import com.zutubi.pulse.master.web.ActionSupport;
-import com.zutubi.pulse.master.web.vfs.DirectoryComparator;
-import com.zutubi.pulse.master.web.vfs.FileObjectWrapper;
+import com.zutubi.pulse.master.xwork.actions.ActionSupport;
+import com.zutubi.pulse.master.xwork.actions.vfs.DirectoryComparator;
+import com.zutubi.pulse.master.xwork.actions.vfs.FileObjectWrapper;
 import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;

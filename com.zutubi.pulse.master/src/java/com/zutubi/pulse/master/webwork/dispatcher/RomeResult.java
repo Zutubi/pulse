@@ -19,9 +19,6 @@ import java.util.List;
 
 /**
  * Render an Rome synd feed instance.
- *
- *
- * @author Daniel Ostermeier
  */
 public class RomeResult extends WebWorkResultSupport
 {
@@ -53,7 +50,7 @@ public class RomeResult extends WebWorkResultSupport
     /**
      * Specify the name of the feed as it appears in the OGNL stack. This value defaults to "feed"
      *
-     * @param feedName
+     * @param feedName the ognl name of the SyndFeed instance to render.
      */
     public void setFeedName(String feedName)
     {

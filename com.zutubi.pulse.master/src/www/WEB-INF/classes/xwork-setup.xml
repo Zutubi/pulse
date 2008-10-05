@@ -8,11 +8,11 @@
 
         <default-action-ref name="default"/>
 
-        <action name="default" class="com.zutubi.pulse.master.web.ActionSupport">
+        <action name="default" class="com.zutubi.pulse.master.xwork.actions.ActionSupport">
             <result name="success" type="redirect">/setup/setup.action</result>
         </action>
 
-        <action name="404" class="com.zutubi.pulse.master.web.FourOhFourAction">
+        <action name="404" class="com.zutubi.pulse.master.xwork.actions.FourOhFourAction">
             <result name="404" type="velocity">404.vm</result>
             <result name="success" type="redirect">/startup/starting.action</result>
         </action>
@@ -21,7 +21,7 @@
     <package name="setup" namespace="/setup" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
-        <action name="setup" class="com.zutubi.pulse.master.web.setup.SetupWorkflowAction">
+        <action name="setup" class="com.zutubi.pulse.master.xwork.actions.setup.SetupWorkflowAction">
             <result name="data" type="redirect">/setup/setupData!input.action</result>
             <result name="database" type="redirect">/setup/setupDatabaseType!input.action</result>
             <result name="migrate" type="redirect">/migrate/preview!input.action</result>
@@ -33,22 +33,22 @@
             <result name="success" type="redirect">/</result>
         </action>
 
-        <action name="setupData" class="com.zutubi.pulse.master.web.setup.SetupDataAction">
+        <action name="setupData" class="com.zutubi.pulse.master.xwork.actions.setup.SetupDataAction">
             <result name="input" type="velocity">/setup/configure-pulsedata.vm</result>
             <result name="success" type="redirect">/</result>
         </action>
 
-        <action name="setupDatabaseType" class="com.zutubi.pulse.master.web.setup.SetupDatabaseTypeAction">
+        <action name="setupDatabaseType" class="com.zutubi.pulse.master.xwork.actions.setup.SetupDatabaseTypeAction">
             <result name="input" type="velocity">/setup/configure-databasetype.vm</result>
             <result name="success" type="redirect">/</result>
         </action>
 
-        <action name="setupLicense" class="com.zutubi.pulse.master.web.setup.SetupLicenseAction">
+        <action name="setupLicense" class="com.zutubi.pulse.master.xwork.actions.setup.SetupLicenseAction">
             <result name="input" type="velocity">/setup/configure-license.vm</result>
             <result name="success" type="redirect">/</result>
         </action>
 
-        <action name="execute" class="com.zutubi.pulse.master.web.setup.SetupActionSupport">
+        <action name="execute" class="com.zutubi.pulse.master.xwork.actions.setup.SetupActionSupport">
             <result name="success" type="velocity">/system-setup.vm</result>
         </action>
     </package>
@@ -73,11 +73,11 @@
     <package name="upgrade" namespace="/upgrade" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
-        <action name="preview" class="com.zutubi.pulse.master.web.upgrade.PreviewUpgradeAction">
+        <action name="preview" class="com.zutubi.pulse.master.xwork.actions.upgrade.PreviewUpgradeAction">
             <result name="success" type="velocity">preview.vm</result>
         </action>
 
-        <action name="execute" class="com.zutubi.pulse.master.web.upgrade.ExecuteUpgradeAction">
+        <action name="execute" class="com.zutubi.pulse.master.xwork.actions.upgrade.ExecuteUpgradeAction">
             <interceptor-ref name="executeAndWaitStack"/>
             <result name="wait" type="velocity">status.vm</result>
             <result name="cancel" type="redirect">/setup/setup!input.action</result>
@@ -85,7 +85,7 @@
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="continue" class="com.zutubi.pulse.master.web.upgrade.PostUpgradeAction">
+        <action name="continue" class="com.zutubi.pulse.master.xwork.actions.upgrade.PostUpgradeAction">
             <result name="success" type="redirect">/</result>
         </action>
     </package>
@@ -93,13 +93,13 @@
     <package name="migrate" namespace="/migrate" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
-        <action name="preview" class="com.zutubi.pulse.master.web.migrate.PreviewMigrateAction">
+        <action name="preview" class="com.zutubi.pulse.master.xwork.actions.migrate.PreviewMigrateAction">
             <result name="input" type="velocity">preview.vm</result>
             <result name="cancel" type="redirect">/migrate/abort.action</result>
             <result name="success" type="redirect">/migrate/execute.action</result>
         </action>
 
-        <action name="execute" class="com.zutubi.pulse.master.web.migrate.ExecuteMigrateAction">
+        <action name="execute" class="com.zutubi.pulse.master.xwork.actions.migrate.ExecuteMigrateAction">
             <interceptor-ref name="executeAndWaitStack"/>
             <result name="wait" type="velocity">status.vm</result>
             <result name="cancel" type="redirect"></result>
@@ -107,11 +107,11 @@
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="continue" class="com.zutubi.pulse.master.web.migrate.PostMigrateAction">
+        <action name="continue" class="com.zutubi.pulse.master.xwork.actions.migrate.PostMigrateAction">
             <result name="success" type="redirect">/</result>
         </action>
 
-        <action name="abort" class="com.zutubi.pulse.master.web.migrate.AbortMigrateAction">
+        <action name="abort" class="com.zutubi.pulse.master.xwork.actions.migrate.AbortMigrateAction">
             <result name="success" type="redirect">/</result>
         </action>
 
@@ -120,22 +120,22 @@
     <package name="restore" namespace="/restore" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
-        <action name="preview" class="com.zutubi.pulse.master.web.restore.PreviewRestoreAction">
+        <action name="preview" class="com.zutubi.pulse.master.xwork.actions.restore.PreviewRestoreAction">
             <result name="success" type="velocity">preview.vm</result>
         </action>
 
-        <action name="execute" class="com.zutubi.pulse.master.web.restore.ExecuteRestoreAction">
+        <action name="execute" class="com.zutubi.pulse.master.xwork.actions.restore.ExecuteRestoreAction">
             <interceptor-ref name="taskExecuteAndWaitStack"/>
             <result name="wait" type="velocity">status.vm</result>
             <result name="success" type="velocity">complete.vm</result>
             <result name="error" type="velocity">generic-error.vm</result>
         </action>
 
-        <action name="continue" class="com.zutubi.pulse.master.web.restore.PostRestoreAction">
+        <action name="continue" class="com.zutubi.pulse.master.xwork.actions.restore.PostRestoreAction">
             <result name="success" type="redirect">/</result>
         </action>
 
-        <action name="abort" class="com.zutubi.pulse.master.web.restore.AbortRestoreAction">
+        <action name="abort" class="com.zutubi.pulse.master.xwork.actions.restore.AbortRestoreAction">
             <result name="success" type="redirect">/</result>
         </action>
 
@@ -144,7 +144,7 @@
     <package name="startup" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
-        <action name="starting" class="com.zutubi.pulse.master.web.ActionSupport">
+        <action name="starting" class="com.zutubi.pulse.master.xwork.actions.ActionSupport">
             <result name="success" type="velocity">system-starting.vm</result>
         </action>
     </package>
@@ -158,22 +158,22 @@
             <result name="success" type="startupajax"/>
         </action>
         
-        <action name="ls" class="com.zutubi.pulse.master.web.vfs.LsAction">
+        <action name="ls" class="com.zutubi.pulse.master.xwork.actions.vfs.LsAction">
             <result name="success" type="json">ls.xml</result>
             <result name="error" type="json">error.xml</result>
         </action>
 
-        <action name="mkdir" class="com.zutubi.pulse.master.web.vfs.MkdirAction">
+        <action name="mkdir" class="com.zutubi.pulse.master.xwork.actions.vfs.MkdirAction">
             <result name="success" type="json">mkdir.xml</result>
             <result name="error" type="json">error.xml</result>
         </action>
 
-        <action name="rmdir" class="com.zutubi.pulse.master.web.vfs.RmAction">
+        <action name="rmdir" class="com.zutubi.pulse.master.xwork.actions.vfs.RmAction">
             <result name="success" type="json">rmdir.xml</result>
             <result name="error" type="json">error.xml</result>
         </action>
 
-        <action name="requestLicense" class="com.zutubi.pulse.master.web.ajax.RequestLicenseAction">
+        <action name="requestLicense" class="com.zutubi.pulse.master.xwork.actions.ajax.RequestLicenseAction">
             <result name="render" type="velocity">request-license.vm</result>
             <result name="input" type="flexjson">configurationErrors</result>
             <result name="success" type="flexjson">result</result>
@@ -223,11 +223,11 @@
     <package name="popups" namespace="/popups" extends="webwork-default-package">
         <default-interceptor-ref name="completeStack"/>
 
-        <action name="fileDialog" class="com.zutubi.pulse.master.web.setup.PulseDataFileDialogAction">
+        <action name="fileDialog" class="com.zutubi.pulse.master.xwork.actions.setup.PulseDataFileDialogAction">
             <result name="success" type="velocity">tree/filedialog.vm</result>
         </action>
 
-        <action name="mkdir" class="com.zutubi.pulse.master.web.ActionSupport">
+        <action name="mkdir" class="com.zutubi.pulse.master.xwork.actions.ActionSupport">
             <result name="success" type="velocity">tree/browse-new-folder.vm</result>
         </action>
     </package>

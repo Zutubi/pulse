@@ -5,7 +5,7 @@ import com.opensymphony.webwork.ServletActionContext;
 import com.opensymphony.xwork.MockActionInvocation;
 import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.pulse.master.web.ActionSupport;
+import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

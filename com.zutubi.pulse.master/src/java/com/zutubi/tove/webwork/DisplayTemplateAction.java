@@ -2,7 +2,7 @@ package com.zutubi.tove.webwork;
 
 import com.zutubi.i18n.Messages;
 import com.zutubi.i18n.MessagesProvider;
-import com.zutubi.pulse.master.web.ActionSupport;
+import com.zutubi.pulse.master.xwork.actions.ActionSupport;
 import com.zutubi.tove.config.ConfigurationTemplateManager;
 import com.zutubi.tove.config.TemplateHierarchy;
 import com.zutubi.tove.config.TemplateNode;

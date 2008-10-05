@@ -5,7 +5,7 @@ import com.opensymphony.xwork.Action;
 import com.opensymphony.xwork.ActionInvocation;
 import com.opensymphony.xwork.ActionSupport;
 import com.opensymphony.xwork.interceptor.Interceptor;
-import com.zutubi.pulse.master.web.LookupErrorException;
+import com.zutubi.pulse.master.xwork.actions.LookupErrorException;
 import com.zutubi.util.logging.Logger;
 import org.acegisecurity.AccessDeniedException;
 import org.mortbay.http.EOFException;
