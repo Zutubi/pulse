@@ -1,4 +1,4 @@
-package com.zutubi.pulse.master.xwork.dispatcher;
+package com.zutubi.pulse.master.webwork.dispatcher;
 
 import com.mockobjects.servlet.MockHttpServletResponse;
 import com.opensymphony.webwork.ServletActionContext;

@@ -1,4 +1,4 @@
-package com.zutubi.pulse.master.webwork.velocity;
+package com.zutubi.pulse.master.webwork.views.velocity.components;
 
 import com.opensymphony.webwork.views.velocity.components.DivDirective;
 

@@ -1,4 +1,4 @@
-package com.zutubi.pulse.master.xwork.dispatcher;
+package com.zutubi.pulse.master.webwork.dispatcher;
 
 import com.opensymphony.webwork.ServletActionContext;
 import com.opensymphony.webwork.dispatcher.WebWorkResultSupport;

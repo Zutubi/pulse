@@ -1,4 +1,4 @@
-package com.zutubi.pulse.master.xwork.results;
+package com.zutubi.pulse.master.webwork.dispatcher;
 
 import com.sun.syndication.feed.WireFeed;
 

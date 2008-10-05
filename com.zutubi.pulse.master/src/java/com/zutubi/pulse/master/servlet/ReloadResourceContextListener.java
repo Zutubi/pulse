@@ -1,13 +1,10 @@
-package com.zutubi.pulse.master.xwork.servlet;
+package com.zutubi.pulse.master.servlet;
 
 import com.opensymphony.xwork.util.LocalizedTextUtil;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-/**
- * <class-comment/>
- */
 public class ReloadResourceContextListener implements ServletContextListener
 {
     public static final String PROPERTY_KEY = "xwork.reload.bundles";

@@ -1,12 +1,10 @@
-package com.zutubi.pulse.master.xwork.results;
+package com.zutubi.pulse.master.webwork.dispatcher;
 
 import com.opensymphony.webwork.ServletActionContext;
 import com.opensymphony.webwork.dispatcher.WebWorkResultSupport;
 import com.opensymphony.xwork.ActionInvocation;
 import com.opensymphony.xwork.util.OgnlValueStack;
 import com.sun.syndication.feed.WireFeed;
-import com.sun.syndication.feed.synd.SyndEntry;
-import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.WireFeedOutput;
 import com.zutubi.util.Constants;
 import com.zutubi.util.TextUtils;
@@ -15,7 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Render an Rome synd feed instance.
@@ -23,7 +20,7 @@ import java.util.List;
  *
  * @author Daniel Ostermeier
  */
-public class RomeResult extends WebWorkResultSupport
+public class JITFeedResult extends WebWorkResultSupport
 {
     /**
      * The name used to retrieve the feed instance from the OGNL stack.
@@ -53,7 +50,7 @@ public class RomeResult extends WebWorkResultSupport
     /**
      * Specify the name of the feed as it appears in the OGNL stack. This value defaults to "feed"
      *
-     * @param feedName
+     * @param feedName name of the feed on the OGNL stack.
      */
     public void setFeedName(String feedName)
     {
@@ -67,7 +64,7 @@ public class RomeResult extends WebWorkResultSupport
 
         OgnlValueStack stack = actionInvocation.getStack();
 
-        SyndFeed feed = (SyndFeed) stack.findValue(feedName);
+        JITFeed feed = (JITFeed) stack.findValue(feedName);
         if (feed == null)
         {
             // this means that the feed requested does not exist. Thats not to say it
@@ -93,14 +90,12 @@ public class RomeResult extends WebWorkResultSupport
         }
 
         Date lastModified = ifModifiedSince;
-        
-        List entries = feed.getEntries();
-        if (entries.size() > 0)
+
+        if (feed.hasEntries())
         {
             // get the latest feed entry - assuming the latest is at the top.
-            SyndEntry entry = (SyndEntry) entries.get(0);
-            lastModified = entry.getPublishedDate();
-            Date updatedDate = entry.getUpdatedDate();
+            lastModified = feed.getPublishedDate();
+            Date updatedDate = feed.getUpdatedDate();
             if (updatedDate != null && lastModified.compareTo(updatedDate) < 0)
             {
                 lastModified = updatedDate;
