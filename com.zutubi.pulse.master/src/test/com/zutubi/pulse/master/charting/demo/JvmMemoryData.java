@@ -8,9 +8,6 @@ import org.jfree.data.xy.XYDataset;
 
 import java.util.concurrent.Executors;
 
-/**
- * <class comment/>
- */
 public class JvmMemoryData
 {
     private static CircularBuffer<Long> used = new CircularBuffer<Long>(100);

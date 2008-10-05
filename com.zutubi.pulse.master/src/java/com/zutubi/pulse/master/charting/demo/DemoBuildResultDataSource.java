@@ -1,14 +1,13 @@
-package com.zutubi.pulse.master.charting;
+package com.zutubi.pulse.master.charting.demo;
 
 import com.zutubi.pulse.master.model.BuildResult;
+import com.zutubi.pulse.master.charting.BuildResultsDataSource;
+import com.zutubi.pulse.master.charting.BuildResultsResultSet;
 
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- * <class comment/>
- */
 public class DemoBuildResultDataSource implements BuildResultsDataSource
 {
     private List<BuildResult> data;
