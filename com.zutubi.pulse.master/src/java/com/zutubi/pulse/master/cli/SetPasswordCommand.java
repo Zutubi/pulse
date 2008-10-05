@@ -1,7 +1,7 @@
-package com.zutubi.pulse.master.command;
+package com.zutubi.pulse.master.cli;
 
-import com.zutubi.pulse.core.command.HelpCommand;
-import com.zutubi.pulse.servercore.command.AdminCommand;
+import com.zutubi.pulse.core.cli.HelpCommand;
+import com.zutubi.pulse.servercore.cli.AdminCommand;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.ParseException;
@@ -23,7 +23,7 @@ public class SetPasswordCommand extends AdminCommand
 
     /**
      * Set the username identifying the account for which the password will be updated.
-     * @param username
+     * @param username the name of the user for whom the password will be reset
      */
     public void setUser(String username)
     {
@@ -33,7 +33,7 @@ public class SetPasswordCommand extends AdminCommand
     /**
      * Set the new password that will be set.
      *
-     * @param newPassword
+     * @param newPassword the new password
      */
     public void setPassword(String newPassword)
     {
@@ -54,12 +54,12 @@ public class SetPasswordCommand extends AdminCommand
 
     public List<String> getUsages()
     {
-        return Arrays.asList(new String[] { "<username> <password>" });
+        return Arrays.asList("<username> <password>");
     }
 
     public List<String> getAliases()
     {
-        return Arrays.asList(new String[] { "passwd", "password", "sp", "setp" });
+        return Arrays.asList("passwd", "password", "sp", "setp");
     }
 
     public int doExecute(String[] argv) throws XmlRpcException, IOException, ParseException
@@ -79,7 +79,7 @@ public class SetPasswordCommand extends AdminCommand
         setPassword(args[1]);
 
         xmlRpcClient.execute("RemoteApi.setPassword", new Vector<Object>(Arrays.asList(
-                new Object[]{adminToken, user, password})));
+                adminToken, user, password)));
         return 0;
     }
 

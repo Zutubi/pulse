@@ -1,4 +1,4 @@
-package com.zutubi.pulse.servercore.command;
+package com.zutubi.pulse.servercore.cli;
 
 import com.zutubi.pulse.command.BootContext;
 import com.zutubi.pulse.command.Command;
@@ -58,7 +58,7 @@ public class StartCommand implements Command
     /**
      * Specify the port to which pulse will bind its web user interface.
      *
-     * @param port
+     * @param port the available port number to bind the pulse web ui to.
      */
     public void setPort(int port)
     {
@@ -72,7 +72,7 @@ public class StartCommand implements Command
 
     /**
      *
-     * @param data
+     * @param data the path to the pulse data directory.
      */
     public void setData(String data)
     {
@@ -264,12 +264,12 @@ public class StartCommand implements Command
 
     public List<String> getUsages()
     {
-        return Arrays.asList(new String[] { "" });
+        return Arrays.asList("");
     }
 
     public List<String> getAliases()
     {
-        return Arrays.asList(new String[] { "st" });
+        return Arrays.asList("st");
     }
 
     public Map<String, String> getOptions()

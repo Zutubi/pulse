@@ -1,4 +1,4 @@
-package com.zutubi.pulse.master.command;
+package com.zutubi.pulse.master.cli;
 
 import com.zutubi.pulse.command.BootContext;
 import com.zutubi.pulse.command.Command;

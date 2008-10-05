@@ -1,6 +1,6 @@
-package com.zutubi.pulse.master.command;
+package com.zutubi.pulse.master.cli;
 
-import com.zutubi.pulse.core.command.HelpCommand;
+import com.zutubi.pulse.core.cli.HelpCommand;
 import com.zutubi.pulse.master.transfer.TransferAPI;
 import com.zutubi.pulse.master.transfer.TransferException;
 import org.apache.commons.cli.CommandLine;

@@ -30,10 +30,6 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-/**
- *
- *
- */
 public class DefaultScmManager implements ScmManager, Stoppable
 {
     private static final Logger LOG = Logger.getLogger(DefaultScmManager.class);

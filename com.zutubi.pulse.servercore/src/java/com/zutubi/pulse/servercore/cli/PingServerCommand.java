@@ -1,4 +1,4 @@
-package com.zutubi.pulse.servercore.command;
+package com.zutubi.pulse.servercore.cli;
 
 import com.zutubi.pulse.command.BootContext;
 import com.zutubi.pulse.command.Command;
@@ -21,7 +21,7 @@ public class PingServerCommand implements Command
     /**
      * Required argument.
      *
-     * @param baseUrl
+     * @param baseUrl the base url of the pulse server to be pinged.
      */
     public void setBaseUrl(String baseUrl)
     {
@@ -82,12 +82,12 @@ public class PingServerCommand implements Command
 
     public List<String> getUsages()
     {
-        return Arrays.asList(new String[] { "<url>" });
+        return Arrays.asList("<url>");
     }
 
     public List<String> getAliases()
     {
-        return Arrays.asList(new String[] { "pi" });
+        return Arrays.asList("pi");
     }
 
     public Map<String, String> getOptions()

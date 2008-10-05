@@ -1,4 +1,4 @@
-package com.zutubi.pulse.servercore.command;
+package com.zutubi.pulse.servercore.cli;
 
 import com.zutubi.pulse.command.BootContext;
 import com.zutubi.pulse.command.Command;
@@ -31,8 +31,6 @@ import java.util.Map;
 /**
  * The abstract base command for commands that are run on the same host as the
  * running server and that require the admin token to authenticate themselves.
- *
- * @author Daniel Ostermeier
  */
 public abstract class AdminCommand implements Command
 {
@@ -167,7 +165,7 @@ public abstract class AdminCommand implements Command
 
     public List<String> getUsages()
     {
-        return Arrays.asList(new String[] { "" });
+        return Arrays.asList("");
     }
 
     public Map<String, String> getOptions()

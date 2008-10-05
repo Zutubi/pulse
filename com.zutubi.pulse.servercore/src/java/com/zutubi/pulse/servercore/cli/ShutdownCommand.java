@@ -1,4 +1,4 @@
-package com.zutubi.pulse.servercore.command;
+package com.zutubi.pulse.servercore.cli;
 
 import org.apache.commons.cli.*;
 import org.apache.xmlrpc.XmlRpcException;
@@ -9,8 +9,6 @@ import java.util.*;
 
 /**
  * The shutdown admin command, supports the force argument.
- *
- * @author Daniel Ostermeier
  */
 public class ShutdownCommand extends AdminCommand
 {
@@ -55,7 +53,7 @@ public class ShutdownCommand extends AdminCommand
 
     public List<String> getAliases()
     {
-        return Arrays.asList(new String[] { "sd", "shut", "stop" });
+        return Arrays.asList("sd", "shut", "stop");
     }
 
 
@@ -75,7 +73,7 @@ public class ShutdownCommand extends AdminCommand
 
     public int execute() throws XmlRpcException, IOException
     {
-        xmlRpcClient.execute("RemoteApi.shutdown", new Vector<Object>(Arrays.asList(new Object[]{adminToken, force, exitJvm})));
+        xmlRpcClient.execute("RemoteApi.shutdown", new Vector<Object>(Arrays.asList(adminToken, force, exitJvm)));
         return 0;
     }
 

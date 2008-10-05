@@ -1,4 +1,4 @@
-package com.zutubi.pulse.servercore.command;
+package com.zutubi.pulse.servercore.cli;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -53,7 +53,7 @@ public class StopServiceCommand extends AdminCommand
         CommandLineParser parser = new PosixParser();
         CommandLine commandLine = parser.parse(getSharedOptions(), argv, true);
         super.processSharedOptions(commandLine);
-        xmlRpcClient.execute("RemoteApi.stopService", new Vector<Object>(Arrays.asList(new Object[]{ adminToken })));
+        xmlRpcClient.execute("RemoteApi.stopService", new Vector<Object>(Arrays.asList(adminToken)));
         return 0;
     }
 }
