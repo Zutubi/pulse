@@ -7,9 +7,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
-/**
- * <class-comment/>
- */
 public class FileConfig implements Config
 {
     private static final Logger LOG = Logger.getLogger(FileConfig.class);

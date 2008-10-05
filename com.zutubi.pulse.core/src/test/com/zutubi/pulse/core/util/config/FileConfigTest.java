@@ -7,9 +7,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
-/**
- * <class-comment/>
- */
 public class FileConfigTest extends PulseTestCase
 {
     private Config config = null;

@@ -2,9 +2,6 @@ package com.zutubi.pulse.core.util.config;
 
 import com.zutubi.pulse.core.test.PulseTestCase;
 
-/**
- * <class-comment/>
- */
 public class CompositeConfigTest extends PulseTestCase
 {
     public CompositeConfigTest()

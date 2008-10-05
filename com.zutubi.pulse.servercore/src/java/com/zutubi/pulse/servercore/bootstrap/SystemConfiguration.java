@@ -6,19 +6,17 @@ package com.zutubi.pulse.servercore.bootstrap;
 public interface SystemConfiguration
 {
     public static final String WEBAPP_BIND_ADDRESS = "webapp.bindAddress";
-    /**
-     *
-     */
+
+    public static final String DEFAULT_WEBAPP_BIND_ADDRESS = "0.0.0.0";
+
     public static final String WEBAPP_PORT = "webapp.port";
 
-    /**
-     *
-     */
+    public static final Integer DEFAULT_WEBAPP_PORT = 8080;
+
     public static final String CONTEXT_PATH = "webapp.contextPath";
 
-    /**
-     *
-     */
+    public static final String DEFAULT_CONTEXT_PATH = "/";
+
     public static final String PULSE_DATA = "pulse.data";
 
     public static final String RESTORE_FILE = "pulse.restore.file";

@@ -1,13 +1,8 @@
-package com.zutubi.pulse.servercore.bootstrap.conf;
+package com.zutubi.pulse.core.util.config;
 
 import com.zutubi.pulse.command.PulseCtl;
 import com.zutubi.pulse.core.util.FileSystemUtils;
-import com.zutubi.pulse.core.util.config.Config;
-import com.zutubi.pulse.core.util.config.ConfigSupport;
 
-/**
- * <class-comment/>
- */
 public class EnvConfig extends ConfigSupport
 {
     // we are leaving the definition of the PULSE_HOME property in the PulseCtl so that it does

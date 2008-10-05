@@ -8,7 +8,10 @@ import java.util.Enumeration;
 import java.util.Properties;
 
 /**
- * <class-comment/>
+ * The properties writer will keep the format of the file being written to.  That is, if the property
+ * being written to the file already exists in that file, the value is replaced.  Any unknown properties
+ * are placed at the end of the file.  This is very useful for properties files that contain some
+ * documentation / comments that you wish to preserve.
  */
 public class PropertiesWriter
 {

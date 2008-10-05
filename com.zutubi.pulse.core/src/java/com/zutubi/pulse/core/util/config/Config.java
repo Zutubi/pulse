@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.util.config;
 
 /**
- *
- * 
+ * The base interface for a configuration object that supports the getting and
+ * setting of properties.
  */
 public interface Config
 {

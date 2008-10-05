@@ -18,7 +18,7 @@ import com.zutubi.pulse.master.restore.RestoreManager;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.upgrade.UpgradeManager;
 import com.zutubi.pulse.servercore.bootstrap.*;
-import com.zutubi.pulse.servercore.bootstrap.conf.EnvConfig;
+import com.zutubi.pulse.core.util.config.EnvConfig;
 import com.zutubi.pulse.servercore.util.logging.LogConfigurationManager;
 import com.zutubi.tove.config.*;
 import com.zutubi.tove.type.record.DelegatingHandleAllocator;
@@ -164,8 +164,8 @@ public class DefaultSetupManager implements SetupManager
                 // There needs to be a way to do this without duplicating the default configuration data.
                 // Unfortunately, the defaults are currently hidden by any system properties that over ride them...
                 Properties props = new Properties();
-                props.setProperty(SystemConfiguration.CONTEXT_PATH, "/");
-                props.setProperty(SystemConfiguration.WEBAPP_PORT, "8080");
+                props.setProperty(SystemConfiguration.CONTEXT_PATH, SystemConfiguration.DEFAULT_CONTEXT_PATH);
+                props.setProperty(SystemConfiguration.WEBAPP_PORT, SystemConfiguration.DEFAULT_WEBAPP_PORT.toString());
                 props.setProperty(SystemConfiguration.PULSE_DATA, (sysConfig.getDataPath() != null ? sysConfig.getDataPath() : ""));
 
                 PropertiesWriter writer = new PropertiesWriter();

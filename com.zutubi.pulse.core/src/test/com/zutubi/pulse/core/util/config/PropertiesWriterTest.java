@@ -10,9 +10,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-/**
- * <class-comment/>
- */
 public class PropertiesWriterTest extends PulseTestCase
 {
     private File tmpDir = null;

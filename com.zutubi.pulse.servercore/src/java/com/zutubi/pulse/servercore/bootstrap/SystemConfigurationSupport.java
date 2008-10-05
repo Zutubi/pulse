@@ -8,9 +8,6 @@ import com.zutubi.util.TextUtils;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-/**
- * <class-comment/>
- */
 public class SystemConfigurationSupport extends ConfigSupport implements SystemConfiguration
 {
     public SystemConfigurationSupport(Config... config)
@@ -20,38 +17,40 @@ public class SystemConfigurationSupport extends ConfigSupport implements SystemC
 
     public String getBindAddress()
     {
-        String result = config.getProperty(WEBAPP_BIND_ADDRESS);
+        String result = delegate.getProperty(WEBAPP_BIND_ADDRESS);
         if(TextUtils.stringSet(result))
         {
             return result;
         }
         else
         {
-            return "0.0.0.0";
+            return DEFAULT_WEBAPP_BIND_ADDRESS;
         }
     }
 
     public int getServerPort()
     {
-        return getInteger(WEBAPP_PORT, 8080);
+        return getInteger(WEBAPP_PORT, DEFAULT_WEBAPP_PORT);
     }
 
     public String getContextPath()
     {
-        return getProperty(CONTEXT_PATH, "/");
+        return getProperty(CONTEXT_PATH, DEFAULT_CONTEXT_PATH);
     }
 
     public String getRestoreFile()
     {
-        return config.getProperty(RESTORE_FILE);
+        return delegate.getProperty(RESTORE_FILE);
     }
 
     public String getRestoreArtifacts()
     {
-        return config.getProperty(RESTORE_ARTIFACTS);
+        return delegate.getProperty(RESTORE_ARTIFACTS);
     }
 
     /**
+     * Ensure that the returned context path has a leading '/' and no trailing '/'.
+     * 
      * @return the web app context path in a normalised form suitable for
      *         appending further path elements like: contextPath + "/" + path
      */

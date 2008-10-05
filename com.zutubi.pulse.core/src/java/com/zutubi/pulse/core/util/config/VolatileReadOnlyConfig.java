@@ -1,12 +1,7 @@
-package com.zutubi.pulse.servercore.bootstrap.conf;
-
-import com.zutubi.pulse.core.util.config.Config;
+package com.zutubi.pulse.core.util.config;
 
 import java.util.Properties;
 
-/**
- * <class-comment/>
- */
 public class VolatileReadOnlyConfig implements Config
 {
     private Properties props = new Properties();

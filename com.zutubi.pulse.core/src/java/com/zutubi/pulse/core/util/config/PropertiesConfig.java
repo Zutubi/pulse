@@ -2,9 +2,6 @@ package com.zutubi.pulse.core.util.config;
 
 import java.util.Properties;
 
-/**
- * <class-comment/>
- */
 public class PropertiesConfig implements Config
 {
     private final Properties props;

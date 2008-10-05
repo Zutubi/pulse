@@ -3,13 +3,13 @@ package com.zutubi.pulse.master.command;
 import com.zutubi.pulse.command.BootContext;
 import com.zutubi.pulse.command.Command;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
+import com.zutubi.pulse.core.util.config.EnvConfig;
 import com.zutubi.pulse.master.bootstrap.DefaultSetupManager;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.database.DatabaseConfig;
 import com.zutubi.pulse.master.hibernate.MutableConfiguration;
 import com.zutubi.pulse.servercore.bootstrap.SystemBootstrapManager;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
-import com.zutubi.pulse.servercore.bootstrap.conf.EnvConfig;
 import com.zutubi.util.TextUtils;
 import org.apache.commons.cli.*;
 

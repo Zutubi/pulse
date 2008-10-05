@@ -1,8 +1,5 @@
 package com.zutubi.pulse.core.util.config;
 
-/**
- * <class-comment/>
- */
 public class ReadOnlyConfig implements Config
 {
     private Config delegate;

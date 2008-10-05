@@ -1,30 +1,30 @@
 package com.zutubi.pulse.core.util.config;
 
 /**
- * <class-comment/>
+ * A wrapper around a delegate config instance that provides some typing support.
  */
 public class ConfigSupport implements Config
 {
-    protected Config config;
+    protected Config delegate;
 
     public ConfigSupport(Config config)
     {
-        this.config = config;
+        this.delegate = config;
     }
 
     public String getProperty(String key)
     {
-        return config.getProperty(key);
+        return delegate.getProperty(key);
     }
 
     public boolean hasProperty(String key)
     {
-        return config.hasProperty(key);
+        return delegate.hasProperty(key);
     }
 
     public void removeProperty(String key)
     {
-        config.removeProperty(key);
+        delegate.removeProperty(key);
     }
 
     public String getProperty(String key, String defaultValue)
@@ -40,17 +40,17 @@ public class ConfigSupport implements Config
     {
         if (value != null)
         {
-            config.setProperty(key, value);
+            delegate.setProperty(key, value);
         }
         else
         {
-            config.removeProperty(key);
+            delegate.removeProperty(key);
         }
     }
 
     public boolean isWriteable()
     {
-        return config.isWriteable();
+        return delegate.isWriteable();
     }
 
     public Integer getInteger(String key)

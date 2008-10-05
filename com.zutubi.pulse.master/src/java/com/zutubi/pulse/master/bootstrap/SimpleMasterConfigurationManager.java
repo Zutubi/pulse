@@ -11,8 +11,8 @@ import com.zutubi.pulse.servercore.bootstrap.AbstractConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfigurationSupport;
-import com.zutubi.pulse.servercore.bootstrap.conf.EnvConfig;
-import com.zutubi.pulse.servercore.bootstrap.conf.VolatileReadOnlyConfig;
+import com.zutubi.pulse.core.util.config.EnvConfig;
+import com.zutubi.pulse.core.util.config.VolatileReadOnlyConfig;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.io.IOUtils;
 

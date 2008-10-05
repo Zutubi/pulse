@@ -3,7 +3,7 @@ package com.zutubi.pulse.servercore;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.StartupManager;
-import com.zutubi.pulse.servercore.bootstrap.conf.EnvConfig;
+import com.zutubi.pulse.core.util.config.EnvConfig;
 import com.zutubi.util.Constants;
 
 import java.text.DateFormat;
