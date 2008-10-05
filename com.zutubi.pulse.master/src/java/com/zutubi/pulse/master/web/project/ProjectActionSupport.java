@@ -3,6 +3,7 @@ package com.zutubi.pulse.master.web.project;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.scheduling.Scheduler;
 import com.zutubi.pulse.master.web.ActionSupport;
+import com.zutubi.pulse.master.scm.ScmManager;
 import com.zutubi.util.TextUtils;
 import org.acegisecurity.AccessDeniedException;
 

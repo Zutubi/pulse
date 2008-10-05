@@ -67,7 +67,7 @@
         </property>
     </bean>
 
-    <bean id="scmManager" class="com.zutubi.pulse.master.model.DefaultScmManager" autowire="byName" init-method="init" destroy-method="shutdown"/>
+    <bean id="scmManager" class="com.zutubi.pulse.master.scm.DefaultScmManager" autowire="byName" init-method="init" destroy-method="shutdown"/>
 
     <bean id="testManagerTarget" class="com.zutubi.pulse.master.model.DefaultTestManager" autowire="byName"/>
     <bean id="testManager" class="org.springframework.aop.framework.ProxyFactoryBean">

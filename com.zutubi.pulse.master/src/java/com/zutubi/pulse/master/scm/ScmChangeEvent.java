@@ -1,4 +1,4 @@
-package com.zutubi.pulse.scm;
+package com.zutubi.pulse.master.scm;
 
 import com.zutubi.events.Event;
 import com.zutubi.pulse.core.model.Revision;

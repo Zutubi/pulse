@@ -1,4 +1,4 @@
-package com.zutubi.pulse.master.model;
+package com.zutubi.pulse.master.scm;
 
 /**
  *

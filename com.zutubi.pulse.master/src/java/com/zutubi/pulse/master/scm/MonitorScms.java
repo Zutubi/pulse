@@ -1,6 +1,5 @@
-package com.zutubi.pulse.scm;
+package com.zutubi.pulse.master.scm;
 
-import com.zutubi.pulse.master.model.ScmManager;
 import com.zutubi.pulse.master.scheduling.Task;
 import com.zutubi.pulse.master.scheduling.TaskExecutionContext;
 import com.zutubi.util.Constants;
