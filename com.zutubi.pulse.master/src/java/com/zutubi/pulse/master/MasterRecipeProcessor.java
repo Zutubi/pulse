@@ -5,6 +5,7 @@ import com.zutubi.pulse.core.RecipeProcessor;
 import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.core.Stoppable;
+import com.zutubi.pulse.core.scm.ScmClientFactory;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.servercore.services.SlaveStatus;
 import com.zutubi.util.logging.Logger;
@@ -25,6 +26,7 @@ public class MasterRecipeProcessor implements Stoppable
     private RecipeProcessor recipeProcessor;
     private MasterConfigurationManager configurationManager;
     private EventManager eventManager;
+    private ScmClientFactory scmClientFactory;
 
     public MasterRecipeProcessor()
     {
@@ -40,7 +42,7 @@ public class MasterRecipeProcessor implements Stoppable
                 try
                 {
                     buildingRecipe.set(request.getId());
-                    MasterRecipeRunner recipeRunner = new MasterRecipeRunner(request, recipeProcessor, eventManager, configurationManager, agentRepository);
+                    MasterRecipeRunner recipeRunner = new MasterRecipeRunner(request, recipeProcessor, eventManager, configurationManager, agentRepository, scmClientFactory);
                     recipeRunner.run();
                 }
                 finally
@@ -88,5 +90,10 @@ public class MasterRecipeProcessor implements Stoppable
     public void setEventManager(EventManager eventManager)
     {
         this.eventManager = eventManager;
+    }
+
+    public void setScmClientFactory(ScmClientFactory scmClientFactory)
+    {
+        this.scmClientFactory = scmClientFactory;
     }
 }

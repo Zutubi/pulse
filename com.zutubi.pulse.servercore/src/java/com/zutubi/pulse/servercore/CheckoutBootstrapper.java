@@ -6,7 +6,6 @@ import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.ScmException;
-import com.zutubi.pulse.core.scm.ScmClientFactory;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.util.logging.Logger;
 
@@ -19,9 +18,9 @@ public class CheckoutBootstrapper extends ScmBootstrapper
 
     private boolean persist;
 
-    public CheckoutBootstrapper(String project, ScmConfiguration scmConfig, BuildRevision revision, boolean persist, ScmClientFactory factory)
+    public CheckoutBootstrapper(String project, ScmConfiguration scmConfig, BuildRevision revision, boolean persist)
     {
-        super(project, scmConfig, revision, factory);
+        super(project, scmConfig, revision);
         this.persist = persist;
     }
 
@@ -36,7 +35,7 @@ public class CheckoutBootstrapper extends ScmBootstrapper
                 id = getId(executionContext);
             }
             executionContext.addString("scm.bootstrap.id", id);
-            scm = createScmClient();
+            scm = createScmClient(executionContext);
             scm.checkout(executionContext, revision.getRevision(), this);
             return scm;
         }

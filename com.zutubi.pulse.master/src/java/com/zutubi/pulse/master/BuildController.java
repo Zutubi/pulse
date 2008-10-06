@@ -13,7 +13,6 @@ import com.zutubi.pulse.core.events.RecipeEvent;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.scm.*;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.events.build.*;
@@ -28,6 +27,7 @@ import com.zutubi.pulse.servercore.PatchBootstrapper;
 import com.zutubi.pulse.servercore.ProjectRepoBootstrapper;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;
 import com.zutubi.util.Constants;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.TimeStamps;
 import com.zutubi.util.TreeNode;
 import com.zutubi.util.logging.Logger;
@@ -297,7 +297,7 @@ public class BuildController implements EventListener
                 boolean checkoutOnly = request.isPersonal() || checkoutScheme == CheckoutScheme.CLEAN_CHECKOUT;
                 if (checkoutOnly)
                 {
-                    initialBootstrapper = new CheckoutBootstrapper(projectConfig.getName(), projectConfig.getScm(), request.getRevision(), false, scmClientFactory);
+                    initialBootstrapper = new CheckoutBootstrapper(projectConfig.getName(), projectConfig.getScm(), request.getRevision(), false);
                     if (request.isPersonal())
                     {
                         initialBootstrapper = createPersonalBuildBootstrapper(initialBootstrapper);
@@ -305,7 +305,7 @@ public class BuildController implements EventListener
                 }
                 else
                 {
-                    initialBootstrapper = new ProjectRepoBootstrapper(projectConfig.getName(), projectConfig.getScm(), request.getRevision(), scmClientFactory);
+                    initialBootstrapper = new ProjectRepoBootstrapper(projectConfig.getName(), projectConfig.getScm(), request.getRevision());
                 }
                 return initialBootstrapper;
             }

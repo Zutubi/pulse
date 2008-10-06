@@ -11,7 +11,6 @@ import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.events.*;
 import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.bootstrap.Data;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
@@ -24,11 +23,12 @@ import com.zutubi.pulse.master.tove.config.project.AnyCapableAgentRequirements;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.servercore.CheckoutBootstrapper;
 import com.zutubi.pulse.servercore.SystemInfo;
-import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
 import com.zutubi.pulse.servercore.agent.Status;
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 import com.zutubi.pulse.servercore.services.SlaveStatus;
 import com.zutubi.pulse.servercore.services.UpgradeState;
+import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
+import com.zutubi.util.FileSystemUtils;
 import static org.mockito.Mockito.mock;
 
 import java.io.File;
@@ -107,7 +107,7 @@ public class RecipeControllerTest extends PulseTestCase
     public void testDispatchRequest()
     {
         // Initialising should cause a dispatch request, and should initialise the bootstrapper
-        Bootstrapper bootstrapper = new CheckoutBootstrapper("project", null, new BuildRevision(), false, null);
+        Bootstrapper bootstrapper = new CheckoutBootstrapper("project", null, new BuildRevision(), false);
         recipeController.initialise(bootstrapper);
         assertTrue(recipeQueue.hasDispatched(rootResult.getId()));
         RecipeAssignmentRequest dispatched = recipeQueue.getRequest(rootResult.getId());

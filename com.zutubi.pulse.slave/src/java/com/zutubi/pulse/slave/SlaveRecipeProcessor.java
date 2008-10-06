@@ -5,7 +5,7 @@ import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.*;
 import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
-import com.zutubi.util.FileSystem;
+import com.zutubi.pulse.core.scm.ScmClientFactory;
 import com.zutubi.pulse.servercore.ChainBootstrapper;
 import com.zutubi.pulse.servercore.RecipeCleanup;
 import com.zutubi.pulse.servercore.ServerBootstrapper;
@@ -14,6 +14,7 @@ import com.zutubi.pulse.servercore.services.MasterService;
 import com.zutubi.pulse.servercore.services.ServiceTokenManager;
 import com.zutubi.pulse.servercore.services.SlaveStatus;
 import com.zutubi.pulse.slave.repository.SlaveFileRepository;
+import com.zutubi.util.FileSystem;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -33,6 +34,7 @@ public class SlaveRecipeProcessor
     private EventManager eventManager;
     private MasterProxyFactory masterProxyFactory;
     private ServiceTokenManager serviceTokenManager;
+    private ScmClientFactory scmClientFactory;
     private RecipeCleanup recipeCleanup;
 
     public SlaveRecipeProcessor()
@@ -86,6 +88,7 @@ public class SlaveRecipeProcessor
                 context.addValue(NAMESPACE_INTERNAL, PROPERTY_RECIPE_PATHS, processorPaths);
                 context.addValue(NAMESPACE_INTERNAL, PROPERTY_RESOURCE_REPOSITORY, repo);
                 context.addValue(NAMESPACE_INTERNAL, PROPERTY_FILE_REPOSITORY, new SlaveFileRepository(processorPaths.getRecipeRoot(), master, serviceTokenManager));
+                context.addValue(NAMESPACE_INTERNAL, PROPERTY_SCM_CLIENT_FACTORY, scmClientFactory);
                 outputStream = new CommandEventOutputStream(eventManager, request.getId(), true);
                 context.setOutputStream(outputStream);
                 context.setWorkingDir(processorPaths.getBaseDir());
@@ -154,5 +157,10 @@ public class SlaveRecipeProcessor
     public void setServiceTokenManager(ServiceTokenManager serviceTokenManager)
     {
         this.serviceTokenManager = serviceTokenManager;
+    }
+
+    public void setScmClientFactory(ScmClientFactory scmClientFactory)
+    {
+        this.scmClientFactory = scmClientFactory;
     }
 }

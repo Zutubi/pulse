@@ -25,14 +25,11 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmEventHandler
     protected boolean terminated = false;
     protected transient PrintWriter outputWriter;
 
-    private ScmClientFactory scmClientFactory;
-
-    public ScmBootstrapper(String project, ScmConfiguration scmConfig, BuildRevision revision, ScmClientFactory factory)
+    public ScmBootstrapper(String project, ScmConfiguration scmConfig, BuildRevision revision)
     {
         this.project = project;
         this.scmConfig = scmConfig;
         this.revision = revision;
-        this.scmClientFactory = factory;
     }
 
     public void bootstrap(ExecutionContext context)
@@ -122,8 +119,9 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmEventHandler
         terminated = true;
     }
 
-    protected ScmClient createScmClient() throws ScmException
+    protected ScmClient createScmClient(ExecutionContext executionContext) throws ScmException
     {
+        ScmClientFactory scmClientFactory = executionContext.getValue(NAMESPACE_INTERNAL, BuildProperties.PROPERTY_SCM_CLIENT_FACTORY, ScmClientFactory.class);
         return scmClientFactory.createClient(scmConfig);
     }
 

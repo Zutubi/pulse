@@ -53,6 +53,7 @@ public class BuildProperties
     public static final String PROPERTY_RECIPE_TIMESTAMP        = "recipe.timestamp";
     public static final String PROPERTY_RECIPE_TIMESTAMP_MILLIS = "recipe.timestamp.millis";
     public static final String PROPERTY_RESOURCE_REPOSITORY     = "resource.repository";
+    public static final String PROPERTY_SCM_CLIENT_FACTORY      = "scm.client.factory";
     public static final String PROPERTY_STAGE                   = "stage";
     public static final String PROPERTY_TEST_RESULTS            = "test.results";
 
