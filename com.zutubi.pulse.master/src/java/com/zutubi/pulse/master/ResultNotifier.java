@@ -17,7 +17,7 @@ import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.user.SubscriptionConfiguration;
 import com.zutubi.pulse.master.tove.config.user.contacts.ContactConfiguration;
-import com.zutubi.pulse.master.webwork.mapping.Urls;
+import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.util.logging.Logger;
 

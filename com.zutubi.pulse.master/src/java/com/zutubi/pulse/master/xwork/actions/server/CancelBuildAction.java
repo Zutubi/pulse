@@ -4,7 +4,7 @@ import com.zutubi.pulse.master.FatController;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.xwork.actions.ActionSupport;
-import com.zutubi.pulse.master.webwork.mapping.Urls;
+import com.zutubi.pulse.master.webwork.Urls;
 
 /**
  */

@@ -4,7 +4,7 @@ import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.IDs;
 import com.zutubi.pulse.acceptance.SeleniumUtils;
 import com.zutubi.pulse.acceptance.forms.admin.CloneForm;
-import com.zutubi.pulse.master.webwork.mapping.Urls;
+import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.tove.type.record.PathUtils;
 
 /**

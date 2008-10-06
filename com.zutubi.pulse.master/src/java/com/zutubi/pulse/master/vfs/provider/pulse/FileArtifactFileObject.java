@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.vfs.provider.pulse.FileAction;
-import com.zutubi.pulse.master.webwork.mapping.Urls;
+import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.logging.Logger;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileSystemException;

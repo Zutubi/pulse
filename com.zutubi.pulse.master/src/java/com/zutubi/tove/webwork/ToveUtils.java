@@ -9,7 +9,7 @@ import com.zutubi.i18n.Messages;
 import com.zutubi.pulse.core.config.Configuration;
 import com.zutubi.pulse.core.util.FileSystemUtils;
 import com.zutubi.pulse.master.bootstrap.freemarker.FreemarkerConfigurationFactoryBean;
-import com.zutubi.pulse.master.webwork.mapping.PulseActionMapper;
+import com.zutubi.pulse.master.webwork.dispatcher.mapper.PulseActionMapper;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.tove.config.ConfigurationSecurityManager;
 import com.zutubi.tove.config.ConfigurationTemplateManager;

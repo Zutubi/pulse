@@ -18,7 +18,7 @@ import com.zutubi.pulse.master.search.Queries;
 import com.zutubi.pulse.master.search.SearchQuery;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
 import com.zutubi.pulse.master.xwork.actions.project.ProjectActionSupport;
-import com.zutubi.pulse.master.webwork.mapping.Urls;
+import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.master.webwork.dispatcher.JITFeed;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.util.StringUtils;

@@ -15,7 +15,7 @@ import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.security.AcegiUtils;
 import com.zutubi.pulse.master.tove.config.admin.GlobalConfiguration;
-import com.zutubi.pulse.master.webwork.mapping.Urls;
+import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.pulse.servercore.events.system.SystemStartedEvent;
 import com.zutubi.tove.config.ConfigurationProvider;
 import org.apache.velocity.context.Context;

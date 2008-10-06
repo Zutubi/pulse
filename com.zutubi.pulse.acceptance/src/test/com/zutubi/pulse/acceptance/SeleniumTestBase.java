@@ -7,7 +7,7 @@ import com.zutubi.pulse.acceptance.forms.admin.SelectTypeState;
 import com.zutubi.pulse.acceptance.pages.LoginPage;
 import com.zutubi.pulse.acceptance.pages.admin.ProjectHierarchyPage;
 import com.zutubi.pulse.master.model.ProjectManager;
-import com.zutubi.pulse.master.webwork.mapping.Urls;
+import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.ExceptionWrappingRunnable;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.StringUtils;

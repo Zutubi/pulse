@@ -3,7 +3,7 @@ package com.zutubi.pulse.acceptance.pages.server;
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.SeleniumUtils;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
-import com.zutubi.pulse.master.webwork.mapping.Urls;
+import com.zutubi.pulse.master.webwork.Urls;
 
 /**
  * The server messages page shows recent server log messages.

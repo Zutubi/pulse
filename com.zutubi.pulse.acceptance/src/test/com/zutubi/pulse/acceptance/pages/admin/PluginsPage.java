@@ -3,7 +3,7 @@ package com.zutubi.pulse.acceptance.pages.admin;
 import com.thoughtworks.selenium.Selenium;
 import com.zutubi.pulse.acceptance.forms.InstallPluginForm;
 import com.zutubi.pulse.acceptance.pages.SeleniumPage;
-import com.zutubi.pulse.master.webwork.mapping.Urls;
+import com.zutubi.pulse.master.webwork.Urls;
 
 /**
  * The all plugins list.

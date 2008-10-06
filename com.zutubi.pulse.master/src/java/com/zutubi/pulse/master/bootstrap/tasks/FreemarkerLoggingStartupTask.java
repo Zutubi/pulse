@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.bootstrap.tasks;
 
-import com.zutubi.pulse.master.freemarker.CustomFreemarkerManager;
+import com.zutubi.pulse.master.webwork.views.freemarker.CustomFreemarkerManager;
 import com.zutubi.pulse.servercore.bootstrap.StartupTask;
 
 /**

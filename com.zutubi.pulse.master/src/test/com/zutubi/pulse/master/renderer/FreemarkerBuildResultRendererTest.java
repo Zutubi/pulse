@@ -5,7 +5,7 @@ import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
-import com.zutubi.pulse.master.webwork.mapping.Urls;
+import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.Constants;
 import com.zutubi.util.io.IOUtils;
 import freemarker.template.Configuration;
