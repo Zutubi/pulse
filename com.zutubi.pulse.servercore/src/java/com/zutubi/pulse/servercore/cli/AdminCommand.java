@@ -2,10 +2,9 @@ package com.zutubi.pulse.servercore.cli;
 
 import com.zutubi.pulse.command.BootContext;
 import com.zutubi.pulse.command.Command;
-import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.core.util.config.ConfigSupport;
-import com.zutubi.pulse.core.util.config.FileConfig;
 import com.zutubi.pulse.core.util.config.EnvConfig;
+import com.zutubi.pulse.core.util.config.FileConfig;
 import com.zutubi.pulse.servercore.api.AdminTokenManager;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.SystemBootstrapManager;
@@ -99,8 +98,7 @@ public abstract class AdminCommand implements Command
 
         SystemBootstrapManager sbm = new SystemBootstrapManager();
         sbm.loadBootstrapContext();
-
-        ConfigurationManager configurationManager = (ConfigurationManager) SpringComponentContext.getBean("configurationManager");
+        ConfigurationManager configurationManager = sbm.getConfigurationManager();
 
         URL url;
         try

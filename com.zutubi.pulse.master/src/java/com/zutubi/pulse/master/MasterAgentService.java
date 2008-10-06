@@ -6,19 +6,18 @@ import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.resources.ResourceDiscoverer;
-import com.zutubi.pulse.core.spring.SpringComponentContext;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.ResourceManager;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.servercore.ServerRecipePaths;
 import com.zutubi.pulse.servercore.SystemInfo;
-import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
 import com.zutubi.pulse.servercore.agent.PingStatus;
 import com.zutubi.pulse.servercore.bootstrap.StartupManager;
-import com.zutubi.pulse.servercore.util.logging.ServerMessagesHandler;
 import com.zutubi.pulse.servercore.services.SlaveStatus;
+import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
+import com.zutubi.pulse.servercore.util.logging.ServerMessagesHandler;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
@@ -186,10 +185,12 @@ public class MasterAgentService implements AgentService
 
     private MasterRecipeProcessor getMasterRecipeProcessor()
     {
+/*
         if (masterRecipeProcessor == null)
         {
             masterRecipeProcessor = SpringComponentContext.getBean("masterRecipeProcessor");
         }
+*/
         return masterRecipeProcessor;
     }
 
@@ -205,10 +206,12 @@ public class MasterAgentService implements AgentService
 
     public ResourceManager getResourceManager()
     {
+/*
         if (resourceManager == null)
         {
             resourceManager = SpringComponentContext.getBean("resourceManager");
         }
+*/
         return resourceManager;
     }
     

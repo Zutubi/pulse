@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.scm.ScmClientFactory;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.util.logging.Logger;
 
@@ -17,9 +18,9 @@ public class UpdateBootstrapper extends ScmBootstrapper
 {
     private static final Logger LOG = Logger.getLogger(UpdateBootstrapper.class);
 
-    public UpdateBootstrapper(String project, ScmConfiguration scmConfig, BuildRevision revision)
+    public UpdateBootstrapper(String project, ScmConfiguration scmConfig, BuildRevision revision, ScmClientFactory factory)
     {
-        super(project, scmConfig, revision);
+        super(project, scmConfig, revision, factory);
     }
 
     ScmClient doBootstrap(ExecutionContext executionContext)

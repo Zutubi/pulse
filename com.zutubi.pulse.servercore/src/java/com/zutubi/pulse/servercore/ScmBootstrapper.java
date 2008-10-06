@@ -6,7 +6,6 @@ import static com.zutubi.pulse.core.BuildProperties.PROPERTY_OUTPUT_DIR;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.scm.*;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
-import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.util.io.ForkOutputStream;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
@@ -26,11 +25,14 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmEventHandler
     protected boolean terminated = false;
     protected transient PrintWriter outputWriter;
 
-    public ScmBootstrapper(String project, ScmConfiguration scmConfig, BuildRevision revision)
+    private ScmClientFactory scmClientFactory;
+
+    public ScmBootstrapper(String project, ScmConfiguration scmConfig, BuildRevision revision, ScmClientFactory factory)
     {
         this.project = project;
         this.scmConfig = scmConfig;
         this.revision = revision;
+        this.scmClientFactory = factory;
     }
 
     public void bootstrap(ExecutionContext context)
@@ -122,8 +124,7 @@ public abstract class ScmBootstrapper implements Bootstrapper, ScmEventHandler
 
     protected ScmClient createScmClient() throws ScmException
     {
-        ScmClientFactory<ScmConfiguration> factory = SpringComponentContext.getBean("scmClientFactory");
-        return factory.createClient(scmConfig);
+        return scmClientFactory.createClient(scmConfig);
     }
 
     abstract ScmClient doBootstrap(ExecutionContext executionContext);

@@ -4,7 +4,6 @@ import com.opensymphony.webwork.ServletActionContext;
 import com.opensymphony.webwork.dispatcher.WebWorkResultSupport;
 import com.opensymphony.xwork.ActionInvocation;
 import com.opensymphony.xwork.util.OgnlValueStack;
-import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.io.IOUtils;
@@ -29,9 +28,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * <class-comment/>
- */
 public class JsonResult extends WebWorkResultSupport
 {
     private static final Logger LOG = Logger.getLogger(JsonResult.class);
@@ -265,17 +261,13 @@ public class JsonResult extends WebWorkResultSupport
 
     public JsonDefinitionLoader getDefinitionLoader()
     {
-        if (this.definitionLoader == null)
-        {
-            this.definitionLoader = getDefaultDefinitionLoader();
-        }
         return this.definitionLoader;
     }
 
-    private JsonDefinitionLoader getDefaultDefinitionLoader()
+    public void setConfigurationManager(MasterConfigurationManager manager)
     {
-        final MasterConfigurationManager config = (MasterConfigurationManager) SpringComponentContext.getBean("configurationManager");
-        return new JsonDefinitionLoader()
+        final MasterConfigurationManager config = manager;
+        setDefinitionLoader(new JsonDefinitionLoader()
         {
             public InputStream load(String location) throws FileNotFoundException
             {
@@ -283,6 +275,6 @@ public class JsonResult extends WebWorkResultSupport
                 File definition = new File(contentRoot, location);
                 return new FileInputStream(definition);
             }
-        };
+        });
     }
 }

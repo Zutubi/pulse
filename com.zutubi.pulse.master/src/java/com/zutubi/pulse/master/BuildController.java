@@ -297,7 +297,7 @@ public class BuildController implements EventListener
                 boolean checkoutOnly = request.isPersonal() || checkoutScheme == CheckoutScheme.CLEAN_CHECKOUT;
                 if (checkoutOnly)
                 {
-                    initialBootstrapper = new CheckoutBootstrapper(projectConfig.getName(), projectConfig.getScm(), request.getRevision(), false);
+                    initialBootstrapper = new CheckoutBootstrapper(projectConfig.getName(), projectConfig.getScm(), request.getRevision(), false, scmClientFactory);
                     if (request.isPersonal())
                     {
                         initialBootstrapper = createPersonalBuildBootstrapper(initialBootstrapper);
@@ -305,7 +305,7 @@ public class BuildController implements EventListener
                 }
                 else
                 {
-                    initialBootstrapper = new ProjectRepoBootstrapper(projectConfig.getName(), projectConfig.getScm(), request.getRevision());
+                    initialBootstrapper = new ProjectRepoBootstrapper(projectConfig.getName(), projectConfig.getScm(), request.getRevision(), scmClientFactory);
                 }
                 return initialBootstrapper;
             }

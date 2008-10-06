@@ -3,6 +3,7 @@ package com.zutubi.pulse.servercore;
 import com.zutubi.pulse.core.*;
 import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
+import com.zutubi.pulse.core.scm.ScmClientFactory;
 import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
@@ -20,12 +21,14 @@ public class ProjectRepoBootstrapper implements Bootstrapper
     private final ScmConfiguration scmConfig;
     private BuildRevision revision;
     private ScmBootstrapper childBootstrapper;
+    private ScmClientFactory scmClientFactory;
 
-    public ProjectRepoBootstrapper(String projectName, ScmConfiguration scmConfig, BuildRevision revision)
+    public ProjectRepoBootstrapper(String projectName, ScmConfiguration scmConfig, BuildRevision revision, ScmClientFactory factory)
     {
         this.projectName = projectName;
         this.scmConfig = scmConfig;
         this.revision = revision;
+        this.scmClientFactory = factory;
     }
 
     public void bootstrap(final ExecutionContext context) throws BuildException
@@ -111,11 +114,11 @@ public class ProjectRepoBootstrapper implements Bootstrapper
         // else we can update.
         if (localDir.list().length == 0)
         {
-            return new CheckoutBootstrapper(projectName, scmConfig, revision, true);
+            return new CheckoutBootstrapper(projectName, scmConfig, revision, true, scmClientFactory);
         }
         else
         {
-            return new UpdateBootstrapper(projectName, scmConfig, revision);
+            return new UpdateBootstrapper(projectName, scmConfig, revision, scmClientFactory);
         }
     }
 }

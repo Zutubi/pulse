@@ -1,7 +1,6 @@
 package com.zutubi.pulse.slave.api;
 
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.servercore.ShutdownManager;
 import com.zutubi.pulse.servercore.api.AdminTokenManager;
 import com.zutubi.pulse.servercore.api.AuthenticationException;
@@ -15,7 +14,6 @@ public class RemoteApi
 
     public RemoteApi()
     {
-        SpringComponentContext.autowire(this);
     }
 
     public boolean shutdown(String token, boolean force, boolean exitJvm) throws AuthenticationException

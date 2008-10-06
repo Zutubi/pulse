@@ -52,6 +52,11 @@ public class SystemBootstrapManager
         }
     }
 
+    public ConfigurationManager getConfigurationManager()
+    {
+        return SpringComponentContext.getBean("configurationManager");
+    }
+
     public void bootstrapSystem()
     {
         loadBootstrapContext();

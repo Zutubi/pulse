@@ -3,7 +3,10 @@ package com.zutubi.pulse.master.agent;
 import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.Stoppable;
-import com.zutubi.pulse.master.*;
+import com.zutubi.pulse.master.AgentService;
+import com.zutubi.pulse.master.MasterAgentService;
+import com.zutubi.pulse.master.SlaveAgentService;
+import com.zutubi.pulse.master.SlaveProxyFactory;
 import com.zutubi.pulse.master.bootstrap.DefaultSetupManager;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.events.*;
@@ -13,15 +16,12 @@ import com.zutubi.pulse.master.license.LicenseManager;
 import com.zutubi.pulse.master.license.authorisation.AddAgentAuthorisation;
 import com.zutubi.pulse.master.model.AgentState;
 import com.zutubi.pulse.master.model.AgentStateManager;
-import com.zutubi.pulse.master.model.ResourceManager;
 import com.zutubi.pulse.master.model.UserManager;
 import com.zutubi.pulse.master.tove.config.agent.AgentAclConfiguration;
 import com.zutubi.pulse.master.tove.config.agent.AgentConfiguration;
 import com.zutubi.pulse.master.tove.config.group.AbstractGroupConfiguration;
 import com.zutubi.pulse.servercore.agent.Status;
-import com.zutubi.pulse.servercore.bootstrap.StartupManager;
-import com.zutubi.pulse.servercore.util.logging.ServerMessagesHandler;
-import com.zutubi.pulse.servercore.services.ServiceTokenManager;
+import com.zutubi.pulse.servercore.services.SlaveService;
 import com.zutubi.pulse.servercore.services.UpgradeStatus;
 import com.zutubi.tove.config.*;
 import com.zutubi.tove.security.AccessManager;
@@ -33,6 +33,7 @@ import com.zutubi.tove.type.record.PathUtils;
 import com.zutubi.tove.type.record.Record;
 import com.zutubi.util.Predicate;
 import com.zutubi.util.Sort;
+import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
 
 import java.util.*;
@@ -51,19 +52,15 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
     private ReentrantLock lock = new ReentrantLock();
     private Map<Long, Agent> agents;
 
+    private ObjectFactory objectFactory;
     private AgentStatusManager agentStatusManager;
     private AgentStateManager agentStateManager;
     private MasterConfigurationManager configurationManager;
     private ConfigurationProvider configurationProvider;
     private ConfigurationTemplateManager configurationTemplateManager;
     private TypeRegistry typeRegistry;
-    private ResourceManager resourceManager;
     private EventManager eventManager;
     private SlaveProxyFactory slaveProxyFactory;
-    private ServiceTokenManager serviceTokenManager;
-    private MasterRecipeProcessor masterRecipeProcessor;
-    private ServerMessagesHandler serverMessagesHandler;
-    private StartupManager startupManager;
     private ThreadFactory threadFactory;
     private MasterLocationProvider masterLocationProvider;
     private AgentPingService agentPingService;
@@ -247,27 +244,25 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
     {
         if (agentConfig.isRemote())
         {
-            // Object factory fails us here as some of these deps are in the
-            // same context.
-            SlaveAgentService agentService = new SlaveAgentService(slaveProxyFactory.createProxy(agentConfig), agentConfig);
-            agentService.setMasterLocationProvider(masterLocationProvider);
-            agentService.setResourceManager(resourceManager);
-            agentService.setServiceTokenManager(serviceTokenManager);
-            return agentService;
+            try
+            {
+                return objectFactory.buildBean(SlaveAgentService.class, new Class[]{SlaveService.class, AgentConfiguration.class}, new Object[]{slaveProxyFactory.createProxy(agentConfig), agentConfig});
+            }
+            catch (Exception e)
+            {
+                throw new RuntimeException(e);
+            }
         }
         else
         {
-            // We wire this up ourselves as it uses resources that are
-            // defined in the same context as this agent manager (and
-            // thus are not in the context atm :|).
-            MasterAgentService agentService = new MasterAgentService(agentConfig);
-            agentService.setConfigurationManager(configurationManager);
-            agentService.setMasterLocationProvider(masterLocationProvider);
-            agentService.setMasterRecipeProcessor(masterRecipeProcessor);
-            agentService.setResourceManager(resourceManager);
-            agentService.setServerMessagesHandler(serverMessagesHandler);
-            agentService.setStartupManager(startupManager);
-            return agentService;
+            try
+            {
+                return objectFactory.buildBean(MasterAgentService.class, new Class[]{AgentConfiguration.class}, new Object[]{agentConfig});
+            }
+            catch (Exception e)
+            {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -604,11 +599,6 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         this.configurationManager = configurationManager;
     }
 
-    public void setResourceManager(ResourceManager resourceManager)
-    {
-        this.resourceManager = resourceManager;
-    }
-
     public void setSlaveProxyFactory(SlaveProxyFactory slaveProxyFactory)
     {
         this.slaveProxyFactory = slaveProxyFactory;
@@ -620,19 +610,9 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         eventManager.register(this);
     }
 
-    public void setServiceTokenManager(ServiceTokenManager serviceTokenManager)
-    {
-        this.serviceTokenManager = serviceTokenManager;
-    }
-
     public void setLicenseManager(LicenseManager licenseManager)
     {
         this.licenseManager = licenseManager;
-    }
-
-    public void setMasterRecipeProcessor(MasterRecipeProcessor masterRecipeProcessor)
-    {
-        this.masterRecipeProcessor = masterRecipeProcessor;
     }
 
     public void setConfigurationTemplateManager(ConfigurationTemplateManager configurationTemplateManager)
@@ -650,16 +630,6 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
         this.typeRegistry = typeRegistry;
     }
 
-    public void setServerMessagesHandler(ServerMessagesHandler serverMessagesHandler)
-    {
-        this.serverMessagesHandler = serverMessagesHandler;
-    }
-
-    public void setStartupManager(StartupManager startupManager)
-    {
-        this.startupManager = startupManager;
-    }
-
     public void setThreadFactory(ThreadFactory threadFactory)
     {
         this.threadFactory = threadFactory;
@@ -668,5 +638,10 @@ public class DefaultAgentManager implements AgentManager, ExternalStateManager<A
     public void setAgentPingService(AgentPingService agentPingService)
     {
         this.agentPingService = agentPingService;
+    }
+
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
     }
 }

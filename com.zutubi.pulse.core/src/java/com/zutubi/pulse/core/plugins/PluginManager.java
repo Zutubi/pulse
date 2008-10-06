@@ -252,7 +252,7 @@ public class PluginManager
     private void startupInternalPlugins() throws PluginException, BundleException
     {
         // A) load and install each of the plugins located in the internal storage location.
-        for(File file : paths.getInternalPluginStorageDir().listFiles(PLUGIN_FILTER))
+        for (File file : paths.getInternalPluginStorageDir().listFiles(PLUGIN_FILTER))
         {
             LocalPlugin internalPlugin = createPluginHandle(file.toURI(), Plugin.Type.INTERNAL);
             internalPlugin.setBundle(equinox.install(internalPlugin.getSource()));
@@ -829,7 +829,7 @@ public class PluginManager
     {
         if (!TextUtils.stringSet(source))
         {
-            throw new IllegalArgumentException("Can not create a plugin handle without a source string defined.");                
+            throw new IllegalArgumentException("Can not create a plugin handle without a source string defined.");
         }
         try
         {
@@ -1000,7 +1000,7 @@ public class PluginManager
             {
                 throw new IOException("Failed to download plugin. Unable to create new directory: " + tmpFile.getParentFile().getAbsolutePath());
             }
-            
+
             os = new FileOutputStream(tmpFile);
 
             IOUtils.joinStreams(is, os);
@@ -1058,11 +1058,10 @@ public class PluginManager
 
     /**
      * Sort the list of plugins according to there defined dependencies.  This sorting does not occur inplace.
-     *
+     * <p/>
      * This only works for installed plugins as only these have the bundle descriptions available.
      *
      * @param plugins list to be sorted.
-     *
      * @return the sorted list of plugins.
      */
     private List<LocalPlugin> sortPlugins(final List<LocalPlugin> plugins)
@@ -1116,29 +1115,22 @@ public class PluginManager
     private void addDependentPlugins(LocalPlugin plugin, List<LocalPlugin> plugins, boolean transitive, List<LocalPlugin> result)
     {
         BundleDescription description = plugin.getBundleDescription();
-/*
-        if (description != null)
+        BundleDescription[] required = description.getDependents();
+        if (required != null)
         {
-*/
-            BundleDescription[] required = description.getDependents();
-            if (required != null)
+            for (BundleDescription r : required)
             {
-                for (BundleDescription r : required)
+                LocalPlugin p = findPlugin(r.getSymbolicName(), plugins);
+                if (p != null)
                 {
-                    LocalPlugin p = findPlugin(r.getSymbolicName(), plugins);
-                    if (p != null)
+                    result.add(p);
+                    if (transitive)
                     {
-                        result.add(p);
-                        if (transitive)
-                        {
-                            addDependentPlugins(p, plugins, transitive, result);
-                        }
+                        addDependentPlugins(p, plugins, transitive, result);
                     }
                 }
             }
-/*
         }
-*/
     }
 
     public PluginRegistry getPluginRegistry()

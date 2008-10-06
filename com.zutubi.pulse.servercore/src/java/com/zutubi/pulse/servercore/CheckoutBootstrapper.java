@@ -6,6 +6,7 @@ import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.scm.ScmClientFactory;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.util.logging.Logger;
 
@@ -18,9 +19,9 @@ public class CheckoutBootstrapper extends ScmBootstrapper
 
     private boolean persist;
 
-    public CheckoutBootstrapper(String project, ScmConfiguration scmConfig, BuildRevision revision, boolean persist)
+    public CheckoutBootstrapper(String project, ScmConfiguration scmConfig, BuildRevision revision, boolean persist, ScmClientFactory factory)
     {
-        super(project, scmConfig, revision);
+        super(project, scmConfig, revision, factory);
         this.persist = persist;
     }
 
