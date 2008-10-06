@@ -57,8 +57,6 @@ public class RemoteApi implements com.zutubi.events.EventListener
 
     public RemoteApi()
     {
-        // can remove this call when we sort out autowiring from the XmlRpcServlet.
-        SpringComponentContext.autowire(this);
     }
 
     /**
