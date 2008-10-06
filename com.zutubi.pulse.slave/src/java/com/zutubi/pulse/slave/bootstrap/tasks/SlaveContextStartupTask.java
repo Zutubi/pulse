@@ -9,7 +9,7 @@ public class SlaveContextStartupTask implements StartupTask
 {
     public void execute()
     {
-        SpringComponentContext.addClassPathContextDefinitions("../applicationContext.xml");
+        SpringComponentContext.addClassPathContextDefinitions("com/zutubi/pulse/slave/bootstrap/applicationContext.xml");
     }
 
     public boolean haltOnFailure()
