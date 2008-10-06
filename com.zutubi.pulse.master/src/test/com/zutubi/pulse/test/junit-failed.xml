@@ -5173,9 +5173,9 @@ test8
 
       </properties>
 
-      <testcase classname="com.zutubi.pulse.core.util.FileSystemUtilsTest" name="testGetPermissions" time="0.01"></testcase>
+      <testcase classname="com.zutubi.util.FileSystemUtilsTest" name="testGetPermissions" time="0.01"></testcase>
 
-      <testcase classname="com.zutubi.pulse.core.util.FileSystemUtilsTest" name="testSetPermissions" time="0.0"></testcase>
+      <testcase classname="com.zutubi.util.FileSystemUtilsTest" name="testSetPermissions" time="0.0"></testcase>
 
       <system-out></system-out>
 
@@ -5388,17 +5388,17 @@ test8
 
       </properties>
 
-      <testcase classname="com.zutubi.pulse.core.util.RemoveDirectoryTest" name="testRemoveNonExistant" time="0.04"></testcase>
+      <testcase classname="com.zutubi.util.RemoveDirectoryTest" name="testRemoveNonExistant" time="0.04"></testcase>
 
-      <testcase classname="com.zutubi.pulse.core.util.RemoveDirectoryTest" name="testRemoveFile" time="0.02"></testcase>
+      <testcase classname="com.zutubi.util.RemoveDirectoryTest" name="testRemoveFile" time="0.02"></testcase>
 
-      <testcase classname="com.zutubi.pulse.core.util.RemoveDirectoryTest" name="testRemoveEmpty" time="0.01"></testcase>
+      <testcase classname="com.zutubi.util.RemoveDirectoryTest" name="testRemoveEmpty" time="0.01"></testcase>
 
-      <testcase classname="com.zutubi.pulse.core.util.RemoveDirectoryTest" name="testRemoveContents" time="0.02"></testcase>
+      <testcase classname="com.zutubi.util.RemoveDirectoryTest" name="testRemoveContents" time="0.02"></testcase>
 
-      <testcase classname="com.zutubi.pulse.core.util.RemoveDirectoryTest" name="testRemoveNested" time="0.02"></testcase>
+      <testcase classname="com.zutubi.util.RemoveDirectoryTest" name="testRemoveNested" time="0.02"></testcase>
 
-      <testcase classname="com.zutubi.pulse.core.util.RemoveDirectoryTest" name="testExternalSymlink" time="0.01"></testcase>
+      <testcase classname="com.zutubi.util.RemoveDirectoryTest" name="testExternalSymlink" time="0.01"></testcase>
 
       <system-out></system-out>
 
@@ -5611,11 +5611,11 @@ test8
 
       </properties>
 
-      <testcase classname="com.zutubi.pulse.core.util.RenameDirectoryTest" name="testRenameFileToNonExistingDest" time="0.06"></testcase>
+      <testcase classname="com.zutubi.util.RenameDirectoryTest" name="testRenameFileToNonExistingDest" time="0.06"></testcase>
 
-      <testcase classname="com.zutubi.pulse.core.util.RenameDirectoryTest" name="testRenameDirectoryToNonExistingDest" time="0.01"></testcase>
+      <testcase classname="com.zutubi.util.RenameDirectoryTest" name="testRenameDirectoryToNonExistingDest" time="0.01"></testcase>
 
-      <testcase classname="com.zutubi.pulse.core.util.RenameDirectoryTest" name="testRenameToExistingDest" time="0.01"></testcase>
+      <testcase classname="com.zutubi.util.RenameDirectoryTest" name="testRenameToExistingDest" time="0.01"></testcase>
 
       <system-out></system-out>
 

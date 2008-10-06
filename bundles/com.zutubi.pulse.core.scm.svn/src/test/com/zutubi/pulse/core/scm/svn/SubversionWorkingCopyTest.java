@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.scm.FileStatus;
 import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.WorkingCopyStatus;
 import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.pulse.core.util.config.PropertiesConfig;
 import com.zutubi.pulse.core.util.process.ProcessControl;

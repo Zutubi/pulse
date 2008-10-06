@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.restore;
 
 import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.tove.transaction.TransactionManager;
 import com.zutubi.tove.type.record.MutableRecordImpl;
 import com.zutubi.tove.type.record.RecordQueries;

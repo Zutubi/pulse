@@ -4,7 +4,7 @@ import com.zutubi.pulse.acceptance.pages.dashboard.*;
 import com.zutubi.pulse.core.personal.PersonalBuildUI;
 import com.zutubi.pulse.core.scm.WorkingCopyFactory;
 import com.zutubi.pulse.core.scm.svn.SubversionWorkingCopy;
-import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.dev.personal.PersonalBuildClient;
 import com.zutubi.pulse.dev.personal.PersonalBuildCommand;
 import com.zutubi.pulse.dev.personal.PersonalBuildConfig;

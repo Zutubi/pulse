@@ -2,7 +2,7 @@ package com.zutubi.pulse.core;
 
 import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.model.CommandResult;
-import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.core.test.PulseTestCase;
 
 import java.io.File;

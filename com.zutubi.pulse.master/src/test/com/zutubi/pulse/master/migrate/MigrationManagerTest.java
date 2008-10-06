@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.migrate;
 
 import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.core.util.JDBCUtils;
 import com.zutubi.pulse.master.bootstrap.Data;
 import com.zutubi.pulse.master.bootstrap.SimpleMasterConfigurationManager;

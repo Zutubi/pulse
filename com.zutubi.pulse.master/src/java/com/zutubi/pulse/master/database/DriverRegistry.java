@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.database;
 
-import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.util.jdbc.DriverWrapper;
 import com.zutubi.util.RandomUtils;

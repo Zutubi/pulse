@@ -1,10 +1,5 @@
 package com.zutubi.tove.transaction;
 
-/**
- *
- *
- */
-//Question: should this be a runtime exception??
 public class TransactionException extends RuntimeException
 {
     public TransactionException()

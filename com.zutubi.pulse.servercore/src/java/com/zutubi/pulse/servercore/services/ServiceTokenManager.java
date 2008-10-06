@@ -1,6 +1,6 @@
 package com.zutubi.pulse.servercore.services;
 
-import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.UserPaths;
 import com.zutubi.util.RandomUtils;

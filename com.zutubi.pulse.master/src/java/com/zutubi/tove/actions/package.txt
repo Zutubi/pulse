@@ -5,7 +5,7 @@ Sample:
 public class XXXActions
 {
     /**
-     * Optional: manually specify the available actoins.
+     * Optional: manually specify the available actions.
      */
     public List<String> getActions(T instance);
 

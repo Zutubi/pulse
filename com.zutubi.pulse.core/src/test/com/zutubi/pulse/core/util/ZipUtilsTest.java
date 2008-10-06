@@ -3,6 +3,7 @@ package com.zutubi.pulse.core.util;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.SystemUtils;
+import com.zutubi.util.FileSystemUtils;
 
 import java.io.*;
 import java.util.Map;

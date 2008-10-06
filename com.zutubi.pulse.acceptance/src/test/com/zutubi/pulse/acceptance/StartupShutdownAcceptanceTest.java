@@ -9,7 +9,7 @@ import com.zutubi.pulse.acceptance.support.PackageFactory;
 import com.zutubi.pulse.acceptance.support.Pulse;
 import com.zutubi.pulse.acceptance.support.PulsePackage;
 import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.core.util.config.Config;
 import com.zutubi.pulse.core.util.config.FileConfig;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;

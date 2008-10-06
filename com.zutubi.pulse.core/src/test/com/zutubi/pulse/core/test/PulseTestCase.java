@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.test;
 
-import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.TextUtils;
 import junit.framework.AssertionFailedError;

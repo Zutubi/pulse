@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.restore;
 
-import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.servercore.bootstrap.MasterUserPaths;
 
 import java.io.File;
@@ -90,7 +90,7 @@ public class DataDirectoryArchive extends AbstractArchiveableComponent
             }
             if (!file.getName().startsWith("database"))
             {
-                FileSystemUtils.delete(file);   
+                FileSystemUtils.delete(file);
             }
         }
     }

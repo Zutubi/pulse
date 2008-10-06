@@ -5,7 +5,7 @@ import com.zutubi.pulse.acceptance.support.PackageFactory;
 import com.zutubi.pulse.acceptance.support.Pulse;
 import com.zutubi.pulse.acceptance.support.PulsePackage;
 import com.zutubi.pulse.core.test.PulseTestCase;
-import static com.zutubi.pulse.core.util.FileSystemUtils.*;
+import static com.zutubi.util.FileSystemUtils.*;
 import com.zutubi.util.Constants;
 
 import java.io.File;

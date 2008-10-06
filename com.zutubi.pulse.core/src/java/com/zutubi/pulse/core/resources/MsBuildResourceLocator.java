@@ -3,11 +3,8 @@ package com.zutubi.pulse.core.resources;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.config.ResourceVersion;
-import com.zutubi.pulse.core.util.FileSystemUtils;
-import com.zutubi.util.Predicate;
-import com.zutubi.util.Sort;
-import com.zutubi.util.StringUtils;
-import com.zutubi.util.SystemUtils;
+import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.*;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;

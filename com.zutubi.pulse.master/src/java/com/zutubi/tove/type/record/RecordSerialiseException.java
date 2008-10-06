@@ -1,12 +1,10 @@
 package com.zutubi.tove.type.record;
 
-import com.zutubi.pulse.core.PulseRuntimeException;
-
 /**
  * An error serialising or deserialising a record, which is considered fatal
  * to the operation.
  */
-public class RecordSerialiseException extends PulseRuntimeException
+public class RecordSerialiseException extends RuntimeException
 {
     public RecordSerialiseException()
     {

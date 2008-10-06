@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.renderer;
 
 import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.master.committransformers.CommitMessageSupport;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;

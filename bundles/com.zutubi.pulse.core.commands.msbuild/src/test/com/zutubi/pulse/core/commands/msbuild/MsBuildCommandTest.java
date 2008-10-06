@@ -3,7 +3,7 @@ package com.zutubi.pulse.core.commands.msbuild;
 import com.zutubi.pulse.core.commands.core.ExecutableCommandTestBase;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
-import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.SystemUtils;
 
 import java.io.File;

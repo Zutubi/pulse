@@ -11,7 +11,6 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  * This transcation manager does not support partial locking of a resource. Therefore, only one transaction
  * is supported at any one time.
- *
  */
 public class TransactionManager
 {

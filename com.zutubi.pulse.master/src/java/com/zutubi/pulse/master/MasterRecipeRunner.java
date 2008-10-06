@@ -4,7 +4,7 @@ import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.*;
 import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
-import com.zutubi.pulse.core.util.FileSystem;
+import com.zutubi.util.FileSystem;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.repository.MasterFileRepository;
 import com.zutubi.pulse.servercore.ChainBootstrapper;

@@ -4,7 +4,7 @@ import com.zutubi.events.DefaultEventManager;
 import static com.zutubi.pulse.core.BuildProperties.NAMESPACE_INTERNAL;
 import static com.zutubi.pulse.core.BuildProperties.PROPERTY_RECIPE_PATHS;
 import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
 

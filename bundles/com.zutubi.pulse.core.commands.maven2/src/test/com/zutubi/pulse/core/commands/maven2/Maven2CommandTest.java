@@ -4,7 +4,7 @@ import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.commands.core.ExecutableCommandTestBase;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.Feature;
-import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.*;

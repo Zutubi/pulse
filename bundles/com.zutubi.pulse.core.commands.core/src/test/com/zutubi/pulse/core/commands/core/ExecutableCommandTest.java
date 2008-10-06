@@ -8,7 +8,7 @@ import com.zutubi.pulse.core.ProcessArtifact;
 import com.zutubi.pulse.core.RegexPattern;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.SystemUtils;
 import com.zutubi.util.io.IOUtils;
 

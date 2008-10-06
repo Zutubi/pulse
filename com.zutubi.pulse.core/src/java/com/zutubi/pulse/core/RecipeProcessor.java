@@ -9,7 +9,7 @@ import com.zutubi.pulse.core.events.RecipeStatusEvent;
 import com.zutubi.pulse.core.model.RecipeResult;
 import com.zutubi.pulse.core.model.TestSuitePersister;
 import com.zutubi.pulse.core.model.TestSuiteResult;
-import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.io.IOUtils;

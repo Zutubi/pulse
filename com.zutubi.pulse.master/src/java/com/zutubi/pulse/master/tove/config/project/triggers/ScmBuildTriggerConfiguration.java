@@ -6,7 +6,7 @@ import com.zutubi.pulse.master.scheduling.ScmChangeEventFilter;
 import com.zutubi.pulse.master.scheduling.Trigger;
 import com.zutubi.pulse.master.scheduling.tasks.BuildProjectTask;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
-import com.zutubi.pulse.scm.ScmChangeEvent;
+import com.zutubi.pulse.master.scm.ScmChangeEvent;
 import com.zutubi.tove.config.ConfigurationProvider;
 
 /**

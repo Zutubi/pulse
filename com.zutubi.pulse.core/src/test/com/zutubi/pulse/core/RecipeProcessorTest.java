@@ -8,7 +8,7 @@ import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.events.*;
 import com.zutubi.pulse.core.model.Feature;
 import com.zutubi.pulse.core.model.ResultState;
-import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.bean.DefaultObjectFactory;
 import com.zutubi.util.bean.ObjectFactory;

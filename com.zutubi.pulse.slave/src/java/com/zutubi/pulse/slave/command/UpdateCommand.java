@@ -2,7 +2,7 @@ package com.zutubi.pulse.slave.command;
 
 import com.zutubi.pulse.command.PulseCtl;
 import com.zutubi.pulse.core.PulseRuntimeException;
-import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.pulse.servercore.ShutdownManager;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;

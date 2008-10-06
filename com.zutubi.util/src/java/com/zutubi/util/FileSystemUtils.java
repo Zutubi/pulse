@@ -1,9 +1,6 @@
-package com.zutubi.pulse.core.util;
+package com.zutubi.util;
 
 import com.zutubi.util.io.IOUtils;
-import com.zutubi.util.StringUtils;
-import com.zutubi.util.TextUtils;
-import com.zutubi.util.SystemUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.*;
@@ -45,10 +42,10 @@ public class FileSystemUtils
     public static final int PERMISSION_ALL_EXECUTE   = PERMISSION_OWNER_EXECUTE | PERMISSION_GROUP_EXECUTE | PERMISSION_OTHER_EXECUTE;
     public static final int PERMISSION_ALL_FULL      = PERMISSION_OWNER_FULL | PERMISSION_GROUP_FULL | PERMISSION_OTHER_FULL;
 
-    static final boolean CP_AVAILABLE;
-    static final boolean LN_AVAILABLE;
-    static final boolean STAT_AVAILABLE;
-    static final boolean ZIP_AVAILABLE;
+    public static final boolean CP_AVAILABLE;
+    public static final boolean LN_AVAILABLE;
+    public static final boolean STAT_AVAILABLE;
+    public static final boolean ZIP_AVAILABLE;
 
     static
     {

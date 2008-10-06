@@ -1,11 +1,8 @@
 package com.zutubi.tove.type.record;
 
-import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.core.util.XMLUtils;
-import com.zutubi.util.CollectionUtils;
-import com.zutubi.util.Mapping;
-import com.zutubi.util.Predicate;
-import com.zutubi.util.StringUtils;
+import com.zutubi.util.*;
 import com.zutubi.util.logging.Logger;
 import nu.xom.*;
 

@@ -1,17 +1,18 @@
-package com.zutubi.pulse.core.util;
+package com.zutubi.util;
 
-import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.io.IOUtils;
-import com.zutubi.util.SystemUtils;
+import junit.framework.Assert;
+import junit.framework.AssertionFailedError;
+import junit.framework.TestCase;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  */
-public class FileSystemUtilsTest extends PulseTestCase
+public class FileSystemUtilsTest extends TestCase
 {
     private File tmpDir;
     private Copier[] copiers;
@@ -33,7 +34,10 @@ public class FileSystemUtilsTest extends PulseTestCase
 
     protected void tearDown() throws Exception
     {
-        removeDirectory(tmpDir);
+        if (!FileSystemUtils.rmdir(tmpDir))
+        {
+            throw new IOException("Failed to remove " + tmpDir);
+        }
 
         super.tearDown();
     }
@@ -62,8 +66,8 @@ public class FileSystemUtilsTest extends PulseTestCase
             File tmpDir = FileSystemUtils.createTempDir(getClass().getName(), "");
             FileSystemUtils.setPermissions(tmpDir, 0);
             int permissions = FileSystemUtils.getPermissions(tmpDir);
-            assertEquals(permissions, 0);
-            assertTrue(FileSystemUtils.rmdir(tmpDir));
+            junit.framework.Assert.assertEquals(permissions, 0);
+            Assert.assertTrue(FileSystemUtils.rmdir(tmpDir));
         }
     }
 
@@ -150,7 +154,7 @@ public class FileSystemUtilsTest extends PulseTestCase
             try
             {
                 f = File.createTempFile(FileSystemUtils.class.getName(), ".txt");
-                assertTrue(FileSystemUtils.PERMISSION_ALL_FULL != FileSystemUtils.getPermissions(f));
+                Assert.assertTrue(FileSystemUtils.PERMISSION_ALL_FULL != FileSystemUtils.getPermissions(f));
                 FileSystemUtils.setPermissions(f, FileSystemUtils.PERMISSION_ALL_FULL);
                 assertEquals(FileSystemUtils.PERMISSION_ALL_FULL, FileSystemUtils.getPermissions(f));
 
@@ -185,13 +189,13 @@ public class FileSystemUtilsTest extends PulseTestCase
             try
             {
                 f = File.createTempFile(FileSystemUtils.class.getName(), ".txt");
-                assertTrue(FileSystemUtils.PERMISSION_ALL_FULL != FileSystemUtils.getPermissions(f));
+                Assert.assertTrue(FileSystemUtils.PERMISSION_ALL_FULL != FileSystemUtils.getPermissions(f));
                 FileSystemUtils.setPermissions(f, FileSystemUtils.PERMISSION_ALL_FULL);
                 assertEquals(FileSystemUtils.PERMISSION_ALL_FULL, FileSystemUtils.getPermissions(f));
 
                 File temp = File.createTempFile(FileSystemUtilsTest.class.getName(), "");
                 temp.renameTo(f);
-                assertTrue(FileSystemUtils.PERMISSION_ALL_FULL != FileSystemUtils.getPermissions(f));
+                Assert.assertTrue(FileSystemUtils.PERMISSION_ALL_FULL != FileSystemUtils.getPermissions(f));
             }
             finally
             {
@@ -275,7 +279,7 @@ public class FileSystemUtilsTest extends PulseTestCase
                 test = FileSystemUtils.createTempFile(FileSystemUtilsTest.class.getName(), ".tmp", "line 1\nline 2\nline 3\r\nline 4\nline 5\rline 6\r\nline 7\rline 8\r");
                 FileSystemUtils.setPermissions(test, FileSystemUtils.PERMISSION_ALL_FULL);
                 FileSystemUtils.translateEOLs(test, SystemUtils.CRLF_BYTES, true);
-                assertEquals("line 1\r\nline 2\r\nline 3\r\nline 4\r\nline 5\r\nline 6\r\nline 7\r\nline 8\r\n", IOUtils.fileToString(test));
+                Assert.assertEquals("line 1\r\nline 2\r\nline 3\r\nline 4\r\nline 5\r\nline 6\r\nline 7\r\nline 8\r\n", IOUtils.fileToString(test));
                 assertEquals(FileSystemUtils.PERMISSION_ALL_FULL, FileSystemUtils.getPermissions(test));
             }
             finally
@@ -295,7 +299,7 @@ public class FileSystemUtilsTest extends PulseTestCase
         {
             test = FileSystemUtils.createTempFile(FileSystemUtilsTest.class.getName(), ".tmp", "");
             FileSystemUtils.translateEOLs(test, SystemUtils.CRLF_BYTES, true);
-            assertEquals("", IOUtils.fileToString(test));
+            Assert.assertEquals("", IOUtils.fileToString(test));
         }
         finally
         {
@@ -313,7 +317,7 @@ public class FileSystemUtilsTest extends PulseTestCase
         {
             test = FileSystemUtils.createTempFile(FileSystemUtilsTest.class.getName(), ".tmp", "\n");
             FileSystemUtils.translateEOLs(test, SystemUtils.CRLF_BYTES, true);
-            assertEquals("\r\n", IOUtils.fileToString(test));
+            Assert.assertEquals("\r\n", IOUtils.fileToString(test));
         }
         finally
         {
@@ -331,7 +335,7 @@ public class FileSystemUtilsTest extends PulseTestCase
         {
             test = FileSystemUtils.createTempFile(FileSystemUtilsTest.class.getName(), ".tmp", "\r\r");
             FileSystemUtils.translateEOLs(test, SystemUtils.LF_BYTES, true);
-            assertEquals("\n\n", IOUtils.fileToString(test));
+            Assert.assertEquals("\n\n", IOUtils.fileToString(test));
         }
         finally
         {
@@ -361,10 +365,10 @@ public class FileSystemUtilsTest extends PulseTestCase
             FileSystemUtils.translateEOLs(test, SystemUtils.LF_BYTES, true);
 
             byte[] got = IOUtils.fileToBytes(test);
-            assertEquals(out.length, got.length);
+            Assert.assertEquals(out.length, got.length);
             for(int i = 0; i < out.length; i++)
             {
-                assertEquals(out[i], got[i]);
+                Assert.assertEquals(out[i], got[i]);
             }
         }
         finally
@@ -381,7 +385,7 @@ public class FileSystemUtilsTest extends PulseTestCase
         for(Copier copier: copiers)
         {
             FileSystemUtils.rmdir(tmpDir);
-            assertTrue(tmpDir.mkdir());
+            Assert.assertTrue(tmpDir.mkdir());
             System.out.println("Trying '" + getName() + "' with copier '" + copier.getName() + "'");
             test.execute(copier);
         }
@@ -418,7 +422,7 @@ public class FileSystemUtilsTest extends PulseTestCase
                 File nested = new File(dir, "nested");
                 File f4 = new File(nested, "f4");
 
-                assertTrue(nested.mkdirs());
+                Assert.assertTrue(nested.mkdirs());
                 FileSystemUtils.createFile(f1, "test f1");
                 FileSystemUtils.createFile(f2, "test f2");
                 FileSystemUtils.createFile(f3, "test f3");
@@ -445,8 +449,8 @@ public class FileSystemUtilsTest extends PulseTestCase
                 File nested = new File(dir, "nested");
                 File f4 = new File(nested, "f4");
 
-                assertTrue(toDir.mkdirs());
-                assertTrue(nested.mkdirs());
+                Assert.assertTrue(toDir.mkdirs());
+                Assert.assertTrue(nested.mkdirs());
                 FileSystemUtils.createFile(f1, "test f1");
                 FileSystemUtils.createFile(f2, "test f2");
                 FileSystemUtils.createFile(f3, "test f3");
@@ -486,11 +490,11 @@ public class FileSystemUtilsTest extends PulseTestCase
                 FileSystemUtils.createFile(src, "Some text.");
 
                 File dest = new File(tmpDir, "dest");
-                assertTrue(dest.mkdirs());
+                Assert.assertTrue(dest.mkdirs());
 
-                assertTrue(dest.isDirectory());
+                Assert.assertTrue(dest.isDirectory());
                 copier.copy(dest, src);
-                assertTrue(new File(dest, "src.txt").isFile());
+                Assert.assertTrue(new File(dest, "src.txt").isFile());
             }
         });
     }
@@ -508,12 +512,12 @@ public class FileSystemUtilsTest extends PulseTestCase
 
                 File dest = new File(tmpDir, "dest");
 
-                assertFalse(dest.isDirectory());
+                Assert.assertFalse(dest.isDirectory());
                 copier.copy(dest, srcA, srcB);
 
-                assertTrue(dest.isDirectory());
-                assertTrue(new File(dest, "srca.txt").isFile());
-                assertTrue(new File(dest, "srcb.txt").isFile());
+                Assert.assertTrue(dest.isDirectory());
+                Assert.assertTrue(new File(dest, "srca.txt").isFile());
+                Assert.assertTrue(new File(dest, "srcb.txt").isFile());
             }
         });
     }
@@ -531,12 +535,12 @@ public class FileSystemUtilsTest extends PulseTestCase
 
                 File dest = new File(tmpDir, FileSystemUtils.composeFilename("dest", "nested"));
 
-                assertFalse(dest.isDirectory());
+                Assert.assertFalse(dest.isDirectory());
                 copier.copy(dest, srcA, srcB);
 
-                assertTrue(dest.isDirectory());
-                assertTrue(new File(dest, "srca.txt").isFile());
-                assertTrue(new File(dest, "srcb.txt").isFile());
+                Assert.assertTrue(dest.isDirectory());
+                Assert.assertTrue(new File(dest, "srca.txt").isFile());
+                Assert.assertTrue(new File(dest, "srcb.txt").isFile());
             }
         });
     }
@@ -554,11 +558,11 @@ public class FileSystemUtilsTest extends PulseTestCase
                 FileSystemUtils.createFile(new File(dir, "b.txt"), "Text file a");
 
                 File dest = new File(tmpDir, "dest");
-                assertFalse(dest.exists());
+                Assert.assertFalse(dest.exists());
                 copier.copy(dest, dir);
-                assertTrue(dest.isDirectory());
-                assertTrue(new File(dest, "a.txt").isFile());
-                assertTrue(new File(dest, "b.txt").isFile());
+                Assert.assertTrue(dest.isDirectory());
+                Assert.assertTrue(new File(dest, "a.txt").isFile());
+                Assert.assertTrue(new File(dest, "b.txt").isFile());
             }
         });
     }
@@ -595,7 +599,7 @@ public class FileSystemUtilsTest extends PulseTestCase
         {
             File file = new File(tmpDir, "file");
             FileSystemUtils.createFile(file, "data");
-            assertFalse(FileSystemUtils.isSymlink(file));
+            Assert.assertFalse(FileSystemUtils.isSymlink(file));
         }
     }
 
@@ -603,7 +607,7 @@ public class FileSystemUtilsTest extends PulseTestCase
     {
         if(FileSystemUtils.LN_AVAILABLE)
         {
-            assertFalse(FileSystemUtils.isSymlink(tmpDir));
+            Assert.assertFalse(FileSystemUtils.isSymlink(tmpDir));
         }
     }
 
@@ -616,7 +620,7 @@ public class FileSystemUtilsTest extends PulseTestCase
             FileSystemUtils.createFile(file, "data");
             FileSystemUtils.createSymlink(link, file);
 
-            assertTrue(FileSystemUtils.isSymlink(link));
+            Assert.assertTrue(FileSystemUtils.isSymlink(link));
         }
     }
 
@@ -628,7 +632,7 @@ public class FileSystemUtilsTest extends PulseTestCase
             File link = new File(tmpDir, "link");
             dir.mkdir();
             FileSystemUtils.createSymlink(link, dir);
-            assertTrue(FileSystemUtils.isSymlink(link));
+            Assert.assertTrue(FileSystemUtils.isSymlink(link));
         }
     }
 
@@ -643,8 +647,8 @@ public class FileSystemUtilsTest extends PulseTestCase
             FileSystemUtils.createSymlink(link, dir);
             FileSystemUtils.createFile(file, "data");
 
-            assertTrue(FileSystemUtils.isSymlink(link));
-            assertFalse(FileSystemUtils.isSymlink(file));
+            Assert.assertTrue(FileSystemUtils.isSymlink(link));
+            Assert.assertFalse(FileSystemUtils.isSymlink(file));
         }
     }
 
@@ -661,8 +665,8 @@ public class FileSystemUtilsTest extends PulseTestCase
             FileSystemUtils.createFile(file, "data");
             FileSystemUtils.createSymlink(fileLink, file);
 
-            assertTrue(FileSystemUtils.isSymlink(dirLink));
-            assertTrue(FileSystemUtils.isSymlink(fileLink));
+            Assert.assertTrue(FileSystemUtils.isSymlink(dirLink));
+            Assert.assertTrue(FileSystemUtils.isSymlink(fileLink));
         }
     }
 
@@ -673,7 +677,7 @@ public class FileSystemUtilsTest extends PulseTestCase
         {
             test = FileSystemUtils.createTempFile(FileSystemUtilsTest.class.getName(), ".tmp", "line 1\nline 2\nline 3\r\nline 4\nline 5\rline 6\r\nline 7\rline 8\r");
             FileSystemUtils.translateEOLs(test, eol, false);
-            assertEquals(out, IOUtils.fileToString(test));
+            Assert.assertEquals(out, IOUtils.fileToString(test));
         }
         finally
         {
@@ -694,6 +698,123 @@ public class FileSystemUtilsTest extends PulseTestCase
 
         assertEquals(expected, FileSystemUtils.filesMatch(f1, f2));
     }
+
+    /**
+     * Asserts that the contents of the two given files is identical.
+     *
+     * @param file1 the first file to compare
+     * @param file2 the second file to compare
+     * @throws junit.framework.AssertionFailedError if the contents of the files differ
+     */
+    protected void assertFilesEqual(File file1, File file2) throws IOException
+    {
+        if (!file1.isFile())
+        {
+            throw new AssertionFailedError("File '" + file1.getAbsolutePath() + "' does not exist or is not a regular file");
+        }
+
+        if (!file2.isFile())
+        {
+            throw new AssertionFailedError("File '" + file2.getAbsolutePath() + "' does not exist or is not a regular file");
+        }
+
+        BufferedReader rs1 = null;
+        BufferedReader rs2 = null;
+        try
+        {
+            rs1 = new BufferedReader(new InputStreamReader(new FileInputStream(file1)));
+            rs2 = new BufferedReader(new InputStreamReader(new FileInputStream(file2)));
+            while (true)
+            {
+                String line1 = rs1.readLine();
+                String line2 = rs2.readLine();
+
+                if (line1 == null)
+                {
+                    if (line2 == null)
+                    {
+                        return;
+                    }
+                    throw new AssertionFailedError("Contents of '" + file1.getAbsolutePath() + " differs from contents of '" + file2.getAbsolutePath() + "'");
+                }
+                else
+                {
+                    if (line2 == null)
+                    {
+                        throw new AssertionFailedError("Contents of '" + file1.getAbsolutePath() + " differs from contents of '" + file2.getAbsolutePath() + "'");
+                    }
+                    assertEquals(line1, line2);
+                }
+            }
+        }
+        finally
+        {
+            IOUtils.close(rs1);
+            IOUtils.close(rs2);
+        }
+    }
+
+    /**
+     * Compares the content of the two given directories recursively,
+     * asserting that they have identical contents.  That is, all the
+     * contained files and directories are the same, as is the
+     * contents of the files.
+     *
+     * @param dir1 the first directory in the comparison
+     * @param dir2 the second directory in the comparison
+     * @throws junit.framework.AssertionFailedError
+     *          if the given directories
+     *          differ
+     */
+    protected void assertDirectoriesEqual(File dir1, File dir2) throws IOException
+    {
+        if (!dir1.isDirectory())
+        {
+            throw new AssertionFailedError("Directory '" + dir1.getAbsolutePath() + "' does not exist or is not a directory");
+        }
+
+        if (!dir2.isDirectory())
+        {
+            throw new AssertionFailedError("Directory '" + dir2.getAbsolutePath() + "' does not exist or is not a directory");
+        }
+
+        String[] files1 = dir1.list();
+        String[] files2 = dir2.list();
+
+        // File.list does not guarantee ordering, so we do
+        Arrays.sort(files1);
+        Arrays.sort(files2);
+
+        List<String> fileList1 = new LinkedList<String>(Arrays.asList(files1));
+        List<String> fileList2 = new LinkedList<String>(Arrays.asList(files2));
+
+        // Ignore .svn directories
+        fileList1.remove(".svn");
+        fileList2.remove(".svn");
+
+        if (!fileList1.equals(fileList2))
+        {
+            throw new AssertionFailedError("Directory contents differ: " +
+                    dir1.getAbsolutePath() + " = " + fileList1 + ", " +
+                    dir2.getAbsolutePath() + " = " + fileList2);
+        }
+
+        for (String file : fileList1)
+        {
+            File file1 = new File(dir1, file);
+            File file2 = new File(dir2, file);
+
+            if (file1.isDirectory())
+            {
+                assertDirectoriesEqual(file1, file2);
+            }
+            else
+            {
+                assertFilesEqual(file1, file2);
+            }
+        }
+    }
+
 
     interface Copier
     {

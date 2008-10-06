@@ -1,24 +1,25 @@
-package com.zutubi.pulse.core.util;
+package com.zutubi.util;
 
-import com.zutubi.pulse.core.test.PulseTestCase;
+import junit.framework.Assert;
+import junit.framework.TestCase;
 
 import java.io.File;
 import java.io.IOException;
 
 /**
  */
-public class RemoveDirectoryTest extends PulseTestCase
+public class RemoveDirectoryTest extends TestCase
 {
     public void testRemoveNonExistant()
     {
-        assertTrue(FileSystemUtils.rmdir(new File("/this/directory/does/not/exist")));
+        Assert.assertTrue(FileSystemUtils.rmdir(new File("/this/directory/does/not/exist")));
     }
 
     public void testRemoveEmpty() throws IOException
     {
         File tmpDir = createTmpDir();
-        assertTrue(FileSystemUtils.rmdir(tmpDir));
-        assertFalse(tmpDir.exists());
+        Assert.assertTrue(FileSystemUtils.rmdir(tmpDir));
+        Assert.assertFalse(tmpDir.exists());
     }
 
     public void testRemoveContents() throws IOException
@@ -30,10 +31,10 @@ public class RemoveDirectoryTest extends PulseTestCase
         FileSystemUtils.createFile(aFile, "content");
         FileSystemUtils.createFile(anotherFile, "content");
 
-        assertTrue(FileSystemUtils.rmdir(tmpDir));
-        assertFalse(tmpDir.exists());
-        assertFalse(aFile.exists());
-        assertFalse(anotherFile.exists());
+        Assert.assertTrue(FileSystemUtils.rmdir(tmpDir));
+        Assert.assertFalse(tmpDir.exists());
+        Assert.assertFalse(aFile.exists());
+        Assert.assertFalse(anotherFile.exists());
     }
 
     public void testRemoveNested() throws IOException
@@ -44,14 +45,14 @@ public class RemoveDirectoryTest extends PulseTestCase
         FileSystemUtils.createFile(aFile, "content");
 
         File nestedDir = new File(tmpDir, "nested");
-        assertTrue(nestedDir.mkdirs());
+        Assert.assertTrue(nestedDir.mkdirs());
 
         File nestedFile = new File(nestedDir, "aFile");
         FileSystemUtils.createFile(nestedFile, "data");
 
-        assertTrue(FileSystemUtils.rmdir(tmpDir));
-        assertFalse(tmpDir.exists());
-        assertFalse(nestedDir.exists());
+        Assert.assertTrue(FileSystemUtils.rmdir(tmpDir));
+        Assert.assertFalse(tmpDir.exists());
+        Assert.assertFalse(nestedDir.exists());
     }
 
     public void testExternalSymlink() throws IOException, InterruptedException
@@ -62,15 +63,15 @@ public class RemoveDirectoryTest extends PulseTestCase
 
         if (FileSystemUtils.createSymlink(symlink, linkDestination))
         {
-            assertTrue(FileSystemUtils.rmdir(tmpDir));
-            assertTrue(linkDestination.isDirectory());
+            Assert.assertTrue(FileSystemUtils.rmdir(tmpDir));
+            Assert.assertTrue(linkDestination.isDirectory());
         }
         else
         {
             FileSystemUtils.rmdir(tmpDir);
         }
 
-        assertTrue(FileSystemUtils.rmdir(linkDestination));
+        Assert.assertTrue(FileSystemUtils.rmdir(linkDestination));
     }
 
     private File createTmpDir() throws IOException

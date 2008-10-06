@@ -3,10 +3,6 @@ package com.zutubi.tove.transaction;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import junit.framework.Assert;
 
-/**
- *
- *
- */
 public class TransactionManagerTest extends PulseTestCase
 {
     private TransactionManager transactionManager;

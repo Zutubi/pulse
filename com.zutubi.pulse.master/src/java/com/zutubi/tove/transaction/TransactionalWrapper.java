@@ -1,8 +1,5 @@
 package com.zutubi.tove.transaction;
 
-/**
- *
- */
 public abstract class TransactionalWrapper<T> implements TransactionResource
 {
     private T global;

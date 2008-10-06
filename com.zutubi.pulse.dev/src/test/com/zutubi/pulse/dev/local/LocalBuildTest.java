@@ -3,7 +3,7 @@ package com.zutubi.pulse.dev.local;
 import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.*;

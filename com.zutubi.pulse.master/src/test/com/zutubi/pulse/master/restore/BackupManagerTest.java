@@ -3,7 +3,7 @@ package com.zutubi.pulse.master.restore;
 import com.zutubi.events.DefaultEventManager;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.master.bootstrap.Data;
 import com.zutubi.pulse.master.model.persistence.mock.MockTriggerDao;
 import com.zutubi.pulse.master.scheduling.CronTrigger;

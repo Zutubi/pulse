@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
-import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.master.xwork.actions.DirectoryEntry;
 import com.zutubi.pulse.servercore.filesystem.File;
 import com.zutubi.pulse.servercore.filesystem.FileSystem;

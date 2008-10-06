@@ -8,7 +8,7 @@ import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.master.AgentService;
 import com.zutubi.pulse.master.events.AgentUpgradeCompleteEvent;
 import com.zutubi.pulse.master.model.AgentState;

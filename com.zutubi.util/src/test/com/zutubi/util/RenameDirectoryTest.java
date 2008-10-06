@@ -1,14 +1,15 @@
-package com.zutubi.pulse.core.util;
+package com.zutubi.util;
+
+import junit.framework.Assert;
+import junit.framework.TestCase;
 
 import java.io.File;
 import java.io.IOException;
 
-import com.zutubi.pulse.core.test.PulseTestCase;
-
 /**
  * Test case for the rename functionality of the FileSystemUtils.
  */
-public class RenameDirectoryTest extends PulseTestCase
+public class RenameDirectoryTest extends TestCase
 {
 
     private File tmpDir = null;
@@ -23,7 +24,7 @@ public class RenameDirectoryTest extends PulseTestCase
         super.setUp();
 
         // add setup code here.
-        tmpDir = FileSystemUtils.createTempDir(ZipUtilsTest.class.getName(), "");
+        tmpDir = FileSystemUtils.createTempDir(RenameDirectoryTest.class.getName(), "");
     }
 
     public void tearDown() throws Exception
@@ -43,35 +44,35 @@ public class RenameDirectoryTest extends PulseTestCase
     public void testRenameFileToNonExistingDest() throws IOException
     {
         File srcFile = new File(tmpDir, "srcFile.txt");
-        assertTrue(srcFile.createNewFile());
+        junit.framework.Assert.assertTrue(srcFile.createNewFile());
         File dest = new File(tmpDir, "non-existant.txt");
-        assertFalse(dest.exists());
+        Assert.assertFalse(dest.exists());
         assertRename(srcFile, dest, false);
     }
 
     public void testRenameDirectoryToNonExistingDest() throws IOException
     {
         File srcDir = new File(tmpDir, "srcDir");
-        assertTrue(srcDir.mkdirs());
+        Assert.assertTrue(srcDir.mkdirs());
         File dest = new File(tmpDir, "non-existant");
-        assertFalse(dest.exists());
+        Assert.assertFalse(dest.exists());
         assertRename(srcDir, dest, false);
     }
 
     public void testRenameToExistingDest() throws IOException
     {
         File srcDir = new File(tmpDir, "srcDir");
-        assertTrue(srcDir.mkdirs());
+        Assert.assertTrue(srcDir.mkdirs());
         File dest = new File(tmpDir, "exists");
-        assertTrue(dest.mkdirs());
+        Assert.assertTrue(dest.mkdirs());
         assertRename(srcDir, dest, true);
     }
 
     private void assertRename(File src, File dest, boolean force)
     {
-        assertTrue(FileSystemUtils.rename(src, dest, force));
-        assertTrue(dest.exists());
-        assertFalse(src.exists());
+        Assert.assertTrue(FileSystemUtils.rename(src, dest, force));
+        Assert.assertTrue(dest.exists());
+        Assert.assertFalse(src.exists());
     }
 
 }

@@ -8,8 +8,6 @@ import java.util.List;
  *  
  * A Transaction object is created corresponding to each global transaction creation. The Transaction object
  * can be used for resource enlistment, transaction completion and status query operations.
- *
- * 
  */
 public class Transaction
 {

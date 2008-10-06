@@ -2,7 +2,7 @@ package com.zutubi.pulse.core.scm.p4;
 
 import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;

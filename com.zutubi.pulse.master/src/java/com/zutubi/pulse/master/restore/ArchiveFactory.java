@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.restore;
 
-import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.util.RandomUtils;
 

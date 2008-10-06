@@ -7,7 +7,7 @@ import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.FileStatus;
 import com.zutubi.pulse.core.scm.WorkingCopyStatus;
-import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.io.NullOutputStream;
 

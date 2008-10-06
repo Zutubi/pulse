@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.model;
 
 import com.zutubi.util.TextUtils;
-import com.zutubi.pulse.core.util.FileSystemUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
