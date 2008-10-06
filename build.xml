@@ -409,6 +409,7 @@
             <fileset dir="build">
                 <include name="pulse-agent-*"/>
                 <include name="pulse-dev-*"/>
+                <exclude name="*-src*"/>
             </fileset>
         </copy>
 
