@@ -1,13 +1,8 @@
 package com.zutubi.pulse.core.scm.cvs;
 
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.personal.PersonalBuildException;
-import com.zutubi.pulse.core.personal.PersonalBuildSupport;
-import com.zutubi.pulse.core.scm.FileStatus;
 import com.zutubi.pulse.core.scm.ScmUtils;
-import com.zutubi.pulse.core.scm.WorkingCopy;
-import com.zutubi.pulse.core.scm.WorkingCopyStatus;
-import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.cvs.client.CvsCore;
 import com.zutubi.pulse.core.util.config.Config;
 import com.zutubi.pulse.core.util.config.ConfigSupport;

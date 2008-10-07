@@ -1,6 +1,5 @@
-package com.zutubi.pulse.core.scm;
+package com.zutubi.pulse.core.scm.api;
 
-import com.zutubi.pulse.core.scm.api.EOLStyle;
 import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;

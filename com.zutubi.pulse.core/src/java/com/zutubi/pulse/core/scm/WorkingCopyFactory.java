@@ -1,6 +1,7 @@
 package com.zutubi.pulse.core.scm;
 
-import com.zutubi.pulse.core.personal.PersonalBuildException;
+import com.zutubi.pulse.core.scm.api.PersonalBuildException;
+import com.zutubi.pulse.core.scm.api.WorkingCopy;
 import com.zutubi.pulse.core.util.config.Config;
 
 import java.io.File;

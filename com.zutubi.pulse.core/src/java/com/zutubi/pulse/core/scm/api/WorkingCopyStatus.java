@@ -1,6 +1,5 @@
-package com.zutubi.pulse.core.scm;
+package com.zutubi.pulse.core.scm.api;
 
-import com.zutubi.pulse.core.model.Revision;
 
 import java.io.File;
 import java.util.Iterator;

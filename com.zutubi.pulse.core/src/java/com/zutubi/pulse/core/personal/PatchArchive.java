@@ -5,9 +5,10 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.scm.FileStatus;
-import com.zutubi.pulse.core.scm.WorkingCopyStatus;
 import com.zutubi.pulse.core.scm.api.EOLStyle;
+import com.zutubi.pulse.core.scm.api.FileStatus;
+import com.zutubi.pulse.core.scm.api.PersonalBuildUI;
+import com.zutubi.pulse.core.scm.api.WorkingCopyStatus;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.io.NullOutputStream;
@@ -38,7 +39,7 @@ public class PatchArchive
      * @param patchFile the destination of the patch file created
      * @param ui the ui reference to allow logging to the command output.
      * 
-     * @throws PersonalBuildException in the event of any error creating the patch
+     * @throws com.zutubi.pulse.core.scm.api.PersonalBuildException in the event of any error creating the patch
      */
     public PatchArchive(WorkingCopyStatus status, File patchFile, PersonalBuildUI ui) throws PersonalBuildException
     {

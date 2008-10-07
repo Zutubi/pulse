@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.personal;
+package com.zutubi.pulse.core.scm.api;
 
 /**
  * Helper for personal build implementations that simplifies listener
