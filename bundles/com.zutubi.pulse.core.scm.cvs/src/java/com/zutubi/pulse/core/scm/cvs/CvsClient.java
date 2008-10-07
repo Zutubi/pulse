@@ -4,7 +4,6 @@ import com.zutubi.pulse.core.BuildProperties;
 import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.PulseScope;
 import com.zutubi.pulse.core.config.ResourceProperty;
-import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.scm.DataCacheAware;
 import com.zutubi.pulse.core.scm.ScmFilepathFilter;
 import com.zutubi.pulse.core.scm.ScmUtils;
@@ -388,7 +387,7 @@ public class CvsClient implements ScmClient, DataCacheAware
         List<Changelist> fixedChangelists = new LinkedList<Changelist>();
         for (Changelist changelist : changes)
         {
-            Changelist fixedChangelist = new Changelist(changelist.getRevision());
+            Changelist fixedChangelist = new Changelist(changelist.getRevision(), changelist.getDate().getTime(), changelist.getAuthor(), changelist.getComment());
             for (Change change : changelist.getChanges())
             {
                 // a) strip off the leading /.

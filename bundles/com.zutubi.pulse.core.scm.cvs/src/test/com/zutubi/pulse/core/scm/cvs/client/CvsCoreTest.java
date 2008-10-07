@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.scm.cvs.client;
 
-import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.scm.ScmChangeAccumulator;
 import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.core.scm.api.Change;
 import com.zutubi.pulse.core.scm.cvs.CvsRevision;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;

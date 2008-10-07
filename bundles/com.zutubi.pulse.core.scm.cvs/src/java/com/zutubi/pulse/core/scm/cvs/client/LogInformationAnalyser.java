@@ -5,8 +5,8 @@
 
 package com.zutubi.pulse.core.scm.cvs.client;
 
-import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.scm.api.Changelist;
+import com.zutubi.pulse.core.scm.api.Change;
 import com.zutubi.pulse.core.scm.cvs.CvsClient;
 import com.zutubi.pulse.core.scm.cvs.CvsRevision;
 import com.zutubi.util.logging.Logger;
@@ -18,8 +18,6 @@ import java.util.*;
 
 /**
  * The log analyser helps process the cvs log output.
- *
- * @author Daniel Ostermeier
  */
 public class LogInformationAnalyser
 {
@@ -183,7 +181,7 @@ public class LogInformationAnalyser
             }
 
             CvsRevision rev = new CvsRevision(lastChange.getAuthor(), lastChange.getTag(), lastChange.getMessage(), lastChange.getDate());
-            Changelist changelist = new Changelist(CvsClient.convertRevision(rev));
+            Changelist changelist = new Changelist(CvsClient.convertRevision(rev), lastChange.getDate().getTime(), lastChange.getAuthor(), lastChange.getMessage());
             for (Revision change : localChanges)
             {
                 changelist.addChange(new Change(change.getFilename(), change.getRevision(), change.getAction()));
@@ -194,12 +192,10 @@ public class LogInformationAnalyser
             // sure what should be done until we see some examples of this.
             if (changelist.getDate() == null)
             {
-                com.zutubi.pulse.core.model.Revision revision = changelist.getRevision();
                 LOG.warning("Unexpected changelist date 'null'");
-                LOG.warning("  - author: " + revision.getAuthor());
-                LOG.warning("  - branch: " + revision.getBranch());
-                LOG.warning("  - comment: " + revision.getComment());
-                LOG.warning("  - revision string: " + revision.getRevisionString());
+                LOG.warning("  - author: " + changelist.getAuthor());
+                LOG.warning("  - comment: " + changelist.getComment());
+                LOG.warning("  - revision string: " + changelist.getRevision().getRevisionString());
             }
 
         }

@@ -1,10 +1,11 @@
 package com.zutubi.pulse.core.scm.cvs.client;
 
-import com.zutubi.pulse.core.model.Change;
-import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.core.scm.api.Changelist;
+import com.zutubi.pulse.core.scm.api.Change;
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.cvs.CvsRevision;
+import com.zutubi.pulse.core.scm.cvs.CvsClient;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.CommandException;
@@ -67,7 +68,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         assertEquals(2, changes.size());
         assertValidChangeSets(changes);
         Changelist changelist = changes.get(0);
-        assertEquals("daniel", changelist.getUser());
+        assertEquals("daniel", changelist.getAuthor());
         assertEquals("file1.txt modified by author a\n", changelist.getComment());
         assertEquals(1, changelist.getChanges().size());
         assertCvsRevision(changelist.getRevision(), "daniel", "", "file1.txt modified by author a\n");
@@ -76,7 +77,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         assertEquals(com.zutubi.pulse.core.model.Change.Action.EDIT, change.getAction());
         assertEquals("1.2", change.getRevisionString());
         changelist = changes.get(1);
-        assertEquals("daniel", changelist.getUser());
+        assertEquals("daniel", changelist.getAuthor());
         assertEquals("file1.txt deleted by author a\n", changelist.getComment());
         assertEquals(1, changelist.getChanges().size());
         assertCvsRevision(changelist.getRevision(), "daniel", "", "file1.txt deleted by author a\n");
@@ -96,7 +97,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         assertEquals(4, changes.size());
         assertValidChangeSets(changes);
         Changelist changelist = changes.get(0);
-        assertEquals("daniel", changelist.getUser());
+        assertEquals("daniel", changelist.getAuthor());
         assertEquals("file1.txt checked in by author a\n", changelist.getComment());
         assertEquals(1, changelist.getChanges().size());
         assertCvsRevision(changelist.getRevision(), "daniel", "", "file1.txt checked in by author a\n");
@@ -105,7 +106,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         assertEquals(com.zutubi.pulse.core.model.Change.Action.ADD, change.getAction());
         assertEquals("1.1", change.getRevisionString());
         changelist = changes.get(1);
-        assertEquals("daniel", changelist.getUser());
+        assertEquals("daniel", changelist.getAuthor());
         assertEquals("file1.txt modified by author a\n", changelist.getComment());
         assertEquals(1, changelist.getChanges().size());
         assertCvsRevision(changelist.getRevision(), "daniel", "", "file1.txt modified by author a\n");
@@ -114,7 +115,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         assertEquals(com.zutubi.pulse.core.model.Change.Action.EDIT, change.getAction());
         assertEquals("1.2", change.getRevisionString());
         changelist = changes.get(2);
-        assertEquals("daniel", changelist.getUser());
+        assertEquals("daniel", changelist.getAuthor());
         assertEquals("file1.txt deleted by author a\n", changelist.getComment());
         assertEquals(1, changelist.getChanges().size());
         assertCvsRevision(changelist.getRevision(), "daniel", "", "file1.txt deleted by author a\n");
@@ -123,7 +124,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         assertEquals(com.zutubi.pulse.core.model.Change.Action.DELETE, change.getAction());
         assertEquals("1.3", change.getRevisionString());
         changelist = changes.get(3);
-        assertEquals("daniel", changelist.getUser());
+        assertEquals("daniel", changelist.getAuthor());
         assertEquals("file2.txt checked in by author a\n", changelist.getComment());
         assertEquals(1, changelist.getChanges().size());
         assertCvsRevision(changelist.getRevision(), "daniel", "", "file2.txt checked in by author a\n");
@@ -304,11 +305,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         List<Changelist> changes = analyser.extractChangelists(infos, null);
         assertEquals(2, changes.size());
 
-        Changelist changelist = changes.get(0);
-        assertEquals("", changelist.getRevision().getBranch());
-        changelist = changes.get(1);
-        assertEquals("", changelist.getRevision().getBranch());
-        
+
         fromRevision.setBranch("BRANCH");
         toRevision.setBranch("BRANCH");
         
@@ -316,7 +313,6 @@ public class LogInformationAnalyserTest extends PulseTestCase
         changes = analyser.extractChangelists(infos, "BRANCH");
 
         assertEquals(1, changes.size());
-        assertEquals("BRANCH", changes.get(0).getRevision().getBranch());
     }
 
     public void testGetLatestRevisionSince() throws Exception
@@ -341,7 +337,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
 
     private static void assertChangelistValues(Changelist changelist, String user, String comment)
     {
-        assertEquals(user, changelist.getUser());
+        assertEquals(user, changelist.getAuthor());
         assertEquals(comment, changelist.getComment());
     }
 
@@ -376,9 +372,11 @@ public class LogInformationAnalyserTest extends PulseTestCase
 
     private static void assertCvsRevision(Revision revision, String author, String branch, String comment)
     {
-        assertEquals(author, revision.getAuthor());
-        assertEquals(branch, revision.getBranch());
-        assertEquals(comment, revision.getComment());
+        CvsRevision rev = CvsClient.convertRevision(revision);
+
+        assertEquals(author, rev.getAuthor());
+        assertEquals(branch, rev.getBranch());
+        assertEquals(comment, rev.getComment());
     }
 
 }

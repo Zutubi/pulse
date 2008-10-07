@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.scm.git;
 
 import com.zutubi.pulse.core.ExecutionContext;
-import com.zutubi.pulse.core.model.Change;
-import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.scm.api.ScmCapability;
+import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.TextUtils;
@@ -288,7 +288,7 @@ public class GitClient implements ScmClient
             {
                 Revision rev = new Revision(entry.getId());
 
-                Changelist changelist = new Changelist(rev);
+                Changelist changelist = new Changelist(rev, entry.getDate().getTime(), entry.getAuthor(), entry.getComment());
 
                 for (GitLogEntry.FileChangeEntry file : entry.getFiles())
                 {

@@ -1,9 +1,9 @@
 package com.zutubi.pulse.core.scm;
 
-import com.zutubi.pulse.core.scm.api.Change;
 import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmFile;
+import com.zutubi.pulse.core.scm.api.Change;
 
 import java.util.*;
 

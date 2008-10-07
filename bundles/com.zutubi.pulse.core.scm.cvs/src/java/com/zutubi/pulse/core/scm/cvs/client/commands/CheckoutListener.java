@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.scm.cvs.client.commands;
 
-import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.scm.api.ScmEventHandler;
+import com.zutubi.pulse.core.scm.api.Change;
 import org.netbeans.lib.cvsclient.event.CVSAdapter;
 import org.netbeans.lib.cvsclient.event.FileAddedEvent;
 

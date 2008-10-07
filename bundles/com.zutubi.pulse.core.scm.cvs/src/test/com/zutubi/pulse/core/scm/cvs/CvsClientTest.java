@@ -1,9 +1,9 @@
 package com.zutubi.pulse.core.scm.cvs;
 
 import com.zutubi.pulse.core.ExecutionContext;
-import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.core.scm.api.Changelist;
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
 import org.netbeans.lib.cvsclient.util.Logger;
@@ -171,8 +171,7 @@ public class CvsClientTest extends PulseTestCase
 
     public void testGetRevision() throws ScmException, ParseException
     {
-        CvsClient cvsClient = new CvsClient(cvsRoot, "unit-test", null, null);
-        Revision revision = cvsClient.parseRevision("author:BRANCH:20070201-01:02:33");
+        CvsRevision revision = new CvsRevision("author:BRANCH:20070201-01:02:33");
         assertEquals("author", revision.getAuthor());
         assertEquals("BRANCH", revision.getBranch());
         assertEquals(CvsRevision.DATE_FORMAT.parse("20070201-01:02:33"), revision.getDate());
@@ -180,17 +179,15 @@ public class CvsClientTest extends PulseTestCase
 
     public void testGetRevisionNoAuthor() throws ScmException, ParseException
     {
-        CvsClient cvsClient = new CvsClient(cvsRoot, "unit-test", null, null);
-        Revision revision = cvsClient.parseRevision(":BRANCH:20070201-01:02:33");
-        assertNull(revision.getAuthor());
-        assertEquals("BRANCH", revision.getBranch());
-        assertEquals(CvsRevision.DATE_FORMAT.parse("20070201-01:02:33"), revision.getDate());
+        CvsRevision cvsRevision = new CvsRevision(":BRANCH:20070201-01:02:33");
+        assertNull(cvsRevision.getAuthor());
+        assertEquals("BRANCH", cvsRevision.getBranch());
+        assertEquals(CvsRevision.DATE_FORMAT.parse("20070201-01:02:33"), cvsRevision.getDate());
     }
 
     public void testGetRevisionNoBranch() throws ScmException, ParseException
     {
-        CvsClient cvsClient = new CvsClient(cvsRoot, "unit-test", null, null);
-        Revision revision = cvsClient.parseRevision("author::20070201-01:02:33");
+        CvsRevision revision = new CvsRevision("author::20070201-01:02:33");
         assertEquals("author", revision.getAuthor());
         assertNull(revision.getBranch());
         assertEquals(CvsRevision.DATE_FORMAT.parse("20070201-01:02:33"), revision.getDate());
@@ -198,8 +195,7 @@ public class CvsClientTest extends PulseTestCase
 
     public void testGetRevisionDateOnly() throws ScmException, ParseException
     {
-        CvsClient cvsClient = new CvsClient(cvsRoot, "unit-test", null, null);
-        Revision revision = cvsClient.parseRevision("20070201-01:02:33");
+        CvsRevision revision = new CvsRevision("20070201-01:02:33");
         assertNull(revision.getAuthor());
         assertNull(revision.getBranch());
         assertEquals(CvsRevision.DATE_FORMAT.parse("20070201-01:02:33"), revision.getDate());
@@ -207,8 +203,7 @@ public class CvsClientTest extends PulseTestCase
 
     public void testGetRevisionDayOnly() throws ScmException, ParseException
     {
-        CvsClient cvsClient = new CvsClient(cvsRoot, "unit-test", null, null);
-        Revision revision = cvsClient.parseRevision("20070201");
+        CvsRevision revision = new CvsRevision("20070201");
         assertNull(revision.getAuthor());
         assertNull(revision.getBranch());
         assertEquals(CvsRevision.DATE_FORMAT.parse("20070201-00:00:00"), revision.getDate());
@@ -244,8 +239,7 @@ public class CvsClientTest extends PulseTestCase
 
     public void testGetRevisionForHead() throws ScmException
     {
-        CvsClient cvsClient = new CvsClient(cvsRoot, "unit-test", null, null);
-        Revision revision = cvsClient.parseRevision("::");
+        CvsRevision revision = new CvsRevision("::");
         assertNull(revision.getAuthor());
         assertNull(revision.getBranch());
         assertNull(revision.getDate());
@@ -253,8 +247,7 @@ public class CvsClientTest extends PulseTestCase
 
     public void testGetRevisionBranchOnly() throws ScmException
     {
-        CvsClient client = new CvsClient(cvsRoot, "unit-test", null, null);
-        Revision revision = client.parseRevision(":BRANCH:");
+        CvsRevision revision = new CvsRevision(":BRANCH:");
         assertNull(revision.getAuthor());
         assertEquals("BRANCH", revision.getBranch());
         assertNull(revision.getDate());

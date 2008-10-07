@@ -1,12 +1,8 @@
 package com.zutubi.pulse.core.scm.git;
 
 import com.zutubi.pulse.core.ExecutionContext;
-import com.zutubi.pulse.core.model.Change;
-import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.RecordingScmEventHandler;
-import com.zutubi.pulse.core.scm.api.ScmContext;
-import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.util.FileSystemUtils;
@@ -79,10 +75,6 @@ public class GitClientTest extends PulseTestCase
         Revision rev = client.checkout(context, null, handler);
 
         assertEquals("e34da05e88de03a4aa5b10b338382f09bbe65d4b", rev.getRevisionString());
-        assertEquals("Daniel Ostermeier <daniel@zutubi.com>", rev.getAuthor());
-        assertEquals("removed content from a.txt", rev.getComment());
-        assertEquals(parse("Sun Sep 28 15:06:49 2008 +1000"), rev.getDate());
-        assertEquals("master", rev.getBranch());
 
         assertTrue(new File(workingDir, "a.txt").isFile());
         assertTrue(new File(workingDir, "b.txt").isFile());
@@ -98,10 +90,6 @@ public class GitClientTest extends PulseTestCase
         Revision rev = client.checkout(context, null, handler);
 
         assertEquals("c34b545b6954b8946967c250dde7617c24a9bb4b", rev.getRevisionString());
-        assertEquals("Daniel Ostermeier <daniel@zutubi.com>", rev.getAuthor());
-        assertEquals("removed content from file 1.txt", rev.getComment());
-        assertEquals(parse("Sun Sep 28 14:57:57 2008 +1000"), rev.getDate());
-        assertEquals("branch", rev.getBranch());
 
         assertTrue(new File(workingDir, "1.txt").isFile());
         assertTrue(new File(workingDir, "2.txt").isFile());
@@ -114,10 +102,6 @@ public class GitClientTest extends PulseTestCase
         Revision rev = client.checkout(context, new Revision("96e8d45dd7627d9e3cab980e90948e3ae1c99c62"), handler);
 
         assertEquals("96e8d45dd7627d9e3cab980e90948e3ae1c99c62", rev.getRevisionString());
-        assertEquals("Daniel Ostermeier <daniel@zutubi.com>", rev.getAuthor());
-        assertEquals("initial commit", rev.getComment());
-        assertEquals(parse("Sun Sep 28 13:26:10 2008 +1000"), rev.getDate());
-        assertEquals("master", rev.getBranch());
 
         assertTrue(new File(workingDir, "a.txt").isFile());
         assertTrue(new File(workingDir, "b.txt").isFile());
@@ -133,10 +117,6 @@ public class GitClientTest extends PulseTestCase
         Revision rev = client.checkout(context, new Revision("83d35b25a6b4711c4d9424c337bf82e5398756f3"), handler);
 
         assertEquals("83d35b25a6b4711c4d9424c337bf82e5398756f3", rev.getRevisionString());
-        assertEquals("Daniel Ostermeier <daniel@zutubi.com>", rev.getAuthor());
-        assertEquals("initial commit on branch", rev.getComment());
-        assertEquals(parse("Sun Sep 28 13:40:17 2008 +1000"), rev.getDate());
-        assertEquals("branch", rev.getBranch());
 
         assertTrue(new File(workingDir, ".git").isDirectory());
         assertEquals(1, workingDir.list().length);
@@ -219,10 +199,6 @@ public class GitClientTest extends PulseTestCase
         
         Revision rev = client.update(context, new Revision("b69a48a6b0f567d0be110c1fbca2c48fc3e1b112"), handler);
         assertEquals("b69a48a6b0f567d0be110c1fbca2c48fc3e1b112", rev.getRevisionString());
-        assertEquals("Daniel Ostermeier <daniel@zutubi.com>", rev.getAuthor());
-        assertEquals("added content to a.txt", rev.getComment());
-        assertEquals(parse("Sun Sep 28 15:06:32 2008 +1000"), rev.getDate());
-        assertEquals("master", rev.getBranch());
 
         assertEquals("content", IOUtils.fileToString(new File(workingDir, "a.txt")));
     }
@@ -242,7 +218,7 @@ public class GitClientTest extends PulseTestCase
         Changelist changelist = changes.get(0);
         assertEquals("removed content from a.txt", changelist.getComment());
         assertEquals("e34da05e88de03a4aa5b10b338382f09bbe65d4b", changelist.getRevision().getRevisionString());
-        assertEquals("Daniel Ostermeier <daniel@zutubi.com>", changelist.getUser());
+        assertEquals("Daniel Ostermeier <daniel@zutubi.com>", changelist.getAuthor());
         assertEquals(1, changelist.getChanges().size());
         Change change = changelist.getChanges().get(0);
         assertEquals(Change.Action.EDIT, change.getAction());
