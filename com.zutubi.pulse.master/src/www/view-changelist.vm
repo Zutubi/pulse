@@ -23,7 +23,7 @@
     <table class="content">
         #headingRow("changelist.details" 2)
         #dynamicLinkRow("changelist.revision" $changelist.revision $action.getChangeUrl())
-        #dynamicRow("changelist.who" $changelist.user)
+        #dynamicRow("changelist.who" $changelist.author)
         <tr>
             #contentRowHeading("changelist.when")
             #dateCell($changelist)

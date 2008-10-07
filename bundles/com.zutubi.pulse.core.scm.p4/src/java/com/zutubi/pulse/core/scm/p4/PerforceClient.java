@@ -350,10 +350,10 @@ public class PerforceClient extends CachingScmClient
 
         Revision revision = new Revision(Long.toString(number));
         ScmFilepathFilter filter = new ScmFilepathFilter(excludedPaths);
-        List<Change> changes = new LinkedList<Change>();
+        List<FileChange> changes = new LinkedList<FileChange>();
         for (int i = affectedFilesIndex + 2; i < lines.length; i++)
         {
-            Change change = getChangelistChange(lines[i]);
+            FileChange change = getChangelistChange(lines[i]);
             if (filter.accept(change.getFilename()))
             {
                 changes.add(change);
@@ -369,7 +369,7 @@ public class PerforceClient extends CachingScmClient
         return new Changelist(revision, date.getTime(), user, comment, changes);
     }
 
-    private Change getChangelistChange(String line) throws ScmException
+    private FileChange getChangelistChange(String line) throws ScmException
     {
         // ... <depot file>#<revision> <action>
         Pattern re = Pattern.compile("\\.\\.\\. (.+)#([0-9]+) (.+)");
@@ -377,7 +377,7 @@ public class PerforceClient extends CachingScmClient
 
         if (matcher.matches())
         {
-            return new Change(matcher.group(1), matcher.group(2), decodeAction(matcher.group(3)));
+            return new FileChange(matcher.group(1), matcher.group(2), decodeAction(matcher.group(3)));
         }
         else
         {
@@ -385,31 +385,31 @@ public class PerforceClient extends CachingScmClient
         }
     }
 
-    public static Change.Action decodeAction(String action)
+    public static FileChange.Action decodeAction(String action)
     {
         if (action.equals("add") || action.equals("added as") || action.equals("refreshing"))
         {
-            return Change.Action.ADD;
+            return FileChange.Action.ADD;
         }
         else if (action.equals("branch"))
         {
-            return Change.Action.BRANCH;
+            return FileChange.Action.BRANCH;
         }
         else if (action.equals("delete") || action.equals("deleted as"))
         {
-            return Change.Action.DELETE;
+            return FileChange.Action.DELETE;
         }
         else if (action.equals("edit") || action.equals("updating"))
         {
-            return Change.Action.EDIT;
+            return FileChange.Action.EDIT;
         }
         else if (action.equals("integrate"))
         {
-            return Change.Action.INTEGRATE;
+            return FileChange.Action.INTEGRATE;
         }
         else
         {
-            return Change.Action.UNKNOWN;
+            return FileChange.Action.UNKNOWN;
         }
     }
 
@@ -903,7 +903,7 @@ public class PerforceClient extends CachingScmClient
                 System.out.println("  Comment : " + l.getComment());
                 System.out.println("  Files   : " + l.getRevision());
 
-                for (Change c : l.getChanges())
+                for (FileChange c : l.getChanges())
                 {
                     System.out.println("    " + c.getFilename() + "#" + c.getRevisionString() + " - " + c.getAction());
                 }

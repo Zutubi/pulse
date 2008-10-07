@@ -1,9 +1,9 @@
 package com.zutubi.pulse.core.model;
 
-import com.zutubi.pulse.core.scm.api.Change;
+import com.zutubi.pulse.core.scm.api.FileChange;
 
 /**
- * An entity wrapped around the {@link com.zutubi.pulse.core.scm.api.Change}
+ * An entity wrapped around the {@link com.zutubi.pulse.core.scm.api.FileChange}
  * data type from the SCM API.
  */
 public class PersistentFileChange extends Entity
@@ -18,12 +18,12 @@ public class PersistentFileChange extends Entity
 
     }
 
-    public PersistentFileChange(Change data)
+    public PersistentFileChange(FileChange data)
     {
         this(data.getFilename(), data.getRevisionString(), data.getAction(), data.isDirectory());
     }
 
-    public PersistentFileChange(String filename, String revisionString, Change.Action action, boolean directory)
+    public PersistentFileChange(String filename, String revisionString, FileChange.Action action, boolean directory)
     {
         this.filename = filename;
         this.actionName = action.name();
@@ -31,9 +31,9 @@ public class PersistentFileChange extends Entity
         this.directory = directory;
     }
 
-    public Change asChange()
+    public FileChange asChange()
     {
-        return new Change(filename, revisionString, Change.Action.valueOf(actionName), directory);
+        return new FileChange(filename, revisionString, FileChange.Action.valueOf(actionName), directory);
     }
 
     public String getFilename()

@@ -231,12 +231,12 @@ public class SubversionClientTest extends PulseTestCase
         assertEquals("3", changelist.getRevision().getRevisionString());
         assertEquals(1, changelist.getChanges().size());
         assertEquals("/test/trunk/bar", changelist.getChanges().get(0).getFilename());
-        assertEquals(Change.Action.ADD, changelist.getChanges().get(0).getAction());
+        assertEquals(FileChange.Action.ADD, changelist.getChanges().get(0).getAction());
         changelist = changes.get(1);
         assertEquals("4", changelist.getRevision().getRevisionString());
         assertEquals(1, changelist.getChanges().size());
         assertEquals("/test/trunk/bar", changelist.getChanges().get(0).getFilename());
-        assertEquals(Change.Action.DELETE, changelist.getChanges().get(0).getAction());
+        assertEquals(FileChange.Action.DELETE, changelist.getChanges().get(0).getAction());
     }
 
     public void testRevisionsSince() throws ScmException

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.scm.cvs.client.commands;
 
-import com.zutubi.pulse.core.scm.api.Change;
+import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.ScmEventHandler;
 import com.zutubi.pulse.core.scm.api.ScmFile;
 import com.zutubi.util.logging.Logger;
@@ -47,7 +47,7 @@ public class UpdateListener extends CVSAdapter
 
     public void fileRemoved(FileRemovedEvent e)
     {
-        handler.fileChanged(new Change(e.getFilePath(), null, Change.Action.DELETE));
+        handler.fileChanged(new FileChange(e.getFilePath(), null, FileChange.Action.DELETE));
     }
 
     public void fileInfoGenerated(FileInfoEvent evt)
@@ -64,7 +64,7 @@ public class UpdateListener extends CVSAdapter
             try
             {
                 String path = relativePath(infoContainer.getFile());
-                handler.fileChanged(new Change(path, null, Change.Action.EDIT));
+                handler.fileChanged(new FileChange(path, null, FileChange.Action.EDIT));
             }
             catch (IOException e)
             {

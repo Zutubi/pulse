@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.scm;
 
-import com.zutubi.pulse.core.scm.api.Change;
+import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.ScmCancelledException;
 import com.zutubi.pulse.core.scm.api.ScmEventHandler;
 
@@ -12,9 +12,9 @@ import java.util.List;
  */
 public class ScmChangeAccumulator implements ScmEventHandler
 {
-    List<Change> changes = new LinkedList<Change>();
+    List<FileChange> changes = new LinkedList<FileChange>();
 
-    public List<Change> getChanges()
+    public List<FileChange> getChanges()
     {
         return changes;
     }
@@ -23,7 +23,7 @@ public class ScmChangeAccumulator implements ScmEventHandler
     {
     }
 
-    public void fileChanged(Change change)
+    public void fileChanged(FileChange change)
     {
         changes.add(change);
     }

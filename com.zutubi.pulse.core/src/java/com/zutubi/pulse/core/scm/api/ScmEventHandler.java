@@ -17,7 +17,7 @@ public interface ScmEventHandler
      *
      * @param change holds details, including at least the file path and action
      */
-    void fileChanged(Change change);
+    void fileChanged(FileChange change);
 
     /**
      * Called periodically to check if the operation is cancelled.  If this

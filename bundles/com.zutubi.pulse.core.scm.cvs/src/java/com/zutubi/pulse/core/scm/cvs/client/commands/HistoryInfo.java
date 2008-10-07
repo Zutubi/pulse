@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.scm.cvs.client.commands;
 
-import com.zutubi.pulse.core.scm.api.Change;
+import com.zutubi.pulse.core.scm.api.FileChange;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -142,23 +142,23 @@ public class HistoryInfo
         }
     }
 
-    public Change.Action getAction()
+    public FileChange.Action getAction()
     {
         if (isCommit())
         {
             if (isAdded())
             {
-                return Change.Action.ADD;
+                return FileChange.Action.ADD;
             }
             else if (isRemoved())
             {
-                return Change.Action.DELETE;
+                return FileChange.Action.DELETE;
             }
             else if (isModified())
             {
-                return Change.Action.EDIT;
+                return FileChange.Action.EDIT;
             }
         }
-        return Change.Action.UNKNOWN;
+        return FileChange.Action.UNKNOWN;
     }
 }

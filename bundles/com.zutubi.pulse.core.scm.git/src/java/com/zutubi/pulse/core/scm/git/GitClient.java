@@ -293,29 +293,29 @@ public class GitClient implements ScmClient
                         entry.getDate().getTime(),
                         entry.getAuthor(),
                         entry.getComment(),
-                        CollectionUtils.map(entry.getFiles(), new Mapping<GitLogEntry.FileChangeEntry, Change>()
+                        CollectionUtils.map(entry.getFiles(), new Mapping<GitLogEntry.FileChangeEntry, FileChange>()
                         {
-                            public Change map(GitLogEntry.FileChangeEntry file)
+                            public FileChange map(GitLogEntry.FileChangeEntry file)
                             {
-                                Change.Action action;
+                                FileChange.Action action;
                                 if (file.getAction().equals(FLAG_EDITED))
                                 {
-                                    action = Change.Action.EDIT;
+                                    action = FileChange.Action.EDIT;
                                 }
                                 else if (file.getAction().equals(FLAG_DELETED))
                                 {
-                                    action = Change.Action.DELETE;
+                                    action = FileChange.Action.DELETE;
                                 }
                                 else if (file.getAction().equals(FLAG_ADDED))
                                 {
-                                    action = Change.Action.ADD;
+                                    action = FileChange.Action.ADD;
                                 }
                                 else
                                 {
-                                    action = Change.Action.UNKNOWN;
+                                    action = FileChange.Action.UNKNOWN;
                                 }
 
-                                return new Change(file.getName(), entry.getId(), action);
+                                return new FileChange(file.getName(), entry.getId(), action);
                             }
                         })
                 );

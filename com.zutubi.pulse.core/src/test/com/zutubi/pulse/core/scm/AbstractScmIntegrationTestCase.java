@@ -86,13 +86,13 @@ public abstract class AbstractScmIntegrationTestCase extends TestCase
         assertEquals(expectedChangelist.getRevision(), changelist.getRevision());
 
         // verify the changes are alike.
-        List<Change> expectedChanges = expectedChangelist.getChanges();
-        List<Change> changes = changelist.getChanges();
+        List<FileChange> expectedChanges = expectedChangelist.getChanges();
+        List<FileChange> changes = changelist.getChanges();
 
         assertChangesEqual(expectedChanges, changes);
     }
 
-    protected void assertChangesEqual(List<Change> expectedChanges, List<Change> changes)
+    protected void assertChangesEqual(List<FileChange> expectedChanges, List<FileChange> changes)
     {
         assertEquals(expectedChanges.size(), changes.size());
 
@@ -112,11 +112,11 @@ public abstract class AbstractScmIntegrationTestCase extends TestCase
 */
         // expected change paths are not necessarily exactly the same as the reported paths. At the very least, they
         // will match the end of a path.
-        for (Change change : changes)
+        for (FileChange change : changes)
         {
             String filename = change.getFilename();
             boolean found = false;
-            for (Change expectedChange : expectedChanges)
+            for (FileChange expectedChange : expectedChanges)
             {
                 if (filename.endsWith(expectedChange.getFilename()))
                 {

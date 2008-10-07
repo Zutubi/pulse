@@ -19,9 +19,9 @@ public class Changelist implements Comparable<Changelist>
     private String author;
     private String comment;
 
-    private List<Change> changes;
+    private List<FileChange> changes;
 
-    public Changelist(Revision revision, long time, String author, String comment, Collection<Change> changes)
+    public Changelist(Revision revision, long time, String author, String comment, Collection<FileChange> changes)
     {
         this.revision = revision;
         this.time = time;
@@ -32,7 +32,7 @@ public class Changelist implements Comparable<Changelist>
             this.comment = StringUtils.trimmedString(comment, MAX_COMMENT_LENGTH, COMMENT_TRIM_MESSAGE);
         }
 
-        this.changes = new LinkedList<Change>(changes);
+        this.changes = new LinkedList<FileChange>(changes);
     }
 
     public Revision getRevision()
@@ -70,7 +70,7 @@ public class Changelist implements Comparable<Changelist>
         return comment;
     }
 
-    public List<Change> getChanges()
+    public List<FileChange> getChanges()
     {
         return Collections.unmodifiableList(changes);
     }

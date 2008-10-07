@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.scm;
 
-import com.zutubi.pulse.core.scm.api.Change;
 import com.zutubi.pulse.core.scm.api.Changelist;
+import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmFile;
 
@@ -55,53 +55,53 @@ public class ExpectedTestResults
     {
         changelists = new LinkedList<Changelist>();
 
-        List<Change> changes = new LinkedList<Change>();
-        changes.add(new Change(pathPrefix + "project/README.txt", null, Change.Action.ADD));
-        changes.add(new Change(pathPrefix + "project/src/Src.java", null, Change.Action.ADD));
-        changes.add(new Change(pathPrefix + "project/test/Test.java", null, Change.Action.ADD));
+        List<FileChange> changes = new LinkedList<FileChange>();
+        changes.add(new FileChange(pathPrefix + "project/README.txt", null, FileChange.Action.ADD));
+        changes.add(new FileChange(pathPrefix + "project/src/Src.java", null, FileChange.Action.ADD));
+        changes.add(new FileChange(pathPrefix + "project/test/Test.java", null, FileChange.Action.ADD));
         if (versionedDirectorySupport)
         {
-            changes.add(new Change("project", null, Change.Action.ADD, true));
-            changes.add(new Change("project/src", null, Change.Action.ADD, true));
-            changes.add(new Change("project/test", null, Change.Action.ADD, true));
+            changes.add(new FileChange("project", null, FileChange.Action.ADD, true));
+            changes.add(new FileChange("project/src", null, FileChange.Action.ADD, true));
+            changes.add(new FileChange("project/test", null, FileChange.Action.ADD, true));
         }
 
         changelists.add(new Changelist(revisions.get(0), 0, null, null, changes));
 
         changes.clear();
 
-        changes.add(new Change(pathPrefix + "project/build.xml", null, Change.Action.ADD));
-        changes.add(new Change(pathPrefix + "project/src/com/Com.java", null, Change.Action.ADD));
-        changes.add(new Change(pathPrefix + "project/src/com/package.properties", null, Change.Action.ADD));
-        changes.add(new Change(pathPrefix + "project/README.txt", null, Change.Action.EDIT));
-        changes.add(new Change(pathPrefix + "project/src/Src.java", null, Change.Action.EDIT));
+        changes.add(new FileChange(pathPrefix + "project/build.xml", null, FileChange.Action.ADD));
+        changes.add(new FileChange(pathPrefix + "project/src/com/Com.java", null, FileChange.Action.ADD));
+        changes.add(new FileChange(pathPrefix + "project/src/com/package.properties", null, FileChange.Action.ADD));
+        changes.add(new FileChange(pathPrefix + "project/README.txt", null, FileChange.Action.EDIT));
+        changes.add(new FileChange(pathPrefix + "project/src/Src.java", null, FileChange.Action.EDIT));
         if (versionedDirectorySupport)
         {
-            changes.add(new Change("project/src/com", null, Change.Action.ADD, true));
+            changes.add(new FileChange("project/src/com", null, FileChange.Action.ADD, true));
         }
 
         changelists.add(new Changelist(revisions.get(1), 0, null, null, changes));
 
         changes.clear();
 
-        changes.add(new Change(pathPrefix + "project/README.txt", null, Change.Action.EDIT));
-        changes.add(new Change(pathPrefix + "project/src/Src.java", null, Change.Action.EDIT));
-        changes.add(new Change(pathPrefix + "project/src/com/package.properties", null, Change.Action.EDIT));
-        changes.add(new Change(pathPrefix + "project/test/Test.java", null, Change.Action.EDIT));
+        changes.add(new FileChange(pathPrefix + "project/README.txt", null, FileChange.Action.EDIT));
+        changes.add(new FileChange(pathPrefix + "project/src/Src.java", null, FileChange.Action.EDIT));
+        changes.add(new FileChange(pathPrefix + "project/src/com/package.properties", null, FileChange.Action.EDIT));
+        changes.add(new FileChange(pathPrefix + "project/test/Test.java", null, FileChange.Action.EDIT));
 
         changelists.add(new Changelist(revisions.get(2), 0, null, null, changes));
 
         changes.clear();
 
-        changes.add(new Change(pathPrefix + "project/README.txt", null, Change.Action.EDIT));
-        changes.add(new Change(pathPrefix + "project/src/Src.java", null, Change.Action.DELETE));
+        changes.add(new FileChange(pathPrefix + "project/README.txt", null, FileChange.Action.EDIT));
+        changes.add(new FileChange(pathPrefix + "project/src/Src.java", null, FileChange.Action.DELETE));
 
         changelists.add(new Changelist(revisions.get(3), 0, null, null, changes));
 
         changes.clear();
 
-        changes.add(new Change(pathPrefix + "project/README.txt", null, Change.Action.EDIT));
-        changes.add(new Change(pathPrefix + "project/test/Test.java", null, Change.Action.EDIT));
+        changes.add(new FileChange(pathPrefix + "project/README.txt", null, FileChange.Action.EDIT));
+        changes.add(new FileChange(pathPrefix + "project/test/Test.java", null, FileChange.Action.EDIT));
         changelists.add(new Changelist(revisions.get(4), 0, null, null, changes));
     }
 
@@ -132,7 +132,7 @@ public class ExpectedTestResults
             Changelist changelist = changelists.get(currentRevision);
 
             // apply changelist to files.
-            for (Change change : changelist.getChanges())
+            for (FileChange change : changelist.getChanges())
             {
                 switch (change.getAction())
                 {
@@ -241,10 +241,10 @@ public class ExpectedTestResults
     {
         // record the latest of each of the changes in the selected changelists
         List<Changelist> changelists = getChanges(from, to);
-        Map<String, Change> latestChanges = new HashMap<String, Change>();
+        Map<String, FileChange> latestChanges = new HashMap<String, FileChange>();
         for (Changelist changelist : changelists)
         {
-            for (Change change : changelist.getChanges())
+            for (FileChange change : changelist.getChanges())
             {
                 String file = change.getFilename();
                 if (latestChanges.containsKey(file))
@@ -252,13 +252,13 @@ public class ExpectedTestResults
                     switch (latestChanges.get(file).getAction())
                     {
                         case ADD:
-                            if (change.getAction() == Change.Action.DELETE)
+                            if (change.getAction() == FileChange.Action.DELETE)
                             {
                                 latestChanges.remove(file);
                             }
                             break;
                         case EDIT:
-                            if (change.getAction() == Change.Action.DELETE)
+                            if (change.getAction() == FileChange.Action.DELETE)
                             {
                                 latestChanges.put(file, change);
                             }

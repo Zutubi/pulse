@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.scm;
 
-import com.zutubi.pulse.core.scm.api.Change;
 import com.zutubi.pulse.core.scm.api.Changelist;
+import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmFile;
 import junit.framework.TestCase;
@@ -145,18 +145,18 @@ public class ExpectedTestResultsTest extends TestCase
         assertNotNull(changelist);
         assertNull(changelist.getRevision()); // this is a virtual changelist, no directly associated revision exists.
 
-        List<Change> changes = changelist.getChanges();
+        List<FileChange> changes = changelist.getChanges();
         assertEquals(6, changes.size());
 
-        Map<String, Change.Action> expectedActions = new HashMap<String, Change.Action>();
-        expectedActions.put("project/README.txt", Change.Action.EDIT);
-        expectedActions.put("project/build.xml", Change.Action.ADD);
-        expectedActions.put("project/src/Src.java", Change.Action.DELETE);
-        expectedActions.put("project/src/com/Com.java", Change.Action.ADD);
-        expectedActions.put("project/src/com/package.properties", Change.Action.ADD);
-        expectedActions.put("project/test/Test.java", Change.Action.EDIT);
+        Map<String, FileChange.Action> expectedActions = new HashMap<String, FileChange.Action>();
+        expectedActions.put("project/README.txt", FileChange.Action.EDIT);
+        expectedActions.put("project/build.xml", FileChange.Action.ADD);
+        expectedActions.put("project/src/Src.java", FileChange.Action.DELETE);
+        expectedActions.put("project/src/com/Com.java", FileChange.Action.ADD);
+        expectedActions.put("project/src/com/package.properties", FileChange.Action.ADD);
+        expectedActions.put("project/test/Test.java", FileChange.Action.EDIT);
 
-        for (Change change : changes)
+        for (FileChange change : changes)
         {
             assertEquals(expectedActions.get(change.getFilename()), change.getAction());
         }
@@ -221,8 +221,8 @@ public class ExpectedTestResultsTest extends TestCase
         changelist = results.getChange(revisions.get(0));
         assertEquals(6, changelist.getChanges().size());
 
-        assertTrue(changelist.getChanges().contains(new Change("project", null, Change.Action.ADD, true)));
-        assertTrue(changelist.getChanges().contains(new Change("project/src", null, Change.Action.ADD, true)));
-        assertTrue(changelist.getChanges().contains(new Change("project/test", null, Change.Action.ADD, true)));
+        assertTrue(changelist.getChanges().contains(new FileChange("project", null, FileChange.Action.ADD, true)));
+        assertTrue(changelist.getChanges().contains(new FileChange("project/src", null, FileChange.Action.ADD, true)));
+        assertTrue(changelist.getChanges().contains(new FileChange("project/test", null, FileChange.Action.ADD, true)));
     }
 }

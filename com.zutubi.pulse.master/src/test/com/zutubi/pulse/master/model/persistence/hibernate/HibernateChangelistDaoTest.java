@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.model.persistence.hibernate;
 
 import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.core.model.PersistentFileChange;
-import com.zutubi.pulse.core.scm.api.Change;
+import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.User;
@@ -37,7 +37,7 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
     public void testLoadSave() throws Exception
     {
         Revision revision = new Revision("wow");
-        PersistentChangelist list = new PersistentChangelist(revision, System.currentTimeMillis() - Constants.YEAR, "pulse", "test changelist", Arrays.asList(new PersistentFileChange("some/random/file", "23", Change.Action.EDIT, false)));
+        PersistentChangelist list = new PersistentChangelist(revision, System.currentTimeMillis() - Constants.YEAR, "pulse", "test changelist", Arrays.asList(new PersistentFileChange("some/random/file", "23", FileChange.Action.EDIT, false)));
         changelistDao.save(list);
 
         commitAndRefreshTransaction();
@@ -242,9 +242,9 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
     private PersistentChangelist createChangelistForResult(Revision r1, long time, int resultId)
     {
         PersistentChangelist l1 = new PersistentChangelist(r1, time, "author", "comment", Arrays.asList(
-                new PersistentFileChange("file1", "1", Change.Action.ADD, false),
-                new PersistentFileChange("file2", "23", Change.Action.ADD, false),
-                new PersistentFileChange("file3", "4", Change.Action.ADD, false)
+                new PersistentFileChange("file1", "1", FileChange.Action.ADD, false),
+                new PersistentFileChange("file2", "23", FileChange.Action.ADD, false),
+                new PersistentFileChange("file3", "4", FileChange.Action.ADD, false)
         ));
         l1.setResultId(resultId);
         changelistDao.save(l1);

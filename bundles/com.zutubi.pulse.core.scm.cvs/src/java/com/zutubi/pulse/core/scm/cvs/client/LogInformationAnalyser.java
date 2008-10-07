@@ -5,8 +5,8 @@
 
 package com.zutubi.pulse.core.scm.cvs.client;
 
-import com.zutubi.pulse.core.scm.api.Change;
 import com.zutubi.pulse.core.scm.api.Changelist;
+import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.cvs.CvsClient;
 import com.zutubi.pulse.core.scm.cvs.CvsRevision;
 import com.zutubi.util.CollectionUtils;
@@ -188,11 +188,11 @@ public class LogInformationAnalyser
                     lastChange.getDate().getTime(),
                     lastChange.getAuthor(),
                     lastChange.getMessage(),
-                    CollectionUtils.map(localChanges, new Mapping<Revision, Change>()
+                    CollectionUtils.map(localChanges, new Mapping<Revision, FileChange>()
                     {
-                        public Change map(Revision revision)
+                        public FileChange map(Revision revision)
                         {
-                            return new Change(revision.getFilename(), revision.getRevision(), revision.getAction());
+                            return new FileChange(revision.getFilename(), revision.getRevision(), revision.getAction());
                         }
                     })
             );
@@ -361,17 +361,17 @@ public class LogInformationAnalyser
             return filename;
         }
 
-        public Change.Action getAction()
+        public FileChange.Action getAction()
         {
             if (log.getAddedLines() == 0 && log.getRemovedLines() == 0)
             {
                 if (!log.getState().equalsIgnoreCase("dead"))
                 {
-                    return Change.Action.ADD;
+                    return FileChange.Action.ADD;
                 }
-                return Change.Action.DELETE;
+                return FileChange.Action.DELETE;
             }
-            return Change.Action.EDIT;
+            return FileChange.Action.EDIT;
         }
 
     }

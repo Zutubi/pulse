@@ -77,13 +77,13 @@ public class PerforceClientTest extends PulseTestCase
     public void testCheckoutHead() throws Exception
     {
         getServer("depot-client");
-        List<Change> changes = checkoutChanges(null, workDir, null, 8);
+        List<FileChange> changes = checkoutChanges(null, workDir, null, 8);
 
         assertEquals(10, changes.size());
         for (int i = 0; i < 10; i++)
         {
-            Change change = changes.get(i);
-            assertEquals(Change.Action.ADD, change.getAction());
+            FileChange change = changes.get(i);
+            assertEquals(FileChange.Action.ADD, change.getAction());
 
             // Foolish of me to create file10 which ruins lexical ordering :|
             int number;
@@ -147,14 +147,14 @@ public class PerforceClientTest extends PulseTestCase
         assertEquals("Delete and edit files in depot2.", list.getComment());
         assertEquals("test-user", list.getAuthor());
         assertEquals("3", list.getRevision().getRevisionString());
-        List<Change> changedFiles = list.getChanges();
+        List<FileChange> changedFiles = list.getChanges();
         assertEquals(2, changedFiles.size());
-        Change file1 = changedFiles.get(0);
+        FileChange file1 = changedFiles.get(0);
         assertEquals("//depot2/file1", file1.getFilename());
-        assertEquals(Change.Action.EDIT, file1.getAction());
-        Change file10 = changedFiles.get(1);
+        assertEquals(FileChange.Action.EDIT, file1.getAction());
+        FileChange file10 = changedFiles.get(1);
         assertEquals("//depot2/file10", file10.getFilename());
-        assertEquals(Change.Action.DELETE, file10.getAction());
+        assertEquals(FileChange.Action.DELETE, file10.getAction());
     }
 
     public void testGetChangesRestrictedToView() throws Exception
@@ -336,12 +336,12 @@ public class PerforceClientTest extends PulseTestCase
         assertEquals("1", got.getRevisionString());
         checkDirectory("checkoutRevision");
 
-        List<Change> changes = updateChanges("my-id", workDir, createRevision(8));
+        List<FileChange> changes = updateChanges("my-id", workDir, createRevision(8));
         checkDirectory("checkoutHead");
         assertEquals(1, changes.size());
-        Change change = changes.get(0);
+        FileChange change = changes.get(0);
         assertEquals("//depot/file2", change.getFilename());
-        assertEquals(Change.Action.EDIT, change.getAction());
+        assertEquals(FileChange.Action.EDIT, change.getAction());
     }
 
     public void testUpdateSameRevision() throws ScmException, IOException
@@ -354,7 +354,7 @@ public class PerforceClientTest extends PulseTestCase
 
         client.checkout(context, null, null);
 
-        List<Change> changes = updateChanges("my-id", workDir, null);
+        List<FileChange> changes = updateChanges("my-id", workDir, null);
         checkDirectory("checkoutHead");
         assertEquals(0, changes.size());
     }
@@ -515,7 +515,7 @@ public class PerforceClientTest extends PulseTestCase
         return new File(getPulseRoot(), FileSystemUtils.composeFilename("bundles", "com.zutubi.pulse.core.scm.p4", "src", "test", "com", "zutubi", "pulse", "core", "scm", "p4", "data"));
     }
 
-    private List<Change> checkoutChanges(String id, File dir, Revision revision, long expectedRevision) throws ScmException
+    private List<FileChange> checkoutChanges(String id, File dir, Revision revision, long expectedRevision) throws ScmException
     {
         ExecutionContext context = new ExecutionContext();
         context.setWorkingDir(dir);
@@ -527,7 +527,7 @@ public class PerforceClientTest extends PulseTestCase
         return accumulator.getChanges();
     }
 
-    private List<Change> updateChanges(String id, File dir, Revision revision) throws ScmException
+    private List<FileChange> updateChanges(String id, File dir, Revision revision) throws ScmException
     {
         ExecutionContext context = new ExecutionContext();
         context.setWorkingDir(dir);

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.model;
 
-import com.zutubi.pulse.core.scm.api.Change;
 import com.zutubi.pulse.core.scm.api.Changelist;
+import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
@@ -47,9 +47,9 @@ public class PersistentChangelist extends Entity
         time = data.getTime();
         author = data.getAuthor();
         comment = data.getComment();
-        changes = CollectionUtils.map(data.getChanges(), new Mapping<Change, PersistentFileChange>()
+        changes = CollectionUtils.map(data.getChanges(), new Mapping<FileChange, PersistentFileChange>()
         {
-            public PersistentFileChange map(Change change)
+            public PersistentFileChange map(FileChange change)
             {
                 return new PersistentFileChange(change);
             }
@@ -58,9 +58,9 @@ public class PersistentChangelist extends Entity
 
     public Changelist asChangelist()
     {
-        return new Changelist(revision, time, author, comment, CollectionUtils.map(changes, new Mapping<PersistentFileChange, Change>()
+        return new Changelist(revision, time, author, comment, CollectionUtils.map(changes, new Mapping<PersistentFileChange, FileChange>()
         {
-            public Change map(PersistentFileChange persistentFileChange)
+            public FileChange map(PersistentFileChange persistentFileChange)
             {
                 return persistentFileChange.asChange();
             }

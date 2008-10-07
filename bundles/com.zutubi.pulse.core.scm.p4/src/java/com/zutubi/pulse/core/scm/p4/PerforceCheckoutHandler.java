@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.scm.p4;
 
-import com.zutubi.pulse.core.scm.api.Change;
+import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.ScmCancelledException;
 import com.zutubi.pulse.core.scm.api.ScmEventHandler;
 
@@ -28,7 +28,7 @@ public class PerforceCheckoutHandler extends PerforceErrorDetectingHandler
             Matcher m = PATTERN.matcher(line);
             if (m.matches())
             {
-                handler.fileChanged(new Change(m.group(1), m.group(2), PerforceClient.decodeAction(m.group(3))));
+                handler.fileChanged(new FileChange(m.group(1), m.group(2), PerforceClient.decodeAction(m.group(3))));
             }
         }
     }

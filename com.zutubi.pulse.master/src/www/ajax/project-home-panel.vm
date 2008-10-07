@@ -58,7 +58,7 @@
                 $action.updateChangeUrl($project, $changelist.revision)
                 <tr>
                     #dynamicRightLinkCell($changelist.revision $action.getChangeUrl())
-                    #dynamicCell($changelist.user)
+                    #dynamicCell($changelist.author)
                     #dateCell($changelist)
                     #commitCommentCell($changelist "project")
                     #linkCell("view.$changelist.id" "view" "$urls.projectChangelist($u_projectName, $changelist.id)")

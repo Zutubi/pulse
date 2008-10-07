@@ -235,7 +235,7 @@ public class SubversionExternalsTest extends PulseTestCase
                 System.out.println(message);
             }
 
-            public void fileChanged(Change change)
+            public void fileChanged(FileChange change)
             {
                 System.out.println(change.toString());
             }
@@ -249,10 +249,10 @@ public class SubversionExternalsTest extends PulseTestCase
     private void assertChange(Changelist changelist, String revision, String... paths)
     {
         assertEquals(revision, changelist.getRevision().getRevisionString());
-        List<Change> changes = changelist.getChanges();
-        Collections.sort(changes, new Comparator<Change>()
+        List<FileChange> changes = changelist.getChanges();
+        Collections.sort(changes, new Comparator<FileChange>()
         {
-            public int compare(Change o1, Change o2)
+            public int compare(FileChange o1, FileChange o2)
             {
                 return o1.getFilename().compareTo(o2.getFilename());
             }
@@ -260,7 +260,7 @@ public class SubversionExternalsTest extends PulseTestCase
         
         for(int i = 0; i < paths.length; i++)
         {
-            Change change = changes.get(i);
+            FileChange change = changes.get(i);
             assertEquals(paths[i], change.getFilename());
         }
     }
@@ -288,7 +288,7 @@ public class SubversionExternalsTest extends PulseTestCase
             for(Changelist list: changelists)
             {
                 System.out.println(list.getRevision().getRevisionString() + ": " + list.getComment());
-                for(Change change: list.getChanges())
+                for(FileChange change: list.getChanges())
                 {
                     System.out.println("    " + change.toString());
                 }

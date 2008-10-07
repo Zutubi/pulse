@@ -98,20 +98,20 @@ public class SubversionClient implements ScmClient
      * @param type the action type as returned by the server
      * @return the corresponding Action value
      */
-    private Change.Action decodeAction(char type)
+    private FileChange.Action decodeAction(char type)
     {
         switch (type)
         {
             case'A':
-                return Change.Action.ADD;
+                return FileChange.Action.ADD;
             case'D':
-                return Change.Action.DELETE;
+                return FileChange.Action.DELETE;
             case'M':
-                return Change.Action.EDIT;
+                return FileChange.Action.EDIT;
             case'R':
-                return Change.Action.MOVE;
+                return FileChange.Action.MOVE;
             default:
-                return Change.Action.UNKNOWN;
+                return FileChange.Action.UNKNOWN;
         }
     }
 
@@ -433,7 +433,7 @@ public class SubversionClient implements ScmClient
                 SVNLogEntryPath entryPath = (SVNLogEntryPath) value;
                 if (filter.accept(entryPath.getPath()))
                 {
-                    if (handler.handleChange(new Change(entryPath.getPath(), String.valueOf(revision.getRevisionNumber()), decodeAction(entryPath.getType()))))
+                    if (handler.handleChange(new FileChange(entryPath.getPath(), String.valueOf(revision.getRevisionNumber()), decodeAction(entryPath.getType()))))
                     {
                         return true;
                     }
@@ -769,25 +769,25 @@ public class SubversionClient implements ScmClient
 
         public void handleEvent(SVNEvent event, double progress)
         {
-            Change.Action action = null;
+            FileChange.Action action = null;
 
             SVNEventAction svnAction = event.getAction();
             if (svnAction == SVNEventAction.UPDATE_ADD)
             {
-                action = Change.Action.ADD;
+                action = FileChange.Action.ADD;
             }
             else if (svnAction == SVNEventAction.UPDATE_DELETE)
             {
-                action = Change.Action.DELETE;
+                action = FileChange.Action.DELETE;
             }
             else if (svnAction == SVNEventAction.UPDATE_UPDATE)
             {
-                action = Change.Action.EDIT;
+                action = FileChange.Action.EDIT;
             }
 
             if (action != null)
             {
-                handler.fileChanged(new Change(event.getPath(), null, action));
+                handler.fileChanged(new FileChange(event.getPath(), null, action));
             }
         }
 
@@ -808,7 +808,7 @@ public class SubversionClient implements ScmClient
     {
         void startChangelist(Revision revision, long time, String author, String message);
 
-        boolean handleChange(Change change);
+        boolean handleChange(FileChange change);
 
         void complete();
     }
@@ -816,7 +816,7 @@ public class SubversionClient implements ScmClient
     private static class ChangelistAccumulator implements ChangeHandler
     {
         private List<Changelist> changelists = new LinkedList<Changelist>();
-        private List<Change> currentChanges = null;
+        private List<FileChange> currentChanges = null;
         private Revision currentRevision;
         private long currentTime;
         private String currentAuthor;
@@ -830,14 +830,14 @@ public class SubversionClient implements ScmClient
         public void startChangelist(Revision revision, long time, String author, String message)
         {
             checkCurrent();
-            currentChanges = new LinkedList<Change>();
+            currentChanges = new LinkedList<FileChange>();
             currentRevision = revision;
             currentTime = time;
             currentAuthor = author;
             currentMessage = message;
         }
 
-        public boolean handleChange(Change change)
+        public boolean handleChange(FileChange change)
         {
             currentChanges.add(change);
             return false;
@@ -879,7 +879,7 @@ public class SubversionClient implements ScmClient
         {
         }
 
-        public boolean handleChange(Change change)
+        public boolean handleChange(FileChange change)
         {
             changed = true;
             return true;

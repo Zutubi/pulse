@@ -220,8 +220,8 @@ public class GitClientTest extends PulseTestCase
         assertEquals("e34da05e88de03a4aa5b10b338382f09bbe65d4b", changelist.getRevision().getRevisionString());
         assertEquals("Daniel Ostermeier <daniel@zutubi.com>", changelist.getAuthor());
         assertEquals(1, changelist.getChanges().size());
-        Change change = changelist.getChanges().get(0);
-        assertEquals(Change.Action.EDIT, change.getAction());
+        FileChange change = changelist.getChanges().get(0);
+        assertEquals(FileChange.Action.EDIT, change.getAction());
         assertEquals("a.txt", change.getFilename());
     }
 

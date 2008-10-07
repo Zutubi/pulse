@@ -1,9 +1,12 @@
 package com.zutubi.pulse.core.scm.api;
 
 /**
+ * Represents a change to a single file as part of a larger Changelist.  For
+ * example, the file may have been edited, added or deleted.
  *
+ * @see com.zutubi.pulse.core.scm.api.Changelist
  */
-public class Change
+public class FileChange
 {
     /**
      * Types of actions that can be performed on an SCM file.
@@ -99,18 +102,18 @@ public class Change
     private boolean directory;
     private String revisionString;
 
-    protected Change()
+    protected FileChange()
     {
 
     }
 
-    public Change(String filename, String revisionString, Action action)
+    public FileChange(String filename, String revisionString, Action action)
     {
         this(filename, revisionString, action, false);
     }
 
 
-    public Change(String filename, String revisionString, Action action, boolean directory)
+    public FileChange(String filename, String revisionString, Action action, boolean directory)
     {
         this.filename = filename;
         this.action = action;
@@ -154,7 +157,7 @@ public class Change
             return false;
         }
 
-        Change change = (Change) o;
+        FileChange change = (FileChange) o;
         if (directory != change.directory)
         {
             return false;

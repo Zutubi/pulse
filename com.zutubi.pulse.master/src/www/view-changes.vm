@@ -61,7 +61,7 @@
         #set($url = $action.getChangeUrl($project, $change.revision))
         <tr>
             #dynamicRightLinkCell($change.revision $url)
-            #dynamicCell($change.user)
+            #dynamicCell($change.author)
             #dateCell($change)
             #commitCommentCell($change "changes")
             #linkCell("view.$change.id" "view" "$urls.buildChangelist($buildResult, $change.id)")

@@ -2,7 +2,7 @@ package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.core.model.PersistentFileChange;
-import com.zutubi.pulse.core.scm.api.Change;
+import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
@@ -229,7 +229,7 @@ public class ViewChangelistAction extends ActionSupport
         fileDiffUrl = null;
     }
 
-    private boolean diffableAction(Change.Action action)
+    private boolean diffableAction(FileChange.Action action)
     {
         switch (action)
         {

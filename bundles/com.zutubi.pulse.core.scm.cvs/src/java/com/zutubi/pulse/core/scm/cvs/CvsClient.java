@@ -394,9 +394,9 @@ public class CvsClient implements ScmClient, DataCacheAware
                     changelist.getTime(),
                     changelist.getAuthor(),
                     changelist.getComment(),
-                    CollectionUtils.map(changelist.getChanges(), new Mapping<Change, Change>()
+                    CollectionUtils.map(changelist.getChanges(), new Mapping<FileChange, FileChange>()
                     {
-                        public Change map(Change change)
+                        public FileChange map(FileChange change)
                         {
                             // a) strip off the leading /.
                             String filename = change.getFilename();
@@ -417,7 +417,7 @@ public class CvsClient implements ScmClient, DataCacheAware
                                 }
                             }
 
-                            return new Change(filename, change.getRevisionString(), change.getAction());
+                            return new FileChange(filename, change.getRevisionString(), change.getAction());
                         }
                     })
             );

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.scm.cvs.client.commands;
 
-import com.zutubi.pulse.core.scm.api.Change;
+import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.ScmEventHandler;
 import org.netbeans.lib.cvsclient.event.CVSAdapter;
 import org.netbeans.lib.cvsclient.event.FileAddedEvent;
@@ -23,7 +23,7 @@ public class CheckoutListener extends CVSAdapter
 
     public void fileAdded(FileAddedEvent e)
     {
-        handler.fileChanged(new Change(e.getFilePath(), null, Change.Action.ADD));
+        handler.fileChanged(new FileChange(e.getFilePath(), null, FileChange.Action.ADD));
     }
 }
 

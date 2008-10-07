@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.scm.cvs.client;
 
 import com.zutubi.pulse.core.scm.ScmChangeAccumulator;
+import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.ScmException;
-import com.zutubi.pulse.core.scm.api.Change;
 import com.zutubi.pulse.core.scm.cvs.CvsRevision;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
@@ -59,16 +59,16 @@ public class CvsCoreTest extends PulseTestCase
     public void testCheckoutHead() throws Exception
     {
         String module = "unit-test/CvsWorkerTest/testCheckout";
-        List<Change> changes = checkoutChanges(module, CvsRevision.HEAD);
+        List<FileChange> changes = checkoutChanges(module, CvsRevision.HEAD);
         assertTrue((new File(workdir, (new StringBuilder()).append(module).append("/file1.txt").toString())).exists());
         assertTrue((new File(workdir, (new StringBuilder()).append(module).append("/file2.txt").toString())).exists());
         assertTrue((new File(workdir, (new StringBuilder()).append(module).append("/dir1/file3.txt").toString())).exists());
         assertTrue((new File(workdir, (new StringBuilder()).append(module).append("/dir2").toString())).exists());
         assertEquals(3, changes.size());
 
-        for (Change change : changes)
+        for (FileChange change : changes)
         {
-            assertEquals(Change.Action.ADD, change.getAction());
+            assertEquals(FileChange.Action.ADD, change.getAction());
         }
     }
 
@@ -86,14 +86,14 @@ public class CvsCoreTest extends PulseTestCase
     public void testCheckoutModule() throws Exception
     {
         String module = "module";
-        List<Change> changes = checkoutChanges(module, CvsRevision.HEAD);
+        List<FileChange> changes = checkoutChanges(module, CvsRevision.HEAD);
         assertTrue((new File(workdir, "unit-test/CvsWorkerTest/testCheckoutModule/dir1/file1.txt")).exists());
         assertTrue((new File(workdir, "unit-test/CvsWorkerTest/testCheckoutModule/dir2/file2.txt")).exists());
         assertEquals(2, changes.size());
 
-        for (Change change : changes)
+        for (FileChange change : changes)
         {
-            assertEquals(Change.Action.ADD, change.getAction());
+            assertEquals(FileChange.Action.ADD, change.getAction());
         }
     }
 
@@ -183,28 +183,28 @@ public class CvsCoreTest extends PulseTestCase
         assertFalse(x.exists());
 
         byDate = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-12-19 01:31:00 GMT"));
-        List<Change> changes = updateChanges(new File(workdir, module), byDate);
+        List<FileChange> changes = updateChanges(new File(workdir, module), byDate);
         assertEquals(1, changes.size());
         assertTrue(x.exists());
         assertEquals("some content", IOUtils.fileToString(x));
-        assertEquals( Change.Action.EDIT, changes.get(0).getAction());
+        assertEquals( FileChange.Action.EDIT, changes.get(0).getAction());
 
         byDate = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-12-23 01:31:00 GMT"));
         changes = updateChanges(new File(workdir, module), byDate);
         assertTrue(x.exists());
         assertEquals(1, changes.size());
-        assertEquals( Change.Action.EDIT, changes.get(0).getAction());
+        assertEquals( FileChange.Action.EDIT, changes.get(0).getAction());
 
         String fileContents = IOUtils.fileToString(x);
         assertTrue(fileContents.startsWith("some content"));
         assertTrue(fileContents.endsWith("Some more content"));
-        assertEquals( Change.Action.EDIT, changes.get(0).getAction());
+        assertEquals( FileChange.Action.EDIT, changes.get(0).getAction());
 
         byDate = new CvsRevision(null, null, null, SERVER_DATE.parse("2006-12-18 01:30:00 GMT"));
         changes = updateChanges(new File(workdir, module), byDate);
         assertFalse(x.exists());
         assertEquals(1, changes.size());
-        assertEquals( Change.Action.DELETE, changes.get(0).getAction());
+        assertEquals( FileChange.Action.DELETE, changes.get(0).getAction());
     }
 
     public void testTagContent() throws Exception
@@ -317,14 +317,14 @@ public class CvsCoreTest extends PulseTestCase
         assertEquals(FileStatus.NEEDS_CHECKOUT, ((StatusInformation)statuses.get(2)).getStatus());
     }
 
-    private List<Change> checkoutChanges(String module, CvsRevision revision) throws ScmException
+    private List<FileChange> checkoutChanges(String module, CvsRevision revision) throws ScmException
     {
         ScmChangeAccumulator accumulator = new ScmChangeAccumulator();
         cvs.checkout(workdir, module, revision, accumulator);
         return accumulator.getChanges();
     }
 
-    private List<Change> updateChanges(File dir, CvsRevision revision) throws ScmException
+    private List<FileChange> updateChanges(File dir, CvsRevision revision) throws ScmException
     {
         ScmChangeAccumulator accumulator = new ScmChangeAccumulator();
         cvs.update(dir, revision, accumulator);

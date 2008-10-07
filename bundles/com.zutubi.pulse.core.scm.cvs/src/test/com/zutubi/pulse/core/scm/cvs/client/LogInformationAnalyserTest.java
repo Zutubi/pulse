@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.scm.cvs.client;
 
-import com.zutubi.pulse.core.scm.api.Change;
 import com.zutubi.pulse.core.scm.api.Changelist;
+import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.cvs.CvsClient;
@@ -72,9 +72,9 @@ public class LogInformationAnalyserTest extends PulseTestCase
         assertEquals("file1.txt modified by author a\n", changelist.getComment());
         assertEquals(1, changelist.getChanges().size());
         assertCvsRevision(changelist.getRevision(), "daniel", null, "file1.txt modified by author a\n");
-        Change change = changelist.getChanges().get(0);
+        FileChange change = changelist.getChanges().get(0);
         assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/Attic/file1.txt", change.getFilename());
-        assertEquals(Change.Action.EDIT, change.getAction());
+        assertEquals(FileChange.Action.EDIT, change.getAction());
         assertEquals("1.2", change.getRevisionString());
         changelist = changes.get(1);
         assertEquals("daniel", changelist.getAuthor());
@@ -83,7 +83,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         assertCvsRevision(changelist.getRevision(), "daniel", null, "file1.txt deleted by author a\n");
         change = changelist.getChanges().get(0);
         assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/Attic/file1.txt", change.getFilename());
-        assertEquals(Change.Action.DELETE, change.getAction());
+        assertEquals(FileChange.Action.DELETE, change.getAction());
         assertEquals("1.3", change.getRevisionString());
     }
 
@@ -101,9 +101,9 @@ public class LogInformationAnalyserTest extends PulseTestCase
         assertEquals("file1.txt checked in by author a\n", changelist.getComment());
         assertEquals(1, changelist.getChanges().size());
         assertCvsRevision(changelist.getRevision(), "daniel", null, "file1.txt checked in by author a\n");
-        Change change = changelist.getChanges().get(0);
+        FileChange change = changelist.getChanges().get(0);
         assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/Attic/file1.txt", change.getFilename());
-        assertEquals(Change.Action.ADD, change.getAction());
+        assertEquals(FileChange.Action.ADD, change.getAction());
         assertEquals("1.1", change.getRevisionString());
         changelist = changes.get(1);
         assertEquals("daniel", changelist.getAuthor());
@@ -112,7 +112,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         assertCvsRevision(changelist.getRevision(), "daniel", null, "file1.txt modified by author a\n");
         change = changelist.getChanges().get(0);
         assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/Attic/file1.txt", change.getFilename());
-        assertEquals(Change.Action.EDIT, change.getAction());
+        assertEquals(FileChange.Action.EDIT, change.getAction());
         assertEquals("1.2", change.getRevisionString());
         changelist = changes.get(2);
         assertEquals("daniel", changelist.getAuthor());
@@ -121,7 +121,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         assertCvsRevision(changelist.getRevision(), "daniel", null, "file1.txt deleted by author a\n");
         change = changelist.getChanges().get(0);
         assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/Attic/file1.txt", change.getFilename());
-        assertEquals(Change.Action.DELETE, change.getAction());
+        assertEquals(FileChange.Action.DELETE, change.getAction());
         assertEquals("1.3", change.getRevisionString());
         changelist = changes.get(3);
         assertEquals("daniel", changelist.getAuthor());
@@ -130,7 +130,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         assertCvsRevision(changelist.getRevision(), "daniel", null, "file2.txt checked in by author a\n");
         change = changelist.getChanges().get(0);
         assertEquals("/unit-test/CvsWorkerTest/testChangeDetails/file2.txt", change.getFilename());
-        assertEquals(Change.Action.ADD, change.getAction());
+        assertEquals(FileChange.Action.ADD, change.getAction());
         assertEquals("1.1", change.getRevisionString());
     }
 
@@ -146,12 +146,12 @@ public class LogInformationAnalyserTest extends PulseTestCase
         Changelist changelist = changes.get(0);
         assertChangelistValues(changelist, "daniel", "file1.txt checked in by author a\n");
         assertEquals(1, changelist.getChanges().size());
-        assertChangeValues(changelist.getChanges().get(0), "file1.txt", Change.Action.ADD, "1.1");
+        assertChangeValues(changelist.getChanges().get(0), "file1.txt", FileChange.Action.ADD, "1.1");
         assertCvsRevision(changelist.getRevision(), "daniel", null, "file1.txt checked in by author a\n");
         changelist = changes.get(1);
         assertChangelistValues(changelist, "jason", "file2.txt checked in by author b\n");
         assertEquals(1, changelist.getChanges().size());
-        assertChangeValues(changelist.getChanges().get(0), "file2.txt", Change.Action.ADD, "1.1");
+        assertChangeValues(changelist.getChanges().get(0), "file2.txt", FileChange.Action.ADD, "1.1");
         assertCvsRevision(changelist.getRevision(), "jason", null, "file2.txt checked in by author b\n");
     }
 
@@ -166,20 +166,20 @@ public class LogInformationAnalyserTest extends PulseTestCase
         assertValidChangeSets(changes);
         Changelist changelist = changes.get(0);
         assertChangelistValues(changelist, "daniel", "file1.txt and file2.txt and file3.txt and file4.txt are checked in by author a\n");
-        assertChangeValues(changelist.getChanges().get(0), "file1.txt", Change.Action.ADD, "1.1");
-        assertChangeValues(changelist.getChanges().get(1), "file2.txt", Change.Action.ADD, "1.1");
-        assertChangeValues(changelist.getChanges().get(2), "file3.txt", Change.Action.ADD, "1.1");
-        assertChangeValues(changelist.getChanges().get(3), "file4.txt", Change.Action.ADD, "1.1");
+        assertChangeValues(changelist.getChanges().get(0), "file1.txt", FileChange.Action.ADD, "1.1");
+        assertChangeValues(changelist.getChanges().get(1), "file2.txt", FileChange.Action.ADD, "1.1");
+        assertChangeValues(changelist.getChanges().get(2), "file3.txt", FileChange.Action.ADD, "1.1");
+        assertChangeValues(changelist.getChanges().get(3), "file4.txt", FileChange.Action.ADD, "1.1");
         assertCvsRevision(changelist.getRevision(), "daniel", null, "file1.txt and file2.txt and file3.txt and file4.txt are checked in by author a\n");
         changelist = changes.get(1);
         assertChangelistValues(changelist, "daniel", "x\n");
-        assertChangeValues(changelist.getChanges().get(0), "file1.txt", Change.Action.EDIT, "1.2");
-        assertChangeValues(changelist.getChanges().get(1), "file3.txt", Change.Action.EDIT, "1.2");
+        assertChangeValues(changelist.getChanges().get(0), "file1.txt", FileChange.Action.EDIT, "1.2");
+        assertChangeValues(changelist.getChanges().get(1), "file3.txt", FileChange.Action.EDIT, "1.2");
         assertCvsRevision(changelist.getRevision(), "daniel", null, "x\n");
         changelist = changes.get(2);
         assertChangelistValues(changelist, "jason", "y\n");
-        assertChangeValues(changelist.getChanges().get(0), "file2.txt", Change.Action.EDIT, "1.2");
-        assertChangeValues(changelist.getChanges().get(1), "file4.txt", Change.Action.EDIT, "1.2");
+        assertChangeValues(changelist.getChanges().get(0), "file2.txt", FileChange.Action.EDIT, "1.2");
+        assertChangeValues(changelist.getChanges().get(1), "file4.txt", FileChange.Action.EDIT, "1.2");
         assertCvsRevision(changelist.getRevision(), "jason", null, "y\n");
     }
 
@@ -194,19 +194,19 @@ public class LogInformationAnalyserTest extends PulseTestCase
         assertValidChangeSets(changes);
         Changelist changelist = changes.get(0);
         assertChangelistValues(changelist, "daniel", "file1.txt checked in by author a\n");
-        assertChangeValues(changelist.getChanges().get(0), "file1.txt", Change.Action.ADD, "1.1");
+        assertChangeValues(changelist.getChanges().get(0), "file1.txt", FileChange.Action.ADD, "1.1");
         assertCvsRevision(changelist.getRevision(), "daniel", null, "file1.txt checked in by author a\n");
         changelist = changes.get(1);
         assertChangelistValues(changelist, "daniel", "file1.txt removed by author a\n");
-        assertChangeValues(changelist.getChanges().get(0), "file1.txt", Change.Action.DELETE, "1.2");
+        assertChangeValues(changelist.getChanges().get(0), "file1.txt", FileChange.Action.DELETE, "1.2");
         assertCvsRevision(changelist.getRevision(), "daniel", null, "file1.txt removed by author a\n");
         changelist = changes.get(2);
         assertChangelistValues(changelist, "daniel", "file1.txt re-checked in by author a\n");
-        assertChangeValues(changelist.getChanges().get(0), "file1.txt", Change.Action.ADD, "1.3");
+        assertChangeValues(changelist.getChanges().get(0), "file1.txt", FileChange.Action.ADD, "1.3");
         assertCvsRevision(changelist.getRevision(), "daniel", null, "file1.txt re-checked in by author a\n");
         changelist = changes.get(3);
         assertChangelistValues(changelist, "daniel", "file1.txt re-removed by author a\n");
-        assertChangeValues(changelist.getChanges().get(0), "file1.txt", Change.Action.DELETE, "1.4");
+        assertChangeValues(changelist.getChanges().get(0), "file1.txt", FileChange.Action.DELETE, "1.4");
         assertCvsRevision(changelist.getRevision(), "daniel", null, "file1.txt re-removed by author a\n");
     }
 
@@ -221,9 +221,9 @@ public class LogInformationAnalyserTest extends PulseTestCase
         assertValidChangeSets(changes);
         Changelist changelist = changes.get(0);
         assertChangelistValues(changelist, "daniel", "file1.txt and file2.txt and dir/file3.txt checked in by author a\n");
-        assertChangeValues(changelist.getChanges().get(0), "file1.txt", Change.Action.ADD, "1.1");
-        assertChangeValues(changelist.getChanges().get(1), "file2.txt", Change.Action.ADD, "1.1");
-        assertChangeValues(changelist.getChanges().get(2), "dir/file3.txt", Change.Action.ADD, "1.1");
+        assertChangeValues(changelist.getChanges().get(0), "file1.txt", FileChange.Action.ADD, "1.1");
+        assertChangeValues(changelist.getChanges().get(1), "file2.txt", FileChange.Action.ADD, "1.1");
+        assertChangeValues(changelist.getChanges().get(2), "dir/file3.txt", FileChange.Action.ADD, "1.1");
         assertCvsRevision(changelist.getRevision(), "daniel", null, "file1.txt and file2.txt and dir/file3.txt checked in by author a\n");
     }
 
@@ -238,15 +238,15 @@ public class LogInformationAnalyserTest extends PulseTestCase
         assertValidChangeSets(changes);
         Changelist changelist = changes.get(0);
         assertChangelistValues(changelist, "daniel", "file1.txt checked in by author a\n");
-        assertChangeValues(changelist.getChanges().get(0), "file1.txt", Change.Action.ADD, "1.1");
+        assertChangeValues(changelist.getChanges().get(0), "file1.txt", FileChange.Action.ADD, "1.1");
         assertCvsRevision(changelist.getRevision(), "daniel", null, "file1.txt checked in by author a\n");
         changelist = changes.get(1);
         assertChangelistValues(changelist, "daniel", "file1.txt modified by author a\n");
-        assertChangeValues(changelist.getChanges().get(0), "file1.txt", Change.Action.EDIT, "1.2");
+        assertChangeValues(changelist.getChanges().get(0), "file1.txt", FileChange.Action.EDIT, "1.2");
         assertCvsRevision(changelist.getRevision(), "daniel", null, "file1.txt modified by author a\n");
         changelist = changes.get(2);
         assertChangelistValues(changelist, "daniel", "file1.txt modified by author a\n");
-        assertChangeValues(changelist.getChanges().get(0), "file1.txt", Change.Action.EDIT, "1.3");
+        assertChangeValues(changelist.getChanges().get(0), "file1.txt", FileChange.Action.EDIT, "1.3");
         assertCvsRevision(changelist.getRevision(), "daniel", null, "file1.txt modified by author a\n");
     }
 
@@ -261,11 +261,11 @@ public class LogInformationAnalyserTest extends PulseTestCase
         assertValidChangeSets(changes);
         Changelist changelist = changes.get(0);
         assertChangelistValues(changelist, "daniel", "file3.txt checked in on BRANCH by author a\n");
-        assertChangeValues(changelist.getChanges().get(0), "file3.txt", Change.Action.ADD, "1.1.2.1");
+        assertChangeValues(changelist.getChanges().get(0), "file3.txt", FileChange.Action.ADD, "1.1.2.1");
         assertCvsRevision(changelist.getRevision(), "daniel", "BRANCH", "file3.txt checked in on BRANCH by author a\n");
         changelist = changes.get(1);
         assertChangelistValues(changelist, "daniel", "file1.txt modified on BRANCH by author a\n");
-        assertChangeValues(changelist.getChanges().get(0), "file1.txt", Change.Action.EDIT, "1.1.2.1");
+        assertChangeValues(changelist.getChanges().get(0), "file1.txt", FileChange.Action.EDIT, "1.1.2.1");
         assertCvsRevision(changelist.getRevision(), "daniel", "BRANCH", "file1.txt modified on BRANCH by author a\n");
     }
 
@@ -341,7 +341,7 @@ public class LogInformationAnalyserTest extends PulseTestCase
         assertEquals(comment, changelist.getComment());
     }
 
-    private static void assertChangeValues(Change change, String file, Change.Action action, String revision)
+    private static void assertChangeValues(FileChange change, String file, FileChange.Action action, String revision)
     {
         assertEndsWith(file, change.getFilename());
         assertEquals(action, change.getAction());
@@ -358,10 +358,10 @@ public class LogInformationAnalyserTest extends PulseTestCase
 
     private static void assertValidChangeSet(Changelist changelist)
     {
-        List<Change> changes = changelist.getChanges();
+        List<FileChange> changes = changelist.getChanges();
         Map<String, String> filenames = new HashMap<String, String>();
 
-        for(Change change : changes)
+        for(FileChange change : changes)
         {
             assertFalse(filenames.containsKey(change.getFilename()));
             filenames.put(change.getFilename(), change.getFilename());
