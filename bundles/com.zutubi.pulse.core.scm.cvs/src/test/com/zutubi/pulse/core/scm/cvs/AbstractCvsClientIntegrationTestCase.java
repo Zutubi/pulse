@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.scm.cvs;
 
-import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.AbstractScmIntegrationTestCase;
 import com.zutubi.pulse.core.scm.ExpectedTestResults;
+import com.zutubi.pulse.core.scm.api.Revision;
 
 import java.text.DateFormat;
 import java.text.ParseException;

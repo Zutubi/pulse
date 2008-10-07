@@ -3,7 +3,6 @@ package com.zutubi.pulse.core.scm.git;
 import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.TextUtils;
@@ -71,7 +70,7 @@ public class GitClient implements ScmClient
     }
 
     /**
-     * @see com.zutubi.pulse.core.scm.api.ScmClient#checkout(com.zutubi.pulse.core.ExecutionContext,com.zutubi.pulse.core.model.Revision,com.zutubi.pulse.core.scm.api.ScmEventHandler)
+     * @see com.zutubi.pulse.core.scm.api.ScmClient#checkout(com.zutubi.pulse.core.ExecutionContext,com.zutubi.pulse.core.scm.api.Revision,com.zutubi.pulse.core.scm.api.ScmEventHandler)
      */
     public Revision checkout(ExecutionContext context, Revision revision, ScmEventHandler handler) throws ScmException
     {
@@ -101,13 +100,11 @@ public class GitClient implements ScmClient
 
         GitLogEntry entry = git.log(1).get(0);
 
-        Revision rev = new Revision(entry.getAuthor(), entry.getComment(), entry.getDate(), entry.getId());
-        rev.setBranch(branch);
-        return rev;
+        return new Revision(entry.getId());
     }
 
     /**
-     * @see com.zutubi.pulse.core.scm.api.ScmClient#update(com.zutubi.pulse.core.ExecutionContext,com.zutubi.pulse.core.model.Revision,com.zutubi.pulse.core.scm.api.ScmEventHandler)
+     * @see com.zutubi.pulse.core.scm.api.ScmClient#update(com.zutubi.pulse.core.ExecutionContext,com.zutubi.pulse.core.scm.api.Revision,com.zutubi.pulse.core.scm.api.ScmEventHandler)
      */
     public Revision update(ExecutionContext context, Revision revision, ScmEventHandler handler) throws ScmException
     {
@@ -143,13 +140,11 @@ public class GitClient implements ScmClient
         git.setWorkingDirectory(workingDir);
         GitLogEntry entry = git.log(1).get(0);
 
-        Revision rev = new Revision(entry.getAuthor(), entry.getComment(), entry.getDate(), entry.getId());
-        rev.setBranch(branch);
-        return rev;
+        return new Revision(entry.getId());
     }
 
     /**
-     * @see com.zutubi.pulse.core.scm.api.ScmClient#retrieve(com.zutubi.pulse.core.scm.api.ScmContext,String,com.zutubi.pulse.core.model.Revision)
+     * @see com.zutubi.pulse.core.scm.api.ScmClient#retrieve(com.zutubi.pulse.core.scm.api.ScmContext,String,com.zutubi.pulse.core.scm.api.Revision)
      */
     public InputStream retrieve(ScmContext context, String path, Revision revision) throws ScmException
     {
@@ -206,9 +201,7 @@ public class GitClient implements ScmClient
 
             GitLogEntry entry = git.log(1).get(0);
 
-            Revision rev = new Revision(entry.getAuthor(), entry.getComment(), entry.getDate(), entry.getId());
-            rev.setBranch(branch);
-            return rev;
+            return new Revision(entry.getId());
         }
     }
 
@@ -238,7 +231,7 @@ public class GitClient implements ScmClient
     }
 
     /**
-     * @see com.zutubi.pulse.core.scm.api.ScmClient#getRevisions(com.zutubi.pulse.core.scm.api.ScmContext,com.zutubi.pulse.core.model.Revision,com.zutubi.pulse.core.model.Revision)
+     * @see com.zutubi.pulse.core.scm.api.ScmClient#getRevisions(com.zutubi.pulse.core.scm.api.ScmContext,com.zutubi.pulse.core.scm.api.Revision,com.zutubi.pulse.core.scm.api.Revision)
      */
     public List<Revision> getRevisions(ScmContext context, Revision from, Revision to) throws ScmException
     {
@@ -261,16 +254,14 @@ public class GitClient implements ScmClient
             List<Revision> revisions = new LinkedList<Revision>();
             for (GitLogEntry entry : entries)
             {
-                Revision rev = new Revision(entry.getAuthor(), entry.getComment(), entry.getDate(), entry.getId());
-                rev.setBranch(branch);
-                revisions.add(rev);
+                revisions.add(new Revision(entry.getId()));
             }
             return revisions;
         }
     }
 
     /**
-     * @see com.zutubi.pulse.core.scm.api.ScmClient#getChanges(com.zutubi.pulse.core.scm.api.ScmContext,com.zutubi.pulse.core.model.Revision,com.zutubi.pulse.core.model.Revision)
+     * @see com.zutubi.pulse.core.scm.api.ScmClient#getChanges(com.zutubi.pulse.core.scm.api.ScmContext,com.zutubi.pulse.core.scm.api.Revision,com.zutubi.pulse.core.scm.api.Revision)
      */
     public List<Changelist> getChanges(ScmContext context, Revision from, Revision to) throws ScmException
     {
@@ -295,8 +286,7 @@ public class GitClient implements ScmClient
             List<Changelist> changelists = new LinkedList<Changelist>();
             for (GitLogEntry entry : entries)
             {
-                Revision rev = new Revision(entry.getAuthor(), entry.getComment(), entry.getDate(), entry.getId());
-                rev.setBranch(branch);
+                Revision rev = new Revision(entry.getId());
 
                 Changelist changelist = new Changelist(rev);
 
@@ -331,7 +321,7 @@ public class GitClient implements ScmClient
     }
 
     /**
-     * @see com.zutubi.pulse.core.scm.api.ScmClient#browse(com.zutubi.pulse.core.scm.api.ScmContext,String,com.zutubi.pulse.core.model.Revision)
+     * @see com.zutubi.pulse.core.scm.api.ScmClient#browse(com.zutubi.pulse.core.scm.api.ScmContext,String,com.zutubi.pulse.core.scm.api.Revision)
      */
     public List<ScmFile> browse(ScmContext context, String path, Revision revision) throws ScmException
     {
@@ -371,7 +361,7 @@ public class GitClient implements ScmClient
     }
 
     /**
-     * @see com.zutubi.pulse.core.scm.api.ScmClient#tag(com.zutubi.pulse.core.ExecutionContext,com.zutubi.pulse.core.model.Revision,String,boolean)
+     * @see com.zutubi.pulse.core.scm.api.ScmClient#tag(com.zutubi.pulse.core.ExecutionContext,com.zutubi.pulse.core.scm.api.Revision,String,boolean)
      */
     public void tag(ExecutionContext context, Revision revision, String name, boolean moveExisting) throws ScmException
     {

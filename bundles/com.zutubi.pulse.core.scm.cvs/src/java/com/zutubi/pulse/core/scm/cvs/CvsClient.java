@@ -6,7 +6,6 @@ import com.zutubi.pulse.core.PulseScope;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.DataCacheAware;
 import com.zutubi.pulse.core.scm.ScmFilepathFilter;
 import com.zutubi.pulse.core.scm.ScmUtils;
@@ -373,7 +372,10 @@ public class CvsClient implements ScmClient, DataCacheAware
         
         LogInformationAnalyser analyser = new LogInformationAnalyser(getUid(), CVSRoot.parse(root));
 
-        String branch = (from != null) ? from.getBranch() : (to != null) ? to.getBranch() : null;
+        CvsRevision cvsFrom = convertRevision(from);
+        CvsRevision cvsTo = convertRevision(to);
+
+        String branch = (from != null) ? cvsFrom.getBranch() : (to != null) ? cvsTo.getBranch() : null;
         List<Changelist> changes = analyser.extractChangelists(info, branch);
 
         // process excludes from the changelist.
@@ -470,7 +472,8 @@ public class CvsClient implements ScmClient, DataCacheAware
      */
     public boolean hasChangedSince(Revision since) throws ScmException
     {
-        if (since.getDate() == null)
+        CvsRevision cvsSince = convertRevision(since);
+        if (cvsSince.getDate() == null)
         {
             throw new IllegalArgumentException("since revision date can not be null.");
         }
@@ -610,7 +613,14 @@ public class CvsClient implements ScmClient, DataCacheAware
         {
             return null;
         }
-        return new CvsRevision(revision.getAuthor(), revision.getBranch(), revision.getComment(), revision.getDate());
+        try
+        {
+            return new CvsRevision(revision.getRevisionString());
+        }
+        catch (ScmException e)
+        {
+            return null;
+        }
     }
 
     public static Revision convertRevision(CvsRevision revision)
@@ -619,9 +629,7 @@ public class CvsClient implements ScmClient, DataCacheAware
         {
             return null;
         }
-        Revision newRevision = new Revision(revision.getAuthor(), revision.getComment(), revision.getDate(), revision.getRevisionString());
-        newRevision.setBranch(revision.getBranch());
-        return newRevision;
+        return new Revision(revision.getRevisionString());
     }
 
     /**
