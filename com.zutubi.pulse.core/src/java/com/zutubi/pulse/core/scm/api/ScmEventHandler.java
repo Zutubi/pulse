@@ -1,7 +1,5 @@
 package com.zutubi.pulse.core.scm.api;
 
-import com.zutubi.pulse.core.model.Change;
-
 /**
  * A callback interface for receiving information about a checkout in progress.
  */

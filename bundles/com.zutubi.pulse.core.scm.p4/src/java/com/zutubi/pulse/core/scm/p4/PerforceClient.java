@@ -2,8 +2,6 @@ package com.zutubi.pulse.core.scm.p4;
 
 import com.zutubi.pulse.core.*;
 import com.zutubi.pulse.core.config.ResourceProperty;
-import com.zutubi.pulse.core.model.Change;
-import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.scm.*;
 import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
@@ -350,9 +348,9 @@ public class PerforceClient extends CachingScmClient
 
         String comment = getChangelistComment(lines, affectedFilesIndex);
 
-        Revision revision = new Revision(user, comment, date, Long.toString(number));
+        Revision revision = new Revision(Long.toString(number));
         ScmFilepathFilter filter = new ScmFilepathFilter(excludedPaths);
-        Changelist changelist = new Changelist(revision);
+        Changelist changelist = new Changelist(revision, date.getTime(), user, comment);
 
         for (int i = affectedFilesIndex + 2; i < lines.length; i++)
         {
@@ -893,15 +891,15 @@ public class PerforceClient extends CachingScmClient
         try
         {
             PerforceClient client = new PerforceClient("localhost:1666", "jsankey", "", "pulse-demo");
-            client.retrieve(null, "file", new Revision(null, null, null, "2"));
-            List<Changelist> cls = client.getChanges(null, new Revision(null, null, null, "2"), new Revision(null, null, null, "6"));
+            client.retrieve(null, "file", new Revision("2"));
+            List<Changelist> cls = client.getChanges(null, new Revision("2"), new Revision("6"));
 
             for (Changelist l : cls)
             {
                 System.out.println("Changelist:");
                 System.out.println("  Revision: " + l.getRevision());
                 System.out.println("  Date    : " + l.getDate());
-                System.out.println("  User    : " + l.getUser());
+                System.out.println("  Author  : " + l.getAuthor());
                 System.out.println("  Comment : " + l.getComment());
                 System.out.println("  Files   : " + l.getRevision());
 
