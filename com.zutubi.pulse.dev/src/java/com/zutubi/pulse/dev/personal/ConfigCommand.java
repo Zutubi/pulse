@@ -2,7 +2,7 @@ package com.zutubi.pulse.dev.personal;
 
 import com.zutubi.pulse.command.BootContext;
 import com.zutubi.pulse.command.Command;
-import com.zutubi.pulse.core.scm.api.PersonalBuildException;
+import com.zutubi.pulse.core.personal.PersonalBuildException;
 import com.zutubi.pulse.core.scm.api.PersonalBuildUI;
 import com.zutubi.pulse.core.util.config.PropertiesConfig;
 import com.zutubi.pulse.dev.xmlrpc.PulseXmlRpcClient;

@@ -39,7 +39,7 @@ public class PatchArchive
      * @param patchFile the destination of the patch file created
      * @param ui the ui reference to allow logging to the command output.
      * 
-     * @throws com.zutubi.pulse.core.scm.api.PersonalBuildException in the event of any error creating the patch
+     * @throws com.zutubi.pulse.core.PersonalBuildException in the event of any error creating the patch
      */
     public PatchArchive(WorkingCopyStatus status, File patchFile, PersonalBuildUI ui) throws PersonalBuildException
     {

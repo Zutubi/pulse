@@ -1,13 +1,9 @@
 package com.zutubi.pulse.core.scm.p4;
 
 import com.zutubi.pulse.core.ExecutionContext;
-import com.zutubi.pulse.core.model.Change;
-import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.NumericalRevision;
 import com.zutubi.pulse.core.scm.ScmChangeAccumulator;
-import com.zutubi.pulse.core.scm.api.ScmException;
-import com.zutubi.pulse.core.scm.api.ScmFile;
+import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.util.FileSystemUtils;
@@ -149,7 +145,7 @@ public class PerforceClientTest extends PulseTestCase
         assertEquals(6, changes.size());
         Changelist list = changes.get(1);
         assertEquals("Delete and edit files in depot2.", list.getComment());
-        assertEquals("test-user", list.getUser());
+        assertEquals("test-user", list.getAuthor());
         assertEquals("3", list.getRevision().getRevisionString());
         List<Change> changedFiles = list.getChanges();
         assertEquals(2, changedFiles.size());
@@ -406,7 +402,7 @@ public class PerforceClientTest extends PulseTestCase
     public void testGetRevision() throws ScmException
     {
         getServer(TEST_CLIENT);
-        NumericalRevision rev = convertRevision(client.parseRevision("3"));
+        NumericalRevision rev = new NumericalRevision(client.parseRevision("3").getRevisionString());
         assertEquals(3, rev.getRevisionNumber());
     }
 
@@ -421,7 +417,7 @@ public class PerforceClientTest extends PulseTestCase
     public void testGetRevisionPostLatest() throws ScmException
     {
         getServer(TEST_CLIENT);
-        NumericalRevision latest = convertRevision(client.getLatestRevision(null));
+        NumericalRevision latest = new NumericalRevision(client.getLatestRevision(null).getRevisionString());
         try
         {
             client.parseRevision(Long.toString(latest.getRevisionNumber() + 1));
@@ -551,11 +547,6 @@ public class PerforceClientTest extends PulseTestCase
 
     private Revision createRevision(long rev)
     {
-        return new Revision(null, null, null, Long.toString(rev));
-    }
-
-    private NumericalRevision convertRevision(Revision rev)
-    {
-        return new NumericalRevision(rev.getAuthor(), rev.getComment(), rev.getDate(), rev.getRevisionString());
+        return new Revision(Long.toString(rev));
     }
 }

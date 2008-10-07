@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
-import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.PersistentFileChange;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
@@ -176,14 +176,14 @@ public class ViewChangelistAction extends ActionSupport
         return fileDiffUrl;
     }
 
-    public void updateUrls(Change change)
+    public void updateUrls(PersistentFileChange change)
     {
         updateFileViewUrl(change);
         updateFileDownloadUrl(change);
         updateFileDiffUrl(change);
     }
 
-    public void updateFileViewUrl(Change change)
+    public void updateFileViewUrl(PersistentFileChange change)
     {
         ChangeViewerConfiguration changeViewer = getChangeViewer();
         if (changeViewer != null && changeViewer.hasCapability(ChangeViewerConfiguration.Capability.VIEW_FILE))
@@ -196,7 +196,7 @@ public class ViewChangelistAction extends ActionSupport
         }
     }
 
-    public void updateFileDownloadUrl(Change change)
+    public void updateFileDownloadUrl(PersistentFileChange change)
     {
         ChangeViewerConfiguration changeViewer = getChangeViewer();
         if (changeViewer != null && changeViewer.hasCapability(ChangeViewerConfiguration.Capability.DOWNLOAD_FILE))
@@ -209,7 +209,7 @@ public class ViewChangelistAction extends ActionSupport
         }
     }
 
-    public void updateFileDiffUrl(Change change)
+    public void updateFileDiffUrl(PersistentFileChange change)
     {
         ChangeViewerConfiguration changeViewer = getChangeViewer();
         if (changeViewer != null && changeViewer.hasCapability(ChangeViewerConfiguration.Capability.VIEW_FILE_DIFF))
@@ -228,7 +228,7 @@ public class ViewChangelistAction extends ActionSupport
         fileDiffUrl = null;
     }
 
-    private boolean diffableAction(Change.Action action)
+    private boolean diffableAction(PersistentFileChange.Action action)
     {
         switch (action)
         {

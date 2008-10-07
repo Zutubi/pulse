@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core.scm.svn;
 
-import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.NumericalRevision;
 import com.zutubi.pulse.core.scm.ScmUtils;
 import com.zutubi.pulse.core.scm.api.*;
@@ -46,16 +45,6 @@ public class SubversionWorkingCopy extends PersonalBuildSupport implements Worki
         ISVNOptions options = SVNWCUtil.createDefaultOptions(true);
         clientManager = SVNClientManager.newInstance(options);
         configSupport = new ConfigSupport(config);
-    }
-
-    public Revision convertRevision(NumericalRevision rev)
-    {
-        return new Revision(rev.getAuthor(), rev.getComment(), rev.getDate(), rev.getRevisionString());
-    }
-
-    public NumericalRevision convertRevision(Revision rev)
-    {
-        return new NumericalRevision(rev.getAuthor(), rev.getComment(), rev.getDate(), rev.getRevisionString());
     }
 
     private void initAuthenticationManager()
@@ -291,7 +280,7 @@ public class SubversionWorkingCopy extends PersonalBuildSupport implements Worki
         try
         {
             long rev = updateClient.doUpdate(base, SVNRevision.HEAD, true);
-            return convertRevision(new NumericalRevision(rev));
+            return new Revision(new NumericalRevision(rev).getRevisionString());
         }
         catch (SVNException e)
         {
@@ -424,7 +413,7 @@ public class SubversionWorkingCopy extends PersonalBuildSupport implements Worki
                 // such as newly-added files, will be reported by the status
                 // operation as out of date.)
                 NumericalRevision rev = new NumericalRevision(event.getRevision());
-                status.setRevision(convertRevision(rev));
+                status.setRevision(new Revision(rev.getRevisionString()));
                 status("Repository revision: " + rev.getRevisionString());
             }
         }

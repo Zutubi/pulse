@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core.scm.p4;
 
-import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.NumericalRevision;
 import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;

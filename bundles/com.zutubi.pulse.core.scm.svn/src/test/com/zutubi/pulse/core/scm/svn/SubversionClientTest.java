@@ -1,12 +1,8 @@
 package com.zutubi.pulse.core.scm.svn;
 
 import com.zutubi.pulse.core.ExecutionContext;
-import com.zutubi.pulse.core.model.Change;
-import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
-import com.zutubi.pulse.core.scm.api.ScmException;
-import com.zutubi.pulse.core.scm.api.ScmFile;
+import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.util.FileSystemUtils;
@@ -321,6 +317,6 @@ public class SubversionClientTest extends PulseTestCase
 
     private static Revision createRevision(long rev)
     {
-        return new Revision(null, null, null, Long.toString(rev));
+        return new Revision(Long.toString(rev));
     }
 }

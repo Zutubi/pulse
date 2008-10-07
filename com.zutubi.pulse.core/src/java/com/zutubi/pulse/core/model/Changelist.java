@@ -22,7 +22,7 @@ public class Changelist extends Entity
      */
     private String hash;
 
-    private List<Change> changes;
+    private List<PersistentFileChange> changes;
 
     private long projectId;
     private long resultId;
@@ -35,7 +35,7 @@ public class Changelist extends Entity
     public Changelist(Revision revision)
     {
         this.revision = revision;
-        this.changes = new LinkedList<Change>();
+        this.changes = new LinkedList<PersistentFileChange>();
     }
 
     public boolean isEquivalent(Changelist other)
@@ -91,7 +91,7 @@ public class Changelist extends Entity
         this.hash = hash;
     }
 
-    public void addChange(Change change)
+    public void addChange(PersistentFileChange change)
     {
         changes.add(change);
     }
@@ -126,12 +126,12 @@ public class Changelist extends Entity
         return getRevision().getComment();
     }
 
-    public List<Change> getChanges()
+    public List<PersistentFileChange> getChanges()
     {
         return changes;
     }
 
-    private void setChanges(List<Change> changes)
+    private void setChanges(List<PersistentFileChange> changes)
     {
         this.changes = changes;
     }

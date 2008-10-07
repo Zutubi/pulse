@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.scm.cvs.client.commands;
 
-import com.zutubi.pulse.core.model.Change;
+import com.zutubi.pulse.core.scm.api.Change;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

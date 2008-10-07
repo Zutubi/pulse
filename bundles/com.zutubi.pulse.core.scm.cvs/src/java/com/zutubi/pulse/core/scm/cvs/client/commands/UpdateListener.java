@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.scm.cvs.client.commands;
 
+import com.zutubi.pulse.core.scm.api.Change;
 import com.zutubi.pulse.core.scm.api.ScmEventHandler;
 import com.zutubi.pulse.core.scm.api.ScmFile;
-import com.zutubi.pulse.core.scm.api.Change;
 import com.zutubi.util.logging.Logger;
 import org.netbeans.lib.cvsclient.command.DefaultFileInfoContainer;
 import org.netbeans.lib.cvsclient.command.FileInfoContainer;

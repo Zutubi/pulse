@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.model.persistence.hibernate;
 
-import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.PersistentFileChange;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.User;
@@ -38,7 +38,7 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
         Revision revision = new Revision("pulse", "test changelist", date);
         revision.setRevisionString("wow");
         Changelist list = new Changelist(revision);
-        Change change = new Change("some/random/file", "23", Change.Action.EDIT);
+        PersistentFileChange change = new PersistentFileChange("some/random/file", "23", PersistentFileChange.Action.EDIT);
 
         list.addChange(change);
         changelistDao.save(list);
@@ -51,7 +51,7 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
         Revision otherRevision = otherList.getRevision();
         assertPropertyEquals(revision, otherRevision);
 
-        Change otherChange = otherList.getChanges().get(0);
+        PersistentFileChange otherChange = otherList.getChanges().get(0);
         assertPropertyEquals(change, otherChange);
     }
 
@@ -247,9 +247,9 @@ public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
     {
         Changelist l1 = new Changelist(r1);
         l1.setResultId(resultId);
-        l1.addChange(new Change("file1", "1", Change.Action.ADD));
-        l1.addChange(new Change("file2", "23", Change.Action.ADD));
-        l1.addChange(new Change("file3", "4", Change.Action.ADD));
+        l1.addChange(new PersistentFileChange("file1", "1", PersistentFileChange.Action.ADD));
+        l1.addChange(new PersistentFileChange("file2", "23", PersistentFileChange.Action.ADD));
+        l1.addChange(new PersistentFileChange("file3", "4", PersistentFileChange.Action.ADD));
         changelistDao.save(l1);
         return l1;
     }

@@ -25,7 +25,7 @@
         <list name="changes" cascade="all,delete-orphan" lazy="true">
             <key column="CHANGELIST_ID"/>
             <index column="ORDINAL"/>
-            <one-to-many class="com.zutubi.pulse.core.model.Change"/>
+            <one-to-many class="com.zutubi.pulse.core.model.PersistentFileChange"/>
         </list>
 
         <property name="projectId" type="long">
@@ -37,7 +37,7 @@
         </property>
     </class>
 
-    <class name="com.zutubi.pulse.core.model.Change" table="BUILD_FILE_CHANGE" lazy="false">
+    <class name="com.zutubi.pulse.core.model.PersistentFileChange" table="BUILD_FILE_CHANGE" lazy="false">
         <id name="id" type="long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>

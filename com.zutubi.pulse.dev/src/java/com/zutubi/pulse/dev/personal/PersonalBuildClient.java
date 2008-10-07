@@ -1,8 +1,8 @@
 package com.zutubi.pulse.dev.personal;
 
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.personal.PatchArchive;
+import com.zutubi.pulse.core.personal.PersonalBuildException;
 import com.zutubi.pulse.core.scm.ScmLocation;
 import com.zutubi.pulse.core.scm.WorkingCopyFactory;
 import com.zutubi.pulse.core.scm.api.*;

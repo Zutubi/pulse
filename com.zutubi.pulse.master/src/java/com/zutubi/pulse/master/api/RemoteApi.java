@@ -1327,7 +1327,7 @@ public class RemoteApi implements com.zutubi.events.EventListener
         }
 
         Vector<Hashtable<String, Object>> files = new Vector<Hashtable<String, Object>>(change.getChanges().size());
-        for(Change file: change.getChanges())
+        for(PersistentFileChange file: change.getChanges())
         {
             files.add(convertChange(file));
         }
@@ -1336,7 +1336,7 @@ public class RemoteApi implements com.zutubi.events.EventListener
         return result;
     }
 
-    private Hashtable<String, Object> convertChange(Change change)
+    private Hashtable<String, Object> convertChange(PersistentFileChange change)
     {
         Hashtable<String, Object> result = new Hashtable<String, Object>();
         if(change.getFilename() != null)

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.condition;
 
-import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.PersistentFileChange;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.master.model.BuildResult;
@@ -66,7 +66,7 @@ public class ChangedByMeNotificationConditionTest extends PulseTestCase
     private Changelist getChangelistBy(String author)
     {
         Changelist change = new Changelist(new Revision(author, "comment", new Date(0)));
-        change.addChange(new Change("file", "1", Change.Action.EDIT));
+        change.addChange(new PersistentFileChange("file", "1", PersistentFileChange.Action.EDIT));
         return change;
     }
 
