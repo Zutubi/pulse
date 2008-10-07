@@ -1,10 +1,6 @@
 package com.zutubi.pulse.core.scm;
 
-import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.scm.api.ScmClient;
-import com.zutubi.pulse.core.scm.api.ScmContext;
-import com.zutubi.pulse.core.scm.api.ScmException;
-import com.zutubi.pulse.core.scm.api.ScmFile;
+import com.zutubi.pulse.core.scm.api.*;
 
 import java.util.List;
 import java.util.Map;

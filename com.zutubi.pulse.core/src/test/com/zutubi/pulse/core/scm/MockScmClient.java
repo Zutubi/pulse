@@ -3,7 +3,6 @@ package com.zutubi.pulse.core.scm;
 import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.api.*;
 
 import java.io.File;
@@ -97,7 +96,7 @@ public class MockScmClient implements ScmClient, DataCacheAware
         }
         else
         {
-            return new Revision(null, null, null, "1");
+            return new Revision("1");
         }
     }
 
