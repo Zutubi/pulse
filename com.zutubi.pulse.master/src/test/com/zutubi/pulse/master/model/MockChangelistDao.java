@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.model;
 
-import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.master.model.persistence.ChangelistDao;
 
 import java.util.Arrays;
@@ -12,67 +12,67 @@ import java.util.Set;
  */
 public class MockChangelistDao implements ChangelistDao
 {
-    public Set<Long> getAllAffectedProjectIds(Changelist changelist)
+    public Set<Long> getAllAffectedProjectIds(PersistentChangelist changelist)
     {
         return new HashSet<Long>(Arrays.asList(changelist.getProjectId()));
     }
 
-    public Set<Long> getAllAffectedResultIds(Changelist changelist)
+    public Set<Long> getAllAffectedResultIds(PersistentChangelist PersistentChangelist)
     {
         throw new RuntimeException("Method not yet implemented");
     }
 
-    public List<Changelist> findLatestByUser(User user, int max)
+    public List<PersistentChangelist> findLatestByUser(User user, int max)
     {
         throw new RuntimeException("Method not yet implemented");
     }
 
-    public List<Changelist> findLatestByProject(Project project, int max)
+    public List<PersistentChangelist> findLatestByProject(Project project, int max)
     {
         throw new RuntimeException("Method not yet implemented");
     }
 
-    public List<Changelist> findLatestByProjects(Project[] projects, int max)
+    public List<PersistentChangelist> findLatestByProjects(Project[] projects, int max)
     {
         throw new RuntimeException("Method not yet implemented");
     }
 
-    public List<Changelist> findByResult(long id)
+    public List<PersistentChangelist> findByResult(long id)
     {
         throw new RuntimeException("Method not yet implemented");
     }
 
-    public List<Changelist> findAllEquivalent(Changelist changelist)
+    public List<PersistentChangelist> findAllEquivalent(PersistentChangelist PersistentChangelist)
     {
         throw new RuntimeException("Method not yet implemented");
     }
 
-    public Changelist findById(long id)
+    public PersistentChangelist findById(long id)
     {
         throw new RuntimeException("Method not yet implemented");
     }
 
-    public <U extends Changelist> U findByIdAndType(long id, Class<U> type)
+    public <U extends PersistentChangelist> U findByIdAndType(long id, Class<U> type)
     {
         throw new RuntimeException("Method not yet implemented");
     }
 
-    public List<Changelist> findAll()
+    public List<PersistentChangelist> findAll()
     {
         throw new RuntimeException("Method not yet implemented");
     }
 
-    public void save(Changelist entity)
+    public void save(PersistentChangelist entity)
     {
         throw new RuntimeException("Method not yet implemented");
     }
 
-    public void delete(Changelist entity)
+    public void delete(PersistentChangelist entity)
     {
         throw new RuntimeException("Method not yet implemented");
     }
 
-    public void refresh(Changelist entity)
+    public void refresh(PersistentChangelist entity)
     {
         throw new RuntimeException("Method not yet implemented");
     }

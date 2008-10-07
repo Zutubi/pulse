@@ -2,8 +2,8 @@ package com.zutubi.pulse.master.tove.config.project.types;
 
 import com.zutubi.config.annotations.*;
 import com.zutubi.pulse.core.BuildException;
-import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.personal.PatchArchive;
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.PostProcessorManager;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;

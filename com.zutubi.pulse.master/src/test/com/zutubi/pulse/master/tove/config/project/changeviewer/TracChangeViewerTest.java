@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.config.project.changeviewer;
 
 import com.zutubi.pulse.core.config.Configuration;
-import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
@@ -48,7 +48,7 @@ public class TracChangeViewerTest extends PulseTestCase
 
     public void testGetChangesetURL()
     {
-        assertEquals("http://trac.edgewall.org/changeset/3673", viewer.getChangesetURL(new Revision(null, null, null, "3673")));
+        assertEquals("http://trac.edgewall.org/changeset/3673", viewer.getChangesetURL(new Revision("3673")));
     }
 
     public void testGetFileViewURL()

@@ -2,10 +2,14 @@ package com.zutubi.pulse.master.tove.config.project.changeviewer;
 
 import com.zutubi.config.annotations.Form;
 import com.zutubi.config.annotations.SymbolicName;
-import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
+import static com.zutubi.pulse.master.tove.config.project.changeviewer.ChangeViewerUtils.*;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.TextUtils;
+
+import java.util.Date;
+import java.util.Map;
 
 /**
  * A ChangeViewer for linking to a Fisheye instance.
@@ -90,7 +94,13 @@ public class FisheyeConfiguration extends BasePathChangeViewer
         ScmConfiguration scm = lookupScmConfiguration();
         if (scm.getType().equals("cvs"))
         {
-            return String.format("%s:%s:%s", revision.getBranch(), revision.getAuthor(), CustomChangeViewerConfiguration.FISHEYE_DATE_FORMAT.format(revision.getDate()));
+            Map<String, Object> properties = getRevisionProperties(revision);
+            if (properties.containsKey(PROPERTY_AUTHOR) &&
+                properties.containsKey(PROPERTY_BRANCH) &&
+                properties.containsKey(PROPERTY_DATE))
+            {
+                return String.format("%s:%s:%s", properties.get(PROPERTY_BRANCH), properties.get(PROPERTY_AUTHOR), CustomChangeViewerConfiguration.FISHEYE_DATE_FORMAT.format((Date) properties.get(PROPERTY_DATE)));
+            }
         }
 
         return revision.getRevisionString();

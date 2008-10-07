@@ -43,7 +43,7 @@ public abstract class ScmConfiguration extends AbstractConfiguration
      * capability {@link com.zutubi.pulse.core.scm.api.ScmCapability#CHANGESETS}.
      *
      * @param revision revision to get the previous revision for (in the form
-     *                 returned by {@link com.zutubi.pulse.core.model.Revision#getRevisionString()}).
+     *                 returned by {@link com.zutubi.pulse.core.scm.api.Revision#getRevisionString()}).
      * @return the previous revision in the same form, or null if it does not
      *         exist or is not supported
      */

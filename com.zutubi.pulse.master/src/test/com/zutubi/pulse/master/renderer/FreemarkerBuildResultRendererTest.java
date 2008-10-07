@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.renderer;
 
 import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
@@ -47,12 +48,12 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
     public void testBasicSuccess() throws Exception
     {
         BuildResult result = createSuccessfulBuild();
-        createAndVerify("basic", "http://test.url:8080", result, new LinkedList<Changelist>());
+        createAndVerify("basic", "http://test.url:8080", result, new LinkedList<PersistentChangelist>());
     }
 
     public void testWithChanges() throws Exception
     {
-        List<Changelist> changes = getChanges();
+        List<PersistentChangelist> changes = getChanges();
         BuildResult result = createBuildWithChanges(changes);
 
         createAndVerify("changes", "http://another.url", result, changes);
@@ -65,7 +66,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
 
     public void testWithErrorLimit() throws Exception
     {
-        List<Changelist> changes = getChanges();
+        List<PersistentChangelist> changes = getChanges();
         BuildResult result = createBuildWithErrors(changes);
         System.setProperty(FreemarkerBuildResultRenderer.FEATURE_LIMIT_PROPERTY, "7");
         createAndVerify("excesserrors", "plain-text-email", "http://another.url", result, changes);
@@ -74,7 +75,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
     public void testSimpleInstantBasic() throws Exception
     {
         BuildResult result = createSuccessfulBuild();
-        createAndVerify("basic", "simple-instant-message", "http://test.url:8080", result, new LinkedList<Changelist>());
+        createAndVerify("basic", "simple-instant-message", "http://test.url:8080", result, new LinkedList<PersistentChangelist>());
     }
 
     public void testSimpleInstantError() throws Exception
@@ -85,7 +86,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
     public void testDetailedInstantBasic() throws Exception
     {
         BuildResult result = createSuccessfulBuild();
-        createAndVerify("basic", "detailed-instant-message", "http://test.url:8080", result, new LinkedList<Changelist>());
+        createAndVerify("basic", "detailed-instant-message", "http://test.url:8080", result, new LinkedList<PersistentChangelist>());
     }
 
     public void testDetailedInstantError() throws Exception
@@ -105,7 +106,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
 
     public void testHTMLWithChanges() throws Exception
     {
-        List<Changelist> changes = getChanges();
+        List<PersistentChangelist> changes = getChanges();
         BuildResult result = createBuildWithChanges(changes);
 
         createAndVerify("changes", "html-email", "http://another.url", result, changes);
@@ -118,7 +119,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
 
     public void testHTMLWithErrorLimit() throws Exception
     {
-        List<Changelist> changes = getChanges();
+        List<PersistentChangelist> changes = getChanges();
         BuildResult result = createBuildWithErrors(changes);
         System.setProperty(FreemarkerBuildResultRenderer.FEATURE_LIMIT_PROPERTY, "7");
         createAndVerify("excesserrors", "html-email", "http://another.url", result, changes);
@@ -178,14 +179,14 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
     public void testProjectOverviewSuccess() throws Exception
     {
         BuildResult result = createSuccessfulBuild();
-        createAndVerify("basic", "html-project-overview", "http://test.url:8080", result, new LinkedList<Changelist>());
+        createAndVerify("basic", "html-project-overview", "http://test.url:8080", result, new LinkedList<PersistentChangelist>());
     }
 
     public void testProjectOverviewFailureNoPreviousSuccess() throws Exception
     {
         BuildResult result = createSuccessfulBuild();
         result.failure("i failed");
-        createAndVerify("failednosuccess", "html-project-overview", "http://test.url:8080", result, new LinkedList<Changelist>(), null, 0, 0);
+        createAndVerify("failednosuccess", "html-project-overview", "http://test.url:8080", result, new LinkedList<PersistentChangelist>(), null, 0, 0);
     }
 
     public void testProjectOverviewFailurePreviousSuccess() throws Exception
@@ -196,17 +197,17 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         previous.getStamps().setStartTime(System.currentTimeMillis() - Constants.DAY * 3);
         BuildResult result = createSuccessfulBuild();
         result.failure("i failed");
-        createAndVerify("failedsuccess", "html-project-overview", "http://test.url:8080", result, new LinkedList<Changelist>(), previous, 33, 10);
+        createAndVerify("failedsuccess", "html-project-overview", "http://test.url:8080", result, new LinkedList<PersistentChangelist>(), previous, 33, 10);
     }
 
     private void errorsHelper(String type) throws Exception
     {
-        List<Changelist> changes = getChanges();
+        List<PersistentChangelist> changes = getChanges();
         BuildResult result = createBuildWithErrors(changes);
         createAndVerify("errors", type, "http://another.url", result, changes);
     }
 
-    private BuildResult createBuildWithErrors(List<Changelist> changes)
+    private BuildResult createBuildWithErrors(List<PersistentChangelist> changes)
     {
         BuildResult result = createBuildWithChanges(changes);
         result.error("test error message");
@@ -368,15 +369,11 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         return project;
     }
 
-    private BuildResult createBuildWithChanges(List<Changelist> changes)
+    private BuildResult createBuildWithChanges(List<PersistentChangelist> changes)
     {
         BuildResult result = createSuccessfulBuild();
-
-        Revision buildRevision = new Revision(null, null, null, "656");
-
-        result.setRevision(buildRevision);
-
-        for(Changelist change: changes)
+        result.setRevision(new Revision("656"));
+        for(PersistentChangelist change: changes)
         {
             change.setResultId(result.getId());
         }
@@ -384,12 +381,12 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         return result;
     }
 
-    private List<Changelist> getChanges()
+    private List<PersistentChangelist> getChanges()
     {
-        List<Changelist> changes = new LinkedList<Changelist>();
-        Changelist list = new Changelist(new Revision("test author", "CIB-1: short comment", new Date(324252), "655"));
+        List<PersistentChangelist> changes = new LinkedList<PersistentChangelist>();
+        PersistentChangelist list = new PersistentChangelist(new Revision("655"), 324252, "test author", "CIB-1: short comment", Collections.<PersistentFileChange>emptyList());
         changes.add(list);
-        list = new Changelist(new Revision("author2", "this time we will use a longer comment to make sure that the renderer is applying some sort of trimming to the resulting output dadada da dadad ad ad adadad ad ad ada d adada dad ad ad d ad ada da d", new Date(310000), "656"));
+        list = new PersistentChangelist(new Revision("656"), 310000, "author2", "this time we will use a longer comment to make sure that the renderer is applying some sort of trimming to the resulting output dadada da dadad ad ad adadad ad ad ada d adada dad ad ad d ad ada da d", Collections.<PersistentFileChange>emptyList());
         changes.add(list);
         return changes;
     }
@@ -432,26 +429,26 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         result.getStamps().setEndTime(100000);
     }
 
-    protected void createAndVerify(String expectedName, String baseUrl, BuildResult result, List<Changelist> changelists) throws IOException
+    protected void createAndVerify(String expectedName, String baseUrl, BuildResult result, List<PersistentChangelist> PersistentChangelists) throws IOException
     {
-        createAndVerify(expectedName, "plain-text-email", baseUrl, result, changelists);
+        createAndVerify(expectedName, "plain-text-email", baseUrl, result, PersistentChangelists);
     }
 
     protected void createAndVerify(String expectedName, String type, String baseUrl, BuildResult result) throws IOException, URISyntaxException
     {
-        createAndVerify(expectedName, type, baseUrl, result, new LinkedList<Changelist>());
+        createAndVerify(expectedName, type, baseUrl, result, new LinkedList<PersistentChangelist>());
     }
 
-    protected void createAndVerify(String expectedName, String type, String baseUrl, BuildResult result, List<Changelist> changelists) throws IOException
+    protected void createAndVerify(String expectedName, String type, String baseUrl, BuildResult result, List<PersistentChangelist> PersistentChangelists) throws IOException
     {
-        createAndVerify(expectedName, type, baseUrl, result, changelists, null, 0, 0);
+        createAndVerify(expectedName, type, baseUrl, result, PersistentChangelists, null, 0, 0);
     }
 
-    protected void createAndVerify(String expectedName, String type, String baseUrl, BuildResult result, List<Changelist> changelists, BuildResult lastSuccess, int unsuccessfulBuilds, int unsuccessfulDays) throws IOException
+    protected void createAndVerify(String expectedName, String type, String baseUrl, BuildResult result, List<PersistentChangelist> PersistentChangelists, BuildResult lastSuccess, int unsuccessfulBuilds, int unsuccessfulDays) throws IOException
     {
         result.calculateFeatureCounts();
         
-        Map<String, Object> dataMap = getDataMap(baseUrl, result, changelists, lastSuccess, unsuccessfulBuilds, unsuccessfulDays);
+        Map<String, Object> dataMap = getDataMap(baseUrl, result, PersistentChangelists, lastSuccess, unsuccessfulBuilds, unsuccessfulDays);
 
         String extension = "txt";
 
@@ -518,7 +515,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         return s.replace("\r", "");
     }
 
-    private Map<String, Object> getDataMap(String baseUrl, BuildResult result, List<Changelist> changelists, BuildResult lastSuccess, int unsuccessfulBuilds, int unsuccessfulDays)
+    private Map<String, Object> getDataMap(String baseUrl, BuildResult result, List<PersistentChangelist> PersistentChangelists, BuildResult lastSuccess, int unsuccessfulBuilds, int unsuccessfulDays)
     {
 
         Map<String, Object> dataMap = new HashMap<String, Object>();
@@ -528,7 +525,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         dataMap.put("status", result.succeeded() ? "healthy" : "broken");
         dataMap.put("result", result);
         dataMap.put("model", result);
-        dataMap.put("changelists", changelists);
+        dataMap.put("PersistentChangelists", PersistentChangelists);
         dataMap.put("errorLevel", Feature.Level.ERROR);
         dataMap.put("warningLevel", Feature.Level.WARNING);
 

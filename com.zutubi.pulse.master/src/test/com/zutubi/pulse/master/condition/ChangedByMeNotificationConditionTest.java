@@ -1,14 +1,15 @@
 package com.zutubi.pulse.master.condition;
 
-import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.core.model.PersistentFileChange;
-import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.scm.api.Change;
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.model.MockBuildManager;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 
-import java.util.Date;
+import java.util.Arrays;
 
 /**
  */
@@ -51,23 +52,21 @@ public class ChangedByMeNotificationConditionTest extends PulseTestCase
         assertTrue(condition.satisfied(result, me));
     }
 
-    private BuildResult getBuildWithChanges(Changelist ...changes)
+    private BuildResult getBuildWithChanges(PersistentChangelist ...changes)
     {
         BuildResult result = new BuildResult();
-        for(Changelist list: changes)
+        for(PersistentChangelist list: changes)
         {
             list.setResultId(result.getId());
             buildManager.save(list);
         }
-        result.setRevision(new Revision(null, null, null, "1"));
+        result.setRevision(new Revision("1"));
         return result;
     }
 
-    private Changelist getChangelistBy(String author)
+    private PersistentChangelist getChangelistBy(String author)
     {
-        Changelist change = new Changelist(new Revision(author, "comment", new Date(0)));
-        change.addChange(new PersistentFileChange("file", "1", PersistentFileChange.Action.EDIT));
-        return change;
+        return new PersistentChangelist(new Revision("1"), 0, author, "comment", Arrays.asList(new PersistentFileChange("file", "1", Change.Action.EDIT, false)));
     }
 
 }

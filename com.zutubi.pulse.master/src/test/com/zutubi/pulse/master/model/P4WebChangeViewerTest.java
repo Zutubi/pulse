@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.model;
 
 import com.zutubi.pulse.core.config.Configuration;
-import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
@@ -48,7 +48,7 @@ public class P4WebChangeViewerTest extends PulseTestCase
 
     public void testGetChangesetURL()
     {
-        assertEquals("http://localhost:8080/@md=d@/2508?ac=10", viewer.getChangesetURL(new Revision(null, null, null, "2508")));   
+        assertEquals("http://localhost:8080/@md=d@/2508?ac=10", viewer.getChangesetURL(new Revision("2508")));   
     }
 
     public void testGetFileViewURL()

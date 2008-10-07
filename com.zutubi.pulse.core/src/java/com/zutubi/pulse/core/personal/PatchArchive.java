@@ -3,12 +3,7 @@ package com.zutubi.pulse.core.personal;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.zutubi.pulse.core.PulseException;
-import com.zutubi.pulse.core.model.Entity;
-import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.scm.api.EOLStyle;
-import com.zutubi.pulse.core.scm.api.FileStatus;
-import com.zutubi.pulse.core.scm.api.PersonalBuildUI;
-import com.zutubi.pulse.core.scm.api.WorkingCopyStatus;
+import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.io.NullOutputStream;
@@ -39,7 +34,7 @@ public class PatchArchive
      * @param patchFile the destination of the patch file created
      * @param ui the ui reference to allow logging to the command output.
      * 
-     * @throws com.zutubi.pulse.core.PersonalBuildException in the event of any error creating the patch
+     * @throws PersonalBuildException in the event of any error creating the patch
      */
     public PatchArchive(WorkingCopyStatus status, File patchFile, PersonalBuildUI ui) throws PersonalBuildException
     {
@@ -127,7 +122,6 @@ public class PatchArchive
         XStream xstream = new XStream(new DomDriver());
         xstream.alias("status", WorkingCopyStatus.class);
         xstream.alias("revision", Revision.class);
-        xstream.omitField(Entity.class, "id");
         xstream.alias("fileStatus", FileStatus.class);
         xstream.addImplicitCollection(WorkingCopyStatus.class, "changes");
         xstream.setMode(XStream.NO_REFERENCES);

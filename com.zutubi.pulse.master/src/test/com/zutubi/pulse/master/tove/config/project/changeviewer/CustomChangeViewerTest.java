@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.config.project.changeviewer;
 
 import com.zutubi.pulse.core.config.Configuration;
-import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
@@ -56,8 +56,7 @@ public class CustomChangeViewerTest extends PulseTestCase
     {
         viewer.setChangesetURL("${revision} ${author} ${branch} ${time.pulse} ${time.fisheye} ${unknown}");
         Date date = new Date(1000);
-        Revision rev = new Revision("author", "comment", date, "author:branch:19700101-10:00:01");
-        rev.setBranch("branch");
+        Revision rev = new Revision("author:branch:19700101-10:00:01");
         assertEquals("author:branch:19700101-10:00:01 author branch " + CustomChangeViewerConfiguration.PULSE_DATE_FORMAT.format(date) + " 19700101000001 ${unknown}", viewer.getChangesetURL(rev));
     }
 

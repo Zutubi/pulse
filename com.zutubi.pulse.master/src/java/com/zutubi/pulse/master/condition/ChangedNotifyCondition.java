@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.condition;
 
-import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
@@ -35,8 +35,8 @@ public class ChangedNotifyCondition implements NotifyCondition
         {
             public void run()
             {
-                List<Changelist> changelists = buildManager.getChangesForBuild(result);
-                for (Changelist changelist : changelists)
+                List<PersistentChangelist> changelists = buildManager.getChangesForBuild(result);
+                for (PersistentChangelist changelist : changelists)
                 {
                     if (changelist.getChanges() != null && changelist.getChanges().size() > 0)
                     {

@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core.scm.cvs;
 
-import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.api.ScmException;
 
 import java.text.DateFormat;
@@ -157,32 +156,6 @@ public class CvsRevision
     public boolean isHead()
     {
         return getAuthor() == null && getBranch() == null && getComment() == null && getDate() == null;
-    }
-
-    public int compareTo(Revision r)
-    {
-        // First try basing on time
-        if (getDate() != null && r.getDate() != null)
-        {
-            int result = getDate().compareTo(getDate());
-            if (result != 0)
-            {
-                return result;
-            }
-        }
-        if (getDate() == null && r.getDate() == null)
-        {
-            return 0;
-        }
-        if (getDate() == null)
-        {
-            return 1;
-        }
-        if (r.getDate() == null)
-        {
-            return -1;
-        }
-        return 0;
     }
 
     public String getAuthor()

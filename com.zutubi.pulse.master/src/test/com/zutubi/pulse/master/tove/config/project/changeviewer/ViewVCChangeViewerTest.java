@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.config.project.changeviewer;
 
 import com.zutubi.pulse.core.config.Configuration;
-import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
@@ -48,7 +48,7 @@ public class ViewVCChangeViewerTest extends PulseTestCase
 
     public void testGetChangesetURL()
     {
-        assertEquals("http://viewvc.tigris.org/source/browse/viewvc?rev=1412&view=rev", viewer.getChangesetURL(new Revision(null, null, null, "1412")));
+        assertEquals("http://viewvc.tigris.org/source/browse/viewvc?rev=1412&view=rev", viewer.getChangesetURL(new Revision("1412")));
     }
 
     public void testGetFileViewURL()

@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
-import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.ChangelistComparator;
+import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.master.model.BuildResult;
 
@@ -18,7 +18,7 @@ public class ViewChangesAction extends BuildActionBase
     private BuildResult previousSuccessful;
     private BuildResult previousUnsuccessful;
     private BuildResult sinceResult;
-    private List<Changelist> changelists;
+    private List<PersistentChangelist> changelists;
 
     public long getSinceBuild()
     {
@@ -50,7 +50,7 @@ public class ViewChangesAction extends BuildActionBase
         return previousUnsuccessful;
     }
 
-    public List<Changelist> getChangelists()
+    public List<PersistentChangelist> getChangelists()
     {
         return changelists;
     }
@@ -117,7 +117,7 @@ public class ViewChangesAction extends BuildActionBase
             }
         }
 
-        changelists = new LinkedList<Changelist>();
+        changelists = new LinkedList<PersistentChangelist>();
 
         // Get changes for all results after since, up to and including to.
         if (sinceBuild != 0)

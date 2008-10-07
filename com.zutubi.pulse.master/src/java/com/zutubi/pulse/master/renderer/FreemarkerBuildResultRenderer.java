@@ -1,10 +1,10 @@
 package com.zutubi.pulse.master.renderer;
 
-import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.master.committransformers.CommitMessageSupport;
 import com.zutubi.pulse.master.model.BuildResult;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.logging.Logger;
 import freemarker.template.Configuration;
@@ -158,22 +158,22 @@ public class FreemarkerBuildResultRenderer implements BuildResultRenderer
         return StringUtils.wrapString(s, 64, prefix);
     }
 
-    public String transformCommentWithoutTrimming(BuildResult buildResult, Changelist changelist)
+    public String transformCommentWithoutTrimming(BuildResult buildResult, PersistentChangelist changelist)
     {
         return createCommitMessageSupport(buildResult, changelist).toString();
     }
 
-    public String transformComment(BuildResult buildResult, Changelist changelist)
+    public String transformComment(BuildResult buildResult, PersistentChangelist changelist)
     {
         return transformComment(buildResult, changelist, 60);
     }
     
-    public String transformComment(BuildResult buildResult, Changelist changelist, int trimToLength)
+    public String transformComment(BuildResult buildResult, PersistentChangelist changelist, int trimToLength)
     {
         return createCommitMessageSupport(buildResult, changelist).trim(trimToLength);
     }
 
-    private CommitMessageSupport createCommitMessageSupport(BuildResult buildResult, Changelist changelist)
+    private CommitMessageSupport createCommitMessageSupport(BuildResult buildResult, PersistentChangelist changelist)
     {
         return new CommitMessageSupport(changelist.getComment(), buildResult.getProject().getConfig().getCommitMessageTransformers().values());
     }

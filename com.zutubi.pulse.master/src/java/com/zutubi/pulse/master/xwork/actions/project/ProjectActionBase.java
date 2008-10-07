@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
-import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Feature;
+import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.master.committransformers.CommitMessageSupport;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.Project;
@@ -100,7 +100,7 @@ public class ProjectActionBase extends ActionSupport
         return project;
     }
 
-    public CommitMessageSupport getCommitMessageSupport(Changelist changelist)
+    public CommitMessageSupport getCommitMessageSupport(PersistentChangelist changelist)
     {
         // When in the context of a project, only apply its own transformers
         return new CommitMessageSupport(changelist.getComment(), getProject().getConfig().getCommitMessageTransformers().values());

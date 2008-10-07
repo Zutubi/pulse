@@ -5,8 +5,8 @@ import com.opensymphony.xwork.ActionContext;
 import com.opensymphony.xwork.TextProvider;
 import com.opensymphony.xwork.util.OgnlValueStack;
 import com.zutubi.i18n.Messages;
-import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.model.PersistentChangelist;
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.committransformers.CommitMessageSupport;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.ProjectManager;
@@ -244,7 +244,8 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
         return changeUrl;
     }
 
-    public void updateChangeUrl(Changelist changelist)
+    
+    public void updateChangeUrl(PersistentChangelist changelist)
     {
         // We cache the URL as velocity null handling is brain dead
         try
@@ -287,7 +288,7 @@ public class ActionSupport extends com.opensymphony.xwork.ActionSupport implemen
         return Messages.getInstance(instance).format(key, (Object[])args);
     }
 
-    public CommitMessageSupport getCommitMessageSupport(Changelist changelist)
+    public CommitMessageSupport getCommitMessageSupport(PersistentChangelist changelist)
     {
         List<CommitMessageTransformerConfiguration> transformers = new LinkedList<CommitMessageTransformerConfiguration>();
         for(long projectId: changelistDao.getAllAffectedProjectIds(changelist))

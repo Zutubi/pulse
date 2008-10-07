@@ -3,10 +3,7 @@ package com.zutubi.pulse.core.scm.api;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.TimeStamps;
 
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 
 /**
@@ -24,11 +21,7 @@ public class Changelist implements Comparable<Changelist>
 
     private List<Change> changes;
 
-    protected Changelist()
-    {
-    }
-
-    public Changelist(Revision revision, long time, String author, String comment)
+    public Changelist(Revision revision, long time, String author, String comment, Collection<Change> changes)
     {
         this.revision = revision;
         this.time = time;
@@ -39,17 +32,17 @@ public class Changelist implements Comparable<Changelist>
             this.comment = StringUtils.trimmedString(comment, MAX_COMMENT_LENGTH, COMMENT_TRIM_MESSAGE);
         }
 
-        this.changes = new LinkedList<Change>();
-    }
-
-    public void addChange(Change change)
-    {
-        changes.add(change);
+        this.changes = new LinkedList<Change>(changes);
     }
 
     public Revision getRevision()
     {
         return revision;
+    }
+
+    public long getTime()
+    {
+        return time;
     }
 
     public Date getDate()
@@ -79,7 +72,7 @@ public class Changelist implements Comparable<Changelist>
 
     public List<Change> getChanges()
     {
-        return changes;
+        return Collections.unmodifiableList(changes);
     }
 
     public int compareTo(Changelist o)

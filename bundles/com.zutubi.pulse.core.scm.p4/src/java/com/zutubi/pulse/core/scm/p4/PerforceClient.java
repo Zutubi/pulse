@@ -350,23 +350,23 @@ public class PerforceClient extends CachingScmClient
 
         Revision revision = new Revision(Long.toString(number));
         ScmFilepathFilter filter = new ScmFilepathFilter(excludedPaths);
-        Changelist changelist = new Changelist(revision, date.getTime(), user, comment);
-
+        List<Change> changes = new LinkedList<Change>();
         for (int i = affectedFilesIndex + 2; i < lines.length; i++)
         {
             Change change = getChangelistChange(lines[i]);
             if (filter.accept(change.getFilename()))
             {
-                changelist.addChange(change);
+                changes.add(change);
             }
         }
 
         // if all of the changes have been filtered out, then there is no changelist so we return null.
-        if (changelist.getChanges().size() == 0)
+        if (changes.isEmpty())
         {
             return null;
         }
-        return changelist;
+
+        return new Changelist(revision, date.getTime(), user, comment, changes);
     }
 
     private Change getChangelistChange(String line) throws ScmException

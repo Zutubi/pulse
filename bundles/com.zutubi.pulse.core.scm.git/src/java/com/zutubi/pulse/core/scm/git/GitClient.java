@@ -1,10 +1,10 @@
 package com.zutubi.pulse.core.scm.git;
 
 import com.zutubi.pulse.core.ExecutionContext;
-import com.zutubi.pulse.core.scm.api.ScmCapability;
-import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.*;
+import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.Mapping;
 import com.zutubi.util.TextUtils;
 
 import java.io.File;
@@ -284,35 +284,42 @@ public class GitClient implements ScmClient
             // be aware, the log contains duplicate file entries for the edit/delete case.
 
             List<Changelist> changelists = new LinkedList<Changelist>();
-            for (GitLogEntry entry : entries)
+            for (final GitLogEntry entry : entries)
             {
                 Revision rev = new Revision(entry.getId());
 
-                Changelist changelist = new Changelist(rev, entry.getDate().getTime(), entry.getAuthor(), entry.getComment());
+                Changelist changelist = new Changelist(
+                        rev,
+                        entry.getDate().getTime(),
+                        entry.getAuthor(),
+                        entry.getComment(),
+                        CollectionUtils.map(entry.getFiles(), new Mapping<GitLogEntry.FileChangeEntry, Change>()
+                        {
+                            public Change map(GitLogEntry.FileChangeEntry file)
+                            {
+                                Change.Action action;
+                                if (file.getAction().equals(FLAG_EDITED))
+                                {
+                                    action = Change.Action.EDIT;
+                                }
+                                else if (file.getAction().equals(FLAG_DELETED))
+                                {
+                                    action = Change.Action.DELETE;
+                                }
+                                else if (file.getAction().equals(FLAG_ADDED))
+                                {
+                                    action = Change.Action.ADD;
+                                }
+                                else
+                                {
+                                    action = Change.Action.UNKNOWN;
+                                }
 
-                for (GitLogEntry.FileChangeEntry file : entry.getFiles())
-                {
-                    Change.Action action;
-                    if (file.getAction().equals(FLAG_EDITED))
-                    {
-                        action = Change.Action.EDIT;
-                    }
-                    else if (file.getAction().equals(FLAG_DELETED))
-                    {
-                        action = Change.Action.DELETE;
-                    }
-                    else if (file.getAction().equals(FLAG_ADDED))
-                    {
-                        action = Change.Action.ADD;
-                    }
-                    else
-                    {
-                        action = Change.Action.UNKNOWN;
-                    }
-                    
-                    Change change = new Change(file.getName(), entry.getId(), action);
-                    changelist.addChange(change);
-                }
+                                return new Change(file.getName(), entry.getId(), action);
+                            }
+                        })
+                );
+
                 changelists.add(changelist);
             }
 

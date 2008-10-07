@@ -3,8 +3,8 @@ package com.zutubi.pulse.master.model;
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
 import com.zutubi.config.annotations.Transient;
-import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.DelegateScmClientFactory;
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmContext;
 import com.zutubi.pulse.core.scm.api.ScmException;
@@ -133,7 +133,7 @@ public class ChangelistIsolatorTest extends PulseTestCase
 
     private Revision returnLatestBuild(long revision)
     {
-        Revision rev = new Revision(null, null, null, Long.toString(revision));
+        Revision rev = new Revision(Long.toString(revision));
         mockScm.expectAndReturn("getLatestRevision", C.ANY_ARGS, rev);
         mockScm.expect("close");
         return rev;
@@ -153,7 +153,7 @@ public class ChangelistIsolatorTest extends PulseTestCase
     private Revision returnBuild(long revision)
     {
         BuildResult result = new BuildResult();
-        Revision rev = new Revision(null, null, null, Long.toString(revision));
+        Revision rev = new Revision(Long.toString(revision));
         result.setRevision(rev);
         mockBuildManager.expectAndReturn("queryBuilds", C.ANY_ARGS, Arrays.asList(result));
         return rev;
@@ -164,10 +164,10 @@ public class ChangelistIsolatorTest extends PulseTestCase
         List<Revision> ret = new LinkedList<Revision>();
         for(long r: revisions)
         {
-            ret.add(new Revision(null, null, null, Long.toString(r)));
+            ret.add(new Revision(Long.toString(r)));
         }
 
-        mockScm.expectAndReturn("getRevisions", C.args(C.IS_ANYTHING, C.eq(new Revision(null, null, null, Long.toString(since))), C.IS_NULL), ret);
+        mockScm.expectAndReturn("getRevisions", C.args(C.IS_ANYTHING, C.eq(new Revision(Long.toString(since))), C.IS_NULL), ret);
         mockScm.expect("close");
     }
 

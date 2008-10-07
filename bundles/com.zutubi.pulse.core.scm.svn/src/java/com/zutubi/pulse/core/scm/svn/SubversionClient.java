@@ -424,8 +424,7 @@ public class SubversionClient implements ScmClient
         for (SVNLogEntry entry : logs)
         {
             NumericalRevision revision = new NumericalRevision(entry.getRevision());
-            Changelist list = new Changelist(convertRevision(revision), entry.getDate().getTime(), entry.getAuthor(), entry.getMessage());
-            handler.handle(list);
+            handler.startChangelist(convertRevision(revision), entry.getDate().getTime(), entry.getAuthor(), entry.getMessage());
 
             Map files = entry.getChangedPaths();
 
@@ -434,7 +433,7 @@ public class SubversionClient implements ScmClient
                 SVNLogEntryPath entryPath = (SVNLogEntryPath) value;
                 if (filter.accept(entryPath.getPath()))
                 {
-                    if (handler.handle(new Change(entryPath.getPath(), String.valueOf(revision.getRevisionNumber()), decodeAction(entryPath.getType()))))
+                    if (handler.handleChange(new Change(entryPath.getPath(), String.valueOf(revision.getRevisionNumber()), decodeAction(entryPath.getType()))))
                     {
                         return true;
                     }
@@ -807,32 +806,40 @@ public class SubversionClient implements ScmClient
 
     private interface ChangeHandler
     {
-        void handle(Changelist list);
+        void startChangelist(Revision revision, long time, String author, String message);
 
-        boolean handle(Change change);
+        boolean handleChange(Change change);
 
         void complete();
     }
 
-    private class ChangelistAccumulator implements ChangeHandler
+    private static class ChangelistAccumulator implements ChangeHandler
     {
         private List<Changelist> changelists = new LinkedList<Changelist>();
-        private Changelist current;
+        private List<Change> currentChanges = null;
+        private Revision currentRevision;
+        private long currentTime;
+        private String currentAuthor;
+        private String currentMessage;
 
         public List<Changelist> getChangelists()
         {
             return changelists;
         }
 
-        public void handle(Changelist list)
+        public void startChangelist(Revision revision, long time, String author, String message)
         {
             checkCurrent();
-            current = list;
+            currentChanges = new LinkedList<Change>();
+            currentRevision = revision;
+            currentTime = time;
+            currentAuthor = author;
+            currentMessage = message;
         }
 
-        public boolean handle(Change change)
+        public boolean handleChange(Change change)
         {
-            current.addChange(change);
+            currentChanges.add(change);
             return false;
         }
 
@@ -843,9 +850,8 @@ public class SubversionClient implements ScmClient
 
         private void checkCurrent()
         {
-            if (current != null && current.getChanges().size() > 0)
+            if (currentChanges != null && !currentChanges.isEmpty())
             {
-                String currentRevision = current.getRevision().getRevisionString();
                 for (Changelist list : changelists)
                 {
                     if (list.getRevision().getRevisionString().equals(currentRevision))
@@ -855,12 +861,12 @@ public class SubversionClient implements ScmClient
                     }
                 }
 
-                changelists.add(current);
+                changelists.add(new Changelist(currentRevision, currentTime, currentAuthor, currentMessage, currentChanges));
             }
         }
     }
 
-    private class ChangeDetector implements ChangeHandler
+    private static class ChangeDetector implements ChangeHandler
     {
         private boolean changed = false;
 
@@ -869,11 +875,11 @@ public class SubversionClient implements ScmClient
             return changed;
         }
 
-        public void handle(Changelist list)
+        public void startChangelist(Revision revision, long time, String author, String message)
         {
         }
 
-        public boolean handle(Change change)
+        public boolean handleChange(Change change)
         {
             changed = true;
             return true;

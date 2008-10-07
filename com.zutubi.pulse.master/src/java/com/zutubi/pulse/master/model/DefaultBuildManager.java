@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.model;
 
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.util.FileSystemUtils;
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.MasterBuildPaths;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.database.DatabaseConsole;
@@ -10,6 +10,7 @@ import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.pulse.master.model.persistence.ChangelistDao;
 import com.zutubi.pulse.master.model.persistence.FileArtifactDao;
 import com.zutubi.pulse.master.security.PulseThreadFactory;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
@@ -127,7 +128,7 @@ public class DefaultBuildManager implements BuildManager
         buildResultDao.save(result);
     }
 
-    public void save(Changelist changelist)
+    public void save(PersistentChangelist changelist)
     {
         changelistDao.save(changelist);
     }
@@ -353,22 +354,22 @@ public class DefaultBuildManager implements BuildManager
         return previousRevision;
     }
 
-    public List<Changelist> getLatestChangesForUser(User user, int max)
+    public List<PersistentChangelist> getLatestChangesForUser(User user, int max)
     {
         return changelistDao.findLatestByUser(user, max);
     }
 
-    public List<Changelist> getLatestChangesForProject(Project project, int max)
+    public List<PersistentChangelist> getLatestChangesForProject(Project project, int max)
     {
         return changelistDao.findLatestByProject(project, max);
     }
 
-    public List<Changelist> getLatestChangesForProjects(Project[] projects, int max)
+    public List<PersistentChangelist> getLatestChangesForProjects(Project[] projects, int max)
     {
         return changelistDao.findLatestByProjects(projects, max);
     }
 
-    public List<Changelist> getChangesForBuild(BuildResult result)
+    public List<PersistentChangelist> getChangesForBuild(BuildResult result)
     {
         return changelistDao.findByResult(result.getId());
     }
@@ -527,8 +528,8 @@ public class DefaultBuildManager implements BuildManager
             Revision revision = build.getRevision();
             if(revision != null)
             {
-                List<Changelist> changelists = changelistDao.findByResult(build.getId());
-                for(Changelist change: changelists)
+                List<PersistentChangelist> changelists = changelistDao.findByResult(build.getId());
+                for(PersistentChangelist change: changelists)
                 {
                     changelistDao.delete(change);
                 }

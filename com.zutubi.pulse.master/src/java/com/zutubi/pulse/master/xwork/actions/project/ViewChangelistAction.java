@@ -1,7 +1,8 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
-import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.core.model.PersistentFileChange;
+import com.zutubi.pulse.core.scm.api.Change;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
@@ -19,7 +20,7 @@ import java.util.*;
 public class ViewChangelistAction extends ActionSupport
 {
     private long id;
-    private Changelist changelist;
+    private PersistentChangelist changelist;
     private BuildManager buildManager;
 
     /**
@@ -97,7 +98,7 @@ public class ViewChangelistAction extends ActionSupport
         return buildResult;
     }
 
-    public Changelist getChangelist()
+    public PersistentChangelist getChangelist()
     {
         return changelist;
     }
@@ -214,7 +215,7 @@ public class ViewChangelistAction extends ActionSupport
         ChangeViewerConfiguration changeViewer = getChangeViewer();
         if (changeViewer != null && changeViewer.hasCapability(ChangeViewerConfiguration.Capability.VIEW_FILE_DIFF))
         {
-            if (diffableAction(change.getAction()))
+            if (diffableAction(change.asChange().getAction()))
             {
                 String previous = scm.getPreviousRevision(change.getRevisionString());
                 if (previous != null)
@@ -228,7 +229,7 @@ public class ViewChangelistAction extends ActionSupport
         fileDiffUrl = null;
     }
 
-    private boolean diffableAction(PersistentFileChange.Action action)
+    private boolean diffableAction(Change.Action action)
     {
         switch (action)
         {
@@ -241,7 +242,7 @@ public class ViewChangelistAction extends ActionSupport
         }
     }
 
-    public void setChangelist(Changelist changelist)
+    public void setChangelist(PersistentChangelist changelist)
     {
         this.changelist = changelist;
     }

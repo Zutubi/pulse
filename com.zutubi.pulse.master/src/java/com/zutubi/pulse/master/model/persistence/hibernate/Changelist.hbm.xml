@@ -6,7 +6,7 @@
             <generator class="hilo"/>
         </id>
 
-        <component name="revision" class="com.zutubi.pulse.core.model.Revision">
+        <component name="revision" class="com.zutubi.pulse.core.scm.api.Revision">
             <property name="author" type="string" length="255">
                 <column name="REVISION_AUTHOR" index="idx_changelist_revision_author"/>
             </property>

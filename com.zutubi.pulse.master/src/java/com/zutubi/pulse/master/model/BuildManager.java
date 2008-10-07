@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.model;
 
 import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.security.SecureParameter;
 import com.zutubi.pulse.master.security.SecureResult;
 import com.zutubi.tove.security.AccessManager;
@@ -19,7 +20,7 @@ public interface BuildManager
 
     void save(RecipeResult result);
 
-    void save(Changelist changelist);
+    void save(PersistentChangelist changelist);
 
     @SecureResult
     BuildResult getBuildResult(long id);
@@ -156,16 +157,16 @@ public interface BuildManager
      * @return a list of up to max of the most recent changes for the user
      */
     @SecureParameter(parameterType = User.class, action = AccessManager.ACTION_VIEW)
-    List<Changelist> getLatestChangesForUser(User user, int max);
+    List<PersistentChangelist> getLatestChangesForUser(User user, int max);
 
     @SecureParameter(parameterType = Project.class, action = AccessManager.ACTION_VIEW)
-    List<Changelist> getLatestChangesForProject(Project project, int max);
+    List<PersistentChangelist> getLatestChangesForProject(Project project, int max);
 
     @SecureParameter(parameterType = Project.class, action = AccessManager.ACTION_VIEW)
-    List<Changelist> getLatestChangesForProjects(Project[] projects, int max);
+    List<PersistentChangelist> getLatestChangesForProjects(Project[] projects, int max);
 
     @SecureParameter(action = AccessManager.ACTION_VIEW)
-    List<Changelist> getChangesForBuild(BuildResult result);
+    List<PersistentChangelist> getChangesForBuild(BuildResult result);
 
     @SecureParameter(action = AccessManager.ACTION_WRITE)
     void deleteAllBuilds(Project project);

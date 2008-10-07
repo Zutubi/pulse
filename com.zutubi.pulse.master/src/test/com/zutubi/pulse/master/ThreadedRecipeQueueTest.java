@@ -10,8 +10,8 @@ import com.zutubi.pulse.core.RecipeRequest;
 import com.zutubi.pulse.core.config.Resource;
 import com.zutubi.pulse.core.config.ResourceRequirement;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
-import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.personal.PatchArchive;
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.agent.Agent;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.agent.AgentSorter;
@@ -36,9 +36,9 @@ import com.zutubi.pulse.master.tove.config.project.types.CustomTypeConfiguration
 import com.zutubi.pulse.servercore.ChainBootstrapper;
 import com.zutubi.pulse.servercore.SystemInfo;
 import com.zutubi.pulse.servercore.agent.PingStatus;
-import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
 import com.zutubi.pulse.servercore.services.SlaveStatus;
 import com.zutubi.pulse.servercore.services.UpgradeStatus;
+import com.zutubi.pulse.servercore.util.logging.CustomLogRecord;
 import com.zutubi.tove.config.MockConfigurationProvider;
 import junit.framework.TestCase;
 
@@ -972,6 +972,6 @@ public class ThreadedRecipeQueueTest extends TestCase implements com.zutubi.even
 
     private Revision createRevision(long rev)
     {
-        return new Revision(null, null, null, Long.toString(rev));
+        return new Revision(Long.toString(rev));
     }
 }

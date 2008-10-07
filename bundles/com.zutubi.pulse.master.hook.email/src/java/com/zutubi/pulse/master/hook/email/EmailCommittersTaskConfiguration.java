@@ -7,7 +7,7 @@ import com.zutubi.config.annotations.Wire;
 import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.config.AbstractConfiguration;
-import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.master.ResultNotifier;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.pulse.master.model.BuildResult;
@@ -112,9 +112,9 @@ public class EmailCommittersTaskConfiguration extends AbstractConfiguration impl
     private List<String> getEmails(BuildResult result)
     {
         List<String> emails = new LinkedList<String>();
-        for (Changelist change : buildManager.getChangesForBuild(result))
+        for (PersistentChangelist change : buildManager.getChangesForBuild(result))
         {
-            String user = change.getUser();
+            String user = change.getAuthor();
             if (TextUtils.stringSet(user) && (!ignorePulseUsers || userManager.getUser(user) == null))
             {
                 emails.add(StringUtils.join("@", true, user, emailDomain));

@@ -8,6 +8,7 @@ import com.zutubi.pulse.core.model.*;
 import com.zutubi.pulse.core.scm.ScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
 import com.zutubi.pulse.core.scm.ScmLocation;
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmCapability;
 import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmException;
@@ -1290,8 +1291,8 @@ public class RemoteApi implements com.zutubi.events.EventListener
             {
                 public void run()
                 {
-                    List<Changelist> changelists = buildManager.getChangesForBuild(build);
-                    for(Changelist change: changelists)
+                    List<PersistentChangelist> changelists = buildManager.getChangesForBuild(build);
+                    for(PersistentChangelist change: changelists)
                     {
                         result.add(convertChangelist(change));
                     }
@@ -1306,16 +1307,16 @@ public class RemoteApi implements com.zutubi.events.EventListener
         }
     }
 
-    private Hashtable<String, Object> convertChangelist(Changelist change)
+    private Hashtable<String, Object> convertChangelist(PersistentChangelist change)
     {
         Hashtable<String, Object> result = new Hashtable<String, Object>();
         if(change.getRevision() != null && change.getRevision().getRevisionString() != null)
         {
             result.put("revision", change.getRevision().getRevisionString());
         }
-        if(change.getUser() != null)
+        if(change.getAuthor() != null)
         {
-            result.put("author", change.getUser());
+            result.put("author", change.getAuthor());
         }
         if(change.getDate() != null)
         {
@@ -1347,9 +1348,9 @@ public class RemoteApi implements com.zutubi.events.EventListener
         {
             result.put("revision", change.getRevisionString());
         }
-        if(change.getAction() != null)
+        if(change.getActionName() != null)
         {
-            result.put("action", change.getAction().toString().toLowerCase());
+            result.put("action", change.getActionName().toLowerCase());
         }
 
         return result;

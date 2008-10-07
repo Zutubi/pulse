@@ -1,9 +1,9 @@
 package com.zutubi.pulse.core.scm;
 
+import com.zutubi.pulse.core.scm.api.Change;
 import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmFile;
-import com.zutubi.pulse.core.scm.api.Change;
 
 import java.util.*;
 
@@ -54,48 +54,55 @@ public class ExpectedTestResults
     private void setupResults()
     {
         changelists = new LinkedList<Changelist>();
-        changelists.add(new Changelist(revisions.get(0), 0, null, null));
-        changelists.add(new Changelist(revisions.get(1), 0, null, null));
-        changelists.add(new Changelist(revisions.get(2), 0, null, null));
-        changelists.add(new Changelist(revisions.get(3), 0, null, null));
-        changelists.add(new Changelist(revisions.get(4), 0, null, null));
 
-
-        Changelist cl1 = changelists.get(0);
-        cl1.addChange(new Change(pathPrefix + "project/README.txt", null, Change.Action.ADD));
-        cl1.addChange(new Change(pathPrefix + "project/src/Src.java", null, Change.Action.ADD));
-        cl1.addChange(new Change(pathPrefix + "project/test/Test.java", null, Change.Action.ADD));
+        List<Change> changes = new LinkedList<Change>();
+        changes.add(new Change(pathPrefix + "project/README.txt", null, Change.Action.ADD));
+        changes.add(new Change(pathPrefix + "project/src/Src.java", null, Change.Action.ADD));
+        changes.add(new Change(pathPrefix + "project/test/Test.java", null, Change.Action.ADD));
         if (versionedDirectorySupport)
         {
-            cl1.addChange(new Change("project", null, Change.Action.ADD, true));
-            cl1.addChange(new Change("project/src", null, Change.Action.ADD, true));
-            cl1.addChange(new Change("project/test", null, Change.Action.ADD, true));
+            changes.add(new Change("project", null, Change.Action.ADD, true));
+            changes.add(new Change("project/src", null, Change.Action.ADD, true));
+            changes.add(new Change("project/test", null, Change.Action.ADD, true));
         }
 
-        Changelist cl2 = changelists.get(1);
-        cl2.addChange(new Change(pathPrefix + "project/build.xml", null, Change.Action.ADD));
-        cl2.addChange(new Change(pathPrefix + "project/src/com/Com.java", null, Change.Action.ADD));
-        cl2.addChange(new Change(pathPrefix + "project/src/com/package.properties", null, Change.Action.ADD));
-        cl2.addChange(new Change(pathPrefix + "project/README.txt", null, Change.Action.EDIT));
-        cl2.addChange(new Change(pathPrefix + "project/src/Src.java", null, Change.Action.EDIT));
+        changelists.add(new Changelist(revisions.get(0), 0, null, null, changes));
+
+        changes.clear();
+
+        changes.add(new Change(pathPrefix + "project/build.xml", null, Change.Action.ADD));
+        changes.add(new Change(pathPrefix + "project/src/com/Com.java", null, Change.Action.ADD));
+        changes.add(new Change(pathPrefix + "project/src/com/package.properties", null, Change.Action.ADD));
+        changes.add(new Change(pathPrefix + "project/README.txt", null, Change.Action.EDIT));
+        changes.add(new Change(pathPrefix + "project/src/Src.java", null, Change.Action.EDIT));
         if (versionedDirectorySupport)
         {
-            cl2.addChange(new Change("project/src/com", null, Change.Action.ADD, true));
+            changes.add(new Change("project/src/com", null, Change.Action.ADD, true));
         }
 
-        Changelist cl3 = changelists.get(2);
-        cl3.addChange(new Change(pathPrefix + "project/README.txt", null, Change.Action.EDIT));
-        cl3.addChange(new Change(pathPrefix + "project/src/Src.java", null, Change.Action.EDIT));
-        cl3.addChange(new Change(pathPrefix + "project/src/com/package.properties", null, Change.Action.EDIT));
-        cl3.addChange(new Change(pathPrefix + "project/test/Test.java", null, Change.Action.EDIT));
+        changelists.add(new Changelist(revisions.get(1), 0, null, null, changes));
 
-        Changelist cl4 = changelists.get(3);
-        cl4.addChange(new Change(pathPrefix + "project/README.txt", null, Change.Action.EDIT));
-        cl4.addChange(new Change(pathPrefix + "project/src/Src.java", null, Change.Action.DELETE));
+        changes.clear();
 
-        Changelist cl5 = changelists.get(4);
-        cl5.addChange(new Change(pathPrefix + "project/README.txt", null, Change.Action.EDIT));
-        cl5.addChange(new Change(pathPrefix + "project/test/Test.java", null, Change.Action.EDIT));
+        changes.add(new Change(pathPrefix + "project/README.txt", null, Change.Action.EDIT));
+        changes.add(new Change(pathPrefix + "project/src/Src.java", null, Change.Action.EDIT));
+        changes.add(new Change(pathPrefix + "project/src/com/package.properties", null, Change.Action.EDIT));
+        changes.add(new Change(pathPrefix + "project/test/Test.java", null, Change.Action.EDIT));
+
+        changelists.add(new Changelist(revisions.get(2), 0, null, null, changes));
+
+        changes.clear();
+
+        changes.add(new Change(pathPrefix + "project/README.txt", null, Change.Action.EDIT));
+        changes.add(new Change(pathPrefix + "project/src/Src.java", null, Change.Action.DELETE));
+
+        changelists.add(new Changelist(revisions.get(3), 0, null, null, changes));
+
+        changes.clear();
+
+        changes.add(new Change(pathPrefix + "project/README.txt", null, Change.Action.EDIT));
+        changes.add(new Change(pathPrefix + "project/test/Test.java", null, Change.Action.EDIT));
+        changelists.add(new Changelist(revisions.get(4), 0, null, null, changes));
     }
 
     public void setVersionDirectorySupport(boolean b)
@@ -268,12 +275,7 @@ public class ExpectedTestResults
             }
         }
 
-        Changelist result = new Changelist(null, 0, null, null);
-        for (Change change : latestChanges.values())
-        {
-            result.addChange(change);
-        }
-        return result;
+        return new Changelist(null, 0, null, null, latestChanges.values());
     }
 
     public List<ScmFile> browse(String path, Revision rev)

@@ -1,12 +1,14 @@
 package com.zutubi.pulse.master.model.persistence.hibernate;
 
 import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.model.persistence.BuildResultDao;
 import com.zutubi.pulse.master.model.persistence.ChangelistDao;
 import com.zutubi.pulse.master.model.persistence.ProjectDao;
 import com.zutubi.pulse.master.model.persistence.UserDao;
 
+import java.util.Collections;
 import java.util.List;
 
 
@@ -88,7 +90,7 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
     {
         RecipeResult recipeResult = createRecipe();
 
-        Revision revision = new Revision(null, null, null, "42");
+        Revision revision = new Revision("42");
 
         // Need to save the Project as it is *not* cascaded from BuildResult
         Project project = new Project();
@@ -447,10 +449,10 @@ public class HibernateBuildResultDaoTest extends MasterPersistenceTestCase
         projectDao.save(p);
 
         BuildResult result = createCompletedBuild(p, 1);
-        result.setRevision(new Revision(null, null, null, "10"));
+        result.setRevision(new Revision("10"));
         buildResultDao.save(result);
 
-        Changelist list = new Changelist(new Revision(null, null, null, "10"));
+        PersistentChangelist list = new PersistentChangelist(new Revision("10"), 0, null, null, Collections.<PersistentFileChange>emptyList());
         list.setProjectId(p.getId());
         list.setResultId(result.getId());
         changelistDao.save(list);

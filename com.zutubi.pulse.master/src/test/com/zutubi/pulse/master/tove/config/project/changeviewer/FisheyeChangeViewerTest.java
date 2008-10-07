@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.tove.config.project.changeviewer;
 
 import com.zutubi.pulse.core.config.Configuration;
-import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
@@ -49,7 +49,7 @@ public class FisheyeChangeViewerTest extends PulseTestCase
 
     public void testGetChangesetURL()
     {
-        assertEquals("http://fisheye.cinnamonbob.com/changelog/Zutubi/?cs=2508", viewer.getChangesetURL(new Revision(null, null, null, "2508")));   
+        assertEquals("http://fisheye.cinnamonbob.com/changelog/Zutubi/?cs=2508", viewer.getChangesetURL(new Revision("2508")));   
     }
 
     public void testGetFileViewURL()

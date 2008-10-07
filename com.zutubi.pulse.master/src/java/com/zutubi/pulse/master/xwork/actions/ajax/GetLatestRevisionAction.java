@@ -1,14 +1,15 @@
 package com.zutubi.pulse.master.xwork.actions.ajax;
 
-import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.ScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmCapability;
 import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmContext;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.scm.ScmContextFactory;
 import com.zutubi.pulse.master.xwork.actions.project.ProjectActionSupport;
+import com.zutubi.util.TimeStamps;
 
 /**
  * Simple ajax action to retrieve the latest revision for a project, used on
@@ -57,7 +58,7 @@ public class GetLatestRevisionAction extends ProjectActionSupport
                 }
                 else
                 {
-                    latestRevision = new Revision(System.currentTimeMillis()).getRevisionString();
+                    latestRevision = new Revision(TimeStamps.getPrettyDate(System.currentTimeMillis(), getLocale())).getRevisionString();
                 }
 
                 successful = true;

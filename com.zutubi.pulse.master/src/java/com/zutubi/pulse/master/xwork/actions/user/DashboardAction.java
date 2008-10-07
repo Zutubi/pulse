@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.xwork.actions.user;
 
-import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.ChangelistComparator;
 import com.zutubi.pulse.core.model.NamedEntityComparator;
+import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.master.ResultNotifier;
 import com.zutubi.pulse.master.model.*;
 import com.zutubi.pulse.master.security.AcegiUtils;
@@ -25,8 +25,8 @@ public class DashboardAction extends ActionSupport
     private List<BuildResult> myBuilds;
     private List<Project> shownProjects;
     private Collection<ProjectGroup> shownGroups;
-    private List<Changelist> changelists;
-    private List<Changelist> projectChangelists = null;
+    private List<PersistentChangelist> changelists;
+    private List<PersistentChangelist> projectChangelists = null;
 
     private BuildManager buildManager;
 
@@ -74,17 +74,17 @@ public class DashboardAction extends ActionSupport
         return buildManager.getLatestBuildResultsForProject(p, dashboardConfig.getBuildCount());
     }
 
-    public List<Changelist> getChangelists()
+    public List<PersistentChangelist> getChangelists()
     {
         return changelists;
     }
 
-    public List<Changelist> getProjectChangelists()
+    public List<PersistentChangelist> getProjectChangelists()
     {
         return projectChangelists;
     }
 
-    public List<BuildResult> getChangelistResults(Changelist changelist)
+    public List<BuildResult> getChangelistResults(PersistentChangelist changelist)
     {
         try
         {

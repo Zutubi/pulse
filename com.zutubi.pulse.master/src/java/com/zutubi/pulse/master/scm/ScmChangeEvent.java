@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.scm;
 
 import com.zutubi.events.Event;
-import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 
 /**

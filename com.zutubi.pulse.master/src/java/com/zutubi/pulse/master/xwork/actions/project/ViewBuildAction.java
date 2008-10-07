@@ -1,7 +1,7 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
 import com.zutubi.pulse.core.config.NamedConfigurationComparator;
-import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.core.model.TestSuiteResult;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.BuildColumns;
@@ -30,7 +30,7 @@ public class ViewBuildAction extends CommandActionBase
 
     private static final Logger LOG = Logger.getLogger(ViewBuildAction.class);
 
-    private List<Changelist> changelists;
+    private List<PersistentChangelist> changelists;
     private BuildColumns summaryColumns;
 
     private MasterConfigurationManager configurationManager;
@@ -168,7 +168,7 @@ public class ViewBuildAction extends CommandActionBase
         pathStack.pop();
     }
 
-    public List<Changelist> getChangelists()
+    public List<PersistentChangelist> getChangelists()
     {
         if(changelists == null)
         {

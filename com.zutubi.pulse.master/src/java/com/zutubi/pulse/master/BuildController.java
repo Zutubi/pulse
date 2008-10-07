@@ -10,7 +10,10 @@ import com.zutubi.pulse.core.events.RecipeCommencedEvent;
 import com.zutubi.pulse.core.events.RecipeCompletedEvent;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.core.events.RecipeEvent;
-import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.core.model.Feature;
+import com.zutubi.pulse.core.model.PersistentChangelist;
+import com.zutubi.pulse.core.model.RecipeResult;
+import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.core.scm.CheckoutScheme;
 import com.zutubi.pulse.core.scm.ScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
@@ -41,10 +44,7 @@ import org.quartz.Trigger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ThreadFactory;
 
 /**
@@ -386,7 +386,7 @@ public class BuildController implements EventListener
             client = scmClientFactory.createClient(scm);
             ScmContext scmContext = scmContextFactory.createContext(project.getId(), scm);
             boolean supportsRevisions = client.getCapabilities().contains(ScmCapability.REVISIONS);
-            return supportsRevisions ? client.getLatestRevision(scmContext) : new Revision(System.currentTimeMillis());
+            return supportsRevisions ? client.getLatestRevision(scmContext) : new Revision(TimeStamps.getPrettyDate(System.currentTimeMillis(), Locale.getDefault()));
         }
         catch (ScmException e)
         {
@@ -691,19 +691,20 @@ public class BuildController implements EventListener
         }
     }
 
-    private List<Changelist> getChangeSince(ScmContext context, ScmClient client, Revision previousRevision, Revision revision) throws ScmException
+    private List<PersistentChangelist> getChangeSince(ScmContext context, ScmClient client, Revision previousRevision, Revision revision) throws ScmException
     {
-        List<Changelist> result = new LinkedList<Changelist>();
+        List<PersistentChangelist> result = new LinkedList<PersistentChangelist>();
         if(client.getCapabilities().contains(ScmCapability.CHANGESETS))
         {
             List<Changelist> scmChanges = client.getChanges(context, previousRevision, revision);
 
-            for (Changelist change : scmChanges)
+            for (Changelist changelist : scmChanges)
             {
-                change.setProjectId(buildResult.getProject().getId());
-                change.setResultId(buildResult.getId());
-                buildManager.save(change);
-                result.add(change);
+                PersistentChangelist persistentChangelist = new PersistentChangelist(changelist);
+                persistentChangelist.setProjectId(buildResult.getProject().getId());
+                persistentChangelist.setResultId(buildResult.getId());
+                buildManager.save(persistentChangelist);
+                result.add(persistentChangelist);
             }
         }
 

@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.xwork.actions.project;
 
-import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.core.model.ResultState;
 import com.zutubi.pulse.master.model.BuildColumns;
 import com.zutubi.pulse.master.model.BuildResult;
@@ -18,7 +18,7 @@ public class ProjectHomeAction extends ProjectActionBase
     private int successfulBuilds;
     private int failedBuilds;
     private BuildResult currentBuild;
-    private List<Changelist> latestChanges;
+    private List<PersistentChangelist> latestChanges;
     private List<BuildResult> recentBuilds;
     private BuildColumns summaryColumns;
     private BuildColumns recentColumns;
@@ -86,7 +86,7 @@ public class ProjectHomeAction extends ProjectActionBase
         return currentBuild;
     }
 
-    public List<Changelist> getLatestChanges()
+    public List<PersistentChangelist> getLatestChanges()
     {
         return latestChanges;
     }

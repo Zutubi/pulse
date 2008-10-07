@@ -49,7 +49,7 @@
 
         <property name="hasWorkDir" type="boolean"/>
 
-        <many-to-one name="revision" class="com.zutubi.pulse.core.model.Revision" column="REVISION_ID" cascade="all" unique="true"/>
+        <many-to-one name="revision" class="com.zutubi.pulse.core.scm.api.Revision" column="REVISION_ID" cascade="all" unique="true"/>
 
     </class>
 

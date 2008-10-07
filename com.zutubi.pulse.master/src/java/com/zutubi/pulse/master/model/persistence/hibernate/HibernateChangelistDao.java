@@ -1,6 +1,6 @@
 package com.zutubi.pulse.master.model.persistence.hibernate;
 
-import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.PersistentChangelist;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.model.persistence.ChangelistDao;
@@ -16,18 +16,18 @@ import java.util.*;
  * Hibernate implementation of ChangelistDao.
  */
 @SuppressWarnings({"unchecked"})
-public class HibernateChangelistDao extends HibernateEntityDao<Changelist> implements ChangelistDao
+public class HibernateChangelistDao extends HibernateEntityDao<PersistentChangelist> implements ChangelistDao
 {
     public Class persistentClass()
     {
-        return Changelist.class;
+        return PersistentChangelist.class;
     }
 
-    public Set<Long> getAllAffectedProjectIds(Changelist changelist)
+    public Set<Long> getAllAffectedProjectIds(PersistentChangelist changelist)
     {
-        List<Changelist> all = findAllEquivalent(changelist);
+        List<PersistentChangelist> all = findAllEquivalent(changelist);
         Set<Long> ids = new HashSet<Long>();
-        for(Changelist cl: all)
+        for(PersistentChangelist cl: all)
         {
             ids.add(cl.getProjectId());
         }
@@ -35,11 +35,11 @@ public class HibernateChangelistDao extends HibernateEntityDao<Changelist> imple
         return ids;
     }
 
-    public Set<Long> getAllAffectedResultIds(Changelist changelist)
+    public Set<Long> getAllAffectedResultIds(PersistentChangelist changelist)
     {
-        List<Changelist> all = findAllEquivalent(changelist);
+        List<PersistentChangelist> all = findAllEquivalent(changelist);
         Set<Long> ids = new HashSet<Long>();
-        for(Changelist cl: all)
+        for(PersistentChangelist cl: all)
         {
             ids.add(cl.getResultId());
         }
@@ -47,7 +47,7 @@ public class HibernateChangelistDao extends HibernateEntityDao<Changelist> imple
         return ids;
     }
 
-    public List<Changelist> findLatestByUser(final User user, final int max)
+    public List<PersistentChangelist> findLatestByUser(final User user, final int max)
     {
         final List<String> allLogins = new LinkedList<String>();
         allLogins.add(user.getConfig().getLogin());
@@ -64,7 +64,7 @@ public class HibernateChangelistDao extends HibernateEntityDao<Changelist> imple
         }, max);
     }
 
-    public List<Changelist> findLatestByProject(final Project project, final int max)
+    public List<PersistentChangelist> findLatestByProject(final Project project, final int max)
     {
         return findUnique(new ChangelistQuery()
         {
@@ -77,7 +77,7 @@ public class HibernateChangelistDao extends HibernateEntityDao<Changelist> imple
         }, max);
     }
 
-    public List<Changelist> findLatestByProjects(Project[] projects, final int max)
+    public List<PersistentChangelist> findLatestByProjects(Project[] projects, final int max)
     {
         final Long[] projectIds = new Long[projects.length];
         for(int i = 0; i < projects.length; i++)
@@ -96,14 +96,14 @@ public class HibernateChangelistDao extends HibernateEntityDao<Changelist> imple
         }, max);
     }
 
-    public List<Changelist> findAllEquivalent(final Changelist changelist)
+    public List<PersistentChangelist> findAllEquivalent(final PersistentChangelist changelist)
     {
-        List<Changelist> result = (List<Changelist>) getHibernateTemplate().execute(new HibernateCallback()
+        List<PersistentChangelist> result = (List<PersistentChangelist>) getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery("from Changelist model where model.hash = :hash");
-                queryObject.setParameter("hash", changelist.getHash());
+                Query queryObject = session.createQuery("from Changelist model where model.revisionString = :revisionString");
+                queryObject.setParameter("revisionString", changelist.getRevision().getRevisionString());
 
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
 
@@ -111,21 +111,12 @@ public class HibernateChangelistDao extends HibernateEntityDao<Changelist> imple
             }
         });
 
-        Iterator<Changelist> it = result.iterator();
-        while(it.hasNext())
-        {
-            if(!it.next().isEquivalent(changelist))
-            {
-                it.remove();
-            }
-        }
-
         return result;
     }
 
-    public List<Changelist> findByResult(final long id)
+    public List<PersistentChangelist> findByResult(final long id)
     {
-        return  (List<Changelist>) getHibernateTemplate().execute(new HibernateCallback()
+        return  (List<PersistentChangelist>) getHibernateTemplate().execute(new HibernateCallback()
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
@@ -144,14 +135,14 @@ public class HibernateChangelistDao extends HibernateEntityDao<Changelist> imple
         Query createQuery(Session session);
     }
 
-    private List<Changelist> findUnique(final ChangelistQuery changelistQuery, final int max)
+    private List<PersistentChangelist> findUnique(final ChangelistQuery changelistQuery, final int max)
     {
-        List<Changelist> results = new ArrayList<Changelist>(max);
+        List<PersistentChangelist> results = new ArrayList<PersistentChangelist>(max);
         final int[] offset = { 0 };
 
         while(results.size() < max)
         {
-            List<Changelist> changelists = (List<Changelist>) getHibernateTemplate().execute(new HibernateCallback()
+            List<PersistentChangelist> changelists = (List<PersistentChangelist>) getHibernateTemplate().execute(new HibernateCallback()
             {
                 public Object doInHibernate(Session session) throws HibernateException
                 {
@@ -182,14 +173,14 @@ public class HibernateChangelistDao extends HibernateEntityDao<Changelist> imple
         return results;
     }
 
-    private void addUnique(Collection<Changelist> lists, Collection<Changelist> toAdd)
+    private void addUnique(Collection<PersistentChangelist> lists, Collection<PersistentChangelist> toAdd)
     {
-        for(Changelist candidate: toAdd)
+        for(PersistentChangelist candidate: toAdd)
         {
             boolean found = false;
-            for(Changelist existing: lists)
+            for(PersistentChangelist existing: lists)
             {
-                if(existing.isEquivalent(candidate))
+                if(existing.equals(candidate))
                 {
                     found = true;
                     break;

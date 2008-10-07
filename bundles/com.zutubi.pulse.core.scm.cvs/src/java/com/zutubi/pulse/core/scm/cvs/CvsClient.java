@@ -11,7 +11,9 @@ import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.cvs.client.CvsCore;
 import com.zutubi.pulse.core.scm.cvs.client.LogInformationAnalyser;
 import com.zutubi.pulse.core.scm.cvs.client.commands.RlsInfo;
+import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.Mapping;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.io.CleanupInputStream;
 import com.zutubi.util.io.IOUtils;
@@ -387,30 +389,39 @@ public class CvsClient implements ScmClient, DataCacheAware
         List<Changelist> fixedChangelists = new LinkedList<Changelist>();
         for (Changelist changelist : changes)
         {
-            Changelist fixedChangelist = new Changelist(changelist.getRevision(), changelist.getDate().getTime(), changelist.getAuthor(), changelist.getComment());
-            for (Change change : changelist.getChanges())
-            {
-                // a) strip off the leading /.
-                String filename = change.getFilename();
-                if (filename.startsWith("/"))
-                {
-                    filename = filename.substring(1);
-                }
-                // b) strip off the 'Attic' for dead files.  This may catch valid directories, but that is a less frequent case.
-                if (filename.contains("/Attic/"))
-                {
-                    // looking for the attic parent directory...
-                    // use the scmfile object to simplify the extraction of the 'Attic'
-                    ScmFile file = new ScmFile(filename);
-                    if (file.getParent() != null && file.getParent().endsWith("/Attic"))
+            Changelist fixedChangelist = new Changelist(
+                    changelist.getRevision(),
+                    changelist.getTime(),
+                    changelist.getAuthor(),
+                    changelist.getComment(),
+                    CollectionUtils.map(changelist.getChanges(), new Mapping<Change, Change>()
                     {
-                        file = new ScmFile(file.getParentFile().getParentFile(), file.getName());
-                        filename = file.getPath();
-                    }
-                }
-                Change fixedChange = new Change(filename, change.getRevisionString(), change.getAction());
-                fixedChangelist.addChange(fixedChange);
-            }
+                        public Change map(Change change)
+                        {
+                            // a) strip off the leading /.
+                            String filename = change.getFilename();
+                            if (filename.startsWith("/"))
+                            {
+                                filename = filename.substring(1);
+                            }
+                            // b) strip off the 'Attic' for dead files.  This may catch valid directories, but that is a less frequent case.
+                            if (filename.contains("/Attic/"))
+                            {
+                                // looking for the attic parent directory...
+                                // use the scmfile object to simplify the extraction of the 'Attic'
+                                ScmFile file = new ScmFile(filename);
+                                if (file.getParent() != null && file.getParent().endsWith("/Attic"))
+                                {
+                                    file = new ScmFile(file.getParentFile().getParentFile(), file.getName());
+                                    filename = file.getPath();
+                                }
+                            }
+
+                            return new Change(filename, change.getRevisionString(), change.getAction());
+                        }
+                    })
+            );
+
             fixedChangelists.add(fixedChangelist);
         }
 

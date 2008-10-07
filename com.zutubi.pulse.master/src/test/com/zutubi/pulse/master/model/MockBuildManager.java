@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.model;
 
 import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.core.scm.api.Revision;
 
 import java.util.*;
 
@@ -11,7 +12,7 @@ public class MockBuildManager implements BuildManager
     private Map<Long, BuildResult> buildResults = new TreeMap<Long, BuildResult>();
     private Map<Long, RecipeResultNode> recipeResultNodes = new TreeMap<Long, RecipeResultNode>();
     private Map<Long, RecipeResult> recipeResults = new TreeMap<Long, RecipeResult>();
-    private Map<Long, Changelist> changelists = new TreeMap<Long, Changelist>();
+    private Map<Long, PersistentChangelist> changelists = new TreeMap<Long, PersistentChangelist>();
 
     public void clear()
     {
@@ -40,7 +41,7 @@ public class MockBuildManager implements BuildManager
         recipeResults.put(result.getId(), result);
     }
 
-    public void save(Changelist changelist)
+    public void save(PersistentChangelist changelist)
     {
         changelists.put(changelist.getId(), changelist);
     }
@@ -208,7 +209,7 @@ public class MockBuildManager implements BuildManager
         throw new RuntimeException("Method not implemented.");
     }
 
-    public List<Changelist> getLatestChangesForUser(User user, int max)
+    public List<PersistentChangelist> getLatestChangesForUser(User user, int max)
     {
         throw new RuntimeException("Method not implemented.");
     }
@@ -228,20 +229,20 @@ public class MockBuildManager implements BuildManager
         throw new RuntimeException("Method not implemented.");
     }
 
-    public List<Changelist> getLatestChangesForProject(Project project, int max)
+    public List<PersistentChangelist> getLatestChangesForProject(Project project, int max)
     {
         throw new RuntimeException("Method not implemented.");
     }
 
-    public List<Changelist> getLatestChangesForProjects(Project[] projects, int max)
+    public List<PersistentChangelist> getLatestChangesForProjects(Project[] projects, int max)
     {
         throw new RuntimeException("Method not implemented.");
     }
 
-    public List<Changelist> getChangesForBuild(BuildResult result)
+    public List<PersistentChangelist> getChangesForBuild(BuildResult result)
     {
-        List<Changelist> lists = new LinkedList<Changelist>();
-        for(Changelist c: changelists.values())
+        List<PersistentChangelist> lists = new LinkedList<PersistentChangelist>();
+        for(PersistentChangelist c: changelists.values())
         {
             if(c.getResultId() == result.getId())
             {
@@ -260,7 +261,7 @@ public class MockBuildManager implements BuildManager
     {
     }
 
-    public Changelist getChangelistByRevision(String serverUid, Revision revision)
+    public PersistentChangelist getChangelistByRevision(String serverUid, Revision revision)
     {
         throw new RuntimeException("Method not implemented.");
     }

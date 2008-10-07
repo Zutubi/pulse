@@ -7,7 +7,7 @@ import com.zutubi.pulse.core.FileLoadException;
 import com.zutubi.pulse.core.Property;
 import com.zutubi.pulse.core.PulseScope;
 import com.zutubi.pulse.core.VariableHelper;
-import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.tove.config.ConfigurationProvider;
@@ -15,6 +15,8 @@ import com.zutubi.util.StringUtils;
 import com.zutubi.util.TextUtils;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Map;
 import java.util.TimeZone;
 
 /**
@@ -160,13 +162,23 @@ public class CustomChangeViewerConfiguration extends ChangeViewerConfiguration
         {
             PulseScope scope = new PulseScope();
             scope.add(new Property(PROPERTY_REVISION, revision.getRevisionString()));
-            scope.add(new Property(PROPERTY_AUTHOR, revision.getAuthor()));
-            scope.add(new Property(PROPERTY_BRANCH, revision.getBranch()));
 
-            if(revision.getDate() != null)
+            Map<String, Object> properties = ChangeViewerUtils.getRevisionProperties(revision);
+            if (properties.containsKey(ChangeViewerUtils.PROPERTY_AUTHOR))
             {
-                scope.add(new Property(PROPERTY_TIMESTAMP_PULSE, PULSE_DATE_FORMAT.format(revision.getDate())));
-                scope.add(new Property(PROPERTY_TIMESTAMP_FISHEYE, FISHEYE_DATE_FORMAT.format(revision.getDate())));
+                scope.add(new Property(PROPERTY_AUTHOR, (String) properties.get(ChangeViewerUtils.PROPERTY_AUTHOR)));
+            }
+
+            if (properties.containsKey(ChangeViewerUtils.PROPERTY_BRANCH))
+            {
+                scope.add(new Property(PROPERTY_BRANCH, (String) properties.get(ChangeViewerUtils.PROPERTY_BRANCH)));
+            }
+
+            if (properties.containsKey(ChangeViewerUtils.PROPERTY_DATE))
+            {
+                Date date = (Date) properties.get(ChangeViewerUtils.PROPERTY_DATE);
+                scope.add(new Property(PROPERTY_TIMESTAMP_PULSE, PULSE_DATE_FORMAT.format(date)));
+                scope.add(new Property(PROPERTY_TIMESTAMP_FISHEYE, FISHEYE_DATE_FORMAT.format(date)));
             }
 
             try

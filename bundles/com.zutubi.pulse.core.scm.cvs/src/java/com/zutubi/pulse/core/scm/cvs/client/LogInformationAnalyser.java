@@ -5,10 +5,12 @@
 
 package com.zutubi.pulse.core.scm.cvs.client;
 
-import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.Change;
+import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.cvs.CvsClient;
 import com.zutubi.pulse.core.scm.cvs.CvsRevision;
+import com.zutubi.util.CollectionUtils;
+import com.zutubi.util.Mapping;
 import com.zutubi.util.logging.Logger;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
@@ -181,11 +183,19 @@ public class LogInformationAnalyser
             }
 
             CvsRevision rev = new CvsRevision(lastChange.getAuthor(), lastChange.getTag(), lastChange.getMessage(), lastChange.getDate());
-            Changelist changelist = new Changelist(CvsClient.convertRevision(rev), lastChange.getDate().getTime(), lastChange.getAuthor(), lastChange.getMessage());
-            for (Revision change : localChanges)
-            {
-                changelist.addChange(new Change(change.getFilename(), change.getRevision(), change.getAction()));
-            }
+            Changelist changelist = new Changelist(
+                    CvsClient.convertRevision(rev),
+                    lastChange.getDate().getTime(),
+                    lastChange.getAuthor(),
+                    lastChange.getMessage(),
+                    CollectionUtils.map(localChanges, new Mapping<Revision, Change>()
+                    {
+                        public Change map(Revision revision)
+                        {
+                            return new Change(revision.getFilename(), revision.getRevision(), revision.getAction());
+                        }
+                    })
+            );
             changelists.add(changelist);
             
             // CIB-1627: need some logging. We do not expect this to be null, but have had cases where this is so.  Not exactly

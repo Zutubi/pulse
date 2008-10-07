@@ -1,8 +1,8 @@
 package com.zutubi.pulse.master.model;
 
-import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.ScmClientFactory;
 import com.zutubi.pulse.core.scm.ScmClientUtils;
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmClient;
 import com.zutubi.pulse.core.scm.api.ScmContext;
 import com.zutubi.pulse.core.scm.api.ScmException;
@@ -79,9 +79,8 @@ public class ChangelistIsolator
         else if (force)
         {
             // Force a build of the latest revision anyway
-            // We need to copy the revision as they are unique in the BUILD_SCM table!
             assert latestBuiltRevision != null;
-            result = Arrays.asList(latestBuiltRevision.copy());
+            result = Arrays.asList(latestBuiltRevision);
         }
 
         return result;

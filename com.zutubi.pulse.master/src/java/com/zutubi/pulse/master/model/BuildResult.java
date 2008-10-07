@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.model;
 
 import com.zutubi.pulse.core.model.*;
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.master.tove.config.user.UserConfiguration;
 import com.zutubi.util.Predicate;
 import org.acegisecurity.acl.basic.AclObjectIdentity;
