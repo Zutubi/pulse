@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.scm;
+package com.zutubi.pulse.core.scm.api;
 
 import java.io.File;
 

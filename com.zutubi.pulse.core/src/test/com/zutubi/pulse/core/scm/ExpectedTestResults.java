@@ -1,14 +1,11 @@
 package com.zutubi.pulse.core.scm;
 
-import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Change;
+import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.scm.api.ScmFile;
 
-import java.util.List;
-import java.util.LinkedList;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.*;
 
 /**
  *

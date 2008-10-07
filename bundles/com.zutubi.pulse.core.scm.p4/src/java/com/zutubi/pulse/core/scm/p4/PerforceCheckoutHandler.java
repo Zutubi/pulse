@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.scm.p4;
 
 import com.zutubi.pulse.core.model.Change;
-import com.zutubi.pulse.core.scm.ScmCancelledException;
-import com.zutubi.pulse.core.scm.ScmEventHandler;
+import com.zutubi.pulse.core.scm.api.ScmCancelledException;
+import com.zutubi.pulse.core.scm.api.ScmEventHandler;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

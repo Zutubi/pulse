@@ -4,7 +4,7 @@ import java.util.List;
 
 /**
  * Interface that must be implemented by SCM configurations when the SCM
- * claims capability {@link com.zutubi.pulse.core.scm.ScmCapability#POLL}.
+ * claims capability {@link com.zutubi.pulse.core.scm.api.ScmCapability#POLL}.
  */
 public interface Pollable
 {

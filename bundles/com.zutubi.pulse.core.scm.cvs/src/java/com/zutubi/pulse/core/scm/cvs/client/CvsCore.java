@@ -1,13 +1,13 @@
 package com.zutubi.pulse.core.scm.cvs.client;
 
-import com.zutubi.util.TextUtils;
+import com.zutubi.pulse.core.scm.api.ScmEventHandler;
+import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.cvs.CvsRevision;
-import com.zutubi.pulse.core.scm.ScmEventHandler;
-import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.cvs.client.commands.*;
 import com.zutubi.pulse.core.scm.cvs.client.util.CvsUtils;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.Constants;
+import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.TextUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.netbeans.lib.cvsclient.CVSRoot;

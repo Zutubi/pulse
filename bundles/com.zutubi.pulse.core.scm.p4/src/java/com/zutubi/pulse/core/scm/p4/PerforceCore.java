@@ -2,8 +2,8 @@ package com.zutubi.pulse.core.scm.p4;
 
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.NumericalRevision;
-import com.zutubi.pulse.core.scm.ScmCancelledException;
-import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.scm.api.ScmCancelledException;
+import com.zutubi.pulse.core.scm.api.ScmException;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.core.util.process.AsyncProcess;
 import com.zutubi.pulse.core.util.process.LineHandler;

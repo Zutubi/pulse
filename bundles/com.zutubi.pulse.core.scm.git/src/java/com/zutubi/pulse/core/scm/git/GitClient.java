@@ -1,11 +1,11 @@
 package com.zutubi.pulse.core.scm.git;
 
 import com.zutubi.pulse.core.ExecutionContext;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.scm.*;
+import com.zutubi.pulse.core.scm.api.*;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.TextUtils;
 
 import java.io.File;
@@ -14,7 +14,7 @@ import java.io.InputStream;
 import java.util.*;
 
 /**
- * Implementation of the {@link com.zutubi.pulse.core.scm.ScmClient} interface for the
+ * Implementation of the {@link com.zutubi.pulse.core.scm.api.ScmClient} interface for the
  * GIT source control system (http://git.or.cz/).
  */
 public class GitClient implements ScmClient
@@ -39,7 +39,7 @@ public class GitClient implements ScmClient
     private static final String FLAG_DELETED =  "D";
 
     /**
-     * @see com.zutubi.pulse.core.scm.ScmClient#close()
+     * @see com.zutubi.pulse.core.scm.api.ScmClient#close()
      */
     public void close()
     {
@@ -47,7 +47,7 @@ public class GitClient implements ScmClient
     }
 
     /**
-     * @see com.zutubi.pulse.core.scm.ScmClient#getCapabilities()
+     * @see com.zutubi.pulse.core.scm.api.ScmClient#getCapabilities()
      */
     public Set<ScmCapability> getCapabilities()
     {
@@ -55,7 +55,7 @@ public class GitClient implements ScmClient
     }
 
     /**
-     * @see com.zutubi.pulse.core.scm.ScmClient#getUid()
+     * @see com.zutubi.pulse.core.scm.api.ScmClient#getUid()
      */
     public String getUid() throws ScmException
     {
@@ -63,7 +63,7 @@ public class GitClient implements ScmClient
     }
 
     /**
-     * @see com.zutubi.pulse.core.scm.ScmClient#getLocation()
+     * @see com.zutubi.pulse.core.scm.api.ScmClient#getLocation()
      */
     public String getLocation() throws ScmException
     {
@@ -71,7 +71,7 @@ public class GitClient implements ScmClient
     }
 
     /**
-     * @see com.zutubi.pulse.core.scm.ScmClient#checkout(com.zutubi.pulse.core.ExecutionContext,com.zutubi.pulse.core.model.Revision,com.zutubi.pulse.core.scm.ScmEventHandler)
+     * @see com.zutubi.pulse.core.scm.api.ScmClient#checkout(com.zutubi.pulse.core.ExecutionContext,com.zutubi.pulse.core.model.Revision,com.zutubi.pulse.core.scm.api.ScmEventHandler)
      */
     public Revision checkout(ExecutionContext context, Revision revision, ScmEventHandler handler) throws ScmException
     {
@@ -107,7 +107,7 @@ public class GitClient implements ScmClient
     }
 
     /**
-     * @see com.zutubi.pulse.core.scm.ScmClient#update(com.zutubi.pulse.core.ExecutionContext,com.zutubi.pulse.core.model.Revision,com.zutubi.pulse.core.scm.ScmEventHandler)
+     * @see com.zutubi.pulse.core.scm.api.ScmClient#update(com.zutubi.pulse.core.ExecutionContext,com.zutubi.pulse.core.model.Revision,com.zutubi.pulse.core.scm.api.ScmEventHandler)
      */
     public Revision update(ExecutionContext context, Revision revision, ScmEventHandler handler) throws ScmException
     {
@@ -149,7 +149,7 @@ public class GitClient implements ScmClient
     }
 
     /**
-     * @see com.zutubi.pulse.core.scm.ScmClient#retrieve(com.zutubi.pulse.core.scm.ScmContext,String,com.zutubi.pulse.core.model.Revision)
+     * @see com.zutubi.pulse.core.scm.api.ScmClient#retrieve(com.zutubi.pulse.core.scm.api.ScmContext,String,com.zutubi.pulse.core.model.Revision)
      */
     public InputStream retrieve(ScmContext context, String path, Revision revision) throws ScmException
     {
@@ -174,7 +174,7 @@ public class GitClient implements ScmClient
     }
 
     /**
-     * @see com.zutubi.pulse.core.scm.ScmClient#storeConnectionDetails(java.io.File)
+     * @see com.zutubi.pulse.core.scm.api.ScmClient#storeConnectionDetails(java.io.File)
      */
     public void storeConnectionDetails(File outputDir) throws ScmException, IOException
     {
@@ -182,15 +182,15 @@ public class GitClient implements ScmClient
     }
 
     /**
-     * @see com.zutubi.pulse.core.scm.ScmClient#getEOLPolicy(com.zutubi.pulse.core.scm.ScmContext)
+     * @see com.zutubi.pulse.core.scm.api.ScmClient#getEOLPolicy(com.zutubi.pulse.core.scm.api.ScmContext)
      */
-    public FileStatus.EOLStyle getEOLPolicy(ScmContext context) throws ScmException
+    public EOLStyle getEOLPolicy(ScmContext context) throws ScmException
     {
-        return FileStatus.EOLStyle.BINARY;
+        return EOLStyle.BINARY;
     }
 
     /**
-     * @see com.zutubi.pulse.core.scm.ScmClient#getLatestRevision(com.zutubi.pulse.core.scm.ScmContext)
+     * @see com.zutubi.pulse.core.scm.api.ScmClient#getLatestRevision(com.zutubi.pulse.core.scm.api.ScmContext)
      */
     public Revision getLatestRevision(ScmContext context) throws ScmException
     {
@@ -238,7 +238,7 @@ public class GitClient implements ScmClient
     }
 
     /**
-     * @see com.zutubi.pulse.core.scm.ScmClient#getRevisions(com.zutubi.pulse.core.scm.ScmContext,com.zutubi.pulse.core.model.Revision,com.zutubi.pulse.core.model.Revision)
+     * @see com.zutubi.pulse.core.scm.api.ScmClient#getRevisions(com.zutubi.pulse.core.scm.api.ScmContext,com.zutubi.pulse.core.model.Revision,com.zutubi.pulse.core.model.Revision)
      */
     public List<Revision> getRevisions(ScmContext context, Revision from, Revision to) throws ScmException
     {
@@ -270,7 +270,7 @@ public class GitClient implements ScmClient
     }
 
     /**
-     * @see com.zutubi.pulse.core.scm.ScmClient#getChanges(com.zutubi.pulse.core.scm.ScmContext,com.zutubi.pulse.core.model.Revision,com.zutubi.pulse.core.model.Revision)
+     * @see com.zutubi.pulse.core.scm.api.ScmClient#getChanges(com.zutubi.pulse.core.scm.api.ScmContext,com.zutubi.pulse.core.model.Revision,com.zutubi.pulse.core.model.Revision)
      */
     public List<Changelist> getChanges(ScmContext context, Revision from, Revision to) throws ScmException
     {
@@ -331,7 +331,7 @@ public class GitClient implements ScmClient
     }
 
     /**
-     * @see com.zutubi.pulse.core.scm.ScmClient#browse(com.zutubi.pulse.core.scm.ScmContext,String,com.zutubi.pulse.core.model.Revision)
+     * @see com.zutubi.pulse.core.scm.api.ScmClient#browse(com.zutubi.pulse.core.scm.api.ScmContext,String,com.zutubi.pulse.core.model.Revision)
      */
     public List<ScmFile> browse(ScmContext context, String path, Revision revision) throws ScmException
     {
@@ -371,7 +371,7 @@ public class GitClient implements ScmClient
     }
 
     /**
-     * @see com.zutubi.pulse.core.scm.ScmClient#tag(com.zutubi.pulse.core.ExecutionContext,com.zutubi.pulse.core.model.Revision,String,boolean)
+     * @see com.zutubi.pulse.core.scm.api.ScmClient#tag(com.zutubi.pulse.core.ExecutionContext,com.zutubi.pulse.core.model.Revision,String,boolean)
      */
     public void tag(ExecutionContext context, Revision revision, String name, boolean moveExisting) throws ScmException
     {
@@ -379,7 +379,7 @@ public class GitClient implements ScmClient
     }
 
     /**
-     * @see com.zutubi.pulse.core.scm.ScmClient#parseRevision(String)
+     * @see com.zutubi.pulse.core.scm.api.ScmClient#parseRevision(String)
      */
     public Revision parseRevision(String revision) throws ScmException
     {

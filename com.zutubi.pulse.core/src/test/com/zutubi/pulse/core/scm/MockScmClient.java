@@ -1,18 +1,15 @@
 package com.zutubi.pulse.core.scm;
 
-import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.config.ResourceProperty;
+import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.scm.api.*;
 
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.List;
 import java.io.File;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
 
 /**
  *
@@ -129,9 +126,9 @@ public class MockScmClient implements ScmClient, DataCacheAware
         throw new RuntimeException("Method not implemented.");
     }
 
-    public FileStatus.EOLStyle getEOLPolicy(ScmContext context) throws ScmException
+    public EOLStyle getEOLPolicy(ScmContext context) throws ScmException
     {
-        return FileStatus.EOLStyle.BINARY;
+        return EOLStyle.BINARY;
     }
 
     public Revision getRevision(String revision) throws ScmException

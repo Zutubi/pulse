@@ -11,7 +11,10 @@ import com.zutubi.pulse.core.events.RecipeCompletedEvent;
 import com.zutubi.pulse.core.events.RecipeErrorEvent;
 import com.zutubi.pulse.core.events.RecipeEvent;
 import com.zutubi.pulse.core.model.*;
-import com.zutubi.pulse.core.scm.*;
+import com.zutubi.pulse.core.scm.CheckoutScheme;
+import com.zutubi.pulse.core.scm.ScmClientFactory;
+import com.zutubi.pulse.core.scm.ScmClientUtils;
+import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.config.ScmConfiguration;
 import com.zutubi.pulse.master.agent.MasterLocationProvider;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
@@ -419,7 +422,7 @@ public class BuildController implements EventListener
         {
             ScmContext context = scmContextFactory.createContext(projectConfig.getProjectId(), projectConfig.getScm());
             client = scmClientFactory.createClient(projectConfig.getScm());
-            FileStatus.EOLStyle localEOL = client.getEOLPolicy(context);
+            EOLStyle localEOL = client.getEOLPolicy(context);
             initialBootstrapper = new PatchBootstrapper(initialBootstrapper, pbr.getUser().getId(), pbr.getNumber(), localEOL);
         }
         catch (ScmException e)

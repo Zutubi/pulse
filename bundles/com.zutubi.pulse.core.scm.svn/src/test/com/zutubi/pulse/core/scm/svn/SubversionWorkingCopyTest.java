@@ -1,13 +1,14 @@
 package com.zutubi.pulse.core.scm.svn;
 
 import com.zutubi.pulse.core.scm.FileStatus;
-import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.WorkingCopyStatus;
+import com.zutubi.pulse.core.scm.api.EOLStyle;
+import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.pulse.core.util.config.PropertiesConfig;
 import com.zutubi.pulse.core.util.process.ProcessControl;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNException;
@@ -194,7 +195,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         File test = new File(base, "textfile1");
         FileSystemUtils.createFile(test, "hello");
         WorkingCopyStatus wcs = assertSimpleStatus("textfile1", FileStatus.State.MODIFIED, false, remote);
-        assertEOL(wcs, "textfile1", FileStatus.EOLStyle.NATIVE);
+        assertEOL(wcs, "textfile1", EOLStyle.NATIVE);
     }
 
     public void testGetStatusEditedNewlyText() throws Exception
@@ -213,7 +214,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         client.doSetProperty(test, SubversionConstants.SVN_PROPERTY_EOL_STYLE, "native", true, false, null);
 
         WorkingCopyStatus wcs = assertSimpleStatus("file1", FileStatus.State.MODIFIED, false, remote);
-        assertEOL(wcs, "file1", FileStatus.EOLStyle.NATIVE);
+        assertEOL(wcs, "file1", EOLStyle.NATIVE);
     }
 
     public void testGetStatusEditedLF() throws Exception
@@ -231,7 +232,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         File test = new File(base, "unixfile1");
         FileSystemUtils.createFile(test, "hello");
         WorkingCopyStatus wcs = assertSimpleStatus("unixfile1", FileStatus.State.MODIFIED, false, remote);
-        assertEOL(wcs, "unixfile1", FileStatus.EOLStyle.LINEFEED);
+        assertEOL(wcs, "unixfile1", EOLStyle.LINEFEED);
     }
 
     public void testGetStatusEditedAddedRandomProperty() throws Exception
@@ -327,7 +328,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         client.doAdd(test, true, false, false, false);
         client.doSetProperty(test, SubversionConstants.SVN_PROPERTY_EOL_STYLE, "native", true, false, null);
         WorkingCopyStatus wcs = assertSimpleStatus("newfile", FileStatus.State.ADDED, false, remote);
-        assertEOL(wcs, "newfile", FileStatus.EOLStyle.NATIVE);
+        assertEOL(wcs, "newfile", EOLStyle.NATIVE);
     }
 
     public void testGetLocalStatusAddedDirectory() throws Exception
@@ -803,7 +804,7 @@ public class SubversionWorkingCopyTest extends PulseTestCase
         assertEquals(0, wcs.getFileStatus(path).getProperties().size());
     }
 
-    private void assertEOL(WorkingCopyStatus wcs, String path, FileStatus.EOLStyle eol)
+    private void assertEOL(WorkingCopyStatus wcs, String path, EOLStyle eol)
     {
         FileStatus fs = wcs.getFileStatus(path);
         assertEquals(eol.toString(), fs.getProperty(FileStatus.PROPERTY_EOL_STYLE));

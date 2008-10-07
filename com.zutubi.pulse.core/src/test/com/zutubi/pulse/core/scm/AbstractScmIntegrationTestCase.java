@@ -1,20 +1,23 @@
 package com.zutubi.pulse.core.scm;
 
+import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.model.Change;
+import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.scm.api.ScmClient;
+import com.zutubi.pulse.core.scm.api.ScmContext;
+import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.core.scm.api.ScmFile;
+import com.zutubi.util.FileSystemUtils;
+import com.zutubi.util.io.IOUtils;
 import junit.framework.TestCase;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ByteArrayOutputStream;
-import java.util.List;
 import java.text.ParseException;
-
-import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.Change;
-import com.zutubi.pulse.core.ExecutionContext;
-import com.zutubi.util.FileSystemUtils;
-import com.zutubi.util.io.IOUtils;
+import java.util.List;
 
 /**
  */

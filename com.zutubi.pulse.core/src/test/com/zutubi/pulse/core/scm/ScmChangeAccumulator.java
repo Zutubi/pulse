@@ -1,6 +1,8 @@
 package com.zutubi.pulse.core.scm;
 
 import com.zutubi.pulse.core.model.Change;
+import com.zutubi.pulse.core.scm.api.ScmCancelledException;
+import com.zutubi.pulse.core.scm.api.ScmEventHandler;
 
 import java.util.LinkedList;
 import java.util.List;

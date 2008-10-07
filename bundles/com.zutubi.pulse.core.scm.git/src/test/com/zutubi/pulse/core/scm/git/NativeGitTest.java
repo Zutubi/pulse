@@ -1,10 +1,10 @@
 package com.zutubi.pulse.core.scm.git;
 
 import com.zutubi.pulse.core.scm.RecordingScmEventHandler;
-import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.core.util.ZipUtils;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 
 import java.io.File;

@@ -3,6 +3,8 @@ package com.zutubi.pulse.core.scm.svn;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.personal.PersonalBuildSupport;
 import com.zutubi.pulse.core.scm.*;
+import com.zutubi.pulse.core.scm.api.EOLStyle;
+import com.zutubi.pulse.core.scm.api.ScmException;
 import static com.zutubi.pulse.core.scm.svn.SubversionConstants.*;
 import com.zutubi.pulse.core.util.config.Config;
 import com.zutubi.pulse.core.util.config.ConfigSupport;
@@ -260,23 +262,23 @@ public class SubversionWorkingCopy extends PersonalBuildSupport implements Worki
     {
         if (eol.equals("native"))
         {
-            return FileStatus.EOLStyle.NATIVE.toString();
+            return EOLStyle.NATIVE.toString();
         }
         else if (eol.equals("CR"))
         {
-            return FileStatus.EOLStyle.CARRIAGE_RETURN.toString();
+            return EOLStyle.CARRIAGE_RETURN.toString();
         }
         else if (eol.equals("CRLF"))
         {
-            return FileStatus.EOLStyle.CARRIAGE_RETURN_LINEFEED.toString();
+            return EOLStyle.CARRIAGE_RETURN_LINEFEED.toString();
         }
         else if (eol.equals("LF"))
         {
-            return FileStatus.EOLStyle.LINEFEED.toString();
+            return EOLStyle.LINEFEED.toString();
         }
         else
         {
-            return FileStatus.EOLStyle.BINARY.toString();
+            return EOLStyle.BINARY.toString();
         }
     }
 

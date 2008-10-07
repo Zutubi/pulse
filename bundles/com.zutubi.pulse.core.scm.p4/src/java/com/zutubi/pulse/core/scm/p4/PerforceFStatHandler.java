@@ -2,9 +2,10 @@ package com.zutubi.pulse.core.scm.p4;
 
 import com.zutubi.pulse.core.personal.PersonalBuildUI;
 import com.zutubi.pulse.core.scm.FileStatus;
-import com.zutubi.pulse.core.scm.ScmCancelledException;
-import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.WorkingCopyStatus;
+import com.zutubi.pulse.core.scm.api.EOLStyle;
+import com.zutubi.pulse.core.scm.api.ScmCancelledException;
+import com.zutubi.pulse.core.scm.api.ScmException;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 
 import java.util.HashMap;
@@ -128,7 +129,7 @@ public class PerforceFStatHandler extends PerforceErrorDetectingHandler
 
                     if(fileIsText(type))
                     {
-                        fs.setProperty(FileStatus.PROPERTY_EOL_STYLE, FileStatus.EOLStyle.TEXT.toString());
+                        fs.setProperty(FileStatus.PROPERTY_EOL_STYLE, EOLStyle.TEXT.toString());
                     }
 
                     resolveExecutableProperty(fs, type, headType);

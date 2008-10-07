@@ -7,6 +7,7 @@ import com.zutubi.pulse.core.model.Entity;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.FileStatus;
 import com.zutubi.pulse.core.scm.WorkingCopyStatus;
+import com.zutubi.pulse.core.scm.api.EOLStyle;
 import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.io.NullOutputStream;
@@ -178,7 +179,7 @@ public class PatchArchive
         return status;
     }
 
-    public void apply(File base, FileStatus.EOLStyle localEOL) throws PulseException
+    public void apply(File base, EOLStyle localEOL) throws PulseException
     {
         try
         {

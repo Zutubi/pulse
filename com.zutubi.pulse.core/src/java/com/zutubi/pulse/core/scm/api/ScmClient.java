@@ -1,8 +1,8 @@
-package com.zutubi.pulse.core.scm;
+package com.zutubi.pulse.core.scm.api;
 
+import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.ExecutionContext;
 
 import java.io.Closeable;
 import java.io.File;
@@ -92,7 +92,7 @@ public interface ScmClient extends Closeable
      * @param path     path defining the content to be retrieved.
      * @param revision the revision be checked out or null for the latest
      *                 revision (may be ignored by implementations that do
-     *                 not support {@link com.zutubi.pulse.core.scm.ScmCapability#REVISIONS}).
+     *                 not support {@link ScmCapability#REVISIONS}).
      * @return input stream providing access to the requested content.
      * @throws ScmException on error
      */
@@ -124,7 +124,7 @@ public interface ScmClient extends Closeable
      *         in effect
      * @throws ScmException on error
      */
-    FileStatus.EOLStyle getEOLPolicy(ScmContext context) throws ScmException;
+    EOLStyle getEOLPolicy(ScmContext context) throws ScmException;
 
     /**
      * Returns the latest repository revision.
@@ -182,7 +182,7 @@ public interface ScmClient extends Closeable
      *                 i.e. an empty string is valid and means "list the root").
      * @param revision revision at which to browse, or null for the latest
      *                 revision (may be ignored by implementations that do not
-     *                 support {@link com.zutubi.pulse.core.scm.ScmCapability#REVISIONS}).
+     *                 support {@link ScmCapability#REVISIONS}).
      * @return a list of files and directories contained within the given
      *         path
      * @throws ScmException on error

@@ -1,11 +1,11 @@
 package com.zutubi.pulse.core.scm.cvs;
 
 import com.zutubi.pulse.core.ExecutionContext;
-import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.scm.api.ScmException;
+import com.zutubi.pulse.core.test.PulseTestCase;
+import com.zutubi.util.FileSystemUtils;
 import org.netbeans.lib.cvsclient.util.Logger;
 
 import java.io.File;

@@ -1,16 +1,19 @@
 package com.zutubi.pulse.core.scm.svn;
 
+import com.zutubi.pulse.core.BuildProperties;
+import com.zutubi.pulse.core.ExecutionContext;
+import com.zutubi.pulse.core.PulseScope;
+import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.scm.*;
-import com.zutubi.pulse.core.ExecutionContext;
-import com.zutubi.pulse.core.PulseScope;
-import com.zutubi.pulse.core.BuildProperties;
+import com.zutubi.pulse.core.scm.FilepathFilter;
+import com.zutubi.pulse.core.scm.NumericalRevision;
+import com.zutubi.pulse.core.scm.ScmFilepathFilter;
+import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.util.FileSystemUtils;
-import com.zutubi.pulse.core.config.ResourceProperty;
-import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.io.IOUtils;
 import com.zutubi.util.logging.Logger;
 import org.tmatesoft.svn.core.*;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
@@ -149,7 +152,7 @@ public class SubversionClient implements ScmClient
      * Creates a new SVNServer using the given location and default credentials.
      *
      * @param url the url of the SVN repository
-     * @throws com.zutubi.pulse.core.scm.ScmException on error
+     * @throws com.zutubi.pulse.core.scm.api.ScmException on error
      */
     public SubversionClient(String url) throws ScmException
     {
@@ -732,9 +735,9 @@ public class SubversionClient implements ScmClient
         }
     }
 
-    public FileStatus.EOLStyle getEOLPolicy(ScmContext context)
+    public EOLStyle getEOLPolicy(ScmContext context)
     {
-        return FileStatus.EOLStyle.BINARY;
+        return EOLStyle.BINARY;
     }
 
     public Revision parseRevision(String revision) throws ScmException

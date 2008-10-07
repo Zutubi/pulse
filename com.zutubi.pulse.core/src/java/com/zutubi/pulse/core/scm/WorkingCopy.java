@@ -2,6 +2,7 @@ package com.zutubi.pulse.core.scm;
 
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.personal.PersonalBuildWorker;
+import com.zutubi.pulse.core.scm.api.ScmException;
 
 /**
  */

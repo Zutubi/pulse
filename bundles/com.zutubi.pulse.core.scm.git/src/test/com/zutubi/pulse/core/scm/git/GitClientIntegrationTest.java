@@ -1,19 +1,19 @@
 package com.zutubi.pulse.core.scm.git;
 
+import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.AbstractScmIntegrationTestCase;
 import com.zutubi.pulse.core.scm.ExpectedTestResults;
-import com.zutubi.pulse.core.scm.ScmException;
-import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.util.ZipUtils;
 
-import java.util.List;
-import java.util.LinkedList;
-import java.text.ParseException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.io.IOException;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  */

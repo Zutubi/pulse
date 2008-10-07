@@ -1,15 +1,15 @@
 package com.zutubi.pulse.core.scm;
 
-import junit.framework.TestCase;
-
-import java.util.List;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.HashMap;
-
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.scm.api.ScmFile;
+import junit.framework.TestCase;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  *

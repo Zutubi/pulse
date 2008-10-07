@@ -6,10 +6,11 @@ import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.*;
+import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.core.util.process.AsyncProcess;
 import com.zutubi.pulse.core.util.process.BufferingCharHandler;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.logging.Logger;
 
@@ -731,9 +732,9 @@ public class PerforceClient extends CachingScmClient
         FileSystemUtils.createFile(new File(outputDir, "template-client.txt"), result.stdout.toString());
     }
 
-    public FileStatus.EOLStyle getEOLPolicy(ScmContext context) throws ScmException
+    public EOLStyle getEOLPolicy(ScmContext context) throws ScmException
     {
-        final FileStatus.EOLStyle[] eol = new FileStatus.EOLStyle[]{FileStatus.EOLStyle.NATIVE};
+        final EOLStyle[] eol = new EOLStyle[]{EOLStyle.NATIVE};
 
         core.runP4WithHandler(new PerforceErrorDetectingHandler(true)
         {
@@ -744,19 +745,19 @@ public class PerforceClient extends CachingScmClient
                     String ending = line.substring(8).trim();
                     if (ending.equals("local"))
                     {
-                        eol[0] = FileStatus.EOLStyle.NATIVE;
+                        eol[0] = EOLStyle.NATIVE;
                     }
                     else if (ending.equals("unix") || ending.equals("share"))
                     {
-                        eol[0] = FileStatus.EOLStyle.LINEFEED;
+                        eol[0] = EOLStyle.LINEFEED;
                     }
                     else if (ending.equals("mac"))
                     {
-                        eol[0] = FileStatus.EOLStyle.CARRIAGE_RETURN;
+                        eol[0] = EOLStyle.CARRIAGE_RETURN;
                     }
                     else if (ending.equals("win"))
                     {
-                        eol[0] = FileStatus.EOLStyle.CARRIAGE_RETURN_LINEFEED;
+                        eol[0] = EOLStyle.CARRIAGE_RETURN_LINEFEED;
                     }
                 }
             }

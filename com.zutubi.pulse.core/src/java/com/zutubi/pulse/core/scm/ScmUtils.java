@@ -1,11 +1,12 @@
 package com.zutubi.pulse.core.scm;
 
-import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Change;
+import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.scm.api.ScmException;
 
 import java.io.File;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Helpers shared amongst SCM implementations.

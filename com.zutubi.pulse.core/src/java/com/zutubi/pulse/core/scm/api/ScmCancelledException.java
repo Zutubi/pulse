@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.scm;
+package com.zutubi.pulse.core.scm.api;
 
 /**
  * An exception to be thrown when an operation is to be cancelled.

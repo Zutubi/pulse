@@ -1,7 +1,11 @@
 package com.zutubi.pulse.core.scm.svn;
 
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.scm.*;
+import com.zutubi.pulse.core.scm.AbstractScmIntegrationTestCase;
+import com.zutubi.pulse.core.scm.ExpectedTestResults;
+import com.zutubi.pulse.core.scm.NumericalRevision;
+import com.zutubi.pulse.core.scm.ScmClientUtils;
+import com.zutubi.pulse.core.scm.api.ScmException;
 
 import java.io.IOException;
 import java.text.ParseException;

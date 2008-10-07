@@ -2,13 +2,14 @@ package com.zutubi.pulse.core.scm.p4;
 
 import com.zutubi.pulse.core.personal.PersonalBuildUI;
 import com.zutubi.pulse.core.scm.FileStatus;
-import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.WorkingCopyStatus;
+import com.zutubi.pulse.core.scm.api.EOLStyle;
+import com.zutubi.pulse.core.scm.api.ScmException;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.pulse.core.util.config.PropertiesConfig;
+import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -700,7 +701,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
         if(text)
         {
             assertEquals(1, fs.getProperties().size());
-            assertEquals(FileStatus.EOLStyle.TEXT.toString(), fs.getProperty(FileStatus.PROPERTY_EOL_STYLE));
+            assertEquals(EOLStyle.TEXT.toString(), fs.getProperty(FileStatus.PROPERTY_EOL_STYLE));
         }
         else
         {

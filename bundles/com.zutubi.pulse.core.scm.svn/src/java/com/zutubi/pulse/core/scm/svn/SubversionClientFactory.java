@@ -1,9 +1,9 @@
 package com.zutubi.pulse.core.scm.svn;
 
 import com.opensymphony.util.TextUtils;
-import com.zutubi.pulse.core.scm.ScmClient;
 import com.zutubi.pulse.core.scm.ScmClientFactory;
-import com.zutubi.pulse.core.scm.ScmException;
+import com.zutubi.pulse.core.scm.api.ScmClient;
+import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.svn.config.SubversionConfiguration;
 
 /**

@@ -6,7 +6,7 @@ import static com.zutubi.pulse.core.BuildProperties.*;
 import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.personal.PatchArchive;
-import com.zutubi.pulse.core.scm.FileStatus;
+import com.zutubi.pulse.core.scm.api.EOLStyle;
 import com.zutubi.pulse.servercore.repository.FileRepository;
 
 import java.io.File;
@@ -24,9 +24,9 @@ public class PatchBootstrapper implements Bootstrapper
     private Bootstrapper delegate;
     private long userId;
     private long number;
-    private FileStatus.EOLStyle localEOL;
+    private EOLStyle localEOL;
 
-    public PatchBootstrapper(Bootstrapper delegate, long userId, long number, FileStatus.EOLStyle localEOL)
+    public PatchBootstrapper(Bootstrapper delegate, long userId, long number, EOLStyle localEOL)
     {
         this.delegate = delegate;
         this.userId = userId;

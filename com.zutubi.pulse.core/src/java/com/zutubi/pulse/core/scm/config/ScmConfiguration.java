@@ -40,7 +40,7 @@ public abstract class ScmConfiguration extends AbstractConfiguration
     /**
      * Calculates the previous revision for a given revision.  May return
      * null if there is no previous revision or the SCM does not have
-     * capability {@link com.zutubi.pulse.core.scm.ScmCapability#CHANGESETS}.
+     * capability {@link com.zutubi.pulse.core.scm.api.ScmCapability#CHANGESETS}.
      *
      * @param revision revision to get the previous revision for (in the form
      *                 returned by {@link com.zutubi.pulse.core.model.Revision#getRevisionString()}).

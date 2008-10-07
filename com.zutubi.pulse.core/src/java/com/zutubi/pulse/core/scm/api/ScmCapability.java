@@ -1,4 +1,4 @@
-package com.zutubi.pulse.core.scm;
+package com.zutubi.pulse.core.scm.api;
 
 /**
  * SCM capabilities are used to indicate which of the optional operations an SCM

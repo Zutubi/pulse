@@ -2,15 +2,13 @@ package com.zutubi.pulse.core.scm.cvs;
 
 import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.AbstractScmIntegrationTestCase;
-import com.zutubi.pulse.core.scm.ScmException;
 import com.zutubi.pulse.core.scm.ExpectedTestResults;
 
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.text.ParseException;
-import java.util.List;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.io.IOException;
+import java.util.List;
 
 public abstract class AbstractCvsClientIntegrationTestCase extends AbstractScmIntegrationTestCase
 {

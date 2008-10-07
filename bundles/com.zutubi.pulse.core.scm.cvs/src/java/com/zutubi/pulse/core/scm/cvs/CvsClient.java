@@ -3,15 +3,18 @@ package com.zutubi.pulse.core.scm.cvs;
 import com.zutubi.pulse.core.BuildProperties;
 import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.PulseScope;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.model.Revision;
-import com.zutubi.pulse.core.scm.*;
+import com.zutubi.pulse.core.scm.DataCacheAware;
+import com.zutubi.pulse.core.scm.ScmFilepathFilter;
+import com.zutubi.pulse.core.scm.ScmUtils;
+import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.cvs.client.CvsCore;
 import com.zutubi.pulse.core.scm.cvs.client.LogInformationAnalyser;
 import com.zutubi.pulse.core.scm.cvs.client.commands.RlsInfo;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.io.CleanupInputStream;
 import com.zutubi.util.io.IOUtils;
@@ -19,12 +22,7 @@ import com.zutubi.util.logging.Logger;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.FileOutputStream;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -108,7 +106,7 @@ public class CvsClient implements ScmClient, DataCacheAware
     /**
      * Returns the unique identifier for this scm server. For CVS servers, this is the cvs root.
      *
-     * @see com.zutubi.pulse.core.scm.ScmClient#getUid()
+     * @see com.zutubi.pulse.core.scm.api.ScmClient#getUid()
      */
     public String getUid()
     {
@@ -242,9 +240,9 @@ public class CvsClient implements ScmClient, DataCacheAware
         }
     }
 
-    public FileStatus.EOLStyle getEOLPolicy(ScmContext context)
+    public EOLStyle getEOLPolicy(ScmContext context)
     {
-        return FileStatus.EOLStyle.BINARY;
+        return EOLStyle.BINARY;
     }
 
     public Revision getRevision(String revision) throws ScmException

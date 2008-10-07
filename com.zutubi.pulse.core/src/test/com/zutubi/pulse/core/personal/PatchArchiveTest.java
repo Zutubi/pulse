@@ -3,9 +3,10 @@ package com.zutubi.pulse.core.personal;
 import com.zutubi.pulse.core.PulseException;
 import com.zutubi.pulse.core.scm.FileStatus;
 import com.zutubi.pulse.core.scm.WorkingCopyStatus;
+import com.zutubi.pulse.core.scm.api.EOLStyle;
 import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.core.util.ZipUtils;
+import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,7 +47,7 @@ public class PatchArchiveTest extends PulseTestCase
     {
         WorkingCopyStatus wcs = new WorkingCopyStatus(baseDir);
         FileStatus fs = new FileStatus(TEST_FILENAME, FileStatus.State.UNCHANGED, false);
-        fs.setProperty(FileStatus.PROPERTY_EOL_STYLE, FileStatus.EOLStyle.CARRIAGE_RETURN.toString());
+        fs.setProperty(FileStatus.PROPERTY_EOL_STYLE, EOLStyle.CARRIAGE_RETURN.toString());
         wcs.add(fs);
         
         PatchArchive archive = new PatchArchive(wcs, archiveFile, null);
@@ -55,6 +56,6 @@ public class PatchArchiveTest extends PulseTestCase
 
         archive = new PatchArchive(archiveFile);
         fs = archive.getStatus().getFileStatus(TEST_FILENAME);
-        assertEquals(FileStatus.EOLStyle.CARRIAGE_RETURN.toString(), fs.getProperty(FileStatus.PROPERTY_EOL_STYLE));
+        assertEquals(EOLStyle.CARRIAGE_RETURN.toString(), fs.getProperty(FileStatus.PROPERTY_EOL_STYLE));
     }
 }

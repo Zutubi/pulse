@@ -1,5 +1,7 @@
 package com.zutubi.pulse.core.scm;
 
+import com.zutubi.pulse.core.scm.api.ScmFile;
+
 import java.util.LinkedList;
 import java.util.List;
 
