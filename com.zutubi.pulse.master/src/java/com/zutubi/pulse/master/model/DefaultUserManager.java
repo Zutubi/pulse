@@ -332,6 +332,7 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
     {
         if(buildManager == null)
         {
+            // Unfortunately, the user manager is created before the buildManager.
             buildManager = (BuildManager) SpringComponentContext.getBean("buildManager");
         }
         return buildManager;
@@ -346,6 +347,7 @@ public class DefaultUserManager implements UserManager, ExternalStateManager<Use
     {
         if(ldapManager == null)
         {
+            // Unfortunately, the user manager is created before the security context is loaded.
             ldapManager = (LdapManager) SpringComponentContext.getBean("ldapManager");
         }
         return ldapManager;

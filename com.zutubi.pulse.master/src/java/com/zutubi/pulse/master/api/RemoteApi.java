@@ -1765,7 +1765,9 @@ public class RemoteApi implements com.zutubi.events.EventListener
 
     public void handleEvent(Event evt)
     {
-        // Rewire on startup to get the full token manager.
+        // Rewire on startup to get the full token manager.  Maybe there is a way to delay
+        // the creation of this instance until after the context is fully initialised and
+        // hence the objectFactory.buildBean(RemoteApi.class) will return a fully wired instance?.
         SpringComponentContext.autowire(this);
         eventManager.unregister(this);
     }

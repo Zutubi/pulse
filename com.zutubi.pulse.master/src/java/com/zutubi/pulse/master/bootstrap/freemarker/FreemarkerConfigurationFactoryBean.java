@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.bootstrap.freemarker;
 
-import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.logging.Logger;
@@ -24,6 +23,8 @@ public class FreemarkerConfigurationFactoryBean implements FactoryBean
 
     private static Configuration FREEMARKER_CONFIGURATION;
 
+    private MasterConfigurationManager configurationManager;
+
     public Object getObject() throws Exception
     {
         if (FREEMARKER_CONFIGURATION == null)
@@ -32,8 +33,6 @@ public class FreemarkerConfigurationFactoryBean implements FactoryBean
             {
                 if (FREEMARKER_CONFIGURATION == null)
                 {
-                    MasterConfigurationManager configurationManager = getConfigurationManager();
-
                     Configuration configuration = new Configuration();
                     configuration.setTemplateLoader(getMultiLoader(configurationManager.getSystemPaths().getTemplateRoots()));
                     configuration.setObjectWrapper(new DefaultObjectWrapper());
@@ -77,9 +76,9 @@ public class FreemarkerConfigurationFactoryBean implements FactoryBean
         return new MultiTemplateLoader(loaders);
     }
 
-    private MasterConfigurationManager getConfigurationManager()
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
-        return (MasterConfigurationManager) SpringComponentContext.getBean("configurationManager");
+        this.configurationManager = configurationManager;
     }
 
     public Class getObjectType()

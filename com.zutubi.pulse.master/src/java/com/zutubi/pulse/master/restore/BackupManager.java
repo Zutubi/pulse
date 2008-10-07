@@ -21,10 +21,6 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- *
- *
- */
 public class BackupManager
 {
     private static final Logger LOG = Logger.getLogger(BackupManager.class);
@@ -60,15 +56,7 @@ public class BackupManager
 
             public void handleEvent(Event event)
             {
-                if (scheduler == null)
-                {
-                    scheduler = SpringComponentContext.getBean("scheduler");
-                }
-
-                if (configurationProvider == null)
-                {
-                    configurationProvider = SpringComponentContext.getBean("configurationProvider");
-                }
+                SpringComponentContext.autowire(this);
 
                 initialiseManager();
             }

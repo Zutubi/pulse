@@ -4,7 +4,6 @@ import com.zutubi.events.Event;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.ResourceRepository;
 import com.zutubi.pulse.core.config.Resource;
-import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.agent.AgentManager;
 import com.zutubi.pulse.master.model.ResourceManager;
 import com.zutubi.pulse.servercore.services.InvalidTokenException;
@@ -48,7 +47,7 @@ public class MasterServiceImpl implements MasterService
     {
         if (validateToken(token))
         {
-            ResourceRepository repository = getResourceManager().getAgentRepository(agentHandle);
+            ResourceRepository repository = resourceManager.getAgentRepository(agentHandle);
             if (repository != null)
             {
                 return repository.getResource(name);
@@ -62,7 +61,7 @@ public class MasterServiceImpl implements MasterService
     {
         if (validateToken(token))
         {
-            ResourceRepository repository = getResourceManager().getAgentRepository(agentHandle);
+            ResourceRepository repository = resourceManager.getAgentRepository(agentHandle);
             if (repository != null)
             {
                 return repository.getResourceNames();
@@ -74,10 +73,9 @@ public class MasterServiceImpl implements MasterService
 
     private boolean validateToken(String token)
     {
-        ServiceTokenManager tokenManager = getServiceTokenManager();
-        if (tokenManager != null)
+        if (serviceTokenManager != null)
         {
-            tokenManager.validateToken(token);
+            serviceTokenManager.validateToken(token);
             return true;
         }
         else
@@ -100,25 +98,6 @@ public class MasterServiceImpl implements MasterService
     public void setServiceTokenManager(ServiceTokenManager serviceTokenManager)
     {
         this.serviceTokenManager = serviceTokenManager;
-    }
-
-    private ResourceManager getResourceManager()
-    {
-        if(resourceManager == null)
-        {
-            SpringComponentContext.autowire(this);
-        }
-        return resourceManager;
-    }
-
-    public ServiceTokenManager getServiceTokenManager()
-    {
-        if(serviceTokenManager == null)
-        {
-            SpringComponentContext.autowire(this);
-        }
-
-        return serviceTokenManager;
     }
 
     public void setAgentManager(AgentManager agentManager)
