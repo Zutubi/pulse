@@ -40,7 +40,7 @@ public class CustomHessianClassLoader extends SecureClassLoader
         return super.findClass(name);
     }
 
-    public void setRegistry(HessianConfigurationExtensionManager registry)
+    public void setHessianExtensionManager(HessianConfigurationExtensionManager registry)
     {
         this.registry = registry;
     }

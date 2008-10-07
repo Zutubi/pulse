@@ -30,6 +30,7 @@ public class ServletWrapper implements Servlet
     public void init(ServletConfig servletConfig) throws ServletException
     {
         delegate = createDelegate(servletConfig);
+        delegate.init(servletConfig);
     }
 
     /**

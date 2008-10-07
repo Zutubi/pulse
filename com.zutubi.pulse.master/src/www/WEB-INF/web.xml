@@ -115,7 +115,11 @@
 
     <servlet>
         <servlet-name>hessian</servlet-name>
-        <servlet-class>com.zutubi.pulse.servercore.hessian.CustomHessianServlet</servlet-class>
+        <servlet-class>com.zutubi.pulse.servercore.spring.ServletWrapper</servlet-class>
+        <init-param>
+            <param-name>delegateClassName</param-name>
+            <param-value>com.zutubi.pulse.servercore.hessian.CustomHessianServlet</param-value>
+        </init-param>
         <init-param>
             <param-name>home-class</param-name>
             <param-value>com.zutubi.pulse.master.MasterServiceImpl</param-value>
@@ -129,33 +133,57 @@
 
     <servlet>
         <servlet-name>download</servlet-name>
-        <servlet-class>com.zutubi.pulse.servercore.servlet.DownloadResultsServlet</servlet-class>
+        <servlet-class>com.zutubi.pulse.servercore.spring.ServletWrapper</servlet-class>
+        <init-param>
+            <param-name>delegateClassName</param-name>
+            <param-value>com.zutubi.pulse.servercore.servlet.DownloadResultsServlet</param-value>
+        </init-param>
     </servlet>
 
     <servlet>
         <servlet-name>display</servlet-name>
-        <servlet-class>com.zutubi.pulse.master.servlet.DisplayServlet</servlet-class>
+        <servlet-class>com.zutubi.pulse.servercore.spring.ServletWrapper</servlet-class>
+        <init-param>
+            <param-name>delegateClassName</param-name>
+            <param-value>com.zutubi.pulse.master.servlet.DisplayServlet</param-value>
+        </init-param>
     </servlet>
 
     <servlet>
         <servlet-name>file</servlet-name>
-        <servlet-class>com.zutubi.pulse.master.servlet.FileServlet</servlet-class>
+        <servlet-class>com.zutubi.pulse.servercore.spring.ServletWrapper</servlet-class>
+        <init-param>
+            <param-name>delegateClassName</param-name>
+            <param-value>com.zutubi.pulse.master.servlet.FileServlet</param-value>
+        </init-param>
     </servlet>
 
     <servlet>
         <servlet-name>package</servlet-name>
-        <servlet-class>com.zutubi.pulse.master.servlet.DownloadPackageServlet</servlet-class>
+        <servlet-class>com.zutubi.pulse.servercore.spring.ServletWrapper</servlet-class>
+        <init-param>
+            <param-name>delegateClassName</param-name>
+            <param-value>com.zutubi.pulse.master.servlet.DownloadPackageServlet</param-value>
+        </init-param>
     </servlet>
 
     <servlet>
         <servlet-name>patch</servlet-name>
-        <servlet-class>com.zutubi.pulse.master.servlet.DownloadPatchServlet</servlet-class>
+        <servlet-class>com.zutubi.pulse.servercore.spring.ServletWrapper</servlet-class>
+        <init-param>
+            <param-name>delegateClassName</param-name>
+            <param-value>com.zutubi.pulse.master.servlet.DownloadPatchServlet</param-value>
+        </init-param>
     </servlet>
 
     <!-- Entry point for xmlrpc services. -->
     <servlet>
         <servlet-name>XmlRpcServlet</servlet-name>
-        <servlet-class>com.zutubi.pulse.master.xmlrpc.MasterXmlRpcServlet</servlet-class>
+        <servlet-class>com.zutubi.pulse.servercore.spring.ServletWrapper</servlet-class>
+        <init-param>
+            <param-name>delegateClassName</param-name>
+            <param-value>com.zutubi.pulse.master.xmlrpc.MasterXmlRpcServlet</param-value>
+        </init-param>
     </servlet>
 
     <!--
@@ -170,16 +198,13 @@
       <servlet-class>org.jfree.chart.servlet.DisplayChart</servlet-class>
     </servlet>
 
-    <!--
-        <servlet>
-            <servlet-name>UserProfileServlet</servlet-name>
-            <servlet-class>com.zutubilet.ProfileServlet</servlet-class>
-        </servlet>
-    -->
-
     <servlet>
         <servlet-name>ViewFileServlet</servlet-name>
-        <servlet-class>com.zutubi.pulse.master.servlet.ViewFileServlet</servlet-class>
+        <servlet-class>com.zutubi.pulse.servercore.spring.ServletWrapper</servlet-class>
+        <init-param>
+            <param-name>delegateClassName</param-name>
+            <param-value>com.zutubi.pulse.master.servlet.ViewFileServlet</param-value>
+        </init-param>
     </servlet>
 
     <servlet-mapping>

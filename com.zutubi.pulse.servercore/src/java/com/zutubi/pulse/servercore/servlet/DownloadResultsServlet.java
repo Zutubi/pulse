@@ -1,6 +1,5 @@
 package com.zutubi.pulse.servercore.servlet;
 
-import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.servercore.ServerRecipePaths;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.services.InvalidTokenException;
@@ -37,7 +36,7 @@ public class DownloadResultsServlet extends HttpServlet
             String token = request.getParameter("token");
             try
             {
-                getServiceTokenManager().validateToken(token);
+                serviceTokenManager.validateToken(token);
             }
             catch (InvalidTokenException e)
             {
@@ -48,7 +47,7 @@ public class DownloadResultsServlet extends HttpServlet
             boolean output = Boolean.parseBoolean(request.getParameter("output"));
 
             // lookup the recipe location, zip it up and write to output.
-            ServerRecipePaths paths = new ServerRecipePaths(project, recipeId, getConfigurationManager().getUserPaths().getData(), incremental);
+            ServerRecipePaths paths = new ServerRecipePaths(project, recipeId, configurationManager.getUserPaths().getData(), incremental);
             File zipFile;
 
             if (output)
@@ -106,21 +105,13 @@ public class DownloadResultsServlet extends HttpServlet
         }
     }
 
-    public ConfigurationManager getConfigurationManager()
+    public void setConfigurationManager(ConfigurationManager configurationManager)
     {
-        if(configurationManager == null)
-        {
-            configurationManager = (ConfigurationManager) SpringComponentContext.getBean("configurationManager");
-        }
-        return configurationManager;
+        this.configurationManager = configurationManager;
     }
 
-    public ServiceTokenManager getServiceTokenManager()
+    public void setServiceTokenManager(ServiceTokenManager serviceTokenManager)
     {
-        if(serviceTokenManager == null)
-        {
-            serviceTokenManager = (ServiceTokenManager) SpringComponentContext.getBean("serviceTokenManager");
-        }
-        return serviceTokenManager;
+        this.serviceTokenManager = serviceTokenManager;
     }
 }

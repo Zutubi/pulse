@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.servlet;
 
-import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.vfs.provider.pulse.AbstractPulseFileObject;
 import com.zutubi.pulse.master.vfs.provider.pulse.AddressableFileObject;
 import com.zutubi.util.logging.Logger;
@@ -43,13 +42,13 @@ public class DisplayServlet extends HttpServlet
             AbstractPulseFileObject pfo;
             try
             {
-                pfo = (AbstractPulseFileObject) getFS().resolveFile(path);
+                pfo = (AbstractPulseFileObject) fsManager.resolveFile(path);
             }
             catch(FileSystemException e)
             {
                 // OK, try replacing pluses with spaces
                 path = path.replace('+', ' ');
-                pfo = (AbstractPulseFileObject) getFS().resolveFile(path);
+                pfo = (AbstractPulseFileObject) fsManager.resolveFile(path);
             }
 
             if (!(pfo instanceof AddressableFileObject))
@@ -85,15 +84,6 @@ public class DisplayServlet extends HttpServlet
             LOG.error(e);
             throw new ServletException(e);
         }
-    }
-
-    protected FileSystemManager getFS() throws FileSystemException
-    {
-        if (fsManager == null)
-        {
-            fsManager = (FileSystemManager) SpringComponentContext.getBean("fileSystemManager");
-        }
-        return fsManager;
     }
 
     public void setFileSystemManager(FileSystemManager fsManager)

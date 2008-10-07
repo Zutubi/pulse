@@ -4,9 +4,6 @@ import com.caucho.hessian.io.HessianInput;
 import com.caucho.hessian.io.HessianOutput;
 import com.caucho.hessian.io.SerializerFactory;
 import com.caucho.hessian.server.HessianSkeleton;
-import com.zutubi.pulse.core.hessian.HessianConfigurationExtensionManager;
-import com.zutubi.pulse.core.plugins.PluginManager;
-import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.core.spring.SpringObjectFactory;
 import com.zutubi.util.bean.ObjectFactory;
 import com.zutubi.util.logging.Logger;
@@ -61,22 +58,17 @@ public class CustomHessianServlet extends GenericServlet
         }
 
         factory = new SerializerFactory();
-        factory.addFactory(getSerialiserFactory());
+        factory.addFactory(customSerialiserFactory);
+    }
+
+    public void setObjectFactory(ObjectFactory objectFactory)
+    {
+        this.objectFactory = objectFactory;
     }
 
     public void setCustomSerialiserFactory(CustomSerialiserFactory serialiserFactory)
     {
         this.customSerialiserFactory = serialiserFactory;
-    }
-
-    public CustomSerialiserFactory getSerialiserFactory()
-    {
-        if (customSerialiserFactory == null)
-        {
-            // TODO: when we get autowiring of servlets sorted out, we can remove this call to the ComponentContext.
-            customSerialiserFactory = (CustomSerialiserFactory) SpringComponentContext.getBean("customSerialiserFactory");
-        }
-        return customSerialiserFactory;
     }
 
     public void service(ServletRequest servletRequest, ServletResponse servletResponse) throws ServletException, IOException
@@ -93,9 +85,8 @@ public class CustomHessianServlet extends GenericServlet
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         try
         {
-            CustomHessianClassLoader customClassLoader = new CustomHessianClassLoader(originalClassLoader);
-            customClassLoader.setRegistry((HessianConfigurationExtensionManager) SpringComponentContext.getBean("hessianExtensionManager"));
-            customClassLoader.setPluginManager((PluginManager) SpringComponentContext.getBean("pluginManager"));
+
+            CustomHessianClassLoader customClassLoader = objectFactory.buildBean(CustomHessianClassLoader.class, new Class[]{ClassLoader.class}, new Object[]{originalClassLoader});
             
             Thread.currentThread().setContextClassLoader(customClassLoader);
 

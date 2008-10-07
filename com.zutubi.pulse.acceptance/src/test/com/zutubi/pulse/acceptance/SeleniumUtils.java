@@ -5,6 +5,7 @@ import com.thoughtworks.selenium.SeleniumException;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Condition;
 import com.zutubi.util.StringUtils;
+import com.zutubi.util.SystemUtils;
 import junit.framework.Assert;
 
 /**
@@ -228,5 +229,22 @@ public class SeleniumUtils
     public static void assertCellContents(Selenium selenium, String tableLocator, int row, int column, String text)
     {
         Assert.assertEquals(text, getCellContents(selenium, tableLocator, row, column));
+    }
+
+    public static String getSeleniumBrowserProperty()
+    {
+        String browser = System.getenv("SELENIUM_BROWSER");
+        if (browser == null)
+        {
+            if (SystemUtils.IS_WINDOWS)
+            {
+                browser = "*iexplore";
+            }
+            else
+            {
+                browser = "*firefox";
+            }
+        }
+        return browser;        
     }
 }

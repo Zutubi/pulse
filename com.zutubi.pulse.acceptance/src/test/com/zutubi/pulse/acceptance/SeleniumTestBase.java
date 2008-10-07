@@ -11,7 +11,6 @@ import com.zutubi.pulse.master.webwork.Urls;
 import com.zutubi.util.ExceptionWrappingRunnable;
 import com.zutubi.util.RandomUtils;
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.SystemUtils;
 import junit.framework.TestCase;
 
 import java.net.URL;
@@ -53,18 +52,7 @@ public class SeleniumTestBase extends TestCase
         urls = new Urls("");
         random = RandomUtils.randomString(10);
 
-        String browser = System.getenv("SELENIUM_BROWSER");
-        if (browser == null)
-        {
-            if (SystemUtils.IS_WINDOWS)
-            {
-                browser = "*iexplore";
-            }
-            else
-            {
-                browser = "*firefox";
-            }
-        }
+        String browser = SeleniumUtils.getSeleniumBrowserProperty();
         
         selenium = new DefaultSelenium("localhost", 4446, browser, "http://localhost:" + port + "/");
         selenium.start();

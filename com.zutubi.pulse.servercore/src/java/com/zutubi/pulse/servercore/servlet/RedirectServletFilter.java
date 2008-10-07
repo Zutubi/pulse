@@ -4,9 +4,6 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-/**
- * <class-comment/>
- */
 public class RedirectServletFilter implements Filter
 {
     private static final String DESTINATION_PARAM_KEY = "destination";
@@ -32,7 +29,7 @@ public class RedirectServletFilter implements Filter
         destination = config.getInitParameter(DESTINATION_PARAM_KEY);
         if (destination == null)
         {
-            // default...
+            throw new ServletException("'destination' is a required init parameter");
         }
     }
 }

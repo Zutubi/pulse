@@ -10,7 +10,11 @@
 
     <servlet>
         <servlet-name>hessian</servlet-name>
-        <servlet-class>com.zutubi.pulse.servercore.hessian.CustomHessianServlet</servlet-class>
+        <servlet-class>com.zutubi.pulse.servercore.spring.ServletWrapper</servlet-class>
+        <init-param>
+            <param-name>delegateClassName</param-name>
+            <param-value>com.zutubi.pulse.servercore.hessian.CustomHessianServlet</param-value>
+        </init-param>
         <init-param>
             <param-name>home-class</param-name>
             <param-value>com.zutubi.pulse.slave.SlaveServiceImpl</param-value>
@@ -24,12 +28,20 @@
 
     <servlet>
         <servlet-name>XmlRpcServlet</servlet-name>
-        <servlet-class>com.zutubi.pulse.slave.xmlrpc.SlaveXmlRpcServlet</servlet-class>
+        <servlet-class>com.zutubi.pulse.servercore.spring.ServletWrapper</servlet-class>
+        <init-param>
+            <param-name>delegateClassName</param-name>
+            <param-value>com.zutubi.pulse.slave.xmlrpc.SlaveXmlRpcServlet</param-value>
+        </init-param>
     </servlet>
 
     <servlet>
         <servlet-name>download</servlet-name>
-        <servlet-class>com.zutubi.pulse.servercore.servlet.DownloadResultsServlet</servlet-class>
+        <servlet-class>com.zutubi.pulse.servercore.spring.ServletWrapper</servlet-class>
+        <init-param>
+            <param-name>delegateClassName</param-name>
+            <param-value>com.zutubi.pulse.servercore.servlet.DownloadResultsServlet</param-value>
+        </init-param>
     </servlet>
 
     <servlet-mapping>

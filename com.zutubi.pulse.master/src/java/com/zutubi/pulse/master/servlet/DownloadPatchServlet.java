@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.servlet;
 
-import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.MasterBuildPaths;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.servercore.services.InvalidTokenException;
@@ -31,7 +30,7 @@ public class DownloadPatchServlet extends HttpServlet
             String token = request.getParameter("token");
             try
             {
-                getServiceTokenManager().validateToken(token);
+                serviceTokenManager.validateToken(token);
             }
             catch (InvalidTokenException e)
             {
@@ -42,7 +41,7 @@ public class DownloadPatchServlet extends HttpServlet
             long userId = Long.parseLong(request.getParameter("user"));
             long number = Long.parseLong(request.getParameter("number"));
 
-            MasterBuildPaths paths = new MasterBuildPaths(getConfigurationManager());
+            MasterBuildPaths paths = new MasterBuildPaths(configurationManager);
             File patchFile = paths.getUserPatchFile(userId, number);
 
             try
@@ -92,21 +91,13 @@ public class DownloadPatchServlet extends HttpServlet
         }
     }
 
-    public MasterConfigurationManager getConfigurationManager()
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
     {
-        if(configurationManager == null)
-        {
-            configurationManager = (MasterConfigurationManager) SpringComponentContext.getBean("configurationManager");
-        }
-        return configurationManager;
+        this.configurationManager = configurationManager;
     }
 
-    public ServiceTokenManager getServiceTokenManager()
+    public void setServiceTokenManager(ServiceTokenManager serviceTokenManager)
     {
-        if(serviceTokenManager == null)
-        {
-            serviceTokenManager = (ServiceTokenManager) SpringComponentContext.getBean("serviceTokenManager");
-        }
-        return serviceTokenManager;
+        this.serviceTokenManager = serviceTokenManager;
     }
 }

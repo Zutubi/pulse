@@ -3,7 +3,6 @@ package com.zutubi.pulse.master.servlet;
 import com.zutubi.pulse.core.model.CommandResult;
 import com.zutubi.pulse.core.model.StoredArtifact;
 import com.zutubi.pulse.core.model.StoredFileArtifact;
-import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.master.bootstrap.MasterConfigurationManager;
 import com.zutubi.pulse.master.model.BuildManager;
 import com.zutubi.util.io.IOUtils;
@@ -27,15 +26,6 @@ public class ViewFileServlet extends HttpServlet
 
     protected void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException
     {
-        if (buildManager == null)
-        {
-            buildManager = (BuildManager) SpringComponentContext.getBean("buildManager");
-        }
-        if (configurationManager == null)
-        {
-            configurationManager =  (MasterConfigurationManager) SpringComponentContext.getBean("configurationManager");
-        }
-
         String path = httpServletRequest.getPathInfo();
         String [] parts = path.split("/", 4);
 
@@ -120,5 +110,15 @@ public class ViewFileServlet extends HttpServlet
             // ensure that we close the open file.
             IOUtils.close(fis);
         }
+    }
+
+    public void setBuildManager(BuildManager buildManager)
+    {
+        this.buildManager = buildManager;
+    }
+
+    public void setConfigurationManager(MasterConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
     }
 }

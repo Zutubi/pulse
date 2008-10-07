@@ -9,10 +9,10 @@ import com.zutubi.pulse.acceptance.support.PackageFactory;
 import com.zutubi.pulse.acceptance.support.Pulse;
 import com.zutubi.pulse.acceptance.support.PulsePackage;
 import com.zutubi.pulse.core.test.PulseTestCase;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.core.util.config.Config;
 import com.zutubi.pulse.core.util.config.FileConfig;
 import com.zutubi.pulse.servercore.bootstrap.SystemConfiguration;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.TextUtils;
 import org.apache.commons.cli.ParseException;
 import org.testng.annotations.AfterMethod;
@@ -527,7 +527,7 @@ public class StartupShutdownAcceptanceTest extends PulseTestCase
 
     private DefaultSelenium initSelenium(RuntimeContext context)
     {
-        DefaultSelenium selenium = new DefaultSelenium("localhost", 4446, "*firefox", "http://localhost:" + context.getPort());
+        DefaultSelenium selenium = new DefaultSelenium("localhost", 4446, SeleniumUtils.getSeleniumBrowserProperty(), "http://localhost:" + context.getPort());
         selenium.start();
         selenium.open((context.getContextPath() != null ? context.getContextPath() : ""));
         return selenium;

@@ -1,7 +1,6 @@
 package com.zutubi.pulse.master.servlet;
 
 import com.zutubi.pulse.Version;
-import com.zutubi.pulse.core.spring.SpringComponentContext;
 import com.zutubi.pulse.servercore.bootstrap.ConfigurationManager;
 import com.zutubi.pulse.servercore.bootstrap.SystemPaths;
 import com.zutubi.util.io.IOUtils;
@@ -40,7 +39,7 @@ public class DownloadPackageServlet extends HttpServlet
                 packageName = packageName.substring(1);
             }
 
-            File packageFile = getPackageFile(getSystemPaths(), packageName);
+            File packageFile = getPackageFile(systemPaths, packageName);
 
             try
             {
@@ -93,15 +92,9 @@ public class DownloadPackageServlet extends HttpServlet
         return new File(systemPaths.getSystemRoot(), "packages");
     }
 
-    private SystemPaths getSystemPaths()
+    public void setConfigurationManager(ConfigurationManager manager)
     {
-        if(systemPaths == null)
-        {
-            ConfigurationManager configurationManager = (ConfigurationManager) SpringComponentContext.getBean("configurationManager");
-            systemPaths = configurationManager.getSystemPaths();
-        }
-
-        return systemPaths;
+        systemPaths = manager.getSystemPaths();
     }
 
     public static String getPackagesUrl(String masterUrl)
