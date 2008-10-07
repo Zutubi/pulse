@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core.scm.api;
 
-import com.zutubi.pulse.core.model.Change;
 import com.zutubi.util.StringUtils;
 import com.zutubi.util.TimeStamps;
 

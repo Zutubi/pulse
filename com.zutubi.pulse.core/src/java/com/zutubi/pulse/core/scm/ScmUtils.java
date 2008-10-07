@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.scm;
 
 import com.zutubi.pulse.core.model.Change;
-import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.ScmException;
 
 import java.io.File;
