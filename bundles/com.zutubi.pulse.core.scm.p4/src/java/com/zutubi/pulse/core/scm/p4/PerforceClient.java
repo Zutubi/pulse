@@ -222,7 +222,7 @@ public class PerforceClient extends CachingScmClient
 
     private Revision convertRevision(NumericalRevision rev)
     {
-        return new Revision(rev.getAuthor(), rev.getComment(), rev.getDate(), rev.getRevisionString());
+        return new Revision(rev.getRevisionString());
     }
 
     public void populate(ScmFileCache.CacheItem item) throws ScmException

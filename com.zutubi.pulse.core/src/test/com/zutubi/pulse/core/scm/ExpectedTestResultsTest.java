@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.scm;
 
 import com.zutubi.pulse.core.model.Change;
-import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.scm.api.Changelist;
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmFile;
 import junit.framework.TestCase;
 
@@ -26,11 +26,11 @@ public class ExpectedTestResultsTest extends TestCase
     {
         super.setUp();
 
-        revisions = Arrays.asList(newRevision("1"),
-                newRevision("2"),
-                newRevision("3"),
-                newRevision("4"),
-                newRevision("5"));
+        revisions = Arrays.asList(new Revision("1"),
+                new Revision("2"),
+                new Revision("3"),
+                new Revision("4"),
+                new Revision("5"));
         results = new ExpectedTestResults(revisions);
     }
 
@@ -40,11 +40,6 @@ public class ExpectedTestResultsTest extends TestCase
         results = null;
 
         super.tearDown();
-    }
-
-    private Revision newRevision(String revisionString)
-    {
-        return new Revision(null, null, null, revisionString);
     }
 
     public void testGetFilesForRevision1()

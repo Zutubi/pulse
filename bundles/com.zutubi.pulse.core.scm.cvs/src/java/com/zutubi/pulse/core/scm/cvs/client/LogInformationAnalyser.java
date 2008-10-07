@@ -6,20 +6,14 @@
 package com.zutubi.pulse.core.scm.cvs.client;
 
 import com.zutubi.pulse.core.model.Change;
-import com.zutubi.pulse.core.model.Changelist;
+import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.cvs.CvsClient;
 import com.zutubi.pulse.core.scm.cvs.CvsRevision;
 import com.zutubi.util.logging.Logger;
 import org.netbeans.lib.cvsclient.CVSRoot;
 import org.netbeans.lib.cvsclient.command.log.LogInformation;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**

@@ -6,7 +6,6 @@ import com.zutubi.pulse.core.PulseScope;
 import com.zutubi.pulse.core.config.ResourceProperty;
 import com.zutubi.pulse.core.model.Change;
 import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.FilepathFilter;
 import com.zutubi.pulse.core.scm.NumericalRevision;
 import com.zutubi.pulse.core.scm.ScmFilepathFilter;
@@ -87,12 +86,12 @@ public class SubversionClient implements ScmClient
 
     public static Revision convertRevision(NumericalRevision rev)
     {
-        return new Revision(rev.getAuthor(), rev.getComment(), rev.getDate(), rev.getRevisionString());
+        return new Revision(rev.getRevisionString());
     }
 
     public NumericalRevision convertToNumericalRevision(Revision rev)
     {
-        return new NumericalRevision(rev.getAuthor(), rev.getComment(), rev.getDate(), rev.getRevisionString());
+        return new NumericalRevision(rev.getRevisionString());
     }
 
     /**
@@ -426,7 +425,7 @@ public class SubversionClient implements ScmClient
         repository.log(new String[]{""}, logs, fromNumber, toNumber, true, true);
         for (SVNLogEntry entry : logs)
         {
-            NumericalRevision revision = new NumericalRevision(entry.getAuthor(), entry.getMessage(), entry.getDate(), entry.getRevision());
+            NumericalRevision revision = new NumericalRevision(entry.getRevision());
             Changelist list = new Changelist(convertRevision(revision));
             handler.handle(list);
 

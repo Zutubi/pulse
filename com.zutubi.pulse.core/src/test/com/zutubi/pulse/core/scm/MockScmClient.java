@@ -2,7 +2,6 @@ package com.zutubi.pulse.core.scm;
 
 import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.config.ResourceProperty;
-import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.scm.api.*;
 
 import java.io.File;

@@ -1,7 +1,6 @@
 package com.zutubi.pulse.core.model;
 
 import com.zutubi.util.TimeStamps;
-import com.zutubi.util.StringUtils;
 
 import java.util.Date;
 import java.util.Locale;
@@ -12,8 +11,6 @@ import java.util.Locale;
  */
 public class Revision extends Entity implements Comparable<Revision>
 {
-    private static final int MAX_COMMENT_LENGTH = 4095;
-    private static final String COMMENT_TRIM_MESSAGE = "... [trimmed]";
 
     private String author;
     private String comment;
@@ -45,10 +42,6 @@ public class Revision extends Entity implements Comparable<Revision>
     public Revision(String author, String comment, Date date, String revisionString)
     {
         this.author = author;
-        if (comment != null)
-        {
-            this.comment = StringUtils.trimmedString(comment, MAX_COMMENT_LENGTH, COMMENT_TRIM_MESSAGE);
-        }
         setDate(date);
         setRevisionString(revisionString);
     }

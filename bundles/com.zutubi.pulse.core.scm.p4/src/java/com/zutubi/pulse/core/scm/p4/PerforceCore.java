@@ -1,7 +1,7 @@
 package com.zutubi.pulse.core.scm.p4;
 
-import com.zutubi.pulse.core.model.Revision;
 import com.zutubi.pulse.core.scm.NumericalRevision;
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmCancelledException;
 import com.zutubi.pulse.core.scm.api.ScmException;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
@@ -59,12 +59,12 @@ public class PerforceCore
 
     public Revision convertRevision(NumericalRevision rev)
     {
-        return new Revision(rev.getAuthor(), rev.getComment(), rev.getDate(), rev.getRevisionString());
+        return new Revision(rev.getRevisionString());
     }
 
     public NumericalRevision convertRevision(Revision rev)
     {
-        return rev == null ? null : new NumericalRevision(rev.getAuthor(), rev.getComment(), rev.getDate(), rev.getRevisionString());
+        return rev == null ? null : new NumericalRevision(rev.getRevisionString());
     }
 
     public Map<String, String> getEnv()

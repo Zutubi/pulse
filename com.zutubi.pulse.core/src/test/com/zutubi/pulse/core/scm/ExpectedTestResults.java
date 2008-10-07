@@ -1,8 +1,8 @@
 package com.zutubi.pulse.core.scm;
 
 import com.zutubi.pulse.core.model.Change;
-import com.zutubi.pulse.core.model.Changelist;
-import com.zutubi.pulse.core.model.Revision;
+import com.zutubi.pulse.core.scm.api.Changelist;
+import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmFile;
 
 import java.util.*;
@@ -33,17 +33,6 @@ public class ExpectedTestResults
 
         this.revisions = revisions;
 
-        // verify that these revisions are in order.
-        for (int i = 1; i < 5; i++)
-        {
-            Revision revisionA = revisions.get(i - 1);
-            Revision revisionB = revisions.get(i);
-            if (revisionA.compareTo(revisionB) >= 0)
-            {
-                throw new IllegalArgumentException("revision '" + revisionA + "' should be less than revision '" + revisionB + "'");
-            }
-        }
-
         if (pathPrefix == null)
         {
             pathPrefix = "";
@@ -65,11 +54,11 @@ public class ExpectedTestResults
     private void setupResults()
     {
         changelists = new LinkedList<Changelist>();
-        changelists.add(new Changelist(revisions.get(0)));
-        changelists.add(new Changelist(revisions.get(1)));
-        changelists.add(new Changelist(revisions.get(2)));
-        changelists.add(new Changelist(revisions.get(3)));
-        changelists.add(new Changelist(revisions.get(4)));
+        changelists.add(new Changelist(revisions.get(0), 0, null, null));
+        changelists.add(new Changelist(revisions.get(1), 0, null, null));
+        changelists.add(new Changelist(revisions.get(2), 0, null, null));
+        changelists.add(new Changelist(revisions.get(3), 0, null, null));
+        changelists.add(new Changelist(revisions.get(4), 0, null, null));
 
 
         Changelist cl1 = changelists.get(0);
@@ -279,7 +268,7 @@ public class ExpectedTestResults
             }
         }
 
-        Changelist result = new Changelist(null);
+        Changelist result = new Changelist(null, 0, null, null);
         for (Change change : latestChanges.values())
         {
             result.addChange(change);
