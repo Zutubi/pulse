@@ -47,6 +47,16 @@ public class SubversionWorkingCopy extends PersonalBuildSupport implements Worki
         configSupport = new ConfigSupport(config);
     }
 
+    public Revision convertRevision(NumericalRevision rev)
+    {
+        return new Revision(rev.getRevisionString());
+    }
+
+    public NumericalRevision convertRevision(Revision rev)
+    {
+        return new NumericalRevision(rev.getRevisionString());
+    }
+
     private void initAuthenticationManager()
     {
         if (authenticationManager == null)
@@ -169,7 +179,7 @@ public class SubversionWorkingCopy extends PersonalBuildSupport implements Worki
         {
             initAuthenticationManager();
         }
-        
+
         StatusHandler handler = new StatusHandler(base);
 
         try
@@ -211,7 +221,7 @@ public class SubversionWorkingCopy extends PersonalBuildSupport implements Worki
 
             if (fs.getState() == FileStatus.State.ADDED)
             {
-                // For new files, check for svn:executable 
+                // For new files, check for svn:executable
                 SVNPropertyData property = wcc.doGetProperty(new File(base, fs.getPath()), SVN_PROPERTY_EXECUTABLE, SVNRevision.WORKING, SVNRevision.WORKING, false);
                 if (property != null)
                 {
@@ -280,7 +290,7 @@ public class SubversionWorkingCopy extends PersonalBuildSupport implements Worki
         try
         {
             long rev = updateClient.doUpdate(base, SVNRevision.HEAD, true);
-            return new Revision(new NumericalRevision(rev).getRevisionString());
+            return convertRevision(new NumericalRevision(rev));
         }
         catch (SVNException e)
         {
@@ -413,7 +423,7 @@ public class SubversionWorkingCopy extends PersonalBuildSupport implements Worki
                 // such as newly-added files, will be reported by the status
                 // operation as out of date.)
                 NumericalRevision rev = new NumericalRevision(event.getRevision());
-                status.setRevision(new Revision(rev.getRevisionString()));
+                status.setRevision(convertRevision(rev));
                 status("Repository revision: " + rev.getRevisionString());
             }
         }

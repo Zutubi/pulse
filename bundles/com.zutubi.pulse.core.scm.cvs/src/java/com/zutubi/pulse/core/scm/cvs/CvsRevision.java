@@ -37,6 +37,7 @@ public class CvsRevision
     {
         this(author, comment, date);
         setBranch(tag);
+        setRevisionString(generateRevisionString());
     }
 
     public CvsRevision(String author, String comment, Date date)

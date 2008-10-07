@@ -331,7 +331,7 @@ public class PerforceClientTest extends PulseTestCase
         ExecutionContext context = new ExecutionContext();
         context.setWorkingDir(workDir);
         context.addString("scm.bootstrap.id", "my-id");
-        
+
         Revision got = client.checkout(context, createRevision(1), null);
         assertEquals("1", got.getRevisionString());
         checkDirectory("checkoutRevision");
@@ -399,13 +399,6 @@ public class PerforceClientTest extends PulseTestCase
         assertNull(client.getFileRevision("//depot2/file10", createRevision(4)));
     }
 
-    public void testGetRevision() throws ScmException
-    {
-        getServer(TEST_CLIENT);
-        NumericalRevision rev = new NumericalRevision(client.parseRevision("3").getRevisionString());
-        assertEquals(3, rev.getRevisionNumber());
-    }
-
     public void testGetRevisionLatest() throws ScmException
     {
         getServer(TEST_CLIENT);
@@ -417,7 +410,7 @@ public class PerforceClientTest extends PulseTestCase
     public void testGetRevisionPostLatest() throws ScmException
     {
         getServer(TEST_CLIENT);
-        NumericalRevision latest = new NumericalRevision(client.getLatestRevision(null).getRevisionString());
+        NumericalRevision latest = convertRevision(client.getLatestRevision(null));
         try
         {
             client.parseRevision(Long.toString(latest.getRevisionNumber() + 1));
@@ -548,5 +541,10 @@ public class PerforceClientTest extends PulseTestCase
     private Revision createRevision(long rev)
     {
         return new Revision(Long.toString(rev));
+    }
+
+    private NumericalRevision convertRevision(Revision rev)
+    {
+        return new NumericalRevision(rev.getRevisionString());
     }
 }

@@ -1,9 +1,10 @@
 package com.zutubi.pulse.core.scm.cvs;
 
+import com.zutubi.pulse.core.BuildProperties;
 import com.zutubi.pulse.core.ExecutionContext;
-import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.util.FileSystemUtils;
 import org.netbeans.lib.cvsclient.util.Logger;
@@ -260,6 +261,7 @@ public class CvsClientTest extends PulseTestCase
 
         ExecutionContext context = new ExecutionContext();
         context.setWorkingDir(workdir);
+        context.getScope().setLabel(BuildProperties.SCOPE_RECIPE);
         client.checkout(context, Revision.HEAD, null);
 
         assertTrue(new File(workdir, "unit-test").isDirectory());
