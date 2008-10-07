@@ -4,8 +4,6 @@ import com.zutubi.pulse.core.BuildProperties;
 import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.PulseScope;
 import com.zutubi.pulse.core.config.ResourceProperty;
-import com.zutubi.pulse.core.model.Change;
-import com.zutubi.pulse.core.model.Changelist;
 import com.zutubi.pulse.core.scm.FilepathFilter;
 import com.zutubi.pulse.core.scm.NumericalRevision;
 import com.zutubi.pulse.core.scm.ScmFilepathFilter;
@@ -426,7 +424,7 @@ public class SubversionClient implements ScmClient
         for (SVNLogEntry entry : logs)
         {
             NumericalRevision revision = new NumericalRevision(entry.getRevision());
-            Changelist list = new Changelist(convertRevision(revision));
+            Changelist list = new Changelist(convertRevision(revision), entry.getDate().getTime(), entry.getAuthor(), entry.getMessage());
             handler.handle(list);
 
             Map files = entry.getChangedPaths();

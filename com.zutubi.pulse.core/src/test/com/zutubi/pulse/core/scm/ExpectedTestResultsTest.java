@@ -1,6 +1,6 @@
 package com.zutubi.pulse.core.scm;
 
-import com.zutubi.pulse.core.model.Change;
+import com.zutubi.pulse.core.scm.api.Change;
 import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.pulse.core.scm.api.ScmFile;
@@ -221,22 +221,8 @@ public class ExpectedTestResultsTest extends TestCase
         changelist = results.getChange(revisions.get(0));
         assertEquals(6, changelist.getChanges().size());
 
-        // temp hack - need to mark Change instances as persisted so that a value comparison is done.
-        // It is all to do with entity equality and persistence.
-        for (Change change : changelist.getChanges())
-        {
-            change.setId(1);
-        }
-
-        assertTrue(changelist.getChanges().contains(createPersistentChange("project", null, Change.Action.ADD, true)));
-        assertTrue(changelist.getChanges().contains(createPersistentChange("project/src", null, Change.Action.ADD, true)));
-        assertTrue(changelist.getChanges().contains(createPersistentChange("project/test", null, Change.Action.ADD, true)));
-    }
-
-    private Change createPersistentChange(String filename, String revisionString, Change.Action action, boolean isDir)
-    {
-        Change change = new Change(filename, revisionString, action, isDir);
-        change.setId(1);
-        return change;
+        assertTrue(changelist.getChanges().contains(new Change("project", null, Change.Action.ADD, true)));
+        assertTrue(changelist.getChanges().contains(new Change("project/src", null, Change.Action.ADD, true)));
+        assertTrue(changelist.getChanges().contains(new Change("project/test", null, Change.Action.ADD, true)));
     }
 }

@@ -153,10 +153,6 @@ public class Change
         {
             return false;
         }
-        if (!super.equals(o))
-        {
-            return false;
-        }
 
         Change change = (Change) o;
         if (directory != change.directory)
