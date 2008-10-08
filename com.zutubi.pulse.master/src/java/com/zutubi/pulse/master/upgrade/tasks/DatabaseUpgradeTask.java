@@ -8,9 +8,10 @@ import com.zutubi.util.logging.Logger;
 
 import javax.sql.DataSource;
 import java.io.*;
-import java.sql.*;
-import java.util.LinkedList;
-import java.util.List;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  */
@@ -45,41 +46,6 @@ public abstract class DatabaseUpgradeTask extends AbstractUpgradeTask implements
     }
 
     public abstract void execute(Connection con) throws IOException, SQLException;
-
-    protected List<Long> getAllProjects(Connection con) throws SQLException
-    {
-        return getAllIds(con, "project");
-    }
-
-    protected List<Long> getAllUsers(Connection con) throws SQLException
-    {
-        return getAllIds(con, "user");
-    }
-
-    private List<Long> getAllIds(Connection con, String table) throws SQLException
-    {
-        CallableStatement stmt = null;
-        ResultSet rs = null;
-
-        List<Long> all = new LinkedList<Long>();
-
-        try
-        {
-            stmt = con.prepareCall("SELECT id FROM " + table);
-            rs = stmt.executeQuery();
-            while (rs.next())
-            {
-                all.add(rs.getLong("id"));
-            }
-
-            return all;
-        }
-        finally
-        {
-            JDBCUtils.close(rs);
-            JDBCUtils.close(stmt);
-        }
-    }
 
     protected byte[] upgradeBlob(ResultSet rs, String columnName, ObjectUpgrader objectUpgrader) throws SQLException, IOException
     {
@@ -166,28 +132,6 @@ public abstract class DatabaseUpgradeTask extends AbstractUpgradeTask implements
         {
             JDBCUtils.close(stmt);
         }
-    }
-
-    protected Long runQueryForLong(Connection con, String sql) throws SQLException
-    {
-        PreparedStatement query = null;
-        ResultSet rs = null;
-        try
-        {
-            query = con.prepareStatement(sql);
-            rs = query.executeQuery();
-            if (rs.next())
-            {
-                return rs.getLong(1);
-            }
-        }
-        finally
-        {
-            JDBCUtils.close(rs);
-            JDBCUtils.close(query);
-        }
-
-        return null;
     }
 
     public void setDataSource(DataSource source)

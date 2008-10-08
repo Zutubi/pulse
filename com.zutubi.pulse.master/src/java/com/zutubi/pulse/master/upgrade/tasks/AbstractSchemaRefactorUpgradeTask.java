@@ -1,6 +1,5 @@
 package com.zutubi.pulse.master.upgrade.tasks;
 
-import com.zutubi.pulse.master.database.DatabaseConsole;
 import com.zutubi.pulse.master.hibernate.HackyConnectionProvider;
 import com.zutubi.pulse.master.hibernate.MutableConfiguration;
 import com.zutubi.pulse.master.hibernate.SchemaRefactor;
@@ -18,7 +17,7 @@ import java.util.Properties;
 public abstract class AbstractSchemaRefactorUpgradeTask extends DatabaseUpgradeTask
 {
     private List<String> mappings = new LinkedList<String>();
-    private DatabaseConsole databaseConsole;
+    private Properties hibernateProperties;
 
     public boolean haltOnFailure()
     {
@@ -27,17 +26,15 @@ public abstract class AbstractSchemaRefactorUpgradeTask extends DatabaseUpgradeT
 
     public void execute(Connection con) throws IOException, SQLException
     {
-        // manually setup the hibernate configuration
-        MutableConfiguration config = new MutableConfiguration();
-
-        // load these properties from the context, same place that all the other
-        // properties are defined.
-        Properties props = databaseConsole.getConfig().getHibernateProperties();
+        Properties props = new Properties();
+        props.putAll(hibernateProperties);
         props.put(Environment.CONNECTION_PROVIDER, "com.zutubi.pulse.master.hibernate.HackyConnectionProvider");
 
         // slight hack to provide hibernate with access to the configured datasource.
         HackyConnectionProvider.dataSource = dataSource;
 
+        // manually setup the hibernate configuration
+        MutableConfiguration config = new MutableConfiguration();
         config.addClassPathMappings(mappings);
         config.buildMappings();
         
@@ -47,11 +44,16 @@ public abstract class AbstractSchemaRefactorUpgradeTask extends DatabaseUpgradeT
 
     protected abstract void doRefactor(Connection con, SchemaRefactor refactor) throws SQLException, IOException;
 
-    public void setDatabaseConsole(DatabaseConsole databaseConsole)
+    public void setHibernateProperties(Properties hibernateProperties)
     {
-        this.databaseConsole = databaseConsole;
+        this.hibernateProperties = hibernateProperties;
     }
 
+    /**
+     * The hibernate mappings that define the existing schema that we are upgrading from.
+     * 
+     * @param mappings a list of classpath references to .hbm.xml files.
+     */
     public void setMappings(List<String> mappings)
     {
         this.mappings = mappings;

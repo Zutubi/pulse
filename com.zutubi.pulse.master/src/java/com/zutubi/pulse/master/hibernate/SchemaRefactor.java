@@ -15,15 +15,9 @@ import org.hibernate.tool.hbm2ddl.TableMetadata;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
+import java.io.IOException;
 
-/**
- *
- *
- */
 public class SchemaRefactor
 {
     private static final Logger LOG = Logger.getLogger(SchemaRefactor.class);
@@ -54,6 +48,64 @@ public class SchemaRefactor
         SchemaUpdate schemaUpdate = new SchemaUpdate(config, connectionProperties);
         schemaUpdate.execute(true, true);
         exceptions = schemaUpdate.getExceptions();
+    }
+
+    /**
+     * Patch the existing configuration.  These patches are 'additive' only.  Any columns
+     * or tables found in the patch that do not already exist will be added.  Anything missing
+     * will be ignored.
+     *
+     * @param mapping the classpath reference to the patch hbm.xml file
+     *
+     * @throws IOException is thrown if there is a problem loading the patch file.
+     */
+    public void patch(String mapping) throws IOException
+    {
+        // Ok, so we do this as follows:
+        // a) load the patch mapping
+        // b) apply it to the existing in memory mapping
+        // c) sync the in memory mapping with the database.
+        // Note: this falls under the same restrictions as normal hibernate syncs, so
+        // any columns that change details will not need to be handled separately.  Only
+        // column additions and table additions are included.
+
+        MutableConfiguration config = new MutableConfiguration();
+        config.addClassPathMappings(Arrays.asList(mapping));
+        config.buildMappings();
+        
+        Iterator tables = config.getTableMappings();
+        while (tables.hasNext())
+        {
+            Table table = (Table) tables.next();
+
+            // do we have this table?.
+            Table existingTable = getTable(table.getName());
+            if (existingTable != null)
+            {
+                Iterator columns = table.getColumnIterator();
+                while (columns.hasNext())
+                {
+                    Column column = (Column) columns.next();
+
+                    Column existingColumn = getColumn(existingTable, column.getName());
+                    if (existingColumn == null)
+                    {
+                        existingTable.addColumn(column);
+                    }
+                    else
+                    {
+                        // avoid this case for now - we need to refresh the column with the new definition,
+                        // which means updating the in memory column configuration, and then running a refresh.
+                    }
+                }
+            }
+            else
+            {
+                this.config.addTable(table);
+            }
+        }
+
+        sync();
     }
 
     public String[] generateSyncSql() throws SQLException
@@ -185,6 +237,8 @@ public class SchemaRefactor
         });
     }
 
+    // WARNING: drop column DOES NOT UPDATE the in memory representation of the schema,
+    // so any subsequent sync / patch calls will RE-ADD the column.
     public void dropColumn(final String tableName, final String columnName) throws SQLException
     {
         executeWithConnection(new Callback()
@@ -195,6 +249,19 @@ public class SchemaRefactor
                 Column column = getColumn(table, columnName);
                 dropColumnConstraints(con, table, column);
                 sqlDropColumn(con, table, columnName);
+                return null;
+            }
+        });
+    }
+
+    public void dropTable(final String tableName) throws SQLException
+    {
+        executeWithConnection(new Callback()
+        {
+            public Object execute(Connection con) throws SQLException
+            {
+                Table table = getTable(tableName);
+                dropTable(con, table);
                 return null;
             }
         });
@@ -270,8 +337,7 @@ public class SchemaRefactor
         sqlDropColumn(connection, table, fromColumnName);
     }
 
-    private void recreatedDroppedConstraints(List<ForeignKey> droppedConstraints, Connection connection)
-            throws SQLException
+    private void recreatedDroppedConstraints(List<ForeignKey> droppedConstraints, Connection connection) throws SQLException
     {
         for (ForeignKey columnKey : droppedConstraints)
         {

@@ -9,10 +9,7 @@ import com.zutubi.pulse.master.database.DatabaseConsoleBeanFactory;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.hsqldb.jdbcDriver;
 
-import java.io.File;
-import java.io.FilenameFilter;
 import java.sql.DriverManager;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -22,7 +19,7 @@ public abstract class BaseUpgradeTaskTestCase extends PulseTestCase
 {
     protected BasicDataSource dataSource;
     protected DatabaseConfig databaseConfig;
-    private DatabaseConsole databaseConsole;
+    protected DatabaseConsole databaseConsole;
 
     public BaseUpgradeTaskTestCase()
     {
@@ -45,7 +42,7 @@ public abstract class BaseUpgradeTaskTestCase extends PulseTestCase
         DatabaseConsoleBeanFactory factory = new DatabaseConsoleBeanFactory();
         factory.setDatabaseConfig((DatabaseConfig) SpringComponentContext.getBean("databaseConfig"));
         factory.setDataSource(dataSource);
-        factory.setHibernateMappings(getTestMappings());
+        factory.setHibernateMappings(getMappings());
 
         DriverManager.registerDriver(new jdbcDriver());
         databaseConsole = (DatabaseConsole) factory.getObject();
@@ -65,29 +62,11 @@ public abstract class BaseUpgradeTaskTestCase extends PulseTestCase
         super.tearDown();
     }
 
-    protected abstract List<String> getTestMappings();
-
-    protected List<String> getMappings(String build)
-    {
-        List<String> mappings = new LinkedList<String>();
-
-        String path = "master/src/test/com/zutubi/pulse/upgrade/schema/build_" + build;
-        File mappingDir = new File(getPulseRoot(), path);
-        for (File f : mappingDir.listFiles(new XMLFilenameFilter()))
-        {
-            mappings.add("com/zutubi/pulse/upgrade/schema/build_" + build + "/" + f.getName());
-        }
-        
-        return mappings;
-    }
-
-    public class XMLFilenameFilter implements FilenameFilter
-    {
-        public boolean accept(File dir, String name)
-        {
-            return name.endsWith(".xml");
-        }
-    }
-
-
+    /**
+     * The list of hibernate mappings that defines the original schema that we are upgrading
+     * from.  The list must define locations on the classpath.
+     *
+     * @return list of mappings.
+     */
+    protected abstract List<String> getMappings();
 }

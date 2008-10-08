@@ -1,0 +1,426 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+<hibernate-mapping>
+
+    <!-- AgentState.hbm.xml -->
+    <class name="com.zutubi.pulse.model.AgentState" table="AGENT_STATE" lazy="false">
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="enableStateName" column="ENABLE_STATE" type="string" length="255"/>
+    </class>
+
+    <!-- BuildResult.hbm.xml -->
+    <class name="com.zutubi.pulse.model.BuildResult" table="BUILD_RESULT" lazy="false">
+
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <many-to-one name="reason" class="com.zutubi.pulse.model.AbstractBuildReason" column="REASON" cascade="all" lazy="false"/>
+
+        <property name="stamps" type="com.zutubi.pulse.util.TimeStampsType">
+            <column name="QUEUE" sql-type="BIGINT"/>
+            <column name="START" sql-type="BIGINT"/>
+            <column name="FINISH" sql-type="BIGINT" index="idx_buildresult_finish"/>
+            <column name="ESTIMATED_RUNNING_TIME" sql-type="BIGINT"/>
+        </property>
+
+        <property name="stateName" column="STATE" type="string" length="127"/>
+
+        <property name="outputDir" type="string" length="1023"/>
+
+        <bag name="features" cascade="all,delete-orphan" lazy="true">
+            <key column="BUILD_RESULT_ID"/>
+            <one-to-many class="com.zutubi.pulse.core.model.Feature"/>
+        </bag>
+
+        <property name="number" column="NUMBER" type="long" not-null="true"/>
+
+        <property name="userRevision" column="USER_REVISION" type="boolean"/>
+
+        <property name="warningFeatureCount" type="int">
+            <column name="WARNING_FEATURE_COUNT" default="-1"/>
+        </property>
+
+        <property name="errorFeatureCount" type="int">
+            <column name="ERROR_FEATURE_COUNT" default="-1"/>
+        </property>
+
+        <many-to-one name="project" column="PROJECT" class="com.zutubi.pulse.model.Project" cascade="none"/>
+
+        <many-to-one name="user" column="LOCAL_USER" class="com.zutubi.pulse.model.User" cascade="none" not-null="false"/>
+
+        <many-to-one name="root" class="com.zutubi.pulse.model.RecipeResultNode" column="RECIPE_RESULT_ID"
+                     cascade="all"/>
+
+        <property name="version" column="VERSION" type="string" length="255"/>
+
+        <property name="hasWorkDir" type="boolean"/>
+
+        <many-to-one name="revision" class="com.zutubi.pulse.core.model.Revision" column="REVISION_ID" cascade="all" unique="true"/>
+
+    </class>
+
+    <class name="com.zutubi.pulse.model.AbstractBuildReason" table="BUILD_REASON" lazy="false">
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <discriminator column="REASON_TYPE" type="string" length="255"/>
+
+        <subclass name="com.zutubi.pulse.model.ManualTriggerBuildReason" discriminator-value="MANUAL_TRIGGER" lazy="false">
+            <property name="username" type="string" column="DETAILS" length="255"/>
+        </subclass>
+
+        <subclass name="com.zutubi.pulse.model.PersonalBuildReason" discriminator-value="PERSONAL" lazy="false">
+            <property name="user" type="string" column="LOCAL_USER" length="255"/>
+        </subclass>
+
+        <subclass name="com.zutubi.pulse.model.RemoteTriggerBuildReason" discriminator-value="REMOTE_TRIGGER" lazy="false"/>
+
+        <subclass name="com.zutubi.pulse.model.TriggerBuildReason" discriminator-value="TRIGGER" lazy="false">
+            <property name="triggerName" type="string" column="DETAILS" length="255"/>
+        </subclass>
+
+        <subclass name="com.zutubi.pulse.model.UnknownBuildReason" discriminator-value="UNKNOWN" lazy="false"/>
+
+    </class>
+
+    <class name="com.zutubi.pulse.model.RecipeResultNode" table="RECIPE_RESULT_NODE" lazy="false">
+
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="host" type="string" length="255"/>
+
+        <property name="stageName" type="string" length="255"/>
+
+        <property name="stageHandle" column="STAGE_HANDLE" type="long"/>
+
+        <many-to-one name="result" class="com.zutubi.pulse.core.model.RecipeResult" column="RECIPE_RESULT_ID" cascade="all" unique="true"/>
+
+        <list name="children" cascade="all,delete-orphan" lazy="false">
+            <key column="PARENT_ID"/>
+            <index column="ORDINAL"/>
+            <one-to-many class="com.zutubi.pulse.model.RecipeResultNode"/>
+        </list>
+
+    </class>
+
+    <class name="com.zutubi.pulse.core.model.RecipeResult" table="RECIPE_RESULT" lazy="false">
+
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="stamps" type="com.zutubi.pulse.util.TimeStampsType">
+            <column name="QUEUE" sql-type="BIGINT"/>
+            <column name="START" sql-type="BIGINT"/>
+            <column name="FINISH" sql-type="BIGINT"/>
+            <column name="ESTIMATED_RUNNING_TIME" sql-type="BIGINT"/>
+        </property>
+
+        <property name="stateName" column="STATE" type="string" length="255"/>
+
+        <property name="outputDir" type="string" length="1023"/>
+
+        <bag name="features" cascade="all,delete-orphan" lazy="true">
+            <key column="RECIPE_RESULT_ID"/>
+            <one-to-many class="com.zutubi.pulse.core.model.Feature"/>
+        </bag>
+
+        <property name="warningFeatureCount" type="int">
+            <column name="WARNING_FEATURE_COUNT" default="-1"/>
+        </property>
+
+        <property name="errorFeatureCount" type="int">
+            <column name="ERROR_FEATURE_COUNT" default="-1"/>
+        </property>
+
+        <property name="recipeName" column="RECIPE_NAME" type="string" length="255"/>
+
+        <list name="commandResults" cascade="all,delete-orphan" lazy="true">
+            <key column="RECIPE_RESULT_ID"/>
+            <index column="ORDINAL"/>
+            <one-to-many class="com.zutubi.pulse.core.model.CommandResult"/>
+        </list>
+
+        <many-to-one name="testSummary" class="com.zutubi.pulse.core.model.TestResultSummary" column="TEST_SUMMARY_ID" cascade="all"/>
+
+    </class>
+
+    <class name="com.zutubi.pulse.core.model.TestResultSummary" table="TEST_RESULT_SUMMARY" lazy="false">
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="errors" column="ERRORS" type="int"/>
+        <property name="failures" column="FAILURES" type="int"/>
+        <property name="total" column="TOTAL" type="int"/>
+    </class>
+
+    <!-- Changelist.hbm.xml -->
+    <class name="com.zutubi.pulse.core.model.Changelist" table="BUILD_CHANGELIST" lazy="false">
+        <id name="id" type="long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <component name="revision" class="com.zutubi.pulse.core.model.Revision">
+            <property name="author" type="string" length="255">
+                <column name="REVISION_AUTHOR" index="idx_changelist_revision_author"/>
+            </property>
+            <property name="comment" column="REVISION_COMMENT" type="string" length="4096"/>
+            <property name="time" type="long">
+                <column name="REVISION_DATE" index="idx_changelist_revision_date"/>
+            </property>
+            <property name="branch" column="REVISION_BRANCH" type="string" length="255"/>
+            <property name="revisionString" column="REVISION_STRING" type="string" length="255"/>
+        </component>
+
+        <property name="hash" type="string" length="255">
+            <column name="HASH" index="idx_changelist_hash"/>
+        </property>
+
+        <list name="changes" cascade="all,delete-orphan" lazy="true">
+            <key column="CHANGELIST_ID"/>
+            <index column="ORDINAL"/>
+            <one-to-many class="com.zutubi.pulse.core.model.Change"/>
+        </list>
+
+        <property name="projectId" type="long">
+            <column name="PROJECT_ID" index="idx_changelist_project_id"/>
+        </property>
+
+        <property name="resultId" type="long">
+            <column name="RESULT_ID" index="idx_changelist_result_id"/>
+        </property>
+    </class>
+
+    <class name="com.zutubi.pulse.core.model.Change" table="BUILD_FILE_CHANGE" lazy="false">
+        <id name="id" type="long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="actionName" column="ACTION" type="string" length="255"/>
+
+        <property name="filename" column="FILENAME" type="string" length="4095"/>
+
+        <property name="revisionString" column="REVISION_STRING" type="string" length="4095"/>
+
+    </class>
+
+    <!-- CommandResult.hbm.xml -->
+    <class name="com.zutubi.pulse.core.model.CommandResult" table="COMMAND_RESULT" lazy="false">
+
+        <id name="id" type="long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="commandName" column="COMMAND_NAME" type="string" length="255"/>
+
+        <property name="stamps" type="com.zutubi.pulse.util.TimeStampsType">
+            <column name="QUEUE" sql-type="BIGINT"/>
+            <column name="START" sql-type="BIGINT"/>
+            <column name="FINISH" sql-type="BIGINT"/>
+            <column name="ESTIMATED_RUNNING_TIME" sql-type="BIGINT"/>
+        </property>
+
+        <property name="stateName" type="string" length="255" not-null="true"/>
+
+        <property name="outputDir" type="string" length="1023"/>
+
+        <bag name="features" cascade="all,delete-orphan" lazy="true">
+            <key column="COMMAND_RESULT_ID"/>
+            <one-to-many class="com.zutubi.pulse.core.model.Feature"/>
+        </bag>
+
+        <property name="warningFeatureCount" type="int">
+            <column name="WARNING_FEATURE_COUNT" default="-1"/>
+        </property>
+
+        <property name="errorFeatureCount" type="int">
+            <column name="ERROR_FEATURE_COUNT" default="-1"/>
+        </property>
+
+        <property name="properties" column="PROPERTIES" type="com.zutubi.pulse.master.util.hibernate.PropertiesType" length="4095"/>
+
+        <list name="artifacts" cascade="all,delete-orphan" lazy="true">
+            <key column="COMMAND_RESULT_ID"/>
+            <index column="ORDINAL"/>
+            <one-to-many class="com.zutubi.pulse.core.model.StoredArtifact"/>
+        </list>
+
+    </class>
+
+    <!-- Feature.hbm.xml -->
+    <class name="com.zutubi.pulse.core.model.Feature" table="FEATURE" lazy="false">
+
+        <id name="id" type="long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <discriminator column="FEATURE_TYPE" type="string" length="255"/>
+
+        <property name="levelName" column="LEVEL" type="string" length="255"/>
+
+        <property name="summary" column="SUMMARY" type="string" length="4095"/>
+
+        <subclass name="com.zutubi.pulse.core.model.PlainFeature" discriminator-value="PLAIN">
+            <property name="firstLine" column="FIRST_LINE" type="long"/>
+
+            <property name="lastLine" column="LAST_LINE" type="long"/>
+
+            <property name="lineNumber" column="LINE" type="long"/>
+        </subclass>
+
+    </class>
+
+    <!-- Project.hbm.xml -->
+    <class name="com.zutubi.pulse.model.Project" table="PROJECT" lazy="false">
+        <cache usage="read-write"/>
+
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="stateName" column="STATE" type="string" length="31"/>
+
+        <bag name="forceCleanAgents" table="FORCE_CLEAN_AGENTS" lazy="false" cascade="save-update">
+ 	        <key column="PROJECT_ID"/>
+            <many-to-many class="com.zutubi.pulse.model.AgentState" column="AGENT_ID"/>
+ 	    </bag>
+
+        <property name="nextBuildNumber" column="NEXT_BUILD_NUMBER" type="long"/>
+
+        <property name="buildCount" type="int">
+            <column name="BUILD_COUNT" default="0"/>
+        </property>
+        <property name="successCount" type="int">
+            <column name="SUCCESS_COUNT" default="0"/>
+        </property>
+
+        <property name="lastPollTime" column="LAST_POLL_TIME" type="long"/>
+    </class>
+
+    <!-- Revision.hbm.xml -->
+    <class name="com.zutubi.pulse.core.model.Revision" table="REVISION" lazy="false">
+
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <discriminator column="REVISIONTYPE" type="string" length="255"/>
+
+        <property name="author" column="AUTHOR" type="string" length="255"/>
+        <property name="comment" column="COMMENT" type="string" length="4096"/>
+        <property name="time" column="DATE" type="long"/>
+        <property name="branch" column="BRANCH" type="string" length="255"/>
+        <property name="revisionString" column="REVISIONSTRING" type="string" length="255"/>
+
+    </class>
+
+    <!-- StoredArtifact.hbm.xml -->
+    <class name="com.zutubi.pulse.core.model.StoredArtifact" table="ARTIFACT" lazy="false">
+
+        <id name="id" type="long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="name" column="NAME" type="string" length="255"/>
+
+        <property name="index" column="INDEX_FILE" type="string" length="255"/>
+
+        <property name="url" column="URL" type="string" length="1023"/>
+
+        <bag name="children" cascade="all,delete-orphan" lazy="false">
+            <key column="ARTIFACT_ID" not-null="true"/>
+            <one-to-many class="com.zutubi.pulse.core.model.StoredFileArtifact"/>
+        </bag>
+
+    </class>
+
+    <class name="com.zutubi.pulse.core.model.StoredFileArtifact" table="FILE_ARTIFACT" lazy="false">
+        <id name="id" type="long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="path" column="FILE" type="string" length="1023"/>
+
+        <property name="type" column="TYPE" type="string" length="255"/>
+    </class>
+
+    <!-- TestCaseIndex.hbm.xml -->
+    <class name="com.zutubi.pulse.core.model.TestCaseIndex" table="TEST_CASE_INDEX" lazy="false">
+        <id name="id" type="long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="projectId" type="long" column="PROJECT_ID"/>
+        <property name="stageNameId" type="long" column="NODE_ID"/>
+        <property name="name" type="text" column="NAME"/>
+        <property name="totalCount" type="int" column="TOTAL_COUNT"/>
+        <property name="failureCount" type="int" column="FAILURE_COUNT"/>
+        <property name="errorCount" type="int" column="ERROR_COUNT"/>
+        <property name="brokenSince" type="long" column="BROKEN_SINCE"/>
+        <property name="brokenNumber" type="long" column="BROKEN_NUMBER"/>
+    </class>
+
+    <!-- Trigger.hbm.xml -->
+    <class name="com.zutubi.pulse.scheduling.Trigger" table="LOCAL_TRIGGER" lazy="false">
+
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <discriminator column="TRIGGER_TYPE" type="string" length="255"/>
+
+        <property name="name" column="TRIGGER_NAME" type="string" not-null="true" length="255"/>
+
+        <property name="group" column="TRIGGER_GROUP" type="string" not-null="true" length="255"/>
+
+        <property name="taskClass" column="TASK_CLASS" type="class"/>
+
+        <property name="project" column="PROJECT" type="long"/>
+
+        <property name="triggerCount" column="TRIGGER_COUNT" type="long"/>
+
+        <property name="previousTriggerTime" column="PREVIOUS_TRIGGER_TIME" type="timestamp"/>
+
+        <property name="dataMap" column="DATA" type="serializable" length="16383"/>
+
+        <property name="triggerState" column="STATE" type="string" not-null="true" length="127"/>
+
+        <subclass name="com.zutubi.pulse.scheduling.NoopTrigger" discriminator-value="NOOP" dynamic-update="false">
+        </subclass>
+
+        <subclass name="com.zutubi.pulse.scheduling.CronTrigger" discriminator-value="CRON" dynamic-update="false">
+            <property name="cron" column="CRON" type="string" not-null="false" length="255"/>
+        </subclass>
+
+        <subclass name="com.zutubi.pulse.scheduling.EventTrigger" discriminator-value="EVENT" dynamic-update="false">
+            <property name="triggerEvent" column="TRIGGER_EVENT" type="class"/>
+            <property name="filterClass" column="FILTER_CLASS" type="class"/>
+        </subclass>
+
+        <subclass name="com.zutubi.pulse.scheduling.SimpleTrigger" discriminator-value="SIMPLE" dynamic-update="false">
+        </subclass>
+
+    </class>
+
+    <!-- User.hbm.xml -->
+    <class name="com.zutubi.pulse.model.User" table="LOCAL_USER" lazy="false">
+        <cache usage="read-write"/>
+
+        <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
+            <generator class="hilo"/>
+        </id>
+
+        <property name="enabled" column="ENABLED" type="boolean"/>
+
+        <property name="nextBuildNumber" column="NEXT_BUILD_NUMBER" type="long"/>
+    </class>
+    
+</hibernate-mapping>

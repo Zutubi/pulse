@@ -6,10 +6,8 @@ import com.zutubi.pulse.master.upgrade.UpgradeTask;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
+import java.io.File;
 
-/**
- * <class-comment/>
- */
 public class MigrateSchemaUpgradeTaskTest extends BaseUpgradeTaskTestCase
 {
     public MigrateSchemaUpgradeTaskTest(String testName)
@@ -28,10 +26,15 @@ public class MigrateSchemaUpgradeTaskTest extends BaseUpgradeTaskTestCase
         super.tearDown();
     }
 
-    protected List<String> getTestMappings()
+    protected List<String> getMappings()
     {
         // we are handling our own map processing.. 
         return new LinkedList<String>();
+    }
+
+    protected List<File> getTestFileMappings()
+    {
+        return new LinkedList<File>();
     }
 
     public void testAddTableWithColumn() throws Exception
