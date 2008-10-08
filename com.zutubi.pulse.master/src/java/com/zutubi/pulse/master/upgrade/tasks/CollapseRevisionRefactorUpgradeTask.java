@@ -33,6 +33,16 @@ public class CollapseRevisionRefactorUpgradeTask extends AbstractSchemaRefactorU
         migrateRevisionStringToBuildResult(con);
         refactor.dropColumn("BUILD_RESULT", "REVISION_ID");
 
+        try
+        {
+            addIndex(con, "BUILD_RESULT", "idx_build_revision_string", "REVISION_STRING");
+        }
+        catch (SQLException e)
+        {
+            // Index could already be present.
+            System.out.println("Warning: Unable to add index to BUILD_RESULT.REVISION_STRING: " + e.getMessage());
+        }
+
         // revision table.
         refactor.dropTable("REVISION");
 
@@ -41,8 +51,17 @@ public class CollapseRevisionRefactorUpgradeTask extends AbstractSchemaRefactorU
         refactor.renameColumn("BUILD_CHANGELIST", "REVISION_AUTHOR", "AUTHOR");
         refactor.renameColumn("BUILD_CHANGELIST", "REVISION_DATE", "TIME");
 
-        refactor.dropColumn("BUILD_CHANGELIST", "HASH");
         refactor.dropColumn("BUILD_CHANGELIST", "REVISION_BRANCH");
+
+        try
+        {
+            addIndex(con, "BUILD_CHANGELIST", "idx_changelist_revision_string", "REVISION_STRING");
+        }
+        catch (SQLException e)
+        {
+            // Index could already be present.
+            System.out.println("Warning: Unable to add index to BUILD_CHANGELIST.REVISION_STRING: " + e.getMessage());
+        }
     }
 
     private void migrateRevisionStringToBuildResult(Connection con) throws SQLException

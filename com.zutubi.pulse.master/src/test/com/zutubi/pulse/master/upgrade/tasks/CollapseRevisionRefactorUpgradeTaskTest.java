@@ -53,12 +53,14 @@ public class CollapseRevisionRefactorUpgradeTaskTest extends BaseUpgradeTaskTest
         }
 
         assertTableNotExists("REVISION");
+        assertColumnExists("BUILD_CHANGELIST", "COMMENT");
+        assertColumnExists("BUILD_CHANGELIST", "AUTHOR");
+        assertColumnExists("BUILD_CHANGELIST", "TIME");
         assertColumnExists("BUILD_RESULT", "REVISION_STRING");
         assertColumnNotExists("BUILD_CHANGELIST", "REVISION_AUTHOR");
         assertColumnNotExists("BUILD_CHANGELIST", "REVISION_COMMENT");
         assertColumnNotExists("BUILD_CHANGELIST", "REVISION_DATE");
         assertColumnNotExists("BUILD_CHANGELIST", "REVISION_BRANCH");
-        assertColumnNotExists("BUILD_CHANGELIST", "HASH");
         assertColumnNotExists("BUILD_RESULT", "REVISION_ID");
     }
 

@@ -5,14 +5,15 @@ import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
+import com.zutubi.util.StringUtils;
 import com.zutubi.util.TimeStamps;
+import org.apache.commons.codec.digest.DigestUtils;
 
 import java.util.*;
 
 /**
- * A trivial implementation of the Changelist interface.
- *
- * @author jsankey
+ * A persistent wrapper around a Changelist, which associates the changelist
+ * details with a specific build.
  */
 public class PersistentChangelist extends Entity
 {
@@ -20,18 +21,37 @@ public class PersistentChangelist extends Entity
     private long time;
     private String author;
     private String comment;
+    /**
+     * An on-demand calculated hash of the basic details of this list (all bar
+     * the individual file changes).  Used for fast lookup of equivalent
+     * changelists.
+     */
+    private String hash = null;
     private List<PersistentFileChange> changes;
 
+    // We can possibly reference entities here but any change would need to be
+    // wary of performance: we need fast lookups by both build and project.
     private long projectId;
     private long resultId;
 
-    protected PersistentChangelist()
-    {
+    /**
+     * Cached version of an equivalent changelist.  Cacheable as changelists
+     * are immutable.  Created on demand (null until then).
+     */
+    private Changelist changelist = null;
 
+    // For hibernate
+    PersistentChangelist()
+    {
     }
 
     public PersistentChangelist(Revision revision, long time, String author, String comment, Collection<PersistentFileChange> changes)
     {
+        if (revision == null)
+        {
+            throw new NullPointerException("Revision may not be null");
+        }
+
         this.revision = revision;
         this.time = time;
         this.author = author;
@@ -52,19 +72,26 @@ public class PersistentChangelist extends Entity
                 return new PersistentFileChange(change);
             }
         });
+
+        changelist = data;
     }
 
     public Changelist asChangelist()
     {
-        return new Changelist(revision, time, author, comment, CollectionUtils.map(changes, new Mapping<PersistentFileChange, FileChange>()
+        if (changelist == null)
         {
-            public FileChange map(PersistentFileChange persistentFileChange)
+            changelist = new Changelist(revision, time, author, comment, CollectionUtils.map(changes, new Mapping<PersistentFileChange, FileChange>()
             {
-                return persistentFileChange.asChange();
-            }
-        }));
+                public FileChange map(PersistentFileChange persistentFileChange)
+                {
+                    return persistentFileChange.asChange();
+                }
+            }));
+        }
+
+        return changelist;
     }
-    
+
     public Date getDate()
     {
         return new Date(time);
@@ -130,6 +157,31 @@ public class PersistentChangelist extends Entity
     public void setComment(String comment)
     {
         this.comment = comment;
+    }
+
+    public String getHash()
+    {
+        if (hash == null)
+        {
+            String toHash = StringUtils.join("/", revision.getRevisionString(), Long.toString(time), safeString(author), safeString(comment));
+            hash = DigestUtils.md5Hex(toHash);
+        }
+        return hash;
+    }
+
+    private String safeString(String s)
+    {
+        if (s == null)
+        {
+            s = "";
+        }
+
+        return s;
+    }
+
+    public void setHash(String hash)
+    {
+        this.hash = hash;
     }
 
     public List<PersistentFileChange> getChanges()

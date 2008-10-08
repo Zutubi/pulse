@@ -180,14 +180,14 @@ public class PatchArchive
         {
             for(FileStatus fs: status)
             {
-                fs.preApply(base);
+                preApply(fs, base);
             }
 
             unzip(base);
 
             for(FileStatus fs: status)
             {
-                fs.postApply(base, localEOL);
+                postApply(fs, base, localEOL);
             }
         }
         catch (IOException e)
@@ -195,6 +195,55 @@ public class PatchArchive
             throw new PulseException("I/O error applying patch file '" + patchFile.getAbsolutePath() + "': " + e.getMessage(), e);
         }
     }
+
+    private void preApply(FileStatus fileStatus, File base) throws IOException
+    {
+        if (fileStatus.getState() == FileStatus.State.DELETED || fileStatus.getState() == FileStatus.State.REPLACED)
+        {
+            File f = new File(base, fileStatus.getTargetPath());
+            if (fileStatus.isDirectory())
+            {
+                FileSystemUtils.rmdir(f);
+            }
+            else
+            {
+                f.delete();
+            }
+        }
+    }
+
+    private void postApply(FileStatus fileStatus, File base, EOLStyle localEOL) throws IOException
+    {
+        File file = new File(base, fileStatus.getTargetPath());
+
+        // Apply line ending settings
+        String eolName = fileStatus.getProperty(FileStatus.PROPERTY_EOL_STYLE);
+        if(eolName != null)
+        {
+            try
+            {
+                EOLStyle eol = EOLStyle.valueOf(eolName);
+                eol.apply(file, localEOL);
+            }
+            catch (IllegalArgumentException e)
+            {
+                // Just ignore it values we don't support.
+            }
+        }
+
+        // Handle the executable bit
+        String executableValue = fileStatus.getProperty(FileStatus.PROPERTY_EXECUTABLE);
+        if(executableValue != null)
+        {
+            boolean executable = Boolean.parseBoolean(executableValue);
+            if(file.exists())
+            {
+                FileSystemUtils.setExecutable(file, executable);
+            }
+        }
+    }
+
+
 
     private void unzip(File base) throws IOException
     {

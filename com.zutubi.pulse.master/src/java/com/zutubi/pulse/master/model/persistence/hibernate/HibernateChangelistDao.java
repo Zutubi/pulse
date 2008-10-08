@@ -1,6 +1,7 @@
 package com.zutubi.pulse.master.model.persistence.hibernate;
 
 import com.zutubi.pulse.core.model.PersistentChangelist;
+import com.zutubi.pulse.core.scm.api.Changelist;
 import com.zutubi.pulse.master.model.Project;
 import com.zutubi.pulse.master.model.User;
 import com.zutubi.pulse.master.model.persistence.ChangelistDao;
@@ -102,14 +103,25 @@ public class HibernateChangelistDao extends HibernateEntityDao<PersistentChangel
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery("from PersistentChangelist model where model.revisionString = :revisionString");
-                queryObject.setParameter("revisionString", changelist.getRevision().getRevisionString());
+                Query queryObject = session.createQuery("from PersistentChangelist model where model.hash = :hash");
+                queryObject.setParameter("hash", changelist.getHash());
 
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
 
                 return queryObject.list();
             }
         });
+
+        // Now eliminate false-positives from hash collisions.
+        Changelist rawChangelist = changelist.asChangelist();
+        for (Iterator<PersistentChangelist> it = result.iterator(); it.hasNext(); )
+        {
+            PersistentChangelist current = it.next();
+            if (!current.asChangelist().equals(rawChangelist))
+            {
+                it.remove();
+            }
+        }
 
         return result;
     }

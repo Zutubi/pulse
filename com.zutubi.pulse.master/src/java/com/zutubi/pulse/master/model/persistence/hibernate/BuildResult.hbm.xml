@@ -47,7 +47,9 @@
 
         <property name="hasWorkDir" type="boolean"/>
 
-        <property name="revisionString" column="REVISION_STRING" type="string" length="255" index="idx_build_revision_string"/>
+        <property name="revisionString" type="string" length="255">
+            <column name="REVISION_STRING" index="idx_build_revision_string"/>
+        </property>
     </class>
 
     <class name="com.zutubi.pulse.master.model.AbstractBuildReason" table="BUILD_REASON" lazy="false">

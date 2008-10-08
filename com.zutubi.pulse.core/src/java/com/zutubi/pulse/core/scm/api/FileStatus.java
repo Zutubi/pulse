@@ -2,8 +2,6 @@ package com.zutubi.pulse.core.scm.api;
 
 import com.zutubi.util.FileSystemUtils;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,12 +17,6 @@ public class FileStatus
      * Possible values are described in the EOLStyle enum (the property value
      * is just the enum value converted to a string.
      *
-     *   - cr    :
-     *   - crlf  :
-     *   - lf    :
-     *   - native:
-     *   - text  :
-     *
      * @see EOLStyle
      */
     public static final String PROPERTY_EOL_STYLE = "eol";
@@ -34,8 +26,6 @@ public class FileStatus
      * property is "true" and off for any other property value.
      */
     public static final String PROPERTY_EXECUTABLE = "executable";
-    private File file;
-
 
     public enum State
     {
@@ -391,11 +381,6 @@ public class FileStatus
         return properties;
     }
 
-    public void setProperties(Map<String, String> properties)
-    {
-        this.properties = properties;
-    }
-
     public String getProperty(String name)
     {
         return properties.get(name);    
@@ -409,55 +394,6 @@ public class FileStatus
     public boolean isInteresting()
     {
         return isOutOfDate() || state.isInteresting() || properties.size() > 0;
-    }
-
-    public void preApply(File base) throws IOException
-    {
-        // TODO dev-personal: better to ensure things are deleted, but this
-        // requires ordering or normalisation or something...
-        if(state == State.DELETED || state == State.REPLACED)
-        {
-            File f = new File(base, getTargetPath());
-            if(directory)
-            {
-                FileSystemUtils.rmdir(f);
-            }
-            else
-            {
-                f.delete();
-            }
-        }
-    }
-
-    public void postApply(File base, EOLStyle localEOL) throws IOException
-    {
-        file = new File(base, getTargetPath());
-
-        // Apply line ending settings
-        String eolName = properties.get(PROPERTY_EOL_STYLE);
-        if(eolName != null)
-        {
-            try
-            {
-                EOLStyle eol = EOLStyle.valueOf(eolName);
-                eol.apply(file, localEOL);
-            }
-            catch (IllegalArgumentException e)
-            {
-                // Just ignore it values we don't support.
-            }
-        }
-
-        // Handle the executable bit
-        String executableValue = properties.get(PROPERTY_EXECUTABLE);
-        if(executableValue != null)
-        {
-            boolean executable = Boolean.parseBoolean(executableValue);
-            if(file.exists())
-            {
-                FileSystemUtils.setExecutable(file, executable);
-            }
-        }
     }
 
     public String toString()

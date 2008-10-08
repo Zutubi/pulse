@@ -6,7 +6,8 @@ import java.util.*;
 
 
 /**
- * Represents an atomic change committed to an SCM server.
+ * Represents an atomic change committed to an SCM server.  Note that
+ * changelists have been designed to be immutable.
  */
 public class Changelist implements Comparable<Changelist>
 {
@@ -22,6 +23,11 @@ public class Changelist implements Comparable<Changelist>
 
     public Changelist(Revision revision, long time, String author, String comment, Collection<FileChange> changes)
     {
+        if (revision == null)
+        {
+            throw new NullPointerException("Revision may not be null");
+        }
+
         this.revision = revision;
         this.time = time;
         this.author = author;
@@ -78,6 +84,7 @@ public class Changelist implements Comparable<Changelist>
         return 0;
     }
 
+
     public boolean equals(Object o)
     {
         if (this == o)
@@ -90,13 +97,31 @@ public class Changelist implements Comparable<Changelist>
         }
 
         Changelist that = (Changelist) o;
-        return revision.equals(that.revision);
 
+        if (time != that.time)
+        {
+            return false;
+        }
+        if (author != null ? !author.equals(that.author) : that.author != null)
+        {
+            return false;
+        }
+        if (comment != null ? !comment.equals(that.comment) : that.comment != null)
+        {
+            return false;
+        }
+
+        return revision.equals(that.revision);
     }
 
     public int hashCode()
     {
-        return revision.hashCode();
+        int result;
+        result = revision.hashCode();
+        result = 31 * result + (int) (time ^ (time >>> 32));
+        result = 31 * result + (author != null ? author.hashCode() : 0);
+        result = 31 * result + (comment != null ? comment.hashCode() : 0);
+        return result;
     }
 
     public String toString()

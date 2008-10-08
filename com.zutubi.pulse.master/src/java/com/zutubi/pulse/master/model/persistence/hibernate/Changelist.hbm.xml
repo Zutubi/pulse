@@ -6,7 +6,9 @@
             <generator class="hilo"/>
         </id>
 
-        <property name="revisionString" column="REVISION_STRING" type="string" length="255" index="idx_changelist_revision_string"/>
+        <property name="revisionString" type="string" length="255">
+            <column name="REVISION_STRING" index="idx_changelist_revision_string"/>
+        </property>
 
         <property name="time" type="long">
             <column name="TIME" index="idx_changelist_revision_date"/>
@@ -17,6 +19,10 @@
         </property>
 
         <property name="comment" column="COMMENT" type="string" length="4096"/>
+
+        <property name="hash" type="string" length="255">
+            <column name="HASH" index="idx_changelist_hash"/>
+        </property>
 
         <list name="changes" cascade="all,delete-orphan" lazy="true">
             <key column="CHANGELIST_ID"/>

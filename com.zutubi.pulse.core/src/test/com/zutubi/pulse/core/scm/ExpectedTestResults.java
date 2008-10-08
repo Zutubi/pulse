@@ -275,7 +275,7 @@ public class ExpectedTestResults
             }
         }
 
-        return new Changelist(null, 0, null, null, latestChanges.values());
+        return new Changelist(new Revision("test"), 0, null, null, latestChanges.values());
     }
 
     public List<ScmFile> browse(String path, Revision rev)

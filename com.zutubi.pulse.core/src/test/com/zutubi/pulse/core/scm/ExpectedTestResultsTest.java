@@ -139,11 +139,10 @@ public class ExpectedTestResultsTest extends TestCase
         assertEquals(revisions.get(4), revs.get(2));
     }
 
-    public void testGetAggregtedChanges()
+    public void testGetAggregatedChanges()
     {
         Changelist changelist = results.getAggregatedChanges(revisions.get(0), revisions.get(4));
         assertNotNull(changelist);
-        assertNull(changelist.getRevision()); // this is a virtual changelist, no directly associated revision exists.
 
         List<FileChange> changes = changelist.getChanges();
         assertEquals(6, changes.size());
