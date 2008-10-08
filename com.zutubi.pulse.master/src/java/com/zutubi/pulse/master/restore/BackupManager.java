@@ -4,7 +4,6 @@ import com.zutubi.events.Event;
 import com.zutubi.events.EventListener;
 import com.zutubi.events.EventManager;
 import com.zutubi.pulse.core.spring.SpringComponentContext;
-import com.zutubi.util.FileSystemUtils;
 import com.zutubi.pulse.master.scheduling.CronTrigger;
 import com.zutubi.pulse.master.scheduling.Scheduler;
 import com.zutubi.pulse.master.scheduling.SchedulingException;
@@ -13,6 +12,7 @@ import com.zutubi.pulse.servercore.events.system.SystemStartedEvent;
 import com.zutubi.tove.config.ConfigurationProvider;
 import com.zutubi.tove.config.TypeAdapter;
 import com.zutubi.tove.config.TypeListener;
+import com.zutubi.util.FileSystemUtils;
 import com.zutubi.util.logging.Logger;
 
 import java.io.File;
@@ -56,7 +56,7 @@ public class BackupManager
 
             public void handleEvent(Event event)
             {
-                SpringComponentContext.autowire(this);
+                SpringComponentContext.autowire(BackupManager.this);
 
                 initialiseManager();
             }
