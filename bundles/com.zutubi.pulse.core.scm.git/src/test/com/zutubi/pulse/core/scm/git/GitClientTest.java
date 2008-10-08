@@ -2,7 +2,11 @@ package com.zutubi.pulse.core.scm.git;
 
 import com.zutubi.pulse.core.ExecutionContext;
 import com.zutubi.pulse.core.scm.RecordingScmEventHandler;
-import com.zutubi.pulse.core.scm.api.*;
+import com.zutubi.pulse.core.scm.ScmContextImpl;
+import com.zutubi.pulse.core.scm.api.Changelist;
+import com.zutubi.pulse.core.scm.api.FileChange;
+import com.zutubi.pulse.core.scm.api.Revision;
+import com.zutubi.pulse.core.scm.api.ScmException;
 import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.core.util.ZipUtils;
 import com.zutubi.util.FileSystemUtils;
@@ -26,7 +30,7 @@ public class GitClientTest extends PulseTestCase
     private File workingDir;
     private ExecutionContext context;
     private RecordingScmEventHandler handler;
-    private ScmContext scmContext;
+    private ScmContextImpl scmContext;
 
     protected void setUp() throws Exception
     {
@@ -50,7 +54,7 @@ public class GitClientTest extends PulseTestCase
         context = new ExecutionContext();
         context.setWorkingDir(workingDir);
 
-        scmContext = new ScmContext();
+        scmContext = new ScmContextImpl();
         scmContext.setPersistentWorkingDir(workingDir);
 
         handler = new RecordingScmEventHandler();

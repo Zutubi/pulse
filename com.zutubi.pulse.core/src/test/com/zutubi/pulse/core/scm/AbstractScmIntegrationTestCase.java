@@ -24,7 +24,7 @@ public abstract class AbstractScmIntegrationTestCase extends TestCase
     protected ScmClient client;
     protected ExpectedTestResults testData;
     protected String prefix;
-    private ScmContext context;
+    private ScmContextImpl context;
 
     protected void setUp() throws Exception
     {
@@ -34,7 +34,7 @@ public abstract class AbstractScmIntegrationTestCase extends TestCase
         workingDir = new File(tmp, "wd");
         persistentWorkingDir = new File(tmp, "pwd");
 
-        context = new ScmContext();
+        context = new ScmContextImpl();
         context.setPersistentWorkingDir(persistentWorkingDir);
     }
 
