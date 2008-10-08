@@ -718,10 +718,6 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
         assertEquals(message, warnings.remove(0));
     }
 
-    public void setVerbosity(Verbosity verbosity)
-    {
-    }
-
     public void debug(String message)
     {
     }

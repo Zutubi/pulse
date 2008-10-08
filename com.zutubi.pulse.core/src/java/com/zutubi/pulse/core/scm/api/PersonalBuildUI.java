@@ -102,15 +102,6 @@ public interface PersonalBuildUI
         }
     }
 
-    public enum Verbosity
-    {
-        QUIET,
-        NORMAL,
-        VERBOSE
-    }
-
-    void setVerbosity(Verbosity verbosity);
-
     void debug(String message);
     void status(String message);
     void warning(String message);

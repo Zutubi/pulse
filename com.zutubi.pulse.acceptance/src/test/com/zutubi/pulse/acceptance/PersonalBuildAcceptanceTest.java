@@ -238,10 +238,6 @@ public class PersonalBuildAcceptanceTest extends SeleniumTestBase
             return buildNumber;
         }
 
-        public void setVerbosity(Verbosity verbosity)
-        {
-        }
-
         public void debug(String message)
         {
             debugs.add(message);

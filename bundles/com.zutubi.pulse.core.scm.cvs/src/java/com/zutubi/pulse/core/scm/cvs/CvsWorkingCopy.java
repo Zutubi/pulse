@@ -1,11 +1,11 @@
 package com.zutubi.pulse.core.scm.cvs;
 
+import com.zutubi.pulse.core.personal.PersonalBuildException;
 import com.zutubi.pulse.core.scm.ScmUtils;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.core.scm.cvs.client.CvsCore;
 import com.zutubi.pulse.core.util.config.Config;
 import com.zutubi.pulse.core.util.config.ConfigSupport;
-import com.zutubi.pulse.core.personal.PersonalBuildException;
 import com.zutubi.util.TextUtils;
 import com.zutubi.util.io.IOUtils;
 import org.netbeans.lib.cvsclient.CVSRoot;
@@ -21,7 +21,7 @@ import java.util.Date;
 
 /**
  */
-public class CvsWorkingCopy extends PersonalBuildSupport implements WorkingCopy
+public class CvsWorkingCopy extends PersonalBuildUIAwareSupport implements WorkingCopy
 {
     private CvsCore core;
 
@@ -163,7 +163,7 @@ public class CvsWorkingCopy extends PersonalBuildSupport implements WorkingCopy
                 }
             }
 
-            status(String.format("%s     %s", info.getType(), file));
+            getUI().status(String.format("%s     %s", info.getType(), file));
         }
     }
 
@@ -262,7 +262,7 @@ public class CvsWorkingCopy extends PersonalBuildSupport implements WorkingCopy
                 fs.setOutOfDate(recordOutOfDate && outOfDate);
                 if (fs.isInteresting())
                 {
-                    status(fs.toString());
+                    getUI().status(fs.toString());
                     status.add(fs);
                 }
             }

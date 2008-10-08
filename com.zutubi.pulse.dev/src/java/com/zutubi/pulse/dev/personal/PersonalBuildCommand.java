@@ -4,7 +4,6 @@ import com.zutubi.pulse.command.BootContext;
 import com.zutubi.pulse.command.Command;
 import com.zutubi.pulse.core.personal.PatchArchive;
 import com.zutubi.pulse.core.personal.PersonalBuildException;
-import com.zutubi.pulse.core.scm.api.PersonalBuildUI;
 import com.zutubi.pulse.core.scm.api.WorkingCopy;
 import com.zutubi.pulse.core.scm.api.WorkingCopyStatus;
 import com.zutubi.pulse.core.util.config.CommandLineConfig;
@@ -70,11 +69,11 @@ public class PersonalBuildCommand implements Command
         }
         if (commandLine.hasOption('q'))
         {
-            console.setVerbosity(PersonalBuildUI.Verbosity.QUIET);
+            console.setVerbosity(ConsoleUI.Verbosity.QUIET);
         }
         if (commandLine.hasOption('v'))
         {
-            console.setVerbosity(PersonalBuildUI.Verbosity.VERBOSE);
+            console.setVerbosity(ConsoleUI.Verbosity.VERBOSE);
         }
         if (commandLine.hasOption('t'))
         {

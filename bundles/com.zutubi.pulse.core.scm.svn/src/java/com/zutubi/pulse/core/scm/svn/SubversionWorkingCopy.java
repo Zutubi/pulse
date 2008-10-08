@@ -22,7 +22,7 @@ import java.util.List;
 
 /**
  */
-public class SubversionWorkingCopy extends PersonalBuildSupport implements WorkingCopy
+public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implements WorkingCopy
 {
     public static final String PROPERTY_ALLOW_EXTERNALS = "svn.allow.externals";
 
@@ -103,7 +103,7 @@ public class SubversionWorkingCopy extends PersonalBuildSupport implements Worki
         String password = configSupport.getProperty(PROPERTY_PASSWORD);
         if(password == null)
         {
-            password = passwordPrompt("Subversion password");
+            password = getUI().passwordPrompt("Subversion password");
             if(password == null)
             {
                 password = "";
@@ -145,7 +145,7 @@ public class SubversionWorkingCopy extends PersonalBuildSupport implements Worki
             }
             else
             {
-                warning("Working copy's repository URL '" + wcUrl + "' does not match Pulse project's repository URL '" + location + "'");
+                getUI().warning("Working copy's repository URL '" + wcUrl + "' does not match Pulse project's repository URL '" + location + "'");
                 return false;
             }
         }
@@ -424,7 +424,7 @@ public class SubversionWorkingCopy extends PersonalBuildSupport implements Worki
                 // operation as out of date.)
                 NumericalRevision rev = new NumericalRevision(event.getRevision());
                 status.setRevision(convertRevision(rev));
-                status("Repository revision: " + rev.getRevisionString());
+                getUI().status("Repository revision: " + rev.getRevisionString());
             }
         }
 
@@ -445,7 +445,7 @@ public class SubversionWorkingCopy extends PersonalBuildSupport implements Worki
 
             if (fs.isInteresting())
             {
-                status(fs.toString());
+                getUI().status(fs.toString());
                 status.add(fs);
             }
         }
@@ -490,8 +490,8 @@ public class SubversionWorkingCopy extends PersonalBuildSupport implements Worki
             }
             else if (action == SVNEventAction.UPDATE_EXTERNAL)
             {
-                status("Fetching external item into '" + event.getFile().getAbsolutePath() + "'");
-                status("External at revision " + event.getRevision());
+                getUI().status("Fetching external item into '" + event.getFile().getAbsolutePath() + "'");
+                getUI().status("External at revision " + event.getRevision());
                 return;
             }
             else if (action == SVNEventAction.UPDATE_COMPLETED)
@@ -499,27 +499,27 @@ public class SubversionWorkingCopy extends PersonalBuildSupport implements Worki
                 /*
                 * Updating the working copy is completed. Prints out the revision.
                 */
-                status("Updated to revision " + event.getRevision());
+                getUI().status("Updated to revision " + event.getRevision());
                 return;
             }
             else if (action == SVNEventAction.ADD)
             {
-                status("A     " + event.getPath());
+                getUI().status("A     " + event.getPath());
                 return;
             }
             else if (action == SVNEventAction.DELETE)
             {
-                status("D     " + event.getPath());
+                getUI().status("D     " + event.getPath());
                 return;
             }
             else if (action == SVNEventAction.LOCKED)
             {
-                status("L     " + event.getPath());
+                getUI().status("L     " + event.getPath());
                 return;
             }
             else if (action == SVNEventAction.LOCK_FAILED)
             {
-                status("Failed to lock: " + event.getPath());
+                getUI().status("Failed to lock: " + event.getPath());
                 return;
             }
 
@@ -553,7 +553,7 @@ public class SubversionWorkingCopy extends PersonalBuildSupport implements Worki
             String message = pathChangeType + propertiesChangeType + lockLabel + "       " + event.getPath();
             if(message.trim().length() > 0)
             {
-                status(message);
+                getUI().status(message);
             }
         }
 

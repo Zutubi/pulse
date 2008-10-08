@@ -10,7 +10,7 @@ import java.io.File;
 
 /**
  */
-public class PerforceWorkingCopy extends PersonalBuildSupport implements WorkingCopy
+public class PerforceWorkingCopy extends PersonalBuildUIAwareSupport implements WorkingCopy
 {
     public static final String PROPERTY_CONFIRM_RESOLVE = "p4.confirm.resolve";
 
@@ -52,7 +52,7 @@ public class PerforceWorkingCopy extends PersonalBuildSupport implements Working
 
                     if(!value.equals(pieces[1]))
                     {
-                        warning("P4PORT setting '" + value + "' does not match Pulse project's P4PORT '" + pieces[1] + "'");
+                        getUI().warning("P4PORT setting '" + value + "' does not match Pulse project's P4PORT '" + pieces[1] + "'");
                         return false;
                     }
                 }
@@ -82,7 +82,7 @@ public class PerforceWorkingCopy extends PersonalBuildSupport implements Working
             revision = core.getLatestRevisionForFiles(null);
             // convert revision.
             status = new WorkingCopyStatus(core.getClientRoot(), core.convertRevision(revision));
-            PerforceFStatHandler handler = new PerforceFStatHandler(getUi(), status);
+            PerforceFStatHandler handler = new PerforceFStatHandler(getUI(), status);
             core.runP4WithHandler(handler, null, getP4Command(COMMAND_FSTAT), COMMAND_FSTAT, FLAG_PATH_IN_DEPOT_FORMAT, "//...");
 
             checkRevision = core.getLatestRevisionForFiles(null);
@@ -99,7 +99,7 @@ public class PerforceWorkingCopy extends PersonalBuildSupport implements Working
     public WorkingCopyStatus getLocalStatus(String... spec) throws ScmException
     {
         WorkingCopyStatus status = new WorkingCopyStatus(core.getClientRoot());
-        PerforceFStatHandler handler = new PerforceFStatHandler(getUi(), status, false);
+        PerforceFStatHandler handler = new PerforceFStatHandler(getUI(), status, false);
 
         // Spec can be either a changelist # or a list of files
         String changelist;
@@ -139,14 +139,14 @@ public class PerforceWorkingCopy extends PersonalBuildSupport implements Working
     {
         NumericalRevision revision = core.getLatestRevisionForFiles(null);
 
-        PerforceSyncHandler syncHandler = new PerforceSyncHandler(getUi());
+        PerforceSyncHandler syncHandler = new PerforceSyncHandler(getUI());
         core.runP4WithHandler(syncHandler, null, getP4Command(COMMAND_SYNC), COMMAND_SYNC, "@" + revision.getRevisionString());
 
         if(syncHandler.isResolveRequired())
         {
             if(configSupport.getBooleanProperty(PROPERTY_CONFIRM_RESOLVE, true))
             {
-                PersonalBuildUI.Response response = ynaPrompt("Some files must be resolved.  Auto-resolve now?", PersonalBuildUI.Response.YES);
+                PersonalBuildUI.Response response = getUI().ynaPrompt("Some files must be resolved.  Auto-resolve now?", PersonalBuildUI.Response.YES);
                 if(response.isPersistent())
                 {
                     configSupport.setBooleanProperty(PROPERTY_CONFIRM_RESOLVE, !response.isAffirmative());
@@ -158,17 +158,17 @@ public class PerforceWorkingCopy extends PersonalBuildSupport implements Working
                 }
             }
 
-            status("Running auto-resolve...");
-            enterContext();
+            getUI().status("Running auto-resolve...");
+            getUI().enterContext();
             try
             {
-                core.runP4WithHandler(new PerforceProgressPrintingHandler(getUi(), false), null, getP4Command(COMMAND_RESOLVE), COMMAND_RESOLVE, FLAG_AUTO_MERGE);
+                core.runP4WithHandler(new PerforceProgressPrintingHandler(getUI(), false), null, getP4Command(COMMAND_RESOLVE), COMMAND_RESOLVE, FLAG_AUTO_MERGE);
             }
             finally
             {
-                exitContext();
+                getUI().exitContext();
             }
-            status("Resolve complete.");
+            getUI().status("Resolve complete.");
         }
 
         return core.convertRevision(revision);

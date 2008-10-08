@@ -27,7 +27,7 @@ import java.net.MalformedURLException;
  * The client does the work of actually talking to the Pulse server, sending
  * personal build requests and getting back the results.
  */
-public class PersonalBuildClient extends PersonalBuildSupport
+public class PersonalBuildClient extends PersonalBuildUIAwareSupport
 {
     private PersonalBuildConfig config;
     private String password;
@@ -39,7 +39,7 @@ public class PersonalBuildClient extends PersonalBuildSupport
 
     public WorkingCopy checkConfiguration() throws PersonalBuildException
     {
-        debug("Verifying configuration with pulse server...");
+        getUI().debug("Verifying configuration with pulse server...");
         checkRequiredConfig();
 
         try
@@ -52,11 +52,11 @@ public class PersonalBuildClient extends PersonalBuildSupport
 
             try
             {
-                debug("Logging in to pulse: url: " + config.getPulseUrl() + ", user: " + config.getPulseUser());
+                getUI().debug("Logging in to pulse: url: " + config.getPulseUrl() + ", user: " + config.getPulseUser());
                 token = rpc.login(config.getPulseUser(), getPassword());
-                debug("Login successful.");
+                getUI().debug("Login successful.");
                 WorkingCopy wc = prepare(rpc, token);
-                debug("Verified: personal build for project: " + config.getProject() + ".");
+                getUI().debug("Verified: personal build for project: " + config.getProject() + ".");
                 return wc;
             }
             catch (PersonalBuildException e)
@@ -85,7 +85,7 @@ public class PersonalBuildClient extends PersonalBuildSupport
             password = config.getPulsePassword();
             if (password == null)
             {
-                password = passwordPrompt("Pulse password");
+                password = getUI().passwordPrompt("Pulse password");
                 if (password == null)
                 {
                     password = "";
@@ -101,13 +101,13 @@ public class PersonalBuildClient extends PersonalBuildSupport
         int ourBuild = Version.getVersion().getBuildNumberAsInt();
         int confirmedBuild = config.getConfirmedVersion();
 
-        debug("Checking pulse server version...");
+        getUI().debug("Checking pulse server version...");
         try
         {
             int serverBuild = rpc.getVersion();
             if (serverBuild != ourBuild)
             {
-                debug("Server build (%d) does not match local build (%d)", serverBuild, ourBuild);
+                getUI().debug(String.format("Server build (%d) does not match local build (%d)", serverBuild, ourBuild));
                 if (serverBuild != confirmedBuild)
                 {
                     String serverVersion = Version.buildNumberToVersion(serverBuild);
@@ -123,7 +123,7 @@ public class PersonalBuildClient extends PersonalBuildSupport
                         question = String.format("Server version (%s) does not match tools version (%s).  Continue anyway?", serverVersion, ourVersion);
                     }
 
-                    PersonalBuildUI.Response response = ynaPrompt(question, PersonalBuildUI.Response.NO);
+                    PersonalBuildUI.Response response = getUI().ynaPrompt(question, PersonalBuildUI.Response.NO);
                     if (response == PersonalBuildUI.Response.ALWAYS)
                     {
                         config.setConfirmedVersion(serverBuild);
@@ -135,7 +135,7 @@ public class PersonalBuildClient extends PersonalBuildSupport
                 }
             }
 
-            debug("Version accepted.");
+            getUI().debug("Version accepted.");
         }
         catch (PulseXmlRpcException e)
         {
@@ -147,10 +147,10 @@ public class PersonalBuildClient extends PersonalBuildSupport
     {
         if (config.getPulseUrl() == null)
         {
-            PersonalBuildUI.Response response = ynPrompt("No pulse server configured.  Configure one now?", PersonalBuildUI.Response.YES);
+            PersonalBuildUI.Response response = getUI().ynPrompt("No pulse server configured.  Configure one now?", PersonalBuildUI.Response.YES);
             if (response.isAffirmative())
             {
-                new ConfigCommand().setupPulseConfig(getUi(), config);
+                new ConfigCommand().setupPulseConfig(getUI(), config);
             }
             else
             {
@@ -160,10 +160,10 @@ public class PersonalBuildClient extends PersonalBuildSupport
 
         if (config.getProject() == null)
         {
-            PersonalBuildUI.Response response = ynPrompt("No pulse project configured.  Configure one now?", PersonalBuildUI.Response.YES);
+            PersonalBuildUI.Response response = getUI().ynPrompt("No pulse project configured.  Configure one now?", PersonalBuildUI.Response.YES);
             if (response.isAffirmative())
             {
-                new ConfigCommand().setupLocalConfig(getUi(), config);
+                new ConfigCommand().setupLocalConfig(getUI(), config);
             }
             else
             {
@@ -176,11 +176,11 @@ public class PersonalBuildClient extends PersonalBuildSupport
     {
         try
         {
-            debug("Checking configuration and obtaining project SCM details...");
+            getUI().debug("Checking configuration and obtaining project SCM details...");
             ScmLocation scmLocation = rpc.preparePersonalBuild(token, config.getProject());
-            debug("Configuration accepted.");
+            getUI().debug("Configuration accepted.");
             String scmType = scmLocation.getType();
-            debug("SCM type: " + scmType);
+            getUI().debug("SCM type: " + scmType);
 
             WorkingCopy wc = WorkingCopyFactory.create(scmType, config.getBase(), config);
             if (wc == null)
@@ -188,13 +188,17 @@ public class PersonalBuildClient extends PersonalBuildSupport
                 throw new PersonalBuildException("Personal builds are not supported for this SCM (" + scmType + ")");
             }
 
-            wc.setUI(getUi());
+            if (wc instanceof PersonalBuildUIAware)
+            {
+                ((PersonalBuildUIAware) wc).setUI(getUI());
+            }
+
             if (config.getCheckRepository())
             {
-                debug("Checking working copy matches project SCM configuration");
+                getUI().debug("Checking working copy matches project SCM configuration");
                 if (!wc.matchesLocation(scmLocation.getLocation()))
                 {
-                    PersonalBuildUI.Response response = ynaPrompt("This working copy may not match project '" + config.getProject() + "'.  Continue anyway?", PersonalBuildUI.Response.NO);
+                    PersonalBuildUI.Response response = getUI().ynaPrompt("This working copy may not match project '" + config.getProject() + "'.  Continue anyway?", PersonalBuildUI.Response.NO);
                     if (response.isPersistent())
                     {
                         config.setCheckRepository(!response.isAffirmative());
@@ -207,7 +211,7 @@ public class PersonalBuildClient extends PersonalBuildSupport
                 }
                 else
                 {
-                    debug("Configuration matches.");
+                    getUI().debug("Configuration matches.");
                 }
             }
 
@@ -228,25 +232,25 @@ public class PersonalBuildClient extends PersonalBuildSupport
         Revision rev;
         try
         {
-            status("Updating working copy...");
-            enterContext();
+            getUI().status("Updating working copy...");
+            getUI().enterContext();
             try
             {
                 rev = wc.update();
             }
             finally
             {
-                exitContext();
+                getUI().exitContext();
             }
-            status("Update complete.");
+            getUI().status("Update complete.");
         }
         catch (ScmException e)
         {
             throw new PersonalBuildException("Unable to update working copy: " + e.getMessage(), e);
         }
 
-        status("Getting working copy status...");
-        enterContext();
+        getUI().status("Getting working copy status...");
+        getUI().enterContext();
 
         WorkingCopyStatus status;
         try
@@ -256,25 +260,25 @@ public class PersonalBuildClient extends PersonalBuildSupport
         }
         finally
         {
-            exitContext();
+            getUI().exitContext();
         }
-        status("Status retrieved.");
+        getUI().status("Status retrieved.");
 
         if (status.hasChanges())
         {
-            status("Creating patch archive...");
-            enterContext();
+            getUI().status("Creating patch archive...");
+            getUI().enterContext();
 
             PatchArchive patchArchive;
             try
             {
-                patchArchive = new PatchArchive(status, patchFile, getUi());
+                patchArchive = new PatchArchive(status, patchFile, getUI());
             }
             finally
             {
-                exitContext();
+                getUI().exitContext();
             }
-            status("Patch created.");
+            getUI().status("Patch created.");
 
             return patchArchive;
         }
@@ -326,7 +330,7 @@ public class PersonalBuildClient extends PersonalBuildSupport
             };
             post.setRequestEntity(new MultipartRequestEntity(parts, post.getParams()));
 
-            status("Sending patch to pulse server...");
+            getUI().status("Sending patch to pulse server...");
             int status = client.executeMethod(post);
             if (status == HttpStatus.SC_OK)
             {
@@ -338,7 +342,7 @@ public class PersonalBuildClient extends PersonalBuildSupport
                     try
                     {
                         long number = Long.parseLong(numberStr);
-                        status("Patch accepted: personal build " + numberStr + ".");
+                        getUI().status("Patch accepted: personal build " + numberStr + ".");
                         return number;
                     }
                     catch (NumberFormatException e)

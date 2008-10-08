@@ -2,7 +2,7 @@ package com.zutubi.pulse.core.scm.api;
 
 /**
  */
-public interface WorkingCopy extends PersonalBuildWorker
+public interface WorkingCopy
 {
     boolean matchesLocation(String location) throws ScmException;
 

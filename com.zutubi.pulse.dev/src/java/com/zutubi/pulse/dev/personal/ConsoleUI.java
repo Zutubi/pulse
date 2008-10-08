@@ -12,6 +12,12 @@ import java.io.PrintStream;
  */
 public class ConsoleUI implements PersonalBuildUI
 {
+    public enum Verbosity
+    {
+        QUIET,
+        NORMAL,
+        VERBOSE
+    }
     private BufferedReader inputReader;
     private PasswordReader passwordReader;
     private Verbosity verbosity;
