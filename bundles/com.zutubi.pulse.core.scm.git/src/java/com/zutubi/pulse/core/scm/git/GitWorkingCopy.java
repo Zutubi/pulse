@@ -7,23 +7,18 @@ import com.zutubi.pulse.core.scm.api.*;
  */
 public class GitWorkingCopy implements WorkingCopy
 {
-    public boolean matchesLocation(String location) throws ScmException
+    public boolean matchesLocation(WorkingCopyContext context, String location) throws ScmException
     {
         return false;
     }
 
-    public WorkingCopyStatus getLocalStatus(String... spec) throws ScmException
+    public WorkingCopyStatus getLocalStatus(WorkingCopyContext context, String... spec) throws ScmException
     {
         return null;
     }
 
-    public Revision update() throws ScmException
+    public Revision update(WorkingCopyContext context, Revision revision) throws ScmException
     {
         return null;
-    }
-
-    public void setUI(PersonalBuildUI ui)
-    {
-
     }
 }

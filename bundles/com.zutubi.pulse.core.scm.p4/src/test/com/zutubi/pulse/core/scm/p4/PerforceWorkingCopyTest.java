@@ -1,5 +1,7 @@
 package com.zutubi.pulse.core.scm.p4;
 
+import com.zutubi.pulse.core.scm.TestPersonalBuildUI;
+import com.zutubi.pulse.core.scm.WorkingCopyContextImpl;
 import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.core.test.PulseTestCase;
@@ -9,12 +11,11 @@ import com.zutubi.util.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
  */
-public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBuildUI
+public class PerforceWorkingCopyTest extends PulseTestCase
 {
     private static final String P4_COMMAND = "p4";
     private static final String CLIENT_NAME = "test-client-1";
@@ -27,12 +28,10 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     private PerforceCore core;
     private File otherClientRoot;
     private PerforceCore otherCore;
-
-    private List<String> statuses = new LinkedList<String>();
-    private List<String> errors = new LinkedList<String>();
-    private List<String> warnings = new LinkedList<String>();
+    private WorkingCopyContext context;
 
     private PerforceWorkingCopy wc;
+    private TestPersonalBuildUI ui;
 
     protected void setUp() throws Exception
     {
@@ -53,12 +52,17 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
 
         createClients();
 
-        wc = new PerforceWorkingCopy(null, new PropertiesConfig());
-        wc.setUI(this);
-        wc.getClient().setEnv(ENV_CLIENT, CLIENT_NAME);
-        wc.getClient().setEnv(ENV_PORT, ":1666");
-        wc.getClient().setEnv(ENV_USER, "test-user");
-        wc.getClient().setWorkingDir(clientRoot);
+        wc = new PerforceWorkingCopy();
+
+        ui = new TestPersonalBuildUI();
+        wc.setUI(ui);
+
+        PropertiesConfig config = new PropertiesConfig();
+        config.setProperty(PerforceWorkingCopy.PROPERTY_CLIENT, CLIENT_NAME);
+        config.setProperty(PerforceWorkingCopy.PROPERTY_PORT, ":1666");
+        config.setProperty(PerforceWorkingCopy.PROPERTY_USER, "test-user");
+
+        context = new WorkingCopyContextImpl(clientRoot, config);
     }
 
     private void createClients() throws ScmException
@@ -99,32 +103,30 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
 
         FileSystemUtils.rmdir(tempDir);
 
-        statuses = null;
-        errors = null;
-        warnings = null;
+        ui = null;
     }
 
     public void testLocationMatches() throws ScmException
     {
-        assertTrue(wc.matchesLocation("foo@:1666"));
+        assertTrue(wc.matchesLocation(context, "foo@:1666"));
     }
 
     public void testLocationDoesntMatch() throws ScmException
     {
-        assertFalse(wc.matchesLocation("foo@anotherhost:1666"));
+        assertFalse(wc.matchesLocation(context, "foo@anotherhost:1666"));
         assertWarning("P4PORT setting ':1666' does not match Pulse project's P4PORT 'anotherhost:1666'");
     }
 
     public void testStatusNoChanges() throws ScmException
     {
-        WorkingCopyStatus status = wc.getStatus();
+        WorkingCopyStatus status = wc.getStatus(context);
         assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
         assertEquals(0, status.getChanges().size());
     }
 
     public void testLocalStatusNoChanges() throws ScmException
     {
-        WorkingCopyStatus status = wc.getLocalStatus();
+        WorkingCopyStatus status = wc.getLocalStatus(context);
         assertEquals(0, status.getChanges().size());
     }
 
@@ -132,7 +134,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     {
         openForEdit("file1");
 
-        WorkingCopyStatus status = wc.getStatus();
+        WorkingCopyStatus status = wc.getStatus(context);
         assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
         assertChange(status, "file1", FileStatus.State.MODIFIED, false, true);
     }
@@ -141,7 +143,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     {
         openForEdit("file1");
 
-        WorkingCopyStatus status = wc.getLocalStatus();
+        WorkingCopyStatus status = wc.getLocalStatus(context);
         assertChange(status, "file1", FileStatus.State.MODIFIED, false, true);
     }
 
@@ -149,7 +151,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     {
         core.runP4(null, P4_COMMAND, COMMAND_EDIT, "script1");
 
-        WorkingCopyStatus status = wc.getStatus();
+        WorkingCopyStatus status = wc.getStatus(context);
         assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
         assertChange(status, "script1", FileStatus.State.MODIFIED, false, true);
     }
@@ -158,7 +160,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     {
         core.runP4(null, P4_COMMAND, COMMAND_EDIT, "script1");
 
-        WorkingCopyStatus status = wc.getLocalStatus();
+        WorkingCopyStatus status = wc.getLocalStatus(context);
         assertChange(status, "script1", FileStatus.State.MODIFIED, false, true);
     }
 
@@ -166,7 +168,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     {
         core.runP4(null, P4_COMMAND, COMMAND_EDIT, FLAG_TYPE, "text+x", "file1");
 
-        WorkingCopyStatus status = wc.getStatus();
+        WorkingCopyStatus status = wc.getStatus(context);
         assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
         assertExecutable(status, "file1", true);
     }
@@ -175,7 +177,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     {
         core.runP4(null, P4_COMMAND, COMMAND_EDIT, FLAG_TYPE, "text+x", "file1");
 
-        WorkingCopyStatus status = wc.getLocalStatus();
+        WorkingCopyStatus status = wc.getLocalStatus(context);
         assertExecutable(status, "file1", true);
     }
 
@@ -183,7 +185,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     {
         core.runP4(null, P4_COMMAND, COMMAND_EDIT, FLAG_TYPE, "text", "script1");
 
-        WorkingCopyStatus status = wc.getStatus();
+        WorkingCopyStatus status = wc.getStatus(context);
         assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
         assertExecutable(status, "script1", false);
     }
@@ -192,7 +194,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     {
         core.runP4(null, P4_COMMAND, COMMAND_EDIT, FLAG_TYPE, "text", "script1");
 
-        WorkingCopyStatus status = wc.getLocalStatus();
+        WorkingCopyStatus status = wc.getLocalStatus(context);
         assertExecutable(status, "script1", false);
     }
 
@@ -200,7 +202,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     {
         core.runP4(null, P4_COMMAND, COMMAND_EDIT, "bin1");
 
-        WorkingCopyStatus status = wc.getStatus();
+        WorkingCopyStatus status = wc.getStatus(context);
         assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
         assertChange(status, "bin1", FileStatus.State.MODIFIED, false, false);
     }
@@ -209,7 +211,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     {
         core.runP4(null, P4_COMMAND, COMMAND_EDIT, "bin1");
 
-        WorkingCopyStatus status = wc.getLocalStatus();
+        WorkingCopyStatus status = wc.getLocalStatus(context);
         assertChange(status, "bin1", FileStatus.State.MODIFIED, false, false);
     }
 
@@ -217,7 +219,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     {
         core.runP4(null, P4_COMMAND, COMMAND_EDIT, FLAG_TYPE, "binary", "file1");
 
-        WorkingCopyStatus status = wc.getStatus();
+        WorkingCopyStatus status = wc.getStatus(context);
         assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
         assertChange(status, "file1", FileStatus.State.MODIFIED, false, false);
     }
@@ -226,7 +228,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     {
         core.runP4(null, P4_COMMAND, COMMAND_EDIT, FLAG_TYPE, "binary", "file1");
 
-        WorkingCopyStatus status = wc.getLocalStatus();
+        WorkingCopyStatus status = wc.getLocalStatus(context);
         assertChange(status, "file1", FileStatus.State.MODIFIED, false, false);
     }
 
@@ -234,7 +236,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     {
         core.runP4(null, P4_COMMAND, COMMAND_EDIT, FLAG_TYPE, "text", "bin1");
 
-        WorkingCopyStatus status = wc.getStatus();
+        WorkingCopyStatus status = wc.getStatus(context);
         assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
         assertChange(status, "bin1", FileStatus.State.MODIFIED, false, true);
     }
@@ -243,7 +245,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     {
         core.runP4(null, P4_COMMAND, COMMAND_EDIT, FLAG_TYPE, "text", "bin1");
 
-        WorkingCopyStatus status = wc.getLocalStatus();
+        WorkingCopyStatus status = wc.getLocalStatus(context);
         assertChange(status, "bin1", FileStatus.State.MODIFIED, false, true);
     }
 
@@ -251,7 +253,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     {
         openForAdd(null);
 
-        WorkingCopyStatus status = wc.getStatus();
+        WorkingCopyStatus status = wc.getStatus(context);
         assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
         assertChange(status, "newfile", FileStatus.State.ADDED, false, true);
     }
@@ -260,7 +262,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     {
         openForAdd(null);
 
-        WorkingCopyStatus status = wc.getLocalStatus();
+        WorkingCopyStatus status = wc.getLocalStatus(context);
         assertChange(status, "newfile", FileStatus.State.ADDED, false, true);
     }
 
@@ -268,7 +270,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     {
         openForAdd("binary");
 
-        WorkingCopyStatus status = wc.getStatus();
+        WorkingCopyStatus status = wc.getStatus(context);
         assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
         assertChange(status, "newfile", FileStatus.State.ADDED, false, false);
     }
@@ -277,7 +279,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     {
         openForAdd("binary");
 
-        WorkingCopyStatus status = wc.getLocalStatus();
+        WorkingCopyStatus status = wc.getLocalStatus(context);
         assertChange(status, "newfile", FileStatus.State.ADDED, false, false);
     }
 
@@ -285,7 +287,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     {
         openForAdd("text+x");
         
-        WorkingCopyStatus status = wc.getStatus();
+        WorkingCopyStatus status = wc.getStatus(context);
         assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
         assertExecutable(status, "newfile", true);
     }
@@ -294,7 +296,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     {
         openForAdd("text+x");
 
-        WorkingCopyStatus status = wc.getLocalStatus();
+        WorkingCopyStatus status = wc.getLocalStatus(context);
         assertExecutable(status, "newfile", true);
     }
 
@@ -302,7 +304,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     {
         core.runP4(null, P4_COMMAND, COMMAND_DELETE, "dir1/file1");
 
-        WorkingCopyStatus status = wc.getStatus();
+        WorkingCopyStatus status = wc.getStatus(context);
         assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
         assertChange(status, "dir1/file1", FileStatus.State.DELETED, false, false);
     }
@@ -311,7 +313,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     {
         core.runP4(null, P4_COMMAND, COMMAND_DELETE, "dir1/file1");
 
-        WorkingCopyStatus status = wc.getLocalStatus();
+        WorkingCopyStatus status = wc.getLocalStatus(context);
         assertChange(status, "dir1/file1", FileStatus.State.DELETED, false, false);
     }
 
@@ -319,7 +321,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     {
         core.runP4(null, P4_COMMAND, COMMAND_INTEGRATE, "file1", "integrated");
 
-        WorkingCopyStatus status = wc.getStatus();
+        WorkingCopyStatus status = wc.getStatus(context);
         assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
         assertChange(status, "integrated", FileStatus.State.BRANCHED, false, true);
     }
@@ -328,7 +330,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     {
         core.runP4(null, P4_COMMAND, COMMAND_INTEGRATE, "file1", "integrated");
 
-        WorkingCopyStatus status = wc.getLocalStatus();
+        WorkingCopyStatus status = wc.getLocalStatus(context);
         assertChange(status, "integrated", FileStatus.State.BRANCHED, false, true);
     }
 
@@ -336,7 +338,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     {
         openForMerge("file1");
 
-        WorkingCopyStatus status = wc.getStatus();
+        WorkingCopyStatus status = wc.getStatus(context);
         assertChange(status, "file1", FileStatus.State.MERGED, false, true);
     }
 
@@ -344,7 +346,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     {
         openForMerge("file1");
 
-        WorkingCopyStatus status = wc.getLocalStatus();
+        WorkingCopyStatus status = wc.getLocalStatus(context);
         assertChange(status, "file1", FileStatus.State.MERGED, false, true);
     }
 
@@ -352,7 +354,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     {
         openForMerge("bin1");
         
-        WorkingCopyStatus status = wc.getStatus();
+        WorkingCopyStatus status = wc.getStatus(context);
         assertChange(status, "bin1", FileStatus.State.MERGED, false, false);
     }
 
@@ -360,7 +362,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     {
         openForMerge("bin1");
 
-        WorkingCopyStatus status = wc.getLocalStatus();
+        WorkingCopyStatus status = wc.getLocalStatus(context);
         assertChange(status, "bin1", FileStatus.State.MERGED, false, false);
     }
 
@@ -368,7 +370,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     {
         openForMerge("script1");
 
-        WorkingCopyStatus status = wc.getStatus();
+        WorkingCopyStatus status = wc.getStatus(context);
         assertChange(status, "script1", FileStatus.State.MERGED, false, true);
     }
 
@@ -376,7 +378,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     {
         openForMerge("script1");
         
-        WorkingCopyStatus status = wc.getLocalStatus();
+        WorkingCopyStatus status = wc.getLocalStatus(context);
         assertChange(status, "script1", FileStatus.State.MERGED, false, true);
     }
 
@@ -384,7 +386,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     {
         openForMerge("file1", "text+x");
 
-        WorkingCopyStatus status = wc.getStatus();
+        WorkingCopyStatus status = wc.getStatus(context);
         assertExecutable(status, "file1", true);
     }
 
@@ -392,7 +394,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     {
         openForMerge("file1", "text+x");
 
-        WorkingCopyStatus status = wc.getLocalStatus();
+        WorkingCopyStatus status = wc.getLocalStatus(context);
         assertExecutable(status, "file1", true);
     }
 
@@ -400,7 +402,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     {
         openForMerge("script1", "text");
 
-        WorkingCopyStatus status = wc.getStatus();
+        WorkingCopyStatus status = wc.getStatus(context);
         assertExecutable(status, "script1", false);
     }
 
@@ -408,7 +410,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     {
         openForMerge("script1", "text");
 
-        WorkingCopyStatus status = wc.getLocalStatus();
+        WorkingCopyStatus status = wc.getLocalStatus(context);
         assertExecutable(status, "script1", false);
     }
 
@@ -416,7 +418,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     {
         otherEdit();
 
-        WorkingCopyStatus status = wc.getStatus();
+        WorkingCopyStatus status = wc.getStatus(context);
         assertChange(status, "file1", FileStatus.State.UNCHANGED, true, false);
     }
 
@@ -424,7 +426,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     {
         otherEdit();
 
-        WorkingCopyStatus status = wc.getLocalStatus();
+        WorkingCopyStatus status = wc.getLocalStatus(context);
         assertEquals(0, status.getChanges().size());
     }
 
@@ -435,7 +437,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
         otherCore.runP4(null, P4_COMMAND, COMMAND_ADD, "newfile");
         otherCore.submit("comment");
 
-        WorkingCopyStatus status = wc.getStatus();
+        WorkingCopyStatus status = wc.getStatus(context);
         assertChange(status, "newfile", FileStatus.State.UNCHANGED, true, false);
     }
 
@@ -444,7 +446,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
         otherCore.runP4(null, P4_COMMAND, COMMAND_DELETE, "file1");
         otherCore.submit("comment");
 
-        WorkingCopyStatus status = wc.getStatus();
+        WorkingCopyStatus status = wc.getStatus(context);
         assertChange(status, "file1", FileStatus.State.UNCHANGED, true, false);
     }
 
@@ -455,7 +457,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
         otherCore.runP4(null, P4_COMMAND, COMMAND_DELETE, "file1");
         otherCore.submit("comment");
 
-        WorkingCopyStatus status = wc.getStatus();
+        WorkingCopyStatus status = wc.getStatus(context);
         assertChange(status, "file1", FileStatus.State.MODIFIED, true, true);
     }
 
@@ -466,7 +468,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
         otherCore.runP4(null, P4_COMMAND, COMMAND_DELETE, "file1");
         otherCore.submit("comment");
 
-        WorkingCopyStatus status = wc.getLocalStatus();
+        WorkingCopyStatus status = wc.getLocalStatus(context);
         assertChange(status, "file1", FileStatus.State.MODIFIED, false, true);
     }
 
@@ -477,7 +479,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
         openForEdit("file1");
         core.runP4(null, P4_COMMAND, COMMAND_SYNC);
 
-        WorkingCopyStatus status = wc.getStatus();
+        WorkingCopyStatus status = wc.getStatus(context);
         assertChange(status, "file1", FileStatus.State.UNRESOLVED, false, false);
     }
 
@@ -489,7 +491,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
         openForEdit("file1");
         core.runP4(null, P4_COMMAND, COMMAND_SYNC);
 
-        WorkingCopyStatus status = wc.getStatus();
+        WorkingCopyStatus status = wc.getStatus(context);
         assertChange(status, "file1", FileStatus.State.UNRESOLVED, false, false);
     }
 
@@ -500,7 +502,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
         core.runP4(null, P4_COMMAND, COMMAND_DELETE, "file1");
         core.runP4(null, P4_COMMAND, COMMAND_SYNC);
 
-        WorkingCopyStatus status = wc.getStatus();
+        WorkingCopyStatus status = wc.getStatus(context);
         assertChange(status, "file1", FileStatus.State.DELETED, false, false);
     }
 
@@ -512,7 +514,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
         core.runP4(null, P4_COMMAND, COMMAND_DELETE, "file1");
         core.runP4(null, P4_COMMAND, COMMAND_SYNC);
 
-        WorkingCopyStatus status = wc.getStatus();
+        WorkingCopyStatus status = wc.getStatus(context);
         assertChange(status, "file1", FileStatus.State.DELETED, false, false);
     }
 
@@ -523,7 +525,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
 
         core.runP4(null, P4_COMMAND, COMMAND_INTEGRATE, "//depot/branches/1/...", "//depot/...");
 
-        WorkingCopyStatus status = wc.getStatus();
+        WorkingCopyStatus status = wc.getStatus(context);
         assertChange(status, "file1", FileStatus.State.UNRESOLVED, false, false);
     }
 
@@ -533,7 +535,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
         openForEdit("file1");
         openForEdit("script1");
 
-        WorkingCopyStatus status = wc.getLocalStatus("//depot/bin1", "//depot/script1");
+        WorkingCopyStatus status = wc.getLocalStatus(context, "//depot/bin1", "//depot/script1");
         assertEquals(2, status.getChanges().size());
         assertEquals("bin1", status.getChanges().get(0).getPath());
         assertEquals("script1", status.getChanges().get(1).getPath());
@@ -543,7 +545,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     {
         openForEdit("file1");
 
-        WorkingCopyStatus status = wc.getLocalStatus("//depot/bin1", "//depot/script1");
+        WorkingCopyStatus status = wc.getLocalStatus(context, "//depot/bin1", "//depot/script1");
         assertEquals(0, status.getChanges().size());
     }
 
@@ -552,7 +554,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
         openForEdit("bin1");
         openForEdit("file1");
 
-        WorkingCopyStatus status = wc.getLocalStatus(":default");
+        WorkingCopyStatus status = wc.getLocalStatus(context, ":default");
         assertEquals(2, status.getChanges().size());
         assertEquals("bin1", status.getChanges().get(0).getPath());
         assertEquals("file1", status.getChanges().get(1).getPath());
@@ -565,7 +567,7 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
         openForEdit("file1");
         openForEdit("script1", changelist);
 
-        WorkingCopyStatus status = wc.getLocalStatus(":" + Long.toString(changelist));
+        WorkingCopyStatus status = wc.getLocalStatus(context, ":" + Long.toString(changelist));
         assertEquals(2, status.getChanges().size());
         assertEquals("bin1", status.getChanges().get(0).getPath());
         assertEquals("script1", status.getChanges().get(1).getPath());
@@ -576,14 +578,14 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
         long changelist = core.createChangelist("test");
         openForEdit("file1");
 
-        WorkingCopyStatus status = wc.getLocalStatus(":" + Long.toString(changelist));
+        WorkingCopyStatus status = wc.getLocalStatus(context, ":" + Long.toString(changelist));
         assertEquals(0, status.getChanges().size());
     }
 
     public void testUpdateAlreadyUpToDate() throws ScmException
     {
-        wc.update();
-        WorkingCopyStatus status = wc.getStatus();
+        wc.update(context, Revision.HEAD);
+        WorkingCopyStatus status = wc.getStatus(context);
         assertEquals(HEAD_REVISION, status.getRevision().getRevisionString());
         assertEquals(0, status.getChanges().size());
     }
@@ -592,8 +594,8 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
     {
         otherEdit();
 
-        wc.update();
-        WorkingCopyStatus status = wc.getStatus();
+        wc.update(context, Revision.HEAD);
+        WorkingCopyStatus status = wc.getStatus(context);
         assertEquals("3", status.getRevision().getRevisionString());
         assertEquals(0, status.getChanges().size());
     }
@@ -603,8 +605,8 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
         otherEdit();
         openForEdit("file1");
 
-        wc.update();
-        WorkingCopyStatus status = wc.getStatus();
+        wc.update(context, Revision.HEAD);
+        WorkingCopyStatus status = wc.getStatus(context);
         assertEquals("3", status.getRevision().getRevisionString());
         assertChange(status, "file1", FileStatus.State.MODIFIED, false, true);
     }
@@ -617,8 +619,8 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
         File file1 = new File(clientRoot, "file1");
         FileSystemUtils.createFile(file1, "this");
 
-        wc.update();
-        WorkingCopyStatus status = wc.getStatus();
+        wc.update(context, Revision.HEAD);
+        WorkingCopyStatus status = wc.getStatus(context);
         assertEquals("3", status.getRevision().getRevisionString());
         assertChange(status, "file1", FileStatus.State.UNRESOLVED, false, false);
     }
@@ -715,63 +717,6 @@ public class PerforceWorkingCopyTest extends PulseTestCase implements PersonalBu
 
     private void assertWarning(String message)
     {
-        assertEquals(message, warnings.remove(0));
-    }
-
-    public void debug(String message)
-    {
-    }
-
-    public void status(String message)
-    {
-        statuses.add(message);
-    }
-
-    public void warning(String message)
-    {
-        warnings.add(message);
-    }
-
-    public void error(String message)
-    {
-        errors.add(message);
-    }
-
-    public void error(String message, Throwable throwable)
-    {
-        errors.add(message);
-    }
-
-    public void enterContext()
-    {
-    }
-
-    public void exitContext()
-    {
-    }
-
-    public String inputPrompt(String question)
-    {
-        return null;
-    }
-
-    public String inputPrompt(String prompt, String defaultResponse)
-    {
-        return defaultResponse;
-    }
-
-    public String passwordPrompt(String question)
-    {
-        return null;
-    }
-
-    public Response ynPrompt(String question, Response defaultResponse)
-    {
-        return defaultResponse;
-    }
-
-    public Response ynaPrompt(String question, Response defaultResponse)
-    {
-        return defaultResponse;
+        assertEquals(message, ui.getWarningMessages().remove(0));
     }
 }

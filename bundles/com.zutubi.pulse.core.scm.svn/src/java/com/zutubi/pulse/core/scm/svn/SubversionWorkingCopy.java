@@ -1,6 +1,5 @@
 package com.zutubi.pulse.core.scm.svn;
 
-import com.zutubi.pulse.core.scm.NumericalRevision;
 import com.zutubi.pulse.core.scm.ScmUtils;
 import com.zutubi.pulse.core.scm.api.*;
 import static com.zutubi.pulse.core.scm.svn.SubversionConstants.*;
@@ -26,11 +25,6 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
 {
     public static final String PROPERTY_ALLOW_EXTERNALS = "svn.allow.externals";
 
-    private File base;
-    private SVNClientManager clientManager;
-    private ConfigSupport configSupport;
-    private ISVNAuthenticationManager authenticationManager;
-
     static
     {
         // Initialise SVN library
@@ -39,68 +33,61 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
         SVNAdminAreaFactory.setUpgradeEnabled(false);
     }
 
-    public SubversionWorkingCopy(File path, Config config)
+    private SVNClientManager getClientManager(WorkingCopyContext context, boolean addAuthenticationManager)
     {
-        this.base = path;
         ISVNOptions options = SVNWCUtil.createDefaultOptions(true);
-        clientManager = SVNClientManager.newInstance(options);
-        configSupport = new ConfigSupport(config);
-    }
-
-    public Revision convertRevision(NumericalRevision rev)
-    {
-        return new Revision(rev.getRevisionString());
-    }
-
-    public NumericalRevision convertRevision(Revision rev)
-    {
-        return new NumericalRevision(rev.getRevisionString());
-    }
-
-    private void initAuthenticationManager()
-    {
-        if (authenticationManager == null)
+        SVNClientManager svnClientManager = SVNClientManager.newInstance(options);
+        if (addAuthenticationManager)
         {
-            String user = configSupport.getProperty(PROPERTY_USERNAME);
-
-            if(user == null)
-            {
-                // See if there is a username specified in the working copy URL.
-                try
-                {
-                    SVNInfo info = clientManager.getWCClient().doInfo(base, null);
-                    user = info.getURL().getUserInfo();
-                }
-                catch (SVNException e)
-                {
-                    // Ignore this error, we can proceed.
-                }
-            }
-
-            if(user == null)
-            {
-                authenticationManager = SVNWCUtil.createDefaultAuthenticationManager();
-            }
-            else
-            {
-                authenticationManager = SVNWCUtil.createDefaultAuthenticationManager(user, getPassword(configSupport));
-
-                if(configSupport.hasProperty(PROPERTY_KEYFILE))
-                {
-                    String privateKeyFile = configSupport.getProperty(PROPERTY_KEYFILE);
-                    String passphrase = configSupport.getProperty(PROPERTY_PASSPHRASE);
-
-                    authenticationManager.setAuthenticationProvider(new SVNSSHAuthenticationProvider(user, privateKeyFile, passphrase));
-                }
-            }
-
-            clientManager = SVNClientManager.newInstance(clientManager.getOptions(), authenticationManager);
+            svnClientManager = SVNClientManager.newInstance(options, getAuthenticationManager(context, svnClientManager));
         }
+
+        return svnClientManager;
     }
 
-    public String getPassword(ConfigSupport configSupport)
+    private ISVNAuthenticationManager getAuthenticationManager(WorkingCopyContext context, SVNClientManager defaultClientManager)
     {
-        String password = configSupport.getProperty(PROPERTY_PASSWORD);
+        ISVNAuthenticationManager authenticationManager;
+        Config config = context.getConfig();
+        String user = config.getProperty(PROPERTY_USERNAME);
+
+        if(user == null)
+        {
+            // See if there is a username specified in the working copy URL.
+            try
+            {
+                SVNInfo info = defaultClientManager.getWCClient().doInfo(context.getBase(), null);
+                user = info.getURL().getUserInfo();
+            }
+            catch (SVNException e)
+            {
+                // Ignore this error, we can proceed.
+            }
+        }
+
+        if(user == null)
+        {
+            authenticationManager = SVNWCUtil.createDefaultAuthenticationManager();
+        }
+        else
+        {
+            authenticationManager = SVNWCUtil.createDefaultAuthenticationManager(user, getPassword(config));
+
+            if(config.hasProperty(PROPERTY_KEYFILE))
+            {
+                String privateKeyFile = config.getProperty(PROPERTY_KEYFILE);
+                String passphrase = config.getProperty(PROPERTY_PASSPHRASE);
+
+                authenticationManager.setAuthenticationProvider(new SVNSSHAuthenticationProvider(user, privateKeyFile, passphrase));
+            }
+        }
+
+        return authenticationManager;
+    }
+
+    public String getPassword(Config config)
+    {
+        String password = config.getProperty(PROPERTY_PASSWORD);
         if(password == null)
         {
             password = getUI().passwordPrompt("Subversion password");
@@ -113,7 +100,7 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
         return password;
     }
 
-    public boolean matchesLocation(String location) throws ScmException
+    public boolean matchesLocation(WorkingCopyContext context, String location) throws ScmException
     {
         // We just check that the URL matches
         SVNURL serverURL;
@@ -130,7 +117,8 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
 
         try
         {
-            SVNInfo info = clientManager.getWCClient().doInfo(base, null);
+            SVNClientManager svnClientManager = getClientManager(context, false);
+            SVNInfo info = svnClientManager.getWCClient().doInfo(context.getBase(), null);
             SVNURL wcUrl = info.getURL();
 
             boolean eq = serverURL.getProtocol().equals(wcUrl.getProtocol()) &&
@@ -155,32 +143,29 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
         }
     }
 
-    public WorkingCopyStatus getStatus() throws ScmException
+    public WorkingCopyStatus getStatus(WorkingCopyContext context) throws ScmException
     {
-        return getStatus(true, base);
+        return getStatus(context, true, context.getBase());
     }
 
-    public WorkingCopyStatus getLocalStatus(String... spec) throws ScmException
+    public WorkingCopyStatus getLocalStatus(WorkingCopyContext context, String... spec) throws ScmException
     {
+        File base = context.getBase();
         File[] files = ScmUtils.specToFiles(base, spec);
         if (files == null)
         {
-            return getStatus(false, base);
+            return getStatus(context, false, base);
         }
         else
         {
-            return getStatus(false, files);
+            return getStatus(context, false, files);
         }
     }
 
-    private WorkingCopyStatus getStatus(boolean remote, File... files) throws ScmException
+    private WorkingCopyStatus getStatus(WorkingCopyContext context, boolean remote, File... files) throws ScmException
     {
-        if (remote)
-        {
-            initAuthenticationManager();
-        }
-
-        StatusHandler handler = new StatusHandler(base);
+        SVNClientManager clientManager = getClientManager(context, remote);
+        StatusHandler handler = new StatusHandler(context);
 
         try
         {
@@ -194,7 +179,7 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
             WorkingCopyStatus wcs = handler.getStatus();
 
             // Now find out if any changed files have an eol-style
-            getProperties(wcs, handler.propertyChangedPaths);
+            getProperties(clientManager, wcs, handler.propertyChangedPaths);
 
             return wcs;
         }
@@ -204,7 +189,7 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
         }
     }
 
-    private void getProperties(WorkingCopyStatus wcs, List<String> propertyChangedPaths) throws SVNException
+    private void getProperties(SVNClientManager clientManager, WorkingCopyStatus wcs, List<String> propertyChangedPaths) throws SVNException
     {
         SVNWCClient wcc = clientManager.getWCClient();
 
@@ -212,7 +197,7 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
         {
             if (fs.getState().requiresFile())
             {
-                SVNPropertyData property = wcc.doGetProperty(new File(base, fs.getPath()), SVN_PROPERTY_EOL_STYLE, SVNRevision.WORKING, SVNRevision.WORKING, false);
+                SVNPropertyData property = wcc.doGetProperty(new File(wcs.getBase(), fs.getPath()), SVN_PROPERTY_EOL_STYLE, SVNRevision.WORKING, SVNRevision.WORKING, false);
                 if (property != null)
                 {
                     fs.setProperty(FileStatus.PROPERTY_EOL_STYLE, convertEOLStyle(property.getValue()));
@@ -222,7 +207,7 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
             if (fs.getState() == FileStatus.State.ADDED)
             {
                 // For new files, check for svn:executable
-                SVNPropertyData property = wcc.doGetProperty(new File(base, fs.getPath()), SVN_PROPERTY_EXECUTABLE, SVNRevision.WORKING, SVNRevision.WORKING, false);
+                SVNPropertyData property = wcc.doGetProperty(new File(wcs.getBase(), fs.getPath()), SVN_PROPERTY_EXECUTABLE, SVNRevision.WORKING, SVNRevision.WORKING, false);
                 if (property != null)
                 {
                     fs.setProperty(FileStatus.PROPERTY_EXECUTABLE, "true");
@@ -234,8 +219,8 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
         for (String path : propertyChangedPaths)
         {
             FileStatus fs = wcs.getFileStatus(path);
-            SVNPropertyData baseProperty = wcc.doGetProperty(new File(base, path), SVN_PROPERTY_EXECUTABLE, SVNRevision.BASE, SVNRevision.BASE, false);
-            SVNPropertyData workingProperty = wcc.doGetProperty(new File(base, path), SVN_PROPERTY_EXECUTABLE, SVNRevision.WORKING, SVNRevision.WORKING, false);
+            SVNPropertyData baseProperty = wcc.doGetProperty(new File(wcs.getBase(), path), SVN_PROPERTY_EXECUTABLE, SVNRevision.BASE, SVNRevision.BASE, false);
+            SVNPropertyData workingProperty = wcc.doGetProperty(new File(wcs.getBase(), path), SVN_PROPERTY_EXECUTABLE, SVNRevision.WORKING, SVNRevision.WORKING, false);
 
             if (baseProperty == null)
             {
@@ -280,17 +265,18 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
         }
     }
 
-    public Revision update() throws ScmException
+    public Revision update(WorkingCopyContext context, Revision revision) throws ScmException
     {
-        initAuthenticationManager();
+        SVNClientManager clientManager = getClientManager(context, true);
 
         SVNUpdateClient updateClient = clientManager.getUpdateClient();
         updateClient.setEventHandler(new UpdateHandler());
 
         try
         {
-            long rev = updateClient.doUpdate(base, SVNRevision.HEAD, true);
-            return convertRevision(new NumericalRevision(rev));
+            SVNRevision svnRevision = revision == null ? SVNRevision.HEAD : SVNRevision.parse(revision.getRevisionString());
+            long rev = updateClient.doUpdate(context.getBase(), svnRevision, true);
+            return new Revision(Long.toString(rev));
         }
         catch (SVNException e)
         {
@@ -303,7 +289,7 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
         return new ScmException(e.getMessage(), e);
     }
 
-    private FileStatus convertStatus(SVNStatus svnStatus, List<String> propertyChangedPaths)
+    private FileStatus convertStatus(File base, ConfigSupport configSupport, SVNStatus svnStatus, List<String> propertyChangedPaths)
     {
         SVNStatusType contentsStatus = svnStatus.getContentsStatus();
         String path = svnStatus.getFile().getPath();
@@ -387,7 +373,7 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
         }
 
         SVNStatusType propertiesStatus = svnStatus.getPropertiesStatus();
-        if (propertiesStatus != SVNStatusType.STATUS_NONE)
+        if (propertiesStatus != SVNStatusType.STATUS_NONE && propertiesStatus != SVNStatusType.UNCHANGED && propertiesStatus != SVNStatusType.STATUS_NORMAL)
         {
             // if we record a property change path, we MUST have an interesting file
             // status to ensure that it is recorded.
@@ -403,11 +389,15 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
 
     private class StatusHandler implements ISVNEventHandler, ISVNStatusHandler
     {
-        WorkingCopyStatus status;
-        List<String> propertyChangedPaths = new LinkedList<String>();
+        private File base;
+        private ConfigSupport configSupport;
+        private WorkingCopyStatus status;
+        private List<String> propertyChangedPaths = new LinkedList<String>();
 
-        public StatusHandler(File base)
+        public StatusHandler(WorkingCopyContext context)
         {
+            base = context.getBase();
+            configSupport = new ConfigSupport(context.getConfig());
             status = new WorkingCopyStatus(base);
         }
 
@@ -422,9 +412,9 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
                 // check out this revision.  (Note even files we don't have,
                 // such as newly-added files, will be reported by the status
                 // operation as out of date.)
-                NumericalRevision rev = new NumericalRevision(event.getRevision());
-                status.setRevision(convertRevision(rev));
-                getUI().status("Repository revision: " + rev.getRevisionString());
+                Revision revision = new Revision(Long.toString(event.getRevision()));
+                status.setRevision(revision);
+                getUI().status("Repository revision: " + revision.getRevisionString());
             }
         }
 
@@ -434,7 +424,7 @@ public class SubversionWorkingCopy extends PersonalBuildUIAwareSupport implement
 
         public void handleStatus(SVNStatus svnStatus)
         {
-            FileStatus fs = convertStatus(svnStatus, propertyChangedPaths);
+            FileStatus fs = convertStatus(base, configSupport, svnStatus, propertyChangedPaths);
 
             if (svnStatus.getRemoteContentsStatus() != SVNStatusType.STATUS_NONE ||
                     svnStatus.getRemotePropertiesStatus() != SVNStatusType.STATUS_NONE)

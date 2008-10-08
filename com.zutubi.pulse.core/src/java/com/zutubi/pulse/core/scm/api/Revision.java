@@ -15,6 +15,11 @@ public class Revision
 
     private String revisionString;
 
+    // Used by hessian
+    Revision()
+    {
+    }
+    
     /**
      * Creates a new revision from the serialised form.
      *
@@ -28,7 +33,7 @@ public class Revision
         {
             throw new NullPointerException("Revision string may not be null");
         }
-        
+
         this.revisionString = revisionString;
     }
 

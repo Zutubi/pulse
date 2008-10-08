@@ -5,11 +5,13 @@ import com.zutubi.pulse.command.Command;
 import com.zutubi.pulse.core.personal.PatchArchive;
 import com.zutubi.pulse.core.personal.PersonalBuildException;
 import com.zutubi.pulse.core.scm.api.WorkingCopy;
+import com.zutubi.pulse.core.scm.api.WorkingCopyContext;
 import com.zutubi.pulse.core.scm.api.WorkingCopyStatus;
 import com.zutubi.pulse.core.util.config.CommandLineConfig;
 import com.zutubi.pulse.core.util.config.CompositeConfig;
 import com.zutubi.pulse.core.util.config.PropertiesConfig;
 import com.zutubi.pulse.dev.bootstrap.DevBootstrapManager;
+import com.zutubi.util.Pair;
 import org.apache.commons.cli.*;
 
 import java.io.File;
@@ -134,11 +136,11 @@ public class PersonalBuildCommand implements Command
     {
         try
         {
-            WorkingCopy wc = client.checkConfiguration();
+            Pair<WorkingCopy,WorkingCopyContext> pair = client.checkConfiguration();
 
             if (statusOnly)
             {
-                WorkingCopyStatus wcs = client.getStatus(wc, files);
+                WorkingCopyStatus wcs = client.getStatus(pair.first, pair.second, files);
                 if(!wcs.hasChanges())
                 {
                     console.status("No changes found.");
@@ -166,7 +168,7 @@ public class PersonalBuildCommand implements Command
                     patchFile = new File(patchFilename);
                 }
 
-                PatchArchive patch = client.preparePatch(wc, patchFile, files);
+                PatchArchive patch = client.preparePatch(pair.first, pair.second, patchFile, files);
                 if(patch == null)
                 {
                     console.status("No changes found.");

@@ -4,10 +4,12 @@ import com.zutubi.pulse.Version;
 import com.zutubi.pulse.core.personal.PatchArchive;
 import com.zutubi.pulse.core.personal.PersonalBuildException;
 import com.zutubi.pulse.core.scm.ScmLocation;
+import com.zutubi.pulse.core.scm.WorkingCopyContextImpl;
 import com.zutubi.pulse.core.scm.WorkingCopyFactory;
 import com.zutubi.pulse.core.scm.api.*;
 import com.zutubi.pulse.dev.xmlrpc.PulseXmlRpcClient;
 import com.zutubi.pulse.dev.xmlrpc.PulseXmlRpcException;
+import com.zutubi.util.Pair;
 import com.zutubi.util.io.IOUtils;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
@@ -37,7 +39,7 @@ public class PersonalBuildClient extends PersonalBuildUIAwareSupport
         this.config = config;
     }
 
-    public WorkingCopy checkConfiguration() throws PersonalBuildException
+    public Pair<WorkingCopy, WorkingCopyContext> checkConfiguration() throws PersonalBuildException
     {
         getUI().debug("Verifying configuration with pulse server...");
         checkRequiredConfig();
@@ -55,9 +57,9 @@ public class PersonalBuildClient extends PersonalBuildUIAwareSupport
                 getUI().debug("Logging in to pulse: url: " + config.getPulseUrl() + ", user: " + config.getPulseUser());
                 token = rpc.login(config.getPulseUser(), getPassword());
                 getUI().debug("Login successful.");
-                WorkingCopy wc = prepare(rpc, token);
+                Pair<WorkingCopy, WorkingCopyContext> pair = prepare(rpc, token);
                 getUI().debug("Verified: personal build for project: " + config.getProject() + ".");
-                return wc;
+                return pair;
             }
             catch (PersonalBuildException e)
             {
@@ -172,7 +174,7 @@ public class PersonalBuildClient extends PersonalBuildUIAwareSupport
         }
     }
 
-    private WorkingCopy prepare(PulseXmlRpcClient rpc, String token) throws PersonalBuildException
+    private Pair<WorkingCopy, WorkingCopyContext> prepare(PulseXmlRpcClient rpc, String token) throws PersonalBuildException
     {
         try
         {
@@ -182,7 +184,8 @@ public class PersonalBuildClient extends PersonalBuildUIAwareSupport
             String scmType = scmLocation.getType();
             getUI().debug("SCM type: " + scmType);
 
-            WorkingCopy wc = WorkingCopyFactory.create(scmType, config.getBase(), config);
+            WorkingCopyContext context = new WorkingCopyContextImpl(config.getBase(), config);
+            WorkingCopy wc = WorkingCopyFactory.create(scmType);
             if (wc == null)
             {
                 throw new PersonalBuildException("Personal builds are not supported for this SCM (" + scmType + ")");
@@ -196,7 +199,7 @@ public class PersonalBuildClient extends PersonalBuildUIAwareSupport
             if (config.getCheckRepository())
             {
                 getUI().debug("Checking working copy matches project SCM configuration");
-                if (!wc.matchesLocation(scmLocation.getLocation()))
+                if (!wc.matchesLocation(context, scmLocation.getLocation()))
                 {
                     PersonalBuildUI.Response response = getUI().ynaPrompt("This working copy may not match project '" + config.getProject() + "'.  Continue anyway?", PersonalBuildUI.Response.NO);
                     if (response.isPersistent())
@@ -215,7 +218,7 @@ public class PersonalBuildClient extends PersonalBuildUIAwareSupport
                 }
             }
 
-            return wc;
+            return new Pair<WorkingCopy, WorkingCopyContext>(wc, context);
         }
         catch (PersonalBuildException e)
         {
@@ -227,7 +230,7 @@ public class PersonalBuildClient extends PersonalBuildUIAwareSupport
         }
     }
 
-    public PatchArchive preparePatch(WorkingCopy wc, File patchFile, String... spec) throws PersonalBuildException
+    public PatchArchive preparePatch(WorkingCopy wc, WorkingCopyContext context, File patchFile, String... spec) throws PersonalBuildException
     {
         Revision rev;
         try
@@ -236,7 +239,7 @@ public class PersonalBuildClient extends PersonalBuildUIAwareSupport
             getUI().enterContext();
             try
             {
-                rev = wc.update();
+                rev = wc.update(context, Revision.HEAD);
             }
             finally
             {
@@ -255,7 +258,7 @@ public class PersonalBuildClient extends PersonalBuildUIAwareSupport
         WorkingCopyStatus status;
         try
         {
-            status = getStatus(wc, spec);
+            status = getStatus(wc, context, spec);
             status.setRevision(rev);
         }
         finally
@@ -288,13 +291,13 @@ public class PersonalBuildClient extends PersonalBuildUIAwareSupport
         }
     }
 
-    public WorkingCopyStatus getStatus(WorkingCopy wc, String... spec) throws PersonalBuildException
+    public WorkingCopyStatus getStatus(WorkingCopy wc, WorkingCopyContext context, String... spec) throws PersonalBuildException
     {
         WorkingCopyStatus status;
 
         try
         {
-            status = wc.getLocalStatus(spec);
+            status = wc.getLocalStatus(context, spec);
         }
         catch (ScmException e)
         {

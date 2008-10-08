@@ -6,26 +6,23 @@ import static com.zutubi.pulse.core.scm.p4.PerforceConstants.*;
 import com.zutubi.pulse.core.util.config.Config;
 import com.zutubi.pulse.core.util.config.ConfigSupport;
 
-import java.io.File;
-
 /**
  */
 public class PerforceWorkingCopy extends PersonalBuildUIAwareSupport implements WorkingCopy
 {
+    // Note that the preferred way to set these standard Perforce properties is
+    // to just use regular p4 configuration (e.g. environment, P4CONFIG, etc).
+    // They are supported by this implementation for completeness and testing.
+    public static final String PROPERTY_CLIENT = "p4.client";
+    public static final String PROPERTY_PORT   = "p4.port";
+    public static final String PROPERTY_USER   = "p4.user";
+
+    // Pulse-specific perforce configuration properties.
     public static final String PROPERTY_CONFIRM_RESOLVE = "p4.confirm.resolve";
 
     private static final int RETRY_LIMIT = 5;
 
-    private PerforceCore core;
-    private ConfigSupport configSupport;
-
-    public PerforceWorkingCopy(File base, Config config)
-    {
-        this.core = new PerforceCore();
-        configSupport = new ConfigSupport(config);
-    }
-
-    public boolean matchesLocation(String location) throws ScmException
+    public boolean matchesLocation(WorkingCopyContext context, String location) throws ScmException
     {
         // Location is <template client>@<port>
         String[] pieces = location.split("@");
@@ -37,6 +34,7 @@ public class PerforceWorkingCopy extends PersonalBuildUIAwareSupport implements 
         // P4PORT=10.0.0.3:1666
         // P4ROOT=C:\Program Files\Perforce (set -s)
         // P4USER=Jason (set)
+        PerforceCore core = createCore(context);
         PerforceCore.P4Result result = core.runP4(null, getP4Command(COMMAND_SET), COMMAND_SET);
         String[] lines = core.splitLines(result);
         for(String line: lines)
@@ -64,7 +62,7 @@ public class PerforceWorkingCopy extends PersonalBuildUIAwareSupport implements 
         return true;
     }
 
-    public WorkingCopyStatus getStatus() throws ScmException
+    public WorkingCopyStatus getStatus(WorkingCopyContext context) throws ScmException
     {
         WorkingCopyStatus status;
         NumericalRevision revision;
@@ -79,6 +77,7 @@ public class PerforceWorkingCopy extends PersonalBuildUIAwareSupport implements 
         int i = 0;
         do
         {
+            PerforceCore core = createCore(context);
             revision = core.getLatestRevisionForFiles(null);
             // convert revision.
             status = new WorkingCopyStatus(core.getClientRoot(), core.convertRevision(revision));
@@ -90,14 +89,15 @@ public class PerforceWorkingCopy extends PersonalBuildUIAwareSupport implements 
 
         if(i == RETRY_LIMIT)
         {
-            throw new ScmException("Retry limit hit waiting for revision to stabilise");    
+            throw new ScmException("Retry limit hit waiting for revision to stabilise");
         }
 
         return status;
     }
 
-    public WorkingCopyStatus getLocalStatus(String... spec) throws ScmException
+    public WorkingCopyStatus getLocalStatus(WorkingCopyContext context, String... spec) throws ScmException
     {
+        PerforceCore core = createCore(context);
         WorkingCopyStatus status = new WorkingCopyStatus(core.getClientRoot());
         PerforceFStatHandler handler = new PerforceFStatHandler(getUI(), status, false);
 
@@ -135,15 +135,17 @@ public class PerforceWorkingCopy extends PersonalBuildUIAwareSupport implements 
         return status;
     }
 
-    public Revision update() throws ScmException
+    public Revision update(WorkingCopyContext context, Revision revision) throws ScmException
     {
-        NumericalRevision revision = core.getLatestRevisionForFiles(null);
+        PerforceCore core = createCore(context);
+        NumericalRevision numericalRevision = revision == null ? core.getLatestRevisionForFiles(null) : core.convertRevision(revision);
 
         PerforceSyncHandler syncHandler = new PerforceSyncHandler(getUI());
-        core.runP4WithHandler(syncHandler, null, getP4Command(COMMAND_SYNC), COMMAND_SYNC, "@" + revision.getRevisionString());
+        core.runP4WithHandler(syncHandler, null, getP4Command(COMMAND_SYNC), COMMAND_SYNC, "@" + numericalRevision.getRevisionString());
 
         if(syncHandler.isResolveRequired())
         {
+            ConfigSupport configSupport = new ConfigSupport(context.getConfig());
             if(configSupport.getBooleanProperty(PROPERTY_CONFIRM_RESOLVE, true))
             {
                 PersonalBuildUI.Response response = getUI().ynaPrompt("Some files must be resolved.  Auto-resolve now?", PersonalBuildUI.Response.YES);
@@ -154,7 +156,7 @@ public class PerforceWorkingCopy extends PersonalBuildUIAwareSupport implements 
 
                 if(!response.isAffirmative())
                 {
-                    return core.convertRevision(revision);
+                    return core.convertRevision(numericalRevision);
                 }
             }
 
@@ -171,11 +173,22 @@ public class PerforceWorkingCopy extends PersonalBuildUIAwareSupport implements 
             getUI().status("Resolve complete.");
         }
 
-        return core.convertRevision(revision);
+        return core.convertRevision(numericalRevision);
     }
 
-    PerforceCore getClient()
+    private PerforceCore createCore(WorkingCopyContext context)
     {
+        PerforceCore core = new PerforceCore();
+        Config config = context.getConfig();
+        transferPropertyIfSet(config, core, PROPERTY_CLIENT, ENV_CLIENT);
+        transferPropertyIfSet(config, core, PROPERTY_PASSWORD, ENV_PASSWORD);
+        transferPropertyIfSet(config, core, PROPERTY_PORT, ENV_PORT);
+        transferPropertyIfSet(config, core, PROPERTY_USER, ENV_USER);
         return core;
+    }
+
+    private void transferPropertyIfSet(Config config, PerforceCore core, String property, String environmentVariable)
+    {
+        core.setEnv(environmentVariable, config.getProperty(property));
     }
 }
