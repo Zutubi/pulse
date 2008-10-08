@@ -14,10 +14,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * 
- *
- */
 public class HibernateChangelistDaoTest extends MasterPersistenceTestCase
 {
     private ChangelistDao changelistDao;

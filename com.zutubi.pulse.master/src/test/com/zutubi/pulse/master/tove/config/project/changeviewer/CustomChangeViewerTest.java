@@ -7,10 +7,9 @@ import com.zutubi.pulse.core.test.PulseTestCase;
 import com.zutubi.pulse.master.tove.config.project.ProjectConfiguration;
 import com.zutubi.tove.config.MockConfigurationProvider;
 
+import java.text.ParseException;
 import java.util.Date;
 
-/**
- */
 public class CustomChangeViewerTest extends PulseTestCase
 {
     private CustomChangeViewerConfiguration viewer;
@@ -52,12 +51,14 @@ public class CustomChangeViewerTest extends PulseTestCase
         super.tearDown();
     }
 
-    public void testGetChangesetURL()
+    public void testGetChangesetURL() throws ParseException
     {
+        final String DATE_STRING = "19700101-10:00:01";
+
         viewer.setChangesetURL("${revision} ${author} ${branch} ${time.pulse} ${time.fisheye} ${unknown}");
-        Date date = new Date(1000);
-        Revision rev = new Revision("author:branch:19700101-10:00:01");
-        assertEquals("author:branch:19700101-10:00:01 author branch " + CustomChangeViewerConfiguration.PULSE_DATE_FORMAT.format(date) + " 19700101000001 ${unknown}", viewer.getChangesetURL(rev));
+        Revision rev = new Revision("author:branch:" + DATE_STRING);
+        Date date = CustomChangeViewerConfiguration.PULSE_DATE_FORMAT.parse(DATE_STRING);
+        assertEquals("author:branch:19700101-10:00:01 author branch " + DATE_STRING + " " + CustomChangeViewerConfiguration.FISHEYE_DATE_FORMAT.format(date) + " ${unknown}", viewer.getChangesetURL(rev));
     }
 
     public void testGetFileViewURL()

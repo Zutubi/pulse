@@ -118,19 +118,6 @@ public class ChangelistIsolatorTest extends PulseTestCase
         expectRevisions(true, 10, 11, 13);
     }
 
-    public void testReturnsDifferentRevisionObject() throws ScmException
-    {
-        Revision rev = returnBuild(10);
-        returnRevisions(10);
-        setupIsolator();
-
-        List<Revision> gotRevisions = isolator.getRevisionsToRequest(projectConfig, project, true);
-        assertEquals(1, gotRevisions.size());
-        Revision got = gotRevisions.get(0);
-        assertEquals(rev.getRevisionString(), got.getRevisionString());
-        assertNotSame(rev, got);
-    }
-
     private Revision returnLatestBuild(long revision)
     {
         Revision rev = new Revision(Long.toString(revision));

@@ -178,8 +178,8 @@ Shows a list of the changes made in a build.
 New changes in this build:
             [#list changelists as change]
                 [#assign revision = change.revision]
-  * ${revision.revisionString} by ${revision.author}:
-    ${renderer.wrapString(renderer.trimmedString(revision.comment, 180), "    ")}
+  * ${revision.revisionString} by ${change.author}:
+    ${renderer.wrapString(renderer.trimmedString(change.comment, 180), "    ")}
             [/#list]
         [#else]
 There were no new changes in this build.
@@ -510,7 +510,7 @@ Shows a table with the given changelists.
         [#list changelists as change]
         <tr>
             [@dynamicCell cc=change.revision.revisionString/]
-            [@dynamicCell cc=change.user/]
+            [@dynamicCell cc=change.author/]
             [@dynamicCell cc=change.prettyTime/]
             [#if trim ]
             [@contentCell cc=renderer.transformComment(result, change, limit)/]

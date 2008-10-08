@@ -5,11 +5,9 @@ import com.zutubi.pulse.core.scm.api.FileChange;
 import com.zutubi.pulse.core.scm.api.Revision;
 import com.zutubi.util.CollectionUtils;
 import com.zutubi.util.Mapping;
+import com.zutubi.util.TimeStamps;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * A trivial implementation of the Changelist interface.
@@ -76,10 +74,22 @@ public class PersistentChangelist extends Entity
     {
         return revision;
     }
-
-    public void setRevision(Revision revision)
+    
+    String getRevisionString()
     {
-        this.revision = revision;
+        return revision == null ? null : revision.getRevisionString();
+    }
+
+    void setRevisionString(String revisionString)
+    {
+        if (revisionString == null)
+        {
+            revision = null;
+        }
+        else
+        {
+            revision = new Revision(revisionString);
+        }
     }
 
     public long getTime()
@@ -90,6 +100,16 @@ public class PersistentChangelist extends Entity
     public void setTime(long time)
     {
         this.time = time;
+    }
+
+    public String getPrettyTime()
+    {
+        return TimeStamps.getPrettyTime(time);
+    }
+
+    public String getPrettyDate(Locale locale)
+    {
+        return TimeStamps.getPrettyDate(time, locale);
     }
 
     public String getAuthor()

@@ -208,6 +208,23 @@ public class BuildResult extends Result implements AclObjectIdentityAware, Itera
         this.revision = revision;
     }
 
+    String getRevisionString()
+    {
+        return revision == null ? null : revision.getRevisionString();
+    }
+
+    void setRevisionString(String revisionString)
+    {
+        if (revisionString == null)
+        {
+            revision = null;
+        }
+        else
+        {
+            revision = new Revision(revisionString);
+        }
+    }
+    
     public AclObjectIdentity getAclObjectIdentity()
     {
         return project;

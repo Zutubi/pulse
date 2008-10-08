@@ -57,7 +57,7 @@ public class HibernateChangelistDao extends HibernateEntityDao<PersistentChangel
         {
             public Query createQuery(Session session)
             {
-                Query queryObject = session.createQuery("from Changelist model where model.revision.author in (:logins) order by model.revision.time desc");
+                Query queryObject = session.createQuery("from PersistentChangelist model where model.author in (:logins) order by model.time desc");
                 queryObject.setParameterList("logins", allLogins);
                 return queryObject;
             }
@@ -70,7 +70,7 @@ public class HibernateChangelistDao extends HibernateEntityDao<PersistentChangel
         {
             public Query createQuery(Session session)
             {
-                Query queryObject = session.createQuery("from Changelist model where model.projectId = :projectId order by model.revision.time desc");
+                Query queryObject = session.createQuery("from PersistentChangelist model where model.projectId = :projectId order by model.time desc");
                 queryObject.setParameter("projectId", project.getId());
                 return queryObject;
             }
@@ -89,7 +89,7 @@ public class HibernateChangelistDao extends HibernateEntityDao<PersistentChangel
         {
             public Query createQuery(Session session)
             {
-                Query queryObject = session.createQuery("from Changelist model where model.projectId in (:projectIds) order by model.revision.time desc");
+                Query queryObject = session.createQuery("from PersistentChangelist model where model.projectId in (:projectIds) order by model.time desc");
                 queryObject.setParameterList("projectIds", projectIds);
                 return queryObject;
             }
@@ -102,7 +102,7 @@ public class HibernateChangelistDao extends HibernateEntityDao<PersistentChangel
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery("from Changelist model where model.revisionString = :revisionString");
+                Query queryObject = session.createQuery("from PersistentChangelist model where model.revisionString = :revisionString");
                 queryObject.setParameter("revisionString", changelist.getRevision().getRevisionString());
 
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
@@ -120,7 +120,7 @@ public class HibernateChangelistDao extends HibernateEntityDao<PersistentChangel
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                Query queryObject = session.createQuery("from Changelist model where model.resultId = :resultId order by model.revision.time desc");
+                Query queryObject = session.createQuery("from PersistentChangelist model where model.resultId = :resultId order by model.time desc");
                 queryObject.setParameter("resultId", id);
 
                 SessionFactoryUtils.applyTransactionTimeout(queryObject, getSessionFactory());
@@ -180,7 +180,7 @@ public class HibernateChangelistDao extends HibernateEntityDao<PersistentChangel
             boolean found = false;
             for(PersistentChangelist existing: lists)
             {
-                if(existing.equals(candidate))
+                if(existing.asChangelist().equals(candidate.asChangelist()))
                 {
                     found = true;
                     break;

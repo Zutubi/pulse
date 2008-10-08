@@ -1,9 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
 <hibernate-mapping>
-
     <class name="com.zutubi.pulse.master.model.BuildResult" table="BUILD_RESULT" lazy="false">
-
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>
@@ -49,8 +47,7 @@
 
         <property name="hasWorkDir" type="boolean"/>
 
-        <many-to-one name="revision" class="com.zutubi.pulse.core.scm.api.Revision" column="REVISION_ID" cascade="all" unique="true"/>
-
+        <property name="revisionString" column="REVISION_STRING" type="string" length="255" index="idx_build_revision_string"/>
     </class>
 
     <class name="com.zutubi.pulse.master.model.AbstractBuildReason" table="BUILD_REASON" lazy="false">
@@ -75,11 +72,9 @@
         </subclass>
 
         <subclass name="com.zutubi.pulse.master.model.UnknownBuildReason" discriminator-value="UNKNOWN" lazy="false"/>
-
     </class>
 
     <class name="com.zutubi.pulse.master.model.RecipeResultNode" table="RECIPE_RESULT_NODE" lazy="false">
-
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>
@@ -97,11 +92,9 @@
             <index column="ORDINAL"/>
             <one-to-many class="com.zutubi.pulse.master.model.RecipeResultNode"/>
         </list>
-
     </class>
 
     <class name="com.zutubi.pulse.core.model.RecipeResult" table="RECIPE_RESULT" lazy="false">
-
         <id name="id" type="java.lang.Long" column="ID" unsaved-value="0">
             <generator class="hilo"/>
         </id>
@@ -139,7 +132,6 @@
         </list>
 
         <many-to-one name="testSummary" class="com.zutubi.pulse.core.model.TestResultSummary" column="TEST_SUMMARY_ID" cascade="all"/>
-
     </class>
 
     <class name="com.zutubi.pulse.core.model.TestResultSummary" table="TEST_RESULT_SUMMARY" lazy="false">
@@ -169,5 +161,4 @@
         where result.stateName = 'SUCCESS'
         order by result.stamps.endTime desc
     ]]></query>
-
 </hibernate-mapping>

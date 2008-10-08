@@ -52,7 +52,7 @@
         <tr>
             #dynamicRightLinkCell($changelist.revision $action.getChangeUrl())
     #if($showWho)
-            #dynamicCell($changelist.revision.author)
+            #dynamicCell($changelist.author)
     #end
             #dateCell($changelist)
             #commitCommentCell($changelist $source)

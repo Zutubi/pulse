@@ -20,9 +20,15 @@ public class Revision
      *
      * @param revisionString a serialised form of the revision, the content of
      *                       which is implemented-dependent
+     * @throws NullPointerException if revisionString is null
      */
     public Revision(String revisionString)
     {
+        if (revisionString == null)
+        {
+            throw new NullPointerException("Revision string may not be null");
+        }
+        
         this.revisionString = revisionString;
     }
 

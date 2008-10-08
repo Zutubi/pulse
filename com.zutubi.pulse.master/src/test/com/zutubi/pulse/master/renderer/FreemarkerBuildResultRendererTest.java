@@ -429,9 +429,9 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         result.getStamps().setEndTime(100000);
     }
 
-    protected void createAndVerify(String expectedName, String baseUrl, BuildResult result, List<PersistentChangelist> PersistentChangelists) throws IOException
+    protected void createAndVerify(String expectedName, String baseUrl, BuildResult result, List<PersistentChangelist> changelists) throws IOException
     {
-        createAndVerify(expectedName, "plain-text-email", baseUrl, result, PersistentChangelists);
+        createAndVerify(expectedName, "plain-text-email", baseUrl, result, changelists);
     }
 
     protected void createAndVerify(String expectedName, String type, String baseUrl, BuildResult result) throws IOException, URISyntaxException
@@ -439,16 +439,16 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         createAndVerify(expectedName, type, baseUrl, result, new LinkedList<PersistentChangelist>());
     }
 
-    protected void createAndVerify(String expectedName, String type, String baseUrl, BuildResult result, List<PersistentChangelist> PersistentChangelists) throws IOException
+    protected void createAndVerify(String expectedName, String type, String baseUrl, BuildResult result, List<PersistentChangelist> changelists) throws IOException
     {
-        createAndVerify(expectedName, type, baseUrl, result, PersistentChangelists, null, 0, 0);
+        createAndVerify(expectedName, type, baseUrl, result, changelists, null, 0, 0);
     }
 
-    protected void createAndVerify(String expectedName, String type, String baseUrl, BuildResult result, List<PersistentChangelist> PersistentChangelists, BuildResult lastSuccess, int unsuccessfulBuilds, int unsuccessfulDays) throws IOException
+    protected void createAndVerify(String expectedName, String type, String baseUrl, BuildResult result, List<PersistentChangelist> changelists, BuildResult lastSuccess, int unsuccessfulBuilds, int unsuccessfulDays) throws IOException
     {
         result.calculateFeatureCounts();
         
-        Map<String, Object> dataMap = getDataMap(baseUrl, result, PersistentChangelists, lastSuccess, unsuccessfulBuilds, unsuccessfulDays);
+        Map<String, Object> dataMap = getDataMap(baseUrl, result, changelists, lastSuccess, unsuccessfulBuilds, unsuccessfulDays);
 
         String extension = "txt";
 
@@ -515,7 +515,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         return s.replace("\r", "");
     }
 
-    private Map<String, Object> getDataMap(String baseUrl, BuildResult result, List<PersistentChangelist> PersistentChangelists, BuildResult lastSuccess, int unsuccessfulBuilds, int unsuccessfulDays)
+    private Map<String, Object> getDataMap(String baseUrl, BuildResult result, List<PersistentChangelist> changelists, BuildResult lastSuccess, int unsuccessfulBuilds, int unsuccessfulDays)
     {
 
         Map<String, Object> dataMap = new HashMap<String, Object>();
@@ -525,7 +525,7 @@ public class FreemarkerBuildResultRendererTest extends PulseTestCase
         dataMap.put("status", result.succeeded() ? "healthy" : "broken");
         dataMap.put("result", result);
         dataMap.put("model", result);
-        dataMap.put("PersistentChangelists", PersistentChangelists);
+        dataMap.put("changelists", changelists);
         dataMap.put("errorLevel", Feature.Level.ERROR);
         dataMap.put("warningLevel", Feature.Level.WARNING);
 

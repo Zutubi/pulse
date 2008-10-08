@@ -1,7 +1,6 @@
 package com.zutubi.pulse.core.scm.api;
 
 import com.zutubi.util.StringUtils;
-import com.zutubi.util.TimeStamps;
 
 import java.util.*;
 
@@ -48,16 +47,6 @@ public class Changelist implements Comparable<Changelist>
     public Date getDate()
     {
         return new Date(time);
-    }
-
-    public String getPrettyTime()
-    {
-        return TimeStamps.getPrettyTime(time);
-    }
-
-    public String getPrettyDate(Locale locale)
-    {
-        return TimeStamps.getPrettyDate(time, locale);
     }
 
     public String getAuthor()
